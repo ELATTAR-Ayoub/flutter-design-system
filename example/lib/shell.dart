@@ -265,8 +265,7 @@ class _MobileNavTrigger extends StatelessWidget {
       onPressed: () => DsSheet.showLeft(
         context,
         width: DsWidths.sidebarMobile,
-        builder: (BuildContext sheetContext) =>
-            _MobileNavSheet(shellContext: context),
+        builder: (BuildContext sheetContext) => const _MobileNavSheet(),
       ),
       child: const DsIcon(DsIconGlyph.menu),
     );
@@ -276,21 +275,22 @@ class _MobileNavTrigger extends StatelessWidget {
 /// `SheetContent side="left" class="w-72 overflow-y-auto px-6"` with a Logo
 /// header and the same tree the rail renders.
 class _MobileNavSheet extends StatelessWidget {
-  const _MobileNavSheet({required this.shellContext});
-
-  /// The context *below* the sheet, so tapping a link routes the page rather
-  /// than the overlay.
-  final BuildContext shellContext;
+  const _MobileNavSheet();
 
   @override
   Widget build(BuildContext context) {
     final DsThemeData theme = DsTheme.of(context);
-    final AppRouter router = AppRouter.of(shellContext);
+    // Both scopes live above the [WidgetsApp], so a pushed route reads them
+    // exactly like the page under it — and reading the route *here* is what
+    // `usePathname()` does inside the reference's `NavTree`: the sheet stays
+    // open across a navigation, so its own active row has to keep up.
+    final AppRouter router = AppRouter.of(context);
 
-    void go(String href) {
-      Navigator.of(context).maybePop();
-      router.navigate(href);
-    }
+    // `<NavTree />` — the reference passes no `onNavigate`, so a link routes
+    // the page *underneath* and leaves the sheet standing; only the close
+    // button and the barrier dismiss it. (SiteHeader's mobile nav is the one
+    // that wraps its links in `SheetClose`; this one does not.)
+    void go(String href) => router.navigate(href);
 
     return SingleChildScrollView(
       padding: EdgeInsets.symmetric(horizontal: ds(6)),

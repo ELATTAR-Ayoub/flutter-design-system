@@ -142,8 +142,30 @@ void main() {
     expect(find.byType(NavTree), findsOneWidget);
     expect(colorsRow, findsOneWidget);
 
-    // A link routes the page and closes the sheet.
+    // A link routes the page *underneath* and leaves the sheet standing: the
+    // docs `DsMobileNav` renders `<NavTree />` with no `onNavigate`, so nothing
+    // wraps its links in a `SheetClose` (shell-map §3, drift register item 6).
     await tester.tap(colorsRow);
+    await tester.pumpAndSettle();
+    expect(find.byType(NavTree), findsOneWidget);
+    expect(colorsRow, findsOneWidget);
+
+    // And the row the sheet marks moved with the page, the way `usePathname()`
+    // re-renders the open tree: `border-action bg-action/12`.
+    final BoxDecoration active =
+        tester.widget<DecoratedBox>(colorsRow).decoration as BoxDecoration;
+    expect((active.border! as Border).left.color, DsPalette.action);
+    expect(active.color, DsPalette.action.withValues(alpha: 0.12));
+    // The sheet's nav row, plus the title of the page now under it.
+    expect(find.text('Colors'), findsNWidgets(2));
+
+    // What does close it: the X the reference leaves in the corner.
+    await tester.tap(
+      find.descendant(
+        of: find.byType(DsSheetPanel),
+        matching: find.bySemanticsLabel('Close'),
+      ),
+    );
     await tester.pumpAndSettle();
     expect(find.byType(NavTree), findsNothing);
     expect(find.text('Colors'), findsOneWidget);
