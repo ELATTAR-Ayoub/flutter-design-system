@@ -43,7 +43,9 @@ const List<_Rule> _rules = <_Rule>[
   _Rule('hardcoded font size', r'fontSize:\s*\d', zeroIsLegal: true),
   _Rule('hardcoded tracking', r'letterSpacing:\s*-?\d', zeroIsLegal: true),
   _Rule('hardcoded font weight', r'FontWeight\.w\d'),
-  _Rule('stock Flutter curve (use DsCurves)', r'Curves\.'),
+  // `\b` so the rule catches stock `Curves.easeOut` without also catching
+  // `DsCurves.out`, which is the thing it exists to push callers towards.
+  _Rule('stock Flutter curve (use DsCurves)', r'\bCurves\.'),
   _Rule('hardcoded duration', r'Duration\((milli|micro)seconds:\s*\d',
       zeroIsLegal: true),
   _Rule('hardcoded radius', r'BorderRadius\.circular\(\d', zeroIsLegal: true),
@@ -148,6 +150,18 @@ void main() {
         expect(hits.map((TokenViolation v) => v.rule), contains(sample.key),
             reason: 'rule "${sample.key}" did not fire on: ${sample.value}');
       }
+    });
+
+    test('DsCurves is the sanctioned spelling, not a violation', () {
+      expect(scanSource('lib/src/probe.dart', 'curve: DsCurves.out,'), isEmpty);
+      expect(
+        scanSource('lib/src/probe.dart', 'reverseCurve: DsCurves.out.flipped,'),
+        isEmpty,
+      );
+      // …while the stock curve it replaces still trips, wherever it appears.
+      expect(scanSource('lib/src/probe.dart', 'curve: Curves.easeOut,'),
+          isNotEmpty);
+      expect(scanSource('lib/src/probe.dart', 'Curves.linear;'), isNotEmpty);
     });
 
     test('allow-hardcoded: exempts the line', () {
