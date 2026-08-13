@@ -35,8 +35,21 @@ class DocsApp extends StatefulWidget {
 
 class _DocsAppState extends State<DocsApp> {
   /// `defaultTheme="dark"` — the controller's own default.
-  final DsThemeController _theme = DsThemeController();
-  final AppRouter _router = AppRouter();
+  ///
+  /// Boot state may be overridden by URL query parameters (`?route=…&theme=…`)
+  /// — deep-link plumbing for the side-by-side verification harness. It sets
+  /// only the initial controller values; nothing rendered differs from the
+  /// reference.
+  final DsThemeController _theme = DsThemeController(
+    mode: switch (Uri.base.queryParameters['theme']) {
+      'light' => DsThemeMode.light,
+      'system' => DsThemeMode.system,
+      _ => DsThemeMode.dark,
+    },
+  );
+  late final AppRouter _router = AppRouter(
+    route: Uri.base.queryParameters['route'] ?? dsRoot,
+  );
 
   @override
   void dispose() {
