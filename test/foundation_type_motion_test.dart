@@ -156,8 +156,26 @@ void main() {
       expect(DsType.h2.variations, hasLength(1));
       expect(DsType.h2.variations.single.axis, 'wght');
       expect(DsType.h2.variations.single.value, 650);
+      // resolve() adds the browser's `font-optical-sizing: auto`: opsz = the
+      // CSS px size, clamped to Inter's 14–32 axis range.
       expect(DsType.h2.resolve(28, _ink).fontVariations,
-          <FontVariation>[FontVariation('wght', 650)]);
+          <FontVariation>[FontVariation('wght', 650), FontVariation('opsz', 28)]);
+    });
+
+    test('optical sizing mirrors the browser: sans only, clamped 14–32', () {
+      // 13px body-adjacent text → opsz 14 (clamped up from 13).
+      expect(DsType.small.resolve(13, _ink).fontVariations,
+          contains(const FontVariation('opsz', 14)));
+      // 40px h1 → opsz 32 (clamped down from 40).
+      expect(DsType.h1.resolve(40, _ink).fontVariations,
+          contains(const FontVariation('opsz', 32)));
+      // 17px lead → opsz tracks the size exactly inside the range.
+      expect(DsType.lead.resolve(17, _ink).fontVariations,
+          contains(const FontVariation('opsz', 17)));
+      // Geist Mono has no opsz axis — mono classes must not carry one.
+      final List<FontVariation>? mono =
+          DsType.numSm.resolve(12, _ink).fontVariations;
+      expect(mono!.where((FontVariation v) => v.axis == 'opsz'), isEmpty);
     });
 
     test('.type-h3 — 21/1.3, 600, -0.01em (L1084)', () {

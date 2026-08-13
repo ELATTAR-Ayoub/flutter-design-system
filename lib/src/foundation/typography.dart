@@ -163,10 +163,30 @@ class DsTypeSpec {
       height: height,
       fontWeight: weight,
       fontStyle: fontStyle,
-      fontVariations: variations.isEmpty ? null : variations,
+      fontVariations: _variationsFor(fontSize),
       letterSpacing: em == null ? null : em * fontSize,
       fontFeatures: tabular ? _tabularFigures : null,
     );
+  }
+
+  /// Browsers apply `font-optical-sizing: auto` to any face with an `opsz`
+  /// axis: the axis is set to the CSS font-size in px, clamped to the axis
+  /// range. Inter Variable carries `opsz` 14–32 (assets-map §1); Geist Mono
+  /// and Redaction carry none. Without this, every Inter glyph renders at the
+  /// axis default (14) and text runs measure a few px off the reference —
+  /// enough to move line-wrap points at 13–15px and to widen the 40px `h1`.
+  List<FontVariation>? _variationsFor(double fontSize) {
+    if (family != DsFonts.sans) {
+      return variations.isEmpty ? null : variations;
+    }
+    // allow-hardcoded: Inter Variable's own opsz axis range (14–32), a font
+    // metric mirroring the browser's font-optical-sizing:auto, not a design
+    // token.
+    final double opsz = fontSize.clamp(14.0, 32.0);
+    return <FontVariation>[
+      ...variations,
+      FontVariation('opsz', opsz),
+    ];
   }
 }
 
