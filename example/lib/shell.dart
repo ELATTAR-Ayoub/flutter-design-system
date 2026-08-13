@@ -105,40 +105,49 @@ class _DocsShellState extends State<DocsShell> {
     final double viewport = MediaQuery.sizeOf(context).width;
     final bool desktop = viewport >= DsBreakpoints.lg;
 
-    return Stack(
-      children: <Widget>[
-        // `background-attachment: fixed` — outside every scroll view.
-        const Positioned.fill(child: DsPageGlow()),
-        Positioned.fill(
-          child: Center(
-            // `mx-auto max-w-(--width-shell)`.
-            child: SizedBox(
-              width: DsWidths.shell,
-              height: double.infinity,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  if (desktop) _Sidebar(controller: _rail, route: widget.route),
-                  Expanded(
-                    child: _Main(
-                      controller: _main,
-                      desktop: desktop,
-                      child: widget.child,
+    return DefaultTextStyle(
+      // `<body class="… text-foreground">`. Only the colour is ever inherited
+      // — every string on every page goes through a `.type-*` class that
+      // states its own family, size and leading — but without this, anything
+      // whose class declares no `color` would inherit the framework's default
+      // instead of the token.
+      style: DsText.styleOf(context, DsType.body, color: theme.foreground),
+      child: Stack(
+        children: <Widget>[
+          // `background-attachment: fixed` — outside every scroll view.
+          const Positioned.fill(child: DsPageGlow()),
+          Positioned.fill(
+            child: Center(
+              // `mx-auto max-w-(--width-shell)`.
+              child: SizedBox(
+                width: DsWidths.shell,
+                height: double.infinity,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    if (desktop)
+                      _Sidebar(controller: _rail, route: widget.route),
+                    Expanded(
+                      child: _Main(
+                        controller: _main,
+                        desktop: desktop,
+                        child: widget.child,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-        Positioned(
-          top: 0,
-          left: 0,
-          right: 0,
-          height: DsWidths.siteHeader,
-          child: _Header(theme: theme, viewport: viewport, desktop: desktop),
-        ),
-      ],
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            height: DsWidths.siteHeader,
+            child: _Header(theme: theme, viewport: viewport, desktop: desktop),
+          ),
+        ],
+      ),
     );
   }
 }
