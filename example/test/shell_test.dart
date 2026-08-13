@@ -122,7 +122,7 @@ void main() {
 
     // …and the page under it changed: the title joins the rail entry.
     expect(find.text('Colors'), findsNWidgets(2));
-    expect(find.text('Not ported yet'), findsOneWidget);
+    expect(find.text('MEASURED, NOT ASSERTED'), findsOneWidget);
   });
 
   testWidgets('below lg the rail is gone and the burger opens the sheet', (
