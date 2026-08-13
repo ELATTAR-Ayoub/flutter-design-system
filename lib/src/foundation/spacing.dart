@@ -1,0 +1,117 @@
+/// Distance, measure and corner — the geometry half of the token set.
+///
+/// Source of truth: `app/globals.css` in the reference repo
+/// (`D:/DESIGN/Design-System-2026-8/design-system/app/globals.css`).
+/// 1 CSS `rem` = 16px throughout.
+library;
+
+/// Tailwind's spacing unit, in logical pixels.
+///
+/// `--spacing` is never redeclared in `globals.css`, so it keeps Tailwind v4's
+/// default `0.25rem` = 4px, and every gap in that file is
+/// `calc(var(--spacing) * n)`. [ds] is that multiplication: `ds(6)` is `gap-6`
+/// is 24px.
+double ds(num n) => n.toDouble() * 4.0;
+
+/// The measures the shell and its pages are built on — globals.css L228–322.
+///
+/// These are the widths that are neither a component's own size nor a fraction
+/// of the viewport; each is a `--width-*` / `--height-*` token in the reference.
+class DsWidths {
+  /// `--width-shell: 1680px` — globals.css L228. The outer frame the sidebar
+  /// and the main column share.
+  static const double shell = 1680;
+
+  /// `--width-content: 1080px` — globals.css L229. The documentation reading
+  /// column inside the shell, held to roughly 90 characters at body size.
+  static const double content = 1080;
+
+  /// `--width-page: 1200px` — globals.css L244. The cap for customer-facing
+  /// pages.
+  ///
+  /// DOCUMENTED DRIFT: `/design-system/spacing` has described this measure in
+  /// prose as "1320px" since before the token existed (L230–243). The copy
+  /// ships as written and the token renders 1200; both sides are kept.
+  static const double page = 1200;
+
+  /// `--width-prose: 720px` — globals.css L245. A column carrying nothing but
+  /// sentences. Deliberately not interchangeable with [content].
+  static const double prose = 720;
+
+  /// `--width-rail: 15rem` = 240px — globals.css L251. The reading rail: a
+  /// table of contents, an anchor list, an article's metadata column.
+  static const double rail = 240;
+
+  /// `--width-sidebar: 16rem` = 256px — globals.css L320. The app shell's
+  /// navigation panel.
+  static const double sidebar = 256;
+
+  /// `--width-sidebar-icon: 3rem` = 48px — globals.css L322. The collapsed
+  /// rail; also the hit-target floor.
+  static const double sidebarIcon = 48;
+
+  /// `--width-sidebar-mobile: 18rem` = 288px — globals.css L321. Wider than
+  /// [sidebar] on purpose: a sheet has no rail beside it competing for the eye.
+  static const double sidebarMobile = 288;
+
+  /// `--height-site-header: 4rem` = 64px — globals.css L290.
+  static const double siteHeader = 64;
+
+  /// `--scroll-offset: calc(var(--height-site-header) + var(--spacing) * 8)`
+  /// = 96px — globals.css L296. Where an anchored heading comes to rest: clear
+  /// of the header, plus one 32px step of air.
+  static const double scrollOffset = siteHeader + 32;
+}
+
+/// The corner ladder — globals.css L324–339.
+///
+/// Both theme blocks also set `--radius: 10px` (L605 / L814), which is
+/// numerically [md]; it is exposed per theme as `DsThemeData.radius`.
+class DsRadii {
+  /// `--radius-xs: 2px` — L324. Tips and swatches only: a tooltip arrow, a
+  /// chart legend key. Nothing with content in it should be this sharp.
+  static const double xs = 2;
+
+  /// `--radius-sm: 6px` — L325.
+  static const double sm = 6;
+
+  /// `--radius-md: 10px` — L326.
+  static const double md = 10;
+
+  /// `--radius-lg: 12px` — L327.
+  static const double lg = 12;
+
+  /// `--radius-xl: 16px` — L328.
+  static const double xl = 16;
+
+  /// `--radius-2xl: 20px` — L329.
+  static const double xl2 = 20;
+
+  /// `--radius-3xl: 24px` — L330.
+  static const double xl3 = 24;
+
+  /// `--radius-4xl: 32px` — L338. The soft-slab step, outside the container
+  /// ladder's normal range (L331–337).
+  static const double xl4 = 32;
+
+  /// `--radius-pill: 999px` — L339.
+  static const double pill = 999;
+}
+
+/// Tailwind's stock breakpoints, in logical pixels.
+///
+/// `globals.css` never redeclares `--breakpoint-*`, so the framework defaults
+/// stand; the shell is desktop-first and shows its sidebar from [lg] up.
+class DsBreakpoints {
+  /// 640px.
+  static const double sm = 640;
+
+  /// 768px.
+  static const double md = 768;
+
+  /// 1024px.
+  static const double lg = 1024;
+
+  /// 1280px.
+  static const double xl = 1280;
+}

@@ -4,3 +4,8 @@
 /// One token source of truth: literals live ONLY under `lib/src/foundation/`
 /// (enforced by `test/token_guard_test.dart`); everything else consumes tokens.
 library;
+
+// ── foundation ──────────────────────────────────────────────────────────────
+export 'src/foundation/colors.dart';
+export 'src/foundation/spacing.dart';
+export 'src/foundation/theme.dart';
