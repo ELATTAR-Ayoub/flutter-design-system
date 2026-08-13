@@ -432,6 +432,75 @@ void main() {
       );
     });
 
+    testWidgets('at sm the row is an 88 / 208 / flex grid with 24px gaps',
+        (WidgetTester tester) async {
+      // `sm:grid-cols-[5.5rem_minmax(0,13rem)_1fr] sm:gap-6 p-4`, and the
+      // swatch tightens from `h-16` to `sm:h-14`.
+      await tester.pumpWidget(
+        _scope(
+          const DsTokenSwatch(
+            token: '--muted-foreground',
+            name: 'Muted foreground',
+            use: 'Secondary text, metadata, helper copy.',
+          ),
+          DsThemeMode.dark,
+        ),
+      );
+
+      final Finder swatch = find.byType(DecoratedBox);
+      expect(tester.getSize(swatch), Size(ds(22), ds(14)));
+
+      final double left = tester.getTopLeft(swatch).dx;
+      // Column two starts after the swatch track plus one gap…
+      expect(
+        tester.getTopLeft(find.text('Muted foreground')).dx,
+        closeTo(left + ds(22) + ds(6), 0.01),
+      );
+      // …and column three after the 13rem name track plus another gap.
+      expect(
+        tester
+            .getTopLeft(find.text('Secondary text, metadata, helper copy.'))
+            .dx,
+        closeTo(left + ds(22) + ds(6) + ds(52) + ds(6), 0.01),
+      );
+    });
+
+    testWidgets('below sm the three cells stack instead',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(
+        DsTheme(
+          controller: DsThemeController(mode: DsThemeMode.dark),
+          child: Directionality(
+            textDirection: TextDirection.ltr,
+            child: MediaQuery(
+              // Under the `sm` breakpoint.
+              data: const MediaQueryData(size: Size(400, 900)),
+              child: Align(
+                alignment: Alignment.topLeft,
+                child: SizedBox(
+                  width: 400,
+                  child: const DsTokenSwatch(
+                    token: '--muted-foreground',
+                    name: 'Muted foreground',
+                    use: 'Secondary text, metadata, helper copy.',
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      final Finder swatch = find.byType(DecoratedBox);
+      // `h-16` — the taller mobile swatch, full width of the column.
+      expect(tester.getSize(swatch).height, ds(16));
+
+      final Offset mark = tester.getTopLeft(swatch);
+      final Offset name = tester.getTopLeft(find.text('Muted foreground'));
+      expect(name.dy, greaterThan(mark.dy));
+      expect(name.dx, closeTo(mark.dx, 0.01));
+    });
+
     testWidgets('the badge renders uppercase, and only the verdict is tinted',
         (WidgetTester tester) async {
       // `.type-micro` carries `text-transform: uppercase`, and the property is
