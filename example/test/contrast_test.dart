@@ -54,6 +54,82 @@ const List<_Expected> _light = <_Expected>[
   (token: '--destructive', ratio: 4.8, verdict: 'AA'),
 ];
 
+/// One row of the map's printed-value tables — all eighteen swatches,
+/// including the four pure fills the page renders with `measure: false`.
+typedef _Printed = ({String token, String dark, String light});
+
+/// colors-map §5–8, the "value shown" columns. Every one of these is the raw
+/// authored CSS text after `var()` substitution — never a normalised `rgb()`.
+const List<_Printed> _printed = <_Printed>[
+  // §5 `#monochrome` — the first four carry no badge; they are fills.
+  (token: '--background', dark: 'hsl(240 10% 3.9%)', light: 'hsl(0 0% 100%)'),
+  (token: '--card', dark: 'hsl(240 5.9% 10%)', light: 'hsl(0 0% 100%)'),
+  (token: '--muted', dark: 'hsl(240 3.7% 15.9%)', light: 'hsl(240 4.8% 95.9%)'),
+  (token: '--accent', dark: 'hsl(240 5.3% 26.1%)', light: 'hsl(240 4.8% 95.9%)'),
+  (token: '--foreground', dark: 'hsl(0 0% 98%)', light: 'hsl(240 10% 3.9%)'),
+  (
+    token: '--muted-foreground',
+    dark: 'hsl(240 4.9% 83.9%)',
+    light: 'hsl(240 4% 40%)'
+  ),
+  // §6 `#action` — only the ink token flips; the three ramp ends are static.
+  (
+    token: '--color-action-ink',
+    dark: 'hsl(213 94% 78%)',
+    light: 'hsl(224 76% 33%)'
+  ),
+  (
+    token: '--color-action-bright',
+    dark: 'hsl(213 94% 78%)',
+    light: 'hsl(213 94% 78%)'
+  ),
+  (token: '--color-action', dark: 'hsl(217 91% 53%)', light: 'hsl(217 91% 53%)'),
+  (
+    token: '--color-action-dark',
+    dark: 'hsl(224 76% 33%)',
+    light: 'hsl(224 76% 33%)'
+  ),
+  // §7 `#value` — page order is ink, mid, bright, dark.
+  (token: '--color-value-ink', dark: '#d9f99d', light: '#4d7c0f'),
+  (token: '--color-value', dark: '#a3e635', light: '#a3e635'),
+  (token: '--color-value-bright', dark: '#d9f99d', light: '#d9f99d'),
+  (token: '--color-value-dark', dark: '#4d7c0f', light: '#4d7c0f'),
+  // §8 `#state`.
+  (token: '--color-success', dark: '#10b981', light: '#10b981'),
+  (token: '--color-warning', dark: '#fbbf24', light: '#fbbf24'),
+  (token: '--color-info', dark: '#22d3ee', light: '#22d3ee'),
+  (
+    token: '--destructive',
+    dark: 'hsl(0 72.2% 50.6%)',
+    light: 'hsl(0 72.2% 50.6%)'
+  ),
+];
+
+DsThemeData _theme(DsThemeKind kind) =>
+    kind == DsThemeKind.dark ? DsThemeData.dark : DsThemeData.light;
+
+final RegExp _hexText = RegExp(r'^#([0-9a-f]{6})$');
+final RegExp _hslText = RegExp(r'^hsl\(([\d.]+) ([\d.]+)% ([\d.]+)%\)$');
+
+/// Turns a printed value back into a [Color] — **for the tests only.**
+///
+/// This deliberately does not exist in `token_swatch.dart`. The engine's two
+/// halves have to stay independent: if resolution ever went through the printed
+/// string, the page could no longer catch itself printing the wrong one. Here
+/// it is exactly the tool for proving the halves agree.
+Color _parseCss(String text) {
+  final RegExpMatch? hex = _hexText.firstMatch(text);
+  if (hex != null) return Color(int.parse('FF${hex[1]}', radix: 16));
+
+  final RegExpMatch? hsl = _hslText.firstMatch(text);
+  expect(hsl, isNotNull, reason: 'unparseable printed value: $text');
+  return dsHsl(
+    double.parse(hsl![1]!),
+    double.parse(hsl[2]!),
+    double.parse(hsl[3]!),
+  );
+}
+
 Widget _scope(Widget child, DsThemeMode mode) => DsTheme(
       controller: DsThemeController(mode: mode),
       child: Directionality(
@@ -183,6 +259,57 @@ void main() {
   });
 
   group('every swatched token matches colors-map', () {
+    test('the page swatches eighteen rows, and all of them are registered', () {
+      expect(_printed, hasLength(18));
+      for (final _Printed row in _printed) {
+        expect(
+          DsTokenRegistry.has(row.token),
+          isTrue,
+          reason: '${row.token} is swatched on the page but not registered',
+        );
+      }
+      // Fourteen of the eighteen carry a badge; the four pure fills do not.
+      expect(_dark, hasLength(14));
+      expect(_light, hasLength(14));
+      final Set<String> measured =
+          _dark.map((_Expected e) => e.token).toSet();
+      expect(
+        _printed
+            .map((_Printed r) => r.token)
+            .where((String t) => !measured.contains(t))
+            .toList(),
+        <String>['--background', '--card', '--muted', '--accent'],
+      );
+      expect(_light.map((_Expected e) => e.token).toSet(), measured);
+    });
+
+    for (final _Printed row in _printed) {
+      test('${row.token} prints the map\'s value in both themes', () {
+        expect(
+          DsTokenRegistry.printedValue(row.token, DsThemeKind.dark),
+          row.dark,
+        );
+        expect(
+          DsTokenRegistry.printedValue(row.token, DsThemeKind.light),
+          row.light,
+        );
+      });
+    }
+
+    test('colors-map\'s one arithmetic slip: dark --foreground', () {
+      // The map's §5 table badges this row `Contrast 19.0:1 · AAA`. Zinc 50 is
+      // rgb(250,250,250) and zinc 950 is rgb(10,10,10); the page's own formula
+      // on those bytes gives 19.0611, which `toFixed(1)` renders as **19.1**.
+      // The raw numbers are 0.06 apart — inside the map's stated ±0.1 — so the
+      // engine stands and the transcript is what needs the correction. Pinned
+      // here so the disagreement is a recorded fact rather than a surprise.
+      final double raw =
+          DsTokenRegistry.contrastRatio('--foreground', DsThemeData.dark);
+      expect(raw, closeTo(19.0611, 0.0005));
+      expect(raw, closeTo(19.0, 0.1)); // still inside the map's allowance
+      expect(dsContrastBadgeText(raw), 'Contrast 19.1:1 · AAA');
+    });
+
     for (final (DsThemeKind kind, List<_Expected> table) in <(
       DsThemeKind,
       List<_Expected>
@@ -248,10 +375,31 @@ void main() {
           DsPalette.value);
     });
 
+    test('what a token paints is what it prints — every token, both themes',
+        () {
+      // The strongest guarantee this file can make: the swatch colour and the
+      // readout beside it are the same colour, arrived at by two independent
+      // routes (a `DsThemeData` field, and a CSS string parsed here).
+      for (final String token in DsTokenRegistry.names) {
+        for (final DsThemeKind kind in DsThemeKind.values) {
+          expect(
+            DsTokenRegistry.resolve(token, _theme(kind)),
+            _parseCss(DsTokenRegistry.printedValue(token, kind)),
+            reason: '$token on ${kind.name}: the painted colour and the printed '
+                'value disagree — one of the two halves is wrong',
+          );
+        }
+      }
+    });
+
     test('an unregistered name is an error, not a silent zero', () {
       expect(DsTokenRegistry.has('--not-a-token'), isFalse);
       expect(() => DsTokenRegistry.resolve('--not-a-token', DsThemeData.dark),
           throwsArgumentError);
+      expect(
+        () => DsTokenRegistry.printedValue('--not-a-token', DsThemeKind.dark),
+        throwsArgumentError,
+      );
     });
   });
 
@@ -282,6 +430,90 @@ void main() {
         find.textContaining('CONTRAST 13.5:1 · AAA', findRichText: true),
         findsOneWidget,
       );
+    });
+
+    testWidgets('the badge renders uppercase, and only the verdict is tinted',
+        (WidgetTester tester) async {
+      // `.type-micro` carries `text-transform: uppercase`, and the property is
+      // inherited, so the verdict span uppercases with the sentence around it.
+      // The authored copy is `Contrast 13.5:1 · AAA`; the pixels are its caps.
+      expect(DsType.micro.uppercase, isTrue);
+
+      await tester.pumpWidget(
+        _scope(const DsContrastBadge('--muted-foreground'), DsThemeMode.dark),
+      );
+
+      final double raw = DsTokenRegistry.contrastRatio(
+        '--muted-foreground',
+        DsThemeData.dark,
+      );
+      expect(dsContrastBadgeText(raw), 'Contrast 13.5:1 · AAA');
+
+      final TextSpan root =
+          tester.widget<Text>(find.byType(Text)).textSpan! as TextSpan;
+      expect(root.toPlainText(), dsContrastBadgeText(raw).toUpperCase());
+
+      final List<InlineSpan> spans = root.children!;
+      expect(spans, hasLength(2));
+      expect((spans[0] as TextSpan).text, 'CONTRAST 13.5:1 · ');
+      expect((spans[1] as TextSpan).text, 'AAA');
+      // The sentence is muted; only the verdict word takes value ink.
+      expect(root.style!.color, DsThemeData.dark.mutedForeground);
+      expect((spans[1] as TextSpan).style!.color, DsThemeData.dark.valueInk);
+    });
+
+    testWidgets('a failing verdict takes destructive ink instead',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(
+        _scope(const DsContrastBadge('--color-value'), DsThemeMode.light),
+      );
+
+      final TextSpan root =
+          tester.widget<Text>(find.byType(Text)).textSpan! as TextSpan;
+      expect(root.toPlainText(), 'CONTRAST 1.5:1 · FAILS');
+      expect(
+        (root.children![1] as TextSpan).style!.color,
+        DsThemeData.light.destructiveInk,
+      );
+    });
+
+    testWidgets('a badge can be measured against a surface other than the page',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(
+        _scope(
+          const DsContrastBadge('--destructive', against: '--card'),
+          DsThemeMode.dark,
+        ),
+      );
+
+      final double onCard = dsContrastRatio(
+        DsThemeData.dark.destructive,
+        DsThemeData.dark.card,
+      );
+      // colors-map drift #5: red measures ~4.1 on the page and lower on a card.
+      expect(onCard, lessThan(4.1));
+      expect(
+        tester.widget<Text>(find.byType(Text)).textSpan!.toPlainText(),
+        dsContrastBadgeText(onCard).toUpperCase(),
+      );
+    });
+
+    testWidgets('an unregistered token renders the em dash, never a crash',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(
+        _scope(
+          const Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              DsTokenValue('--not-a-token'),
+              DsContrastBadge('--not-a-token'),
+            ],
+          ),
+          DsThemeMode.dark,
+        ),
+      );
+
+      expect(find.text('—'), findsNWidgets(2));
     });
 
     testWidgets('measure: false drops the badge — the pure fills',
