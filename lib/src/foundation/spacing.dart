@@ -57,6 +57,14 @@ class DsWidths {
   /// `--height-site-header: 4rem` = 64px — globals.css L290.
   static const double siteHeader = 64;
 
+  /// The width Tailwind's bare `border` utility gives an element: 1px.
+  ///
+  /// Recorded because of `box-sizing: border-box`, which Tailwind sets
+  /// globally: a border costs a padded component one pixel of inner width on
+  /// each side. `Border.all` defaults to the same 1.0, but a component that
+  /// pads inside a border has to add this back or every label sits 1px off.
+  static const double hairline = 1;
+
   /// `--scroll-offset: calc(var(--height-site-header) + var(--spacing) * 8)`
   /// = 96px — globals.css L296. Where an anchored heading comes to rest: clear
   /// of the header, plus one 32px step of air.
@@ -96,6 +104,24 @@ class DsRadii {
 
   /// `--radius-pill: 999px` — L339.
   static const double pill = 999;
+}
+
+/// Tailwind's stock blur ladder — the `--blur-*` scale, which `globals.css`
+/// never redeclares, so the framework defaults render.
+///
+/// CSS `filter: blur(<length>)` takes the length as the Gaussian **standard
+/// deviation** (Filter Effects §8.4), unlike `box-shadow`, whose blur radius
+/// is twice sigma. These values therefore go straight into
+/// `ImageFilter.blur(sigmaX:, sigmaY:)` with no conversion.
+class DsBlurs {
+  const DsBlurs._();
+
+  /// `--blur-xs: 4px` — `backdrop-blur-xs` on the sheet overlay.
+  static const double xs = 4;
+
+  /// `--blur-xl: 24px` — `backdrop-blur-xl` on the sticky docs header and on
+  /// the `glass-panel` utility.
+  static const double xl = 24;
 }
 
 /// Tailwind's stock breakpoints, in logical pixels.

@@ -128,9 +128,32 @@ Color _actionBrightAt(double alpha) =>
     DsPalette.actionBright.withValues(alpha: alpha);
 Color _valueAt(double alpha) => DsPalette.value.withValues(alpha: alpha);
 
+/// Tailwind's own `shadow-lg` ink: `rgb(0 0 0 / 0.1)`, the same in both
+/// themes because it is not part of the `--ink-*` family.
+Color _tailwindShadowInk(DsThemeData t) => const Color(0x1A000000);
+
 /// Every `--shadow-*` token in `app/globals.css` L354–387.
 class DsShadows {
   const DsShadows._();
+
+  /// `box-shadow: none` — an empty layer list.
+  ///
+  /// Not a token in globals.css; it is the absence of one, named so that a
+  /// component with no elevation can still say which spec it paints instead
+  /// of special-casing null.
+  static const DsShadowSpec none = DsShadowSpec(<DsShadowLayer>[]);
+
+  /// Tailwind's stock `shadow-lg`, carried because `SheetContent` asks for it
+  /// by that name (`components/ui/sheet.tsx`) and `globals.css` never
+  /// redeclares `--shadow-lg` — so the framework default is what renders.
+  ///
+  /// Deliberately outside the `e1`–`e4` ladder: it is not part of this
+  /// system's elevation vocabulary, and calling it `e3` would launder a
+  /// foreign value into the token set.
+  static const DsShadowSpec tailwindLg = DsShadowSpec(<DsShadowLayer>[
+    DsShadowLayer(0, 10, 15, -3, _tailwindShadowInk),
+    DsShadowLayer(0, 4, 6, -4, _tailwindShadowInk),
+  ]);
 
   /// `--shadow-e1: 0 1px 1px var(--ink-2), 0 1px 3px var(--ink-1)`
   static const DsShadowSpec e1 = DsShadowSpec(<DsShadowLayer>[

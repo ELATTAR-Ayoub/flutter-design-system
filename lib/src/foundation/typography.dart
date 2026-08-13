@@ -170,6 +170,38 @@ class DsTypeSpec {
   }
 }
 
+/// Type a component declares inline instead of reaching for a `.type-*` class.
+///
+/// Two surfaces in this phase do it, both in `components/ui/`. Their values
+/// are still tokens — `text-sm` resolves through `--text-sm` — so they are
+/// transcribed here rather than typed into the components.
+class DsComponentType {
+  const DsComponentType._();
+
+  /// `Button`'s base: `font-medium` at size `text-sm`.
+  ///
+  /// `--text-sm: var(--text-small)` (globals.css L213), so a button label is
+  /// **13px**, not Tailwind's stock 14 — the scale is redefined under the
+  /// framework's own name.
+  ///
+  /// No `--text-sm--line-height` companion token is declared, so Tailwind's
+  /// `text-sm` utility leaves `line-height` at `normal`; [DsTypeSpec.height]
+  /// is therefore null, which is Flutter's spelling of the same thing.
+  static final DsTypeSpec buttonLabel = DsTypeSpec(
+    family: DsFonts.sans,
+    size: 13,
+    wght: 500,
+  );
+
+  /// `SheetContent`'s `text-sm`, with no `font-weight` of its own — so it
+  /// inherits `html`'s 400.
+  static final DsTypeSpec sheetBody = DsTypeSpec(
+    family: DsFonts.sans,
+    size: 13,
+    wght: 400,
+  );
+}
+
 /// Every `.type-*` class in globals.css, one [DsTypeSpec] each.
 class DsType {
   const DsType._();

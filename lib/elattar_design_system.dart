@@ -16,6 +16,12 @@ export 'src/foundation/typography.dart';
 // ── scope ───────────────────────────────────────────────────────────────────
 export 'src/theme_scope.dart';
 
+// ── components ──────────────────────────────────────────────────────────────
+export 'src/components/button.dart';
+export 'src/components/icon.dart';
+export 'src/components/icon_paths.dart';
+export 'src/components/sheet.dart';
+
 // ── effects ─────────────────────────────────────────────────────────────────
 export 'src/effects/machine_surface.dart';
 export 'src/effects/page_glow.dart';

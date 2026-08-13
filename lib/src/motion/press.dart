@@ -27,11 +27,21 @@ class DsPress extends StatefulWidget {
     required this.child,
     this.onTap,
     this.behavior = HitTestBehavior.opaque,
+    this.downDuration = DsDurations.pressDown,
+    this.upDuration = DsDurations.base,
   });
 
   /// The `:active` scale. Defaults to the `press` utility's 0.94; `DsButton`
   /// passes [DsTransforms.buttonScale], `click-spring` surfaces 0.9.
   final double scale;
+
+  /// How long the squish takes. `press` and its two siblings all use 40ms;
+  /// `btn-spring` — what a `DsButton` wears — uses `--duration-tick`, 80ms.
+  final Duration downDuration;
+
+  /// How long the spring back takes. `--duration-base` for every utility in
+  /// the family.
+  final Duration upDuration;
 
   final Widget child;
 
@@ -76,10 +86,9 @@ class _DsPressState extends State<DsPress> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    _controller.duration =
-        dsAnimationDuration(context, DsDurations.pressDown);
+    _controller.duration = dsAnimationDuration(context, widget.downDuration);
     _controller.reverseDuration =
-        dsAnimationDuration(context, DsDurations.base);
+        dsAnimationDuration(context, widget.upDuration);
 
     Widget result = Listener(
       onPointerDown: _down,
