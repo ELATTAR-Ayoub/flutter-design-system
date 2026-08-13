@@ -1,18 +1,1215 @@
 /// `/design-system/typography` — the Typography foundation page.
 ///
-/// Stub: the real content (2 specimen panels, 10 word-scale rows, 5 numeric
-/// rows, pairing cards, the full prose demo, Meta, DoDont, foot-nav) lands in
-/// Task 10 and replaces the body of this file only.
+/// A transcript of `app/design-system/typography/page.tsx`: the two-face rule,
+/// the ten word-scale specimens, the five numeric ones, the tabular argument,
+/// the canonical pairings, the full `.prose` demo, and the rules.
+///
+/// **The drift this page is built on.** Every line of visible copy here names
+/// *Space Grotesk* as the word face — the panel label, the rule note, the
+/// pairing description, the second don't. The tokens say otherwise:
+/// `--font-sans` is `"Inter Local"`, the woff2 behind it is genuinely Inter
+/// Variable, and there is no Space Grotesk asset anywhere in the reference.
+/// The recorded decision is *fonts follow tokens, copy follows the reference*:
+/// this page renders [DsFonts.sans] (Inter) and still says Space Grotesk,
+/// exactly as the reference does. Two more of its own claims are kept the same
+/// way: "Nine classes" over ten specimen rows, and `.type-micro` called "the
+/// floor … never smaller" while `.type-tag` ships a step below it.
+///
+/// `Spec` is a page-local component in the reference, so [_Spec] is local here
+/// too; `.prose` is a CSS layer with no component at all, so [_Prose] is this
+/// file's own — a Flutter widget set carrying the rhythm of globals.css
+/// L1322–1507 and nothing else.
 library;
 
+import 'dart:math' as math;
+
+import 'package:elattar_design_system/elattar_design_system.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 
-import 'placeholder.dart';
+import '../kit.dart';
+import '../nav.dart';
 
+/// `lg:grid-cols-[15rem_1fr]` — the specimen row's left column.
+///
+/// 15rem is 240px, which is `--width-rail`; the reference writes the length
+/// rather than the token, and they are the same measure.
+const double _specColumn = DsWidths.rail;
+
+/// The four figures both columns of the tabular demo print, in source order.
+const List<String> _tabularValues = <String>[
+  r'$1,240.00',
+  r'$48.00',
+  r'$7.15',
+  r'$11,908.40',
+];
+
+/// `/design-system/typography`.
 class TypographyPage extends StatelessWidget {
   const TypographyPage({super.key});
 
   @override
-  Widget build(BuildContext context) =>
-      const PlaceholderPage(eyebrow: 'Foundations', title: 'Typography');
+  Widget build(BuildContext context) {
+    // `findCategory("foundations", "typography")` — the header's copy is the
+    // nav registry's, so the page cannot drift from the tree that links to it.
+    final DsCategoryHit here = findCategory('foundations', 'typography');
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        DsPageHeader(
+          eyebrow: here.group.title,
+          title: here.category.title,
+          blurb: here.category.blurb,
+          contents: here.category.contents,
+        ),
+        const _RuleSection(),
+        const _WordScaleSection(),
+        const _NumericScaleSection(),
+        const _PairingSection(),
+        const _ProseSection(),
+        const DsSection(
+          id: 'rules',
+          title: 'Rules',
+          child: DsDoDont(
+            dos: <String>[
+              'Always apply a .type-* or .type-num-* class — never a raw pixel size in a utility.',
+              'Put numerical values in the Geist Mono type-num foundation so comparable figures stay tabular.',
+              'Keep .type-micro as the absolute floor at 10.5px, and only for uppercase labels.',
+              'Use .type-display once per screen at most, and only for hero or reveal moments.',
+            ],
+            donts: <String>[
+              "Don't apply font families or numeric weights at the call site; choose a named foundation class.",
+              "Don't add a third typeface for display; heavy Space Grotesk at tight tracking already carries the hero.",
+              "Don't put important text below 12px, or inside decorative pack artwork.",
+              "Don't use proportional figures anywhere money, odds or counts appear.",
+            ],
+          ),
+        ),
+        const DsPageFootNav(groupId: 'foundations', slug: 'typography'),
+      ],
+    );
+  }
+}
+
+/* ── #rule ───────────────────────────────────────────────────────────────── */
+
+/// The two faces, side by side, and the sentence that is the whole system.
+class _RuleSection extends StatelessWidget {
+  const _RuleSection();
+
+  @override
+  Widget build(BuildContext context) {
+    final DsThemeData theme = DsTheme.of(context);
+
+    return DsSection(
+      id: 'rule',
+      title: 'Two foundation faces',
+      description:
+          'The whole type system is a single rule with no exceptions, which is '
+          'what keeps it consistent across every screen and component.',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          DsGrid(
+            sm: 2,
+            children: <Widget>[
+              DsPanel(
+                // Says Space Grotesk; renders Inter. See the library note.
+                label: 'Space Grotesk — words',
+                child: _FaceSpecimen(
+                  token: '--font-sans',
+                  copy:
+                      'Headings, body, buttons, labels, navigation, card names, '
+                      'pack names. A geometric grotesk: technical enough to feel '
+                      'engineered, open enough to stay readable at 11px.',
+                  specimen: DsText(
+                    'Aa',
+                    DsType.display,
+                    fontSize: DsFluid.display(context),
+                    color: theme.foreground,
+                  ),
+                ),
+              ),
+              DsPanel(
+                label: 'Geist Mono — numerical values',
+                child: _FaceSpecimen(
+                  token: '--font-mono',
+                  copy:
+                      'Prices, balances, dates, quantities, statistics, serials '
+                      'and code. Numerical variants are tabular so aligned '
+                      'values do not jitter.',
+                  specimen: DsText('0123', DsType.numXl, color: theme.valueInk),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: ds(4)),
+          DsNote(
+            title: 'The rule',
+            child: Text.rich(
+              TextSpan(
+                children: <InlineSpan>[
+                  const TextSpan(text: 'Words use Space Grotesk through '),
+                  DsCode.span('.type-*'),
+                  const TextSpan(
+                    text: '. Numerical values use Geist Mono through ',
+                  ),
+                  DsCode.span('.type-num-*'),
+                  const TextSpan(
+                    text: '. Each named foundation owns its complete font, '
+                        'size, line-height, weight and tracking.',
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// One face panel's body: the specimen, `mt-5` copy, `mt-4` token line.
+class _FaceSpecimen extends StatelessWidget {
+  const _FaceSpecimen({
+    required this.specimen,
+    required this.copy,
+    required this.token,
+  });
+
+  final Widget specimen;
+  final String copy;
+
+  /// The CSS variable, in `.type-code text-muted-foreground` — the class sets
+  /// no colour of its own, so the call site states one.
+  final String token;
+
+  @override
+  Widget build(BuildContext context) {
+    final DsThemeData theme = DsTheme.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        specimen,
+        SizedBox(height: ds(5)),
+        DsText(copy, DsType.small),
+        SizedBox(height: ds(4)),
+        DsText(token, DsType.code, color: theme.mutedForeground),
+      ],
+    );
+  }
+}
+
+/* ── Spec row ────────────────────────────────────────────────────────────── */
+
+/// One specimen row: the class name and what it is for, beside a live sample.
+///
+/// `grid gap-4 border-b border-border px-6 py-7 last:border-b-0
+/// lg:grid-cols-[15rem_1fr] lg:gap-8` — the hairline and the corner clipping
+/// belong to the [DsDividedList] these are stacked in, so this is the cell
+/// padding and the two-column split only.
+class _Spec extends StatelessWidget {
+  const _Spec({required this.cls, required this.use, required this.child});
+
+  /// The class name **without** its leading dot: the reference writes
+  /// `.{cls}`, so the dot is punctuation the row adds, not part of the name.
+  final String cls;
+
+  final String use;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final DsThemeData theme = DsTheme.of(context);
+    final bool wide = MediaQuery.sizeOf(context).width >= DsBreakpoints.lg;
+
+    final Widget meta = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        DsText('.$cls', DsType.code, color: theme.actionInk),
+        SizedBox(height: ds(2)),
+        DsText(use, DsType.small),
+      ],
+    );
+
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: ds(6), vertical: ds(7)),
+      child: wide
+          ? IntrinsicHeight(
+              child: Row(
+                // Grid cells stretch; the sample then centres itself inside
+                // its own (`self-center`), while the meta column stays top-set.
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  SizedBox(width: _specColumn, child: meta),
+                  SizedBox(width: ds(8)),
+                  Expanded(
+                    child: Align(alignment: Alignment.centerLeft, child: child),
+                  ),
+                ],
+              ),
+            )
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[meta, SizedBox(height: ds(4)), child],
+            ),
+    );
+  }
+}
+
+/* ── #words ──────────────────────────────────────────────────────────────── */
+
+/// Ten classes under a description that says nine — the reference's own slack.
+class _WordScaleSection extends StatelessWidget {
+  const _WordScaleSection();
+
+  @override
+  Widget build(BuildContext context) {
+    final DsThemeData theme = DsTheme.of(context);
+
+    return DsSection(
+      id: 'words',
+      title: 'Word scale',
+      description:
+          'Nine classes cover every piece of text in the product. Display is '
+          'reserved for the landing hero and pack-opening moments — nothing '
+          'else earns it.',
+      child: DsDividedList(
+        radius: DsRadii.xl,
+        children: <Widget>[
+          _Spec(
+            cls: 'type-display',
+            use: 'Landing hero. Pack-opening reveal. Once per page, at most.',
+            child: DsText(
+              'Pull something legendary',
+              DsType.display,
+              fontSize: DsFluid.display(context),
+              color: theme.foreground,
+            ),
+          ),
+          _Spec(
+            cls: 'type-h1',
+            use: 'The page heading. Exactly one per screen.',
+            child: DsText(
+              'Pack Marketplace',
+              DsType.h1,
+              fontSize: DsFluid.h1(context),
+              color: theme.foreground,
+            ),
+          ),
+          _Spec(
+            cls: 'type-h2',
+            use: 'Major page sections — Featured Packs, Live Pulls, Top Grails.',
+            child: DsText('Featured Packs', DsType.h2, color: theme.foreground),
+          ),
+          _Spec(
+            cls: 'type-h3',
+            use: 'Card titles, module headings, modal titles.',
+            child: DsText(
+              'Eclipse Vault — Series I',
+              DsType.h3,
+              color: theme.foreground,
+            ),
+          ),
+          _Spec(
+            cls: 'type-h4',
+            use: 'Pack names on cards, collectible card names, row titles.',
+            child: DsText(
+              'Voidwing Ascendant',
+              DsType.h4,
+              color: theme.foreground,
+            ),
+          ),
+          // The four rows below pass no colour: `.type-lead`, `.type-small`,
+          // `.type-label` and `.type-micro` each declare muted-foreground on
+          // themselves, and the reference overrides none of them here.
+          _Spec(
+            cls: 'type-lead',
+            use: 'The sentence under a page heading. One per screen.',
+            child: DsText(
+              'Every pack lists its odds, its remaining supply and its top '
+              'possible hit before you spend anything.',
+              DsType.lead,
+            ),
+          ),
+          _Spec(
+            cls: 'type-body',
+            use: 'Standard interface copy, descriptions, dialog content.',
+            child: DsText(
+              'Cards land in your Stash the moment a pack finishes opening. '
+              'From there you can keep them, sell them back at the listed '
+              'value, or add them to a shipment.',
+              DsType.body,
+              color: theme.mutedForeground,
+            ),
+          ),
+          _Spec(
+            cls: 'type-small',
+            use: 'Helper text, secondary detail, table cells, filter labels.',
+            child: DsText(
+              'Sell-back values are quoted at the time of sale and may move '
+              'with the market.',
+              DsType.small,
+            ),
+          ),
+          _Spec(
+            cls: 'type-label',
+            use: 'Section eyebrows, panel labels, field labels, rarity names.',
+            child: DsText('Remaining supply', DsType.label),
+          ),
+          _Spec(
+            cls: 'type-micro',
+            use: 'The floor. Badge text, pip captions, chart axes. Never smaller.',
+            child: DsText('Limited edition', DsType.micro),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/* ── #numbers ────────────────────────────────────────────────────────────── */
+
+/// Five of the six numeric steps, then the argument for tabular figures.
+class _NumericScaleSection extends StatelessWidget {
+  const _NumericScaleSection();
+
+  @override
+  Widget build(BuildContext context) {
+    final DsThemeData theme = DsTheme.of(context);
+
+    return DsSection(
+      id: 'numbers',
+      title: 'Numeric scale',
+      description:
+          "Five sizes, all tabular, all semibold. Numbers carry the product's "
+          'meaning — what things cost and what they are worth — so they are '
+          'given more weight than the words around them.',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          DsDividedList(
+            radius: DsRadii.xl,
+            children: <Widget>[
+              _Spec(
+                cls: 'type-num-xl',
+                use: 'Wallet available balance. Total inventory value. Hero figures.',
+                child: DsText(
+                  r'$12,480.65',
+                  DsType.numXl,
+                  color: theme.foreground,
+                ),
+              ),
+              _Spec(
+                cls: 'type-num-lg',
+                use: 'Card value in the inspection modal. Reward amounts. Stat tiles.',
+                child: DsText(
+                  r'$1,240.00',
+                  DsType.numLg,
+                  color: theme.valueInk,
+                ),
+              ),
+              _Spec(
+                cls: 'type-num-md',
+                use: 'Pack price. Card value on a tile. Leaderboard points.',
+                child: DsText(r'$48.00', DsType.numMd, color: theme.valueInk),
+              ),
+              _Spec(
+                cls: 'type-num',
+                use: 'Table figures, transaction amounts, quantities, odds.',
+                child: DsText('1,284', DsType.numBase, color: theme.foreground),
+              ),
+              _Spec(
+                cls: 'type-num-sm',
+                use: 'Timestamps, supply counters, token names, metadata figures.',
+                child: DsText(
+                  '412 / 2,000',
+                  DsType.numSm,
+                  color: theme.mutedForeground,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: ds(4)),
+          DsPanel(
+            label: 'Why tabular matters',
+            note: 'font-variant-numeric: tabular-nums',
+            child: DsGrid(
+              sm: 2,
+              gap: ds(6),
+              children: <Widget>[
+                _FigureColumn(
+                  heading: 'Tabular — the product',
+                  headingInk: theme.valueInk,
+                  spec: DsType.numBase,
+                  valueColor: theme.foreground,
+                  caption:
+                      'Decimal points align. Digits keep their column as values '
+                      'update live, so a ticking balance does not shuffle '
+                      'sideways.',
+                ),
+                // The rejected column is not mono at all: `.type-section` is
+                // the sans face at 13px/600/muted, so it differs in family,
+                // size, weight, colour AND figure spacing. Proportional
+                // figures are simply the absence of `tabular-nums`, which is
+                // what every non-numeric spec already is.
+                _FigureColumn(
+                  heading: 'Proportional — rejected',
+                  headingInk: theme.destructiveInk,
+                  spec: DsType.section,
+                  caption:
+                      'Proportional figures do not align, and every live update '
+                      'nudges the layout.',
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// One half of the tabular demo: a label, the four figures, a caption.
+class _FigureColumn extends StatelessWidget {
+  const _FigureColumn({
+    required this.heading,
+    required this.headingInk,
+    required this.spec,
+    required this.caption,
+    this.valueColor,
+  });
+
+  final String heading;
+  final Color headingInk;
+
+  /// `.type-num` on the left, `.type-section` on the right.
+  final DsTypeSpec spec;
+
+  /// Only the tabular column states one; the rejected column takes the muted
+  /// colour `.type-section` brings with it.
+  final Color? valueColor;
+
+  final String caption;
+
+  @override
+  Widget build(BuildContext context) {
+    final DsThemeData theme = DsTheme.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        DsText(heading, DsType.label, color: headingInk),
+        SizedBox(height: ds(3)),
+        for (int i = 0; i < _tabularValues.length; i++) ...<Widget>[
+          // `space-y-1.5`.
+          if (i > 0) SizedBox(height: ds(1.5)),
+          Container(
+            padding: EdgeInsets.only(bottom: ds(1.5)),
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: theme.border,
+                  width: DsWidths.hairline,
+                ),
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                DsText('Row', DsType.small),
+                DsText(_tabularValues[i], spec, color: valueColor),
+              ],
+            ),
+          ),
+        ],
+        SizedBox(height: ds(3)),
+        DsText(caption, DsType.small),
+      ],
+    );
+  }
+}
+
+/* ── #pairing ────────────────────────────────────────────────────────────── */
+
+/// Three cards where a word class and a numeric class meet.
+class _PairingSection extends StatelessWidget {
+  const _PairingSection();
+
+  @override
+  Widget build(BuildContext context) {
+    final DsThemeData theme = DsTheme.of(context);
+
+    return DsSection(
+      id: 'pairing',
+      title: 'Pairing the foundations',
+      description:
+          'Words stay in Space Grotesk while numerical values use Geist Mono. '
+          'The named classes carry each treatment without page-level '
+          'typography values.',
+      child: DsPanel(
+        label: 'Canonical pairings',
+        child: DsGrid(
+          sm: 2,
+          lg: 3,
+          gap: ds(5),
+          children: <Widget>[
+            _PairingCard(
+              label: 'Pack price',
+              figure: DsText(r'$48.00', DsType.numMd, color: theme.valueInk),
+              caption: const TextSpan(text: '6 cards per pack'),
+            ),
+            _PairingCard(
+              label: 'Available balance',
+              figure: DsText(
+                r'$1,204.80',
+                DsType.numLg,
+                color: theme.foreground,
+              ),
+              caption: TextSpan(
+                children: <InlineSpan>[
+                  TextSpan(
+                    text: r'+$120.00',
+                    style: TextStyle(color: theme.valueInk),
+                  ),
+                  const TextSpan(text: ' today'),
+                ],
+              ),
+            ),
+            _PairingCard(
+              label: 'Legendary odds',
+              figure: DsText('1 in 240', DsType.numMd, color: theme.foreground),
+              caption: const TextSpan(text: '0.42% per card'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// `rounded-lg border border-border bg-card p-5`.
+class _PairingCard extends StatelessWidget {
+  const _PairingCard({
+    required this.label,
+    required this.figure,
+    required this.caption,
+  });
+
+  final String label;
+  final Widget figure;
+
+  /// An [InlineSpan] because one of the three tints a fragment value-ink.
+  final InlineSpan caption;
+
+  @override
+  Widget build(BuildContext context) {
+    final DsThemeData theme = DsTheme.of(context);
+
+    return Container(
+      padding: EdgeInsets.all(ds(5)),
+      decoration: BoxDecoration(
+        color: theme.card,
+        borderRadius: BorderRadius.circular(DsRadii.lg),
+        border: Border.all(color: theme.border, width: DsWidths.hairline),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          DsText(label, DsType.label),
+          SizedBox(height: ds(2)),
+          figure,
+          SizedBox(height: ds(1)),
+          Text.rich(caption, style: DsText.styleOf(context, DsType.small)),
+        ],
+      ),
+    );
+  }
+}
+
+/* ── #prose ──────────────────────────────────────────────────────────────── */
+
+/// The same scale reached a second way, plus what `.prose` does and does not
+/// own.
+class _ProseSection extends StatelessWidget {
+  const _ProseSection();
+
+  /// `Meta` — six rows, verbatim.
+  static const List<DsMetaItem> _meta = <DsMetaItem>[
+    (
+      k: 'What it owns',
+      v: TextSpan(
+        text: 'Vertical rhythm on the 8-point scale, list markers and indents, '
+            'link treatment, quote rule, and code and table chrome.',
+      ),
+    ),
+    (
+      k: 'Anchors',
+      v: TextSpan(
+        text: 'Nothing. html carries scroll-padding-block-start: '
+            'var(--scroll-offset), derived from --height-site-header. A '
+            'scroll-margin here as well would add to it — measured at 192px '
+            'below a 64px header before it was removed.',
+      ),
+    ),
+    (
+      k: 'Wide tables scroll',
+      v: TextSpan(
+        text: 'A table is display:block with width:max-content capped at 100%, '
+            "so it is its own scroll port on the system's thin rail. It takes "
+            'content width rather than filling the measure — the trade for '
+            'never being clipped, which is what happened at 375px before the '
+            'rule existed.',
+      ),
+    ),
+    (
+      k: 'What it does not own',
+      v: TextSpan(
+        text: 'Sizes. Every one lives in the .type-* role it shares a '
+            'declaration block with. It also sets no max-width — the measure '
+            'belongs to the page container, and two owners for one number is '
+            'how --width-page spent months as prose on the Spacing page.',
+      ),
+    ),
+    (
+      k: '--width-prose',
+      v: TextSpan(
+        text: '720px. Narrower than --width-content (1080px) because that '
+            'column carries specimens and panels beside the copy, while this '
+            'one carries nothing but sentences.',
+      ),
+    ),
+    (
+      k: 'Headings start at h2',
+      v: TextSpan(
+        text: "The page heading is the page's own h1. .prose styles h1 anyway, "
+            'because an unstyled browser default is worse than a heading level '
+            'used wrongly — but a document that opens with h2 is the '
+            'convention.',
+      ),
+    ),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    // `bodyClassName="p-6 sm:p-10"`.
+    final bool wide = MediaQuery.sizeOf(context).width >= DsBreakpoints.sm;
+
+    return DsSection(
+      id: 'prose',
+      title: 'Prose',
+      description:
+          'The same scale, reached a second way. A policy, a help article or '
+          'the output of a markdown renderer has no call site to put a class '
+          'on, so .prose styles the elements instead — and it does it by '
+          'adding a selector to the type roles above rather than by owning a '
+          'second set of sizes.',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          DsPanel(
+            label: 'Long-form content',
+            note: 'max-w-(--width-prose) · 720px',
+            bodyPadding: EdgeInsets.all(wide ? ds(10) : ds(6)),
+            child: Align(
+              alignment: Alignment.topLeft,
+              child: ConstrainedBox(
+                // `max-w-(--width-prose)` — the measure, stated once.
+                constraints: const BoxConstraints(maxWidth: DsWidths.prose),
+                child: const _Prose(),
+              ),
+            ),
+          ),
+          SizedBox(height: ds(4)),
+          const DsMeta(items: _meta),
+          SizedBox(height: ds(4)),
+          DsNote(
+            tone: DsNoteTone.error,
+            title: 'Two mechanisms that do not work',
+            child: Text.rich(
+              TextSpan(
+                children: <InlineSpan>[
+                  DsCode.span('@apply type-h2'),
+                  const TextSpan(text: ' inside a '),
+                  DsCode.span('.prose h2'),
+                  const TextSpan(text: ' rule fails the build outright — '),
+                  const TextSpan(
+                    text: 'Cannot apply unknown utility class',
+                    style: TextStyle(fontStyle: FontStyle.italic),
+                  ),
+                  const TextSpan(text: ' — because '),
+                  DsCode.span('@apply'),
+                  const TextSpan(text: ' reaches Tailwind utilities and '),
+                  DsCode.span('@utility'),
+                  const TextSpan(
+                    text: ' registrations, and the type scale lives in ',
+                  ),
+                  DsCode.span('@layer components'),
+                  const TextSpan(text: '. The call-site spelling '),
+                  DsCode.span('[&_h2]:type-h2'),
+                  const TextSpan(
+                    text: ' is the same wall from the other side and fails ',
+                  ),
+                  const TextSpan(
+                    text: 'silently',
+                    style: TextStyle(fontStyle: FontStyle.italic),
+                  ),
+                  const TextSpan(
+                    text: ', which is the worse of the two: no error, no class, '
+                        'every guard green, and the size quietly falling back '
+                        'to inherited.',
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/* ── The prose widget set ────────────────────────────────────────────────── */
+
+/// One block-level element and the `margin-block` its selector declares.
+typedef _ProseBlock = ({double top, double bottom, Widget child});
+
+/// `<div class="prose">` — unclassed markup, styled by element.
+///
+/// Every value below is globals.css L1322–1507 (globals-map §6). Two CSS
+/// behaviours have to be performed rather than declared:
+///
+/// * **Margin collapsing.** Adjacent block margins collapse to the larger of
+///   the two, so a `p` (16px bottom) before an `h3` (32px top) is separated by
+///   32px, not 48. [_column] inserts `max(previous.bottom, next.top)` between
+///   blocks — and nothing before the first or after the last, which is the
+///   `> :first-child` / `> :last-child` reset.
+/// * **List markers.** `list-style-position: outside` puts the marker in the
+///   list's `padding-inline-start`, so each item is a 24px gutter carrying a
+///   right-set marker beside its content.
+class _Prose extends StatelessWidget {
+  const _Prose();
+
+  /// Stacks [blocks] with their margins collapsed.
+  static Widget _column(List<_ProseBlock> blocks) => Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          for (int i = 0; i < blocks.length; i++) ...<Widget>[
+            if (i > 0)
+              SizedBox(height: math.max(blocks[i - 1].bottom, blocks[i].top)),
+            blocks[i].child,
+          ],
+        ],
+      );
+
+  @override
+  Widget build(BuildContext context) {
+    final DsThemeData theme = DsTheme.of(context);
+    // `.prose { color: var(--foreground) }` — inherited by every element that
+    // does not state a colour, which is all of them but the blockquote.
+    final TextStyle paragraph = DsText.styleOf(
+      context,
+      DsType.body,
+      color: theme.foreground,
+    );
+
+    return _column(<_ProseBlock>[
+      // h2 — `margin-block: 40px 16px`.
+      (
+        top: ds(10),
+        bottom: ds(4),
+        child: DsText(
+          'Refunds and cancellations',
+          DsType.h2,
+          color: theme.foreground,
+        ),
+      ),
+      // p — `margin-block: 16px`.
+      (
+        top: ds(4),
+        bottom: ds(4),
+        child: Text.rich(
+          TextSpan(
+            children: <InlineSpan>[
+              const TextSpan(
+                text: 'Every element here is unstyled markup inside a single ',
+              ),
+              DsCode.span('prose'),
+              const TextSpan(
+                text: ' wrapper. The heading above is the same declaration '
+                    'block as ',
+              ),
+              DsCode.span('.type-h2'),
+              const TextSpan(
+                text: ' — not a copy of its size, the block itself — so '
+                    'retuning the scale moves both and neither can drift from '
+                    'the other.',
+              ),
+            ],
+          ),
+          style: paragraph,
+        ),
+      ),
+      (top: ds(4), bottom: ds(4), child: const _ProseLinkParagraph()),
+      // h3 — `margin-block: 32px 12px`.
+      (
+        top: ds(8),
+        bottom: ds(3),
+        child: DsText(
+          'What a reader is entitled to',
+          DsType.h3,
+          color: theme.foreground,
+        ),
+      ),
+      (
+        top: ds(4),
+        bottom: ds(4),
+        child: _ProseList(
+          style: paragraph,
+          items: <_ProseListItem>[
+            (text: 'A refund within fourteen days of purchase.', nested: null),
+            (
+              // The reference's JSX puts the nested list straight after the
+              // text with no space and no full stop — kept.
+              text: 'A written reason when a request is refused, including',
+              nested: <String>[
+                'the clause it was refused under, and',
+                'the address an appeal goes to.',
+              ],
+            ),
+            (text: 'A reply inside one working week.', nested: null),
+          ],
+        ),
+      ),
+      (
+        top: ds(4),
+        bottom: ds(4),
+        child: _ProseQuote(
+          'Nested lists take the interior step rather than the block step, so '
+          'a sub-clause reads as part of its parent rather than as a new '
+          'paragraph.',
+        ),
+      ),
+      (
+        top: ds(8),
+        bottom: ds(3),
+        child: DsText('Ordered steps', DsType.h3, color: theme.foreground),
+      ),
+      (
+        top: ds(4),
+        bottom: ds(4),
+        child: _ProseList(
+          ordered: true,
+          style: paragraph,
+          items: const <_ProseListItem>[
+            (text: 'Open the order from your account.', nested: null),
+            (text: 'Choose the items you are returning.', nested: null),
+            (
+              text: 'Print the label and post it within seven days.',
+              nested: null,
+            ),
+          ],
+        ),
+      ),
+      // h4 — `margin-block: 24px 8px`. The override demo: an `h4` carrying
+      // `.type-label`, so it renders 11px uppercase muted, not 17px foreground.
+      // `:where(.prose) h4` weighs one element; the class beats it.
+      (
+        top: ds(6),
+        bottom: ds(2),
+        child: DsText('An explicit class still wins inside prose', DsType.label),
+      ),
+      (
+        top: ds(4),
+        bottom: ds(4),
+        child: Text.rich(
+          TextSpan(
+            children: <InlineSpan>[
+              const TextSpan(text: 'That heading is an '),
+              DsCode.span('h4'),
+              const TextSpan(text: ' carrying '),
+              DsCode.span('.type-label'),
+              const TextSpan(text: '. The prose selector is wrapped in '),
+              DsCode.span(':where()'),
+              const TextSpan(
+                text: ', so it weighs one element and any real class beats '
+                    'it — ',
+              ),
+              DsCode.span('.prose'),
+              const TextSpan(text: ' is a default, not a cage.'),
+            ],
+          ),
+          style: paragraph,
+        ),
+      ),
+      // hr — `margin-block: 40px; border: 0; border-block-start: 1px solid
+      // var(--border)`.
+      (
+        top: ds(10),
+        bottom: ds(10),
+        child: SizedBox(
+          height: DsWidths.hairline,
+          child: ColoredBox(color: theme.border),
+        ),
+      ),
+      (top: ds(4), bottom: ds(4), child: const _ProseTable()),
+    ]);
+  }
+}
+
+/// The one paragraph with a link in it — and the page's one prose animation.
+///
+/// `:where(.prose) a` is action-ink and underlined at rest; hover fades
+/// `text-decoration-color` to transparent over 150ms on `--ease-out`. The href
+/// is `#prose`, so the tap scrolls this very section back under the header.
+class _ProseLinkParagraph extends StatefulWidget {
+  const _ProseLinkParagraph();
+
+  @override
+  State<_ProseLinkParagraph> createState() => _ProseLinkParagraphState();
+}
+
+class _ProseLinkParagraphState extends State<_ProseLinkParagraph> {
+  late final TapGestureRecognizer _tap;
+  bool _hovered = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _tap = TapGestureRecognizer()
+      ..onTap = () => DsSection.scrollTo('prose');
+  }
+
+  @override
+  void dispose() {
+    _tap.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final DsThemeData theme = DsTheme.of(context);
+    final TextStyle paragraph = DsText.styleOf(
+      context,
+      DsType.body,
+      color: theme.foreground,
+    );
+
+    return TweenAnimationBuilder<Color?>(
+      tween: ColorTween(end: _hovered ? dsTransparent : theme.actionInk),
+      duration: dsAnimationDuration(context, DsDurations.fast),
+      curve: DsCurves.out,
+      builder: (BuildContext context, Color? underline, Widget? child) {
+        return Text.rich(
+          TextSpan(
+            children: <InlineSpan>[
+              const TextSpan(text: 'Links take '),
+              DsCode.span('--color-action-ink'),
+              const TextSpan(
+                text: ', which is the only shade of the action ramp that reads '
+                    'in both themes, and they are underlined at rest because ',
+              ),
+              TextSpan(
+                text: 'a link identified by hue alone',
+                style: TextStyle(
+                  color: theme.actionInk,
+                  decoration: TextDecoration.underline,
+                  decorationColor: underline,
+                ),
+                recognizer: _tap,
+                mouseCursor: SystemMouseCursors.click,
+                onEnter: (PointerEnterEvent event) =>
+                    setState(() => _hovered = true),
+                onExit: (PointerExitEvent event) =>
+                    setState(() => _hovered = false),
+              ),
+              const TextSpan(
+                text: ' is one signal where the accessibility contract asks '
+                    'for two.',
+              ),
+            ],
+          ),
+          style: paragraph,
+        );
+      },
+    );
+  }
+}
+
+/// One `<li>`: its text, and the nested list it may carry.
+typedef _ProseListItem = ({String text, List<String>? nested});
+
+/// `<ul>` / `<ol>` — disc or decimal markers in a 24px gutter.
+class _ProseList extends StatelessWidget {
+  const _ProseList({
+    required this.items,
+    required this.style,
+    this.ordered = false,
+  });
+
+  final List<_ProseListItem> items;
+
+  /// The `.type-body` style the items and their markers share.
+  final TextStyle style;
+
+  final bool ordered;
+
+  @override
+  Widget build(BuildContext context) {
+    final DsThemeData theme = DsTheme.of(context);
+    // `li::marker { color: var(--muted-foreground) }`.
+    final TextStyle marker = style.copyWith(color: theme.mutedForeground);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        for (int i = 0; i < items.length; i++) ...<Widget>[
+          // `li + li { margin-block-start: 8px }`.
+          if (i > 0) SizedBox(height: ds(2)),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              SizedBox(
+                // `padding-inline-start: 24px` on the list — the marker sits
+                // inside it, set against the content edge.
+                width: ds(6),
+                child: Padding(
+                  padding: EdgeInsets.only(right: ds(2)),
+                  child: Text(
+                    ordered ? '${i + 1}.' : '•',
+                    style: marker,
+                    textAlign: TextAlign.right,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    Text(items[i].text, style: style),
+                    if (items[i].nested != null) ...<Widget>[
+                      // Nested `li > ul { margin-block: 8px }`.
+                      SizedBox(height: ds(2)),
+                      _ProseList(
+                        style: style,
+                        items: <_ProseListItem>[
+                          for (final String text in items[i].nested!)
+                            (text: text, nested: null),
+                        ],
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+/// `<blockquote>` — the `--input` hairline, the interior step, muted italic.
+class _ProseQuote extends StatelessWidget {
+  const _ProseQuote(this.text);
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final DsThemeData theme = DsTheme.of(context);
+
+    return Container(
+      padding: EdgeInsets.only(left: ds(4)),
+      decoration: BoxDecoration(
+        border: Border(
+          // `border-inline-start: 2px solid var(--input)` — the stronger
+          // hairline, at double width.
+          left: BorderSide(color: theme.input, width: ds(0.5)),
+        ),
+      ),
+      child: Text(
+        text,
+        style: DsText.styleOf(
+          context,
+          DsType.body,
+          color: theme.mutedForeground,
+        ).copyWith(fontStyle: FontStyle.italic),
+      ),
+    );
+  }
+}
+
+/// `<table>` — `display:block; width:max-content; max-width:100%;
+/// overflow-x:auto`.
+///
+/// It is its own scroll port: [IntrinsicWidth] gives the [Table] the finite
+/// width it requires inside a horizontal viewport, and the viewport then takes
+/// the smaller of that width and the measure — content width when it fits,
+/// a scroller when it does not.
+class _ProseTable extends StatelessWidget {
+  const _ProseTable();
+
+  static const List<String> _head = <String>[
+    'Request',
+    'Window',
+    'Refunded to',
+  ];
+
+  static const List<List<String>> _rows = <List<String>>[
+    <String>['Unopened item', '14 days', 'Original payment method'],
+    <String>['Faulty item', '30 days', 'Original payment method'],
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final DsThemeData theme = DsTheme.of(context);
+
+    Widget cell(Widget child) => Container(
+          // `padding: 12px 16px`.
+          padding: EdgeInsets.symmetric(horizontal: ds(4), vertical: ds(3)),
+          decoration: BoxDecoration(
+            border: Border(
+              bottom: BorderSide(color: theme.border, width: DsWidths.hairline),
+            ),
+          ),
+          child: child,
+        );
+
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: IntrinsicWidth(
+          child: Table(
+            defaultColumnWidth: const IntrinsicColumnWidth(),
+            defaultVerticalAlignment: TableCellVerticalAlignment.top,
+            children: <TableRow>[
+              TableRow(
+                // `th { background: var(--muted) }`, plus the `.type-label`
+                // treatment `:where(.prose) th` shares with it.
+                decoration: BoxDecoration(color: theme.muted),
+                children: <Widget>[
+                  for (final String head in _head)
+                    cell(DsText(head, DsType.label)),
+                ],
+              ),
+              for (final List<String> row in _rows)
+                TableRow(
+                  children: <Widget>[
+                    for (final String value in row)
+                      cell(
+                        DsText(value, DsType.body, color: theme.foreground),
+                      ),
+                  ],
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
