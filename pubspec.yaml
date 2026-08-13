@@ -1,0 +1,42 @@
+name: elattar_design_system
+description: "Elattar's Design System — a 1:1 Flutter port of the web design system: one token source of truth, nothing hardcoded outside it."
+version: 0.0.1
+homepage:
+publish_to: 'none'
+
+environment:
+  sdk: ^3.12.2
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  yaml: ^3.1.2
+
+# The following section is specific to Flutter packages.
+flutter:
+  # Reference faces, converted from the web repo's own binaries.
+  # Families follow the TOKENS (--font-sans/--font-mono/--font-accent), not the
+  # prose comment in globals.css that names Space Grotesk.
+  #
+  # These are declared in the PACKAGE pubspec, so flutter_tools bundles them
+  # automatically for every dependent app and registers them under the prefixed
+  # family name `packages/elattar_design_system/<Family>`. Call sites never see
+  # that: `DsFonts.package` is threaded through `TextStyle(package: ...)` inside
+  # foundation/typography.dart, which performs the same prefixing.
+  fonts:
+    - family: InterLocal
+      fonts:
+        - asset: assets/fonts/InterVariable.ttf
+    - family: GeistMono
+      fonts:
+        - asset: assets/fonts/GeistMono-Variable.ttf
+    - family: Redaction35
+      fonts:
+        - asset: assets/fonts/Redaction35-Italic.ttf
+          style: italic

@@ -1,0 +1,24 @@
+name: example
+description: "Elattar's Design System — docs app (Flutter port of the Next.js docs site)."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.12.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  elattar_design_system:
+    path: ../
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  # Fonts are NOT re-declared here: they are registered in the package pubspec,
+  # so flutter_tools bundles them for this app automatically under the family
+  # name `packages/elattar_design_system/<Family>`.
