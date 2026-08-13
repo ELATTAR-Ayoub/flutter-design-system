@@ -7,5 +7,8 @@ library;
 
 // ── foundation ──────────────────────────────────────────────────────────────
 export 'src/foundation/colors.dart';
+export 'src/foundation/motion.dart';
+export 'src/foundation/shadows.dart';
 export 'src/foundation/spacing.dart';
 export 'src/foundation/theme.dart';
+export 'src/foundation/typography.dart';
