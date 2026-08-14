@@ -132,8 +132,10 @@ void main() {
       await _pumpPage(tester);
 
       expect(find.text('--destructive'), findsOneWidget);
-      // …and prints what `globals.css` authored, not a normalised rgb().
-      expect(find.text('hsl(0 72.2% 50.6%)'), findsOneWidget);
+      // …and prints what the browser reads back. `globals.css` authors
+      // `hsl(0 72.2% 50.6%)`; Tailwind's minifier serves `#dc2626`, and the
+      // readout is the served text, not the authored one.
+      expect(find.text('#dc2626'), findsOneWidget);
     });
   });
 
@@ -143,7 +145,7 @@ void main() {
       await _pumpPage(tester);
 
       expect(find.text('Muted foreground'), findsOneWidget);
-      expect(find.text('hsl(240 4.9% 83.9%)'), findsOneWidget);
+      expect(find.text('#d4d4d8'), findsOneWidget);
       // `.type-micro` uppercases at paint, so this is the rendered string.
       expect(
         find.textContaining('CONTRAST 13.5:1 · AAA', findRichText: true),
@@ -175,9 +177,10 @@ void main() {
         find.textContaining('CONTRAST 6.0:1 · AA', findRichText: true),
         findsOneWidget,
       );
-      expect(find.text('hsl(240 4% 40%)'), findsOneWidget);
-      // The ink token is the one whose printed text flips with the block.
-      expect(find.text('hsl(224 76% 33%)'), findsNWidgets(2));
+      expect(find.text('#62626a'), findsOneWidget);
+      // The ink token is the one whose printed text flips with the block, and
+      // on light it lands on the same hex the deep end already prints.
+      expect(find.text('#143694'), findsNWidgets(2));
     });
   });
 

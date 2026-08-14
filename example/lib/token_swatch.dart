@@ -15,12 +15,17 @@
 ///   objects every other widget paints with — so a swatch cannot disagree with
 ///   the thing it is documenting. It never re-parses [DsTokenRegistry
 ///   .printedValue]; the printed text is a *readout*, not a source.
-/// * **The printed value** ([DsTokenRegistry.printedValue]) is the raw authored
-///   CSS text after `var()` substitution, which is exactly what
-///   `getComputedStyle().getPropertyValue()` hands back: `hsl(240 10% 3.9%)`,
-///   `#a3e635`, `hsl(0 72.2% 50.6%)` — never a normalised `rgb()`. It is
-///   per-theme wherever the underlying var flips, because substitution happens
-///   after the cascade has picked a theme block.
+/// * **The printed value** ([DsTokenRegistry.printedValue]) is the text
+///   `getComputedStyle().getPropertyValue()` hands back — which is *not* the
+///   text `app/globals.css` authors. The stylesheet writes `hsl(240 10% 3.9%)`;
+///   the browser is served `#09090b`, because Tailwind v4 compiles the sheet
+///   through Lightning CSS, whose colour minifier rewrites every colour to its
+///   shortest form before the CSS ever leaves the dev server. So the page reads
+///   back lowercase hex for all eighteen swatches, with `#ffffff` collapsed to
+///   `#fff`. That is a pure function of the resolved colour, so it is *derived*
+///   here ([dsCssColorText]) rather than transcribed: a rebrand moves the token
+///   and the readout follows, which is the same guarantee the web gets for free.
+///   It stays per-theme wherever the underlying var flips.
 ///
 /// The observer has no port and needs none: every widget here reads
 /// `DsTheme.of(context)`, so a mode change rebuilds them and both halves
@@ -172,284 +177,136 @@ String dsContrastBadgeText(double ratio) =>
     '${dsContrastBadgePrefix(ratio)}${dsContrastVerdict(ratio)}';
 
 // ─────────────────────────────────────────────────────────────────────────────
+// The serialisation the page reads back
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// A colour written the way the reference's compiled stylesheet writes it.
+///
+/// `getComputedStyle().getPropertyValue('--background')` returns the declaration
+/// text as the browser parsed it — but the browser never sees `globals.css`.
+/// Tailwind v4 compiles it through Lightning CSS, whose colour minifier rewrites
+/// every colour to the shortest equivalent form, so `hsl(240 10% 3.9%)` arrives
+/// as `#09090b` and `hsl(0 0% 100%)` as `#fff`. Measured on the live dev server,
+/// both themes, 2026-08-14: all forty-seven registered properties come back as
+/// lowercase hex, three-digit wherever every byte's two nibbles match.
+///
+/// Two things the minifier does that this does not need to: it would prefer a
+/// CSS named colour when one is shorter (`red` beats `#f00`), and it would emit
+/// `rgb()` if that were ever shorter than hex (it is not, for an opaque colour).
+/// No token in this system lands on a named colour; if a rebrand ever moved one
+/// onto `red`, `contrast_test.dart`'s round-trip — which parses every printed
+/// value back to a [Color] — is what would catch it.
+///
+/// Alpha follows the same rule in eight digits (`#000000df` is how the
+/// reference's own captured-theme block arrives). No registered token is
+/// translucent, so that arm documents the pipeline rather than the page.
+String dsCssColorText(Color color) {
+  String byte(double channel) =>
+      (channel * 255).round().toRadixString(16).padLeft(2, '0');
+
+  final String digits = color.a >= 1
+      ? '${byte(color.r)}${byte(color.g)}${byte(color.b)}'
+      : '${byte(color.r)}${byte(color.g)}${byte(color.b)}${byte(color.a)}';
+
+  // `#ffffff` → `#fff`: the CSS shorthand, available only when both nibbles of
+  // every byte agree.
+  final bool collapsible = <int>[
+    for (int i = 0; i < digits.length; i += 2) i,
+  ].every((int i) => digits[i] == digits[i + 1]);
+
+  if (!collapsible) return '#$digits';
+  return '#${<String>[
+    for (int i = 0; i < digits.length; i += 2) digits[i],
+  ].join()}';
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // The registry
 // ─────────────────────────────────────────────────────────────────────────────
 
-/// One CSS custom property: how it resolves, and what it prints.
-class _DsToken {
-  /// A property whose substituted text differs between the theme blocks —
-  /// every `--*-ink`, and every semantic token the two blocks both declare.
-  const _DsToken({
-    required this.resolve,
-    required this.light,
-    required this.dark,
-  });
-
-  /// A property declared once in `@theme static`, so both themes print the
-  /// same text — the ramps and the state hues.
-  const _DsToken.constant({required this.resolve, required String value})
-      : light = value,
-        dark = value;
-
-  /// Where the value lives on a resolved theme block. Always a field read:
-  /// the token IS the theme's field, and going through anything else would
-  /// re-introduce the second source of truth this file exists to remove.
-  final Color Function(DsThemeData theme) resolve;
-
-  /// The raw CSS text `:root, .light` substitutes to.
-  final String light;
-
-  /// The raw CSS text `.dark` substitutes to.
-  final String dark;
-
-  String printed(DsThemeKind kind) =>
-      kind == DsThemeKind.dark ? dark : light;
-}
+/// Where a token's value lives on a resolved theme block.
+///
+/// Always a field read: the token IS the theme's field, and going through
+/// anything else would re-introduce the second source of truth this file exists
+/// to remove. The printed text is no longer a second half to keep in step — it
+/// is [dsCssColorText] of whatever this returns.
+typedef _DsToken = Color Function(DsThemeData theme);
 
 /// Every token the docs can swatch, keyed by its CSS custom-property name.
 ///
-/// The strings are transcriptions of `app/globals.css`, line by line — they are
-/// the page's *readout*, and the one thing here that genuinely cannot be
-/// derived, because a browser hands back the authored text rather than a
-/// normalised colour. The [Color] on the other side of each row is never parsed
-/// from them.
+/// One entry per property, and each entry is one field read. There is nothing
+/// else to keep in step: the printed readout is derived from the same [Color]
+/// the swatch paints, so the row cannot disagree with itself. The line
+/// references point at `app/globals.css` in the reference repo.
 class DsTokenRegistry {
   const DsTokenRegistry._();
 
   static final Map<String, _DsToken> _tokens = <String, _DsToken>{
     // ── Monochrome: zinc (globals.css L549–574 light / L746–762 dark) ───────
-    '--background': _DsToken(
-      resolve: (DsThemeData t) => t.background,
-      light: 'hsl(0 0% 100%)',
-      dark: 'hsl(240 10% 3.9%)',
-    ),
-    '--foreground': _DsToken(
-      resolve: (DsThemeData t) => t.foreground,
-      light: 'hsl(240 10% 3.9%)',
-      dark: 'hsl(0 0% 98%)',
-    ),
-    '--card': _DsToken(
-      resolve: (DsThemeData t) => t.card,
-      light: 'hsl(0 0% 100%)',
-      dark: 'hsl(240 5.9% 10%)',
-    ),
-    '--card-foreground': _DsToken(
-      resolve: (DsThemeData t) => t.cardForeground,
-      light: 'hsl(240 10% 3.9%)',
-      dark: 'hsl(0 0% 98%)',
-    ),
-    '--popover': _DsToken(
-      resolve: (DsThemeData t) => t.popover,
-      light: 'hsl(0 0% 100%)',
-      dark: 'hsl(240 5.9% 10%)',
-    ),
-    '--popover-foreground': _DsToken(
-      resolve: (DsThemeData t) => t.popoverForeground,
-      light: 'hsl(240 10% 3.9%)',
-      dark: 'hsl(0 0% 98%)',
-    ),
-    '--secondary': _DsToken(
-      resolve: (DsThemeData t) => t.secondary,
-      light: 'hsl(240 4.8% 95.9%)',
-      dark: 'hsl(240 3.7% 15.9%)',
-    ),
-    '--secondary-foreground': _DsToken(
-      resolve: (DsThemeData t) => t.secondaryForeground,
-      light: 'hsl(240 5.9% 10%)',
-      dark: 'hsl(0 0% 98%)',
-    ),
-    '--muted': _DsToken(
-      resolve: (DsThemeData t) => t.muted,
-      light: 'hsl(240 4.8% 95.9%)',
-      dark: 'hsl(240 3.7% 15.9%)',
-    ),
-    '--muted-foreground': _DsToken(
-      resolve: (DsThemeData t) => t.mutedForeground,
-      light: 'hsl(240 4% 40%)',
-      dark: 'hsl(240 4.9% 83.9%)',
-    ),
-    '--accent': _DsToken(
-      resolve: (DsThemeData t) => t.accent,
-      light: 'hsl(240 4.8% 95.9%)',
-      dark: 'hsl(240 5.3% 26.1%)',
-    ),
-    '--accent-foreground': _DsToken(
-      resolve: (DsThemeData t) => t.accentForeground,
-      light: 'hsl(240 5.9% 10%)',
-      dark: 'hsl(0 0% 98%)',
-    ),
-    '--border': _DsToken(
-      resolve: (DsThemeData t) => t.border,
-      light: 'hsl(240 5.9% 90%)',
-      dark: 'hsl(240 3.7% 15.9%)',
-    ),
-    '--input': _DsToken(
-      resolve: (DsThemeData t) => t.input,
-      light: 'hsl(240 5.9% 90%)',
-      dark: 'hsl(240 5.3% 26.1%)',
-    ),
-    '--page-glow': _DsToken(
-      resolve: (DsThemeData t) => t.pageGlow,
-      light: 'hsl(240 30% 98%)',
-      dark: 'hsl(240 8% 10%)',
-    ),
+    '--background': (DsThemeData t) => t.background,
+    '--foreground': (DsThemeData t) => t.foreground,
+    '--card': (DsThemeData t) => t.card,
+    '--card-foreground': (DsThemeData t) => t.cardForeground,
+    '--popover': (DsThemeData t) => t.popover,
+    '--popover-foreground': (DsThemeData t) => t.popoverForeground,
+    '--secondary': (DsThemeData t) => t.secondary,
+    '--secondary-foreground': (DsThemeData t) => t.secondaryForeground,
+    '--muted': (DsThemeData t) => t.muted,
+    '--muted-foreground': (DsThemeData t) => t.mutedForeground,
+    '--accent': (DsThemeData t) => t.accent,
+    '--accent-foreground': (DsThemeData t) => t.accentForeground,
+    '--border': (DsThemeData t) => t.border,
+    '--input': (DsThemeData t) => t.input,
+    '--page-glow': (DsThemeData t) => t.pageGlow,
 
     // ── Brand (L582–584 / L772–780) ────────────────────────────────────────
-    // `--primary: var(--color-action)` in both blocks, so it prints the ramp's
-    // own text; `--ring` is the one that flips.
-    '--primary': _DsToken.constant(
-      resolve: (DsThemeData t) => t.primary,
-      value: 'hsl(217 91% 53%)',
-    ),
-    '--primary-foreground': _DsToken.constant(
-      resolve: (DsThemeData t) => t.primaryForeground,
-      value: 'hsl(0 0% 100%)',
-    ),
-    '--ring': _DsToken(
-      resolve: (DsThemeData t) => t.ring,
-      light: 'hsl(217 91% 53%)',
-      dark: 'hsl(213 94% 78%)',
-    ),
+    // `--primary: var(--color-action)` in both blocks, so it reads the same in
+    // either; `--ring` is the one that flips.
+    '--primary': (DsThemeData t) => t.primary,
+    '--primary-foreground': (DsThemeData t) => t.primaryForeground,
+    '--ring': (DsThemeData t) => t.ring,
 
     // ── The ramps, `@theme static` (L103–109) ──────────────────────────────
-    // Declared once, outside both theme blocks, so the printed text is the same
-    // in light and dark — only what they MEAN changes, and that is the ink
+    // Declared once, outside both theme blocks, so these read identically in
+    // light and dark — only what they MEAN changes, and that is the ink
     // tokens' job.
-    '--color-action-bright': _DsToken.constant(
-      resolve: (DsThemeData t) => DsPalette.actionBright,
-      value: 'hsl(213 94% 78%)',
-    ),
-    '--color-action': _DsToken.constant(
-      resolve: (DsThemeData t) => DsPalette.action,
-      value: 'hsl(217 91% 53%)',
-    ),
-    '--color-action-dark': _DsToken.constant(
-      resolve: (DsThemeData t) => DsPalette.actionDark,
-      value: 'hsl(224 76% 33%)',
-    ),
-    '--color-value-bright': _DsToken.constant(
-      resolve: (DsThemeData t) => DsPalette.valueBright,
-      value: '#d9f99d',
-    ),
-    '--color-value': _DsToken.constant(
-      resolve: (DsThemeData t) => DsPalette.value,
-      value: '#a3e635',
-    ),
-    '--color-value-dark': _DsToken.constant(
-      resolve: (DsThemeData t) => DsPalette.valueDark,
-      value: '#4d7c0f',
-    ),
-    '--color-value-foreground': _DsToken.constant(
-      resolve: (DsThemeData t) => DsPalette.valueForeground,
-      value: 'hsl(240 10% 8%)',
-    ),
+    '--color-action-bright': (DsThemeData t) => DsPalette.actionBright,
+    '--color-action': (DsThemeData t) => DsPalette.action,
+    '--color-action-dark': (DsThemeData t) => DsPalette.actionDark,
+    '--color-value-bright': (DsThemeData t) => DsPalette.valueBright,
+    '--color-value': (DsThemeData t) => DsPalette.value,
+    '--color-value-dark': (DsThemeData t) => DsPalette.valueDark,
+    '--color-value-foreground': (DsThemeData t) => DsPalette.valueForeground,
 
     // ── State hues, `@theme static` (L148–165) ─────────────────────────────
-    '--color-success': _DsToken.constant(
-      resolve: (DsThemeData t) => DsPalette.success,
-      value: '#10b981',
-    ),
-    '--color-warning': _DsToken.constant(
-      resolve: (DsThemeData t) => DsPalette.warning,
-      value: '#fbbf24',
-    ),
-    '--color-info': _DsToken.constant(
-      resolve: (DsThemeData t) => DsPalette.info,
-      value: '#22d3ee',
-    ),
-    '--color-success-deep': _DsToken.constant(
-      resolve: (DsThemeData t) => DsPalette.successDeep,
-      value: '#047857',
-    ),
-    '--color-warning-deep': _DsToken.constant(
-      resolve: (DsThemeData t) => DsPalette.warningDeep,
-      value: '#b45309',
-    ),
-    '--color-info-deep': _DsToken.constant(
-      resolve: (DsThemeData t) => DsPalette.infoDeep,
-      value: '#0e7490',
-    ),
-    '--color-destructive-lifted': _DsToken.constant(
-      resolve: (DsThemeData t) => DsPalette.destructiveLifted,
-      value: '#f87171',
-    ),
-    '--color-destructive-deep': _DsToken.constant(
-      resolve: (DsThemeData t) => DsPalette.destructiveDeep,
-      value: 'hsl(0 72.2% 46%)',
-    ),
-    '--destructive': _DsToken.constant(
-      resolve: (DsThemeData t) => t.destructive,
-      value: 'hsl(0 72.2% 50.6%)',
-    ),
-    '--destructive-foreground': _DsToken.constant(
-      resolve: (DsThemeData t) => t.destructiveForeground,
-      value: 'hsl(0 0% 98%)',
-    ),
+    '--color-success': (DsThemeData t) => DsPalette.success,
+    '--color-warning': (DsThemeData t) => DsPalette.warning,
+    '--color-info': (DsThemeData t) => DsPalette.info,
+    '--color-success-deep': (DsThemeData t) => DsPalette.successDeep,
+    '--color-warning-deep': (DsThemeData t) => DsPalette.warningDeep,
+    '--color-info-deep': (DsThemeData t) => DsPalette.infoDeep,
+    '--color-destructive-lifted': (DsThemeData t) =>
+        DsPalette.destructiveLifted,
+    '--color-destructive-deep': (DsThemeData t) => DsPalette.destructiveDeep,
+    '--destructive': (DsThemeData t) => t.destructive,
+    '--destructive-foreground': (DsThemeData t) => t.destructiveForeground,
 
     // ── The text-safe end of each ramp, per theme (L589–594 / L784–802) ────
     // `--color-action-ink: var(--action-ink)` (L490) and the theme block then
     // answers with a ramp end, so ONE substitution chain lands on two different
-    // strings. This is the whole reason the printed value is per-theme.
-    '--action-ink': _DsToken(
-      resolve: (DsThemeData t) => t.actionInk,
-      light: 'hsl(224 76% 33%)',
-      dark: 'hsl(213 94% 78%)',
-    ),
-    '--color-action-ink': _DsToken(
-      resolve: (DsThemeData t) => t.actionInk,
-      light: 'hsl(224 76% 33%)',
-      dark: 'hsl(213 94% 78%)',
-    ),
-    '--value-ink': _DsToken(
-      resolve: (DsThemeData t) => t.valueInk,
-      light: '#4d7c0f',
-      dark: '#d9f99d',
-    ),
-    '--color-value-ink': _DsToken(
-      resolve: (DsThemeData t) => t.valueInk,
-      light: '#4d7c0f',
-      dark: '#d9f99d',
-    ),
-    '--success-ink': _DsToken(
-      resolve: (DsThemeData t) => t.successInk,
-      light: '#047857',
-      dark: '#10b981',
-    ),
-    '--color-success-ink': _DsToken(
-      resolve: (DsThemeData t) => t.successInk,
-      light: '#047857',
-      dark: '#10b981',
-    ),
-    '--warning-ink': _DsToken(
-      resolve: (DsThemeData t) => t.warningInk,
-      light: '#b45309',
-      dark: '#fbbf24',
-    ),
-    '--color-warning-ink': _DsToken(
-      resolve: (DsThemeData t) => t.warningInk,
-      light: '#b45309',
-      dark: '#fbbf24',
-    ),
-    '--info-ink': _DsToken(
-      resolve: (DsThemeData t) => t.infoInk,
-      light: '#0e7490',
-      dark: '#22d3ee',
-    ),
-    '--color-info-ink': _DsToken(
-      resolve: (DsThemeData t) => t.infoInk,
-      light: '#0e7490',
-      dark: '#22d3ee',
-    ),
-    '--destructive-ink': _DsToken(
-      resolve: (DsThemeData t) => t.destructiveInk,
-      light: 'hsl(0 72.2% 46%)',
-      dark: '#f87171',
-    ),
-    '--color-destructive-ink': _DsToken(
-      resolve: (DsThemeData t) => t.destructiveInk,
-      light: 'hsl(0 72.2% 46%)',
-      dark: '#f87171',
-    ),
+    // colours. This is the whole reason the printed value is per-theme.
+    '--action-ink': (DsThemeData t) => t.actionInk,
+    '--color-action-ink': (DsThemeData t) => t.actionInk,
+    '--value-ink': (DsThemeData t) => t.valueInk,
+    '--color-value-ink': (DsThemeData t) => t.valueInk,
+    '--success-ink': (DsThemeData t) => t.successInk,
+    '--color-success-ink': (DsThemeData t) => t.successInk,
+    '--warning-ink': (DsThemeData t) => t.warningInk,
+    '--color-warning-ink': (DsThemeData t) => t.warningInk,
+    '--info-ink': (DsThemeData t) => t.infoInk,
+    '--color-info-ink': (DsThemeData t) => t.infoInk,
+    '--destructive-ink': (DsThemeData t) => t.destructiveInk,
+    '--color-destructive-ink': (DsThemeData t) => t.destructiveInk,
   };
 
   /// Every registered custom-property name.
@@ -467,12 +324,17 @@ class DsTokenRegistry {
   /// [printedValue]: the printed text is documentation, and documentation that
   /// feeds back into rendering is how a docs page starts lying.
   static Color resolve(String cssName, DsThemeData theme) =>
-      _require(cssName).resolve(theme);
+      _require(cssName)(theme);
 
-  /// The raw CSS text `getComputedStyle().getPropertyValue(cssName)` returns
-  /// under [kind] — after `var()` substitution, before any normalisation.
+  /// The text `getComputedStyle().getPropertyValue(cssName)` returns under
+  /// [kind] — the compiled stylesheet's shortest-hex form, not the `hsl()` the
+  /// stylesheet source authors. See [dsCssColorText].
   static String printedValue(String cssName, DsThemeKind kind) =>
-      _require(cssName).printed(kind);
+      dsCssColorText(resolve(cssName, themeOf(kind)));
+
+  /// The theme block [kind] selects — `.dark` or `:root, .light`.
+  static DsThemeData themeOf(DsThemeKind kind) =>
+      kind == DsThemeKind.dark ? DsThemeData.dark : DsThemeData.light;
 
   /// The measured ratio of [cssName] against [against] in [theme] — the port of
   /// `useContrast`.
@@ -490,7 +352,7 @@ class DsTokenRegistry {
         cssName,
         'cssName',
         'Not a registered design token. Add it to DsTokenRegistry with the '
-            'raw text globals.css substitutes to in each theme block.',
+            'DsThemeData field the theme blocks resolve it to.',
       );
     }
     return token;

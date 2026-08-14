@@ -222,3 +222,55 @@ Default transition tokens (context): `--duration-tick 80ms / fast 150ms / base 2
 ## 13. Key token/class values needed to reproduce (quick reference)
 
 Radii: `rounded-sm 6px · rounded-lg 12px · rounded-xl 16px · rounded-pill 999px`. Type classes used here: `type-h1 clamp(32→40px)/1.1/700/−0.02em · type-h3 21px/1.3/600/−0.01em · type-h4 17px/1.4/600 · type-lead 17px/1.65/400 muted · type-small 13px/1.5/400 muted · type-label 11px/1/600 upper 0.16em muted · type-chip 11.5px/1.2/500 · type-micro 10.5px/1/600 upper 0.18em muted · type-num-sm mono 12px/1.2/600 −0.01em tabular · type-code mono 12.5px/1.4`. Wash opacities: Note action/value/error = `bg-<tone>/[0.08]`, `border-<tone>/30`. Spacing rhythm: header `mb-14 pb-10`; lead note `mb-12`; sections `mb-20`, heading block `mb-6`; in-section notes `mt-4`; swatch rows `p-4`; panel body `p-6`; foot nav `mt-8 pt-8`.
+
+---
+
+## 14. CORRECTION 2026-08-14 — the printed `TokenValue` strings above are wrong
+
+Everything above this line is left as first written. This section supersedes the **"value shown"** columns in §5, §6, §7 and §8, and the claim in §1.1 that `getComputedStyle(document.documentElement).getPropertyValue(token).trim()` yields *"the raw authored CSS text after `var()` substitution"*.
+
+### What was wrong
+
+§1.1 reasoned from `globals.css` source: since the stylesheet writes `--background: hsl(240 10% 3.9%)`, the readout was recorded as `hsl(240 10% 3.9%)`. It is not. The page prints `#09090b`. **Eleven of the eighteen rows were affected** — every row whose token `globals.css` authors as `hsl()`. The seven rows authored as hex (`#d9f99d`, `#a3e635`, `#4d7c0f`, `#10b981`, `#fbbf24`, `#22d3ee`, and `--color-value-bright`'s repeat) were right by accident.
+
+### Why
+
+The mechanism in §1.1 is correct — `getPropertyValue` really does hand back declaration text rather than a normalised `rgb()`. The error was assuming the browser is served `globals.css`. It is not: Tailwind v4 compiles the sheet through **Lightning CSS**, whose colour minifier rewrites every colour to its shortest equivalent form before the dev server responds. So the declaration the browser parses is already `#09090b`, and that is the text it reads back.
+
+Two consequences worth recording:
+
+- The output is **lowercase hex**, six digits, collapsed to three where every byte's nibbles match — so `hsl(0 0% 100%)` prints **`#fff`**, the table's one shape variation.
+- This is *not* the typed-`@theme`-registration story it first looks like. Checked directly on the live page: the compiled sheet contains 100 `@property` rules, and **not one of them registers a colour token** — the eight non-`--tw-*` registrations are `--scroll-fade-*`, `--shimmer-*`. Nothing about CSSOM colour serialisation is involved; CSSOM would emit `rgb(9, 9, 11)` and never `#fff`.
+
+### The measured table
+
+Read from the DOM (`textContent` of the `.type-num-sm` value line in each swatch row) at 1440×900, theme forced pre-load via `localStorage.setItem('theme', …)`, after `document.fonts.ready`:
+
+| # | § | Token | Dark | Light | Was recorded as (dark / light) |
+|---|---|---|---|---|---|
+| 1 | 5 | `--background` | `#09090b` | `#fff` | ✗ `hsl(240 10% 3.9%)` / `hsl(0 0% 100%)` |
+| 2 | 5 | `--card` | `#18181b` | `#fff` | ✗ `hsl(240 5.9% 10%)` / `hsl(0 0% 100%)` |
+| 3 | 5 | `--muted` | `#27272a` | `#f4f4f5` | ✗ `hsl(240 3.7% 15.9%)` / `hsl(240 4.8% 95.9%)` |
+| 4 | 5 | `--accent` | `#3f3f46` | `#f4f4f5` | ✗ `hsl(240 5.3% 26.1%)` / `hsl(240 4.8% 95.9%)` |
+| 5 | 5 | `--foreground` | `#fafafa` | `#09090b` | ✗ `hsl(0 0% 98%)` / `hsl(240 10% 3.9%)` |
+| 6 | 5 | `--muted-foreground` | `#d4d4d8` | `#62626a` | ✗ `hsl(240 4.9% 83.9%)` / `hsl(240 4% 40%)` |
+| 7 | 6 | `--color-action-ink` | `#92c2fc` | `#143694` | ✗ `hsl(213 94% 78%)` / `hsl(224 76% 33%)` |
+| 8 | 6 | `--color-action-bright` | `#92c2fc` | `#92c2fc` | ✗ `hsl(213 94% 78%)` |
+| 9 | 6 | `--color-action` | `#1a6ef4` | `#1a6ef4` | ✗ `hsl(217 91% 53%)` |
+| 10 | 6 | `--color-action-dark` | `#143694` | `#143694` | ✗ `hsl(224 76% 33%)` |
+| 11 | 7 | `--color-value-ink` | `#d9f99d` | `#4d7c0f` | ✓ |
+| 12 | 7 | `--color-value` | `#a3e635` | `#a3e635` | ✓ |
+| 13 | 7 | `--color-value-bright` | `#d9f99d` | `#d9f99d` | ✓ |
+| 14 | 7 | `--color-value-dark` | `#4d7c0f` | `#4d7c0f` | ✓ |
+| 15 | 8 | `--color-success` | `#10b981` | `#10b981` | ✓ |
+| 16 | 8 | `--color-warning` | `#fbbf24` | `#fbbf24` | ✓ |
+| 17 | 8 | `--color-info` | `#22d3ee` | `#22d3ee` | ✓ |
+| 18 | 8 | `--destructive` | `#dc2626` | `#dc2626` | ✗ `hsl(0 72.2% 50.6%)` |
+
+The **badge** columns in §5–8 are unaffected and were re-confirmed against the same run, with one already-known exception: §5 badges dark `--foreground` at `19.0:1` and the page renders `19.1:1` (pinned in `example/test/contrast_test.dart`).
+
+### What the port does with it
+
+`DsTokenRegistry.printedValue` no longer carries a per-token string table. Shortest-hex is a pure function of the resolved colour, so the readout is **derived** from the same `DsThemeData` field the swatch paints (`dsCssColorText` in `example/lib/token_swatch.dart`) — nothing is hardcoded, and a rebrand moves the swatch and its caption together. Verified against all 43 custom properties the compiled sheet actually emits, both themes, exact string match.
+
+Also observed while sweeping the full registry, and *not* acted on: `--color-success-ink`, `--color-warning-ink`, `--color-info-ink` and `--color-destructive-ink` return **empty** on the live page — Tailwind tree-shakes `@theme` variables no generated utility references. None is swatched on this page. The port keeps them registered, since their absence is a property of what the reference site happens to use rather than of the design system.

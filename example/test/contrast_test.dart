@@ -1,10 +1,14 @@
 /// The colors page's claim is that nothing on it is typed by hand. These are
 /// the tests that hold the arithmetic to the numbers the reference renders.
 ///
-/// Expected values come from `docs/superpowers/research/colors-map.md` §5–8,
+/// Expected ratios come from `docs/superpowers/research/colors-map.md` §5–8,
 /// which computed them with the page's own math. The map allows ±0.1 on the
 /// last decimal (the browser rasterises through 8-bit `rgb()` before measuring);
 /// anything wider than that is a real disagreement and fails here.
+///
+/// Expected **printed values** do not come from the map — §5–8's "value shown"
+/// columns were wrong, and the map's dated correction says so. They were read
+/// off the live dev server's DOM on 2026-08-14, both themes, all eighteen rows.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
@@ -58,37 +62,29 @@ const List<_Expected> _light = <_Expected>[
 /// including the four pure fills the page renders with `measure: false`.
 typedef _Printed = ({String token, String dark, String light});
 
-/// colors-map §5–8, the "value shown" columns. Every one of these is the raw
-/// authored CSS text after `var()` substitution — never a normalised `rgb()`.
+/// The eighteen `TokenValue` lines as the reference actually renders them —
+/// `textContent` read straight off `/design-system/colors` in Chrome, once per
+/// theme, on 2026-08-14.
+///
+/// Every one is lowercase hex, because the browser is never served the `hsl()`
+/// that `globals.css` authors: Tailwind v4 compiles the sheet through Lightning
+/// CSS, whose colour minifier rewrites each declaration to its shortest form
+/// before the dev server hands it over. `hsl(0 0% 100%)` arrives as `#fff` —
+/// three digits, not six — and that shorthand is the only shape variation in
+/// the whole table.
 const List<_Printed> _printed = <_Printed>[
   // §5 `#monochrome` — the first four carry no badge; they are fills.
-  (token: '--background', dark: 'hsl(240 10% 3.9%)', light: 'hsl(0 0% 100%)'),
-  (token: '--card', dark: 'hsl(240 5.9% 10%)', light: 'hsl(0 0% 100%)'),
-  (token: '--muted', dark: 'hsl(240 3.7% 15.9%)', light: 'hsl(240 4.8% 95.9%)'),
-  (token: '--accent', dark: 'hsl(240 5.3% 26.1%)', light: 'hsl(240 4.8% 95.9%)'),
-  (token: '--foreground', dark: 'hsl(0 0% 98%)', light: 'hsl(240 10% 3.9%)'),
-  (
-    token: '--muted-foreground',
-    dark: 'hsl(240 4.9% 83.9%)',
-    light: 'hsl(240 4% 40%)'
-  ),
+  (token: '--background', dark: '#09090b', light: '#fff'),
+  (token: '--card', dark: '#18181b', light: '#fff'),
+  (token: '--muted', dark: '#27272a', light: '#f4f4f5'),
+  (token: '--accent', dark: '#3f3f46', light: '#f4f4f5'),
+  (token: '--foreground', dark: '#fafafa', light: '#09090b'),
+  (token: '--muted-foreground', dark: '#d4d4d8', light: '#62626a'),
   // §6 `#action` — only the ink token flips; the three ramp ends are static.
-  (
-    token: '--color-action-ink',
-    dark: 'hsl(213 94% 78%)',
-    light: 'hsl(224 76% 33%)'
-  ),
-  (
-    token: '--color-action-bright',
-    dark: 'hsl(213 94% 78%)',
-    light: 'hsl(213 94% 78%)'
-  ),
-  (token: '--color-action', dark: 'hsl(217 91% 53%)', light: 'hsl(217 91% 53%)'),
-  (
-    token: '--color-action-dark',
-    dark: 'hsl(224 76% 33%)',
-    light: 'hsl(224 76% 33%)'
-  ),
+  (token: '--color-action-ink', dark: '#92c2fc', light: '#143694'),
+  (token: '--color-action-bright', dark: '#92c2fc', light: '#92c2fc'),
+  (token: '--color-action', dark: '#1a6ef4', light: '#1a6ef4'),
+  (token: '--color-action-dark', dark: '#143694', light: '#143694'),
   // §7 `#value` — page order is ink, mid, bright, dark.
   (token: '--color-value-ink', dark: '#d9f99d', light: '#4d7c0f'),
   (token: '--color-value', dark: '#a3e635', light: '#a3e635'),
@@ -98,36 +94,33 @@ const List<_Printed> _printed = <_Printed>[
   (token: '--color-success', dark: '#10b981', light: '#10b981'),
   (token: '--color-warning', dark: '#fbbf24', light: '#fbbf24'),
   (token: '--color-info', dark: '#22d3ee', light: '#22d3ee'),
-  (
-    token: '--destructive',
-    dark: 'hsl(0 72.2% 50.6%)',
-    light: 'hsl(0 72.2% 50.6%)'
-  ),
+  (token: '--destructive', dark: '#dc2626', light: '#dc2626'),
 ];
 
 DsThemeData _theme(DsThemeKind kind) =>
     kind == DsThemeKind.dark ? DsThemeData.dark : DsThemeData.light;
 
-final RegExp _hexText = RegExp(r'^#([0-9a-f]{6})$');
-final RegExp _hslText = RegExp(r'^hsl\(([\d.]+) ([\d.]+)% ([\d.]+)%\)$');
+final RegExp _hexText = RegExp(r'^#([0-9a-f]{3}|[0-9a-f]{6})$');
 
 /// Turns a printed value back into a [Color] — **for the tests only.**
 ///
-/// This deliberately does not exist in `token_swatch.dart`. The engine's two
-/// halves have to stay independent: if resolution ever went through the printed
-/// string, the page could no longer catch itself printing the wrong one. Here
-/// it is exactly the tool for proving the halves agree.
+/// The printed text is now derived from the painted colour, so this is no
+/// longer a check that two hand-kept halves agree; it is a check that the
+/// derivation is *lossless and correctly shaped*. A byte rounded the wrong way,
+/// a channel out of order, or a three-digit collapse applied when the nibbles
+/// do not actually match all land here as a colour that is not the one the
+/// theme holds. The strict pattern is half the test: anything the reference's
+/// minifier would not emit — an `hsl()`, an uppercase digit, a named colour —
+/// fails to parse rather than sliding through.
 Color _parseCss(String text) {
   final RegExpMatch? hex = _hexText.firstMatch(text);
-  if (hex != null) return Color(int.parse('FF${hex[1]}', radix: 16));
+  expect(hex, isNotNull, reason: 'unparseable printed value: $text');
 
-  final RegExpMatch? hsl = _hslText.firstMatch(text);
-  expect(hsl, isNotNull, reason: 'unparseable printed value: $text');
-  return dsHsl(
-    double.parse(hsl![1]!),
-    double.parse(hsl[2]!),
-    double.parse(hsl[3]!),
-  );
+  final String digits = hex![1]!;
+  final String full = digits.length == 3
+      ? digits.split('').map((String d) => '$d$d').join()
+      : digits;
+  return Color(int.parse('FF$full', radix: 16));
 }
 
 Widget _scope(Widget child, DsThemeMode mode) => DsTheme(
@@ -335,35 +328,60 @@ void main() {
   });
 
   group('DsTokenRegistry', () {
-    test('prints the raw CSS text, per theme', () {
+    test('prints the compiled stylesheet\'s hex, per theme', () {
+      // `globals.css` authors `hsl(240 10% 3.9%)` here; the browser is served
+      // — and therefore reads back — the minifier's `#09090b`.
       expect(DsTokenRegistry.printedValue('--background', DsThemeKind.dark),
-          'hsl(240 10% 3.9%)');
+          '#09090b');
       expect(DsTokenRegistry.printedValue('--background', DsThemeKind.light),
-          'hsl(0 0% 100%)');
+          '#fff');
       expect(DsTokenRegistry.printedValue('--muted-foreground', DsThemeKind.dark),
-          'hsl(240 4.9% 83.9%)');
+          '#d4d4d8');
       expect(
           DsTokenRegistry.printedValue('--muted-foreground', DsThemeKind.light),
-          'hsl(240 4% 40%)');
+          '#62626a');
+      // A token authored as hex passes through untouched.
       expect(DsTokenRegistry.printedValue('--color-value', DsThemeKind.dark),
           '#a3e635');
       // A ramp token is declared once, so it prints the same text in both.
       expect(DsTokenRegistry.printedValue('--color-value', DsThemeKind.light),
           '#a3e635');
       expect(DsTokenRegistry.printedValue('--destructive', DsThemeKind.dark),
-          'hsl(0 72.2% 50.6%)');
+          '#dc2626');
       // The ink tokens are the ones that flip.
       expect(
           DsTokenRegistry.printedValue('--color-action-ink', DsThemeKind.dark),
-          'hsl(213 94% 78%)');
+          '#92c2fc');
       expect(
           DsTokenRegistry.printedValue('--color-action-ink', DsThemeKind.light),
-          'hsl(224 76% 33%)');
+          '#143694');
       expect(DsTokenRegistry.printedValue('--color-value-ink', DsThemeKind.dark),
           '#d9f99d');
       expect(
           DsTokenRegistry.printedValue('--color-value-ink', DsThemeKind.light),
           '#4d7c0f');
+    });
+
+    test('the three-digit collapse is the only shape variation', () {
+      // `#ffffff` is the one value in this system whose bytes all have matching
+      // nibbles, and the reference prints it `#fff`. Everything else is six
+      // digits — including `#fafafa`, which looks collapsible and is not
+      // (`fa` is two different nibbles).
+      expect(dsCssColorText(dsHsl(0, 0, 100)), '#fff');
+      expect(dsCssColorText(DsThemeData.dark.foreground), '#fafafa');
+      expect(dsCssColorText(DsThemeData.light.background), '#fff');
+      expect(dsCssColorText(DsThemeData.light.card), '#fff');
+      // Every registered token, both themes, is one of the two hex shapes and
+      // is lowercase — the minifier never emits anything else here.
+      for (final String token in DsTokenRegistry.names) {
+        for (final DsThemeKind kind in DsThemeKind.values) {
+          expect(
+            DsTokenRegistry.printedValue(token, kind),
+            matches(_hexText),
+            reason: '$token on ${kind.name}',
+          );
+        }
+      }
     });
 
     test('resolves through the live theme, not through the printed text', () {
@@ -377,9 +395,9 @@ void main() {
 
     test('what a token paints is what it prints — every token, both themes',
         () {
-      // The strongest guarantee this file can make: the swatch colour and the
-      // readout beside it are the same colour, arrived at by two independent
-      // routes (a `DsThemeData` field, and a CSS string parsed here).
+      // The swatch colour and the readout beside it are the same colour. Since
+      // the readout is derived, this proves the derivation loses nothing on the
+      // way out and comes back to the byte it started from.
       for (final String token in DsTokenRegistry.names) {
         for (final DsThemeKind kind in DsThemeKind.values) {
           expect(
@@ -422,7 +440,7 @@ void main() {
       );
 
       expect(find.text('Muted foreground'), findsOneWidget);
-      expect(find.text('hsl(240 4.9% 83.9%)'), findsOneWidget);
+      expect(find.text('#d4d4d8'), findsOneWidget);
       expect(find.text('--muted-foreground'), findsOneWidget);
       expect(find.text('Secondary text, metadata, helper copy.'), findsOneWidget);
       // `.type-micro` uppercases the whole badge.
