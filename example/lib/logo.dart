@@ -88,7 +88,7 @@ class Logo extends StatelessWidget {
           const DsLogoMark(),
           SizedBox(width: ds(2.5)),
         ],
-        Text.rich(
+        DsRichText(
           TextSpan(
             text: 'ELATTAR',
             children: <InlineSpan>[
@@ -103,11 +103,8 @@ class Logo extends StatelessWidget {
               ),
             ],
           ),
-          style: DsText.styleOf(
-            context,
-            DsType.wordmark,
-            color: theme.foreground,
-          ),
+          DsType.wordmark,
+          color: theme.foreground,
         ),
       ],
     );

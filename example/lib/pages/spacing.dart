@@ -209,12 +209,13 @@ class _ScaleSection extends StatelessWidget {
             ],
           ),
           SizedBox(height: ds(4)),
-          const DsNote(
+          DsNote(
             tone: DsNoteTone.error,
             title: 'The only spacing rule',
-            child: Text(
+            child: DsText(
               'If a gap is not on this scale, it is wrong. There is no 18px, '
               'no 30px and no 50px anywhere in the product.',
+              DsType.small,
             ),
           ),
         ],
@@ -535,7 +536,7 @@ class _GlowCell extends StatelessWidget {
           child: DsText(label, DsType.numSm, color: ink),
         ),
         SizedBox(height: ds(3)),
-        Text.rich(
+        DsRichText(
           TextSpan(
             children: <InlineSpan>[
               TextSpan(text: lead),
@@ -546,7 +547,7 @@ class _GlowCell extends StatelessWidget {
               const TextSpan(text: '.'),
             ],
           ),
-          style: DsText.styleOf(context, DsType.small),
+          DsType.small,
         ),
       ],
     );
@@ -733,7 +734,7 @@ class _BreakpointsSection extends StatelessWidget {
           SizedBox(height: ds(4)),
           DsNote(
             title: 'Why the scale was not overridden',
-            child: Text.rich(
+            child: DsRichText(
               TextSpan(
                 children: <InlineSpan>[
                   const TextSpan(
@@ -753,6 +754,7 @@ class _BreakpointsSection extends StatelessWidget {
                   const TextSpan(text: ' for the mobile boundary.'),
                 ],
               ),
+              DsType.small,
             ),
           ),
         ],
@@ -774,9 +776,11 @@ class _UseCopy extends StatelessWidget {
   final String text;
 
   @override
-  Widget build(BuildContext context) => Text(
-        text,
-        style: DsText.styleOf(context, DsType.small)
-            .copyWith(height: _leadingSnug),
-      );
+  Widget build(BuildContext context) {
+    final TextStyle style = DsText.styleOf(context, DsType.small)
+        .copyWith(height: _leadingSnug);
+    // Not a `.type-*` class, so it cannot go through [DsText] — but the line
+    // box still has to be the one CSS lays out.
+    return DsLineBox(style: style, child: Text(text, style: style));
+  }
 }

@@ -147,7 +147,7 @@ class _RuleSection extends StatelessWidget {
           SizedBox(height: ds(4)),
           DsNote(
             title: 'The rule',
-            child: Text.rich(
+            child: DsRichText(
               TextSpan(
                 children: <InlineSpan>[
                   const TextSpan(text: 'Words use Space Grotesk through '),
@@ -162,6 +162,7 @@ class _RuleSection extends StatelessWidget {
                   ),
                 ],
               ),
+              DsType.small,
             ),
           ),
         ],
@@ -623,7 +624,7 @@ class _PairingCard extends StatelessWidget {
           SizedBox(height: ds(2)),
           figure,
           SizedBox(height: ds(1)),
-          Text.rich(caption, style: DsText.styleOf(context, DsType.small)),
+          DsRichText(caption, DsType.small),
         ],
       ),
     );
@@ -729,7 +730,7 @@ class _ProseSection extends StatelessWidget {
           DsNote(
             tone: DsNoteTone.error,
             title: 'Two mechanisms that do not work',
-            child: Text.rich(
+            child: DsRichText(
               TextSpan(
                 children: <InlineSpan>[
                   DsCode.span('@apply type-h2'),
@@ -764,6 +765,7 @@ class _ProseSection extends StatelessWidget {
                   ),
                 ],
               ),
+              DsType.small,
             ),
           ),
         ],
@@ -831,7 +833,7 @@ class _Prose extends StatelessWidget {
       (
         top: ds(4),
         bottom: ds(4),
-        child: Text.rich(
+        child: DsRichText(
           TextSpan(
             children: <InlineSpan>[
               const TextSpan(
@@ -850,7 +852,8 @@ class _Prose extends StatelessWidget {
               ),
             ],
           ),
-          style: paragraph,
+          DsType.body,
+          color: theme.foreground,
         ),
       ),
       (top: ds(4), bottom: ds(4), child: const _ProseLinkParagraph()),
@@ -925,7 +928,7 @@ class _Prose extends StatelessWidget {
       (
         top: ds(4),
         bottom: ds(4),
-        child: Text.rich(
+        child: DsRichText(
           TextSpan(
             children: <InlineSpan>[
               const TextSpan(text: 'That heading is an '),
@@ -942,7 +945,8 @@ class _Prose extends StatelessWidget {
               const TextSpan(text: ' is a default, not a cage.'),
             ],
           ),
-          style: paragraph,
+          DsType.body,
+          color: theme.foreground,
         ),
       ),
       // hr — `margin-block: 40px; border: 0; border-block-start: 1px solid
@@ -992,18 +996,13 @@ class _ProseLinkParagraphState extends State<_ProseLinkParagraph> {
   @override
   Widget build(BuildContext context) {
     final DsThemeData theme = DsTheme.of(context);
-    final TextStyle paragraph = DsText.styleOf(
-      context,
-      DsType.body,
-      color: theme.foreground,
-    );
 
     return TweenAnimationBuilder<Color?>(
       tween: ColorTween(end: _hovered ? dsTransparent : theme.actionInk),
       duration: dsAnimationDuration(context, DsDurations.fast),
       curve: DsCurves.out,
       builder: (BuildContext context, Color? underline, Widget? child) {
-        return Text.rich(
+        return DsRichText(
           TextSpan(
             children: <InlineSpan>[
               const TextSpan(text: 'Links take '),
@@ -1032,7 +1031,8 @@ class _ProseLinkParagraphState extends State<_ProseLinkParagraph> {
               ),
             ],
           ),
-          style: paragraph,
+          DsType.body,
+          color: theme.foreground,
         );
       },
     );
@@ -1078,10 +1078,13 @@ class _ProseList extends StatelessWidget {
                 width: ds(6),
                 child: Padding(
                   padding: EdgeInsets.only(right: ds(2)),
-                  child: Text(
-                    ordered ? '${i + 1}.' : '•',
+                  child: DsLineBox(
                     style: marker,
-                    textAlign: TextAlign.right,
+                    child: Text(
+                      ordered ? '${i + 1}.' : '•',
+                      style: marker,
+                      textAlign: TextAlign.right,
+                    ),
                   ),
                 ),
               ),
@@ -1089,7 +1092,10 @@ class _ProseList extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[
-                    Text(items[i].text, style: style),
+                    DsLineBox(
+                      style: style,
+                      child: Text(items[i].text, style: style),
+                    ),
                     if (items[i].nested != null) ...<Widget>[
                       // Nested `li > ul { margin-block: 8px }`.
                       SizedBox(height: ds(2)),
@@ -1121,6 +1127,12 @@ class _ProseQuote extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final DsThemeData theme = DsTheme.of(context);
+    // `blockquote` — `.type-body`, muted and italic.
+    final TextStyle quote = DsText.styleOf(
+      context,
+      DsType.body,
+      color: theme.mutedForeground,
+    ).copyWith(fontStyle: FontStyle.italic);
 
     return Container(
       padding: EdgeInsets.only(left: ds(4)),
@@ -1131,13 +1143,9 @@ class _ProseQuote extends StatelessWidget {
           left: BorderSide(color: theme.input, width: ds(0.5)),
         ),
       ),
-      child: Text(
-        text,
-        style: DsText.styleOf(
-          context,
-          DsType.body,
-          color: theme.mutedForeground,
-        ).copyWith(fontStyle: FontStyle.italic),
+      child: DsLineBox(
+        style: quote,
+        child: Text(text, style: quote),
       ),
     );
   }

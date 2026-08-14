@@ -569,7 +569,7 @@ class DsContrastBadge extends StatelessWidget {
     String cased(String text) =>
         DsType.micro.uppercase ? text.toUpperCase() : text;
 
-    return Text.rich(
+    return DsRichText(
       TextSpan(
         style: sentence,
         children: <InlineSpan>[
@@ -577,6 +577,7 @@ class DsContrastBadge extends StatelessWidget {
           TextSpan(text: cased(dsContrastVerdict(ratio)), style: verdict),
         ],
       ),
+      DsType.micro,
     );
   }
 }

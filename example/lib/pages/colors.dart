@@ -206,7 +206,7 @@ class ColorsPage extends StatelessWidget {
           padding: EdgeInsets.only(bottom: ds(12)),
           child: DsNote(
             title: 'Measured, not asserted',
-            child: Text.rich(
+            child: DsRichText(
               TextSpan(
                 children: <InlineSpan>[
                   const TextSpan(
@@ -226,6 +226,7 @@ class ColorsPage extends StatelessWidget {
                   const TextSpan(text: '.'),
                 ],
               ),
+              DsType.small,
             ),
           ),
         ),
@@ -243,7 +244,7 @@ class ColorsPage extends StatelessWidget {
               DsNote(
                 tone: DsNoteTone.value,
                 title: 'The one step that is not a mirror',
-                child: Text.rich(
+                child: DsRichText(
                   TextSpan(
                     children: <InlineSpan>[
                       const TextSpan(
@@ -268,6 +269,7 @@ class ColorsPage extends StatelessWidget {
                       ),
                     ],
                   ),
+                  DsType.small,
                 ),
               ),
             ],
@@ -289,7 +291,7 @@ class ColorsPage extends StatelessWidget {
               DsNote(
                 title: 'One text-safe shade per theme — and it is not the same '
                     'shade',
-                child: Text.rich(
+                child: DsRichText(
                   TextSpan(
                     children: <InlineSpan>[
                       const TextSpan(
@@ -313,6 +315,7 @@ class ColorsPage extends StatelessWidget {
                       const TextSpan(text: ' on top of it.'),
                     ],
                   ),
+                  DsType.small,
                 ),
               ),
             ],
@@ -373,7 +376,7 @@ class ColorsPage extends StatelessWidget {
             children: <Widget>[
               DsPanel(
                 label: 'Texture',
-                child: Text.rich(
+                child: DsRichText(
                   TextSpan(
                     style: DsText.styleOf(context, DsType.small),
                     children: <InlineSpan>[
@@ -405,6 +408,7 @@ class ColorsPage extends StatelessWidget {
                       ),
                     ],
                   ),
+                  DsType.small,
                 ),
               ),
               DsPanel(

@@ -14,6 +14,7 @@ export 'src/foundation/theme.dart';
 export 'src/foundation/typography.dart';
 
 // ── scope ───────────────────────────────────────────────────────────────────
+export 'src/text_layout.dart';
 export 'src/theme_scope.dart';
 
 // ── components ──────────────────────────────────────────────────────────────

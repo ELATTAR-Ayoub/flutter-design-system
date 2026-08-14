@@ -153,14 +153,43 @@ class DsTypeSpec {
   /// [fontSize] is always explicit — it is the resolved value for the fluid
   /// classes, and an override for the fixed ones. [tracking] is converted from
   /// em to px against it, which is what the browser does.
-  TextStyle resolve(double fontSize, Color color) {
+  TextStyle resolve(double fontSize, Color color) =>
+      _style(fontSize, color, height);
+
+  /// The same class as a CSS **inline** box.
+  ///
+  /// An inline non-replaced element's border box is the font's content area —
+  /// its ascent plus its descent — and `line-height` governs only what the
+  /// element contributes to the line box around it. A `<code>` chip in a
+  /// sentence is therefore 17px of glyph plus its padding and border, not
+  /// 17.5px of line box plus them. Dropping [height] is how Flutter spells
+  /// "content area".
+  TextStyle resolveInline(double fontSize, Color color) =>
+      _style(fontSize, color, null, inherit: false);
+
+  TextStyle _style(
+    double fontSize,
+    Color color,
+    double? lineHeight, {
+    bool inherit = true,
+  }) {
     final double? em = tracking;
     return TextStyle(
+      // A null `height` means "no line-height of my own", and `Text` merges an
+      // ambient [DefaultTextStyle] into whatever it is given — so an inline
+      // box would silently pick the surrounding paragraph's ratio back up.
+      // Standing outside the cascade is the only way to say nothing at all.
+      inherit: inherit,
       color: color,
       fontFamily: family,
       package: DsFonts.package,
       fontSize: fontSize,
-      height: height,
+      height: lineHeight,
+      // CSS splits a line's leading in half, above the glyphs and below them.
+      // Flutter's default splits it in the ratio of the font's own ascent to
+      // its descent instead, which drops every line about a pixel below where
+      // the browser paints it. `even` **is** CSS half-leading.
+      leadingDistribution: TextLeadingDistribution.even,
       fontWeight: weight,
       fontStyle: fontStyle,
       fontVariations: _variationsFor(fontSize),

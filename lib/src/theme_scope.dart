@@ -15,6 +15,7 @@ import 'package:flutter/widgets.dart';
 
 import 'foundation/theme.dart';
 import 'foundation/typography.dart';
+import 'text_layout.dart';
 
 /// The three-way choice the toggle offers — `next-themes` with `enableSystem`.
 ///
@@ -175,6 +176,7 @@ class DsText extends StatelessWidget {
     this.overflow,
     this.softWrap,
     this.textDirection,
+    this.inline = false,
   });
 
   /// The string as authored. Any `text-transform` is applied at paint time,
@@ -200,6 +202,11 @@ class DsText extends StatelessWidget {
   final bool? softWrap;
   final TextDirection? textDirection;
 
+  /// Renders the class as a CSS **inline** box rather than a block one — the
+  /// `<code>` chip, whose own box is glyph-tall and whose `line-height` shapes
+  /// only the sentence around it. See [DsTypeSpec.resolveInline].
+  final bool inline;
+
   /// The [TextStyle] [spec] resolves to in [context].
   ///
   /// Exposed for the places a widget is not enough: an [InlineSpan] inside a
@@ -210,6 +217,7 @@ class DsText extends StatelessWidget {
     DsTypeSpec spec, {
     Color? color,
     double? fontSize,
+    bool inline = false,
   }) {
     final double? size = fontSize ?? spec.size;
     assert(
@@ -218,7 +226,8 @@ class DsText extends StatelessWidget {
       '.type-display and .type-h1 take DsFluid.display/h1(context); '
       '.type-accent takes DsType.accentSize(inheritedSize).',
     );
-    return spec.resolve(size!, color ?? _colorOf(context, spec));
+    final Color ink = color ?? _colorOf(context, spec);
+    return inline ? spec.resolveInline(size!, ink) : spec.resolve(size!, ink);
   }
 
   static Color _colorOf(BuildContext context, DsTypeSpec spec) {
@@ -234,14 +243,81 @@ class DsText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
+    final TextStyle style = styleOf(
+      context,
+      spec,
+      color: color,
+      fontSize: fontSize,
+      inline: inline,
+    );
+    final Widget paragraph = Text(
       spec.uppercase ? text.toUpperCase() : text,
-      style: styleOf(context, spec, color: color, fontSize: fontSize),
+      style: style,
       textAlign: align,
       maxLines: maxLines,
       overflow: overflow,
       softWrap: softWrap,
       textDirection: textDirection,
+    );
+    return DsLineBox(
+      style: style,
+      // An inline box is measured by the font's content area rather than by
+      // any line box — see [dsContentAreaHeight].
+      lineHeight: inline ? dsContentAreaHeight(style) : null,
+      child: paragraph,
+    );
+  }
+}
+
+/// [DsText] for a span tree — a sentence carrying code chips, an emphasis, a
+/// second colour — rather than one flat string.
+///
+/// The class states the paragraph's own style, exactly as the element's
+/// `.type-*` class does in the reference; the spans below it override only
+/// what the markup overrides.
+class DsRichText extends StatelessWidget {
+  const DsRichText(
+    this.span,
+    this.spec, {
+    super.key,
+    this.color,
+    this.fontSize,
+    this.align,
+    this.maxLines,
+    this.overflow,
+    this.textDirection,
+  });
+
+  final InlineSpan span;
+
+  /// The `.type-*` class the paragraph itself carries.
+  final DsTypeSpec spec;
+
+  final Color? color;
+  final double? fontSize;
+  final TextAlign? align;
+  final int? maxLines;
+  final TextOverflow? overflow;
+  final TextDirection? textDirection;
+
+  @override
+  Widget build(BuildContext context) {
+    final TextStyle style = DsText.styleOf(
+      context,
+      spec,
+      color: color,
+      fontSize: fontSize,
+    );
+    return DsLineBox(
+      style: style,
+      child: Text.rich(
+        span,
+        style: style,
+        textAlign: align,
+        maxLines: maxLines,
+        overflow: overflow,
+        textDirection: textDirection,
+      ),
     );
   }
 }

@@ -153,11 +153,12 @@ class OverviewPage extends StatelessWidget {
           ),
         ),
         // Outside every section: no `mb-20`, just the last child of the page.
-        const DsNote(
+        DsNote(
           tone: DsNoteTone.value,
           title: 'Scope of this phase',
-          child: Text(
+          child: DsText(
             'This is the design system and component library. The ten product screens are built on top of it and are tracked separately — nothing in here implements a real wallet, payment, blockchain or shipping integration. All figures, packs, cards and users are placeholder data.',
+            DsType.small,
           ),
         ),
       ],
@@ -200,7 +201,7 @@ class _RuleRow extends StatelessWidget {
           DsText(number, DsType.numSm, color: theme.actionInk),
           SizedBox(width: ds(5)),
           Expanded(
-            child: Text.rich(
+            child: DsRichText(
               TextSpan(
                 children: <InlineSpan>[
                   TextSpan(text: rule.lead, style: strong),
@@ -208,11 +209,8 @@ class _RuleRow extends StatelessWidget {
                   TextSpan(text: ' ${rule.detail}'),
                 ],
               ),
-              style: DsText.styleOf(
-                context,
-                DsType.small,
-                color: theme.mutedForeground,
-              ),
+              DsType.small,
+              color: theme.mutedForeground,
             ),
           ),
         ],

@@ -296,33 +296,7 @@ class DsPanel extends StatelessWidget {
                       ),
                     ),
                   ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.baseline,
-                    textBaseline: TextBaseline.alphabetic,
-                    children: <Widget>[
-                      if (label != null)
-                        Flexible(
-                          child: DsText(
-                            label!,
-                            DsType.label,
-                            color: theme.mutedForeground,
-                          ),
-                        ),
-                      const Spacer(),
-                      if (note != null) ...<Widget>[
-                        SizedBox(width: ds(4)),
-                        Flexible(
-                          // `.type-num-*` declares no colour of its own; the
-                          // strip states it.
-                          child: DsText(
-                            note!,
-                            DsType.numSm,
-                            color: theme.mutedForeground,
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
+                  child: _PanelStrip(label: label, note: note),
                 ),
               Container(
                 color: theme.background,
@@ -335,6 +309,64 @@ class DsPanel extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// The header strip's `flex items-baseline justify-between gap-4`.
+///
+/// A CSS flex item is laid out at the width its content asks for and shrinks
+/// only when the line runs out of room; a Flutter `Flexible` is offered a
+/// *share* of the row up front. The difference shows: a `Spacer` between two
+/// `Flexible`s makes three flex children, each capped at a third of the strip,
+/// and "Geist Mono — numerical values" — 249.66px against a 163px third —
+/// wrapped to a second line the browser never draws, pushing everything under
+/// that panel 11px down.
+///
+/// So there is no spacer, and the count of flex children is the count of
+/// strings: a lone label is offered the whole strip, and a label beside a note
+/// half of it. Measured against the reference, that is enough for every panel
+/// on these four pages — the widest pairing is 170px + 240.7px inside a 1038px
+/// strip — and the shares still let both shrink and wrap on a narrow screen
+/// rather than overflowing.
+class _PanelStrip extends StatelessWidget {
+  const _PanelStrip({this.label, this.note});
+
+  final String? label;
+  final String? note;
+
+  @override
+  Widget build(BuildContext context) {
+    final DsThemeData theme = DsTheme.of(context);
+    final Widget? labelText = label == null
+        ? null
+        : DsText(label!, DsType.label, color: theme.mutedForeground);
+    final Widget? noteText = note == null
+        ? null
+        // `.type-num-*` declares no colour of its own; the strip states it.
+        : DsText(
+            note!,
+            DsType.numSm,
+            color: theme.mutedForeground,
+            // Alignment only matters in the one shape where the note fills the
+            // row: with no label to push it over, it right-aligns itself.
+            align: label == null ? TextAlign.right : null,
+          );
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.baseline,
+      textBaseline: TextBaseline.alphabetic,
+      // `justify-between`: whatever neither string claims falls between them.
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: <Widget>[
+        if (labelText != null) Flexible(child: labelText),
+        if (labelText != null && noteText != null) SizedBox(width: ds(4)),
+        if (noteText != null)
+          if (labelText == null)
+            Expanded(child: noteText)
+          else
+            Flexible(child: noteText),
+      ],
     );
   }
 }
@@ -402,10 +434,7 @@ class _MetaValue extends StatelessWidget {
   final InlineSpan value;
 
   @override
-  Widget build(BuildContext context) => Text.rich(
-        value,
-        style: DsText.styleOf(context, DsType.small),
-      );
+  Widget build(BuildContext context) => DsRichText(value, DsType.small);
 }
 
 /// `code.type-code.rounded-sm.border.border-border.bg-card.px-1.5.py-0.5` —
@@ -415,14 +444,21 @@ class DsCode extends StatelessWidget {
 
   final String text;
 
+  /// What the chip's frame costs it vertically: `py-0.5` twice, plus a
+  /// hairline on each edge. A browser paints all four outside the line box.
+  static final double _frame = (ds(0.5) + DsWidths.hairline) * 2;
+
   /// The same chip, spliced into a sentence.
   ///
-  /// Flutter has no inline box: a chip inside a paragraph is a [WidgetSpan],
-  /// baseline-aligned so it sits on the sentence's own baseline rather than
-  /// riding the line box.
+  /// `<code>` is an inline element: the line box grows for its `line-height`
+  /// only — never for its padding or its border, which overflow the leading —
+  /// and its glyphs sit on the sentence's own baseline. A [WidgetSpan] makes
+  /// no such distinction, so [DsInlineBox] hides the frame from the line and
+  /// `PlaceholderAlignment.baseline` does the rest.
   static InlineSpan span(String text) => WidgetSpan(
-        alignment: PlaceholderAlignment.middle,
-        child: DsCode(text),
+        alignment: PlaceholderAlignment.baseline,
+        baseline: TextBaseline.alphabetic,
+        child: DsInlineBox(trim: _frame, child: DsCode(text)),
       );
 
   @override
@@ -435,7 +471,12 @@ class DsCode extends StatelessWidget {
         borderRadius: BorderRadius.circular(DsRadii.sm),
         border: Border.all(color: theme.border, width: DsWidths.hairline),
       ),
-      child: DsText(text, DsType.code, color: theme.mutedForeground),
+      child: DsText(
+        text,
+        DsType.code,
+        color: theme.mutedForeground,
+        inline: true,
+      ),
     );
   }
 }
@@ -879,7 +920,11 @@ class DsPageFootNav extends StatelessWidget {
     }
 
     return Container(
-      margin: EdgeInsets.only(top: ds(8)),
+      // No `mt-8` here, and that is not an omission: the nav always follows a
+      // `DsSection`, whose `mb-20` is an adjoining margin. CSS collapses the
+      // pair to the larger of the two, so the 80px below the last section is
+      // the whole gap and the nav's own 32px never shows. Flutter has no
+      // margin collapsing — it would add them — so the collapse is done here.
       padding: EdgeInsets.only(top: ds(8)),
       decoration: BoxDecoration(
         border: Border(
