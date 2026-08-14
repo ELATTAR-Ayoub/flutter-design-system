@@ -198,6 +198,7 @@ class _DsLiftCardState extends State<DsLiftCard>
                   borderRadius: radius,
                   border: Border.all(
                     color: _colorAt(resting, hovering, _tint.value),
+                    width: DsWidths.hairline,
                   ),
                   boxShadow: _shadowAt(lifted, _rise.value),
                 ),
@@ -205,7 +206,15 @@ class _DsLiftCardState extends State<DsLiftCard>
               ),
             ),
             child: Padding(
-              padding: widget.padding,
+              // `box-sizing: border-box`: the hairline is paid for out of the
+              // card's own box, so the content box is the card minus its
+              // padding *and* minus the border on each side. [Container] adds
+              // `decoration.padding` for exactly this reason; [DecoratedBox]
+              // paints the border without reserving room for it, and the two
+              // pixels it hands back are enough to move a line-wrap point.
+              padding: widget.padding.add(
+                const EdgeInsets.all(DsWidths.hairline),
+              ),
               child: widget.builder(context, hovered),
             ),
           ),

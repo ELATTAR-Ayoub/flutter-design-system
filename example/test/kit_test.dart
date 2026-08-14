@@ -29,6 +29,15 @@ Widget _harness(
 TextStyle _styleOf(WidgetTester tester, String text) =>
     tester.widget<Text>(find.text(text)).style!;
 
+/// [child] laid out at exactly [width], left-aligned, so a measurement is the
+/// widget's own arithmetic rather than the test view's.
+Widget _atWidth(Widget child, {double width = 400}) => _harness(
+      Align(
+        alignment: Alignment.topLeft,
+        child: SizedBox(width: width, child: child),
+      ),
+    );
+
 void main() {
   group('DsNote', () {
     // The rendering fact colors-map §3 flags: `.type-label` declares its own
@@ -264,6 +273,121 @@ void main() {
     final TextStyle note = _styleOf(tester, 'max-w-(--width-prose) · 720px');
     expect(note.fontSize, DsType.numSm.size);
     expect(note.color, DsThemeData.dark.mutedForeground);
+  });
+
+  // `box-sizing: border-box` is global in Tailwind, so a framed box spends its
+  // own width on its border: a 400px panel with `p-6` gives its specimen
+  // 400 − 2·24 − 2·1. Flutter's `Container` reproduces that automatically
+  // (`decoration.padding`); a bare `DecoratedBox` does not, and the two pixels
+  // it hands back are enough to move a line-wrap point — which is how this was
+  // found (index-card blurbs measured 309.33px here against 307.33 in Chrome).
+  group('border-box', () {
+    const Key body = Key('body');
+
+    testWidgets('DsPanel spends its frame on its own width',
+        (WidgetTester tester) async {
+      const double outer = 400;
+      await tester.pumpWidget(
+        _atWidth(
+          const DsPanel(
+            label: 'Seven steps',
+            child: SizedBox(key: body, height: 40),
+          ),
+        ),
+      );
+
+      expect(
+        tester.getSize(find.byKey(body)).width,
+        outer - 2 * ds(6) - 2 * DsWidths.hairline,
+      );
+      // …and the strip above it starts at the border's inner edge, not on it.
+      expect(
+        tester.getTopLeft(find.text('SEVEN STEPS')).dx,
+        closeTo(ds(5) + DsWidths.hairline, 0.01),
+      );
+    });
+
+    testWidgets('a flush DsPanel body is still inset by the frame',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(
+        _atWidth(
+          const DsPanel(flush: true, child: SizedBox(key: body, height: 40)),
+        ),
+      );
+      expect(
+        tester.getSize(find.byKey(body)).width,
+        400 - 2 * DsWidths.hairline,
+      );
+    });
+
+    testWidgets('DsDividedList rows clear the frame, and each divider is a '
+        'real pixel of row height', (WidgetTester tester) async {
+      const Key first = Key('row-0');
+      const Key second = Key('row-1');
+      await tester.pumpWidget(
+        _atWidth(
+          const DsDividedList(
+            children: <Widget>[
+              SizedBox(key: first, height: 40),
+              SizedBox(key: second, height: 40),
+            ],
+          ),
+        ),
+      );
+
+      for (final Key key in <Key>[first, second]) {
+        expect(
+          tester.getSize(find.byKey(key)).width,
+          400 - 2 * DsWidths.hairline,
+          reason: '$key',
+        );
+      }
+      // `divide-y` is a `border-top` on the second row: it adds to that row's
+      // height rather than painting over its first pixel.
+      expect(
+        tester.getTopLeft(find.byKey(second)).dy -
+            tester.getBottomLeft(find.byKey(first)).dy,
+        DsWidths.hairline,
+      );
+    });
+
+    testWidgets('an index card blurb measures p-5 in from the frame',
+        (WidgetTester tester) async {
+      // The measurement that started this: at the overview's 1080 column the
+      // six-up card is 349.33 wide, and `border p-5` leaves its copy 307.33 —
+      // the number Chrome reports. Without the border inset it read 309.33,
+      // and "every contrast ratio" wrapped a word later than on the web.
+      const double outer = 349.33;
+      await tester.pumpWidget(
+        _atWidth(
+          const SizedBox(
+            // A grid row is an `IntrinsicHeight`; on its own the card's `grow`
+            // blurb needs a bounded height from somewhere.
+            height: 240,
+            child: DsIndexCard(
+              href: '$dsRoot/colors',
+              title: 'Colors',
+              blurb: 'Surfaces, the action and value ramps, text, hairlines, '
+                  'semantic states, and every contrast ratio measured live in '
+                  'both themes.',
+              contents: <String>['Surfaces'],
+            ),
+          ),
+          width: outer,
+        ),
+      );
+
+      final RenderBox blurb = tester.renderObject<RenderBox>(
+        find.text(
+          'Surfaces, the action and value ramps, text, hairlines, semantic '
+          'states, and every contrast ratio measured live in both themes.',
+        ),
+      );
+      expect(
+        blurb.constraints.maxWidth,
+        closeTo(outer - 2 * ds(5) - 2 * DsWidths.hairline, 0.01),
+      );
+    });
   });
 
   testWidgets('DsMeta puts the key in mono action ink beside its value',

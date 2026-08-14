@@ -254,6 +254,43 @@ void main() {
       await t.pump();
       expect(seen, isTrue);
     });
+
+    // `box-sizing: border-box`, the rule the whole system is laid out under:
+    // a bordered, padded box gives its content `width − 2·padding − 2·border`.
+    // Two pixels is not cosmetic — the overview's index-card blurbs measured
+    // 309.33px here against 307.33px in Chrome, and that is the difference
+    // between "every contrast ratio" wrapping after `contrast` and after
+    // `ratio`.
+    testWidgets('the border is paid for out of the content box',
+        (WidgetTester t) async {
+      const Key content = Key('content');
+      const double outer = 240;
+      final double pad = ds(5); // `p-5`, the index card
+
+      await t.pumpWidget(host(
+        SizedBox(
+          width: outer,
+          height: 140,
+          child: DsLiftCard(
+            padding: EdgeInsets.all(pad),
+            builder: (BuildContext c, bool hovered) =>
+                const SizedBox.expand(key: content),
+          ),
+        ),
+      ));
+
+      expect(
+        t.getSize(find.byKey(content)).width,
+        outer - 2 * pad - 2 * DsWidths.hairline,
+      );
+      expect(
+        t.getSize(find.byKey(content)).height,
+        140 - 2 * pad - 2 * DsWidths.hairline,
+      );
+      // And the border it is paying for is the token, not `Border.all`'s
+      // coincidentally-identical default.
+      expect((decorationOf(t).border! as Border).top.width, DsWidths.hairline);
+    });
   });
 
   group('DsSlidingPillGroup', () {

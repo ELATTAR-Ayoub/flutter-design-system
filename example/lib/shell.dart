@@ -485,6 +485,12 @@ class NavTree extends StatelessWidget {
                       // exact pixel (`-ml-px`), and a row that declares
                       // `border-transparent` is letting this line show
                       // through.
+                      //
+                      // The one bordered box on this page that must NOT inset
+                      // its child. `border-box` does move the `ul`'s content
+                      // edge in by a pixel, and the rows' `-ml-px` moves them
+                      // straight back out again — the two cancel, and the
+                      // rows span the list's full border box.
                       decoration: BoxDecoration(
                         border: Border(
                           left: BorderSide(
@@ -638,9 +644,13 @@ class _NavRowState extends State<_NavRow> {
                   ),
                 ),
                 child: Padding(
-                  // `py-2 pl-4`, measured from where the hairline sits.
+                  // `py-2 pl-4`, measured from where the hairline sits — and
+                  // `box-sizing: border-box` puts the row's own `border-l`
+                  // inside its box, so the label starts one pixel further in
+                  // than the padding alone would put it. Vertically there is
+                  // no border to pay for, so `py-2` is `py-2`.
                   padding: EdgeInsets.only(
-                    left: ds(4),
+                    left: ds(4) + DsWidths.hairline,
                     top: ds(2),
                     bottom: ds(2),
                   ),

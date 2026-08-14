@@ -80,6 +80,48 @@ void main() {
       }
     });
 
+    testWidgets('a border is paid for out of the child, as border-box does',
+        (WidgetTester t) async {
+      // The surface is what every outline button is built on, and a button is
+      // `border px-4`: the border lives *inside* the declared box, so the
+      // label gets the box less two hairlines — not two pixels more.
+      const Key content = Key('content');
+      await t.pumpWidget(host(SizedBox(
+        width: 100,
+        height: 40,
+        child: DsMachineSurface(
+          spec: DsShadows.btn,
+          radius: BorderRadius.circular(DsRadii.pill),
+          border: Border.all(
+            color: DsThemeData.dark.input,
+            width: DsWidths.hairline,
+          ),
+          child: const SizedBox.expand(key: content),
+        ),
+      )));
+
+      expect(
+        t.getSize(find.byKey(content)),
+        Size(100 - 2 * DsWidths.hairline, 40 - 2 * DsWidths.hairline),
+      );
+    });
+
+    testWidgets('a borderless surface takes the whole box',
+        (WidgetTester t) async {
+      const Key content = Key('content');
+      await t.pumpWidget(host(SizedBox(
+        width: 100,
+        height: 40,
+        child: DsMachineSurface(
+          spec: DsShadows.e1,
+          radius: BorderRadius.circular(DsRadii.pill),
+          child: const SizedBox.expand(key: content),
+        ),
+      )));
+
+      expect(t.getSize(find.byKey(content)), const Size(100, 40));
+    });
+
     testWidgets('re-resolves its ink when the theme flips',
         (WidgetTester t) async {
       final DsThemeController controller = DsThemeController();

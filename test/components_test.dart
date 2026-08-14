@@ -353,6 +353,22 @@ void main() {
       expect(t.getRect(find.byType(DsSheetPanel)).width, DsWidths.sidebar);
     });
 
+    testWidgets('the right-hand hairline comes out of the 288, not off it',
+        (WidgetTester t) async {
+      // `w-72` under `box-sizing: border-box`: 288px including the border, so
+      // the sheet's content is 287 wide and the panel's right edge is where
+      // the page resumes.
+      useFrame(t);
+      await t.pumpWidget(trigger());
+      await t.tap(find.byType(DsButton));
+      await t.pumpAndSettle();
+
+      expect(
+        t.getSize(find.byType(SafeArea)).width,
+        DsWidths.sidebarMobile - DsWidths.hairline,
+      );
+    });
+
     testWidgets('slides in from 40px out, over the overlay duration',
         (WidgetTester t) async {
       useFrame(t);

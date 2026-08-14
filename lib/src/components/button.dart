@@ -205,11 +205,11 @@ class _DsButtonState extends State<DsButton> {
           fill: fill,
           border: Border.all(color: skin.border, width: DsWidths.hairline),
           child: Padding(
-            // The border is inside the box, so its width comes off the
-            // padding — `box-sizing: border-box`.
+            // Just `px-*`: the border is inside the box and [DsMachineSurface]
+            // already insets this child by its width, the way `box-sizing:
+            // border-box` does.
             padding: EdgeInsets.symmetric(
-              horizontal:
-                  DsButton.paddingXFor(widget.size) + DsWidths.hairline,
+              horizontal: DsButton.paddingXFor(widget.size),
             ),
             child: Center(
               widthFactor: square ? null : 1,

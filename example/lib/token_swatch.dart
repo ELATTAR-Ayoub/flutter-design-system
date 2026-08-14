@@ -634,7 +634,9 @@ class DsTokenSwatch extends StatelessWidget {
               ? DsTokenRegistry.resolve(token, theme)
               : dsTransparent,
           borderRadius: BorderRadius.circular(DsRadii.lg),
-          border: Border.all(color: theme.input),
+          // No child to inset: the swatch *is* the colour, and the hairline
+          // only has to keep a white card visible on a white background.
+          border: Border.all(color: theme.input, width: DsWidths.hairline),
         ),
       ),
     );
@@ -723,7 +725,7 @@ class DsTokenSwatchList extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.card,
         borderRadius: BorderRadius.circular(DsRadii.xl),
-        border: Border.all(color: theme.border),
+        border: Border.all(color: theme.border, width: DsWidths.hairline),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,

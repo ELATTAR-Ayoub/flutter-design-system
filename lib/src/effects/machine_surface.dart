@@ -64,7 +64,12 @@ class DsMachineSurface extends StatelessWidget {
     if (border != null) {
       content = DecoratedBox(
         decoration: BoxDecoration(border: border, borderRadius: radius),
-        child: content,
+        // `box-sizing: border-box` — the border is paid for out of the
+        // surface's own box, so what is left for the content is the box minus
+        // the border on each side. [Container] does this for its callers via
+        // `decoration.padding`; [DecoratedBox] does not, so it is done here
+        // rather than left for every caller to remember.
+        child: Padding(padding: border!.dimensions, child: content),
       );
     }
     if (spec.hasInset) {

@@ -99,30 +99,37 @@ class DsSheetPanel extends StatelessWidget {
           ),
           boxShadow: DsShadows.tailwindLg.outerShadows(theme),
         ),
-        child: DefaultTextStyle(
-          style: DsText.styleOf(
-            context,
-            DsComponentType.sheetBody,
-            color: theme.popoverForeground,
-          ),
-          child: SafeArea(
-            child: Stack(
-              children: <Widget>[
-                child,
-                if (showCloseButton)
-                  Positioned(
-                    // `absolute top-3 right-3`.
-                    top: ds(3),
-                    right: ds(3),
-                    child: DsButton(
-                      variant: DsButtonVariant.ghost,
-                      size: DsButtonSize.iconSm,
-                      label: 'Close',
-                      onPressed: () => Navigator.of(context).maybePop(),
-                      child: const DsIcon(DsIconGlyph.x),
+        // `w-72` is the *border* box: `box-sizing: border-box` spends one of
+        // those 288 pixels on the right-hand hairline, so the panel's content
+        // — and the absolutely-positioned close button, which is placed
+        // against the padding box — starts one pixel in from it.
+        child: Padding(
+          padding: const EdgeInsets.only(right: DsWidths.hairline),
+          child: DefaultTextStyle(
+            style: DsText.styleOf(
+              context,
+              DsComponentType.sheetBody,
+              color: theme.popoverForeground,
+            ),
+            child: SafeArea(
+              child: Stack(
+                children: <Widget>[
+                  child,
+                  if (showCloseButton)
+                    Positioned(
+                      // `absolute top-3 right-3`.
+                      top: ds(3),
+                      right: ds(3),
+                      child: DsButton(
+                        variant: DsButtonVariant.ghost,
+                        size: DsButtonSize.iconSm,
+                        label: 'Close',
+                        onPressed: () => Navigator.of(context).maybePop(),
+                        child: const DsIcon(DsIconGlyph.x),
+                      ),
                     ),
-                  ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

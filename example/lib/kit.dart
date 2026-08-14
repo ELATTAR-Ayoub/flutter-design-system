@@ -268,60 +268,71 @@ class DsPanel extends StatelessWidget {
         borderRadius: radius,
         border: Border.all(color: theme.border, width: DsWidths.hairline),
       ),
-      child: ClipRRect(
-        // `overflow-hidden`, so the body's fill stops at the corner.
-        borderRadius: radius,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            if (label != null || note != null)
-              Container(
-                padding:
-                    EdgeInsets.symmetric(horizontal: ds(5), vertical: ds(3)),
-                decoration: BoxDecoration(
-                  color: theme.muted,
-                  border: Border(
-                    bottom: BorderSide(
-                      color: theme.border,
-                      width: DsWidths.hairline,
+      // `box-sizing: border-box` — the frame is paid for out of the panel's
+      // own width, so the strip and the body start at the border's inner edge
+      // and are two pixels narrower than the panel. Outside the clip, not
+      // inside it, so the body's fill still reaches that edge instead of
+      // leaving a hairline of card showing.
+      child: Padding(
+        padding: const EdgeInsets.all(DsWidths.hairline),
+        child: ClipRRect(
+          // `overflow-hidden`, so the body's fill stops at the corner — on the
+          // *inner* curve, which CSS derives as the outer radius less the
+          // border it sits inside.
+          borderRadius: BorderRadius.circular(DsRadii.xl - DsWidths.hairline),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              if (label != null || note != null)
+                Container(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: ds(5), vertical: ds(3)),
+                  decoration: BoxDecoration(
+                    color: theme.muted,
+                    border: Border(
+                      bottom: BorderSide(
+                        color: theme.border,
+                        width: DsWidths.hairline,
+                      ),
                     ),
                   ),
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.baseline,
-                  textBaseline: TextBaseline.alphabetic,
-                  children: <Widget>[
-                    if (label != null)
-                      Flexible(
-                        child: DsText(
-                          label!,
-                          DsType.label,
-                          color: theme.mutedForeground,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                    textBaseline: TextBaseline.alphabetic,
+                    children: <Widget>[
+                      if (label != null)
+                        Flexible(
+                          child: DsText(
+                            label!,
+                            DsType.label,
+                            color: theme.mutedForeground,
+                          ),
                         ),
-                      ),
-                    const Spacer(),
-                    if (note != null) ...<Widget>[
-                      SizedBox(width: ds(4)),
-                      Flexible(
-                        // `.type-num-*` declares no colour of its own; the
-                        // strip states it.
-                        child: DsText(
-                          note!,
-                          DsType.numSm,
-                          color: theme.mutedForeground,
+                      const Spacer(),
+                      if (note != null) ...<Widget>[
+                        SizedBox(width: ds(4)),
+                        Flexible(
+                          // `.type-num-*` declares no colour of its own; the
+                          // strip states it.
+                          child: DsText(
+                            note!,
+                            DsType.numSm,
+                            color: theme.mutedForeground,
+                          ),
                         ),
-                      ),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
+              Container(
+                color: theme.background,
+                padding: flush
+                    ? EdgeInsets.zero
+                    : bodyPadding ?? EdgeInsets.all(ds(6)),
+                child: child,
               ),
-            Container(
-              color: theme.background,
-              padding:
-                  flush ? EdgeInsets.zero : bodyPadding ?? EdgeInsets.all(ds(6)),
-              child: child,
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -1004,27 +1015,39 @@ class DsDividedList extends StatelessWidget {
         borderRadius: shape,
         border: Border.all(color: theme.border, width: DsWidths.hairline),
       ),
-      child: ClipRRect(
-        borderRadius: shape,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            for (int i = 0; i < children.length; i++)
-              if (i == 0)
-                children[i]
-              else
-                DecoratedBox(
-                  decoration: BoxDecoration(
-                    border: Border(
-                      top: BorderSide(
-                        color: theme.border,
-                        width: DsWidths.hairline,
+      // `box-sizing: border-box` — the frame costs the rows a pixel on each
+      // side, so a row's content box is the list's width less two.
+      child: Padding(
+        padding: const EdgeInsets.all(DsWidths.hairline),
+        child: ClipRRect(
+          // The inner curve: the outer radius less the border inside it.
+          borderRadius: BorderRadius.circular(radius - DsWidths.hairline),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              for (int i = 0; i < children.length; i++)
+                if (i == 0)
+                  children[i]
+                else
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      border: Border(
+                        top: BorderSide(
+                          color: theme.border,
+                          width: DsWidths.hairline,
+                        ),
                       ),
                     ),
+                    // The divider is a `border-top` on the row itself, so it
+                    // adds to that row's height and sits above its content
+                    // rather than over the first pixel of it.
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: DsWidths.hairline),
+                      child: children[i],
+                    ),
                   ),
-                  child: children[i],
-                ),
-          ],
+            ],
+          ),
         ),
       ),
     );

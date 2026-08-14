@@ -125,6 +125,34 @@ void main() {
     expect(find.text('MEASURED, NOT ASSERTED'), findsOneWidget);
   });
 
+  testWidgets('the rail is 240px including its rule, and a row label clears '
+      'its own', (WidgetTester tester) async {
+    tester.useViewport(_desktop);
+    await tester.pumpApp();
+
+    // `aside.w-60.border-r` under `box-sizing: border-box`: 240px *including*
+    // the right-hand hairline, so the nav content box is 239 and `main`
+    // starts at exactly 240. Get this wrong and the centred 1080 column
+    // shifts a pixel against the reference.
+    final Finder rail = find.ancestor(
+      of: find.byType(NavTree),
+      matching: find.byType(SingleChildScrollView),
+    );
+    expect(tester.getSize(rail).width, DsWidths.rail - DsWidths.hairline);
+    expect(tester.getTopLeft(rail).dx, 0);
+
+    // The row is `-ml-px border-l pl-4`: its own hairline sits on the list's,
+    // and the label starts inside it — 17px from the list's left edge, not 16.
+    final Finder row =
+        find.byKey(const ValueKey<String>('nav:$dsRoot/colors'));
+    expect(
+      tester.getTopLeft(find.descendant(of: row, matching: find.text('Colors')))
+              .dx -
+          tester.getTopLeft(row).dx,
+      closeTo(ds(4) + DsWidths.hairline, 0.01),
+    );
+  });
+
   testWidgets('below lg the rail is gone and the burger opens the sheet', (
     WidgetTester tester,
   ) async {
