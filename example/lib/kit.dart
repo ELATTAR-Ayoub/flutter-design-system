@@ -440,13 +440,57 @@ class _MetaValue extends StatelessWidget {
 /// `code.type-code.rounded-sm.border.border-border.bg-card.px-1.5.py-0.5` —
 /// the inline code chip.
 class DsCode extends StatelessWidget {
-  const DsCode(this.text, {super.key});
+  const DsCode(this.text, {super.key})
+      : chip = text,
+        _openLeft = false,
+        _openRight = false;
 
+  /// One slice of a chip that a line break ran through — see [span].
+  ///
+  /// Positional because two of the fields are private, and a named parameter
+  /// may not be: the whole chip, then the left edge, then the right.
+  const DsCode._fragment(this.text, this.chip, this._openLeft, this._openRight);
+
+  /// What this widget draws — a slice of [chip], or all of it.
   final String text;
+
+  /// The whole chip this slice belongs to.
+  ///
+  /// Equal to [text] unless a line break was allowed to fall inside the chip,
+  /// in which case the slices of one chip all name it — which is how a caller
+  /// (a test, say) reads a chip back from however many pieces the line breaker
+  /// left it in.
+  final String chip;
+
+  /// This slice continues a chip that began on the line above, so its frame is
+  /// cut off on the left; likewise [_openRight] for one that continues below.
+  final bool _openLeft;
+  final bool _openRight;
 
   /// What the chip's frame costs it vertically: `py-0.5` twice, plus a
   /// hairline on each edge. A browser paints all four outside the line box.
   static final double _frame = (ds(0.5) + DsWidths.hairline) * 2;
+
+  /// The chip cut at every break opportunity CSS gives it.
+  ///
+  /// `<code>` holds text, and text breaks: UAX #14 allows a line break *after*
+  /// a hyphen (LB21 forbids one before it), which is why Chrome sets
+  /// `sheen-action` as `sheen-` at the end of one line and `action` at the
+  /// start of the next. A run of hyphens stays whole — no break may fall
+  /// between two of them — so `--width-prose` offers `--` / `width-` / `prose`
+  /// and not a break after the first dash.
+  static List<String> _fragments(String text) {
+    final List<String> out = <String>[];
+    int start = 0;
+    for (int i = 0; i < text.length - 1; i++) {
+      if (text[i] == '-' && text[i + 1] != '-') {
+        out.add(text.substring(start, i + 1));
+        start = i + 1;
+      }
+    }
+    out.add(text.substring(start));
+    return out;
+  }
 
   /// The same chip, spliced into a sentence.
   ///
@@ -455,30 +499,140 @@ class DsCode extends StatelessWidget {
   /// and its glyphs sit on the sentence's own baseline. A [WidgetSpan] makes
   /// no such distinction, so [DsInlineBox] hides the frame from the line and
   /// `PlaceholderAlignment.baseline` does the rest.
-  static InlineSpan span(String text) => WidgetSpan(
+  ///
+  /// A placeholder is also atomic, and a chip is not: it goes on one span per
+  /// [_fragments] entry, which puts a break opportunity exactly where CSS has
+  /// one and nowhere else. Flush on a single line the fragments meet with no
+  /// gap and no seam, because each one paints the whole frame and shows only
+  /// its own slice of it — that is `box-decoration-break: slice`, the default.
+  static InlineSpan span(String text) {
+    final List<String> parts = _fragments(text);
+    if (parts.length == 1) {
+      return _sliceSpan(text, text, openLeft: false, openRight: false);
+    }
+    return TextSpan(
+      children: <InlineSpan>[
+        for (int i = 0; i < parts.length; i++)
+          _sliceSpan(
+            parts[i],
+            text,
+            openLeft: i > 0,
+            openRight: i < parts.length - 1,
+          ),
+      ],
+    );
+  }
+
+  static InlineSpan _sliceSpan(
+    String text,
+    String chip, {
+    required bool openLeft,
+    required bool openRight,
+  }) =>
+      WidgetSpan(
         alignment: PlaceholderAlignment.baseline,
         baseline: TextBaseline.alphabetic,
-        child: DsInlineBox(trim: _frame, child: DsCode(text)),
+        child: DsInlineBox(
+          trim: _frame,
+          child: DsCode._fragment(text, chip, openLeft, openRight),
+        ),
       );
 
   @override
   Widget build(BuildContext context) {
     final DsThemeData theme = DsTheme.of(context);
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: ds(1.5), vertical: ds(0.5)),
-      decoration: BoxDecoration(
-        color: theme.card,
-        borderRadius: BorderRadius.circular(DsRadii.sm),
-        border: Border.all(color: theme.border, width: DsWidths.hairline),
+    // `px-1.5 py-0.5` plus the border, which insets content as CSS's
+    // border-box does — and which an open edge does not have.
+    final double pad = ds(1.5) + DsWidths.hairline;
+    final double lead = ds(0.5) + DsWidths.hairline;
+    return CustomPaint(
+      painter: _ChipFrame(
+        fill: theme.card,
+        stroke: theme.border,
+        openLeft: _openLeft,
+        openRight: _openRight,
       ),
-      child: DsText(
-        text,
-        DsType.code,
-        color: theme.mutedForeground,
-        inline: true,
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(
+          _openLeft ? 0 : pad,
+          lead,
+          _openRight ? 0 : pad,
+          lead,
+        ),
+        child: DsText(
+          text,
+          DsType.code,
+          color: theme.mutedForeground,
+          inline: true,
+        ),
       ),
     );
   }
+}
+
+/// The chip's frame, painted the way a browser paints a broken inline box.
+///
+/// `box-decoration-break: slice` — the initial value — draws the border box
+/// once for the whole element and then cuts it at each line break, so the
+/// fragment ending a line carries no right border and no right corners, and
+/// the one continuing it carries no left border and no left corners. Painting
+/// the whole frame and clipping to the fragment *is* that rule rather than an
+/// imitation of it, and it is why two fragments flush on one line show no seam.
+class _ChipFrame extends CustomPainter {
+  const _ChipFrame({
+    required this.fill,
+    required this.stroke,
+    required this.openLeft,
+    required this.openRight,
+  });
+
+  final Color fill;
+  final Color stroke;
+  final bool openLeft;
+  final bool openRight;
+
+  /// Enough for the hidden side's corners and border to fall outside the clip.
+  static const double _overhang = DsRadii.sm + DsWidths.hairline;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final Rect whole = Rect.fromLTRB(
+      openLeft ? -_overhang : 0,
+      0,
+      size.width + (openRight ? _overhang : 0),
+      size.height,
+    );
+    const Radius radius = Radius.circular(DsRadii.sm);
+    // Half the hairline: a CSS border is drawn inside the border box, so the
+    // stroke's centre line sits half a width in — the same inset
+    // `BoxBorder.paintUniformBorder` uses for `BorderSide.strokeAlignInside`.
+    final double inset = DsWidths.hairline / 2;
+
+    canvas.save();
+    canvas.clipRect(Offset.zero & size);
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(whole, radius),
+      Paint()..color = fill,
+    );
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        whole.deflate(inset),
+        Radius.circular(DsRadii.sm - inset),
+      ),
+      Paint()
+        ..color = stroke
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = DsWidths.hairline,
+    );
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(_ChipFrame old) =>
+      old.fill != fill ||
+      old.stroke != stroke ||
+      old.openLeft != openLeft ||
+      old.openRight != openRight;
 }
 
 /* ── Do / Don't ──────────────────────────────────────────────────────────── */

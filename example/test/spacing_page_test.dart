@@ -3,10 +3,24 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
+import 'package:example/kit.dart';
 import 'package:example/pages/spacing.dart';
 import 'package:example/shell.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+/// The `<code>` chip [text], read back from however many slices the line
+/// breaker left it in.
+///
+/// A chip is one [WidgetSpan] per break opportunity CSS gives it, so a chip
+/// with a hyphen renders as two [DsCode]s and `find.text` no longer sees it
+/// whole. Joining the slices that name the same chip returns the chip itself
+/// exactly when it is on screen once and nothing was lost in the slicing.
+String _chip(WidgetTester tester, String text) => tester
+    .widgetList<DsCode>(find.byType(DsCode))
+    .where((DsCode code) => code.chip == text)
+    .map((DsCode code) => code.text)
+    .join();
 
 /// The design frame, tall enough that the whole page is laid out at once.
 ///
@@ -179,7 +193,7 @@ void main() {
 
     expect(find.text('WHY THE SCALE WAS NOT OVERRIDDEN'), findsOneWidget);
     for (final String chip in <String>['--breakpoint-xl', 'xl:', 'md:']) {
-      expect(find.text(chip), findsOneWidget);
+      expect(_chip(tester, chip), chip);
     }
   });
 

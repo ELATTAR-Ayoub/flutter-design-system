@@ -22,6 +22,19 @@ import 'package:flutter_test/flutter_test.dart';
 /// column is tall enough that most of the page is laid out on screen.
 const Size _viewport = Size(1440, 4000);
 
+/// The `<code>` chip [text], read back from however many slices the line
+/// breaker left it in.
+///
+/// A chip is one [WidgetSpan] per break opportunity CSS gives it, so a chip
+/// with a hyphen renders as two [DsCode]s and `find.text` no longer sees it
+/// whole. Joining the slices that name the same chip returns the chip itself
+/// exactly when it is on screen once and nothing was lost in the slicing.
+String _chip(WidgetTester tester, String text) => tester
+    .widgetList<DsCode>(find.byType(DsCode))
+    .where((DsCode code) => code.chip == text)
+    .map((DsCode code) => code.text)
+    .join();
+
 Widget _harness(DsThemeController controller, AppRouter router) => DsTheme(
       controller: controller,
       child: AppRouterScope(
@@ -285,9 +298,9 @@ void main() {
       expect(find.text('MEANING'), findsOneWidget);
       // The texture utilities are named in copy only — nothing on this page
       // renders a foil, bloom or sheen specimen.
-      expect(find.text('foil-value'), findsOneWidget);
-      expect(find.text('bloom-cosmic'), findsOneWidget);
-      expect(find.text('sheen-action'), findsOneWidget);
+      expect(_chip(tester, 'foil-value'), 'foil-value');
+      expect(_chip(tester, 'bloom-cosmic'), 'bloom-cosmic');
+      expect(_chip(tester, 'sheen-action'), 'sheen-action');
       expect(
         find.textContaining(
           'Nothing may be communicated by colour alone.',

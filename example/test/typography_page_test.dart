@@ -46,6 +46,19 @@ extension on WidgetTester {
   }
 }
 
+/// The `<code>` chip [text], read back from however many slices the line
+/// breaker left it in.
+///
+/// A chip is one [WidgetSpan] per break opportunity CSS gives it, so a chip
+/// with a hyphen renders as two [DsCode]s and `find.text` no longer sees it
+/// whole. Joining the slices that name the same chip returns the chip itself
+/// exactly when it is on screen once and nothing was lost in the slicing.
+String _chip(WidgetTester tester, String text) => tester
+    .widgetList<DsCode>(find.byType(DsCode))
+    .where((DsCode code) => code.chip == text)
+    .map((DsCode code) => code.text)
+    .join();
+
 TextStyle _styleOf(WidgetTester tester, String text) =>
     tester.widget<Text>(find.text(text)).style!;
 
@@ -343,8 +356,8 @@ void main() {
       // A `DsNote` title is muted-foreground in every tone.
       expect(_styleOf(tester, 'TWO MECHANISMS THAT DO NOT WORK').color,
           DsThemeData.dark.mutedForeground);
-      expect(find.text('@apply type-h2'), findsOneWidget);
-      expect(find.text('[&_h2]:type-h2'), findsOneWidget);
+      expect(_chip(tester, '@apply type-h2'), '@apply type-h2');
+      expect(_chip(tester, '[&_h2]:type-h2'), '[&_h2]:type-h2');
       expect(
         find.textContaining('Cannot apply unknown utility class',
             findRichText: true),

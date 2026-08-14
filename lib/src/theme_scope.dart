@@ -311,7 +311,9 @@ class DsRichText extends StatelessWidget {
     return DsLineBox(
       style: style,
       child: Text.rich(
-        span,
+        // Inline boxes reach the line breaker as a breakable-anywhere object;
+        // CSS treats them as the text they hold. See [dsGlueInlineBoxes].
+        dsGlueInlineBoxes(span, style),
         style: style,
         textAlign: align,
         maxLines: maxLines,

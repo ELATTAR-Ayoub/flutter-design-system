@@ -336,3 +336,218 @@ class _RenderInlineBox extends RenderProxyBox {
     transform.translateByDouble(0, _dy, 0, 1);
   }
 }
+
+/* ── Break opportunities around an inline box ────────────────────────────── */
+
+/// Characters a line may not break **before** — UAX #14 LB13 (`× CL`, `× CP`,
+/// `× IS`, `× SY`, `× EX`): closing brackets and quotes, and the punctuation
+/// that belongs to whatever it follows.
+const String _noBreakBefore = ')]}\u00bb\u201d\u2019.,:;!?/';
+
+/// Characters a line may not break **after** — UAX #14 LB14 (`OP SP* ×`):
+/// opening brackets and quotes.
+const String _noBreakAfter = '([{\u00ab\u201c\u2018';
+
+/// Restores the break opportunities CSS has around an inline box.
+///
+/// A `<code>` chip in a sentence is text as far as line breaking is concerned.
+/// `…sheen-action) and…` may break *inside* the chip, at its hyphen — UAX #14
+/// allows a break after a hyphen — but never between the chip and the `)`,
+/// because LB13 forbids a break before a closing bracket. Chrome therefore
+/// sets `sheen-` at the end of the line and `action)` at the start of the next.
+///
+/// Flutter renders the chip as a [WidgetSpan], and the engine gives every
+/// placeholder a soft break opportunity on both sides unconditionally —
+/// measurably so: `aaaa<box>bbbb` breaks between the box and `bbbb` though no
+/// rule in UAX #14 allows it, and a U+2060 WORD JOINER at that seam does not
+/// suppress it. Flutter's opportunity set around a chip is thus a strict
+/// superset of CSS's, and the greedy breaker takes an opportunity the browser
+/// does not have.
+///
+/// The repair is to delete the surplus opportunities rather than to nudge the
+/// legal ones: punctuation the line may not break away from is moved *into*
+/// the placeholder, so chip and bracket reach the breaker as one object. With
+/// the two engines then offering the same opportunities over the same widths,
+/// the same greedy walk produces the same lines. Nothing here can move a line
+/// that already breaks where the browser breaks it, because a line that did
+/// not use a deleted opportunity cannot notice that it is gone.
+InlineSpan dsGlueInlineBoxes(InlineSpan root, TextStyle base) {
+  final _Glue glue = _Glue(base);
+  glue._collect(root, base);
+  glue._plan();
+  return glue._seams.isEmpty ? root : glue._rebuild(root);
+}
+
+/// What a placeholder swallowed from its neighbours.
+class _Seam {
+  String head = '';
+  String tail = '';
+  TextStyle? headStyle;
+  TextStyle? tailStyle;
+}
+
+/// Two passes over one span tree: read the seams, then write them.
+///
+/// Both passes walk in the same order and count the same leaves — a [TextSpan]
+/// carrying text, and a placeholder — so a leaf's index means the same thing
+/// in each.
+class _Glue {
+  _Glue(this.base);
+
+  final TextStyle base;
+
+  final List<bool> _isBox = <bool>[];
+  final List<String> _texts = <String>[];
+  final List<TextStyle> _styles = <TextStyle>[];
+
+  final Map<int, _Seam> _seams = <int, _Seam>{};
+  final Map<int, int> _fromStart = <int, int>{};
+  final Map<int, int> _fromEnd = <int, int>{};
+
+  int _at = 0;
+
+  void _collect(InlineSpan span, TextStyle inherited) {
+    final TextStyle style =
+        span.style == null ? inherited : inherited.merge(span.style);
+    if (span is TextSpan) {
+      final String? text = span.text;
+      if (text != null && text.isNotEmpty) {
+        _isBox.add(false);
+        _texts.add(text);
+        _styles.add(style);
+      }
+      for (final InlineSpan child in span.children ?? const <InlineSpan>[]) {
+        _collect(child, style);
+      }
+    } else if (span is PlaceholderSpan) {
+      _isBox.add(true);
+      _texts.add('\uFFFC');
+      _styles.add(style);
+    }
+  }
+
+  /// Reads the seams once the leaves are known.
+  void _plan() {
+    for (int i = 0; i < _isBox.length; i++) {
+      if (!_isBox[i]) continue;
+      final _Seam seam = _Seam();
+      if (i + 1 < _isBox.length && !_isBox[i + 1]) {
+        final String next = _texts[i + 1];
+        int n = 0;
+        while (n < next.length && _noBreakBefore.contains(next[n])) {
+          n++;
+        }
+        if (n > 0) {
+          seam.tail = next.substring(0, n);
+          seam.tailStyle = _styles[i + 1];
+          _fromStart[i + 1] = n;
+        }
+      }
+      if (i > 0 && !_isBox[i - 1]) {
+        final String prev = _texts[i - 1];
+        int n = 0;
+        while (n < prev.length && _noBreakAfter.contains(prev[prev.length - 1 - n])) {
+          n++;
+        }
+        if (n > 0) {
+          seam.head = prev.substring(prev.length - n);
+          seam.headStyle = _styles[i - 1];
+          _fromEnd[i - 1] = n;
+        }
+      }
+      if (seam.head.isNotEmpty || seam.tail.isNotEmpty) _seams[i] = seam;
+    }
+    // A leaf short enough to be claimed from both ends would be double-counted;
+    // leave such a seam alone rather than drop characters.
+    _fromStart.removeWhere((int i, int n) => n + (_fromEnd[i] ?? 0) > _texts[i].length);
+    _fromEnd.removeWhere((int i, int n) => n + (_fromStart[i] ?? 0) > _texts[i].length);
+  }
+
+  InlineSpan _rebuild(InlineSpan span) {
+    if (span is TextSpan) {
+      String? text = span.text;
+      if (text != null && text.isNotEmpty) {
+        final int i = _at++;
+        final int a = _fromStart[i] ?? 0;
+        final int b = _fromEnd[i] ?? 0;
+        text = text.substring(a, text.length - b);
+      }
+      final List<InlineSpan>? children = span.children;
+      return TextSpan(
+        text: text,
+        children: children == null
+            ? null
+            : <InlineSpan>[
+                for (final InlineSpan child in children) _rebuild(child),
+              ],
+        style: span.style,
+        recognizer: span.recognizer,
+        mouseCursor: span.mouseCursor,
+        onEnter: span.onEnter,
+        onExit: span.onExit,
+        semanticsLabel: span.semanticsLabel,
+        semanticsIdentifier: span.semanticsIdentifier,
+        locale: span.locale,
+        spellOut: span.spellOut,
+      );
+    }
+    if (span is! PlaceholderSpan) return span;
+    // Counted whatever kind of placeholder it is, so this walk stays in step
+    // with the one that read the seams; only a widget has a child to glue to.
+    final int i = _at++;
+    final _Seam? seam = _seams[i];
+    if (seam == null || span is! WidgetSpan) return span;
+    return WidgetSpan(
+      alignment: span.alignment,
+      baseline: span.baseline,
+      style: span.style,
+      child: _GluedBox(
+        head: seam.head,
+        headStyle: seam.headStyle ?? base,
+        tail: seam.tail,
+        tailStyle: seam.tailStyle ?? base,
+        child: span.child,
+      ),
+    );
+  }
+}
+
+/// An inline box and the punctuation a line may not break away from it.
+///
+/// The punctuation renders in the style it came from and contributes only its
+/// content area, exactly as [DsInlineBox] leaves the chip contributing only
+/// its own — the line box's height stays the paragraph's business, so gluing
+/// changes where lines break and never how tall they are.
+class _GluedBox extends StatelessWidget {
+  const _GluedBox({
+    required this.head,
+    required this.headStyle,
+    required this.tail,
+    required this.tailStyle,
+    required this.child,
+  });
+
+  final String head;
+  final TextStyle headStyle;
+  final String tail;
+  final TextStyle tailStyle;
+  final Widget child;
+
+  static Widget _punctuation(String text, TextStyle style) => DsLineBox(
+        style: style,
+        lineHeight: dsContentAreaHeight(style),
+        child: Text(text, style: style, softWrap: false),
+      );
+
+  @override
+  Widget build(BuildContext context) => Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.baseline,
+        textBaseline: TextBaseline.alphabetic,
+        children: <Widget>[
+          if (head.isNotEmpty) _punctuation(head, headStyle),
+          child,
+          if (tail.isNotEmpty) _punctuation(tail, tailStyle),
+        ],
+      );
+}
