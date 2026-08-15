@@ -1292,3 +1292,24 @@ Consequences here:
     **whether or not the action would have collided** — on specimen 3 it shortens the description column from 968
     to 904px. **Recommendation:** reproduce exactly (it is a measured layout fact, and it is what makes the two
     action Alerts wrap differently from the other three), rather than sizing the lane to the button.
+
+---
+
+## Dated correction — 2026-08-16, B2 build-time probes (supervisor-appended)
+
+- **§6.2 glyph column error:** sonner's loading glyph does NOT spin —
+  `sonner.tsx` adds no `anim-spin`. The port matches (no spin).
+- **Back-expanded exit is unreachable on the live page:** `expanded` pauses
+  every toast clock, so a toast cannot expire while expanded, and a swipe
+  takes the swipe-out branch. Transcribed from the stylesheet; reachable and
+  pinned in the port.
+- **Enter curve measured** as CSS `ease` `cubic-bezier(.25,.1,.25,1)`
+  (opacity 0.314@20.3%/0.645@38.3%/0.9445@69.6%); swipe-out release is CSS
+  `ease-out` `(0,0,.58,1)` — both named in DsCurves (cssEase/cssEaseOut).
+- **Reduced motion:** `transition: none`, toast appears at identity/opacity 1,
+  and STILL expires on its 4000ms clock — timers are not motion.
+- **Blanked back toasts:** `li` opacity 1 with content/icon at 0; both bloom
+  pseudos keep drifting at 0.75; the starfield hangs off `[data-content]` so
+  it goes dark with the children (port: `starfield: false`, measured-correct;
+  the reference fades it over the 400ms content fade — the port cuts, bounded
+  by the bloom/starfield architecture; recorded).
