@@ -270,6 +270,8 @@ void main() {
         DsIconGlyph.circleCheck: 2,
         DsIconGlyph.octagonX: 3,
         DsIconGlyph.circleX: 3,
+        DsIconGlyph.atSign: 2,
+        DsIconGlyph.ticket: 4,
       };
       expect(DsIconPaths.elements.keys, unorderedEquals(DsIconGlyph.values));
       for (final DsIconGlyph glyph in DsIconGlyph.values) {
@@ -384,10 +386,12 @@ void main() {
           DsIconGlyph.circleCheck,
           DsIconGlyph.octagonX,
           DsIconGlyph.circleX,
+          DsIconGlyph.atSign,
+          DsIconGlyph.ticket,
         ],
       );
-      // 8 chrome + 59 new curated + 9 off-set.
-      expect(DsIconGlyph.values, hasLength(76));
+      // 8 chrome + 59 new curated + 11 off-set.
+      expect(DsIconGlyph.values, hasLength(78));
     });
 
     test('the 59 new curated glyphs come to the ledger\'s 162 elements', () {
@@ -532,17 +536,24 @@ void main() {
       // grid assertion above survive 59 arc-heavy glyphs, given `getBounds()`
       // includes control points that bulge outside the drawn curve?
       //
-      // MEASURED, not assumed: the worst excursion across all 68 glyphs is
-      // **negative** — every control polygon lands strictly inside the grid,
-      // and the tightest still clears the edge by a full unit. So the −0.01 /
-      // +24.01 tolerance above never had to be widened, and `_tightBounds`
-      // never had to be substituted for `getBounds()`.
+      // MEASURED, not assumed: the worst excursion across all 78 glyphs is
+      // **negative** — every control polygon lands strictly inside the grid.
+      // So the −0.01 / +24.01 tolerance above never had to be widened, and
+      // `_tightBounds` never had to be substituted for `getBounds()`.
       //
-      // The tightest is `radio`, whose outer pair of 10-unit broadcast arcs
-      // are drawn about the grid centre and reach x = 2 and x = 22; their
-      // cubic control points sit at 1.0252 and 22.9748. `zap` is the tightest
-      // *vertically* (control points at y = 1.8586 and 22.1417 around geometry
-      // that stops at 2.0008 and 21.9992) — see the spike group below.
+      // The tightest is `atSign`, which took the title from `radio` when the
+      // off-set glyphs landed. Both lose it the same way — a 10-unit arc drawn
+      // about the grid centre reaches the 2 / 22 lines, and the cubics that
+      // approximate it bulge about a unit further — but the `@`'s outer sweep
+      // is a single large-arc segment rather than a pair of quarter arcs, so
+      // its control polygon sits marginally wider: left 0.9817 and bottom
+      // 22.7827, against `radio`'s 1.0252 and 22.9748.
+      //
+      // The margin is therefore no longer "a full unit": it is 0.9817, and the
+      // comment used to say otherwise. The invariant that matters is the one
+      // asserted — `worst < 0` — and it still holds with room to spare. `zap`
+      // remains the tightest *vertically* (control points at y = 1.8586 and
+      // 22.1417 around geometry that stops at 2.0008 and 21.9992).
       double worst = double.negativeInfinity;
       DsIconGlyph worstGlyph = DsIconGlyph.menu;
       for (final DsIconGlyph glyph in DsIconGlyph.values) {
@@ -558,8 +569,8 @@ void main() {
           worstGlyph = glyph;
         }
       }
-      expect(worstGlyph, DsIconGlyph.radio);
-      expect(worst, closeTo(-1.0252, 0.001));
+      expect(worstGlyph, DsIconGlyph.atSign);
+      expect(worst, closeTo(-0.9817, 0.001));
       expect(worst, lessThan(0));
     });
 
@@ -697,12 +708,14 @@ void main() {
             reason: '${glyph.name} closed-contour count');
         totalClosed += closed;
       }
-      // 17 `z` commands + 28 circles + 12 rects. Seventeen, not twelve: the map
+      // 18 `z` commands + 29 circles + 12 rects. Eighteen, not twelve: the map
       // counts twelve *glyphs* that carry a `z`, `packageOpen` spends two of
       // them (its second and fourth flaps both close), the off-set swap glyphs
       // add three — `play`'s triangle and the speaker body that `volume2` and
-      // `volumeX` share — and `octagonX`'s plate is the seventeenth.
-      expect(totalClosed, 57);
+      // `volumeX` share — `octagonX`'s plate is the seventeenth, and `ticket`'s
+      // outline the eighteenth. Twenty-nine circles, not twenty-eight, because
+      // `atSign` brings a 4-unit bowl that shares nothing.
+      expect(totalClosed, 59);
       expect(
         DsIconGlyph.values.where((DsIconGlyph g) => DsIconPaths.elements[g]!
             .whereType<DsIconPathElement>()
@@ -727,6 +740,9 @@ void main() {
           DsIconGlyph.volume2,
           DsIconGlyph.volumeX,
           DsIconGlyph.octagonX,
+          // `ticket` closes with an uppercase `Z`; the regex takes both cases,
+          // which is the point of writing it `[zZ]`.
+          DsIconGlyph.ticket,
         ],
       );
     });
@@ -1321,6 +1337,18 @@ const Map<DsIconGlyph, List<String>> _transcript = <DsIconGlyph, List<String>>{
     'circle 12 12 10',
     'path m15 9-6 6',
     'path m9 9 6 6',
+  ],
+  // A 4-unit bowl, not the 10-unit ring the status glyphs share.
+  DsIconGlyph.atSign: <String>[
+    'circle 12 12 4',
+    'path M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-4 8',
+  ],
+  // The one `d` in the set that closes with an uppercase `Z`.
+  DsIconGlyph.ticket: <String>[
+    'path M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z',
+    'path M13 5v2',
+    'path M13 17v2',
+    'path M13 11v2',
   ],
 };
 

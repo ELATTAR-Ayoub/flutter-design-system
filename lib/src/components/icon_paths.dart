@@ -203,6 +203,21 @@ enum DsIconGlyph {
   /// It is [octagonX]'s cross inside [circleCheck]'s ring: all three of its
   /// nodes are shared geometry, and all three carry their neighbours' keys.
   circleX,
+
+  /// `at-sign.mjs`. Off-set (ruling I6): the inputs page's Email addon.
+  ///
+  /// Its ring is a **4**-unit circle, not the 10-unit `1mglay` one the status
+  /// glyphs share — it is the `@`'s inner bowl, with the sweep around it drawn
+  /// as the companion path.
+  atSign,
+
+  /// `ticket.mjs`. Off-set (ruling I6): the inputs page's Invite-code addon.
+  ///
+  /// The only glyph in the embedded set whose `d` closes with an **uppercase**
+  /// `Z`. Transcribed as lucide writes it: the parser treats the two spellings
+  /// identically, so a silent lowercasing would never fail a test — which is
+  /// exactly why the transcript has to carry the character it was given.
+  ticket,
 }
 
 /// One SVG element from a lucide `__iconNode` list.
@@ -1038,6 +1053,25 @@ class DsIconPaths {
       DsIconCircleElement(12, 12, 10), // key: 1mglay
       DsIconPathElement('m15 9-6 6'), // key: 1uzhvr
       DsIconPathElement('m9 9 6 6'), // key: z0biqf
+    ],
+
+    // `at-sign.mjs` — the inputs page's Email addon. The bowl is a 4-unit
+    // circle; the path is the tail that starts inside the ring at (16,8), runs
+    // down and around, and stops short of closing so the `@` reads as open.
+    DsIconGlyph.atSign: <DsIconElement>[
+      DsIconCircleElement(12, 12, 4), // key: 4exip2
+      DsIconPathElement('M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-4 8'), // key: 7n84p3
+    ],
+
+    // `ticket.mjs` — the inputs page's Invite-code addon. The outline plus
+    // three stub perforations down the x = 13 line. Its `d` ends in an
+    // uppercase `Z`, which is kept verbatim.
+    DsIconGlyph.ticket: <DsIconElement>[
+      DsIconPathElement(
+          'M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z'), // key: qn84l0
+      DsIconPathElement('M13 5v2'), // key: dyzc3o
+      DsIconPathElement('M13 17v2'), // key: 1ont0d
+      DsIconPathElement('M13 11v2'), // key: 1wjjxi
     ],
   };
 

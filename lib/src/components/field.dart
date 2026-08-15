@@ -58,6 +58,7 @@ import 'package:flutter/widgets.dart';
 import '../foundation/spacing.dart';
 import '../foundation/theme.dart';
 import '../foundation/typography.dart';
+import '../text_layout.dart';
 import '../theme_scope.dart';
 import 'ds_rule.dart';
 
@@ -200,7 +201,19 @@ class DsFieldLegend extends StatelessWidget {
         .copyWith(height: DsComponentType.textSm.height);
     return Align(
       alignment: AlignmentDirectional.centerStart,
-      child: Text(text, style: style),
+      // Shrink-wrap the height: these align horizontally, and a block element
+      // in a flex column is its content's height and never its container's. In
+      // a `DsField`'s Column the constraint is unbounded and an [Align] already
+      // wraps; anywhere the height is bounded it would otherwise swallow it.
+      heightFactor: 1,
+      // [DsLineBox] rather than a bare [Text], for the reason every rendered
+      // string in this port carries one: the engine rounds a line's ascent and
+      // descent to whole pixels before adding them, so a paragraph quantizes UP
+      // to the next half pixel and the declared box is not what renders. This
+      // is the one spec composed at a call site rather than named in the
+      // foundation, so it reaches for `DsLineBox` directly where the others go
+      // through `DsText`.
+      child: DsLineBox(style: style, child: Text(text, style: style)),
     );
   }
 }
@@ -397,10 +410,13 @@ class DsFieldLabel extends StatelessWidget {
 
     // No colour: `Label` declares none, so it inherits — which is what lets
     // `Field`'s invalid colouring reach it.
-    Widget label = Text(
-      text,
-      style: DsText.styleOf(context, DsComponentType.fieldLabel),
-    );
+    //
+    // [DsText] and not a bare [Text]: it wraps the paragraph in a [DsLineBox],
+    // which holds the line to `font-size × line-height` instead of the engine's
+    // rounded metrics. A bare `Text` renders this label 18.0 tall against a
+    // declared 17.875 — an eighth of a pixel that a column of sixteen fields
+    // turns into two.
+    Widget label = DsText(text, DsComponentType.fieldLabel);
 
     if (node != null && enabled) {
       label = GestureDetector(
@@ -416,6 +432,11 @@ class DsFieldLabel extends StatelessWidget {
 
     return Align(
       alignment: AlignmentDirectional.centerStart,
+      // Shrink-wrap the height: these align horizontally, and a block element
+      // in a flex column is its content's height and never its container's. In
+      // a `DsField`'s Column the constraint is unbounded and an [Align] already
+      // wraps; anywhere the height is bounded it would otherwise swallow it.
+      heightFactor: 1,
       // The string is already the control's accessible name. Announcing it here
       // too would read the field's label twice, which is exactly what a correct
       // `<label for>` does *not* do.
@@ -469,14 +490,20 @@ class DsFieldError extends StatelessWidget {
     if (unique.isEmpty) return const SizedBox.shrink();
 
     final DsThemeData theme = DsTheme.of(context);
-    final TextStyle style = DsText.styleOf(
-      context,
-      DsComponentType.textSm,
-      color: theme.destructiveInk,
-    );
+
+    // [DsText], never a bare [Text]: every string goes through a [DsLineBox] so
+    // the paragraph measures `font-size × line-height` rather than the engine's
+    // rounded ascent-plus-descent. Bare, this renders 19.0 against a declared
+    // 18.5714 — and in the list branch **every item** quantizes, so a
+    // four-message password error drifts by nearly two pixels on its own.
+    DsText ink(String message) => DsText(
+          message,
+          DsComponentType.textSm,
+          color: theme.destructiveInk,
+        );
 
     final Widget content = unique.length == 1
-        ? Text(unique.single, style: style)
+        ? ink(unique.single)
         : _Stack(
             gap: itemGap,
             children: <Widget>[
@@ -490,11 +517,13 @@ class DsFieldError extends StatelessWidget {
                         alignment: AlignmentDirectional.topEnd,
                         // `list-style-type: disc`. A bullet glyph is the
                         // closest Flutter has to a CSS marker box, which is
-                        // generated content no widget tree contains.
-                        child: Text('•', style: style),
+                        // generated content no widget tree contains. It is
+                        // line-boxed like the text beside it, or the row would
+                        // take the marker's rounding instead.
+                        child: ink('•'),
                       ),
                     ),
-                    Expanded(child: Text(message, style: style)),
+                    Expanded(child: ink(message)),
                   ],
                 ),
             ],
@@ -504,7 +533,13 @@ class DsFieldError extends StatelessWidget {
     return Semantics(
       container: true,
       liveRegion: true,
-      child: Align(alignment: AlignmentDirectional.centerStart, child: content),
+      child: Align(
+        alignment: AlignmentDirectional.centerStart,
+        // As above: the error is a block whose height is its messages, not
+        // whatever room it is offered.
+        heightFactor: 1,
+        child: content,
+      ),
     );
   }
 }

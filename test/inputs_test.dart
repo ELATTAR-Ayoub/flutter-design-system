@@ -1201,6 +1201,15 @@ void main() {
       final double textLeft = t.getTopLeft(find.text('One capital letter.')).dx;
       final double errorLeft = t.getTopLeft(find.byType(DsFieldError)).dx;
       expect(textLeft - errorLeft, ds(4), reason: 'ml-4 on the list');
+
+      // EVERY item lands on the declared box, marker included — bare, each one
+      // quantized on its own and a four-message password error drifted by
+      // nearly two pixels. Two items at 18.5714 with one 4px gap between them.
+      expect(
+        t.getSize(find.byType(DsFieldError)).height,
+        closeTo(18.5714 * 2 + ds(1), 1e-3),
+        reason: 'the list is exactly its items plus its gaps',
+      );
     });
 
     testWidgets('one message renders as a bare string', (WidgetTester t) async {
@@ -1428,9 +1437,16 @@ void main() {
       );
     });
 
-    testWidgets('the three line-heights are three different specs',
+    testWidgets('the three line-heights RENDER at three different boxes',
         (WidgetTester t) async {
       // forms-map §3.2 — 17.875 / 19.5 / 18.571 on three consecutive lines.
+      //
+      // REGRESSION: this once asserted `fontSize × height` off the resolved
+      // style — the box the spec DECLARES, which is a restatement of the spec
+      // and cannot fail. The label and the error were meanwhile rendering 18.0
+      // and 19.0, because a bare `Text` takes the engine's rounded ascent plus
+      // descent and quantizes up to the next half pixel. Measuring the
+      // RenderBox is the only form of this assertion with teeth.
       await t.pumpWidget(host(const SizedBox(
         width: 512,
         child: DsField(
@@ -1441,7 +1457,8 @@ void main() {
         ),
       )));
 
-      double lineBox(Finder of) {
+      /// The box the spec asks for.
+      double declared(Finder of) {
         final TextStyle style = t
             .widget<Text>(
                 find.descendant(of: of, matching: find.byType(Text)).first)
@@ -1449,9 +1466,28 @@ void main() {
         return style.fontSize! * style.height!;
       }
 
-      expect(lineBox(find.byType(DsFieldLabel)), closeTo(17.875, 1e-3));
-      expect(lineBox(find.byType(DsFieldDescription)), closeTo(19.5, 1e-3));
-      expect(lineBox(find.byType(DsFieldError)), closeTo(18.5714, 1e-3));
+      /// The box that actually lays out.
+      double rendered(Finder of) => t.getSize(of).height;
+
+      const Map<String, double> boxes = <String, double>{
+        'label': 17.875, // 13 × leading-snug 1.375
+        'description': 19.5, // 13 × leading-normal 1.5
+        'error': 18.5714, // 13 × text-sm's 1.428571
+      };
+      final Map<String, Finder> parts = <String, Finder>{
+        'label': find.byType(DsFieldLabel),
+        'description': find.byType(DsFieldDescription),
+        'error': find.byType(DsFieldError),
+      };
+
+      for (final MapEntry<String, Finder> part in parts.entries) {
+        expect(rendered(part.value), closeTo(boxes[part.key]!, 1e-3),
+            reason: part.key);
+        // …and it is the box its own spec declares, not a rounding that lands
+        // near it.
+        expect(rendered(part.value), closeTo(declared(part.value), 1e-3),
+            reason: '${part.key} renders its declared box');
+      }
     });
 
     testWidgets('a disabled field disables the control it holds',
@@ -1503,6 +1539,14 @@ void main() {
           t.getBottomLeft(find.byType(DsFieldLegend)).dy;
       final double nextTop = t.getTopLeft(find.byKey(const Key('radios'))).dy;
       expect(nextTop - legendBottom, ds(3));
+
+      // The legend is the one spec composed at its call site rather than named
+      // in the foundation, so it is the easiest of the four to leave un-boxed:
+      // 13 × text-sm's 1.428571, rendered, not declared.
+      expect(
+        t.getSize(find.byType(DsFieldLegend)).height,
+        closeTo(18.5714, 1e-3),
+      );
     });
   });
 }
