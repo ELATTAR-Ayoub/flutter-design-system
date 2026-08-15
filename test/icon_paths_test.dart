@@ -263,6 +263,13 @@ void main() {
         DsIconGlyph.alertTriangle: 3,
         DsIconGlyph.rotateCcw: 2,
         DsIconGlyph.loaderCircle: 1,
+        DsIconGlyph.play: 1,
+        DsIconGlyph.pause: 2,
+        DsIconGlyph.volume2: 3,
+        DsIconGlyph.volumeX: 3,
+        DsIconGlyph.circleCheck: 2,
+        DsIconGlyph.octagonX: 3,
+        DsIconGlyph.circleX: 3,
       };
       expect(DsIconPaths.elements.keys, unorderedEquals(DsIconGlyph.values));
       for (final DsIconGlyph glyph in DsIconGlyph.values) {
@@ -367,10 +374,20 @@ void main() {
       expect(
         DsIconGlyph.values.where(
             (DsIconGlyph g) => !_curated.contains(g) && !chrome.contains(g)),
-        <DsIconGlyph>[DsIconGlyph.rotateCcw, DsIconGlyph.loaderCircle],
+        <DsIconGlyph>[
+          DsIconGlyph.rotateCcw,
+          DsIconGlyph.loaderCircle,
+          DsIconGlyph.play,
+          DsIconGlyph.pause,
+          DsIconGlyph.volume2,
+          DsIconGlyph.volumeX,
+          DsIconGlyph.circleCheck,
+          DsIconGlyph.octagonX,
+          DsIconGlyph.circleX,
+        ],
       );
-      // 8 chrome + 59 new curated + rotateCcw + loaderCircle.
-      expect(DsIconGlyph.values, hasLength(69));
+      // 8 chrome + 59 new curated + 9 off-set.
+      expect(DsIconGlyph.values, hasLength(76));
     });
 
     test('the 59 new curated glyphs come to the ledger\'s 162 elements', () {
@@ -436,7 +453,8 @@ void main() {
         for (final DsIconGlyph glyph in DsIconGlyph.values)
           ...DsIconPaths.elements[glyph]!.whereType<DsIconRectElement>(),
       ];
-      expect(rects, hasLength(10)); // 9 curated + monitor's screen
+      // 9 curated + monitor's screen + pause's two bars.
+      expect(rects, hasLength(12));
       final Iterable<DsIconRectElement> spelled =
           rects.where((DsIconRectElement r) => r.ry != null);
       expect(spelled, hasLength(2));
@@ -679,10 +697,12 @@ void main() {
             reason: '${glyph.name} closed-contour count');
         totalClosed += closed;
       }
-      // 13 `z` commands + 26 circles + 10 rects. Thirteen, not twelve: the map
-      // counts twelve *glyphs* that carry a `z`, and `packageOpen` spends two
-      // of them (its second and fourth flaps both close).
-      expect(totalClosed, 49);
+      // 17 `z` commands + 28 circles + 12 rects. Seventeen, not twelve: the map
+      // counts twelve *glyphs* that carry a `z`, `packageOpen` spends two of
+      // them (its second and fourth flaps both close), the off-set swap glyphs
+      // add three — `play`'s triangle and the speaker body that `volume2` and
+      // `volumeX` share — and `octagonX`'s plate is the seventeenth.
+      expect(totalClosed, 57);
       expect(
         DsIconGlyph.values.where((DsIconGlyph g) => DsIconPaths.elements[g]!
             .whereType<DsIconPathElement>()
@@ -700,6 +720,13 @@ void main() {
           DsIconGlyph.tag,
           DsIconGlyph.shield,
           DsIconGlyph.shieldCheck,
+          // The off-set glyphs that carry a `z`, in enum order. `circleCheck`
+          // and `circleX` are absent on purpose: their rings close by being
+          // `circle` nodes, not by a `z` command.
+          DsIconGlyph.play,
+          DsIconGlyph.volume2,
+          DsIconGlyph.volumeX,
+          DsIconGlyph.octagonX,
         ],
       );
     });
@@ -1234,6 +1261,40 @@ const Map<DsIconGlyph, List<String>> _transcript = <DsIconGlyph, List<String>>{
   // `loader-circle.mjs`, imported in the reference as `Loader2Icon`.
   DsIconGlyph.loaderCircle: <String>[
     'path M21 12a9 9 0 1 1-6.219-8.56',
+  ],
+  DsIconGlyph.play: <String>[
+    'path M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z',
+  ],
+  // The right-hand bar is declared first — order is paint order, so it is kept.
+  DsIconGlyph.pause: <String>[
+    'rect 14 3 5 18 1',
+    'rect 5 3 5 18 1',
+  ],
+  DsIconGlyph.volume2: <String>[
+    'path M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z',
+    'path M16 9a5 5 0 0 1 0 6',
+    'path M19.364 18.364a9 9 0 0 0 0-12.728',
+  ],
+  DsIconGlyph.volumeX: <String>[
+    'path M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z',
+    'line 22 9 16 15',
+    'line 16 9 22 15',
+  ],
+  DsIconGlyph.circleCheck: <String>[
+    'circle 12 12 10',
+    'path m9 12 2 2 4-4',
+  ],
+  // Stroke, plate, stroke — lucide declares the octagon BETWEEN its two
+  // diagonals, and order is paint order.
+  DsIconGlyph.octagonX: <String>[
+    'path m15 9-6 6',
+    'path M2.586 16.726A2 2 0 0 1 2 15.312V8.688a2 2 0 0 1 .586-1.414l4.688-4.688A2 2 0 0 1 8.688 2h6.624a2 2 0 0 1 1.414.586l4.688 4.688A2 2 0 0 1 22 8.688v6.624a2 2 0 0 1-.586 1.414l-4.688 4.688a2 2 0 0 1-1.414.586H8.688a2 2 0 0 1-1.414-.586z',
+    'path m9 9 6 6',
+  ],
+  DsIconGlyph.circleX: <String>[
+    'circle 12 12 10',
+    'path m15 9-6 6',
+    'path m9 9 6 6',
   ],
 };
 

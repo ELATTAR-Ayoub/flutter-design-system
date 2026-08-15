@@ -168,7 +168,7 @@ void main() {
     DsMachineSurface surfaceOf(WidgetTester t) =>
         t.widget<DsMachineSurface>(find.byType(DsMachineSurface));
 
-    testWidgets('sizes: sm 32 high, md 40 high, icon 40², icon-sm 32²',
+    testWidgets('all nine rungs render at their cva height',
         (WidgetTester t) async {
       Future<Size> sizeOf(DsButtonSize size) async {
         await t.pumpWidget(host(DsButton(
@@ -180,10 +180,17 @@ void main() {
         return t.getSize(find.byType(DsButton));
       }
 
+      // The five text rungs — 24 / 32 / 40 / 48 / 56.
+      expect((await sizeOf(DsButtonSize.xs)).height, ds(6));
       expect((await sizeOf(DsButtonSize.sm)).height, ds(8));
       expect((await sizeOf(DsButtonSize.md)).height, ds(10));
-      expect(await sizeOf(DsButtonSize.icon), Size(ds(10), ds(10)));
+      expect((await sizeOf(DsButtonSize.lg)).height, ds(12));
+      expect((await sizeOf(DsButtonSize.xl)).height, ds(14));
+      // The four squares, which are square.
+      expect(await sizeOf(DsButtonSize.iconXs), Size(ds(6), ds(6)));
       expect(await sizeOf(DsButtonSize.iconSm), Size(ds(8), ds(8)));
+      expect(await sizeOf(DsButtonSize.icon), Size(ds(10), ds(10)));
+      expect(await sizeOf(DsButtonSize.iconLg), Size(ds(12), ds(12)));
     });
 
     testWidgets('outline is card on input with --shadow-btn',
@@ -323,6 +330,1101 @@ void main() {
           .descendant(of: find.byType(DsButton), matching: find.byType(Opacity))
           .first);
       expect(opacity.opacity, lessThan(1));
+    });
+  });
+
+  group('the nine-rung cva ladder', () {
+    // buttons-map §3.1, resolved to pixels. Every value below is the class the
+    // reference declares, multiplied out: `--spacing` is 0.25rem, so `gap-1.5`
+    // is 6 and `px-2.5` is 10.
+
+    test('the enum is nine members in the cva\'s declaration order', () {
+      expect(DsButtonSize.values, <DsButtonSize>[
+        DsButtonSize.xs,
+        DsButtonSize.sm,
+        DsButtonSize.md,
+        DsButtonSize.lg,
+        DsButtonSize.xl,
+        DsButtonSize.iconXs,
+        DsButtonSize.iconSm,
+        DsButtonSize.icon,
+        DsButtonSize.iconLg,
+      ]);
+    });
+
+    test('height — 24 / 32 / 40 / 48 / 56, squares included', () {
+      expect(DsButton.heightFor(DsButtonSize.xs), 24);
+      expect(DsButton.heightFor(DsButtonSize.sm), 32);
+      expect(DsButton.heightFor(DsButtonSize.md), 40);
+      expect(DsButton.heightFor(DsButtonSize.lg), 48);
+      expect(DsButton.heightFor(DsButtonSize.xl), 56);
+      expect(DsButton.heightFor(DsButtonSize.iconXs), 24);
+      expect(DsButton.heightFor(DsButtonSize.iconSm), 32);
+      expect(DsButton.heightFor(DsButtonSize.icon), 40);
+      expect(DsButton.heightFor(DsButtonSize.iconLg), 48);
+    });
+
+    test('gap — 4 / 6 / 8 / 10 / 10, and none on any square', () {
+      expect(DsButton.gapFor(DsButtonSize.xs), 4);
+      expect(DsButton.gapFor(DsButtonSize.sm), 6);
+      expect(DsButton.gapFor(DsButtonSize.md), 8);
+      // `lg` and `xl` share `gap-2.5`; the ladder does not step here.
+      expect(DsButton.gapFor(DsButtonSize.lg), 10);
+      expect(DsButton.gapFor(DsButtonSize.xl), 10);
+      for (final DsButtonSize square in DsButtonSize.values.where(
+        DsButton.isSquare,
+      )) {
+        expect(DsButton.gapFor(square), 0, reason: '${square.name} declares no gap');
+      }
+    });
+
+    test('padding-x — 10 / 14 / 16 / 24 / 32, and none on any square', () {
+      expect(DsButton.paddingXFor(DsButtonSize.xs), 10);
+      expect(DsButton.paddingXFor(DsButtonSize.sm), 14);
+      expect(DsButton.paddingXFor(DsButtonSize.md), 16);
+      expect(DsButton.paddingXFor(DsButtonSize.lg), 24);
+      expect(DsButton.paddingXFor(DsButtonSize.xl), 32);
+      for (final DsButtonSize square in DsButtonSize.values.where(
+        DsButton.isSquare,
+      )) {
+        expect(DsButton.paddingXFor(square), 0);
+      }
+    });
+
+    test('exactly four rungs are squares', () {
+      expect(
+        DsButtonSize.values.where(DsButton.isSquare),
+        <DsButtonSize>[
+          DsButtonSize.iconXs,
+          DsButtonSize.iconSm,
+          DsButtonSize.icon,
+          DsButtonSize.iconLg,
+        ],
+      );
+    });
+
+    test('the svg override — 12 / 14 / 16 / 16 / 20 across the pairs', () {
+      // `[&_svg:not([class*='size-'])]:size-*`. `md` and `lg` are the two text
+      // rungs that never override the base `size-4`, which is why a 48px `lg`
+      // button and a 40px `md` button hold the same 16px glyph.
+      expect(DsButton.iconPxFor(DsButtonSize.xs), 12);
+      expect(DsButton.iconPxFor(DsButtonSize.sm), 14);
+      expect(DsButton.iconPxFor(DsButtonSize.md), 16);
+      expect(DsButton.iconPxFor(DsButtonSize.lg), 16);
+      expect(DsButton.iconPxFor(DsButtonSize.xl), 20);
+      expect(DsButton.iconPxFor(DsButtonSize.iconXs), 12);
+      expect(DsButton.iconPxFor(DsButtonSize.iconSm), 14);
+      expect(DsButton.iconPxFor(DsButtonSize.icon), 16);
+      expect(DsButton.iconPxFor(DsButtonSize.iconLg), 20);
+    });
+
+    test('five rungs, three type sizes, three leadings — drift 15', () {
+      DsTypeSpec spec(DsButtonSize size) =>
+          DsButton.typeFor(size, DsButtonEmphasis.none)!;
+
+      // Three sizes across five rungs: only `xs` is unique.
+      expect(spec(DsButtonSize.xs).size, 12);
+      expect(spec(DsButtonSize.sm).size, 13);
+      expect(spec(DsButtonSize.md).size, 13);
+      expect(spec(DsButtonSize.lg).size, 15);
+      expect(spec(DsButtonSize.xl).size, 15);
+
+      // And the leadings do not agree with the sizes. `text-xs`, `text-sm` and
+      // `text-base` are Tailwind steps repointed at this scale, so their stock
+      // `--text-*--line-height` companions survive and apply to the new size;
+      // `text-small` and `text-body` are bespoke, have no companion, and emit
+      // font-size only.
+      expect(spec(DsButtonSize.xs).height, closeTo(1 / 0.75, 1e-12));
+      expect(spec(DsButtonSize.sm).height, isNull);
+      expect(spec(DsButtonSize.md).height, closeTo(1.25 / 0.875, 1e-12));
+      expect(spec(DsButtonSize.lg).height, isNull);
+      expect(spec(DsButtonSize.xl).height, closeTo(1.5 / 1, 1e-12));
+
+      // Computed line boxes: 16.0 / — / 18.571 / — / 22.5.
+      expect(spec(DsButtonSize.xs).height! * 12, closeTo(16.0, 1e-9));
+      expect(spec(DsButtonSize.md).height! * 13, closeTo(18.571, 1e-3));
+      expect(spec(DsButtonSize.xl).height! * 15, closeTo(22.5, 1e-9));
+
+      // Every text rung is `font-medium`.
+      for (final DsButtonSize size in <DsButtonSize>[
+        DsButtonSize.xs,
+        DsButtonSize.sm,
+        DsButtonSize.md,
+        DsButtonSize.lg,
+        DsButtonSize.xl,
+      ]) {
+        expect(spec(size).weight, FontWeight.w500);
+      }
+    });
+
+    test('the four squares declare no text class at all', () {
+      for (final DsButtonSize square in DsButtonSize.values.where(
+        DsButton.isSquare,
+      )) {
+        expect(
+          DsButton.typeFor(square, DsButtonEmphasis.none),
+          isNull,
+          reason: '${square.name} sets no text-*; it inherits from the page',
+        );
+      }
+    });
+
+    testWidgets('a square rung inherits the page\'s type and takes only ink',
+        (WidgetTester t) async {
+      // The CSS consequence of the null above: an `icon-*` button changes the
+      // colour of the text inside it and nothing else.
+      const TextStyle ambient = TextStyle(fontSize: 31, fontFamily: 'Ambient');
+      await t.pumpWidget(host(DefaultTextStyle(
+        style: ambient,
+        child: DsButton(
+          variant: DsButtonVariant.ghost,
+          size: DsButtonSize.icon,
+          onPressed: () {},
+          child: const Text('x'),
+        ),
+      )));
+
+      final TextStyle resolved = t
+          .widget<DefaultTextStyle>(find
+              .descendant(
+                of: find.byType(DsButton),
+                matching: find.byType(DefaultTextStyle),
+              )
+              .first)
+          .style;
+      expect(resolved.fontSize, 31);
+      expect(resolved.fontFamily, 'Ambient');
+      expect(resolved.color, DsThemeData.dark.mutedForeground);
+    });
+  });
+
+  group('DsButton emphasis: caps', () {
+    TextStyle labelStyleOf(WidgetTester t) => t
+        .widget<DefaultTextStyle>(find
+            .descendant(
+              of: find.byType(DsButton),
+              matching: find.byType(DefaultTextStyle),
+            )
+            .first)
+        .style;
+
+    testWidgets('is 12px / 600 / 0.09em on every rung, including default',
+        (WidgetTester t) async {
+      for (final DsButtonSize size in DsButtonSize.values) {
+        await t.pumpWidget(host(DsButton(
+          variant: DsButtonVariant.premium,
+          size: size,
+          emphasis: DsButtonEmphasis.caps,
+          onPressed: () {},
+          child: const Text('Claim Reward'),
+        )));
+
+        final TextStyle style = labelStyleOf(t);
+        expect(style.fontSize, 12, reason: '${size.name}: text-num-sm');
+        // `--tracking-cta: 0.09em`, resolved against the 12px size.
+        expect(style.letterSpacing, closeTo(0.09 * 12, 1e-9),
+            reason: '${size.name}: tracking-cta');
+        expect(
+          style.fontVariations!
+              .firstWhere((FontVariation v) => v.axis == 'wght')
+              .value,
+          600,
+          reason: '${size.name}: font-semibold',
+        );
+      }
+    });
+
+    testWidgets('shrinks the default rung from 13px to 12 — drift 22',
+        (WidgetTester t) async {
+      await t.pumpWidget(host(DsButton(
+        onPressed: () {},
+        child: const Text('Open Pack'),
+      )));
+      expect(labelStyleOf(t).fontSize, 13);
+
+      await t.pumpWidget(host(DsButton(
+        emphasis: DsButtonEmphasis.caps,
+        onPressed: () {},
+        child: const Text('Claim Reward'),
+      )));
+      expect(labelStyleOf(t).fontSize, 12);
+    });
+
+    testWidgets('uppercases the glyphs and leaves the accessible name alone',
+        (WidgetTester t) async {
+      await t.pumpWidget(host(DsButton(
+        variant: DsButtonVariant.premium,
+        emphasis: DsButtonEmphasis.caps,
+        onPressed: () {},
+        child: const Text('Claim Reward'),
+      )));
+
+      final Text rendered = t.widget<Text>(find.descendant(
+        of: find.byType(DsButton),
+        matching: find.byType(Text),
+      ));
+      // `text-transform` repaints the glyphs; the DOM text — and therefore the
+      // accessible name — stays as authored.
+      expect(rendered.data, 'CLAIM REWARD');
+      expect(rendered.semanticsLabel, 'Claim Reward');
+    });
+
+    testWidgets('leaves a non-Text child alone', (WidgetTester t) async {
+      await t.pumpWidget(host(DsButton(
+        emphasis: DsButtonEmphasis.caps,
+        onPressed: () {},
+        child: const DsIcon(DsIconGlyph.menu),
+      )));
+      expect(t.takeException(), isNull);
+      expect(find.byType(DsIcon), findsOneWidget);
+    });
+  });
+
+  group('DsButton.loading', () {
+    testWidgets('prepends a spinner and disables the button',
+        (WidgetTester t) async {
+      int presses = 0;
+      await t.pumpWidget(host(DsButton(
+        loading: true,
+        onPressed: () => presses++,
+        child: const Text('Saving'),
+      )));
+
+      expect(find.byType(DsSpinner), findsOneWidget);
+      // The spinner leads: `<>{loading && <Spinner />}{children}</>`.
+      final Offset spinner = t.getCenter(find.byType(DsSpinner));
+      final Offset label = t.getCenter(find.text('Saving'));
+      expect(spinner.dx, lessThan(label.dx));
+
+      // `disabled = disabled || loading` — the callback is live and still must
+      // not fire.
+      await t.tap(find.byType(DsButton), warnIfMissed: false);
+      await t.pump(DsDurations.base);
+      expect(presses, 0);
+
+      final Opacity opacity = t.widget<Opacity>(find
+          .descendant(of: find.byType(DsButton), matching: find.byType(Opacity))
+          .first);
+      expect(opacity.opacity, 0.45);
+    });
+
+    testWidgets('the width DOES jump, by 24px on the default rung — drift 3',
+        (WidgetTester t) async {
+      await t.pumpWidget(host(DsButton(
+        onPressed: () {},
+        child: const Text('Saving'),
+      )));
+      final double resting = t.getSize(find.byType(DsButton)).width;
+
+      await t.pumpWidget(host(DsButton(
+        loading: true,
+        onPressed: () {},
+        child: const Text('Saving'),
+      )));
+      final double busy = t.getSize(find.byType(DsButton)).width;
+
+      // 16px of glyph plus the rung's own `gap-2`. Four separate sentences in
+      // the reference say this does not happen.
+      expect(busy - resting,
+          closeTo(DsSpinner.px + DsButton.gapFor(DsButtonSize.md), 1e-9));
+    });
+
+    testWidgets('the gap in front of the label is the rung\'s own',
+        (WidgetTester t) async {
+      for (final DsButtonSize size in <DsButtonSize>[
+        DsButtonSize.xs,
+        DsButtonSize.sm,
+        DsButtonSize.md,
+        DsButtonSize.lg,
+        DsButtonSize.xl,
+      ]) {
+        await t.pumpWidget(host(DsButton(
+          size: size,
+          onPressed: () {},
+          child: const Text('Saving'),
+        )));
+        final double resting = t.getSize(find.byType(DsButton)).width;
+
+        await t.pumpWidget(host(DsButton(
+          size: size,
+          loading: true,
+          onPressed: () {},
+          child: const Text('Saving'),
+        )));
+        final double busy = t.getSize(find.byType(DsButton)).width;
+
+        expect(busy - resting, closeTo(DsSpinner.px + DsButton.gapFor(size), 1e-9),
+            reason: '${size.name}: spinner + gap-*');
+      }
+    });
+
+    testWidgets('exposes the disabled half of aria-busy — ruling B9',
+        (WidgetTester t) async {
+      // `aria-busy` has no analogue in the pinned SDK; what a loading button
+      // can still say is that it is not actionable, which is the state the
+      // reference's `disabled = disabled || loading` puts it in.
+      final SemanticsHandle handle = t.ensureSemantics();
+      await t.pumpWidget(host(DsButton(
+        loading: true,
+        label: 'Save Account',
+        onPressed: () {},
+        child: const Text('Saving'),
+      )));
+
+      // `isSemantics`, not `matchesSemantics`: the assertion is about three
+      // flags, and a whole-node match would also be pinning whichever actions
+      // the gesture layer happens to expose under an `IgnorePointer`.
+      expect(
+        t.getSemantics(find.byType(DsButton).first),
+        isSemantics(
+          label: 'Save Account',
+          isButton: true,
+          hasEnabledState: true,
+          isEnabled: false,
+        ),
+      );
+      handle.dispose();
+    });
+  });
+
+  group('DsSpinner', () {
+    testWidgets('is 16px and turns once every 900ms, linearly',
+        (WidgetTester t) async {
+      await t.pumpWidget(host(const DsSpinner()));
+
+      expect(t.getSize(find.byType(DsSpinner)), const Size(16, 16));
+
+      double turnsNow() =>
+          t.widget<RotationTransition>(find.byType(RotationTransition))
+              .turns
+              .value;
+
+      expect(turnsNow(), 0);
+      // Quarter of `pulls-spin`'s 0.9s. `linear` on purpose — a quarter of the
+      // clock has to be a quarter of the turn, or the spinner is easing.
+      await t.pump(const Duration(milliseconds: 225));
+      expect(turnsNow(), closeTo(0.25, 1e-6));
+      await t.pump(const Duration(milliseconds: 225));
+      expect(turnsNow(), closeTo(0.5, 1e-6));
+      await t.pump(const Duration(milliseconds: 225));
+      expect(turnsNow(), closeTo(0.75, 1e-6));
+
+      // It repeats forever, so it is never allowed to settle — land the test
+      // on a still frame rather than pumping to quiescence.
+      await t.pumpWidget(host(const SizedBox()));
+    });
+
+    testWidgets('is silent to assistive tech — drift 4, ruling B9',
+        (WidgetTester t) async {
+      final SemanticsHandle handle = t.ensureSemantics();
+      await t.pumpWidget(host(const DsSpinner()));
+      // `role="status"` and `aria-label="Loading"` are handed to `Icon` and
+      // dropped by its destructure; the glyph renders `aria-hidden`.
+      expect(find.byType(ExcludeSemantics), findsWidgets);
+      expect(
+        t.getSemantics(find.byType(DsSpinner)).label,
+        isEmpty,
+      );
+      handle.dispose();
+      await t.pumpWidget(host(const SizedBox()));
+    });
+
+    testWidgets('reduced motion holds it upright at 0° — ruling B13',
+        (WidgetTester t) async {
+      await t.pumpWidget(MediaQuery(
+        data: const MediaQueryData(
+          size: Size(1440, 900),
+          disableAnimations: true,
+        ),
+        child: Directionality(
+          textDirection: TextDirection.ltr,
+          child: DsTheme(
+            controller: DsThemeController(mode: DsThemeMode.dark),
+            child: const Center(child: DsSpinner()),
+          ),
+        ),
+      ));
+
+      double turnsNow() =>
+          t.widget<RotationTransition>(find.byType(RotationTransition))
+              .turns
+              .value;
+
+      // `pulls-spin` declares no fill mode, so the blanket reduced-motion rule
+      // leaves it at the element's resting style rather than its final stop.
+      expect(turnsNow(), 0);
+      await t.pump(DsDurations.spin);
+      expect(turnsNow(), 0);
+      await t.pump(DsDurations.spin);
+      expect(turnsNow(), 0);
+    });
+  });
+
+  group('DsToggle', () {
+    DsMachineSurface surfaceOf(WidgetTester t) =>
+        t.widget<DsMachineSurface>(find.descendant(
+          of: find.byType(DsToggle),
+          matching: find.byType(DsMachineSurface),
+        ).first);
+
+    Widget toggle({
+      bool pressed = false,
+      bool enabled = true,
+      DsToggleSize size = DsToggleSize.md,
+      DsToggleVariant variant = DsToggleVariant.standard,
+    }) =>
+        host(DsToggle(
+          pressed: pressed,
+          size: size,
+          variant: variant,
+          label: 'Favourite',
+          onChanged: enabled ? (bool _) {} : null,
+          child: const DsIcon(DsIconGlyph.heart),
+        ));
+
+    testWidgets('is 32 tall with a 32 floor and a 12px radius — not a pill',
+        (WidgetTester t) async {
+      await t.pumpWidget(toggle());
+      final Size box = t.getSize(find.byType(DsToggle));
+      // `h-8 min-w-8 px-2.5` around a 16px glyph: 16 + 20 = 36 × 32.
+      expect(box.height, ds(8));
+      expect(box.width, ds(9));
+      expect(
+        surfaceOf(t).radius,
+        BorderRadius.circular(DsRadii.lg),
+        reason: 'rounded-lg — a Toggle is not a pill',
+      );
+    });
+
+    test('the ladder: 28 / 32 / 36, and sm clamps its own radius', () {
+      expect(DsToggle.heightFor(DsToggleSize.sm), 28);
+      expect(DsToggle.heightFor(DsToggleSize.md), 32);
+      expect(DsToggle.heightFor(DsToggleSize.lg), 36);
+      expect(DsToggle.minWidthFor(DsToggleSize.sm), 28);
+      expect(DsToggle.minWidthFor(DsToggleSize.md), 32);
+      expect(DsToggle.minWidthFor(DsToggleSize.lg), 36);
+      // `rounded-[min(var(--radius-md),12px)]` — 10px today, and it stays a
+      // live clamp so a rebrand that raises --radius-md still ceilings at 12.
+      expect(DsToggle.radiusFor(DsToggleSize.sm), DsRadii.md);
+      expect(DsToggle.radiusFor(DsToggleSize.md), DsRadii.lg);
+      expect(DsToggle.radiusFor(DsToggleSize.lg), DsRadii.lg);
+      // All three rungs declare the same `px-2.5` and `gap-1`.
+      expect(DsToggle.paddingX, 10);
+      expect(DsToggle.gap, 4);
+    });
+
+    testWidgets('rest is bare — no fill, no border box, no shadow',
+        (WidgetTester t) async {
+      await t.pumpWidget(toggle());
+      final DsMachineSurface surface = surfaceOf(t);
+      expect(surface.fill, dsTransparent);
+      // `variant="default"` is `bg-transparent` with no `border` class at all,
+      // which is exactly why `focus-visible:border-ring` is inert on it.
+      expect(surface.border, isNull);
+      expect(surface.spec.layers.single.color(DsThemeData.dark).a, 0);
+    });
+
+    testWidgets('hover fills with --muted and moves no ink — drift 10',
+        (WidgetTester t) async {
+      await t.pumpWidget(toggle());
+      final Color restingInk = t
+          .widget<DefaultTextStyle>(find.descendant(
+            of: find.byType(DsToggle),
+            matching: find.byType(DefaultTextStyle),
+          ).first)
+          .style
+          .color!;
+
+      await hoverOver(t, find.byType(DsToggle));
+      await t.pump(DsDurations.base);
+      await t.pump(DsDurations.base);
+
+      expect(surfaceOf(t).fill, DsThemeData.dark.muted);
+      // `hover:text-foreground` restates the colour the element already
+      // inherits: the base sets no resting ink, so the hover half is inert.
+      expect(
+        t
+            .widget<DefaultTextStyle>(find.descendant(
+              of: find.byType(DsToggle),
+              matching: find.byType(DefaultTextStyle),
+            ).first)
+            .style
+            .color,
+        restingInk,
+      );
+      expect(restingInk, DsThemeData.dark.foreground);
+    });
+
+    testWidgets('the pressed fill is --muted — GREY, not blue — drift 5',
+        (WidgetTester t) async {
+      await t.pumpWidget(toggle(pressed: true));
+      await t.pump(DsDurations.base);
+      await t.pump(DsDurations.base);
+      // The panel's own caption says "the pressed state fills with the blue
+      // tint — selection is always blue". `data-[state=on]:bg-muted` says
+      // otherwise, and blue selection is real one panel further down.
+      expect(surfaceOf(t).fill, DsThemeData.dark.muted);
+      expect(surfaceOf(t).fill, isNot(DsThemeData.dark.primary));
+    });
+
+    testWidgets('disabled is 50%, not the Button\'s 45% — drift 12',
+        (WidgetTester t) async {
+      await t.pumpWidget(toggle(enabled: false));
+      final Opacity opacity = t.widget<Opacity>(find
+          .descendant(of: find.byType(DsToggle), matching: find.byType(Opacity))
+          .first);
+      expect(opacity.opacity, 0.50);
+    });
+
+    testWidgets('has no press feedback at all — drift 11',
+        (WidgetTester t) async {
+      await t.pumpWidget(toggle());
+      // `DsButton` reaches for `DsPress`; a Toggle's class list has no
+      // `:active` rule and no `press` utility, so nothing may scale it.
+      expect(
+        find.descendant(
+          of: find.byType(DsToggle),
+          matching: find.byType(DsPress),
+        ),
+        findsNothing,
+      );
+
+      final TestGesture hold =
+          await t.startGesture(t.getCenter(find.byType(DsToggle)));
+      await t.pump(DsDurations.tick);
+      final Size held = t.getSize(find.byType(DsToggle));
+      expect(held.height, ds(8));
+      await hold.up();
+      await t.pump(DsDurations.base);
+    });
+
+    testWidgets('focus draws the 3px ring at --ring @50%',
+        (WidgetTester t) async {
+      final FocusNode node = FocusNode();
+      addTearDown(node.dispose);
+      await t.pumpWidget(host(DsToggle(
+        pressed: false,
+        focusNode: node,
+        label: 'Favourite',
+        onChanged: (bool _) {},
+        child: const DsIcon(DsIconGlyph.heart),
+      )));
+
+      node.requestFocus();
+      await t.pump();
+      await t.pump(DsDurations.base);
+      await t.pump(DsDurations.base);
+
+      final DsShadowLayer ring = surfaceOf(t).spec.layers.single;
+      expect(ring.spread, 3);
+      expect(ring.blur, 0);
+      expect(
+        ring.color(DsThemeData.dark),
+        DsThemeData.dark.ring.withValues(alpha: 0.50),
+      );
+    });
+
+    testWidgets('toggles on tap and on Space', (WidgetTester t) async {
+      final List<bool> changes = <bool>[];
+      final FocusNode node = FocusNode();
+      addTearDown(node.dispose);
+      await t.pumpWidget(host(DsToggle(
+        pressed: false,
+        focusNode: node,
+        label: 'Favourite',
+        onChanged: changes.add,
+        child: const DsIcon(DsIconGlyph.heart),
+      )));
+
+      await t.tap(find.byType(DsToggle));
+      await t.pump();
+      node.requestFocus();
+      await t.pump();
+      await t.sendKeyEvent(LogicalKeyboardKey.space);
+      await t.pump();
+      // Both routes ask for the opposite of the state they were handed.
+      expect(changes, <bool>[true, true]);
+    });
+  });
+
+  group('DsToggleGroup', () {
+    Widget group({int? selected, ValueChanged<int?>? onChanged}) =>
+        host(DsToggleGroup(
+          selectedIndex: selected,
+          onChanged: onChanged ?? (int? _) {},
+          items: const <DsToggleGroupItem>[
+            DsToggleGroupItem(label: 'Newest'),
+            DsToggleGroupItem(label: 'Price'),
+            DsToggleGroupItem(label: 'Popular'),
+          ],
+        ));
+
+    test('the group gap is `--gap: 2`, i.e. 8px', () {
+      expect(DsToggleGroup.gap, ds(2));
+    });
+
+    testWidgets('lays three items out 8px apart', (WidgetTester t) async {
+      await t.pumpWidget(group(selected: 0));
+      await t.pump();
+
+      final Rect first = t.getRect(find.byType(DsToggle).at(0));
+      final Rect second = t.getRect(find.byType(DsToggle).at(1));
+      expect(second.left - first.right, closeTo(ds(2), 1e-9));
+    });
+
+    testWidgets('the pill is a --primary stadium over a 12px item — drift 9',
+        (WidgetTester t) async {
+      await t.pumpWidget(group(selected: 0));
+      await t.pump();
+      await t.pump();
+
+      // The pill: `bg-primary rounded-pill shadow-chip`.
+      final DsMachineSurface pill = t.widget<DsMachineSurface>(
+        find.descendant(
+          of: find.byType(DsSlidingPillGroup),
+          matching: find.byType(DsMachineSurface),
+        ).first,
+      );
+      expect(pill.fill, DsThemeData.dark.primary);
+      expect(pill.radius, BorderRadius.circular(DsRadii.pill));
+      expect(pill.spec, same(DsShadows.chip));
+
+      // The item underneath it is still `rounded-lg`. Two shapes, one slot:
+      // hover-on-unselected paints a 12px rect where selection paints a
+      // 16px stadium.
+      final DsMachineSurface item = t.widget<DsMachineSurface>(
+        find.descendant(
+          of: find.byType(DsToggle).at(0),
+          matching: find.byType(DsMachineSurface),
+        ).first,
+      );
+      expect(item.radius, BorderRadius.circular(DsRadii.lg));
+    });
+
+    testWidgets('the selected item gives up its fill and flips to white ink',
+        (WidgetTester t) async {
+      await t.pumpWidget(group(selected: 1));
+      await t.pump(DsDurations.base);
+      await t.pump(DsDurations.base);
+
+      DsMachineSurface itemAt(int i) => t.widget<DsMachineSurface>(
+            find.descendant(
+              of: find.byType(DsToggle).at(i),
+              matching: find.byType(DsMachineSurface),
+            ).first,
+          );
+      TextStyle inkAt(int i) => t
+          .widget<DefaultTextStyle>(find.descendant(
+            of: find.byType(DsToggle).at(i),
+            matching: find.byType(DefaultTextStyle),
+          ).first)
+          .style;
+
+      // `data-[state=on]:bg-transparent` — declared last on purpose, because
+      // the pill is the background now.
+      expect(itemAt(1).fill, dsTransparent);
+      expect(inkAt(1).color, DsThemeData.dark.primaryForeground);
+      // Its unselected neighbours are unchanged.
+      expect(itemAt(0).fill, dsTransparent);
+      expect(inkAt(0).color, DsThemeData.dark.foreground);
+    });
+
+    testWidgets('tapping the selected item deselects — ruling B7',
+        (WidgetTester t) async {
+      final List<int?> changes = <int?>[];
+      await t.pumpWidget(group(selected: 1, onChanged: changes.add));
+      await t.pump();
+
+      // Radix `type="single"` clears on a second press of the active item.
+      await t.tap(find.byType(DsToggle).at(1));
+      await t.pump();
+      expect(changes, <int?>[null]);
+
+      // And an unselected neighbour still selects normally.
+      await t.tap(find.byType(DsToggle).at(2));
+      await t.pump();
+      expect(changes, <int?>[null, 2]);
+    });
+
+    testWidgets('nothing selected hides the pill', (WidgetTester t) async {
+      await t.pumpWidget(group(selected: null));
+      await t.pump();
+      await t.pump();
+      await t.pump(DsDurations.fast);
+      await t.pump(DsDurations.fast);
+
+      // `activeIndex: -1` — the substrate's documented out-of-range path, and
+      // the reason it exists at all.
+      final AnimatedOpacity fade = t.widget<AnimatedOpacity>(find.descendant(
+        of: find.byType(DsSlidingPillGroup),
+        matching: find.byType(AnimatedOpacity),
+      ).first);
+      expect(fade.opacity, 0);
+    });
+  });
+
+  group('DsButtonGroup', () {
+    // The three groups the page renders, verbatim (buttons-map §6.2).
+    List<Widget> groupA() => <Widget>[
+          DsButton(
+            variant: DsButtonVariant.outline,
+            onPressed: () {},
+            child: const Text('Newest'),
+          ),
+          DsButton(
+            variant: DsButtonVariant.outline,
+            onPressed: () {},
+            child: const Text('Price'),
+          ),
+          DsButton(
+            variant: DsButtonVariant.outline,
+            onPressed: () {},
+            child: const Text('Popularity'),
+          ),
+        ];
+
+    List<Widget> groupB() => <Widget>[
+          const DsButtonGroupText('Quantity'),
+          const DsButtonGroupSeparator(),
+          DsButton(
+            variant: DsButtonVariant.outline,
+            size: DsButtonSize.icon,
+            label: 'Decrease quantity',
+            onPressed: () {},
+            child: const DsIcon(DsIconGlyph.minus),
+          ),
+          const DsButtonGroupText('3', numeric: true),
+          DsButton(
+            variant: DsButtonVariant.outline,
+            size: DsButtonSize.icon,
+            label: 'Increase quantity',
+            onPressed: () {},
+            child: const DsIcon(DsIconGlyph.plus),
+          ),
+        ];
+
+    List<Widget> groupC() => <Widget>[
+          DsButton(onPressed: () {}, child: const Text('Open Pack')),
+          const DsButtonGroupSeparator(),
+          DsButton(
+            size: DsButtonSize.icon,
+            label: 'More open options',
+            onPressed: () {},
+            child: const DsIcon(DsIconGlyph.chevronDown),
+          ),
+        ];
+
+    test('group A: pill on the left, 12px on the right — drift 7', () {
+      final List<Widget> a = groupA();
+      // The leading member keeps its own radius; the trailing one is forced to
+      // `--radius-lg` by an `!important` rule. Asymmetric by construction.
+      expect(DsButtonGroup.radiiOf(a, 0).topLeft.x, DsRadii.pill);
+      expect(DsButtonGroup.radiiOf(a, 0).topRight.x, 0);
+      // Interior corners are squared on both sides.
+      expect(DsButtonGroup.radiiOf(a, 1).topLeft.x, 0);
+      expect(DsButtonGroup.radiiOf(a, 1).topRight.x, 0);
+      expect(DsButtonGroup.radiiOf(a, 2).topLeft.x, 0);
+      expect(DsButtonGroup.radiiOf(a, 2).topRight.x, DsRadii.lg);
+    });
+
+    test('group B is symmetric only because it opens with a Text cell', () {
+      final List<Widget> b = groupB();
+      // 12px both ends — and the left 12 is the `ButtonGroupText`'s own
+      // `rounded-lg`, not anything the group did.
+      expect(DsButtonGroup.radiiOf(b, 0).topLeft.x, DsRadii.lg);
+      expect(DsButtonGroup.radiiOf(b, 4).topRight.x, DsRadii.lg);
+    });
+
+    test('group C: pill left, 12px right', () {
+      final List<Widget> c = groupC();
+      expect(DsButtonGroup.radiiOf(c, 0).topLeft.x, DsRadii.pill);
+      expect(DsButtonGroup.radiiOf(c, 2).topRight.x, DsRadii.lg);
+    });
+
+    test('the rounding rule reaches PAST a Text cell — drift 8', () {
+      // `ButtonGroupText` sets no `data-slot`, so it can never satisfy
+      // `[&>[data-slot]:not(:has(~[data-slot]))]` and the rule lands on the
+      // last member that can — here the Button, which is not last.
+      final List<Widget> trailing = <Widget>[
+        DsButton(onPressed: () {}, child: const Text('Open Pack')),
+        const DsButtonGroupText('of 12'),
+      ];
+      expect(DsButtonGroup.radiiOf(trailing, 0).topRight.x, DsRadii.lg,
+          reason: 'an interior Button forced to 12px by the reach-past');
+    });
+
+    test('only the first member keeps a left border — border-l-0', () {
+      final List<Widget> a = groupA();
+      expect(DsButtonGroup.hasLeftBorder(a, 0), isTrue);
+      expect(DsButtonGroup.hasLeftBorder(a, 1), isFalse);
+      expect(DsButtonGroup.hasLeftBorder(a, 2), isFalse);
+    });
+
+    testWidgets('members are flush and stretch to the tallest',
+        (WidgetTester t) async {
+      await t.pumpWidget(host(DsButtonGroup(children: groupB())));
+
+      // `items-stretch` is what gives the height-less Text cell its 40px.
+      final double rowHeight = t.getSize(find.byType(DsButtonGroup)).height;
+      expect(rowHeight, ds(10));
+      expect(t.getSize(find.byType(DsButtonGroupText).first).height, ds(10));
+
+      // `gap` is 0 — the `has-[>[data-slot=button-group]]:gap-2` rule needs a
+      // nested group, and nothing on this page nests.
+      final Rect text = t.getRect(find.byType(DsButtonGroupText).first);
+      final Rect rule = t.getRect(find.byType(DsButtonGroupSeparator));
+      expect(rule.left, closeTo(text.right, 1e-9));
+    });
+
+    testWidgets('the separator is 1px wide and inset 1px top and bottom',
+        (WidgetTester t) async {
+      await t.pumpWidget(host(DsButtonGroup(children: groupC())));
+
+      // `self-stretch` makes the separator's own box the full row height…
+      expect(t.getSize(find.byType(DsButtonGroupSeparator)).height, ds(10));
+
+      // …and `my-px` is a *margin*, so the painted rule stops one pixel short
+      // at each end. `w-px` is the width.
+      final Size rule = t.getSize(find.descendant(
+        of: find.byType(DsButtonGroupSeparator),
+        matching: find.byType(ColoredBox),
+      ));
+      expect(rule.width, DsWidths.hairline);
+      expect(rule.height, ds(10) - 2 * DsWidths.hairline);
+    });
+
+    testWidgets('a Text cell is --muted at 13/500, 10px in from its border',
+        (WidgetTester t) async {
+      await t.pumpWidget(host(DsButtonGroup(children: groupB())));
+
+      final DecoratedBox box = t.widget<DecoratedBox>(find.descendant(
+        of: find.byType(DsButtonGroupText).first,
+        matching: find.byType(DecoratedBox),
+      ).first);
+      expect((box.decoration as BoxDecoration).color, DsThemeData.dark.muted);
+      expect(DsButtonGroupText.paddingX, 10);
+
+      final TextStyle style = t.widget<Text>(find.descendant(
+        of: find.byType(DsButtonGroupText).first,
+        matching: find.byType(Text),
+      )).style!;
+      expect(style.fontSize, 13);
+      expect(style.fontFamily, contains('InterLocal'));
+    });
+
+    testWidgets('className="type-num" renders 13px/500 mono — drift 16',
+        (WidgetTester t) async {
+      await t.pumpWidget(host(DsButtonGroup(children: groupB())));
+
+      final TextStyle style = t.widget<Text>(find.descendant(
+        of: find.byType(DsButtonGroupText).at(1),
+        matching: find.byType(Text),
+      )).style!;
+      // The utilities beat `.type-num` on the two properties they share…
+      expect(style.fontSize, 13, reason: 'text-sm beats --text-body 15');
+      expect(
+        style.fontVariations!
+            .firstWhere((FontVariation v) => v.axis == 'wght')
+            .value,
+        500,
+        reason: 'font-medium beats .type-num\'s 600',
+      );
+      // …and everything they do not declare survives.
+      expect(style.fontFamily, contains('GeistMono'));
+      expect(style.letterSpacing, closeTo(-0.01 * 13, 1e-9));
+      expect(style.fontFeatures, contains(const FontFeature.tabularFigures()));
+    });
+  });
+
+  group('DsKbd', () {
+    test('20 tall, 20 minimum wide, 4px padding, 4px gaps', () {
+      expect(DsKbd.height, 20);
+      expect(DsKbd.minWidth, 20);
+      expect(DsKbd.paddingX, 4);
+      expect(DsKbd.gap, 4);
+      expect(DsKbdGroup.gap, 4);
+    });
+
+    testWidgets('is a flat 6px --muted chip — no border, no shadow — drift 18',
+        (WidgetTester t) async {
+      await t.pumpWidget(host(const DsKbd('Esc')));
+
+      final DsMachineSurface surface = t.widget<DsMachineSurface>(
+        find.descendant(
+          of: find.byType(DsKbd),
+          matching: find.byType(DsMachineSurface),
+        ).first,
+      );
+      expect(surface.fill, DsThemeData.dark.muted);
+      expect(surface.radius, BorderRadius.circular(DsRadii.sm));
+      // `--shadow-key`, `--shadow-key-down` and `press-key` all exist for
+      // exactly this object, one foundations page away, and Kbd uses none.
+      expect(surface.spec.layers, isEmpty);
+      expect(surface.border, isNull);
+    });
+
+    testWidgets('is 20px tall and never narrower than 20', (WidgetTester t) async {
+      await t.pumpWidget(host(const DsKbd('K')));
+      final Size box = t.getSize(find.byType(DsKbd));
+      expect(box.height, 20);
+      // A single narrow glyph plus 4+4 of padding is under the floor, so
+      // `min-w-5` decides.
+      expect(box.width, 20);
+
+      await t.pumpWidget(host(const DsKbd('Space')));
+      expect(t.getSize(find.byType(DsKbd)).width, greaterThan(20));
+    });
+
+    testWidgets('the key label is 12px/500 at --muted-foreground',
+        (WidgetTester t) async {
+      await t.pumpWidget(host(const DsKbd('Ctrl')));
+      final TextStyle style = t.widget<Text>(find.descendant(
+        of: find.byType(DsKbd),
+        matching: find.byType(Text),
+      )).style!;
+      expect(style.fontSize, 12);
+      expect(style.color, DsThemeData.dark.mutedForeground);
+    });
+
+    testWidgets('a group is one shortcut, 4px apart — drift 19',
+        (WidgetTester t) async {
+      await t.pumpWidget(host(const DsKbdGroup(children: <Widget>[
+        DsKbd('Ctrl'),
+        DsKbd('K'),
+      ])));
+
+      final Rect ctrl = t.getRect(find.byType(DsKbd).at(0));
+      final Rect k = t.getRect(find.byType(DsKbd).at(1));
+      expect(k.left - ctrl.right, closeTo(DsKbdGroup.gap, 1e-9));
+
+      // `<kbd><kbd>Ctrl</kbd><kbd>K</kbd></kbd>` is one keyboard object, and
+      // it is announced as one.
+      expect(
+        find.descendant(
+          of: find.byType(DsKbdGroup),
+          matching: find.byType(MergeSemantics),
+        ),
+        findsOneWidget,
+      );
+    });
+  });
+
+  group('DsIconSwap', () {
+    Widget swap(int active) => host(DsIconSwap(
+          activeIndex: active,
+          window: 20,
+          cell: 16,
+          icons: const <Widget>[
+            DsIcon(DsIconGlyph.layoutGrid),
+            DsIcon(DsIconGlyph.rows3),
+          ],
+        ));
+
+    testWidgets('is a fixed clip window, whatever the strip is doing',
+        (WidgetTester t) async {
+      await t.pumpWidget(swap(0));
+      expect(t.getSize(find.byType(DsIconSwap)), const Size(20, 20));
+    });
+
+    test('an unknown index clamps to 0, as Math.max(0, indexOf) does', () {
+      expect(DsIconSwap.resolveIndex(-1, 2), 0);
+      expect(DsIconSwap.resolveIndex(7, 2), 0);
+      expect(DsIconSwap.resolveIndex(1, 2), 1);
+    });
+
+    testWidgets('the leaver exits through the top and the arriver rises',
+        (WidgetTester t) async {
+      await t.pumpWidget(swap(0));
+      await t.pump(DsSwapRoll.duration);
+      await t.pump(DsSwapRoll.duration);
+
+      double yOf(int i) => t.getRect(find.byType(DsIcon).at(i)).center.dy;
+      final double windowCentre =
+          t.getRect(find.byType(DsIconSwap)).center.dy;
+
+      // At rest: glyph 0 centred, glyph 1 parked one full step BELOW.
+      expect(yOf(0), closeTo(windowCentre, 0.51));
+      expect(yOf(1) - yOf(0), closeTo(DsSwapRoll.travelFor(16), 0.51));
+
+      await t.pumpWidget(swap(1));
+      await t.pump(DsSwapRoll.duration);
+      await t.pump(DsSwapRoll.duration);
+      await t.pump(DsJelly.duration);
+
+      // After the roll the strip has moved up by exactly one step: glyph 1 is
+      // centred and glyph 0 has left through the top.
+      expect(yOf(1), closeTo(windowCentre, 0.51));
+      expect(yOf(0), lessThan(windowCentre));
+      expect(yOf(1) - yOf(0), closeTo(DsSwapRoll.travelFor(16), 0.51));
+    });
+
+    testWidgets('the arriving glyph squashes on FIRST MOUNT too',
+        (WidgetTester t) async {
+      // The one place IconSwap is the inverse of the sliding pill: the pill
+      // deliberately lands its first placement silently, and every IconSwap
+      // demo deliberately squashes once on page load.
+      List<double> scalesUnderSwap() => t
+          .widgetList<Transform>(find.descendant(
+            of: find.byType(DsIconSwap),
+            matching: find.byType(Transform),
+          ))
+          .map((Transform x) => x.transform.storage[0])
+          .toList();
+
+      await t.pumpWidget(swap(0));
+      await t.pump();
+
+      // `animation-delay: var(--duration-fast)` — still identity at 150ms…
+      await t.pump(DsSwapRoll.squashDelay);
+      expect(scalesUnderSwap().every((double s) => (s - 1).abs() < 1e-6), isTrue,
+          reason: 'the delay holds stop 0');
+
+      // …and 30% into the 600ms jelly it is at the table's widest stop, 1.18.
+      await t.pump(const Duration(milliseconds: 180));
+      expect(scalesUnderSwap().any((double s) => s > 1.1), isTrue);
+
+      // It settles back to identity by the end of the run.
+      await t.pump(DsJelly.duration);
+      expect(scalesUnderSwap().every((double s) => (s - 1).abs() < 1e-6), isTrue);
+    });
+
+    testWidgets('reduced motion lands the swap instantly — ruling B13',
+        (WidgetTester t) async {
+      Widget stilled(int active) => MediaQuery(
+            data: const MediaQueryData(
+              size: Size(1440, 900),
+              disableAnimations: true,
+            ),
+            child: Directionality(
+              textDirection: TextDirection.ltr,
+              child: DsTheme(
+                controller: DsThemeController(mode: DsThemeMode.dark),
+                child: Center(
+                  child: DsIconSwap(
+                    activeIndex: active,
+                    window: 20,
+                    cell: 16,
+                    icons: const <Widget>[
+                      DsIcon(DsIconGlyph.play),
+                      DsIcon(DsIconGlyph.pause),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+
+      await t.pumpWidget(stilled(0));
+      await t.pump();
+      await t.pumpWidget(stilled(1));
+      // One frame, no waiting: instant, not disabled and not frozen part-way.
+      await t.pump();
+      await t.pump();
+
+      final double windowCentre =
+          t.getRect(find.byType(DsIconSwap)).center.dy;
+      expect(t.getRect(find.byType(DsIcon).at(1)).center.dy,
+          closeTo(windowCentre, 0.51));
     });
   });
 

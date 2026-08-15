@@ -155,6 +155,21 @@ class DsShadows {
     DsShadowLayer(0, 4, 6, -4, _tailwindShadowInk),
   ]);
 
+  /// Tailwind's stock `shadow-md`, carried for the same reason as
+  /// [tailwindLg]: `SelectContent` asks for it by that name
+  /// (`components/ui/select.tsx`) and `globals.css` never redeclares
+  /// `--shadow-md`, so the framework default is what renders.
+  ///
+  /// `0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)`.
+  ///
+  /// DOCUMENTED DRIFT (forms-map drift 16): it is the only elevation on the
+  /// forms page not drawn from the `--shadow-*` token set — fixed black at
+  /// 10%, with no theme response at all, under a popover whose fill flips.
+  static const DsShadowSpec tailwindMd = DsShadowSpec(<DsShadowLayer>[
+    DsShadowLayer(0, 4, 6, -1, _tailwindShadowInk),
+    DsShadowLayer(0, 2, 4, -2, _tailwindShadowInk),
+  ]);
+
   /// `--shadow-e1: 0 1px 1px var(--ink-2), 0 1px 3px var(--ink-1)`
   static const DsShadowSpec e1 = DsShadowSpec(<DsShadowLayer>[
     DsShadowLayer(0, 1, 1, 0, _ink2),

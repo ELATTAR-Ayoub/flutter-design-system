@@ -16,7 +16,8 @@
 /// `key` kept as a trailing comment so the transcription stays auditable
 /// against the package. Those keys are content hashes, so glyphs that share
 /// geometry share a key (`shield` and `shield-check` open with the same crest
-/// under key `oel41y`; five glyphs share the 10-unit ring `1mglay`) — a
+/// under key `oel41y`; seven glyphs share the 10-unit ring `1mglay`, and
+/// `circle-x` borrows every node it has) — a
 /// mismatched key is therefore a transcription bug, not a coincidence.
 ///
 /// **Recorded decision: structure over stringification.** `line`, `circle`,
@@ -159,6 +160,49 @@ enum DsIconGlyph {
   /// choice, because no curated list prints "Loader2" and the module the
   /// geometry comes from is the honest name.
   loaderCircle,
+
+  /// `play.mjs`. Off-set: the buttons page's `PlayPauseDemo` renders it inside
+  /// an `IconSwap`, and no curated list contains it.
+  play,
+
+  /// `pause.mjs`. The other half of that swap.
+  pause,
+
+  /// `volume-2.mjs`. Off-set: the buttons page's `MuteDemo`.
+  volume2,
+
+  /// `volume-x.mjs`. The other half of the mute swap. It shares its speaker
+  /// body with [volume2] — the same `d`, under the same key `uqj9uw` — and
+  /// differs only in what stands beside it: two arcs there, a cross here.
+  volumeX,
+
+  /// `circle-check.mjs`. Off-set: sonner's `TOAST_ICONS.success`
+  /// (`components/ui/sonner.tsx` L19), imported there as `CircleCheckIcon`.
+  ///
+  /// Not to be confused with `check-circle.mjs`, which in 1.28.0 re-exports
+  /// **`circle-check-big.mjs`** — a different glyph with a longer tick. The
+  /// alias and the module are not two names for one shape here, which is why
+  /// the module name is the one worth carrying.
+  circleCheck,
+
+  /// `octagon-x.mjs`. Off-set: sonner's `TOAST_ICONS.error` (L22), imported
+  /// there as `OctagonXIcon`. `x-octagon.mjs` is its deprecated alias.
+  octagonX,
+
+  /// `circle-x.mjs`. Off-set: the forms page's server-error `Alert`, which
+  /// imports it as **`XCircle`** (`…/base/forms/page.tsx` L4, rendered at
+  /// L246).
+  ///
+  /// Named after the module rather than the import, on [loaderCircle]'s
+  /// precedent and for its reason: `x-circle.mjs` in 1.28.0 is a one-line
+  /// re-export of this module, no curated list prints either spelling, and the
+  /// file the geometry lives in is the honest name. The three glyphs that
+  /// *keep* their alias spelling ([filter], [helpCircle], [alertTriangle]) do
+  /// so only because the icons page prints those strings.
+  ///
+  /// It is [octagonX]'s cross inside [circleCheck]'s ring: all three of its
+  /// nodes are shared geometry, and all three carry their neighbours' keys.
+  circleX,
 }
 
 /// One SVG element from a lucide `__iconNode` list.
@@ -931,6 +975,69 @@ class DsIconPaths {
     // makes a rotation read as a spinner rather than as a wheel.
     DsIconGlyph.loaderCircle: <DsIconElement>[
       DsIconPathElement('M21 12a9 9 0 1 1-6.219-8.56'), // key: 13zald
+    ],
+
+    // `play.mjs` — the `PlayPauseDemo` swap. One closed path: a triangle whose
+    // three corners are 2-unit arcs, which is why it is a `path` and not a
+    // `polygon`.
+    DsIconGlyph.play: <DsIconElement>[
+      DsIconPathElement(
+          'M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z'), // key: 10ikf1
+    ],
+
+    // `pause.mjs` — two 5×18 bars at x = 14 and x = 5, in that order. The
+    // right-hand bar is declared first; the transcription keeps lucide's order
+    // because order is paint order.
+    DsIconGlyph.pause: <DsIconElement>[
+      DsIconRectElement(14, 3, 5, 18, 1), // key: kaeet6
+      DsIconRectElement(5, 3, 5, 18, 1), // key: 1wsw3u
+    ],
+
+    // `volume-2.mjs` — the `MuteDemo` swap. The speaker body plus two arcs.
+    DsIconGlyph.volume2: <DsIconElement>[
+      DsIconPathElement(
+          'M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z'), // key: uqj9uw
+      DsIconPathElement('M16 9a5 5 0 0 1 0 6'), // key: 1q6k2b
+      DsIconPathElement('M19.364 18.364a9 9 0 0 0 0-12.728'), // key: ijwkga
+    ],
+
+    // `volume-x.mjs` — the same speaker body under the same content hash, with
+    // a cross where the arcs were. The two `line` nodes are the two diagonals,
+    // declared in lucide's `x1, x2, y1, y2` order and reordered here to this
+    // element's point-then-point constructor.
+    DsIconGlyph.volumeX: <DsIconElement>[
+      DsIconPathElement(
+          'M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z'), // key: uqj9uw
+      DsIconLineElement(22, 9, 16, 15), // key: 1ewh16
+      DsIconLineElement(16, 9, 22, 15), // key: 5ykzw1
+    ],
+
+    // `circle-check.mjs` — sonner's success toast. The shared 10-unit ring,
+    // then a tick drawn inside it.
+    DsIconGlyph.circleCheck: <DsIconElement>[
+      DsIconCircleElement(12, 12, 10), // key: 1mglay
+      DsIconPathElement('m9 12 2 2 4-4'), // key: dzmm74
+    ],
+
+    // `octagon-x.mjs` — sonner's error toast. The two diagonals are declared
+    // AROUND the octagon, not after it: lucide writes the first stroke, then
+    // the plate, then the second stroke, so the plate paints over the first
+    // diagonal's middle. Order is paint order and the order is kept.
+    DsIconGlyph.octagonX: <DsIconElement>[
+      DsIconPathElement('m15 9-6 6'), // key: 1uzhvr
+      DsIconPathElement(
+          'M2.586 16.726A2 2 0 0 1 2 15.312V8.688a2 2 0 0 1 .586-1.414l4.688-4.688A2 2 0 0 1 8.688 2h6.624a2 2 0 0 1 1.414.586l4.688 4.688A2 2 0 0 1 22 8.688v6.624a2 2 0 0 1-.586 1.414l-4.688 4.688a2 2 0 0 1-1.414.586H8.688a2 2 0 0 1-1.414-.586z'), // key: 2d38gg
+      DsIconPathElement('m9 9 6 6'), // key: z0biqf
+    ],
+
+    // `circle-x.mjs` — the forms page's server-error Alert, imported there as
+    // `XCircle`. Every node is borrowed: the ring is [circleCheck]'s and both
+    // diagonals are [octagonX]'s, keys included — which is exactly what shared
+    // keys are supposed to look like, since they are content hashes.
+    DsIconGlyph.circleX: <DsIconElement>[
+      DsIconCircleElement(12, 12, 10), // key: 1mglay
+      DsIconPathElement('m15 9-6 6'), // key: 1uzhvr
+      DsIconPathElement('m9 9 6 6'), // key: z0biqf
     ],
   };
 

@@ -221,9 +221,18 @@ class DsTypeSpec {
 
 /// Type a component declares inline instead of reaching for a `.type-*` class.
 ///
-/// Two surfaces in this phase do it, both in `components/ui/`. Their values
-/// are still tokens — `text-sm` resolves through `--text-sm` — so they are
-/// transcribed here rather than typed into the components.
+/// Most of `components/ui/` does it: a control types itself out of the bare
+/// Tailwind ladder — `text-sm`, `text-xs`, an optional `leading-*` and a weight
+/// — and never names a `.type-*` class. Their values are still tokens
+/// (`text-sm` resolves through `--text-sm`), so they are transcribed here
+/// rather than typed into the components, which is also what keeps `fontSize:`
+/// out of every file the token guard scans.
+///
+/// Three of these specs — [buttonGroupNum], [inputNum], [inputSerial] — are not
+/// transcriptions of a class list but **resolutions of a cascade**: a `.type-*`
+/// class in `@layer components` sitting under utilities that beat it on some
+/// properties and not others. Each carries the table of who won what. A call
+/// site that re-derived one would be re-deriving a bug.
 ///
 /// ## The button ladder's type, and why it lives here
 ///
@@ -279,7 +288,21 @@ class DsComponentType {
   /// **13px**, not Tailwind's stock 14 — the scale is redefined under the
   /// framework's own name. Its companion `--text-sm--line-height` is *not*
   /// redefined, so the utility still emits Tailwind's ratio and the label's
-  /// line box is 18.571px.
+  /// line box is **18.5714px**.
+  ///
+  /// CORRECTED, and the correction is measured rather than reasoned. This spec
+  /// and [sheetBody] both shipped with `height: null` under a doc comment
+  /// asserting that `text-sm` leaves `line-height` at `normal`. The supervisor's
+  /// probe on the live reference (`InputGroupText`) computes **13px at
+  /// 18.5714px**, which is `calc(1.25 / 0.875) × 13` — the stock companion key
+  /// survives the repoint, and it does so at every `text-sm` site that carries
+  /// no `leading-*` override.
+  ///
+  /// Phases 1 and 2 never caught it because nothing they measured could: CSS
+  /// centres glyphs in their line box by splitting the leading in half, and
+  /// [DsTypeSpec] sets [TextLeadingDistribution.even] to match, so a
+  /// single-line centred label does not move when its line box grows. Only
+  /// multi-line copy — [sheetBody]'s — changes spacing.
   ///
   /// Kept under the bare name [buttonLabel] rather than renamed to match its
   /// siblings: it is the cva's `defaultVariants.size`, and it is the style the
@@ -418,13 +441,106 @@ class DsComponentType {
   /// `SheetContent`'s `text-sm`, with no `font-weight` of its own — so it
   /// inherits `html`'s 400.
   ///
-  /// Its `line-height` is `text-sm`'s inherited Tailwind ratio, the same one
-  /// [buttonLabel] carries.
+  /// Its `line-height` is `text-sm`'s surviving Tailwind ratio, the same one
+  /// [buttonLabel] carries and corrected on the same measurement — see that
+  /// spec's doc. This is the one site where the correction is **visible**:
+  /// `SheetContent` sets the mobile nav sheet's ambient text style, and a
+  /// paragraph's line spacing does change when its line box goes from `normal`
+  /// to 18.5714px. `DsInput`, the other consumer, does not move — a single line
+  /// centred in a fixed 40px pill lands where it always did.
   static final DsTypeSpec sheetBody = DsTypeSpec(
     family: DsFonts.sans,
     size: 13,
     height: _leadingSm,
     wght: 400,
+  );
+
+  // ── the field family ────────────────────────────────────────────────────
+  // `field.tsx`, `textarea.tsx` and `input-otp.tsx` type themselves out of the
+  // bare Tailwind ladder — `text-sm` with an optional `leading-*` override —
+  // and never reach for a `.type-*` class. Five resolved styles, all 13px.
+  //
+  // `--leading-*` is never redeclared in globals.css, so Tailwind's stock
+  // ratios stand. They are unitless multipliers of the element's own font size,
+  // which is what [DsTypeSpec.height] is.
+
+  /// `--leading-snug: 1.375` — Tailwind stock, undeclared in globals.css.
+  static const double _leadingSnug = 1.375;
+
+  /// `--leading-relaxed: 1.625` — Tailwind stock, undeclared in globals.css.
+  static const double _leadingRelaxed = 1.625;
+
+  /// A bare `text-sm` with no weight and no leading override — 13px / 400 /
+  /// 1.428571.
+  ///
+  /// The rung `FieldError` and the OTP slots sit on. Same size and leading as
+  /// [buttonLabel] at `html`'s inherited 400 instead of `font-medium`'s 500,
+  /// which is the only thing that separates the two.
+  static final DsTypeSpec textSm = DsTypeSpec(
+    family: DsFonts.sans,
+    size: 13,
+    height: _leadingSm,
+    wght: 400,
+  );
+
+  /// `FieldLabel`'s `text-sm leading-snug font-medium` — 13px / 500 / 1.375.
+  ///
+  /// The one place in the family that tightens the leading: a label is a short
+  /// run above a control, and `text-sm`'s own 1.428571 would push it away from
+  /// the field it names.
+  static final DsTypeSpec fieldLabel = DsTypeSpec(
+    family: DsFonts.sans,
+    size: 13,
+    height: _leadingSnug,
+    wght: 500,
+  );
+
+  /// `Textarea`'s `text-sm leading-relaxed` — 13px / 400 / 1.625, i.e. a
+  /// 21.125px line box.
+  ///
+  /// The opposite override to [fieldLabel] and for the opposite reason: a
+  /// textarea is the one control on the page that holds real paragraphs, and
+  /// paragraphs need air between the lines.
+  static final DsTypeSpec textareaBody = DsTypeSpec(
+    family: DsFonts.sans,
+    size: 13,
+    height: _leadingRelaxed,
+    wght: 400,
+  );
+
+  /// `.type-num` under a `text-sm` utility — ruling I7's collapse, resolved.
+  ///
+  /// Same cascade as [buttonGroupNum]: `.type-num` is `@layer components` and
+  /// `text-sm` is a utility, so the utility wins the one property they share
+  /// and **the size drops from 15px to 13**. Everything the utility does not
+  /// declare survives — Geist Mono, `font-variant-numeric: tabular-nums`,
+  /// `--tracking-num` −0.01em and, unlike [buttonGroupNum], the **weight**:
+  /// there is no `font-medium` in this class list to beat `.type-num`'s 600.
+  ///
+  /// The leading is `text-sm`'s 1.428571 rather than `.type-num`'s 1.2, because
+  /// here the utility carries a companion `--text-sm--line-height` and a
+  /// utility beats a component layer on every property it declares.
+  static final DsTypeSpec inputNum = DsTypeSpec(
+    family: DsFonts.mono,
+    size: 13,
+    height: _leadingSm,
+    wght: 600,
+    tracking: -0.01,
+    tabular: true,
+  );
+
+  /// `.type-serial` under a `text-sm` utility — the same I7 collapse.
+  ///
+  /// `.type-serial` declares **no `font-weight` at all** (globals.css L1211),
+  /// so the 400 recorded here is not the class's, it is `html`'s, inherited
+  /// through it. Mono, uppercase and −0.01em survive; the size drops 15 → 13.
+  static final DsTypeSpec inputSerial = DsTypeSpec(
+    family: DsFonts.mono,
+    size: 13,
+    height: _leadingSm,
+    wght: 400,
+    tracking: -0.01,
+    uppercase: true,
   );
 }
 

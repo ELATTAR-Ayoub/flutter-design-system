@@ -1,0 +1,530 @@
+/// `components/ui/field.tsx` — label, control, description, error, and the
+/// wiring that makes a screen reader read them as one thing.
+///
+/// The geometry is four gaps and three line-heights (`forms-map.md` §3.2,
+/// measured):
+///
+/// | part | resolved |
+/// |---|---|
+/// | `FieldGroup` | column, **20px** between fields, full width (16px when nested) |
+/// | `Field` | column, **8px**, and `width: 100%` forced on every direct child |
+/// | `FieldLabel` | 13 / **1.375** / 500, `width: fit-content`, `user-select: none` |
+/// | `FieldDescription` | 13 / **1.5** / 400 / `--muted-foreground` |
+/// | `FieldError` | 13 / **1.428571** / 400 / `--destructive-ink`, `role="alert"` |
+///
+/// **Three different line-heights on three consecutive lines.** The family
+/// types itself out of Tailwind's `text-sm` rung with `leading-*` overrides and
+/// never touches a `.type-*` class, which is why [DsComponentType.fieldLabel],
+/// [DsComponentType.textSm] and [DsType.small] are three different specs here
+/// rather than one.
+///
+/// ## The wiring contract
+///
+/// The web builds an id graph — `useId()` per field instance, then
+/// `htmlFor`/`id`, `aria-describedby` and `aria-invalid` pointing into it
+/// (`form.tsx:101–114`). Flutter has no id graph and no way to grow one. The
+/// translation (inputs-map §7.2, forms-map §3.5) collapses it into **one merged
+/// semantics node per field**:
+///
+/// | web | here |
+/// |---|---|
+/// | `<label for=id>` | the label string is fed to the control as its accessible name, and the visible label is excluded from semantics so it is not announced twice |
+/// | `aria-describedby` → description | folded into `Semantics(hint:)` |
+/// | `aria-describedby` → description **+** message | concatenated, description first — the DOM order the id list encodes |
+/// | `aria-invalid` | `Semantics(validationResult: SemanticsValidationResult.invalid)` |
+/// | `role="alert"` on `FieldError` | `Semantics(liveRegion: true)`, on the error subtree only |
+/// | `role="group"` on `Field` | the field's own container node |
+///
+/// The threading itself is [DsFieldScope]. A Radix `Slot` merges props onto
+/// whatever child it is given; the Flutter analogue of that is context, so a
+/// control reads what the field knows instead of the field reaching into the
+/// control. Order of precedence is the Slot's own: **the child's own props
+/// win** (`form.tsx` merge order, forms-map §3.1).
+///
+/// DOCUMENTED DRIFT (inputs-map drift 11): `fieldVariants` carries
+/// `data-[invalid=true]:text-destructive-ink` for the whole group, and the
+/// **inputs** page never sets `data-invalid` on any `Field` — it puts
+/// `aria-invalid` on the control instead, so no label there ever turns red
+/// despite the API row claiming Field *"handles the invalid colouring for the
+/// whole group"*. The **forms** page does set it (`data-invalid={fieldState
+/// .invalid}`), and there it fires. Both behaviours fall out of one switch:
+/// [DsField.invalid] colours the subtree, and a page that marks only its
+/// control leaves the field valid.
+library;
+
+import 'package:flutter/semantics.dart';
+import 'package:flutter/widgets.dart';
+
+import '../foundation/spacing.dart';
+import '../foundation/theme.dart';
+import '../foundation/typography.dart';
+import '../theme_scope.dart';
+import 'ds_rule.dart';
+
+/// What a `Field` threads down to the control inside it.
+///
+/// Everything the id graph would have carried, in the one direction Flutter can
+/// carry it. A control opts in by reading it; nothing is forced on a child that
+/// does not.
+class DsFieldScope extends InheritedWidget {
+  const DsFieldScope({
+    super.key,
+    this.label,
+    this.describedBy,
+    this.invalid = false,
+    this.enabled = true,
+    this.focusNode,
+    required super.child,
+  });
+
+  /// The visible label's text, to be announced as the control's name — the
+  /// `<label for=…>` translation.
+  final String? label;
+
+  /// Description, then error message, in DOM order. What `aria-describedby`
+  /// resolves to, as one string.
+  final String? describedBy;
+
+  /// `aria-invalid` on the control.
+  final bool invalid;
+
+  /// A disabled field disables its control; a control cannot opt back in.
+  final bool enabled;
+
+  /// The node the label focuses and a failed submit lands on.
+  final FocusNode? focusNode;
+
+  static DsFieldScope? maybeOf(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<DsFieldScope>();
+
+  @override
+  bool updateShouldNotify(DsFieldScope old) =>
+      old.label != label ||
+      old.describedBy != describedBy ||
+      old.invalid != invalid ||
+      old.enabled != enabled ||
+      old.focusNode != focusNode;
+}
+
+/// `fieldVariants`' `orientation`.
+enum DsFieldOrientation {
+  /// `flex-col *:w-full` — the default, and every field on both ported pages
+  /// except the switch and the checkbox.
+  vertical,
+
+  /// `flex-row items-center`, with the label taking `flex: auto` so the control
+  /// sits hard against the trailing edge.
+  horizontal,
+}
+
+/// `FieldGroup` — `flex w-full flex-col gap-5`.
+class DsFieldGroup extends StatelessWidget {
+  const DsFieldGroup({super.key, required this.children, this.nested = false});
+
+  final List<Widget> children;
+
+  /// `*:data-[slot=field-group]:gap-4` — a group inside a group closes up from
+  /// 20px to 16.
+  final bool nested;
+
+  /// `gap-5` — 20px between fields, the measure both pages' panels are built
+  /// on.
+  static double get gap => ds(5);
+
+  /// `gap-4` — 16px, the nested step.
+  static double get nestedGap => ds(4);
+
+  @override
+  Widget build(BuildContext context) {
+    return _Stack(
+      gap: nested ? nestedGap : gap,
+      children: children,
+    );
+  }
+}
+
+/// `FieldSet` — `flex flex-col gap-4`, closing to `gap-3` around a selection
+/// group.
+class DsFieldSet extends StatelessWidget {
+  const DsFieldSet({
+    super.key,
+    required this.children,
+    this.tightForGroup = false,
+  });
+
+  final List<Widget> children;
+
+  /// `has-[>[data-slot=radio-group]]:gap-3` /
+  /// `has-[>[data-slot=checkbox-group]]:gap-3` — 16px drops to 12 when a radio
+  /// or checkbox group is a **direct** child.
+  ///
+  /// A `has-` selector inspects the subtree; Flutter cannot, and type-sniffing
+  /// the children would couple this file to components another owner builds.
+  /// So the caller states it, which is also what the selector means.
+  final bool tightForGroup;
+
+  /// `gap-4` — 16px.
+  static double get gap => ds(4);
+
+  /// `gap-3` — 12px, the selection-group step.
+  static double get groupGap => ds(3);
+
+  @override
+  Widget build(BuildContext context) =>
+      _Stack(gap: tightForGroup ? groupGap : gap, children: children);
+}
+
+/// `FieldLegend variant="label"` — `mb-1.5 font-medium text-sm`.
+///
+/// The page's one legend sits over a radio group, because `<label for>` may
+/// only point at a labelable element and a RadioGroup container is a `div`, so
+/// `FormLabel`'s `htmlFor` would announce nothing (`page.tsx:322–325`).
+class DsFieldLegend extends StatelessWidget {
+  const DsFieldLegend(this.text, {super.key});
+
+  final String text;
+
+  /// `mb-1.5` — 6px, **on top of** the enclosing `FieldSet`'s own flex gap. A
+  /// margin and a gap both apply in CSS, so the legend clears its group by 22px
+  /// and not by 16.
+  static double get spaceBelow => ds(1.5);
+
+  @override
+  Widget build(BuildContext context) {
+    // 13 / 500 / 1.428571: `font-medium` at `text-sm`, with **no** `leading-*`
+    // override, so it keeps the utility's own ratio rather than the label's
+    // 1.375. Composed from the two specs that each carry half of it rather than
+    // typing a third — the size and weight are [DsComponentType.fieldLabel]'s,
+    // the leading is [DsComponentType.textSm]'s.
+    final TextStyle style = DsText.styleOf(context, DsComponentType.fieldLabel)
+        .copyWith(height: DsComponentType.textSm.height);
+    return Align(
+      alignment: AlignmentDirectional.centerStart,
+      child: Text(text, style: style),
+    );
+  }
+}
+
+/// One field: a label, the control it names, and what is said about it.
+///
+/// The four slots are passed as data rather than composed as children so the
+/// field can publish [DsFieldScope] and place the description's conditional
+/// gap. [DsFieldLabel], [DsFieldDescription] and [DsFieldError] stay public for
+/// the compositions this shape does not cover.
+class DsField extends StatelessWidget {
+  const DsField({
+    super.key,
+    required this.child,
+    this.label,
+    this.description,
+    this.errors = const <String>[],
+    this.invalid,
+    this.enabled = true,
+    this.focusNode,
+    this.orientation = DsFieldOrientation.vertical,
+  });
+
+  /// The control.
+  final Widget child;
+
+  /// `FieldLabel`'s text. Rendered visibly **and** announced as the control's
+  /// accessible name — one string, one announcement.
+  final String? label;
+
+  /// `FieldDescription`'s text.
+  final String? description;
+
+  /// `FieldError`'s messages. Empty renders nothing at all: `FieldError`
+  /// returns `null` when valid, and a zero-height live region that exists on
+  /// every field is the anti-pattern the page's own Note names.
+  final List<String> errors;
+
+  /// `data-invalid` on the field. Defaults to "there are messages".
+  ///
+  /// Separable because the reference separates them: the inputs page marks the
+  /// control and leaves the field valid, which is why no label turns red there.
+  final bool? invalid;
+
+  /// `data-[disabled=true]`.
+  final bool enabled;
+
+  /// The node the label focuses, and the one a failed submit lands on.
+  final FocusNode? focusNode;
+
+  final DsFieldOrientation orientation;
+
+  /// `gap-2` — 8px between label, control and what follows.
+  static double get gap => ds(2);
+
+  /// `nth-last-2:-mt-1` — the description tucks 4px closer to the control the
+  /// moment an error appears below it *(measured: forms-map §3.2 records the
+  /// rule emitted as `margin-top: calc(var(--spacing) * -1)`)*.
+  ///
+  /// `FieldError` renders `null` when valid, so the description's position in
+  /// the child list — and therefore which of `last:mt-0` and `nth-last-2:-mt-1`
+  /// matches — changes with validity. Nothing animates it; it is a relayout.
+  static double get describedGap => gap - ds(1);
+
+  @override
+  Widget build(BuildContext context) {
+    final DsThemeData theme = DsTheme.of(context);
+    final List<String> messages = DsRules.dedupe(errors);
+    final bool isInvalid = invalid ?? messages.isNotEmpty;
+
+    // `aria-describedby="{id}-description {id}-message"` — one id list, read in
+    // DOM order, so one string in the same order.
+    final String described = <String>[
+      ?description,
+      ...messages,
+    ].join(' ');
+
+    final Widget control = DsFieldScope(
+      label: label,
+      describedBy: described.isEmpty ? null : described,
+      invalid: isInvalid,
+      enabled: enabled,
+      focusNode: focusNode,
+      child: child,
+    );
+
+    final Widget? labelWidget = label == null
+        ? null
+        : DsFieldLabel(label!, focusNode: focusNode, enabled: enabled);
+
+    final List<Widget> rows = <Widget>[];
+    switch (orientation) {
+      case DsFieldOrientation.vertical:
+        if (labelWidget != null) {
+          rows
+            ..add(labelWidget)
+            ..add(SizedBox(height: gap));
+        }
+        rows.add(control);
+      case DsFieldOrientation.horizontal:
+        rows.add(Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            // `*:data-[slot=field-label]:flex-auto` — the label takes the slack
+            // and the control sits at its own size against the trailing edge.
+            if (labelWidget != null) Expanded(child: labelWidget),
+            if (labelWidget != null) SizedBox(width: gap),
+            child,
+          ],
+        ));
+    }
+
+    if (description != null) {
+      rows
+        ..add(SizedBox(height: messages.isEmpty ? gap : describedGap))
+        // Excluded because the string is already the control's `hint`, which
+        // is where `aria-describedby` lands. Left in, it merges into this
+        // field's one node as part of the control's NAME — "Email Receipts and
+        // nothing else." — which is neither what the web announces nor what a
+        // name is for. The standalone [DsFieldDescription] announces itself
+        // normally; only the copy this field has already folded is silenced.
+        ..add(ExcludeSemantics(child: DsFieldDescription(description!)));
+    }
+    if (messages.isNotEmpty) {
+      rows
+        ..add(SizedBox(height: gap))
+        ..add(DsFieldError(messages));
+    }
+
+    Widget field = Column(
+      // `*:w-full` — every direct child stretches to the field's measure.
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      children: rows,
+    );
+
+    if (isInvalid) {
+      // `data-[invalid=true]:text-destructive-ink` sets `color` on the whole
+      // subtree. Who actually changes is decided by who declares a colour of
+      // their own: the label and the control's typed text inherit and turn; the
+      // description, the error and the placeholder all state theirs and do not
+      // (forms-map §3.2).
+      field = DefaultTextStyle.merge(
+        style: TextStyle(color: theme.destructiveInk),
+        child: field,
+      );
+    }
+
+    // `role="group"`, and the field's own `aria-invalid`.
+    //
+    // The control inside publishes a validation result too, from the same
+    // scope, and a merge keeps the parent's — so stating it here costs nothing
+    // and buys the case that matters: a control that does **not** read
+    // [DsFieldScope] still ends up inside a node a screen reader hears as
+    // invalid. An error nobody is told about is the one drift class this port
+    // does not ship, and it must not depend on every control opting in.
+    return Semantics(
+      container: true,
+      validationResult: isInvalid
+          ? SemanticsValidationResult.invalid
+          : SemanticsValidationResult.none,
+      child: field,
+    );
+  }
+}
+
+/// `FieldLabel` → `Label` — 13 / 1.375 / 500, `width: fit-content`.
+///
+/// `w-fit` is not cosmetic: it narrows the click target to the words, so a
+/// click 400px to the right of "Email" inside a 512px field does not focus the
+/// input. Tapping the text does, which is the whole of what `htmlFor` buys and
+/// the only part of it Flutter can reproduce.
+class DsFieldLabel extends StatelessWidget {
+  const DsFieldLabel(this.text, {super.key, this.focusNode, this.enabled = true});
+
+  final String text;
+
+  /// Focused on tap. Falls back to the enclosing [DsFieldScope]'s node.
+  final FocusNode? focusNode;
+
+  final bool enabled;
+
+  /// `group-data-[disabled=true]/field:opacity-50`.
+  static const double disabledOpacity = 0.50;
+
+  @override
+  Widget build(BuildContext context) {
+    final FocusNode? node = focusNode ?? DsFieldScope.maybeOf(context)?.focusNode;
+
+    // No colour: `Label` declares none, so it inherits — which is what lets
+    // `Field`'s invalid colouring reach it.
+    Widget label = Text(
+      text,
+      style: DsText.styleOf(context, DsComponentType.fieldLabel),
+    );
+
+    if (node != null && enabled) {
+      label = GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: node.requestFocus,
+        child: label,
+      );
+    }
+
+    if (!enabled) {
+      label = Opacity(opacity: disabledOpacity, child: label);
+    }
+
+    return Align(
+      alignment: AlignmentDirectional.centerStart,
+      // The string is already the control's accessible name. Announcing it here
+      // too would read the field's label twice, which is exactly what a correct
+      // `<label for>` does *not* do.
+      child: ExcludeSemantics(child: label),
+    );
+  }
+}
+
+/// `FieldDescription` — 13 / 1.5 / 400 / `--muted-foreground`.
+class DsFieldDescription extends StatelessWidget {
+  const DsFieldDescription(this.text, {super.key});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    // `text-sm leading-normal font-normal text-muted-foreground` resolves to
+    // exactly `.type-small`'s four values. Reused rather than re-transcribed:
+    // the numbers are the same numbers, and a second spec carrying them would
+    // be a second place for them to drift.
+    return DsText(text, DsType.small, align: TextAlign.start);
+  }
+}
+
+/// `FieldError` — 13 / 1.428571 / 400 / `--destructive-ink`, `role="alert"`.
+///
+/// One message renders as a bare string; two or more render as a bulleted list
+/// (`ul.ml-4.list-disc.gap-1`). The list branch fires in exactly one place in
+/// the corpus — the password form under `criteriaMode: "all"` — and it is the
+/// entire reason §3 of the forms page exists.
+class DsFieldError extends StatelessWidget {
+  const DsFieldError(this.messages, {super.key});
+
+  final List<String> messages;
+
+  /// `ml-4` — 16px. With Preflight zeroing the list's padding, this margin is
+  /// where the disc markers hang: the item text starts at 16px and the marker
+  /// paints to the left of it, inside the indent.
+  static double get listIndent => ds(4);
+
+  /// `gap-1` — 4px between items.
+  static double get itemGap => ds(1);
+
+  @override
+  Widget build(BuildContext context) {
+    final List<String> unique = DsRules.dedupe(messages);
+    // `FieldError` returns `null` when there is nothing to say. Not a
+    // zero-height box carrying a live region — an empty live region on every
+    // field is the anti-pattern the page's own Note names and `donts[1]`
+    // forbids.
+    if (unique.isEmpty) return const SizedBox.shrink();
+
+    final DsThemeData theme = DsTheme.of(context);
+    final TextStyle style = DsText.styleOf(
+      context,
+      DsComponentType.textSm,
+      color: theme.destructiveInk,
+    );
+
+    final Widget content = unique.length == 1
+        ? Text(unique.single, style: style)
+        : _Stack(
+            gap: itemGap,
+            children: <Widget>[
+              for (final String message in unique)
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    SizedBox(
+                      width: listIndent,
+                      child: Align(
+                        alignment: AlignmentDirectional.topEnd,
+                        // `list-style-type: disc`. A bullet glyph is the
+                        // closest Flutter has to a CSS marker box, which is
+                        // generated content no widget tree contains.
+                        child: Text('•', style: style),
+                      ),
+                    ),
+                    Expanded(child: Text(message, style: style)),
+                  ],
+                ),
+            ],
+          );
+
+    // `role="alert"` — announced when it appears, which is the whole contract.
+    return Semantics(
+      container: true,
+      liveRegion: true,
+      child: Align(alignment: AlignmentDirectional.centerStart, child: content),
+    );
+  }
+}
+
+/// A column with one gap between every pair of children, and none at the ends.
+///
+/// `Column(spacing:)` would do it in one line, but a `SizedBox` per gap is what
+/// the rest of this port uses and what its geometry tests read.
+class _Stack extends StatelessWidget {
+  const _Stack({required this.gap, required this.children});
+
+  final double gap;
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    final List<Widget> rows = <Widget>[];
+    for (int i = 0; i < children.length; i++) {
+      if (i > 0) rows.add(SizedBox(height: gap));
+      rows.add(children[i]);
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      children: rows,
+    );
+  }
+}

@@ -494,6 +494,78 @@ void main() {
           offsetMoreOrLessEquals(const Offset(1, 1), epsilon: 1e-9));
     });
 
+    test('check-draw slides a 22-unit dash into view over 280ms', () {
+      // `from { stroke-dashoffset: 22 } to { stroke-dashoffset: 0 }`, and the
+      // utility's own `stroke-dasharray: 22` is what makes one dash cover the
+      // whole path.
+      expect(DsCheckDraw.dashArray, 22);
+      expect(DsCheckDraw.dashOffset.transform(0), 22);
+      expect(DsCheckDraw.dashOffset.transform(1), closeTo(0, 1e-9));
+      expect(DsCheckDraw.duration, DsDurations.checkDraw);
+      expect(DsCheckDraw.duration.inMilliseconds, 280);
+      expect(DsCheckDraw.curve, DsCurves.out);
+
+      // Read the other way round: nothing painted at 0, all of it at 1.
+      expect(DsCheckDraw.drawnFractionAt(0), closeTo(0, 1e-9));
+      expect(DsCheckDraw.drawnFractionAt(1), closeTo(1, 1e-9));
+      // And the two readings are one table, not two — the fraction is the
+      // offset, inverted, at every point in between.
+      expect(
+        DsCheckDraw.drawnFractionAt(0.4),
+        closeTo(1 - DsCheckDraw.dashOffset.transform(0.4) / 22, 1e-12),
+      );
+    });
+
+    test('dash-draw is the same mechanism over a 12-unit stroke, in 200ms', () {
+      expect(DsDashDraw.dashArray, 12);
+      expect(DsDashDraw.dashOffset.transform(0), 12);
+      expect(DsDashDraw.dashOffset.transform(1), closeTo(0, 1e-9));
+      expect(DsDashDraw.duration.inMilliseconds, 200);
+      expect(DsDashDraw.curve, DsCurves.out);
+      // Shorter stroke, shorter run — the pair is why both numbers exist.
+      expect(DsDashDraw.duration, lessThan(DsCheckDraw.duration));
+      expect(DsDashDraw.dashArray, lessThan(DsCheckDraw.dashArray));
+    });
+
+    test('dot-pop overshoots to 1.35 at 55%, on the spring', () {
+      expect(DsDotPop.scale.transform(0), 0);
+      expect(DsDotPop.scale.transform(0.55), closeTo(1.35, stopTolerance));
+      expect(DsDotPop.scale.transform(1), closeTo(1, 1e-9));
+
+      // Opacity reaches 1 at the same stop the dot is widest, so the flash and
+      // the peak land together.
+      expect(DsDotPop.opacity.transform(0), 0);
+      expect(DsDotPop.opacity.transform(0.55), closeTo(1, stopTolerance));
+      expect(DsDotPop.opacity.transform(1), 1);
+
+      expect(DsDotPop.duration.inMilliseconds, 320);
+      expect(DsDotPop.curve, DsCurves.spring,
+          reason: 'the one selection-control table that is not --ease-out');
+    });
+
+    test('swap-roll is a transition: 400ms spring, 160% a step', () {
+      expect(DsSwapRoll.duration, DsDurations.slow);
+      expect(DsSwapRoll.duration.inMilliseconds, 400);
+      expect(DsSwapRoll.curve, DsCurves.spring);
+      expect(DsSwapRoll.squashDelay, DsDurations.fast);
+      expect(DsSwapRoll.squashDelay.inMilliseconds, 150);
+
+      // A CSS percentage translate resolves against the element's OWN box, and
+      // every strip cell is centred on one glyph — so a step is 1.6 × the
+      // glyph, never 1.6 × the clip window.
+      expect(DsSwapRoll.travelFor(16), closeTo(25.6, 1e-9));
+      expect(DsSwapRoll.travelFor(20), closeTo(32, 1e-9));
+      expect(DsTransforms.swapRollTravel, 1.6);
+
+      // The spring exceeds 1 mid-flight, which is what sails the arriving
+      // glyph past centre before it settles.
+      final double peak = <double>[
+        for (int i = 0; i <= 100; i++) DsSwapRoll.curve.transform(i / 100),
+      ].reduce((double a, double b) => a > b ? a : b);
+      expect(peak, greaterThan(1));
+      expect(peak, closeTo(1.098, 1e-2));
+    });
+
     test('yuki-spring-up rises 32, overshoots 4, settles in three bounces', () {
       expect(DsSpringUp.translateY.transform(0), 32);
       expect(DsSpringUp.translateY.transform(0.55), closeTo(-4, stopTolerance));

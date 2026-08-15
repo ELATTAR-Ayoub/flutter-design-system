@@ -33,6 +33,7 @@ import '../foundation/theme.dart';
 import '../foundation/typography.dart';
 import '../motion/press.dart';
 import '../theme_scope.dart';
+import 'spinner.dart';
 
 /// The seven `cva` variants, in the reference's own declaration order.
 enum DsButtonVariant {
@@ -83,22 +84,74 @@ enum DsButtonVariant {
   link,
 }
 
-/// The sizes the docs chrome uses.
+/// The nine `cva` size rungs, in the reference's own declaration order
+/// (`button.tsx` L57–69).
 ///
-/// The reference declares nine (`xs`/`sm`/`default`/`lg`/`xl` and four square
-/// `icon-*` steps); these four are the ones anything in this port asks for.
+/// Five text rungs and four squares. The text ladder is **32 / 40 / 48 / 56
+/// plus a 24px step for dense internals**, and the component's own docstring
+/// says why it is taller than stock shadcn: *"a premium product's primary
+/// action cannot be 32px tall."*
+///
+/// Two things about it are worth knowing before reading [typeFor]:
+///
+/// * **Five rungs, three type sizes.** `sm` and `default` are both 13px, `lg`
+///   and `xl` are both 15px; only `xs` is unique at the bottom. The ladder is a
+///   *height* ladder that changes type twice (buttons-map drift 15).
+/// * **The four `icon-*` rungs declare no `gap-*`, no `px-*` and no `text-*`
+///   at all.** They are pure squares that inherit their type from the page.
+///
+/// `icon-xs` is declared here and rendered nowhere: the reference's cva
+/// declares it and the API table prints it, and the page shows 8 of the 9
+/// (drift 17). Supervisor ruling B3 — build nine of nine, so the printed API
+/// row stays true.
 enum DsButtonSize {
-  /// `h-8 gap-1.5 px-3.5` — 32px tall.
+  /// `h-6 gap-1 px-2.5 text-xs` — 24px tall. *"Dense internal use only — chips
+  /// inside combobox and attachment."*
+  xs,
+
+  /// `h-8 gap-1.5 px-3.5 text-small` — 32px tall.
   sm,
 
-  /// `h-10 gap-2 px-4` — 40px tall. The `default` size.
+  /// `h-10 gap-2 px-4 text-sm` — 40px tall. The `default` size.
+  ///
+  /// Named [md] because `default` is a Dart keyword — the same rename
+  /// [DsButtonVariant.primary] carries, and for the same reason.
   md,
+
+  /// `h-12 gap-2.5 px-6 text-body` — 48px tall.
+  lg,
+
+  /// `h-14 gap-2.5 px-8 text-base` — 56px tall. *"Hero CTA only — landing page
+  /// and pack opening."*
+  xl,
+
+  /// `size-6` — a 24px square.
+  iconXs,
+
+  /// `size-8` — a 32px square.
+  iconSm,
 
   /// `size-10` — a 40px square.
   icon,
 
-  /// `size-8` — a 32px square.
-  iconSm,
+  /// `size-12` — a 48px square.
+  iconLg,
+}
+
+/// The third cva axis (`button.tsx` L71–75) — *"uppercase label treatment for
+/// pack and money CTAs."*
+enum DsButtonEmphasis {
+  /// `emphasis="none"` — the empty string. The cva's own default.
+  none,
+
+  /// `emphasis="caps"` — `text-num-sm font-semibold tracking-cta uppercase`.
+  ///
+  /// An axis, not a rung: cva emits variant → size → emphasis and
+  /// tailwind-merge keeps the later class in each group, so this beats whatever
+  /// `text-*` the size declared **and** the base `font-medium`, on all nine
+  /// sizes. On the `default` rung that means the label *shrinks*, 13px → 12
+  /// (buttons-map drift 22).
+  caps,
 }
 
 /// `disabled:opacity-45` — the one opacity in the base class list.
@@ -172,6 +225,8 @@ class DsButton extends StatefulWidget {
     required this.child,
     this.variant = DsButtonVariant.primary,
     this.size = DsButtonSize.md,
+    this.emphasis = DsButtonEmphasis.none,
+    this.loading = false,
     this.onPressed,
     this.label,
     this.focusNode,
@@ -185,8 +240,35 @@ class DsButton extends StatefulWidget {
 
   final DsButtonSize size;
 
+  /// The uppercase treatment. See [DsButtonEmphasis.caps].
+  final DsButtonEmphasis emphasis;
+
+  /// `loading` (`button.tsx` L104, L120–127, L134–136) — four things at once:
+  ///
+  /// ```
+  /// content  = <>{loading && <Spinner />}{children}</>
+  /// data-loading = loading || undefined
+  /// aria-busy    = loading || undefined
+  /// disabled     = disabled || loading
+  /// ```
+  ///
+  /// So it **prepends a spinner**, **disables the button** — which pulls in the
+  /// base `disabled:pointer-events-none disabled:opacity-45` — and announces
+  /// itself as busy. The port does the first two exactly; the third is where
+  /// Flutter runs out of vocabulary, and [_DsButtonState.build] records why.
+  ///
+  /// DOCUMENTED DRIFT (buttons-map drift 3, forms-map drift 2). The prop's own
+  /// JSDoc says *"The label stays in place so the button does not change width
+  /// mid-action"*, the states cell is captioned *"Disabled, width held"*, and
+  /// the rules list repeats it a fourth time. The spinner is **prepended**, so
+  /// the button grows by [DsSpinner.px] + [gapFor] = **24px on the `default`
+  /// rung**. It is accidentally true only where a parent stretches the button
+  /// to a fixed width, which is what the forms page does and what the states
+  /// grid does not. Four statements, false every time; all four ship.
+  final bool loading;
+
   /// `null` disables the button: `disabled:pointer-events-none
-  /// disabled:opacity-45`.
+  /// disabled:opacity-45`. [loading] disables it too.
   final VoidCallback? onPressed;
 
   /// The accessible name, for the icon-only sizes that carry an `sr-only`
@@ -199,31 +281,102 @@ class DsButton extends StatefulWidget {
 
   /// `h-*` / `size-*`.
   static double heightFor(DsButtonSize size) => switch (size) {
+        DsButtonSize.xs || DsButtonSize.iconXs => ds(6),
         DsButtonSize.sm || DsButtonSize.iconSm => ds(8),
         DsButtonSize.md || DsButtonSize.icon => ds(10),
+        DsButtonSize.lg || DsButtonSize.iconLg => ds(12),
+        DsButtonSize.xl => ds(14),
       };
 
   /// `gap-*` — the space between an icon and its label.
   ///
   /// Exposed rather than applied, because this component takes one [child]:
   /// a button with both an icon and a label composes its own row and asks
-  /// here for the spacing rather than inventing it.
+  /// here for the spacing rather than inventing it. The one case where the
+  /// button applies it itself is [loading], which prepends a child of its own
+  /// and therefore owns the gap in front of it.
+  ///
+  /// `lg` and `xl` share `gap-2.5`; the four squares declare none.
   static double gapFor(DsButtonSize size) => switch (size) {
+        DsButtonSize.xs => ds(1),
         DsButtonSize.sm => ds(1.5),
         DsButtonSize.md => ds(2),
-        DsButtonSize.icon || DsButtonSize.iconSm => 0,
+        DsButtonSize.lg || DsButtonSize.xl => ds(2.5),
+        DsButtonSize.iconXs ||
+        DsButtonSize.iconSm ||
+        DsButtonSize.icon ||
+        DsButtonSize.iconLg =>
+          0,
       };
 
   /// `px-*`. The square sizes have none — they centre their glyph.
   static double paddingXFor(DsButtonSize size) => switch (size) {
+        DsButtonSize.xs => ds(2.5),
         DsButtonSize.sm => ds(3.5),
         DsButtonSize.md => ds(4),
-        DsButtonSize.icon || DsButtonSize.iconSm => 0,
+        DsButtonSize.lg => ds(6),
+        DsButtonSize.xl => ds(8),
+        DsButtonSize.iconXs ||
+        DsButtonSize.iconSm ||
+        DsButtonSize.icon ||
+        DsButtonSize.iconLg =>
+          0,
       };
 
-  /// Whether the size is one of the two squares.
+  /// `[&_svg:not([class*='size-'])]:size-*` — the px a rung forces on an icon
+  /// child that does not state a size of its own.
+  ///
+  /// The base class list sets `size-4`; four rungs override it, and `md`/`lg`
+  /// are the two text rungs that leave the base value alone.
+  ///
+  /// **This is the port's honest version of a CSS descendant selector.** The
+  /// reference restyles the `<svg>` from the button; a Flutter parent cannot
+  /// reach into [child] and resize a [DsIcon], so the rung publishes the number
+  /// and the caller passes it. It is also why buttons-map drift 6 exists at
+  /// all: `Icon size="sm"` writes 14 as an *attribute* and never emits a
+  /// `size-*` class, so the CSS wins the box at 16 while `strokeWidth` keeps
+  /// being computed from the declared 14. Invisible only because
+  /// `strokeFor(14) == strokeFor(16) == 2.4`.
+  static double iconPxFor(DsButtonSize size) => switch (size) {
+        DsButtonSize.xs || DsButtonSize.iconXs => 12,
+        DsButtonSize.sm || DsButtonSize.iconSm => 14,
+        DsButtonSize.md || DsButtonSize.lg || DsButtonSize.icon => 16,
+        DsButtonSize.xl || DsButtonSize.iconLg => 20,
+      };
+
+  /// The `text-*` class a rung declares, or **null** where it declares none.
+  ///
+  /// Null is not a missing case: the four `icon-*` rungs genuinely set no
+  /// font-size, so their label inherits whatever the page is set in — which is
+  /// what [_DsButtonState.build] reproduces by merging only the ink into the
+  /// ambient [DefaultTextStyle] instead of replacing it.
+  ///
+  /// [emphasis] is checked first because cva emits it last: `caps` overrides
+  /// every rung's own class, squares included.
+  static DsTypeSpec? typeFor(DsButtonSize size, DsButtonEmphasis emphasis) {
+    if (emphasis == DsButtonEmphasis.caps) {
+      return DsComponentType.buttonLabelCaps;
+    }
+    return switch (size) {
+      DsButtonSize.xs => DsComponentType.buttonLabelXs,
+      DsButtonSize.sm => DsComponentType.buttonLabelSm,
+      DsButtonSize.md => DsComponentType.buttonLabel,
+      DsButtonSize.lg => DsComponentType.buttonLabelLg,
+      DsButtonSize.xl => DsComponentType.buttonLabelXl,
+      DsButtonSize.iconXs ||
+      DsButtonSize.iconSm ||
+      DsButtonSize.icon ||
+      DsButtonSize.iconLg =>
+        null,
+    };
+  }
+
+  /// Whether the size is one of the four squares.
   static bool isSquare(DsButtonSize size) =>
-      size == DsButtonSize.icon || size == DsButtonSize.iconSm;
+      size == DsButtonSize.iconXs ||
+      size == DsButtonSize.iconSm ||
+      size == DsButtonSize.icon ||
+      size == DsButtonSize.iconLg;
 
   /// [spec] with `focus-visible:ring-3 focus-visible:ring-<c>` composited in
   /// front of it — the shared focus-ring helper both this widget and `DsInput`
@@ -253,7 +406,10 @@ class _DsButtonState extends State<DsButton> {
   bool _pressed = false;
   bool _focused = false;
 
-  bool get _enabled => widget.onPressed != null;
+  /// `disabled = disabled || loading` — the reference ORs the two, so a
+  /// loading button is a disabled button and takes the whole disabled branch:
+  /// 45% opacity, no pointer events, no focus.
+  bool get _enabled => widget.onPressed != null && !widget.loading;
 
   void _setHovered(bool value) {
     if (_hovered == value) return;
@@ -415,6 +571,64 @@ class _DsButtonState extends State<DsButton> {
     );
   }
 
+  /// `text-transform: uppercase`, which Flutter has no [TextStyle] for.
+  ///
+  /// CSS transforms the *rendered* glyphs and leaves the DOM text alone, so the
+  /// accessible name of a `caps` button is still "Claim Reward" — a screen
+  /// reader never hears the shouting. That is reproduced here: the visible
+  /// string is uppercased and [Text.semanticsLabel] is pinned to the original,
+  /// which is Flutter's spelling of the same split.
+  ///
+  /// It reaches a [Text] child only. A CSS `text-transform` inherits through
+  /// the whole subtree, and nothing here does — but the reference passes `caps`
+  /// exactly one shape, a bare string, and a widget walker that rebuilt
+  /// arbitrary descendants would be a much larger lie than this limit. Callers
+  /// wrapping their label in anything else uppercase it themselves; the type
+  /// spec still applies to the whole subtree, because that *is* inherited.
+  Widget _caps(Widget child) {
+    if (child is! Text) return child;
+    final String? data = child.data;
+    if (data == null) return child;
+    return Text(
+      data.toUpperCase(),
+      key: child.key,
+      style: child.style,
+      strutStyle: child.strutStyle,
+      textAlign: child.textAlign,
+      textDirection: child.textDirection,
+      softWrap: child.softWrap,
+      overflow: child.overflow,
+      textScaler: child.textScaler,
+      maxLines: child.maxLines,
+      semanticsLabel: child.semanticsLabel ?? data,
+      textWidthBasis: child.textWidthBasis,
+      textHeightBehavior: child.textHeightBehavior,
+      selectionColor: child.selectionColor,
+    );
+  }
+
+  /// `<>{loading && <Spinner />}{children}</>` — the button's own flex row.
+  ///
+  /// The spinner is **prepended**, and the gap between it and the label is the
+  /// rung's own `gap-*`, because in CSS it is the button's flex `gap` doing the
+  /// spacing rather than anything the spinner brings. That is where the missing
+  /// 24px of [DsButton.loading]'s drift comes from: 16 for the glyph, 8 for
+  /// `gap-2`.
+  Widget _content() {
+    final Widget label = widget.emphasis == DsButtonEmphasis.caps
+        ? _caps(widget.child)
+        : widget.child;
+    if (!widget.loading) return label;
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        const DsSpinner(),
+        SizedBox(width: DsButton.gapFor(widget.size)),
+        label,
+      ],
+    );
+  }
+
   /// The variant's surface.
   ///
   /// Three of the seven paint a flat `background-color` and go through
@@ -486,11 +700,16 @@ class _DsButtonState extends State<DsButton> {
       content: skin.content,
       duration: transition,
       builder: (BuildContext context, Color fill, Color border, Color ink) {
-        TextStyle style = DsText.styleOf(
-          context,
-          DsComponentType.buttonLabel,
-          color: ink,
-        );
+        final DsTypeSpec? typeSpec =
+            DsButton.typeFor(widget.size, widget.emphasis);
+        // Null means the rung declares no `text-*` class — the four squares.
+        // CSS then leaves `font-size`, `line-height` and family inherited, and
+        // the only thing the button contributes is its own `color`. Merging the
+        // ink into the ambient style is exactly that; replacing the style would
+        // be inventing a size the reference never sets.
+        TextStyle style = typeSpec == null
+            ? DefaultTextStyle.of(context).style.copyWith(color: ink)
+            : DsText.styleOf(context, typeSpec, color: ink);
         if (skin.semibold) style = _applySemibold(style);
         if (skin.underline) {
           // `underline-offset-4` has no Flutter equivalent — [TextStyle] can
@@ -515,7 +734,7 @@ class _DsButtonState extends State<DsButton> {
             ),
             child: Center(
               widthFactor: square ? null : 1,
-              child: DefaultTextStyle(style: style, child: widget.child),
+              child: DefaultTextStyle(style: style, child: _content()),
             ),
           ),
         );
@@ -564,8 +783,38 @@ class _DsButtonState extends State<DsButton> {
       child: IgnorePointer(ignoring: !_enabled, child: button),
     );
 
-    if (widget.label == null) return button;
-    return Semantics(button: true, label: widget.label, child: button);
+    // `<button>` — the element carries button semantics whether or not it also
+    // carries an `sr-only` name, and `disabled` is part of what it exposes.
+    //
+    // `aria-busy` HAS NO FLUTTER ANALOGUE. Supervisor ruling B9 asks for the
+    // web's split — the spinner silent, the button carrying the busy state —
+    // and only half of it is expressible: `SemanticsProperties` in the pinned
+    // SDK (3.44.8) declares `enabled`, `checked`, `expanded`, `toggled`,
+    // `readOnly`, `liveRegion`, `isRequired` and the rest, and **no `busy`**.
+    // There is no flag to set and no role to borrow that would not also
+    // announce something the reference does not.
+    //
+    // So what ships is the half that is real: [loading] forces `enabled: false`
+    // through [_enabled], which is exactly the state `aria-busy` accompanies on
+    // the reference (`disabled = disabled || loading`), and assistive tech
+    // learns the control is not actionable. What it does not learn is *why*.
+    // Recorded rather than faked — inventing a hint string would put copy on
+    // the page that the reference does not have, and the one drift class this
+    // port does not ship is an invisible a11y difference in either direction.
+    // `excludeSemantics` is what makes [label] behave like the `aria-label` it
+    // ports. An accessible name given by `aria-label` **replaces** the
+    // element's contents rather than joining them — an icon button labelled
+    // "Search packs" is called exactly that, and a labelled button that also
+    // holds text is called by its label alone. Without this, Flutter merges the
+    // two and the name comes out "Search packs\n…". With `label == null` the
+    // contents supply the name, which is the unlabelled `<button>`'s behaviour.
+    return Semantics(
+      button: true,
+      enabled: _enabled,
+      label: widget.label,
+      excludeSemantics: widget.label != null,
+      child: button,
+    );
   }
 }
 

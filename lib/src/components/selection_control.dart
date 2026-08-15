@@ -1,0 +1,426 @@
+/// What `Checkbox`, `RadioGroupItem` and `Switch` share.
+///
+/// The reference shares two things between the three and duplicates the rest:
+///
+///  * `use-replay-on-state-change.ts` — one hook, imported by all three, which
+///    replays the squash on every real state change and never on mount. That
+///    is [DsJellyReplay].
+///  * `checkboxControlClassName` / `radioControlClassName` — two exported
+///    strings that are character-identical apart from the corner
+///    (`rounded-sm` against `rounded-full aspect-square`). `Switch` restates
+///    the same idea a third time with a longer transition list.
+///
+/// The socket, the focus ring, the invalid ring, the disabled dimming, the
+/// keyboard path and the invisible hit-area expander are identical across all
+/// three, so they are stated once here as [DsSelectionControl] and each
+/// component supplies only its own skin — the same split `DsButton` makes
+/// between `_ButtonSkin` and the widget that wears it.
+///
+/// **`aria-invalid` beats `focus-visible`** *(forms-map §3.3, measured)*. The
+/// invalid rules are emitted later in the built stylesheet at equal
+/// specificity, so a focused invalid control is pixel-identical to an
+/// unfocused invalid one: focusing an errored checkbox produces **no visible
+/// change**. RULES §7 opens with *"Focus always visible, never removed"*, and
+/// this is the one place the system contradicts it. Reproduced exactly
+/// (supervisor ruling F5) — it is visible, it is measured, and it is what the
+/// page renders.
+library;
+
+import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
+
+import '../effects/machine_surface.dart';
+import '../foundation/motion.dart';
+import '../foundation/shadows.dart';
+import '../foundation/spacing.dart';
+import '../foundation/theme.dart';
+import '../motion/keyframes.dart';
+import '../theme_scope.dart';
+import 'button.dart';
+
+/// `focus-visible:ring-ring/50` — the ring alpha every selection control
+/// carries, and the one a `Button` carries too.
+const double _focusRingAlpha = 0.50;
+
+/// `aria-invalid:ring-destructive/20`.
+const double _invalidRingAlpha = 0.20;
+
+/// `disabled:opacity-50` / `data-disabled:opacity-50`.
+///
+/// Deliberately not `Button`'s and `Input`'s 45%: the five form controls follow
+/// the shadcn default here and the two text surfaces do not (forms-map drift
+/// 13). Both numbers ship.
+const double _disabledOpacity = 0.50;
+
+/// `after:-inset-x-3` — 12px of invisible target on each side.
+double get _hitInsetX => ds(3);
+
+/// `after:-inset-y-2` — 8px above and below.
+double get _hitInsetY => ds(2);
+
+/// The `after:absolute after:-inset-x-3 after:-inset-y-2` pseudo-element, as a
+/// hit test rather than as a box.
+///
+/// All three controls carry it, and the numbers are the reason RULES §7's 44px
+/// floor is met at all: a 20px checkbox answers a **44 × 36** target and a
+/// 44 × 24 switch answers **68 × 40**. The paint is untouched.
+///
+/// **Why a render object.** The pseudo-element is `position: absolute`, so it
+/// takes no part in layout — the control still occupies 20 × 20 in flow and its
+/// label still sits 8px away. Growing the widget instead (Flutter's own
+/// `MaterialTapTargetSize.padded` trick) would move every neighbour by 12px, so
+/// the box stays the size CSS gives it and only [hitTest] is widened. A point
+/// in the margin is forwarded to the child at its centre, which is where the
+/// browser sends a click on the pseudo-element too.
+class DsHitArea extends SingleChildRenderObjectWidget {
+  const DsHitArea({
+    super.key,
+    required this.insets,
+    required Widget super.child,
+  });
+
+  /// How far past its own box the control answers a pointer.
+  final EdgeInsets insets;
+
+  @override
+  RenderObject createRenderObject(BuildContext context) =>
+      _RenderHitArea(insets);
+
+  @override
+  void updateRenderObject(
+    BuildContext context,
+    covariant RenderObject renderObject,
+  ) {
+    (renderObject as _RenderHitArea).insets = insets;
+  }
+}
+
+class _RenderHitArea extends RenderProxyBox {
+  _RenderHitArea(this._insets);
+
+  EdgeInsets _insets;
+  set insets(EdgeInsets value) {
+    if (value == _insets) return;
+    _insets = value;
+  }
+
+  /// The rect the pseudo-element covers, in this box's own coordinates.
+  Rect get expanded => _insets.inflateRect(Offset.zero & size);
+
+  @override
+  bool hitTest(BoxHitTestResult result, {required Offset position}) {
+    // Inside the paint, everything is ordinary.
+    if (super.hitTest(result, position: position)) return true;
+    if (!expanded.contains(position)) return false;
+
+    // Outside it, the click still belongs to the control. Forward it at the
+    // centre so the child accepts it in its own coordinates.
+    final Offset centre = size.center(Offset.zero);
+    return result.addWithRawTransform(
+      transform: MatrixUtils.forceToPoint(centre),
+      position: centre,
+      hitTest: (BoxHitTestResult result, Offset transformed) {
+        assert(transformed == centre);
+        return child!.hitTest(result, position: centre);
+      },
+    );
+  }
+}
+
+/// `use-replay-on-state-change.ts` — replays `anim-jelly` whenever [state]
+/// actually changes, in both directions, and never on first paint.
+///
+/// The hook's own comment explains why it is JavaScript rather than CSS:
+/// *"`data-[state=unchecked]:animate-jelly` would fire on mount for every
+/// unchecked control on the page, and `:active` only holds while the pointer is
+/// down, so a quick click cuts the animation off partway."* A `MutationObserver`
+/// does not report initial state, which is the whole trick — so this widget
+/// builds [child] bare until the first transition and only then mounts a player.
+///
+/// The replay itself is a re-key, which is the mechanism `DsKeyframePlayer`
+/// documents: a freshly mounted player starts at t=0, mid-flight restarts
+/// included, exactly as the hook's `remove / reflow / re-add` does.
+class DsJellyReplay extends StatefulWidget {
+  const DsJellyReplay({
+    super.key,
+    required this.state,
+    required this.child,
+  });
+
+  /// The `data-state` analogue. Any value whose `==` changes on a real
+  /// transition; the reference watches the attribute for the same reason and
+  /// bails when Radix rewrites it unchanged.
+  final Object? state;
+
+  final Widget child;
+
+  @override
+  State<DsJellyReplay> createState() => _DsJellyReplayState();
+}
+
+class _DsJellyReplayState extends State<DsJellyReplay> {
+  /// The last state seen. Captured in [initState] and deliberately NOT with a
+  /// `late` field initialiser: `late` evaluates on first read, the first read
+  /// is inside [didUpdateWidget], and by then `widget` is already the new one —
+  /// so every comparison would pass and the replay would never fire.
+  Object? _last;
+
+  /// Which run is playing. Zero means *"nothing has changed yet"* — the
+  /// mount case the observer cannot see.
+  int _run = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _last = widget.state;
+  }
+
+  @override
+  void didUpdateWidget(DsJellyReplay old) {
+    super.didUpdateWidget(old);
+    if (widget.state == _last) return;
+    _last = widget.state;
+    setState(() => _run++);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_run == 0) return widget.child;
+    return KeyedSubtree(
+      key: ValueKey<int>(_run),
+      child: DsKeyframePlayer(
+        duration: DsJelly.duration,
+        fill: DsJelly.fill,
+        builder: (BuildContext context, double t, Widget? child) {
+          final Offset scale = DsJelly.scale.transform(t);
+          return Transform(
+            // `transform-origin` is untouched, so the squash pivots on the
+            // control's own centre.
+            alignment: Alignment.center,
+            transform: Matrix4.diagonal3Values(scale.dx, scale.dy, 1),
+            child: child,
+          );
+        },
+        child: widget.child,
+      ),
+    );
+  }
+}
+
+/// The socket every selection control sits in.
+///
+/// Paints [shadow] with [fill] and [border] inside [radius], transitions the
+/// two colours over [duration] on `--ease-out`, composites the focus or invalid
+/// ring in front of the socket, dims and deafens itself when disabled, answers
+/// Enter and Space, and squashes on every change of [jellyState].
+class DsSelectionControl extends StatefulWidget {
+  const DsSelectionControl({
+    super.key,
+    required this.width,
+    required this.height,
+    required this.radius,
+    required this.fill,
+    required this.border,
+    required this.shadow,
+    required this.duration,
+    required this.jellyState,
+    required this.child,
+    this.onTap,
+    this.enabled = true,
+    this.invalid = false,
+    this.focusNode,
+    this.skipTraversal = false,
+    this.onKey,
+    this.semantics,
+  });
+
+  /// The painted size. The hit target is [width] + 24 by [height] + 16.
+  final double width;
+  final double height;
+
+  final BorderRadius radius;
+
+  /// `background-color` at rest for the state the caller is in.
+  final Color fill;
+
+  /// `border-color` at rest. Overridden while focused or invalid.
+  final Color border;
+
+  /// The `--shadow-*` token for the state the caller is in — `shadow-pressed`
+  /// at rest, `shadow-btn-primary` once checked or on.
+  final DsShadowSpec shadow;
+
+  /// `--duration-fast` for a checkbox or radio, `--duration-base` for a switch.
+  final Duration duration;
+
+  /// Handed to [DsJellyReplay]; a change replays the squash.
+  final Object? jellyState;
+
+  /// The indicator, centred in the socket.
+  final Widget child;
+
+  /// `null` disables the control.
+  final VoidCallback? onTap;
+
+  /// Separate from [onTap] being null: a `Field` can disable a control that
+  /// still has a handler, and `Switch` spells its own disabled state
+  /// `data-disabled` rather than `:disabled` (forms-map drift 14).
+  final bool enabled;
+
+  /// `aria-invalid="true"`.
+  final bool invalid;
+
+  final FocusNode? focusNode;
+
+  /// Roving tabindex — a `RadioGroup` is one tab stop, so every item but the
+  /// active one leaves the Tab order while staying focusable.
+  final bool skipTraversal;
+
+  /// Consulted before Enter and Space, for the keys a group owns rather than
+  /// an item: a `RadioGroup`'s arrows select as they move.
+  final KeyEventResult Function(KeyEvent)? onKey;
+
+  /// The control's own [Semantics], applied **inside** the hit-area expander.
+  ///
+  /// It has to go here rather than around the finished widget: every render
+  /// object above [DsHitArea] tests its own bounds before it asks a child, so a
+  /// `Semantics` wrapped outside would reject a pointer in the pseudo-element's
+  /// margin before the expander ever saw it.
+  final Widget Function(Widget)? semantics;
+
+  @override
+  State<DsSelectionControl> createState() => _DsSelectionControlState();
+}
+
+class _DsSelectionControlState extends State<DsSelectionControl> {
+  bool _focused = false;
+
+  bool get _enabled => widget.enabled && widget.onTap != null;
+
+  void _setFocused(bool value) {
+    if (_focused == value) return;
+    setState(() => _focused = value);
+  }
+
+  /// A Radix control is a `<button>`, and a `<button>` activates on Enter and
+  /// on Space. Wired by hand for the same reason `DsButton` wires it: a bare
+  /// [Listener] gets neither, and a focus ring on something the keyboard cannot
+  /// operate is worse than no ring at all.
+  KeyEventResult _onKey(FocusNode node, KeyEvent event) {
+    if (!_enabled) return KeyEventResult.ignored;
+    final KeyEventResult? owned = widget.onKey?.call(event);
+    if (owned != null && owned != KeyEventResult.ignored) return owned;
+    if (event is! KeyDownEvent) return KeyEventResult.ignored;
+    final bool activates = event.logicalKey == LogicalKeyboardKey.enter ||
+        event.logicalKey == LogicalKeyboardKey.numpadEnter ||
+        event.logicalKey == LogicalKeyboardKey.space;
+    if (!activates) return KeyEventResult.ignored;
+    widget.onTap!();
+    return KeyEventResult.handled;
+  }
+
+  /// `focus-visible:border-ring`, beaten by `aria-invalid:border-destructive`.
+  Color _borderTarget(DsThemeData theme) {
+    if (widget.invalid) return theme.destructive;
+    if (_focused) return theme.ring;
+    return widget.border;
+  }
+
+  /// `focus-visible:ring-3 ring-ring/50`, beaten by `aria-invalid:ring-3
+  /// ring-destructive/20`.
+  ///
+  /// The resting value is the ring hue at **zero alpha** rather than
+  /// `transparent`: a ring that fades out through its own colour is what the
+  /// browser interpolates, and a 3px spread of nothing paints nothing.
+  Color _ringTarget(DsThemeData theme) {
+    if (widget.invalid) {
+      return theme.destructive.withValues(alpha: _invalidRingAlpha);
+    }
+    return theme.ring.withValues(alpha: _focused ? _focusRingAlpha : 0);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final DsThemeData theme = DsTheme.of(context);
+    final Duration duration = dsAnimationDuration(context, widget.duration);
+
+    Widget control = TweenAnimationBuilder<Color?>(
+      tween: ColorTween(end: widget.fill),
+      duration: duration,
+      curve: DsCurves.out,
+      builder: (BuildContext context, Color? fill, Widget? child) =>
+          TweenAnimationBuilder<Color?>(
+        tween: ColorTween(end: _borderTarget(theme)),
+        duration: duration,
+        curve: DsCurves.out,
+        builder: (BuildContext context, Color? border, Widget? child) =>
+            TweenAnimationBuilder<Color?>(
+          tween: ColorTween(end: _ringTarget(theme)),
+          duration: duration,
+          curve: DsCurves.out,
+          builder: (BuildContext context, Color? ring, Widget? child) =>
+              DsMachineSurface(
+            // The ring is ADDED to the socket, never replacing it — the same
+            // composition `DsInput` makes, for the same reason: the socket is
+            // what makes the control read as operable and it never rises.
+            spec: DsButton.withFocusRing(widget.shadow, ring ?? theme.ring),
+            radius: widget.radius,
+            fill: fill ?? widget.fill,
+            border: Border.all(
+              color: border ?? widget.border,
+              width: DsWidths.hairline,
+            ),
+            child: Center(child: child),
+          ),
+          child: child,
+        ),
+        child: child,
+      ),
+      child: widget.child,
+    );
+
+    control = SizedBox(
+      width: widget.width,
+      height: widget.height,
+      child: control,
+    );
+
+    control = DsJellyReplay(state: widget.jellyState, child: control);
+
+    control = Focus(
+      focusNode: widget.focusNode,
+      canRequestFocus: _enabled,
+      skipTraversal: widget.skipTraversal,
+      onFocusChange: _setFocused,
+      onKeyEvent: _onKey,
+      child: control,
+    );
+
+    control = GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: _enabled ? widget.onTap : null,
+      child: MouseRegion(
+        // No control on this page authors a hover state (forms-map §8.2), so
+        // the cursor is the only thing a pointer changes.
+        cursor: _enabled ? SystemMouseCursors.click : SystemMouseCursors.basic,
+        child: control,
+      ),
+    );
+
+    control = Opacity(
+      opacity: widget.enabled ? 1 : _disabledOpacity,
+      child: IgnorePointer(ignoring: !_enabled, child: control),
+    );
+
+    if (widget.semantics != null) control = widget.semantics!(control);
+
+    // Outermost, and it has to be: every render object above it checks its own
+    // bounds before asking a child, so anything wrapped around this one would
+    // reject a pointer in the margin before it ever arrived.
+    return DsHitArea(
+      insets: EdgeInsets.symmetric(horizontal: _hitInsetX, vertical: _hitInsetY),
+      child: control,
+    );
+  }
+}

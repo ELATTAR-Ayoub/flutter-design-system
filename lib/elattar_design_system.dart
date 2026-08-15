@@ -18,13 +18,33 @@ export 'src/text_layout.dart';
 export 'src/theme_scope.dart';
 
 // ── components ──────────────────────────────────────────────────────────────
+export 'src/components/alert.dart';
 export 'src/components/button.dart';
+export 'src/components/button_group.dart';
+export 'src/components/checkbox.dart';
+export 'src/components/ds_rule.dart';
+export 'src/components/field.dart';
+export 'src/components/form.dart';
 export 'src/components/icon.dart';
 export 'src/components/icon_paths.dart';
+export 'src/components/icon_swap.dart';
 export 'src/components/input.dart';
+export 'src/components/input_group.dart';
+export 'src/components/input_otp.dart';
+export 'src/components/kbd.dart';
+export 'src/components/radio.dart';
+export 'src/components/select.dart';
+export 'src/components/selection_control.dart';
 export 'src/components/sheet.dart';
+export 'src/components/spinner.dart';
+export 'src/components/switch.dart';
+export 'src/components/textarea.dart';
+export 'src/components/toaster.dart';
+export 'src/components/toggle.dart';
+export 'src/components/toggle_group.dart';
 
 // ── effects ─────────────────────────────────────────────────────────────────
+export 'src/effects/bloom_cosmic.dart';
 export 'src/effects/foil_value.dart';
 export 'src/effects/glass.dart';
 export 'src/effects/machine_surface.dart';
