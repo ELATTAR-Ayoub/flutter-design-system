@@ -33,7 +33,7 @@ void main() => runApp(const DocsApp());
 
 /// Holds the two things that outlive every page.
 class DocsApp extends StatefulWidget {
-  const DocsApp({super.key, this.reduceMotion});
+  const DocsApp({super.key, this.reduceMotion, this.clock});
 
   /// Overrides the `?motion=` boot parameter — see
   /// [_DocsAppState._reduceMotion] for what it does and why it exists.
@@ -41,6 +41,43 @@ class DocsApp extends StatefulWidget {
   /// Null, the default and what `main` boots with, reads the URL. A test
   /// cannot set `Uri.base`, so this is the seam it sets instead.
   final bool? reduceMotion;
+
+  /// Overrides the `?clock=` boot parameter — see [_DocsAppState._clock].
+  ///
+  /// Same shape and same reason as [reduceMotion]: null reads the URL, and a
+  /// test that cannot set `Uri.base` sets this instead.
+  final DateTime? clock;
+
+  /// Parses `?clock=<ISO-8601>` into the instant the app calls "now".
+  ///
+  /// Public because both the boot path and its test read it, and because it is
+  /// the one place the parameter's contract lives. Anything [DateTime.tryParse]
+  /// rejects — and the empty string, and an absent parameter — returns null,
+  /// which leaves the app on the real wall clock. A boot flag that silently
+  /// froze the app on the wrong month because someone typed a bad date would
+  /// be worse than one that ignores itself.
+  ///
+  /// That last part needs a second check. [DateTime.tryParse] accepts
+  /// `2026-13-45` and **rolls it over** into February 2027 rather than
+  /// rejecting it, and this parameter's whole job is to decide which month a
+  /// calendar opens on — so the calendar fields are compared back against the
+  /// string that produced them, and a value that did not survive the round
+  /// trip is treated as a typo.
+  ///
+  /// A `Z`-suffixed or offset-bearing value is converted **to local time**:
+  /// [DsClock] is a calendar clock, and the point of freezing it is that both
+  /// renderers agree on which day it is.
+  static DateTime? parseClock(String? raw) {
+    if (raw == null || raw.isEmpty) return null;
+    final DateTime? parsed = DateTime.tryParse(raw);
+    if (parsed == null) return null;
+    // The date half only — the time half cannot roll a month over, and an
+    // offset-bearing value is *supposed* to land on a different calendar day.
+    if (raw.length >= 10 && !parsed.isUtc && !raw.contains('+')) {
+      if (DsDateFormat.dayKey(parsed) != raw.substring(0, 10)) return null;
+    }
+    return parsed.isUtc ? parsed.toLocal() : parsed;
+  }
 
   @override
   State<DocsApp> createState() => _DocsAppState();
@@ -84,6 +121,34 @@ class _DocsAppState extends State<DocsApp> {
   late final bool _reduceMotion =
       widget.reduceMotion ?? Uri.base.queryParameters['motion'] == 'reduced';
 
+  /// `?clock=<ISO-8601>` — the fourth boot parameter, and the second one that
+  /// changes what paints.
+  ///
+  /// **Why (supervisor ruling L2).** `react-day-picker`'s `getInitialMonth` is
+  /// `month || defaultMonth || today`, and the selects page passes neither of
+  /// the first two to any of its three calendars — so all three open on the
+  /// reader's current month and the page's rendered height moves with the
+  /// wall clock: a four-, five- or six-week month differs by one 36px row per
+  /// calendar. The port reproduces that, because it is what the page does.
+  ///
+  /// A vertical-parity probe cannot pin a route whose height depends on the
+  /// date, so the capture harness freezes the clock on **both** sides: Chrome
+  /// gets a `Date` shim injected with `evaluateOnNewDocument`, and this side
+  /// gets this parameter. Pass the same ISO-8601 instant to both and the two
+  /// renderers agree on the month, the week count, the `today` cell and the
+  /// document height.
+  ///
+  /// It reaches the tree as a [DsClock] above [MaterialApp] — above, not
+  /// below, for the reason the library note gives: a pushed route is a sibling
+  /// of `home` rather than a descendant, and a calendar inside a sheet must
+  /// resolve the same "now" as one on the page.
+  ///
+  /// Null — no parameter, or one [DocsApp.parseClock] rejects — leaves every
+  /// calendar on [DateTime.now], which is the behaviour of every build before
+  /// this seam existed.
+  late final DateTime? _clock =
+      widget.clock ?? DocsApp.parseClock(Uri.base.queryParameters['clock']);
+
   @override
   void dispose() {
     _theme.dispose();
@@ -93,7 +158,7 @@ class _DocsAppState extends State<DocsApp> {
 
   @override
   Widget build(BuildContext context) {
-    return DsTheme(
+    final Widget app = DsTheme(
       controller: _theme,
       child: AppRouterScope(
         router: _router,
@@ -105,6 +170,13 @@ class _DocsAppState extends State<DocsApp> {
         ),
       ),
     );
+
+    final DateTime? frozen = _clock;
+    if (frozen == null) return app;
+    // Above [MaterialApp], beside the theme scope and the router — the three
+    // things that outlive every page, and the three a pushed route has to be
+    // able to read. See [_clock].
+    return DsClock(now: frozen, child: app);
   }
 }
 

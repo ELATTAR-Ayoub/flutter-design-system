@@ -89,9 +89,10 @@ extension on WidgetTester {
   Future<void> pumpDocs({
     required bool reduceMotion,
     required String route,
+    DateTime? clock,
   }) async {
     useViewport(_desktop);
-    await pumpWidget(DocsApp(reduceMotion: reduceMotion));
+    await pumpWidget(DocsApp(reduceMotion: reduceMotion, clock: clock));
     await pump();
 
     AppRouter.of(element(find.byType(DocsShell))).navigate(route);
@@ -163,6 +164,68 @@ void main() {
         tester,
         DsDurations.glintHover,
         reason: 'foil-value is still drifting or glinting',
+      );
+    });
+  });
+
+  group('?clock=', () {
+    // Supervisor ruling L2. `react-day-picker`'s `getInitialMonth` is
+    // `month || defaultMonth || today` and the selects page passes neither of
+    // the first two, so all three of its calendars open on the reader's
+    // current month — and the page's rendered height moves 36px per calendar
+    // with the month's week count *(measured on the live reference: February
+    // 2026 renders four rows at 232.563px, July five at 268.563, August six at
+    // 304.563)*. The rig freezes the clock on BOTH sides; this is this side.
+
+    test('parses an ISO-8601 instant', () {
+      expect(DocsApp.parseClock('2026-08-16T02:15:00'),
+          DateTime(2026, 8, 16, 2, 15));
+      expect(DocsApp.parseClock('2026-08-16'), DateTime(2026, 8, 16));
+    });
+
+    test('a UTC value comes back LOCAL — the clock is a calendar clock, and '
+        'the whole point of freezing it is that both renderers agree on which '
+        'day it is', () {
+      final DateTime parsed = DocsApp.parseClock('2026-08-16T02:15:00Z')!;
+      expect(parsed.isUtc, isFalse);
+      expect(parsed, DateTime.utc(2026, 8, 16, 2, 15).toLocal());
+    });
+
+    test('anything unparseable is ignored rather than obeyed', () {
+      expect(DocsApp.parseClock(null), isNull);
+      expect(DocsApp.parseClock(''), isNull);
+      expect(DocsApp.parseClock('yesterday'), isNull);
+      expect(DocsApp.parseClock('2026-13-45'), isNull);
+    });
+
+    testWidgets('the frozen instant reaches every page below the app', (
+      WidgetTester tester,
+    ) async {
+      final DateTime frozen = DateTime(2026, 8, 16, 2, 15);
+      await tester.pumpDocs(
+        reduceMotion: true,
+        route: '$dsRoot/motion',
+        clock: frozen,
+      );
+
+      final BuildContext page = tester.element(find.byType(MotionPage));
+      expect(DsClock.nowOf(page), frozen);
+      expect(DsClock.maybeOf(page), isNotNull);
+      // And the seam a calendar actually reads: `getInitialMonth` resolves
+      // against it, so a calendar mounted anywhere under the app opens on
+      // August 2026 rather than on whatever month the suite happens to run in.
+      expect(DsDateFormat.monthYear(DsClock.nowOf(page)), 'August 2026');
+    });
+
+    testWidgets('with no parameter the app mounts no clock at all, and the '
+        'seam falls through to DateTime.now', (WidgetTester tester) async {
+      await tester.pumpDocs(reduceMotion: true, route: '$dsRoot/motion');
+
+      final BuildContext page = tester.element(find.byType(MotionPage));
+      expect(DsClock.maybeOf(page), isNull);
+      expect(
+        DsDateFormat.monthYear(DsClock.nowOf(page)),
+        DsDateFormat.monthYear(DateTime.now()),
       );
     });
   });

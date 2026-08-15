@@ -7,6 +7,7 @@ library;
 
 // ── foundation ──────────────────────────────────────────────────────────────
 export 'src/foundation/colors.dart';
+export 'src/foundation/date_format.dart';
 export 'src/foundation/motion.dart';
 export 'src/foundation/shadows.dart';
 export 'src/foundation/spacing.dart';
@@ -21,6 +22,7 @@ export 'src/theme_scope.dart';
 export 'src/components/alert.dart';
 export 'src/components/button.dart';
 export 'src/components/button_group.dart';
+export 'src/components/calendar.dart';
 export 'src/components/checkbox.dart';
 export 'src/components/combobox.dart';
 export 'src/components/command.dart';

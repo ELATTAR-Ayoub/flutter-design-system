@@ -218,6 +218,21 @@ enum DsIconGlyph {
   /// identically, so a silent lowercasing would never fail a test — which is
   /// exactly why the transcript has to carry the character it was given.
   ticket,
+
+  /// `calendar.mjs`. Off-set: the selects page's **two** `Icon Calendar` sites
+  /// — the date picker's trigger and its disabled twin (`…/base/selects
+  /// /page.tsx` L344, L381) — and nothing else in the corpus renders it.
+  ///
+  /// Off-set rather than curated on the same test the other eleven pass: it is
+  /// not in `lib/ds/icons.ts`'s sixty-three, so the icons page's registry must
+  /// keep excluding it. Note that [clock] — its neighbour in meaning — **is**
+  /// curated, entry 6 of "Money & status"; a page that shows both would print
+  /// one and not the other.
+  ///
+  /// The only glyph in the embedded set whose `rect` carries an `rx` and no
+  /// `ry`, so its corners are circular rather than elliptical; the parser
+  /// falls `ry` back to `rx`, which is what SVG says to do.
+  calendar,
 }
 
 /// One SVG element from a lucide `__iconNode` list.
@@ -1072,6 +1087,18 @@ class DsIconPaths {
       DsIconPathElement('M13 5v2'), // key: dyzc3o
       DsIconPathElement('M13 17v2'), // key: 1ont0d
       DsIconPathElement('M13 11v2'), // key: 1wjjxi
+    ],
+
+    // `calendar.mjs` — the selects page's date-picker triggers. Two 3-unit
+    // tabs above an 18-unit plate, then the rule that separates the header
+    // strip from the grid. Lucide declares the tabs FIRST and the plate
+    // second, so the plate paints over their feet; order is paint order and
+    // the order is kept.
+    DsIconGlyph.calendar: <DsIconElement>[
+      DsIconPathElement('M8 2v3'), // key: 1ioesn
+      DsIconPathElement('M16 2v3'), // key: otl347
+      DsIconRectElement(3, 3, 18, 18, 2), // key: h1oib
+      DsIconPathElement('M3 9h18'), // key: 1pudct
     ],
   };
 

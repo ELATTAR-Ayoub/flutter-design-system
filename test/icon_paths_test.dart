@@ -272,6 +272,7 @@ void main() {
         DsIconGlyph.circleX: 3,
         DsIconGlyph.atSign: 2,
         DsIconGlyph.ticket: 4,
+        DsIconGlyph.calendar: 4,
       };
       expect(DsIconPaths.elements.keys, unorderedEquals(DsIconGlyph.values));
       for (final DsIconGlyph glyph in DsIconGlyph.values) {
@@ -388,10 +389,14 @@ void main() {
           DsIconGlyph.circleX,
           DsIconGlyph.atSign,
           DsIconGlyph.ticket,
+          // Wave C: the selects page's two `Icon Calendar` sites. Off-set on
+          // the same test as the eleven above — `lib/ds/icons.ts` does not
+          // list it, so the icons page's registry must keep excluding it.
+          DsIconGlyph.calendar,
         ],
       );
-      // 8 chrome + 59 new curated + 11 off-set.
-      expect(DsIconGlyph.values, hasLength(78));
+      // 8 chrome + 59 new curated + 12 off-set.
+      expect(DsIconGlyph.values, hasLength(79));
     });
 
     test('the 59 new curated glyphs come to the ledger\'s 162 elements', () {
@@ -457,8 +462,8 @@ void main() {
         for (final DsIconGlyph glyph in DsIconGlyph.values)
           ...DsIconPaths.elements[glyph]!.whereType<DsIconRectElement>(),
       ];
-      // 9 curated + monitor's screen + pause's two bars.
-      expect(rects, hasLength(12));
+      // 9 curated + monitor's screen + pause's two bars + calendar's plate.
+      expect(rects, hasLength(13));
       final Iterable<DsIconRectElement> spelled =
           rects.where((DsIconRectElement r) => r.ry != null);
       expect(spelled, hasLength(2));
@@ -708,14 +713,15 @@ void main() {
             reason: '${glyph.name} closed-contour count');
         totalClosed += closed;
       }
-      // 18 `z` commands + 29 circles + 12 rects. Eighteen, not twelve: the map
+      // 18 `z` commands + 29 circles + 13 rects. Eighteen, not twelve: the map
       // counts twelve *glyphs* that carry a `z`, `packageOpen` spends two of
       // them (its second and fourth flaps both close), the off-set swap glyphs
       // add three — `play`'s triangle and the speaker body that `volume2` and
       // `volumeX` share — `octagonX`'s plate is the seventeenth, and `ticket`'s
       // outline the eighteenth. Twenty-nine circles, not twenty-eight, because
-      // `atSign` brings a 4-unit bowl that shares nothing.
-      expect(totalClosed, 59);
+      // `atSign` brings a 4-unit bowl that shares nothing. Thirteen rects,
+      // not twelve, because wave C's off-set `calendar` brings its plate.
+      expect(totalClosed, 60);
       expect(
         DsIconGlyph.values.where((DsIconGlyph g) => DsIconPaths.elements[g]!
             .whereType<DsIconPathElement>()
@@ -1032,7 +1038,7 @@ void main() {
       // its registry from it by subtraction. A filled, stroke-less shape out of
       // the stylesheet belongs to neither, so the count must not have moved and
       // no member may carry this geometry.
-      expect(DsIconGlyph.values, hasLength(78));
+      expect(DsIconGlyph.values, hasLength(79));
       for (final DsIconGlyph glyph in DsIconGlyph.values) {
         for (final DsIconElement element in DsIconPaths.elements[glyph]!) {
           if (element is DsIconPathElement) {
@@ -1426,6 +1432,15 @@ const Map<DsIconGlyph, List<String>> _transcript = <DsIconGlyph, List<String>>{
     'path M13 5v2',
     'path M13 17v2',
     'path M13 11v2',
+  ],
+  // Tabs first, plate second — lucide's order, and order is paint order. The
+  // only `rect` in the set with an `rx` and no `ry`, so the signature carries
+  // no `ry` half.
+  DsIconGlyph.calendar: <String>[
+    'path M8 2v3',
+    'path M16 2v3',
+    'rect 3 3 18 18 2',
+    'path M3 9h18',
   ],
 };
 
