@@ -101,6 +101,12 @@ Route arms ×3, `shell_test` tightening (B11), full suites, web rebuild,
 rig pass (reduced-motion captures via `?motion=reduced`), phase report with
 the two sign-off items (F4 here; I-Q1 already shipped in phase 2).
 
+**Guard gap (from the text-entry builder):** token_guard_test has no rule
+for `height:` — line-height literals outside the foundation pass silently.
+Add the pattern at integration, not mid-wave (it would trip legitimately
+in-flight work), and sweep for undeclared line-height literals when it
+first runs.
+
 **Carried caveat (from the boot-param builder):** the `disableAnimations`
 override sits *below* `MaterialApp`, so pushed routes and Navigator-overlay
 entries (dialogs, sheets, an overlay-hosted select menu) do not inherit it.

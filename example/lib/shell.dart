@@ -26,6 +26,7 @@ import 'package:flutter/widgets.dart';
 
 import 'logo.dart';
 import 'nav.dart';
+import 'scroll_bridge.dart';
 import 'theme_toggle.dart';
 
 /// `bg-background/85` — the header is translucent so the blur has something to
@@ -91,6 +92,21 @@ class DocsShell extends StatefulWidget {
 class _DocsShellState extends State<DocsShell> {
   final ScrollController _main = ScrollController();
   final ScrollController _rail = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    // The capture rig's ground truth for "where is this page scrolled to" —
+    // see `scroll_bridge.dart` for why pixel matching cannot answer that here.
+    // A no-op off the web.
+    //
+    // After the first frame, not during `initState`: a [ScrollController] has
+    // no position until the view it drives has laid out, so `maxScrollExtent`
+    // does not exist yet and the rig's first question would throw.
+    WidgetsBinding.instance.addPostFrameCallback((Duration _) {
+      if (mounted) dsInstallScrollBridge(_main);
+    });
+  }
 
   @override
   void dispose() {
