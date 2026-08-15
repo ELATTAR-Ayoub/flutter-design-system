@@ -62,9 +62,30 @@ double get _hitInsetY => ds(2);
 /// The `after:absolute after:-inset-x-3 after:-inset-y-2` pseudo-element, as a
 /// hit test rather than as a box.
 ///
-/// All three controls carry it, and the numbers are the reason RULES §7's 44px
-/// floor is met at all: a 20px checkbox answers a **44 × 36** target and a
-/// 44 × 24 switch answers **68 × 40**. The paint is untouched.
+/// ## The insets grow from the PADDING box, not the border box
+///
+/// *(measured)* An absolutely positioned element resolves `inset` against its
+/// containing block's **padding box** (CSS Position §3), and the containing
+/// block here is the control itself — every one of them is `position:
+/// relative`. So the expander starts one border-width inside the box the
+/// widget occupies, and the whole family is 2px narrower and 2px shorter than
+/// reading `-inset-*` off the border box suggests:
+///
+/// | control | border box | padding box | expander *(probed)* |
+/// |---|---|---|---|
+/// | checkbox / radio | 20 × 20 | 18 × 18 | **42 × 34** |
+/// | switch | 44 × 24 | 42 × 22 | **66 × 38** |
+/// | slider thumb | 20 × 20 | 18 × 18 | **34 × 34** |
+///
+/// Probed with `getComputedStyle(el, '::after')` on the live reference at
+/// 1440 × 900, which reports the pseudo-element's own `width`/`height`
+/// directly. This port shipped the border-box reading first — 44 × 36 and
+/// 68 × 40 — and that 2px of extra generosity was a divergence, so it is
+/// corrected here in the one place the whole family inherits it from.
+///
+/// One consequence worth stating plainly: RULES §7 asks for a 44px floor and
+/// **the checkbox misses it by 2px**, at 42. That is what the reference
+/// renders.
 ///
 /// **Why a render object.** The pseudo-element is `position: absolute`, so it
 /// takes no part in layout — the control still occupies 20 × 20 in flow and its
@@ -77,27 +98,52 @@ class DsHitArea extends SingleChildRenderObjectWidget {
   const DsHitArea({
     super.key,
     required this.insets,
+    this.border,
     required Widget super.child,
   });
 
-  /// How far past its own box the control answers a pointer.
+  /// How far past its own **padding** box the control answers a pointer.
   final EdgeInsets insets;
+
+  /// The border [insets] are measured inside, defaulting to the single
+  /// hairline every control in this family draws.
+  ///
+  /// Pass `0` for a wrapper that paints no border of its own — a slider's root
+  /// carries its border on the track inside it, and states insets already
+  /// measured from its thumb's padding box.
+  final double? border;
+
+  /// The rect this expander answers, in the control's own coordinates.
+  ///
+  /// Exposed for tests because a tap cannot always reach it: **every render
+  /// object above this one bounds-checks itself before it asks a child**, so an
+  /// ancestor cut to the control's own box rejects a pointer in the margin
+  /// before the expander is ever consulted. CSS has no such gate — nothing on
+  /// the reference's chain clips — which is why the browser's 42 × 34 is
+  /// reachable there and a Flutter tap through a snug parent is not.
+  ///
+  /// Pass `tester.renderObject(find.byType(DsHitArea))`.
+  @visibleForTesting
+  static Rect debugExpanded(RenderObject box) =>
+      (box as _RenderHitArea).expanded;
 
   @override
   RenderObject createRenderObject(BuildContext context) =>
-      _RenderHitArea(insets);
+      _RenderHitArea(insets, border ?? DsWidths.hairline);
 
   @override
   void updateRenderObject(
     BuildContext context,
     covariant RenderObject renderObject,
   ) {
-    (renderObject as _RenderHitArea).insets = insets;
+    (renderObject as _RenderHitArea)
+      ..insets = insets
+      ..border = border ?? DsWidths.hairline;
   }
 }
 
 class _RenderHitArea extends RenderProxyBox {
-  _RenderHitArea(this._insets);
+  _RenderHitArea(this._insets, this._border);
 
   EdgeInsets _insets;
   set insets(EdgeInsets value) {
@@ -105,8 +151,21 @@ class _RenderHitArea extends RenderProxyBox {
     _insets = value;
   }
 
+  double _border;
+  set border(double value) {
+    if (value == _border) return;
+    _border = value;
+  }
+
   /// The rect the pseudo-element covers, in this box's own coordinates.
-  Rect get expanded => _insets.inflateRect(Offset.zero & size);
+  ///
+  /// The border comes off first: `inset: -8px` on an absolutely positioned
+  /// `::after` is measured from the padding box, so on a 20px control with a
+  /// 1px border it reaches 8px out from an **18px** square and not from a 20px
+  /// one.
+  Rect get expanded => _insets.inflateRect(
+        EdgeInsets.all(_border).deflateRect(Offset.zero & size),
+      );
 
   @override
   bool hitTest(BoxHitTestResult result, {required Offset position}) {
@@ -242,7 +301,11 @@ class DsSelectionControl extends StatefulWidget {
     this.semantics,
   });
 
-  /// The painted size. The hit target is [width] + 24 by [height] + 16.
+  /// The painted size.
+  ///
+  /// The hit target is the **padding** box — this less a border on each side —
+  /// grown by 24 horizontally and 16 vertically, so a 20px control answers
+  /// 42 × 34. See [DsHitArea] for the measurement.
   final double width;
   final double height;
 

@@ -20,7 +20,7 @@
 /// | `translate-x-5` / `translate-x-4` | **20px** / 16px of travel |
 /// | track `transition-[background-color,box-shadow,border-color] duration-base ease-out` | 250ms — but from `--default-transition-duration`, not `duration-base`, which emits nothing ([DsDurations.transitionDefault]) |
 /// | thumb `transition-transform duration-base ease-spring` | the same 250ms, and it overshoots |
-/// | `after:-inset-x-3 after:-inset-y-2` | a **68 × 40** target |
+/// | `after:-inset-x-3 after:-inset-y-2` | a **66 × 38** target — measured from the 42 × 22 padding box, see [DsHitArea] |
 ///
 /// **The travel is 20px on a track whose content box is 38 wide.** A 20px thumb
 /// starting 2px in cannot move 20px and stay inside its own padding: it ends

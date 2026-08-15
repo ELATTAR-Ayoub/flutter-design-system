@@ -86,16 +86,20 @@ double get _thumbSize => ds(5);
 
 /// `after:-inset-2` — 8px of invisible target around the knob.
 ///
-/// **Measured 34 × 34, not 36 × 36.** An absolutely positioned pseudo-element
+/// **The expander measures 34 × 34.** An absolutely positioned pseudo-element
 /// resolves its insets against the containing block's *padding* box, and the
-/// thumb's 20px border box carries a 1px border, so the expander grows from an
-/// 18px box: `18 + 8 + 8 = 34`. The same reading on the three shipped controls
-/// gives 42 × 34 for a checkbox and 66 × 38 for a switch, where
-/// [DsSelectionControl] inflates the border box and produces 44 × 36 and
-/// 68 × 40. This component follows its siblings rather than diverging alone —
-/// the two-pixel difference is in a hit target, never in paint — and the
-/// measurement is recorded here so the family can be corrected together.
+/// thumb's 20px border box carries a 1px border, so it grows from an 18px
+/// square: `18 + 8 + 8 = 34`. [DsHitArea] states that rule once for the whole
+/// family and the three shipped controls now follow it too.
 double get _hitInset => ds(2);
+
+/// How far the thumb's expander reaches from the knob's own centre — 17px.
+///
+/// Half the **padding** box plus the inset, which is the same arithmetic
+/// behind the 34 × 34 above. Both the pointer target and the hover region are
+/// measured with it, because a pseudo-element belongs to its element: hovering
+/// the expander hovers the thumb.
+double get _thumbReach => _thumbSize / 2 - DsWidths.hairline + _hitInset;
 
 /// `ring-ring/50` — the alpha every ring in the system carries.
 const double _ringAlpha = 0.50;
@@ -197,6 +201,18 @@ class _DsSliderState extends State<DsSlider> {
 
   /// Which thumb holds focus, if any.
   int? _focused;
+
+  /// The root's own box, for turning a global pointer position into a local
+  /// one.
+  ///
+  /// **Not `event.localPosition`.** [DsHitArea] forwards a hit in the margin to
+  /// its child at the control's *centre* — right for a checkbox, where a click
+  /// is a click, and wrong here, where `x` IS the value. Worse, the transform
+  /// it records is reused for every later event in the same gesture, so a drag
+  /// that began below the channel would report the centre forever. The browser
+  /// hands Radix `event.clientX` no matter which descendant was hit; this is
+  /// that.
+  final GlobalKey _rootKey = GlobalKey();
 
   /// The width the last layout gave the root. Pointer maths needs it outside
   /// [build], where the [LayoutBuilder]'s constraints are no longer in scope.
@@ -330,6 +346,13 @@ class _DsSliderState extends State<DsSlider> {
 
   // ── Pointer ───────────────────────────────────────────────────────────────
 
+  /// [global] in the root's own coordinates, or null before it has laid out.
+  Offset? _localOf(Offset global) {
+    final RenderObject? box = _rootKey.currentContext?.findRenderObject();
+    if (box is! RenderBox || !box.hasSize) return null;
+    return box.globalToLocal(global);
+  }
+
   void _grab(Offset local) {
     if (!_operable) return;
     final int index = _nearestTo(local.dx);
@@ -358,8 +381,9 @@ class _DsSliderState extends State<DsSlider> {
   /// parent's bounds never receives a pointer.
   int? _hoveredAt(Offset local) {
     for (int i = 0; i < widget.values.length; i++) {
-      final double reach = _thumbSize / 2 + _hitInset;
-      if ((local.dx - _thumbCentre(widget.values[i])).abs() <= reach) return i;
+      if ((local.dx - _thumbCentre(widget.values[i])).abs() <= _thumbReach) {
+        return i;
+      }
     }
     return null;
   }
@@ -423,6 +447,7 @@ class _DsSliderState extends State<DsSlider> {
     // being asked. Nesting them the other way round makes the whole control
     // unusable inside any parent that measures.
     Widget slider = SizedBox(
+      key: _rootKey,
       height: _trackHeight,
       child: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
@@ -487,13 +512,22 @@ class _DsSliderState extends State<DsSlider> {
 
     slider = Listener(
       behavior: HitTestBehavior.opaque,
-      onPointerDown: (PointerDownEvent event) => _grab(event.localPosition),
-      onPointerMove: (PointerMoveEvent event) => _drag(event.localPosition),
+      onPointerDown: (PointerDownEvent event) {
+        final Offset? local = _localOf(event.position);
+        if (local != null) _grab(local);
+      },
+      onPointerMove: (PointerMoveEvent event) {
+        final Offset? local = _localOf(event.position);
+        if (local != null) _drag(local);
+      },
       onPointerUp: (PointerUpEvent _) => _release(),
       onPointerCancel: (PointerCancelEvent _) => _release(),
       child: MouseRegion(
         cursor: _operable ? SystemMouseCursors.click : SystemMouseCursors.basic,
-        onHover: (PointerHoverEvent event) => _hover(event.localPosition),
+        onHover: (PointerHoverEvent event) {
+          final Offset? local = _localOf(event.position);
+          if (local != null) _hover(local);
+        },
         onExit: (PointerExitEvent _) => _hover(const Offset(-1, -1)),
         child: slider,
       ),
@@ -511,11 +545,17 @@ class _DsSliderState extends State<DsSlider> {
     // Outermost, so nothing above it rejects a pointer aimed at a knob that
     // stands outside the channel — the same ordering [DsHitArea] documents.
     return DsHitArea(
+      // The root paints no border of its own — the track inside it does — so
+      // there is none to discount, and these insets are already measured from
+      // the thumb's padding box through [_thumbReach].
+      border: 0,
       insets: EdgeInsets.symmetric(
-        horizontal: _hitInset,
-        // Far enough to reach a knob's expander: half the knob stands proud of
-        // the channel, and the expander reaches past that.
-        vertical: (_thumbSize - _trackHeight) / 2 + _hitInset,
+        // A knob at either extreme sits half its width in from the root's
+        // edge, and its expander reaches [_thumbReach] from that centre.
+        horizontal: _thumbReach - _thumbSize / 2,
+        // Vertically the knob is centred on a 10px channel, so the expander
+        // stands 12px proud of it on both sides.
+        vertical: _thumbReach - _trackHeight / 2,
       ),
       child: slider,
     );

@@ -1,5 +1,4 @@
 import 'dart:math' as math;
-import 'dart:typed_data';
 import 'dart:ui' as ui show Image, ImageByteFormat;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
@@ -92,18 +91,14 @@ Widget slider({
 class _Live extends StatefulWidget {
   const _Live({
     required this.initial,
-    this.min = 0,
     this.max = 100,
     this.step = 1,
-    this.width = _panel,
     this.enabled = true,
   });
 
   final List<double> initial;
-  final double min;
   final double max;
   final double step;
-  final double width;
   final bool enabled;
 
   @override
@@ -115,10 +110,9 @@ class _LiveState extends State<_Live> {
 
   @override
   Widget build(BuildContext context) => SizedBox(
-        width: widget.width,
+        width: _panel,
         child: DsSlider(
           values: values,
-          min: widget.min,
           max: widget.max,
           step: widget.step,
           enabled: widget.enabled,
@@ -697,7 +691,7 @@ void main() {
       ]) {
         await t.sendKeyEvent(key);
         await t.pump();
-        expect(valuesOf(t).single, want, reason: '${key.keyLabel}');
+        expect(valuesOf(t).single, want, reason: key.keyLabel);
       }
     });
 
@@ -807,6 +801,70 @@ void main() {
   // ───────────────────────────────────────────────────────────────────────────
   // The rest of the contract
   // ───────────────────────────────────────────────────────────────────────────
+
+  group('the hit expander', () {
+    testWidgets('answers 34 tall — `-inset-2` off the PADDING box',
+        (WidgetTester t) async {
+      // `after:absolute after:-inset-2` resolves against the containing
+      // block's padding box, and the knob's 20px border box carries a 1px
+      // border, so the pseudo-element grows from 18 × 18 to **34 × 34** —
+      // probed as `34px × 34px` on the live reference. Reading the insets off
+      // the border box instead would give 36.
+      //
+      // Read as a rect rather than driven with a tap: every render object
+      // above [DsHitArea] bounds-checks itself first, so a snug parent rejects
+      // a pointer in the margin before the expander is consulted. CSS has no
+      // such gate. The rect is what the contract actually promises.
+      await t.pumpWidget(host(slider(values: <double>[50])));
+      final Rect expander = DsHitArea.debugExpanded(
+        t.renderObject(find.descendant(
+          of: find.byType(DsSlider),
+          matching: find.byType(DsHitArea),
+        )),
+      );
+
+      // The knob is centred on the 10px channel and reaches 17 either way.
+      expect(expander.height, 34,
+          reason: 'the thumb expander is 34 tall, not 36');
+      expect(expander.top, -12);
+      expect(expander.bottom, DsSlider.trackHeight + 12);
+
+      // Horizontally a knob at either end sits half its width in, so the
+      // expander clears the root by 17 - 10 = 7.
+      expect(expander.left, -7);
+      expect(expander.right, _panel + 7);
+    });
+
+    testWidgets('the hover region is the expander, not the painted knob',
+        (WidgetTester t) async {
+      // A pseudo-element belongs to its element, so hovering it hovers the
+      // thumb — which is why `hover:scale-110` fires from 17px out and not
+      // from the knob's own 10.
+      await t.pumpWidget(host(const _Live(initial: <double>[50])));
+      double scaleNow() => t
+          .widgetList<Transform>(find.descendant(
+            of: find.byType(DsSlider),
+            matching: find.byType(Transform),
+          ))
+          .map((Transform x) => x.transform.getMaxScaleOnAxis())
+          .first;
+
+      final Offset centre = thumbCentre(t, 0);
+      final TestGesture gesture =
+          await t.createGesture(kind: PointerDeviceKind.mouse);
+      addTearDown(gesture.removePointer);
+      await gesture.addPointer(location: Offset.zero);
+
+      await gesture.moveTo(centre + const Offset(16.9, 0));
+      await t.pump();
+      expect(scaleNow(), DsTransforms.sliderThumbHoverScale,
+          reason: 'still inside the 34-wide expander');
+
+      await gesture.moveTo(centre + const Offset(17.1, 0));
+      await t.pump();
+      expect(scaleNow(), 1, reason: 'and past it the knob is not hovered');
+    });
+  });
 
   group('contract', () {
     testWidgets('reduced motion stills the ring', (WidgetTester t) async {

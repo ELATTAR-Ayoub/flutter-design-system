@@ -215,7 +215,7 @@ void main() {
       expect(seen, DsCheckboxState.checked);
     });
 
-    testWidgets('answers a pointer 44 × 36 — the pseudo-element, not the paint',
+    testWidgets('answers a pointer 42 × 34 — the pseudo-element, not the paint',
         (WidgetTester t) async {
       int taps = 0;
       await t.pumpWidget(host(DsCheckbox(
@@ -224,13 +224,21 @@ void main() {
       // The box is 20 × 20 and takes 20 × 20 of layout…
       expect(t.getSize(find.byType(DsHitArea)), const Size(20, 20));
       final Offset centre = t.getCenter(find.byType(DsCheckbox));
-      // …and answers 12px out on each side and 8px above and below.
-      await t.tapAt(centre + const Offset(21, 0));
-      await t.tapAt(centre + const Offset(0, 17));
+
+      // …and `-inset-x-3 -inset-y-2` grows from the **padding** box — 18 × 18
+      // inside the 1px border — so the target is 42 × 34 and reaches 21px and
+      // 17px from the centre. Probed on the live reference, whose `::after`
+      // computes to exactly `42px × 34px`.
+      await t.tapAt(centre + const Offset(20.9, 0));
+      await t.tapAt(centre + const Offset(0, 16.9));
       expect(taps, 2);
-      // Past the pseudo-element, nothing.
-      await t.tapAt(centre + const Offset(23, 0));
-      expect(taps, 2);
+
+      // A tenth of a pixel past it, nothing. The bracket is tight on purpose:
+      // the border-box reading this port shipped first would answer here.
+      await t.tapAt(centre + const Offset(21.1, 0));
+      await t.tapAt(centre + const Offset(0, 17.1));
+      expect(taps, 2,
+          reason: 'the expander grows from 18 × 18, not from 20 × 20');
     });
 
     testWidgets('jelly never fires on mount, and fires both ways',
@@ -526,18 +534,25 @@ void main() {
       );
     });
 
-    testWidgets('answers a pointer 68 × 40', (WidgetTester t) async {
+    testWidgets('answers a pointer 66 × 38', (WidgetTester t) async {
       int taps = 0;
       await t.pumpWidget(host(DsSwitch(
         value: false,
         onChanged: (bool _) => taps++,
       )));
       final Offset centre = t.getCenter(find.byType(DsSwitch));
-      await t.tapAt(centre + const Offset(33, 0));
-      await t.tapAt(centre + const Offset(0, 19));
+
+      // The same padding-box rule on a 44 × 24 track: 42 × 22 inside the
+      // border, grown to 66 × 38, so the target reaches 33px and 19px from the
+      // centre. Probed `::after` = `66px × 38px`.
+      await t.tapAt(centre + const Offset(32.9, 0));
+      await t.tapAt(centre + const Offset(0, 18.9));
       expect(taps, 2);
-      await t.tapAt(centre + const Offset(35, 0));
-      expect(taps, 2);
+
+      await t.tapAt(centre + const Offset(33.1, 0));
+      await t.tapAt(centre + const Offset(0, 19.1));
+      expect(taps, 2,
+          reason: 'measured 66 x 38, not the border box reading of 68 x 40');
     });
 
     testWidgets('the thumb runs on the spring, the track does not',
