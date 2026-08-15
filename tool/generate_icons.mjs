@@ -28,9 +28,15 @@ const PACKAGE_DIR = path.resolve(
 const ICONS_DIR = path.join(PACKAGE_DIR, 'dist/esm/icons');
 const OUT_DIR = path.join(REPO, 'lib/src/components');
 
-/** Emitted Dart type names. Flip to `SEALED` after the merge described in
- *  `tool/README.md` — the constructor call shapes do not change, only the
- *  names, which is what makes that merge a flag flip plus a rerun. */
+/** Emitted Dart type names.
+ *
+ *  `SEALED` is the default and the merged state: the node types are
+ *  `icon_paths.dart`'s own `DsIconElement` hierarchy, which this file imports
+ *  rather than declares. `SHIM` is the pre-merge shape kept for one reason —
+ *  the two differ **only** in these names, and re-running under it reproduces
+ *  the old file's node lines byte for byte, which is how the merge was checked.
+ *  The constructor call shapes are identical in both, which is what made that
+ *  merge a flag flip plus a rerun. */
 const MODEL = {
   SHIM: {
     base: 'DsLucideNode',
@@ -55,7 +61,7 @@ const MODEL = {
     emitModel: false,
   },
 };
-const T = MODEL[process.env.DS_ICON_MODEL ?? 'SHIM'];
+const T = MODEL[process.env.DS_ICON_MODEL ?? 'SEALED'];
 
 // ── read the package ────────────────────────────────────────────────────────
 
@@ -225,7 +231,13 @@ function header(extra) {
 ${extra}`;
 }
 
-function emitModel() {
+/** The node model itself — emitted only by `SHIM`.
+ *
+ *  Under `SEALED` these seven types are `icon_paths.dart`'s own, the file
+ *  imports them instead of declaring them, and this whole block goes away. That
+ *  is the merge `tool/README.md` describes; the glyph class below is emitted
+ *  either way, because it is the registry's own shape rather than the model. */
+function emitNodeModel() {
   return `
 /// One SVG element from a lucide \`__iconNode\` list.
 ///
@@ -385,7 +397,12 @@ class ${T.polygon} extends ${T.base} {
     path.close();
   }
 }
+`;
+}
 
+/** The glyph class — emitted under both models. */
+function emitGlyphClass() {
+  return `
 /// One lucide glyph: its module name and its \`__iconNode\` list.
 ///
 /// A plain class with a const constructor rather than an enum member, and that
@@ -413,7 +430,7 @@ class DsLucideGlyph {
   }
 
   /// The \`fill="currentColor"\` nodes as one [Path], or \`null\` when there are
-  /// none. 19 nodes across 11 glyphs carry the attribute.
+  /// none. 19 nodes across 9 glyphs carry the attribute.
   Path? toFillPath() {
     Path? path;
     for (final ${T.base} node in nodes) {
@@ -481,8 +498,10 @@ library;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/painting.dart';
 
-import 'icon_paths.dart';
-${emitModel()}
+import 'icon_paths.dart';${
+  T.emitModel ? '' : ' // the sealed element model this file is emitted against'
+}
+${T.emitModel ? emitNodeModel() : ''}${emitGlyphClass()}
 /// Every glyph lucide ${pkg.version} ships.
 class DsLucide {
   const DsLucide._();

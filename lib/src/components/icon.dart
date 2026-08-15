@@ -202,6 +202,72 @@ class DsIcon extends StatelessWidget {
     return _authoredStroke;
   }
 
+  /// Paints one glyph into [size], the way lucide's `<svg>` wrapper does.
+  ///
+  /// [path] and [fill] are in lucide's 24-unit space ([DsIconPaths.viewBox]);
+  /// so is [strokeWidth], exactly as the SVG `stroke-width` attribute is — the
+  /// canvas scale converts it, which is what a browser does when it fits a
+  /// `viewBox` into a smaller box.
+  ///
+  /// **The clip is the `<svg>` viewport.** An outermost `<svg>` clips to its
+  /// own box by default (`overflow: hidden`), and one glyph in lucide 1.28.0
+  /// needs it: `save-off`'s sixth node is `"M29.5 11.5s5 5 4 5"`, a stroke that
+  /// runs from x = 29.5 to x = 34.5, entirely outside the `viewBox="0 0 24 24"`
+  /// its other six nodes are drawn in. It is an upstream defect, the browser
+  /// hides it by clipping, and the generated registry reproduces it verbatim
+  /// because a transcript that quietly repairs its source is not a transcript.
+  /// Measured over all 1756 glyphs, `save-off` is the only one that leaves the
+  /// grid (by 10.5 units); the runner-up touches x = 24 and no further. So this
+  /// is a `clipRect`, matching the browser's rule, and not a special case for
+  /// one glyph.
+  ///
+  /// It is [Canvas.clipRect] rather than a path intersection on purpose: the
+  /// stroke and fill passes stay two plain `drawPath` calls on the geometry
+  /// lucide ships. Nothing here combines paths and nothing blurs one.
+  ///
+  /// Public and [visibleForTesting] because the clip is only provable in
+  /// rendered pixels, and the glyph that proves it lives in the generated
+  /// registry rather than in [DsIconGlyph].
+  @visibleForTesting
+  static void paintGlyph(
+    Canvas canvas,
+    Size size, {
+    required Path path,
+    required Color color,
+    required double strokeWidth,
+    Path? fill,
+  }) {
+    if (size.isEmpty) return;
+    canvas.save();
+    canvas.scale(
+        size.width / DsIconPaths.viewBox, size.height / DsIconPaths.viewBox);
+    canvas.clipRect(
+      const Rect.fromLTWH(0, 0, DsIconPaths.viewBox, DsIconPaths.viewBox),
+    );
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = color
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = strokeWidth
+        // lucide's own SVG attributes: `stroke-linecap="round"`,
+        // `stroke-linejoin="round"`, `fill="none"`.
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round,
+    );
+    // Second pass: the nodes that override `fill="none"` with
+    // `fill="currentColor"`. A node that sets `fill` keeps the inherited
+    // `stroke`, so this paints *over* the stroke pass rather than instead of
+    // it — the same two operations, in the same order, a browser performs for
+    // `<circle … fill="currentColor">` inside lucide's `<svg>`. `tag`'s
+    // 0.5-unit dot is the only one in the embedded set; every other glyph
+    // skips this entirely because [DsIconPaths.fillPathFor] returns null.
+    if (fill != null) {
+      canvas.drawPath(fill, Paint()..color = color);
+    }
+    canvas.restore();
+  }
+
   /// The token [tone] resolves to in [context].
   ///
   /// [DsIconTone.inherit] is `text-current`: it takes the colour of the
@@ -260,35 +326,14 @@ class _GlyphPainter extends CustomPainter {
   final double strokeWidth;
 
   @override
-  void paint(Canvas canvas, Size size) {
-    if (size.isEmpty) return;
-    canvas.save();
-    canvas.scale(size.width / DsIconPaths.viewBox,
-        size.height / DsIconPaths.viewBox);
-    canvas.drawPath(
-      DsIconPaths.pathFor(glyph),
-      Paint()
-        ..color = color
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = strokeWidth
-        // lucide's own SVG attributes: `stroke-linecap="round"`,
-        // `stroke-linejoin="round"`, `fill="none"`.
-        ..strokeCap = StrokeCap.round
-        ..strokeJoin = StrokeJoin.round,
-    );
-    // Second pass: the nodes that override `fill="none"` with
-    // `fill="currentColor"`. A node that sets `fill` keeps the inherited
-    // `stroke`, so this paints *over* the stroke pass rather than instead of
-    // it — the same two operations, in the same order, a browser performs for
-    // `<circle … fill="currentColor">` inside lucide's `<svg>`. `tag`'s
-    // 0.5-unit dot is the only one in the set; every other glyph skips this
-    // entirely because [DsIconPaths.fillPathFor] returns null.
-    final Path? fill = DsIconPaths.fillPathFor(glyph);
-    if (fill != null) {
-      canvas.drawPath(fill, Paint()..color = color);
-    }
-    canvas.restore();
-  }
+  void paint(Canvas canvas, Size size) => DsIcon.paintGlyph(
+        canvas,
+        size,
+        path: DsIconPaths.pathFor(glyph),
+        fill: DsIconPaths.fillPathFor(glyph),
+        color: color,
+        strokeWidth: strokeWidth,
+      );
 
   @override
   bool shouldRepaint(_GlyphPainter old) =>

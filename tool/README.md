@@ -95,16 +95,16 @@ not survive the whole package, and one glyph is an upstream defect.
 
 ### 1. `ellipse` exists (16 nodes, 15 glyphs)
 
-`icon_paths.dart` calls `ellipse` "the one lucide never reaches for". True of
-the curated 78; false of the package — `database` and its nine siblings,
+`icon_paths.dart` used to call `ellipse` "the one lucide never reaches for".
+True of the curated 78; false of the package — `database` and its nine siblings,
 `cone`, `cylinder`, `drum`, `ellipse` and `torus` all use it, and every one
 is genuinely non-circular (`rx != ry`), so none could be demoted to a
 `circle`. **New element type.**
 
 ### 2. `polygon` exists (2 nodes)
 
-`icon_paths.dart`'s polyline doc says "closing is what `polygon` means, and
-lucide emits none". `navigation` and `navigation-2` are polygons.
+`icon_paths.dart`'s polyline doc used to say "closing is what `polygon` means,
+and lucide emits none". `navigation` and `navigation-2` are polygons.
 
 Both happen to repeat their first point as their last, so a polyline through
 the same list would trace the same *geometry* — but it would meet itself
@@ -115,7 +115,7 @@ stringification" ruling forbids, so `polygon` is a type of its own.
 
 ### 3. `rect` may omit `rx` (5 nodes)
 
-`icon_paths.dart` states "lucide writes `ry` only where it equals `rx`".
+`icon_paths.dart` stated "lucide writes `ry` only where it equals `rx`".
 True of the 78. In the package, four nodes spell `ry` with **no `rx` at
 all** (`arrow-down-0-1`, `arrow-down-1-0`, `arrow-up-0-1`, `arrow-up-1-0`)
 and one spells neither (`spray-can`).
@@ -124,8 +124,11 @@ SVG's mutual-auto rule applies: an absent `rx` takes `ry`'s value and vice
 versa, and absent together means square corners. The generator resolves it
 **at emit time**, explicitly, and records the omission in a trailing comment
 (`// key: 1bwicg; rx absent (= ry)`) so the transcript still shows what
-lucide wrote. The current `DsIconRectElement` takes `rx` as a required
-positional, which cannot express the distinction — see *The merge*.
+lucide wrote. The pre-merge `DsIconRectElement` took `rx` as a non-null
+positional, which could not express the distinction at all; both radii are
+nullable now and the element applies the rule itself, so a hand transcript can
+spell the omission where the generator states the resolved value — see
+*The merge*.
 
 ### 4. `save-off` is broken upstream — reproduced deliberately
 
@@ -147,10 +150,23 @@ control points included. So this is one bad node, not a slope.
 
 The generator reproduces it verbatim — dropping or "fixing" a node would
 make the registry disagree with its source and hide the defect. **The
-consequence is a renderer decision, not a data one:** `_GlyphPainter` in
-`icon.dart` scales but does not clip, so this glyph would paint outside its
-own box and overlap whatever sits to its right. Clipping to the viewBox, as
-the browser does, is the fix, and it belongs in the painter.
+consequence is a renderer decision, not a data one**, and it has been taken:
+`DsIcon.paintGlyph` clips to the 24-grid with a single `Canvas.clipRect`,
+which is the browser's own rule rather than a special case for one glyph.
+Measured on the rendered pixels, at 24 px on a 40×24 surface:
+
+| | inked pixels beyond x = 24 | rightmost inked column |
+|---|---|---|
+| unclipped | **31** | 34 |
+| clipped | **0** | 22 |
+
+Inside the grid the two agree to within 13/255 of alpha on 21 pixels — Skia
+rasterising a clipped draw slightly differently, not geometry going missing.
+The anti-assertion is byte-for-byte: `at-sign` (the closest any embedded
+glyph comes to the edge, 0.98 units inside it) and `line-squiggle` (the whole
+package's runner-up, touching x = 24 exactly) render **identically** clipped
+and unclipped, because the clip never meets their geometry. Both pins are in
+`test/icon_paths_generated_test.dart`.
 
 ## Bundle size and tree-shaking
 
@@ -222,50 +238,43 @@ Two bytes on 2.6 MB is build noise, not content: nothing imports
 file that nobody names is free, and adding 1756 glyphs to this package costs
 the gallery nothing.
 
-## The merge
+## The merge — done
 
-The generated registry currently ships its **own** node model
-(`DsLucideNode` and its seven subclasses) rather than reusing
-`DsIconElement` from `icon_paths.dart`. That is deliberate and temporary:
+The generated registry used to ship its **own** node model (`DsLucideNode`
+and its seven subclasses) because `DsIconElement` is `sealed` and cannot be
+extended from another library, while the full set needs two node types the
+hierarchy did not have (`ellipse`, `polygon`) plus a `rect` whose `rx` may be
+absent. That shim is gone. `icon_paths.dart` now declares all seven types,
+and this file is emitted **against them**: `DS_ICON_MODEL` still selects the
+table, `SEALED` is the default, and `SHIM` is kept only because re-running
+under it reproduces the pre-merge file's node lines byte for byte.
 
-- `DsIconElement` is `sealed`, so it cannot be extended from another
-  library, and the full set needs two node types it does not have
-  (`ellipse`, `polygon`) plus a `rect` whose `rx` may be absent.
-- `icon_paths.dart` was being edited by another workstream when this landed,
-  so extending it in place was not available.
+The parser never was duplicated — the shim's `addTo` delegated to
+`DsIconPathElement` — so all 5932 `d` strings have always gone through the
+port's own reader.
 
-**The parser is not duplicated.** `DsLucidePath.addTo` delegates straight to
-`DsIconPathElement` — the port's own reader, unchanged — so all 5932 `d`
-strings go through the same code the hand-transcribed 78 do.
+**The merge changed no data.** Re-running under `SEALED` and renaming the
+seven types in the pre-merge output gives back the new file's registry
+character for character: 7032 node lines, 690,808 → 727,724 bytes of purely
+type-name growth, and `icon_paths.g.index.dart` identical outright. The
+78-glyph identity check in `test/icon_paths_generated_test.dart` still
+passes, and now compares one model to itself rather than two models to each
+other — its two signature functions collapsed into one.
 
-To retire the shim:
-
-1. In `icon_paths.dart`, add `DsIconEllipseElement` and
-   `DsIconPolygonElement` to the sealed hierarchy, and make
-   `DsIconRectElement`'s `rx` nullable with SVG's mutual-auto rule
-   (`rx ?? ry ?? 0`). Update the two docstrings the findings above falsify.
-2. Regenerate against the real model — the constructor call shapes do not
-   change, only the type names, which is why the generator carries them in
-   one table:
-
-   ```sh
-   DS_ICON_MODEL=SEALED node tool/generate_icons.mjs
-   ```
-
-3. Delete the `emitModel()` output (the flag already suppresses it) and
-   point `test/icon_paths_generated_test.dart`'s
-   `_generatedSignature` at `DsIconElement`.
-
-Two further integration steps, both out of scope here and neither required
-for the registry to be correct:
+One integration step remains out of scope, and is not required for the
+registry to be correct:
 
 - **Rendering.** `DsIcon` takes a `DsIconGlyph`; a `DsLucideGlyph` needs
-  either a second constructor or a widened parameter. Note that
-  `DsIcon.strokeFor` — the per-size stroke retune that is the reason this
-  port draws paths instead of using an icon font — is geometry-independent
-  and needs no change at all.
-- **The curated/off-set distinction survives untouched.** The generated set
-  is the *universe*; `lib/ds/icons.ts`'s curated 63 stay an explicit list, and
-  the icons page's registry keeps enumerating them by name. Nothing about
-  making 1756 glyphs available changes which ones that page prints — which is
-  the point of keeping the two lists separate.
+  either a second constructor or a widened parameter. `DsIcon.paintGlyph` is
+  already the seam — it takes a `Path`, not a glyph — and `DsIcon.strokeFor`,
+  the per-size stroke retune that is the reason this port draws paths instead
+  of using an icon font, is geometry-independent and needs no change at all.
+  Nothing imports `icon_paths.g.dart` from `lib/` today, which is what keeps
+  the gallery's cost at the +2 bytes measured above.
+
+**The curated/off-set distinction survives untouched.** The generated set is
+the *universe*; `lib/ds/icons.ts`'s curated 63 stay an explicit list, and the
+icons page's registry keeps enumerating them by name. Nothing about making
+1756 glyphs available changes which ones that page prints — which is the
+point of keeping the two lists separate, and `example/test/icons_page_test.dart`
+passes unmodified through this merge.

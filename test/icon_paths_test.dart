@@ -54,12 +54,25 @@ String _signature(DsIconElement element) => switch (element) {
         :final double y,
         :final double width,
         :final double height,
-        :final double rx,
+        :final double? rx,
         :final double? ry
       ) =>
-        'rect ${_n(x)} ${_n(y)} ${_n(width)} ${_n(height)} ${_n(rx)}'
+        'rect ${_n(x)} ${_n(y)} ${_n(width)} ${_n(height)} '
+            '${rx == null ? 'auto' : _n(rx)}'
             '${ry == null ? '' : ' ry ${_n(ry)}'}',
       DsIconPolylineElement(:final List<Offset> points) => 'polyline '
+          '${points.map((Offset p) => '${_n(p.dx)} ${_n(p.dy)}').join(' ')}',
+      // Neither appears in the 78 transcribed here — both arrived with the
+      // generated registry, and both are rendered anyway so that a glyph which
+      // grew one would print it rather than crash the switch.
+      DsIconEllipseElement(
+        :final double cx,
+        :final double cy,
+        :final double rx,
+        :final double ry
+      ) =>
+        'ellipse ${_n(cx)} ${_n(cy)} ${_n(rx)} ${_n(ry)}',
+      DsIconPolygonElement(:final List<Offset> points) => 'polygon '
           '${points.map((Offset p) => '${_n(p.dx)} ${_n(p.dy)}').join(' ')}',
     };
 
@@ -73,14 +86,19 @@ int _expectedContours(DsIconGlyph glyph) => DsIconPaths.elements[glyph]!
         });
 
 /// How many of them must come out **closed**: one per `z`/`Z`, plus every
-/// `circle` and `rect`, which are closed subpaths by construction. `line` and
-/// `polyline` are always open — closing a polyline is what `polygon` means,
-/// and lucide emits none.
+/// `circle`, `rect`, `ellipse` and `polygon`, which are closed subpaths by
+/// construction. `line` and `polyline` are always open — closing a polyline is
+/// exactly what `polygon` means, and the two of those lucide emits
+/// (`navigation`, `navigation-2`) are not among the glyphs embedded here.
 int _expectedClosedContours(DsIconGlyph glyph) => DsIconPaths.elements[glyph]!
     .fold<int>(0, (int n, DsIconElement e) => n + switch (e) {
           DsIconPathElement(:final String d) =>
             RegExp('[zZ]').allMatches(d).length,
-          DsIconCircleElement() || DsIconRectElement() => 1,
+          DsIconCircleElement() ||
+          DsIconRectElement() ||
+          DsIconEllipseElement() ||
+          DsIconPolygonElement() =>
+            1,
           DsIconLineElement() || DsIconPolylineElement() => 0,
         });
 
@@ -319,8 +337,11 @@ void main() {
       // monitor.mjs: ["rect", { width: 20, height: 14, x: 2, y: 3, rx: 2 }]
       final DsIconRectElement rect = DsIconPaths
           .elements[DsIconGlyph.monitor]!.first as DsIconRectElement;
+      // `rx` is nullable since the merge — lucide omits it on five nodes in
+      // the full package — so it is asserted as a written value here, not
+      // merely as a number.
       expect(
-        <double>[rect.x, rect.y, rect.width, rect.height, rect.rx],
+        <double?>[rect.x, rect.y, rect.width, rect.height, rect.rx],
         <double>[2, 3, 20, 14, 2],
       );
 

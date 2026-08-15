@@ -237,10 +237,19 @@ enum DsIconGlyph {
 
 /// One SVG element from a lucide `__iconNode` list.
 ///
-/// Sealed: lucide only ever emits `path`, `line`, `circle`, `rect`, `ellipse`
-/// and `polyline` nodes, and these five cover every glyph this package embeds
-/// (`ellipse` is the one lucide never reaches for). A new node type is a new
-/// subclass here, not a special case at the call site.
+/// Sealed, and now **complete**: `path`, `line`, `circle`, `rect`, `ellipse`,
+/// `polyline` and `polygon` are every tag lucide 1.28.0 emits, counted over the
+/// whole package rather than inferred from a sample — 5932 path, 524 circle,
+/// 397 rect, 155 line, 16 ellipse, 6 polyline, 2 polygon, and `tool/README.md`
+/// records the tally that says so. A new node type is a new subclass here, not
+/// a special case at the call site.
+///
+/// Five of the seven appear in the glyphs transcribed by hand below.
+/// [DsIconEllipseElement] and [DsIconPolygonElement] arrived with the generated
+/// registry (`icon_paths.g.dart`), which is the same 24-unit model applied to
+/// all 1756 modules; they live here, in the sealed hierarchy, because a sealed
+/// class cannot be extended from another library and because one model for both
+/// halves is what lets the identity check compare them element for element.
 @immutable
 sealed class DsIconElement {
   const DsIconElement();
@@ -327,14 +336,24 @@ class DsIconCircleElement extends DsIconElement {
       path.addOval(Rect.fromCircle(center: Offset(cx, cy), radius: r));
 }
 
-/// `["rect", { x, y, width, height, rx, ry? }]` — a closed rounded-rect
+/// `["rect", { x, y, width, height, rx?, ry? }]` — a closed rounded-rect
 /// subpath.
 ///
-/// lucide sets `ry` only where it equals `rx` (`copy.mjs` and `lock.mjs` are
-/// the two, both `rx: "2", ry: "2"`); everywhere else it is absent and SVG's
-/// "`ry` defaults to `rx`" rule applies. Either way the corner radius comes out
+/// Among the glyphs transcribed by hand below, lucide always writes `rx` and
+/// writes `ry` only where it equals it (`copy.mjs` and `lock.mjs` are the two,
+/// both `rx: "2", ry: "2"`); everywhere else `ry` is absent and SVG's "`ry`
+/// defaults to `rx`" rule applies. Either way the corner radius comes out
 /// uniform — but [ry] is transcribed rather than assumed, so the test can
 /// assert the equality instead of the file quietly relying on it.
+///
+/// **That generalisation does not survive the whole package**, which is why
+/// both radii are nullable. Four nodes spell `ry` with no `rx` at all
+/// (`arrow-down-0-1`, `arrow-down-1-0`, `arrow-up-0-1`, `arrow-up-1-0`) and one
+/// spells neither (`spray-can`). SVG's rule for the pair is *mutual*: an absent
+/// `rx` takes `ry`'s value, an absent `ry` takes `rx`'s, and absent together
+/// means square corners — which is exactly what [addTo] reads. A model that
+/// took `rx` as a non-null number could not say "absent" at all, and would have
+/// to guess. See `tool/README.md`.
 ///
 /// Constructor order is `(x, y, width, height, rx)`; lucide usually writes
 /// `width, height, x, y, rx` — `gift.mjs` is the one that writes
@@ -361,8 +380,9 @@ class DsIconRectElement extends DsIconElement {
   /// `height`.
   final double height;
 
-  /// `rx` — corner radius on the x axis.
-  final double rx;
+  /// `rx` — corner radius on the x axis, when lucide writes it. `null` means
+  /// the attribute is absent and the radius falls back to [ry].
+  final double? rx;
 
   /// `ry` — corner radius on the y axis, when lucide writes it. `null` means
   /// the attribute is absent and the radius falls back to [rx].
@@ -372,7 +392,9 @@ class DsIconRectElement extends DsIconElement {
   void addTo(Path path) => path.addRRect(
         RRect.fromRectAndRadius(
           Rect.fromLTWH(x, y, width, height),
-          Radius.elliptical(rx, ry ?? rx),
+          // SVG's mutual-auto rule, both directions, and square when neither
+          // is written.
+          Radius.elliptical(rx ?? ry ?? 0, ry ?? rx ?? 0),
         ),
       );
 }
@@ -380,8 +402,10 @@ class DsIconRectElement extends DsIconElement {
 /// `["polyline", { points }]` — an **open** run of straight segments.
 ///
 /// `moveTo` the first point, `lineTo` the rest, and no `close()`: closing is
-/// what `polygon` means, and lucide emits none. `package.mjs`'s
-/// `points: "3.29 7 12 12 20.71 7"` is the only polyline in the embedded set.
+/// what [DsIconPolygonElement] means. `package.mjs`'s
+/// `points: "3.29 7 12 12 20.71 7"` is the only polyline in the embedded set;
+/// the package holds six, `mailbox`'s being the one whose `points` are
+/// comma-separated rather than space-separated.
 class DsIconPolylineElement extends DsIconElement {
   const DsIconPolylineElement(this.points);
 
@@ -395,6 +419,77 @@ class DsIconPolylineElement extends DsIconElement {
     for (final Offset point in points.skip(1)) {
       path.lineTo(point.dx, point.dy);
     }
+  }
+}
+
+/// `["ellipse", { cx, cy, rx, ry }]` — a closed elliptical subpath.
+///
+/// None of the glyphs transcribed by hand below use one, which is what the old
+/// docstring on [DsIconElement] generalised into "the one lucide never reaches
+/// for". Over the whole package it appears **16 times across 15 glyphs** —
+/// `database` and its nine siblings, `cone`, `cylinder`, `drum`, `ellipse` and
+/// `torus` — and every one of the 16 is genuinely non-circular (`rx != ry`), so
+/// not one of them could have been demoted to a [DsIconCircleElement] without
+/// changing the drawn shape.
+///
+/// [Rect.fromCenter] takes diameters, so both radii are doubled here; a circle
+/// is the `rx == ry` case of the same call, and stays its own type because
+/// lucide spells it as its own tag.
+class DsIconEllipseElement extends DsIconElement {
+  const DsIconEllipseElement(this.cx, this.cy, this.rx, this.ry);
+
+  /// `cx` — centre x.
+  final double cx;
+
+  /// `cy` — centre y.
+  final double cy;
+
+  /// `rx` — radius on the x axis.
+  final double rx;
+
+  /// `ry` — radius on the y axis.
+  final double ry;
+
+  @override
+  void addTo(Path path) => path.addOval(
+        Rect.fromCenter(
+          center: Offset(cx, cy),
+          width: rx * 2,
+          height: ry * 2,
+        ),
+      );
+}
+
+/// `["polygon", { points }]` — the same run of segments as a polyline, but
+/// **closed**.
+///
+/// lucide emits two, `navigation` and `navigation-2`, and neither is in the
+/// hand-transcribed set — which is what let [DsIconPolylineElement]'s old
+/// docstring say "lucide emits none".
+///
+/// **Why this is a type of its own and not a polyline with a repeated point.**
+/// Both polygons happen to repeat their first point as their last, so a
+/// polyline through the same list would trace the same *geometry*. It would not
+/// paint the same: an open contour meeting itself is two round **caps**, while
+/// a closed one is a round **join**, and lucide's `<svg>` sets both
+/// `stroke-linecap="round"` and `stroke-linejoin="round"` precisely because
+/// they are different operations. Spelling a polygon as a polyline would be a
+/// silent rewrite of the kind this file's "structure over stringification"
+/// ruling forbids.
+class DsIconPolygonElement extends DsIconElement {
+  const DsIconPolygonElement(this.points);
+
+  /// The `points` attribute, parsed into its coordinate pairs in source order.
+  final List<Offset> points;
+
+  @override
+  void addTo(Path path) {
+    if (points.isEmpty) return;
+    path.moveTo(points.first.dx, points.first.dy);
+    for (final Offset point in points.skip(1)) {
+      path.lineTo(point.dx, point.dy);
+    }
+    path.close();
   }
 }
 
