@@ -217,6 +217,24 @@ function findAdvance(prevSig, newSig) {
     const PARK_AT = [8, 8];
     await page.mouse.move(...PARK_AT);
 
+    // An autofocusing element (cmdk's palette input on the selects page)
+    // makes the browser scroll it into view BEFORE frame 0, so the stitch
+    // silently starts mid-page and the total comes out short by the initial
+    // scroll offset. Blur whatever holds focus and pin the scroll back to
+    // the top before the first frame counts.
+    await page.evaluate(() => {
+      if (document.activeElement && document.activeElement.blur) {
+        document.activeElement.blur();
+      }
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    });
+    try {
+      await page.evaluate(
+        () => window.__dsScrollTo && window.__dsScrollTo(0),
+      );
+    } catch (_) {}
+    await new Promise((r) => setTimeout(r, 400));
+
     // The DOM app scrolls deterministically — no matching, no ambiguity. The
     // Flutter app exposes the same ground truth through a js_interop seam
     // (__dsScrollTo/__dsScrollY/__dsScrollMax): pixel matching cannot recover
