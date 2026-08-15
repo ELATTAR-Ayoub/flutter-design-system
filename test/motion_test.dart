@@ -327,7 +327,7 @@ void main() {
     final List<Key> itemKeys =
         List<Key>.generate(3, (int i) => ValueKey<int>(i));
 
-    Widget group(int active, {double itemWidth = 28}) => host(
+    Widget group(int active, {double itemWidth = 28, Duration? travel}) => host(
           SizedBox(
             width: 300,
             child: DsSlidingPillGroup(
@@ -335,6 +335,7 @@ void main() {
               pill: const SizedBox.expand(key: pillKey),
               gap: 1,
               padding: EdgeInsets.all(ds(0.5)),
+              travelDuration: travel,
               children: <Widget>[
                 for (int i = 0; i < 3; i++)
                   SizedBox(key: itemKeys[i], width: itemWidth, height: 28),
@@ -342,6 +343,16 @@ void main() {
             ),
           ),
         );
+
+    /// The opacity the pill is actually **painted** at, not the target the
+    /// [AnimatedOpacity] is aiming for — which is the whole question in T6.
+    double paintedOpacity(WidgetTester t) => t
+        .widget<FadeTransition>(find.descendant(
+          of: find.byType(DsSlidingPillGroup),
+          matching: find.byType(FadeTransition),
+        ))
+        .opacity
+        .value;
 
     testWidgets('is hidden until the first layout has been measured',
         (WidgetTester t) async {
@@ -355,16 +366,43 @@ void main() {
       expect(t.widget<AnimatedOpacity>(find.byType(AnimatedOpacity)).opacity, 1);
     });
 
-    testWidgets('first placement lands without travelling',
+    testWidgets('T6 — first placement POPS: it lands without travelling and '
+        'without fading', (WidgetTester t) async {
+      await t.pumpWidget(group(0));
+      expect(paintedOpacity(t), 0, reason: 'nothing measured yet');
+
+      await t.pump();
+      // No pumping past a transition: it is already there, at full opacity.
+      // Measured from before hydration — the hook's first `move()` writes
+      // opacity 0→1, width 0→W and the transform in ONE frame, with
+      // `transition: none`. The port used to fade this in over 150ms.
+      expect(t.getRect(find.byKey(pillKey)),
+          rectMoreOrLessEquals(t.getRect(find.byKey(itemKeys[0])), epsilon: 0.01));
+      expect(paintedOpacity(t), 1, reason: 'popped, not faded');
+    });
+
+    testWidgets('T7 — …and then squashes once, on its own',
         (WidgetTester t) async {
       await t.pumpWidget(group(0));
       await t.pump();
+      // The reference's squash is not the first `move()` — that one returns on
+      // `isFirstMove` before the jelly. It is the ResizeObserver's mandatory
+      // initial callback re-entering `move()` ~117ms later with identical
+      // geometry, which does take the jelly branch. The port's analogue is the
+      // post-frame re-measure, so the squash starts a frame after the pop; this
+      // pump is that frame, and the jelly's own zero point.
+      await t.pump();
+      expect(scaleOf(t, find.byType(DsSlidingPillGroup)).x, 1.0);
 
-      // No pumping past a transition: it is already there.
-      expect(t.getRect(find.byKey(pillKey)),
-          rectMoreOrLessEquals(t.getRect(find.byKey(itemKeys[0])), epsilon: 0.01));
-      expect(scaleOf(t, find.byType(DsSlidingPillGroup)).x, 1.0,
-          reason: 'and it does not squash on arrival the first time');
+      await t.pump(const Duration(milliseconds: 180));
+      // 30% of yuki-jelly's 600ms: scale3d(1.18, 0.82, 1).
+      final ({double x, double y}) squashed =
+          scaleOf(t, find.byType(DsSlidingPillGroup));
+      expect(squashed.x, closeTo(1.18, 0.01));
+      expect(squashed.y, closeTo(0.82, 0.01));
+
+      await t.pump(DsDurations.animJelly);
+      expect(scaleOf(t, find.byType(DsSlidingPillGroup)).x, closeTo(1, 1e-6));
     });
 
     testWidgets('travels to the new selection', (WidgetTester t) async {
@@ -402,6 +440,82 @@ void main() {
           scaleOf(t, find.byType(DsSlidingPillGroup));
       expect(settled.x, closeTo(1.0, 1e-6));
       expect(settled.y, closeTo(1.0, 1e-6));
+    });
+
+    testWidgets('T8/T8b — deselection fades in place: the rect is held, the '
+        'squash does not replay', (WidgetTester t) async {
+      await t.pumpWidget(group(1));
+      await t.pump();
+      await t.pump(DsDurations.animJelly);
+      final Rect parked = t.getRect(find.byKey(pillKey));
+      expect(paintedOpacity(t), 1);
+
+      // The `MutationObserver` recorded exactly ONE style write on the live
+      // reference: `width: 51.89px; height: 32px; transform: translate(74.89px,
+      // 0px); opacity: 0` — width, height and transform unchanged from the
+      // selection being left. The port used to re-target left/top/width/height
+      // to 0/0/0/0, sliding the pill to the group origin under the fade.
+      await t.pumpWidget(group(-1));
+      final List<double> opacities = <double>[];
+      for (int f = 0; f < 12; f++) {
+        await t.pump(const Duration(milliseconds: 16));
+        expect(t.getRect(find.byKey(pillKey)), parked,
+            reason: 'frame ${f + 1}: the rect must not move at all');
+        expect(scaleOf(t, find.byType(DsSlidingPillGroup)).x, 1.0,
+            reason: 'frame ${f + 1}: the jelly held 1.000 on the reference');
+        opacities.add(paintedOpacity(t));
+      }
+
+      // 150ms `--ease-out`, which is extremely front-loaded: measured 0.562 at
+      // Δ29 and 0.024 at Δ89 on the reference.
+      expect(opacities.first, lessThan(1));
+      expect(opacities[9], 0, reason: 'gone by 160ms — a 150ms leg plus a frame');
+      for (int i = 1; i < opacities.length; i++) {
+        expect(opacities[i], lessThanOrEqualTo(opacities[i - 1]));
+      }
+    });
+
+    testWidgets('a deselected pill re-selects from where it was parked',
+        (WidgetTester t) async {
+      await t.pumpWidget(group(2));
+      await t.pump();
+      await t.pump(DsDurations.animJelly);
+      final Rect parked = t.getRect(find.byKey(pillKey));
+
+      await t.pumpWidget(group(-1));
+      await t.pump(DsDurations.fast);
+      await t.pump();
+      expect(t.getRect(find.byKey(pillKey)), parked, reason: 'still parked');
+
+      // Re-selecting writes the transform and `opacity: 1` together, and both
+      // legs are transitioned again — so it travels from where it stands.
+      await t.pumpWidget(group(0));
+      await t.pump(const Duration(milliseconds: 16));
+      expect(t.getRect(find.byKey(pillKey)).left,
+          greaterThan(t.getRect(find.byKey(itemKeys[0])).left),
+          reason: 'in flight, still short of its target');
+      await t.pump(DsDurations.animJelly);
+      expect(t.getRect(find.byKey(pillKey)),
+          rectMoreOrLessEquals(t.getRect(find.byKey(itemKeys[0])), epsilon: 0.01));
+    });
+
+    testWidgets('travelDuration: zero jumps and still squashes — the theme '
+        'toggle\'s contract', (WidgetTester t) async {
+      await t.pumpWidget(group(0, travel: Duration.zero));
+      await t.pump();
+      await t.pump(DsDurations.animJelly);
+
+      await t.pumpWidget(group(2, travel: Duration.zero));
+      await t.pump();
+      // No travel at all: the pill is on its target in the first frame after
+      // the change, where a 250ms spring would still be in flight.
+      expect(t.getRect(find.byKey(pillKey)),
+          rectMoreOrLessEquals(t.getRect(find.byKey(itemKeys[2])), epsilon: 0.01));
+
+      // …and the arrival squash still plays: the class is re-added in the same
+      // batch and runs its full 600ms whatever the travel did.
+      await t.pump(const Duration(milliseconds: 180));
+      expect(scaleOf(t, find.byType(DsSlidingPillGroup)).x, closeTo(1.18, 0.01));
     });
 
     testWidgets('re-measures when the row is laid out again',

@@ -76,6 +76,25 @@ Color saturate(Color c, double s) {
   );
 }
 
+/// The phase the pseudo-element painter under [of] is currently being fed.
+///
+/// The port's equivalent of the rAF probe reading `getComputedStyle(el,
+/// '::before')` on the reference: [field] is `beat` on `sheen-action`, `drift`
+/// or `glint` on `foil-value`. Both painters are the **last** `CustomPaint` in
+/// their stack, because CSS paints the positioned pseudo-elements after the
+/// ramp, the inset shadows and the inline content.
+double phaseOf(WidgetTester t, Finder of, String field) {
+  final CustomPaint paint = t.widget<CustomPaint>(
+    find.descendant(of: of, matching: find.byType(CustomPaint)).last,
+  );
+  final dynamic painter = paint.painter;
+  return switch (field) {
+    'beat' => painter.beat as double,
+    'drift' => painter.drift as double,
+    _ => painter.glint as double,
+  };
+}
+
 void main() {
   // ── The composited glass oracles — shadows-map §7.4 ──────────────────────
   // Both glass boxes sit on an opaque Panel body, so the 24px blur is a no-op
@@ -216,6 +235,102 @@ void main() {
       expect(t.hasRunningAnimations, isFalse);
     });
 
+    // ── Elapsed-time semantics — behaviour-audit §3.6, B7/B8 ───────────────
+    // A CSS animation counts elapsed time. Changing `animation-duration`
+    // re-divides that same elapsed time; it neither restarts the animation nor
+    // preserves the frame it was on. The port used to preserve the phase, which
+    // is a third thing that matches neither.
+
+    test('phaseAt re-divides elapsed time rather than keeping phase', () {
+      // Infinite (`:hover`) wraps…
+      expect(
+        DsSheenAction.phaseAt(
+          const Duration(milliseconds: 137),
+          DsDurations.beatHover,
+          repeats: true,
+        ),
+        closeTo(137 / 2600, 1e-9),
+      );
+      // …and the SAME elapsed time on the press's 620ms lands somewhere else
+      // entirely. Verified on the reference to four significant figures:
+      // 137.4 / 620 = 22.2%, which is the 24% keyframe's approach — predicted
+      // `scale 1.32`, measured 1.3197 in the frame after `pointerdown`.
+      final double pressed = DsSheenAction.phaseAt(
+        const Duration(microseconds: 137400),
+        DsDurations.beatPress,
+        repeats: false,
+      );
+      expect(pressed, closeTo(0.2216, 1e-4));
+      expect(DsSheenAction.beatScale.transform(pressed), closeTo(1.3197, 0.001));
+      expect(DsSheenAction.beatOpacity.transform(pressed), closeTo(0, 0.01));
+
+      // One iteration and no `animation-fill-mode`: past the end, the element
+      // falls back to its base style, which for this ::before is frame 0.
+      expect(
+        DsSheenAction.phaseAt(
+          const Duration(milliseconds: 2500),
+          DsDurations.beatPress,
+          repeats: false,
+        ),
+        0,
+      );
+    });
+
+    testWidgets('B8 — a press deep into a hover produces NO thump',
+        (WidgetTester t) async {
+      await t.pumpWidget(host(surface(hovered: true)));
+      await t.pump(const Duration(milliseconds: 2500));
+      expect(phaseOf(t, find.byType(DsSheenAction), 'beat'),
+          closeTo(2500 / 2600, 1e-6));
+
+      // The rule swaps to `action-beat 620ms ease-out 1`, same animation-name,
+      // so the clock is kept and re-divided — and 2500ms is already past a
+      // single 620ms iteration. Measured on the reference: `opacity 0.000,
+      // scale 0.550` held for the whole 278ms hold.
+      await t.pumpWidget(host(surface(hovered: true, pressed: true)));
+      expect(phaseOf(t, find.byType(DsSheenAction), 'beat'), 0);
+      await t.pump(const Duration(milliseconds: 278));
+      expect(phaseOf(t, find.byType(DsSheenAction), 'beat'), 0);
+      expect(DsSheenAction.beatScale.transform(0), 0.55);
+      expect(DsSheenAction.beatOpacity.transform(0), 0);
+    });
+
+    testWidgets('B8 — a press early in a hover DOES thump, at the re-divided '
+        'frame', (WidgetTester t) async {
+      await t.pumpWidget(host(surface(hovered: true)));
+      await t.pump(const Duration(milliseconds: 137));
+
+      await t.pumpWidget(host(surface(hovered: true, pressed: true)));
+      final double beat = phaseOf(t, find.byType(DsSheenAction), 'beat');
+      expect(beat, closeTo(137 / 620, 1e-6));
+      expect(DsSheenAction.beatScale.transform(beat), closeTo(1.3199, 0.001));
+
+      // Releasing hands the same elapsed clock back to the 2.6s rule.
+      await t.pumpWidget(host(surface(hovered: true)));
+      expect(phaseOf(t, find.byType(DsSheenAction), 'beat'),
+          closeTo(137 / 2600, 1e-6));
+    });
+
+    testWidgets('B7 — hover-out deletes the animation; the next hover starts '
+        'at frame 0', (WidgetTester t) async {
+      await t.pumpWidget(host(surface(hovered: true)));
+      await t.pump(const Duration(milliseconds: 400));
+      expect(phaseOf(t, find.byType(DsSheenAction), 'beat'), greaterThan(0));
+
+      // `animation-name: none` within 1.4ms of `pointerout` — ::before snaps to
+      // its base style mid-thump, and the clock goes with it.
+      await t.pumpWidget(host(surface()));
+      expect(phaseOf(t, find.byType(DsSheenAction), 'beat'), 0);
+
+      // The port used to resume the controller from wherever it stopped.
+      await t.pumpWidget(host(surface(hovered: true)));
+      expect(phaseOf(t, find.byType(DsSheenAction), 'beat'), 0,
+          reason: 'a fresh animation, at frame 0');
+      await t.pump(const Duration(milliseconds: 100));
+      expect(phaseOf(t, find.byType(DsSheenAction), 'beat'),
+          closeTo(100 / 2600, 1e-6));
+    });
+
     testWidgets('paints in both themes, at rest, hovered and pressed',
         (WidgetTester t) async {
       for (final DsThemeMode mode in <DsThemeMode>[
@@ -315,6 +430,57 @@ void main() {
       await t.pump(const Duration(milliseconds: 16));
       expect(t.hasRunningAnimations, isTrue,
           reason: 'value-foil-drift 11s + value-glint 5.5s, both infinite');
+    });
+
+    // ── Elapsed-time semantics — behaviour-audit §3.7, B10b ────────────────
+
+    test('phaseAt keeps one elapsed clock and re-divides it', () {
+      // 2217ms in, the glint is 40% through a 5.5s pass — idle, invisible,
+      // parked at 135% — and 92% through a 2.4s one, which is the far end of
+      // the sweep. Hovering changes nothing but the duration, and this is the
+      // elapsed time that reproduces the audit's own two sampled frames.
+      const Duration elapsed = Duration(milliseconds: 2217);
+      final double rest = DsFoilValue.phaseAt(elapsed, DsDurations.glint);
+      final double hovered =
+          DsFoilValue.phaseAt(elapsed, DsDurations.glintHover);
+      expect(rest, closeTo(0.4031, 1e-3));
+      expect(hovered, closeTo(0.92375, 1e-5));
+
+      // The measured pair, from the two frames either side of `pointerover`:
+      // `opacity 0.0000, background-position 135%` → `opacity 1.0000, −49.86%`.
+      expect(DsFoilValue.glintOpacity.transform(rest), 0);
+      expect(DsFoilValue.glintPosition.transform(rest), closeTo(1.35, 1e-6));
+      expect(DsFoilValue.glintOpacity.transform(hovered), closeTo(1, 1e-9));
+      expect(DsFoilValue.glintPosition.transform(hovered),
+          closeTo(-0.4986, 1e-3));
+
+      // The drift is on the same clock and never changes duration, so it never
+      // jumps: 11s, hovered or not.
+      expect(DsFoilValue.phaseAt(elapsed, DsDurations.foilDrift),
+          closeTo(2217 / 11000, 1e-9));
+    });
+
+    testWidgets('B10b — the glint TELEPORTS when hover retimes it',
+        (WidgetTester t) async {
+      await t.pumpWidget(host(surface()));
+      await t.pump(const Duration(milliseconds: 2217));
+      expect(phaseOf(t, find.byType(DsFoilValue), 'glint'),
+          closeTo(0.4031, 1e-3));
+
+      // One frame, no elapsed time, only `animation-duration: 2.4s`. The port
+      // used to continue smoothly from the same phase at the new rate; the
+      // browser was measured jumping from idle-and-invisible to fully bright
+      // and almost off the left edge in the very next frame.
+      await t.pumpWidget(host(surface(hovered: true)));
+      final double glint = phaseOf(t, find.byType(DsFoilValue), 'glint');
+      expect(glint, closeTo(0.92375, 1e-5));
+      expect(DsFoilValue.glintOpacity.transform(glint), closeTo(1, 1e-9));
+      expect(DsFoilValue.glintPosition.transform(glint),
+          closeTo(-0.4986, 1e-3));
+
+      // The drift, on the same clock and the same 11s, does not move with it.
+      expect(phaseOf(t, find.byType(DsFoilValue), 'drift'),
+          closeTo(2217 / 11000, 1e-6));
     });
 
     testWidgets('reduced motion stills both loops', (WidgetTester t) async {

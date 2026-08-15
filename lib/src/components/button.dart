@@ -12,6 +12,40 @@
 /// border, colour, box-shadow and opacity all transition at `--duration-base`
 /// on `--ease-spring`, and `:active` shortens that to `--duration-tick`.
 ///
+/// **THE PRESS DOES NOT SPRING — MEASURED** (behaviour-audit §3.1–3.2, B1/B6).
+/// That docstring prose is drift, and it is the most expensive drift in the
+/// system because it describes the one animation that fires on every
+/// interaction. Tailwind v4 compiles `scale-95` to the **standalone `scale`
+/// property**, and `scale` is *not* in `btn-spring`'s `transition-property`
+/// list — `transform` is, and `transform` stays `none` for the entire press.
+/// Driven with a real pointer against the live reference and sampled every
+/// ~16.6ms: 9.5ms after `pointerdown` (the very next frame) the button is
+/// already fully at `0.95` with **no intermediate value**, and 10.5ms after
+/// `pointerup` it is fully back at `1.0` with **no overshoot**. Any hold —
+/// 10ms or 500ms — shows the full 0.95 for exactly as long as the button is
+/// held. So the scale here is driven straight off the pressed flag with zero
+/// interpolation, both directions.
+///
+/// What *does* run on `btn-spring`'s clock is measured too, and is kept:
+/// the colour legs (250ms `--ease-spring`, overshooting **past** the target
+/// colour, shortening to 80ms while held — B4/B5), the focus ring's spread
+/// (B12, below), and the disabled opacity (B11, below). The rule the whole
+/// component turns on: **colours spring and overshoot; geometry hard-cuts.**
+///
+/// `box-shadow` is in the transition list and still snaps on press, because
+/// `--shadow-btn-primary` (8 layers, `inset` at index 5) and
+/// `--shadow-btn-down` (6 layers, non-inset there) have mismatched layer counts
+/// *and* mismatched `inset` flags, which CSS refuses to interpolate — measured
+/// changing inside a single frame (B2), as does premium's
+/// `btn-value → glow-value` hover (B3, 1.2ms). Those hard cuts are correct and
+/// must stay; the focus ring is the opposite case and is why [withFocusRing]
+/// takes a progress. Decide per token pair, never by rule.
+///
+/// `DsPress` is deliberately **not** used here. §3.9 of the audit traces a live
+/// `.press` surface and it matches that widget to four decimal places, release
+/// overshoot included — because `press` animates `transform`, which *is* in its
+/// own transition list. One utility, two properties, opposite behaviour.
+///
 /// Two variants are not a flat fill. `default` wears `sheen-action` and
 /// `premium` wears `foil-value` — a gradient ramp plus two blended
 /// pseudo-layers each — so those two route their surface through
@@ -19,6 +53,7 @@
 /// the state table is shared.
 library;
 
+import 'package:flutter/foundation.dart' show clampDouble;
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
@@ -31,7 +66,6 @@ import '../foundation/shadows.dart';
 import '../foundation/spacing.dart';
 import '../foundation/theme.dart';
 import '../foundation/typography.dart';
-import '../motion/press.dart';
 import '../theme_scope.dart';
 import 'spinner.dart';
 
@@ -391,9 +425,38 @@ class DsButton extends StatefulWidget {
   ///
   /// [ring] arrives already at its modifier alpha — `--ring` @ 50% on a
   /// button, @ 35% on an input, `--destructive` @ 25% on a destructive button.
-  static DsShadowSpec withFocusRing(DsShadowSpec spec, Color ring) =>
+  ///
+  /// [progress] is how far the ring has *opened*, `0..1` — the one leg of this
+  /// component's `box-shadow` that genuinely interpolates. The tokens carry
+  /// four leading fully-transparent placeholder layers precisely so a ring can
+  /// be dropped into one of those slots with the layer count and the per-layer
+  /// `inset` flags unchanged, and when that holds the browser tweens the whole
+  /// list. Measured by Shift-Tabbing onto the primary button (behaviour-audit
+  /// §3.4, B12): the spread springs **0 → 3.29px at Δ134 → 3px at Δ241** —
+  /// `--ease-spring`'s +9.66% overshoot — with the ring's alpha tracking it in
+  /// exact proportion (`alpha = 0.5 × spread / 3` at every sampled frame,
+  /// because what interpolates is the whole layer from a transparent 0-spread
+  /// placeholder to the ring). Both are therefore scaled by the same number.
+  ///
+  /// It defaults to a fully-open ring, which is the hard cut every other caller
+  /// makes today. The reference's inputs and selection controls were **not**
+  /// measured (audit §5), so nothing here claims they snap — only that this
+  /// helper does not animate them for free.
+  static DsShadowSpec withFocusRing(
+    DsShadowSpec spec,
+    Color ring, {
+    double progress = 1,
+  }) =>
       DsShadowSpec(<DsShadowLayer>[
-        DsShadowLayer(0, 0, 0, _focusRingSpread, (DsThemeData _) => ring),
+        DsShadowLayer(
+          0,
+          0,
+          0,
+          _focusRingSpread * progress,
+          (DsThemeData _) => ring.withValues(
+            alpha: clampDouble(ring.a * progress, 0, 1),
+          ),
+        ),
         ...spec.layers,
       ]);
 
@@ -691,52 +754,66 @@ class _DsButtonState extends State<DsButton> {
     );
 
     final Color borderColor = _focused ? _focusBorder(theme) : skin.border;
-    final DsShadowSpec spec =
-        _focused ? DsButton.withFocusRing(skin.shadow, skin.ring) : skin.shadow;
 
-    Widget button = _SpringColors(
-      fill: skin.fill,
-      border: borderColor,
-      content: skin.content,
+    // B12 — the ring's spread and alpha, on `btn-spring`'s own clock. The
+    // border colour beside it is already carried by [_SpringColors] on the same
+    // duration and the same curve, which is what "springing in step" means.
+    Widget button = TweenAnimationBuilder<double>(
+      tween: Tween<double>(end: _focused ? 1 : 0),
       duration: transition,
-      builder: (BuildContext context, Color fill, Color border, Color ink) {
-        final DsTypeSpec? typeSpec =
-            DsButton.typeFor(widget.size, widget.emphasis);
-        // Null means the rung declares no `text-*` class — the four squares.
-        // CSS then leaves `font-size`, `line-height` and family inherited, and
-        // the only thing the button contributes is its own `color`. Merging the
-        // ink into the ambient style is exactly that; replacing the style would
-        // be inventing a size the reference never sets.
-        TextStyle style = typeSpec == null
-            ? DefaultTextStyle.of(context).style.copyWith(color: ink)
-            : DsText.styleOf(context, typeSpec, color: ink);
-        if (skin.semibold) style = _applySemibold(style);
-        if (skin.underline) {
-          // `underline-offset-4` has no Flutter equivalent — [TextStyle] can
-          // say that a run is underlined but not how far below the baseline.
-          // The rule renders at the font's own offset instead.
-          style = style.copyWith(
-            decoration: TextDecoration.underline,
-            decorationColor: ink,
-          );
-        }
-        return _surface(
-          spec: spec,
-          radius: radius,
-          border: Border.all(color: border, width: DsWidths.hairline),
-          fill: fill,
-          child: Padding(
-            // Just `px-*`: the border is inside the box and the surface
-            // already insets this child by its width, the way `box-sizing:
-            // border-box` does.
-            padding: EdgeInsets.symmetric(
-              horizontal: DsButton.paddingXFor(widget.size),
-            ),
-            child: Center(
-              widthFactor: square ? null : 1,
-              child: DefaultTextStyle(style: style, child: _content()),
-            ),
-          ),
+      curve: DsCurves.spring,
+      builder: (BuildContext context, double ringT, Widget? _) {
+        // Below zero the spring has undershot on the way out; the layer's alpha
+        // is clamped to nothing there, so the browser paints no ring either.
+        final DsShadowSpec spec = ringT <= 0
+            ? skin.shadow
+            : DsButton.withFocusRing(skin.shadow, skin.ring, progress: ringT);
+        return _SpringColors(
+          fill: skin.fill,
+          border: borderColor,
+          content: skin.content,
+          duration: transition,
+          builder: (BuildContext context, Color fill, Color border, Color ink) {
+            final DsTypeSpec? typeSpec =
+                DsButton.typeFor(widget.size, widget.emphasis);
+            // Null means the rung declares no `text-*` class — the four
+            // squares. CSS then leaves `font-size`, `line-height` and family
+            // inherited, and the only thing the button contributes is its own
+            // `color`. Merging the ink into the ambient style is exactly that;
+            // replacing the style would be inventing a size the reference
+            // never sets.
+            TextStyle style = typeSpec == null
+                ? DefaultTextStyle.of(context).style.copyWith(color: ink)
+                : DsText.styleOf(context, typeSpec, color: ink);
+            if (skin.semibold) style = _applySemibold(style);
+            if (skin.underline) {
+              // `underline-offset-4` has no Flutter equivalent — [TextStyle]
+              // can say that a run is underlined but not how far below the
+              // baseline. The rule renders at the font's own offset instead.
+              style = style.copyWith(
+                decoration: TextDecoration.underline,
+                decorationColor: ink,
+              );
+            }
+            return _surface(
+              spec: spec,
+              radius: radius,
+              border: Border.all(color: border, width: DsWidths.hairline),
+              fill: fill,
+              child: Padding(
+                // Just `px-*`: the border is inside the box and the surface
+                // already insets this child by its width, the way `box-sizing:
+                // border-box` does.
+                padding: EdgeInsets.symmetric(
+                  horizontal: DsButton.paddingXFor(widget.size),
+                ),
+                child: Center(
+                  widthFactor: square ? null : 1,
+                  child: DefaultTextStyle(style: style, child: _content()),
+                ),
+              ),
+            );
+          },
         );
       },
     );
@@ -747,14 +824,22 @@ class _DsButtonState extends State<DsButton> {
       child: button,
     );
 
-    button = DsPress(
-      scale: DsTransforms.buttonScale,
-      // `btn-spring`'s `:active { transition-duration: --duration-tick }`,
-      // where a bare `press` surface would use 40ms.
-      downDuration: DsDurations.tick,
-      upDuration: DsDurations.base,
-      onTap: widget.onPressed,
+    // B1 — `active:not-aria-[haspopup]:scale-95`, and it does **not** animate.
+    // No controller, no curve, no duration: the flag is the frame. Two values
+    // ever reach this widget, 1 and 0.95, which is what the rAF sampler saw on
+    // the reference through every hold length it was driven at (B6).
+    //
+    // `transform-origin: 50% 50%` is [Transform.scale]'s own default, and the
+    // scale is applied *outside* the shadow-painting surface so the whole
+    // rendered box shrinks — elevation included — exactly as the CSS property
+    // does.
+    button = Transform.scale(
+      scale: _pressed ? DsTransforms.buttonScale : 1,
       child: Listener(
+        // The one thing `DsPress` was contributing besides the animation: a hit
+        // area that covers the whole control rather than only what its child
+        // happens to paint. A `ghost` or `link` button has no fill to hit.
+        behavior: HitTestBehavior.opaque,
         onPointerDown: (_) => _setPressed(true),
         onPointerUp: (_) => _setPressed(false),
         onPointerCancel: (_) => _setPressed(false),
@@ -767,6 +852,14 @@ class _DsButtonState extends State<DsButton> {
       ),
     );
 
+    if (widget.onPressed != null) {
+      button = GestureDetector(
+        onTap: widget.onPressed,
+        behavior: HitTestBehavior.opaque,
+        child: button,
+      );
+    }
+
     // `:focus-visible`, not `:focus`. Flutter does not move focus on a bare
     // pointer tap — only keyboard traversal or an explicit request focuses
     // this node — so `hasFocus` here IS the keyboard-only predicate CSS means.
@@ -778,8 +871,24 @@ class _DsButtonState extends State<DsButton> {
       child: button,
     );
 
-    button = Opacity(
-      opacity: _enabled ? 1 : _disabledOpacity,
+    // B11 — `disabled:opacity-45`, and `opacity` IS in `btn-spring`'s
+    // transition list. Measured by adding `disabled` live: 1 → **0.3969** at
+    // Δ~180 → 0.45 at Δ~280, an undershoot of (0.45 − 0.3969) / (1 − 0.45) =
+    // +9.65% — `--ease-spring` on opacity, exactly as the utility declares.
+    //
+    // `pointer-events: none` is not on that clock: the reference kills input in
+    // the same frame the attribute lands, so [IgnorePointer] stays instant.
+    button = TweenAnimationBuilder<double>(
+      tween: Tween<double>(end: _enabled ? 1 : _disabledOpacity),
+      duration: transition,
+      curve: DsCurves.spring,
+      builder: (BuildContext context, double value, Widget? child) => Opacity(
+        // The spring overshoots past 1 on the way back to enabled. CSS clamps
+        // `opacity` to 0..1 for its used value, so a browser cannot show that
+        // either — this is the reference's own ceiling, not Flutter's.
+        opacity: clampDouble(value, 0, 1),
+        child: child,
+      ),
       child: IgnorePointer(ignoring: !_enabled, child: button),
     );
 

@@ -64,6 +64,15 @@
 /// whole widget, where it still stops a perpetually drifting button from
 /// repainting the page.
 ///
+/// **Both loops run off ONE elapsed clock, and the glint's hover retiming
+/// therefore JUMPS — measured** (see [DsFoilValue.phaseAt]). CSS keeps an
+/// animation's elapsed `currentTime` across a change to `animation-duration`
+/// and re-divides it; it does not preserve the phase. `foil-value:hover::before`
+/// changes nothing but the duration — 5.5s → 2.4s — so the glint teleports to
+/// wherever the same elapsed time lands on the shorter timeline. The port used
+/// to resume the controller from its current phase, which continues smoothly
+/// and is a different animation.
+///
 /// **Reduced motion.** Both loops re-read their period through
 /// [dsAnimationDuration] on each build, so under `MediaQuery.disableAnimations`
 /// they get [Duration.zero], stop, and paint frame 0 — the glint invisible at
@@ -82,6 +91,7 @@ import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/scheduler.dart' show Ticker;
 import 'package:flutter/widgets.dart';
 
 import '../foundation/colors.dart';
@@ -358,6 +368,38 @@ class DsFoilValue extends StatefulWidget {
     ],
   );
 
+  /// Where an `infinite` animation stands after [elapsed], at the duration it
+  /// is *currently* declared at — the B10b ruling, as arithmetic.
+  ///
+  /// A CSS animation has one clock and it counts **elapsed time**. Changing
+  /// `animation-duration` on a running animation neither restarts it nor keeps
+  /// it where it visually was: the browser divides the same elapsed time by the
+  /// new duration and paints whatever frame that lands on.
+  ///
+  /// **Recorded ruling: the retiming jump is the reference's own.** The port
+  /// used to keep the phase — `c.duration = period; c.repeat();` resumes an
+  /// [AnimationController] from its normalised value — on the argument that a
+  /// smooth glint is what light on metal looks like. A browser does something
+  /// else, and it was traced doing it (behaviour-audit §3.7, B10b):
+  /// `pointerover` at t=1214.8 switches `animation-duration` 5.5s → 2.4s
+  /// without restarting the animation, so the same elapsed time is divided by
+  /// the new duration, and in the **very next frame** the glint went from
+  /// `opacity 0.0000, background-position 135%` — idling, invisible, parked at
+  /// the right — to `opacity 1.0000, −49.86%`, fully bright and almost off the
+  /// left edge. It finished that sweep in ~210ms and then idled 1268ms, which
+  /// is 54% of 2400ms to the millisecond. That pop is real reference behaviour,
+  /// not an artifact of the probe.
+  ///
+  /// The drift is on the same clock and reads the same way; it simply never
+  /// changes duration (`11s` hovered or not, measured), so it never jumps.
+  @visibleForTesting
+  static double phaseAt(Duration elapsed, Duration period) {
+    final int t = elapsed.inMicroseconds;
+    final int d = period.inMicroseconds;
+    if (d <= 0 || t <= 0) return 0;
+    return (t % d) / d;
+  }
+
   @override
   State<DsFoilValue> createState() => _DsFoilValueState();
 }
@@ -372,78 +414,71 @@ TweenSequenceItem<double> _glintStep(double from, double to, double weight) =>
     );
 
 class _DsFoilValueState extends State<DsFoilValue>
-    with TickerProviderStateMixin {
-  /// `animation: value-foil-drift 11s linear infinite`. The durations named
-  /// here are placeholders for construction only — [build] re-reads both
-  /// through [dsAnimationDuration] on every pass, the way `DsPress` does.
-  late final AnimationController _drift = AnimationController(
-    vsync: this,
-    duration: DsDurations.foilDrift,
-  );
+    with SingleTickerProviderStateMixin {
+  /// **One clock for both pseudo-elements**, and the reason it is a bare
+  /// [Ticker] rather than two [AnimationController]s: what a browser preserves
+  /// across a change to `animation-duration` is elapsed time, and a [Ticker]
+  /// hands that over directly. Neither animation is ever restarted — both are
+  /// `infinite` and both have been running since the element was rendered — so
+  /// there is exactly one number to keep, and this is it.
+  ///
+  /// Built in [initState] rather than lazily: under reduced motion the clock
+  /// never starts, and a `late final` would then be created for the first time
+  /// inside [dispose], where the [TickerMode] lookup it needs is no longer
+  /// legal.
+  late final Ticker _clock;
 
-  /// `animation: value-glint 5.5s var(--ease-in-out) infinite`, hover 2.4s.
-  /// The easing lives in [DsFoilValue.glintPosition] and
-  /// [DsFoilValue.glintOpacity] — per segment, as CSS applies it — so this
-  /// controller runs raw.
-  late final AnimationController _glint = AnimationController(
-    vsync: this,
-    duration: DsDurations.glint,
-  );
+  /// Both animations' `currentTime`, and the repaint trigger for the shared
+  /// painter (`::after` blends over `::before`'s result, so they paint
+  /// together).
+  final ValueNotifier<Duration> _elapsed =
+      ValueNotifier<Duration>(Duration.zero);
 
-  /// One repaint trigger for both loops, built once: the two pseudo-elements
-  /// share a painter because `::after` blends over `::before`'s result.
-  late final Listenable _loops = Listenable.merge(<Listenable>[_drift, _glint]);
+  /// Whether the clock is running. It stops for exactly one reason — reduced
+  /// motion — because both of these animations are `infinite` and have no
+  /// resting state.
+  bool _running = false;
 
-  /// The period each controller is currently running at, or null while it is
-  /// stopped — which is reduced motion, and only reduced motion: both of these
-  /// animations are `infinite` and have no resting state.
-  Duration? _driftPeriod;
-  Duration? _glintPeriod;
+  @override
+  void initState() {
+    super.initState();
+    _clock = createTicker(_onTick);
+  }
 
   @override
   void dispose() {
-    _drift.dispose();
-    _glint.dispose();
+    _clock.dispose();
+    _elapsed.dispose();
     super.dispose();
   }
 
-  /// Starts, retimes or stills one loop, and reports back the period it is on.
-  ///
-  /// **Recorded decision.** Retiming keeps the phase. `animation-duration:
-  /// 2.4s` on hover leaves a browser's elapsed time untouched and re-divides
-  /// it, which can jump the glint to a different point of its cycle — at 3s
-  /// elapsed, 54% of a 5.5s pass becomes 125% of a 2.4s one. Restarting the
-  /// repeating simulation from the controller's current value continues from
-  /// the same fraction at the new rate instead. Of the two, only one of them
-  /// looks like light on metal.
-  Duration? _loop(AnimationController c, Duration period, Duration? playing) {
-    if (period == Duration.zero) {
-      if (playing != null) c.stop();
-      return null;
+  void _onTick(Duration elapsed) => _elapsed.value = elapsed;
+
+  /// Starts or stills the shared clock. Where the two animations stand once it
+  /// is running is [DsFoilValue.phaseAt], which is where the B10b ruling is
+  /// recorded.
+  void _run(bool running) {
+    if (running == _running) return;
+    _running = running;
+    if (running) {
+      _clock.start();
+      return;
     }
-    if (period == playing) return playing;
-    c.duration = period;
-    c.repeat();
-    return period;
+    _clock.stop();
+    _elapsed.value = Duration.zero;
   }
 
   @override
   Widget build(BuildContext context) {
     final DsThemeData theme = DsTheme.of(context);
 
-    _driftPeriod = _loop(
-      _drift,
-      dsAnimationDuration(context, DsDurations.foilDrift),
-      _driftPeriod,
+    final Duration driftPeriod =
+        dsAnimationDuration(context, DsDurations.foilDrift);
+    final Duration glintPeriod = dsAnimationDuration(
+      context,
+      widget.hovered ? DsDurations.glintHover : DsDurations.glint,
     );
-    _glintPeriod = _loop(
-      _glint,
-      dsAnimationDuration(
-        context,
-        widget.hovered ? DsDurations.glintHover : DsDurations.glint,
-      ),
-      _glintPeriod,
-    );
+    _run(driftPeriod > Duration.zero || glintPeriod > Duration.zero);
 
     return RepaintBoundary(
       // A paint-order device, not a layout one. [StackFit.passthrough] hands
@@ -487,11 +522,11 @@ class _DsFoilValueState extends State<DsFoilValue>
               child: ClipRRect(
                 borderRadius: widget.radius,
                 child: AnimatedBuilder(
-                  animation: _loops,
+                  animation: _elapsed,
                   builder: (BuildContext context, Widget? _) => CustomPaint(
                     painter: _PseudoPainter(
-                      drift: _driftPeriod == null ? 0 : _drift.value,
-                      glint: _glintPeriod == null ? 0 : _glint.value,
+                      drift: DsFoilValue.phaseAt(_elapsed.value, driftPeriod),
+                      glint: DsFoilValue.phaseAt(_elapsed.value, glintPeriod),
                       opacity: widget.hovered
                           ? DsFoilValue.foilHoverOpacity
                           : DsFoilValue.foilOpacity,

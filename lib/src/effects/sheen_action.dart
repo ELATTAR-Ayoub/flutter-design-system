@@ -59,12 +59,20 @@
 /// whole widget, where it still stops an animating button from repainting the
 /// page.
 ///
+/// **The beat is driven by ELAPSED TIME, not by phase — measured** (see
+/// [_DsSheenActionState._drive]). `:hover::before` and `:active::before` name
+/// the same `animation-name`, so a press does not create a new animation; it
+/// changes the duration of the one that is already running, and CSS keeps that
+/// animation's elapsed `currentTime` and re-divides it by the new duration.
+/// The port used to preserve *phase* instead, which is a different animation
+/// and produces a thump the reference usually does not play at all.
+///
 /// **Reduced motion.** Every duration is re-read through [dsAnimationDuration]
 /// on each build, so under `MediaQuery.disableAnimations` the beat's period is
-/// [Duration.zero] and it freezes at frame 0 — `opacity: 0; scale(0.55)`, which
-/// is invisible. That is the port of the reference's blanket
-/// `prefers-reduced-motion` rule (globals.css L2533–2541), not a divergence
-/// from it: that rule collapses every animation to 0.01ms at
+/// [Duration.zero], the clock stops and it freezes at frame 0 — `opacity: 0;
+/// scale(0.55)`, which is invisible. That is the port of the reference's
+/// blanket `prefers-reduced-motion` rule (globals.css L2533–2541), not a
+/// divergence from it: that rule collapses every animation to 0.01ms at
 /// `animation-iteration-count: 1`, and with no `animation-fill-mode` the
 /// element falls back to its base style — which for `::before` is exactly
 /// frame 0.
@@ -74,6 +82,7 @@ import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/scheduler.dart' show Ticker;
 import 'package:flutter/widgets.dart';
 
 import '../foundation/colors.dart';
@@ -279,6 +288,41 @@ class DsSheenAction extends StatefulWidget {
     ],
   );
 
+  /// Where an animation stands after [elapsed], given the duration it is
+  /// *currently* declared at — the whole of the B7/B8 ruling, as arithmetic.
+  ///
+  /// A CSS animation has one clock, and it counts **elapsed time**. Changing
+  /// `animation-duration` on a running animation does not restart it and does
+  /// not preserve where it visually was: the browser divides the same elapsed
+  /// time by the new duration and paints whatever frame that lands on. A
+  /// Flutter [AnimationController] does the opposite — `repeat()` resumes from
+  /// its normalised value, i.e. it preserves phase — which is why this is a
+  /// function of a [Duration] rather than a controller call.
+  ///
+  /// [repeats] is `animation-iteration-count`. `:hover` declares `infinite`, so
+  /// the clock wraps; `:active` declares `1`, so once the elapsed time is past
+  /// the end the animation is **finished**, and with no `animation-fill-mode`
+  /// the element falls back to its base style — which for this `::before` is
+  /// frame 0 exactly (`scale(0.55); opacity: 0`). That is why a press usually
+  /// produces no thump at all: press 2.5s into a hover and 2500/620 is already
+  /// past the last iteration, so nothing plays. Verified on the reference to
+  /// four significant figures at the other end of the same rule — pressed
+  /// 137.4ms into a hover, 137.4/620 = 22.2%, predicted `scale 1.32` from the
+  /// 24% keyframe, **measured 1.3197** in the frame after `pointerdown`,
+  /// jumping there from `scale 0.958`.
+  @visibleForTesting
+  static double phaseAt(
+    Duration elapsed,
+    Duration period, {
+    required bool repeats,
+  }) {
+    final int t = elapsed.inMicroseconds;
+    final int d = period.inMicroseconds;
+    if (d <= 0 || t <= 0) return 0;
+    if (repeats) return (t % d) / d;
+    return t >= d ? 0 : t / d;
+  }
+
   @override
   State<DsSheenAction> createState() => _DsSheenActionState();
 }
@@ -295,53 +339,110 @@ TweenSequenceItem<double> _beatStep(double from, double to, double weight) =>
 
 class _DsSheenActionState extends State<DsSheenAction>
     with SingleTickerProviderStateMixin {
-  /// The beat. Its duration is a placeholder for construction only — [build]
-  /// re-reads it through [dsAnimationDuration] on every pass, the way
-  /// `DsPress` does.
-  late final AnimationController _beat = AnimationController(
-    vsync: this,
-    duration: DsDurations.beatHover,
-  );
+  /// The animation's own clock, and the reason this is a bare [Ticker] rather
+  /// than an [AnimationController]: what a browser preserves across a duration
+  /// change is elapsed time, and a [Ticker] hands that over directly.
+  ///
+  /// It runs only while an animation exists — hover-out deletes the animation
+  /// outright (`animation-name: none` within 1.4ms of `pointerout`, measured),
+  /// and a stopped ticker restarts its elapsed count at zero, which is exactly
+  /// the fresh animation the next hover creates.
+  ///
+  /// Built in [initState] rather than lazily: a button that is never hovered
+  /// never starts the clock, and a `late final` would then be created for the
+  /// first time inside [dispose], where the [TickerMode] lookup it needs is no
+  /// longer legal.
+  late final Ticker _clock;
 
-  /// What the controller is currently running, and at what period. Null while
-  /// nothing is: no pointer on the button, or reduced motion.
+  /// `::before`'s progress through `action-beat`, `0..1`, and what the painter
+  /// is fed. Zero is also the resting base style, so a finished, absent or
+  /// stilled animation needs no separate representation.
+  final ValueNotifier<double> _beat = ValueNotifier<double>(0);
+
+  /// Which rule is driving the animation, and at what period. Null while no
+  /// animation exists: no pointer on the button, or reduced motion.
   _Beat? _playing;
-  Duration? _period;
+  Duration _period = Duration.zero;
+
+  /// The animation's `currentTime` — how long it has been alive, across every
+  /// duration change it has been through.
+  Duration _elapsed = Duration.zero;
+
+  @override
+  void initState() {
+    super.initState();
+    _clock = createTicker(_onTick);
+  }
 
   @override
   void dispose() {
+    _clock.dispose();
     _beat.dispose();
     super.dispose();
   }
 
-  /// Starts, retimes or stops the beat.
+  void _onTick(Duration elapsed) {
+    _elapsed = elapsed;
+    _beat.value = DsSheenAction.phaseAt(
+      elapsed,
+      _period,
+      repeats: _playing == _Beat.hover,
+    );
+  }
+
+  /// Creates, retimes or deletes the beat — the three things the CSS does.
   ///
-  /// **Recorded decision.** A press restarts the animation from frame 0. A
-  /// browser would not: `:hover::before` and `:active::before` name the same
-  /// `animation-name`, so changing `animation-duration` retimes the running
-  /// animation and keeps its elapsed time, which after a second of hovering
-  /// lands the press somewhere past the end of a 620ms cycle. The utility's own
-  /// comment says what the press is for — *"A press is one hard thump, not a
-  /// rhythm"* — and one hard thump is what this plays.
+  /// **Recorded ruling: this reproduces the browser, thump and all.** The port
+  /// used to play a fresh 620ms beat on every press, on the argument that the
+  /// utility's own comment says *"A press is one hard thump, not a rhythm"*.
+  /// The comment is what the author intended; it is not what ships. Driven and
+  /// rAF-sampled on the live reference (behaviour-audit §3.6, B7/B8):
+  ///
+  /// * **hover-in** — `action-beat 2.6s ease-out infinite` appears 1.3ms after
+  ///   `pointerover`, **starting at frame 0** (`scale 0.55`, `opacity 0`),
+  ///   because hover-out deleted the previous one. A fresh clock, every time.
+  /// * **press** — the rule swaps to `action-beat 620ms ease-out 1`. Same
+  ///   `animation-name`, so the animation is *not* recreated: its elapsed time
+  ///   is preserved and re-divided by the new duration. Press 137.4ms into a
+  ///   hover and the beat jumps to 22.2% of a 620ms timeline; press at the more
+  ///   usual 2.5s and the re-divided clock is already past the single
+  ///   iteration, so **nothing plays** — measured holding `opacity 0.000,
+  ///   scale 0.550` for the entire 278ms hold.
+  /// * **release** — back to `2.6s infinite`, still the same animation, elapsed
+  ///   still preserved.
+  /// * **hover-out** — `animation-name: none`; `::before` snaps to its base
+  ///   style mid-thump, and the elapsed clock is discarded with it.
+  ///
+  /// So the press thump is real but rare, and that is the reference's own feel.
+  /// The port's old version was the more energetic of the two; 1:1 is the bar.
   void _drive(_Beat? rule, Duration period) {
     if (rule == null || period == Duration.zero) {
       if (_playing != null) {
-        _beat.stop();
+        _clock.stop();
         _playing = null;
-        _period = null;
+        _period = Duration.zero;
+        _elapsed = Duration.zero;
+        _beat.value = 0;
       }
       return;
     }
     if (rule == _playing && period == _period) return;
+    // A rule arriving where there was none is a NEW animation: frame 0. A rule
+    // replacing another only changes `animation-duration` on the running one.
+    final bool created = _playing == null;
     _playing = rule;
     _period = period;
-    _beat.duration = period;
-    switch (rule) {
-      case _Beat.hover:
-        _beat.repeat();
-      case _Beat.press:
-        _beat.forward(from: 0);
+    if (created) {
+      _elapsed = Duration.zero;
+      _beat.value = 0;
+      _clock.start();
+      return;
     }
+    _beat.value = DsSheenAction.phaseAt(
+      _elapsed,
+      period,
+      repeats: rule == _Beat.hover,
+    );
   }
 
   @override
@@ -407,10 +508,7 @@ class _DsSheenActionState extends State<DsSheenAction>
                 child: AnimatedBuilder(
                   animation: _beat,
                   builder: (BuildContext context, Widget? _) => CustomPaint(
-                    painter: _PseudoPainter(
-                      beat: _playing == null ? 0 : _beat.value,
-                      blend: blend,
-                    ),
+                    painter: _PseudoPainter(beat: _beat.value, blend: blend),
                   ),
                 ),
               ),

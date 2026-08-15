@@ -278,6 +278,18 @@ void main() {
       expect(surfaceOf(t).fill, DsThemeData.dark.secondary);
     });
 
+    /// The scale the button is currently drawn at — the first [Transform] under
+    /// it, which is the one `scale-95` maps to.
+    double scaleOf(WidgetTester t) => t
+        .widget<Transform>(find
+            .descendant(
+              of: find.byType(DsButton),
+              matching: find.byType(Transform),
+            )
+            .first)
+        .transform
+        .storage[0];
+
     testWidgets('squishes to 0.95 — the button scale, not press\'s 0.94',
         (WidgetTester t) async {
       await t.pumpWidget(host(DsButton(
@@ -286,21 +298,226 @@ void main() {
         child: const DsIcon(DsIconGlyph.menu),
       )));
 
-      final Transform transform = t.widget<Transform>(find
-          .descendant(of: find.byType(DsButton), matching: find.byType(Transform))
-          .first);
-      expect(transform.transform.storage[0], 1.0);
+      expect(scaleOf(t), 1.0);
 
       await t.startGesture(t.getCenter(find.byType(DsButton)));
+      // RETUNED (behaviour-audit B1). This used to pump `--duration-tick`
+      // before asserting, on the theory that `btn-spring`'s `:active`
+      // duration eased the squish over 80ms. It does not: Tailwind v4 compiles
+      // `scale-95` to the standalone `scale` property, which is **not** in
+      // `btn-spring`'s transition-property list. One frame is all it takes on
+      // the reference, so one frame is all this pumps — stricter, and true.
       await t.pump();
-      // `btn-spring`: :active transition-duration is --duration-tick, 80ms.
-      await t.pump(DsDurations.tick);
+      expect(scaleOf(t), DsTransforms.buttonScale);
+    });
 
-      final Transform pressed = t.widget<Transform>(find
-          .descendant(of: find.byType(DsButton), matching: find.byType(Transform))
-          .first);
-      expect(pressed.transform.storage[0],
-          closeTo(DsTransforms.buttonScale, 1e-6));
+    // ── Measured behaviour — behaviour-audit §3 ────────────────────────────
+    // Every number below is a trace off the live reference at 1440×900, driven
+    // with real pointer/keyboard input and rAF-sampled at ~16.6ms. Each of
+    // these fails against the port as it stood before this wave.
+
+    testWidgets('B1 — the press scale snaps both ways, with no frame between',
+        (WidgetTester t) async {
+      await t.pumpWidget(host(DsButton(
+        variant: DsButtonVariant.outline,
+        onPressed: () {},
+        child: const DsIcon(DsIconGlyph.menu),
+      )));
+      expect(scaleOf(t), 1.0, reason: 'at rest');
+
+      final List<double> frames = <double>[];
+      final TestGesture press =
+          await t.startGesture(t.getCenter(find.byType(DsButton)));
+
+      // Measured: 9.5ms after `pointerdown` — the very next frame — the button
+      // is already fully at 0.95, with no intermediate value sampled.
+      await t.pump();
+      expect(scaleOf(t), DsTransforms.buttonScale);
+      for (int i = 0; i < 24; i++) {
+        await t.pump(const Duration(milliseconds: 16));
+        frames.add(scaleOf(t));
+      }
+
+      // …and 10.5ms after `pointerup` it is fully back, with no overshoot.
+      await press.up();
+      await t.pump();
+      expect(scaleOf(t), 1.0);
+      for (int i = 0; i < 24; i++) {
+        await t.pump(const Duration(milliseconds: 16));
+        frames.add(scaleOf(t));
+      }
+
+      // The whole press, sampled: two values and nothing else. No 80ms
+      // down-stroke, no 250ms spring back, and none of the ≈1.005 release
+      // overshoot the port used to carry through `DsPress`.
+      expect(frames.toSet(), <double>{DsTransforms.buttonScale, 1.0});
+    });
+
+    testWidgets('B6 — a 10, 20 or 30ms tap still shows the full 0.95',
+        (WidgetTester t) async {
+      await t.pumpWidget(host(DsButton(
+        variant: DsButtonVariant.outline,
+        onPressed: () {},
+        child: const DsIcon(DsIconGlyph.menu),
+      )));
+
+      // The port used to reach 0.9756 / 0.9592 / 0.9497 for these three holds,
+      // then play a shortened spring backwards. Instant means depth cannot
+      // depend on hold length.
+      for (final int ms in <int>[10, 20, 30]) {
+        final TestGesture tap =
+            await t.startGesture(t.getCenter(find.byType(DsButton)));
+        await t.pump();
+        expect(scaleOf(t), DsTransforms.buttonScale, reason: '${ms}ms hold');
+        await t.pump(Duration(milliseconds: ms));
+        expect(scaleOf(t), DsTransforms.buttonScale, reason: '${ms}ms hold');
+
+        await tap.up();
+        await t.pump();
+        expect(scaleOf(t), 1.0, reason: 'one frame after a ${ms}ms hold');
+      }
+    });
+
+    testWidgets('B2 — the pressed shadow hard-cuts: the token pair cannot '
+        'interpolate', (WidgetTester t) async {
+      await t.pumpWidget(host(DsButton(
+        onPressed: () {},
+        child: const DsIcon(DsIconGlyph.menu),
+      )));
+      DsShadowSpec spec() =>
+          t.widget<DsSheenAction>(find.byType(DsSheenAction)).spec;
+
+      // `--shadow-btn-primary` is 4 layers (2 inset, 2 not) against
+      // `--shadow-btn-down`'s 2 (1 inset, 1 not). Mismatched layer counts AND
+      // mismatched `inset` flags: CSS refuses to interpolate, and the browser
+      // was measured swapping the value inside a single frame. A later
+      // well-meaning tween here would be motion the reference never shows.
+      final List<DsShadowSpec> seen = <DsShadowSpec>[spec()];
+      final TestGesture press =
+          await t.startGesture(t.getCenter(find.byType(DsButton)));
+      for (int i = 0; i < 8; i++) {
+        await t.pump(const Duration(milliseconds: 16));
+        seen.add(spec());
+      }
+      await press.up();
+      for (int i = 0; i < 8; i++) {
+        await t.pump(const Duration(milliseconds: 16));
+        seen.add(spec());
+      }
+
+      expect(seen.first, same(DsShadows.btnPrimary));
+      expect(seen[1], same(DsShadows.btnDown), reason: 'the very next frame');
+      expect(seen.last, same(DsShadows.btnPrimary));
+      for (final DsShadowSpec s in seen) {
+        expect(
+          identical(s, DsShadows.btnPrimary) || identical(s, DsShadows.btnDown),
+          isTrue,
+          reason: 'no third, interpolated value may ever appear',
+        );
+      }
+    });
+
+    testWidgets('B3 — premium\'s hover glow hard-cuts too',
+        (WidgetTester t) async {
+      await t.pumpWidget(host(DsButton(
+        variant: DsButtonVariant.premium,
+        onPressed: () {},
+        child: const DsIcon(DsIconGlyph.menu),
+      )));
+      DsShadowSpec spec() =>
+          t.widget<DsFoilValue>(find.byType(DsFoilValue)).spec;
+
+      expect(spec(), same(DsShadows.btnValue));
+      // Measured at **1.2ms** after `pointerover`: `--shadow-btn-value` (8
+      // computed layers, insets) → `--shadow-glow-value` (6, none). Snap.
+      await hoverOver(t, find.byType(DsButton));
+      expect(spec(), same(DsShadows.glowValue));
+    });
+
+    testWidgets('B12 — the focus ring springs its spread 0 → 3.29 → 3',
+        (WidgetTester t) async {
+      final FocusNode node = FocusNode();
+      addTearDown(node.dispose);
+      await t.pumpWidget(host(DsButton(
+        variant: DsButtonVariant.outline,
+        focusNode: node,
+        onPressed: () {},
+        child: const DsIcon(DsIconGlyph.menu),
+      )));
+
+      // The ring lands in one of the token's leading transparent placeholder
+      // slots, so the layer count and the per-layer `inset` flags never change
+      // and `box-shadow` interpolates normally — the opposite case to B2/B3.
+      expect(surfaceOf(t).spec, same(DsShadows.btn), reason: 'no ring at rest');
+
+      node.requestFocus();
+      await t.pump();
+      double spread() => surfaceOf(t).spec.layers.first.spread;
+      double alpha() =>
+          surfaceOf(t).spec.layers.first.color(DsThemeData.dark).a;
+
+      double peak = 0;
+      double peakAlpha = 0;
+      Duration peakAt = Duration.zero;
+      double? firstFrame;
+      for (int f = 1; f <= 20; f++) {
+        await t.pump(const Duration(milliseconds: 16));
+        firstFrame ??= spread();
+        if (spread() > peak) {
+          peak = spread();
+          peakAlpha = alpha();
+          peakAt = Duration(milliseconds: 16 * f);
+        }
+      }
+
+      // It does not simply appear. Before this wave frame 1 was already 3.0.
+      expect(firstFrame, lessThan(3));
+      // Measured: 3.290px at Δ134 — `--ease-spring`'s +9.66% overshoot, at 54%
+      // of the 250ms duration.
+      expect(peak, closeTo(3.29, 0.02));
+      expect(peakAt.inMilliseconds, closeTo(134, 40));
+      // …and the ring's alpha tracks the spread in exact proportion, because
+      // what interpolates is the whole layer from a transparent 0-spread
+      // placeholder: measured 0.548 at the same frame the spread peaks.
+      expect(peakAlpha, closeTo(0.5 * peak / 3, 1e-6));
+      expect(peakAlpha, closeTo(0.548, 0.005));
+
+      await t.pump(const Duration(milliseconds: 250));
+      expect(spread(), closeTo(3, 1e-9));
+      expect(alpha(), closeTo(0.5, 1e-9));
+    });
+
+    testWidgets('B11 — the disabled opacity springs, undershooting to 0.397',
+        (WidgetTester t) async {
+      Widget button({required bool enabled}) => host(DsButton(
+            variant: DsButtonVariant.outline,
+            onPressed: enabled ? () {} : null,
+            child: const DsIcon(DsIconGlyph.menu),
+          ));
+      double opacity() => t
+          .widget<Opacity>(find
+              .descendant(
+                of: find.byType(DsButton),
+                matching: find.byType(Opacity),
+              )
+              .first)
+          .opacity;
+
+      await t.pumpWidget(button(enabled: true));
+      expect(opacity(), 1.0);
+
+      await t.pumpWidget(button(enabled: false));
+      double lowest = 1;
+      for (int i = 0; i < 20; i++) {
+        await t.pump(const Duration(milliseconds: 16));
+        if (opacity() < lowest) lowest = opacity();
+      }
+      // `opacity` IS in btn-spring's transition list, so it springs like the
+      // colours: measured 1 → 0.3969 at Δ~180 → 0.45 at Δ~280, an undershoot of
+      // (0.45 − 0.3969) / (1 − 0.45) = +9.65%.
+      expect(lowest, closeTo(0.3969, 0.005));
+      await t.pump(const Duration(milliseconds: 250));
+      expect(opacity(), closeTo(0.45, 1e-9));
     });
 
     testWidgets('fires onPressed', (WidgetTester t) async {
@@ -879,8 +1096,12 @@ void main() {
     testWidgets('has no press feedback at all — drift 11',
         (WidgetTester t) async {
       await t.pumpWidget(toggle());
-      // `DsButton` reaches for `DsPress`; a Toggle's class list has no
-      // `:active` rule and no `press` utility, so nothing may scale it.
+      // A Toggle's class list has no `:active` rule and no `press` utility, so
+      // nothing may scale it — measured (audit G2): `scale` and `transform`
+      // both read `none` in every state, `:active` included. `DsButton` does
+      // not reach for `DsPress` either any more (B1) — it snaps its own scale —
+      // but this assertion is about the utility being absent, which is what a
+      // regression here would reintroduce.
       expect(
         find.descendant(
           of: find.byType(DsToggle),
