@@ -1,11 +1,15 @@
 import 'dart:async';
+import 'dart:typed_data';
 // `Tristate` is a `dart:ui` type that `package:flutter/semantics.dart` does not
 // re-export; `SemanticsNode.flagsCollection` hands one back for every
 // three-state flag.
 import 'dart:ui' show Tristate;
+import 'dart:ui' as ui show Image, ImageByteFormat;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/semantics.dart';
+// `rendering.dart` re-exports `semantics.dart`, and brings `RenderRepaintBoundary`
+// for the raster reads.
+import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -54,7 +58,134 @@ DsShadowLayer? ringOf(DsMachineSurface surface) {
   return first.spread == 3 && first.blur == 0 ? first : null;
 }
 
+/// `src-over`: [top] composited onto opaque [under].
+Color _over(Color top, Color under) {
+  final double a = top.a;
+  return Color.from(
+    alpha: 1,
+    red: top.r * a + under.r * (1 - a),
+    green: top.g * a + under.g * (1 - a),
+    blue: top.b * a + under.b * (1 - a),
+  );
+}
+
+double _luma(Color c) => c.r * 0.2126 + c.g * 0.7152 + c.b * 0.0722;
+
+/// One rasterised pixel column straight down the middle of [child].
+///
+/// The socket is the one thing in this family that no widget-tree assertion can
+/// reach: `DsMachineSurface` paints its inset layers with a [CustomPainter], so
+/// what a `DsShadowSpec` *says* and what lands on the canvas are two different
+/// claims. This reads the canvas.
+Future<List<Color>> _column(
+  WidgetTester t,
+  Widget child, {
+  required DsThemeMode mode,
+}) async {
+  await t.pumpWidget(host(
+    RepaintBoundary(key: const Key('raster'), child: child),
+    mode: mode,
+  ));
+  await t.pump(DsDurations.base);
+  await t.pump(DsDurations.base);
+
+  final RenderRepaintBoundary box =
+      t.renderObject(find.byKey(const Key('raster')));
+  final ui.Image image = (await t.runAsync(() => box.toImage(pixelRatio: 1)))!;
+  final ByteData bytes = (await t.runAsync(() async =>
+      (await image.toByteData(format: ui.ImageByteFormat.rawRgba))!))!;
+  final int w = image.width;
+  final int x = w ~/ 2;
+  final List<Color> column = <Color>[
+    for (int y = 0; y < image.height; y++)
+      Color.from(
+        alpha: bytes.getUint8((y * w + x) * 4 + 3) / 255,
+        red: bytes.getUint8((y * w + x) * 4) / 255,
+        green: bytes.getUint8((y * w + x) * 4 + 1) / 255,
+        blue: bytes.getUint8((y * w + x) * 4 + 2) / 255,
+      ),
+  ];
+  image.dispose();
+  return column;
+}
+
 void main() {
+  // ───────────────────────────────────────────────────────────────────────────
+  // The socket, read off the canvas
+  // ───────────────────────────────────────────────────────────────────────────
+
+  group('the socket, rasterised', () {
+    /// The colour the interior would be if the inset ring ever collapsed to a
+    /// full fill — both `--shadow-pressed` layers at unblurred full coverage.
+    ///
+    /// `#cacace` on light, and the reason this pin is written as an explicit
+    /// anti-assertion rather than left implicit in "the interior is the card":
+    /// it names the failure mode, so a future reader of a red test knows what
+    /// broke and not merely that something did.
+    Color collapsed(DsThemeData theme) =>
+        _over(theme.ink3, _over(theme.ink4, theme.card));
+
+    for (final DsThemeMode mode in <DsThemeMode>[
+      DsThemeMode.light,
+      DsThemeMode.dark,
+    ]) {
+      final DsThemeData theme = mode == DsThemeMode.light
+          ? DsThemeData.light
+          : DsThemeData.dark;
+
+      testWidgets('$mode: the interior is the card token, the edges are inset',
+          (WidgetTester t) async {
+        final List<Color> column = await _column(
+          t,
+          const SizedBox(width: 120, child: DsInput()),
+          mode: mode,
+        );
+        expect(column.length, DsInput.height.round());
+
+        // The socket darkens the EDGES and leaves the fill alone. Anything
+        // that inverts the ring paints the complement of this.
+        for (int y = 10; y <= 30; y++) {
+          expect(column[y], theme.card, reason: '$mode interior at y=$y');
+        }
+
+        // The band below the border is the inset, and it lightens monotonically
+        // inward until it reaches the fill — a falloff, not a step.
+        expect(_luma(column[1]), lessThan(_luma(theme.card)),
+            reason: '$mode: the top band carries the inset');
+        for (int y = 1; y < 7; y++) {
+          expect(_luma(column[y]), lessThanOrEqualTo(_luma(column[y + 1])),
+              reason: '$mode: the falloff is monotonic at y=$y');
+        }
+        expect(_luma(column[column.length - 2]),
+            lessThan(_luma(theme.card)),
+            reason: '$mode: and the bottom band carries it too');
+
+        // The named failure mode, excluded by name.
+        expect(collapsed(theme), isNot(theme.card),
+            reason: 'the anti-assertion has to be able to fail');
+        expect(column[20], isNot(collapsed(theme)),
+            reason: '$mode: the inset ring collapsed to a full fill — the '
+                'painter filled the clip instead of the band between the '
+                'shape and its displaced hole');
+      });
+
+      testWidgets('$mode: the textarea wears the identical socket',
+          (WidgetTester t) async {
+        final List<Color> column = await _column(
+          t,
+          const SizedBox(width: 120, child: DsTextarea()),
+          mode: mode,
+        );
+        expect(column.length, DsTextarea.minHeight.round());
+        for (int y = 20; y <= 60; y++) {
+          expect(column[y], theme.card, reason: '$mode interior at y=$y');
+        }
+        expect(_luma(column[1]), lessThan(_luma(theme.card)));
+        expect(column[40], isNot(collapsed(theme)));
+      });
+    }
+  });
+
   // ───────────────────────────────────────────────────────────────────────────
   // The validator — forms-map §5
   // ───────────────────────────────────────────────────────────────────────────

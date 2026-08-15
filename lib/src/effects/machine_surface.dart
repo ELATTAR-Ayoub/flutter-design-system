@@ -105,17 +105,42 @@ class DsMachineSurface extends StatelessWidget {
 double _ringReach(DsShadowLayer layer) =>
     layer.blur * 2 + layer.spread.abs() + layer.offset.distance + 4;
 
-/// The area an inset [layer] covers inside [shape]: everything except the
-/// "hole" — the shape itself, displaced by the layer's offset and shrunk by
-/// its spread. Blurring the boundary of that hole is the shadow.
-Path _insetRing(RRect shape, DsShadowLayer layer) {
-  final Path outer = Path()
-    ..addRect(shape.outerRect.inflate(_ringReach(layer)));
-
+/// The area an inset [layer] covers inside [shape], as the **pair of rounded
+/// rectangles** it actually is: everything inside `outer` except the `hole` —
+/// the shape itself, displaced by the layer's offset and shrunk by its spread.
+/// Blurring the boundary of that hole is the shadow.
+///
+/// A null `hole` means a spread wide enough to close it, so the layer covers
+/// the whole surface.
+///
+/// Kept as two rectangles rather than one combined [Path] because that is what
+/// [Canvas.drawDRRect] takes, and because a rectangle pair is the shape's own
+/// vocabulary — see [_InsetShadowPainter.paint] for why the difference matters.
+({RRect outer, RRect? hole}) _insetRingRects(RRect shape, DsShadowLayer layer) {
+  final RRect outer = RRect.fromRectAndRadius(
+    shape.outerRect.inflate(_ringReach(layer)),
+    Radius.zero,
+  );
   RRect hole = shape.shift(layer.offset);
   if (layer.spread != 0) hole = hole.deflate(layer.spread);
-  // A spread wide enough to close the hole fills the whole surface.
-  if (hole.width <= 0 || hole.height <= 0) return outer;
+  if (hole.width <= 0 || hole.height <= 0) {
+    return (outer: outer, hole: null);
+  }
+  return (outer: outer, hole: hole);
+}
+
+/// [_insetRingRects] as one [Path].
+///
+/// Derived from the same pair the painter draws, so the region this reports and
+/// the region that lands on the canvas cannot drift apart. It is no longer what
+/// gets painted — see [_InsetShadowPainter.paint] — and survives because it is
+/// how the ring's *geometry* is asserted: which edge a signed `dy` lights, and
+/// how far past the shape the ring has to reach.
+Path _insetRing(RRect shape, DsShadowLayer layer) {
+  final ({RRect outer, RRect? hole}) rects = _insetRingRects(shape, layer);
+  final Path outer = Path()..addRRect(rects.outer);
+  final RRect? hole = rects.hole;
+  if (hole == null) return outer;
 
   return Path.combine(
     PathOperation.difference,
@@ -135,6 +160,24 @@ class _InsetShadowPainter extends CustomPainter {
   final BorderRadius radius;
   final DsThemeData theme;
 
+  /// **Why [Canvas.drawDRRect] and not `drawPath` over a combined path.**
+  ///
+  /// The ring used to be built with `Path.combine(PathOperation.difference, …)`
+  /// and drawn under a [MaskFilter]. On the Dart VM that rasters correctly; on
+  /// **CanvasKit it collapses** — the blur fills the entire clip instead of the
+  /// band, so every socket interior came out at the layer colours composited at
+  /// full coverage rather than at the surface's own fill. Measured on the
+  /// inputs page as `#cacace` against a `#ffffff` card, and reproduced in three
+  /// Chrome variants — headful, headless, and headless with the capture rig's
+  /// flags — against the released bundle. The VM and CanvasKit disagreed about
+  /// the same scene, so the scene was the thing to change.
+  ///
+  /// A ring between two rounded rectangles is a **DRRect**, which Skia has as a
+  /// first-class op with its own blur path, rather than a general path it has
+  /// to resolve and then mask. Expressing it as what it is rasters the same on
+  /// both backends. The geometry is unchanged — [_insetRingRects] is the single
+  /// source both this and [_insetRing] read — so nothing about which edge a
+  /// layer lights, or how far it reaches, moves.
   @override
   void paint(Canvas canvas, Size size) {
     if (size.isEmpty) return;
@@ -153,7 +196,14 @@ class _InsetShadowPainter extends CustomPainter {
       if (sigma > 0) {
         paint.maskFilter = MaskFilter.blur(BlurStyle.normal, sigma);
       }
-      canvas.drawPath(_insetRing(shape, layer), paint);
+      final ({RRect outer, RRect? hole}) rects = _insetRingRects(shape, layer);
+      final RRect? hole = rects.hole;
+      if (hole == null) {
+        // A spread wide enough to close the hole: the layer is the surface.
+        canvas.drawRRect(rects.outer, paint);
+      } else {
+        canvas.drawDRRect(rects.outer, hole, paint);
+      }
     }
     canvas.restore();
   }
