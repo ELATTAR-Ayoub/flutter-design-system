@@ -16,11 +16,12 @@ const MAX_STEPS = 40;
 
 function parseArgs() {
   const [url, out] = process.argv.slice(2);
-  const args = { url, out, theme: null, settle: 1200, reduced: false };
+  const args = { url, out, theme: null, settle: 1200, reduced: false, clock: null };
   for (let i = 4; i < process.argv.length; i++) {
     if (process.argv[i] === '--theme') args.theme = process.argv[++i];
     if (process.argv[i] === '--settle') args.settle = +process.argv[++i];
     if (process.argv[i] === '--reduced') args.reduced = true;
+    if (process.argv[i] === '--clock') args.clock = process.argv[++i];
   }
   return args;
 }
@@ -109,7 +110,7 @@ function findAdvance(prevSig, newSig) {
 }
 
 (async () => {
-  const { url, out, theme, settle, reduced } = parseArgs();
+  const { url, out, theme, settle, reduced, clock } = parseArgs();
   const browser = await puppeteer.launch({
     executablePath: CHROME,
     headless: true,
@@ -139,6 +140,29 @@ function findAdvance(prevSig, newSig) {
       await page.emulateMediaFeatures([
         { name: 'prefers-reduced-motion', value: 'reduce' },
       ]);
+    }
+    if (clock) {
+      // Calendar pages are date-dependent (row counts move the document
+      // ±36px per calendar with the month). Freeze the DOM app's clock to
+      // the same instant the Flutter app gets via its ?clock= boot param.
+      await page.evaluateOnNewDocument((fixedIso) => {
+        const OrigDate = Date;
+        const fixed = new OrigDate(fixedIso).getTime();
+        const offset = fixed - OrigDate.now();
+        const now = () => OrigDate.now() + offset;
+        const Shim = new Proxy(OrigDate, {
+          construct(t, args) {
+            return args.length ? new t(...args) : new t(now());
+          },
+          apply() {
+            return new OrigDate(now()).toString();
+          },
+          get(t, k) {
+            return k === 'now' ? now : t[k];
+          },
+        });
+        window.Date = Shim;
+      }, clock);
     }
     if (theme) {
       // next-themes reads localStorage('theme'); the Flutter app takes ?theme=
