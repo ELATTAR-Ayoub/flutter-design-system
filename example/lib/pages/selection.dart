@@ -100,6 +100,28 @@ const double _measureMd = 448;
 // allow-hardcoded: framework container scale with no token to read it from.
 const double _measureLg = 512;
 
+/// A block box wearing a `max-w-*`.
+///
+/// CSS caps a block box's width and leaves it at the start of its line. A bare
+/// [ConstrainedBox] cannot say that: handed a **tight** width — which is what
+/// every `CrossAxisAlignment.stretch` column and every `Padding` inside one
+/// passes down — it *enforces* that width and the cap is silently lost, so
+/// `max-w-sm` renders at the panel's full 1030. Measured: all six sites on this
+/// page rendered 1030 against the reference's 384 / 512 / 512 / 512 / 448 /
+/// 448. [Align] is what turns the incoming constraint loose again, and its own
+/// start alignment is the rest of the declaration — the reference's boxes all
+/// begin at the panel's content edge, 24px in.
+///
+/// The same shape `feedback.dart` names `_measured` and `selects.dart` wraps
+/// its calendars in.
+Widget _measured(double maxWidth, Widget child) => Align(
+      alignment: Alignment.centerLeft,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: maxWidth),
+        child: child,
+      ),
+    );
+
 /// `w-40` — the three slider matrix cells.
 final double _matrixSlider = ds(40);
 
@@ -333,9 +355,9 @@ class _CheckboxSectionState extends State<_CheckboxSection> {
           SizedBox(height: ds(4)),
           DsPanel(
             label: 'In a filter list',
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: _measureSm),
-              child: DsFieldSet(
+            child: _measured(
+              _measureSm,
+              DsFieldSet(
                 children: <Widget>[
                   const DsFieldLegend('Availability'),
                   DsFieldGroup(
@@ -360,9 +382,9 @@ class _CheckboxSectionState extends State<_CheckboxSection> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: _measureLg),
-                  child: _BulkList(
+                _measured(
+                  _measureLg,
+                  _BulkList(
                     children: <Widget>[
                       _BulkRow(
                         fill: theme.muted,
@@ -676,9 +698,9 @@ class _RadioSectionState extends State<_RadioSection> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: _measureLg),
-                  child: DsRadioGroup<String>(
+                _measured(
+                  _measureLg,
+                  DsRadioGroup<String>(
                     value: _method,
                     // `className="max-w-lg gap-3"` — tw-merges over the Root's
                     // own `gap-2`.
@@ -934,9 +956,9 @@ class _SwitchSectionState extends State<_SwitchSection> {
           SizedBox(height: ds(4)),
           DsPanel(
             label: 'Notification preferences',
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: _measureLg),
-              child: DsFieldGroup(
+            child: _measured(
+              _measureLg,
+              DsFieldGroup(
                 children: <Widget>[
                   for (int i = 0; i < _preferences.length; i++)
                     _PreferenceRow(
@@ -1043,9 +1065,9 @@ class _SliderSectionState extends State<_SliderSection> {
           // The one Panel on the page with no `mt`.
           DsPanel(
             label: 'Price range filter',
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: _measureMd),
-              child: Column(
+            child: _measured(
+              _measureMd,
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
                   _Readout(label: 'Price range', value: _priceReadout),
@@ -1074,9 +1096,9 @@ class _SliderSectionState extends State<_SliderSection> {
           SizedBox(height: ds(4)),
           DsPanel(
             label: 'Single value',
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: _measureMd),
-              child: Column(
+            child: _measured(
+              _measureMd,
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
                   _Readout(

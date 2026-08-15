@@ -1647,6 +1647,216 @@ void main() {
       expect(t.getRect(find.byType(DsIcon).at(1)).center.dy,
           closeTo(windowCentre, 0.51));
     });
+
+    /* ── S1–S8: guards over measured-correct behaviour ────────────────────── */
+
+    // `docs/superpowers/research/behavior-audit.md` §2.4 traced all eight legs
+    // of this module against the reference in the browser and found **every
+    // one a match** — the only module of the three audited that was wholly
+    // correct. These guards exist for that reason and not despite it: the
+    // audit's own §"Explicitly protect" lists the icon swap entire, and a leg
+    // with no test is a leg a well-meaning later "fix" can quietly retune. Each
+    // number below is the measured web value, not a derivation.
+
+    double centre(WidgetTester t) =>
+        t.getRect(find.byType(DsIconSwap)).center.dy;
+    double yOf(WidgetTester t, int i) =>
+        t.getRect(find.byType(DsIcon).at(i)).center.dy;
+    List<double> opacities(WidgetTester t) => t
+        .widgetList<Opacity>(find.descendant(
+          of: find.byType(DsIconSwap),
+          matching: find.byType(Opacity),
+        ))
+        .map((Opacity o) => o.opacity)
+        .toList();
+
+    testWidgets('S1: the strip travels 160% of the CELL, at both call sites',
+        (WidgetTester t) async {
+      // Measured 25.6px against a 16px glyph. A CSS percentage translate
+      // resolves against the element's own border box, so the multiplier hangs
+      // off the cell and never off the 20/24px clip window.
+      expect(DsSwapRoll.travelFor(16), closeTo(25.6, 1e-9));
+      expect(DsSwapRoll.travelFor(20), closeTo(32, 1e-9));
+      expect(DsTransforms.swapRollTravel, 1.6);
+
+      await t.pumpWidget(swap(0));
+      await t.pump(DsSwapRoll.duration);
+      await t.pump(DsJelly.duration);
+      expect(yOf(t, 1) - yOf(t, 0), closeTo(25.6, 0.51),
+          reason: 'the parked cell sits one full step below, not one window');
+    });
+
+    testWidgets('S2: 400ms on the spring, and the overshoot is NOT clamped',
+        (WidgetTester t) async {
+      // 400ms `--ease-spring`, peaking 9.77% past centre. The transform is left
+      // unclamped on purpose — clamping it is the "fix" this guards against.
+      expect(DsSwapRoll.duration, const Duration(milliseconds: 400));
+      expect(DsSwapRoll.curve, DsCurves.spring);
+
+      await t.pumpWidget(swap(0));
+      await t.pump(DsSwapRoll.duration);
+      await t.pump(DsJelly.duration);
+      final double home = centre(t);
+
+      await t.pumpWidget(swap(1));
+      double furthest = 0;
+      for (int ms = 0; ms < 400; ms += 10) {
+        await t.pump(const Duration(milliseconds: 10));
+        // The arriver rises to centre; past it, dy goes negative.
+        final double past = home - yOf(t, 1);
+        if (past > furthest) furthest = past;
+      }
+      expect(furthest / DsSwapRoll.travelFor(16), closeTo(0.0977, 0.015),
+          reason: 'measured +9.77% of travel past centre, mid-flight');
+
+      await t.pump(DsSwapRoll.duration);
+      await t.pump(DsJelly.duration);
+      expect(yOf(t, 1), closeTo(home, 0.51), reason: 'and it settles ON centre');
+    });
+
+    testWidgets('S3: opacity rides the same clock and is CLAMPED',
+        (WidgetTester t) async {
+      // Not a second, shorter duration: the spring first reaches y=1 at ~40% of
+      // 400ms and the browser clamps the overshoot, so the crossfade is
+      // visually finished at 163ms while the strip is still travelling.
+      await t.pumpWidget(swap(0));
+      await t.pump(DsSwapRoll.duration);
+      await t.pump(DsJelly.duration);
+
+      await t.pumpWidget(swap(1));
+      for (int ms = 0; ms < 400; ms += 10) {
+        await t.pump(const Duration(milliseconds: 10));
+        for (final double o in opacities(t)) {
+          expect(o, inInclusiveRange(0, 1),
+              reason: 'the browser clamps; so must this');
+        }
+      }
+      await t.pump(DsJelly.duration);
+      expect(opacities(t), <double>[0, 1]);
+    });
+
+    testWidgets('S3b: the crossfade is done at 163ms, the roll is not',
+        (WidgetTester t) async {
+      await t.pumpWidget(swap(0));
+      await t.pump(DsSwapRoll.duration);
+      await t.pump(DsJelly.duration);
+      final double home = centre(t);
+
+      await t.pumpWidget(swap(1));
+      await t.pump(const Duration(milliseconds: 163));
+      expect(opacities(t), <double>[0, 1],
+          reason: 'measured: opacity pinned from 163ms');
+      expect((yOf(t, 1) - home).abs(), greaterThan(0.51),
+          reason: 'and the strip has 237ms still to run');
+    });
+
+    testWidgets('S4: reverse is the exact arithmetic inverse of advance',
+        (WidgetTester t) async {
+      // Advance sends the leaver up and out the top; reversing mirrors it with
+      // no special-casing anywhere — `offset = i - strip(t)` does both.
+      await t.pumpWidget(swap(0));
+      await t.pump(DsSwapRoll.duration);
+      await t.pump(DsJelly.duration);
+      final double home = centre(t);
+
+      await t.pumpWidget(swap(1));
+      await t.pump(DsSwapRoll.duration);
+      await t.pump(DsJelly.duration);
+      expect(yOf(t, 0), lessThan(home), reason: 'advance: leaver exits the TOP');
+      final double advanced = home - yOf(t, 0);
+
+      await t.pumpWidget(swap(0));
+      await t.pump(DsSwapRoll.duration);
+      await t.pump(DsJelly.duration);
+      expect(yOf(t, 1), greaterThan(home),
+          reason: 'reverse: the leaver goes back out the BOTTOM');
+      expect(yOf(t, 1) - home, closeTo(advanced, 0.51));
+    });
+
+    testWidgets('S5: the squash waits 150ms, then runs 600 — one 750ms clock',
+        (WidgetTester t) async {
+      expect(DsSwapRoll.squashDelay, const Duration(milliseconds: 150));
+      expect(DsJelly.duration, const Duration(milliseconds: 600));
+      expect(DsSwapRoll.squashDelay + DsJelly.duration,
+          const Duration(milliseconds: 750),
+          reason: 'total visible motion, roll included, is 750ms');
+    });
+
+    testWidgets('S6: every glyph is built at once, the inactive one at zero',
+        (WidgetTester t) async {
+      // Not an AnimatedSwitcher: the strip is one Stack holding all of them,
+      // which is why the leaver can be seen travelling out.
+      await t.pumpWidget(swap(0));
+      await t.pump(DsSwapRoll.duration);
+      await t.pump(DsJelly.duration);
+
+      expect(find.descendant(
+        of: find.byType(DsIconSwap),
+        matching: find.byType(DsIcon),
+      ), findsNWidgets(2));
+      expect(opacities(t), <double>[1, 0]);
+      expect((yOf(t, 1) - yOf(t, 0)).abs(), closeTo(25.6, 0.51),
+          reason: 'parked at +step, present and invisible');
+    });
+
+    testWidgets('S7: no roll on FIRST BUILD, but the jelly runs once',
+        (WidgetTester t) async {
+      // Measured from before hydration: the roll transform never leaves the
+      // identity matrix on mount. The active glyph is on centre in frame one —
+      // a mount that rolls in from off-screen is the regression.
+      await t.pumpWidget(swap(1));
+      await t.pump();
+      expect(yOf(t, 1), closeTo(centre(t), 0.51),
+          reason: 'the active glyph is home on the very first frame');
+      expect(opacities(t), <double>[0, 1], reason: 'and no crossfade either');
+
+      // …while `yuki-jelly` (delay 0.15s, `both`) does run its full 600ms once.
+      await t.pump(DsSwapRoll.squashDelay);
+      await t.pump(const Duration(milliseconds: 180));
+      final List<double> scales = t
+          .widgetList<Transform>(find.descendant(
+            of: find.byType(DsIconSwap),
+            matching: find.byType(Transform),
+          ))
+          .map((Transform x) => x.transform.storage[0])
+          .toList();
+      expect(scales.any((double s) => s > 1.1), isTrue,
+          reason: 'stop 2 of the jelly, 1.18');
+      await t.pump(DsJelly.duration);
+    });
+
+    testWidgets('S8: an interruption re-targets from the CURRENT transform and '
+        'runs the full 400ms', (WidgetTester t) async {
+      // Measured at a reversal 264ms into a 400ms roll — mid-overshoot, with
+      // the strip at −28.10 rather than its −25.60 target. CSS re-targets from
+      // where the box actually is and restarts the whole duration; snapping to
+      // the target first, or finishing early, are both the regression.
+      await t.pumpWidget(swap(0));
+      await t.pump(DsSwapRoll.duration);
+      await t.pump(DsJelly.duration);
+      final double home = centre(t);
+
+      await t.pumpWidget(swap(1));
+      await t.pump(const Duration(milliseconds: 264));
+      final double interrupted = yOf(t, 0);
+      expect(home - interrupted, greaterThan(DsSwapRoll.travelFor(16)),
+          reason: 'at 264ms the leaver is PAST its target, mid-overshoot');
+
+      await t.pumpWidget(swap(0));
+      await t.pump();
+      expect(yOf(t, 0), closeTo(interrupted, 0.51),
+          reason: 'the reversal starts from where the strip is, not from the '
+              'target it never reached');
+
+      // Still travelling most of the way through a fresh 400ms…
+      await t.pump(const Duration(milliseconds: 200));
+      expect((yOf(t, 0) - home).abs(), greaterThan(0.51),
+          reason: 'a shortened or scaled-down return is the regression');
+
+      await t.pump(DsSwapRoll.duration);
+      await t.pump(DsJelly.duration);
+      expect(yOf(t, 0), closeTo(home, 0.51));
+    });
   });
 
   group('DsSheet', () {

@@ -7,12 +7,15 @@ import 'package:example/main.dart';
 import 'package:example/nav.dart';
 import 'package:example/pages/buttons.dart';
 import 'package:example/pages/colors.dart';
+import 'package:example/pages/feedback.dart';
 import 'package:example/pages/forms.dart';
 import 'package:example/pages/icons.dart';
 import 'package:example/pages/inputs.dart';
 import 'package:example/pages/motion.dart';
 import 'package:example/pages/overview.dart';
 import 'package:example/pages/placeholder.dart';
+import 'package:example/pages/selection.dart';
+import 'package:example/pages/selects.dart';
 import 'package:example/pages/shadows.dart';
 import 'package:example/pages/spacing.dart';
 import 'package:example/pages/typography.dart';
@@ -51,8 +54,8 @@ extension on WidgetTester {
 /// Named as types rather than counted, because `isNotNull` cannot tell a real
 /// page from the [PlaceholderPage] every unbuilt href falls through to: a route
 /// arm dropped by a bad merge would still have satisfied it, and the page would
-/// have gone missing behind a title that looks right (ruling B11). Ten arms,
-/// in `pageFor`'s own order.
+/// have gone missing behind a title that looks right (ruling B11). Thirteen
+/// arms, in `pageFor`'s own order.
 const Map<String, Type> _wired = <String, Type>{
   dsRoot: OverviewPage,
   '$dsRoot/colors': ColorsPage,
@@ -64,6 +67,9 @@ const Map<String, Type> _wired = <String, Type>{
   '$dsRoot/components/base/buttons': ButtonsPage,
   '$dsRoot/components/base/inputs': InputsPage,
   '$dsRoot/components/base/forms': FormsPage,
+  '$dsRoot/components/base/selects': SelectsPage,
+  '$dsRoot/components/base/selection': SelectionPage,
+  '$dsRoot/components/base/feedback': FeedbackPage,
 };
 
 Iterable<({DsGroup group, DsCategory category})> get _everyCategory sync* {

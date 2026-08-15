@@ -31,12 +31,6 @@ final double _keyColumn = ds(52);
 /// `hover:border-action/45` on a lifting card.
 const double _cardHoverBorderAlpha = 0.45;
 
-/// Tailwind's `leading-relaxed` ratio, which the `<pre>` in [DsCodeBlock]
-/// overrides `.type-code`'s own 1.4 with. `globals.css` declares no
-/// `--leading-*` token for it, so it cannot come from the foundation layer.
-// allow-hardcoded: framework default with no token to read it from.
-const double _leadingRelaxed = 1.625;
-
 /// `border-<tone>/30` and `bg-<tone>/[0.08]` on a [DsNote].
 const double _noteBorderAlpha = 0.30;
 const double _noteWashAlpha = 0.08;
@@ -939,10 +933,12 @@ class _ChipFrame extends CustomPainter {
 /// beating the component layer:
 /// * **`leading-relaxed` beats `.type-code`.** The class declares its own
 ///   leading inside `@layer components` — [DsType.code]'s, which owns that
-///   number — and `leading-relaxed` is a utility, so [_leadingRelaxed] wins:
+///   number — and `leading-relaxed` is a utility, so the utility's 1.625 wins:
 ///   20.3125px per line. That override is why the style is assembled here
 ///   rather than handed to [DsText], which renders a `.type-*` class as
-///   declared.
+///   declared. The ratio is read off [DsComponentType.textareaBody], which
+///   resolves the same utility on `Textarea` — one spelling of one number,
+///   not a second literal that can drift from it.
 /// * **`.type-code` sets no `font-weight`**, so a sample inherits 400. It is
 ///   the one mono class on the site that is not 600.
 /// * The fill is `--background` — the same colour as the [DsPanel] body it
@@ -977,7 +973,7 @@ class _DsCodeBlockState extends State<DsCodeBlock> {
     final DsThemeData theme = DsTheme.of(context);
     final TextStyle style =
         DsText.styleOf(context, DsType.code, color: theme.mutedForeground)
-            .copyWith(height: _leadingRelaxed);
+            .copyWith(height: DsComponentType.textareaBody.height);
 
     return DecoratedBox(
       decoration: BoxDecoration(

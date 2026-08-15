@@ -14,12 +14,15 @@ import 'package:flutter/material.dart';
 import 'nav.dart';
 import 'pages/buttons.dart';
 import 'pages/colors.dart';
+import 'pages/feedback.dart';
 import 'pages/forms.dart';
 import 'pages/icons.dart';
 import 'pages/inputs.dart';
 import 'pages/motion.dart';
 import 'pages/overview.dart';
 import 'pages/placeholder.dart';
+import 'pages/selection.dart';
+import 'pages/selects.dart';
 import 'pages/shadows.dart';
 import 'pages/spacing.dart';
 import 'pages/typography.dart';
@@ -217,14 +220,18 @@ class _DocsHome extends StatelessWidget {
   }
 }
 
-/// The ten real routes; every other href in the nav gets a [PlaceholderPage].
+/// The thirteen real routes; every other href in the nav gets a
+/// [PlaceholderPage].
 ///
 /// Public because the shell test drives it directly, and because it is the one
 /// place the route table lives.
 ///
 /// The arms follow the nav's own order (`nav.ts` foundations: colors →
 /// typography → spacing → shadows → motion → icons, then base components:
-/// buttons → inputs → forms), so this switch reads as the sidebar reads.
+/// buttons → inputs → forms → selects → selection → … → feedback), so this
+/// switch reads as the sidebar reads. `selects` sitting between `forms` and
+/// `selection` is the registry's order, not an alphabetisation; `feedback` is
+/// four categories further down, past the three that are still placeholders.
 Widget pageFor(String route) {
   return switch (route) {
     dsRoot => const OverviewPage(),
@@ -237,6 +244,9 @@ Widget pageFor(String route) {
     '$dsRoot/components/base/buttons' => const ButtonsPage(),
     '$dsRoot/components/base/inputs' => const InputsPage(),
     '$dsRoot/components/base/forms' => const FormsPage(),
+    '$dsRoot/components/base/selects' => const SelectsPage(),
+    '$dsRoot/components/base/selection' => const SelectionPage(),
+    '$dsRoot/components/base/feedback' => const FeedbackPage(),
     _ => _placeholderFor(route),
   };
 }

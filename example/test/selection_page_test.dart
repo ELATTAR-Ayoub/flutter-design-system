@@ -75,6 +75,25 @@ const List<double> _switchTops = <double>[2548.5, 2605.9, 2663.3, 2720.7];
 /// One bulk row: `px-4 py-3` around a 20px box — 12 + 20 + 12.
 const double _bulkRowHeight = 44;
 
+/// The six `max-w-*` specimens, by the panel that holds each, and the width the
+/// reference renders it at.
+///
+/// Measured on `http://localhost:3000/design-system/components/base/selection`
+/// at 1440 x 900 with `getBoundingClientRect()`: 384 / 512 / 512 / 512 / 448 /
+/// 448, every one of them equal to its own `max-w-*` cap and every one starting
+/// at the panel's content edge (`left: 325` against a panel at 300). The panel
+/// they sit in offers 1030, so a cap that is silently dropped shows up as 1030
+/// and nothing else on the page moves — which is exactly how this went
+/// unnoticed until B3 hit the same trap on `feedback`.
+const Map<String, double> _capped = <String, double>{
+  'In a filter list': 384, // max-w-sm
+  'Bulk selection header': 512, // max-w-lg
+  'Withdrawal method': 512, // max-w-lg
+  'Notification preferences': 512, // max-w-lg
+  'Price range filter': 448, // max-w-md
+  'Single value': 448, // max-w-md
+};
+
 /// `section.mb-20` — 80px, paid as padding inside the section's own box
 /// because Flutter has no margins.
 final double _sectionGap = ds(20);
@@ -384,6 +403,33 @@ void main() {
         expect(rows[i].top - (rows[i - 1].top + rows[i - 1].height),
             closeTo(DsWidths.hairline, 0.01),
             reason: '`space-y-px` is a 1px MARGIN, not a gap');
+      }
+    });
+
+    testWidgets('every `max-w-*` specimen renders at its cap, not the panel\'s '
+        '1030', (WidgetTester tester) async {
+      await pumpSelectionInShell(tester);
+
+      for (final MapEntry<String, double> entry in _capped.entries) {
+        final Finder box = _inPanel(
+          entry.key,
+          find.byWidgetPredicate(
+            (Widget widget) =>
+                widget is ConstrainedBox &&
+                widget.constraints.maxWidth == entry.value,
+          ),
+        );
+        expect(box, findsOneWidget, reason: entry.key);
+        expect(tester.getSize(box).width, entry.value,
+            reason: '${entry.key} — the cap is a MAX width, and a tight '
+                'incoming constraint must not overrule it');
+        // `max-w-*` leaves the box at the start of its line: the reference's
+        // six all begin at the panel's content edge, `p-6` inside the hairline.
+        expect(
+          tester.getTopLeft(box).dx - tester.getTopLeft(_panel(entry.key)).dx,
+          closeTo(ds(6) + DsWidths.hairline, 0.01),
+          reason: '${entry.key} — start-aligned, not centred',
+        );
       }
     });
   });

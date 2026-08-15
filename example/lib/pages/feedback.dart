@@ -30,8 +30,13 @@
 ///
 ///  * it renders **the preview's own numbers**, which are measurably not the
 ///    live toast's — see the divergence note below;
-///  * it carries `[data-button]`, the action pill, which `DsToastMessage`
-///    cannot yet express (wave B2 owns `toaster.dart` and that slot);
+///  * it writes its own `[data-button]`. `toast-preview.tsx` L42–46 spells the
+///    `<button>` inline rather than letting sonner render one, so
+///    [_ToastActionPill] is that element and not a stand-in for the live pill.
+///    The live one now comes from `DsToastAction`, which [_ToastSectionState._error]
+///    passes and `DsToast` paints — the two are the same 32px secondary pill
+///    because `.cn-toast [data-button]` styles both, exactly as the preview's
+///    own doc-comment claims of the whole object;
 ///  * it is static. No queue, no lifetime, no dismissal — a `<li>` in a list.
 ///
 /// [_PackCardSkeleton]'s and [_PullRowSkeletons]'s containers are inline
@@ -515,17 +520,19 @@ class _ToastSectionState extends State<_ToastSection> {
 
   /// `toast.error(…, { description, action })`.
   ///
-  /// The reference's options carry `action: { label: "Retry" }`, which the live
-  /// toast renders as its `[data-button]` pill. `DsToastMessage` has no action
-  /// slot, so the fired toast arrives without one — the *preview* of the same
-  /// message, one panel up the page, is where the pill renders
-  /// ([_ToastActionPill]).
+  /// The reference's options carry
+  /// `action: { label: "Retry", onClick: () => {} }` (`page.tsx` L227), and the
+  /// live toast renders it as `[data-button]`. `DsToastMessage.action` landed
+  /// with wave B2's toaster, so the fired toast now carries the pill itself and
+  /// the preview one panel up is no longer the only place it can be looked at.
   ///
-  /// FOLLOW-UP: drop the pill from this file the day `DsToastMessage` grows an
-  /// action, and pass the label here instead.
+  /// No `onPressed`: the reference's handler is an empty arrow, and the
+  /// dismissal that follows a press is sonner's own — [DsToastAction] runs the
+  /// handler and `DsToaster` deletes the toast after it, handler or not.
   void _error() => docsToasts.error(
         'Could not reach the vault',
         description: 'Nothing was charged. Try again in a moment.',
+        action: const DsToastAction(label: 'Retry'),
       );
 
   /// `toast.warning(…)`.
@@ -834,6 +841,12 @@ class _ToastPreview extends StatelessWidget {
 
 /// `[data-button]` — `variant="secondary" size="sm"` written out by hand,
 /// because sonner renders the button itself and never sees the cva.
+///
+/// **The preview's own element**, not the live pill: `toast-preview.tsx`
+/// L42–46 writes `<button type="button" data-button="">` into its own markup,
+/// so this is a port of that `<button>`. The live toast's pill is
+/// `DsToastAction`'s, painted by `DsToast`; both are the same 32px secondary
+/// pill because the one `.cn-toast [data-button]` block styles both.
 ///
 /// `flex-shrink: 0; margin-left: auto; height: calc(--spacing * 8);
 /// padding-inline: calc(--spacing * 3.5); border: 1px solid transparent;

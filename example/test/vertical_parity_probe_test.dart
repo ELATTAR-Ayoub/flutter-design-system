@@ -53,6 +53,8 @@ const double _contentWidth = 1080;
 /// submitted, no menu open. Its height moves with error state, so the pump
 /// below has to leave it alone — one `pump`, no interaction — or this number is
 /// measuring a different page.
+///
+/// `selects` is measured under a **frozen clock** — see [_routes].
 const Map<String, double> _referenceHeight = <String, double>{
   'overview': 2402.66,
   'colors': 3781.83,
@@ -61,11 +63,48 @@ const Map<String, double> _referenceHeight = <String, double>{
   'buttons': 4783.5,
   'inputs': 5086.3,
   'forms': 4968.7,
+  'selection': 4252.14,
+  'feedback': 5946.0,
+  'selects': 4833.9,
 };
 
 /// Half a CSS pixel: below the smallest thing either engine can paint, and
 /// wider than the 1/64px grid Chrome quantises its own layout to.
 const double _tolerance = 0.5;
+
+/// One covered page: the route it lives at, and the instant it is pumped at.
+typedef _Route = ({String route, DateTime? clock});
+
+/// Every route this probe covers, in `pageFor`'s own order.
+///
+/// **[clock] is the `?clock=` boot parameter, per route** (supervisor ruling
+/// L2). Null — every page but one — means the page's height is a pure function
+/// of its markup and the wall clock cannot move it, so the harness leaves it on
+/// [DateTime.now] exactly as the app boots.
+///
+/// `selects` is the exception, and the reason this column exists.
+/// `react-day-picker`'s `getInitialMonth` is `month || defaultMonth || today`
+/// and the page passes neither of the first two, so its two on-page calendars
+/// open on the reader's current month — a four-, five- or six-week month is one
+/// 36px week row apart, twice over, and the document height moves by 72px
+/// between two runs of the same unchanged code. The reference was captured with
+/// Chrome's `Date` shim frozen at the same instant this passes to [DsClock], so
+/// both renderers agree on the month, the week count and the height.
+final Map<String, _Route> _routes = <String, _Route>{
+  'overview': (route: dsRoot, clock: null),
+  'colors': (route: '$dsRoot/colors', clock: null),
+  'typography': (route: '$dsRoot/typography', clock: null),
+  'spacing': (route: '$dsRoot/spacing', clock: null),
+  'buttons': (route: '$dsRoot/components/base/buttons', clock: null),
+  'inputs': (route: '$dsRoot/components/base/inputs', clock: null),
+  'forms': (route: '$dsRoot/components/base/forms', clock: null),
+  'selects': (
+    route: '$dsRoot/components/base/selects',
+    clock: DateTime(2026, 8, 16, 12),
+  ),
+  'selection': (route: '$dsRoot/components/base/selection', clock: null),
+  'feedback': (route: '$dsRoot/components/base/feedback', clock: null),
+};
 
 Future<void> _loadFont(String family, String file) async {
   final ByteData bytes = ByteData.sublistView(
@@ -177,40 +216,45 @@ void main() {
     await _loadFont('Redaction35', 'Redaction35-Italic.ttf');
   });
 
-  final Map<String, String> routes = <String, String>{
-    'overview': dsRoot,
-    'colors': '$dsRoot/colors',
-    'typography': '$dsRoot/typography',
-    'spacing': '$dsRoot/spacing',
-    'buttons': '$dsRoot/components/base/buttons',
-    'inputs': '$dsRoot/components/base/inputs',
-    'forms': '$dsRoot/components/base/forms',
-  };
-
-  for (final MapEntry<String, String> entry in routes.entries) {
+  for (final MapEntry<String, _Route> entry in _routes.entries) {
     testWidgets('parity probe: ${entry.key}', (WidgetTester tester) async {
       tester.view.physicalSize = _viewport;
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
 
+      final String route = entry.value.route;
       final DsThemeController theme = DsThemeController();
-      final AppRouter router = AppRouter(route: entry.value);
+      final AppRouter router = AppRouter(route: route);
       addTearDown(theme.dispose);
       addTearDown(router.dispose);
 
-      final Widget page = pageFor(entry.value);
-      await tester.pumpWidget(
-        DsTheme(
-          controller: theme,
-          child: AppRouterScope(
-            router: router,
-            child: MaterialApp(
-              debugShowCheckedModeBanner: false,
-              home: DocsShell(route: entry.value, child: page),
+      final Widget page = pageFor(route);
+      Widget app = DsTheme(
+        controller: theme,
+        child: AppRouterScope(
+          router: router,
+          child: MaterialApp(
+            debugShowCheckedModeBanner: false,
+            home: Builder(
+              // The port's `prefers-reduced-motion`, and the state every page
+              // test in this suite measures in: `feedback` alone stands 69
+              // infinite animations at rest, so a tree holding it never comes
+              // to rest. Below `MaterialApp` so the framework's own
+              // `MediaQuery` does not win, exactly as `main.dart` applies it.
+              builder: (BuildContext context) => MediaQuery(
+                data: MediaQuery.of(context).copyWith(disableAnimations: true),
+                child: DocsShell(route: route, child: page),
+              ),
             ),
           ),
         ),
       );
+
+      // Above [MaterialApp], where `main.dart` puts it — see [_Route.clock].
+      final DateTime? clock = entry.value.clock;
+      if (clock != null) app = DsClock(now: clock, child: app);
+
+      await tester.pumpWidget(app);
       await tester.pump();
 
       final Finder finder = find.byWidget(page);
