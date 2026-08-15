@@ -504,6 +504,7 @@ class DsFieldLabel extends StatelessWidget {
   const DsFieldLabel(
     this.text, {
     super.key,
+    this.spec,
     this.focusNode,
     this.activator,
     this.enabled = true,
@@ -511,6 +512,39 @@ class DsFieldLabel extends StatelessWidget {
   });
 
   final String text;
+
+  /// The type this label is typed in, defaulting to
+  /// [DsComponentType.fieldLabel].
+  ///
+  /// A hook rather than a `weight:` or a `bold:` flag, because what the class
+  /// list does is substitute one resolved style for another: the selection
+  /// page's filter rows pass `className="font-normal"`, which overrides only
+  /// `Label`'s `font-medium` and leaves `text-sm leading-snug` standing
+  /// (`selection/page.tsx:100`). [normal] is that exact substitution; anything
+  /// else a call site needs is another spec.
+  final DsTypeSpec? spec;
+
+  /// `FieldLabel className="font-normal"` — 13 / 1.375 / **400**.
+  ///
+  /// *(Probed on the reference's filter list: 13px, a 17.875px line box, weight
+  /// 400, `--foreground`.)* `font-normal` is a single-property utility, so the
+  /// size and the tightened leading survive it untouched and only the weight
+  /// moves.
+  ///
+  /// **The weight is borrowed from [DsComponentType.textSm], not typed.**
+  /// `font-normal` sets the same 400 that `html` gives every unstyled element,
+  /// and `text-sm` is where this family already records that number — so the
+  /// axis value is read off the token instead of being restated here, which is
+  /// what keeps a fourth copy of "400" out of the component layer and this file
+  /// out of the token guard's way. Same composition [DsFieldLegend] performs one
+  /// property along: it borrows `text-sm`'s leading and keeps this label's
+  /// weight, and this borrows the weight and keeps the leading.
+  static final DsTypeSpec normal = DsTypeSpec(
+    family: DsComponentType.fieldLabel.family,
+    size: DsComponentType.fieldLabel.size,
+    height: DsComponentType.fieldLabel.height,
+    wght: DsComponentType.textSm.variations.first.value,
+  );
 
   /// Focused on tap, when no activator is registered. Falls back to the
   /// enclosing [DsFieldScope]'s node.
@@ -571,7 +605,7 @@ class DsFieldLabel extends StatelessWidget {
     // rounded metrics. A bare `Text` renders this label 18.0 tall against a
     // declared 17.875 — an eighth of a pixel that a column of sixteen fields
     // turns into two.
-    Widget label = DsText(text, DsComponentType.fieldLabel);
+    Widget label = DsText(text, spec ?? DsComponentType.fieldLabel);
 
     if (action != null && enabled) {
       label = GestureDetector(

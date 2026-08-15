@@ -101,7 +101,9 @@ class DsCheckbox extends StatefulWidget {
     this.state = DsCheckboxState.unchecked,
     this.onChanged,
     this.enabled = true,
+    this.inert = false,
     this.invalid = false,
+    this.forceFocusRing,
     this.focusNode,
     this.label,
     this.hint,
@@ -122,8 +124,29 @@ class DsCheckbox extends StatefulWidget {
   /// cannot opt back in.
   final bool enabled;
 
+  /// `<Checkbox checked="indeterminate"/>` with no `onCheckedChange` — the
+  /// state matrix's Indeterminate cell, and the bulk header's select-all box.
+  ///
+  /// Radix holds a controlled checkbox at its prop value, so the box never
+  /// changes; but it carries no `disabled`, so it stays **opaque, focusable and
+  /// announced as enabled** *(measured: `disabled: false`, opacity 1)*. See
+  /// [DsSelectionControl.inert] for the full state table and for what the flag
+  /// actually changes.
+  ///
+  /// Distinct from `enabled: false`, which dims by half and leaves the tab
+  /// order, and from a bare `onChanged: null`, which is a control that merely
+  /// has nothing to do rather than one held at a value.
+  final bool inert;
+
   /// `aria-invalid="true"`. ORed with the enclosing [DsFieldScope]'s.
   final bool invalid;
+
+  /// `className="border-ring ring-3 ring-ring/50"` — paints the focus ring
+  /// without owning the focus, for the matrix's "Focus" cell.
+  ///
+  /// See [DsSelectionControl.forceFocusRing]: the cell is a static fake, two of
+  /// them sit on one page, and `aria-invalid` still beats it.
+  final bool? forceFocusRing;
 
   /// A [DsFieldScope]'s node wins over the one this widget would otherwise
   /// leave to `Focus`, and loses to this — so `DsForm.focusFirstError` lands on
@@ -152,19 +175,33 @@ class DsCheckbox extends StatefulWidget {
 }
 
 class _DsCheckboxState extends State<DsCheckbox> {
-  /// Which mounting of the Indicator is on screen.
+  /// Which **reveal** is on screen.
   ///
-  /// Radix mounts `CheckboxPrimitive.Indicator` when the box leaves
-  /// `unchecked` and unmounts it when it returns, so both draw animations fire
-  /// on that mount and **not** on a checked → indeterminate swap: the marks are
-  /// already mounted there and only their visibility changes. Bumping this on
-  /// the mount transition alone is that behaviour.
-  int _mount = 0;
+  /// **Every reveal re-draws, from the full dash offset, every time**
+  /// *(measured — behaviour audit, second pass)*. The hidden mark carries no
+  /// animation at all while it is hidden (`getAnimations()` is empty on it),
+  /// and restoring its `display` starts a brand-new CSS animation rather than
+  /// resuming a finished one. So a checked → indeterminate swap re-runs
+  /// `dash-draw` from zero over its own 200ms, and indeterminate → checked
+  /// re-runs `check-draw` over 280ms.
+  ///
+  /// This corrects the model this file shipped with, which mounted both marks
+  /// together behind an `IndexedStack` and therefore revealed a bar that had
+  /// already finished drawing. That read `group-data-[state=indeterminate]:
+  /// hidden` as a visibility toggle over two live animations; the browser
+  /// treats it as a mount.
+  ///
+  /// **Going out is not a draw.** Returning to `unchecked` unmounts the
+  /// indicator outright — no reverse stroke, no fade *(measured)* — which is
+  /// the `SizedBox.shrink()` branch below.
+  int _reveal = 0;
 
   @override
   void didUpdateWidget(DsCheckbox old) {
     super.didUpdateWidget(old);
-    if (!old.state.isOn && widget.state.isOn) _mount++;
+    // Any change that lands on a lit state is a reveal, including a swap
+    // between the two lit states.
+    if (widget.state != old.state && widget.state.isOn) _reveal++;
   }
 
   @override
@@ -187,45 +224,42 @@ class _DsCheckboxState extends State<DsCheckbox> {
     // Re-registered on every build because the closure reads [DsCheckbox.state],
     // and set back to null while disabled so a stale toggle from an earlier
     // build cannot outlive the state that made it legal.
-    final VoidCallback? toggle = enabled && widget.onChanged != null
-        ? () => widget.onChanged!(DsCheckbox.nextAfter(widget.state))
-        : null;
+    //
+    // An inert box registers nothing either: a controlled checkbox with no
+    // handler is not toggled by clicking its label on the web, and there is
+    // nothing here that would make it so.
+    final VoidCallback? toggle =
+        enabled && !widget.inert && widget.onChanged != null
+            ? () => widget.onChanged!(DsCheckbox.nextAfter(widget.state))
+            : null;
     scope?.activator?.callback = toggle;
 
     final bool on = widget.state.isOn;
 
+    final bool bar = widget.state == DsCheckboxState.indeterminate;
+
+    // Only the visible mark is mounted, and it is re-keyed on every reveal, so
+    // each one starts a fresh player at dash offset zero. A hidden mark holds
+    // no animation in the browser either — see [_reveal].
     final Widget indicator = on
         ? KeyedSubtree(
-            key: ValueKey<int>(_mount),
+            key: ValueKey<int>(_reveal),
             child: SizedBox(
               width: _markSize,
               height: _markSize,
-              // Both marks are mounted together and one is hidden, exactly as
-              // `group-data-[state=indeterminate]/checkbox:hidden` does — which
-              // is why a checked → indeterminate swap reveals a bar that has
-              // already finished drawing.
-              child: IndexedStack(
-                index: widget.state == DsCheckboxState.indeterminate ? 1 : 0,
-                alignment: Alignment.center,
-                children: <Widget>[
-                  _Mark(
-                    path: _tickPath(),
-                    dashArray: DsCheckDraw.dashArray,
-                    duration: DsCheckDraw.duration,
-                    drawnAt: DsCheckDraw.drawnFractionAt,
-                    color: theme.primaryForeground,
-                  ),
-                  _Mark(
-                    path: _dashPath(),
-                    dashArray: DsDashDraw.dashArray,
-                    duration: DsDashDraw.duration,
-                    drawnAt: DsDashDraw.drawnFractionAt,
-                    color: theme.primaryForeground,
-                  ),
-                ],
+              child: _Mark(
+                path: bar ? _dashPath() : _tickPath(),
+                dashArray:
+                    bar ? DsDashDraw.dashArray : DsCheckDraw.dashArray,
+                duration: bar ? DsDashDraw.duration : DsCheckDraw.duration,
+                drawnAt:
+                    bar ? DsDashDraw.drawnFractionAt : DsCheckDraw.drawnFractionAt,
+                color: theme.primaryForeground,
               ),
             ),
           )
+        // Instant unmount, both marks gone at once. No reverse draw and no
+        // fade — measured.
         : const SizedBox.shrink();
 
     return DsSelectionControl(
@@ -241,7 +275,9 @@ class _DsCheckboxState extends State<DsCheckbox> {
       duration: DsDurations.transitionDefault,
       jellyState: widget.state,
       enabled: enabled,
+      inert: widget.inert,
       invalid: invalid,
+      forceFocusRing: widget.forceFocusRing,
       focusNode: focusNode,
       onTap: toggle,
       // Inside the hit-area expander, never around it — see [DsHitArea].
@@ -249,7 +285,11 @@ class _DsCheckboxState extends State<DsCheckbox> {
         container: true,
         checked: widget.state == DsCheckboxState.checked,
         mixed: widget.state == DsCheckboxState.indeterminate,
-        enabled: enabled && widget.onChanged != null,
+        // An inert box is announced as an ENABLED checkbox, because that is
+        // what the reference's `disabled: false` says. Faithful, and the
+        // second half of drift 7: it gives assistive technology no more signal
+        // than it gives a reader.
+        enabled: enabled && (widget.inert || widget.onChanged != null),
         label: label,
         hint: hint,
         child: child,

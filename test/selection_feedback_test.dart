@@ -108,24 +108,76 @@ void main() {
       expect(borderOf(socketOf(t, DsCheckbox)), theme.primary);
     });
 
-    testWidgets('mounts no indicator while unchecked', (WidgetTester t) async {
-      await t.pumpWidget(host(const DsCheckbox()));
-      expect(find.byType(DsKeyframePlayer), findsNothing);
+    /// The mark's own player, told apart from [DsJellyReplay]'s by its
+    /// duration: a draw runs 280ms or 200ms, the squash 600.
+    Finder markPlayer() => find.byWidgetPredicate(
+          (Widget w) =>
+              w is DsKeyframePlayer &&
+              (w.duration == DsCheckDraw.duration ||
+                  w.duration == DsDashDraw.duration),
+        );
 
+    testWidgets('mounts no indicator while unchecked, and one when lit',
+        (WidgetTester t) async {
+      await t.pumpWidget(host(const DsCheckbox()));
+      expect(markPlayer(), findsNothing);
+
+      // Exactly ONE mark is mounted at a time. The old model mounted both and
+      // hid one, which is what made a swap reveal a finished stroke.
       await t.pumpWidget(
           host(const DsCheckbox(state: DsCheckboxState.checked)));
-      // Both marks mount together — the tick and the bar — with one hidden, so
-      // a checked → indeterminate swap reveals a bar that has already finished
-      // drawing, exactly as `group-data-[state=indeterminate]:hidden` does.
-      IndexedStack marks() => t.widget<IndexedStack>(find.byType(IndexedStack));
-      expect(marks().children.length, 2);
-      expect(marks().index, 0);
+      expect(markPlayer(), findsOneWidget);
       await t.pump(DsJelly.duration);
 
       await t.pumpWidget(
           host(const DsCheckbox(state: DsCheckboxState.indeterminate)));
-      expect(marks().children.length, 2);
-      expect(marks().index, 1);
+      expect(markPlayer(), findsOneWidget);
+      await t.pump(DsJelly.duration);
+
+      // Going out is an unmount, not a reverse draw and not a fade.
+      await t.pumpWidget(host(const DsCheckbox()));
+      await t.pump();
+      expect(markPlayer(), findsNothing,
+          reason: 'unchecking unmounts the indicator outright — measured');
+    });
+
+    testWidgets('every reveal re-draws its mark from zero',
+        (WidgetTester t) async {
+      // MEASURED (behaviour audit, second pass): a hidden mark carries no
+      // animation of its own, and restoring it starts a brand-new one. So a
+      // swap between the two lit states re-runs the arriving mark's draw in
+      // full rather than revealing a stroke that already finished. A fresh
+      // Element is exactly what a fresh CSS animation is here — the player is
+      // re-keyed, so it cannot resume.
+      await t.pumpWidget(
+          host(const DsCheckbox(state: DsCheckboxState.checked)));
+      await t.pump(DsCheckDraw.duration);
+      await t.pump(DsJelly.duration);
+      final Element tick = t.element(markPlayer());
+      expect(t.widget<DsKeyframePlayer>(markPlayer()).duration,
+          DsCheckDraw.duration);
+
+      // checked -> indeterminate re-runs `dash-draw`, all 200ms of it.
+      await t.pumpWidget(
+          host(const DsCheckbox(state: DsCheckboxState.indeterminate)));
+      await t.pump();
+      expect(t.element(markPlayer()), isNot(tick),
+          reason: 'a fresh player, not the finished bar re-shown');
+      expect(t.widget<DsKeyframePlayer>(markPlayer()).duration,
+          DsDashDraw.duration);
+      await t.pump(DsDashDraw.duration);
+      await t.pump(DsJelly.duration);
+
+      // …and indeterminate -> checked re-runs `check-draw`.
+      final Element bar = t.element(markPlayer());
+      await t.pumpWidget(
+          host(const DsCheckbox(state: DsCheckboxState.checked)));
+      await t.pump();
+      expect(t.element(markPlayer()), isNot(bar),
+          reason: 'the tick starts over too');
+      expect(t.widget<DsKeyframePlayer>(markPlayer()).duration,
+          DsCheckDraw.duration);
+      await t.pump(DsCheckDraw.duration);
       await t.pump(DsJelly.duration);
     });
 
@@ -1361,6 +1413,353 @@ void main() {
       await t.pump();
       expect(state, DsCheckboxState.unchecked,
           reason: 'a stale toggle must not outlive the state that allowed it');
+    });
+  });
+
+  // The three cells a state MATRIX renders and a real form never asks for —
+  // ruling S4.
+  //
+  // `<Checkbox checked="indeterminate"/>` with no `onCheckedChange`, the two
+  // `className="border-ring ring-3 ring-ring/50"` fakes, and
+  // `<FieldLabel className="font-normal">`. Each is a documented package prop
+  // rather than something the page fakes locally, because `selects` and
+  // `feedback` render the same three cells again.
+  group('Matrix-only states — ruling S4', () {
+    /// The control's **own** [Focus] — the one carrying a key handler, which
+    /// the `Visibility` wrappers inside a mounted indicator do not have.
+    Focus controlFocus(WidgetTester t, Type of) => t
+        .widgetList<Focus>(
+            find.descendant(of: find.byType(of), matching: find.byType(Focus)))
+        .firstWhere((Focus f) => f.onKeyEvent != null);
+
+    /// `disabled:opacity-50` / `data-disabled:opacity-50`, as the socket dims.
+    double opacityOf(WidgetTester t) => t
+        .widget<Opacity>(find
+            .descendant(
+                of: find.byType(DsCheckbox), matching: find.byType(Opacity))
+            .first)
+        .opacity;
+
+    /// Whether a pointer reaches the control at all.
+    bool ignoresPointer(WidgetTester t) => t
+        .widget<IgnorePointer>(find
+            .descendant(
+                of: find.byType(DsCheckbox), matching: find.byType(IgnorePointer))
+            .first)
+        .ignoring;
+
+    /// What the control hands its own [Semantics] — read off the widget for the
+    /// reason the adoption group records: the annotation sits *inside*
+    /// [DsHitArea], so walking the semantics tree lands somewhere else.
+    SemanticsProperties announced(WidgetTester t, Finder of) => t
+        .widgetList<Semantics>(
+            find.descendant(of: of, matching: find.byType(Semantics)))
+        .first
+        .properties;
+
+    /// A checkbox whose focus this test owns, so "has the focus" and "is
+    /// painted as though it had the focus" can be told apart.
+    Widget ringBox(FocusNode node, {bool? force, bool invalid = false}) =>
+        host(DsCheckbox(
+          focusNode: node,
+          forceFocusRing: force,
+          invalid: invalid,
+          onChanged: (DsCheckboxState _) {},
+        ));
+
+    testWidgets('operable, inert and disabled are three distinct states',
+        (WidgetTester t) async {
+      // Measured on the reference's Indeterminate cell: `disabled: false`,
+      // `opacity: 1` — and measured in this tree BEFORE the flag existed:
+      // opacity already 1.0, IgnorePointer already true, but
+      // `Focus.canRequestFocus` FALSE. Focusability was the only real gap, and
+      // this table is what pins all three states apart.
+      //
+      // Every case is handed a live `onChanged`, so `inert` is measured
+      // *beating* a handler rather than merely coinciding with a missing one.
+      const List<
+          ({
+            String name,
+            bool enabled,
+            bool inert,
+            double opacity,
+            bool focusable,
+            bool operable,
+          })> cases = <({
+        String name,
+        bool enabled,
+        bool inert,
+        double opacity,
+        bool focusable,
+        bool operable,
+      })>[
+        (
+          name: 'operable',
+          enabled: true,
+          inert: false,
+          opacity: 1,
+          focusable: true,
+          operable: true,
+        ),
+        (
+          name: 'inert',
+          enabled: true,
+          inert: true,
+          opacity: 1,
+          focusable: true,
+          operable: false,
+        ),
+        (
+          name: 'disabled',
+          enabled: false,
+          inert: false,
+          opacity: 0.50,
+          focusable: false,
+          operable: false,
+        ),
+      ];
+
+      for (final ({
+            String name,
+            bool enabled,
+            bool inert,
+            double opacity,
+            bool focusable,
+            bool operable,
+          }) c in cases) {
+        final FocusNode node = FocusNode(debugLabel: c.name);
+        addTearDown(node.dispose);
+        int taps = 0;
+        final String why = c.name;
+
+        await t.pumpWidget(host(DsCheckbox(
+          key: ValueKey<String>(c.name),
+          state: DsCheckboxState.indeterminate,
+          enabled: c.enabled,
+          inert: c.inert,
+          focusNode: node,
+          onChanged: (DsCheckboxState _) => taps++,
+        )));
+        await t.pumpAndSettle();
+
+        expect(opacityOf(t), c.opacity,
+            reason: '$why: only `disabled` dims — a control held at a value is '
+                'painted at full strength');
+        expect(ignoresPointer(t), !c.operable,
+            reason: '$why: anything that cannot be operated is deaf to a '
+                'pointer');
+        expect(controlFocus(t, DsCheckbox).canRequestFocus, c.focusable,
+            reason: '$why: `disabled` leaves the tab order and a missing '
+                'handler does not');
+
+        node.requestFocus();
+        await t.pump();
+        expect(node.hasPrimaryFocus, c.focusable,
+            reason: '$why: and the flag is not merely declared — the focus '
+                'either lands or it does not');
+
+        await t.tap(find.byType(DsCheckbox), warnIfMissed: false);
+        await t.pump();
+        expect(taps, c.operable ? 1 : 0,
+            reason: '$why: a click on an inert box changes nothing, exactly as '
+                'a controlled Radix checkbox with no handler does');
+
+        // The keyboard says the same thing the pointer does — which matters
+        // most for the inert case, the one control here that can be focused
+        // and still must not answer Space.
+        await t.sendKeyEvent(LogicalKeyboardKey.space);
+        await t.pump();
+        expect(taps, c.operable ? 2 : 0,
+            reason: '$why: Enter and Space follow operability, not focus');
+        await t.pumpAndSettle();
+      }
+    });
+
+    testWidgets('the Indeterminate cell is announced as an enabled checkbox',
+        (WidgetTester t) async {
+      // `<Checkbox checked="indeterminate" aria-label="Indeterminate"/>`:
+      // controlled, no `onCheckedChange`, and — the point — no `disabled`.
+      final SemanticsHandle semantics = t.ensureSemantics();
+      await t.pumpWidget(host(const DsCheckbox(
+        state: DsCheckboxState.indeterminate,
+        inert: true,
+        label: 'Indeterminate',
+      )));
+      await t.pumpAndSettle();
+
+      final SemanticsProperties said = announced(t, find.byType(DsCheckbox));
+      expect(said.enabled, isTrue,
+          reason: 'the reference measures `disabled: false`; DRIFT 7 is that '
+              'assistive technology is told no more than a reader is');
+      expect(said.mixed, isTrue, reason: 'data-state="indeterminate"');
+      expect(said.checked, isFalse);
+      expect(said.label, 'Indeterminate');
+
+      // …against the state it must not be confused with.
+      await t.pumpWidget(host(const DsCheckbox(
+        state: DsCheckboxState.indeterminate,
+        enabled: false,
+        label: 'Disabled',
+      )));
+      await t.pumpAndSettle();
+      expect(announced(t, find.byType(DsCheckbox)).enabled, isFalse,
+          reason: '`disabled` is announced, and inert is not');
+      semantics.dispose();
+    });
+
+    testWidgets('an inert box registers no activation on its field label',
+        (WidgetTester t) async {
+      // `<label for>` activates the control it points at — and a control Radix
+      // holds at a value has no activation to offer, so the words are inert
+      // too.
+      DsCheckboxState state = DsCheckboxState.indeterminate;
+      await t.pumpWidget(host(SizedBox(
+        width: 448,
+        child: StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) => DsField(
+            label: 'Partial bulk selection',
+            orientation: DsFieldOrientation.horizontal,
+            child: DsCheckbox(
+              state: state,
+              inert: true,
+              onChanged: (DsCheckboxState next) => setState(() => state = next),
+            ),
+          ),
+        ),
+      )));
+
+      await t.tap(find.text('Partial bulk selection'), warnIfMissed: false);
+      await t.pump();
+      expect(state, DsCheckboxState.indeterminate,
+          reason: 'the box is held at its prop value from every direction');
+      await t.pumpAndSettle();
+    });
+
+    testWidgets('forceFocusRing paints a ring nothing is focused for',
+        (WidgetTester t) async {
+      final FocusNode node = FocusNode();
+      addTearDown(node.dispose);
+
+      await t.pumpWidget(ringBox(node, force: true));
+      final DsThemeData theme = themeIn(t, DsCheckbox);
+      await t.pumpAndSettle();
+      expect(node.hasPrimaryFocus, isFalse,
+          reason: 'the cell is a lie painted with class names — nothing on the '
+              'reference page has the focus either');
+      expect(borderOf(socketOf(t, DsCheckbox)), theme.ring,
+          reason: '`border-ring`, with tw-merge having deleted `border-input` '
+              'from the string outright');
+      expect(ringOf(socketOf(t, DsCheckbox), theme).a, closeTo(0.50, 0.001),
+          reason: '`ring-3 ring-ring/50`');
+
+      // `false` withholds the ring from a control that genuinely has the focus.
+      await t.pumpWidget(ringBox(node, force: false));
+      node.requestFocus();
+      await t.pumpAndSettle();
+      expect(node.hasPrimaryFocus, isTrue, reason: 'the focus is real here');
+      expect(borderOf(socketOf(t, DsCheckbox)), theme.input,
+          reason: 'and the socket is still at rest');
+      expect(ringOf(socketOf(t, DsCheckbox), theme).a, closeTo(0, 0.001),
+          reason: 'the resting ring is the hue at zero alpha, and a 3px spread '
+              'of nothing paints nothing');
+
+      // `null` — the default — follows the real focus, in both directions.
+      await t.pumpWidget(ringBox(node));
+      await t.pumpAndSettle();
+      expect(borderOf(socketOf(t, DsCheckbox)), theme.ring,
+          reason: 'still focused, and now the ring is allowed to say so');
+      expect(ringOf(socketOf(t, DsCheckbox), theme).a, closeTo(0.50, 0.001));
+
+      node.unfocus();
+      await t.pumpAndSettle();
+      expect(borderOf(socketOf(t, DsCheckbox)), theme.input,
+          reason: 'and back to rest when the focus leaves');
+    });
+
+    testWidgets('aria-invalid still beats a forced ring — F5 order kept',
+        (WidgetTester t) async {
+      final FocusNode node = FocusNode();
+      addTearDown(node.dispose);
+
+      await t.pumpWidget(ringBox(node, force: true, invalid: true));
+      final DsThemeData theme = themeIn(t, DsCheckbox);
+      await t.pumpAndSettle();
+      expect(borderOf(socketOf(t, DsCheckbox)), theme.destructive,
+          reason: 'the invalid branch is tested first in both colour targets, '
+              'so a forced ring is as invisible as a real focus is');
+      expect(ringOf(socketOf(t, DsCheckbox), theme),
+          theme.destructive.withValues(alpha: 0.20),
+          reason: '`aria-invalid:ring-3 ring-destructive/20`');
+    });
+
+    testWidgets('the radio matrix gets the same painted ring',
+        (WidgetTester t) async {
+      // The second of the page's two fakes, and the reason the flag exists at
+      // all: Flutter has exactly one focus and this page renders two focused
+      // controls.
+      await t.pumpWidget(host(SizedBox(
+        width: 200,
+        child: DsRadioGroup<String>(
+          value: null,
+          onChanged: (String _) {},
+          children: const <Widget>[
+            DsRadioGroupItem<String>(
+              value: 'a',
+              forceFocusRing: true,
+              label: 'Focus',
+            ),
+          ],
+        ),
+      )));
+      final DsThemeData theme = themeIn(t, DsRadioGroupItem<String>);
+      await t.pumpAndSettle();
+      expect(borderOf(socketOf(t, DsRadioGroupItem<String>)), theme.ring,
+          reason: 'the item wears `border-ring` with nothing focused');
+      expect(ringOf(socketOf(t, DsRadioGroupItem<String>), theme).a,
+          closeTo(0.50, 0.001),
+          reason: '`ring-3 ring-ring/50`, character-identical to the checkbox '
+              'cell');
+    });
+
+    testWidgets('DsFieldLabel takes a spec, and `normal` is font-normal',
+        (WidgetTester t) async {
+      // `<FieldLabel htmlFor={…} className="font-normal">` — probed on the
+      // filter list at 13px, a 17.875px line box, weight 400, `--foreground`.
+      expect(DsFieldLabel.normal.family, DsComponentType.fieldLabel.family);
+      expect(DsFieldLabel.normal.size, DsComponentType.fieldLabel.size,
+          reason: '`font-normal` declares one property: `text-sm` survives it');
+      expect(DsFieldLabel.normal.height, DsComponentType.fieldLabel.height,
+          reason: '…and so does `leading-snug`, which is the whole point');
+      expect(DsFieldLabel.normal.variations.first.value,
+          DsComponentType.textSm.variations.first.value,
+          reason: 'the weight is borrowed from the token that already records '
+              'the 400 `html` gives, never typed into this layer');
+
+      await t.pumpWidget(host(SizedBox(
+        width: 448,
+        child: DsFieldLabel('Available now', spec: DsFieldLabel.normal),
+      )));
+      final TextStyle overridden =
+          t.widget<Text>(find.text('Available now')).style!;
+      expect(overridden.fontWeight, FontWeight.w400,
+          reason: 'the resolved style, read off the tree');
+      expect(overridden.fontSize, 13);
+      expect(overridden.height, closeTo(1.375, 0.000001));
+      expect(t.getSize(find.byType(DsText)).height, closeTo(17.875, 0.001),
+          reason: 'the probed line box: 13 × 1.375');
+
+      // …and the default is what `Label` types itself in, unchanged.
+      await t.pumpWidget(host(const SizedBox(
+        width: 448,
+        child: DsFieldLabel('Available now'),
+      )));
+      final TextStyle byDefault =
+          t.widget<Text>(find.text('Available now')).style!;
+      expect(byDefault.fontWeight, FontWeight.w500,
+          reason: '`Label`\'s own `font-medium`, with nothing overriding it');
+      expect(byDefault.fontSize, overridden.fontSize,
+          reason: 'and the two differ in nothing but the weight');
+      expect(byDefault.height, overridden.height);
     });
   });
 

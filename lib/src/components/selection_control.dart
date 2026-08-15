@@ -214,6 +214,11 @@ class _DsJellyReplayState extends State<DsJellyReplay> {
 /// two colours over [duration] on `--ease-out`, composites the focus or invalid
 /// ring in front of the socket, dims and deafens itself when disabled, answers
 /// Enter and Space, and squashes on every change of [jellyState].
+///
+/// **Operable, [inert] and disabled are three states, not two.** `disabled`
+/// dims a control and takes it out of the tab order; a controlled control with
+/// no handler does neither and still cannot be operated. Both ship, because a
+/// state matrix renders both.
 class DsSelectionControl extends StatefulWidget {
   const DsSelectionControl({
     super.key,
@@ -228,7 +233,9 @@ class DsSelectionControl extends StatefulWidget {
     required this.child,
     this.onTap,
     this.enabled = true,
+    this.inert = false,
     this.invalid = false,
+    this.forceFocusRing,
     this.focusNode,
     this.skipTraversal = false,
     this.onKey,
@@ -273,8 +280,60 @@ class DsSelectionControl extends StatefulWidget {
   /// `data-disabled` rather than `:disabled` (forms-map drift 14).
   final bool enabled;
 
+  /// `checked="indeterminate"` with **no** `onCheckedChange` — a control Radix
+  /// holds at the value it was handed, forever.
+  ///
+  /// It carries no `disabled`, so what the browser renders is a live
+  /// `<button>`: **fully opaque, still in the tab order, still ringing on
+  /// `:focus-visible`**, and a click on it changes nothing only because there is
+  /// no handler to call *(measured on the reference's Indeterminate cell:
+  /// `disabled: false`, opacity 1)*. Three distinct states result, and all three
+  /// ship:
+  ///
+  /// | | paints | pointer / keyboard | tab order |
+  /// |---|---|---|---|
+  /// | operable | full strength | operates | in |
+  /// | [inert] | **full strength** | deaf | **in** |
+  /// | `enabled: false` | dimmed by half | deaf | out |
+  ///
+  /// Only the last of those three columns is new. `enabled` already drove the
+  /// dimming while `enabled && onTap != null` drove the deafness, so a control
+  /// with no handler was *already* opaque and *already* deaf — and only its
+  /// focusability was wrong (measured: `Opacity.opacity` 1.0,
+  /// `IgnorePointer.ignoring` true, `Focus.canRequestFocus` **false**). This
+  /// flag closes that one gap and nothing else.
+  ///
+  /// It beats [onTap]: *inert* is a statement about the control, not about
+  /// whether a caller happened to pass a handler.
+  ///
+  /// DOCUMENTED DRIFT (selection-map drift 7): this is the one specimen on the
+  /// reference page a reader can click with no result and no explanation.
+  /// Reproduced, because it is what the page renders.
+  final bool inert;
+
   /// `aria-invalid="true"`.
   final bool invalid;
+
+  /// `className="border-ring ring-3 ring-ring/50"` — the focus ring worn by a
+  /// control that does not have the focus.
+  ///
+  /// The reference's two "Focus" cells are **static fakes** *(selection-map
+  /// §4.1 cell 4, drift 6)*: `cn()` is `extendTailwindMerge`, and `border-input`
+  /// and `border-ring` are one `border-color` group, so the merge deletes
+  /// `border-input` from the class string outright and what remains is a
+  /// permanent box-shadow. Nothing on that page is focused — and two such cells
+  /// sit on one page, which real focus cannot answer, there being exactly one of
+  /// it.
+  ///
+  /// `true` paints the ring, `false` withholds it even while genuinely focused,
+  /// and `null` — the default — follows the focus like any other control. One
+  /// flag drives the border and the ring together because the two classes always
+  /// travel together.
+  ///
+  /// [invalid] still beats it, unchanged: `aria-invalid` is tested first in both
+  /// colour targets (ruling F5), so a forced ring on an errored control is as
+  /// invisible as a real focus is.
+  final bool? forceFocusRing;
 
   final FocusNode? focusNode;
 
@@ -301,7 +360,23 @@ class DsSelectionControl extends StatefulWidget {
 class _DsSelectionControlState extends State<DsSelectionControl> {
   bool _focused = false;
 
-  bool get _enabled => widget.enabled && widget.onTap != null;
+  /// Whether the control can be **operated** — the `:disabled` predicate, plus
+  /// the two ways a control ends up with nothing to say.
+  bool get _enabled =>
+      widget.enabled && !widget.inert && widget.onTap != null;
+
+  /// Whether the control takes the focus, which is deliberately **not**
+  /// [_enabled].
+  ///
+  /// `disabled` removes a `<button>` from the tab order; a missing handler does
+  /// not. Reading the same flag for both is what made an inert control
+  /// unfocusable, and separating them is the whole of what
+  /// [DsSelectionControl.inert] fixes.
+  bool get _focusable =>
+      widget.enabled && (widget.inert || widget.onTap != null);
+
+  /// Whether the ring paints: the real focus, or the class list's fake.
+  bool get _focusRing => widget.forceFocusRing ?? _focused;
 
   void _setFocused(bool value) {
     if (_focused == value) return;
@@ -328,7 +403,7 @@ class _DsSelectionControlState extends State<DsSelectionControl> {
   /// `focus-visible:border-ring`, beaten by `aria-invalid:border-destructive`.
   Color _borderTarget(DsThemeData theme) {
     if (widget.invalid) return theme.destructive;
-    if (_focused) return theme.ring;
+    if (_focusRing) return theme.ring;
     return widget.border;
   }
 
@@ -342,7 +417,7 @@ class _DsSelectionControlState extends State<DsSelectionControl> {
     if (widget.invalid) {
       return theme.destructive.withValues(alpha: _invalidRingAlpha);
     }
-    return theme.ring.withValues(alpha: _focused ? _focusRingAlpha : 0);
+    return theme.ring.withValues(alpha: _focusRing ? _focusRingAlpha : 0);
   }
 
   @override
@@ -395,7 +470,7 @@ class _DsSelectionControlState extends State<DsSelectionControl> {
 
     control = Focus(
       focusNode: widget.focusNode,
-      canRequestFocus: _enabled,
+      canRequestFocus: _focusable,
       skipTraversal: widget.skipTraversal,
       onFocusChange: _setFocused,
       onKeyEvent: _onKey,

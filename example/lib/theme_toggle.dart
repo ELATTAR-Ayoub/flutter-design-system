@@ -73,6 +73,20 @@ class ThemeToggle extends StatelessWidget {
           padding: _containerPadding,
           // `gap-px`.
           gap: DsWidths.hairline,
+          // **The pill snaps here, and only here.**
+          //
+          // Clicking an option flips the theme, and `next-themes` writes
+          // `transition: none !important` onto `<html>` for roughly 14ms so
+          // the whole document does not cross-fade at once. The pill's
+          // transform commits inside that freeze, so its travel never runs —
+          // measured on a real theme click, where the pill is at its new home
+          // on the first frame with no spring between.
+          //
+          // The arrival squash is unaffected: the class goes back on in the
+          // same batch and plays its full 600ms once the freeze lifts. So this
+          // control is a snap plus a jelly, never a travel. The nav rail's
+          // pill flips no theme, is not frozen, and keeps its 250ms spring.
+          travelDuration: Duration.zero,
           pill: DsMachineSurface(
             spec: DsShadows.e1,
             radius: BorderRadius.circular(DsRadii.pill),
@@ -135,6 +149,29 @@ class _ThemeOptionState extends State<_ThemeOption> {
         onExit: (_) => _hover(false),
         child: DsPress(
           onTap: widget.onTap,
+          // **The squish SNAPS on this control, and only on this one.**
+          //
+          // The option's class list is `press … transition-colors
+          // duration-fast ease-out`. The `press` utility declares the whole
+          // `transition` shorthand — `transition: transform
+          // var(--duration-base) var(--ease-spring)` — and `transition-colors`
+          // is emitted later at equal specificity, so it REPLACES that
+          // shorthand's `transition-property` with the colour list. `transform`
+          // is not in that list, so `:active { transform: scale(0.94) }`
+          // arrives and leaves with nothing interpolating it.
+          //
+          // Measured, not read off the cascade: a real pointer press driven on
+          // the live reference and sampled every frame reported
+          // `none → matrix(0.94, 0, 0, 0.94, 0, 0) → none`, each change landing
+          // in a single frame, with **zero** intermediate matrices across 73
+          // samples. The 250ms that the class list does buy belongs to the
+          // glyph's colour, which is tweened separately below.
+          //
+          // Zero on both legs rather than a different widget: the asymmetry
+          // [DsPress] exists to express is real everywhere else, and every
+          // other call site keeps it.
+          downDuration: Duration.zero,
+          upDuration: Duration.zero,
           child: SizedBox(
             width: _optionPx,
             height: _optionPx,

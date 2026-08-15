@@ -291,6 +291,7 @@ class DsRadioGroupItem<T> extends StatefulWidget {
     required this.value,
     this.enabled = true,
     this.invalid = false,
+    this.forceFocusRing,
     this.label,
     this.hint,
   });
@@ -304,6 +305,14 @@ class DsRadioGroupItem<T> extends StatefulWidget {
 
   /// `aria-invalid="true"`.
   final bool invalid;
+
+  /// `className="border-ring ring-3 ring-ring/50"` on the item — the matrix's
+  /// "Focus" cell, which is painted rather than focused.
+  ///
+  /// See [DsSelectionControl.forceFocusRing]. The radio matrix carries the
+  /// second of the page's two such cells, which is the reason the flag exists
+  /// at all: only one control can really hold the focus.
+  final bool? forceFocusRing;
 
   /// The accessible name, for a control whose visible label is a sibling.
   ///
@@ -421,6 +430,7 @@ class _DsRadioGroupItemState<T> extends State<DsRadioGroupItem<T>> {
       jellyState: checked,
       enabled: enabled,
       invalid: invalid,
+      forceFocusRing: widget.forceFocusRing,
       focusNode: focusNode,
       skipTraversal: !_group!.isTabStop(widget.value),
       onKey: _onKey,
