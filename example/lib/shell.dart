@@ -39,6 +39,15 @@ const double _activeRowAlpha = 0.12;
 /// `bg-muted/50` — the sheet header's band.
 const double _sheetHeaderAlpha = 0.5;
 
+/// sonner's module-level `toast` — one queue for the whole app.
+///
+/// `<Toaster position="bottom-right" />` is mounted **once**, in the root
+/// layout (`app/layout.tsx:39`), and every page just imports `toast` and calls
+/// it. Supervisor ruling F8 keeps that split: the widget is a package
+/// component, its mounting is the example's, and the queue behind it is a
+/// singleton here for the same reason sonner's is a module-level object there.
+final DsToastController docsToasts = DsToastController();
+
 /// The current route, and the only way to change it.
 ///
 /// The docs app has one route dimension (a path string) and no history, so a
@@ -162,6 +171,16 @@ class _DocsShellState extends State<DocsShell> {
             height: DsWidths.siteHeader,
             child: _Header(theme: theme, viewport: viewport, desktop: desktop),
           ),
+          // `<Toaster position="bottom-right" />`, above everything, the way a
+          // `position: fixed` viewport with sonner's z-index is.
+          //
+          // A full-size slot in **this** Stack rather than an `Overlay` entry:
+          // the reduced-motion `MediaQuery` override the capture rig installs
+          // sits below `MaterialApp`, and an overlay entry does not inherit it
+          // — so a toast captured through the rig would still be animating.
+          // The host paints nothing and takes no pointer until a toast is
+          // queued.
+          Positioned.fill(child: DsToaster(controller: docsToasts)),
         ],
       ),
     );
