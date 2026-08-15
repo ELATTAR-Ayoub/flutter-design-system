@@ -5,6 +5,17 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/main.dart';
 import 'package:example/nav.dart';
+import 'package:example/pages/buttons.dart';
+import 'package:example/pages/colors.dart';
+import 'package:example/pages/forms.dart';
+import 'package:example/pages/icons.dart';
+import 'package:example/pages/inputs.dart';
+import 'package:example/pages/motion.dart';
+import 'package:example/pages/overview.dart';
+import 'package:example/pages/placeholder.dart';
+import 'package:example/pages/shadows.dart';
+import 'package:example/pages/spacing.dart';
+import 'package:example/pages/typography.dart';
 import 'package:example/shell.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -34,6 +45,26 @@ extension on WidgetTester {
     await pumpAndSettle();
   }
 }
+
+/// Every route that is really built, and the page each one must mount.
+///
+/// Named as types rather than counted, because `isNotNull` cannot tell a real
+/// page from the [PlaceholderPage] every unbuilt href falls through to: a route
+/// arm dropped by a bad merge would still have satisfied it, and the page would
+/// have gone missing behind a title that looks right (ruling B11). Ten arms,
+/// in `pageFor`'s own order.
+const Map<String, Type> _wired = <String, Type>{
+  dsRoot: OverviewPage,
+  '$dsRoot/colors': ColorsPage,
+  '$dsRoot/typography': TypographyPage,
+  '$dsRoot/spacing': SpacingPage,
+  '$dsRoot/shadows': ShadowsPage,
+  '$dsRoot/motion': MotionPage,
+  '$dsRoot/icons': IconsPage,
+  '$dsRoot/components/base/buttons': ButtonsPage,
+  '$dsRoot/components/base/inputs': InputsPage,
+  '$dsRoot/components/base/forms': FormsPage,
+};
 
 Iterable<({DsGroup group, DsCategory category})> get _everyCategory sync* {
   for (final DsGroup group in dsGroups) {
@@ -220,14 +251,41 @@ void main() {
     expect(activeIndex(), 1);
   });
 
-  testWidgets('every nav href resolves to a page', (WidgetTester tester) async {
+  testWidgets('every nav href resolves to a page, and a built route to its '
+      'own', (WidgetTester tester) async {
     tester.useViewport(_desktop);
     await tester.pumpApp();
 
-    for (final DsGroup group in dsGroups) {
-      expect(pageFor(group.href), isNotNull);
-      for (final DsCategory category in group.categories) {
-        expect(pageFor(categoryHref(group, category)), isNotNull);
+    final Set<String> hrefs = <String>{
+      for (final DsGroup group in dsGroups) group.href,
+      for (final ({DsGroup group, DsCategory category}) entry in _everyCategory)
+        categoryHref(entry.group, entry.category),
+    };
+
+    // The table is an inventory, so it has to be spent: a route arm pointing at
+    // an href the nav does not carry is a page nothing can reach.
+    expect(
+      _wired.keys.where((String route) => !hrefs.contains(route)),
+      isEmpty,
+      reason: 'these routes are wired but absent from the nav',
+    );
+
+    for (final String href in hrefs) {
+      final Widget page = pageFor(href);
+      final Type? built = _wired[href];
+      if (built == null) {
+        expect(
+          page,
+          isA<PlaceholderPage>(),
+          reason: '$href is not built yet, so it falls through to the '
+              'placeholder — and nothing else may',
+        );
+      } else {
+        expect(
+          page.runtimeType,
+          built,
+          reason: '$href must mount $built, not ${page.runtimeType}',
+        );
       }
     }
   });

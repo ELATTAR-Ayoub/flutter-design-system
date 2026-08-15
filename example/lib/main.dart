@@ -12,8 +12,11 @@ import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:flutter/material.dart';
 
 import 'nav.dart';
+import 'pages/buttons.dart';
 import 'pages/colors.dart';
+import 'pages/forms.dart';
 import 'pages/icons.dart';
+import 'pages/inputs.dart';
 import 'pages/motion.dart';
 import 'pages/overview.dart';
 import 'pages/placeholder.dart';
@@ -142,15 +145,14 @@ class _DocsHome extends StatelessWidget {
   }
 }
 
-/// The seven real routes; every other href in the nav gets a
-/// [PlaceholderPage].
+/// The ten real routes; every other href in the nav gets a [PlaceholderPage].
 ///
 /// Public because the shell test drives it directly, and because it is the one
 /// place the route table lives.
 ///
 /// The arms follow the nav's own order (`nav.ts` foundations: colors →
-/// typography → spacing → shadows → motion → icons), so this switch reads as
-/// the sidebar reads.
+/// typography → spacing → shadows → motion → icons, then base components:
+/// buttons → inputs → forms), so this switch reads as the sidebar reads.
 Widget pageFor(String route) {
   return switch (route) {
     dsRoot => const OverviewPage(),
@@ -160,6 +162,9 @@ Widget pageFor(String route) {
     '$dsRoot/shadows' => const ShadowsPage(),
     '$dsRoot/motion' => const MotionPage(),
     '$dsRoot/icons' => const IconsPage(),
+    '$dsRoot/components/base/buttons' => const ButtonsPage(),
+    '$dsRoot/components/base/inputs' => const InputsPage(),
+    '$dsRoot/components/base/forms' => const FormsPage(),
     _ => _placeholderFor(route),
   };
 }

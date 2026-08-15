@@ -1130,51 +1130,58 @@ void main() {
       // The composed form's `terms`: the reference cannot focus it at all,
       // because a hand-wired Checkbox exposes no ref for `shouldFocusError` to
       // call (forms-map drift 7). Here it is a field like any other.
-      final DsFormField<bool> terms = DsFormField<bool>(
-        name: 'terms',
-        initialValue: false,
-        rules: <DsRule<bool>>[
-          const DsRule<bool>(_accepted, 'You have to accept the terms.'),
-        ],
-      );
-      final DsForm form = DsForm(fields: <DsFormFieldBase>[terms]);
-      addTearDown(form.dispose);
+      //
+      // Both orientations, because the composed form's `terms` is a
+      // **horizontal** field and that branch once published no `DsFieldScope`
+      // at all — it put its raw `child` in the Row where the vertical branch
+      // put the scope-wrapped control, so the checkbox adopted nothing and a
+      // failed submit focused nothing. Fixed in `field.dart`; asserted on both
+      // branches here so the shape this ruling is about is the shape that is
+      // measured.
+      for (final DsFieldOrientation orientation in DsFieldOrientation.values) {
+        final DsFormField<bool> terms = DsFormField<bool>(
+          name: 'terms',
+          initialValue: false,
+          rules: <DsRule<bool>>[
+            const DsRule<bool>(_accepted, 'You have to accept the terms.'),
+          ],
+        );
+        final DsForm form = DsForm(fields: <DsFormFieldBase>[terms]);
+        addTearDown(form.dispose);
 
-      await t.pumpWidget(host(SizedBox(
-        width: 448,
-        child: ListenableBuilder(
-          listenable: form,
-          builder: (BuildContext context, Widget? _) => DsField(
-            label: 'I accept the terms',
-            errors: terms.errors,
-            focusNode: terms.focusNode,
-            // NOTE, and reported: `DsField`'s **horizontal** branch renders its
-            // raw `child` instead of the `DsFieldScope`-wrapped one
-            // (`field.dart`, the `DsFieldOrientation.horizontal` case), so a
-            // horizontal field publishes no scope at all and nothing below it
-            // can adopt anything. The composed form's `terms` is exactly that
-            // shape. Pinned vertical here so this test measures THIS task's
-            // wiring; the horizontal gap is one word in a file this task does
-            // not own.
-            child: DsCheckbox(
-              state: terms.value
-                  ? DsCheckboxState.checked
-                  : DsCheckboxState.unchecked,
-              onChanged: (DsCheckboxState next) =>
-                  terms.value = next == DsCheckboxState.checked,
+        await t.pumpWidget(host(SizedBox(
+          width: 448,
+          child: ListenableBuilder(
+            listenable: form,
+            builder: (BuildContext context, Widget? _) => DsField(
+              key: ValueKey<DsFieldOrientation>(orientation),
+              label: 'I accept the terms',
+              errors: terms.errors,
+              focusNode: terms.focusNode,
+              orientation: orientation,
+              child: DsCheckbox(
+                state: terms.value
+                    ? DsCheckboxState.checked
+                    : DsCheckboxState.unchecked,
+                onChanged: (DsCheckboxState next) =>
+                    terms.value = next == DsCheckboxState.checked,
+              ),
             ),
           ),
-        ),
-      )));
+        )));
 
-      expect(terms.focusNode.hasFocus, isFalse);
-      await form.submit();
-      await t.pumpAndSettle();
+        final String why = orientation.name;
+        expect(terms.focusNode.hasFocus, isFalse, reason: why);
+        await form.submit();
+        await t.pumpAndSettle();
 
-      expect(terms.errors, <String>['You have to accept the terms.']);
-      expect(terms.focusNode.hasFocus, isTrue);
-      expect(adopted(t, find.byType(DsCheckbox), terms.focusNode), isTrue,
-          reason: 'the node a failed submit focuses IS the checkbox\'s own');
+        expect(terms.errors, <String>['You have to accept the terms.'],
+            reason: why);
+        expect(terms.focusNode.hasFocus, isTrue, reason: why);
+        expect(adopted(t, find.byType(DsCheckbox), terms.focusNode), isTrue,
+            reason: '$why: the node a failed submit focuses IS the '
+                'checkbox\'s own');
+      }
     });
   });
 

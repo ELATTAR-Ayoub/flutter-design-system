@@ -937,11 +937,12 @@ class _ChipFrame extends CustomPainter {
 ///
 /// Three cascade facts decide how it reads, and two of them are utilities
 /// beating the component layer:
-/// * **`leading-relaxed` beats `.type-code`.** The class declares
-///   `line-height: 1.4` inside `@layer components`; `leading-relaxed` is a
-///   utility, so **1.625** wins — 20.3125px per line. That override is why the
-///   style is assembled here rather than handed to [DsText], which renders a
-///   `.type-*` class as declared.
+/// * **`leading-relaxed` beats `.type-code`.** The class declares its own
+///   leading inside `@layer components` — [DsType.code]'s, which owns that
+///   number — and `leading-relaxed` is a utility, so [_leadingRelaxed] wins:
+///   20.3125px per line. That override is why the style is assembled here
+///   rather than handed to [DsText], which renders a `.type-*` class as
+///   declared.
 /// * **`.type-code` sets no `font-weight`**, so a sample inherits 400. It is
 ///   the one mono class on the site that is not 600.
 /// * The fill is `--background` — the same colour as the [DsPanel] body it

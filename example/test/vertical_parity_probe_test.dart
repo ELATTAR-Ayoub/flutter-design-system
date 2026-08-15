@@ -1,10 +1,10 @@
 // parity probe — the Flutter half of the vertical-metric comparison against
 // the web reference.
 //
-// Pumps each of the four foundation pages inside the real [DocsShell] at the
-// 1440 frame with the reference's own font binaries loaded (without them the
-// test engine measures Ahem and every line height is fiction), then walks the
-// render tree and prints one line per box:
+// Pumps each covered page inside the real [DocsShell] at the 1440 frame with
+// the reference's own font binaries loaded (without them the test engine
+// measures Ahem and every line height is fiction), then walks the render tree
+// and prints one line per box:
 //
 //     PARITY|<page>|<depth>|<widget>|<top>|<height>|<left>|<width>|<text>
 //
@@ -36,17 +36,31 @@ const double _contentWidth = 1080;
 
 /// The reference's own reading-column height per route, in CSS pixels.
 ///
-/// Measured off `http://localhost:3000` at 1440×900, dark, fonts loaded, with
+/// Measured off `http://localhost:3000` at 1440×900, fonts loaded, with
 /// `getBoundingClientRect()` on `main > div.mx-auto.max-w-(--width-content)`
-/// (`scratchpad/measure-vertical.js`, 2026-08-14). A page that drifts from
-/// these is a page that no longer stacks the way the reference stacks — which
-/// is the whole failure this file exists to catch, since the drift is
-/// invisible per element and only shows up as an accumulated offset.
+/// (`scratchpad/measure-vertical.js`) — the four foundation pages dark on
+/// 2026-08-14, the three base-component pages light on 2026-08-15. The theme is
+/// recorded rather than reconciled because nothing on either side changes size
+/// with it: `forms_page_test` measures the same column in both and holds it to
+/// one number.
+///
+/// A page that drifts from these is a page that no longer stacks the way the
+/// reference stacks — which is the whole failure this file exists to catch,
+/// since the drift is invisible per element and only shows up as an accumulated
+/// offset.
+///
+/// `forms` is measured **pristine** (ruling F3): nothing typed, nothing
+/// submitted, no menu open. Its height moves with error state, so the pump
+/// below has to leave it alone — one `pump`, no interaction — or this number is
+/// measuring a different page.
 const Map<String, double> _referenceHeight = <String, double>{
   'overview': 2402.66,
   'colors': 3781.83,
   'typography': 6039.94,
   'spacing': 4159.36,
+  'buttons': 4783.5,
+  'inputs': 5086.3,
+  'forms': 4968.7,
 };
 
 /// Half a CSS pixel: below the smallest thing either engine can paint, and
@@ -168,6 +182,9 @@ void main() {
     'colors': '$dsRoot/colors',
     'typography': '$dsRoot/typography',
     'spacing': '$dsRoot/spacing',
+    'buttons': '$dsRoot/components/base/buttons',
+    'inputs': '$dsRoot/components/base/inputs',
+    'forms': '$dsRoot/components/base/forms',
   };
 
   for (final MapEntry<String, String> entry in routes.entries) {

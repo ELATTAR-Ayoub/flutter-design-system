@@ -40,8 +40,6 @@
 ///   accessibility regression is the one drift class this port does not ship
 ///   (the principle ruling F4 states), so the omission is recorded and not
 ///   reproduced.
-/// * **`AtSign` and `Ticket`.** Both are off the curated 63 and neither has
-///   landed in `DsIconGlyph` yet — see [_atSign] and [_ticket].
 ///
 /// Reference drifts, all shipped as written (inputs-map §17). Where a drift
 /// belongs to a component rather than to this page it is recorded at its own
@@ -128,20 +126,6 @@ const double _measureLg = 512;
 /// `max-w-40` — the Quantity and Referral groups. This one *is* the spacing
 /// scale, so it reads off it.
 final double _measure40 = ds(40);
-
-/// `AtSign` — the Email field's leading addon.
-///
-/// **Not yet in [DsIconGlyph].** Ruling I6 adds `at-sign` and `ticket` to the
-/// off-curated glyphs beside `rotateCcw`, and `icon_paths.dart` belongs to
-/// another owner this wave, so both addons below draw the nearest curated shape
-/// until the transcripts land. Nothing measured moves: every addon glyph on this
-/// page paints 16×16 at stroke 2.4 whichever path is inside it, so the page's
-/// stack is the reference's either way and swapping these two constants is the
-/// whole of the fix.
-const DsIconGlyph _atSign = DsIconGlyph.user;
-
-/// `Ticket` — the Invite code field's leading addon. See [_atSign].
-const DsIconGlyph _ticket = DsIconGlyph.tag;
 
 /// `#api` — six rows.
 ///
@@ -600,7 +584,7 @@ class _TypesSectionState extends State<_TypesSection> {
                 child: DsInputGroup(
                   startAddon: const DsInputGroupAddon(
                     child: DsIcon(
-                      _atSign,
+                      DsIconGlyph.atSign,
                       size: DsIconSize.md,
                       tone: DsIconTone.subtle,
                     ),
@@ -730,7 +714,7 @@ class _TypesSectionState extends State<_TypesSection> {
                 child: DsInputGroup(
                   startAddon: const DsInputGroupAddon(
                     child: DsIcon(
-                      _ticket,
+                      DsIconGlyph.ticket,
                       size: DsIconSize.md,
                       tone: DsIconTone.subtle,
                     ),

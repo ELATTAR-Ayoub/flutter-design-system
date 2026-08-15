@@ -50,6 +50,16 @@ const List<_Rule> _rules = <_Rule>[
       zeroIsLegal: true),
   _Rule('hardcoded radius', r'BorderRadius\.circular\(\d', zeroIsLegal: true),
   _Rule('raw BoxShadow (use DsShadows/DsMachineSurface)', r'BoxShadow\('),
+  // Leading, not box height. A [TextStyle.height] is the unitless ratio CSS
+  // calls `line-height`, so the scope is "the integer part is 0 or 1" — which
+  // is every value the type scale declares and none of the pixel heights a box
+  // takes (`h-9` is 36, a row is 40, an icon is 16, and all of them read off
+  // `ds()` or a component spec already).
+  //
+  // `\b` before `height` is what keeps `maxHeight:`/`minHeight:` out; the
+  // camel-cased `lineHeight:` never matches at all, this rule being
+  // case-sensitive like every other one here.
+  _Rule('hardcoded line height', r'\bheight:\s*[01](?!\d)', zeroIsLegal: true),
 ];
 
 /// A number literal is "bare zero" when it is `0`, `0.0`, `0.00`… — nothing else.
@@ -144,6 +154,7 @@ void main() {
         'hardcoded duration': 'const d = Duration(milliseconds: 250);',
         'hardcoded radius': 'final r = BorderRadius.circular(16);',
         'raw BoxShadow (use DsShadows/DsMachineSurface)': 'const b = BoxShadow();',
+        'hardcoded line height': 'const s = TextStyle(height: 1.4);',
       };
       for (final MapEntry<String, String> sample in samples.entries) {
         final List<TokenViolation> hits = scanSource('lib/src/probe.dart', sample.value);
@@ -162,6 +173,36 @@ void main() {
       expect(scanSource('lib/src/probe.dart', 'curve: Curves.easeOut,'),
           isNotEmpty);
       expect(scanSource('lib/src/probe.dart', 'Curves.linear;'), isNotEmpty);
+    });
+
+    test('the line-height rule is leading, not box height', () {
+      // What it is for: the ratios the type scale declares, wherever they are
+      // restated — in code or in a comment quoting the stylesheet.
+      for (final String leading in <String>[
+        'height: 1,',
+        'height: 1.0,',
+        'height: 1.375,',
+        'height: 1.625,',
+        '/// `line-height: 1.4` inside `@layer components`',
+      ]) {
+        expect(scanSource('lib/src/probe.dart', leading), isNotEmpty,
+            reason: 'a line height escaped the guard: $leading');
+      }
+
+      // What it must not swallow: a box is measured in pixels and reads its
+      // number off the scale, so those numbers are the *other* rules' business
+      // and a false positive here would be paid for on every layout line.
+      for (final String box in <String>[
+        'SizedBox(height: 40)',
+        'const SizedBox(height: 12, width: 12)',
+        'constraints: const BoxConstraints(maxHeight: 1.5)',
+        'BoxConstraints(minHeight: 20)',
+        'final double lineHeight = 1.4;',
+        '// width: 20, height: 14, x: 2, y: 3, rx: 2',
+      ]) {
+        expect(scanSource('lib/src/probe.dart', box), isEmpty,
+            reason: 'the line-height rule fired on a box: $box');
+      }
     });
 
     test('allow-hardcoded: exempts the line', () {

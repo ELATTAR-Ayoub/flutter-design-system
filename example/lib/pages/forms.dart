@@ -25,15 +25,6 @@
 ///   The reference focuses nothing at all there — see drift 7 — because RHF
 ///   needs a DOM ref and all three failing fields are hand-wired. An invisible
 ///   accessibility regression is the one drift class this port does not ship.
-/// * **The horizontal rows are hand-composed, control first.** The reference's
-///   three horizontal `Field`s put the control in the DOM before the label and
-///   let `*:data-[slot=field-label]:flex-auto` give the label the slack, so a
-///   radio, a switch and a checkbox all sit at the **left** of their row.
-///   [DsField]'s horizontal branch renders label-then-control (pinned by its own
-///   package test), so this page builds the row itself with [_ControlRow] and
-///   keeps [DsField] for what it is needed for — the scope that carries the
-///   focus node, the invalid colouring and the error placement. Page-local
-///   composition, not a component change; flagged for the field layer's owner.
 /// * **`form.reset(values)`** has no single call in the port: `DsForm.reset`
 ///   goes back to `defaultValues`. [_resetToSavedValues] does what RHF does —
 ///   reset, then write the saved strings back through the controllers, which at
@@ -1155,35 +1146,46 @@ class _ComposedFormState extends State<_ComposedForm> {
                 child: DsTextarea(controller: bio.controller),
               ),
               // `alerts` — a horizontal field, no description, no error, and
-              // nothing that can fail.
+              // nothing that can fail. The label is the field's, so the switch
+              // states no name of its own: the reference's `<Switch/>` carries
+              // no `aria-label` either and is named by the `FormLabel` beside
+              // it.
               DsField(
+                label: 'Price alerts',
+                orientation: DsFieldOrientation.horizontal,
                 focusNode: alerts.focusNode,
-                child: _ControlRow(
-                  label: 'Price alerts',
-                  onTap: () => alerts.value = !alerts.value,
-                  control: DsSwitch(
-                    value: alerts.value,
-                    onChanged: (bool next) => alerts.value = next,
-                    label: 'Price alerts',
-                  ),
+                child: DsSwitch(
+                  value: alerts.value,
+                  onChanged: (bool next) => alerts.value = next,
                 ),
               ),
-              // `terms` — a horizontal field nested inside a vertical one, so
-              // the message sits under the row rather than beside it.
+              // `terms` — **one** horizontal field where the reference nests
+              // two.
+              //
+              // It nests because its horizontal `Field` is `flex-row`: a
+              // `<FormError/>` inside it would sit *beside* the label rather
+              // than under the row, so the message needs an outer vertical
+              // `Field` to fall into. [DsField]'s horizontal branch is already
+              // a column holding the row, and the description/message slots
+              // append to that column — so the wrapper collapses into it and
+              // the rendered box tree is the same one: row, `gap-2`, message.
+              //
+              // Collapsing it is also what keeps the wiring intact. A nested
+              // [DsField] publishes a *new* [DsFieldScope] that shadows the
+              // outer one, so the checkbox would adopt a null focus node and a
+              // valid state — focus-on-error (ruling F4) would stop landing on
+              // it and the message would stop being announced with it.
               DsField(
+                label: 'I accept the terms',
+                orientation: DsFieldOrientation.horizontal,
                 errors: terms.errors,
                 focusNode: terms.focusNode,
-                child: _ControlRow(
-                  label: 'I accept the terms',
-                  onTap: () => terms.value = !terms.value,
-                  control: DsCheckbox(
-                    state: terms.value
-                        ? DsCheckboxState.checked
-                        : DsCheckboxState.unchecked,
-                    onChanged: (DsCheckboxState next) =>
-                        terms.value = next == DsCheckboxState.checked,
-                    label: 'I accept the terms',
-                  ),
+                child: DsCheckbox(
+                  state: terms.value
+                      ? DsCheckboxState.checked
+                      : DsCheckboxState.unchecked,
+                  onChanged: (DsCheckboxState next) =>
+                      terms.value = next == DsCheckboxState.checked,
                 ),
               ),
               DsButton(
@@ -1238,22 +1240,21 @@ class _PayoutFieldSet extends StatelessWidget {
               focusNode: field.focusNode,
               label: 'Payout rhythm',
               hint: field.errors.isEmpty ? null : field.errors.join(' '),
-              children: <Widget>[
-                _ControlRow(
+              // One labelled horizontal field per option, which is the shape
+              // the reference uses: `<label for="payout-daily">` selects that
+              // radio outright, so each item registers its own selection on
+              // its own field rather than on the group's — the group's field
+              // belongs to the legend.
+              children: const <Widget>[
+                DsField(
                   label: 'Daily',
-                  onTap: () => field.value = 'daily',
-                  control: const DsRadioGroupItem<String>(
-                    value: 'daily',
-                    label: 'Daily',
-                  ),
+                  orientation: DsFieldOrientation.horizontal,
+                  child: DsRadioGroupItem<String>(value: 'daily'),
                 ),
-                _ControlRow(
+                DsField(
                   label: 'Weekly',
-                  onTap: () => field.value = 'weekly',
-                  control: const DsRadioGroupItem<String>(
-                    value: 'weekly',
-                    label: 'Weekly',
-                  ),
+                  orientation: DsFieldOrientation.horizontal,
+                  child: DsRadioGroupItem<String>(value: 'weekly'),
                 ),
               ],
             ),
@@ -1349,62 +1350,4 @@ class _Measure extends StatelessWidget {
           child: child,
         ),
       );
-}
-
-/// `<Field orientation="horizontal">` as this page writes it: the **control
-/// first**, then the label taking the slack.
-///
-/// The three horizontal rows here — two radios, the switch and the checkbox —
-/// all put their control in the DOM before their label, and
-/// `*:data-[slot=field-label]:flex-auto` grows the label to fill the row. That
-/// growth is what makes the whole remaining width a click target, which is what
-/// [onTap] reproduces: a `<label for>` pointed at a Radix control forwards a
-/// **click** to it, so tapping the words toggles rather than merely focusing.
-///
-/// The label is therefore wrapped in a [DsFieldScope] of its own carrying no
-/// focus node: [DsFieldLabel] adds its own tap-to-focus whenever a scope offers
-/// it one, and that inner recogniser would win the arena and leave the row
-/// focusing instead of activating. Focus is not requested either, because a tap
-/// on the control itself does not request it — Flutter moves focus on keyboard
-/// traversal only, which is what makes `hasFocus` the `:focus-visible`
-/// predicate everywhere else in this port.
-///
-/// See the library note for why this is page-local rather than [DsField]'s
-/// horizontal branch.
-class _ControlRow extends StatelessWidget {
-  const _ControlRow({
-    required this.control,
-    required this.label,
-    this.onTap,
-  });
-
-  final Widget control;
-
-  /// Rendered by [DsFieldLabel], which excludes itself from semantics — the
-  /// string is already the control's accessible name.
-  final String label;
-
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: <Widget>[
-        control,
-        // `gap-2`.
-        SizedBox(width: DsField.gap),
-        Expanded(
-          child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: onTap,
-            child: DsFieldScope(
-              label: label,
-              child: DsFieldLabel(label),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
 }
