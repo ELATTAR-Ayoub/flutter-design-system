@@ -221,6 +221,14 @@ class _DsRadioGroupState<T> extends State<DsRadioGroup<T>> {
     final bool enabled = widget.enabled && (field?.enabled ?? true);
     final FocusNode? node = widget.focusNode ?? field?.focusNode;
 
+    // A group has no single toggle, so activating it is **focusing** the item
+    // the roving tabindex is on — which is exactly what `<label for>` does to a
+    // radiogroup: it moves focus and changes no selection. Registering a
+    // "select the first one" here would invent a behaviour the web does not
+    // have.
+    field?.activator?.callback =
+        enabled && widget.onChanged != null ? _forwardToTabStop : null;
+
     return _RadioScope<T>(
       value: widget.value,
       onChanged: enabled ? widget.onChanged : null,
@@ -375,6 +383,16 @@ class _DsRadioGroupItemState<T> extends State<DsRadioGroupItem<T>> {
         (!ownField || field.enabled) &&
         scope.onChanged != null;
 
+    final VoidCallback? select =
+        enabled ? () => scope.onChanged!(widget.value) : null;
+
+    // Only when the item has a field of its own — one labelled `DsField` per
+    // radio, which is how the reference puts a name beside each. There,
+    // `<label for="payout-daily">` selects that radio, so the item registers
+    // its own selection. The group's field is the legend's, and the group has
+    // already registered focus-the-tab-stop on it.
+    if (ownField) field.activator?.callback = select;
+
     final bool checked = scope.value == widget.value;
     if (checked != _wasChecked) {
       _wasChecked = checked;
@@ -404,7 +422,7 @@ class _DsRadioGroupItemState<T> extends State<DsRadioGroupItem<T>> {
       focusNode: focusNode,
       skipTraversal: !_group!.isTabStop(widget.value),
       onKey: _onKey,
-      onTap: enabled ? () => scope.onChanged!(widget.value) : null,
+      onTap: select,
       // Inside the hit-area expander, never around it — see [DsHitArea].
       semantics: (Widget child) => Semantics(
         container: true,

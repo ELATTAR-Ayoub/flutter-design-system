@@ -62,6 +62,31 @@ import '../text_layout.dart';
 import '../theme_scope.dart';
 import 'ds_rule.dart';
 
+/// What activating a field **does** — a one-slot holder a control fills in.
+///
+/// `<label for=id>` does not focus the control it points at, it **activates**
+/// it: clicking the word "I accept the terms" ticks the checkbox. Flutter has
+/// no id graph to forward a click along, and a label cannot know what
+/// activating an arbitrary control means, so the control says so.
+///
+/// Mutable on purpose, and deliberately not part of [DsFieldScope]'s equality:
+/// a control registers during its own `build`, which is after the scope above
+/// it was built. A `ValueNotifier` would be the same holder plus a notification
+/// nobody listens for — the label reads the callback at tap time, not at build
+/// time, so there is nothing to rebuild.
+///
+/// ```dart
+/// // In a control's build, once it knows what it would do:
+/// DsFieldScope.maybeOf(context)?.activator?.callback = _toggle;
+/// ```
+///
+/// A control that leaves it null is not broken: a text field's activation *is*
+/// focus, and [DsFieldLabel] falls back to the scope's focus node.
+class DsFieldActivator {
+  /// What a tap on the label should do. Null until a control registers.
+  VoidCallback? callback;
+}
+
 /// What a `Field` threads down to the control inside it.
 ///
 /// Everything the id graph would have carried, in the one direction Flutter can
@@ -75,6 +100,7 @@ class DsFieldScope extends InheritedWidget {
     this.invalid = false,
     this.enabled = true,
     this.focusNode,
+    this.activator,
     required super.child,
   });
 
@@ -95,6 +121,13 @@ class DsFieldScope extends InheritedWidget {
   /// The node the label focuses and a failed submit lands on.
   final FocusNode? focusNode;
 
+  /// Where the control registers what activating this field does.
+  ///
+  /// A [DsField] supplies one; a scope built by hand may leave it null, which
+  /// is how a caller keeps [DsFieldLabel] from attaching any recogniser of its
+  /// own and takes the tap with a handler of its own instead.
+  final DsFieldActivator? activator;
+
   static DsFieldScope? maybeOf(BuildContext context) =>
       context.dependOnInheritedWidgetOfExactType<DsFieldScope>();
 
@@ -104,7 +137,8 @@ class DsFieldScope extends InheritedWidget {
       old.describedBy != describedBy ||
       old.invalid != invalid ||
       old.enabled != enabled ||
-      old.focusNode != focusNode;
+      old.focusNode != focusNode ||
+      !identical(old.activator, activator);
 }
 
 /// `fieldVariants`' `orientation`.
@@ -146,6 +180,13 @@ class DsFieldGroup extends StatelessWidget {
 
 /// `FieldSet` — `flex flex-col gap-4`, closing to `gap-3` around a selection
 /// group.
+///
+/// **A rendered `<legend>` is not a flex item** *(oracle-confirmed: the measured
+/// gap between "Payout rhythm" and its radios is 6px, not 6 + the fieldset's
+/// own 12)*. CSS lifts a `<legend>` out of the fieldset's anonymous flex content
+/// box and renders it over the border, so the box's `gap` never applies to it
+/// and only its own `mb-1.5` does. A leading [DsFieldLegend] child is therefore
+/// special-cased to that 6px; every other gap in the set is the normal one.
 class DsFieldSet extends StatelessWidget {
   const DsFieldSet({
     super.key,
@@ -171,8 +212,31 @@ class DsFieldSet extends StatelessWidget {
   static double get groupGap => ds(3);
 
   @override
-  Widget build(BuildContext context) =>
-      _Stack(gap: tightForGroup ? groupGap : gap, children: children);
+  Widget build(BuildContext context) {
+    final double normal = tightForGroup ? groupGap : gap;
+    // The one thing a `has-` selector could tell CSS that a parent can tell
+    // itself: whether its own first child is the legend. A type check, for the
+    // same reason `DsInputGroupAddon` sniffs for a button — the selector is
+    // about a direct child's identity, which is exactly what this reads.
+    final bool leadingLegend =
+        children.isNotEmpty && children.first is DsFieldLegend;
+
+    final List<Widget> rows = <Widget>[];
+    for (int i = 0; i < children.length; i++) {
+      if (i > 0) {
+        rows.add(SizedBox(
+          height: i == 1 && leadingLegend ? DsFieldLegend.spaceBelow : normal,
+        ));
+      }
+      rows.add(children[i]);
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      children: rows,
+    );
+  }
 }
 
 /// `FieldLegend variant="label"` — `mb-1.5 font-medium text-sm`.
@@ -224,7 +288,7 @@ class DsFieldLegend extends StatelessWidget {
 /// field can publish [DsFieldScope] and place the description's conditional
 /// gap. [DsFieldLabel], [DsFieldDescription] and [DsFieldError] stay public for
 /// the compositions this shape does not cover.
-class DsField extends StatelessWidget {
+class DsField extends StatefulWidget {
   const DsField({
     super.key,
     required this.child,
@@ -279,10 +343,22 @@ class DsField extends StatelessWidget {
   static double get describedGap => gap - ds(1);
 
   @override
+  State<DsField> createState() => _DsFieldState();
+}
+
+class _DsFieldState extends State<DsField> {
+  /// Stateful for exactly this: the holder has to outlive a rebuild, or the
+  /// control would register into an object the label no longer reads.
+  final DsFieldActivator _activator = DsFieldActivator();
+
+  @override
   Widget build(BuildContext context) {
     final DsThemeData theme = DsTheme.of(context);
-    final List<String> messages = DsRules.dedupe(errors);
-    final bool isInvalid = invalid ?? messages.isNotEmpty;
+    final String? label = widget.label;
+    final String? description = widget.description;
+    final List<String> messages = DsRules.dedupe(widget.errors);
+    final bool isInvalid = widget.invalid ?? messages.isNotEmpty;
+    final double gap = DsField.gap;
 
     // `aria-describedby="{id}-description {id}-message"` — one id list, read in
     // DOM order, so one string in the same order.
@@ -295,17 +371,26 @@ class DsField extends StatelessWidget {
       label: label,
       describedBy: described.isEmpty ? null : described,
       invalid: isInvalid,
-      enabled: enabled,
-      focusNode: focusNode,
-      child: child,
+      enabled: widget.enabled,
+      focusNode: widget.focusNode,
+      activator: _activator,
+      child: widget.child,
     );
 
     final Widget? labelWidget = label == null
         ? null
-        : DsFieldLabel(label!, focusNode: focusNode, enabled: enabled);
+        // The activator is handed over rather than read from context: the scope
+        // wraps the control alone, so the label is its sibling and cannot see
+        // it. Same reason `focusNode` has always been passed here.
+        : DsFieldLabel(
+            label,
+            focusNode: widget.focusNode,
+            activator: _activator,
+            enabled: widget.enabled,
+          );
 
     final List<Widget> rows = <Widget>[];
-    switch (orientation) {
+    switch (widget.orientation) {
       case DsFieldOrientation.vertical:
         if (labelWidget != null) {
           rows
@@ -317,30 +402,36 @@ class DsField extends StatelessWidget {
         rows.add(Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            // `*:data-[slot=field-label]:flex-auto` — the label takes the slack
-            // and the control sits at its own size against the trailing edge.
-            if (labelWidget != null) Expanded(child: labelWidget),
-            if (labelWidget != null) SizedBox(width: gap),
+            // **Control first.** All three horizontal fields on the reference
+            // put the control in the DOM before its label — a radio, a switch
+            // and a checkbox each sit at the LEFT of their row — and
+            // `*:data-[slot=field-label]:flex-auto` then grows the label into
+            // the slack beside it. That growth is not decoration: it is what
+            // makes the rest of the row a click target.
+            //
             // `control`, never the bare `child`: the scope has to wrap the
-            // control on BOTH branches. The horizontal one is where the switch
-            // and the checkbox live, so a field that publishes nothing here is
-            // a field whose focus-on-error and accessible name go missing on
+            // control on BOTH branches. This is the branch the switch and the
+            // checkbox live on, so a field that publishes nothing here is a
+            // field whose focus-on-error and accessible name go missing on
             // exactly the controls that need them most.
             control,
+            if (labelWidget != null) SizedBox(width: gap),
+            if (labelWidget != null) Expanded(child: labelWidget),
           ],
         ));
     }
 
     if (description != null) {
       rows
-        ..add(SizedBox(height: messages.isEmpty ? gap : describedGap))
+        ..add(SizedBox(
+            height: messages.isEmpty ? gap : DsField.describedGap))
         // Excluded because the string is already the control's `hint`, which
         // is where `aria-describedby` lands. Left in, it merges into this
         // field's one node as part of the control's NAME — "Email Receipts and
         // nothing else." — which is neither what the web announces nor what a
         // name is for. The standalone [DsFieldDescription] announces itself
         // normally; only the copy this field has already folded is silenced.
-        ..add(ExcludeSemantics(child: DsFieldDescription(description!)));
+        ..add(ExcludeSemantics(child: DsFieldDescription(description)));
     }
     if (messages.isNotEmpty) {
       rows
@@ -391,22 +482,86 @@ class DsField extends StatelessWidget {
 /// click 400px to the right of "Email" inside a 512px field does not focus the
 /// input. Tapping the text does, which is the whole of what `htmlFor` buys and
 /// the only part of it Flutter can reproduce.
+/// ## What a tap does, in order
+///
+/// `<label for=id>` **activates** the control it points at — clicking the words
+/// "I accept the terms" ticks the checkbox, it does not merely focus it. So the
+/// tap resolves down a ladder, and the first rung that answers wins:
+///
+/// | rung | when | what happens |
+/// |---|---|---|
+/// | [onTap] | the caller states its own handler | it is called, and nothing else is |
+/// | [DsFieldScope.activator] | a control registered a callback | the control is **activated** |
+/// | [DsFieldScope.focusNode] | a node is offered, no activator | the control is focused |
+/// | — | none of those | **no recogniser is attached at all** |
+///
+/// The last rung is not a fallthrough, it is a feature: a caller composing its
+/// own row wraps the label in a handler of its own and hands it a scope with
+/// neither activator nor node, and the label then contests nothing. An inner
+/// recogniser would win the gesture arena over an ancestor's and leave the row
+/// focusing where it should be toggling.
 class DsFieldLabel extends StatelessWidget {
-  const DsFieldLabel(this.text, {super.key, this.focusNode, this.enabled = true});
+  const DsFieldLabel(
+    this.text, {
+    super.key,
+    this.focusNode,
+    this.activator,
+    this.enabled = true,
+    this.onTap,
+  });
 
   final String text;
 
-  /// Focused on tap. Falls back to the enclosing [DsFieldScope]'s node.
+  /// Focused on tap, when no activator is registered. Falls back to the
+  /// enclosing [DsFieldScope]'s node.
   final FocusNode? focusNode;
 
+  /// Where the control registered what activating this field does.
+  ///
+  /// Passed explicitly by [DsField], because the label is a **sibling** of the
+  /// scope rather than a descendant of it — the scope wraps the control alone,
+  /// so that a control reads it and the label's own text does not. A standalone
+  /// label inside a hand-built scope falls back to reading it from context,
+  /// exactly as [focusNode] does.
+  final DsFieldActivator? activator;
+
   final bool enabled;
+
+  /// The caller's own tap handler, which outranks both rungs below it.
+  ///
+  /// Supplying it is how a call site says "activation here is mine" — for a
+  /// control this component cannot know how to operate, or a row that wants one
+  /// handler over both halves of itself.
+  final VoidCallback? onTap;
 
   /// `group-data-[disabled=true]/field:opacity-50`.
   static const double disabledOpacity = 0.50;
 
   @override
   Widget build(BuildContext context) {
-    final FocusNode? node = focusNode ?? DsFieldScope.maybeOf(context)?.focusNode;
+    final DsFieldScope? scope = DsFieldScope.maybeOf(context);
+    final FocusNode? node = focusNode ?? scope?.focusNode;
+    final DsFieldActivator? holder = activator ?? scope?.activator;
+
+    // Resolved at tap time, not at build time: a control registers during its
+    // own build, which runs after this one, so reading `activator.callback`
+    // here would always find it empty on the first frame.
+    VoidCallback? action;
+    if (onTap != null) {
+      action = onTap;
+    } else if (holder != null) {
+      action = () {
+        final VoidCallback? registered = holder.callback;
+        if (registered != null) {
+          registered();
+        } else {
+          // A text control registers nothing, because focus IS its activation.
+          node?.requestFocus();
+        }
+      };
+    } else if (node != null) {
+      action = node.requestFocus;
+    }
 
     // No colour: `Label` declares none, so it inherits — which is what lets
     // `Field`'s invalid colouring reach it.
@@ -418,10 +573,10 @@ class DsFieldLabel extends StatelessWidget {
     // turns into two.
     Widget label = DsText(text, DsComponentType.fieldLabel);
 
-    if (node != null && enabled) {
+    if (action != null && enabled) {
       label = GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onTap: node.requestFocus,
+        onTap: action,
         child: label,
       );
     }

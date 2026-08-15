@@ -181,6 +181,17 @@ class _DsCheckboxState extends State<DsCheckbox> {
     final String? hint = widget.hint ?? scope?.describedBy;
     final FocusNode? focusNode = widget.focusNode ?? scope?.focusNode;
 
+    // `<label for>` **activates** its control; it does not merely focus it.
+    // Registering the toggle is what makes a tap on the visible `DsFieldLabel`
+    // tick the box, the way clicking "I accept the terms" does on the web.
+    // Re-registered on every build because the closure reads [DsCheckbox.state],
+    // and set back to null while disabled so a stale toggle from an earlier
+    // build cannot outlive the state that made it legal.
+    final VoidCallback? toggle = enabled && widget.onChanged != null
+        ? () => widget.onChanged!(DsCheckbox.nextAfter(widget.state))
+        : null;
+    scope?.activator?.callback = toggle;
+
     final bool on = widget.state.isOn;
 
     final Widget indicator = on
@@ -229,9 +240,7 @@ class _DsCheckboxState extends State<DsCheckbox> {
       enabled: enabled,
       invalid: invalid,
       focusNode: focusNode,
-      onTap: widget.onChanged == null
-          ? null
-          : () => widget.onChanged!(DsCheckbox.nextAfter(widget.state)),
+      onTap: toggle,
       // Inside the hit-area expander, never around it — see [DsHitArea].
       semantics: (Widget child) => Semantics(
         container: true,

@@ -1178,6 +1178,185 @@ void main() {
     });
   });
 
+  // `<label for>` ACTIVATES its control — it does not merely focus it. Each
+  // control registers what activating it means on the scope's
+  // `DsFieldActivator`, and `DsFieldLabel` reads that at tap time.
+  //
+  // Every case below taps a **real** `DsFieldLabel` inside a **real**
+  // `DsField`, wrapped around the real control, so the pair is what is
+  // measured rather than either half against a stub.
+  group('DsFieldLabel activation', () {
+    /// Taps the visible label text, which is what a reader clicks.
+    Future<void> tapLabel(WidgetTester t, String text) async {
+      await t.tap(find.text(text));
+      await t.pump();
+    }
+
+    testWidgets('a label tap ticks a real DsCheckbox', (WidgetTester t) async {
+      DsCheckboxState state = DsCheckboxState.unchecked;
+      await t.pumpWidget(host(SizedBox(
+        width: 448,
+        child: StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) => DsField(
+            label: 'I accept the terms',
+            orientation: DsFieldOrientation.horizontal,
+            child: DsCheckbox(
+              state: state,
+              onChanged: (DsCheckboxState next) =>
+                  setState(() => state = next),
+            ),
+          ),
+        ),
+      )));
+
+      await tapLabel(t, 'I accept the terms');
+      expect(state, DsCheckboxState.checked,
+          reason: 'the label activated, it did not merely focus');
+
+      // …and back again: activation is the toggle, not "set true".
+      await tapLabel(t, 'I accept the terms');
+      expect(state, DsCheckboxState.unchecked);
+      await t.pumpAndSettle();
+    });
+
+    testWidgets('a label tap flips a real DsSwitch', (WidgetTester t) async {
+      bool on = false;
+      await t.pumpWidget(host(SizedBox(
+        width: 448,
+        child: StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) => DsField(
+            label: 'Price alerts',
+            orientation: DsFieldOrientation.horizontal,
+            child: DsSwitch(
+              value: on,
+              onChanged: (bool next) => setState(() => on = next),
+            ),
+          ),
+        ),
+      )));
+
+      await tapLabel(t, 'Price alerts');
+      expect(on, isTrue);
+      await tapLabel(t, 'Price alerts');
+      expect(on, isFalse);
+      await t.pumpAndSettle();
+    });
+
+    testWidgets('a label tap opens a real DsSelect', (WidgetTester t) async {
+      await t.pumpWidget(overlayHost(SizedBox(
+        width: 448,
+        child: DsField(
+          label: 'Plan',
+          child: DsSelect<String>(
+            options: const <DsSelectOption<String>>[
+              DsSelectOption<String>(value: 'free', label: 'Free'),
+              DsSelectOption<String>(value: 'pro', label: 'Pro'),
+            ],
+            value: null,
+            onChanged: (String _) {},
+            placeholder: 'Choose a plan',
+            expand: true,
+          ),
+        ),
+      )));
+      expect(find.text('Free'), findsNothing);
+
+      await tapLabel(t, 'Plan');
+      expect(find.text('Free'), findsOneWidget);
+      expect(find.text('Pro'), findsOneWidget);
+      await t.sendKeyEvent(LogicalKeyboardKey.escape);
+      await t.pumpAndSettle();
+    });
+
+    testWidgets('a legend tap focuses the radio tab stop and selects nothing',
+        (WidgetTester t) async {
+      String? value;
+      await t.pumpWidget(host(SizedBox(
+        width: 448,
+        child: DsField(
+          label: 'Payout rhythm',
+          child: DsRadioGroup<String>(
+            value: value,
+            onChanged: (String next) => value = next,
+            children: const <Widget>[
+              DsRadioGroupItem<String>(value: 'daily', label: 'Daily'),
+              DsRadioGroupItem<String>(value: 'weekly', label: 'Weekly'),
+            ],
+          ),
+        ),
+      )));
+
+      await tapLabel(t, 'Payout rhythm');
+      await t.pumpAndSettle();
+
+      // Focus moved to the item the roving tabindex is on…
+      expect(
+        t
+            .widgetList<Focus>(find.descendant(
+                of: find.byType(DsRadioGroupItem<String>).at(0),
+                matching: find.byType(Focus)))
+            .any((Focus f) => f.focusNode?.hasPrimaryFocus ?? false),
+        isTrue,
+      );
+      // …and the selection is untouched, which is what `<label for>` does to a
+      // radiogroup. Selecting here would be a behaviour the web does not have.
+      expect(value, isNull);
+    });
+
+    testWidgets('a per-radio label selects that radio', (WidgetTester t) async {
+      // The reference's other shape: one labelled field per option, where
+      // `<label for="payout-daily">` selects that radio outright.
+      String? value;
+      await t.pumpWidget(host(SizedBox(
+        width: 448,
+        child: StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) =>
+              DsRadioGroup<String>(
+            value: value,
+            onChanged: (String next) => setState(() => value = next),
+            children: const <Widget>[
+              DsField(
+                label: 'Daily',
+                orientation: DsFieldOrientation.horizontal,
+                child: DsRadioGroupItem<String>(value: 'daily'),
+              ),
+              DsField(
+                label: 'Weekly',
+                orientation: DsFieldOrientation.horizontal,
+                child: DsRadioGroupItem<String>(value: 'weekly'),
+              ),
+            ],
+          ),
+        ),
+      )));
+
+      await tapLabel(t, 'Weekly');
+      expect(value, 'weekly');
+      await t.pumpAndSettle();
+    });
+
+    testWidgets('a disabled field registers nothing', (WidgetTester t) async {
+      DsCheckboxState state = DsCheckboxState.unchecked;
+      await t.pumpWidget(host(SizedBox(
+        width: 448,
+        child: DsField(
+          label: 'I accept the terms',
+          enabled: false,
+          orientation: DsFieldOrientation.horizontal,
+          child: DsCheckbox(
+            state: state,
+            onChanged: (DsCheckboxState next) => state = next,
+          ),
+        ),
+      )));
+
+      await t.tap(find.text('I accept the terms'), warnIfMissed: false);
+      await t.pump();
+      expect(state, DsCheckboxState.unchecked,
+          reason: 'a stale toggle must not outlive the state that allowed it');
+    });
+  });
+
   group('DsToaster', () {
     Widget toaster(DsToastController controller) => host(
           SizedBox(

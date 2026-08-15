@@ -377,6 +377,10 @@ class _DsSelectState<T> extends State<DsSelect<T>> {
     final DsThemeData theme = DsTheme.of(context);
     final Duration duration = dsAnimationDuration(context, DsDurations.base);
 
+    // `<label for>` on a select opens it — the trigger is the labelable thing,
+    // and clicking its label is clicking the trigger. Null while disabled.
+    _scope?.activator?.callback = _enabled ? _openMenu : null;
+
     DsSelectOption<T>? chosen;
     if (widget.value != null) {
       for (final DsSelectOption<T> option in widget.options) {

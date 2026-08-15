@@ -133,6 +133,13 @@ class DsSwitch extends StatelessWidget {
     final String? described = hint ?? scope?.describedBy;
     final FocusNode? node = focusNode ?? scope?.focusNode;
 
+    // `<label for>` activates rather than focuses: a tap on "Price alerts"
+    // flips the switch. Null while disabled, so a stale toggle cannot outlive
+    // the state that made it legal.
+    final VoidCallback? toggle =
+        isEnabled && onChanged != null ? () => onChanged!(!value) : null;
+    scope?.activator?.callback = toggle;
+
     return DsSelectionControl(
       width: size.trackWidth,
       height: size.trackHeight,
@@ -148,7 +155,7 @@ class DsSwitch extends StatelessWidget {
       enabled: isEnabled,
       invalid: isInvalid,
       focusNode: node,
-      onTap: onChanged == null ? null : () => onChanged!(!value),
+      onTap: toggle,
       // Inside the hit-area expander, never around it — see [DsHitArea].
       semantics: (Widget child) => Semantics(
         container: true,

@@ -1502,7 +1502,13 @@ void main() {
       );
     });
 
-    testWidgets('horizontal puts the label on the slack', (WidgetTester t) async {
+    testWidgets('horizontal is CONTROL first, label on the slack',
+        (WidgetTester t) async {
+      // All three horizontal fields on the reference put the control in the DOM
+      // before its label — a radio, a switch and a checkbox each sit at the
+      // LEFT of their row — and `*:data-[slot=field-label]:flex-auto` grows the
+      // label into what is left. This pin once said label-first, which is what
+      // sent the forms page off to hand-compose its own row.
       await t.pumpWidget(host(SizedBox(
         width: 512,
         child: DsField(
@@ -1511,16 +1517,141 @@ void main() {
           child: const SizedBox(width: 44, height: 24, key: Key('switch')),
         ),
       )));
+
+      final Rect field = t.getRect(find.byType(DsField));
       final Rect label = t.getRect(find.byType(DsFieldLabel));
       final Rect control = t.getRect(find.byKey(const Key('switch')));
-      expect(label.left, lessThan(control.left));
+
+      expect(control.left, lessThan(label.left),
+          reason: 'the control comes first');
+      expect(control.left, field.left, reason: 'and sits at the row\'s edge');
       expect(control.width, 44, reason: 'the control keeps its own size');
+      expect(label.left - control.right, DsField.gap);
+      // `flex-auto`: the label takes every remaining pixel, which is what makes
+      // the rest of the row a target.
+      expect(label.right, field.right);
+    });
+
+    testWidgets('a label tap ACTIVATES the control, it does not just focus it',
+        (WidgetTester t) async {
+      // `<label for=id>` forwards a click: tapping "I accept the terms" ticks
+      // the checkbox. The control says what activation means by registering on
+      // the scope's DsFieldActivator; the label calls it.
+      //
+      // The control here is a checkbox-shaped stub rather than `DsCheckbox`,
+      // because registration lives in each control's own build and those files
+      // belong to another owner — this pins THIS side of the contract, which is
+      // the half that has to exist before the other half can be written.
+      bool checked = false;
+      int focused = 0;
+      final FocusNode node = FocusNode();
+      addTearDown(node.dispose);
+      node.addListener(() {
+        if (node.hasFocus) focused++;
+      });
+
+      await t.pumpWidget(host(StatefulBuilder(
+        builder: (BuildContext context, StateSetter setState) => SizedBox(
+          width: 512,
+          child: DsField(
+            label: 'I accept the terms',
+            focusNode: node,
+            orientation: DsFieldOrientation.horizontal,
+            child: Builder(builder: (BuildContext inner) {
+              DsFieldScope.maybeOf(inner)?.activator?.callback =
+                  () => setState(() => checked = !checked);
+              return const SizedBox(width: 16, height: 16);
+            }),
+          ),
+        ),
+      )));
+
+      await t.tap(find.text('I accept the terms'));
+      await t.pump();
+      expect(checked, isTrue, reason: 'the tap toggled, it did not focus');
+      expect(focused, 0);
+
+      await t.tap(find.text('I accept the terms'));
+      await t.pump();
+      expect(checked, isFalse, reason: 'and it toggles back');
+    });
+
+    testWidgets('a control that registers nothing still gets focused',
+        (WidgetTester t) async {
+      // A text control's activation IS focus, so it registers nothing and the
+      // ladder falls through to the scope's node.
+      final FocusNode node = FocusNode();
+      addTearDown(node.dispose);
+      await t.pumpWidget(host(SizedBox(
+        width: 512,
+        child: DsField(
+          label: 'Username',
+          focusNode: node,
+          child: const DsInput(),
+        ),
+      )));
+
+      await t.tap(find.text('Username'));
+      await t.pump();
+      expect(node.hasFocus, isTrue);
+    });
+
+    testWidgets('the label yields to a handler the caller supplies',
+        (WidgetTester t) async {
+      // A scope with neither activator nor node: the label attaches no
+      // recogniser at all, so an ancestor's wins the arena instead of losing to
+      // an inner one. This is what lets a call site compose its own row.
+      int outer = 0;
+      final FocusNode node = FocusNode();
+      addTearDown(node.dispose);
+
+      await t.pumpWidget(host(SizedBox(
+        width: 512,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () => outer++,
+          child: DsFieldScope(
+            label: 'Price alerts',
+            child: DsFieldLabel('Price alerts', focusNode: null),
+          ),
+        ),
+      )));
+
+      await t.tap(find.text('Price alerts'));
+      await t.pump();
+      expect(outer, 1, reason: 'the ancestor took the tap');
+      expect(node.hasFocus, isFalse);
+    });
+
+    testWidgets('an explicit onTap outranks both rungs below it',
+        (WidgetTester t) async {
+      int taps = 0;
+      final FocusNode node = FocusNode();
+      addTearDown(node.dispose);
+
+      await t.pumpWidget(host(SizedBox(
+        width: 512,
+        child: DsField(
+          label: 'Plan',
+          focusNode: node,
+          child: DsFieldLabel('Plan', onTap: () => taps++),
+        ),
+      )));
+
+      await t.tap(find.text('Plan').last);
+      await t.pump();
+      expect(taps, 1);
+      expect(node.hasFocus, isFalse, reason: 'onTap replaced the focus rung');
     });
   });
 
   group('DsFieldSet', () {
-    testWidgets('closes from 16 to 12 around a selection group',
+    testWidgets('a leading legend clears by 6, not by 6 plus the set\'s gap',
         (WidgetTester t) async {
+      // *(Oracle-confirmed on the forms page.)* CSS lifts a rendered `<legend>`
+      // out of the fieldset's anonymous flex content box, so the box's own
+      // `gap` never applies to it and only its `mb-1.5` does. This pin once
+      // asserted the set's gap here, which is the bug.
       expect(DsFieldSet.gap, ds(4));
       expect(DsFieldSet.groupGap, ds(3));
       expect(DsFieldLegend.spaceBelow, ds(1.5));
@@ -1532,13 +1663,24 @@ void main() {
           children: const <Widget>[
             DsFieldLegend('Payout rhythm'),
             SizedBox(height: 20, key: Key('radios')),
+            SizedBox(height: 20, key: Key('message')),
           ],
         ),
       )));
-      final double legendBottom =
-          t.getBottomLeft(find.byType(DsFieldLegend)).dy;
-      final double nextTop = t.getTopLeft(find.byKey(const Key('radios'))).dy;
-      expect(nextTop - legendBottom, ds(3));
+
+      expect(
+        t.getTopLeft(find.byKey(const Key('radios'))).dy -
+            t.getBottomLeft(find.byType(DsFieldLegend)).dy,
+        ds(1.5),
+        reason: 'only the legend\'s own mb-1.5',
+      );
+      // …and every other gap in the set is the normal one.
+      expect(
+        t.getTopLeft(find.byKey(const Key('message'))).dy -
+            t.getBottomLeft(find.byKey(const Key('radios'))).dy,
+        ds(3),
+        reason: 'the content box keeps its gap-3',
+      );
 
       // The legend is the one spec composed at its call site rather than named
       // in the foundation, so it is the easiest of the four to leave un-boxed:
@@ -1546,6 +1688,24 @@ void main() {
       expect(
         t.getSize(find.byType(DsFieldLegend)).height,
         closeTo(18.5714, 1e-3),
+      );
+    });
+
+    testWidgets('without a legend every gap is the normal one',
+        (WidgetTester t) async {
+      await t.pumpWidget(host(SizedBox(
+        width: 512,
+        child: DsFieldSet(
+          children: const <Widget>[
+            SizedBox(height: 20, key: Key('a')),
+            SizedBox(height: 20, key: Key('b')),
+          ],
+        ),
+      )));
+      expect(
+        t.getTopLeft(find.byKey(const Key('b'))).dy -
+            t.getBottomLeft(find.byKey(const Key('a'))).dy,
+        ds(4),
       );
     });
   });
