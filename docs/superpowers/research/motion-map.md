@@ -725,3 +725,42 @@ Verified against `D:\DESIGN\Design-System-2026-8\flutter-design-system` at HEAD 
 6. **`.anim-shimmer`'s frozen gradient under reduced motion** (§8.2) depends on `background-position`'s initial value being `0% 0`. Worth one screenshot in reduced-motion mode; it is the least obvious row in that table.
 7. **Ratchet wrap frame.** `steps(8, jump-end)` never shows 360°. For an infinite loop this is unobservable, but if the port ever plays it finitely (reduced motion runs it once), decide whether the single 0.01ms run lands on 0° (matches CSS + no fill) or 315°.
 8. **Should `DsCurves.all` be reordered?** Its docstring claims globals.css declaration order but lists `outFlex` 5th where the field order puts it 7th. Unrelated to this page (which needs only four curves, in its own order), but it will mislead whoever builds a full easing gallery later.
+
+
+---
+
+## CHECKED - 2026-08-15 - the `duration-*` utility classes are inert
+
+*(Corpus-wide sweep prompted by `selection-map.md` §7.1. Full mechanism and probe
+record in `forms-map.md`'s 2026-08-15 correction block.)*
+
+**This map's scale and utility inventory are clean.** §4's token table is the
+motion page's own rendered content; §5's `press` / `click-spring` / `press-key` /
+`lift` / `btn-spring` rows and §6's `anim-*` rows all read `var(--duration-*)`
+directly out of `globals.css`. Nothing here was derived from a class list.
+
+One thing this map is the right place to record, because it governs every other
+map's timing inventory:
+
+**Tailwind v4 has no `--duration-*` theme namespace.** The ten duration customs
+are emitted into `:root,:host` and are consumed correctly by `@utility` blocks,
+by the `anim-*` keyframe rules, by the `[class*="animate-in"]` bridge
+(`--tw-duration: var(--duration-overlay)`) and by plain rules such as
+`:where(.prose) a` - but they **generate no utility class**. The only
+`.duration-*` selectors in the built stylesheet are `.duration-200` and
+`.duration-400`. A `duration-fast` / `duration-base` / `duration-tick` in a
+`className` is decoration: `--tw-duration` stays unset and every `transition-*`
+utility resolves through `var(--tw-duration, var(--default-transition-duration))`
+to **250ms** (`globals.css:395`).
+
+globals.css:392-394 points the framework default at `--duration-base` to stop a
+`duration-*` class beating it - a precaution against a class that cannot be
+generated. The two values agree today; they are two declarations, not one.
+
+**Port impact.** `lib\src\foundation\motion.dart` gained
+`DsDurations.transitionDefault` (250ms) for exactly this, documented and cited to
+the probe. Spell `DsDurations.base` **only** where the reference reads
+`var(--duration-base)` directly; every `transition-*` **utility** maps to
+`transitionDefault`. Nine call sites moved on 2026-08-15 - two of them
+(`checkbox.dart`, `radio.dart`) were rendering at 150ms and are now correct; the
+other seven were value-identical.

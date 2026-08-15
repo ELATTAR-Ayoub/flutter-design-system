@@ -22,9 +22,45 @@ class DsDurations {
 
   /// `--duration-base: 250ms` (L400).
   ///
-  /// Also `--default-transition-duration` (L395): the framework's own default
-  /// is pointed at this token so nothing can beat it on the same element.
+  /// Spell this token only where the reference reads `var(--duration-base)`
+  /// **directly** — the `btn-spring`, `lift`, `press`, `click-spring` and
+  /// `slide-pill` `@utility` blocks, and the `anim-*` keyframes. Where the
+  /// reference writes a `duration-base` **utility class** the value that
+  /// actually applies is [transitionDefault], which is a different declaration
+  /// that happens to carry the same number.
   static const Duration base = Duration(milliseconds: 250);
+
+  /// `--default-transition-duration: 250ms` (globals.css L395) — the duration
+  /// every `transition-*` utility in the reference actually runs at.
+  ///
+  /// **Tailwind v4 has no `--duration-*` theme namespace.** The `--duration-*`
+  /// customs above are declared and are read by hand-written `@utility` blocks,
+  /// component classes and keyframes, but they generate no `duration-*`
+  /// utility. The only `.duration-*` selectors in the built stylesheet are
+  /// `.duration-200` and `.duration-400`, and nothing in the reference uses
+  /// either. So `duration-fast` / `duration-base` / `duration-tick` in a
+  /// `className` **emit no CSS at all**: `--tw-duration` is never set, and every
+  /// `transition-*` utility falls through the second half of
+  /// `var(--tw-duration, var(--default-transition-duration))` to land here.
+  /// globals.css L392–394 points the framework default at `--duration-base` to
+  /// stop a `duration-*` class beating it — a precaution against a class that
+  /// cannot be generated.
+  ///
+  /// Probed on the live reference at `localhost:3000`, 1440 × 900, 2026-08-15.
+  /// `getComputedStyle(el).transitionDuration` reads **0.25s** on every element
+  /// whose class list names a duration token: checkbox, radio item, switch
+  /// track, switch thumb, slider thumb, the withdrawal option card, `Input`,
+  /// `Textarea`, `InputGroup`, `Item`, tabs trigger, the navigation-menu
+  /// chevron, both `DsNav` link levels, the theme-toggle option, and the
+  /// index-card chevron. The control group confirms the mechanism rather than
+  /// the number: `:where(.prose) a` and `slide-pill`'s opacity leg read
+  /// `var(--duration-fast)` directly and report **0.15s** on the same pages.
+  ///
+  /// Numerically equal to [base] and spelled separately for the same reason
+  /// [popIn] is not [reward]: two declarations that agree today. A retune of
+  /// `--duration-base` moves the `@utility` blocks and leaves every
+  /// `transition-*` utility exactly where it stands.
+  static const Duration transitionDefault = Duration(milliseconds: 250);
 
   /// `--duration-slow: 400ms` (L401).
   static const Duration slow = Duration(milliseconds: 400);

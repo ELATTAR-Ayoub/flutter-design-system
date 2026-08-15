@@ -19,7 +19,7 @@
 /// | `border border-input` | 1px |
 /// | `bg-card` → `data-[state=checked]:bg-primary` | — |
 /// | `shadow-pressed` → `data-[state=checked]:shadow-btn-primary` | the socket lights and casts blue beneath |
-/// | `transition-[background-color,border-color,box-shadow] duration-fast ease-out` | 150ms |
+/// | `transition-[background-color,border-color,box-shadow] duration-fast ease-out` | 250ms — `duration-fast` emits nothing, see [DsDurations.transitionDefault] |
 /// | `after:absolute after:-inset-x-3 after:-inset-y-2` | a 44 × 36 target under a 20px box |
 /// | `focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50` | — |
 /// | `aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20` | and it beats the focus ring |
@@ -235,7 +235,10 @@ class _DsCheckboxState extends State<DsCheckbox> {
       fill: on ? theme.primary : theme.card,
       border: on ? theme.primary : theme.input,
       shadow: on ? DsShadows.btnPrimary : DsShadows.pressed,
-      duration: DsDurations.fast,
+      // NOT `--duration-fast`. The class list says `duration-fast`, and that
+      // utility does not exist in Tailwind v4 — the socket runs at the
+      // framework default, probed at 0.25s on the live reference.
+      duration: DsDurations.transitionDefault,
       jellyState: widget.state,
       enabled: enabled,
       invalid: invalid,

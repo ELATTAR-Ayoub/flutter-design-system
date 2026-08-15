@@ -384,7 +384,8 @@ class _DsToggleState extends State<DsToggle> {
     // `transition-all` at `--default-transition-duration` /
     // `--default-transition-timing-function`. There is no `:active` override
     // to shorten it, the way `btn-spring` has.
-    final Duration transition = dsAnimationDuration(context, DsDurations.base);
+    final Duration transition =
+        dsAnimationDuration(context, DsDurations.transitionDefault);
 
     Widget toggle = _TransitionAllColors(
       duration: transition,

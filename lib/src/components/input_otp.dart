@@ -506,9 +506,10 @@ class DsInputOtpSlot extends StatelessWidget {
       right: Radius.circular(last ? DsRadii.lg : 0),
     );
 
-    // `transition-all` at the framework default, which globals.css points at
-    // `--duration-base` on `--ease-out` (L395–396).
-    final Duration duration = dsAnimationDuration(context, DsDurations.base);
+    // `transition-all` with no duration class at all, so this is the
+    // framework default outright (L395–396).
+    final Duration duration =
+        dsAnimationDuration(context, DsDurations.transitionDefault);
 
     return TweenAnimationBuilder<Color?>(
       tween: ColorTween(end: borderColor),

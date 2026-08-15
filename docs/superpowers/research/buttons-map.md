@@ -726,3 +726,31 @@ Consequences specific to this page:
 11. **`main.dart` routing debt.** `shadows`, `motion` and `icons` are built and unrouted; `buttons` would be the fourth. Add all four arms as part of this build, or only `buttons`? **Recommend: all four**, plus tighten `shell_test.dart:228–230` so `isNotNull` no longer passes on a `PlaceholderPage` — otherwise the same debt silently accrues again.
 12. **Parity measurement.** `_referenceHeight['buttons']` and a `_referenceBreaks['buttons']` table must both be measured off `localhost:3000` at the 1440 frame. Is that measurement mine to take (dev server + the existing `PARITY_DUMP=1` / `WRAP_DUMP=1` rigs), or supplied? Same question stands open for the three unrouted pages.
 13. **Reduced motion.** The reference's blanket rule collapses `swap-roll`, `anim-jelly`, the pill travel and the foil to 0.01ms. The port routes everything through `dsAnimationDuration`. Confirm the intended equivalence: reduced motion should make the swap and the pill **instant** (not disabled), and should freeze the foil at its first frame.
+
+
+---
+
+## CHECKED - 2026-08-15 - duration utilities (no correction needed)
+
+*(Corpus-wide sweep prompted by `selection-map.md` §7.1: Tailwind v4 emits no
+`duration-*` utility for the `--duration-*` theme namespace, so those class names
+are inert and the element falls back to `--default-transition-duration: 250ms`.
+Mechanism and probe record in `forms-map.md`'s 2026-08-15 correction block.)*
+
+**This map's timing inventory is clean.** Every duration it asserts comes from a
+rule that reads `var(--duration-*)` **directly**, not from a utility class:
+
+- `slide-pill` (`globals.css:2256`) - transform/width/height 250ms, opacity
+  **150ms**. Probed: `transition-duration: 0.25s, 0.25s, 0.25s, 0.15s`. Real.
+- `swap-roll` (`:2265`) - 400ms on both properties. Real.
+- `IconSwap`'s inner squash - `style={{ animationDelay: "var(--duration-fast)" }}`
+  is an **inline style reading the custom property**, not a utility. Real 150ms.
+- `btn-spring` (`:1886`) - 250ms, dropping to 80ms on `:active`. Probed on the
+  live `[data-slot=button]`: six legs, all `0.25s`. Real.
+- `Toggle` / `ToggleGroupItem` `transition-all` "at the framework default 250ms"
+  (the variant-base row and drift 11) - **already correct**; those components
+  carry no duration class at all.
+
+No entry in this map transcribed a no-op utility as a real value. The port's
+`button.dart`, `press.dart`, `sliding_pill.dart` and `keyframes.dart` keep
+`DsDurations.tick` / `.base` / `.fast` / `.slow` unchanged for the same reason.

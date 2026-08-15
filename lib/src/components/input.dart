@@ -18,7 +18,7 @@
 /// | `text-sm` | 13px, no `font-weight` of its own → `html`'s 400 |
 /// | `shadow-pressed` | permanent |
 /// | `outline-none` | — |
-/// | `transition-[box-shadow,border-color,background-color] duration-base ease-out` | 250ms on `--ease-out` |
+/// | `transition-[box-shadow,border-color,background-color] duration-base ease-out` | 250ms on `--ease-out` — from `--default-transition-duration`; `duration-base` emits nothing ([DsDurations.transitionDefault]) |
 /// | `placeholder:text-muted-foreground` | — |
 /// | `focus-visible:border-primary/50` | note `--primary`, not `--ring` |
 /// | `focus-visible:ring-3 focus-visible:ring-ring/35` | **added to** `shadow-pressed`, not replacing it: the ring lives in `--tw-ring-shadow` and the socket in `--tw-shadow` |
@@ -478,10 +478,12 @@ class DsFieldSurface extends StatelessWidget {
             // nothing, which is what an alpha transition does in CSS.
             : theme.ring.withValues(alpha: 0);
 
-    // `transition-[box-shadow,border-color,background-color]` at
-    // `--duration-base` on `--ease-out`. The border tint and the ring change
-    // together and only together, so they ride one duration.
-    final Duration duration = dsAnimationDuration(context, DsDurations.base);
+    // `transition-[box-shadow,border-color,background-color]` at the
+    // framework default on `--ease-out` — the `duration-base` class beside
+    // it emits nothing. The border tint and the ring change together and
+    // only together, so they ride one duration.
+    final Duration duration =
+        dsAnimationDuration(context, DsDurations.transitionDefault);
 
     return TweenAnimationBuilder<Color?>(
       tween: ColorTween(end: border),

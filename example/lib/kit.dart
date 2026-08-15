@@ -1370,6 +1370,10 @@ class DsIndexCard extends StatelessWidget {
 
 /// `Icon icon={ArrowRight}` with `transition-[transform,color] duration-fast
 /// group-hover:translate-x-0.5 group-hover:text-action-ink`.
+///
+/// `duration-fast` is not a utility Tailwind v4 can generate, so the slide
+/// and the tint both run at [DsDurations.transitionDefault] — probed at
+/// 0.25s on the index, the components index and every group page.
 class _CardArrow extends StatelessWidget {
   const _CardArrow({required this.hovered, required this.large});
 
@@ -1385,20 +1389,21 @@ class _CardArrow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final DsThemeData theme = DsTheme.of(context);
-    final Duration fast = dsAnimationDuration(context, DsDurations.fast);
+    final Duration transition =
+        dsAnimationDuration(context, DsDurations.transitionDefault);
     // `AnimatedSlide` measures its offset in child widths, and the two
     // variants are different widths for the same 2px travel.
     final double px = large ? ds(5) : DsIcon.pxFor(DsIconSize.md);
 
     return AnimatedSlide(
       offset: Offset(hovered ? _arrowSlide / px : 0, 0),
-      duration: fast,
+      duration: transition,
       curve: DsCurves.out,
       child: TweenAnimationBuilder<Color?>(
         tween: ColorTween(
           end: hovered ? theme.actionInk : theme.mutedForeground,
         ),
-        duration: fast,
+        duration: transition,
         curve: DsCurves.out,
         builder: (BuildContext context, Color? colour, Widget? child) =>
             DefaultTextStyle.merge(

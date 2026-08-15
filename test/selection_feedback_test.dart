@@ -101,7 +101,7 @@ void main() {
 
       await t.pumpWidget(
           host(const DsCheckbox(state: DsCheckboxState.checked)));
-      await t.pump(DsDurations.fast);
+      await t.pump(DsDurations.transitionDefault);
       expect(socketOf(t, DsCheckbox).spec.layers.skip(1).toList(),
           DsShadows.btnPrimary.layers);
       expect(socketOf(t, DsCheckbox).fill, theme.primary);
@@ -214,7 +214,7 @@ void main() {
         onChanged: (DsCheckboxState _) {},
       )));
       final DsThemeData theme = themeIn(t, DsCheckbox);
-      await t.pump(DsDurations.fast);
+      await t.pump(DsDurations.transitionDefault);
       final Color restBorder = borderOf(socketOf(t, DsCheckbox));
       final Color restRing = ringOf(socketOf(t, DsCheckbox), theme);
       expect(restBorder, theme.destructive);
@@ -348,7 +348,7 @@ void main() {
     testWidgets('the socket lights on selection', (WidgetTester t) async {
       await t.pumpWidget(group('daily', (String _) {}));
       final DsThemeData theme = themeIn(t, DsRadioGroupItem<String>);
-      await t.pump(DsDurations.fast);
+      await t.pump(DsDurations.transitionDefault);
       expect(socketOf(t, DsRadioGroupItem<String>).fill, theme.primary);
       expect(socketOf(t, DsRadioGroupItem<String>).spec.layers.skip(1).toList(),
           DsShadows.btnPrimary.layers);
@@ -496,14 +496,14 @@ void main() {
         find.byType(TweenAnimationBuilder<double>),
       );
       expect(thumb.curve, DsCurves.spring);
-      expect(thumb.duration, DsDurations.base);
+      expect(thumb.duration, DsDurations.transitionDefault);
 
       final TweenAnimationBuilder<Color?> track =
           t.widget<TweenAnimationBuilder<Color?>>(
         find.byType(TweenAnimationBuilder<Color?>).first,
       );
       expect(track.curve, DsCurves.out);
-      expect(track.duration, DsDurations.base);
+      expect(track.duration, DsDurations.transitionDefault);
     });
   });
 

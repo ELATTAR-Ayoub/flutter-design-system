@@ -251,7 +251,12 @@ class DsSelectionControl extends StatefulWidget {
   /// at rest, `shadow-btn-primary` once checked or on.
   final DsShadowSpec shadow;
 
-  /// `--duration-fast` for a checkbox or radio, `--duration-base` for a switch.
+  /// [DsDurations.transitionDefault] for all three controls.
+  ///
+  /// The class lists disagree — `duration-fast` on checkbox and radio,
+  /// `duration-base` on the switch — and neither utility exists in Tailwind v4,
+  /// so all three sockets fall through to `--default-transition-duration` and
+  /// run at the same speed. Probed, not read off the class list.
   final Duration duration;
 
   /// Handed to [DsJellyReplay]; a change replays the squash.

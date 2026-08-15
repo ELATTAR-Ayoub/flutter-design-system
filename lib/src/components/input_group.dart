@@ -233,8 +233,10 @@ class _DsInputGroupState extends State<DsInputGroup> {
             : theme.ring.withValues(alpha: 0);
 
     // `transition-[box-shadow,border-color]` — note the absence of
-    // `background-color`, which the bare `Input` does transition.
-    final Duration duration = dsAnimationDuration(context, DsDurations.base);
+    // `background-color`, which the bare `Input` does transition. At the
+    // framework default: the `duration-base` class beside it emits nothing.
+    final Duration duration =
+        dsAnimationDuration(context, DsDurations.transitionDefault);
 
     Widget group = _GroupScope(
       hasStartAddon: widget.startAddon != null,

@@ -665,3 +665,32 @@ Package root `D:\DESIGN\Design-System-2026-8\flutter-design-system\`.
 8. **Two measurements are blocking.** `_referenceHeight['inputs']` and the wrap table both need the live page at 1440×900. Same question as shadows open-question 1: is that measurement mine to take, or supplied?
 9. **The `text-sm` line-height question (§4.3).** Whether Tailwind emits a `line-height` for `text-sm` given `--text-sm` has no companion token decides whether `.type-num`'s 1.2 survives on the `InputGroupText` spans and inside the textarea. One `getComputedStyle` call settles it; it should be taken in the same browser session as question 8, along with the `InputGroupButton` icon size in §4.4.
 10. **The selection-alpha bug (§16.2).** `DsInput` uses 0.30 where the reference and the rest of the port use 0.35. Fix it in this task, or spin it out? **Recommendation:** fix in place — it is one constant and the shadows page's own test does not assert it.
+
+
+---
+
+## CORRECTION - 2026-08-15 - `duration-base` is not what sets these 250ms
+
+*(Corpus-wide sweep prompted by `selection-map.md` §7.1; mechanism and probe
+record in `forms-map.md`'s 2026-08-15 correction block.)*
+
+**The numbers in this map are right; the attribution is not.** Tailwind v4 has no
+`--duration-*` theme namespace, so the `duration-base` in
+
+- `Input` / `Textarea` - `transition-[box-shadow,border-color,background-color] duration-base ease-out`, recorded as "250ms, `cubic-bezier(0.22,1,0.36,1)`"
+- `InputGroup` - `transition-[box-shadow,border-color] duration-base ease-out`, in the `InputGroup` class table
+
+**emits no CSS.** Both fall through to `--default-transition-duration`
+(`globals.css:395`), which globals.css happens to point at `--duration-base` - so
+the rendered value is 250ms either way. Probed 2026-08-15 on
+`/design-system/components/base/inputs`: `[data-slot=input]`,
+`[data-slot=textarea]` and `[data-slot=input-group]` all report
+`transitionDuration: 0.25s`.
+
+`InputOTPSlot`'s `transition-all` carries no duration class at all and was
+already recorded as the framework default - correct as written.
+
+**Port impact.** `input.dart`, `input_group.dart` and `input_otp.dart` now spell
+`DsDurations.transitionDefault` rather than `.base`. **No render change** - the
+edit exists so that a future retune of `--duration-base` moves only the
+`@utility` blocks, exactly as it would in the browser.

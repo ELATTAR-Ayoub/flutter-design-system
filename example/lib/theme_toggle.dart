@@ -141,8 +141,13 @@ class _ThemeOptionState extends State<_ThemeOption> {
             child: Center(
               child: TweenAnimationBuilder<Color?>(
                 tween: ColorTween(end: ink),
-                // `transition-colors duration-fast ease-out`.
-                duration: dsAnimationDuration(context, DsDurations.fast),
+                // `transition-colors duration-fast ease-out` — and
+                // `duration-fast` emits no CSS, so this is the framework
+                // default, probed at 0.25s.
+                duration: dsAnimationDuration(
+                  context,
+                  DsDurations.transitionDefault,
+                ),
                 curve: DsCurves.out,
                 builder: (BuildContext context, Color? colour, Widget? child) =>
                     DefaultTextStyle.merge(

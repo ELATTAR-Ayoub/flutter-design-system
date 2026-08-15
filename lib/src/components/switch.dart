@@ -18,8 +18,8 @@
 /// | `data-[state=checked]:border-primary bg-primary shadow-btn-primary` | *"lit and radiating when on"* |
 /// | thumb `bg-foreground shadow-btn` | raised in both states |
 /// | `translate-x-5` / `translate-x-4` | **20px** / 16px of travel |
-/// | track `transition-[background-color,box-shadow,border-color] duration-base ease-out` | 250ms |
-/// | thumb `transition-transform duration-base ease-spring` | 250ms, and it overshoots |
+/// | track `transition-[background-color,box-shadow,border-color] duration-base ease-out` | 250ms — but from `--default-transition-duration`, not `duration-base`, which emits nothing ([DsDurations.transitionDefault]) |
+/// | thumb `transition-transform duration-base ease-spring` | the same 250ms, and it overshoots |
 /// | `after:-inset-x-3 after:-inset-y-2` | a **68 × 40** target |
 ///
 /// **The travel is 20px on a track whose content box is 38 wide.** A 20px thumb
@@ -150,7 +150,9 @@ class DsSwitch extends StatelessWidget {
       fill: value ? theme.primary : theme.muted,
       border: value ? theme.primary : theme.input,
       shadow: value ? DsShadows.btnPrimary : DsShadows.pressed,
-      duration: DsDurations.base,
+      // `duration-base` is a Tailwind v4 no-op; the track runs at the
+      // framework default. Same number, different declaration.
+      duration: DsDurations.transitionDefault,
       jellyState: value,
       enabled: isEnabled,
       invalid: isInvalid,
@@ -188,7 +190,10 @@ class _Thumb extends StatelessWidget {
     return SizedBox.expand(
       child: TweenAnimationBuilder<double>(
         tween: Tween<double>(end: on ? 1 : 0),
-        duration: dsAnimationDuration(context, DsDurations.base),
+        duration: dsAnimationDuration(
+          context,
+          DsDurations.transitionDefault,
+        ),
         // *"the thumb overshoots, the track does not"* — the one place in the
         // three controls where the two halves of a surface run different
         // curves.

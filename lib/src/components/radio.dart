@@ -22,7 +22,7 @@
 /// | `data-[state=checked]:border-primary bg-primary shadow-btn-primary` | lit |
 /// | dot `size-2 rounded-full bg-primary-foreground shadow-e1` | 8px, raised |
 /// | `anim-dot-pop` | 320ms on `--ease-spring`, `scale 0 → 1.35 @55% → 1` |
-/// | `transition-[background-color,border-color,box-shadow] duration-fast ease-out` | 150ms |
+/// | `transition-[background-color,border-color,box-shadow] duration-fast ease-out` | 250ms — `duration-fast` emits nothing, see [DsDurations.transitionDefault] |
 ///
 /// `RadioGroup` itself is `grid w-full gap-2` — 8px — and the forms page passes
 /// `className="gap-3"`, which tw-merges over it to **12px**. Both are reachable
@@ -415,7 +415,9 @@ class _DsRadioGroupItemState<T> extends State<DsRadioGroupItem<T>> {
       fill: checked ? theme.primary : theme.card,
       border: checked ? theme.primary : theme.input,
       shadow: checked ? DsShadows.btnPrimary : DsShadows.pressed,
-      duration: DsDurations.fast,
+      // NOT `--duration-fast` — same Tailwind v4 no-op as the checkbox's
+      // socket, and probed at 0.25s on the live reference.
+      duration: DsDurations.transitionDefault,
       jellyState: checked,
       enabled: enabled,
       invalid: invalid,

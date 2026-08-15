@@ -770,3 +770,60 @@ Consequences here:
 7. **The validator's shape.** Zod is a schema library; Flutter has none in-repo and the port takes no dependencies. **Recommendation:** a tiny `DsRule<T>` list per field (`(value) => String?`) with an "all issues" and a "first issue" collection mode — enough to express both `criteriaMode`s and nothing more. The Zod-4 email regex ships verbatim as one rule.
 8. **Toast host placement.** The web mounts `<Toaster/>` once in the root layout. In Flutter this is an `Overlay` entry owned by the example app's shell, not by `lib\`. **Recommendation:** put `DsToaster`'s widget in `lib\` and its mounting in `example\lib\shell.dart`, mirroring the split.
 9. **Two `AccountForm`s (drift 19).** Confirm both instances are built as separate live forms rather than the second being a still — the §2 Note's whole argument ("asks nothing until you submit, then re-checks on every keystroke") is only demonstrable if it is live.
+
+
+---
+
+## CORRECTION - 2026-08-15 - §8.3 durations
+
+*(Raised by `selection-map.md` §7.1, verified by a full-corpus sweep plus a
+computed-style probe against `localhost:3000` at 1440 x 900 on 2026-08-15.)*
+
+**Tailwind v4 has no `--duration-*` theme namespace.** The tokens are declared in
+`globals.css` and are read correctly by hand-written `@utility` blocks
+(`btn-spring`, `lift`, `press`, `click-spring`, `slide-pill`, `swap-roll`), by
+the `anim-*` keyframe rules, by the `[class*="animate-in"]` bridge and by plain
+component rules such as `:where(.prose) a` - but they generate **no `duration-*`
+utility class**. The only `.duration-*` selectors in the built stylesheet are
+`.duration-200` and `.duration-400`, and nothing in the reference uses either.
+
+So a `duration-fast` or `duration-base` in a `className` **emits no CSS**.
+`--tw-duration` is never set, and every `transition-*` utility falls through
+`var(--tw-duration, var(--default-transition-duration))` to
+**`--default-transition-duration: 250ms`** (`globals.css:395`).
+
+§8.3's table is therefore wrong in one row, and right for the wrong reason in
+three more:
+
+| §8.3 row | table says | **actually renders** *(probed)* |
+|---|---|---|
+| `Checkbox`, `RadioGroupItem` | **150ms** (`--duration-fast`) | **250ms** - `--default-transition-duration` |
+| `Input`, `Textarea`, `Switch` track | 250ms (`--duration-base`) | 250ms - but from the **default**, not the token |
+| `Switch` thumb | 250ms | 250ms - same, from the default |
+| `SelectTrigger` | 250ms via `--default-transition-duration` | correct as written - the one row that reasoned about the cascade rather than the class list |
+
+Everything below the transition rows in §8.3 (`anim-check-draw` 280,
+`anim-dash-draw` 200, `anim-dot-pop` 320, `anim-jelly` 600) is **unaffected**:
+those are `@utility` blocks with their own durations, never utility classes.
+
+Probe record, `getComputedStyle(el).transitionDuration`, dark theme, 1440 x 900,
+2026-08-15: `[data-slot=checkbox]` 0.25s, `[data-slot=radio-group-item]` 0.25s,
+`[data-slot=switch]` 0.25s, `[data-slot=switch-thumb]` 0.25s,
+`[data-slot=slider-thumb]` 0.25s, `[data-slot=input]` 0.25s,
+`[data-slot=textarea]` 0.25s, `[data-slot=input-group]` 0.25s. Control group,
+same session, same pages: `:where(.prose) a` **0.15s** and `slide-pill`'s opacity
+leg **0.15s** - both read `var(--duration-fast)` directly, which is what makes
+the mechanism (rather than the number) the finding.
+
+**Port impact, landed 2026-08-15.** `lib\src\components\checkbox.dart` and
+`lib\src\components\radio.dart` ran their socket transition at
+`DsDurations.fast` (150ms) where the browser runs 250ms. Both now use
+`DsDurations.transitionDefault`, a new member of
+`lib\src\foundation\motion.dart` that spells `--default-transition-duration`
+separately from `--duration-base` so a retune of the token cannot silently move
+the utilities. The three `pump(DsDurations.fast)` calls in
+`test\selection_feedback_test.dart` were retuned with it.
+
+**Also note §14's summary line** ("The seven new animation timings ... 150
+(`fast`)"): 150ms is a real token, but no *transition* on the forms page runs at
+it.

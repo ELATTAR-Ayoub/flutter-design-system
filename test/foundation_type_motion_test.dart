@@ -682,7 +682,7 @@ void main() {
 
   // ─── motion ──────────────────────────────────────────────────────────────
 
-  group('DsDurations (globals.css L398–418)', () {
+  group('DsDurations (globals.css L395–418)', () {
     test('every duration token', () {
       expect(DsDurations.tick, const Duration(milliseconds: 80));
       expect(DsDurations.fast, const Duration(milliseconds: 150));
@@ -696,9 +696,24 @@ void main() {
       expect(DsDurations.swayAlt, const Duration(seconds: 33));
     });
 
-    test('base is the framework default transition duration (L395)', () {
-      expect(DsDurations.base, const Duration(milliseconds: 250));
-      expect(DsDurations.base.inMilliseconds, 250);
+    test('the framework default transition duration (L395)', () {
+      expect(DsDurations.transitionDefault, const Duration(milliseconds: 250));
+      expect(DsDurations.transitionDefault.inMilliseconds, 250);
+    });
+
+    test('transitionDefault equals base and is a separate declaration', () {
+      // globals.css points `--default-transition-duration` at `--duration-base`,
+      // so the two agree — but Tailwind v4 emits no `duration-*` utility for
+      // the theme namespace, which means every `transition-*` class in the
+      // reference resolves through the DEFAULT and never through the token.
+      // Probed 2026-08-15: checkbox, radio, switch, slider thumb, input,
+      // textarea, input-group, tabs, both nav levels and the theme toggle all
+      // report a 0.25s transitionDuration; `:where(.prose) a` and
+      // `slide-pill`'s opacity leg, which read `var(--duration-fast)` directly,
+      // report 0.15s on the same pages.
+      expect(DsDurations.transitionDefault, DsDurations.base);
+      expect(DsDurations.transitionDefault, isNot(same(DsDurations.fast)));
+      expect(DsDurations.fast, const Duration(milliseconds: 150));
     });
 
     test('the two sways are deliberately not multiples of each other', () {

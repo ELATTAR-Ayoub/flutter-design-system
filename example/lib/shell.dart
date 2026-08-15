@@ -705,6 +705,10 @@ class _NavRowState extends State<_NavRow> {
 }
 
 /// `transition-colors duration-fast` for one colour.
+///
+/// At [DsDurations.transitionDefault], not `--duration-fast`: Tailwind v4
+/// generates no `duration-fast` utility, so both nav levels fall through to
+/// `--default-transition-duration`. Probed at 0.25s on the live sidebar.
 class _ColorFade extends StatelessWidget {
   const _ColorFade({required this.target, required this.builder});
 
@@ -715,7 +719,7 @@ class _ColorFade extends StatelessWidget {
   Widget build(BuildContext context) {
     return TweenAnimationBuilder<Color?>(
       tween: ColorTween(end: target),
-      duration: dsAnimationDuration(context, DsDurations.fast),
+      duration: dsAnimationDuration(context, DsDurations.transitionDefault),
       curve: DsCurves.out,
       builder: (BuildContext context, Color? colour, Widget? child) =>
           builder(context, colour ?? target),

@@ -166,3 +166,40 @@ Links on the page: 6 IndexCard hrefs (§2 table), 3 group hrefs (§3), sidebar: 
 3. **Components-section arrow Icon**: SVG attrs computed for 16px (`strokeWidth 2.4`) but CSS `size-5` renders it at 20px — visual stroke ≈ 2px; the sibling IndexCard arrow is a true 16px with the same 2.4 attr. Also an `aria-hidden` prop is passed that `IconProps` doesn't declare (harmless — Icon already sets `aria-hidden` when unlabelled).
 4. **Section headings** are `h2` elements wearing `.type-h3` (21px), while card titles are `h3` wearing `.type-h4`/`.type-h3` — heading level and type class deliberately decoupled.
 5. `.type-label`/`.type-micro` own their `--muted-foreground` color, yet call sites still stack explicit color overrides (`text-action-ink` on eyebrow/"n sets", `text-muted-foreground` on Panel labels) — override wins.
+
+
+---
+
+## CORRECTION - 2026-08-15 - the arrow, the nav links and the theme toggle do not run at 150ms
+
+*(Corpus-wide sweep prompted by `selection-map.md` §7.1; mechanism and probe
+record in `forms-map.md`'s 2026-08-15 correction block.)*
+
+**Tailwind v4 has no `--duration-*` theme namespace**, so a `duration-fast` in a
+`className` emits no CSS and the element falls through to
+`--default-transition-duration: 250ms` (`globals.css:395`). Four claims in this
+map read the class name rather than the cascade:
+
+| where | map says | **actually renders** *(probed 2026-08-15, 1440 x 900)* |
+|---|---|---|
+| IndexCard arrow, `transition-[transform,color] duration-fast` | "arrow translates `translate-x-0.5` (+2px) and recolors to `text-action-ink` over `duration-fast` **150ms**" | **250ms** |
+| Motion summary, "Card hover (`lift`)" | "arrow icon `translateX(2px)` + color ..., **both 150ms**" | **250ms** |
+| NavTree group link and category link, `transition-colors duration-fast` | *(no number stated - but the class implies 150)* | **250ms** each |
+| ThemeToggle option button, `press ... transition-colors duration-fast ease-out` | *(no number stated)* | **250ms** |
+
+Unaffected in the same paragraphs, because they read `var(--duration-*)`
+directly: the `lift` utility's 250ms transform / box-shadow / border-color legs,
+the `slide-pill` travel (250ms transform/width/height, **150ms** opacity -
+genuinely 150), and `anim-jelly`'s 600ms arrival replay.
+
+**Also worth recording** *(observed during the same probe; out of scope, not
+fixed)*: on the theme-toggle button the layered `transition-colors` utility
+**replaces** `press`'s `transition: transform ...` shorthand. The probed
+`transitionProperty` is the colour list only, with no `transform`, so `press`'s
+`:active { scale(0.94) }` snaps in and out with no tween on that control. Same
+shape on `/design-system/components/base/navigation`'s `type-nav press` rows.
+
+**Port impact.** `example\lib\kit.dart`'s `_CardArrow`,
+`example\lib\shell.dart`'s `_ColorFade` (shared by both nav levels) and
+`example\lib\theme_toggle.dart` moved from `DsDurations.fast` to
+`DsDurations.transitionDefault`.

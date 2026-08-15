@@ -375,7 +375,9 @@ class _DsSelectState<T> extends State<DsSelect<T>> {
   @override
   Widget build(BuildContext context) {
     final DsThemeData theme = DsTheme.of(context);
-    final Duration duration = dsAnimationDuration(context, DsDurations.base);
+    // `transition-colors` with no duration class — the framework default.
+    final Duration duration =
+        dsAnimationDuration(context, DsDurations.transitionDefault);
 
     // `<label for>` on a select opens it — the trigger is the labelable thing,
     // and clicking its label is clicking the trigger. Null while disabled.
