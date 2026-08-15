@@ -86,16 +86,11 @@ import 'dart:math' as math;
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
-import '../effects/machine_surface.dart';
-import '../foundation/colors.dart';
 import '../foundation/motion.dart';
-import '../foundation/shadows.dart';
 import '../foundation/spacing.dart';
 import '../foundation/theme.dart';
 import '../foundation/typography.dart';
-import '../motion/press.dart';
 import '../theme_scope.dart';
-import 'button.dart';
 import 'field.dart';
 import 'icon.dart';
 import 'icon_paths.dart';
@@ -106,9 +101,6 @@ import 'select.dart';
 /// `data-highlighted:bg-accent` — the same token `SelectItem` highlights with,
 /// reached through a different state name (drift 5).
 const double _disabledOpacity = 0.50;
-
-/// `focus-visible:ring-ring/50` on the addon button.
-const double _focusRingAlpha = 0.50;
 
 /// One row of the popup.
 ///
@@ -427,22 +419,22 @@ class _DsComboboxState<T> extends State<DsCombobox<T>> {
       anchor: input,
       content: (BuildContext context, DsPopoverAnchorMetrics metrics) =>
           _ComboboxPopup<T>(
-        width: metrics.anchorWidth + DsCombobox.popupOvershoot,
-        maxHeight: math.min(
-          DsCombobox.listMaxHeight,
-          metrics.availableHeight - ds(9),
-        ),
-        items: visible,
-        selected: widget.value,
-        highlighted: _highlighted,
-        emptyLabel: widget.emptyLabel,
-        onPick: _commit,
-        onHover: (int index) {
-          // `highlightItemOnHover: true`.
-          if (_highlighted == index) return;
-          setState(() => _highlighted = index);
-        },
-      ),
+            width: metrics.anchorWidth + DsCombobox.popupOvershoot,
+            maxHeight: math.min(
+              DsCombobox.listMaxHeight,
+              metrics.availableHeight - ds(9),
+            ),
+            items: visible,
+            selected: widget.value,
+            highlighted: _highlighted,
+            emptyLabel: widget.emptyLabel,
+            onPick: _commit,
+            onHover: (int index) {
+              // `highlightItemOnHover: true`.
+              if (_highlighted == index) return;
+              setState(() => _highlighted = index);
+            },
+          ),
     );
 
     Widget group = DsInputGroup(
@@ -618,8 +610,9 @@ class _ComboboxRow<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color ink =
-        highlighted ? theme.accentForeground : theme.popoverForeground;
+    final Color ink = highlighted
+        ? theme.accentForeground
+        : theme.popoverForeground;
 
     Widget row = DecoratedBox(
       decoration: BoxDecoration(
@@ -666,7 +659,10 @@ class _ComboboxRow<T> extends StatelessWidget {
       ],
     );
 
-    row = DefaultTextStyle.merge(style: TextStyle(color: ink), child: row);
+    row = DefaultTextStyle.merge(
+      style: TextStyle(color: ink),
+      child: row,
+    );
     row = Opacity(opacity: item.enabled ? 1 : _disabledOpacity, child: row);
 
     return Semantics(
@@ -716,127 +712,38 @@ class _ComboboxEmpty extends StatelessWidget {
 /// `InputGroupButton size="icon-xs"` wrapping `ComboboxTrigger` — **24 × 24**,
 /// radius 7, `p-0`, ghost.
 ///
-/// Built here rather than in `input_group.dart` because `icon-xs` is a rung of
-/// that file's `cva` the port has not built — the shipped [DsInputGroupButton]
-/// is the default rung, `h-6 px-1.5`, and its 6px of horizontal padding would
-/// render this trigger 28px wide. `input_group.dart` belongs to another owner
-/// this wave, and it makes the same argument about `DsButton` in its own doc.
-/// **Promotion candidate**: an `icon-xs` size on `DsInputGroupButton` collapses
-/// this widget onto it.
+/// **Promotion, landed.** This was a local copy of `input-group.tsx`'s
+/// `icon-xs` cva rung, written here because the shipped [DsInputGroupButton]
+/// only had the default `xs` rung and its 6px of horizontal padding would have
+/// rendered the trigger 28px wide. The rung is now
+/// [DsInputGroupButtonSize.iconXs] and this is a thin call site again: a
+/// square, the chevron, and `data-pressed:bg-transparent` through
+/// [DsInputGroupButton.cancelPressFill].
 ///
-/// `data-pressed:bg-transparent` is the one thing here that is not a plain
-/// ghost: pressing it **cancels** the fill instead of deepening it, so the
-/// pressed state is the resting one and only the scale moves.
-class _ComboboxTriggerButton extends StatefulWidget {
+/// The collapse changes one pixel of behaviour and the change is a *fix*: the
+/// local copy painted the focus ring but not `focus-visible:border-ring`, which
+/// the reference's ghost `Button` base carries and the promoted rung does. The
+/// trigger is not reachable by keyboard on this page anyway — the input takes
+/// the focus and the arrows drive the popup — so the correction is invisible
+/// where it matters and right where it does not.
+class _ComboboxTriggerButton extends StatelessWidget {
   const _ComboboxTriggerButton({required this.open, required this.onPressed});
 
   final bool open;
   final VoidCallback? onPressed;
 
-  /// `size-6`.
-  static double get size => ds(6);
-
-  @override
-  State<_ComboboxTriggerButton> createState() => _ComboboxTriggerButtonState();
-}
-
-class _ComboboxTriggerButtonState extends State<_ComboboxTriggerButton> {
-  bool _hovered = false;
-  bool _pressed = false;
-  bool _focused = false;
-
-  bool get _enabled => widget.onPressed != null;
-
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
-
-    // ghost: nothing at rest, `--secondary` on hover — and transparent again on
-    // press, which is `data-pressed:bg-transparent` beating the variant.
-    final Color fill = _pressed
-        ? dsTransparent
-        : _hovered
-            ? theme.secondary
-            : dsTransparent;
-    final Color ink =
-        _hovered || _pressed ? theme.foreground : theme.mutedForeground;
-
-    final Duration duration = dsAnimationDuration(
-      context,
-      _pressed ? DsDurations.tick : DsDurations.base,
-    );
-
-    Widget button = TweenAnimationBuilder<Color?>(
-      tween: ColorTween(end: fill),
-      duration: duration,
-      curve: DsCurves.spring,
-      builder: (BuildContext context, Color? f, Widget? child) =>
-          TweenAnimationBuilder<Color?>(
-        tween: ColorTween(end: ink),
-        duration: duration,
-        curve: DsCurves.spring,
-        builder: (BuildContext context, Color? c, Widget? child) =>
-            DsMachineSurface(
-          spec: _focused
-              ? DsButton.withFocusRing(
-                  DsShadows.none,
-                  theme.ring.withValues(alpha: _focusRingAlpha),
-                )
-              : DsShadows.none,
-          radius: BorderRadius.circular(DsRadii.addonButton),
-          fill: f ?? fill,
-          child: Center(
-            // `p-0 has-[>svg]:p-0` — the glyph is centred in the square with
-            // nothing around it.
-            child: const DsIcon(
-              DsIconGlyph.chevronDown,
-              tone: DsIconTone.inherit,
-            ),
-          ),
-        ),
-        child: child,
-      ),
-    );
-
-    button = DefaultTextStyle.merge(
-      style: TextStyle(color: ink),
-      child: button,
-    );
-
-    button = SizedBox.square(
-      dimension: _ComboboxTriggerButton.size,
-      child: button,
-    );
-
-    button = DsPress(
-      scale: DsTransforms.buttonScale,
-      downDuration: DsDurations.tick,
-      upDuration: DsDurations.base,
-      onTap: widget.onPressed,
-      child: Listener(
-        onPointerDown: (_) => setState(() => _pressed = true),
-        onPointerUp: (_) => setState(() => _pressed = false),
-        onPointerCancel: (_) => setState(() => _pressed = false),
-        child: MouseRegion(
-          cursor: _enabled ? SystemMouseCursors.click : MouseCursor.defer,
-          onEnter: (_) => setState(() => _hovered = true),
-          onExit: (_) => setState(() => _hovered = false),
-          child: button,
-        ),
-      ),
-    );
-
-    button = Focus(
-      focusNode: null,
-      canRequestFocus: _enabled,
-      onFocusChange: (bool value) => setState(() => _focused = value),
-      child: button,
-    );
-
-    return Semantics(
-      button: true,
-      label: widget.open ? 'Close' : 'Open',
-      child: button,
+    return DsInputGroupButton(
+      size: DsInputGroupButtonSize.iconXs,
+      cancelPressFill: true,
+      onPressed: onPressed,
+      label: open ? 'Close' : 'Open',
+      // `icon-xs` declares no `[&>svg]` size, so the `Button` base's `size-4`
+      // stands: 16px, the [DsIcon] default. `pointer-events-none
+      // text-muted-foreground` — the tone is the button's ink, which is what
+      // [DsIconTone.inherit] reads.
+      child: const DsIcon(DsIconGlyph.chevronDown, tone: DsIconTone.inherit),
     );
   }
 }

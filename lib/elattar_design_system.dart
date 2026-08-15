@@ -23,6 +23,7 @@ export 'src/components/button.dart';
 export 'src/components/button_group.dart';
 export 'src/components/checkbox.dart';
 export 'src/components/combobox.dart';
+export 'src/components/command.dart';
 export 'src/components/ds_rule.dart';
 export 'src/components/empty.dart';
 export 'src/components/field.dart';

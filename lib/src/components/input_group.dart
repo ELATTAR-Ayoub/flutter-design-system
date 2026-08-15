@@ -224,19 +224,21 @@ class _DsInputGroupState extends State<DsInputGroup> {
     final Color border = invalid
         ? theme.destructive
         : _focusWithin
-            ? theme.ring
-            : theme.input;
+        ? theme.ring
+        : theme.input;
     final Color ring = invalid
         ? theme.destructive.withValues(alpha: invalidAlpha)
         : _focusWithin
-            ? theme.ring.withValues(alpha: _focusRingAlpha)
-            : theme.ring.withValues(alpha: 0);
+        ? theme.ring.withValues(alpha: _focusRingAlpha)
+        : theme.ring.withValues(alpha: 0);
 
     // `transition-[box-shadow,border-color]` — note the absence of
     // `background-color`, which the bare `Input` does transition. At the
     // framework default: the `duration-base` class beside it emits nothing.
-    final Duration duration =
-        dsAnimationDuration(context, DsDurations.transitionDefault);
+    final Duration duration = dsAnimationDuration(
+      context,
+      DsDurations.transitionDefault,
+    );
 
     Widget group = _GroupScope(
       hasStartAddon: widget.startAddon != null,
@@ -261,25 +263,28 @@ class _DsInputGroupState extends State<DsInputGroup> {
       curve: DsCurves.out,
       builder: (BuildContext context, Color? b, Widget? child) =>
           TweenAnimationBuilder<Color?>(
-        tween: ColorTween(end: ring),
-        duration: duration,
-        curve: DsCurves.out,
-        builder: (BuildContext context, Color? r, Widget? child) {
-          final Color ringColor = r ?? ring;
-          return DsMachineSurface(
-            spec: ringColor.a == 0
-                ? DsShadows.pressed
-                : DsButton.withFocusRing(DsShadows.pressed, ringColor),
-            radius: BorderRadius.circular(DsRadii.pill),
-            fill: theme.card,
-            border: Border.all(color: b ?? border, width: DsWidths.hairline),
-            // Threaded through both builders unrebuilt, so it is the `group`
-            // handed to the outer `child:` and never null.
-            child: child!,
-          );
-        },
-        child: child,
-      ),
+            tween: ColorTween(end: ring),
+            duration: duration,
+            curve: DsCurves.out,
+            builder: (BuildContext context, Color? r, Widget? child) {
+              final Color ringColor = r ?? ring;
+              return DsMachineSurface(
+                spec: ringColor.a == 0
+                    ? DsShadows.pressed
+                    : DsButton.withFocusRing(DsShadows.pressed, ringColor),
+                radius: BorderRadius.circular(DsRadii.pill),
+                fill: theme.card,
+                border: Border.all(
+                  color: b ?? border,
+                  width: DsWidths.hairline,
+                ),
+                // Threaded through both builders unrebuilt, so it is the `group`
+                // handed to the outer `child:` and never null.
+                child: child!,
+              );
+            },
+            child: child,
+          ),
       child: group,
     );
 
@@ -515,15 +520,43 @@ class DsInputGroupText extends StatelessWidget {
   }
 }
 
-/// `InputGroupButton` — a ghost `Button` at 24×auto with a 7px corner.
+/// The `inputGroupButtonVariants` size rungs (`input-group.tsx:68–84`) the port
+/// has consumers for.
+///
+/// The cva declares four — `xs`, `sm`, `icon-xs`, `icon-sm`. `sm` is the empty
+/// string (it adds nothing at all to the base) and `icon-sm` is `size-8 p-0`,
+/// which no ported page reaches; both stay recorded, not built, on the same
+/// rule that scoped `DsInputGroupAlign` to its two inline values.
+enum DsInputGroupButtonSize {
+  /// `h-6 gap-1 rounded-[calc(var(--radius)-3px)] px-1.5
+  /// [&>svg:not([class*='size-'])]:size-3.5` — the cva's `defaultVariants`,
+  /// and the rung the inputs page's password toggle wears.
+  ///
+  /// Its `size-3.5` beats the `Button` base's `size-4`, so an icon in this rung
+  /// paints **14×14** — `DsIcon(size: DsIconSize.sm)`.
+  xs,
+
+  /// `size-6 rounded-[calc(var(--radius)-3px)] p-0 has-[>svg]:p-0` — a **24 ×
+  /// 24 square with no padding at all**, worn by the combobox's trigger
+  /// (`combobox.tsx:71–79`).
+  ///
+  /// It declares no `[&>svg]` size of its own, so the `Button` base's `size-4`
+  /// stands and an icon here paints **16×16** — one rung larger than [xs] on a
+  /// button two pixels *narrower*.
+  iconXs,
+}
+
+/// `InputGroupButton` — a ghost `Button` at 24px with a 7px corner.
 ///
 /// `size` is `Omit`ted from the props, so the reference builds a `Button` at
 /// `size="default"` and then overrides height, gap, padding and radius through
 /// its own `cva`. The geometry therefore belongs to *this* file rather than to
 /// the button's size ladder, which is why it is stated here:
-/// **24px tall, 6px horizontal padding, 4px gap, 7px radius, 13px text,
-/// `variant="ghost"`, `shadow-none`** — with the base list's `btn-spring`,
-/// `active:scale-95` and `focus-visible:ring-3 ring-ring/50` all surviving.
+/// **24px tall, 7px radius, 13px text, `variant="ghost"`, `shadow-none`** —
+/// with the base list's `btn-spring`, `active:scale-95` and
+/// `focus-visible:border-ring ring-3 ring-ring/50` all surviving. What the two
+/// rungs disagree about is width: [DsInputGroupButtonSize.xs] is
+/// `px-1.5`-wide-as-its-content, [DsInputGroupButtonSize.iconXs] is a square.
 ///
 /// A 7px radius on a control inside a 999px pill is the only non-pill,
 /// non-ladder corner in the system ([DsRadii.addonButton]).
@@ -541,6 +574,8 @@ class DsInputGroupButton extends StatefulWidget {
     this.label,
     this.toggled,
     this.focusNode,
+    this.size = DsInputGroupButtonSize.xs,
+    this.cancelPressFill = false,
   });
 
   final Widget child;
@@ -557,11 +592,28 @@ class DsInputGroupButton extends StatefulWidget {
 
   final FocusNode? focusNode;
 
-  /// `h-6` — 24px.
+  /// The cva rung. `defaultVariants.size` is `xs`.
+  final DsInputGroupButtonSize size;
+
+  /// `data-pressed:bg-transparent` — a **call-site** class, not part of any
+  /// rung.
+  ///
+  /// The combobox trigger (`combobox.tsx:77`) stamps it, and it inverts the
+  /// ghost variant's usual arc: pressing *cancels* the fill instead of
+  /// deepening it, so the pressed state is the resting one and only the scale
+  /// moves. Kept as a flag rather than a colour, because the reference names a
+  /// behaviour and not a value.
+  final bool cancelPressFill;
+
+  /// `h-6` / `size-6` — 24px, both rungs.
   static double get height => ds(6);
 
-  /// `px-1.5` — 6px.
+  /// `px-1.5` — 6px, on [DsInputGroupButtonSize.xs] only.
   static double get paddingX => ds(1.5);
+
+  /// The rung's horizontal padding: `px-1.5` for `xs`, `p-0` for `icon-xs`.
+  static double paddingXFor(DsInputGroupButtonSize size) =>
+      size == DsInputGroupButtonSize.iconXs ? 0 : paddingX;
 
   /// `gap-1` — 4px. Exposed rather than applied, the same contract
   /// [DsButton.gapFor] uses: this widget takes one child, and a button with
@@ -585,16 +637,23 @@ class _DsInputGroupButtonState extends State<DsInputGroupButton> {
   Widget build(BuildContext context) {
     final DsThemeData theme = DsTheme.of(context);
 
+    /// `size-6` — the `icon-xs` rung is a square, the `xs` rung is not.
+    final bool square = widget.size == DsInputGroupButtonSize.iconXs;
+
     // `variant="ghost"`: no fill, no border, no elevation until touched.
     // `active` outranks `hover` — Tailwind orders it later — so a press shows
-    // `--muted` even though the pointer is necessarily hovering.
+    // `--muted` even though the pointer is necessarily hovering. Unless the
+    // call site cancelled it, in which case the press paints nothing and the
+    // hover underneath it is cancelled too: `bg-transparent` is a fill, and it
+    // wins outright.
     final Color fill = _pressed
-        ? theme.muted
+        ? (widget.cancelPressFill ? dsTransparent : theme.muted)
         : _hovered
-            ? theme.secondary
-            : dsTransparent;
-    final Color ink =
-        _hovered || _pressed ? theme.foreground : theme.mutedForeground;
+        ? theme.secondary
+        : dsTransparent;
+    final Color ink = _hovered || _pressed
+        ? theme.foreground
+        : theme.mutedForeground;
     final Color border = _focused ? theme.ring : dsTransparent;
 
     final Duration duration = dsAnimationDuration(
@@ -609,51 +668,59 @@ class _DsInputGroupButtonState extends State<DsInputGroupButton> {
       curve: DsCurves.spring,
       builder: (BuildContext context, Color? f, Widget? _) =>
           TweenAnimationBuilder<Color?>(
-        tween: ColorTween(end: ink),
-        duration: duration,
-        curve: DsCurves.spring,
-        builder: (BuildContext context, Color? c, Widget? _) =>
-            TweenAnimationBuilder<Color?>(
-          tween: ColorTween(end: border),
-          duration: duration,
-          curve: DsCurves.spring,
-          builder: (BuildContext context, Color? b, Widget? _) {
-            return DsMachineSurface(
-              // `shadow-none` at rest; the focus ring is the only layer this
-              // button ever paints.
-              spec: _focused
-                  ? DsButton.withFocusRing(
-                      DsShadows.none,
-                      theme.ring.withValues(alpha: _focusRingAlpha),
-                    )
-                  : DsShadows.none,
-              radius: BorderRadius.circular(DsRadii.addonButton),
-              fill: f ?? fill,
-              border:
-                  Border.all(color: b ?? border, width: DsWidths.hairline),
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: DsInputGroupButton.paddingX,
+            tween: ColorTween(end: ink),
+            duration: duration,
+            curve: DsCurves.spring,
+            builder: (BuildContext context, Color? c, Widget? _) =>
+                TweenAnimationBuilder<Color?>(
+                  tween: ColorTween(end: border),
+                  duration: duration,
+                  curve: DsCurves.spring,
+                  builder: (BuildContext context, Color? b, Widget? _) {
+                    return DsMachineSurface(
+                      // `shadow-none` at rest; the focus ring is the only layer this
+                      // button ever paints.
+                      spec: _focused
+                          ? DsButton.withFocusRing(
+                              DsShadows.none,
+                              theme.ring.withValues(alpha: _focusRingAlpha),
+                            )
+                          : DsShadows.none,
+                      radius: BorderRadius.circular(DsRadii.addonButton),
+                      fill: f ?? fill,
+                      border: Border.all(
+                        color: b ?? border,
+                        width: DsWidths.hairline,
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: DsInputGroupButton.paddingXFor(
+                            widget.size,
+                          ),
+                        ),
+                        child: Center(
+                          // `size-6` is a fixed square; `h-6 px-1.5` is as wide as its
+                          // content, which is what `widthFactor: 1` says.
+                          widthFactor: square ? null : 1,
+                          child: DefaultTextStyle(
+                            style: DsText.styleOf(
+                              context,
+                              DsComponentType.buttonLabel,
+                              color: c ?? ink,
+                            ),
+                            child: widget.child,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
                 ),
-                child: Center(
-                  widthFactor: 1,
-                  child: DefaultTextStyle(
-                    style: DsText.styleOf(
-                      context,
-                      DsComponentType.buttonLabel,
-                      color: c ?? ink,
-                    ),
-                    child: widget.child,
-                  ),
-                ),
-              ),
-            );
-          },
-        ),
-      ),
+          ),
     );
 
-    button = SizedBox(height: DsInputGroupButton.height, child: button);
+    button = square
+        ? SizedBox.square(dimension: DsInputGroupButton.height, child: button)
+        : SizedBox(height: DsInputGroupButton.height, child: button);
 
     button = DsPress(
       scale: DsTransforms.buttonScale,

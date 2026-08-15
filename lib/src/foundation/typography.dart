@@ -84,10 +84,10 @@ class DsTypeSpec {
     this.tabular = false,
     this.defaultColor = DsTypeColor.none,
     this.fontStyle = FontStyle.normal,
-  })  : weight = wght == null ? null : _staticFallback(wght),
-        variations = wght == null
-            ? const <FontVariation>[]
-            : <FontVariation>[FontVariation(_wghtAxis, wght)];
+  }) : weight = wght == null ? null : _staticFallback(wght),
+       variations = wght == null
+           ? const <FontVariation>[]
+           : <FontVariation>[FontVariation(_wghtAxis, wght)];
 
   /// The variable-weight axis both foundation faces expose.
   static const String _wghtAxis = 'wght';
@@ -212,10 +212,7 @@ class DsTypeSpec {
     // metric mirroring the browser's font-optical-sizing:auto, not a design
     // token.
     final double opsz = fontSize.clamp(14.0, 32.0);
-    return <FontVariation>[
-      ...variations,
-      FontVariation('opsz', opsz),
-    ];
+    return <FontVariation>[...variations, FontVariation('opsz', opsz)];
   }
 }
 
@@ -454,9 +451,8 @@ class DsComponentType {
   // `ComboboxLabel` `px-2 py-1.5` at 400, `CommandGroup`'s heading `px-3 py-2`
   // at **500**. Only the padding differs between the first two, which is box
   // geometry and belongs to the components; the type is one spec. The
-  // heading's weight-500 variant is a **fourth** spec and is deliberately not
-  // added here — `command.tsx` is a later wave's file, and a spec with no
-  // consumer is a guess.
+  // heading's weight-500 variant is the fourth spec, [menuHeading], and it
+  // landed with its consumer — see its doc.
 
   /// `SelectLabel`'s `px-3 py-2 text-xs text-muted-foreground`
   /// (`components/ui/select.tsx:101`) — and `ComboboxLabel`'s `text-xs` with
@@ -478,6 +474,30 @@ class DsComponentType {
     size: 12,
     height: _leadingXs,
     wght: 400,
+  );
+
+  /// `CommandGroup`'s heading — [menuLabel] at **weight 500**.
+  ///
+  /// The class arrives through an arbitrary-variant on the group rather than on
+  /// the heading itself: `**:[[cmdk-group-heading]]:text-xs
+  /// **:[[cmdk-group-heading]]:font-medium` (`components/ui/command.tsx:129`),
+  /// which is why nothing in the heading's own markup says 12px or 500.
+  ///
+  /// Ruling L8 made this spec conditional on a probe, because the class list
+  /// alone cannot say whether `font-medium` survives the cascade. It does:
+  /// *(measured)* the live palette's heading computes
+  /// **`font-size: 12px`, `line-height: 16px`, `font-weight: 500`** at
+  /// `font-variation-settings: normal` — a static face selection, not an axis
+  /// tweak, which is why [DsTypeSpec] carrying `wght: 500` reproduces it on
+  /// both the variable and the fallback face.
+  ///
+  /// One weight step is the whole difference from [menuLabel], and that step is
+  /// selects-map drift 6: three group labels, three sets of numbers, one role.
+  static final DsTypeSpec menuHeading = DsTypeSpec(
+    family: DsFonts.sans,
+    size: 12,
+    height: _leadingXs,
+    wght: 500,
   );
 
   /// `CommandShortcut`'s `ml-auto text-xs tracking-widest text-muted-foreground`
