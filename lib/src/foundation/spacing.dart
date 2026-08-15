@@ -104,6 +104,25 @@ class DsRadii {
 
   /// `--radius-pill: 999px` — L339.
   static const double pill = 999;
+
+  /// The `- 3px` in `calc(var(--radius) - 3px)`.
+  static const double _addonButtonInset = 3;
+
+  /// `calc(var(--radius) - 3px)` = **7px** — the corner an `InputGroupButton`
+  /// wears at its `xs` size (`components/ui/input-group.tsx:73`).
+  ///
+  /// The only non-pill, non-ladder radius in the system: a 24px control sitting
+  /// inside a 999px pill. It is a **derived getter** rather than a ninth rung
+  /// because the stylesheet writes arithmetic, and the relationship is the
+  /// point — retune `--radius` and the addon button follows, which is exactly
+  /// what `calc()` says. A frozen literal would silently stop tracking.
+  ///
+  /// The base is [md] because `--radius` resolves to 10px in *both* theme
+  /// blocks (globals.css L605 / L814) — numerically the same 10 the
+  /// `--radius-md` rung carries. [DsThemeData.radius] is the per-theme reading
+  /// of `--radius`; if the two themes ever disagree, that is what this should
+  /// be derived from instead, and this getter is the one place to change.
+  static double get addonButton => md - _addonButtonInset;
 }
 
 /// Tailwind's stock blur ladder — the `--blur-*` scale, which `globals.css`

@@ -224,29 +224,206 @@ class DsTypeSpec {
 /// Two surfaces in this phase do it, both in `components/ui/`. Their values
 /// are still tokens — `text-sm` resolves through `--text-sm` — so they are
 /// transcribed here rather than typed into the components.
+///
+/// ## The button ladder's type, and why it lives here
+///
+/// `Button`'s `cva` gives five of its nine sizes a `text-*` class
+/// (`components/ui/button.tsx` L59–64) and its `emphasis="caps"` a sixth
+/// (L73); the four `icon-*` rungs declare none and inherit. Five rungs, but
+/// only **three distinct sizes** and **three distinct leadings**, on different
+/// rungs — so a single [buttonLabel] cannot express the ladder and a component
+/// cannot express it either without writing `fontSize:` outside this layer.
+///
+/// | rung | class | px | `line-height` |
+/// |---|---|---|---|
+/// | `xs` | `text-xs` → `--text-num-sm` | 12 | 16.0 |
+/// | `sm` | `text-small` | 13 | *inherits* |
+/// | `default` | `text-sm` → `--text-small` | 13 | 18.571 |
+/// | `lg` | `text-body` | 15 | *inherits* |
+/// | `xl` | `text-base` → `--text-body` | 15 | 22.5 |
+/// | `caps` | `text-num-sm` | 12 | *inherits* |
+///
+/// The leading asymmetry is not a choice, it is a leftover. globals.css
+/// L212–215 repoints Tailwind's own `--text-xs/sm/base/lg` at this scale but
+/// leaves the companion `--text-*--line-height` keys at the framework's
+/// **ratios**, which then apply to the new sizes: `calc(1 / 0.75) × 12`,
+/// `calc(1.25 / 0.875) × 13`, `calc(1.5 / 1) × 15`. The four bespoke steps
+/// (`--text-small`, `--text-body`, `--text-num-sm`) were declared here and have
+/// no companion key at all, so their utilities emit `font-size` only and
+/// `line-height` stays inherited. Buttons-map §3.1 verified all six against the
+/// compiled stylesheet.
+///
+/// It is **practically inert inside a button**: the label is centred in a
+/// fixed-height flex box with symmetric half-leading, so the glyphs land in the
+/// same place either way. It is recorded because it is the reason `sm` and
+/// `default` — both 13px — are not the same text style, and because a caller
+/// that ever sizes a container to a button label's line box would see it.
 class DsComponentType {
   const DsComponentType._();
 
-  /// `Button`'s base: `font-medium` at size `text-sm`.
+  /// The ratios Tailwind's own `text-*` utilities carry, as globals.css leaves
+  /// them.
+  ///
+  /// Written as the framework's own division rather than as the product,
+  /// because that is what the stylesheet says: a `--text-*--line-height` key is
+  /// `calc(<stock line-height> / <stock font-size>)` in rem, and the repointed
+  /// size is what it multiplies. Spelling `1.4285714…` here would hide the
+  /// derivation and drift the moment either half moves.
+  static const double _leadingXs = 1 / 0.75;
+  static const double _leadingSm = 1.25 / 0.875;
+  static const double _leadingBase = 1.5 / 1;
+
+  /// `Button` `size="default"`: `font-medium` at `text-sm`.
   ///
   /// `--text-sm: var(--text-small)` (globals.css L213), so a button label is
   /// **13px**, not Tailwind's stock 14 — the scale is redefined under the
-  /// framework's own name.
+  /// framework's own name. Its companion `--text-sm--line-height` is *not*
+  /// redefined, so the utility still emits Tailwind's ratio and the label's
+  /// line box is 18.571px.
   ///
-  /// No `--text-sm--line-height` companion token is declared, so Tailwind's
-  /// `text-sm` utility leaves `line-height` at `normal`; [DsTypeSpec.height]
-  /// is therefore null, which is Flutter's spelling of the same thing.
+  /// Kept under the bare name [buttonLabel] rather than renamed to match its
+  /// siblings: it is the cva's `defaultVariants.size`, and it is the style the
+  /// rest of the port means when it says "a button label".
   static final DsTypeSpec buttonLabel = DsTypeSpec(
+    family: DsFonts.sans,
+    size: 13,
+    height: _leadingSm,
+    wght: 500,
+  );
+
+  /// `Button` `size="xs"`: `text-xs` → `--text-num-sm` **12px**, leading 16.0.
+  /// The one rung whose size is unique in the ladder.
+  static final DsTypeSpec buttonLabelXs = DsTypeSpec(
+    family: DsFonts.sans,
+    size: 12,
+    height: _leadingXs,
+    wght: 500,
+  );
+
+  /// `Button` `size="sm"`: `text-small` **13px**, no line-height of its own.
+  ///
+  /// The same 13px as [buttonLabel] through a different class — which is
+  /// exactly why both exist: `text-small` is bespoke and carries no companion
+  /// leading key, `text-sm` is aliased and inherits Tailwind's.
+  static final DsTypeSpec buttonLabelSm = DsTypeSpec(
     family: DsFonts.sans,
     size: 13,
     wght: 500,
   );
 
+  /// `Button` `size="lg"`: `text-body` **15px**, no line-height of its own.
+  static final DsTypeSpec buttonLabelLg = DsTypeSpec(
+    family: DsFonts.sans,
+    size: 15,
+    wght: 500,
+  );
+
+  /// `Button` `size="xl"`: `text-base` → `--text-body` **15px**, leading 22.5.
+  /// Same size as [buttonLabelLg], different leading, same reason as `sm`.
+  static final DsTypeSpec buttonLabelXl = DsTypeSpec(
+    family: DsFonts.sans,
+    size: 15,
+    height: _leadingBase,
+    wght: 500,
+  );
+
+  /// `Button` `emphasis="caps"`: `text-num-sm font-semibold tracking-cta
+  /// uppercase` (`button.tsx` L73) — **12px**, 600, `--tracking-cta` 0.09em
+  /// (globals.css L184), uppercase.
+  ///
+  /// `cva` emits variant → size → emphasis, so tailwind-merge keeps the later
+  /// class in each group and this beats the rung's own `text-*` and the base
+  /// `font-medium` outright — including on `size="default"`, where it drops the
+  /// label from 13px to 12 (buttons-map drift 22). It is an axis, not a rung:
+  /// one style for all nine sizes.
+  ///
+  /// [DsTypeSpec.uppercase] is a flag, not a transform — the widget that
+  /// renders the label performs it, the way `DsText` does.
+  static final DsTypeSpec buttonLabelCaps = DsTypeSpec(
+    family: DsFonts.sans,
+    size: 12,
+    wght: 600,
+    tracking: 0.09,
+    uppercase: true,
+  );
+
+  /// `Toggle`'s base: `text-sm font-medium` (`components/ui/toggle.tsx` L10),
+  /// and `ToggleGroupItem`'s too — the item's class list is
+  /// `toggleVariants(...)` plus positioning (`toggle-group.tsx` L85–96).
+  ///
+  /// Value-identical to [buttonLabel] and named separately because the
+  /// reference declares it separately: a `Toggle` is not a `Button` and its
+  /// class list can move without the button's.
+  static final DsTypeSpec toggleLabel = DsTypeSpec(
+    family: DsFonts.sans,
+    size: 13,
+    height: _leadingSm,
+    wght: 500,
+  );
+
+  /// `ButtonGroupText`'s `text-sm font-medium` (`button-group.tsx` L44).
+  static final DsTypeSpec buttonGroupText = DsTypeSpec(
+    family: DsFonts.sans,
+    size: 13,
+    height: _leadingSm,
+    wght: 500,
+  );
+
+  /// What `<ButtonGroupText className="type-num">` actually renders —
+  /// buttons-map drift 16, resolved.
+  ///
+  /// `.type-num` lives in `@layer components` (globals.css L1275) while
+  /// `text-sm` and `font-medium` are utilities, and Tailwind v4 orders
+  /// `theme → base → components → utilities`; tailwind-merge does not strip
+  /// `type-num`, since it is not a class it recognises. So both apply and the
+  /// utilities win the two properties they share:
+  ///
+  /// | property | `.type-num` | utility | renders |
+  /// |---|---|---|---|
+  /// | font-size | `--text-body` 15 | `text-sm` 13 | **13** |
+  /// | font-weight | 600 | `font-medium` 500 | **500** |
+  /// | font-family | `--font-mono` | — | **Geist Mono** |
+  /// | `font-variant-numeric` | tabular-nums | — | **tabular** |
+  /// | letter-spacing | `--tracking-num` −0.01em | — | **−0.01em** |
+  ///
+  /// Transcribed as its own spec rather than left to a `.copyWith` at the call
+  /// site: the cascade is the fact, and a page that re-derived it would be
+  /// re-deriving a bug.
+  ///
+  /// Leading: `.type-num` declares `line-height: 1.2`, which no utility
+  /// overrides, so the component-layer value survives where the two the
+  /// utilities beat do not.
+  static final DsTypeSpec buttonGroupNum = DsTypeSpec(
+    family: DsFonts.mono,
+    size: 13,
+    height: 1.2,
+    wght: 500,
+    tracking: -0.01,
+    tabular: true,
+  );
+
+  /// `Kbd`'s `font-sans text-xs font-medium` (`components/ui/kbd.tsx` L7) —
+  /// 12px, 500, and `text-xs`'s inherited Tailwind leading of 16.0.
+  ///
+  /// `font-sans` is declared even though `html` already carries it: a `<kbd>`
+  /// is one of the elements Preflight resets to the monospace stack, so the
+  /// class is undoing a UA default rather than restating an inherited one.
+  static final DsTypeSpec kbdKey = DsTypeSpec(
+    family: DsFonts.sans,
+    size: 12,
+    height: _leadingXs,
+    wght: 500,
+  );
+
   /// `SheetContent`'s `text-sm`, with no `font-weight` of its own — so it
   /// inherits `html`'s 400.
+  ///
+  /// Its `line-height` is `text-sm`'s inherited Tailwind ratio, the same one
+  /// [buttonLabel] carries.
   static final DsTypeSpec sheetBody = DsTypeSpec(
     family: DsFonts.sans,
     size: 13,
+    height: _leadingSm,
     wght: 400,
   );
 }

@@ -5,7 +5,8 @@ import 'package:flutter_test/flutter_test.dart';
 
 /// The motion layer: the three interaction utilities the shell and the docs
 /// pages are built out of — `press`, `lift`, and the travelling `slide-pill`
-/// with its `anim-jelly` arrival.
+/// with its `anim-jelly` arrival — and the keyframe layer underneath the named
+/// animations.
 
 Widget host(Widget child, {DsThemeMode mode = DsThemeMode.dark}) {
   return MediaQuery(
@@ -36,6 +37,34 @@ double translationYOf(WidgetTester t, Finder of) {
   );
   return transform.transform.storage[13];
 }
+
+/// [host], with `prefers-reduced-motion` switched on.
+///
+/// The [MediaQuery] goes *inside* [host]'s own, because the nearer one wins and
+/// [host] declares a size the widgets under test need.
+Widget stilledHost(Widget child, {DsThemeMode mode = DsThemeMode.dark}) => host(
+      MediaQuery(
+        data: const MediaQueryData(
+          size: Size(1440, 900),
+          disableAnimations: true,
+        ),
+        child: child,
+      ),
+      mode: mode,
+    );
+
+/// The slack a keyframe stop is sampled with.
+///
+/// Not the table's. At 0%, at 100%, and on every held tail the values are
+/// exact. It is Flutter's [Cubic]: it solves its x-parameter by binary search to
+/// a documented bound of 0.001, so it is inexact for a local `t` that is not
+/// literally zero — and a stop lands on a literal zero only when the sequence's
+/// cumulative weight is a representable double. `yuki-jelly`'s 45% is not
+/// (`0.3 + 0.15 == 0.44999999999999996`), so a sample at 0.45 reads 4e-16 into
+/// the next segment and the solver answers 0.0041 where the curve is 0. That
+/// costs ~7e-4 of one segment, against keyframe values never closer together
+/// than 0.02.
+const double stopTolerance = 1e-3;
 
 void main() {
   group('DsPress', () {
@@ -390,6 +419,388 @@ void main() {
       expect(t.getRect(find.byKey(pillKey)), isNot(before));
       expect(t.getRect(find.byKey(pillKey)),
           rectMoreOrLessEquals(t.getRect(find.byKey(itemKeys[1])), epsilon: 0.01));
+    });
+  });
+
+  // ── keyframes ─────────────────────────────────────────────────────────────
+
+  group('DsSteps', () {
+    test('steps(8) holds eight positions and never shows the wrap frame', () {
+      const Curve steps = DsSteps(8);
+      final Set<double> seen = <double>{};
+      for (int i = 0; i < 800; i++) {
+        final double value = steps.transform(i / 800);
+        expect(value, lessThan(1.0), reason: '360° is never displayed');
+        seen.add(value);
+      }
+      expect(seen, hasLength(8));
+
+      // One per 45°, which is what makes it read as a mechanism.
+      final List<double> ordered = seen.toList()..sort();
+      for (int i = 0; i < 8; i++) {
+        expect(ordered[i] * 360, closeTo(i * 45, 1e-9));
+      }
+
+      // The frame `Curve.transform` is contractually asked for, and the one
+      // CSS never paints: it holds the last position instead of reaching 1.
+      expect(steps.transform(1), closeTo(7 / 8, 1e-12));
+      expect(DsRatchet.degreesAt(1), closeTo(315, 1e-9));
+      expect(DsRatchet.radiansAt(0), 0);
+      expect(DsRatchet.step, DsDurations.ratchetStep);
+    });
+
+    test('jump-start is the other CSS variant', () {
+      const Curve steps = DsSteps(2, jumpEnd: false);
+      expect(steps.transform(0), closeTo(0.5, 1e-12),
+          reason: 'jump-start takes its first step at t=0');
+      expect(steps.transform(0.75), 1);
+      expect(steps.transform(1), 1);
+    });
+  });
+
+  group('the finite keyframe tables', () {
+    test('yuki-pop-in matches globals.css at every stop', () {
+      expect(DsPopIn.scale.transform(0),
+          offsetMoreOrLessEquals(const Offset(0.25, 0.25), epsilon: 1e-9));
+      expect(DsPopIn.scale.transform(0.55),
+          offsetMoreOrLessEquals(const Offset(0.92, 1.08), epsilon: stopTolerance));
+      expect(DsPopIn.scale.transform(0.80),
+          offsetMoreOrLessEquals(const Offset(1.04, 0.97), epsilon: stopTolerance));
+      expect(DsPopIn.scale.transform(0.92),
+          offsetMoreOrLessEquals(const Offset(0.99, 1.01), epsilon: stopTolerance));
+      expect(DsPopIn.scale.transform(1),
+          offsetMoreOrLessEquals(const Offset(1, 1), epsilon: 1e-9));
+
+      // Declared at 0% and 55% only — and then it HOLDS, exactly, because the
+      // tail is modelled rather than left to emerge.
+      expect(DsPopIn.opacity.transform(0), 0);
+      expect(DsPopIn.opacity.transform(0.55), closeTo(1, stopTolerance));
+      expect(DsPopIn.opacity.transform(0.8), 1);
+      expect(DsPopIn.opacity.transform(1), 1);
+    });
+
+    test('yuki-jelly matches globals.css at every stop', () {
+      expect(DsJelly.scale.transform(0),
+          offsetMoreOrLessEquals(const Offset(1, 1), epsilon: 1e-9));
+      expect(DsJelly.scale.transform(0.30),
+          offsetMoreOrLessEquals(const Offset(1.18, 0.82), epsilon: stopTolerance));
+      expect(DsJelly.scale.transform(0.45),
+          offsetMoreOrLessEquals(const Offset(0.88, 1.12), epsilon: stopTolerance));
+      expect(DsJelly.scale.transform(0.60),
+          offsetMoreOrLessEquals(const Offset(1.06, 0.94), epsilon: stopTolerance));
+      expect(DsJelly.scale.transform(0.78),
+          offsetMoreOrLessEquals(const Offset(0.98, 1.02), epsilon: stopTolerance));
+      expect(DsJelly.scale.transform(1),
+          offsetMoreOrLessEquals(const Offset(1, 1), epsilon: 1e-9));
+    });
+
+    test('yuki-spring-up rises 32, overshoots 4, settles in three bounces', () {
+      expect(DsSpringUp.translateY.transform(0), 32);
+      expect(DsSpringUp.translateY.transform(0.55), closeTo(-4, stopTolerance));
+      expect(DsSpringUp.translateY.transform(0.76), closeTo(1.5, stopTolerance));
+      expect(DsSpringUp.translateY.transform(0.90), closeTo(-0.5, stopTolerance));
+      expect(DsSpringUp.translateY.transform(1), closeTo(0, 1e-9));
+
+      expect(DsSpringUp.opacity.transform(0), 0);
+      expect(DsSpringUp.opacity.transform(0.55), closeTo(1, stopTolerance));
+      expect(DsSpringUp.opacity.transform(1), 1);
+      expect(DsSpringUp.curve, DsCurves.settle,
+          reason: 'the one table that is not --ease-out');
+    });
+
+    test('yuki-jelly-in matches globals.css at every stop', () {
+      expect(DsJellyIn.scale.transform(0), 0.92);
+      expect(DsJellyIn.scale.transform(0.60), closeTo(1.02, stopTolerance));
+      expect(DsJellyIn.scale.transform(1), closeTo(1, 1e-9));
+
+      expect(DsJellyIn.translateY.transform(0), 24);
+      expect(DsJellyIn.translateY.transform(0.60), closeTo(-4, stopTolerance));
+      expect(DsJellyIn.translateY.transform(1), closeTo(0, 1e-9));
+
+      expect(DsJellyIn.opacity.transform(0), 0);
+      expect(DsJellyIn.opacity.transform(0.60), closeTo(1, stopTolerance));
+      expect(DsJellyIn.opacity.transform(1), 1);
+    });
+
+    test('pulls-reveal turns the card face-up flat, not in perspective', () {
+      expect(DsReveal.opacity.transform(0), 0);
+      expect(DsReveal.opacity.transform(1), 1);
+      expect(DsReveal.rotationY.transform(0), closeTo(DsReveal.fromRadians, 1e-12));
+      expect(DsReveal.rotationY.transform(1), closeTo(0, 1e-9));
+      expect(DsReveal.scale.transform(0), DsReveal.fromScale);
+      expect(DsReveal.scale.transform(1), closeTo(1, 1e-9));
+
+      // cos(38°) = 0.78801, and the 0.9 uniform scale on top of it.
+      final Matrix4 start = DsReveal.transformAt(0);
+      expect(start.storage[0], closeTo(0.9 * 0.78801, 1e-4));
+      // Ruling M4: no perspective on the element or any ancestor, so the
+      // matrix's perspective entry stays untouched.
+      expect(start.storage[11], 0);
+      expect(DsReveal.transformAt(1).storage[0], closeTo(1, stopTolerance));
+    });
+
+    test('ds-sweep grows the bar 0 → 1 on --ease-out', () {
+      expect(DsSweep.widthFactor.transform(0), 0);
+      expect(DsSweep.widthFactor.transform(1), 1);
+      expect(DsSweep.widthFactor.transform(0.5), greaterThan(0.5),
+          reason: '--ease-out is front-loaded');
+    });
+  });
+
+  group('yuki-sign-on', () {
+    test('cuts rather than interpolates', () {
+      for (final DsSignOnFrame frame in DsSignOn.frames.skip(1)) {
+        final double t = frame.percent / 100;
+        expect(DsSignOn.frameAt(t), same(frame));
+
+        final DsSignOnFrame before = DsSignOn.frameAt(t - 1e-9);
+        expect(before.percent, lessThan(frame.percent));
+        expect(before.opacity, isNot(frame.opacity));
+
+        // Just before the cut is still wholly the old frame, just after is
+        // wholly the new one. Nothing in between is ever produced.
+        expect(DsSignOn.frameAt(t - 1e-6).opacity, before.opacity);
+        expect(DsSignOn.frameAt(t + 1e-6).opacity, frame.opacity);
+      }
+    });
+
+    test('opens dark at 0.12 and brightness 0.5, unlit', () {
+      final DsSignOnFrame first = DsSignOn.frameAt(0);
+      expect(first.percent, 0);
+      expect(first.opacity, 0.12);
+      expect(first.brightness, 0.5);
+      expect(first.glowBlurs, isEmpty, reason: 'text-shadow: none');
+    });
+
+    test('rests lit, not neutral — `both` holds the 70% frame', () {
+      final DsSignOnFrame resting = DsSignOn.frameAt(1);
+      expect(resting.percent, 70);
+      expect(resting.opacity, 1);
+      expect(resting.brightness, 1.15);
+      expect(resting.glowBlurs, <double>[6, 18]);
+
+      // Ruling M3: the live filter ships, the map's colour table is the oracle.
+      expect(
+        resting.brightnessFilter,
+        const ColorFilter.matrix(<double>[
+          1.15, 0, 0, 0, 0, //
+          0, 1.15, 0, 0, 0, //
+          0, 0, 1.15, 0, 0, //
+          0, 0, 0, 1, 0, //
+        ]),
+      );
+
+      // `text-shadow: 0 0 Npx` → offset 0, blur N, σ = N/2 — inverted through
+      // the same arithmetic DsShadowLayer.blurRadius uses for box-shadow.
+      final List<Shadow> glow = resting.shadows(DsThemeData.dark.valueInk);
+      expect(glow, hasLength(2));
+      expect(glow.first.offset, Offset.zero);
+      expect(glow.first.color, DsThemeData.dark.valueInk);
+      expect(glow.first.blurRadius, closeTo((6 / 2 - 0.5) / 0.57735, 1e-9));
+      expect(glow.last.blurRadius, closeTo((18 / 2 - 0.5) / 0.57735, 1e-9));
+    });
+  });
+
+  group('pulls-shimmer', () {
+    // The named-animation panel body at the 1440 frame.
+    const double w = 299.333;
+
+    test('slides one 2W tile from -2W to +2W, band -W to +3W', () {
+      expect(DsShimmer.tileWidth(w), closeTo(2 * w, 1e-9));
+      expect(DsShimmer.offsetAt(0, w), closeTo(-2 * w, 1e-9));
+      expect(DsShimmer.offsetAt(1, w), closeTo(2 * w, 1e-9));
+      expect(DsShimmer.bandCenterAt(0, w), closeTo(-w, 1e-9));
+      expect(DsShimmer.bandCenterAt(1, w), closeTo(3 * w, 1e-9));
+
+      // One crossing per cycle, left to right, never back.
+      double previous = DsShimmer.bandCenterAt(0, w);
+      for (int i = 1; i <= 20; i++) {
+        final double next = DsShimmer.bandCenterAt(i / 20, w);
+        expect(next, greaterThan(previous));
+        previous = next;
+      }
+    });
+
+    test('takes its colours from the live theme, never frozen', () {
+      expect(DsShimmer.gradient(DsThemeData.dark).colors, <Color>[
+        DsThemeData.dark.popover,
+        DsThemeData.dark.accent,
+        DsThemeData.dark.popover,
+      ]);
+      expect(DsShimmer.gradient(DsThemeData.light).colors.first,
+          DsThemeData.light.popover);
+      expect(DsShimmer.gradient(DsThemeData.dark).stops, <double>[0, 0.5, 1]);
+    });
+  });
+
+  group('ds-travel', () {
+    test('is the verified no-op on a 24px chip (ruling M1)', () {
+      expect(DsTravel.inset, ds(6));
+      expect(DsTravel.inset, 24);
+
+      // `calc(100% - 1.5rem)` where `100%` is the chip's own 24px border box.
+      expect(DsTravel.distanceFor(24), 0);
+      expect(DsTravel.translationAt(0, 24, curve: DsCurves.out), 0);
+      expect(DsTravel.translationAt(0.5, 24, curve: DsCurves.spring), 0);
+      expect(DsTravel.translationAt(1, 24, curve: DsCurves.out), 0);
+
+      // …and stays honest if the utility is ever put on a wider element.
+      expect(DsTravel.distanceFor(482), 458);
+      expect(DsTravel.translationAt(0, 482, curve: DsCurves.out), 0);
+      expect(DsTravel.translationAt(1, 482, curve: DsCurves.out),
+          closeTo(458, 1e-9));
+    });
+  });
+
+  group('DsKeyframePlayer', () {
+    Future<double> freezeFrame(
+      WidgetTester t, {
+      required Duration duration,
+      required DsKeyframeFill fill,
+      required bool repeat,
+    }) async {
+      double seen = -1;
+      await t.pumpWidget(stilledHost(DsKeyframePlayer(
+        duration: duration,
+        fill: fill,
+        repeat: repeat,
+        builder: (BuildContext c, double progress, Widget? child) {
+          seen = progress;
+          return const SizedBox(width: 40, height: 40);
+        },
+      )));
+      await t.pump();
+      return seen;
+    }
+
+    testWidgets('reduced motion holds a both-fill animation at its final stop',
+        (WidgetTester t) async {
+      expect(
+        await freezeFrame(t,
+            duration: DsPopIn.duration, fill: DsPopIn.fill, repeat: false),
+        1.0,
+      );
+      expect(DsPopIn.opacity.transform(1), 1);
+      expect(DsPopIn.scale.transform(1),
+          offsetMoreOrLessEquals(const Offset(1, 1), epsilon: 1e-9));
+    });
+
+    testWidgets('reduced motion reverts each no-fill looper to stop 0',
+        (WidgetTester t) async {
+      // Ruling M7: one collapsed iteration and no fill mode means the element's
+      // own transform — the ratchet lands on 0°, not 315° and not 360°.
+      expect(
+        await freezeFrame(t,
+            duration: DsRatchet.duration, fill: DsRatchet.fill, repeat: true),
+        0.0,
+      );
+      expect(DsRatchet.degreesAt(0), 0);
+
+      expect(
+        await freezeFrame(t,
+            duration: DsShimmer.duration, fill: DsShimmer.fill, repeat: true),
+        0.0,
+      );
+
+      expect(
+        await freezeFrame(t,
+            duration: DsPulseLive.duration,
+            fill: DsPulseLive.fill,
+            repeat: true),
+        0.0,
+      );
+      // Stop 0 is a ring of exactly the dot's radius, i.e. hidden behind it —
+      // motion-map §8.2's "plain 8px dot, no ring, opacity 1".
+      expect(DsPulseLive.ringRadiusAt(0), DsPulseLive.dotRadius);
+      expect(DsPulseLive.ringAlphaAt(0), DsPulseLive.ringAlpha);
+      expect(DsPulseLive.dotOpacityAt(0), 1);
+    });
+
+    testWidgets('a looper runs, fenced off behind a RepaintBoundary',
+        (WidgetTester t) async {
+      double seen = -1;
+      await t.pumpWidget(host(DsKeyframePlayer(
+        duration: DsRatchet.duration,
+        fill: DsRatchet.fill,
+        repeat: true,
+        builder: (BuildContext c, double progress, Widget? child) {
+          seen = progress;
+          return const SizedBox(width: 40, height: 40);
+        },
+      )));
+
+      expect(
+        find.descendant(
+          of: find.byType(DsKeyframePlayer),
+          matching: find.byType(RepaintBoundary),
+        ),
+        findsOneWidget,
+      );
+
+      // No pumpAndSettle: this one never settles.
+      await t.pump();
+      for (int i = 0; i < 4; i++) {
+        await t.pump(DsDurations.ratchetStep);
+      }
+      expect(seen, greaterThan(0));
+      expect(DsRatchet.degreesAt(seen) % 45, closeTo(0, 1e-9));
+
+      // Unmount so the infinite ticker is disposed with the test.
+      await t.pumpWidget(const SizedBox());
+    });
+
+    testWidgets('a finite player starts at 0 and lands on its final stop',
+        (WidgetTester t) async {
+      double seen = -1;
+      await t.pumpWidget(host(DsKeyframePlayer(
+        duration: DsPopIn.duration,
+        fill: DsPopIn.fill,
+        builder: (BuildContext c, double progress, Widget? child) {
+          seen = progress;
+          return const SizedBox(width: 40, height: 40);
+        },
+      )));
+
+      await t.pump();
+      expect(seen, 0, reason: 'a freshly mounted demo starts at t=0');
+      await t.pump(DsDurations.popIn);
+      expect(seen, 1.0);
+    });
+  });
+
+  group('DsSlidingPillGroup under reduced motion', () {
+    const Key pillKey = Key('pill');
+
+    Widget pillGroup(int active) => stilledHost(
+          SizedBox(
+            width: 300,
+            child: DsSlidingPillGroup(
+              activeIndex: active,
+              pill: const SizedBox.expand(key: pillKey),
+              gap: 1,
+              padding: EdgeInsets.all(ds(0.5)),
+              children: <Widget>[
+                for (int i = 0; i < 3; i++)
+                  SizedBox(key: ValueKey<int>(i), width: 28, height: 28),
+              ],
+            ),
+          ),
+        );
+
+    // Regression: the arrival squash used to run at its full 600ms whatever the
+    // platform asked for, because the controller's duration was set once at
+    // field init instead of being re-read through dsAnimationDuration.
+    testWidgets('the arrival jelly does not squash', (WidgetTester t) async {
+      await t.pumpWidget(pillGroup(0));
+      await t.pump();
+
+      await t.pumpWidget(pillGroup(1));
+      await t.pump();
+
+      final ({double x, double y}) scale =
+          scaleOf(t, find.byType(DsSlidingPillGroup));
+      expect(scale.x, 1.0);
+      expect(scale.y, 1.0);
     });
   });
 }

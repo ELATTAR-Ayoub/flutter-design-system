@@ -13,12 +13,18 @@
 /// * it is **invisible until the first measurement**, and that first placement
 ///   does not animate — flying in from the left edge on mount looks like a
 ///   glitch, so the web sets `transition: none` for one frame.
+///
+/// The arrival squash itself is [DsJelly] — `keyframes.dart` holds the one
+/// transcription of `yuki-jelly`, which is also what `.anim-jelly` plays on
+/// the motion page. This file used to carry a private second copy of the same
+/// six stops; the reference declares them once, and so does the port.
 library;
 
 import 'package:flutter/widgets.dart';
 
 import '../foundation/motion.dart';
 import '../theme_scope.dart';
+import 'keyframes.dart';
 
 /// Lays [children] out in a row with one travelling [pill] behind them.
 ///
@@ -68,6 +74,10 @@ class _DsSlidingPillGroupState extends State<DsSlidingPillGroup>
   /// travel rather than an appearance.
   bool _placed = false;
 
+  /// The arrival squash. The duration named here is a placeholder for the
+  /// first frame only — [build] re-reads it through [dsAnimationDuration] on
+  /// every pass, the way `DsPress` does, so reduced motion stills the squash
+  /// as well as the travel and the fade.
   late final AnimationController _jelly = AnimationController(
     vsync: this,
     duration: DsDurations.animJelly,
@@ -159,6 +169,10 @@ class _DsSlidingPillGroupState extends State<DsSlidingPillGroup>
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) => _measure());
+    // `anim-jelly` is an animation like any other: the reference's blanket
+    // `prefers-reduced-motion` rule collapses it to 0.01ms along with the
+    // travel and the fade below, and this is that rule.
+    _jelly.duration = dsAnimationDuration(context, DsDurations.animJelly);
 
     final Rect? target = _target(_rects);
     final bool travels = _placed;
@@ -185,7 +199,7 @@ class _DsSlidingPillGroupState extends State<DsSlidingPillGroup>
               child: AnimatedBuilder(
                 animation: _jelly,
                 builder: (BuildContext context, Widget? child) {
-                  final Offset scale = _jellyScale.evaluate(_jelly);
+                  final Offset scale = DsJelly.scale.evaluate(_jelly);
                   return Transform.scale(
                     scaleX: scale.dx,
                     scaleY: scale.dy,
@@ -213,42 +227,3 @@ class _DsSlidingPillGroupState extends State<DsSlidingPillGroup>
     );
   }
 }
-
-/// `@keyframes yuki-jelly` as an [Animatable], with `dx` carrying `scaleX` and
-/// `dy` carrying `scaleY`:
-///
-/// ```css
-/// 0%   { transform: scale3d(1,    1,    1); }
-/// 30%  { transform: scale3d(1.18, 0.82, 1); }
-/// 45%  { transform: scale3d(0.88, 1.12, 1); }
-/// 60%  { transform: scale3d(1.06, 0.94, 1); }
-/// 78%  { transform: scale3d(0.98, 1.02, 1); }
-/// 100% { transform: scale3d(1,    1,    1); }
-/// ```
-///
-/// Weights are the gaps between those percentages. Each segment carries
-/// `--ease-out` of its own because that is what a CSS
-/// `animation-timing-function` does — it eases *between keyframes*, not across
-/// the whole run, and applying it once over the sequence would smear the
-/// squash into a wobble.
-final Animatable<Offset> _jellyScale = TweenSequence<Offset>(
-  <TweenSequenceItem<Offset>>[
-    // allow-hardcoded: yuki-jelly keyframe geometry (globals.css L2431–2438)
-    _jellyStep(Offset(1, 1), Offset(1.18, 0.82), 30),
-    // allow-hardcoded: yuki-jelly keyframe geometry
-    _jellyStep(Offset(1.18, 0.82), Offset(0.88, 1.12), 15),
-    // allow-hardcoded: yuki-jelly keyframe geometry
-    _jellyStep(Offset(0.88, 1.12), Offset(1.06, 0.94), 15),
-    // allow-hardcoded: yuki-jelly keyframe geometry
-    _jellyStep(Offset(1.06, 0.94), Offset(0.98, 1.02), 18),
-    // allow-hardcoded: yuki-jelly keyframe geometry
-    _jellyStep(Offset(0.98, 1.02), Offset(1, 1), 22),
-  ],
-);
-
-TweenSequenceItem<Offset> _jellyStep(Offset from, Offset to, double weight) =>
-    TweenSequenceItem<Offset>(
-      tween: Tween<Offset>(begin: from, end: to)
-          .chain(CurveTween(curve: DsCurves.out)),
-      weight: weight,
-    );

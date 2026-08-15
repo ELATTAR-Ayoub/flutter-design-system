@@ -31,6 +31,12 @@ final double _keyColumn = ds(52);
 /// `hover:border-action/45` on a lifting card.
 const double _cardHoverBorderAlpha = 0.45;
 
+/// Tailwind's `leading-relaxed` ratio, which the `<pre>` in [DsCodeBlock]
+/// overrides `.type-code`'s own 1.4 with. `globals.css` declares no
+/// `--leading-*` token for it, so it cannot come from the foundation layer.
+// allow-hardcoded: framework default with no token to read it from.
+const double _leadingRelaxed = 1.625;
+
 /// `border-<tone>/30` and `bg-<tone>/[0.08]` on a [DsNote].
 const double _noteBorderAlpha = 0.30;
 const double _noteWashAlpha = 0.08;
@@ -324,11 +330,27 @@ class DsPanel extends StatelessWidget {
 /// that panel 11px down.
 ///
 /// So there is no spacer, and the count of flex children is the count of
-/// strings: a lone label is offered the whole strip, and a label beside a note
-/// half of it. Measured against the reference, that is enough for every panel
-/// on these four pages — the widest pairing is 170px + 240.7px inside a 1038px
-/// strip — and the shares still let both shrink and wrap on a narrow screen
-/// rather than overflowing.
+/// strings. That was half of it. **The other half is that an equal share is
+/// still not `flex: 0 1 auto`.** It was enough while every panel was full
+/// width — the widest pairing on the first four pages is 170px + 240.7px
+/// inside a 1038px strip, and half of that is plenty — but the motion page
+/// puts panels three-up, and on a 307.33px strip half is 145.67px. Four
+/// `.type-num-sm` notes did not fit it, each wrapped one 14.4px line the
+/// browser never draws, and two of that page's sections came out 28.8px tall
+/// between them. Same bug as the `Spacer`, one breakpoint further down.
+///
+/// So the share is weighted by what each run actually measures. `flex: 0 1
+/// auto` is two rules in one — **the base size is the content width**, and
+/// **shrinkage is proportional to that base** — and giving each [Flexible] a
+/// flex of its own natural width reproduces both, because a proportional share
+/// of the free space is `free × wᵢ / Σw`:
+/// * while the pair fits, `free ≥ Σw`, so every share is at least the width it
+///   was measured at: nothing is offered less than it asked for, and nothing
+///   wraps that the browser would not wrap. `FlexFit.loose` then hands the
+///   slack back, which is what `justify-between` puts between the two;
+/// * once the pair does not fit, the shares fall in proportion to base size,
+///   which is exactly what `flex-shrink: 1` computes against `flex-basis:
+///   auto` — so the overflow behaviour the equal split got right is kept.
 class _PanelStrip extends StatelessWidget {
   const _PanelStrip({this.label, this.note});
 
@@ -359,15 +381,60 @@ class _PanelStrip extends StatelessWidget {
       // `justify-between`: whatever neither string claims falls between them.
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
-        if (labelText != null) Flexible(child: labelText),
+        if (labelText != null)
+          Flexible(
+            flex: _basis(context, label!, DsType.label),
+            child: labelText,
+          ),
         if (labelText != null && noteText != null) SizedBox(width: ds(4)),
         if (noteText != null)
           if (labelText == null)
+            // One run and nothing to share with: it takes the strip, and its
+            // own `text-align` is what pushes it to the far edge.
             Expanded(child: noteText)
           else
-            Flexible(child: noteText),
+            Flexible(
+              flex: _basis(context, note!, DsType.numSm),
+              child: noteText,
+            ),
       ],
     );
+  }
+
+  /// The `flex-basis: auto` of a run, as a flex weight.
+  ///
+  /// Rounded because [Flexible.flex] is an `int`, and floored at 1 because
+  /// `flex: 0` is not a small share — it is no share at all, and a run that
+  /// measured zero would be given no width to lay out in.
+  static int _basis(BuildContext context, String text, DsTypeSpec spec) {
+    final int width = _naturalWidth(context, text, spec).round();
+    return width < 1 ? 1 : width;
+  }
+
+  /// What [text] asks for in [spec] with no line to run out of — `max-content`,
+  /// which is what a flex item's `auto` basis resolves to.
+  ///
+  /// Measured on the string the class actually paints, not the string it was
+  /// authored with: `.type-label` applies `text-transform: uppercase` at paint
+  /// time, and `TWELVE COLUMNS · 24PX GUTTERS` is wider than the sentence case
+  /// it is written in.
+  static double _naturalWidth(
+    BuildContext context,
+    String text,
+    DsTypeSpec spec,
+  ) {
+    final TextPainter painter = TextPainter(
+      text: TextSpan(
+        text: spec.uppercase ? text.toUpperCase() : text,
+        // Colour cannot move a glyph, so the strip's own `text-*` override is
+        // left off and the class resolves its metrics alone.
+        style: DsText.styleOf(context, spec),
+      ),
+      textDirection: Directionality.of(context),
+    )..layout();
+    final double width = painter.width;
+    painter.dispose();
+    return width;
   }
 }
 
@@ -633,6 +700,94 @@ class _ChipFrame extends CustomPainter {
       old.stroke != stroke ||
       old.openLeft != openLeft ||
       old.openRight != openRight;
+}
+
+/// `pre.type-code.scrollbar-thin.overflow-x-auto.rounded-lg.border.border-border
+/// .bg-background.p-5.leading-relaxed.text-muted-foreground` — the multi-line
+/// code sample. [DsCode]'s block-level twin, and the only one of the pair that
+/// scrolls.
+///
+/// Three cascade facts decide how it reads, and two of them are utilities
+/// beating the component layer:
+/// * **`leading-relaxed` beats `.type-code`.** The class declares
+///   `line-height: 1.4` inside `@layer components`; `leading-relaxed` is a
+///   utility, so **1.625** wins — 20.3125px per line. That override is why the
+///   style is assembled here rather than handed to [DsText], which renders a
+///   `.type-*` class as declared.
+/// * **`.type-code` sets no `font-weight`**, so a sample inherits 400. It is
+///   the one mono class on the site that is not 600.
+/// * The fill is `--background` — the same colour as the [DsPanel] body it
+///   sits in — so only the hairline tells the two apart.
+///
+/// `<pre>` neither wraps nor reflows: it keeps the line breaks it was authored
+/// with and hands anything too wide for the column to `overflow-x-auto`.
+class DsCodeBlock extends StatefulWidget {
+  const DsCodeBlock(this.code, {super.key});
+
+  /// The sample, exactly as authored — newlines included, blank lines
+  /// included, and never re-broken to fit.
+  final String code;
+
+  @override
+  State<DsCodeBlock> createState() => _DsCodeBlockState();
+}
+
+class _DsCodeBlockState extends State<DsCodeBlock> {
+  /// The scroller and its bar read the same position, which is what makes the
+  /// thumb track the text rather than a second, parallel scroll offset.
+  final ScrollController _scroller = ScrollController();
+
+  @override
+  void dispose() {
+    _scroller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final DsThemeData theme = DsTheme.of(context);
+    final TextStyle style =
+        DsText.styleOf(context, DsType.code, color: theme.mutedForeground)
+            .copyWith(height: _leadingRelaxed);
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: theme.background,
+        borderRadius: BorderRadius.circular(DsRadii.lg),
+        border: Border.all(color: theme.border, width: DsWidths.hairline),
+      ),
+      // `box-sizing: border-box` — the hairline is paid for out of the block's
+      // own width, so the scroll port starts at the border's inner edge. Same
+      // treatment [DsPanel] gives its body, and the reason the frame stays put
+      // while the text underneath it moves.
+      child: Padding(
+        padding: const EdgeInsets.all(DsWidths.hairline),
+        child: ClipRRect(
+          // The inner curve: the outer radius less the border inside it.
+          borderRadius: BorderRadius.circular(DsRadii.lg - DsWidths.hairline),
+          child: DsThinScrollbar(
+            controller: _scroller,
+            child: SingleChildScrollView(
+              controller: _scroller,
+              scrollDirection: Axis.horizontal,
+              // `p-5` belongs to the scroll container, so it travels with the
+              // content: the left inset is what the first line starts behind,
+              // and the right one is what the longest line ends against once
+              // it has been scrolled to.
+              padding: EdgeInsets.all(ds(5)),
+              child: DsLineBox(
+                style: style,
+                // `softWrap: false` in a horizontally unbounded port is
+                // `white-space: pre` — the sample is laid out at its own
+                // width and the port scrolls to reach the rest of it.
+                child: Text(widget.code, style: style, softWrap: false),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 /* ── Do / Don't ──────────────────────────────────────────────────────────── */

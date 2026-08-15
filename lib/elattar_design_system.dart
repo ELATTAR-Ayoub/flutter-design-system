@@ -21,13 +21,18 @@ export 'src/theme_scope.dart';
 export 'src/components/button.dart';
 export 'src/components/icon.dart';
 export 'src/components/icon_paths.dart';
+export 'src/components/input.dart';
 export 'src/components/sheet.dart';
 
 // ── effects ─────────────────────────────────────────────────────────────────
+export 'src/effects/foil_value.dart';
+export 'src/effects/glass.dart';
 export 'src/effects/machine_surface.dart';
 export 'src/effects/page_glow.dart';
+export 'src/effects/sheen_action.dart';
 
 // ── motion ──────────────────────────────────────────────────────────────────
+export 'src/motion/keyframes.dart';
 export 'src/motion/lift.dart';
 export 'src/motion/press.dart';
 export 'src/motion/sliding_pill.dart';

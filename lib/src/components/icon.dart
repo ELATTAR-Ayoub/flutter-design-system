@@ -42,7 +42,25 @@ enum DsIconSize {
   xl2,
 
   /// 40px — `3xl`.
-  xl3,
+  xl3;
+
+  /// The key this rung is spelled with in `ICON_SIZES`, and therefore the
+  /// string the icons page prints beside each specimen.
+  ///
+  /// Not `name`: `ICON_SIZES` keys the top two rungs **`2xl`** and **`3xl`**,
+  /// and a Dart identifier cannot start with a digit, so this enum spells them
+  /// [xl2] and [xl3]. That rename is a Dart constraint, not a design decision,
+  /// and it must not leak into rendered copy — which is the whole reason this
+  /// mapping exists rather than a `.name` call at the call site.
+  String get label => switch (this) {
+        DsIconSize.xs => 'xs',
+        DsIconSize.sm => 'sm',
+        DsIconSize.md => 'md',
+        DsIconSize.lg => 'lg',
+        DsIconSize.xl => 'xl',
+        DsIconSize.xl2 => '2xl',
+        DsIconSize.xl3 => '3xl',
+      };
 }
 
 /// `ICON_TONES` — every tone maps to a token, never to a raw colour.
@@ -78,7 +96,30 @@ enum DsIconTone {
 
   /// `text-current` — the colour of whatever contains it. The **default**,
   /// for use inside buttons.
-  inherit,
+  inherit;
+
+  /// The key this tone is spelled with in `ICON_TONES`, and therefore the
+  /// string the icons page prints beside each swatch.
+  ///
+  /// Not `name`: `ICON_TONES`'s first key is **`default`**, which is a Dart
+  /// reserved word, so this enum spells it [normal]. Same rule as
+  /// [DsIconSize.label] — the rename is a language constraint and must not
+  /// reach rendered copy.
+  ///
+  /// [muted] and [subtle] return different strings for the same colour on
+  /// purpose; see [subtle]'s own doc for why the two names exist.
+  String get label => switch (this) {
+        DsIconTone.normal => 'default',
+        DsIconTone.muted => 'muted',
+        DsIconTone.subtle => 'subtle',
+        DsIconTone.action => 'action',
+        DsIconTone.value => 'value',
+        DsIconTone.success => 'success',
+        DsIconTone.warning => 'warning',
+        DsIconTone.info => 'info',
+        DsIconTone.error => 'error',
+        DsIconTone.inherit => 'inherit',
+      };
 }
 
 /// The stroke lucide draws its 24-unit grid for.
@@ -235,6 +276,17 @@ class _GlyphPainter extends CustomPainter {
         ..strokeCap = StrokeCap.round
         ..strokeJoin = StrokeJoin.round,
     );
+    // Second pass: the nodes that override `fill="none"` with
+    // `fill="currentColor"`. A node that sets `fill` keeps the inherited
+    // `stroke`, so this paints *over* the stroke pass rather than instead of
+    // it — the same two operations, in the same order, a browser performs for
+    // `<circle … fill="currentColor">` inside lucide's `<svg>`. `tag`'s
+    // 0.5-unit dot is the only one in the set; every other glyph skips this
+    // entirely because [DsIconPaths.fillPathFor] returns null.
+    final Path? fill = DsIconPaths.fillPathFor(glyph);
+    if (fill != null) {
+      canvas.drawPath(fill, Paint()..color = color);
+    }
     canvas.restore();
   }
 

@@ -13,8 +13,11 @@ import 'package:flutter/material.dart';
 
 import 'nav.dart';
 import 'pages/colors.dart';
+import 'pages/icons.dart';
+import 'pages/motion.dart';
 import 'pages/overview.dart';
 import 'pages/placeholder.dart';
+import 'pages/shadows.dart';
 import 'pages/spacing.dart';
 import 'pages/typography.dart';
 import 'shell.dart';
@@ -27,7 +30,14 @@ void main() => runApp(const DocsApp());
 
 /// Holds the two things that outlive every page.
 class DocsApp extends StatefulWidget {
-  const DocsApp({super.key});
+  const DocsApp({super.key, this.reduceMotion});
+
+  /// Overrides the `?motion=` boot parameter — see
+  /// [_DocsAppState._reduceMotion] for what it does and why it exists.
+  ///
+  /// Null, the default and what `main` boots with, reads the URL. A test
+  /// cannot set `Uri.base`, so this is the seam it sets instead.
+  final bool? reduceMotion;
 
   @override
   State<DocsApp> createState() => _DocsAppState();
@@ -51,6 +61,26 @@ class _DocsAppState extends State<DocsApp> {
     route: Uri.base.queryParameters['route'] ?? dsRoot,
   );
 
+  /// `?motion=reduced` — the third boot parameter, and the only one that
+  /// changes what paints rather than only what is on screen at boot.
+  ///
+  /// The verification harness captures a tall page in two shots and stitches
+  /// them, so anything still moving between the shots tears the seam. On the
+  /// web side Chrome's emulated `prefers-reduced-motion` freezes the
+  /// reference's CSS outright. That emulation never reaches Flutter web, which
+  /// reads `disableAnimations` off the platform's accessibility features and
+  /// not off a media query — so on this side the same state is plumbed by
+  /// hand, forcing [MediaQueryData.disableAnimations] on the tree below. That
+  /// is the flag `dsAnimationDuration` resolves against, so every duration in
+  /// the package collapses to zero exactly as `prefers-reduced-motion` makes
+  /// it, and exactly as the page tests' own harness does.
+  ///
+  /// It earns its keep only on the pages holding a looping effect — shadows'
+  /// `foil-value`, and motion's ratchet, shimmer and live dot. A page that is
+  /// wholly static (icons) converges to the pixel without it.
+  late final bool _reduceMotion =
+      widget.reduceMotion ?? Uri.base.queryParameters['motion'] == 'reduced';
+
   @override
   void dispose() {
     _theme.dispose();
@@ -64,11 +94,11 @@ class _DocsAppState extends State<DocsApp> {
       controller: _theme,
       child: AppRouterScope(
         router: _router,
-        child: const MaterialApp(
+        child: MaterialApp(
           // `metadata.title` in `app/layout.tsx`.
           title: "Elattar's Design System",
           debugShowCheckedModeBanner: false,
-          home: _DocsHome(),
+          home: _DocsHome(reduceMotion: _reduceMotion),
         ),
       ),
     );
@@ -76,7 +106,20 @@ class _DocsAppState extends State<DocsApp> {
 }
 
 class _DocsHome extends StatelessWidget {
-  const _DocsHome();
+  const _DocsHome({required this.reduceMotion});
+
+  /// See [_DocsAppState._reduceMotion].
+  ///
+  /// Applied on this layer — the one [DefaultSelectionStyle] already sits on —
+  /// because it is the layer the page tests override and the one the capture
+  /// rig was specified against. One consequence is worth knowing: a pushed
+  /// route is a sibling of `home` rather than a descendant (see the library
+  /// note above), so a sheet or dialog opened over the page does **not**
+  /// inherit this. Nothing the rig captures is inside one. Moving the override
+  /// above [MaterialApp] would reach them as well — `MediaQueryData.fromView`
+  /// takes `disableAnimations` from an ancestor when there is one — if that is
+  /// ever wanted.
+  final bool reduceMotion;
 
   @override
   Widget build(BuildContext context) {
@@ -85,24 +128,38 @@ class _DocsHome extends StatelessWidget {
     // together.
     final String route = AppRouter.of(context).route;
 
-    return DefaultSelectionStyle(
+    final Widget home = DefaultSelectionStyle(
       selectionColor: DsPalette.action.withValues(alpha: _selectionAlpha),
       cursorColor: theme.foreground,
       child: DocsShell(route: route, child: pageFor(route)),
     );
+
+    if (!reduceMotion) return home;
+    return MediaQuery(
+      data: MediaQuery.of(context).copyWith(disableAnimations: true),
+      child: home,
+    );
   }
 }
 
-/// The four real routes; every other href in the nav gets a [PlaceholderPage].
+/// The seven real routes; every other href in the nav gets a
+/// [PlaceholderPage].
 ///
 /// Public because the shell test drives it directly, and because it is the one
 /// place the route table lives.
+///
+/// The arms follow the nav's own order (`nav.ts` foundations: colors →
+/// typography → spacing → shadows → motion → icons), so this switch reads as
+/// the sidebar reads.
 Widget pageFor(String route) {
   return switch (route) {
     dsRoot => const OverviewPage(),
     '$dsRoot/colors' => const ColorsPage(),
     '$dsRoot/typography' => const TypographyPage(),
     '$dsRoot/spacing' => const SpacingPage(),
+    '$dsRoot/shadows' => const ShadowsPage(),
+    '$dsRoot/motion' => const MotionPage(),
+    '$dsRoot/icons' => const IconsPage(),
     _ => _placeholderFor(route),
   };
 }
