@@ -612,7 +612,7 @@ void main() {
         'Slider',
         'Range Slider',
       ]);
-      for (final String chip in here.category.contents!) {
+      for (final String chip in here.category.contents) {
         expect(find.text(chip), findsWidgets, reason: 'chip "$chip"');
       }
       // "Range Slider" names no section, and two sections get no chip.
