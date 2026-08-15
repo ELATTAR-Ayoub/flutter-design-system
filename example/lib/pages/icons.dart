@@ -923,7 +923,12 @@ class _GroupPanel extends StatelessWidget {
           // `p.type-small.mb-6`.
           DsText(group.blurb, DsType.small),
           SizedBox(height: ds(6)),
-          _HairlineGrid(
+          // `grid gap-px … sm:grid-cols-2 lg:grid-cols-3` — the kit's lattice
+          // with this page's own column map, which is none of `StateGrid`'s
+          // five. The frame is shared; the map is not.
+          DsStateGrid.columns(
+            sm: 2,
+            lg: 3,
             children: <Widget>[
               for (final _Entry entry in group.icons) _EntryCell(entry: entry),
             ],
@@ -934,49 +939,11 @@ class _GroupPanel extends StatelessWidget {
   }
 }
 
-/// `div.grid.gap-px.overflow-hidden.rounded-lg.border.border-border.bg-border`
-/// — the hairline lattice.
-///
-/// The container is painted `--border` **and** bordered `--border`, and the
-/// `gap-px` gutters let that fill show through between `bg-background` cells.
-/// So there is no divider widget anywhere in here: the gaps *are* the rules,
-/// and a short last row leaves its trailing slots showing the field, which is
-/// what an empty CSS grid cell does.
-class _HairlineGrid extends StatelessWidget {
-  const _HairlineGrid({required this.children});
-
-  final List<Widget> children;
-
-  @override
-  Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
-
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: theme.border,
-        borderRadius: BorderRadius.circular(DsRadii.lg),
-        border: Border.all(color: theme.border, width: DsWidths.hairline),
-      ),
-      // `box-sizing: border-box`, as everywhere else in the kit: the frame is
-      // paid for out of the grid's own width.
-      child: Padding(
-        padding: const EdgeInsets.all(DsWidths.hairline),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(DsRadii.lg - DsWidths.hairline),
-          child: _Grid(
-            sm: 2,
-            lg: 3,
-            gapX: DsWidths.hairline,
-            gapY: DsWidths.hairline,
-            children: children,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 /// `div.flex.items-center.gap-3.bg-background.p-4`.
+///
+/// The tile itself is the kit's [DsStateCell]; what is page-local is what
+/// stands in it — a glyph beside its name and its single meaning, where the
+/// kit's own cell holds a demo well over a label.
 class _EntryCell extends StatelessWidget {
   const _EntryCell({required this.entry});
 
@@ -986,8 +953,7 @@ class _EntryCell extends StatelessWidget {
   Widget build(BuildContext context) {
     final DsThemeData theme = DsTheme.of(context);
 
-    return Container(
-      color: theme.background,
+    return DsStateCell.bare(
       padding: EdgeInsets.all(ds(4)),
       child: Row(
         children: <Widget>[

@@ -438,6 +438,234 @@ class _PanelStrip extends StatelessWidget {
   }
 }
 
+/* ── Row ─────────────────────────────────────────────────────────────────── */
+
+/// How a [DsRow] lines its specimens up within a run.
+///
+/// The reference's `align` prop offers a fourth value, `baseline`, which no
+/// page passes. It is **not** declared here: [Wrap] cross-aligns by
+/// [WrapCrossAlignment], which has no baseline member, so the value would have
+/// to silently behave like [start] — and a parameter that quietly does the
+/// wrong thing is worse than an absent one.
+enum DsRowAlign {
+  /// `items-center` — the default.
+  center,
+
+  /// `items-start`.
+  start,
+
+  /// `items-end` — the size ladder, where aligning the columns' bottoms is
+  /// what gives the five buttons a shared baseline.
+  end,
+}
+
+/// `div.flex.flex-wrap.gap-4` — the horizontal cluster of specimens.
+///
+/// One gap on both axes: `gap-4` sets `row-gap` and `column-gap` together, so
+/// a run that wraps sits 16px under the one above it.
+class DsRow extends StatelessWidget {
+  const DsRow({
+    super.key,
+    required this.children,
+    this.align = DsRowAlign.center,
+  });
+
+  final List<Widget> children;
+
+  final DsRowAlign align;
+
+  /// `gap-4`.
+  static double get gap => ds(4);
+
+  @override
+  Widget build(BuildContext context) => Wrap(
+        spacing: gap,
+        runSpacing: gap,
+        crossAxisAlignment: switch (align) {
+          DsRowAlign.center => WrapCrossAlignment.center,
+          DsRowAlign.start => WrapCrossAlignment.start,
+          DsRowAlign.end => WrapCrossAlignment.end,
+        },
+        children: children,
+      );
+}
+
+/* ── State matrices ──────────────────────────────────────────────────────── */
+
+/// `div.grid.gap-px.overflow-hidden.rounded-lg.border.border-border.bg-border`
+/// — the hairline lattice.
+///
+/// The container is painted `--border` **and** bordered `--border`, and the
+/// `gap-px` gutters let that fill show through between `bg-background`
+/// [DsStateCell]s. So there is no divider widget anywhere in here: the gaps
+/// *are* the rules, and a short last row leaves its trailing slots showing the
+/// field, which is what an empty CSS grid cell does.
+class DsStateGrid extends StatelessWidget {
+  /// `StateGrid cols={n}` — one of the kit's five column maps.
+  ///
+  /// Every one of them is 2-up on a phone; they part company at `sm:` and
+  /// again at `lg:`. The buttons page passes 4 (variants) and 5 (states).
+  const DsStateGrid({super.key, required this.children, this.cols = 4})
+      : base = null,
+        sm = null,
+        lg = null;
+
+  /// A lattice with a column map of its own.
+  ///
+  /// The icons page's glyph registry is `grid-cols-1 sm:grid-cols-2
+  /// lg:grid-cols-3`, which is none of the five above — it is a page-local
+  /// grid in the reference too. Only the *frame* is shared, and this is what
+  /// sharing it looks like.
+  const DsStateGrid.columns({
+    super.key,
+    required this.children,
+    this.base = 1,
+    this.sm,
+    this.lg,
+  }) : cols = null;
+
+  final List<Widget> children;
+
+  /// Which of the kit's maps to resolve, or null when [base]/[sm]/[lg] state
+  /// the map directly.
+  final int? cols;
+
+  final int? base;
+  final int? sm;
+  final int? lg;
+
+  @override
+  Widget build(BuildContext context) {
+    final DsThemeData theme = DsTheme.of(context);
+    // `{2: "grid-cols-1 sm:grid-cols-2", 3: "grid-cols-2 sm:grid-cols-3",
+    //   4: "grid-cols-2 sm:grid-cols-4",
+    //   5: "grid-cols-2 sm:grid-cols-3 lg:grid-cols-5",
+    //   6: "grid-cols-2 sm:grid-cols-3 lg:grid-cols-6"}[cols]`
+    final (int, int?, int?) map = switch (cols) {
+      null => (base!, sm, lg),
+      2 => (1, 2, null),
+      3 => (2, 3, null),
+      4 => (2, 4, null),
+      5 => (2, 3, 5),
+      _ => (2, 3, 6),
+    };
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: theme.border,
+        borderRadius: BorderRadius.circular(DsRadii.lg),
+        border: Border.all(color: theme.border, width: DsWidths.hairline),
+      ),
+      // `box-sizing: border-box`, as everywhere else in the kit: the frame is
+      // paid for out of the grid's own width.
+      child: Padding(
+        padding: const EdgeInsets.all(DsWidths.hairline),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(DsRadii.lg - DsWidths.hairline),
+          child: DsGrid(
+            base: map.$1,
+            sm: map.$2,
+            lg: map.$3,
+            gap: DsWidths.hairline,
+            children: children,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// `div.bg-background.p-5` — one opaque tile in a [DsStateGrid], holding a
+/// specimen over its name.
+///
+/// The demo well is `mb-4 flex min-h-14 items-center justify-center`: **56px
+/// minimum, which is exactly the `xl` button height**, so a grid of buttons
+/// keeps one well depth however tall its tallest specimen is.
+///
+/// [label] and [note] are the same 10.5px — `.type-micro` and `.type-caption`
+/// are separated only by case, weight, tracking and leading.
+class DsStateCell extends StatelessWidget {
+  const DsStateCell({
+    super.key,
+    required this.label,
+    this.note,
+    required this.child,
+  }) : padding = null;
+
+  /// The opaque tile without the kit's well-and-label block.
+  ///
+  /// The icons page's registry entry is a `bg-background p-4` cell holding a
+  /// glyph beside its name — a different composition doing the same structural
+  /// job, which is to be the solid tile the lattice shows between. Sharing the
+  /// tile is what keeps one `gap-px` grid in the port instead of two.
+  const DsStateCell.bare({super.key, required this.child, this.padding})
+      : label = null,
+        note = null;
+
+  /// `.type-micro text-center text-muted-foreground` — 10.5px, uppercased by
+  /// the class.
+  final String? label;
+
+  /// `.type-caption mt-1.5 text-center text-muted-foreground` — 10.5px again,
+  /// sentence case.
+  final String? note;
+
+  final Widget child;
+
+  /// Overrides `p-5`. [DsStateCell.bare] only — the labelled cell's padding is
+  /// part of the kit's anatomy.
+  final EdgeInsetsGeometry? padding;
+
+  /// `min-h-14`.
+  static double get wellHeight => ds(14);
+
+  @override
+  Widget build(BuildContext context) {
+    final DsThemeData theme = DsTheme.of(context);
+
+    if (label == null) {
+      return Container(
+        color: theme.background,
+        padding: padding ?? EdgeInsets.all(ds(4)),
+        child: child,
+      );
+    }
+
+    return Container(
+      color: theme.background,
+      padding: EdgeInsets.all(ds(5)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Padding(
+            padding: EdgeInsets.only(bottom: ds(4)),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: wellHeight),
+              child: Center(child: child),
+            ),
+          ),
+          DsText(
+            label!,
+            DsType.micro,
+            color: theme.mutedForeground,
+            align: TextAlign.center,
+          ),
+          if (note != null) ...<Widget>[
+            SizedBox(height: ds(1.5)),
+            DsText(
+              note!,
+              DsType.caption,
+              color: theme.mutedForeground,
+              align: TextAlign.center,
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
 /* ── Reference blocks ────────────────────────────────────────────────────── */
 
 /// One `<dt>/<dd>` pair in a [DsMeta].
