@@ -24,16 +24,22 @@
 /// | description | `text-sm text-balance text-muted-foreground` | 13px muted |
 /// | role | `role="alert"` on the root | no `aria-live`, no `aria-atomic` |
 ///
-/// Scope, per supervisor ruling F1: the fidelity the forms page renders. The
-/// bloom is mounted **static** — see `DsBloomCosmic`, which records why the two
-/// infinite drifts and the starfield wait for the `feedback` page.
+/// The bloom is live: both drifts, the hover swell and the starfield all run —
+/// see `DsBloomCosmic`, which is where the forms page's deferral was closed.
+/// `alert.tsx` L85's `<span data-slot="alert-stars" class="starfield"/>` is
+/// mounted by the bloom rather than written here, because the toast reaches the
+/// same effect through a different selector and both resolve against the same
+/// padding box.
 ///
-/// Not ported, and recorded rather than guessed:
-///  * `AlertAction` (`absolute top-2 right-2`, with `has-data-[slot=alert-action]:pr-20`)
-///    — no call site on this page;
+/// [DsAlert.action] closes the other half of that deferral —
+/// `AlertAction`, `absolute top-2 right-2`, with the reserved lane F10 rules on
+/// (see the field's own doc).
+///
+/// Still recorded rather than guessed:
 ///  * `text-balance` → `md:text-pretty` on the description. Flutter's line
 ///    breaker has neither mode, so the description wraps greedily. The
-///    reference's balanced last line is unreachable, not skipped.
+///    reference's balanced last line is unreachable, not skipped — supervisor
+///    ruling F3 keeps the record and measures parity against a greedy wrap.
 library;
 
 import 'package:flutter/widgets.dart';
@@ -95,8 +101,24 @@ class DsAlert extends StatelessWidget {
     required this.title,
     this.description,
     this.icon,
+    this.action,
     this.variant = DsAlertVariant.normal,
   });
+
+  /// `--spacing * 2` — `AlertAction`'s `top-2 right-2`.
+  static double get actionInset => ds(2);
+
+  /// `pr-20` — the right padding the base switches to when an action is
+  /// present, in place of `px-4`'s 16.
+  ///
+  /// **Unconditional, and that is the point** (supervisor ruling F10).
+  /// `has-data-[slot=alert-action]:pr-20` widens the lane whether or not the
+  /// button would have collided with anything: on the feedback page's
+  /// "Withdrawal under review" it shortens the description column from 968px to
+  /// **904px**, and that is what makes the two action Alerts wrap differently
+  /// from the other three. Sizing the lane to the button instead would be a
+  /// better layout and a different page.
+  static double get actionLane => ds(20);
 
   /// `AlertTitle` — `font-medium`, column 2.
   final String title;
@@ -111,6 +133,19 @@ class DsAlert extends StatelessWidget {
   /// variant only says what colour it comes out. Its colour arrives through
   /// the surrounding [DefaultTextStyle], which is what `text-current` means.
   final Widget? icon;
+
+  /// `AlertAction` — the absolutely-positioned top-right slot
+  /// (`alert.tsx` L120–128), and the reason the root sets `relative` itself
+  /// while `bloom-cosmic` deliberately does not.
+  ///
+  /// A slot, not a button: the page writes
+  /// `<AlertAction><Button variant="secondary" size="sm">Retry</Button></AlertAction>`,
+  /// so what goes here is whatever the call site puts there — a 32px `secondary
+  /// sm` button on both of the feedback page's two, at 8px from the top and
+  /// right of the **border** box.
+  ///
+  /// Its presence also widens the base's right padding; see [actionLane].
+  final Widget? action;
 
   final DsAlertVariant variant;
 
@@ -157,8 +192,14 @@ class DsAlert extends StatelessWidget {
     }
 
     Widget alert = Padding(
-      // `px-4 py-3.5`.
-      padding: EdgeInsets.symmetric(horizontal: ds(4), vertical: ds(3.5)),
+      // `px-4 py-3.5`, with `has-data-[slot=alert-action]:pr-20` replacing the
+      // right half of `px-4` whenever an action is mounted.
+      padding: EdgeInsets.fromLTRB(
+        ds(4),
+        ds(3.5),
+        action == null ? ds(4) : DsAlert.actionLane,
+        ds(3.5),
+      ),
       child: column,
     );
 
@@ -204,6 +245,23 @@ class DsAlert extends StatelessWidget {
         child: alert,
       ),
     );
+
+    if (action != null) {
+      // `position: absolute; top: 8px; right: 8px` against the root, which is
+      // `relative` — so the offsets are from the **border** box, outside the
+      // bloom's clip, and the button is never dimmed by the light behind it.
+      alert = Stack(
+        fit: StackFit.passthrough,
+        children: <Widget>[
+          alert,
+          Positioned(
+            top: DsAlert.actionInset,
+            right: DsAlert.actionInset,
+            child: action!,
+          ),
+        ],
+      );
+    }
 
     return Semantics(
       container: true,

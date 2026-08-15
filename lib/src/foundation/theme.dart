@@ -82,6 +82,13 @@ class DsThemeData {
     required this.agent,
     required this.agentMuted,
     required this.scrim,
+    required this.bloomVoid,
+    required this.bloomL,
+    required this.bloomC,
+    required this.bloomLift,
+    required this.bloomHotC,
+    required this.starGlowSize,
+    required this.starGlowMix,
   });
 
   /// Which block this is.
@@ -339,6 +346,69 @@ class DsThemeData {
   /// dark `hsl(240 10% 3.9% / 0.66)` L906.
   final Color scrim;
 
+  // ── `bloom-cosmic`'s five theme knobs ──────────────────────────────────────
+  // Declared in the two theme blocks beside every other token (globals.css
+  // L699–715 light, L885–898 dark) and read by exactly one effect, which
+  // computes `--bloom-core` / `--bloom-glow` / `--bloom-hot` from them with
+  // relative-OKLCH syntax. They lived in `effects/bloom_cosmic.dart` under a
+  // standing FOLLOW-UP until this file was next opened; supervisor ruling F9
+  // is that opening.
+  //
+  // The line this draws, and the reason `--star-glow` is NOT here: a bloom
+  // variable that resolves to a **flat** value per theme block is a theme
+  // token and lives here. The ones that read `--bloom-1` / `--bloom-2` —
+  // `--bloom-core`, `--bloom-glow`, `--bloom-hot`, and `--star-glow` on light
+  // — cannot be flattened, because those two customs only exist on the host
+  // element. Those stay derivations, next to the effect that performs them.
+
+  /// `--bloom-void` — light `white` L700 / dark `black` L886.
+  ///
+  /// The identity operand of the theme's own blend mode: `multiply` by white
+  /// and `screen` by black both leave the destination alone. Every gradient
+  /// ramp in the effect ends here rather than on `transparent`, which is what
+  /// makes the light fade out instead of leaving a rectangular edge.
+  final Color bloomVoid;
+
+  /// `--bloom-l` — light **0.6** L701 / dark **1** L887.
+  ///
+  /// The lightness multiplier every hue is put through before it is blurred.
+  /// On paper a pale wash multiplied into white disappears, so light darkens
+  /// first; dark is identity and the hues go in as they are.
+  final double bloomL;
+
+  /// `--bloom-c` — light **1.55** L702 / dark **1** L888. Chroma, same story:
+  /// light pushes a hue well past its own saturation to survive the multiply.
+  final double bloomC;
+
+  /// `--bloom-lift` — light **0** L703 / dark **0.85** L889.
+  ///
+  /// How far `--bloom-hot` is lifted from `--bloom-core` toward white:
+  /// `calc(l + (1 - l) * var(--bloom-lift))`. Zero on light, so the hot core
+  /// is the core exactly — pure pigment.
+  final double bloomLift;
+
+  /// `--bloom-hot-c` — light **1** L704 / dark **0.5** L890. Half-desaturating
+  /// the lifted core is what makes it read as light on glass rather than paint.
+  final double bloomHotC;
+
+  /// `--star-glow-size` — light **3px** L715 / dark **2px** L898.
+  ///
+  /// The `.starfield`'s tight `drop-shadow` radius; its wide companion is
+  /// `calc(… * 3)`, which is the utility's own declaration and stays there.
+  /// Light spends the larger radius because a coloured glow on paper has to
+  /// travel further to register than white light on black does.
+  final double starGlowSize;
+
+  /// `--star-glow`'s strength — light **0.85** L714 / dark **0.5** L897.
+  ///
+  /// The one number the two blocks share a meaning for and not a form: dark
+  /// declares `rgb(255 255 255 / 0.5)`, a flat white at half alpha, while light
+  /// declares `color-mix(in oklab, var(--bloom-2) 85%, transparent)` — the
+  /// host's own hue at 85%. Only the **strength** can be flattened into a theme
+  /// block; which colour it is applied to depends on `--bloom-2`, which exists
+  /// only on the host element. `DsStarfield.glowFor` is that second half.
+  final double starGlowMix;
+
   // ───────────────────────────────────────────────────────────────────────────
 
   /// `:root, .light` — globals.css L546–735.
@@ -392,6 +462,16 @@ class DsThemeData {
     agent: DsPalette.action,
     agentMuted: dsHsl(213, 100, 97),
     scrim: dsHsl(240, 10, 3.9, 0.28),
+    // CSS `white` *is* `hsl(0 0% 100%)`; spelled as the top of the lightness
+    // axis rather than as an ARGB literal, so this block states no colour the
+    // rest of it would not.
+    bloomVoid: dsHsl(0, 0, 100),
+    bloomL: 0.6,
+    bloomC: 1.55,
+    bloomLift: 0,
+    bloomHotC: 1,
+    starGlowSize: 3,
+    starGlowMix: 0.85,
   );
 
   /// `.dark` — globals.css L741–942.
@@ -447,6 +527,14 @@ class DsThemeData {
     agent: DsPalette.actionBright,
     agentMuted: dsHsl(217, 40, 13),
     scrim: dsHsl(240, 10, 3.9, 0.66),
+    // `black` — the bottom of the same axis, for the same reason.
+    bloomVoid: dsHsl(0, 0, 0),
+    bloomL: 1,
+    bloomC: 1,
+    bloomLift: 0.85,
+    bloomHotC: 0.5,
+    starGlowSize: 2,
+    starGlowMix: 0.5,
   );
 
   /// Builds one theme block from its DECLARED tokens, resolving the two groups
@@ -505,6 +593,13 @@ class DsThemeData {
     required Color agent,
     required Color agentMuted,
     required Color scrim,
+    required Color bloomVoid,
+    required double bloomL,
+    required double bloomC,
+    required double bloomLift,
+    required double bloomHotC,
+    required double starGlowSize,
+    required double starGlowMix,
   }) {
     return DsThemeData._(
       kind: kind,
@@ -568,6 +663,13 @@ class DsThemeData {
       agent: agent,
       agentMuted: agentMuted,
       scrim: scrim,
+      bloomVoid: bloomVoid,
+      bloomL: bloomL,
+      bloomC: bloomC,
+      bloomLift: bloomLift,
+      bloomHotC: bloomHotC,
+      starGlowSize: starGlowSize,
+      starGlowMix: starGlowMix,
     );
   }
 }

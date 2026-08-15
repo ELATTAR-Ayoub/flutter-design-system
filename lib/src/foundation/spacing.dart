@@ -143,6 +143,24 @@ class DsBlurs {
   static const double xl = 24;
 }
 
+/// Tailwind's stock container ladder — the `--container-*` scale, which
+/// `globals.css` never redeclares, so the framework defaults render.
+///
+/// Only the rungs the port actually reaches for are transcribed, on [DsBlurs]'s
+/// precedent: a ladder with no consumer is a guess about what the reference
+/// will need next.
+class DsContainers {
+  const DsContainers._();
+
+  /// `--container-sm: 24rem` = **384px** — `max-w-sm`.
+  ///
+  /// The measure `EmptyHeader` and `EmptyContent` both cap themselves at
+  /// (`components/ui/empty.tsx` L20 / L96), which is what keeps an empty
+  /// state's title and its description on the same short column while the
+  /// panel around them is 482px wide.
+  static const double sm = 384;
+}
+
 /// Tailwind's stock breakpoints, in logical pixels.
 ///
 /// `globals.css` never redeclares `--breakpoint-*`, so the framework defaults

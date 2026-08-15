@@ -965,6 +965,83 @@ void main() {
       expect(tight.bottom, closeTo(21, 0.001));
     });
   });
+
+  // ─── the one shape in this file lucide did not draw ──────────────────────
+
+  group('the starfield sparkle — off-set and off-lucide', () {
+    /// The `d` as `globals.css` L3474/L3478 write it inside the two
+    /// `url("data:image/svg+xml…")` backgrounds, transcribed here independently
+    /// of `icon_paths.dart` so the two have to agree — the same contract
+    /// [_transcript] holds the lucide glyphs to.
+    const String css =
+        'M12 0C12 6.6 17.4 12 24 12C17.4 12 12 17.4 12 24C12 17.4 6.6 12 0 12C6.6 12 12 6.6 12 0Z';
+
+    test('the `d` is copied character for character', () {
+      expect(DsIconPaths.sparkleElement.d, css);
+      // Four cubic segments and a close, and nothing else: `C` five times would
+      // be a different star and `Q` would be a different waist.
+      expect('C'.allMatches(css), hasLength(4));
+      expect(css.endsWith('Z'), isTrue);
+    });
+
+    test('it fills the 24-unit grid corner to corner', () {
+      final Path path = DsIconPaths.sparkle();
+      // The four points sit ON the grid's edges — (12,0), (24,12), (12,24),
+      // (0,12) — so the shape is exactly [DsIconPaths.viewBox] square, and the
+      // control points at 6.6/17.4 are inside it. A sparkle's rendered box is
+      // therefore `24 × scale`, which is what `DsSparkle.box` claims.
+      expect(path.getBounds(),
+          _rectCloseTo(const Rect.fromLTRB(0, 0, 24, 24), 0.0005));
+      expect(_tightBounds(path),
+          _rectCloseTo(const Rect.fromLTRB(0, 0, 24, 24), 0.0005));
+    });
+
+    test('the waist is concave — it is a star, not a diamond', () {
+      // The midpoint of the (12,0) → (24,12) arm. The four arms are congruent,
+      // so an eighth of the contour's length is exactly that point.
+      final PathMetric arm = _contours(DsIconPaths.sparkle()).single;
+      final Offset mid = arm.getTangentForOffset(arm.length / 8)!.position;
+      const Offset centre = Offset(12, 12);
+
+      // A rhombus would run the arm straight from (12,0) to (24,12) and put
+      // this point on the chord's own midpoint, (18,6). The 6.6/17.4 control
+      // points pull it back toward the centre instead — that pull IS the waist,
+      // and it is the whole difference between this glyph and a diamond.
+      expect((mid - centre).distance,
+          lessThan((const Offset(18, 6) - centre).distance));
+      // Measured on Flutter 3.44.8, and equal to the cubic's own `t = 0.5`
+      // point `(P0 + 3P1 + 3P2 + P3) / 8` — which is what proves the parser
+      // emitted the control polygon the `d` states and not a smoothed one.
+      expect(mid.dx, closeTo(15.525, 0.01));
+      expect(mid.dy, closeTo(8.475, 0.01));
+      // Still clear of the centre, so an arm reads as an arm and not as a
+      // pinched circle.
+      expect((mid - centre).distance, greaterThan(4));
+    });
+
+    test('it is one closed contour, and a fresh Path every call', () {
+      expect(_contours(DsIconPaths.sparkle()), hasLength(1));
+      expect(_contours(DsIconPaths.sparkle()).single.isClosed, isTrue);
+      // Thirteen instances share this shape; handing out one mutable [Path]
+      // would let the first painter's transform corrupt the other twelve.
+      expect(identical(DsIconPaths.sparkle(), DsIconPaths.sparkle()), isFalse);
+    });
+
+    test('it stays out of the glyph registry', () {
+      // The enum is a transcript of lucide modules and the icons page derives
+      // its registry from it by subtraction. A filled, stroke-less shape out of
+      // the stylesheet belongs to neither, so the count must not have moved and
+      // no member may carry this geometry.
+      expect(DsIconGlyph.values, hasLength(78));
+      for (final DsIconGlyph glyph in DsIconGlyph.values) {
+        for (final DsIconElement element in DsIconPaths.elements[glyph]!) {
+          if (element is DsIconPathElement) {
+            expect(element.d, isNot(css), reason: '${glyph.name} carries it');
+          }
+        }
+      }
+    });
+  });
 }
 
 /// Every element of every glyph, in lucide's own order, transcribed from the

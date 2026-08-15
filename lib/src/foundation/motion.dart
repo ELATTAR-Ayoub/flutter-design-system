@@ -86,6 +86,31 @@ class DsDurations {
   /// rigid sheet.
   static const Duration swayAlt = Duration(seconds: 33);
 
+  // ── `bloom-cosmic`'s two drifts ─────────────────────────────────────────
+  // Neither is tokenised: `@utility bloom-cosmic` writes both inline
+  // (globals.css L1759 / L1817), which is the same situation the `anim-*`
+  // literals below are in. They are transcribed here anyway — the constraint
+  // is that literals live in this layer, not that the reference named them.
+  //
+  // The utility's own comment (L1859–1860) says why the pair is what it is:
+  // 18 and 11 are **coprime-ish on purpose**, so the two layers take minutes
+  // to return to the same arrangement and the surface never reads as one
+  // rigid sheet. That is the same argument [swayAlt] carries, one layer down.
+
+  /// `animation: cosmic-drift-deep 18s var(--ease-in-out) infinite alternate`
+  /// (globals.css L1759) — the `::before` field, the one that reads as
+  /// distance.
+  static const Duration cosmicDriftDeep = Duration(seconds: 18);
+
+  /// `animation: cosmic-drift-near 11s var(--ease-in-out) infinite alternate`
+  /// (globals.css L1817) — the `::after` field, tighter and brighter.
+  ///
+  /// Numerically equal to [foilDrift] and spelled separately for the reason
+  /// [popIn] is not [reward]: `value-foil-drift` is a metal sheen on a button
+  /// and `cosmic-drift-near` is a corner light on a card. They agree today by
+  /// accident, and retiming one must not retime the other.
+  static const Duration cosmicDriftNear = Duration(seconds: 11);
+
   // ── Durations globals.css writes as literals ────────────────────────────
   // Three utilities set a duration inline rather than through a `--duration-*`
   // token. They are transcribed here anyway: the constraint is that literals
@@ -269,6 +294,31 @@ class DsTransforms {
   /// A button squishes less than a bare `press` surface because it already
   /// travels: `--shadow-btn` swaps to `--shadow-btn-down` in the same beat.
   static const double buttonScale = 0.95;
+
+  /// `Slider`'s thumb `hover:scale-110` (`components/ui/slider.tsx`) —
+  /// Tailwind `scale-110` = 1.10.
+  ///
+  /// Recorded here for the same reason as [buttonScale]: a component's own
+  /// stock-Tailwind scale utility is still a transform amount, and the one
+  /// place transform amounts live is this class.
+  ///
+  /// **It arrives instantly.** The built stylesheet emits
+  /// `.hover\:scale-110:hover { scale: var(--tw-scale-x) var(--tw-scale-y) }`
+  /// — the CSS **`scale`** property, not `transform` — while the thumb's
+  /// transition list is `transition-[transform,box-shadow]`. `scale` is not in
+  /// that list, so nothing interpolates it. Driven on the live reference and
+  /// rAF-sampled through a real pointer gesture (1440 × 900, 2026-08-15): the
+  /// sampler saw `none → 1.1 → 1.25 → 1.1` with **zero** intermediate frames
+  /// across ~100 samples. The ring beside it does tween, on
+  /// [DsCurves.spring] over [DsDurations.transitionDefault].
+  static const double sliderThumbHoverScale = 1.10;
+
+  /// `Slider`'s thumb `active:scale-125` — Tailwind `scale-125` = 1.25.
+  ///
+  /// Its source comment: *"Grabbing it springs the knob up, like picking it
+  /// out of the groove."* The spring named there reaches the ring only — see
+  /// [sliderThumbHoverScale] for the measurement.
+  static const double sliderThumbActiveScale = 1.25;
 
   /// `lift` `:hover { transform: translateY(-3px) }` (L2327).
   static const double liftY = -3;

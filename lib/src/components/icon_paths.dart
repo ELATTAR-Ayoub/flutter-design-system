@@ -1111,6 +1111,50 @@ class DsIconPaths {
     }
     return path;
   }
+
+  // ─── off-set, and off-lucide: the starfield's sparkle ────────────────────
+
+  /// The one glyph the `.starfield` utility draws, thirteen times
+  /// (`app/globals.css` L3474 and L3478, inside the two `url("data:image/svg+xml…")`
+  /// backgrounds).
+  ///
+  /// ```svg
+  /// <path d="M12 0C12 6.6 17.4 12 24 12C17.4 12 12 17.4 12 24C12 17.4 6.6 12 0 12C6.6 12 12 6.6 12 0Z" fill="#ffffff"/>
+  /// ```
+  ///
+  /// A four-point star on the same 24×24 grid lucide authors on ([viewBox]),
+  /// so the two sets of geometry share this file's units and its parser. Four
+  /// cubic segments, closed; every control point sits at 6.6 or 17.4, which is
+  /// 27.5% of the way in from each edge — that is what pinches the waist and
+  /// makes the arms concave rather than a plain diamond.
+  ///
+  /// **Deliberately NOT a [DsIconGlyph].** Every member of that enum is a
+  /// transcript of one lucide module, stroked through `icon.dart`'s ladder,
+  /// and the icons page's registry is derived from it by subtraction (78 =
+  /// chrome + curated + off-set). This shape is none of those things: its
+  /// source is the stylesheet, it carries `fill="#ffffff"` and **no stroke at
+  /// all**, and there is no size rung or tone that would make sense for it. It
+  /// lands in this file because this file is where transcribed geometry lives
+  /// — supervisor ruling F7 — and it stays out of the enum so that neither the
+  /// registry arithmetic nor `DsIcon` can ever reach it by accident.
+  ///
+  /// Held as a [DsIconPathElement] rather than a bare [String] so the `d`
+  /// reads as one more transcript beside the others, and so [sparkle] can go
+  /// through the same parser every glyph above does.
+  static const DsIconPathElement sparkleElement = DsIconPathElement(
+      'M12 0C12 6.6 17.4 12 24 12C17.4 12 12 17.4 12 24C12 17.4 6.6 12 0 12C6.6 12 12 6.6 12 0Z');
+
+  /// [sparkleElement] as a fresh [Path] in 24-unit coordinates — the caller
+  /// scales and translates, exactly as the SVG's own
+  /// `transform="translate(x,y) scale(s)"` does.
+  ///
+  /// A **fresh** path every call, for [pathFor]'s reason: [Path] is mutable and
+  /// thirteen instances share one shape.
+  static Path sparkle() {
+    final Path path = Path();
+    sparkleElement.addTo(path);
+    return path;
+  }
 }
 
 // ─── SVG path data ──────────────────────────────────────────────────────────

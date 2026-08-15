@@ -49,12 +49,16 @@
 ///  * `[data-button]` — the action pill. No call site on the forms page.
 ///  * the starfield on `[data-content]`. See `DsBloomCosmic`.
 ///
-/// **KNOWN GAP — two glyphs.** `TOAST_ICONS` maps success to lucide's
-/// `CircleCheck` and error to `OctagonX`, and `DsIconGlyph` carries neither;
-/// `icon_paths.dart` is another task's file this wave. [DsToastType.glyph]
-/// therefore answers `null` for those two and [DsToast.glyph] overrides it, so
-/// a call site can supply the geometry the moment it lands. Everything else —
-/// the ink, the bloom, the anatomy — is complete.
+/// **KNOWN GAP, half closed — two glyphs.** `TOAST_ICONS` maps success to
+/// lucide's `CircleCheck` and error to `OctagonX`. The geometry has **landed**:
+/// `DsIconGlyph.circleCheck` and `DsIconGlyph.octagonX` are both in
+/// `icon_paths.dart`, so the half of this note that said they were missing is
+/// no longer true. What is still open is only the wiring —
+/// [DsToastType.glyph] answers `null` for those two, [DsToast.glyph] overrides
+/// it, and a test pins the `null`. Flipping the getter and that pin belongs to
+/// the task that owns this file's choreography (wave B2), not to the one that
+/// wrote the paths. Everything else — the ink, the bloom, the anatomy — is
+/// complete.
 library;
 
 import 'dart:async';
@@ -132,9 +136,10 @@ enum DsToastType {
 
   /// `TOAST_ICONS[type]`, where this package has the geometry.
   ///
-  /// `CircleCheck` and `OctagonX` are not in `DsIconGlyph` yet — see the KNOWN
-  /// GAP note on this library. A `null` here is a missing transcript, not a
-  /// toast without an icon.
+  /// A `null` here is not a toast without an icon — see the KNOWN GAP note on
+  /// this library. It no longer means a missing transcript either:
+  /// [DsIconGlyph.circleCheck] and [DsIconGlyph.octagonX] both exist now, and
+  /// only this switch is still to be flipped.
   DsIconGlyph? get glyph => switch (this) {
         DsToastType.info => DsIconGlyph.info,
         DsToastType.warning => DsIconGlyph.alertTriangle,

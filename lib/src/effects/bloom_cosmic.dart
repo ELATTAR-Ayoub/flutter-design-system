@@ -42,66 +42,83 @@
 /// canvas moments earlier, so the destination under a blend op IS the
 /// surface's own paint.
 ///
-/// **Static.** The reference runs `cosmic-drift-deep 18s` and
-/// `cosmic-drift-near 11s`, both `infinite alternate`, plus a hover `scale`
-/// over `--duration-bloom`. Neither is ported here: RULES §4 rations perpetual
-/// motion, an Alert on a form is not the live indicator, and the four
-/// animations are properly the `feedback` page's subject. What renders is the
-/// element's own resting style — the frame a `prefers-reduced-motion` browser
-/// settles on, since both animations declare no `animation-fill-mode` and so
-/// revert rather than hold.
+/// **Live.** Both layers drift forever and both swell on hover — the deferral
+/// this file used to carry is closed, on the page the deferral named.
 ///
-/// FOLLOW-UP, recorded rather than fixed:
-///  * the drift animations and the hover scale, with the `feedback` page;
-///  * `.starfield` — thirteen hand-placed sparkles and two more infinite
-///    sways, carried by an `alert-stars` span in the reference and by
-///    `[data-content]` on a toast. Same argument, same page.
+/// ```css
+/// cosmic-drift-deep 18s var(--ease-in-out) infinite alternate   /* ::before */
+/// cosmic-drift-near 11s var(--ease-in-out) infinite alternate   /* ::after  */
+/// &::before, &::after { scale: 1; transition: scale var(--duration-bloom) var(--ease-out) }
+/// &:hover::before { scale: 2.2 }  &:hover::after { scale: 2.5 }
+/// ```
+///
+/// The periods are coprime-ish on purpose (globals.css L1859–1860): the pair
+/// takes minutes to return to the same arrangement, which is what stops a
+/// corner light from reading as a loop.
+///
+/// **The composition problem, and the shape of the answer.** CSS gets this for
+/// free — the drift is the `transform` property and the swell is the
+/// standalone `scale` property, and two properties multiply. The stylesheet
+/// says so outright (L1826–1830): `transform: scale()` would be *ignored*
+/// here, because an animation beats a plain declaration on the property it
+/// animates, so the swell had to be written on a different property. Flutter
+/// has one matrix, so the two are multiplied by hand in CSS Transforms 2's own
+/// order — the individual `scale` first, then the `transform` list — both
+/// about the layer's own `transform-origin`. See [DsBloomDrift.matrixFor].
+///
+/// **The layer's `filter` is inside its transform, not outside.** A CSS
+/// `filter` renders in the element's local space and the transform maps the
+/// filtered result, so a layer at `scale(1.2)` carries a blur 1.2× as wide in
+/// the parent. The painter therefore transforms the canvas *first* and opens
+/// the blurred `saveLayer` inside it; drawing the blur first and scaling the
+/// result would hold the halo's width fixed while the light grew.
+///
+/// Supervisor ruling F2: all of it builds, always. The only gate is
+/// `dsAnimationDuration` — there is deliberately no out-of-view pause, because
+/// the reference has none and a page whose lights stop when they leave the fold
+/// is a different page.
 library;
 
+import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 
 import '../foundation/colors.dart';
+import '../foundation/motion.dart';
 import '../foundation/spacing.dart';
 import '../foundation/theme.dart';
+import '../motion/keyframes.dart';
 import '../theme_scope.dart';
+import 'starfield.dart';
 
-// ── The per-theme bloom variables ───────────────────────────────────────────
+// ── CLOSED: the per-theme bloom variables ───────────────────────────────────
 // `--bloom-void` / `--bloom-l` / `--bloom-c` / `--bloom-lift` / `--bloom-hot-c`
-// are declared in the two theme blocks (globals.css L680–715 light, L885–898
-// dark) beside every other token — but `DsThemeData` does not carry them yet
-// and `foundation/theme.dart` is not this task's file. They live here, next to
-// the only effect that reads them, until that file is next opened.
+// used to live here as eight file-local constants under a standing FOLLOW-UP —
+// they are declared in the two theme blocks (globals.css L699–715 light,
+// L885–898 dark) beside every other token, and `foundation/theme.dart` was not
+// that task's file. Supervisor ruling F9 opened it: they are now
+// `DsThemeData.bloomVoid` / `.bloomL` / `.bloomC` / `.bloomLift` / `.bloomHotC`
+// and this file reads them like any other token. The FOLLOW-UP also asked for
+// `DsBloomInk.of` to be deleted; there is no such member and has not been since
+// the resolver became the instance method [DsBloomCosmic._ink], which is part
+// of what made the note stale.
 //
-// FOLLOW-UP: move these five onto `DsThemeData` and delete `_BloomInk.of`.
-
-/// Light: `--bloom-l: 0.6` — every hue is darkened before it is blurred,
-/// because a pale wash multiplied into white paper disappears.
-const double _lightL = 0.6;
-
-/// Light: `--bloom-c: 1.55` — and pushed well past its own chroma to survive
-/// the same multiply.
-const double _lightC = 1.55;
-
-/// Light: `--bloom-lift: 0`, `--bloom-hot-c: 1` — so `--bloom-hot` is
-/// `--bloom-core` exactly. On paper the hot core is pure pigment.
-const double _lightLift = 0;
-const double _lightHotC = 1;
-
-/// Dark: `--bloom-l: 1`, `--bloom-c: 1` — identity. The hues go in as they are.
-const double _darkL = 1;
-const double _darkC = 1;
-
-/// Dark: `--bloom-lift: 0.85`, `--bloom-hot-c: 0.5` — the hot core is lifted
-/// 85% of the way to white and half-desaturated, which is what makes it read
-/// as light on glass rather than as paint.
-const double _darkLift = 0.85;
-const double _darkHotC = 0.5;
+// What did NOT move, and why: `--bloom-core`, `--bloom-glow` and `--bloom-hot`
+// are `oklch(from var(--bloom-2) …)` — they read a custom property that only
+// exists on the host element, so they cannot be flattened into a theme block
+// and stay derivations here. `--star-glow` splits along the same seam; see
+// `DsStarfield.glowFor`.
 
 /// `opacity: 0.75` on `.dark`, `0.34` on `:root`/`.light` (globals.css
 /// L3235–3245). The utility's own `0.75` on `::before` is overridden by both.
+///
+/// Not a `--bloom-*` custom property: this is the theme blend split's own
+/// declaration on the pseudo-elements, one selector away from the five above,
+/// and it moves with [DsBloomCosmic.blendFor] rather than with the theme's
+/// token list.
 const double _darkOpacity = 0.75;
 const double _lightOpacity = 0.34;
 
@@ -138,6 +155,225 @@ const double _maskCentreX = 0.96;
 const double _maskCentreY = 0.78;
 const List<double> _maskStops = <double>[0, 0.28, 0.84];
 
+// ── The two drifts, and the hover swell ─────────────────────────────────────
+
+/// One `@keyframes cosmic-drift-*` stop: a percentage translate, a rotation and
+/// a scale, exactly as the stylesheet writes it.
+///
+/// The translate is in **percent of the layer's own box** — CSS resolves a
+/// percentage translation against the translated element, and the two layers
+/// are 416 × 200.44 and 336 × 179.72 on the feedback page's Alert, not against
+/// the host. A port that resolved it against the host would drift the deep
+/// layer nearly three times too far.
+@immutable
+class DsBloomDriftStop {
+  const DsBloomDriftStop(
+    this.percent, {
+    required this.translate,
+    required this.degrees,
+    required this.scale,
+  });
+
+  /// The keyframe's own `0%`…`100%`.
+  final double percent;
+
+  /// `translate3d(x%, y%, 0)` as fractions — `-11%, 8%` is `Offset(-0.11, 0.08)`.
+  final Offset translate;
+
+  /// `rotate(<n>deg)`.
+  final double degrees;
+
+  /// `scale(<n>)`.
+  final double scale;
+}
+
+/// `@keyframes cosmic-drift-deep` / `cosmic-drift-near` — globals.css
+/// L1864–1877, and the hover swell that multiplies onto them (L1836–1846).
+///
+/// Both run `var(--ease-in-out)` `infinite alternate`, so the controller walks
+/// 0→1→0 forever and the easing is applied here, per gap, by
+/// [DsKeyframes.doubles]'s own rule: the clock stays linear so nothing is eased
+/// twice.
+@immutable
+class DsBloomDrift {
+  /// The four tracks are built **once, at construction**, not per frame: this
+  /// runs on every tick of every mounted bloom (the feedback page rests at ten
+  /// hosts, twenty layers), and rebuilding four [TweenSequence]s per layer per
+  /// frame would allocate for no reason. Which is why [deep] and [near] are
+  /// `static final` rather than `const` — the same shape `DsShadows.btnPrimary`
+  /// takes for the same kind of reason.
+  DsBloomDrift({
+    required this.duration,
+    required this.stops,
+    required this.hoverScale,
+    required this.originX,
+    required this.originY,
+  })  : translateX = _track(stops, _readX),
+        translateY = _track(stops, _readY),
+        rotation = _track(stops, _readRadians),
+        scale = _track(stops, _readScale);
+
+  /// `::before` — 18s, three stops, `transform-origin: 88% 82%`, swelling to
+  /// 2.2 on hover.
+  static final DsBloomDrift deep = DsBloomDrift(
+    duration: DsDurations.cosmicDriftDeep,
+    originX: 0.88,
+    originY: 0.82,
+    hoverScale: 2.2,
+    stops: <DsBloomDriftStop>[
+      DsBloomDriftStop(0, translate: Offset.zero, degrees: 0, scale: 1),
+      DsBloomDriftStop(50,
+          translate: Offset(-0.11, 0.08), degrees: 7, scale: 1.2),
+      DsBloomDriftStop(100,
+          translate: Offset(0.06, -0.09), degrees: -5, scale: 1.08),
+    ],
+  );
+
+  /// `::after` — 11s, four stops, `transform-origin: 90% 86%`, swelling to 2.5.
+  ///
+  /// Note stop 0: `scale(1.04)`, not 1. The near field is *born* slightly
+  /// larger than its box, which is the difference between the two layers'
+  /// resting frames and the reason [restingMatrixFor] is not simply this
+  /// table at `t = 0` — see that member.
+  static final DsBloomDrift near = DsBloomDrift(
+    duration: DsDurations.cosmicDriftNear,
+    originX: 0.90,
+    originY: 0.86,
+    hoverScale: 2.5,
+    stops: <DsBloomDriftStop>[
+      DsBloomDriftStop(0, translate: Offset.zero, degrees: 0, scale: 1.04),
+      DsBloomDriftStop(35,
+          translate: Offset(-0.03, -0.02), degrees: -9, scale: 1.18),
+      DsBloomDriftStop(70,
+          translate: Offset(0.03, 0.02), degrees: 6, scale: 1),
+      DsBloomDriftStop(100,
+          translate: Offset(-0.02, 0.01), degrees: -4, scale: 1.14),
+    ],
+  );
+
+  /// `animation-duration`.
+  final Duration duration;
+
+  /// The keyframe table, in the stylesheet's order.
+  final List<DsBloomDriftStop> stops;
+
+  /// `&:hover::before { scale: 2.2 }` — the standalone `scale` property, over
+  /// [DsDurations.bloom] on `--ease-out`.
+  final double hoverScale;
+
+  /// `transform-origin`'s x, as a fraction of the layer's own width.
+  final double originX;
+
+  /// …and its y.
+  final double originY;
+
+  /// `translate3d(x%, …)` as a fraction of the layer's width, eased.
+  final Animatable<double> translateX;
+
+  /// `translate3d(…, y%, 0)` as a fraction of the layer's **height**.
+  final Animatable<double> translateY;
+
+  /// `rotate(…)`, in radians — the table states degrees, [Matrix4] wants
+  /// radians, and converting once at the table keeps the call site honest.
+  final Animatable<double> rotation;
+
+  /// `scale(…)`.
+  final Animatable<double> scale;
+
+  /// The `transform` list at linear progress [t], as one matrix about the
+  /// layer's origin.
+  ///
+  /// CSS applies a transform list left to right — `translate3d`, then
+  /// `rotate`, then `scale` — so the rotation happens in the translated frame
+  /// and the scale in the rotated one.
+  Matrix4 driftMatrix(Rect layer, double t) {
+    final double clamped = t.clamp(0.0, 1.0);
+    final Offset o = _originIn(layer);
+    final double s = scale.transform(clamped);
+    return Matrix4.identity()
+      ..translateByDouble(o.dx, o.dy, 0, 1)
+      ..translateByDouble(
+        translateX.transform(clamped) * layer.width,
+        translateY.transform(clamped) * layer.height,
+        0,
+        1,
+      )
+      ..rotateZ(rotation.transform(clamped))
+      ..scaleByDouble(s, s, 1, 1)
+      ..translateByDouble(-o.dx, -o.dy, 0, 1);
+  }
+
+  /// The drift with the hover swell multiplied onto it.
+  ///
+  /// CSS Transforms 2 composes the individual properties **before** the
+  /// `transform` property: `translate`, `rotate`, `scale`, then `transform`.
+  /// Only `scale` is used here, so the swell is the outer factor and the drift
+  /// the inner — which is why a hovered layer grows about its own origin
+  /// instead of about wherever the drift has carried it.
+  Matrix4 matrixFor(
+    Rect layer, {
+    required double driftT,
+    required double hoverT,
+  }) {
+    final Offset o = _originIn(layer);
+    final double swell = _swellAt(hoverT);
+    return Matrix4.identity()
+      ..translateByDouble(o.dx, o.dy, 0, 1)
+      ..scaleByDouble(swell, swell, 1, 1)
+      ..translateByDouble(-o.dx, -o.dy, 0, 1)
+      ..multiply(driftMatrix(layer, driftT));
+  }
+
+  /// The frame a `prefers-reduced-motion` browser settles on — the element's
+  /// **resting style**, which is `transform: none`, with the hover swell still
+  /// applied because a transition is collapsed rather than removed.
+  ///
+  /// Deliberately not `driftMatrix(layer, 0)`. The blanket rule (globals.css
+  /// L2534–2542) collapses `animation-duration` to 0.01ms and
+  /// `animation-iteration-count` to 1, so both animations *finish* rather than
+  /// freeze; neither declares an `animation-fill-mode`, so what is left is the
+  /// element's own `transform`, which the utility never sets. For [deep] that
+  /// happens to equal stop 0; for [near] it does **not** — stop 0 is
+  /// `scale(1.04)` and the resting style is `scale(1)`, a 4% difference that
+  /// the reference genuinely shows between a still browser and a moving one.
+  /// This is also exactly the frame the static bloom shipped for the forms
+  /// page, so nothing that page renders moves.
+  Matrix4 restingMatrixFor(Rect layer, {required double hoverT}) {
+    final Offset o = _originIn(layer);
+    final double swell = _swellAt(hoverT);
+    return Matrix4.identity()
+      ..translateByDouble(o.dx, o.dy, 0, 1)
+      ..scaleByDouble(swell, swell, 1, 1)
+      ..translateByDouble(-o.dx, -o.dy, 0, 1);
+  }
+
+  Offset _originIn(Rect layer) => Offset(
+        layer.left + layer.width * originX,
+        layer.top + layer.height * originY,
+      );
+
+  /// `1` at rest, [hoverScale] held, on `--ease-out` over `--duration-bloom`.
+  double _swellAt(double hoverT) =>
+      1 + (hoverScale - 1) * DsCurves.out.transform(hoverT.clamp(0.0, 1.0));
+
+  static double _readX(DsBloomDriftStop s) => s.translate.dx;
+  static double _readY(DsBloomDriftStop s) => s.translate.dy;
+  static double _readScale(DsBloomDriftStop s) => s.scale;
+  static double _readRadians(DsBloomDriftStop s) => s.degrees * math.pi / 180;
+
+  static Animatable<double> _track(
+    List<DsBloomDriftStop> stops,
+    double Function(DsBloomDriftStop) read,
+  ) =>
+      DsKeyframes.doubles(
+        <DsKeyframeStop<double>>[
+          for (final DsBloomDriftStop stop in stops)
+            DsKeyframeStop<double>(stop.percent, read(stop)),
+        ],
+        curve: DsCurves.inOut,
+      );
+}
+
 // ── Hue resolvers ───────────────────────────────────────────────────────────
 // Named functions rather than closures, so each named constructor below reads
 // as the `[--bloom-1: …] [--bloom-2: …]` pair it transcribes. The shape mirrors
@@ -154,10 +390,15 @@ Color _warning(DsThemeData t) => DsPalette.warning;
 Color _info(DsThemeData t) => DsPalette.info;
 Color _destructive(DsThemeData t) => t.destructive;
 
-/// The three working colours a bloom resolves to, for one theme and one pair.
+/// The three working colours a bloom resolves to, for one theme and one pair,
+/// plus the two things the theme's blend split decides.
+///
+/// Public because it is the whole derivation in one object: a probe that wants
+/// to check `--bloom-hot` against a measured hex should not have to rasterise a
+/// gradient to reach it.
 @immutable
-class _BloomInk {
-  const _BloomInk({
+class DsBloomInk {
+  const DsBloomInk({
     required this.core,
     required this.glow,
     required this.hot,
@@ -184,7 +425,7 @@ class _BloomInk {
 
   @override
   bool operator ==(Object other) =>
-      other is _BloomInk &&
+      other is DsBloomInk &&
       other.core == core &&
       other.glow == glow &&
       other.hot == hot &&
@@ -196,12 +437,24 @@ class _BloomInk {
   int get hashCode => Object.hash(core, glow, hot, voidInk, opacity, blend);
 }
 
-/// Paints `bloom-cosmic` behind [child].
+/// Paints `bloom-cosmic` behind [child], and hangs `.starfield` over it.
 ///
 /// Mount it inside whatever draws the surface's border — the CSS clips both
 /// layers to the padding box — and give it the surface's own [fill], which the
 /// blend composites against.
-class DsBloomCosmic extends StatelessWidget {
+///
+/// **Stateful** (supervisor ruling F1): four infinite drifts and a hover swell
+/// need clocks. It carries three controllers — deep, near, and one hover that
+/// times both the bloom's `scale` and the starfield's `translate`/`scale`,
+/// because one `--duration-bloom` declaration times all of them.
+///
+/// The [MouseRegion] is on this widget rather than on the Alert or the toast
+/// for a reason worth stating: the CSS `:hover` is on the `.bloom-cosmic`
+/// element itself, and this widget's box is that element's **padding** box. A
+/// host's 1px border is therefore outside this hover where CSS counts it
+/// inside — one pixel of lag on a 1000ms transition, recorded rather than
+/// worked around.
+class DsBloomCosmic extends StatefulWidget {
   /// An arbitrary pair, for a caller that is transcribing a declaration this
   /// file has no named constructor for.
   const DsBloomCosmic({
@@ -211,6 +464,7 @@ class DsBloomCosmic extends StatelessWidget {
     required this.radius,
     required this.fill,
     required this.child,
+    this.starfield = true,
   });
 
   /// The utility's own defaults — `--bloom-1: var(--color-action-bright)`,
@@ -220,6 +474,7 @@ class DsBloomCosmic extends StatelessWidget {
     required this.radius,
     required this.fill,
     required this.child,
+    this.starfield = true,
   })  : bloom1 = _actionBright,
         bloom2 = _action;
 
@@ -230,6 +485,7 @@ class DsBloomCosmic extends StatelessWidget {
     required this.radius,
     required this.fill,
     required this.child,
+    this.starfield = true,
   })  : bloom1 = _destructive,
         bloom2 = _action;
 
@@ -240,6 +496,7 @@ class DsBloomCosmic extends StatelessWidget {
     required this.radius,
     required this.fill,
     required this.child,
+    this.starfield = true,
   })  : bloom1 = _success,
         bloom2 = _value;
 
@@ -256,6 +513,7 @@ class DsBloomCosmic extends StatelessWidget {
     required this.radius,
     required this.fill,
     required this.child,
+    this.starfield = true,
   })  : bloom1 = _warning,
         bloom2 = _action;
 
@@ -266,6 +524,7 @@ class DsBloomCosmic extends StatelessWidget {
     required this.radius,
     required this.fill,
     required this.child,
+    this.starfield = true,
   })  : bloom1 = _info,
         bloom2 = _action;
 
@@ -280,6 +539,7 @@ class DsBloomCosmic extends StatelessWidget {
     required this.radius,
     required this.fill,
     required this.child,
+    this.starfield = true,
   })  : bloom1 = _valueBright,
         bloom2 = _valueDark;
 
@@ -290,6 +550,7 @@ class DsBloomCosmic extends StatelessWidget {
     required this.radius,
     required this.fill,
     required this.child,
+    this.starfield = true,
   })  : bloom1 = _actionBright,
         bloom2 = _value;
 
@@ -311,6 +572,19 @@ class DsBloomCosmic extends StatelessWidget {
 
   final Widget child;
 
+  /// Whether `.starfield` hangs over the two bloom layers.
+  ///
+  /// True for both hosts the reference has, and by two different mechanisms:
+  /// the Alert writes the span itself (`alert.tsx` L85) and every toast is
+  /// caught by `.bloom-cosmic [data-content]::before`. Mounting it here rather
+  /// than in either component is what makes the toast's measured accident come
+  /// out right — `[data-content]` is unpositioned, so its pseudo-elements'
+  /// `inset: 0` resolves against the toast, which is this widget's box.
+  ///
+  /// A parameter rather than a constant because a third host would be opting
+  /// *in* to sparkles, and that should be a decision someone writes down.
+  final bool starfield;
+
   /// `mix-blend-mode` — `screen` on `.dark`, `multiply` on `:root`/`.light`
   /// (globals.css L3235–3245). The same split `sheen-action` carries, and the
   /// reason the ramps end on `--bloom-void`: white and black are the two
@@ -322,63 +596,248 @@ class DsBloomCosmic extends StatelessWidget {
 
   /// `--bloom-void` — `white` on light, `black` on dark.
   ///
-  /// Spelled as the two ends of the lightness axis rather than as an ARGB
-  /// literal: CSS `white` *is* `hsl(0 0% 100%)`, and this file states no
-  /// colour of its own.
+  /// A thin reader over [DsThemeData.bloomVoid], kept because half the callers
+  /// of this file hold a [DsThemeKind] and not a whole theme, and because the
+  /// name says which custom property is being asked for.
   static Color voidFor(DsThemeKind kind) => switch (kind) {
-        DsThemeKind.light => dsHsl(0, 0, 100),
-        DsThemeKind.dark => dsHsl(0, 0, 0),
+        DsThemeKind.light => DsThemeData.light.bloomVoid,
+        DsThemeKind.dark => DsThemeData.dark.bloomVoid,
       };
 
-  _BloomInk _ink(DsThemeData theme) {
-    final bool light = theme.kind == DsThemeKind.light;
-    final double l = light ? _lightL : _darkL;
-    final double c = light ? _lightC : _darkC;
-    final double lift = light ? _lightLift : _darkLift;
-    final double hotC = light ? _lightHotC : _darkHotC;
+  /// One pseudo-element's box on a host padding box of [box].
+  ///
+  /// Exposed because the two `min()` caps are the entire reason the effect
+  /// works on two hosts of wildly different widths, and no widget assertion can
+  /// reach them: `min(95%, 26rem)` and `min(86%, 21rem)` mean the corner light
+  /// is roughly the same **physical** size on a 356px toast and a 1030px Alert.
+  /// Both caps bite on the Alert; neither bites on the toast. A port that used
+  /// a bare 95%/86% would flood the Alert, and this is the pin that would fail.
+  @visibleForTesting
+  static Rect layerRectFor(Rect box, {required bool deep}) => deep
+      ? _BloomPainter._layerRect(
+          box,
+          insetY: _deepInsetY,
+          insetRight: _deepInsetRight,
+          widthFraction: _deepWidthFraction,
+          widthCap: _deepWidthCap,
+        )
+      : _BloomPainter._layerRect(
+          box,
+          insetY: _nearInsetY,
+          insetRight: _nearInsetRight,
+          widthFraction: _nearWidthFraction,
+          widthCap: _nearWidthCap,
+        );
 
+  /// `--bloom-core` / `--bloom-glow` / `--bloom-hot`, resolved for [theme] and
+  /// this host's own pair.
+  ///
+  /// The three relative-OKLCH derivations, and the reason they are not theme
+  /// fields: each reads `--bloom-1` or `--bloom-2`, which exist only on the
+  /// host element. The four scalars they multiply by *are* theme fields.
+  ///
+  /// Exposed rather than private so a probe can assert the derivation against
+  /// the map's measured hexes without rasterising anything.
+  @visibleForTesting
+  DsBloomInk inkFor(DsThemeData theme) {
     Color relit(Color source) {
       final ({double l, double c, double h}) from = DsOklab.toOklch(source);
-      return DsOklab.fromOklch(from.l * l, from.c * c, from.h);
+      return DsOklab.fromOklch(
+        from.l * theme.bloomL,
+        from.c * theme.bloomC,
+        from.h,
+      );
     }
 
     final Color core = relit(bloom2(theme));
     final ({double l, double c, double h}) coreLch = DsOklab.toOklch(core);
 
-    return _BloomInk(
+    return DsBloomInk(
       core: core,
       glow: relit(bloom1(theme)),
       // `calc(l + (1 - l) * var(--bloom-lift))` on the core's own lightness.
       hot: DsOklab.fromOklch(
-        coreLch.l + (1 - coreLch.l) * lift,
-        coreLch.c * hotC,
+        coreLch.l + (1 - coreLch.l) * theme.bloomLift,
+        coreLch.c * theme.bloomHotC,
         coreLch.h,
       ),
-      voidInk: voidFor(theme.kind),
-      opacity: light ? _lightOpacity : _darkOpacity,
+      voidInk: theme.bloomVoid,
+      opacity:
+          theme.kind == DsThemeKind.light ? _lightOpacity : _darkOpacity,
       blend: blendFor(theme.kind),
     );
   }
 
   @override
+  State<DsBloomCosmic> createState() => _DsBloomCosmicState();
+}
+
+class _DsBloomCosmicState extends State<DsBloomCosmic>
+    with TickerProviderStateMixin {
+  /// The two drifts. The durations named here are placeholders for the first
+  /// frame only — [build] re-reads both through [dsAnimationDuration] on every
+  /// pass, the way `DsSpinner` and `DsKeyframePlayer` do.
+  late final AnimationController _deep = AnimationController(
+    vsync: this,
+    duration: DsBloomDrift.deep.duration,
+  );
+  late final AnimationController _near = AnimationController(
+    vsync: this,
+    duration: DsBloomDrift.near.duration,
+  );
+
+  /// `transition: scale var(--duration-bloom) var(--ease-out)` — one clock for
+  /// both pseudo-elements *and* for the starfield's two clusters, because one
+  /// declaration times all four.
+  late final AnimationController _hover = AnimationController(
+    vsync: this,
+    duration: DsDurations.bloom,
+  );
+
+  /// Null until the first resolution, so a MediaQuery change that is *not* a
+  /// reduced-motion change does not restart the drifts.
+  bool? _stilled;
+
+  bool _hovered = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final bool stilled =
+        dsAnimationDuration(context, DsBloomDrift.deep.duration) ==
+            Duration.zero;
+    if (_stilled == stilled) return;
+    _stilled = stilled;
+    _play();
+  }
+
+  @override
+  void dispose() {
+    _deep.dispose();
+    _near.dispose();
+    _hover.dispose();
+    super.dispose();
+  }
+
+  /// Supervisor ruling F2: both loopers build in full, and `dsAnimationDuration`
+  /// is the only gate. No out-of-view pause — the reference has none.
+  void _play() {
+    if (_stilled ?? false) {
+      _deep.stop();
+      _near.stop();
+      return;
+    }
+    // `infinite alternate`: the clock runs 0→1→0 forever, and the keyframe
+    // easing lives in the tracks, so nothing is eased twice.
+    _deep.repeat(reverse: true);
+    _near.repeat(reverse: true);
+  }
+
+  void _setHovered(bool hovered) {
+    if (_hovered == hovered) return;
+    setState(() => _hovered = hovered);
+    if (hovered) {
+      _hover.forward();
+    } else {
+      _hover.reverse();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final DsThemeData theme = DsTheme.of(context);
-    return ClipRRect(
-      // `overflow: hidden` — *"the bloom needs something to clip against."*
-      borderRadius: radius,
-      child: CustomPaint(
-        painter: _BloomPainter(fill: fill, ink: _ink(theme)),
-        child: child,
+    final bool stilled = _stilled ?? false;
+    _deep.duration =
+        dsAnimationDuration(context, DsBloomDrift.deep.duration);
+    _near.duration =
+        dsAnimationDuration(context, DsBloomDrift.near.duration);
+    _hover.duration = dsAnimationDuration(context, DsDurations.bloom);
+
+    Widget content = widget.child;
+    if (widget.starfield) {
+      content = Stack(
+        // The incoming constraints reach the content unchanged: a bloom on a
+        // `w-full` Alert is handed a tight width, and `StackFit.loose` would
+        // hand the column a loose one and collapse the surface onto its text.
+        fit: StackFit.passthrough,
+        children: <Widget>[
+          // `position: absolute; inset: 0`. First in the list, so it paints
+          // UNDER the content — which is the reference's own order: the
+          // `alert-stars` span precedes the children in the DOM and both sit at
+          // `z-index: 1`.
+          Positioned.fill(
+            child: DsStarfield(
+              bloom2: widget.bloom2(theme),
+              hovered: _hovered,
+            ),
+          ),
+          widget.child,
+        ],
+      );
+    }
+
+    return MouseRegion(
+      // `pointer-events` is untouched: this only watches, and `opaque: false`
+      // keeps it from claiming the region from whatever is underneath.
+      opaque: false,
+      onEnter: (PointerEnterEvent _) => _setHovered(true),
+      onExit: (PointerExitEvent _) => _setHovered(false),
+      child: ClipRRect(
+        // `overflow: hidden` — *"the bloom needs something to clip against."*
+        // It is also what keeps a layer at `scale(2.5)` inside the card.
+        borderRadius: widget.radius,
+        child: RepaintBoundary(
+          child: AnimatedBuilder(
+            animation: Listenable.merge(<Listenable>[_deep, _near, _hover]),
+            builder: (BuildContext context, Widget? child) => CustomPaint(
+              painter: _BloomPainter(
+                fill: widget.fill,
+                ink: widget.inkFor(theme),
+                deepT: _deep.value,
+                nearT: _near.value,
+                hoverT: _hover.value,
+                stilled: stilled,
+              ),
+              child: child,
+            ),
+            child: content,
+          ),
+        ),
       ),
     );
   }
 }
 
 class _BloomPainter extends CustomPainter {
-  const _BloomPainter({required this.fill, required this.ink});
+  const _BloomPainter({
+    required this.fill,
+    required this.ink,
+    required this.deepT,
+    required this.nearT,
+    required this.hoverT,
+    required this.stilled,
+  });
 
   final Color fill;
-  final _BloomInk ink;
+  final DsBloomInk ink;
+
+  /// `cosmic-drift-deep`'s linear progress.
+  final double deepT;
+
+  /// `cosmic-drift-near`'s.
+  final double nearT;
+
+  /// The hover swell's, shared by both layers.
+  final double hoverT;
+
+  /// Whether the drifts are stilled and the layers sit on their resting frame.
+  final bool stilled;
+
+  /// One layer's whole transform: the drift with the swell multiplied on, or
+  /// the resting frame with the swell alone.
+  Matrix4 _matrix(DsBloomDrift drift, Rect layer, double t) => stilled
+      ? drift.restingMatrixFor(layer, hoverT: hoverT)
+      : drift.matrixFor(layer, driftT: t, hoverT: hoverT);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -399,6 +858,12 @@ class _BloomPainter extends CustomPainter {
       widthCap: _deepWidthCap,
     );
 
+    // The element's `transform` maps its already-filtered rendering into the
+    // parent, so it goes on OUTSIDE the blurred group: a layer at `scale(1.2)`
+    // must carry a 1.2× wider halo, which is what CSS renders and what
+    // blurring after the scale would not.
+    canvas.save();
+    canvas.transform(_matrix(DsBloomDrift.deep, layer, deepT).storage);
     canvas.saveLayer(layer.inflate(_deepBlur * 3), _groupPaint(_deepBlur));
     // CSS paints the FIRST-listed background layer on top, so the two are
     // walked backwards — the same reversal `DsShadowSpec.outerShadows` makes.
@@ -427,6 +892,7 @@ class _BloomPainter extends CustomPainter {
       stops: const <double>[0, 0.54, 0.84],
     );
     canvas.restore();
+    canvas.restore();
   }
 
   /// `::after` — three gradients under one radial mask, `blur(10px)`, at the
@@ -440,6 +906,8 @@ class _BloomPainter extends CustomPainter {
       widthCap: _nearWidthCap,
     );
 
+    canvas.save();
+    canvas.transform(_matrix(DsBloomDrift.near, layer, nearT).storage);
     canvas.saveLayer(layer.inflate(_nearBlur * 3), _groupPaint(_nearBlur));
     // `mask-image` applies to the finished background stack, so the three
     // layers composite among themselves inside their own group first.
@@ -511,6 +979,7 @@ class _BloomPainter extends CustomPainter {
     );
     canvas.restore();
     canvas.restore();
+    canvas.restore();
   }
 
   /// A pseudo-element's `filter`, `opacity` and `mix-blend-mode`, as the paint
@@ -572,7 +1041,12 @@ class _BloomPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_BloomPainter old) =>
-      old.fill != fill || old.ink != ink;
+      old.fill != fill ||
+      old.ink != ink ||
+      old.deepT != deepT ||
+      old.nearT != nearT ||
+      old.hoverT != hoverT ||
+      old.stilled != stilled;
 }
 
 /// CSS `radial-gradient(<rx> <ry> at <cx> <cy>, …)`, every value a fraction of
