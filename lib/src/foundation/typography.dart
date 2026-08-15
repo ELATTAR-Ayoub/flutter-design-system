@@ -438,6 +438,71 @@ class DsComponentType {
     wght: 500,
   );
 
+  // ── the menu family ─────────────────────────────────────────────────────
+  // `select.tsx`, `combobox.tsx` and `command.tsx` all type their group labels
+  // and their metadata column out of `text-xs` — the 12px rung that
+  // `--text-xs: var(--text-num-sm)` repoints, carrying Tailwind's own
+  // `--text-xs--line-height: calc(1 / .75)` and therefore a 16px line box.
+  //
+  // Ruling L8: these are component roles, not a new `DsType` rung. The port has
+  // no 12px sans class at all — `DsType.numSm` is mono, and the three existing
+  // 12px component roles ([buttonLabelXs], [buttonLabelCaps], [kbdKey]) all
+  // declare a weight the menu family does not.
+  //
+  // selects-map drift 6 records that the same role is written three ways
+  // across the three primitives — `SelectLabel` `px-3 py-2` at weight 400,
+  // `ComboboxLabel` `px-2 py-1.5` at 400, `CommandGroup`'s heading `px-3 py-2`
+  // at **500**. Only the padding differs between the first two, which is box
+  // geometry and belongs to the components; the type is one spec. The
+  // heading's weight-500 variant is a **fourth** spec and is deliberately not
+  // added here — `command.tsx` is a later wave's file, and a spec with no
+  // consumer is a guess.
+
+  /// `SelectLabel`'s `px-3 py-2 text-xs text-muted-foreground`
+  /// (`components/ui/select.tsx:101`) — and `ComboboxLabel`'s `text-xs` with
+  /// it.
+  ///
+  /// **12px, weight 400** — there is no `font-*` class in either list, so it
+  /// inherits `html`'s 400, which is what separates this from [kbdKey] and
+  /// [buttonLabelXs] at the same size. `text-xs`'s companion leading key
+  /// survives the repoint exactly as `text-sm`'s does ([buttonLabel] carries
+  /// that measurement), so the line box is `calc(1 / .75) × 12` = **16px** and
+  /// a label row with `py-2` is **32px** tall — the step the item-aligned
+  /// placement counts in beside a 34.571px item.
+  ///
+  /// The colour is not recorded here: `text-muted-foreground` is a utility on
+  /// the element, not a declaration the class makes about itself, and the
+  /// widget passes it — the same division [DsInputGroupText] follows.
+  static final DsTypeSpec menuLabel = DsTypeSpec(
+    family: DsFonts.sans,
+    size: 12,
+    height: _leadingXs,
+    wght: 400,
+  );
+
+  /// `CommandShortcut`'s `ml-auto text-xs tracking-widest text-muted-foreground`
+  /// (`components/ui/command.tsx:178`) — [menuLabel] plus `--tracking-widest`.
+  ///
+  /// **0.1em** *(measured, the production stylesheet at byte 3532:
+  /// `--tracking-widest: .1em`)*, which is the widest tracking anywhere in the
+  /// system and the only positive one outside `--tracking-cta`.
+  ///
+  /// It is **sans**, not mono, and that is selects-map drift 4: the palette
+  /// renders `$48.00` and `$120.00` through this class while the same page's
+  /// own Do 5 says *"render dates and prices with the named numerical
+  /// typography foundation"*. Reproduce it as written.
+  ///
+  /// Declared this wave although its consumer arrives with `command.dart`:
+  /// this file has one writer per wave, and a shortcut column typed by hand at
+  /// the call site would put `fontSize:` in a component the guard scans.
+  static final DsTypeSpec menuShortcut = DsTypeSpec(
+    family: DsFonts.sans,
+    size: 12,
+    height: _leadingXs,
+    wght: 400,
+    tracking: 0.1,
+  );
+
   /// `SheetContent`'s `text-sm`, with no `font-weight` of its own — so it
   /// inherits `html`'s 400.
   ///

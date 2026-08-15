@@ -1,10 +1,10 @@
 /// `components/ui/select.tsx` — a pill trigger over a socket, and a popover
 /// that does not animate.
 ///
-/// Scope, per supervisor ruling F1: **the fidelity the forms page renders** —
-/// a working menu with a keyboard, at the trigger, content and item geometry
-/// below. The full variant matrix (groups, labels, separators, the two scroll
-/// buttons, `position="popper"`) belongs to the `selects` page.
+/// Phase 3 built this to *"the fidelity the forms page renders"* and named the
+/// `selects` page as the owner of the rest. **That promise is now discharged**:
+/// all ten `select.tsx` exports are reachable from here. What arrived with the
+/// selects page is marked NEW below.
 ///
 /// | part | class | value |
 /// |---|---|---|
@@ -16,11 +16,16 @@
 /// | | `aria-invalid:border-destructive aria-invalid:ring-3 ring-destructive/20` | and it beats focus |
 /// | | `data-placeholder:text-muted-foreground` | — |
 /// | | chevron | `size-4 text-muted-foreground` |
+/// | | NEW `className="w-40"` | an explicit [DsSelect.width] — see the ruling below |
 /// | content | `min-w-36 rounded-lg bg-popover shadow-md ring-1 ring-foreground/10` | 144, 12px, Tailwind's stock elevation |
 /// | viewport | `p-2` | 8 |
 /// | item | `py-2 pr-9 pl-3 rounded-md gap-2 text-sm` | 8 / 36 / 12, 10px |
 /// | | `focus:bg-accent focus:text-accent-foreground` | the highlighted row |
 /// | indicator | `absolute right-3 size-4` | a 16px tick, 12px in |
+/// | NEW label | `px-3 py-2 text-xs text-muted-foreground` | 12px/400 in a 16px line box → a **32px** row |
+/// | NEW group | `scroll-my-2` | 8px of scroll margin; it paints nothing |
+/// | NEW separator | `-mx-2 my-2 h-px bg-border` | a 1px rule at the **full content width**, 8px of air each side → **17px** |
+/// | NEW scroll buttons | `flex items-center justify-center bg-popover py-2` + a 16px chevron | **32px**, opaque, one at each end of the viewport |
 ///
 /// **The popover does not animate** (forms-map drift 10). `SelectContent`
 /// ships a full `animate-in / fade-in-0 / zoom-in-95 / slide-in-from-*` set and
@@ -28,28 +33,49 @@
 /// `position` defaults to `"item-aligned"` and the page passes none. The four
 /// `translate-*` nudges are `data-[position=popper]`-only and inert for the
 /// same reason. What renders is a menu that simply appears; that is what is
-/// ported.
+/// ported. Its counterexample now sits in the same package: `DsPopover` and
+/// `DsCombobox` run the identical class set at 320ms (selects-map drift 9).
 ///
 /// **`item-aligned`** is what that default *does*: the content is placed so the
 /// chosen row sits over the trigger, the way a native `<select>` opens. With
 /// nothing chosen the first row takes that place.
 ///
-/// DOCUMENTED DRIFT (forms-map drift 11): the trigger's own `w-fit` never
-/// applies on the forms page — the vertical `Field`'s `*:w-full` is emitted
-/// later at equal specificity and wins, so the trigger renders at the full
-/// 448px field width. Both behaviours are reachable: [DsSelect.expand] false is
-/// the class, true is the cascade.
+/// Phase 3 computed that placement as `ds(2) + (index + 0.5) × itemHeight`,
+/// which is only true of a menu whose rows are all items. The selects page's
+/// first menu is a label, three items, a separator, a second label and two more
+/// items, and its chosen row sits **40px** into the content rather than 17.3
+/// (selects-map §4.2). The arithmetic is therefore a running offset over the
+/// real flattened list — [DsSelectGroup] and [DsSelectSeparator] contribute
+/// their own heights to it — and every row kind states its height as a static
+/// on [DsSelect] so a test can pin the sum rather than a magic number.
 ///
-/// DOCUMENTED DRIFT (forms-map drift 17): `Select` is the only control on the
-/// page with `dark:` variants — its dark resting fill is `--input` at 30%, not
-/// `--card` like every sibling, and it is the only control anywhere in the form
-/// that authors a hover state at all (`dark:hover:bg-input/50`). Light mode has
-/// no hover feedback on any control.
+/// DOCUMENTED DRIFT (forms-map drift 11, selects-map drift 10): the trigger's
+/// own `w-fit` never applies on either page — on the forms page the vertical
+/// `Field`'s `*:w-full` is emitted later at equal specificity and wins; in the
+/// selects page's state cells `w-40` kills it through twMerge before CSS is
+/// consulted. All three widths are reachable here: [DsSelect.expand] false is
+/// the class, true is the cascade, and [DsSelect.width] is the utility that
+/// beats both — ruling L4 keeps `expand` rather than replacing a documented
+/// switch with an enum.
 ///
-/// DOCUMENTED DRIFT (forms-map drift 16): `shadow-md` is Tailwind's stock
-/// elevation, the only one on the page outside the `--shadow-*` set — fixed
-/// black at 10% under a popover whose fill flips with the theme.
+/// DOCUMENTED DRIFT (forms-map drift 17, selects-map drift 19): `Select`'s dark
+/// resting fill is `--input` at 30%, not `--card` like its siblings, and it
+/// authors the only hover state in the family (`dark:hover:bg-input/50`). Light
+/// mode has no hover feedback on any control. It is no longer *the only*
+/// control with `dark:` variants — `DsNativeSelect` carries the same four.
+///
+/// DOCUMENTED DRIFT (forms-map drift 16, selects-map drift 11): `shadow-md` is
+/// Tailwind's stock elevation, fixed black at 10% under a popover whose fill
+/// flips with the theme. It now carries all three overlays on the selects page,
+/// which is why the recipe moved to [DsPopoverSurface].
+///
+/// DOCUMENTED PARITY (ruling L5, selects-map drift 18): the "Disabled" state
+/// cell ships an empty `<SelectContent />` behind a trigger that cannot open
+/// it. [_openMenu] early-returns on a menu with no selectable row, so nothing
+/// opens — which is the reference's own answer, reached from the other side.
 library;
+
+import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -65,6 +91,7 @@ import 'button.dart';
 import 'field.dart';
 import 'icon.dart';
 import 'icon_paths.dart';
+import 'popover.dart';
 
 /// `focus-visible:ring-ring/50`.
 const double _focusRingAlpha = 0.50;
@@ -84,9 +111,6 @@ const double _disabledOpacity = 0.50;
 const double _darkFillAlpha = 0.30;
 const double _darkHoverFillAlpha = 0.50;
 
-/// `ring-1 ring-foreground/10` on the content.
-const double _contentRingAlpha = 0.10;
-
 /// `min-w-36`.
 double get _contentMinWidth => ds(36);
 
@@ -94,6 +118,14 @@ double get _contentMinWidth => ds(36);
 /// back — `--radix-select-content-available-height` reserves the same margin
 /// that `collisionPadding` defaults to in Radix.
 double get _viewportMargin => ds(2);
+
+/// How often a hovered scroll button advances the viewport.
+///
+/// `SelectScrollButtonImpl` starts a `window.setInterval(onAutoScroll, 50)` on
+/// `pointerMove` and clears it on `pointerLeave`; each tick scrolls by one
+/// item's height. A dependency's own timer, not a `--duration-*` token.
+const Duration _autoScrollTick =
+    Duration(milliseconds: 50); // allow-hardcoded: Radix's own scroll interval
 
 /// The two rungs of `data-size` on the trigger.
 enum DsSelectSize {
@@ -111,9 +143,20 @@ enum DsSelectSize {
   double get height => this == DsSelectSize.md ? ds(10) : ds(8);
 }
 
+/// Anything that can sit directly inside a `SelectContent`.
+///
+/// The reference's content is a child list, not an array of options: the
+/// selects page writes `<SelectGroup>`, `<SelectSeparator />` and
+/// `<SelectItem>` as siblings, and the item-aligned placement has to count all
+/// three. Modelling it as one sealed family is what lets [DsSelect] walk the
+/// list once and get both the geometry and the keyboard order out of it.
+sealed class DsSelectChild<T> {
+  const DsSelectChild();
+}
+
 /// One `SelectItem`.
 @immutable
-class DsSelectOption<T> {
+class DsSelectOption<T> extends DsSelectChild<T> {
   const DsSelectOption({
     required this.value,
     required this.label,
@@ -129,6 +172,40 @@ class DsSelectOption<T> {
   final bool enabled;
 }
 
+/// `SelectGroup` + the `SelectLabel` inside it (`select.tsx:16`, `:94`).
+///
+/// The two are one type here because the reference never separates them on this
+/// page: every `SelectGroup` opens with a `SelectLabel`, and a label outside a
+/// group would be a `<div>` in a listbox with nothing to name. The group itself
+/// paints nothing — its whole class list is `scroll-my-2`, an 8px scroll margin
+/// that only `scrollIntoView` reads, which is why [DsSelect] applies it when
+/// the keyboard walks into a grouped row and nowhere else.
+@immutable
+class DsSelectGroup<T> extends DsSelectChild<T> {
+  const DsSelectGroup({this.label, required this.children});
+
+  /// The `SelectLabel`'s text. Null renders a group with no label — legal in
+  /// the primitive, unused on the page.
+  final String? label;
+
+  final List<DsSelectOption<T>> children;
+}
+
+/// `SelectSeparator` (`select.tsx:131`) — `pointer-events-none -mx-2 my-2 h-px
+/// bg-border`.
+///
+/// `-mx-2` cancels the viewport's `p-2`, so the rule runs the **full content
+/// width** rather than the padded one; `my-2` puts 8px of air on each side. A
+/// 1px line that occupies 17px, and the reason `(index + 0.5) × itemHeight` was
+/// never going to survive this page.
+///
+/// It carries no value, so its element type is [Never] — which is what makes
+/// one `const DsSelectSeparator()` legal inside a list of options of any type.
+@immutable
+class DsSelectSeparator extends DsSelectChild<Never> {
+  const DsSelectSeparator();
+}
+
 /// A select with a real menu.
 class DsSelect<T> extends StatefulWidget {
   const DsSelect({
@@ -141,12 +218,19 @@ class DsSelect<T> extends StatefulWidget {
     this.enabled = true,
     this.invalid = false,
     this.expand = false,
+    this.width,
     this.focusNode,
     this.label,
     this.hint,
   });
 
-  final List<DsSelectOption<T>> options;
+  /// `SelectContent`'s children — items, groups and separators.
+  ///
+  /// Kept under the name `options` through the widening from
+  /// `List<DsSelectOption<T>>`: a flat list of items is still the common call
+  /// and still compiles unchanged, because a `List<DsSelectOption<T>>` is a
+  /// `List<DsSelectChild<T>>`.
+  final List<DsSelectChild<T>> options;
 
   /// `value` — `null` renders [placeholder] under
   /// `data-placeholder:text-muted-foreground`.
@@ -171,6 +255,16 @@ class DsSelect<T> extends StatefulWidget {
   /// this library.
   final bool expand;
 
+  /// A `w-*` utility on the trigger — the selects page's three state cells pass
+  /// `w-40`, which twMerge resolves against `w-fit` before CSS is consulted.
+  ///
+  /// Ruling L4: this is added **beside** [expand] rather than replacing it with
+  /// a width enum. `expand` names a documented cascade that a shipped test
+  /// pins; a number is a third case, not a third name for the same one. When
+  /// both are given, this wins — which is what twMerge does to `w-fit` and what
+  /// an explicit width does to `*:w-full`.
+  final double? width;
+
   /// A [DsFieldScope]'s node wins over the owned one and loses to this.
   ///
   /// `FormControl` wraps the **trigger**, not the `Select` — *"the trigger is
@@ -179,6 +273,9 @@ class DsSelect<T> extends StatefulWidget {
   final FocusNode? focusNode;
 
   /// The accessible name.
+  ///
+  /// The selects page is the first consumer: its three state-cell triggers
+  /// carry `aria-label` and no visible label at all.
   final String? label;
 
   /// `aria-describedby`, resolved: description, then error message.
@@ -195,6 +292,24 @@ class DsSelect<T> extends StatefulWidget {
     final DsTypeSpec spec = DsComponentType.sheetBody;
     return (spec.size ?? 0) * (spec.height ?? 1) + ds(2) * 2;
   }
+
+  /// `SelectLabel`'s `px-3 py-2 text-xs` — 12px in a 16px line box, so **32**.
+  ///
+  /// Derived from [DsComponentType.menuLabel] for the same reason [itemHeight]
+  /// is derived from `sheetBody`: the placement counts this height before the
+  /// row exists.
+  static double get labelHeight {
+    final DsTypeSpec spec = DsComponentType.menuLabel;
+    return (spec.size ?? 0) * (spec.height ?? 1) + ds(2) * 2;
+  }
+
+  /// `SelectSeparator`'s `my-2 h-px` — 8 + 1 + 8 = **17**.
+  static double get separatorHeight => DsWidths.hairline + ds(2) * 2;
+
+  /// `SelectScrollUpButton` / `SelectScrollDownButton` — `py-2` around a 16px
+  /// chevron, so **32** each.
+  static double get scrollButtonHeight =>
+      DsIcon.pxFor(DsIconSize.md) + ds(2) * 2;
 
   @override
   State<DsSelect<T>> createState() => _DsSelectState<T>();
@@ -242,6 +357,17 @@ class _DsSelectState<T> extends State<DsSelect<T>> {
   /// or the first when nothing is chosen.
   int _highlighted = 0;
 
+  /// The flattened child list, kept until the caller passes a different one.
+  _MenuGeometry<T>? _cachedMenu;
+
+  _MenuGeometry<T> get _menu => _cachedMenu ??= _MenuGeometry<T>(widget.options);
+
+  @override
+  void didUpdateWidget(DsSelect<T> old) {
+    super.didUpdateWidget(old);
+    if (!identical(old.options, widget.options)) _cachedMenu = null;
+  }
+
   bool get _enabled => _fieldEnabled && widget.onChanged != null;
   bool get _open => _entry != null;
 
@@ -254,13 +380,16 @@ class _DsSelectState<T> extends State<DsSelect<T>> {
   }
 
   int get _selectedIndex {
-    final int i = widget.options
+    final int i = _menu.options
         .indexWhere((DsSelectOption<T> o) => o.value == widget.value);
     return i < 0 ? 0 : i;
   }
 
   void _openMenu() {
-    if (_open || !_enabled || widget.options.isEmpty) return;
+    // Ruling L5: an empty `<SelectContent />` opens nothing. A content holding
+    // only labels and rules has nothing to choose either, so the guard is on
+    // the selectable rows rather than on the child list.
+    if (_open || !_enabled || _menu.options.isEmpty) return;
     final OverlayState? overlay = Overlay.maybeOf(context);
     final RenderObject? box = overlay?.context.findRenderObject();
     if (overlay == null || box is! RenderBox) return;
@@ -280,7 +409,7 @@ class _DsSelectState<T> extends State<DsSelect<T>> {
   }
 
   void _commit(int index) {
-    final DsSelectOption<T> option = widget.options[index];
+    final DsSelectOption<T> option = _menu.options[index];
     if (!option.enabled) return;
     _closeMenu();
     widget.onChanged?.call(option.value);
@@ -288,11 +417,11 @@ class _DsSelectState<T> extends State<DsSelect<T>> {
 
   /// Walks to the next enabled row, wrapping the way Radix's menu does.
   void _move(int step) {
-    final int count = widget.options.length;
+    final int count = _menu.options.length;
     int next = _highlighted;
     for (int i = 0; i < count; i++) {
       next = (next + step + count) % count;
-      if (widget.options[next].enabled) break;
+      if (_menu.options[next].enabled) break;
     }
     if (next == _highlighted) return;
     _highlighted = next;
@@ -324,7 +453,7 @@ class _DsSelectState<T> extends State<DsSelect<T>> {
         _highlighted = -1;
         _move(1);
       case LogicalKeyboardKey.end:
-        _highlighted = widget.options.length;
+        _highlighted = _menu.options.length;
         _move(-1);
       case LogicalKeyboardKey.enter:
       case LogicalKeyboardKey.numpadEnter:
@@ -385,12 +514,16 @@ class _DsSelectState<T> extends State<DsSelect<T>> {
 
     DsSelectOption<T>? chosen;
     if (widget.value != null) {
-      for (final DsSelectOption<T> option in widget.options) {
+      for (final DsSelectOption<T> option in _menu.options) {
         if (option.value != widget.value) continue;
         chosen = option;
         break;
       }
     }
+
+    // `w-fit` unless something beats it: an explicit `w-40` first, then the
+    // vertical field's `*:w-full`.
+    final bool fills = widget.width != null || widget.expand;
 
     Widget trigger = TweenAnimationBuilder<Color?>(
       tween: ColorTween(end: _triggerFill(theme)),
@@ -427,7 +560,7 @@ class _DsSelectState<T> extends State<DsSelect<T>> {
       ),
       child: Row(
         // `justify-between` — the value takes the room, the chevron sits out.
-        mainAxisSize: widget.expand ? MainAxisSize.max : MainAxisSize.min,
+        mainAxisSize: fills ? MainAxisSize.max : MainAxisSize.min,
         children: <Widget>[
           Flexible(
             child: DsText(
@@ -449,7 +582,7 @@ class _DsSelectState<T> extends State<DsSelect<T>> {
     trigger = SizedBox(
       key: _triggerKey,
       height: widget.size.height,
-      width: widget.expand ? double.infinity : null,
+      width: widget.width ?? (widget.expand ? double.infinity : null),
       child: trigger,
     );
 
@@ -493,10 +626,24 @@ class _DsSelectState<T> extends State<DsSelect<T>> {
   /// Where `position="item-aligned"` puts the content: the chosen row over the
   /// trigger, clamped so the menu stays on screen.
   ///
-  /// The full alignment matrix — `popper`, the six sides, `collisionPadding`,
-  /// the two scroll buttons — is the `selects` page's subject; this is the one
-  /// arrangement the forms page renders.
-  ({Offset origin, double width, double maxHeight}) _placement() {
+  /// The chosen row's centre is `ds(2) + Σ(heights of every row above it) +
+  /// itemHeight / 2` — labels and separators included, which is the whole of
+  /// selects-map §3.2 delta 5. A menu of nothing but items reduces to the
+  /// arithmetic phase 3 shipped, so the forms page does not move.
+  ///
+  /// When the box cannot go where it wants — the clamp moved it — the
+  /// **viewport** carries what is left of the alignment: it scrolls by exactly
+  /// the distance the clamp stole, capped by its own scroll extent.
+  ///
+  /// *(Measured on the live reference, 2026-08-15.)* The `s-sort` menu opened
+  /// against a trigger with 198px of room above it, wanted its top at 198.26,
+  /// was clamped to Radix's own 10px margin, and its viewport came up scrolled
+  /// by **32px** — which is its entire scroll extent (270 of content in a 238
+  /// viewport), i.e. `clamp(198.26 − 10, 0, 32)`. It also painted a scroll-up
+  /// button and no scroll-down button, at that offset. Both are reproduced.
+  /// When nothing clamps, `wanted == top` and the offset is 0, which is why the
+  /// forms page's flat menus do not move.
+  ({Offset origin, double width, double maxHeight, double scroll}) _placement() {
     final RenderBox trigger =
         _triggerKey.currentContext!.findRenderObject()! as RenderBox;
     final RenderBox overlay = _overlayBox!;
@@ -504,16 +651,14 @@ class _DsSelectState<T> extends State<DsSelect<T>> {
     final Offset topLeft =
         trigger.localToGlobal(Offset.zero, ancestor: overlay);
     final Size screen = overlay.size;
-    final double rowHeight = DsSelect.itemHeight;
 
-    // The chosen row's centre lands on the trigger's centre.
-    final double wanted = topLeft.dy +
-        trigger.size.height / 2 -
-        (ds(2) + (_selectedIndex + 0.5) * rowHeight);
+    final double triggerCentre = topLeft.dy + trigger.size.height / 2;
+    final double chosenCentre = _menu.centreOfOption(_selectedIndex);
 
-    final double height =
-        ds(2) * 2 + rowHeight * widget.options.length;
+    final double height = _menu.contentHeight;
     final double maxHeight = screen.height - _viewportMargin * 2;
+    final double wanted = triggerCentre - chosenCentre;
+
     final double top = wanted
         .clamp(_viewportMargin, (screen.height - _viewportMargin - height)
             .clamp(_viewportMargin, double.infinity))
@@ -532,12 +677,17 @@ class _DsSelectState<T> extends State<DsSelect<T>> {
       origin: Offset(topLeft.dx, top),
       width: width.clamp(0.0, screen.width).toDouble(),
       maxHeight: maxHeight,
+      // The alignment the clamp could not pay for. Never negative — a menu
+      // pushed *down* by the top margin has its chosen row below the trigger
+      // and no amount of scrolling raises it — and the scroll position clamps
+      // the far end against its own extent.
+      scroll: wanted - top < 0 ? 0 : wanted - top,
     );
   }
 
   Widget _buildMenu(BuildContext overlayContext) {
-    final DsThemeData theme = DsTheme.of(context);
-    final ({Offset origin, double width, double maxHeight}) at = _placement();
+    final ({Offset origin, double width, double maxHeight, double scroll}) at =
+        _placement();
 
     return Stack(
       children: <Widget>[
@@ -557,11 +707,11 @@ class _DsSelectState<T> extends State<DsSelect<T>> {
             child: Focus(
               autofocus: true,
               onKeyEvent: _onMenuKey,
-              child: _SelectContent<T>(
-                theme: theme,
-                options: widget.options,
+              child: DsSelectMenu<T>(
+                children: widget.options,
                 selected: widget.value,
                 highlighted: _highlighted,
+                initialScrollOffset: at.scroll,
                 onPick: _commit,
                 onHover: (int index) {
                   if (_highlighted == index) return;
@@ -577,60 +727,390 @@ class _DsSelectState<T> extends State<DsSelect<T>> {
   }
 }
 
-/// `SelectContent` + `SelectPrimitive.Viewport`.
-class _SelectContent<T> extends StatelessWidget {
-  const _SelectContent({
-    required this.theme,
-    required this.options,
+/// The open menu, flattened: every row in document order with its own height,
+/// and the running offset the item-aligned placement counts in.
+///
+/// Built once per child list and cached on the state, because it is read by the
+/// placement (before the menu exists), by the keyboard (which walks only the
+/// selectable rows) and by the scroll-into-view (which needs a row's box).
+class _MenuGeometry<T> {
+  _MenuGeometry(List<DsSelectChild<T>> children) {
+    void add(_Row<T> row) {
+      offsets.add(_height);
+      rows.add(row);
+      _height += row.height;
+    }
+
+    for (final DsSelectChild<T> child in children) {
+      switch (child) {
+        case DsSelectOption<T>():
+          _rowOfOption.add(rows.length);
+          add(_Row<T>.option(child, options.length, scrollMargin: 0));
+          options.add(child);
+        case DsSelectGroup<T>():
+          // `scroll-my-2` lives on the group, so every row inside it — the
+          // label included — carries the margin when it is scrolled to.
+          if (child.label != null) {
+            add(_Row<T>.label(child.label!, scrollMargin: ds(2)));
+          }
+          for (final DsSelectOption<T> option in child.children) {
+            _rowOfOption.add(rows.length);
+            add(_Row<T>.option(option, options.length, scrollMargin: ds(2)));
+            options.add(option);
+          }
+        case DsSelectSeparator():
+          add(_Row<T>.separator());
+      }
+    }
+  }
+
+  /// Every row that paints, in document order.
+  final List<_Row<T>> rows = <_Row<T>>[];
+
+  /// The top of each row, measured from the first row rather than from the
+  /// content box — the viewport's `p-2` is added by whoever asks.
+  final List<double> offsets = <double>[];
+
+  /// The selectable rows only: what the value, the keyboard and the tick index
+  /// into.
+  final List<DsSelectOption<T>> options = <DsSelectOption<T>>[];
+
+  final List<int> _rowOfOption = <int>[];
+
+  double _height = 0;
+
+  /// The height of the rows alone.
+  double get rowsHeight => _height;
+
+  /// `p-2` + every row + `p-2` — the menu's height when nothing caps it.
+  double get contentHeight => ds(2) * 2 + _height;
+
+  /// The distance from the content's top edge to the middle of option [i].
+  double centreOfOption(int i) =>
+      ds(2) + offsets[_rowOfOption[i]] + DsSelect.itemHeight / 2;
+
+  /// Option [i]'s box inside the scrolling viewport, `scroll-my-2` included —
+  /// what `scrollIntoView` is asked to reveal.
+  ({double top, double bottom}) scrollBoxOfOption(int i) {
+    final int row = _rowOfOption[i];
+    final double margin = rows[row].scrollMargin;
+    return (
+      top: ds(2) + offsets[row] - margin,
+      bottom: ds(2) + offsets[row] + rows[row].height + margin,
+    );
+  }
+}
+
+/// What kind of row this is, and how tall.
+enum _RowKind { option, label, separator }
+
+@immutable
+class _Row<T> {
+  const _Row._(this.kind, {this.option, this.text, this.index = -1,
+      this.scrollMargin = 0});
+
+  const _Row.option(DsSelectOption<T> option, int index,
+      {required double scrollMargin})
+      : this._(_RowKind.option,
+            option: option, index: index, scrollMargin: scrollMargin);
+
+  const _Row.label(String text, {required double scrollMargin})
+      : this._(_RowKind.label, text: text, scrollMargin: scrollMargin);
+
+  const _Row.separator() : this._(_RowKind.separator);
+
+  final _RowKind kind;
+  final DsSelectOption<T>? option;
+  final String? text;
+
+  /// Into [_MenuGeometry.options], or −1 for a row that cannot be chosen.
+  final int index;
+
+  /// `scroll-my-2` on the enclosing `SelectGroup`.
+  final double scrollMargin;
+
+  double get height => switch (kind) {
+        _RowKind.option => DsSelect.itemHeight,
+        _RowKind.label => DsSelect.labelHeight,
+        _RowKind.separator => DsSelect.separatorHeight,
+      };
+}
+
+/// `SelectContent` — the popover surface, the two scroll buttons and the
+/// `Viewport` between them.
+///
+/// Public because ruling L6 makes [DsNativeSelect] mount it: Flutter has no OS
+/// `<select>` list, so the port's own menu is what the native control opens.
+/// Everything about it belongs to `select.tsx`; nothing about it belongs to
+/// whoever is showing it, which is why the placement stays with the caller.
+class DsSelectMenu<T> extends StatefulWidget {
+  const DsSelectMenu({
+    super.key,
+    required this.children,
     required this.selected,
     required this.highlighted,
     required this.onPick,
     required this.onHover,
+    this.initialScrollOffset = 0,
   });
 
-  final DsThemeData theme;
-  final List<DsSelectOption<T>> options;
+  /// `SelectContent`'s children, in DOM order.
+  ///
+  /// The menu flattens them itself rather than taking the caller's geometry:
+  /// the flattening is a walk over a handful of records, and a widget that took
+  /// a private type could not be mounted from another file — which is exactly
+  /// what ruling L6 asks of it.
+  final List<DsSelectChild<T>> children;
+
+  /// The chosen value — the row that wears the tick.
   final T? selected;
+
+  /// The row the keyboard is on, indexed into the selectable rows.
   final int highlighted;
+
+  /// Called with an index into the selectable rows.
   final ValueChanged<int> onPick;
   final ValueChanged<int> onHover;
 
+  /// Where item-aligned placement wants the viewport to start when the content
+  /// is too tall to be placed by moving the box.
+  final double initialScrollOffset;
+
+  /// The height the child list renders at, `p-2` included — what a caller
+  /// needs before the menu exists in order to place it.
+  static double heightOf<T>(List<DsSelectChild<T>> children) =>
+      _MenuGeometry<T>(children).contentHeight;
+
+  @override
+  State<DsSelectMenu<T>> createState() => _DsSelectMenuState<T>();
+}
+
+class _DsSelectMenuState<T> extends State<DsSelectMenu<T>> {
+  late final ScrollController _scroll =
+      ScrollController(initialScrollOffset: widget.initialScrollOffset);
+
+  late _MenuGeometry<T> _menu = _MenuGeometry<T>(widget.children);
+
+  /// `canScrollUp` / `canScrollDown` — Radix mounts each button only while the
+  /// viewport can move that way, which is why a menu at rest shows the down
+  /// cap alone.
+  bool _canScrollUp = false;
+  bool _canScrollDown = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _scroll.addListener(_syncCaps);
+    // The extents are unknown until the first layout.
+    WidgetsBinding.instance.addPostFrameCallback((_) => _syncCaps());
+  }
+
+  @override
+  void didUpdateWidget(DsSelectMenu<T> old) {
+    super.didUpdateWidget(old);
+    if (!identical(old.children, widget.children)) {
+      _menu = _MenuGeometry<T>(widget.children);
+    }
+    if (old.highlighted != widget.highlighted) {
+      _revealHighlighted();
+    }
+    WidgetsBinding.instance.addPostFrameCallback((_) => _syncCaps());
+  }
+
+  @override
+  void dispose() {
+    _scroll.dispose();
+    super.dispose();
+  }
+
+  void _syncCaps() {
+    if (!mounted || !_scroll.hasClients) return;
+    final ScrollPosition at = _scroll.position;
+    final bool up = at.extentBefore > 0;
+    final bool down = at.extentAfter > 0;
+    if (up == _canScrollUp && down == _canScrollDown) return;
+    setState(() {
+      _canScrollUp = up;
+      _canScrollDown = down;
+    });
+  }
+
+  /// `scrollIntoView` on the highlighted row, honouring the group's
+  /// `scroll-my-2`.
+  void _revealHighlighted() {
+    if (!_scroll.hasClients) return;
+    final int index = widget.highlighted;
+    if (index < 0 || index >= _menu.options.length) return;
+    final ScrollPosition at = _scroll.position;
+    final ({double top, double bottom}) box = _menu.scrollBoxOfOption(index);
+    final double ceiling = at.maxScrollExtent;
+    if (box.top < at.pixels) {
+      at.jumpTo(box.top.clamp(0, ceiling < 0 ? 0 : ceiling));
+    } else if (box.bottom > at.pixels + at.viewportDimension) {
+      at.jumpTo((box.bottom - at.viewportDimension)
+          .clamp(0, ceiling < 0 ? 0 : ceiling));
+    }
+  }
+
+  void _scrollBy(double delta) {
+    if (!_scroll.hasClients) return;
+    final ScrollPosition at = _scroll.position;
+    at.jumpTo((at.pixels + delta).clamp(0, at.maxScrollExtent));
+  }
+
   @override
   Widget build(BuildContext context) {
-    return DsMachineSurface(
-      // `shadow-md ring-1 ring-foreground/10`. Tailwind composites its ring
-      // slot in front of the shadow slot, which is what prepending the layer
-      // means here — the same order `DsButton.withFocusRing` documents.
-      spec: DsShadowSpec(<DsShadowLayer>[
-        DsShadowLayer(
-          0,
-          0,
-          0,
-          DsWidths.hairline,
-          (DsThemeData t) => t.foreground.withValues(alpha: _contentRingAlpha),
-        ),
-        ...DsShadows.tailwindMd.layers,
-      ]),
-      radius: BorderRadius.circular(DsRadii.lg),
-      fill: theme.popover,
+    final DsThemeData theme = DsTheme.of(context);
+
+    return DsPopoverSurface(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          if (_canScrollUp)
+            _ScrollButton(
+              glyph: DsIconGlyph.chevronUp,
+              onScroll: () => _scrollBy(-DsSelect.itemHeight),
+            ),
+          Flexible(
+            child: SingleChildScrollView(
+              controller: _scroll,
+              // The viewport's `p-2`, on the scrolling box itself so a
+              // separator's `-mx-2` has something to cancel. The horizontal
+              // half is applied per row instead — see [_SelectSeparator].
+              padding: EdgeInsets.symmetric(vertical: ds(2)),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  for (final _Row<T> row in _menu.rows)
+                    switch (row.kind) {
+                      _RowKind.option => Padding(
+                          padding: EdgeInsets.symmetric(horizontal: ds(2)),
+                          child: _SelectItem<T>(
+                            theme: theme,
+                            option: row.option!,
+                            checked: row.option!.value == widget.selected,
+                            highlighted: row.index == widget.highlighted,
+                            onTap: () => widget.onPick(row.index),
+                            onHover: () => widget.onHover(row.index),
+                          ),
+                        ),
+                      _RowKind.label => Padding(
+                          padding: EdgeInsets.symmetric(horizontal: ds(2)),
+                          child: _SelectLabel(theme: theme, text: row.text!),
+                        ),
+                      // `-mx-2` cancels the padding the other rows keep, so the
+                      // rule runs the full content width.
+                      _RowKind.separator => _SelectSeparator(theme: theme),
+                    },
+                ],
+              ),
+            ),
+          ),
+          if (_canScrollDown)
+            _ScrollButton(
+              glyph: DsIconGlyph.chevronDown,
+              onScroll: () => _scrollBy(DsSelect.itemHeight),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+/// `SelectLabel` — `px-3 py-2 text-xs text-muted-foreground`.
+class _SelectLabel extends StatelessWidget {
+  const _SelectLabel({required this.theme, required this.text});
+
+  final DsThemeData theme;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: ds(3), vertical: ds(2)),
+      child: DsText(
+        text,
+        DsComponentType.menuLabel,
+        color: theme.mutedForeground,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        softWrap: false,
+      ),
+    );
+  }
+}
+
+/// `SelectSeparator` — `-mx-2 my-2 h-px bg-border`, and `pointer-events-none`
+/// so a pointer crossing it never leaves the row it came from.
+class _SelectSeparator extends StatelessWidget {
+  const _SelectSeparator({required this.theme});
+
+  final DsThemeData theme;
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
       child: Padding(
-        // viewport `p-2`.
-        padding: EdgeInsets.all(ds(2)),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              for (int i = 0; i < options.length; i++)
-                _SelectItem<T>(
-                  theme: theme,
-                  option: options[i],
-                  checked: options[i].value == selected,
-                  highlighted: i == highlighted,
-                  onTap: () => onPick(i),
-                  onHover: () => onHover(i),
-                ),
-            ],
+        padding: EdgeInsets.symmetric(vertical: ds(2)),
+        child: SizedBox(
+          height: DsWidths.hairline,
+          child: ColoredBox(color: theme.border),
+        ),
+      ),
+    );
+  }
+}
+
+/// `SelectScrollUpButton` / `SelectScrollDownButton` — `z-10 flex cursor-default
+/// items-center justify-center bg-popover py-2`.
+///
+/// Opaque by class, because it caps a viewport that scrolls underneath it, and
+/// `cursor-default` because it is not a button you click: hovering it scrolls,
+/// which is the whole of its behaviour.
+class _ScrollButton extends StatefulWidget {
+  const _ScrollButton({required this.glyph, required this.onScroll});
+
+  final DsIconGlyph glyph;
+  final VoidCallback onScroll;
+
+  @override
+  State<_ScrollButton> createState() => _ScrollButtonState();
+}
+
+class _ScrollButtonState extends State<_ScrollButton> {
+  Timer? _timer;
+
+  void _start() {
+    _timer ??= Timer.periodic(_autoScrollTick, (_) => widget.onScroll());
+  }
+
+  void _stop() {
+    _timer?.cancel();
+    _timer = null;
+  }
+
+  @override
+  void dispose() {
+    _stop();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final DsThemeData theme = DsTheme.of(context);
+    return MouseRegion(
+      cursor: SystemMouseCursors.basic,
+      onEnter: (_) => _start(),
+      onExit: (_) => _stop(),
+      child: ColoredBox(
+        color: theme.popover,
+        child: SizedBox(
+          height: DsSelect.scrollButtonHeight,
+          child: Center(
+            // `tone="inherit"` under the content's `text-popover-foreground`.
+            child: DsIcon(widget.glyph, tone: DsIconTone.inherit),
           ),
         ),
       ),
@@ -688,6 +1168,10 @@ class _SelectItem<T> extends StatelessWidget {
     );
 
     row = Stack(
+      // `w-full` on the item. Without this the stack hands its child loose
+      // constraints and the row shrinks to its own label — which puts the
+      // accent highlight around the text instead of across the menu.
+      fit: StackFit.passthrough,
       children: <Widget>[
         row,
         if (checked)
