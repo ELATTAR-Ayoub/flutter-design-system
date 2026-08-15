@@ -62,6 +62,7 @@ import '../foundation/theme.dart';
 import '../foundation/typography.dart';
 import '../theme_scope.dart';
 import 'button.dart';
+import 'field.dart';
 import 'icon.dart';
 import 'icon_paths.dart';
 
@@ -142,6 +143,7 @@ class DsSelect<T> extends StatefulWidget {
     this.expand = false,
     this.focusNode,
     this.label,
+    this.hint,
   });
 
   final List<DsSelectOption<T>> options;
@@ -158,10 +160,10 @@ class DsSelect<T> extends StatefulWidget {
 
   final DsSelectSize size;
 
-  /// `disabled`.
+  /// `disabled`. ANDed with the enclosing [DsFieldScope]'s.
   final bool enabled;
 
-  /// `aria-invalid="true"`.
+  /// `aria-invalid="true"`. ORed with the enclosing [DsFieldScope]'s.
   final bool invalid;
 
   /// The trigger's own class is `w-fit`; a vertical `Field` overrides it to
@@ -169,10 +171,18 @@ class DsSelect<T> extends StatefulWidget {
   /// this library.
   final bool expand;
 
+  /// A [DsFieldScope]'s node wins over the owned one and loses to this.
+  ///
+  /// `FormControl` wraps the **trigger**, not the `Select` — *"the trigger is
+  /// the focusable thing, so it is the thing that needs the id"* — which is why
+  /// the scope's node lands here and nowhere else in this file.
   final FocusNode? focusNode;
 
   /// The accessible name.
   final String? label;
+
+  /// `aria-describedby`, resolved: description, then error message.
+  final String? hint;
 
   /// `py-2` plus one `text-sm` line box — the height of one row, and the step
   /// `item-aligned` positioning counts in.
@@ -194,8 +204,27 @@ class _DsSelectState<T> extends State<DsSelect<T>> {
   final GlobalKey _triggerKey = GlobalKey();
 
   FocusNode? _ownedFocusNode;
+
+  /// The enclosing [DsFieldScope], cached on every dependency change so the
+  /// pointer and keyboard handlers can read it without depending on an
+  /// inherited widget outside a build.
+  DsFieldScope? _scope;
+
   FocusNode get _focusNode =>
-      widget.focusNode ?? (_ownedFocusNode ??= FocusNode(debugLabel: 'DsSelect'));
+      widget.focusNode ??
+      _scope?.focusNode ??
+      (_ownedFocusNode ??= FocusNode(debugLabel: 'DsSelect'));
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _scope = DsFieldScope.maybeOf(context);
+  }
+
+  // The slot merge (`FormControl`): the scope supplies what the id graph would
+  // have wired, and this widget's own props win where both speak.
+  bool get _invalid => widget.invalid || (_scope?.invalid ?? false);
+  bool get _fieldEnabled => widget.enabled && (_scope?.enabled ?? true);
 
   OverlayEntry? _entry;
 
@@ -213,7 +242,7 @@ class _DsSelectState<T> extends State<DsSelect<T>> {
   /// or the first when nothing is chosen.
   int _highlighted = 0;
 
-  bool get _enabled => widget.enabled && widget.onChanged != null;
+  bool get _enabled => _fieldEnabled && widget.onChanged != null;
   bool get _open => _entry != null;
 
   @override
@@ -322,7 +351,7 @@ class _DsSelectState<T> extends State<DsSelect<T>> {
   }
 
   Color _triggerBorder(DsThemeData theme) {
-    if (widget.invalid) {
+    if (_invalid) {
       return theme.kind == DsThemeKind.dark
           ? theme.destructive.withValues(alpha: _invalidBorderAlphaDark)
           : theme.destructive;
@@ -332,7 +361,7 @@ class _DsSelectState<T> extends State<DsSelect<T>> {
   }
 
   Color _triggerRing(DsThemeData theme) {
-    if (widget.invalid) {
+    if (_invalid) {
       return theme.destructive.withValues(
         alpha: theme.kind == DsThemeKind.dark
             ? _invalidRingAlphaDark
@@ -438,13 +467,14 @@ class _DsSelectState<T> extends State<DsSelect<T>> {
     );
 
     trigger = Opacity(
-      opacity: widget.enabled ? 1 : _disabledOpacity,
+      opacity: _fieldEnabled ? 1 : _disabledOpacity,
       child: IgnorePointer(ignoring: !_enabled, child: trigger),
     );
 
     return Semantics(
       button: true,
-      label: widget.label,
+      label: widget.label ?? _scope?.label,
+      hint: widget.hint ?? _scope?.describedBy,
       value: chosen?.label ?? widget.placeholder,
       expanded: _open,
       enabled: _enabled,

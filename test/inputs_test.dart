@@ -1261,6 +1261,81 @@ void main() {
       handle.dispose();
     });
 
+    testWidgets('the scope reaches the control on BOTH orientations',
+        (WidgetTester t) async {
+      // REGRESSION: the horizontal branch once put the bare `child` in its Row
+      // where the vertical branch put the scope-wrapped control, so a
+      // horizontal field published no DsFieldScope at all. That is the branch
+      // the switch and the checkbox live on — the two composed-form controls
+      // focus-on-error has to reach — so the failure was invisible and landed
+      // exactly where it hurt. Both orientations are asserted together so
+      // neither can drift from the other again.
+      for (final DsFieldOrientation orientation in DsFieldOrientation.values) {
+        final FocusNode node = FocusNode(debugLabel: orientation.name);
+        addTearDown(node.dispose);
+        DsFieldScope? seen;
+
+        await t.pumpWidget(host(SizedBox(
+          width: 512,
+          child: DsField(
+            key: ValueKey<DsFieldOrientation>(orientation),
+            label: 'Price alerts',
+            description: 'Only for the packs you follow.',
+            errors: const <String>['You have to accept the terms.'],
+            enabled: false,
+            focusNode: node,
+            orientation: orientation,
+            child: Builder(builder: (BuildContext c) {
+              seen = DsFieldScope.maybeOf(c);
+              return const SizedBox(width: 44, height: 24);
+            }),
+          ),
+        )));
+
+        final String why = orientation.name;
+        expect(seen, isNotNull,
+            reason: '$why publishes no DsFieldScope — nothing under it can '
+                'adopt a label, a describedby, a disabled state or a node');
+        expect(seen!.label, 'Price alerts', reason: why);
+        expect(
+          seen!.describedBy,
+          'Only for the packs you follow. You have to accept the terms.',
+          reason: why,
+        );
+        expect(seen!.invalid, isTrue, reason: why);
+        expect(seen!.enabled, isFalse, reason: why);
+        expect(seen!.focusNode, same(node), reason: why);
+      }
+    });
+
+    testWidgets('a horizontal field\'s control adopts it observably',
+        (WidgetTester t) async {
+      // The scope being present is one thing; a control actually wearing it is
+      // the thing F4 depends on. Focus-on-error requires the control to be on
+      // the field's node, and a disabled field has to reach the control.
+      final FocusNode node = FocusNode();
+      addTearDown(node.dispose);
+
+      await t.pumpWidget(host(SizedBox(
+        width: 512,
+        child: DsField(
+          label: 'Price alerts',
+          enabled: false,
+          focusNode: node,
+          orientation: DsFieldOrientation.horizontal,
+          child: const SizedBox(width: 200, child: DsInput()),
+        ),
+      )));
+
+      final EditableText editable =
+          t.widget<EditableText>(find.byType(EditableText));
+      expect(editable.focusNode, same(node),
+          reason: 'the form\'s node has to land ON the control, or a failed '
+              'submit focuses nothing');
+      expect(editable.readOnly, isTrue,
+          reason: 'a disabled field disables what is inside it');
+    });
+
     testWidgets('the visible label is not announced twice',
         (WidgetTester t) async {
       final SemanticsHandle handle = t.ensureSemantics();

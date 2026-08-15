@@ -69,6 +69,9 @@ Color borderOf(DsMachineSurface surface) =>
 Color ringOf(DsMachineSurface surface, DsThemeData theme) =>
     surface.spec.layers.first.color(theme);
 
+/// `z.boolean().refine(v => v, …)` — the one rule the `terms` field carries.
+bool _accepted(bool value) => value;
+
 /// The [FocusNode] a radio item's own [Focus] carries — the ones with a key
 /// handler, which the `Visibility` wrappers inside an indicator do not have.
 FocusNode itemFocus(WidgetTester t, int index) => t
@@ -881,6 +884,297 @@ void main() {
         ),
       )));
       expect(find.byType(DsIcon), findsOneWidget);
+    });
+  });
+
+  // The Slot merge, on the four controls that are not an `<input>`.
+  //
+  // `FormControl` is a `Slot`: it stamps `id`, `aria-invalid` and
+  // `aria-describedby` onto whatever it wraps — *"input, trigger, switch or
+  // checkbox alike"*. Flutter's analogue is context, so each of these reads
+  // `DsFieldScope` and lets its own props win where both speak.
+  group('DsFieldScope adoption', () {
+    /// A control inside a field that says everything a field can say.
+    Widget inField(Widget control, {required FocusNode node, bool valid = false}) =>
+        host(SizedBox(
+          width: 448,
+          child: DsField(
+            label: 'Price alerts',
+            description: 'Receipts and nothing else.',
+            errors: valid ? const <String>[] : const <String>['Pick one.'],
+            enabled: false,
+            focusNode: node,
+            child: control,
+          ),
+        ));
+
+    /// What the control passes into its own [Semantics].
+    ///
+    /// Read off the widget rather than the semantics tree: a control's
+    /// annotation sits *inside* its [DsHitArea] (the expander has to be
+    /// outermost, or a pointer in the pseudo-element's margin is rejected
+    /// before it arrives), so walking up from the control's own render object
+    /// lands on the field's container node instead of on this one.
+    SemanticsProperties announced(WidgetTester t, Finder of) => t
+        .widgetList<Semantics>(
+            find.descendant(of: of, matching: find.byType(Semantics)))
+        .first
+        .properties;
+
+    /// Whether the enclosing field's node is the one the control's own [Focus]
+    /// carries — which is what makes `DsForm.focusFirstError` land on it.
+    bool adopted(WidgetTester t, Finder of, FocusNode node) => t
+        .widgetList<Focus>(find.descendant(of: of, matching: find.byType(Focus)))
+        .any((Focus f) => identical(f.focusNode, node));
+
+    testWidgets('DsCheckbox takes label, description, enabled, invalid, node',
+        (WidgetTester t) async {
+      final SemanticsHandle semantics = t.ensureSemantics();
+      final FocusNode node = FocusNode();
+      addTearDown(node.dispose);
+
+      await t.pumpWidget(inField(
+        const DsCheckbox(state: DsCheckboxState.unchecked),
+        node: node,
+      ));
+      await t.pumpAndSettle();
+      final DsThemeData theme = themeIn(t, DsCheckbox);
+
+      final SemanticsProperties said = announced(t, find.byType(DsCheckbox));
+      expect(said.label!, contains('Price alerts'));
+      expect(said.hint!, contains('Receipts and nothing else.'));
+      expect(said.hint!, contains('Pick one.'),
+          reason: 'description then error, in the order the id list encodes');
+
+      // `data-[disabled=true]` on the field disables the control, and the
+      // control cannot opt back in.
+      expect(
+        t
+            .widget<Opacity>(find
+                .descendant(
+                    of: find.byType(DsCheckbox), matching: find.byType(Opacity))
+                .first)
+            .opacity,
+        0.50,
+      );
+      // `aria-invalid` reaches the paint, not only the field's own container.
+      expect(borderOf(socketOf(t, DsCheckbox)), theme.destructive);
+      expect(adopted(t, find.byType(DsCheckbox), node), isTrue);
+      semantics.dispose();
+    });
+
+    testWidgets('DsSwitch takes label, description, enabled, invalid, node',
+        (WidgetTester t) async {
+      final SemanticsHandle semantics = t.ensureSemantics();
+      final FocusNode node = FocusNode();
+      addTearDown(node.dispose);
+
+      await t.pumpWidget(inField(const DsSwitch(value: false), node: node));
+      await t.pumpAndSettle();
+      final DsThemeData theme = themeIn(t, DsSwitch);
+
+      final SemanticsProperties said = announced(t, find.byType(DsSwitch));
+      expect(said.label!, contains('Price alerts'));
+      expect(said.hint!, contains('Receipts and nothing else.'));
+      expect(borderOf(socketOf(t, DsSwitch)), theme.destructive);
+      expect(
+        t
+            .widget<Opacity>(find
+                .descendant(
+                    of: find.byType(DsSwitch), matching: find.byType(Opacity))
+                .first)
+            .opacity,
+        0.50,
+      );
+      expect(adopted(t, find.byType(DsSwitch), node), isTrue);
+      semantics.dispose();
+    });
+
+    testWidgets('DsSelect takes label, description, enabled, invalid, node',
+        (WidgetTester t) async {
+      final SemanticsHandle semantics = t.ensureSemantics();
+      final FocusNode node = FocusNode();
+      addTearDown(node.dispose);
+
+      await t.pumpWidget(host(SizedBox(
+        width: 448,
+        child: DsField(
+          label: 'Plan',
+          description: 'Pick one you can afford.',
+          errors: const <String>['Pick a plan.'],
+          enabled: false,
+          focusNode: node,
+          child: DsSelect<String>(
+            options: const <DsSelectOption<String>>[
+              DsSelectOption<String>(value: 'free', label: 'Free'),
+            ],
+            value: null,
+            onChanged: (String _) {},
+            placeholder: 'Choose a plan',
+            expand: true,
+          ),
+        ),
+      )));
+      await t.pumpAndSettle();
+      final DsThemeData theme = themeIn(t, DsSelect<String>);
+
+      final SemanticsProperties said =
+          announced(t, find.byType(DsSelect<String>));
+      expect(said.label!, contains('Plan'));
+      expect(said.hint!, contains('Pick one you can afford.'));
+      expect(said.hint!, contains('Pick a plan.'));
+      // Dark substitutes `border-destructive/50` for the opaque border.
+      expect(borderOf(socketOf(t, DsSelect<String>)),
+          theme.destructive.withValues(alpha: 0.50));
+      expect(adopted(t, find.byType(DsSelect<String>), node), isTrue);
+      semantics.dispose();
+    });
+
+    testWidgets('DsRadioGroup takes the legend and the node; items take the rest',
+        (WidgetTester t) async {
+      final SemanticsHandle semantics = t.ensureSemantics();
+      final FocusNode node = FocusNode();
+      addTearDown(node.dispose);
+
+      await t.pumpWidget(host(SizedBox(
+        width: 448,
+        child: DsField(
+          label: 'Payout rhythm',
+          description: 'How often you get paid.',
+          errors: const <String>['Pick a payout rhythm.'],
+          focusNode: node,
+          child: DsRadioGroup<String>(
+            value: null,
+            onChanged: (String _) {},
+            children: const <Widget>[
+              DsRadioGroupItem<String>(value: 'daily', label: 'Daily'),
+              DsRadioGroupItem<String>(value: 'weekly', label: 'Weekly'),
+            ],
+          ),
+        ),
+      )));
+      await t.pumpAndSettle();
+      final DsThemeData theme = themeIn(t, DsRadioGroupItem<String>);
+
+      // `FormControl` wraps the RadioGroup, not the items, so the legend and
+      // the description are announced on the group.
+      final SemanticsProperties group =
+          announced(t, find.byType(DsRadioGroup<String>));
+      expect(group.label!, contains('Payout rhythm'));
+      expect(group.hint!, contains('How often you get paid.'));
+      expect(group.hint!, contains('Pick a payout rhythm.'));
+
+      // …while each item keeps its own name, never the legend.
+      expect(announced(t, find.byType(DsRadioGroupItem<String>).at(0)).label,
+          'Daily');
+      expect(announced(t, find.byType(DsRadioGroupItem<String>).at(1)).label,
+          'Weekly');
+
+      // The group's `aria-invalid` paints on every item.
+      expect(borderOf(socketOf(t, DsRadioGroupItem<String>)), theme.destructive);
+
+      // The field's node lands on the group and never on two Focus widgets at
+      // once — the group holds it and passes the focus to the tab stop.
+      expect(adopted(t, find.byType(DsRadioGroup<String>), node), isTrue);
+      node.requestFocus();
+      await t.pumpAndSettle();
+      // `hasFocus` stays true — the item is a descendant of this node — but the
+      // group never keeps the focus itself.
+      expect(node.hasPrimaryFocus, isFalse,
+          reason: 'the group hands the focus straight on');
+      expect(
+        t
+            .widgetList<Focus>(find.descendant(
+                of: find.byType(DsRadioGroupItem<String>).at(0),
+                matching: find.byType(Focus)))
+            .any((Focus f) => f.focusNode?.hasPrimaryFocus ?? false),
+        isTrue,
+        reason: 'the first enabled item is the roving tab stop',
+      );
+      semantics.dispose();
+    });
+
+    testWidgets('a disabled field disables its radio items',
+        (WidgetTester t) async {
+      int changes = 0;
+      await t.pumpWidget(host(SizedBox(
+        width: 448,
+        child: DsField(
+          label: 'Payout rhythm',
+          enabled: false,
+          child: DsRadioGroup<String>(
+            value: null,
+            onChanged: (String _) => changes++,
+            children: const <Widget>[
+              DsRadioGroupItem<String>(value: 'daily', label: 'Daily'),
+            ],
+          ),
+        ),
+      )));
+      await t.tap(find.byType(DsRadioGroupItem<String>), warnIfMissed: false);
+      expect(changes, 0);
+      expect(
+        t
+            .widget<Opacity>(find
+                .descendant(
+                    of: find.byType(DsRadioGroupItem<String>),
+                    matching: find.byType(Opacity))
+                .first)
+            .opacity,
+        0.50,
+      );
+    });
+
+    testWidgets('DsForm.focusFirstError lands on a checkbox — ruling F4',
+        (WidgetTester t) async {
+      // The composed form's `terms`: the reference cannot focus it at all,
+      // because a hand-wired Checkbox exposes no ref for `shouldFocusError` to
+      // call (forms-map drift 7). Here it is a field like any other.
+      final DsFormField<bool> terms = DsFormField<bool>(
+        name: 'terms',
+        initialValue: false,
+        rules: <DsRule<bool>>[
+          const DsRule<bool>(_accepted, 'You have to accept the terms.'),
+        ],
+      );
+      final DsForm form = DsForm(fields: <DsFormFieldBase>[terms]);
+      addTearDown(form.dispose);
+
+      await t.pumpWidget(host(SizedBox(
+        width: 448,
+        child: ListenableBuilder(
+          listenable: form,
+          builder: (BuildContext context, Widget? _) => DsField(
+            label: 'I accept the terms',
+            errors: terms.errors,
+            focusNode: terms.focusNode,
+            // NOTE, and reported: `DsField`'s **horizontal** branch renders its
+            // raw `child` instead of the `DsFieldScope`-wrapped one
+            // (`field.dart`, the `DsFieldOrientation.horizontal` case), so a
+            // horizontal field publishes no scope at all and nothing below it
+            // can adopt anything. The composed form's `terms` is exactly that
+            // shape. Pinned vertical here so this test measures THIS task's
+            // wiring; the horizontal gap is one word in a file this task does
+            // not own.
+            child: DsCheckbox(
+              state: terms.value
+                  ? DsCheckboxState.checked
+                  : DsCheckboxState.unchecked,
+              onChanged: (DsCheckboxState next) =>
+                  terms.value = next == DsCheckboxState.checked,
+            ),
+          ),
+        ),
+      )));
+
+      expect(terms.focusNode.hasFocus, isFalse);
+      await form.submit();
+      await t.pumpAndSettle();
+
+      expect(terms.errors, <String>['You have to accept the terms.']);
+      expect(terms.focusNode.hasFocus, isTrue);
+      expect(adopted(t, find.byType(DsCheckbox), terms.focusNode), isTrue,
+          reason: 'the node a failed submit focuses IS the checkbox\'s own');
     });
   });
 

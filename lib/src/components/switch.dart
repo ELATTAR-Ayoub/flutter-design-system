@@ -43,6 +43,7 @@ import '../foundation/shadows.dart';
 import '../foundation/spacing.dart';
 import '../foundation/theme.dart';
 import '../theme_scope.dart';
+import 'field.dart';
 import 'selection_control.dart';
 
 /// `border` — 1px, paid for out of the track's own box.
@@ -89,6 +90,7 @@ class DsSwitch extends StatelessWidget {
     this.invalid = false,
     this.focusNode,
     this.label,
+    this.hint,
   });
 
   /// `checked`.
@@ -100,20 +102,36 @@ class DsSwitch extends StatelessWidget {
   final DsSwitchSize size;
 
   /// `data-disabled` — separate from a null [onChanged] so a disabled `Field`
-  /// can dim a switch that still carries its handler.
+  /// can dim a switch that still carries its handler. ANDed with the enclosing
+  /// [DsFieldScope]'s.
   final bool enabled;
 
-  /// `aria-invalid="true"`.
+  /// `aria-invalid="true"`. ORed with the enclosing [DsFieldScope]'s.
   final bool invalid;
 
+  /// A [DsFieldScope]'s node wins over none and loses to this, so
+  /// `DsForm.focusFirstError` lands on the switch itself (ruling F4).
   final FocusNode? focusNode;
 
-  /// The accessible name, for a switch whose visible label is a sibling.
+  /// The accessible name, for a switch whose visible label is a sibling —
+  /// supplied by a `DsField` through the scope when there is one.
   final String? label;
+
+  /// `aria-describedby`, resolved: description, then error message.
+  final String? hint;
 
   @override
   Widget build(BuildContext context) {
     final DsThemeData theme = DsTheme.of(context);
+    final DsFieldScope? scope = DsFieldScope.maybeOf(context);
+
+    // The slot merge, as on every other control: the scope supplies what the id
+    // graph would have wired and this widget's own props win.
+    final bool isInvalid = invalid || (scope?.invalid ?? false);
+    final bool isEnabled = enabled && (scope?.enabled ?? true);
+    final String? name = label ?? scope?.label;
+    final String? described = hint ?? scope?.describedBy;
+    final FocusNode? node = focusNode ?? scope?.focusNode;
 
     return DsSelectionControl(
       width: size.trackWidth,
@@ -127,15 +145,17 @@ class DsSwitch extends StatelessWidget {
       shadow: value ? DsShadows.btnPrimary : DsShadows.pressed,
       duration: DsDurations.base,
       jellyState: value,
-      enabled: enabled,
-      invalid: invalid,
-      focusNode: focusNode,
+      enabled: isEnabled,
+      invalid: isInvalid,
+      focusNode: node,
       onTap: onChanged == null ? null : () => onChanged!(!value),
+      // Inside the hit-area expander, never around it — see [DsHitArea].
       semantics: (Widget child) => Semantics(
         container: true,
         toggled: value,
-        enabled: enabled && onChanged != null,
-        label: label,
+        enabled: isEnabled && onChanged != null,
+        label: name,
+        hint: described,
         child: child,
       ),
       child: _Thumb(size: size, on: value, color: theme.foreground),

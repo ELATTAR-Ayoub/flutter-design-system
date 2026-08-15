@@ -308,7 +308,12 @@ class DsField extends StatelessWidget {
             // and the control sits at its own size against the trailing edge.
             if (labelWidget != null) Expanded(child: labelWidget),
             if (labelWidget != null) SizedBox(width: gap),
-            child,
+            // `control`, never the bare `child`: the scope has to wrap the
+            // control on BOTH branches. The horizontal one is where the switch
+            // and the checkbox live, so a field that publishes nothing here is
+            // a field whose focus-on-error and accessible name go missing on
+            // exactly the controls that need them most.
+            control,
           ],
         ));
     }

@@ -39,6 +39,7 @@ import '../foundation/spacing.dart';
 import '../foundation/theme.dart';
 import '../motion/keyframes.dart';
 import '../theme_scope.dart';
+import 'field.dart';
 import 'selection_control.dart';
 
 /// `size-5`.
@@ -54,6 +55,9 @@ class _RadioScope<T> extends InheritedWidget {
     required this.value,
     required this.onChanged,
     required this.state,
+    required this.invalid,
+    required this.enabled,
+    required this.field,
     required super.child,
   });
 
@@ -61,12 +65,33 @@ class _RadioScope<T> extends InheritedWidget {
   final ValueChanged<T>? onChanged;
   final _DsRadioGroupState<T> state;
 
+  /// `aria-invalid` on the group, which `FormControl` stamps on the
+  /// `RadioGroup` rather than on any item, and which every item then paints.
+  final bool invalid;
+
+  /// The group's own `disabled`, ANDed with its field's.
+  final bool enabled;
+
+  /// The [DsFieldScope] the **group** consumed, if any.
+  ///
+  /// An item compares its own nearest scope against this one: when they are the
+  /// same object the group has already adopted that field's focus node, and a
+  /// second `Focus` attaching it would be two widgets sharing one node. When
+  /// they differ the item sits in a nested field of its own — the shape the
+  /// reference uses to put a label beside each radio — and adopts it.
+  final DsFieldScope? field;
+
   static _RadioScope<T>? maybeOf<T>(BuildContext context) =>
       context.dependOnInheritedWidgetOfExactType<_RadioScope<T>>();
 
   @override
   bool updateShouldNotify(_RadioScope<T> old) =>
-      old.value != value || old.onChanged != onChanged || old.state != state;
+      old.value != value ||
+      old.onChanged != onChanged ||
+      old.state != state ||
+      old.invalid != invalid ||
+      old.enabled != enabled ||
+      old.field != field;
 }
 
 /// `RadioGroupPrimitive.Root` — `grid w-full gap-2`.
@@ -81,6 +106,11 @@ class DsRadioGroup<T> extends StatefulWidget {
     required this.onChanged,
     required this.children,
     this.gap,
+    this.enabled = true,
+    this.invalid = false,
+    this.focusNode,
+    this.label,
+    this.hint,
   });
 
   /// `value` — `null` while nothing is chosen, which is also the state the
@@ -96,6 +126,36 @@ class DsRadioGroup<T> extends StatefulWidget {
 
   /// `gap-2` by default; the composed form passes `gap-3`.
   final double? gap;
+
+  /// `disabled` on the Root. ANDed with the enclosing [DsFieldScope]'s.
+  final bool enabled;
+
+  /// `aria-invalid="true"`, which `FormControl` stamps on the **group** —
+  /// `data-slot="radio-group"` survives the Slot merge, and the group is what
+  /// the wiring wraps. ORed with the enclosing [DsFieldScope]'s.
+  final bool invalid;
+
+  /// The node a failed submit lands on, adopted from the enclosing
+  /// [DsFieldScope] when this is null.
+  ///
+  /// A group is not itself operable, so focus does not stop here: taking it
+  /// hands it straight to the item a keyboard user would reach — the checked
+  /// one, or the first enabled one when nothing is checked. That is what makes
+  /// `DsForm.focusFirstError` land somewhere useful on the `payout` field,
+  /// which on the reference is where focus-on-error silently does nothing
+  /// (forms-map drift 7, ruling F4).
+  final FocusNode? focusNode;
+
+  /// The legend's text, announced as the group's accessible name.
+  ///
+  /// The `payout` field is the page's one `FieldSet` + `FieldLegend`, and its
+  /// source comment says why: `<label for>` may only point at a labelable
+  /// element and a RadioGroup container is a `div`, so `FormLabel`'s `htmlFor`
+  /// would announce nothing. A Flutter container has no such restriction.
+  final String? label;
+
+  /// `aria-describedby`, resolved: description, then error message.
+  final String? hint;
 
   /// `gap-2` — the Root's own row gap.
   static double get defaultGap => ds(2);
@@ -142,31 +202,76 @@ class _DsRadioGroupState<T> extends State<DsRadioGroup<T>> {
     return KeyEventResult.handled;
   }
 
+  /// Hands focus to the item the roving tabindex would have put it on.
+  void _forwardToTabStop() {
+    for (final _DsRadioGroupItemState<T> item in _items) {
+      if (!item.enabled || !isTabStop(item.widget.value)) continue;
+      item.focusNode.requestFocus();
+      return;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final double gap = widget.gap ?? DsRadioGroup.defaultGap;
+    final DsFieldScope? field = DsFieldScope.maybeOf(context);
+
+    // The slot merge, at the element `FormControl` actually wraps.
+    final bool invalid = widget.invalid || (field?.invalid ?? false);
+    final bool enabled = widget.enabled && (field?.enabled ?? true);
+    final FocusNode? node = widget.focusNode ?? field?.focusNode;
+
     return _RadioScope<T>(
       value: widget.value,
-      onChanged: widget.onChanged,
+      onChanged: enabled ? widget.onChanged : null,
       state: this,
+      invalid: invalid,
+      enabled: enabled,
+      field: field,
       // `w-full` — the group fills whatever measure it is given. Its rows are
       // NOT stretched to match: a grid stretches its items, but
       // `RadioGroupItem` declares `size-5 shrink-0` and an explicit width beats
       // `justify-items: stretch`, so a bare item stays 20px while a `Field` row
       // beside it still fills. Loose constraints are what expresses that.
-      child: SizedBox(
-        width: double.infinity,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            for (int i = 0; i < widget.children.length; i++) ...<Widget>[
-              if (i > 0) SizedBox(height: gap),
-              widget.children[i],
-            ],
-          ],
+      child: Semantics(
+        container: true,
+        label: widget.label ?? field?.label,
+        hint: widget.hint ?? field?.describedBy,
+        enabled: enabled && widget.onChanged != null,
+        child: _withGroupFocus(
+          node,
+          SizedBox(
+            width: double.infinity,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                for (int i = 0; i < widget.children.length; i++) ...<Widget>[
+                  if (i > 0) SizedBox(height: gap),
+                  widget.children[i],
+                ],
+              ],
+            ),
+          ),
         ),
       ),
+    );
+  }
+
+  /// Attaches the field's node to the group so a failed submit can land on it,
+  /// and passes the focus straight through to an item.
+  ///
+  /// `skipTraversal` because the items own the tab order between them: this
+  /// node exists to be *requested*, never to be tabbed into.
+  Widget _withGroupFocus(FocusNode? node, Widget child) {
+    if (node == null) return child;
+    return Focus(
+      focusNode: node,
+      skipTraversal: true,
+      onFocusChange: (bool has) {
+        if (has) _forwardToTabStop();
+      },
+      child: child,
     );
   }
 }
@@ -179,6 +284,7 @@ class DsRadioGroupItem<T> extends StatefulWidget {
     this.enabled = true,
     this.invalid = false,
     this.label,
+    this.hint,
   });
 
   /// The value this item selects. Compared with the group's by `==`.
@@ -192,7 +298,14 @@ class DsRadioGroupItem<T> extends StatefulWidget {
   final bool invalid;
 
   /// The accessible name, for a control whose visible label is a sibling.
+  ///
+  /// Taken from the item's **own** nested [DsFieldScope] when it has one —
+  /// which is the shape the reference uses, one labelled field per radio — and
+  /// never from the group's, whose label is the legend for all of them.
   final String? label;
+
+  /// `aria-describedby`, resolved.
+  final String? hint;
 
   /// `size-5` — 20px, level with a checkbox.
   static double get size => _boxSize;
@@ -202,12 +315,20 @@ class DsRadioGroupItem<T> extends StatefulWidget {
 }
 
 class _DsRadioGroupItemState<T> extends State<DsRadioGroupItem<T>> {
-  final FocusNode focusNode = FocusNode(debugLabel: 'DsRadioGroupItem');
+  final FocusNode _ownNode = FocusNode(debugLabel: 'DsRadioGroupItem');
+
+  /// A nested field's node, when this item sits in a `DsField` of its own that
+  /// the group did not already take. See `_RadioScope.field`.
+  FocusNode? _adoptedNode;
+
+  /// The node the roving tabindex moves to and a failed submit can land on.
+  FocusNode get focusNode => _adoptedNode ?? _ownNode;
 
   _DsRadioGroupState<T>? _group;
 
-  /// Whether this item can be operated: its own `disabled`, and the group's.
-  bool get enabled => widget.enabled && _group?.widget.onChanged != null;
+  /// Whether this item can be operated: its own `disabled`, its field's, and
+  /// the group's.
+  bool enabled = true;
 
   /// Which mounting of the indicator is on screen. Radix mounts it only when
   /// the item becomes checked, so the pop fires on every real selection and
@@ -218,7 +339,8 @@ class _DsRadioGroupItemState<T> extends State<DsRadioGroupItem<T>> {
   @override
   void dispose() {
     _group?._unregister(this);
-    focusNode.dispose();
+    // Only the owned one: an adopted node belongs to the field that made it.
+    _ownNode.dispose();
     super.dispose();
   }
 
@@ -237,6 +359,21 @@ class _DsRadioGroupItemState<T> extends State<DsRadioGroupItem<T>> {
       _group = scope.state;
       _group!._register(this);
     }
+
+    // The item's own nearest field, which is a *different* one from the
+    // group's whenever the call site wraps each radio in its own labelled
+    // `DsField` — the arrangement the reference uses. Where they are the same
+    // object the group has already taken it, and the item takes nothing.
+    final DsFieldScope? field = DsFieldScope.maybeOf(context);
+    final bool ownField = field != null && !identical(field, scope.field);
+    _adoptedNode = ownField ? field.focusNode : null;
+
+    final bool invalid =
+        widget.invalid || scope.invalid || (ownField && field.invalid);
+    enabled = widget.enabled &&
+        scope.enabled &&
+        (!ownField || field.enabled) &&
+        scope.onChanged != null;
 
     final bool checked = scope.value == widget.value;
     if (checked != _wasChecked) {
@@ -263,19 +400,19 @@ class _DsRadioGroupItemState<T> extends State<DsRadioGroupItem<T>> {
       duration: DsDurations.fast,
       jellyState: checked,
       enabled: enabled,
-      invalid: widget.invalid,
+      invalid: invalid,
       focusNode: focusNode,
       skipTraversal: !_group!.isTabStop(widget.value),
       onKey: _onKey,
-      onTap: scope.onChanged == null || !widget.enabled
-          ? null
-          : () => scope.onChanged!(widget.value),
+      onTap: enabled ? () => scope.onChanged!(widget.value) : null,
+      // Inside the hit-area expander, never around it — see [DsHitArea].
       semantics: (Widget child) => Semantics(
         container: true,
         inMutuallyExclusiveGroup: true,
         checked: checked,
         enabled: enabled,
-        label: widget.label,
+        label: widget.label ?? (ownField ? field.label : null),
+        hint: widget.hint ?? (ownField ? field.describedBy : null),
         child: child,
       ),
       child: indicator,

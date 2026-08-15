@@ -731,6 +731,32 @@ void main() {
       );
     });
 
+    test('the status trio shares its geometry, node for node', () {
+      // lucide's keys are content hashes, so glyphs that share a shape share a
+      // key — and `circle-x` is the extreme case: it has three nodes and
+      // borrows all three. Asserted as string equality against the *other two
+      // glyphs* rather than against a literal, because that is the claim: not
+      // "circleX contains this path" but "circleX's cross IS octagonX's cross".
+      String node(DsIconGlyph glyph, int i) =>
+          _signature(DsIconPaths.elements[glyph]![i]);
+
+      // The ring, shared with circleCheck (and five older glyphs) under 1mglay.
+      expect(node(DsIconGlyph.circleX, 0), node(DsIconGlyph.circleCheck, 0));
+      // The two diagonals, shared with octagonX under 1uzhvr and z0biqf. Note
+      // the index skip: octagonX declares its plate BETWEEN them.
+      expect(node(DsIconGlyph.circleX, 1), node(DsIconGlyph.octagonX, 0));
+      expect(node(DsIconGlyph.circleX, 2), node(DsIconGlyph.octagonX, 2));
+
+      // Seven glyphs now carry the 10-unit ring; the library doc says so.
+      expect(
+        DsIconGlyph.values.where((DsIconGlyph g) => DsIconPaths.elements[g]!
+            .whereType<DsIconCircleElement>()
+            .any((DsIconCircleElement c) =>
+                c.cx == 12 && c.cy == 12 && c.r == 10)),
+        hasLength(7),
+      );
+    });
+
     test('one synthetic d exercises H V Q T S Z together', () {
       final Path path =
           _pathOf('M2 2 H10 V6 Q14 6 14 10 T18 18 S22 14 22 10 L22 2 Z');

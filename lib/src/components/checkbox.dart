@@ -40,6 +40,7 @@ import '../foundation/spacing.dart';
 import '../foundation/theme.dart';
 import '../motion/keyframes.dart';
 import '../theme_scope.dart';
+import 'field.dart';
 import 'icon_paths.dart';
 import 'selection_control.dart';
 
@@ -103,6 +104,7 @@ class DsCheckbox extends StatefulWidget {
     this.invalid = false,
     this.focusNode,
     this.label,
+    this.hint,
   });
 
   /// `checked` — the whole `data-state`, not a bool, because the reference's
@@ -115,17 +117,26 @@ class DsCheckbox extends StatefulWidget {
   final ValueChanged<DsCheckboxState>? onChanged;
 
   /// A `Field` may disable a control that still carries a handler —
-  /// `group-has-disabled/field:opacity-50`.
+  /// `group-has-disabled/field:opacity-50`. ANDed with the enclosing
+  /// [DsFieldScope]'s: a disabled field disables its control and the control
+  /// cannot opt back in.
   final bool enabled;
 
-  /// `aria-invalid="true"`.
+  /// `aria-invalid="true"`. ORed with the enclosing [DsFieldScope]'s.
   final bool invalid;
 
+  /// A [DsFieldScope]'s node wins over the one this widget would otherwise
+  /// leave to `Focus`, and loses to this — so `DsForm.focusFirstError` lands on
+  /// the checkbox itself (ruling F4).
   final FocusNode? focusNode;
 
-  /// The accessible name. A visible `DsFieldLabel` feeds this rather than
-  /// duplicating it — Flutter has no `htmlFor` graph.
+  /// The accessible name. A visible `DsFieldLabel` feeds this through the
+  /// scope rather than duplicating it — Flutter has no `htmlFor` graph.
   final String? label;
+
+  /// `aria-describedby`, resolved: description, then error message, in DOM
+  /// order. [Semantics.hint] is the only channel that reads after the label.
+  final String? hint;
 
   /// `size-5` — 20px, *"because 16px is a fiddly target"*.
   static double get size => _boxSize;
@@ -159,6 +170,17 @@ class _DsCheckboxState extends State<DsCheckbox> {
   @override
   Widget build(BuildContext context) {
     final DsThemeData theme = DsTheme.of(context);
+    final DsFieldScope? scope = DsFieldScope.maybeOf(context);
+
+    // The slot merge (`FormControl`): the scope supplies what the id graph
+    // would have wired, and the child's own props win where both speak. Same
+    // four lines `DsInput` and `DsTextarea` carry.
+    final bool invalid = widget.invalid || (scope?.invalid ?? false);
+    final bool enabled = widget.enabled && (scope?.enabled ?? true);
+    final String? label = widget.label ?? scope?.label;
+    final String? hint = widget.hint ?? scope?.describedBy;
+    final FocusNode? focusNode = widget.focusNode ?? scope?.focusNode;
+
     final bool on = widget.state.isOn;
 
     final Widget indicator = on
@@ -204,18 +226,20 @@ class _DsCheckboxState extends State<DsCheckbox> {
       shadow: on ? DsShadows.btnPrimary : DsShadows.pressed,
       duration: DsDurations.fast,
       jellyState: widget.state,
-      enabled: widget.enabled,
-      invalid: widget.invalid,
-      focusNode: widget.focusNode,
+      enabled: enabled,
+      invalid: invalid,
+      focusNode: focusNode,
       onTap: widget.onChanged == null
           ? null
           : () => widget.onChanged!(DsCheckbox.nextAfter(widget.state)),
+      // Inside the hit-area expander, never around it — see [DsHitArea].
       semantics: (Widget child) => Semantics(
         container: true,
         checked: widget.state == DsCheckboxState.checked,
         mixed: widget.state == DsCheckboxState.indeterminate,
-        enabled: widget.enabled && widget.onChanged != null,
-        label: widget.label,
+        enabled: enabled && widget.onChanged != null,
+        label: label,
+        hint: hint,
         child: child,
       ),
       child: indicator,
