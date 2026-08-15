@@ -930,15 +930,33 @@ void main() {
       expect(DsToastType.normal.label, 'default');
     });
 
-    testWidgets('KNOWN GAP: two lucide glyphs are not in the package yet',
+    testWidgets('GAP CLOSED: TOAST_ICONS maps all five types',
         (WidgetTester t) async {
-      // `icon_paths.dart` is another task's file this wave; the map records
-      // `CircleCheck` and `OctagonX` as owed. A call site can supply them.
+      // Was a KNOWN GAP: `circleCheck` and `octagonX` had no geometry, so
+      // `DsToastType.glyph` answered null for success and error and this test
+      // pinned the null. Both paths landed with the icon writer; wave B2 flips
+      // the getter and this pin with it.
+      expect(DsToastType.success.glyph, DsIconGlyph.circleCheck);
       expect(DsToastType.info.glyph, DsIconGlyph.info);
       expect(DsToastType.warning.glyph, DsIconGlyph.alertTriangle);
+      expect(DsToastType.error.glyph, DsIconGlyph.octagonX);
       expect(DsToastType.loading.glyph, DsIconGlyph.loaderCircle);
-      expect(DsToastType.success.glyph, isNull);
-      expect(DsToastType.error.glyph, isNull);
+
+      // The one remaining null is not a gap: `TOAST_ICONS` has no `default`
+      // key, so an untyped toast renders with no icon slot at all — while a
+      // call site may still put one there.
+      expect(DsToastType.normal.glyph, isNull);
+      expect(
+        const DsToastMessage(title: 'Added to favourites').resolvedGlyph,
+        isNull,
+      );
+      expect(
+        const DsToastMessage(
+          title: 'Added to favourites',
+          glyph: DsIconGlyph.check,
+        ).resolvedGlyph,
+        DsIconGlyph.check,
+      );
 
       await t.pumpWidget(host(SizedBox(
         width: DsToaster.width,
@@ -946,7 +964,6 @@ void main() {
           message: DsToastMessage(
             title: 'Saved',
             type: DsToastType.success,
-            glyph: DsIconGlyph.check,
           ),
         ),
       )));
@@ -1778,6 +1795,21 @@ void main() {
     });
   });
 
+  // RETUNED BY WAVE B2 — supervisor ruling F4. These four pinned a toaster
+  // that stacked at full size with a flat gap and no entrance, so each of them
+  // read the toast on the frame it was queued. A sonner toast is not there yet
+  // on that frame: it mounts at `translateY(100%)` / `opacity: 0`, flips
+  // `data-mounted` one frame later, and only then travels. Its height is not
+  // known on that frame either — the host measures it out of layout, exactly as
+  // sonner reads `getBoundingClientRect()` out of an effect, so nothing is
+  // positioned or hit-testable until the measurement lands.
+  //
+  // Every change below is one of those two facts and nothing else: the
+  // assertions are the same assertions. Bite-proven — all three of the pins
+  // that needed a pump failed first against the new behaviour (the entrance
+  // put the anchor 28.57px low, and the tap missed a stack that had not been
+  // measured yet), which is what says they were pinning the old choreography
+  // rather than the contract.
   group('DsToaster', () {
     Widget toaster(DsToastController controller) => host(
           SizedBox(
@@ -1787,6 +1819,16 @@ void main() {
           ),
         );
 
+    /// The mount frame, the measure-then-lay-out round trip, and the entrance.
+    ///
+    /// No `pumpAndSettle`: a toast carries a `DsBloomCosmic`, which runs two
+    /// forever loops, so a settle would never return.
+    Future<void> arrive(WidgetTester t) async {
+      await t.pump(); // data-mounted flips, the height is reported
+      await t.pump(); // the entrance retargets off the reported height
+      await t.pump(DsToaster.transition);
+    }
+
     testWidgets('shows nothing until something is queued',
         (WidgetTester t) async {
       final DsToastController controller = DsToastController();
@@ -1794,10 +1836,15 @@ void main() {
       await t.pumpWidget(toaster(controller));
       expect(find.byType(DsToast), findsNothing);
 
-      controller.success('Saved as @ayoub', glyph: DsIconGlyph.check);
+      controller.success('Saved as @ayoub');
       await t.pump();
       expect(find.byType(DsToast), findsOneWidget);
       expect(find.text('Saved as @ayoub'), findsOneWidget);
+      // The lifetime clock is a ticker now, because sonner's hover-pause
+      // stores a remainder and a remainder is what a ticker already holds — so
+      // it starts on the frame after it is armed, the way sonner's own
+      // `startTimer` runs after paint.
+      await t.pump();
       await t.pump(DsToaster.lifetime);
       await t.pump(DsToaster.unmountDelay);
       expect(find.byType(DsToast), findsNothing);
@@ -1809,8 +1856,7 @@ void main() {
       addTearDown(controller.dispose);
       await t.pumpWidget(toaster(controller));
       for (int i = 0; i < 5; i++) {
-        controller.error('Could not claim that handle $i',
-            glyph: DsIconGlyph.x);
+        controller.error('Could not claim that handle $i');
       }
       await t.pump();
       expect(controller.length, 5);
@@ -1828,8 +1874,8 @@ void main() {
       final DsToastController controller = DsToastController();
       addTearDown(controller.dispose);
       await t.pumpWidget(toaster(controller));
-      controller.success('Preferences saved', glyph: DsIconGlyph.check);
-      await t.pump();
+      controller.success('Preferences saved');
+      await arrive(t);
 
       await t.tap(find.byType(DsToast));
       await t.pump();
@@ -1844,13 +1890,13 @@ void main() {
       final DsToastController controller = DsToastController();
       addTearDown(controller.dispose);
       await t.pumpWidget(toaster(controller));
-      controller.success('Account saved', glyph: DsIconGlyph.check);
-      await t.pump();
+      controller.success('Account saved');
+      await arrive(t);
 
       final Rect frame = t.getRect(find.byType(DsToaster));
       final Rect toast = t.getRect(find.byType(DsToast));
       expect(frame.right - toast.right, 24);
-      expect(frame.bottom - toast.bottom, 24);
+      expect(frame.bottom - toast.bottom, closeTo(24, 1e-9));
       controller.clear();
       await t.pump();
     });

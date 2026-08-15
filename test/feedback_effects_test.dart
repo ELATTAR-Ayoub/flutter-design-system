@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 import 'dart:ui' as ui show Image, ImageByteFormat;
 
@@ -1082,6 +1083,886 @@ void main() {
 
       expect(DsEmptyDescription.spec.size, 13);
       expect(DsEmptyDescription.spec.height, closeTo(1.625, 1e-9));
+    });
+  });
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Wave B2 — sonner's choreography. Supervisor rulings F4, F5, F8.
+  //
+  // Transcribed from `node_modules/sonner/dist/styles.css` + `index.mjs`, then
+  // rAF-sampled on the live reference (1440 × 900, dark, 2026-08-16) before a
+  // line was written. Every number below is one of those two, and where the two
+  // disagree the measurement wins.
+  //
+  // Geometry is read off `getRect`, which resolves ancestor transforms — so
+  // these pin **where the toast landed**, not which `Transform` widgets are in
+  // the tree. That distinction is the whole point: three nested transforms
+  // could each be right and compose wrong.
+  //
+  // No `pumpAndSettle` here either: a toast carries a `DsBloomCosmic`, which
+  // runs two forever loops, so a settle would never return.
+  // ────────────────────────────────────────────────────────────────────────
+  group('sonner choreography — the stack', () {
+    Widget toaster(DsToastController c) => host(
+          SizedBox(
+            width: 1440,
+            height: 900,
+            child: DsToaster(controller: c),
+          ),
+        );
+
+    Finder toastWith(String title) => find.ancestor(
+          of: find.text(title),
+          matching: find.byType(DsToast),
+        );
+
+    /// The edge every toast is anchored to — `bottom: 24px` inside the host.
+    double anchor(WidgetTester t) =>
+        t.getRect(find.byType(DsToaster)).bottom - DsToaster.viewportOffset;
+
+    /// How far a toast's own bottom edge sits above that anchor.
+    double raise(WidgetTester t, String title) =>
+        anchor(t) - t.getRect(toastWith(title)).bottom;
+
+    double scaleOf(WidgetTester t, String title) =>
+        t.getRect(toastWith(title)).width / DsToaster.width;
+
+    /// The measured natural height the host pinned the stack to — read back
+    /// off the widget rather than assumed, because it is a font metric.
+    double heightOf(WidgetTester t, String title) =>
+        t.getRect(toastWith(title)).height / scaleOf(t, title);
+
+    double opacityOf(WidgetTester t, String title) => t
+        .widget<Opacity>(
+            find.ancestor(of: toastWith(title), matching: find.byType(Opacity)).first)
+        .opacity;
+
+    double contentOpacityOf(WidgetTester t, String title) =>
+        t.widget<DsToast>(toastWith(title)).contentOpacity;
+
+    /// The mount frame, the measure-then-lay-out round trip, and the entrance.
+    Future<void> arrive(WidgetTester t) async {
+      await t.pump();
+      await t.pump();
+      await t.pump(DsToaster.transition);
+      await t.pump();
+    }
+
+    Future<TestGesture> hover(WidgetTester t, Offset at) async {
+      final TestGesture g =
+          await t.createGesture(kind: PointerDeviceKind.mouse);
+      await g.addPointer(location: Offset.zero);
+      addTearDown(g.removePointer);
+      await g.moveTo(at);
+      await t.pump();
+      return g;
+    }
+
+    testWidgets(
+        'enters from translateY(100%) at opacity 0, over the slow window on '
+        'CSS ease', (WidgetTester t) async {
+      final DsToastController c = DsToastController();
+      addTearDown(c.dispose);
+      await t.pumpWidget(toaster(c));
+      c.success('Sold 3 cards for \$2,481.00',
+          description: 'Credited to your available balance.');
+
+      // The base rule, before `data-mounted` flips: the toast is a whole box
+      // BELOW its resting place and completely transparent. There is no
+      // `@keyframes` entrance — sonner's own comment says so.
+      await t.pump();
+      final double height = heightOf(t, 'Sold 3 cards for \$2,481.00');
+      expect(height, greaterThan(0));
+      expect(raise(t, 'Sold 3 cards for \$2,481.00'), closeTo(-height, 0.01),
+          reason: 'translateY(100%) is a whole box, resolved against itself');
+      expect(opacityOf(t, 'Sold 3 cards for \$2,481.00'), 0);
+
+      // `data-mounted="true"` — one frame later, and it travels.
+      await t.pump();
+      await t.pump(DsToaster.transition ~/ 2);
+      final double half = DsCurves.cssEase.transform(0.5);
+      expect(raise(t, 'Sold 3 cards for \$2,481.00'),
+          closeTo(-height * (1 - half), 0.6),
+          reason: 'measured 0.645 of the travel at 38.3% of the window — this '
+              'curve, and not DsCurves.standard or DsCurves.out');
+      expect(opacityOf(t, 'Sold 3 cards for \$2,481.00'), closeTo(half, 0.02));
+
+      await t.pump(DsToaster.transition);
+      expect(raise(t, 'Sold 3 cards for \$2,481.00'), closeTo(0, 0.01));
+      expect(opacityOf(t, 'Sold 3 cards for \$2,481.00'), 1);
+      c.clear();
+      await t.pump();
+    });
+
+    testWidgets(
+        'a collapsed stack blanks, scales 1 − 0.05n and pins every back toast '
+        "to the FRONT toast's measured height", (WidgetTester t) async {
+      final DsToastController c = DsToastController();
+      addTearDown(c.dispose);
+      await t.pumpWidget(toaster(c));
+      const String front = 'Could not reach the vault';
+      const String back1 = 'Sold 3 cards for \$2,481.00';
+      const String back2 = 'Added to favourites';
+
+      // Each toast's own height, read while it is still the front one — the
+      // only moment it wears it.
+      c.show(const DsToastMessage(title: back2));
+      await arrive(t);
+      final double natural2 = heightOf(t, back2);
+      c.success(back1, description: 'Credited to your available balance.');
+      await arrive(t);
+      final double natural1 = heightOf(t, back1);
+      c.error(front, description: 'Nothing was charged. Try again in a moment.');
+      await arrive(t);
+
+      final double frontHeight = heightOf(t, front);
+      // A title-only toast and a title-plus-description one genuinely differ,
+      // which is the only reason the pin below means anything. The comparison
+      // is between line COUNTS, never between wrap widths: this file renders on
+      // the test fallback face, so where a description breaks is not a fact
+      // about the reference.
+      expect(natural2, lessThan(natural1));
+      expect(natural2, lessThan(frontHeight));
+
+      // The front toast is untouched: `--offset: 0`, no scale, legible.
+      expect(raise(t, front), closeTo(0, 0.01));
+      expect(scaleOf(t, front), closeTo(1, 1e-9));
+      expect(contentOpacityOf(t, front), 1);
+
+      // `--y: translateY(--lift-amount * n) scale(1 - 0.05n)` — measured
+      // `matrix(0.95, 0, 0, 0.95, 0, -14)` and `matrix(0.9, 0, 0, 0.9, 0, -28)`.
+      for (final (int n, String title) in <(int, String)>[
+        (1, back1),
+        (2, back2),
+      ]) {
+        final double scale = 1 - DsToaster.stackScaleStep * n;
+        expect(scaleOf(t, title), closeTo(scale, 1e-6), reason: 'toast $n');
+        // `height: var(--front-toast-height)` — drift 17's measure-then-lay-out
+        // pass, and the assertion this whole render object exists for.
+        expect(heightOf(t, title), closeTo(frontHeight, 0.01),
+            reason: 'back toast $n is pinned to the front toast, not to itself');
+        // The box is translated by the gap and then scaled about its centre.
+        expect(
+          raise(t, title),
+          closeTo(DsToaster.gap * n + frontHeight * (1 - scale) / 2, 0.02),
+          reason: 'toast $n sits translateY(-14n) up, scaled about its centre',
+        );
+        // `> * { opacity: 0 }` — the icon slot and the content column both.
+        expect(contentOpacityOf(t, title), 0);
+        // …and the starfield goes with them, because it hangs off
+        // `[data-content]`. Measured on the live stack: contentOpacity 0 with
+        // both bloom layers still at 0.75 and still drifting.
+        expect(t.widget<DsToast>(toastWith(title)).starfield, isFalse);
+        // The bloom is NOT blanked: its two pseudo-elements are on the toast
+        // itself, so a collapsed sliver still glows.
+        expect(
+          find.descendant(
+              of: toastWith(title), matching: find.byType(DsBloomCosmic)),
+          findsOneWidget,
+        );
+      }
+      // The whole toast stays opaque; only its children fade.
+      expect(opacityOf(t, back2), 1);
+
+      c.clear();
+      await t.pump();
+    });
+
+    testWidgets(
+        'hovering expands to translateY(-offset) at each toast\'s own height',
+        (WidgetTester t) async {
+      final DsToastController c = DsToastController();
+      addTearDown(c.dispose);
+      await t.pumpWidget(toaster(c));
+      c.show(const DsToastMessage(title: 'Added to favourites'));
+      await arrive(t);
+      c.success('Sold 3 cards for \$2,481.00',
+          description: 'Credited to your available balance.');
+      await arrive(t);
+      c.error('Could not reach the vault',
+          description: 'Nothing was charged. Try again in a moment.');
+      await arrive(t);
+
+      const String front = 'Could not reach the vault';
+      const String back1 = 'Sold 3 cards for \$2,481.00';
+      const String back2 = 'Added to favourites';
+      final double h0 = heightOf(t, front);
+      final double h1 = t.widget<DsToast>(toastWith(back1)).pinnedHeight!;
+
+      await hover(t, t.getCenter(toastWith(front)));
+      await t.pump(DsToaster.transition);
+      await t.pump();
+
+      // `--offset: heightIndex * gap + Σ(heights before)`. Measured on the
+      // live stack: 107.875px for the second of three, at its own 75.6875px.
+      final double h1Natural = heightOf(t, back1);
+      expect(raise(t, back1), closeTo(DsToaster.gap + h0, 0.02));
+      expect(scaleOf(t, back1), closeTo(1, 1e-6));
+      expect(contentOpacityOf(t, back1), 1);
+      expect(h1Natural, lessThan(h1),
+          reason: 'it was pinned to the taller front toast and has now been '
+              'let back down to its own height');
+
+      expect(raise(t, back2), closeTo(2 * DsToaster.gap + h0 + h1Natural, 0.05));
+      expect(scaleOf(t, back2), closeTo(1, 1e-6));
+      expect(contentOpacityOf(t, back2), 1);
+
+      // The front toast never moves: its own offset is zero.
+      expect(raise(t, front), closeTo(0, 0.01));
+
+      c.clear();
+      await t.pump();
+    });
+
+    testWidgets('the host grows to cover the expanded stack, so crossing the '
+        'gap does not collapse it', (WidgetTester t) async {
+      final DsToastController c = DsToastController();
+      addTearDown(c.dispose);
+      await t.pumpWidget(toaster(c));
+      c.show(const DsToastMessage(title: 'Added to favourites'));
+      await arrive(t);
+      c.success('Sold 3 cards for \$2,481.00');
+      await arrive(t);
+
+      final Finder stack = find.descendant(
+          of: find.byType(DsToaster), matching: find.byType(Stack));
+      final double collapsed = t.getRect(stack.first).height;
+
+      final TestGesture g =
+          await hover(t, t.getCenter(toastWith('Sold 3 cards for \$2,481.00')));
+      await t.pump(DsToaster.transition);
+      await t.pump();
+      final double expanded = t.getRect(stack.first).height;
+      expect(expanded, greaterThan(collapsed),
+          reason: 'sonner bridges the gap with an ::after strip; the port '
+              'gives the host the stack\'s own reach instead');
+
+      // The 14px gap between two expanded toasts is inside the host, so the
+      // pointer never leaves it.
+      final Rect top = t.getRect(toastWith('Added to favourites'));
+      await g.moveTo(Offset(top.center.dx, top.bottom + DsToaster.gap / 2));
+      await t.pump();
+      await t.pump(DsToaster.transition);
+      expect(contentOpacityOf(t, 'Added to favourites'), 1,
+          reason: 'a stack that collapsed in the gap would flicker');
+
+      c.clear();
+      await t.pump();
+    });
+
+    testWidgets('a blanked toast lays its content out and clips it, rather '
+        'than squashing it', (WidgetTester t) async {
+      final DsToastController c = DsToastController();
+      addTearDown(c.dispose);
+      await t.pumpWidget(toaster(c));
+      // A two-line toast first, then a one-line one on top of it: the back
+      // toast is now pinned SHORTER than it measures, which is the direction
+      // that clips.
+      c.success('Sold 3 cards for \$2,481.00',
+          description: 'Credited to your available balance.');
+      await arrive(t);
+      final double tall = heightOf(t, 'Sold 3 cards for \$2,481.00');
+      c.show(const DsToastMessage(title: 'Added to favourites'));
+      await arrive(t);
+
+      final double short = heightOf(t, 'Added to favourites');
+      expect(short, lessThan(tall));
+      expect(heightOf(t, 'Sold 3 cards for \$2,481.00'), closeTo(short, 0.01));
+      // The description is still laid out at full size — `overflow: hidden`
+      // clips the paint, it does not reflow the text.
+      expect(find.text('Credited to your available balance.'), findsOneWidget);
+      expect(
+        t.getRect(find.text('Credited to your available balance.')).height,
+        greaterThan(0),
+      );
+      c.clear();
+      await t.pump();
+    });
+  });
+
+  group('sonner choreography — the three exits and the swipe', () {
+    Widget toaster(DsToastController c) => host(
+          SizedBox(
+            width: 1440,
+            height: 900,
+            child: DsToaster(controller: c),
+          ),
+        );
+
+    Finder toastWith(String title) => find.ancestor(
+          of: find.text(title),
+          matching: find.byType(DsToast),
+        );
+
+    double anchor(WidgetTester t) =>
+        t.getRect(find.byType(DsToaster)).bottom - DsToaster.viewportOffset;
+
+    double raise(WidgetTester t, String title) =>
+        anchor(t) - t.getRect(toastWith(title)).bottom;
+
+    double scaleOf(WidgetTester t, String title) =>
+        t.getRect(toastWith(title)).width / DsToaster.width;
+
+    double heightOf(WidgetTester t, String title) =>
+        t.getRect(toastWith(title)).height / scaleOf(t, title);
+
+    double opacityOf(WidgetTester t, String title) => t
+        .widget<Opacity>(
+            find.ancestor(of: toastWith(title), matching: find.byType(Opacity)).first)
+        .opacity;
+
+    Future<void> arrive(WidgetTester t) async {
+      await t.pump();
+      await t.pump();
+      await t.pump(DsToaster.transition);
+      await t.pump();
+    }
+
+    testWidgets('the front leaves the way it came in, and is torn out '
+        'mid-flight', (WidgetTester t) async {
+      final DsToastController c = DsToastController();
+      addTearDown(c.dispose);
+      await t.pumpWidget(toaster(c));
+      final int id = c.success('Preferences saved');
+      await arrive(t);
+      final double height = heightOf(t, 'Preferences saved');
+
+      c.dismiss(id);
+      await t.pump();
+      await t.pump(DsToaster.unmountDelay ~/ 2);
+      // `--y: translateY(--lift * -100%)` — the entrance, run backwards.
+      final double t100 = DsCurves.cssEase.transform(
+          DsToaster.unmountDelay.inMicroseconds /
+              2 /
+              DsToaster.transition.inMicroseconds);
+      expect(raise(t, 'Preferences saved'), closeTo(-height * t100, 1.2));
+      expect(opacityOf(t, 'Preferences saved'), closeTo(1 - t100, 0.03));
+
+      // TIME_BEFORE_UNMOUNT is 200ms and the transition is 400ms, so the node
+      // is torn out with the exit half-run. Measured on the live front exit:
+      // the last frame before unmount read opacity 0.35.
+      expect(opacityOf(t, 'Preferences saved'), greaterThan(0.2));
+      await t.pump(DsToaster.unmountDelay ~/ 2);
+      await t.pump();
+      expect(find.byType(DsToast), findsNothing);
+      expect(c.length, 0);
+    });
+
+    testWidgets('a back toast in a COLLAPSED stack falls 40% instead, on a '
+        'longer transform window than its fade', (WidgetTester t) async {
+      final DsToastController c = DsToastController();
+      addTearDown(c.dispose);
+      await t.pumpWidget(toaster(c));
+      final int oldest = c.show(const DsToastMessage(title: 'Added to favourites'));
+      await arrive(t);
+      c.success('Sold 3 cards for \$2,481.00',
+          description: 'Credited to your available balance.');
+      await arrive(t);
+
+      const String back = 'Added to favourites';
+      expect(scaleOf(t, back), closeTo(1 - DsToaster.stackScaleStep, 1e-6));
+
+      c.dismiss(oldest);
+      await t.pump();
+      await t.pump(DsToaster.unmountDelay ~/ 2);
+
+      // `--y: translateY(40%)` with NO `scale()` in it — so the scale is
+      // released back to 1 on the way out. Measured: 0.9 → 0.9019 → 0.9152 →
+      // 0.9295 over the frames before the unmount.
+      final double moved = DsCurves.cssEase.transform(
+          DsToaster.unmountDelay.inMicroseconds /
+              2 /
+              DsToaster.collapsedExitTransform.inMicroseconds);
+      expect(scaleOf(t, back),
+          closeTo(1 - DsToaster.stackScaleStep * (1 - moved), 0.01));
+      expect(
+        raise(t, back),
+        lessThan(DsToaster.gap),
+        reason: 'it is falling, not lifting',
+      );
+
+      // `transition: transform 500ms, opacity 200ms` — the fade is more than
+      // twice as far along as the fall.
+      final double faded = DsCurves.cssEase.transform(0.5);
+      expect(opacityOf(t, back), closeTo(1 - faded, 0.06));
+      expect(1 - opacityOf(t, back), greaterThan(moved * 2),
+          reason: 'it is gone well before it has finished falling');
+
+      await t.pump(DsToaster.unmountDelay ~/ 2);
+      await t.pump();
+      expect(find.text(back), findsNothing);
+      c.clear();
+      await t.pump();
+    });
+
+    testWidgets('a back toast in an EXPANDED stack leaves through its own slot',
+        (WidgetTester t) async {
+      final DsToastController c = DsToastController();
+      addTearDown(c.dispose);
+      await t.pumpWidget(toaster(c));
+      final int oldest = c.show(const DsToastMessage(title: 'Added to favourites'));
+      await arrive(t);
+      c.success('Sold 3 cards for \$2,481.00');
+      await arrive(t);
+
+      final TestGesture g = await t.createGesture(kind: PointerDeviceKind.mouse);
+      await g.addPointer(location: Offset.zero);
+      addTearDown(g.removePointer);
+      await g.moveTo(t.getCenter(toastWith('Sold 3 cards for \$2,481.00')));
+      await t.pump();
+      await t.pump(DsToaster.transition);
+      await t.pump();
+
+      const String back = 'Added to favourites';
+      final double offset = raise(t, back);
+      final double height = heightOf(t, back);
+      expect(offset, greaterThan(DsToaster.gap));
+
+      c.dismiss(oldest);
+      await t.pump();
+      await t.pump(DsToaster.unmountDelay ~/ 2);
+
+      // `--y: translateY(--lift * --offset + --lift * -100%)` — it keeps the
+      // slot the expansion gave it and travels a whole box further down it.
+      final double moved = DsCurves.cssEase.transform(
+          DsToaster.unmountDelay.inMicroseconds /
+              2 /
+              DsToaster.transition.inMicroseconds);
+      expect(raise(t, back), closeTo(offset - height * moved, 1.2));
+      expect(scaleOf(t, back), closeTo(1, 1e-6));
+
+      await t.pump(DsToaster.unmountDelay);
+      await t.pump();
+      expect(find.text(back), findsNothing);
+      c.clear();
+      await t.pump();
+    });
+
+    testWidgets('a swipe past the threshold throws it out; short of it the '
+        'toast snaps home and survives', (WidgetTester t) async {
+      final DsToastController c = DsToastController();
+      addTearDown(c.dispose);
+      await t.pumpWidget(toaster(c));
+      c.warning('Only 12 packs left in this print run');
+      await arrive(t);
+      const String title = 'Only 12 packs left in this print run';
+      final double home = t.getRect(toastWith(title)).left;
+
+      // Short of SWIPE_THRESHOLD, and slowly: sonner writes the swipe amount
+      // back to zero while `data-swiping` is still true, so it snaps with no
+      // transition at all. Measured: the toast did not travel and survived.
+      await t.drag(toastWith(title),
+          Offset(DsToaster.swipeThreshold - 15, 0),
+          touchSlopX: 0);
+      await t.pump();
+      expect(find.byType(DsToast), findsOneWidget);
+      expect(t.getRect(toastWith(title)).left, closeTo(home, 0.01),
+          reason: 'a snap, not a spring — there is no transition to ride');
+
+      // Past it: `data-swipe-out` beats all three removal rules.
+      await t.drag(
+          toastWith(title), Offset(DsToaster.swipeThreshold + 15, 0),
+          touchSlopX: 0);
+      await t.pump();
+      await t.pump(DsToaster.swipeOutDuration ~/ 2);
+      expect(t.getRect(toastWith(title)).left,
+          greaterThan(home + DsToaster.swipeThreshold + 15),
+          reason: 'it keeps going in the direction it was thrown, a whole box '
+              'further on');
+      await t.pump(DsToaster.unmountDelay);
+      await t.pump();
+      expect(find.byType(DsToast), findsNothing);
+      expect(c.length, 0);
+    });
+
+    testWidgets('a drag pulling back INTO the corner is dampened',
+        (WidgetTester t) async {
+      // `getDampening` — `1 / (1.5 + |delta| / 20)`. Only the corner's own two
+      // directions travel one-for-one.
+      expect(DsToaster.dampen(20), closeTo(20 / 2.5, 1e-9));
+      expect(DsToaster.dampen(-20), closeTo(-20 / 2.5, 1e-9));
+      expect(DsToaster.dampen(100), closeTo(100 / 6.5, 1e-9));
+
+      final DsToastController c = DsToastController();
+      addTearDown(c.dispose);
+      await t.pumpWidget(toaster(c));
+      c.warning('Only 12 packs left in this print run');
+      await arrive(t);
+      const String title = 'Only 12 packs left in this print run';
+      final double home = t.getRect(toastWith(title)).left;
+
+      // Left is *away* from a bottom-right toaster's swipe directions.
+      await t.drag(toastWith(title), const Offset(-60, 0), touchSlopX: 0);
+      await t.pump();
+      expect(find.byType(DsToast), findsOneWidget,
+          reason: '60px dampened to ${DsToaster.dampen(-60)} never reaches the '
+              'threshold');
+      expect(t.getRect(toastWith(title)).left, closeTo(home, 0.01));
+      c.clear();
+      await t.pump();
+    });
+
+    testWidgets('a fling under the threshold still dismisses, on velocity',
+        (WidgetTester t) async {
+      final DsToastController c = DsToastController();
+      addTearDown(c.dispose);
+      await t.pumpWidget(toaster(c));
+      c.warning('Only 12 packs left in this print run');
+      await arrive(t);
+      expect(DsToaster.swipeVelocity, 110,
+          reason: "sonner's 0.11 px/ms, in the units DragEndDetails speaks");
+
+      await t.fling(
+        toastWith('Only 12 packs left in this print run'),
+        const Offset(120, 0),
+        900,
+      );
+      await t.pump();
+      await t.pump(DsToaster.unmountDelay);
+      await t.pump();
+      expect(find.byType(DsToast), findsNothing);
+    });
+  });
+
+  group('sonner choreography — clocks, promise and reduced motion', () {
+    Widget toaster(DsToastController c, {bool reducedMotion = false}) => host(
+          SizedBox(
+            width: 1440,
+            height: 900,
+            child: DsToaster(controller: c),
+          ),
+          reducedMotion: reducedMotion,
+        );
+
+    Finder toastWith(String title) => find.ancestor(
+          of: find.text(title),
+          matching: find.byType(DsToast),
+        );
+
+    Future<void> arrive(WidgetTester t) async {
+      await t.pump();
+      await t.pump();
+      await t.pump(DsToaster.transition);
+      await t.pump();
+    }
+
+    testWidgets('hover-pause resumes from the stored remainder, not from zero',
+        (WidgetTester t) async {
+      final DsToastController c = DsToastController();
+      addTearDown(c.dispose);
+      await t.pumpWidget(toaster(c));
+      c.info('Saved as @ayoub');
+      await t.pump();
+      await t.pump();
+
+      // A quarter of the way through the lifetime, park a pointer on it.
+      await t.pump(DsToaster.lifetime ~/ 4);
+      final TestGesture g = await t.createGesture(kind: PointerDeviceKind.mouse);
+      await g.addPointer(location: Offset.zero);
+      addTearDown(g.removePointer);
+      await g.moveTo(t.getCenter(toastWith('Saved as @ayoub')));
+      await t.pump();
+
+      // Held for four whole lifetimes. A toast whose clock had not stopped
+      // would be long gone.
+      await t.pump(DsToaster.lifetime * 4);
+      expect(find.byType(DsToast), findsOneWidget);
+
+      await g.moveTo(const Offset(4, 4));
+      await t.pump();
+      // Three quarters were left, and three quarters are what is left. Measured
+      // on the live page: hovered at +1062ms, released at +3844ms, gone at
+      // +6798ms — a restart would have been +7700ms.
+      await t.pump(DsToaster.lifetime ~/ 2);
+      expect(find.byType(DsToast), findsOneWidget,
+          reason: 'a restart would still be running here too — the next step '
+              'is what tells them apart');
+      await t.pump(DsToaster.lifetime ~/ 4);
+      await t.pump(DsToaster.unmountDelay);
+      await t.pump();
+      expect(find.byType(DsToast), findsNothing,
+          reason: 'a restart would have had a full quarter still to run');
+    });
+
+    testWidgets('a loading toast has no clock at all', (WidgetTester t) async {
+      final DsToastController c = DsToastController();
+      addTearDown(c.dispose);
+      await t.pumpWidget(toaster(c));
+      c.loading('Requesting withdrawal…');
+      await arrive(t);
+      await t.pump(DsToaster.lifetime * 3);
+      expect(find.byType(DsToast), findsOneWidget,
+          reason: "index.mjs returns before startTimer whenever the type is "
+              "loading");
+      c.clear();
+      await t.pump();
+    });
+
+    testWidgets('toast.promise swaps in place — same toast, no second entrance',
+        (WidgetTester t) async {
+      final DsToastController c = DsToastController();
+      addTearDown(c.dispose);
+      await t.pumpWidget(toaster(c));
+      final Completer<void> settled = Completer<void>();
+      final int id = c.promise<void>(
+        settled.future,
+        loading: 'Requesting withdrawal…',
+        success: 'Withdrawal requested',
+        error: 'Request failed',
+      );
+      await arrive(t);
+
+      expect(c.messageOf(id)!.type, DsToastType.loading);
+      expect(c.messageOf(id)!.promise, isTrue);
+      expect(t.widget<DsToast>(toastWith('Requesting withdrawal…'))
+          .message.resolvedGlyph, DsIconGlyph.loaderCircle);
+      final Rect before = t.getRect(toastWith('Requesting withdrawal…'));
+
+      // The page's Promise button resolves after 1800ms.
+      await t.pump(const Duration(milliseconds: 1800));
+      settled.complete();
+      await t.pump();
+      await t.pump();
+
+      expect(c.length, 1, reason: 'the same toast, not a second one');
+      expect(c.messageOf(id)!.type, DsToastType.success);
+      expect(find.text('Requesting withdrawal…'), findsNothing);
+      expect(find.text('Withdrawal requested'), findsOneWidget);
+      expect(t.getRect(toastWith('Withdrawal requested')), before,
+          reason: 'same box, same slot — it never left and never re-entered');
+
+      // The settled glyph crosses in over the loader rather than cutting.
+      await t.pump(const Duration(milliseconds: 100));
+      final DsToast mid = t.widget<DsToast>(toastWith('Withdrawal requested'));
+      expect(mid.swapFrom, DsIconGlyph.loaderCircle);
+      expect(mid.message.resolvedGlyph, DsIconGlyph.circleCheck);
+      expect(mid.swapIn, greaterThan(0));
+      expect(mid.swapIn, lessThan(1));
+      expect(mid.swapOut, greaterThan(mid.swapIn),
+          reason: 'the loader leaves over a shorter window than the glyph '
+              'arrives over, so the two cross');
+
+      // …and only now does the 4000ms clock start.
+      await t.pump(const Duration(milliseconds: 300));
+      expect(t.widget<DsToast>(toastWith('Withdrawal requested')).swapFrom,
+          isNull);
+      await t.pump(DsToaster.lifetime);
+      await t.pump(DsToaster.unmountDelay);
+      await t.pump();
+      expect(find.byType(DsToast), findsNothing);
+    });
+
+    testWidgets('a rejected promise settles to the error toast',
+        (WidgetTester t) async {
+      final DsToastController c = DsToastController();
+      addTearDown(c.dispose);
+      await t.pumpWidget(toaster(c));
+      final Completer<void> settled = Completer<void>();
+      final int id = c.promise<void>(
+        settled.future,
+        loading: 'Requesting withdrawal…',
+        success: 'Withdrawal requested',
+        error: 'Request failed',
+      );
+      await arrive(t);
+      settled.completeError(StateError('vault unreachable'));
+      await t.pump();
+      await t.pump();
+      expect(c.messageOf(id)!.type, DsToastType.error);
+      expect(find.text('Request failed'), findsOneWidget);
+      c.clear();
+      await t.pump();
+    });
+
+    testWidgets('the four missing controller methods fire their own types',
+        (WidgetTester t) async {
+      final DsToastController c = DsToastController();
+      addTearDown(c.dispose);
+      await t.pumpWidget(toaster(c));
+      // The page fires neutral, success, error, warning and promise; `info`
+      // and `loading` complete the set sonner exposes.
+      expect(c.messageOf(c.info('i'))!.type, DsToastType.info);
+      expect(c.messageOf(c.warning('w'))!.type, DsToastType.warning);
+      expect(c.messageOf(c.loading('l'))!.type, DsToastType.loading);
+      expect(c.messageOf(c.success('s'))!.type, DsToastType.success);
+      expect(c.messageOf(c.error('e'))!.type, DsToastType.error);
+      expect(c.messageOf(c.show(const DsToastMessage(title: 'n')))!.type,
+          DsToastType.normal);
+      c.clear();
+      await t.pump();
+    });
+
+    testWidgets('reduced motion lands every leg on its final frame, and the '
+        'clocks still run', (WidgetTester t) async {
+      final DsToastController c = DsToastController();
+      addTearDown(c.dispose);
+      await t.pumpWidget(toaster(c, reducedMotion: true));
+      c.success('Sold 3 cards for \$2,481.00');
+      await t.pump();
+      await t.pump();
+      await t.pump();
+
+      // Sonner ships its own `prefers-reduced-motion` block that removes the
+      // transitions outright, where globals.css collapses them to 0.01ms —
+      // drift 14, two regimes that disagree. The port has one switch and takes
+      // sonner's reading. Measured under `prefers-reduced-motion: reduce`: the
+      // toast appears already at matrix(1,0,0,1,0,0) / opacity 1.
+      final double anchor =
+          t.getRect(find.byType(DsToaster)).bottom - DsToaster.viewportOffset;
+      expect(
+        anchor - t.getRect(toastWith('Sold 3 cards for \$2,481.00')).bottom,
+        closeTo(0, 0.01),
+        reason: 'no entrance to run — it is simply there',
+      );
+      expect(
+        t
+            .widget<Opacity>(find
+                .ancestor(
+                    of: toastWith('Sold 3 cards for \$2,481.00'),
+                    matching: find.byType(Opacity))
+                .first)
+            .opacity,
+        1,
+      );
+
+      // The lifetime is NOT gated on dsAnimationDuration: sonner's block
+      // removes transitions, not timers, and the live page confirms it.
+      await t.pump(DsToaster.lifetime);
+      await t.pump(DsToaster.unmountDelay);
+      await t.pump();
+      expect(find.byType(DsToast), findsNothing);
+    });
+
+    testWidgets('the title inherits .cn-toast\'s 1.5 and the description keeps '
+        'sonner\'s own 1.4', (WidgetTester t) async {
+      // `[data-title]` declares weight and colour and no leading, so it takes
+      // `.cn-toast { line-height: 1.5 }` → 19.5px. `DsComponentType.buttonLabel`
+      // is the same 13/500 on text-sm's surviving Tailwind ratio and is 0.93px
+      // a line short of it.
+      expect(DsToast.titleSpec.size, 13);
+      expect(DsToast.titleSpec.height, DsType.small.height);
+      expect(DsToast.titleSpec.weight, DsComponentType.buttonLabel.weight);
+      expect(
+          DsToast.titleSpec.height! * DsToast.titleSpec.size!, closeTo(19.5, 1e-9));
+      expect(DsToast.titleSpec.height,
+          isNot(closeTo(DsComponentType.buttonLabel.height!, 1e-6)),
+          reason: 'the whole reason this spec exists');
+
+      // `[data-description]`: `.cn-toast` sets its size and colour and never
+      // its leading, so sonner's own 1.4 survives — drift 4, live numbers.
+      expect(DsToast.descriptionSpec.size, 13);
+      expect(DsToast.descriptionSpec.height! * DsToast.descriptionSpec.size!,
+          closeTo(18.2, 1e-9));
+      expect(DsToast.descriptionSpec.weight, DsType.small.weight);
+
+      // And the box they add up to. Measured on the live toaster: 53.5px for a
+      // title-only toast — 32 of padding and 2 of border around one 19.5 line.
+      final DsToastController c = DsToastController();
+      addTearDown(c.dispose);
+      await t.pumpWidget(toaster(c));
+      c.show(const DsToastMessage(title: 'Added to favourites'));
+      await arrive(t);
+      expect(t.getRect(toastWith('Added to favourites')).height,
+          closeTo(53.5, 0.35));
+      c.clear();
+      await t.pump();
+    });
+
+    testWidgets('the toast carries an action pill, and pressing it dismisses',
+        (WidgetTester t) async {
+      final DsToastController c = DsToastController();
+      addTearDown(c.dispose);
+      await t.pumpWidget(toaster(c));
+      bool retried = false;
+      c.error(
+        'Could not reach the vault',
+        description: 'Nothing was charged. Try again in a moment.',
+        action: DsToastAction(
+          label: 'Retry',
+          onPressed: () => retried = true,
+        ),
+      );
+      await arrive(t);
+
+      // `[data-button]` — 32px on a pill, `margin-left: auto`, and top-aligned
+      // against `align-items: flex-start`.
+      final Finder pill = find.ancestor(
+        of: find.text('Retry'),
+        matching: find.byType(AnimatedContainer),
+      );
+      final Rect box = t.getRect(pill);
+      final Rect toast = t.getRect(toastWith('Could not reach the vault'));
+      expect(box.height, closeTo(32, 1e-9));
+      // padding 16 + the hairline.
+      expect(toast.right - box.right, closeTo(17, 0.01),
+          reason: 'margin-left: auto puts it hard against the right edge');
+      expect(box.top - toast.top, closeTo(17, 0.01),
+          reason: 'flex-start, not centred against a one-line title');
+
+      final DsThemeData theme = DsTheme.of(t.element(find.byType(DsToast)));
+      expect(
+        t.widget<AnimatedContainer>(pill).decoration,
+        isA<BoxDecoration>().having(
+            (BoxDecoration d) => d.color, 'secondary, not outline', theme.secondary),
+      );
+
+      // The handler first, `deleteToast()` after — sonner's own order.
+      await t.tap(find.text('Retry'));
+      await t.pump();
+      expect(retried, isTrue);
+      await t.pump(DsToaster.unmountDelay);
+      await t.pump();
+      expect(find.byType(DsToast), findsNothing);
+    });
+
+    testWidgets('a spinner keeps the 16px stroke at every box — drift 11',
+        (WidgetTester t) async {
+      // `Icon` computes strokeWidth from the size PROP and `spinner.tsx` never
+      // passes one, so the className moves the box and leaves the stroke where
+      // it was. Measured: 20px and 24px spinners still at 2.4.
+      await t.pumpWidget(host(Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          const DsSpinner(),
+          DsSpinner(size: ds(5)),
+          DsSpinner(size: ds(6)),
+        ],
+      )));
+      final List<DsIcon> icons =
+          t.widgetList<DsIcon>(find.byType(DsIcon)).toList();
+      expect(icons, hasLength(3));
+      for (final DsIcon icon in icons) {
+        expect(icon.strokeOverride, closeTo(2.4, 1e-9));
+      }
+      // The ladder's own answer for the two larger boxes, which the reference
+      // never reaches.
+      expect(DsIcon.strokeFor(ds(5)), 2);
+      expect(DsIcon.strokeFor(ds(6)), 2);
+      expect(DsIcon.strokeFor(DsSpinner.px), closeTo(2.4, 1e-9));
+
+      // …and a caller may still say otherwise.
+      await t.pumpWidget(host(DsSpinner(size: ds(6), strokeOverride: 2)));
+      expect(t.widget<DsIcon>(find.byType(DsIcon)).strokeOverride, 2);
+    });
+
+    testWidgets('sonner\'s two easings are CSS\'s, not the system\'s — F5',
+        (WidgetTester t) async {
+      // Both are foreign defaults, and both are visibly not the tokens whose
+      // names they share. Measured against the live traces.
+      expect(DsCurves.cssEase, const Cubic(0.25, 0.1, 0.25, 1));
+      expect(DsCurves.cssEaseOut, const Cubic(0, 0, 0.58, 1));
+      expect(DsCurves.all, isNot(contains(DsCurves.cssEase)),
+          reason: 'the transcript of --ease-* has seven entries and neither of '
+              'these is one of them');
+      expect(DsCurves.all, isNot(contains(DsCurves.cssEaseOut)));
+      // The retiming that snapping either to a system token would have caused.
+      expect(DsCurves.cssEase.transform(0.2),
+          isNot(closeTo(DsCurves.standard.transform(0.2), 0.05)));
+      expect(DsCurves.cssEaseOut.transform(0.775),
+          isNot(closeTo(DsCurves.out.transform(0.775), 0.02)));
+      // The two numbers the live traces actually produced.
+      expect(DsCurves.cssEase.transform(0.383), closeTo(0.645, 0.02));
+      expect(DsCurves.cssEaseOut.transform(0.775), closeTo(0.923, 0.02));
     });
   });
 }

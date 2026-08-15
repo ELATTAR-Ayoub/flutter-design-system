@@ -1222,9 +1222,18 @@ void main() {
     await tester.pump();
     expect(find.byType(DsToast), findsOneWidget);
 
+    // RETUNED BY WAVE B2 — ruling F4. A sonner toast is not where it will be
+    // on the frame it is queued: it mounts a whole box below its resting place
+    // at opacity 0, flips `data-mounted` one frame later, and its height is
+    // measured out of layout rather than known up front — so there is nothing
+    // to tap until the entrance has run. Same assertions, three more pumps.
+    await tester.pump();
+    await tester.pump(DsToaster.transition);
+    await tester.pump();
+
     await tester.tap(find.byType(DsToast));
     await tester.pump();
-    await tester.pump(const Duration(milliseconds: 200));
+    await tester.pump(DsToaster.unmountDelay);
     await tester.pump();
     expect(docsToasts.length, 0);
 

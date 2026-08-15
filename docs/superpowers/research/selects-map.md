@@ -991,3 +991,29 @@ For this page:
 11. **`DsPopover`'s scope.** §7 needs exactly one arrangement (`side=bottom`, `align=start`, `sideOffset=4`) and §3 needs one more (`sideOffset=6`). The full Radix/base-ui matrix — six sides, three aligns, collision flipping, arrow — is `menus`/`dialogs` territory. **Recommendation:** build `DsPopover` with side/align/offset parameters and *real* collision flipping (a popover that runs off-screen is a bug, not a drift), but no arrow and no nested-portal support until a later page needs them. Same shape as the ruling that scoped `DsSelect` in phase 3.
 12. **Every `duration-<word>` on this page is a no-op (drift 27, §13.1).** Both sites resolve to the 250ms default rather than to `--duration-base`, and the two numbers coincide, so nothing here changes on screen. **Recommendation:** port them as the default and write the mechanism into the doc comment, so the next reader does not "fix" it back to `DsDurations.base`. Two things I am *not* deciding here: (a) whether the shipped `DsInput` / `DsInputGroup` doc comments need the same correction — a corrective sweep is running in parallel and owns that; (b) whether any `duration-<word>` elsewhere in the corpus names a **non**-250ms token, where the drift would be visible rather than latent. Flag if you want me to add the computed `transitionDuration` on `[data-slot=input-group]` to the §17 Q3 probe list — I have written it as measured-from-the-stylesheet, not measured-from-the-page.
 13. **Seven chips, seven promised sections.** `nav.dart:333–342` records that a `contents` entry with no section is the bug this very page's §6 is a postmortem of. The port's nav already promises all seven. **Recommendation:** if the wave splits (Q1), the `selects` route stays on `PlaceholderPage` until **all seven** sections exist, rather than shipping a page that advertises Calendar and renders nothing — repeating the exact bug the page exists to document.
+
+---
+
+## Dated correction — 2026-08-16, B1 build-time probes (supervisor-appended)
+
+- **Drift 12 / §Command radius half-corrected:** measured `[data-slot=command]`
+  `border-radius` is **16px** in both themes — twMerge keeps `rounded-xl!` in
+  its own group key (important modifier) and `!important` wins the cascade
+  over the later `rounded-lg`. Background half stands (`--card`; `bg-popover`
+  stripped). Port ships `DsRadii.xl`.
+- **New drift — cmdk group re-sort is dead code:** `sort()` looks groups up by
+  `[cmdk-group=""][data-value="<React useId>"]` but the element's
+  `data-value` holds its heading, so the selector never matches. Item sort is
+  real (typing `t` lifts "Go to Stash" over "Open Wallet"); group order never
+  changes (typing `o` leaves Packs above Actions). Shipped faithfully.
+- **New drift — the command input has no focus affordance:** the group's
+  `has-[[data-slot=input-group-control]:focus-visible]` selector misses
+  (cmdk's Input stamps no such slot) and `shadow-none!` kills the ring.
+  Resting and focused are byte-identical.
+- **New drift — separator unmounts on the first keystroke** (cmdk renders it
+  only when `!state.search`); returns on clear. 1px height swing.
+- **Shortcuts are searchable** (`data-value` concatenates label + shortcut;
+  typing `48` finds the first pack).
+- Palette height measured **293.25** (derivation said 293.29 — Chrome 1/64px
+  grid). Empty state 124.56. Search glyph `--muted-foreground` @ .5.
+- `menuHeading` confirmed 12px / 16px box / weight 500 → spec added (L8).

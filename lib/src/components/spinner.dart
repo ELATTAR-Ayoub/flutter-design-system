@@ -47,7 +47,7 @@ import 'icon_paths.dart';
 /// null `label` anyway, spelled out here so the choice is visible), and
 /// [DsButton] carries the busy state alone.
 class DsSpinner extends StatefulWidget {
-  const DsSpinner({super.key, this.size = DsSpinner.px});
+  const DsSpinner({super.key, this.size = DsSpinner.px, this.strokeOverride});
 
   /// `size-4` — 16px, stated explicitly on the class list.
   ///
@@ -60,6 +60,19 @@ class DsSpinner extends StatefulWidget {
   /// The rendered box. Defaults to [px]; a caller that wants another size is
   /// doing what `className="size-5"` would do.
   final double size;
+
+  /// The stroke, for a caller that wants one this widget would not choose.
+  ///
+  /// Left null it is **not** derived from [size], and that is the point —
+  /// feedback-map drift 11. `Icon` computes `strokeWidth` from the `size`
+  /// **prop**, and `spinner.tsx` never passes one, so every spinner on the
+  /// reference is computed at `size="md"` (16px → 2.4) no matter what the
+  /// className does to its box. Measured on the `feedback` page: the `size-5`
+  /// and `size-6` spinners render 20px and 24px glyphs **still at 2.4**, where
+  /// the ladder's own rule would have given them 2. Deriving from [size] would
+  /// have drawn 1.92 and 2 — visibly thinner than the reference, and a
+  /// correction the reference never made.
+  final double? strokeOverride;
 
   @override
   State<DsSpinner> createState() => _DsSpinnerState();
@@ -129,6 +142,9 @@ class _DsSpinnerState extends State<DsSpinner>
             // the same 16 — the one place on this page where the declared size
             // and the rendered size agree.
             sizePx: widget.size,
+            // …and everywhere it does NOT agree, the stroke stays behind with
+            // the prop. See [strokeOverride].
+            strokeOverride: widget.strokeOverride ?? DsIcon.strokeFor(DsSpinner.px),
             tone: DsIconTone.inherit,
           ),
         ),

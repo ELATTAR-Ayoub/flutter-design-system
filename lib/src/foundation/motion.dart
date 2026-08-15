@@ -373,6 +373,43 @@ class DsCurves {
   /// `--ease-out-flex: cubic-bezier(0.05, 0.6, 0.4, 0.9)` (L430).
   static const Cubic outFlex = Cubic(0.05, 0.6, 0.4, 0.9);
 
+  /// CSS's own unnamed `ease` — `cubic-bezier(0.25, 0.1, 0.25, 1)`.
+  ///
+  /// **Not one of the system's easings, and deliberately not on [all].**
+  /// It is here for exactly one reason: sonner's stylesheet
+  /// (`node_modules/sonner/dist/styles.css` L89) writes
+  /// `transition: transform 400ms, opacity 400ms, height 400ms, box-shadow
+  /// 200ms` and names no timing function, so every leg of the toast
+  /// choreography — enter, stack collapse, expand-on-hover, two of the three
+  /// exits, the child fade, the container's own travel and the promise icon's
+  /// swap — runs on the CSS initial value. A foreign library's default, on the
+  /// same argument [DsToaster.unmountDelay] carries: putting it on the system's
+  /// motion scale would let a rebrand silently retime a third-party component,
+  /// and snapping it to [standard] `(0.4, 0, 0.2, 1)` would retime every toast
+  /// today.
+  ///
+  /// Verified against the live reference rather than assumed. rAF-sampled
+  /// through a real toast entrance (1440 × 900, dark, 2026-08-16): opacity read
+  /// 0.314 at 20.3% of the 400ms window, 0.645 at 38.3% and 0.9445 at 69.6% —
+  /// which is this curve to within the sampler's own frame slop, and is not
+  /// [standard], [out] or [inOut] at any of the three.
+  ///
+  /// Sonner's swipe-out is the one leg that names an easing, and it names
+  /// `ease-out` — CSS's `cubic-bezier(0, 0, 0.58, 1)`, which is a *fourth*
+  /// stock curve and not this system's [out]. See [cssEaseOut].
+  static const Cubic cssEase = Cubic(0.25, 0.1, 0.25, 1);
+
+  /// CSS's own `ease-out` — `cubic-bezier(0, 0, 0.58, 1)`.
+  ///
+  /// The companion to [cssEase], and here for the same one reason: sonner's
+  /// `swipe-out-*` keyframes run `200ms ease-out forwards` (`styles.css`
+  /// L356–358), and that `ease-out` is the CSS keyword, not `--ease-out`.
+  /// Measured on a live downward swipe: transform and opacity both read 95.5%
+  /// of their travel at 77.5% of the 200ms window, which is this curve and is
+  /// visibly not [out] `(0.22, 1, 0.36, 1)` — that one is 99.7% done by the
+  /// same instant.
+  static const Cubic cssEaseOut = Cubic(0, 0, 0.58, 1);
+
   /// All seven easings, in the order globals.css **declares** them:
   /// `spring` L420, `out` L421, `curveIn` L428, `inOut` L429, `outFlex` L430,
   /// `settle` L431, `standard` L432.
