@@ -30,3 +30,5 @@ running reference at 1440×900 in both themes.
 * Verification rig at `tool/verify/` (stitched captures, pixel diffs,
   section oracles); gallery boot params `?route= &theme= &motion=reduced`
   plus a js_interop scroll seam for deterministic capture.
+
+* Base families complete (2026-08-16): selects/pickers, selection, dialogs & overlays, menus, navigation, feedback, chat, data display, charts, layout primitives, sidebar - 21 gallery pages at rig-verified height parity, 1074 package + 624 example tests, full generated Lucide registry.
