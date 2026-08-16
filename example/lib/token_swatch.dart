@@ -307,6 +307,25 @@ class DsTokenRegistry {
     '--color-info-ink': (DsThemeData t) => t.infoInk,
     '--destructive-ink': (DsThemeData t) => t.destructiveInk,
     '--color-destructive-ink': (DsThemeData t) => t.destructiveInk,
+
+    // ── The five chart tokens, per theme (L624–628 / L842–846) ─────────────
+    // *"Declared once per theme in `app/globals.css`, and mirrored between them
+    // on purpose: 2 and 3 swap, and so do 4 and 5, so the reading order of a
+    // stack survives the theme flip instead of inverting with it… There is no
+    // sixth, and adding one needs a written reason."* The charts page renders
+    // all five through `TokenSwatchList`, with `measure: false` on every row —
+    // a series fill is not text and is not held to the AA threshold, which is
+    // exactly why a chart token must not be reused as a label colour.
+    '--chart-1': (DsThemeData t) => t.chart1,
+    '--chart-2': (DsThemeData t) => t.chart2,
+    '--chart-3': (DsThemeData t) => t.chart3,
+    '--chart-4': (DsThemeData t) => t.chart4,
+    '--chart-5': (DsThemeData t) => t.chart5,
+    '--color-chart-1': (DsThemeData t) => t.chart1,
+    '--color-chart-2': (DsThemeData t) => t.chart2,
+    '--color-chart-3': (DsThemeData t) => t.chart3,
+    '--color-chart-4': (DsThemeData t) => t.chart4,
+    '--color-chart-5': (DsThemeData t) => t.chart5,
   };
 
   /// Every registered custom-property name.

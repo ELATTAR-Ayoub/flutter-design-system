@@ -432,6 +432,25 @@ class DsCurves {
   /// `--ease-out-flex: cubic-bezier(0.05, 0.6, 0.4, 0.9)` (L430).
   static const Cubic outFlex = Cubic(0.05, 0.6, 0.4, 0.9);
 
+  /// CSS's own `linear` — `cubic-bezier(0, 0, 1, 1)`, i.e. no easing at all.
+  ///
+  /// **Not one of the system's easings and not on [all]**, on [cssEase]'s
+  /// precedent: `globals.css` declares no `--ease-linear`, so `ease-linear` is
+  /// Tailwind's own utility emitting the CSS keyword.
+  ///
+  /// It has exactly one consumer, and it is the app shell's most visible
+  /// motion: `Sidebar`'s gap and container both carry
+  /// `transition-[…] duration-base ease-linear`, so the panel's collapse is a
+  /// **constant-rate** width change rather than an eased one. Measured on the
+  /// live reference (1440 × 900, 2026-08-16, `sb-collapse.js`): 256 → 48 in
+  /// even ~13.85px steps per 16.6ms frame, reaching 48 exactly 250ms after the
+  /// state flip, with no front-loading and no overshoot at either end.
+  ///
+  /// Spelled as the identity [Cubic] rather than as the framework's own linear
+  /// curve so that every easing in the port is one object type and one
+  /// transcription of a CSS value.
+  static const Cubic linear = Cubic(0, 0, 1, 1);
+
   /// CSS's own unnamed `ease` — `cubic-bezier(0.25, 0.1, 0.25, 1)`.
   ///
   /// **Not one of the system's easings, and deliberately not on [all].**

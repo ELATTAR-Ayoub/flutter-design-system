@@ -44,13 +44,28 @@ import '../theme_scope.dart';
 /// `zoom-in-95` / `zoom-out-95`.
 const double _zoom = 0.95;
 
-/// One `MouseRegion` around a trigger, and a labelled diamond above it.
+/// `TooltipContent side` — the two the corpus asks for.
+///
+/// `top` is the component's own default and what the dialogs page measures.
+/// `right` arrives with `SidebarMenuButton`, whose tooltip is the *only* label
+/// a collapsed rail has: `<TooltipContent side="right" align="center" …>`.
+enum DsTooltipSide {
+  /// The default. Content above the trigger, arrow lane below it.
+  top,
+
+  /// Content to the trigger's right, arrow lane to its left.
+  right,
+}
+
+/// One `MouseRegion` around a trigger, and a labelled diamond beside it.
 class DsTooltip extends StatefulWidget {
   const DsTooltip({
     super.key,
     required this.label,
     required this.child,
     this.delay = DsDurations.tooltipDelay,
+    this.side = DsTooltipSide.top,
+    this.hidden = false,
   });
 
   /// The content. *"Content must be a short label."*
@@ -60,6 +75,19 @@ class DsTooltip extends StatefulWidget {
   final Widget child;
 
   final Duration delay;
+
+  /// Which edge of the trigger the content sits on.
+  final DsTooltipSide side;
+
+  /// `hidden` on the content — the trigger keeps its hover behaviour and
+  /// nothing is rendered.
+  ///
+  /// `SidebarMenuButton` passes `hidden={state !== "collapsed" || isMobile}`:
+  /// every row on the reference is wrapped in a `Tooltip`, and the label only
+  /// appears once the panel has collapsed to a rail and the row's own text has
+  /// gone. Expressed as a prop rather than by omitting the wrapper, because
+  /// that is what the reference does — the tooltip exists either way.
+  final bool hidden;
 
   /// `size-2.5` — the arrow's box, before the 45° turn.
   static double get arrowSize => ds(2.5);
@@ -113,6 +141,7 @@ class _DsTooltipState extends State<DsTooltip>
   /// dwell time, not motion, and `prefers-reduced-motion` has nothing to say
   /// about how long a pointer must rest before a label appears.
   void _enter() {
+    if (widget.hidden) return;
     final Object token = Object();
     _pending = token;
     Future<void>.delayed(widget.delay, () {
@@ -151,10 +180,11 @@ class _DsTooltipState extends State<DsTooltip>
     return Positioned.fill(
       child: IgnorePointer(
         child: CustomSingleChildLayout(
-          delegate: _TooltipLayout(anchor: anchor),
+          delegate: _TooltipLayout(anchor: anchor, side: widget.side),
           child: _TooltipTransition(
             animation: _animation,
-            child: DsTooltipContent(label: widget.label),
+            side: widget.side,
+            child: DsTooltipContent(label: widget.label, side: widget.side),
           ),
         ),
       ),
@@ -173,11 +203,13 @@ class _DsTooltipState extends State<DsTooltip>
       );
 }
 
-/// Puts the tooltip above its trigger, centred, and keeps it on screen.
+/// Puts the tooltip on its trigger's chosen edge, centred, and keeps it on
+/// screen.
 class _TooltipLayout extends SingleChildLayoutDelegate {
-  const _TooltipLayout({required this.anchor});
+  const _TooltipLayout({required this.anchor, required this.side});
 
   final Rect anchor;
+  final DsTooltipSide side;
 
   @override
   BoxConstraints getConstraintsForChild(BoxConstraints constraints) =>
@@ -185,17 +217,39 @@ class _TooltipLayout extends SingleChildLayoutDelegate {
 
   @override
   Offset getPositionForChild(Size size, Size childSize) {
-    final double x = (anchor.center.dx - childSize.width / 2)
-        .clamp(0.0, (size.width - childSize.width).clamp(0.0, double.infinity));
-    // The child is the content PLUS the arrow's lane, so its own bottom is the
-    // trigger's top.
-    final double y = (anchor.top - childSize.height)
-        .clamp(0.0, (size.height - childSize.height).clamp(0.0, double.infinity));
-    return Offset(x, y);
+    double clamp(double v, double extent) =>
+        v.clamp(0.0, extent.clamp(0.0, double.infinity));
+
+    switch (side) {
+      case DsTooltipSide.top:
+        final double x = clamp(
+          anchor.center.dx - childSize.width / 2,
+          size.width - childSize.width,
+        );
+        // The child is the content PLUS the arrow's lane, so its own bottom is
+        // the trigger's top.
+        final double y = clamp(
+          anchor.top - childSize.height,
+          size.height - childSize.height,
+        );
+        return Offset(x, y);
+      case DsTooltipSide.right:
+        // Same construction one quarter turn round: the lane is the child's
+        // leading column, so its own left edge is the trigger's right.
+        // *(Measured on a collapsed rail row: anchor right 340, content left
+        // 350 — the lane's own 10px, with `sideOffset` at 0.)*
+        final double x = clamp(anchor.right, size.width - childSize.width);
+        final double y = clamp(
+          anchor.center.dy - childSize.height / 2,
+          size.height - childSize.height,
+        );
+        return Offset(x, y);
+    }
   }
 
   @override
-  bool shouldRelayout(_TooltipLayout old) => old.anchor != anchor;
+  bool shouldRelayout(_TooltipLayout old) =>
+      old.anchor != anchor || old.side != side;
 }
 
 /// `TooltipContent` and its arrow, as one box: the label's pill on top and a
@@ -206,44 +260,65 @@ class _TooltipLayout extends SingleChildLayoutDelegate {
 /// reserves the arrow's height in exactly the same way, which is why
 /// `sideOffset={0}` still leaves a gap.
 class DsTooltipContent extends StatelessWidget {
-  const DsTooltipContent({super.key, required this.label});
+  const DsTooltipContent({
+    super.key,
+    required this.label,
+    this.side = DsTooltipSide.top,
+  });
 
   final String label;
+
+  /// Which edge the lane sits on — below the pill on [DsTooltipSide.top], left
+  /// of it on [DsTooltipSide.right].
+  final DsTooltipSide side;
 
   @override
   Widget build(BuildContext context) {
     final DsThemeData theme = DsTheme.of(context);
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        ConstrainedBox(
-          // `max-w-xs`.
-          constraints: BoxConstraints(maxWidth: DsContainers.xs),
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              color: theme.foreground,
-              borderRadius: BorderRadius.circular(DsRadii.md),
-            ),
-            child: Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: DsTooltip.horizontalPadding,
-                vertical: DsTooltip.verticalPadding,
-              ),
-              child: DsText(
-                label,
-                DsComponentType.tooltipLabel,
-                color: theme.background,
-              ),
-            ),
+    final Widget pill = ConstrainedBox(
+      // `max-w-xs`.
+      constraints: BoxConstraints(maxWidth: DsContainers.xs),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: theme.foreground,
+          borderRadius: BorderRadius.circular(DsRadii.md),
+        ),
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: DsTooltip.horizontalPadding,
+            vertical: DsTooltip.verticalPadding,
+          ),
+          child: DsText(
+            label,
+            DsComponentType.tooltipLabel,
+            color: theme.background,
           ),
         ),
-        SizedBox(
-          height: DsTooltip.arrowSize,
-          child: CustomPaint(painter: _ArrowPainter(color: theme.foreground)),
-        ),
-      ],
+      ),
     );
+
+    final Widget lane = CustomPaint(
+      painter: _ArrowPainter(color: theme.foreground, side: side),
+    );
+
+    return switch (side) {
+      DsTooltipSide.top => Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            pill,
+            SizedBox(height: DsTooltip.arrowSize, child: lane),
+          ],
+        ),
+      DsTooltipSide.right => Row(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            SizedBox(width: DsTooltip.arrowSize, child: lane),
+            pill,
+          ],
+        ),
+    };
   }
 }
 
@@ -254,30 +329,40 @@ class DsTooltipContent extends StatelessWidget {
 /// the painter rule's reason: a rotated, rounded square is one rendered path,
 /// and rendering it as one is what lets a pixel pin hold it.
 class _ArrowPainter extends CustomPainter {
-  const _ArrowPainter({required this.color});
+  const _ArrowPainter({required this.color, this.side = DsTooltipSide.top});
 
   final Color color;
 
+  /// Which lane this is painting in, and therefore which way the diamond's
+  /// centre is pushed out of it.
+  final DsTooltipSide side;
+
   @override
   void paint(Canvas canvas, Size size) {
-    final double side = DsTooltip.arrowSize;
-    // The pill is `align="center"` on its trigger and the arrow is centred on
-    // the trigger too, so the two centres coincide — measured 344.5 against
-    // 344.63, an eighth of a pixel apart.
-    final double cx = size.width / 2;
-    // `translate-y-[calc(-50% - 2px)]`, measured from the lane's own top.
-    final double cy = -DsRadii.xs;
+    final double square = DsTooltip.arrowSize;
+    // On `top` the pill is `align="center"` on its trigger and the arrow is
+    // centred on the trigger too, so the two centres coincide — measured 344.5
+    // against 344.63, an eighth of a pixel apart. On `right` the same holds one
+    // quarter turn round: the diamond's centre lands on the trigger's centre
+    // line and **2px inside** the content's facing edge *(measured: centre
+    // (352, 379) against a content box at x 350 and a centre line at 379)*.
+    final Offset centre = switch (side) {
+      // `translate-y-[calc(-50% - 2px)]`, measured from the lane's own top.
+      DsTooltipSide.top => Offset(size.width / 2, -DsRadii.xs),
+      DsTooltipSide.right =>
+        Offset(size.width + DsRadii.xs, size.height / 2),
+    };
 
-    final RRect square = RRect.fromRectAndRadius(
-      Rect.fromCenter(center: Offset(cx, cy), width: side, height: side),
+    final RRect diamond = RRect.fromRectAndRadius(
+      Rect.fromCenter(center: centre, width: square, height: square),
       Radius.circular(DsTooltip.arrowRadius),
     );
     canvas
       ..save()
-      ..translate(cx, cy)
+      ..translate(centre.dx, centre.dy)
       ..rotate(_quarterTurn)
-      ..translate(-cx, -cy)
-      ..drawRRect(square, Paint()..color = color)
+      ..translate(-centre.dx, -centre.dy)
+      ..drawRRect(diamond, Paint()..color = color)
       ..restore();
   }
 
@@ -285,15 +370,25 @@ class _ArrowPainter extends CustomPainter {
   static const double _quarterTurn = 0.7853981633974483;
 
   @override
-  bool shouldRepaint(_ArrowPainter old) => old.color != color;
+  bool shouldRepaint(_ArrowPainter old) =>
+      old.color != color || old.side != side;
 }
 
 /// `animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2` and its
 /// `animate-out` twin, minus the slide the twin does not have.
 class _TooltipTransition extends StatelessWidget {
-  const _TooltipTransition({required this.animation, required this.child});
+  const _TooltipTransition({
+    required this.animation,
+    required this.child,
+    this.side = DsTooltipSide.top,
+  });
 
   final Animation<double> animation;
+
+  /// `data-[side=top]:slide-in-from-bottom-2` against
+  /// `data-[side=right]:slide-in-from-left-2` — the travel is always **toward**
+  /// the trigger, so the axis follows the side.
+  final DsTooltipSide side;
 
   final Widget child;
 
@@ -304,14 +399,21 @@ class _TooltipTransition extends StatelessWidget {
         builder: (BuildContext context, Widget? child) {
           final double t = DsCurves.out.transform(animation.value.clamp(0, 1));
           final bool entering = animation.status != AnimationStatus.reverse;
+          final double travel = entering ? DsTooltip.slide * (1 - t) : 0;
           return Opacity(
             opacity: t,
             child: Transform.translate(
-              offset: Offset(0, entering ? DsTooltip.slide * (1 - t) : 0),
+              offset: switch (side) {
+                DsTooltipSide.top => Offset(0, travel),
+                DsTooltipSide.right => Offset(-travel, 0),
+              },
               child: Transform.scale(
                 scale: _zoom + (1 - _zoom) * t,
-                // The bottom edge of the box is where the trigger is.
-                alignment: Alignment.bottomCenter,
+                // The edge of the box the trigger is on.
+                alignment: switch (side) {
+                  DsTooltipSide.top => Alignment.bottomCenter,
+                  DsTooltipSide.right => Alignment.centerLeft,
+                },
                 child: child,
               ),
             ),

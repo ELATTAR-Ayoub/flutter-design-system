@@ -13,13 +13,16 @@ import 'package:flutter/material.dart';
 
 import 'nav.dart';
 import 'pages/buttons.dart';
+import 'pages/charts.dart';
 import 'pages/chat.dart';
 import 'pages/colors.dart';
+import 'pages/data.dart';
 import 'pages/dialogs.dart';
 import 'pages/feedback.dart';
 import 'pages/forms.dart';
 import 'pages/icons.dart';
 import 'pages/inputs.dart';
+import 'pages/layout.dart';
 import 'pages/menus.dart';
 import 'pages/motion.dart';
 import 'pages/navigation.dart';
@@ -28,6 +31,7 @@ import 'pages/placeholder.dart';
 import 'pages/selection.dart';
 import 'pages/selects.dart';
 import 'pages/shadows.dart';
+import 'pages/sidebar.dart';
 import 'pages/spacing.dart';
 import 'pages/typography.dart';
 import 'shell.dart';
@@ -224,7 +228,7 @@ class _DocsHome extends StatelessWidget {
   }
 }
 
-/// The seventeen real routes; every other href in the nav gets a
+/// The twenty-one real routes; every other href in the nav gets a
 /// [PlaceholderPage].
 ///
 /// Public because the shell test drives it directly, and because it is the one
@@ -233,10 +237,13 @@ class _DocsHome extends StatelessWidget {
 /// The arms follow the nav's own order (`nav.ts` foundations: colors →
 /// typography → spacing → shadows → motion → icons, then base components:
 /// buttons → inputs → forms → selects → selection → dialogs → menus →
-/// navigation → feedback → chat), so this switch reads as the sidebar reads.
-/// `selects` sitting between `forms` and `selection` is the registry's order,
-/// not an alphabetisation; `feedback` sits between `navigation` and `chat` for
-/// the same reason, which is why it is no longer the last arm.
+/// navigation → feedback → chat → data → charts → layout → sidebar), so this
+/// switch reads as the sidebar reads. `selects` sitting between `forms` and
+/// `selection` is the registry's order, not an alphabetisation; `feedback` sits
+/// between `navigation` and `chat` for the same reason, which is why neither of
+/// them is the last arm. With `sidebar` landed the whole Base group is built,
+/// so every arm below the foundations block is a base component and the
+/// placeholder is reached only by the Agent and Site groups.
 Widget pageFor(String route) {
   return switch (route) {
     dsRoot => const OverviewPage(),
@@ -256,6 +263,10 @@ Widget pageFor(String route) {
     '$dsRoot/components/base/navigation' => const NavigationPage(),
     '$dsRoot/components/base/feedback' => const FeedbackPage(),
     '$dsRoot/components/base/chat' => const ChatPage(),
+    '$dsRoot/components/base/data' => const DataPage(),
+    '$dsRoot/components/base/charts' => const ChartsPage(),
+    '$dsRoot/components/base/layout' => const LayoutPage(),
+    '$dsRoot/components/base/sidebar' => const SidebarPage(),
     _ => _placeholderFor(route),
   };
 }

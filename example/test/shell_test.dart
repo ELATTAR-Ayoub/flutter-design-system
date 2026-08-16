@@ -6,13 +6,16 @@ import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/main.dart';
 import 'package:example/nav.dart';
 import 'package:example/pages/buttons.dart';
+import 'package:example/pages/charts.dart';
 import 'package:example/pages/chat.dart';
 import 'package:example/pages/colors.dart';
+import 'package:example/pages/data.dart';
 import 'package:example/pages/dialogs.dart';
 import 'package:example/pages/feedback.dart';
 import 'package:example/pages/forms.dart';
 import 'package:example/pages/icons.dart';
 import 'package:example/pages/inputs.dart';
+import 'package:example/pages/layout.dart';
 import 'package:example/pages/menus.dart';
 import 'package:example/pages/motion.dart';
 import 'package:example/pages/navigation.dart';
@@ -21,6 +24,7 @@ import 'package:example/pages/placeholder.dart';
 import 'package:example/pages/selection.dart';
 import 'package:example/pages/selects.dart';
 import 'package:example/pages/shadows.dart';
+import 'package:example/pages/sidebar.dart';
 import 'package:example/pages/spacing.dart';
 import 'package:example/pages/typography.dart';
 import 'package:example/shell.dart';
@@ -58,7 +62,7 @@ extension on WidgetTester {
 /// Named as types rather than counted, because `isNotNull` cannot tell a real
 /// page from the [PlaceholderPage] every unbuilt href falls through to: a route
 /// arm dropped by a bad merge would still have satisfied it, and the page would
-/// have gone missing behind a title that looks right (ruling B11). Seventeen
+/// have gone missing behind a title that looks right (ruling B11). Twenty-one
 /// arms, in `pageFor`'s own order.
 const Map<String, Type> _wired = <String, Type>{
   dsRoot: OverviewPage,
@@ -78,6 +82,10 @@ const Map<String, Type> _wired = <String, Type>{
   '$dsRoot/components/base/navigation': NavigationPage,
   '$dsRoot/components/base/feedback': FeedbackPage,
   '$dsRoot/components/base/chat': ChatPage,
+  '$dsRoot/components/base/data': DataPage,
+  '$dsRoot/components/base/charts': ChartsPage,
+  '$dsRoot/components/base/layout': LayoutPage,
+  '$dsRoot/components/base/sidebar': SidebarPage,
 };
 
 Iterable<({DsGroup group, DsCategory category})> get _everyCategory sync* {
@@ -302,5 +310,33 @@ void main() {
         );
       }
     }
+
+    // …and the state this wiring pass reaches, said out loud rather than left
+    // to be inferred from the table's length: **Foundations and Base are
+    // finished**. Every category in either group mounts a real page, so the
+    // placeholder is now reachable only from Agent and Site. Asserted as a set
+    // difference and not as a count, for the reason the table itself is typed
+    // rather than counted: a category renamed out of Base and a category left
+    // unbuilt are the same arithmetic and very different bugs.
+    for (final String id in const <String>['foundations', 'base']) {
+      final DsGroup group = dsGroupById(id);
+      expect(
+        <String>[
+          for (final DsCategory category in group.categories)
+            if (!_wired.containsKey(categoryHref(group, category)))
+              category.slug,
+        ],
+        isEmpty,
+        reason: 'every $id category is built, so none may be a placeholder',
+      );
+    }
+    // The converse, so the assertion above cannot pass by the group emptying:
+    // the two families that are genuinely unbuilt still are, indexes included.
+    expect(
+      hrefs.where((String href) => !_wired.containsKey(href)),
+      isNotEmpty,
+      reason: 'Agent and Site are not built yet — if that changed, this test '
+          'is what has to say so',
+    );
   });
 }

@@ -400,6 +400,8 @@ class DsSheetContent extends StatelessWidget {
     this.side = DsSheetSide.right,
     this.showCloseButton = true,
     this.onClose,
+    this.width,
+    this.fill,
   });
 
   /// The `flex flex-col gap-4` column. A [DsSheetFooter] takes `mt-auto` and is
@@ -407,6 +409,20 @@ class DsSheetContent extends StatelessWidget {
   final List<Widget> children;
 
   final DsSheetSide side;
+
+  /// Overrides `sm:max-w-sm`.
+  ///
+  /// One consumer, and its class list explains why the override has to be
+  /// *important* on the reference: `Sidebar`'s mobile branch writes
+  /// `w-(--sidebar-width)!` at `--width-sidebar-mobile` (288), because
+  /// `SheetContent` already sets `data-[side=left]:w-3/4` and a
+  /// variant-prefixed width outranks a plain one. The file records the bug that
+  /// caught: the panel rendered at 281.25 of a 375px viewport — exactly 0.75 ×
+  /// 375 — with the token *declared, referenced and completely inert*.
+  final double? width;
+
+  /// Overrides `bg-popover` — the mobile sidebar's `bg-sidebar`.
+  final Color? fill;
 
   /// Defaulted on by the reference, which is what puts `pr-12` on the header.
   final bool showCloseButton;
@@ -440,11 +456,11 @@ class DsSheetContent extends StatelessWidget {
     return DsSheetContentGroup(
       showCloseButton: showCloseButton,
       child: SizedBox(
-        width: side.isHorizontal ? maxWidth : null,
+        width: side.isHorizontal ? (width ?? maxWidth) : null,
         height: side.isHorizontal ? double.infinity : null,
         child: DecoratedBox(
           decoration: BoxDecoration(
-            color: theme.popover,
+            color: fill ?? theme.popover,
             border: switch (side) {
               DsSheetSide.left => Border(right: edge),
               DsSheetSide.right => Border(left: edge),

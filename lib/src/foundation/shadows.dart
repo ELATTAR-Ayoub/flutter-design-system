@@ -170,6 +170,36 @@ class DsShadows {
     DsShadowLayer(0, 2, 4, -2, _tailwindShadowInk),
   ]);
 
+  /// Tailwind's stock `shadow-xl`, carried for the same reason as [tailwindLg]
+  /// and [tailwindMd]: `ChartTooltipContent` asks for it by that name
+  /// (`components/ui/chart.tsx` — `rounded-lg border border-border/50
+  /// bg-background px-2.5 py-1.5 text-xs shadow-xl`) and `globals.css` never
+  /// redeclares `--shadow-xl`, so the framework default is what renders.
+  ///
+  /// `0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)`.
+  ///
+  /// The third foreign elevation in the system, and the third one to arrive
+  /// through a vendored shadcn component rather than through a design
+  /// decision — which is why it stays outside the `e1`–`e4` ladder like the
+  /// other two.
+  static const DsShadowSpec tailwindXl = DsShadowSpec(<DsShadowLayer>[
+    DsShadowLayer(0, 20, 25, -5, _tailwindShadowInk),
+    DsShadowLayer(0, 8, 10, -6, _tailwindShadowInk),
+  ]);
+
+  /// Tailwind's stock `shadow-sm`, the fourth foreign elevation and the
+  /// smallest: `Sidebar`'s `floating` variant lifts its panel with it
+  /// (`group-data-[variant=floating]:shadow-sm`) and its `inset` variant lifts
+  /// the **main column** with it (`md:peer-data-[variant=inset]:shadow-sm`).
+  /// `globals.css` never redeclares `--shadow-sm`, so the framework default is
+  /// what renders.
+  ///
+  /// `0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)`.
+  static const DsShadowSpec tailwindSm = DsShadowSpec(<DsShadowLayer>[
+    DsShadowLayer(0, 1, 3, 0, _tailwindShadowInk),
+    DsShadowLayer(0, 1, 2, -1, _tailwindShadowInk),
+  ]);
+
   /// `--shadow-e1: 0 1px 1px var(--ink-2), 0 1px 3px var(--ink-1)`
   static const DsShadowSpec e1 = DsShadowSpec(<DsShadowLayer>[
     DsShadowLayer(0, 1, 1, 0, _ink2),

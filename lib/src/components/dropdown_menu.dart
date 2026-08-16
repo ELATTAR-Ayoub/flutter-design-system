@@ -102,6 +102,7 @@ class DsDropdownMenu extends StatefulWidget {
     required this.children,
     this.width,
     this.align = DsPopoverAlign.start,
+    this.side = DsPopoverSide.bottom,
     this.enabled = true,
   });
 
@@ -120,6 +121,16 @@ class DsDropdownMenu extends StatefulWidget {
 
   /// `align` — the file's default is `"start"`, not Radix's `"center"`.
   final DsPopoverAlign align;
+
+  /// `side` — Radix's own default is `"bottom"` and the menus page never
+  /// changes it, so that is this widget's default too.
+  ///
+  /// The sidebar is where it moves: a menu opened from a 256px panel has no
+  /// room under it and every trigger in that family asks for `side="right"`
+  /// (`NavUser` conditionally, `side={isMobile ? "bottom" : "right"}`). The
+  /// placement itself is [DsPopover]'s, collision flip included; all this does
+  /// is stop hard-coding one value of it.
+  final DsPopoverSide side;
 
   final bool enabled;
 
@@ -163,7 +174,7 @@ class _DsDropdownMenuState extends State<DsDropdownMenu> {
   Widget build(BuildContext context) {
     return DsPopover(
       open: _isOpen,
-      side: DsPopoverSide.bottom,
+      side: widget.side,
       align: widget.align,
       sideOffset: DsDropdownMenu.sideOffset,
       origin: DsPopoverOriginModel.corner,

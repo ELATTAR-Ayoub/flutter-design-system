@@ -82,6 +82,7 @@ import '../foundation/typography.dart';
 import '../theme_scope.dart';
 import 'icon.dart';
 import 'icon_paths.dart';
+import 'icon_paths.g.dart';
 import 'popover.dart';
 
 /// `data-disabled:opacity-50`.
@@ -137,6 +138,7 @@ class DsMenuItem extends DsMenuChild {
   const DsMenuItem({
     required this.label,
     this.icon,
+    this.lucideIcon,
     this.shortcut,
     this.variant = DsMenuItemVariant.normal,
     this.enabled = true,
@@ -150,6 +152,14 @@ class DsMenuItem extends DsMenuChild {
   /// The leading `Icon` — `size="sm" tone="subtle"`, which the item's own
   /// `[&_svg:not([class*='size-'])]:size-4` renders at 16.
   final DsIconGlyph? icon;
+
+  /// The same slot, over the **generated** registry.
+  ///
+  /// [DsIconGlyph] is the icons page's whitelist; a menu row is free to render
+  /// anything lucide ships, and `NavUser`'s account menu does — `BadgeCheck` is
+  /// not on the whitelist and never will be. Same split, same reason, as
+  /// [DsIcon.lucide] beside `DsIcon`. Ignored when [icon] is given.
+  final DsLucideGlyph? lucideIcon;
 
   /// `*MenuShortcut`'s content — *"a real number in the normal product face"*
   /// as often as a key hint.
@@ -906,6 +916,7 @@ class _DsMenuContentState extends State<DsMenuContent> {
           theme: theme,
           label: item.label,
           leading: item.icon,
+          leadingLucide: item.lucideIcon,
           shortcut: item.shortcut,
           variant: item.variant,
           enabled: item.enabled,
@@ -1082,6 +1093,7 @@ class _MenuRow extends StatelessWidget {
     required this.highlighted,
     required this.enabled,
     this.leading,
+    this.leadingLucide,
     this.trailing,
     this.shortcut,
     this.checked,
@@ -1099,6 +1111,9 @@ class _MenuRow extends StatelessWidget {
 
   /// The leading `Icon`, forced to 16px by the row's own class list.
   final DsIconGlyph? leading;
+
+  /// The same slot over the generated registry — see [DsMenuItem.lucideIcon].
+  final DsLucideGlyph? leadingLucide;
 
   /// `ChevronRightIcon className="ml-auto"` on a sub-trigger.
   final DsIconGlyph? trailing;
@@ -1177,17 +1192,23 @@ class _MenuRow extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                if (leading != null) ...<Widget>[
+                if (leading != null || leadingLucide != null) ...<Widget>[
                   // `text-current` under a colour of its own — which is what a
                   // `text-*` utility on an SVG's parent means, and the only way
                   // a lucide glyph is ever coloured.
                   DefaultTextStyle.merge(
                     style: TextStyle(color: glyph),
-                    child: DsIcon(
-                      leading!,
-                      sizePx: DsMenu.iconSize,
-                      strokeOverride: DsMenu.iconStroke,
-                    ),
+                    child: leading != null
+                        ? DsIcon(
+                            leading!,
+                            sizePx: DsMenu.iconSize,
+                            strokeOverride: DsMenu.iconStroke,
+                          )
+                        : DsIcon.lucide(
+                            leadingLucide!,
+                            sizePx: DsMenu.iconSize,
+                            strokeOverride: DsMenu.iconStroke,
+                          ),
                   ),
                   // `gap-2`.
                   SizedBox(width: ds(2)),

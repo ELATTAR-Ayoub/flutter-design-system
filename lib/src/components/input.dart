@@ -100,6 +100,9 @@ class DsInput extends StatefulWidget {
     this.hint,
     this.bare = false,
     this.padding,
+    this.boxHeight,
+    this.fill,
+    this.flat = false,
   }) : assert(
           controller == null || initialValue == null,
           'A controller already carries the value — seed it there instead.',
@@ -208,6 +211,30 @@ class DsInput extends StatefulWidget {
   /// (0,1,0) and drop the padding to 8px on whichever side an addon occupies.
   /// `DsInputGroupInput` computes it; nothing else should need to.
   final EdgeInsetsGeometry? padding;
+
+  /// Overrides `h-10`.
+  ///
+  /// One consumer: `SidebarInput`, which is `Input` plus `h-8 w-full
+  /// bg-background shadow-none` — a 32px field, because a sidebar header is
+  /// not a form. Named [boxHeight] rather than `height` because [height] is
+  /// already the class's own static reading of `h-10`, and Dart will not let a
+  /// class hold both.
+  final double? boxHeight;
+
+  /// Overrides the socket's `bg-card` fill.
+  ///
+  /// `SidebarInput`'s `bg-background`: the panel is already `--sidebar` (which
+  /// **is** `--card`), so a field wearing the same fill would have no socket at
+  /// all. Sinking it to `--background` is what makes the well read as a well.
+  final Color? fill;
+
+  /// `shadow-none` — drops `shadow-pressed`, keeping the focus ring.
+  ///
+  /// The two are different Tailwind slots: `shadow-none` clears `--tw-shadow`
+  /// and says nothing about `--tw-ring-shadow`. *(Measured on `SidebarInput`:
+  /// five fully transparent `box-shadow` layers at rest — the four framework
+  /// placeholders and nothing else — with the ring still arriving on focus.)*
+  final bool flat;
 
   /// `h-10` — 40px, deliberately level with a default `DsButton`.
   static double get height => ds(10);
@@ -376,9 +403,11 @@ class _DsInputState extends State<DsInput> {
         focused: _focused,
         invalid: invalid,
         padding: padding,
+        fill: widget.fill,
+        flat: widget.flat,
         child: line,
       );
-      field = SizedBox(height: DsInput.height, child: field);
+      field = SizedBox(height: widget.boxHeight ?? DsInput.height, child: field);
     }
 
     // [EditableText] does not handle its own pointer gestures — `TextField`
@@ -431,6 +460,8 @@ class DsFieldSurface extends StatelessWidget {
     required this.focused,
     required this.invalid,
     required this.child,
+    this.fill,
+    this.flat = false,
   });
 
   /// The selection wash — `::selection` at `globals.css:1007–1010`, the
@@ -454,6 +485,12 @@ class DsFieldSurface extends StatelessWidget {
 
   /// `aria-invalid` — beats [focused] on both properties they share.
   final bool invalid;
+
+  /// Overrides `bg-card` — see [DsInput.fill].
+  final Color? fill;
+
+  /// `shadow-none`: the socket goes, the ring stays — see [DsInput.flat].
+  final bool flat;
 
   final Widget child;
 
@@ -498,14 +535,15 @@ class DsFieldSurface extends StatelessWidget {
           // The ring is ADDED to `shadow-pressed`, never replacing it — the
           // socket is what makes the field read as editable and it never rises.
           final Color ringColor = r ?? ring;
+          final DsShadowSpec base = flat ? DsShadows.none : DsShadows.pressed;
           final DsShadowSpec spec = ringColor.a == 0
-              ? DsShadows.pressed
-              : DsButton.withFocusRing(DsShadows.pressed, ringColor);
+              ? base
+              : DsButton.withFocusRing(base, ringColor);
 
           return DsMachineSurface(
             spec: spec,
             radius: radius,
-            fill: theme.card,
+            fill: fill ?? theme.card,
             border: Border.all(color: b ?? border, width: DsWidths.hairline),
             child: child,
           );
@@ -522,11 +560,15 @@ class _Socket extends StatelessWidget {
     required this.invalid,
     required this.padding,
     required this.child,
+    this.fill,
+    this.flat = false,
   });
 
   final bool focused;
   final bool invalid;
   final EdgeInsetsGeometry padding;
+  final Color? fill;
+  final bool flat;
   final Widget child;
 
   @override
@@ -535,6 +577,8 @@ class _Socket extends StatelessWidget {
       radius: BorderRadius.circular(DsRadii.pill),
       focused: focused,
       invalid: invalid,
+      fill: fill,
+      flat: flat,
       child: Padding(
         // The surface has already inset this child by the border's width, the
         // way `box-sizing: border-box` does.

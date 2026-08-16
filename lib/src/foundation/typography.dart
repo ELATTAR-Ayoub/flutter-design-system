@@ -325,18 +325,47 @@ class DsComponentType {
   /// The same 13px as [buttonLabel] through a different class — which is
   /// exactly why both exist: `text-small` is bespoke and carries no companion
   /// leading key, `text-sm` is aliased and inherits Tailwind's.
+  ///
+  /// CORRECTED, and it is [buttonLabel]'s correction one rung down. "No
+  /// companion leading key" does not mean *no leading*: it means the property
+  /// is **inherited**, and what it inherits is Preflight's `html { line-height:
+  /// 1.5 }`, which nothing between `html` and a button overrides. So the line
+  /// box is `1.5 × 13` = **19.5px**, not the face's own natural leading.
+  ///
+  /// It shipped as `height: null` for the same reason [buttonLabel]'s error
+  /// survived two phases: a label centred in a fixed-height flex box lands in
+  /// the same place either way, so nothing that had been measured could see it.
+  /// `SidebarMenuButton` is the first `h-auto` button in the corpus and it can:
+  /// *(measured on the live reference)* a default sidebar row computes
+  /// `font-size: 13px; line-height: 19.5px` and stands **37.5px** tall
+  /// (19.5 + `py-2` + a 1px border); with the face's own leading it comes out
+  /// 34, and the whole page runs short.
   static final DsTypeSpec buttonLabelSm = DsTypeSpec(
     family: DsFonts.sans,
     size: 13,
+    height: _leadingInherited,
     wght: 500,
   );
 
-  /// `Button` `size="lg"`: `text-body` **15px**, no line-height of its own.
+  /// `Button` `size="lg"`: `text-body` **15px**, inheriting 1.5 → **22.5px**.
+  ///
+  /// Same correction as [buttonLabelSm], and the same measurement: the `lg`
+  /// sidebar row computes `15px / 22.5px` and is 50px tall around a 32px tile.
   static final DsTypeSpec buttonLabelLg = DsTypeSpec(
     family: DsFonts.sans,
     size: 15,
+    height: _leadingInherited,
     wght: 500,
   );
+
+  /// Preflight's `html { line-height: 1.5 }` — what a `text-*` utility with no
+  /// companion `--text-*--line-height` key leaves the element inheriting.
+  ///
+  /// Numerically [_leadingBase], and deliberately not spelled as it: that one
+  /// is Tailwind's `--text-base--line-height` key, `calc(1.5rem / 1rem)`, and
+  /// the two agreeing today is a coincidence of the stock scale rather than a
+  /// relationship.
+  static const double _leadingInherited = 1.5;
 
   /// `Button` `size="xl"`: `text-base` → `--text-body` **15px**, leading 22.5.
   /// Same size as [buttonLabelLg], different leading, same reason as `sm`.
@@ -650,6 +679,53 @@ class DsComponentType {
     wght: 500,
   );
 
+  // ── the sidebar family ──────────────────────────────────────────────────
+  // Two roles, and both are the same collision: a `.type-num-*` **component**
+  // class written onto an element whose own **utility** classes already state
+  // a size and a weight. `cn()` keeps both — tailwind-merge has no group for a
+  // `.type-*` class — and the utility layer is emitted after the component
+  // layer, so the utility wins every property it names. What survives from the
+  // `.type-num-*` side is only what the utilities are silent about: the mono
+  // family, `tabular-nums`, and `--tracking-num` −0.01em.
+  //
+  // Neither is a new class in globals.css and neither is a design decision;
+  // both are the *resolved* style, measured on the live page (1440 × 900,
+  // 2026-08-16), and they are recorded here because a `.type-*` spec passed
+  // straight through would render the wrong size on both.
+
+  /// `SidebarMenuBadge`'s `.type-num-xs` over `Badge`'s own `text-xs
+  /// font-medium` — **12px / 500 / 1.333333, mono, tabular, −0.01em**.
+  ///
+  /// [DsType.numXs] is 11px at 600; `text-xs` (→ `--text-num-sm`, 12px) and
+  /// `font-medium` both outrank it. *(Measured: `font-size: 12px`,
+  /// `font-weight: 500`, `line-height: 16px`, `letter-spacing: -0.12px`,
+  /// `font-variant-numeric: tabular-nums`, family `GeistMono`.)*
+  static final DsTypeSpec sidebarMenuBadge = DsTypeSpec(
+    family: DsFonts.mono,
+    size: 12,
+    height: _leadingXs,
+    wght: 500,
+    tracking: -0.01,
+    tabular: true,
+  );
+
+  /// `NavUser`'s `<AvatarFallback className="type-num-sm">` over
+  /// `AvatarFallback`'s own `text-sm` — **13px / 600 / 1.428571, mono,
+  /// tabular, −0.01em**.
+  ///
+  /// The mirror image of [sidebarMenuBadge]: here the class list carries a
+  /// size but **no** weight, so `.type-num-sm`'s 600 survives and its 12px
+  /// does not. *(Measured: 13px / 600 / 18.5714px / −0.13px / tabular /
+  /// `GeistMono`.)*
+  static final DsTypeSpec avatarFallback = DsTypeSpec(
+    family: DsFonts.mono,
+    size: 13,
+    height: _leadingSm,
+    wght: 600,
+    tracking: -0.01,
+    tabular: true,
+  );
+
   // ── the field family ────────────────────────────────────────────────────
   // `field.tsx`, `textarea.tsx` and `input-otp.tsx` type themselves out of the
   // bare Tailwind ladder — `text-sm` with an optional `leading-*` override —
@@ -810,6 +886,94 @@ class DsComponentType {
     height: _leadingXs,
     wght: 400,
   );
+
+  // ── the data-display family ─────────────────────────────────────────────
+  // `table.tsx`, `card.tsx`, `item.tsx` and `avatar.tsx` type off the bare
+  // Tailwind ladder as well. Every number below is a computed style read off
+  // `/design-system/components/base/data` at 1440×900 on 2026-08-16.
+
+  /// `--leading-normal: 1.5` — Tailwind stock, undeclared in globals.css.
+  ///
+  /// Numerically [_leadingNavUtility] and a different fact: that one is the
+  /// ratio the framework *supplies* when a `--text-*` entry declares no
+  /// companion; this one is an author writing `leading-normal` by hand.
+  static const double _leadingNormal = 1.5;
+
+  /// `TableHead`'s `font-medium` under the table's own `text-sm` —
+  /// **13px / 18.5714px / 500**.
+  ///
+  /// The size is inherited: `<table className="… text-sm">` sets it once and
+  /// every `th` and `td` under it takes the resolved 13px *and* the resolved
+  /// 18.5714px line box, because an inherited `line-height` inherits as the
+  /// computed pixel value rather than as the ratio.
+  static final DsTypeSpec tableHead = DsTypeSpec(
+    family: DsFonts.sans,
+    size: 13,
+    height: _leadingSm,
+    wght: 500,
+  );
+
+  /// `CardTitle`'s `font-heading text-base leading-snug font-medium` —
+  /// **15px / 20.625px / 500**.
+  ///
+  /// The overlay family's [overlayTitle] is the same size and weight in the
+  /// same face at `text-base`'s own 1.5; a card title tightens to
+  /// `leading-snug`, so it sits 1.875px shorter and closer to the description
+  /// under it.
+  static final DsTypeSpec cardTitle = DsTypeSpec(
+    family: DsFonts.heading,
+    size: _textBase,
+    height: _leadingSnug,
+    wght: 500,
+  );
+
+  /// `ItemTitle`'s `text-sm leading-snug font-medium` — 13px / 17.875px / 500.
+  ///
+  /// Numerically [fieldLabel], and named separately because it is a different
+  /// component's declaration: `item.tsx` writes the three utilities itself and
+  /// has no `field.tsx` in its cascade.
+  static final DsTypeSpec itemTitle = DsTypeSpec(
+    family: DsFonts.sans,
+    size: 13,
+    height: _leadingSnug,
+    wght: 500,
+  );
+
+  /// `ItemDescription`'s `text-sm leading-normal font-normal` —
+  /// **13px / 19.5px / 400**.
+  ///
+  /// `--leading-normal: 1.5` — Tailwind stock, undeclared in globals.css, and
+  /// the same ratio [navMenuTrigger] takes from the framework for the opposite
+  /// reason (there it is a *missing* companion key; here it is an explicit
+  /// utility). A row's description is the one string in an `Item` that is
+  /// allowed to wrap, and 1.5 is what separates the two lines.
+  static final DsTypeSpec itemDescription = DsTypeSpec(
+    family: DsFonts.sans,
+    size: 13,
+    height: _leadingNormal,
+    wght: 400,
+  );
+
+  /// `AvatarFallback` under the page's `.type-caption` — **13px / 18.5714px /
+  /// 500**.
+  ///
+  /// Ruling I7's collapse again, on a class the fallback's own list beats:
+  /// `AvatarFallback` carries `text-sm`, a *utility*, and `.type-caption` is
+  /// `@layer components`, so the utility wins both properties they share —
+  /// the class's 10.5px size and its 1.35 leading are both discarded. What
+  /// survives is the one thing `text-sm` does not declare: **the 500 weight**.
+  /// *(Measured on the 24px avatar: 13px/18.5714px/500, where the class alone
+  /// would render 10.5/14.175.)*
+  static final DsTypeSpec avatarInitials = DsTypeSpec(
+    family: DsFonts.sans,
+    size: 13,
+    height: _leadingSm,
+    wght: 500,
+  );
+
+  // The data page's other five fallbacks wear `.type-num-sm` over the same
+  // `text-sm`, which is [avatarFallback] — already recorded above for
+  // `NavUser`, measured on a different page, and byte-identical. One spelling.
 }
 
 /// Every `.type-*` class in globals.css, one [DsTypeSpec] each.

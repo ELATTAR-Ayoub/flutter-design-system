@@ -701,17 +701,27 @@ void main() {
       // And the leadings do not agree with the sizes. `text-xs`, `text-sm` and
       // `text-base` are Tailwind steps repointed at this scale, so their stock
       // `--text-*--line-height` companions survive and apply to the new size;
-      // `text-small` and `text-body` are bespoke, have no companion, and emit
-      // font-size only.
+      // `text-small` and `text-body` are bespoke and have no companion, so
+      // their leading is **inherited** — from Preflight's `html { line-height:
+      // 1.5 }`, which nothing between `html` and a button overrides.
+      //
+      // CORRECTED (the sidebar family): those two shipped as `null`, which
+      // Flutter reads as "the face's own leading" rather than as "inherit". It
+      // was invisible for as long as every button had a fixed height and
+      // centred its label; `SidebarMenuButton` is the corpus's first `h-auto`
+      // button and it measures the difference — a default row is 37.5 tall on
+      // the reference and came out 34.
       expect(spec(DsButtonSize.xs).height, closeTo(1 / 0.75, 1e-12));
-      expect(spec(DsButtonSize.sm).height, isNull);
+      expect(spec(DsButtonSize.sm).height, 1.5);
       expect(spec(DsButtonSize.md).height, closeTo(1.25 / 0.875, 1e-12));
-      expect(spec(DsButtonSize.lg).height, isNull);
+      expect(spec(DsButtonSize.lg).height, 1.5);
       expect(spec(DsButtonSize.xl).height, closeTo(1.5 / 1, 1e-12));
 
-      // Computed line boxes: 16.0 / — / 18.571 / — / 22.5.
+      // Computed line boxes: 16.0 / 19.5 / 18.571 / 22.5 / 22.5.
       expect(spec(DsButtonSize.xs).height! * 12, closeTo(16.0, 1e-9));
+      expect(spec(DsButtonSize.sm).height! * 13, closeTo(19.5, 1e-9));
       expect(spec(DsButtonSize.md).height! * 13, closeTo(18.571, 1e-3));
+      expect(spec(DsButtonSize.lg).height! * 15, closeTo(22.5, 1e-9));
       expect(spec(DsButtonSize.xl).height! * 15, closeTo(22.5, 1e-9));
 
       // Every text rung is `font-medium`.

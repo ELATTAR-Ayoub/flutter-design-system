@@ -39,7 +39,9 @@ const double _contentWidth = 1080;
 /// Measured off `http://localhost:3000` at 1440×900, fonts loaded, with
 /// `getBoundingClientRect()` on `main > div.mx-auto.max-w-(--width-content)`
 /// (`scratchpad/measure-vertical.js`) — the four foundation pages dark on
-/// 2026-08-14, the three base-component pages light on 2026-08-15. The theme is
+/// 2026-08-14, the three base-component pages light on 2026-08-15, and the four
+/// batch-2 families — `data`, `charts`, `layout`, `sidebar` — on 2026-08-16
+/// beside their own page tests' section oracles. The theme is
 /// recorded rather than reconciled because nothing on either side changes size
 /// with it: `forms_page_test` measures the same column in both and holds it to
 /// one number.
@@ -58,7 +60,8 @@ const double _contentWidth = 1080;
 ///
 /// Every number here is the **reference's** height. Where the port stands a
 /// measured, named distance from it, that distance is [_Route.residual] on the
-/// route rather than a wider band on everybody — see [_chatWrapResidual].
+/// route rather than a wider band on everybody — see [_chatWrapResidual] and
+/// [_chartsWrapResidual].
 const Map<String, double> _referenceHeight = <String, double>{
   'overview': 2402.66,
   'colors': 3781.83,
@@ -74,9 +77,21 @@ const Map<String, double> _referenceHeight = <String, double>{
   'feedback': 5946.0,
   'chat': 8382.03,
   'selects': 4833.9,
+  'data': 8394.8,
+  // NOT the 25,745 `charts_page_test` publishes — that is
+  // `document.documentElement.scrollHeight`, and this table is the reading
+  // column. The column is the last section's measured border-box bottom
+  // (24745.8 + 769.8), plus the `mb-20` that collapses out of the div's own
+  // height, plus the foot nav, less the 112 the column starts at. Cross-checks
+  // against the published figure the other way round — 25745 − 112 − 48 =
+  // 25585 — to inside the integer rounding `scrollHeight` applies.
+  'charts': 25584.6,
+  'layout': 4316.06,
+  'sidebar': 5483.7,
 };
 
-/// ONE MEASURED RESIDUAL, carried by the one route that owns it.
+/// THREE MEASURED RESIDUALS, each carried by the route that owns it. This is
+/// the first.
 ///
 /// `chat_page_test.dart`'s `_wrapResidual` is the same fact, named there:
 /// §4's *"preview and download"* Note wraps to **eleven** `type-small` lines
@@ -97,6 +112,48 @@ const Map<String, double> _referenceHeight = <String, double>{
 /// It is added to the one page it reaches rather than folded into [_tolerance],
 /// so the band stays tight enough to catch anything else — on chat included.
 const double _chatWrapResidual = 18.495;
+
+/// The second, and the same fact one page over — the same species, the same
+/// shape, and the same reason the two files carry two numbers for it.
+///
+/// `charts_page_test.dart`'s `_residuals` names it where it originates — the
+/// **`animation`** section, at **+19.5**, which is exactly one 13px/1.5 line
+/// box. One paragraph owns it: the reference's *"The obvious claim — recharts
+/// ignores `prefers-reduced-motion`, so we have to do it"* sets a `<Code>` chip
+/// inside an `<em>` and wraps to four lines at the 768 cap; the port's chip is
+/// a hair wider and takes five. All thirteen of the section's other paragraphs
+/// match the reference's line count, so it is chip metrics rather than copy
+/// drift.
+///
+/// Measured on the whole reading column the port stands **16.05** above the
+/// reference: the same one line, less the **3.45** the seven sections above it
+/// give back (`bar` and `line` are 1.9 short each, `pie` and `radar` 0.1 long,
+/// and the page header starts 0.15 low). Everything below `animation` carries
+/// the 16.05 forward unchanged — `unit-activity`, `conversion-funnel` and
+/// `states` are all +16.05 on their tops and 0.00 on their heights — which is
+/// what says the line is paid once and then only transported.
+///
+/// That decomposition is exactly [_chatWrapResidual]'s, and for the same
+/// reason: `charts_page_test` widens the band on the section that owns the
+/// line, which is the right instrument there; this probe measures the column
+/// and so takes the number the column actually shows.
+const double _chartsWrapResidual = 16.05;
+
+/// The third, and the odd one out: not a line box, an accumulation.
+///
+/// The port's sidebar column stands **0.575** above the reference's 5483.7, and
+/// the section table says where: the `anatomy` section is **+0.50** and every
+/// section below it carries that half-pixel forward untouched, with a further
+/// **0.075** appearing across the `shell` section's box. `sidebar_page_test`
+/// holds the same column to ±2 and so never had to name it; this probe's band
+/// is half a pixel, which is under the total by 0.075.
+///
+/// It is recorded rather than tuned because it is below anything either engine
+/// can paint and above what this file is willing to hide. Widening [_tolerance]
+/// would have bought it at the cost of every other route's teeth — the drift
+/// this probe exists to catch is cumulative, and half a pixel per section is
+/// precisely its scale.
+const double _sidebarStackResidual = 0.575;
 
 /// Half a CSS pixel: below the smallest thing either engine can paint, and
 /// wider than the 1/64px grid Chrome quantises its own layout to.
@@ -122,10 +179,12 @@ typedef _Route = ({String route, DateTime? clock, double residual});
 /// Chrome's `Date` shim frozen at the same instant this passes to [DsClock], so
 /// both renderers agree on the month, the week count and the height.
 ///
-/// **[residual] is the same idea one column over**: zero — every page but one —
-/// means the port lands on the reference's own number, and the only non-zero
-/// entry names what it is rather than loosening the band. See
-/// [_chatWrapResidual].
+/// **[residual] is the same idea one column over**: zero — every page but three
+/// — means the port lands on the reference's own number, and each non-zero
+/// entry names what it is rather than loosening the band. Two of them are the
+/// same species of fact, a single line box on a single paragraph; the third is
+/// a sub-pixel accumulation. See [_chatWrapResidual], [_chartsWrapResidual] and
+/// [_sidebarStackResidual].
 final Map<String, _Route> _routes = <String, _Route>{
   'overview': (route: dsRoot, clock: null, residual: 0),
   'colors': (route: '$dsRoot/colors', clock: null, residual: 0),
@@ -168,6 +227,18 @@ final Map<String, _Route> _routes = <String, _Route>{
     route: '$dsRoot/components/base/chat',
     clock: null,
     residual: _chatWrapResidual,
+  ),
+  'data': (route: '$dsRoot/components/base/data', clock: null, residual: 0),
+  'charts': (
+    route: '$dsRoot/components/base/charts',
+    clock: null,
+    residual: _chartsWrapResidual,
+  ),
+  'layout': (route: '$dsRoot/components/base/layout', clock: null, residual: 0),
+  'sidebar': (
+    route: '$dsRoot/components/base/sidebar',
+    clock: null,
+    residual: _sidebarStackResidual,
   ),
 };
 

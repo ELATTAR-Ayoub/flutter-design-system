@@ -323,7 +323,40 @@ class DsButton extends StatefulWidget {
     this.surface,
     this.expanded = false,
     this.suppressPressScale = false,
+    this.radius,
+    this.autoHeight = false,
+    this.contentAlignment,
   });
+
+  /// Overrides the base list's `rounded-pill`.
+  ///
+  /// §3 makes every control a pill and that is right for a button you press
+  /// once. The sidebar is the one place the system says otherwise, in
+  /// `sidebar.tsx`'s own words: a nav row is *"a COLUMN of them at full width,
+  /// and a 240px pill is a lozenge"*, so `SidebarMenuButton` and
+  /// `SidebarMenuSubButton` both write `rounded-lg` over the base class, and
+  /// `SidebarMenuAction` writes `rounded-md`.
+  ///
+  /// Null keeps the pill, which is what every other call site in the corpus
+  /// renders.
+  final BorderRadius? radius;
+
+  /// `h-auto` — drops the rung's fixed height and lets the content set it.
+  ///
+  /// The sidebar's three row sizes all write it (`h-auto px-2 py-2`), so a row
+  /// is `content + 16 + 2` tall rather than 24 / 32 / 48: **37.5px** for a
+  /// default row (a 19.5px line box) and **50px** for the `lg` header row (a
+  /// 32px tile) *(both measured)*. Everything else the rung declares — gap,
+  /// icon size, type — still applies; only the height is given up.
+  final bool autoHeight;
+
+  /// `justify-start` plus `w-full`, as one statement.
+  ///
+  /// Null is the base list's `justify-center` on a box that hugs its content,
+  /// which is what every ordinary button is. Non-null fills the incoming width
+  /// and puts the content at that alignment — the sidebar row's
+  /// `w-full justify-start`, and the only shape in the corpus that needs it.
+  final AlignmentGeometry? contentAlignment;
 
   /// `aria-expanded` — an open trigger holds its hover fill.
   ///
@@ -876,7 +909,8 @@ class _DsButtonState extends State<DsButton> {
         _skin(theme).withSurface(widget.surface, hovered: _hovered);
     final double height = DsButton.heightFor(widget.size);
     final bool square = DsButton.isSquare(widget.size);
-    final BorderRadius radius = BorderRadius.circular(DsRadii.pill);
+    final BorderRadius radius =
+        widget.radius ?? BorderRadius.circular(DsRadii.pill);
 
     // `btn-spring`: 250ms, dropping to `--duration-tick` while active.
     final Duration transition = dsAnimationDuration(
@@ -939,10 +973,21 @@ class _DsButtonState extends State<DsButton> {
                     EdgeInsets.symmetric(
                       horizontal: DsButton.paddingXFor(widget.size),
                     ),
-                child: Center(
-                  widthFactor: square ? null : 1,
-                  child: DefaultTextStyle(style: style, child: _content()),
-                ),
+                child: widget.contentAlignment == null
+                    ? Center(
+                        widthFactor: square ? null : 1,
+                        child:
+                            DefaultTextStyle(style: style, child: _content()),
+                      )
+                    // `w-full justify-start`: no width factor, so the box takes
+                    // the measure it is offered, and `heightFactor: 1` is what
+                    // `h-auto` means once the [SizedBox] below has stood down.
+                    : Align(
+                        alignment: widget.contentAlignment!,
+                        heightFactor: widget.autoHeight ? 1 : null,
+                        child:
+                            DefaultTextStyle(style: style, child: _content()),
+                      ),
               ),
             );
           },
@@ -950,11 +995,17 @@ class _DsButtonState extends State<DsButton> {
       },
     );
 
-    button = SizedBox(
-      width: square ? height : null,
-      height: height,
-      child: button,
-    );
+    // `h-auto` gives the rung's height up entirely; a square rung keeps its
+    // `size-*` width either way, because that class states both.
+    if (!widget.autoHeight) {
+      button = SizedBox(
+        width: square ? height : null,
+        height: height,
+        child: button,
+      );
+    } else if (square) {
+      button = SizedBox(width: height, child: button);
+    }
 
     // B1 — `active:not-aria-[haspopup]:scale-95`, and it does **not** animate.
     // No controller, no curve, no duration: the flag is the frame. Two values
