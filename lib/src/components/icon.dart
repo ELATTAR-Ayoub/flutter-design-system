@@ -17,6 +17,7 @@ import 'package:flutter/widgets.dart';
 import '../foundation/theme.dart';
 import '../theme_scope.dart';
 import 'icon_paths.dart';
+import 'icon_paths.g.dart';
 
 /// `ICON_SIZES` — the fixed ladder, in px.
 ///
@@ -141,9 +142,39 @@ class DsIcon extends StatelessWidget {
     this.sizePx,
     this.strokeOverride,
     this.label,
-  });
+  }) : lucide = null;
 
-  final DsIconGlyph glyph;
+  /// The same widget, over the **generated** registry rather than the curated
+  /// enum.
+  ///
+  /// [DsIconGlyph] is the icons page's own whitelist — the glyphs that page
+  /// prints and names. Every other page reaches for lucide directly, and until
+  /// the chat family there was no call site that needed one outside the
+  /// whitelist. `chat/page.tsx` imports seven (`BotIcon`, `CircleAlertIcon`,
+  /// `FileTextIcon`, `ImageIcon`, `SheetIcon`, `UserIcon`, `XIcon`) and
+  /// `message-scroller.tsx` an eighth (`ArrowDownIcon`); five of the eight are
+  /// not on the whitelist and never will be, because the whitelist is a
+  /// transcript of one page's registry rather than a budget.
+  ///
+  /// So this constructor takes a [DsLucideGlyph] from `icon_paths.g.dart` and
+  /// paints it through exactly the same [paintGlyph] the enum path uses — same
+  /// 24-unit space, same stroke formula, same clip. Nothing about the render is
+  /// different; only where the geometry was looked up.
+  const DsIcon.lucide(
+    DsLucideGlyph this.lucide, {
+    super.key,
+    this.size = DsIconSize.md,
+    this.tone = DsIconTone.inherit,
+    this.sizePx,
+    this.strokeOverride,
+    this.label,
+  }) : glyph = null;
+
+  /// The curated glyph, or null when [lucide] carries the geometry.
+  final DsIconGlyph? glyph;
+
+  /// The generated-registry glyph, or null when [glyph] does.
+  final DsLucideGlyph? lucide;
 
   /// A rung of the ladder. Ignored when [sizePx] is given.
   final DsIconSize size;
@@ -299,6 +330,7 @@ class DsIcon extends StatelessWidget {
       child: CustomPaint(
         painter: _GlyphPainter(
           glyph: glyph,
+          lucide: lucide,
           color: colorFor(context, tone),
           strokeWidth: strokeOverride ?? strokeFor(px),
         ),
@@ -313,11 +345,13 @@ class DsIcon extends StatelessWidget {
 class _GlyphPainter extends CustomPainter {
   _GlyphPainter({
     required this.glyph,
+    required this.lucide,
     required this.color,
     required this.strokeWidth,
   });
 
-  final DsIconGlyph glyph;
+  final DsIconGlyph? glyph;
+  final DsLucideGlyph? lucide;
   final Color color;
 
   /// In lucide's 24-unit space, exactly as the SVG `stroke-width` attribute
@@ -329,8 +363,12 @@ class _GlyphPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) => DsIcon.paintGlyph(
         canvas,
         size,
-        path: DsIconPaths.pathFor(glyph),
-        fill: DsIconPaths.fillPathFor(glyph),
+        path: glyph != null
+            ? DsIconPaths.pathFor(glyph!)
+            : lucide!.toPath(),
+        fill: glyph != null
+            ? DsIconPaths.fillPathFor(glyph!)
+            : lucide!.toFillPath(),
         color: color,
         strokeWidth: strokeWidth,
       );
@@ -338,6 +376,7 @@ class _GlyphPainter extends CustomPainter {
   @override
   bool shouldRepaint(_GlyphPainter old) =>
       old.glyph != glyph ||
+      old.lucide != lucide ||
       old.color != color ||
       old.strokeWidth != strokeWidth;
 }

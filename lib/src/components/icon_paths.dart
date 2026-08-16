@@ -233,6 +233,26 @@ enum DsIconGlyph {
   /// `ry`, so its corners are circular rather than elliptical; the parser
   /// falls `ry` back to `rx`, which is what SVG says to do.
   calendar,
+
+  /// `shield-alert.mjs`. Off-set: the dialogs page's `DangerZone` heading
+  /// (`components/ds/danger-zone-demo.tsx` L4, rendered at L97) and nothing
+  /// else in the corpus.
+  ///
+  /// Its crest is [shield]'s, character for character and under the same key
+  /// `oel41y` — the same sharing [shieldCheck] documents — plus the stem and
+  /// the `h.01` dot that `alert-triangle` and [info] also carry.
+  shieldAlert,
+
+  /// `gavel.mjs`. Off-set: the navigation page's `MARKET_LINKS`, where it
+  /// labels *"Ending soon"* inside the navigation menu's Marketplace panel.
+  ///
+  /// Not in `lib/ds/icons.ts`'s sixty-three, so the icons page's registry keeps
+  /// excluding it — the same standing as [calendar] and [shieldAlert].
+  ///
+  /// Five open strokes and no closed contour at all: the mallet's handle (with
+  /// the only arc in the glyph, the grip), the block, the two faces of the head
+  /// and the band across it.
+  gavel,
 }
 
 /// One SVG element from a lucide `__iconNode` list.
@@ -1194,6 +1214,26 @@ class DsIconPaths {
       DsIconPathElement('M16 2v3'), // key: otl347
       DsIconRectElement(3, 3, 18, 18, 2), // key: h1oib
       DsIconPathElement('M3 9h18'), // key: 1pudct
+    ],
+
+    // `shield-alert.mjs` — the crest, then the stem and the dot.
+    DsIconGlyph.shieldAlert: <DsIconElement>[
+      DsIconPathElement(
+          'M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z'), // key: oel41y
+      DsIconPathElement('M12 8v4'), // key: 1got3b
+      DsIconPathElement('M12 16h.01'), // key: 1drbdi
+    ],
+
+    // `gavel.mjs` — the navigation page's "Ending soon". Handle first (the arc
+    // in it is the grip's rounded end), then the block, then the head's two
+    // faces and its band. Five open strokes; nothing here closes.
+    DsIconGlyph.gavel: <DsIconElement>[
+      DsIconPathElement(
+          'm14 13-8.381 8.38a1 1 0 0 1-3.001-3l8.384-8.381'), // key: pgg06f
+      DsIconPathElement('m16 16 6-6'), // key: vzrcl6
+      DsIconPathElement('m21.5 10.5-8-8'), // key: a17d9x
+      DsIconPathElement('m8 8 6-6'), // key: 18bi4p
+      DsIconPathElement('m8.5 7.5 8 8'), // key: 1oyaui
     ],
   };
 

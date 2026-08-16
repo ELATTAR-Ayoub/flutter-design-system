@@ -1366,6 +1366,39 @@ void main() {
       // Button's `active:not-aria-[haspopup]:scale-95`. Recorded as a
       // property so the drift is assertable rather than only commented.
       expect(DsDatePicker.pressScaleSuppressed, isTrue);
+
+      // …and driven, so the property is a claim about the port rather than
+      // about itself: the trigger passes `DsButton.suppressPressScale`, and a
+      // held trigger stays at unity where every other Button is at 0.95.
+      await t.pumpWidget(overlayHost(
+        SizedBox(
+          width: 320,
+          child: DsDatePicker(
+            value: DateTime(2026, 7, 30),
+            onChanged: (DateTime? _) {},
+          ),
+        ),
+        clock: _frozen,
+      ));
+      await t.pump();
+
+      double scaleOf() => t
+          .widget<Transform>(find
+              .descendant(
+                of: find.byType(DsButton),
+                matching: find.byType(Transform),
+              )
+              .first)
+          .transform
+          .storage[0];
+
+      final TestGesture press =
+          await t.startGesture(t.getCenter(find.byType(DsButton)));
+      await settleOverlay(t);
+      expect(scaleOf(), 1.0);
+      await press.up();
+      await t.pump();
+      expect(scaleOf(), 1.0);
     });
 
     testWidgets('the calendar glyph is 16px with the 14px-derived 2.4 stroke '

@@ -6,12 +6,16 @@ import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/main.dart';
 import 'package:example/nav.dart';
 import 'package:example/pages/buttons.dart';
+import 'package:example/pages/chat.dart';
 import 'package:example/pages/colors.dart';
+import 'package:example/pages/dialogs.dart';
 import 'package:example/pages/feedback.dart';
 import 'package:example/pages/forms.dart';
 import 'package:example/pages/icons.dart';
 import 'package:example/pages/inputs.dart';
+import 'package:example/pages/menus.dart';
 import 'package:example/pages/motion.dart';
+import 'package:example/pages/navigation.dart';
 import 'package:example/pages/overview.dart';
 import 'package:example/pages/placeholder.dart';
 import 'package:example/pages/selection.dart';
@@ -54,7 +58,7 @@ extension on WidgetTester {
 /// Named as types rather than counted, because `isNotNull` cannot tell a real
 /// page from the [PlaceholderPage] every unbuilt href falls through to: a route
 /// arm dropped by a bad merge would still have satisfied it, and the page would
-/// have gone missing behind a title that looks right (ruling B11). Thirteen
+/// have gone missing behind a title that looks right (ruling B11). Seventeen
 /// arms, in `pageFor`'s own order.
 const Map<String, Type> _wired = <String, Type>{
   dsRoot: OverviewPage,
@@ -69,7 +73,11 @@ const Map<String, Type> _wired = <String, Type>{
   '$dsRoot/components/base/forms': FormsPage,
   '$dsRoot/components/base/selects': SelectsPage,
   '$dsRoot/components/base/selection': SelectionPage,
+  '$dsRoot/components/base/dialogs': DialogsPage,
+  '$dsRoot/components/base/menus': MenusPage,
+  '$dsRoot/components/base/navigation': NavigationPage,
   '$dsRoot/components/base/feedback': FeedbackPage,
+  '$dsRoot/components/base/chat': ChatPage,
 };
 
 Iterable<({DsGroup group, DsCategory category})> get _everyCategory sync* {

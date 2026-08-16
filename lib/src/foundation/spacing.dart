@@ -159,6 +159,23 @@ class DsContainers {
   /// state's title and its description on the same short column while the
   /// panel around them is 482px wide.
   static const double sm = 384;
+
+  /// `--container-xs: 20rem` = **320px** — `max-w-xs`.
+  ///
+  /// `AlertDialogContent`'s base cap, which `sm:max-w-sm` overrules at every
+  /// width the port renders at; `PopoverContent w-80` and `TooltipContent
+  /// max-w-xs` both land on the same 320.
+  static const double xs = 320;
+
+  /// `--container-md: 28rem` = **448px** — `max-w-md`.
+  ///
+  /// `DialogContent variant="media"`'s `sm:max-w-md`, and the `max-w-md` the
+  /// danger zone's description column is held to.
+  static const double md = 448;
+
+  /// `--container-2xl: 42rem` = **672px** — `max-w-2xl`, the settings column
+  /// the dialogs page centres its first danger zone in.
+  static const double xl2 = 672;
 }
 
 /// Tailwind's stock breakpoints, in logical pixels.

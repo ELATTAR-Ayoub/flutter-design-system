@@ -13,12 +13,16 @@ import 'package:flutter/material.dart';
 
 import 'nav.dart';
 import 'pages/buttons.dart';
+import 'pages/chat.dart';
 import 'pages/colors.dart';
+import 'pages/dialogs.dart';
 import 'pages/feedback.dart';
 import 'pages/forms.dart';
 import 'pages/icons.dart';
 import 'pages/inputs.dart';
+import 'pages/menus.dart';
 import 'pages/motion.dart';
+import 'pages/navigation.dart';
 import 'pages/overview.dart';
 import 'pages/placeholder.dart';
 import 'pages/selection.dart';
@@ -220,7 +224,7 @@ class _DocsHome extends StatelessWidget {
   }
 }
 
-/// The thirteen real routes; every other href in the nav gets a
+/// The seventeen real routes; every other href in the nav gets a
 /// [PlaceholderPage].
 ///
 /// Public because the shell test drives it directly, and because it is the one
@@ -228,10 +232,11 @@ class _DocsHome extends StatelessWidget {
 ///
 /// The arms follow the nav's own order (`nav.ts` foundations: colors →
 /// typography → spacing → shadows → motion → icons, then base components:
-/// buttons → inputs → forms → selects → selection → … → feedback), so this
-/// switch reads as the sidebar reads. `selects` sitting between `forms` and
-/// `selection` is the registry's order, not an alphabetisation; `feedback` is
-/// four categories further down, past the three that are still placeholders.
+/// buttons → inputs → forms → selects → selection → dialogs → menus →
+/// navigation → feedback → chat), so this switch reads as the sidebar reads.
+/// `selects` sitting between `forms` and `selection` is the registry's order,
+/// not an alphabetisation; `feedback` sits between `navigation` and `chat` for
+/// the same reason, which is why it is no longer the last arm.
 Widget pageFor(String route) {
   return switch (route) {
     dsRoot => const OverviewPage(),
@@ -246,7 +251,11 @@ Widget pageFor(String route) {
     '$dsRoot/components/base/forms' => const FormsPage(),
     '$dsRoot/components/base/selects' => const SelectsPage(),
     '$dsRoot/components/base/selection' => const SelectionPage(),
+    '$dsRoot/components/base/dialogs' => const DialogsPage(),
+    '$dsRoot/components/base/menus' => const MenusPage(),
+    '$dsRoot/components/base/navigation' => const NavigationPage(),
     '$dsRoot/components/base/feedback' => const FeedbackPage(),
+    '$dsRoot/components/base/chat' => const ChatPage(),
     _ => _placeholderFor(route),
   };
 }

@@ -19,6 +19,16 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  # The reference's own `public/imgs/` artwork, copied byte for byte. Only the
+  # one file the corpus renders: the dialogs page's media dialog leads with
+  # `<Image src="/imgs/sample-pack.jpg" fill className="object-cover">`, and a
+  # `bg-muted` rectangle in its place would be a different specimen.
+  assets:
+    - assets/imgs/sample-pack.jpg
+    # The chat page's attachment media well and its full-size preview both
+    # render `<Image src="/imgs/sample-card.png">`; the well is a 102px
+    # `object-cover` crop and the preview is the whole 734x1024 frame.
+    - assets/imgs/sample-card.png
   # Fonts are NOT re-declared here: they are registered in the package pubspec,
   # so flutter_tools bundles them for this app automatically under the family
   # name `packages/elattar_design_system/<Family>`.

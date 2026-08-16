@@ -378,6 +378,58 @@ void main() {
       }
     });
 
+    // ── The two attributes `asChild` merges into a trigger ─────────────────
+
+    testWidgets('aria-haspopup: a trigger does not squish, for the whole press',
+        (WidgetTester t) async {
+      await t.pumpWidget(host(DsButton(
+        variant: DsButtonVariant.outline,
+        suppressPressScale: true,
+        onPressed: () {},
+        child: const DsIcon(DsIconGlyph.menu),
+      )));
+
+      final List<double> frames = <double>[scaleOf(t)];
+      final TestGesture press =
+          await t.startGesture(t.getCenter(find.byType(DsButton)));
+      await t.pump();
+      frames.add(scaleOf(t));
+      // The same 24 frames B1 samples a squishing button over, plus the two
+      // short holds B6 uses: `not-aria-[haspopup]` is not a shorter squish.
+      for (int i = 0; i < 24; i++) {
+        await t.pump(const Duration(milliseconds: 16));
+        frames.add(scaleOf(t));
+      }
+      await press.up();
+      await t.pump();
+      frames.add(scaleOf(t));
+
+      expect(frames.toSet(), <double>{1.0},
+          reason: 'one value for the whole press, and it is unity');
+    });
+
+    testWidgets('…and it exempts the scale alone: the socket still takes it',
+        (WidgetTester t) async {
+      await t.pumpWidget(host(DsButton(
+        variant: DsButtonVariant.outline,
+        suppressPressScale: true,
+        onPressed: () {},
+        child: const DsIcon(DsIconGlyph.menu),
+      )));
+
+      final TestGesture press =
+          await t.startGesture(t.getCenter(find.byType(DsButton)));
+      await t.pump();
+      // `active:shadow-btn-down` carries no `not-` guard, so a trigger sinks
+      // into its socket exactly like every other button.
+      expect(surfaceOf(t).spec, same(DsShadows.btnDown));
+      expect(scaleOf(t), 1.0);
+
+      await press.up();
+      await t.pump(DsDurations.base);
+      expect(surfaceOf(t).spec, same(DsShadows.btn));
+    });
+
     testWidgets('B2 — the pressed shadow hard-cuts: the token pair cannot '
         'interpolate', (WidgetTester t) async {
       await t.pumpWidget(host(DsButton(
@@ -1920,8 +1972,15 @@ void main() {
       await t.tap(find.byType(DsButton));
       await t.pump(); // route pushed, animation at zero
 
-      // `slide-in-from-left-10` = 10 spacing units = 40px.
-      expect(t.getRect(find.byType(DsSheetPanel)).left, closeTo(-ds(10), 0.5));
+      // CORRECTED 2026-08-16, measured. `slide-in-from-left-10` is **not** 10
+      // spacing units: the installed tw-animate-css resolves it to
+      // `calc(.1 * 100%)`, a percentage of the element's own border box. The
+      // live sheet's first `enter` frame reads `matrix(1,0,0,1,38.4,0)` against
+      // a 384px panel — so the 288px docs sheet travels 28.8, not 40.
+      expect(
+        t.getRect(find.byType(DsSheetPanel)).left,
+        closeTo(-DsWidths.sidebarMobile * 0.1, 0.5),
+      );
 
       await t.pump(DsDurations.overlay);
       expect(t.getRect(find.byType(DsSheetPanel)).left, closeTo(0, 0.5));
@@ -2044,6 +2103,89 @@ void main() {
         DsButtonVariant.destructive,
         DsButtonVariant.link,
       ]);
+    });
+
+    group('aria-expanded — an open trigger holds its hover fill', () {
+      /// [mount], plus the attribute `DropdownMenuTrigger asChild` merges into
+      /// the `Button` it renders.
+      ///
+      /// The two pumps are belt and braces: `btn-spring` carries colour over
+      /// 250ms, but a button mounted already-expanded has nothing to spring
+      /// *from*, so the fill is right on the first frame and stays right.
+      Future<void> mountExpanded(
+        WidgetTester t,
+        DsButtonVariant variant,
+      ) async {
+        await t.pumpWidget(host(DsButton(
+          variant: variant,
+          expanded: true,
+          onPressed: () {},
+          child: const DsIcon(DsIconGlyph.check),
+        )));
+        await t.pump(DsDurations.base);
+        await t.pump(DsDurations.base);
+      }
+
+      testWidgets('ghost: --secondary over --foreground, with no pointer '
+          'anywhere near it', (WidgetTester t) async {
+        await mountExpanded(t, DsButtonVariant.ghost);
+        // `aria-expanded:bg-secondary aria-expanded:text-foreground` — the
+        // pair its hover already paints, held while the menu is open. The gap
+        // this closes is exactly the pointer-less case.
+        expect(surfaceOf(t).fill, DsThemeData.dark.secondary);
+        expect(labelStyleOf(t).color, DsThemeData.dark.foreground);
+      });
+
+      testWidgets('outline: --muted, which is its own hover fill',
+          (WidgetTester t) async {
+        await mountExpanded(t, DsButtonVariant.outline);
+        expect(surfaceOf(t).fill, DsThemeData.dark.muted);
+      });
+
+      testWidgets('secondary: --accent, likewise', (WidgetTester t) async {
+        await mountExpanded(t, DsButtonVariant.secondary);
+        expect(surfaceOf(t).fill, DsThemeData.dark.accent);
+      });
+
+      testWidgets('the other four declare no `aria-expanded:` class at all',
+          (WidgetTester t) async {
+        // The two ramps read `hovered` themselves, and an open trigger is not
+        // a hovered one.
+        await mountExpanded(t, DsButtonVariant.primary);
+        expect(sheenOf(t).hovered, isFalse);
+        expect(sheenOf(t).spec, same(DsShadows.btnPrimary));
+
+        await mountExpanded(t, DsButtonVariant.premium);
+        expect(foilOf(t).hovered, isFalse);
+        expect(foilOf(t).spec, same(DsShadows.btnValue));
+
+        // The two flat ones are compared against their own rest. The pumps
+        // matter: the element survives a re-pump, so the fill springs from the
+        // *previous* variant's colour and a reading taken on the first frame
+        // would be the one before it.
+        Future<Color?> restFillOf(DsButtonVariant variant) async {
+          await mount(t, variant);
+          await t.pump(DsDurations.base);
+          await t.pump(DsDurations.base);
+          return surfaceOf(t).fill;
+        }
+
+        for (final DsButtonVariant variant in <DsButtonVariant>[
+          DsButtonVariant.destructive,
+          DsButtonVariant.link,
+        ]) {
+          final Color? rest = await restFillOf(variant);
+          await mountExpanded(t, variant);
+          expect(surfaceOf(t).fill, rest, reason: '$variant is unmoved by it');
+        }
+
+        // …and the teeth for that comparison: destructive's hover IS a
+        // different fill, so the equality above is an assertion rather than
+        // two identical nothings agreeing.
+        final Color? rest = await restFillOf(DsButtonVariant.destructive);
+        await hoverAndSettle(t);
+        expect(surfaceOf(t).fill, isNot(rest));
+      });
     });
 
     group('primary — sheen-action bg-primary shadow-btn-primary', () {

@@ -1308,9 +1308,9 @@ const double _ringAlpha = 0.50;
 /// selects-map drift 20 is reproduced by construction: `PopoverTrigger` stamps
 /// `aria-haspopup="dialog"`, which cancels the Button's
 /// `active:not-aria-[haspopup]:scale-95`, so **this is the one Button on the
-/// page that does not squish**. [DsButton] has no such flag, so the trigger
-/// takes the press through the popover's own open toggle and the scale is
-/// simply not asked for — see [_pressScaleSuppressed].
+/// page that does not squish**. The trigger passes
+/// [DsButton.suppressPressScale] for it, and [DsButton.expanded] for the
+/// `aria-expanded:bg-muted` beside it — see [_pressScaleSuppressed].
 class DsDatePicker extends StatefulWidget {
   const DsDatePicker({
     super.key,
@@ -1343,7 +1343,8 @@ class DsDatePicker extends StatefulWidget {
   static const bool _pressScaleSuppressed = true;
 
   /// Whether the press scale is suppressed on this control. Always true; it
-  /// exists so the drift is assertable.
+  /// exists so the drift is assertable, and the trigger holds up its end by
+  /// passing [DsButton.suppressPressScale].
   static bool get pressScaleSuppressed => _pressScaleSuppressed;
 
   @override
@@ -1367,6 +1368,12 @@ class _DsDatePickerState extends State<DsDatePicker> {
       variant: DsButtonVariant.outline,
       focusNode: widget.focusNode,
       label: widget.label,
+      // Drift 20 itself: `PopoverTrigger`'s `aria-haspopup="dialog"` cancels
+      // `active:not-aria-[haspopup]:scale-95`, and `aria-expanded:bg-muted`
+      // holds the hover fill for as long as the calendar is open. See
+      // [DsDatePicker._pressScaleSuppressed].
+      suppressPressScale: true,
+      expanded: _open && enabled,
       onPressed: enabled ? () => setState(() => _open = !_open) : null,
       // `justify-start` beats the base `justify-center` through twMerge. A
       // `Row` at `MainAxisSize.max` inside the Button's shrink-wrapping

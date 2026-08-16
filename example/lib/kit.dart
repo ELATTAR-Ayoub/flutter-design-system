@@ -241,6 +241,7 @@ class DsPanel extends StatelessWidget {
     required this.child,
     this.flush = false,
     this.bodyPadding,
+    this.bodyFill,
   });
 
   /// `.type-label text-muted-foreground`, left of the strip.
@@ -256,6 +257,15 @@ class DsPanel extends StatelessWidget {
 
   /// Overrides `p-6` — the typography page's prose panel uses `p-6 sm:p-10`.
   final EdgeInsetsGeometry? bodyPadding;
+
+  /// Overrides the body's `--background` fill.
+  ///
+  /// `bodyClassName` on the reference's own `Panel`, used by exactly two panels
+  /// in the corpus: the chat page's two `BubbleReactions` specimens pass
+  /// `bodyClassName="bg-card"`, because the rail rings itself in `--card` to
+  /// punch a hole in the bubble edge and on `--background` that ring reads as a
+  /// halo. The page says so in a source comment above them.
+  final Color? bodyFill;
 
   @override
   Widget build(BuildContext context) {
@@ -299,7 +309,7 @@ class DsPanel extends StatelessWidget {
                   child: _PanelStrip(label: label, note: note),
                 ),
               Container(
-                color: theme.background,
+                color: bodyFill ?? theme.background,
                 padding: flush
                     ? EdgeInsets.zero
                     : bodyPadding ?? EdgeInsets.all(ds(6)),

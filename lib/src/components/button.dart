@@ -241,6 +241,61 @@ class _ButtonSkin {
 
   /// `hover:underline` — link only.
   final bool underline;
+
+  /// [DsButtonSurface] applied over this skin.
+  _ButtonSkin withSurface(DsButtonSurface? surface, {required bool hovered}) {
+    if (surface == null) return this;
+    return _ButtonSkin(
+      fill: (hovered ? surface.hoverFill ?? surface.fill : surface.fill) ?? fill,
+      border: surface.border ?? border,
+      content:
+          (hovered ? surface.hoverInk ?? surface.ink : surface.ink) ?? content,
+      shadow: shadow,
+      ring: ring,
+      semibold: semibold,
+      underline: underline,
+    );
+  }
+}
+
+/// A class-list colour override on top of a variant.
+///
+/// The reference restyles a `Button` by appending utilities to its class list,
+/// and tailwind-merge keeps the later class per property group — so a variant's
+/// fill, border and ink can each be replaced while its shadow, its ring, its
+/// shape and its press behaviour stay exactly the variant's. This is that, as a
+/// parameter.
+///
+/// It exists for `MessageScrollerButton`, whose class list is
+/// `border-border bg-background text-foreground hover:bg-muted
+/// hover:text-foreground` over `variant="secondary"` — five overrides, measured
+/// as the computed values on the live control. Every field is optional and a
+/// null one leaves the variant's own value alone, which is what an absent
+/// utility does.
+class DsButtonSurface {
+  const DsButtonSurface({
+    this.fill,
+    this.hoverFill,
+    this.border,
+    this.ink,
+    this.hoverInk,
+  });
+
+  /// `bg-*`.
+  final Color? fill;
+
+  /// `hover:bg-*`. Falls back to [fill] when the class list names no hover
+  /// fill, which is what CSS does.
+  final Color? hoverFill;
+
+  /// `border-*`.
+  final Color? border;
+
+  /// `text-*`.
+  final Color? ink;
+
+  /// `hover:text-*`.
+  final Color? hoverInk;
 }
 
 /// A pill button.
@@ -264,7 +319,51 @@ class DsButton extends StatefulWidget {
     this.onPressed,
     this.label,
     this.focusNode,
+    this.padding,
+    this.surface,
+    this.expanded = false,
+    this.suppressPressScale = false,
   });
+
+  /// `aria-expanded` — an open trigger holds its hover fill.
+  ///
+  /// Three variants declare it, and each one names a colour the variant
+  /// **already paints on hover**: `secondary` `aria-expanded:bg-accent`,
+  /// `outline` `aria-expanded:bg-muted`, `ghost` `aria-expanded:bg-secondary
+  /// aria-expanded:text-foreground` *(measured in both themes: ghost open is
+  /// `--secondary` over `--foreground`, and ghost hover is the same pair)*. So
+  /// this is not a fifth state — it is the hover state, held for as long as
+  /// whatever the button opened stays open, which is why the difference only
+  /// shows once the pointer leaves the trigger.
+  ///
+  /// The other four variants declare no `aria-expanded:` class at all, so this
+  /// paints nothing on `primary`, `premium`, `destructive` and `link`. That is
+  /// the reference's behaviour rather than an unfinished case.
+  ///
+  /// It is a prop and not a state because the button is not what knows: on the
+  /// reference `DropdownMenuTrigger asChild` writes the attribute onto the
+  /// `Button` it renders, and the button's own class list resolves against it.
+  final bool expanded;
+
+  /// `aria-haspopup` — the one attribute that cancels the press scale.
+  ///
+  /// The base class list is `active:not-aria-[haspopup]:scale-95`, so a button
+  /// that opens something — a menu, a popover, a dialog — **does not squish
+  /// while held**, and every other button does. Like [expanded] it is a
+  /// property of the control the button is standing in for rather than of the
+  /// button: `DropdownMenuTrigger` stamps `aria-haspopup="menu"` and
+  /// `PopoverTrigger` stamps `aria-haspopup="dialog"`.
+  ///
+  /// Nothing else about the press is exempt. `active:shadow-btn-down` and
+  /// `btn-spring`'s `--duration-tick` colour clock carry no `not-` guard and
+  /// still fire — a suppressed trigger still sinks into its socket.
+  final bool suppressPressScale;
+
+  /// Utilities appended to the variant's class list — see [DsButtonSurface].
+  ///
+  /// Null on every button in the system but one: `MessageScrollerButton`,
+  /// which is a `secondary` button wearing five measured colour overrides.
+  final DsButtonSurface? surface;
 
   /// The button's content — an icon, a label, or a row of both spaced by
   /// [gapFor].
@@ -312,6 +411,22 @@ class DsButton extends StatefulWidget {
   /// Supply one to drive `:focus-visible` from outside; otherwise the button
   /// owns its own node.
   final FocusNode? focusNode;
+
+  /// A caller's own padding, replacing the rung's `px-*`.
+  ///
+  /// Null — every site but two — leaves [paddingXFor] in charge, which is what
+  /// the `cva` size rung declares. The exception is `Pagination`: its
+  /// `PaginationPrevious` and `PaginationNext` pass `pl-1.5!` / `pr-1.5!`
+  /// (`components/ui/pagination.tsx` L74, L92), an **important** override that
+  /// tailwind-merge cannot drop, pulling one side in from 16px to 6 so the
+  /// chevron sits closer to the edge than the word does. Measured on the live
+  /// reference: `padding: 0px 16px 0px 6px` on Previous and the mirror of it on
+  /// Next.
+  ///
+  /// An `EdgeInsets` rather than two doubles because that is the shape the one
+  /// consumer needs and the shape [Padding] takes; the vertical component is
+  /// always zero in the reference, the height being fixed by the rung.
+  final EdgeInsets? padding;
 
   /// `h-*` / `size-*`.
   static double heightFor(DsButtonSize size) => switch (size) {
@@ -510,7 +625,17 @@ class _DsButtonState extends State<DsButton> {
   /// after `hover`, so **active outranks hover** wherever both declare the
   /// same property: premium's `active:shadow-btn-down` beats its
   /// `hover:shadow-glow-value`, and outline's beats nothing but its own rest.
+  ///
+  /// [DsButton.expanded] enters the table as `lit` — the three variants that
+  /// declare an `aria-expanded:` class declare the fill they already paint on
+  /// hover, so an open trigger is a button whose hover is held.
   _ButtonSkin _skin(DsThemeData theme) {
+    // `hover:` and `aria-expanded:` resolve to one colour on every variant that
+    // declares both, so they resolve to one flag here. `active:` still outranks
+    // it where a variant declares one — ghost's `active:bg-muted` shows while
+    // an open trigger is held down, exactly as the cascade orders it.
+    final bool lit = _hovered || widget.expanded;
+
     switch (widget.variant) {
       case DsButtonVariant.primary:
         return _ButtonSkin(
@@ -547,8 +672,9 @@ class _DsButtonState extends State<DsButton> {
       case DsButtonVariant.secondary:
         return _ButtonSkin(
           // No `active:` class of its own, so a press keeps the hover fill and
-          // changes nothing but the scale.
-          fill: _hovered ? theme.accent : theme.secondary,
+          // changes nothing but the scale. `aria-expanded:bg-accent` is that
+          // same hover fill under another name.
+          fill: lit ? theme.accent : theme.secondary,
           border: dsTransparent,
           content: theme.secondaryForeground,
           shadow: DsShadows.none,
@@ -558,7 +684,8 @@ class _DsButtonState extends State<DsButton> {
       case DsButtonVariant.outline:
         return _ButtonSkin(
           // `active:` changes only the elevation here — the fill stays put.
-          fill: _hovered ? theme.muted : theme.card,
+          // `aria-expanded:bg-muted` is the hover fill again.
+          fill: lit ? theme.muted : theme.card,
           border: theme.input,
           content: theme.foreground,
           shadow: _pressed ? DsShadows.btnDown : DsShadows.btn,
@@ -567,16 +694,19 @@ class _DsButtonState extends State<DsButton> {
 
       case DsButtonVariant.ghost:
         return _ButtonSkin(
+          // The one variant that declares all three: `hover:bg-secondary`,
+          // `active:bg-muted` and `aria-expanded:bg-secondary`.
           fill: _pressed
               ? theme.muted
-              : _hovered
+              : lit
                   ? theme.secondary
                   : dsTransparent,
           // The base class list is `border border-transparent` for every
           // variant: a real 1px border that costs a pixel of inner width.
           border: dsTransparent,
-          content:
-              _hovered || _pressed ? theme.foreground : theme.mutedForeground,
+          // `hover:text-foreground` and `aria-expanded:text-foreground`, plus
+          // the press that implies a hover on a pointer device.
+          content: lit || _pressed ? theme.foreground : theme.mutedForeground,
           shadow: DsShadows.none,
           ring: theme.ring.withValues(alpha: _focusRingAlpha),
         );
@@ -742,7 +872,8 @@ class _DsButtonState extends State<DsButton> {
   @override
   Widget build(BuildContext context) {
     final DsThemeData theme = DsTheme.of(context);
-    final _ButtonSkin skin = _skin(theme);
+    final _ButtonSkin skin =
+        _skin(theme).withSurface(widget.surface, hovered: _hovered);
     final double height = DsButton.heightFor(widget.size);
     final bool square = DsButton.isSquare(widget.size);
     final BorderRadius radius = BorderRadius.circular(DsRadii.pill);
@@ -804,9 +935,10 @@ class _DsButtonState extends State<DsButton> {
                 // Just `px-*`: the border is inside the box and the surface
                 // already insets this child by its width, the way `box-sizing:
                 // border-box` does.
-                padding: EdgeInsets.symmetric(
-                  horizontal: DsButton.paddingXFor(widget.size),
-                ),
+                padding: widget.padding ??
+                    EdgeInsets.symmetric(
+                      horizontal: DsButton.paddingXFor(widget.size),
+                    ),
                 child: Center(
                   widthFactor: square ? null : 1,
                   child: DefaultTextStyle(style: style, child: _content()),
@@ -829,12 +961,17 @@ class _DsButtonState extends State<DsButton> {
     // ever reach this widget, 1 and 0.95, which is what the rAF sampler saw on
     // the reference through every hold length it was driven at (B6).
     //
+    // …and `not-aria-[haspopup]` is the whole of it: a trigger asks for no
+    // scale at all, at any hold length. See [DsButton.suppressPressScale].
+    //
     // `transform-origin: 50% 50%` is [Transform.scale]'s own default, and the
     // scale is applied *outside* the shadow-painting surface so the whole
     // rendered box shrinks — elevation included — exactly as the CSS property
     // does.
     button = Transform.scale(
-      scale: _pressed ? DsTransforms.buttonScale : 1,
+      scale: _pressed && !widget.suppressPressScale
+          ? DsTransforms.buttonScale
+          : 1,
       child: Listener(
         // The one thing `DsPress` was contributing besides the animation: a hit
         // area that covers the whole control rather than only what its child

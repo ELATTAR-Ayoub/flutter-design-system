@@ -291,6 +291,8 @@ void main() {
         DsIconGlyph.atSign: 2,
         DsIconGlyph.ticket: 4,
         DsIconGlyph.calendar: 4,
+        DsIconGlyph.shieldAlert: 3,
+        DsIconGlyph.gavel: 5,
       };
       expect(DsIconPaths.elements.keys, unorderedEquals(DsIconGlyph.values));
       for (final DsIconGlyph glyph in DsIconGlyph.values) {
@@ -414,10 +416,15 @@ void main() {
           // the same test as the eleven above — `lib/ds/icons.ts` does not
           // list it, so the icons page's registry must keep excluding it.
           DsIconGlyph.calendar,
+          // The dialogs family's `DangerZone` heading.
+          DsIconGlyph.shieldAlert,
+          // The navigation family: `MARKET_LINKS`' "Ending soon" row, inside
+          // the navigation menu's Marketplace panel.
+          DsIconGlyph.gavel,
         ],
       );
-      // 8 chrome + 59 new curated + 12 off-set.
-      expect(DsIconGlyph.values, hasLength(79));
+      // 8 chrome + 59 new curated + 14 off-set.
+      expect(DsIconGlyph.values, hasLength(81));
     });
 
     test('the 59 new curated glyphs come to the ledger\'s 162 elements', () {
@@ -742,7 +749,9 @@ void main() {
       // outline the eighteenth. Twenty-nine circles, not twenty-eight, because
       // `atSign` brings a 4-unit bowl that shares nothing. Thirteen rects,
       // not twelve, because wave C's off-set `calendar` brings its plate.
-      expect(totalClosed, 60);
+      // Nineteen `z` commands, not eighteen: `shieldAlert` borrows `shield`'s
+      // crest, and that crest closes. `gavel` adds none — five open strokes.
+      expect(totalClosed, 61);
       expect(
         DsIconGlyph.values.where((DsIconGlyph g) => DsIconPaths.elements[g]!
             .whereType<DsIconPathElement>()
@@ -770,6 +779,9 @@ void main() {
           // `ticket` closes with an uppercase `Z`; the regex takes both cases,
           // which is the point of writing it `[zZ]`.
           DsIconGlyph.ticket,
+          // `shieldAlert`'s crest IS `shield`'s, `z` included — key `oel41y`
+          // on both. `gavel` is absent: none of its five strokes closes.
+          DsIconGlyph.shieldAlert,
         ],
       );
     });
@@ -1059,7 +1071,7 @@ void main() {
       // its registry from it by subtraction. A filled, stroke-less shape out of
       // the stylesheet belongs to neither, so the count must not have moved and
       // no member may carry this geometry.
-      expect(DsIconGlyph.values, hasLength(79));
+      expect(DsIconGlyph.values, hasLength(81));
       for (final DsIconGlyph glyph in DsIconGlyph.values) {
         for (final DsIconElement element in DsIconPaths.elements[glyph]!) {
           if (element is DsIconPathElement) {
@@ -1462,6 +1474,22 @@ const Map<DsIconGlyph, List<String>> _transcript = <DsIconGlyph, List<String>>{
     'path M16 2v3',
     'rect 3 3 18 18 2',
     'path M3 9h18',
+  ],
+  // The crest is `shield`'s, character for character (key `oel41y`), then the
+  // stem and the dot `alert-triangle` and `info` also carry.
+  DsIconGlyph.shieldAlert: <String>[
+    'path M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z',
+    'path M12 8v4',
+    'path M12 16h.01',
+  ],
+  // Handle, block, then the head's two faces and its band. The only arc in the
+  // glyph is the grip's rounded end, inside the first stroke.
+  DsIconGlyph.gavel: <String>[
+    'path m14 13-8.381 8.38a1 1 0 0 1-3.001-3l8.384-8.381',
+    'path m16 16 6-6',
+    'path m21.5 10.5-8-8',
+    'path m8 8 6-6',
+    'path m8.5 7.5 8 8',
   ],
 };
 

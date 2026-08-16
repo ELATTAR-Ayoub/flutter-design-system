@@ -47,6 +47,25 @@
 /// events travel up from the focused node, so a `Focus` wrapped around the
 /// content sees them, and a caller whose focus stays outside (the combobox)
 /// handles Escape where the focus is.
+///
+/// ## What the `menus` family added (2026-08-16)
+///
+/// Ruling L11 scoped this to *"side/align/offset + collision flip; no arrow; no
+/// nested portals"*, with nested portals **deferred until a page needed them**.
+/// The menus page needs one — a context-menu submenu is a popover mounted from
+/// inside a popover's content — so the deferral is discharged here, and four
+/// more knobs arrived with it. Every one is a **measured** difference between
+/// what `popover.tsx` declares and what `dropdown-menu.tsx`,
+/// `context-menu.tsx` and `menubar.tsx` declare; none changes a default, so no
+/// shipped consumer moves.
+///
+/// | knob | why | measured |
+/// |---|---|---|
+/// | [DsPopover.origin] | Radix and base-ui write **different** transform origins | an open dropdown computes `--radix-dropdown-menu-content-transform-origin: 0% 0px` — the content's own **corner** — where the combobox's base-ui popup computes `172px calc(100% + 6px)`, the **anchor's centre** |
+/// | [DsPopover.slideSides] | `popover.tsx` writes one `slide-in-from-*`; every menu writes four | a submenu at `side=right` enters with `translateX −8 → 0` (x 695 → 703 over 320ms) |
+/// | [DsPopover.anchorPoint] | a context menu has no trigger box — Radix anchors it to a **virtual element** at the pointer | the content lands at `pointer + (2, 0)`, `side=right align=start` |
+/// | [DsPopover.animateOut] | `MenubarContent`'s class list carries `data-open:animate-in` and **no `animate-out` twin** | its sibling `MenubarSubContent` carries both |
+/// | [DsPopover.barrier] | a submenu is one dismissable branch with its parent, not a second layer over it | with a barrier of its own, a pointer moving from the submenu back onto a parent row would never reach the row |
 library;
 
 import 'package:flutter/scheduler.dart';
@@ -107,6 +126,79 @@ enum DsPopoverAlign {
   end,
 }
 
+/// Which library's `transform-origin` the zoom grows from.
+///
+/// The two overlay libraries in the corpus disagree, and both answers are
+/// measured on the live reference — so this is a fact about the consumer, not a
+/// tuning knob.
+enum DsPopoverOriginModel {
+  /// base-ui's `--transform-origin`: **it points at the trigger.**
+  ///
+  /// *(Measured 2026-08-15: an open combobox popup computes
+  /// `172px calc(100% + 6px)` — 172 is half of its 344px anchor, and
+  /// `100% + 6px` is its own far edge plus the 6px `sideOffset`.)* The default,
+  /// because `DsPopover`'s first two consumers are both base-ui's.
+  anchor,
+
+  /// Radix's `--radix-*-content-transform-origin`: **the popup's own corner.**
+  ///
+  /// *(Measured 2026-08-16: an open `DropdownMenuContent` at
+  /// `side=bottom align=start` computes `0% 0px`; a `ContextMenuContent` at
+  /// `side=right align=start` computes `0px 0%`; a `MenubarContent` at
+  /// `side=bottom align=start` computes `0% 0px`.)* Radix's own middleware
+  /// writes `{start: '0%', center: '50%', end: '100%'}` on the cross axis and
+  /// `0px` / `100%` on the main one — it reads the **resolved placement** and
+  /// nothing else, so neither the `sideOffset` nor the collision shift moves
+  /// it.
+  corner,
+
+  /// CSS's own initial value — `50% 50%`, the popup's own middle.
+  ///
+  /// A model in its own right because one overlay in the corpus reaches it by
+  /// **failure**: `NavigationMenuViewport` writes `origin-top-center`
+  /// (`components/ui/navigation-menu.tsx` L164), which is not a Tailwind
+  /// utility — the scale has `origin-top`, `origin-center` and
+  /// `origin-top-left`, and no `origin-top-center` — so the class compiles to
+  /// nothing and the property keeps its initial value. Measured 2026-08-16 on
+  /// an open Packs panel: `transform-origin` computes **`288px 89px`** on a
+  /// 576 × 178 viewport, which is dead centre and is not the top of anything.
+  ///
+  /// Spelled as a model rather than reproduced by picking a wrong side,
+  /// because it is not a placement fact: no `side` or `align` combination makes
+  /// [corner] or [anchor] answer the centre, and a reader of the call site
+  /// should see that this popup zooms from its own middle on purpose.
+  selfCenter,
+}
+
+/// What an open popup lays under itself to catch a pointer aimed elsewhere.
+///
+/// Radix's `modal` prop and its `DismissableLayer` nesting, on one axis —
+/// because the three answers are exactly the three configurations the corpus
+/// uses, and no consumer needs two independent switches.
+enum DsPopoverBarrier {
+  /// `modal={true}` — the layer is **opaque** to hit testing, so nothing
+  /// outside the popup can be hovered or clicked while it is open; the pointer
+  /// dismisses instead. `DropdownMenu`'s and `ContextMenu`'s own default, and
+  /// what every popover in the port shipped with.
+  modal,
+
+  /// `modal={false}` — the layer is **translucent**: an outside pointer both
+  /// dismisses *and* reaches whatever it landed on.
+  ///
+  /// This is what makes a menubar work. *(Measured 2026-08-16: with one menu
+  /// open, `pointerover` on a sibling trigger at t=167.3 flipped both
+  /// `data-state` attributes by t=168.5.)* A modal layer would swallow that
+  /// hover and the strip could never hand over.
+  nonModal,
+
+  /// No layer at all — a **submenu**. Radix nests a `MenuSub`'s content inside
+  /// its parent's dismissable branch rather than stacking a second one, and a
+  /// layer here would sit over the parent's rows: a pointer moving from an open
+  /// submenu back onto a sibling row would land on the barrier instead of the
+  /// row, and the submenu would never close.
+  none,
+}
+
 /// Where the positioner put the popup, after the flip and the shift.
 @immutable
 class DsPopoverPlacement {
@@ -157,6 +249,7 @@ DsPopoverPlacement dsPopoverPlacement({
   DsPopoverAlign align = DsPopoverAlign.center,
   double sideOffset = 0,
   double collisionPadding = 0,
+  DsPopoverOriginModel origin = DsPopoverOriginModel.anchor,
 }) {
   double roomOn(DsPopoverSide s) => switch (s) {
         DsPopoverSide.top => anchor.top - sideOffset - collisionPadding,
@@ -227,22 +320,44 @@ DsPopoverPlacement dsPopoverPlacement({
   double alignmentOf(double point, double origin, double extent) =>
       extent <= 0 ? 0 : (point - origin) / extent * 2 - 1;
 
-  final Alignment origin = switch (resolved) {
-    DsPopoverSide.bottom || DsPopoverSide.top => Alignment(
-        alignmentOf(anchor.center.dx, offset.dx, content.width),
-        resolved == DsPopoverSide.bottom
-            ? -1 - 2 * sideOffset / (content.height <= 0 ? 1 : content.height)
-            : 1 + 2 * sideOffset / (content.height <= 0 ? 1 : content.height),
-      ),
-    DsPopoverSide.right || DsPopoverSide.left => Alignment(
-        resolved == DsPopoverSide.right
-            ? -1 - 2 * sideOffset / (content.width <= 0 ? 1 : content.width)
-            : 1 + 2 * sideOffset / (content.width <= 0 ? 1 : content.width),
-        alignmentOf(anchor.center.dy, offset.dy, content.height),
-      ),
+  // Radix's cross axis, on the other hand, is a keyword per `align` and
+  // nothing else — `{start: '0%', center: '50%', end: '100%'}` — and its main
+  // axis is the flat edge, `0px` or `100%`, with no `sideOffset` term.
+  final double crossKeyword = switch (align) {
+    DsPopoverAlign.start => -1,
+    DsPopoverAlign.center => 0,
+    DsPopoverAlign.end => 1,
   };
 
-  return DsPopoverPlacement(offset: offset, side: resolved, origin: origin);
+  final Alignment resolvedOrigin = switch (origin) {
+    // `transform-origin: 50% 50%` — the initial value, and what an unmatched
+    // `origin-*` class leaves behind.
+    DsPopoverOriginModel.selfCenter => Alignment.center,
+    DsPopoverOriginModel.corner => switch (resolved) {
+        DsPopoverSide.bottom => Alignment(crossKeyword, -1),
+        DsPopoverSide.top => Alignment(crossKeyword, 1),
+        DsPopoverSide.right => Alignment(-1, crossKeyword),
+        DsPopoverSide.left => Alignment(1, crossKeyword),
+      },
+    DsPopoverOriginModel.anchor => switch (resolved) {
+        DsPopoverSide.bottom || DsPopoverSide.top => Alignment(
+            alignmentOf(anchor.center.dx, offset.dx, content.width),
+            resolved == DsPopoverSide.bottom
+                ? -1 -
+                    2 * sideOffset / (content.height <= 0 ? 1 : content.height)
+                : 1 + 2 * sideOffset / (content.height <= 0 ? 1 : content.height),
+          ),
+        DsPopoverSide.right || DsPopoverSide.left => Alignment(
+            resolved == DsPopoverSide.right
+                ? -1 - 2 * sideOffset / (content.width <= 0 ? 1 : content.width)
+                : 1 + 2 * sideOffset / (content.width <= 0 ? 1 : content.width),
+            alignmentOf(anchor.center.dy, offset.dy, content.height),
+          ),
+      },
+  };
+
+  return DsPopoverPlacement(
+      offset: offset, side: resolved, origin: resolvedOrigin);
 }
 
 /// What the positioner knows about the trigger before the popup has been
@@ -291,33 +406,60 @@ typedef DsPopoverContentBuilder = Widget Function(
 /// which is what prepending the ring layer means here — the same order
 /// `DsButton.withFocusRing` documents.
 class DsPopoverSurface extends StatelessWidget {
-  const DsPopoverSurface({super.key, required this.child, this.radius});
+  const DsPopoverSurface({
+    super.key,
+    required this.child,
+    this.radius,
+    this.shadow,
+    this.ring = true,
+    this.border,
+  });
 
   final Widget child;
 
   /// `rounded-lg` unless a caller says otherwise.
   final BorderRadius? radius;
 
+  /// The elevation under the ring — `shadow-md` unless a caller says
+  /// otherwise. Every `*SubContent` in the menu family writes `shadow-lg`.
+  final DsShadowSpec? shadow;
+
+  /// `ring-1 ring-foreground/10`. **False for `ContextMenuSubContent`**, which
+  /// is the one overlay in the corpus that writes a real `border` instead.
+  final bool ring;
+
+  /// A real border, when the class list writes one. It costs the box 2px, the
+  /// way `box-sizing: border-box` does not — a `border` on a shrink-wrapping
+  /// popup makes it wider, and *(measured)* the context menu's submenu is
+  /// 87.125 tall where its rows add up to 85.125.
+  final BoxBorder? border;
+
   /// The spec every overlay in the family wears: a 1px `--foreground`/10 ring
   /// over Tailwind's stock `shadow-md`.
-  static DsShadowSpec spec(DsThemeData theme) => DsShadowSpec(<DsShadowLayer>[
-        DsShadowLayer(
-          0,
-          0,
-          0,
-          DsWidths.hairline,
-          (DsThemeData t) => t.foreground.withValues(alpha: _ringAlpha),
-        ),
-        ...DsShadows.tailwindMd.layers,
+  static DsShadowSpec spec(DsThemeData theme) => specOf();
+
+  /// The same recipe with either half swapped out.
+  static DsShadowSpec specOf({DsShadowSpec? shadow, bool ring = true}) =>
+      DsShadowSpec(<DsShadowLayer>[
+        if (ring)
+          DsShadowLayer(
+            0,
+            0,
+            0,
+            DsWidths.hairline,
+            (DsThemeData t) => t.foreground.withValues(alpha: _ringAlpha),
+          ),
+        ...(shadow ?? DsShadows.tailwindMd).layers,
       ]);
 
   @override
   Widget build(BuildContext context) {
     final DsThemeData theme = DsTheme.of(context);
     return DsMachineSurface(
-      spec: spec(theme),
+      spec: specOf(shadow: shadow, ring: ring),
       radius: radius ?? BorderRadius.circular(DsRadii.lg),
       fill: theme.popover,
+      border: border,
       // `text-popover-foreground` — an ambient style, the way the class is.
       child: DefaultTextStyle.merge(
         style: TextStyle(color: theme.popoverForeground),
@@ -339,6 +481,11 @@ class DsPopover extends StatefulWidget {
     this.sideOffset = 0,
     this.collisionPadding = 0,
     this.animate = true,
+    this.animateOut = true,
+    this.origin = DsPopoverOriginModel.anchor,
+    this.slideSides = const <DsPopoverSide>{DsPopoverSide.bottom},
+    this.anchorPoint,
+    this.barrier = DsPopoverBarrier.modal,
     this.onDismiss,
   });
 
@@ -371,6 +518,42 @@ class DsPopover extends StatefulWidget {
   /// `DsNativeSelect` mounts its menu under: an operating system's picker does
   /// not zoom.
   final bool animate;
+
+  /// Whether the **exit** half of that set exists.
+  ///
+  /// `PopoverContent`, `DropdownMenuContent`, `ContextMenuContent` and every
+  /// `*SubContent` in the corpus write `data-closed:animate-out
+  /// data-closed:fade-out-0 data-closed:zoom-out-95`. **`MenubarContent` does
+  /// not** — its class list stops after `data-open:zoom-in-95`, so the menubar's
+  /// menus zoom in and vanish. False is that missing twin: the popup unmounts
+  /// on the frame `open` goes false. Ignored while [animate] is false, which
+  /// already means "no animation at either end".
+  final bool animateOut;
+
+  /// Whose `transform-origin` the zoom grows from — see [DsPopoverOriginModel].
+  final DsPopoverOriginModel origin;
+
+  /// The sides whose **entrance** carries a `slide-in-from-*` utility.
+  ///
+  /// `popover.tsx` writes one (`data-[side=bottom]:slide-in-from-top-2`); all
+  /// three menu files write four. The travel is always 2 spacing units
+  /// *towards* the trigger's side — measured on an open submenu at
+  /// `side=right`, which enters from 8px to its left.
+  final Set<DsPopoverSide> slideSides;
+
+  /// A **virtual anchor**: a zero-size rect at this point, in global
+  /// coordinates, instead of [DsPopover.anchor]'s measured box.
+  ///
+  /// Radix's `ContextMenu` anchors its content to a virtual element built from
+  /// the `contextmenu` event's client coordinates, which is why a right-click
+  /// menu opens at the pointer and not at the corner of the thing right-clicked.
+  /// [anchor] still renders and is still hit-tested — it is the target, it is
+  /// simply no longer the box.
+  final Offset? anchorPoint;
+
+  /// What the popup lays under itself to catch an outside pointer — Radix's
+  /// `modal`, and its `DismissableLayer` nesting.
+  final DsPopoverBarrier barrier;
 
   /// A pointer outside the popup, or Escape while focus is inside it.
   final VoidCallback? onDismiss;
@@ -478,6 +661,13 @@ class _DsPopoverState extends State<DsPopover>
 
   void _hide() {
     if (!_showing) return;
+    // `MenubarContent` writes no `animate-out`: there is no exit to run, so the
+    // controller is not reversed at all and the portal goes in this frame.
+    if (!widget.animateOut) {
+      _animation.value = 0;
+      _portal.hide();
+      return;
+    }
     _animation.duration = _duration;
     _animation.reverse().whenComplete(() {
       // A reopen mid-exit takes the controller forward again; only the run that
@@ -521,8 +711,12 @@ class _DsPopoverState extends State<DsPopover>
     }
     final RenderBox overlay = theatre;
 
-    final Rect anchor =
-        object.localToGlobal(Offset.zero, ancestor: overlay) & object.size;
+    // Radix's virtual element, when the caller supplies one: a zero-size box at
+    // the pointer, in the overlay's own coordinate space.
+    final Offset? point = widget.anchorPoint;
+    final Rect anchor = point == null
+        ? object.localToGlobal(Offset.zero, ancestor: overlay) & object.size
+        : (overlay.globalToLocal(point) & Size.zero);
     final Size viewport = overlay.size;
     final DsPopoverAnchorMetrics metrics = DsPopoverAnchorMetrics(
       rect: anchor,
@@ -545,12 +739,16 @@ class _DsPopoverState extends State<DsPopover>
     // uses the requested side, which is also the resolved one whenever nothing
     // collides.
     final Alignment origin = _placement?.origin ??
-        switch (widget.side) {
-          DsPopoverSide.bottom => Alignment(_alignAxis, -1),
-          DsPopoverSide.top => Alignment(_alignAxis, 1),
-          DsPopoverSide.right => Alignment(-1, _alignAxis),
-          DsPopoverSide.left => Alignment(1, _alignAxis),
-        };
+        // [DsPopoverOriginModel.selfCenter] does not depend on the placement at
+        // all, so it is right from the first frame rather than from the second.
+        (widget.origin == DsPopoverOriginModel.selfCenter
+            ? Alignment.center
+            : switch (widget.side) {
+                DsPopoverSide.bottom => Alignment(_alignAxis, -1),
+                DsPopoverSide.top => Alignment(_alignAxis, 1),
+                DsPopoverSide.right => Alignment(-1, _alignAxis),
+                DsPopoverSide.left => Alignment(1, _alignAxis),
+              });
     final DsPopoverSide side = _placement?.side ?? widget.side;
 
     return Stack(
@@ -558,13 +756,19 @@ class _DsPopoverState extends State<DsPopover>
       // stack would collapse around children that are all positioned.
       fit: StackFit.expand,
       children: <Widget>[
-        // Radix renders no scrim; a pointer anywhere else dismisses.
-        Positioned.fill(
-          child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: widget.onDismiss,
+        // Radix renders no scrim; a pointer anywhere else dismisses. How much
+        // of that pointer the layer keeps is [DsPopoverBarrier]'s subject: a
+        // modal layer swallows it, a non-modal one lets it through to whatever
+        // it landed on, and a submenu lays no layer at all.
+        if (widget.barrier != DsPopoverBarrier.none)
+          Positioned.fill(
+            child: GestureDetector(
+              behavior: widget.barrier == DsPopoverBarrier.modal
+                  ? HitTestBehavior.opaque
+                  : HitTestBehavior.translucent,
+              onTap: widget.onDismiss,
+            ),
           ),
-        ),
         Positioned.fill(
           child: CustomSingleChildLayout(
             delegate: _PopoverLayout(
@@ -573,13 +777,15 @@ class _DsPopoverState extends State<DsPopover>
               align: widget.align,
               sideOffset: widget.sideOffset,
               collisionPadding: widget.collisionPadding,
+              origin: widget.origin,
               onPlaced: _report,
             ),
             child: _animate(
               origin: origin,
-              // `data-[side=bottom]:slide-in-from-top-2` — the one side the
-              // class list writes a slide for.
-              slide: side == DsPopoverSide.bottom,
+              // `data-[side=bottom]:slide-in-from-top-2`, and its three
+              // siblings on a menu. The travel is towards the trigger, so the
+              // resolved side names the axis and the sign.
+              slide: widget.slideSides.contains(side) ? side : null,
               child: Focus(
                 canRequestFocus: false,
                 skipTraversal: true,
@@ -602,7 +808,7 @@ class _DsPopoverState extends State<DsPopover>
   /// that is simply the menu.
   Widget _animate({
     required Alignment origin,
-    required bool slide,
+    required DsPopoverSide? slide,
     required Widget child,
   }) {
     if (!widget.animate) return child;
@@ -640,6 +846,7 @@ class _PopoverLayout extends SingleChildLayoutDelegate {
     required this.align,
     required this.sideOffset,
     required this.collisionPadding,
+    required this.origin,
     required this.onPlaced,
   });
 
@@ -648,6 +855,7 @@ class _PopoverLayout extends SingleChildLayoutDelegate {
   final DsPopoverAlign align;
   final double sideOffset;
   final double collisionPadding;
+  final DsPopoverOriginModel origin;
   final ValueChanged<DsPopoverPlacement> onPlaced;
 
   /// `max-h-(--available-height) max-w-(--available-width)`, applied as
@@ -683,6 +891,7 @@ class _PopoverLayout extends SingleChildLayoutDelegate {
       align: align,
       sideOffset: sideOffset,
       collisionPadding: collisionPadding,
+      origin: origin,
     );
     onPlaced(placement);
     return placement.offset;
@@ -694,7 +903,8 @@ class _PopoverLayout extends SingleChildLayoutDelegate {
       old.side != side ||
       old.align != align ||
       old.sideOffset != sideOffset ||
-      old.collisionPadding != collisionPadding;
+      old.collisionPadding != collisionPadding ||
+      old.origin != origin;
 }
 
 /// `animate-in fade-in-0 zoom-in-95 slide-in-from-top-2` and its `animate-out`
@@ -710,16 +920,27 @@ class _PopoverTransition extends StatelessWidget {
   final Animation<double> animation;
   final Alignment origin;
 
-  /// Whether the entrance carries `slide-in-from-top-2`.
-  final bool slide;
+  /// The resolved side, when its entrance carries a `slide-in-from-*`; null
+  /// when the class list writes none for that side.
+  final DsPopoverSide? slide;
 
   final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    // `slide-in-from-top-2` — 2 spacing units of travel, and the exit has no
+    // `slide-in-from-*-2` — 2 spacing units of travel, and the exit has no
     // twin, so the offset is pinned to the forward run.
     final double travel = ds(2);
+    // The popup starts displaced **away** from the trigger's side and closes
+    // the gap: `side=bottom` writes `slide-in-from-top`, `side=right` writes
+    // `slide-in-from-left`.
+    final Offset unit = switch (slide) {
+      null => Offset.zero,
+      DsPopoverSide.bottom => const Offset(0, -1),
+      DsPopoverSide.top => const Offset(0, 1),
+      DsPopoverSide.right => const Offset(-1, 0),
+      DsPopoverSide.left => const Offset(1, 0),
+    };
     return AnimatedBuilder(
       animation: animation,
       child: child,
@@ -729,7 +950,7 @@ class _PopoverTransition extends StatelessWidget {
         return Opacity(
           opacity: t,
           child: Transform.translate(
-            offset: Offset(0, slide && entering ? -travel * (1 - t) : 0),
+            offset: entering ? unit * (travel * (1 - t)) : Offset.zero,
             child: Transform.scale(
               scale: _zoom + (1 - _zoom) * t,
               alignment: origin,

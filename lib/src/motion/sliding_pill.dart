@@ -70,6 +70,7 @@ class DsSlidingPillGroup extends StatefulWidget {
     this.padding = EdgeInsets.zero,
     this.gap = 0,
     this.travelDuration,
+    this.jellyAlignment = Alignment.center,
   });
 
   /// The selected child. Out of range — including a deliberate −1 — hides the
@@ -105,6 +106,23 @@ class DsSlidingPillGroup extends StatefulWidget {
   /// because reduced motion already collapses both legs through
   /// `dsAnimationDuration` below.
   final Duration? travelDuration;
+
+  /// `transform-origin` for the arrival squash.
+  ///
+  /// The web puts `anim-jelly` on the **jelly span**, which normally fills the
+  /// measured rect — so scaling it about its own centre and scaling the rect
+  /// about the rect's centre are the same statement, and [Alignment.center] is
+  /// that.
+  ///
+  /// `Tabs`' `line` variant is the one place they part. There the jelly span is
+  /// re-classed to `absolute inset-x-0 bottom-0 h-0.5` (`tabs.tsx` L93), so the
+  /// thing being squashed is a **2px rule sitting on the bottom edge** of a
+  /// 32px rect, and it scales about its own centre — one pixel above that edge.
+  /// [Alignment.bottomCenter] on the rect is that same pivot to within the
+  /// jelly's own amplitude (0.06px at the extreme), and pinning the rule's
+  /// bottom edge is what keeps an underline from floating off its baseline
+  /// mid-squash.
+  final Alignment jellyAlignment;
 
   @override
   State<DsSlidingPillGroup> createState() => _DsSlidingPillGroupState();
@@ -284,6 +302,7 @@ class _DsSlidingPillGroupState extends State<DsSlidingPillGroup>
                   return Transform.scale(
                     scaleX: scale.dx,
                     scaleY: scale.dy,
+                    alignment: widget.jellyAlignment,
                     child: child,
                   );
                 },

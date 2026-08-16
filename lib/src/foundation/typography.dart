@@ -523,6 +523,40 @@ class DsComponentType {
     tracking: 0.1,
   );
 
+  // ── the navigation family ───────────────────────────────────────────────
+
+  /// `--leading-relaxed`'s sibling: the ratio Tailwind v4 pairs with a
+  /// `--text-*` entry that declares **no** `--text-*--line-height` of its own.
+  ///
+  /// `--text-nav` is such an entry (globals.css L201 declares the size and
+  /// nothing else), so `text-nav` emits `line-height: 1.5` from the framework
+  /// rather than the 1.2 the `.type-nav` *component class* sets one layer down.
+  static const double _leadingNavUtility = 1.5;
+
+  /// `navigationMenuTriggerStyle()`'s `text-nav font-medium`
+  /// (`components/ui/navigation-menu.tsx` L107) — 13.5px / 500 / **1.5**.
+  ///
+  /// **Not [DsType.nav], and the difference is measurable.** `.type-nav`
+  /// (globals.css L1128) sets `--text-nav` *and* `line-height: 1.2`; the
+  /// `text-nav` **utility** sets only the size, and Tailwind supplies its own
+  /// 1.5 because globals.css declares no `--text-nav--line-height`. Probed on
+  /// the live reference at 1440 × 900 (2026-08-16): the navigation-menu trigger
+  /// and its `Leaderboard` link both report `13.5px/20.25px 500`, while the
+  /// top-nav buttons two sections above them — which wear the `.type-nav`
+  /// *class* — report `13.5px/16.2px 500`. Two spellings of one token, four
+  /// pixels of leading apart, on the same page.
+  ///
+  /// It reaches the same three sites the utility does: the trigger, the plain
+  /// link that borrows `navigationMenuTriggerStyle()`, and the `type-nav` title
+  /// span inside a panel link — no: that last one is the *class* and stays on
+  /// [DsType.nav]. Two sites.
+  static final DsTypeSpec navMenuTrigger = DsTypeSpec(
+    family: DsFonts.sans,
+    size: 13.5,
+    height: _leadingNavUtility,
+    wght: 500,
+  );
+
   /// `SheetContent`'s `text-sm`, with no `font-weight` of its own — so it
   /// inherits `html`'s 400.
   ///
@@ -538,6 +572,82 @@ class DsComponentType {
     size: 13,
     height: _leadingSm,
     wght: 400,
+  );
+
+  // ── the overlay family ──────────────────────────────────────────────────
+  // `dialog.tsx`, `alert-dialog.tsx`, `sheet.tsx`, `drawer.tsx`, `popover.tsx`
+  // and `tooltip.tsx` type their headings off the bare Tailwind ladder too —
+  // `font-heading text-base font-medium`, with `leading-none` on exactly one
+  // of them. Every number below is a computed style read off the live
+  // reference at 1440x900 on 2026-08-16 with the overlay open.
+
+  /// `--text-base: var(--text-body)` (globals.css L214), so an overlay heading
+  /// is **15px**, not Tailwind's stock 16. Its companion `--text-base--line-
+  /// height` is not redeclared, so the utility still emits the stock ratio.
+  static const double _textBase = 15;
+
+  /// `DialogTitle`'s `font-heading text-base leading-none font-medium`.
+  ///
+  /// The one overlay heading that overrides its leading, and the override is
+  /// visible: `leading-none` collapses the line box onto the font size, so the
+  /// measured title is **15px in a 15px box** where its four siblings sit in
+  /// 22.5. That is what lets the dialog's header band close at 93px with an
+  /// 8px gap under the title rather than a 15px optical one.
+  static final DsTypeSpec dialogTitle = DsTypeSpec(
+    family: DsFonts.heading,
+    size: _textBase,
+    height: 1,
+    wght: 500,
+  );
+
+  /// `font-heading text-base font-medium` with no leading override —
+  /// `AlertDialogTitle`, `SheetTitle` and `DrawerTitle`, all three measured at
+  /// 15px / 22.5px.
+  ///
+  /// The alert dialog is where the difference reads: its title is the
+  /// question, it wraps to two lines on the narrow content, and `leading-none`
+  /// would set those two lines solid.
+  static final DsTypeSpec overlayTitle = DsTypeSpec(
+    family: DsFonts.heading,
+    size: _textBase,
+    height: _leadingBase,
+    wght: 500,
+  );
+
+  /// `PopoverTitle`'s bare `font-medium` — no size and no family of its own,
+  /// so it takes `PopoverContent`'s `text-sm`: 13px / 500 / 1.428571.
+  ///
+  /// Sans, not [DsFonts.heading]: `popover.tsx` writes no `font-heading`, and
+  /// a popover header is a label on a panel rather than a heading over a task.
+  static final DsTypeSpec popoverTitle = DsTypeSpec(
+    family: DsFonts.sans,
+    size: 13,
+    height: _leadingSm,
+    wght: 500,
+  );
+
+  /// `TooltipContent`'s `text-xs` — 12px / 400 / 1.333333, inheriting `html`'s
+  /// weight. A tooltip is a label, and the class list gives it no weight of
+  /// its own.
+  static final DsTypeSpec tooltipLabel = DsTypeSpec(
+    family: DsFonts.sans,
+    size: 12,
+    height: _leadingXs,
+    wght: 400,
+  );
+
+  /// `Badge`'s `text-xs font-medium` — 12px / 500 / 1.333333.
+  ///
+  /// **Not `.type-badge`.** That class (11px, 600, uppercase, 0.14em) is a
+  /// different object with an unfortunately similar name; `badge.tsx` never
+  /// reaches for it, and the measured chip on the media dialog is 12px at 500
+  /// with no transform. [DsType.badge] stays where it is for the callers that
+  /// do want the class.
+  static final DsTypeSpec badgeLabel = DsTypeSpec(
+    family: DsFonts.sans,
+    size: 12,
+    height: _leadingXs,
+    wght: 500,
   );
 
   // ── the field family ────────────────────────────────────────────────────
@@ -626,6 +736,79 @@ class DsComponentType {
     wght: 400,
     tracking: -0.01,
     uppercase: true,
+  );
+
+  // ── the chat family ─────────────────────────────────────────────────────
+  // `message.tsx`, `bubble.tsx` and `attachment.tsx` type off the bare
+  // Tailwind ladder. Every number below is a computed style read off
+  // `/design-system/components/base/chat` at 1440×900 on 2026-08-16.
+
+  /// `leading-tight` — 1.25, on `AttachmentContent`.
+  static const double _leadingTight = 1.25;
+
+  /// `BubbleContent`'s `text-sm leading-relaxed` — **13px / 21.125px / 400**.
+  ///
+  /// `--text-sm: var(--text-small)` puts it at 13, and `leading-relaxed`
+  /// replaces `text-sm`'s own companion ratio outright, so this is the one
+  /// 13px site in the port whose line box is 21.125 rather than 18.5714. It is
+  /// what makes every single-line bubble on the page **39.13px** tall:
+  /// 21.125 + `py-2` twice + the 1px transparent border twice.
+  static final DsTypeSpec bubbleContent = DsTypeSpec(
+    family: DsFonts.sans,
+    size: 13,
+    height: _leadingRelaxed,
+    wght: 400,
+  );
+
+  /// `MessageHeader` / `MessageFooter` — `text-xs font-medium`, **12px / 16px
+  /// / 500**.
+  ///
+  /// Value-identical to [DsType.badge] and declared separately for the same
+  /// reason [toggleLabel] is: the reference declares it separately, and a
+  /// message's byline is free to move without a badge's.
+  static final DsTypeSpec messageMeta = DsTypeSpec(
+    family: DsFonts.sans,
+    size: 12,
+    height: _leadingXs,
+    wght: 500,
+  );
+
+  /// `BubbleReactions`' own `text-sm` — 13px / 18.5714px / 400, inherited by
+  /// the bare rail's emoji spans and by every reaction pill.
+  static final DsTypeSpec bubbleReactions = DsTypeSpec(
+    family: DsFonts.sans,
+    size: 13,
+    height: _leadingSm,
+    wght: 400,
+  );
+
+  /// `AttachmentTitle`'s `font-medium` under `Attachment size="default"`'s
+  /// `text-sm` and `AttachmentContent`'s `leading-tight` — **13px / 16.25px /
+  /// 500**.
+  static final DsTypeSpec attachmentTitle = DsTypeSpec(
+    family: DsFonts.sans,
+    size: 13,
+    height: _leadingTight,
+    wght: 500,
+  );
+
+  /// The same title under `size="sm"` / `size="xs"`, whose root is `text-xs` —
+  /// **12px / 15px / 500**.
+  static final DsTypeSpec attachmentTitleSm = DsTypeSpec(
+    family: DsFonts.sans,
+    size: 12,
+    height: _leadingTight,
+    wght: 500,
+  );
+
+  /// `AttachmentDescription`'s `text-xs` — 12px / 16px / 400, on every size,
+  /// because the description states its own size and the root's does not reach
+  /// it.
+  static final DsTypeSpec attachmentDescription = DsTypeSpec(
+    family: DsFonts.sans,
+    size: 12,
+    height: _leadingXs,
+    wght: 400,
   );
 }
 

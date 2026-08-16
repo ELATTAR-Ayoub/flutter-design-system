@@ -75,6 +75,65 @@ class DsDurations {
   /// `--duration-reward: 550ms` (L407).
   static const Duration reward = Duration(milliseconds: 550);
 
+  // ── third-party timings, measured rather than declared ───────────────────
+  // Three overlays on the dialogs page take their clock from a library rather
+  // than from globals.css. Their numbers live here for the same reason
+  // sonner's do: a duration in a component file is a literal the guard scans,
+  // and a duration nobody can point at a source for is a guess.
+
+  /// **vaul**'s drawer, enter and exit — measured 500ms on the live reference
+  /// (2026-08-16), on [DsCurves.vaul].
+  ///
+  /// `--duration-overlay` does not reach it: vaul ships its own `fadeIn` /
+  /// `slideFromBottom` keyframes and its own stylesheet, and the
+  /// `[class*="animate-in"]` bridge that retimes every Radix overlay never
+  /// matches them. So the drawer is the one overlay in the system that is
+  /// visibly slower than its neighbours — recorded, reproduced.
+  static const Duration drawer = Duration(milliseconds: 500);
+
+  /// `TooltipProvider delayDuration={200}` (`app/layout.tsx` L38) — the whole
+  /// system's hover-open delay, *"set once on the provider in the root layout
+  /// so timing cannot vary between screens"*.
+  ///
+  /// Measured: the tooltip's first frame lands 232.5ms after the pointer
+  /// enters, which is 200 plus a rAF and a paint.
+  static const Duration tooltipDelay = Duration(milliseconds: 200);
+
+  /// Radix `HoverCard`'s `openDelay` default — measured 728.3ms from pointer
+  /// entry to first frame. The reference passes no override.
+  static const Duration hoverCardOpenDelay = Duration(milliseconds: 700);
+
+  /// Radix `HoverCard`'s `closeDelay` default — measured 329.3ms from the
+  /// pointer leaving to `data-state="closed"`.
+  static const Duration hoverCardCloseDelay = Duration(milliseconds: 300);
+
+  /// `window.setTimeout(() => setSaving(false), 1600)` — how long
+  /// `AttachmentAction`'s glyph stays on the check after a save is started
+  /// (`attachment.tsx` L328).
+  ///
+  /// A library-shaped literal rather than a token: it is written inline in
+  /// the component, the way sonner's own numbers are, and it is here for the
+  /// same reason — a duration in a component file is a literal the guard
+  /// scans, and one nobody can point at a source for is a guess.
+  static const Duration attachmentSaving = Duration(milliseconds: 1600);
+
+  /// One 60 Hz frame — the unit **Chrome's programmatic smooth scroll**
+  /// measures its own duration in.
+  ///
+  /// `MessageScrollerButton` calls `scrollTo({behavior: "smooth"})` and the
+  /// browser, not the stylesheet, picks the timing. It is not a constant:
+  /// sampled on the chat page's scroller (`ba2-chat-scroll.js`,
+  /// `ba2-chat-inter.js`, 1440×900, 2026-08-16) a **100px** jump settled in
+  /// ~168ms and the full **398px** jump in ~335ms — a ratio of 1.99 for four
+  /// times the distance, which is `√d` to within a frame. Dividing out gives
+  /// **16.8 ms per √px**, one frame, so the port computes
+  /// `frame × sqrt(distancePx)` rather than pinning either measurement.
+  ///
+  /// The shape runs on [DsCurves.cssEase]; see
+  /// `DsMessageScrollerController.scrollToEnd` for the residual that fit
+  /// leaves.
+  static const Duration frame = Duration(microseconds: 16667);
+
   /// `--duration-bloom: 1000ms` (L411) — ambient, not interactive.
   static const Duration bloom = Duration(milliseconds: 1000);
 
@@ -409,6 +468,32 @@ class DsCurves {
   /// visibly not [out] `(0.22, 1, 0.36, 1)` — that one is 99.7% done by the
   /// same instant.
   static const Cubic cssEaseOut = Cubic(0, 0, 0.58, 1);
+
+  /// CSS's own `ease-in-out` — `cubic-bezier(0.42, 0, 0.58, 1)`.
+  ///
+  /// The third stock keyword, and here for the same reason as [cssEase] and
+  /// [cssEaseOut]: `shadcn/tailwind.css`'s `scroll-fade-*` utilities write
+  /// `animation: 1ms ease-in-out scroll-fade-reveal-b` and name the keyword,
+  /// not `--ease-in-out`. The two are far apart — this one is much lazier in
+  /// the middle — and the mask geometry is where it shows.
+  ///
+  /// Measured on the chat page's message scroller (`ba2-chat-scroll.js`,
+  /// 1440×900, 2026-08-16): with the reveal 58.33% through its 96px range the
+  /// mask's remaining fade read **0.3588** of full, and `1 - Y(0.5833)` on
+  /// this curve is 0.3563; the system's own [inOut] `(0.65, 0, 0.35, 1)` would
+  /// give 0.284 at the same point. Two more samples (75% → 0.1292, 87.5% →
+  /// 0.0561) agree to within the sampler's slop.
+  static const Cubic cssEaseInOut = Cubic(0.42, 0, 0.58, 1);
+
+  /// **vaul**'s own easing — `cubic-bezier(0.32, 0.72, 0, 1)`.
+  ///
+  /// Read off the live drawer's computed `animation-timing-function`
+  /// (2026-08-16). A fifth curve in the system and, like [cssEase] and
+  /// [cssEaseOut], one this design system did not choose: it arrives with the
+  /// library, applies to `fadeIn` and `slideFromBottom` alike, and is much
+  /// flatter at the start than [out] — 50% of the travel is still 130ms away
+  /// at 500ms total, where [out] would be past 90%.
+  static const Cubic vaul = Cubic(0.32, 0.72, 0, 1);
 
   /// All seven easings, in the order globals.css **declares** them:
   /// `spring` L420, `out` L421, `curveIn` L428, `inOut` L429, `outFlex` L430,
