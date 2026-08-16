@@ -139,6 +139,7 @@ class DsMenuItem extends DsMenuChild {
     required this.label,
     this.icon,
     this.lucideIcon,
+    this.subtitle,
     this.shortcut,
     this.variant = DsMenuItemVariant.normal,
     this.enabled = true,
@@ -148,6 +149,23 @@ class DsMenuItem extends DsMenuChild {
 
   /// The row's text.
   final String label;
+
+  /// A second line under [label] — the row's `flex-col items-start gap-1`.
+  ///
+  /// GAP CLOSED. `*MenuItem` takes arbitrary children on the reference, and the
+  /// agent console's `ModelPicker` is the corpus's only row that passes more
+  /// than one line of them: a model's name over what it is for. This class had
+  /// `label` and `shortcut` and no child slot, so the hint rode the shortcut and
+  /// landed **beside** the label instead of under it — recorded as the
+  /// console's divergence 2 rather than forked into `agent_console.dart`.
+  ///
+  /// It is [DsCommandItem.subtitle]'s slot, one file over and on the same
+  /// terms: a string rather than a widget, because the type is the row's
+  /// decision and not the call site's. The two rows differ in one number, and
+  /// it is the reference's difference rather than this port's — a command row
+  /// stacks its two lines with no gap, a menu row writes `gap-1`. See
+  /// [DsMenu.twoLineItemHeight].
+  final String? subtitle;
 
   /// The leading `Icon` — `size="sm" tone="subtle"`, which the item's own
   /// `[&_svg:not([class*='size-'])]:size-4` renders at 16.
@@ -343,6 +361,22 @@ abstract final class DsMenu {
     return (spec.size ?? 0) * (spec.height ?? 1) + ds(2) * 2;
   }
 
+  /// A row carrying a [DsMenuItem.subtitle] — **52.7464**.
+  ///
+  /// The same `py-2` as [itemHeight], now over two line boxes and the row's own
+  /// `gap-1`: 16 + 18.5714 (`text-sm`) + 4 + 14.175 (`.type-caption`). Read off
+  /// the type specs for the reason [itemHeight] is, and stated here rather than
+  /// left to the layout because [_Row.height] adds a menu up before it exists.
+  ///
+  /// `DsCommandItem`'s two-line row is **48.7** — the same two line boxes in the
+  /// same padding, 4px shorter, because a command row writes no gap between
+  /// them and a menu row writes `gap-1`. Two components, two numbers, one
+  /// reference.
+  static double get twoLineItemHeight {
+    final DsTypeSpec caption = DsType.caption;
+    return itemHeight + ds(1) + (caption.size ?? 0) * (caption.height ?? 1);
+  }
+
   /// `*MenuLabel`'s `px-3 py-2 text-xs` — 12px in a 16px line box, so **32**.
   static double get labelHeight {
     final DsTypeSpec spec = DsComponentType.menuHeading;
@@ -484,10 +518,13 @@ class _Row {
   /// is laid out. A [DsMenuLabel] with a custom [DsMenuLabel.child] is
   /// intrinsic and reports its plain-text height instead.
   double get height => switch (kind) {
-        _RowKind.item ||
-        _RowKind.checkbox ||
-        _RowKind.radio ||
-        _RowKind.sub =>
+        // The one row-like kind that can be two lines tall: only [DsMenuItem]
+        // carries a subtitle, and a check row, a radio row and a sub-trigger
+        // have no slot for one.
+        _RowKind.item => item!.subtitle == null
+            ? DsMenu.itemHeight
+            : DsMenu.twoLineItemHeight,
+        _RowKind.checkbox || _RowKind.radio || _RowKind.sub =>
           DsMenu.itemHeight,
         _RowKind.label => DsMenu.labelHeight,
         _RowKind.separator => DsMenu.separatorHeight,
@@ -917,6 +954,7 @@ class _DsMenuContentState extends State<DsMenuContent> {
           label: item.label,
           leading: item.icon,
           leadingLucide: item.lucideIcon,
+          subtitle: item.subtitle,
           shortcut: item.shortcut,
           variant: item.variant,
           enabled: item.enabled,
@@ -1095,6 +1133,7 @@ class _MenuRow extends StatelessWidget {
     this.leading,
     this.leadingLucide,
     this.trailing,
+    this.subtitle,
     this.shortcut,
     this.checked,
     this.indicatorSide = DsMenuIndicatorSide.end,
@@ -1117,6 +1156,9 @@ class _MenuRow extends StatelessWidget {
 
   /// `ChevronRightIcon className="ml-auto"` on a sub-trigger.
   final DsIconGlyph? trailing;
+
+  /// [DsMenuItem.subtitle] — the row's second line.
+  final String? subtitle;
 
   final String? shortcut;
 
@@ -1214,13 +1256,41 @@ class _MenuRow extends StatelessWidget {
                   SizedBox(width: ds(2)),
                 ],
                 Flexible(
-                  child: DsText(
-                    label,
-                    DsComponentType.sheetBody,
-                    color: ink,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    softWrap: false,
+                  // One block when the row is one line, two stacked blocks when
+                  // it carries a [DsMenuItem.subtitle] — `flex-col items-start
+                  // gap-1` on the item. It is the label *slot* that stacks
+                  // rather than the whole row, so a leading glyph stays leading;
+                  // the corpus's only two-line row (`ModelPicker`) carries none,
+                  // so nothing depends on which of the two readings is taken.
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      DsText(
+                        label,
+                        DsComponentType.sheetBody,
+                        color: ink,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        softWrap: false,
+                      ),
+                      if (subtitle != null) ...<Widget>[
+                        // `gap-1`.
+                        SizedBox(height: ds(1)),
+                        DsText(
+                          subtitle!,
+                          DsType.caption,
+                          // `text-muted-foreground`, and muted whether or not
+                          // the row is highlighted — the span's own class beats
+                          // the row's `focus:text-accent-foreground`, exactly as
+                          // `DsCommandItem.meta`'s does one file over.
+                          color: theme.mutedForeground,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          softWrap: false,
+                        ),
+                      ],
+                    ],
                   ),
                 ),
               ],
@@ -1296,7 +1366,12 @@ class _MenuRow extends StatelessWidget {
       );
     }
 
-    row = SizedBox(height: DsMenu.itemHeight, child: row);
+    row = SizedBox(
+      height: subtitle == null
+          ? DsMenu.itemHeight
+          : DsMenu.twoLineItemHeight,
+      child: row,
+    );
     // The row's resolved `color`, which every `text-current` child reads.
     row = DefaultTextStyle.merge(style: TextStyle(color: ink), child: row);
     row = Opacity(opacity: enabled ? 1 : _disabledOpacity, child: row);
@@ -1305,7 +1380,10 @@ class _MenuRow extends StatelessWidget {
       button: true,
       selected: checked,
       enabled: enabled,
-      label: label,
+      // The accessible name is the item's text content, which on a two-line row
+      // is both spans — a reader gets *"Fast, Answers in a second"* rather than
+      // a name that stops at the label and a hint nothing announces.
+      label: subtitle == null ? label : '$label $subtitle',
       child: MouseRegion(
         // `cursor-default` — a menu row is not a link.
         cursor: SystemMouseCursors.basic,

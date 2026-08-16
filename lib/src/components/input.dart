@@ -103,6 +103,7 @@ class DsInput extends StatefulWidget {
     this.boxHeight,
     this.fill,
     this.flat = false,
+    this.radius,
   }) : assert(
           controller == null || initialValue == null,
           'A controller already carries the value — seed it there instead.',
@@ -235,6 +236,15 @@ class DsInput extends StatefulWidget {
   /// five fully transparent `box-shadow` layers at rest — the four framework
   /// placeholders and nothing else — with the ring still arriving on focus.)*
   final bool flat;
+
+  /// Overrides the socket's `rounded-pill`.
+  ///
+  /// One consumer: the agent's history card, whose inline rename field is
+  /// `h-6 rounded-sm px-1.5 py-0 shadow-none` — *(measured 348 × 24 at
+  /// `border-radius: 6px`)*. A pill on a 24px box would be a lozenge sitting
+  /// inside a 12px-cornered row, which is the same argument `SidebarMenuButton`
+  /// makes against [DsButton.radius].
+  final BorderRadius? radius;
 
   /// `h-10` — 40px, deliberately level with a default `DsButton`.
   static double get height => ds(10);
@@ -405,6 +415,7 @@ class _DsInputState extends State<DsInput> {
         padding: padding,
         fill: widget.fill,
         flat: widget.flat,
+        radius: widget.radius,
         child: line,
       );
       field = SizedBox(height: widget.boxHeight ?? DsInput.height, child: field);
@@ -562,6 +573,7 @@ class _Socket extends StatelessWidget {
     required this.child,
     this.fill,
     this.flat = false,
+    this.radius,
   });
 
   final bool focused;
@@ -571,10 +583,13 @@ class _Socket extends StatelessWidget {
   final bool flat;
   final Widget child;
 
+  /// [DsInput.radius] — null keeps the pill.
+  final BorderRadius? radius;
+
   @override
   Widget build(BuildContext context) {
     return DsFieldSurface(
-      radius: BorderRadius.circular(DsRadii.pill),
+      radius: radius ?? BorderRadius.circular(DsRadii.pill),
       focused: focused,
       invalid: invalid,
       fill: fill,

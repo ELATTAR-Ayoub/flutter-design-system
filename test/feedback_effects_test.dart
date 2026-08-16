@@ -29,10 +29,11 @@ Widget host(
   Widget child, {
   DsThemeMode mode = DsThemeMode.dark,
   bool reducedMotion = false,
+  Size viewport = const Size(1440, 900),
 }) {
   return MediaQuery(
     data: MediaQueryData(
-      size: const Size(1440, 900),
+      size: viewport,
       disableAnimations: reducedMotion,
     ),
     child: Directionality(
@@ -1963,6 +1964,379 @@ void main() {
       // The two numbers the live traces actually produced.
       expect(DsCurves.cssEase.transform(0.383), closeTo(0.645, 0.02));
       expect(DsCurves.cssEaseOut.transform(0.775), closeTo(0.923, 0.02));
+    });
+  });
+
+  // ────────────────────────────────────────────────────────────────────────
+  // The compact anchor — user-ordered top placement on a phone.
+  //
+  // What the reference does, measured before a line was written:
+  // `styles.css` L425 is `@media (max-width: 600px)`, sonner's one breakpoint.
+  // Inside it the toaster takes `left/right: var(--mobile-offset)` and
+  // `width: 100%`, each toast takes `calc(100% - offset * 2)`, and the anchored
+  // edge moves to the mobile offset — `MOBILE_VIEWPORT_OFFSET` 16px against
+  // `VIEWPORT_OFFSET` 24px. The block has a rule for EACH of
+  // `[data-y-position=bottom]` and `[data-y-position=top]` and moves neither:
+  // it reskins whichever is already set. `app/layout.tsx:39` mounts
+  // `<Toaster position="bottom-right" />` as a literal, with no `mobileOffset`
+  // and no responsive override in the app, so the reference's own phone
+  // behaviour is a BOTTOM stack at a 16px inset.
+  //
+  // The order was top-on-mobile and the order wins. Sonner's geometry is
+  // adopted whole — 600px, 16px, full bleed — and only the anchored edge is
+  // the port's own. These tests pin both halves of that.
+  //
+  // No `pumpAndSettle`: the bloom's forever loops are still running here.
+  // ────────────────────────────────────────────────────────────────────────
+  group('sonner choreography — the compact anchor', () {
+    /// A phone: 375 × 812 in logical pixels, both as the media query the
+    /// widget reads and as the surface it is laid out on.
+    const Size phone = Size(375, 812);
+
+    Widget toaster(
+      DsToastController c, {
+      Size viewport = const Size(1440, 900),
+      DsToastPosition position = DsToastPosition.bottomRight,
+    }) =>
+        host(
+          SizedBox(
+            width: viewport.width,
+            height: viewport.height,
+            child: DsToaster(controller: c, position: position),
+          ),
+          viewport: viewport,
+        );
+
+    /// Shrinks the test surface so a 375-wide host is not laid out inside an
+    /// 800 × 600 window it overflows.
+    void useSurface(WidgetTester t, Size size) {
+      t.view.physicalSize = size;
+      t.view.devicePixelRatio = 1;
+      addTearDown(t.view.reset);
+    }
+
+    Finder toastWith(String title) => find.ancestor(
+          of: find.text(title),
+          matching: find.byType(DsToast),
+        );
+
+    /// The edge a compact stack hangs from — `top: 16px` inside the host.
+    double topAnchor(WidgetTester t) =>
+        t.getRect(find.byType(DsToaster)).top + DsToaster.mobileViewportOffset;
+
+    /// How far a toast's own top edge sits BELOW that anchor. The mirror of
+    /// the wide contract's `raise`, and positive in the direction the stack
+    /// grows.
+    double drop(WidgetTester t, String title) =>
+        t.getRect(toastWith(title)).top - topAnchor(t);
+
+    double scaleOf(WidgetTester t, String title) =>
+        t.getRect(toastWith(title)).width / DsToaster.widthFor(phone.width);
+
+    double heightOf(WidgetTester t, String title) =>
+        t.getRect(toastWith(title)).height / scaleOf(t, title);
+
+    double opacityOf(WidgetTester t, String title) => t
+        .widget<Opacity>(
+            find.ancestor(of: toastWith(title), matching: find.byType(Opacity)).first)
+        .opacity;
+
+    Future<void> arrive(WidgetTester t) async {
+      await t.pump();
+      await t.pump();
+      await t.pump(DsToaster.transition);
+      await t.pump();
+    }
+
+    test('the breakpoint and the offsets are sonner\'s own', () {
+      // `@media (max-width: 600px)` — a max-width query is inclusive, so 600
+      // itself is compact and 601 is not.
+      expect(DsToaster.mobileBreakpoint, 600);
+      expect(DsToaster.isCompact(600), isTrue);
+      expect(DsToaster.isCompact(601), isFalse);
+      expect(DsToaster.isCompact(375), isTrue);
+      expect(DsToaster.isCompact(1440), isFalse);
+
+      // MOBILE_VIEWPORT_OFFSET against VIEWPORT_OFFSET.
+      expect(DsToaster.mobileViewportOffset, 16);
+      expect(DsToaster.viewportOffset, 24);
+      expect(DsToaster.offsetFor(375), DsToaster.mobileViewportOffset);
+      expect(DsToaster.offsetFor(1440), DsToaster.viewportOffset);
+
+      // `width: calc(100% - var(--mobile-offset-left) * 2)` against the
+      // 356px box.
+      expect(DsToaster.widthFor(375), 375 - 16 * 2);
+      expect(DsToaster.widthFor(1440), DsToaster.width);
+      expect(DsToaster.width, 356);
+      // It tracks the viewport rather than swapping one constant for another:
+      // narrower than the 356px box on a 375 phone, wider than it at the
+      // breakpoint itself.
+      expect(DsToaster.widthFor(375), lessThan(DsToaster.width));
+      expect(DsToaster.widthFor(600), greaterThan(DsToaster.width));
+      // A viewport narrower than its own two insets squeezes rather than
+      // going negative, which would be an assertion in `Positioned`.
+      expect(DsToaster.widthFor(20), 0);
+
+      // The ordered departure, stated as an assertion so a later "fix" back to
+      // the reference fails loudly. sonner's mobile block moves the x-position
+      // and the offsets and NEVER the y-position; the app mounts bottom-right;
+      // the reference therefore keeps its bottom stack on a phone. This port
+      // does not.
+      expect(DsToaster.positionFor(DsToastPosition.bottomRight, 375),
+          DsToastPosition.topRight,
+          reason: 'user-ordered top placement on small screens — the one place '
+              'this file leaves the reference');
+      expect(DsToaster.positionFor(DsToastPosition.bottomLeft, 375),
+          DsToastPosition.topLeft,
+          reason: 'the side survives the anchor swap; only the edge moves');
+      expect(DsToaster.positionFor(DsToastPosition.bottomRight, 1440),
+          DsToastPosition.bottomRight,
+          reason: 'the wide contract is untouched');
+
+      // `--lift` is the whole of the swap: every offset in the choreography is
+      // a multiple of it, which is why there is one set of rules and not two.
+      expect(DsToastPosition.bottomRight.lift, -1);
+      expect(DsToastPosition.bottomRight.topAnchored.lift, 1);
+    });
+
+    testWidgets('a phone anchors the stack to the TOP, 16px down, full bleed '
+        'between the two insets', (WidgetTester t) async {
+      useSurface(t, phone);
+      final DsToastController c = DsToastController();
+      addTearDown(c.dispose);
+      await t.pumpWidget(toaster(c, viewport: phone));
+      c.success('Sold 3 cards for \$2,481.00',
+          description: 'Credited to your available balance.');
+      await arrive(t);
+
+      const String title = 'Sold 3 cards for \$2,481.00';
+      final Rect toast = t.getRect(toastWith(title));
+      final Rect screen = t.getRect(find.byType(DsToaster));
+
+      // Anchored to the top edge, at the mobile offset.
+      expect(drop(t, title), closeTo(0, 0.01));
+      expect(toast.top - screen.top,
+          closeTo(DsToaster.mobileViewportOffset, 0.01));
+      // And nowhere near the bottom, which is what it would be on the wide
+      // contract and what the reference itself still does.
+      expect(screen.bottom - toast.bottom,
+          greaterThan(screen.height / 2),
+          reason: 'a bottom anchor here would be the reference behaviour and '
+              'the wrong one — the order was top');
+
+      // `width: calc(100% - var(--mobile-offset-left) * 2)`, and the insets it
+      // leaves on each side.
+      expect(toast.width, closeTo(phone.width - 16 * 2, 0.01));
+      expect(toast.width, closeTo(DsToaster.widthFor(phone.width), 0.01));
+      expect(toast.left - screen.left,
+          closeTo(DsToaster.mobileViewportOffset, 0.01));
+      expect(screen.right - toast.right,
+          closeTo(DsToaster.mobileViewportOffset, 0.01));
+      // Full bleed is the viewport minus its insets, not a second fixed box —
+      // narrower than 356 on a 375 phone and wider than it at the 600px
+      // breakpoint, which a constant could not be both of.
+      expect(toast.width, isNot(closeTo(DsToaster.width, 1)));
+      expect(toast.width, closeTo(343, 0.01));
+
+      c.clear();
+      await t.pump();
+    });
+
+    testWidgets('it enters from the TOP edge — translateY(-100%) at opacity 0',
+        (WidgetTester t) async {
+      useSurface(t, phone);
+      final DsToastController c = DsToastController();
+      addTearDown(c.dispose);
+      await t.pumpWidget(toaster(c, viewport: phone));
+      c.success('Sold 3 cards for \$2,481.00');
+
+      // `[data-y-position=top] { --y: translateY(-100%) }` — a whole box ABOVE
+      // its resting place, and transparent. The sign is the anchor's, not a
+      // second rule.
+      await t.pump();
+      const String title = 'Sold 3 cards for \$2,481.00';
+      final double height = heightOf(t, title);
+      expect(height, greaterThan(0));
+      expect(drop(t, title), closeTo(-height, 0.01),
+          reason: 'a bottom stack enters from +height; this one mirrors it');
+      expect(opacityOf(t, title), 0);
+
+      // `data-mounted="true"` — and it travels DOWNWARD into place, on the
+      // same slow window and the same CSS ease as the wide contract.
+      await t.pump();
+      await t.pump(DsToaster.transition ~/ 2);
+      final double half = DsCurves.cssEase.transform(0.5);
+      expect(drop(t, title), closeTo(-height * (1 - half), 0.6));
+      expect(drop(t, title), lessThan(0),
+          reason: 'still above its slot, on its way down');
+      expect(opacityOf(t, title), closeTo(half, 0.02));
+
+      await t.pump(DsToaster.transition);
+      expect(drop(t, title), closeTo(0, 0.01));
+      expect(opacityOf(t, title), 1);
+      c.clear();
+      await t.pump();
+    });
+
+    testWidgets('the stack grows DOWNWARD, and expands downward too',
+        (WidgetTester t) async {
+      useSurface(t, phone);
+      final DsToastController c = DsToastController();
+      addTearDown(c.dispose);
+      await t.pumpWidget(toaster(c, viewport: phone));
+      c.success('Sold 3 cards for \$2,481.00');
+      await arrive(t);
+      c.info('Saved as @ayoub');
+      await arrive(t);
+      c.warning('Only 12 packs left in this print run');
+      await arrive(t);
+
+      // Collapsed: the same `--lift * gap * n` and `1 − 0.05n` as the wide
+      // contract, with `--lift` now +1 — so every back toast sits BELOW the
+      // front one instead of above it.
+      const String front = 'Only 12 packs left in this print run';
+      final double frontHeight = heightOf(t, front);
+      expect(drop(t, front), closeTo(0, 0.01));
+      for (final (int n, String title) in <(int, String)>[
+        (1, 'Saved as @ayoub'),
+        (2, 'Sold 3 cards for \$2,481.00'),
+      ]) {
+        final double scale = 1 - DsToaster.stackScaleStep * n;
+        expect(scaleOf(t, title), closeTo(scale, 0.01));
+        expect(drop(t, title),
+            closeTo(DsToaster.gap * n + frontHeight * (1 - scale) / 2, 0.05),
+            reason: 'positive is downward here — the stack hangs from the top');
+        expect(drop(t, title), greaterThan(0));
+        // Pinned to the front toast's measured height, as ever.
+        expect(heightOf(t, title), closeTo(frontHeight, 0.05));
+      }
+
+      // Hovering lifts each toast to its own `--offset`, still downward.
+      final TestGesture g = await t.createGesture(kind: PointerDeviceKind.mouse);
+      await g.addPointer(location: Offset.zero);
+      addTearDown(g.removePointer);
+      await g.moveTo(t.getCenter(toastWith(front)));
+      await t.pump();
+      await t.pump(DsToaster.transition);
+      await t.pump();
+
+      final double h0 = heightOf(t, front);
+      expect(scaleOf(t, 'Saved as @ayoub'), closeTo(1, 0.01));
+      expect(drop(t, 'Saved as @ayoub'), closeTo(DsToaster.gap + h0, 0.05),
+          reason: 'expanded offset = n * gap + Σ heights before, downward');
+      final double h1 = heightOf(t, 'Saved as @ayoub');
+      expect(drop(t, 'Sold 3 cards for \$2,481.00'),
+          closeTo(2 * DsToaster.gap + h0 + h1, 0.1));
+
+      c.clear();
+      await t.pump();
+    });
+
+    testWidgets('the swipe follows the anchor — up dismisses, down is dampened',
+        (WidgetTester t) async {
+      useSurface(t, phone);
+      final DsToastController c = DsToastController();
+      addTearDown(c.dispose);
+      await t.pumpWidget(toaster(c, viewport: phone));
+      c.warning('Only 12 packs left in this print run');
+      await arrive(t);
+      const String title = 'Only 12 packs left in this print run';
+      final double home = t.getRect(toastWith(title)).top;
+
+      // DOWN is away from a top toaster's own direction, so it is dampened by
+      // `1 / (1.5 + |delta| / 20)` and 60px lands at 13.3 — nowhere near the
+      // 45px threshold. On the wide bottom-right contract this same drag is
+      // the one that dismisses.
+      expect(DsToaster.dampen(60), lessThan(DsToaster.swipeThreshold));
+      await t.drag(toastWith(title), const Offset(0, 60), touchSlopY: 0);
+      await t.pump();
+      expect(find.byType(DsToast), findsOneWidget);
+      expect(t.getRect(toastWith(title)).top, closeTo(home, 0.01),
+          reason: 'released short, it snaps home with no transition at all');
+
+      // UP travels 1:1 and clears the threshold.
+      await t.drag(toastWith(title), const Offset(0, -60), touchSlopY: 0);
+      await t.pump();
+      await t.pump(DsToaster.swipeOutDuration ~/ 2);
+      expect(t.getRect(toastWith(title)).top, lessThan(home - 60),
+          reason: 'the swipe-out keyframe carries it a further 100% upward');
+      await t.pump(DsToaster.unmountDelay);
+      await t.pump();
+      expect(find.byType(DsToast), findsNothing);
+    });
+
+    testWidgets('the hover-pause, the collapse reset and the exits all still '
+        'run compact', (WidgetTester t) async {
+      useSurface(t, phone);
+      final DsToastController c = DsToastController();
+      addTearDown(c.dispose);
+      await t.pumpWidget(toaster(c, viewport: phone));
+      c.info('Saved as @ayoub');
+      await t.pump();
+      await t.pump();
+
+      // The clock is the clock whatever edge the toast hangs from.
+      await t.pump(DsToaster.lifetime ~/ 4);
+      final TestGesture g = await t.createGesture(kind: PointerDeviceKind.mouse);
+      await g.addPointer(location: Offset.zero);
+      addTearDown(g.removePointer);
+      await g.moveTo(t.getCenter(toastWith('Saved as @ayoub')));
+      await t.pump();
+      await t.pump(DsToaster.lifetime * 4);
+      expect(find.byType(DsToast), findsOneWidget,
+          reason: 'pauseTimer holds the remainder, compact or not');
+
+      await g.moveTo(const Offset(4, 4));
+      await t.pump();
+      await t.pump(DsToaster.lifetime ~/ 2);
+      expect(find.byType(DsToast), findsOneWidget);
+      await t.pump(DsToaster.lifetime ~/ 4);
+
+      // The front exit leaves the way it came in — upward, out of the top.
+      const String title = 'Saved as @ayoub';
+      final double home = t.getRect(toastWith(title)).top;
+      await t.pump(DsToaster.unmountDelay ~/ 2);
+      expect(t.getRect(toastWith(title)).top, lessThan(home),
+          reason: '--y: translateY(--lift * -100%) with --lift = +1 is upward');
+      await t.pump(DsToaster.unmountDelay);
+      await t.pump();
+      expect(find.byType(DsToast), findsNothing);
+    });
+
+    testWidgets('at 1440 the bottom-right contract is untouched',
+        (WidgetTester t) async {
+      final DsToastController c = DsToastController();
+      addTearDown(c.dispose);
+      await t.pumpWidget(toaster(c));
+      c.success('Sold 3 cards for \$2,481.00');
+      await arrive(t);
+
+      const String title = 'Sold 3 cards for \$2,481.00';
+      final Rect toast = t.getRect(toastWith(title));
+      final Rect screen = t.getRect(find.byType(DsToaster));
+
+      // 24px from the bottom and 24px from the right, at 356px wide — every
+      // pin the wide contract already carries, restated here so a regression
+      // in the responsive branch cannot pass by only breaking the phone.
+      expect(screen.bottom - toast.bottom,
+          closeTo(DsToaster.viewportOffset, 0.01));
+      expect(screen.right - toast.right,
+          closeTo(DsToaster.viewportOffset, 0.01));
+      expect(toast.width, closeTo(DsToaster.width, 0.01));
+      expect(toast.top - screen.top, greaterThan(screen.height / 2),
+          reason: 'nowhere near the top edge');
+
+      // And the entrance is still upward from below.
+      c.clear();
+      await t.pump();
+      c.info('Saved as @ayoub');
+      await t.pump();
+      final Rect entering = t.getRect(toastWith('Saved as @ayoub'));
+      expect(entering.bottom,
+          greaterThan(screen.bottom - DsToaster.viewportOffset),
+          reason: 'translateY(+100%) — below its slot, not above it');
+      c.clear();
+      await t.pump();
     });
   });
 }

@@ -247,7 +247,9 @@ class _ButtonSkin {
     if (surface == null) return this;
     return _ButtonSkin(
       fill: (hovered ? surface.hoverFill ?? surface.fill : surface.fill) ?? fill,
-      border: surface.border ?? border,
+      border:
+          (hovered ? surface.hoverBorder ?? surface.border : surface.border) ??
+              border,
       content:
           (hovered ? surface.hoverInk ?? surface.ink : surface.ink) ?? content,
       shadow: shadow,
@@ -277,6 +279,7 @@ class DsButtonSurface {
     this.fill,
     this.hoverFill,
     this.border,
+    this.hoverBorder,
     this.ink,
     this.hoverInk,
   });
@@ -290,6 +293,24 @@ class DsButtonSurface {
 
   /// `border-*`.
   final Color? border;
+
+  /// `hover:border-*`. Falls back to [border] when the class list names no
+  /// hover border — the same fallback [hoverFill] makes, and the same reason.
+  ///
+  /// GAP CLOSED. This is the fifth override, and it was reported from two call
+  /// sites at once rather than forked into either: `AgentLauncher`'s
+  /// `hover:border-agent/50` on the launcher pill, and the same utility on the
+  /// welcome card's capability chips. Both wrote a resting border this class
+  /// could already carry and a hover border it could not, so the rim stayed the
+  /// variant's own while the ink moved — a half-painted hover, visible.
+  ///
+  /// It costs nothing beyond the field: the border colour is already carried by
+  /// `_SpringColors` on `btn-spring`'s own clock, so an override here springs
+  /// exactly as a variant's own hover border does *(measured on the launcher:
+  /// 250ms on `--ease-spring`, overshooting to L 0.894 at Δ160 and settling at
+  /// L 0.802 α 0.5 by Δ248)*. Nothing about the animation had to be taught this
+  /// value; only the value was missing.
+  final Color? hoverBorder;
 
   /// `text-*`.
   final Color? ink;

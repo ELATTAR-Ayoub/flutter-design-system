@@ -155,6 +155,41 @@ void main() {
       expect(DsMenu.itemHeight, DsSelect.itemHeight);
     });
 
+    test('a two-line row is that plus `gap-1` and a caption line box', () {
+      // `flex-col items-start gap-1` — the shape the agent console's
+      // `ModelPicker` writes, and the only two-line row in the corpus:
+      // 16 (`py-2`) + 18.5714 (`text-sm`) + 4 (`gap-1`) + 14.175
+      // (`.type-caption`).
+      expect(DsMenu.twoLineItemHeight, closeTo(52.746, 0.001));
+      expect(DsMenu.twoLineItemHeight - DsMenu.itemHeight,
+          closeTo(4 + 14.175, 0.001));
+      // The command palette's two-line row is the same two line boxes in the
+      // same padding and **48.7**, because a command row writes no gap between
+      // them. Two components, two numbers, one reference — so this is the
+      // assertion that catches the first one being copied onto the second.
+      expect(DsMenu.twoLineItemHeight - 48.7, closeTo(4, 0.05));
+    });
+
+    test('a subtitle is what makes a row two lines, and nothing else does', () {
+      const List<DsMenuChild> oneLine = <DsMenuChild>[
+        DsMenuItem(label: 'Fast', shortcut: 'Answers in a second'),
+      ];
+      const List<DsMenuChild> twoLine = <DsMenuChild>[
+        DsMenuItem(label: 'Fast', subtitle: 'Answers in a second'),
+      ];
+      // The same string in the two slots: beside the label it costs nothing,
+      // under it costs a line box and the gap. That difference is the whole of
+      // the console's divergence 2, in one number.
+      expect(
+        DsMenuContent.heightOf(oneLine),
+        closeTo(DsMenu.contentPadding * 2 + DsMenu.itemHeight, 0.001),
+      );
+      expect(
+        DsMenuContent.heightOf(twoLine),
+        closeTo(DsMenu.contentPadding * 2 + DsMenu.twoLineItemHeight, 0.001),
+      );
+    });
+
     test('a label is 12px/500 in a 16px line box, `py-2` — 32', () {
       // *(Measured: "Visible columns" occupies exactly 32.)*
       expect(DsMenu.labelHeight, 32);
@@ -254,6 +289,55 @@ void main() {
       expect(content.top - trigger.bottom, closeTo(4, 0.01));
       expect(content.left, closeTo(trigger.left, 0.01));
       expect(content.width, 240, reason: '`w-60` beats the trigger width');
+    });
+
+    testWidgets('GAP CLOSED: a subtitle stacks UNDER the label, and the row '
+        'grows for it', (WidgetTester t) async {
+      useFrame(t);
+      // The agent console's `ModelPicker`, in miniature. Its hint rode the
+      // `shortcut` slot for as long as [DsMenuItem] had no second line, which
+      // put it *beside* the label — recorded as the console's divergence 2 and
+      // closed by this slot.
+      const List<DsMenuChild> models = <DsMenuChild>[
+        DsMenuItem(label: 'Fast', subtitle: 'Answers in a second'),
+        DsMenuItem(label: 'Deep', subtitle: 'Slower, checks its work'),
+      ];
+      await t.pumpWidget(overlayHost(
+        const DsDropdownMenu(
+          trigger: _Trigger(width: 111),
+          children: models,
+        ),
+      ));
+      await t.tap(find.byType(DsDropdownMenu));
+      await settleOverlay(t);
+      await t.pump(DsDurations.overlay);
+
+      final Rect label = t.getRect(find.text('Fast'));
+      final Rect hint = t.getRect(find.text('Answers in a second'));
+      // Under, and left-aligned with it — `flex-col items-start`. Beside is
+      // exactly what the divergence was, so this is the assertion that bites.
+      expect(hint.top, greaterThan(label.top));
+      expect(hint.left, closeTo(label.left, 0.01));
+      // `gap-1`, measured between the two **painted** text boxes and so a
+      // tenth short of the declared 4: this suite loads no font binaries, and
+      // the test engine's fallback face paints a `text-sm` run a hair taller
+      // than the 18.5714 line box the layout reserves for it. The overshoot
+      // comes off the label's bottom edge rather than out of the gap — which
+      // is why the row's own height below is the number to hold, and this one
+      // is only here to say the gap exists at all.
+      expect(hint.top - label.bottom, closeTo(ds(1), 0.2));
+
+      // …and the popup really is two tall rows and its own `p-2`, rather than
+      // two short rows with an overflowing child.
+      expect(
+        t.getSize(find.byType(DsMenuContent)).height,
+        closeTo(DsMenuContent.heightOf(models), 0.05),
+      );
+      expect(
+        t.getSize(find.byType(DsMenuContent)).height,
+        closeTo(DsMenu.contentPadding * 2 + DsMenu.twoLineItemHeight * 2, 0.05),
+      );
+      expect(t.takeException(), isNull);
     });
 
     testWidgets('the highlight snaps, and recolours icon and shortcut too',

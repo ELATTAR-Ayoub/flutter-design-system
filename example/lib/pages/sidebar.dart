@@ -62,9 +62,12 @@
 ///  9. **`SidebarInput` is `h-8 bg-background shadow-none`** — the one field in
 ///     the system with no socket. It reads as a well only because the panel
 ///     around it is `--sidebar`.
-/// 10. **The shell link goes nowhere here.** *"Open the full-viewport
-///     sidebar"* points at `/sidebar-demo`, a route this port does not carry;
-///     the button ships, and pressing it does nothing.
+/// 10. **~~The shell link goes nowhere here.~~ — CLOSED.** *"Open the
+///     full-viewport sidebar"* points at `/sidebar-demo`, which the port now
+///     carries: `pages/sidebar_demo.dart`, mounted outside [DocsShell] by the
+///     one route arm in `main.dart` that renders no docs chrome. The button
+///     navigates. Kept in the register rather than deleted, because the drift
+///     was real for two phases and the entry is where its close is recorded.
 /// 11. **`duration-base` is inert, five times over** — closed corpus-wide by
 ///     the sweep. All five sites still run 250ms, because
 ///     `--default-transition-duration` **is** `--duration-base`.
@@ -78,6 +81,8 @@ import 'package:flutter/widgets.dart';
 
 import '../kit.dart';
 import '../nav.dart';
+import '../shell.dart';
+import 'sidebar_demo.dart';
 
 /* ── Fixtures ────────────────────────────────────────────────────────────── */
 
@@ -1350,8 +1355,10 @@ class _ShellSection extends StatelessWidget {
               alignment: AlignmentDirectional.centerStart,
               child: DsButton(
                 variant: DsButtonVariant.outline,
-                // DRIFT 10: `/sidebar-demo` is not a route this port carries.
-                onPressed: () {},
+                // `asChild` + `<Link href="/sidebar-demo">` — the B4
+                // divergence, so the href is the button's own handler.
+                onPressed: () =>
+                    AppRouter.of(context).navigate(sidebarDemoRoute),
                 child: const Text('Open the full-viewport sidebar'),
               ),
             ),

@@ -106,6 +106,7 @@ import '../foundation/typography.dart';
 import '../theme_scope.dart';
 import 'icon.dart';
 import 'icon_paths.dart';
+import 'icon_paths.g.dart';
 import 'input.dart';
 import 'input_group.dart';
 
@@ -323,6 +324,10 @@ class DsCommandItem {
   const DsCommandItem({
     required this.label,
     this.icon,
+    this.lucideIcon,
+    this.iconTone,
+    this.subtitle,
+    this.meta,
     this.shortcut,
     this.value,
     this.keywords = const <String>[],
@@ -332,6 +337,37 @@ class DsCommandItem {
 
   /// The row's copy.
   final String label;
+
+  /// A second line under [label] — `<span className="type-caption block
+  /// truncate text-muted-foreground">`.
+  ///
+  /// `CommandItem` takes arbitrary children, and the agent's history palette is
+  /// the corpus's only row that uses more than one line of them: title over
+  /// preview. *(Measured: the row grows from 34.5625 to **48.7** — one 18.5714
+  /// line box plus one 14.175 caption line box inside the same `py-2`.)*
+  final String? subtitle;
+
+  /// Trailing metadata that is **not** a `CommandShortcut` —
+  /// `<span className="type-caption shrink-0 text-muted-foreground">`.
+  ///
+  /// The distinction is load-bearing twice. It rides [DsType.caption] rather
+  /// than [DsComponentType.menuShortcut], and because it carries no
+  /// `data-slot="command-shortcut"` it does **not** trigger
+  /// `group-has-data-[slot=command-shortcut]/command-item:hidden` — so the
+  /// trailing check indicator is still rendered, at `opacity-0`, and still
+  /// reserves its 16px. Drift 13 the other way round.
+  final String? meta;
+
+  /// The same slot as [icon], over the **generated** registry — the split
+  /// [DsMenuItem] already makes. Ignored when [icon] is given.
+  final DsLucideGlyph? lucideIcon;
+
+  /// Overrides the row's own `tone="subtle"`.
+  ///
+  /// The history palette's pinned rows carry `tone="action"`, which the
+  /// selected-row rule (`data-selected:*:[svg]:text-foreground`) then overrules
+  /// exactly as it overrules the muted default.
+  final DsIconTone? iconTone;
 
   /// The leading glyph. `Icon size="sm" tone="subtle"` on this page, which
   /// paints **16px at stroke 2.4** — drift 15, and why this is a glyph rather
@@ -367,7 +403,8 @@ class DsCommandItem {
   /// The icon contributes no text and JSX has already collapsed the whitespace
   /// around the label, so the derived value is the label and the shortcut
   /// **concatenated with nothing between them**.
-  String get searchValue => (value ?? '$label${shortcut ?? ''}').trim();
+  String get searchValue =>
+      (value ?? '$label${subtitle ?? ''}${meta ?? ''}${shortcut ?? ''}').trim();
 }
 
 /// One `CommandGroup`.
@@ -429,7 +466,27 @@ class DsCommand extends StatefulWidget {
     this.vimBindings = true,
     this.label,
     this.onValueChanged,
+    this.inDialog = false,
   });
+
+  /// The palette is rendered inside a `DialogContent` — `CommandDialog`.
+  ///
+  /// Two measured consequences, and they arrive together because only
+  /// `CommandDialog` produces either:
+  ///
+  ///  * **Every item takes `rounded-lg!`**, not `rounded-md`. `CommandItem`'s
+  ///    own class list carries `in-data-[slot=dialog-content]:rounded-lg!`, so
+  ///    a row inside the dialog corners at **12px** and one on a page corners
+  ///    at 10.
+  ///  * **The root paints the component's own surface.** `Command` declares
+  ///    `bg-popover` and no border; the selects page's inline palette adds
+  ///    `border border-border bg-card` at the *call site*, and
+  ///    `CommandDialog`'s children are handed straight to `DialogContent`
+  ///    without it. So inside a dialog the palette is a bare `--popover` fill
+  ///    with no stroke, and the panel around it supplies the ring and the
+  ///    radius. *(Measured: dialog 384 × 344 at radius 16 on `--popover`;
+  ///    command 384 × 344, `p-2`, no border of its own.)*
+  final bool inDialog;
 
   /// The groups, in the order they are written. **They are never reordered** —
   /// see [DsCommand.sortsGroups].
@@ -866,6 +923,7 @@ class _DsCommandState extends State<DsCommand> {
                   key: _rowKeys.putIfAbsent(item.searchValue, GlobalKey.new),
                   theme: theme,
                   item: item,
+                  inDialog: widget.inDialog,
                   selected: item.searchValue == _value,
                   onTap: () => _commit(item),
                   // `onPointerMove` — `disablePointerSelection` defaults false, so
@@ -956,9 +1014,14 @@ class _DsCommandState extends State<DsCommand> {
     palette = Container(
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        color: theme.card,
+        // `bg-popover` is the component's own; `bg-card` and the stroke are the
+        // inline call site's, which `CommandDialog` does not write. See
+        // [DsCommand.inDialog].
+        color: widget.inDialog ? theme.popover : theme.card,
         borderRadius: BorderRadius.circular(DsRadii.xl),
-        border: Border.all(color: theme.border, width: DsWidths.hairline),
+        border: widget.inDialog
+            ? null
+            : Border.all(color: theme.border, width: DsWidths.hairline),
       ),
       child: palette,
     );
@@ -1158,6 +1221,7 @@ class _CommandRow extends StatelessWidget {
     required this.selected,
     required this.onTap,
     required this.onHover,
+    this.inDialog = false,
   });
 
   final DsThemeData theme;
@@ -1165,6 +1229,9 @@ class _CommandRow extends StatelessWidget {
   final bool selected;
   final VoidCallback onTap;
   final VoidCallback onHover;
+
+  /// `in-data-[slot=dialog-content]:rounded-lg!` — see [DsCommand.inDialog].
+  final bool inDialog;
 
   @override
   Widget build(BuildContext context) {
@@ -1182,9 +1249,10 @@ class _CommandRow extends StatelessWidget {
     Widget row = Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
-        if (item.icon != null) ...<Widget>[
-          DsIcon(
-            item.icon!,
+        if (item.icon != null || item.lucideIcon != null) ...<Widget>[
+          if (item.icon != null)
+            DsIcon(
+              item.icon!,
             // `size="sm"` writes 14 into the SVG's attributes and the row's
             // `[&_svg:not([class*='size-'])]:size-4` overrules it to **16**,
             // while `strokeWidth` stays computed from the 14 — drift 15.
@@ -1192,23 +1260,62 @@ class _CommandRow extends StatelessWidget {
             // override for it: `strokeFor` is 2.4 at both sizes, because 48/16
             // and 48/14 both clear the same 2.6 threshold, so the drift
             // collapses to an identity here exactly as it does in an addon.
-            sizePx: ds(4),
-            // `tone="subtle"`, brightened by the selected row's own rule.
-            tone: selected ? DsIconTone.normal : DsIconTone.subtle,
-          ),
+              sizePx: ds(4),
+              // `tone="subtle"`, brightened by the selected row's own rule.
+              tone: selected
+                  ? DsIconTone.normal
+                  : (item.iconTone ?? DsIconTone.subtle),
+            )
+          else
+            DsIcon.lucide(
+              item.lucideIcon!,
+              sizePx: ds(4),
+              tone: selected
+                  ? DsIconTone.normal
+                  : (item.iconTone ?? DsIconTone.subtle),
+            ),
           // `gap-2`.
           SizedBox(width: ds(2)),
         ],
         Expanded(
-          child: DsText(
-            item.label,
-            DsComponentType.sheetBody,
-            color: ink,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            softWrap: false,
+          // `<span className="min-w-0 flex-1">` — one block when the row is one
+          // line, two stacked blocks when it carries a [DsCommandItem.subtitle].
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              DsText(
+                item.label,
+                DsComponentType.sheetBody,
+                color: ink,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                softWrap: false,
+              ),
+              if (item.subtitle != null)
+                DsText(
+                  item.subtitle!,
+                  DsType.caption,
+                  color: theme.mutedForeground,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: false,
+                ),
+            ],
           ),
         ),
+        if (item.meta != null) ...<Widget>[
+          SizedBox(width: ds(2)),
+          // `shrink-0 text-muted-foreground`, and muted whether or not the row
+          // is selected — the span's own class beats `data-selected:text-*`.
+          DsText(
+            item.meta!,
+            DsType.caption,
+            color: theme.mutedForeground,
+            maxLines: 1,
+            softWrap: false,
+          ),
+        ],
         if (item.shortcut != null)
           // `ml-auto` — the shortcut is pushed to the trailing edge, which the
           // Expanded above already does.
@@ -1224,7 +1331,10 @@ class _CommandRow extends StatelessWidget {
           // on this page — and `opacity-0` otherwise, so on a shortcut-less row
           // it reserves 16px and shows nothing. Only `data-checked` reveals it,
           // and nothing here sets that.
-          Opacity(opacity: 0, child: DsIcon(DsIconGlyph.check, sizePx: ds(4))),
+          ...<Widget>[
+            SizedBox(width: ds(2)),
+            Opacity(opacity: 0, child: DsIcon(DsIconGlyph.check, sizePx: ds(4))),
+          ],
       ],
     );
 
@@ -1239,7 +1349,7 @@ class _CommandRow extends StatelessWidget {
         // `data-selected:bg-muted` — a third highlight token on one page,
         // drift 5. There is no `transition-*` on this row, so it snaps.
         color: selected ? theme.muted : dsTransparent,
-        borderRadius: BorderRadius.circular(DsRadii.md),
+        borderRadius: BorderRadius.circular(inDialog ? DsRadii.lg : DsRadii.md),
       ),
       child: row,
     );

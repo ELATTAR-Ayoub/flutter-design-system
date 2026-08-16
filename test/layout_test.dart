@@ -447,7 +447,8 @@ void main() {
       );
     });
 
-    testWidgets('the 4px grab strip answers 1.5px into each neighbour', (
+    testWidgets('the grab strip is 24px, 11.5 into each neighbour — '
+        'USER-ORDERED DIVERGENCE from the measured 4', (
       WidgetTester tester,
     ) async {
       Future<double> grabAt(double dx) async {
@@ -463,12 +464,24 @@ void main() {
         return panes(tester).first.size.width;
       }
 
-      // The strip is [seam − 1.5, seam + 2.5] — measured 735 to 739 against a
-      // handle box of [736.8, 737.8].
+      // The reference measured 4 (735 → 739 against a handle box of
+      // [736.8, 737.8]) and the port ships 24, centred on the same hairline:
+      // a fingertip cannot land on 4px. `handleHit` keeps the measurement,
+      // `handleGrab` is what hit-tests.
+      expect(handleHit, 4);
+      expect(handleGrab, 24);
+
+      // The reference's own zone still answers: [seam − 1.5, seam + 2.5].
       expect(await grabAt(410.8 - 1), closeTo(470.8, 1));
       expect(await grabAt(410.8 + 2), closeTo(470.8, 1));
-      // Six pixels out is past it, and nothing moves.
-      expect(await grabAt(410.8 - 6), closeTo(410.8, 0.05));
+      // And so does the touch strip around it — [seam − 11.5, seam + 12.5].
+      // Both of these are outside the 4px zone, so before the divergence they
+      // moved nothing: that is what pins the new width rather than the old.
+      expect(await grabAt(410.8 - 11), closeTo(470.8, 1));
+      expect(await grabAt(410.8 + 12), closeTo(470.8, 1));
+      // A pixel past either edge is past it, and nothing moves.
+      expect(await grabAt(410.8 - 12), closeTo(410.8, 0.05));
+      expect(await grabAt(410.8 + 13), closeTo(410.8, 0.05));
     });
 
     testWidgets('the keyboard steps 5 points, Home floors and End maxes', (

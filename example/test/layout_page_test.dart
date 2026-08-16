@@ -646,28 +646,36 @@ void main() {
       expect(_panes(tester).first.size.width, closeTo(25, _fineTolerance));
     });
 
-    testWidgets('the handle answers 1.5px into each neighbour', (
+    testWidgets('the handle answers 11.5px into each neighbour — a 24px '
+        'strip, USER-ORDERED DIVERGENCE from the measured 4', (
       WidgetTester tester,
     ) async {
-      await tester.pumpLayoutPage();
-      final RenderBox box = tester.renderObject<RenderBox>(
-        find.byType(DsResizablePanelGroup),
-      );
-      final Offset origin = box.localToGlobal(Offset.zero);
-
-      final double start = _panes(tester).first.size.width;
-
-      Future<double> dragAt(double dx) async {
+      /// Remounts the page, drags 40px right from [offset] pixels off the
+      /// seam, and answers how far the first pane actually moved.
+      Future<double> dragOffSeam(double offset) async {
+        await tester.pumpLayoutPage();
+        final RenderBox box = tester.renderObject<RenderBox>(
+          find.byType(DsResizablePanelGroup),
+        );
+        final double seam = _panes(tester).first.size.width;
         await tester.dragFrom(
-          origin + Offset(dx, box.size.height / 2),
+          box.localToGlobal(Offset(seam + offset, box.size.height / 2)),
           const Offset(40, 0),
         );
         await tester.pump();
-        return _panes(tester).first.size.width;
+        return _panes(tester).first.size.width - seam;
       }
 
-      // 1px to the left of the seam is still inside the 4px grab strip.
-      expect(await dragAt(start - 1), greaterThan(start + 30));
+      // The reference's 4px zone, [seam − 1.5, seam + 2.5], still answers.
+      expect(await dragOffSeam(-1), closeTo(40, _tolerance));
+      // The touch strip around it — [seam − 11.5, seam + 12.5] — answers too,
+      // and both of these lie outside the 4px zone: before the divergence
+      // they moved nothing. That is what pins 24 rather than 4.
+      expect(await dragOffSeam(-11), closeTo(40, _tolerance));
+      expect(await dragOffSeam(12), closeTo(40, _tolerance));
+      // A pixel past either edge is past it.
+      expect(await dragOffSeam(-12), closeTo(0, _fineTolerance));
+      expect(await dragOffSeam(13), closeTo(0, _fineTolerance));
     });
 
     testWidgets('the browser-scrollbar specimens scroll on both axes', (

@@ -303,4 +303,41 @@ class DsShadows {
     DsShadowLayer(0, 0, 0, 1, (_) => _valueAt(0.45)),
     DsShadowLayer(0, 10, 34, -8, (_) => _valueAt(0.42)),
   ]);
+
+  /// `@keyframes pulls-pulse-live` (globals.css L2521–2530) — the expanding
+  /// ring under a live control, sampled at [t] through one half of its cycle.
+  ///
+  /// ```css
+  /// 0%, 100% { box-shadow: 0 0 0 0   rgba(61, 220, 151, 0.5); }
+  /// 50%      { box-shadow: 0 0 0 5px rgba(61, 220, 151, 0);   }
+  /// ```
+  ///
+  /// A **function** rather than a constant because this token only exists as
+  /// two keyframe stops: there is no resting `--shadow-pulse-live` to name, and
+  /// a caller animating it needs the value in between. [t] is 0 at either end
+  /// of the cycle and 1 at the midpoint, already eased.
+  ///
+  /// The green is the reference's own literal. It is written inline in the
+  /// keyframe and points at nothing in `:root` — it is not `--color-success`
+  /// (`#10b981`) or any other member of the palette — so it is transcribed
+  /// here, in the one layer allowed to hold a literal, rather than laundered
+  /// into a token the stylesheet does not have.
+  static DsShadowSpec pulseLiveRing(double t) => DsShadowSpec(<DsShadowLayer>[
+        DsShadowLayer(
+          0,
+          0,
+          0,
+          _pulseLiveSpread * t,
+          (_) => _pulseLiveInk.withValues(alpha: _pulseLiveAlpha * (1 - t)),
+        ),
+      ]);
+
+  /// `rgba(61, 220, 151, …)`.
+  static const Color _pulseLiveInk = Color(0xFF3DDC97);
+
+  /// The ring's alpha at the top of the cycle.
+  static const double _pulseLiveAlpha = 0.5;
+
+  /// `0 0 0 0` → `0 0 0 5px`.
+  static const double _pulseLiveSpread = 5;
 }

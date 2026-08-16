@@ -277,6 +277,22 @@ class DsDurations {
   /// spin are unrelated, and the reference states each separately.
   static const Duration shimmer = Duration(milliseconds: 1400);
 
+  /// `anim-shimmer-text { … animation: pulls-shimmer 2.6s var(--ease-in-out)
+  /// infinite }` (globals.css L3051–3070) — the agent's status line while it
+  /// works.
+  ///
+  /// The **same keyframes** as [shimmer], at nearly twice the period, and the
+  /// utility's own comment says why the pair is not one number: *"A highlight
+  /// travelling through live text… Clipped to the glyphs rather than painted
+  /// behind them, so it reads as the words themselves being lit rather than as
+  /// a loading bar."* A skeleton is a placeholder and hurries; a status line
+  /// is a sentence and does not.
+  ///
+  /// Numerically equal to [beatHover] and spelled separately on [popIn]'s
+  /// precedent: `action-beat` is a pulse under a button and this is a sweep
+  /// across text.
+  static const Duration shimmerText = Duration(milliseconds: 2600);
+
   /// `anim-pulse-live { animation: pulls-pulse-live 2s var(--ease-in-out)
   /// infinite }` (globals.css L2354–2356) — *"the only animation allowed to
   /// run forever, and only on the live indicator"*.

@@ -18,6 +18,8 @@
 ///     whose own box is [736.8, 737.8]. The `withHandle` grip is `h-6 w-1` —
 ///     4 × 24, `rounded-lg`, `bg-border`, `z-10` — i.e. the same 4px, made
 ///     visible for 24px of the seam's height. [handleHit], [gripSize].
+///     **The port no longer drags off that 4px** — see [handleGrab] and the
+///     divergence note below.
 ///  2. **`minSize={25}` is 25 *pixels*.** Dragged hard left, the first panel
 ///     stops at 25.0px and the separator reports `aria-valuemin="2.434"`,
 ///     which is 25 ÷ 1027. `defaultSize={40}` and `{60}` meanwhile land on
@@ -39,6 +41,28 @@
 ///     flight. The port matches at rest and sets [SystemMouseCursors.resizeLeftRight]
 ///     over the grab zone, which is the drag affordance the reference gets from
 ///     its own global stylesheet.
+///
+/// ## USER-ORDERED DIVERGENCE — the grab strip is 24px, not the measured 4
+///
+/// The reference is a mouse-only document: `after:w-1` is a 4px target, which a
+/// cursor hits and a fingertip does not (the platform guidance both stores
+/// publish is 44/48px, and 4px is under a tenth of it). **On the user's order**
+/// the drag strip widens to [handleGrab] — 24px, centred on the same hairline,
+/// so it reaches 11.5px into each neighbouring panel instead of 1.5px.
+///
+/// What does **not** move, and the reason this is a hit-area change and not a
+/// visual one:
+///
+///  * the seam is still `_handleWidth` — one hairline of `--border`;
+///  * the grip is still [gripSize] — 4 × 24, exactly the reference's box;
+///  * [handleHit] still states the measured 4px, so the number the probe found
+///    stays in the file rather than being overwritten by the one that ships.
+///
+/// The strip is invisible either way — it paints nothing, it only answers — so
+/// the rendered pixels are unchanged and only `elementFromPoint` would tell the
+/// two apart. Pinned by the two hit tests in `test/layout_test.dart` and
+/// `example/test/layout_page_test.dart`, which now walk out to the new edge and
+/// past it.
 library;
 
 import 'package:flutter/gestures.dart' show DragStartBehavior;
@@ -52,10 +76,23 @@ import '../theme_scope.dart';
 /// `w-px` — the seam itself.
 const double _handleWidth = DsWidths.hairline;
 
-/// `after:w-1` — the 4px pseudo-element that answers the pointer.
+/// `after:w-1` — the 4px pseudo-element that answers the pointer **on the
+/// reference**.
+///
+/// Kept as the measurement it is. What the port actually hit-tests is
+/// [handleGrab]; see the library note's divergence section.
 double get handleHit => ds(1);
 
-/// `h-6 w-1` — the visible grip, when `withHandle` is set.
+/// The width the port's drag strip really is: **24px**, centred on the same
+/// hairline the reference centres its 4px on.
+///
+/// A user-ordered divergence for touch — the library note carries the whole
+/// reasoning. 24 is `ds(6)`, the same rung the grip is 24 *tall* at, so the
+/// strip is a square around the visible grip rather than a number of its own.
+double get handleGrab => ds(6);
+
+/// `h-6 w-1` — the visible grip, when `withHandle` is set. Unchanged by the
+/// [handleGrab] divergence: the hit area widened, the paint did not.
 Size get gripSize => Size(ds(1), ds(6));
 
 /// Arrow keys move the separator by five percentage points.
@@ -187,8 +224,10 @@ class _DsResizablePanelGroupState extends State<DsResizablePanelGroup> {
                   children: row,
                 ),
                 // `after:absolute after:inset-y-0 after:left-1/2 after:w-1
-                // after:-translate-x-1/2` — the 4px grab zone, laid out here
-                // rather than inside the 1px seam.
+                // after:-translate-x-1/2` — the grab zone, laid out here
+                // rather than inside the 1px seam. Widened from the measured
+                // 4px to [handleGrab]'s 24 on the user's order; see the
+                // library note.
                 //
                 // **This is the hit-area precedent, avoided rather than
                 // paid.** A `Positioned` child that hangs 1.5px out of a 1px
@@ -200,10 +239,10 @@ class _DsResizablePanelGroupState extends State<DsResizablePanelGroup> {
                 // order — ahead of both neighbouring panels.
                 for (int i = 0; i < seams.length; i++)
                   Positioned(
-                    left: seams[i] - (handleHit - _handleWidth) / 2,
+                    left: seams[i] - (handleGrab - _handleWidth) / 2,
                     top: 0,
                     bottom: 0,
-                    width: handleHit,
+                    width: handleGrab,
                     child: _GrabStrip(
                       onDrag: (double dx) => _resize(i, dx, space),
                       onKey: (double sign) {
@@ -270,7 +309,8 @@ class _Seam extends StatelessWidget {
 }
 
 /// `<ResizableHandle>`'s interactive half: `role="separator" tabIndex={0}`,
-/// the 4px pointer target, and the arrow/Home/End keys.
+/// the pointer target ([handleGrab] wide, not the reference's 4), and the
+/// arrow/Home/End keys.
 class _GrabStrip extends StatefulWidget {
   const _GrabStrip({required this.onDrag, required this.onKey});
 
@@ -285,7 +325,7 @@ class _GrabStrip extends StatefulWidget {
 
 class _GrabStripState extends State<_GrabStrip> {
   /// Labelled so a test can reach `tabIndex={0}` without a tab order to walk:
-  /// the strip is 4px wide and nothing else on the page points at it.
+  /// the strip paints nothing and nothing else on the page points at it.
   final FocusNode _focus = FocusNode(debugLabel: dsResizableHandleFocusLabel);
 
   @override

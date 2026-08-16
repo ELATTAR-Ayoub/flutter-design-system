@@ -30,41 +30,71 @@
 ///
 /// **Not ported:** `asChild` and with it the whole `[a]:hover:bg-muted` /
 /// `[button]:hover:bg-muted` pair — the hover surface is keyed to the element
-/// the row *is*, and every row in the corpus is a plain `<div>`, so none of it
-/// ever matches. `ItemSeparator`, `ItemHeader` and `ItemFooter` (no call site),
-/// `variant` `outline`/`muted` (no call site), `size` `sm`/`xs` (no call site,
-/// and their effect on the group's gap is what the drift above reproduces
-/// anyway), and `focus-visible:` — a `<div>` takes no focus.
+/// the row *is*, and the rows in the base corpus are plain `<div>`s, so none of
+/// it ever matches. `ItemSeparator`, `ItemHeader` and `ItemFooter` (no call
+/// site), `variant="muted"` (no call site), `size` `sm`/`xs` (their rungs are
+/// byte-identical to `default` for `sm`, and their only *visible* effect is on
+/// the group's gap, which is what the drift above reproduces anyway), and
+/// `focus-visible:` — a `<div>` takes no focus.
+///
+/// **Reopened by the agent family (2026-08-16).** `variant="outline"` and
+/// `items-start` both have a call site now — `agent/parts/history-card.tsx`
+/// renders `<Item variant="outline" className="… items-start …">` — so
+/// [DsItemVariant] and [DsItem.alignStart] are built rather than recorded.
 library;
 
 import 'package:flutter/widgets.dart';
 
 import '../foundation/colors.dart';
 import '../foundation/spacing.dart';
+import '../foundation/theme.dart';
 import '../foundation/typography.dart';
 import '../theme_scope.dart';
 
 /// `<ItemGroup>` — `role="list"`, `flex w-full flex-col`.
 class DsItemGroup extends StatelessWidget {
-  const DsItemGroup({super.key, required this.children});
+  const DsItemGroup({super.key, required this.children, this.gapOverride});
 
   final List<Widget> children;
+
+  /// A `gap-*` written at the call site, which beats the base list through
+  /// tailwind-merge.
+  ///
+  /// The agent's history list passes `gap-1` (**4px** *measured*) and the
+  /// drawer's navigation group `gap-0.5` (2px); the data page passes none and
+  /// keeps [gap]. Null is that base case, drift included.
+  final double? gapOverride;
 
   /// `has-data-[size=sm]:gap-2.5` — 10px, matched by the `size="sm"` buttons
   /// inside the rows rather than by the rows themselves. See the library doc.
   static double get gap => ds(2.5);
 
   @override
-  Widget build(BuildContext context) => Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          for (int i = 0; i < children.length; i++) ...<Widget>[
-            if (i > 0) SizedBox(height: gap),
-            children[i],
-          ],
+  Widget build(BuildContext context) {
+    final double pitch = gapOverride ?? gap;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        for (int i = 0; i < children.length; i++) ...<Widget>[
+          if (i > 0) SizedBox(height: pitch),
+          children[i],
         ],
-      );
+      ],
+    );
+  }
+}
+
+/// `itemVariants`' first axis.
+enum DsItemVariant {
+  /// `border-transparent`. Named [normal] because `default` is a Dart keyword.
+  normal,
+
+  /// `border-border` — what the agent's history card passes.
+  outline,
+
+  /// `border-transparent bg-muted/50`. RECORDED, NOT BUILT: no call site.
+  muted,
 }
 
 /// One row.
@@ -74,6 +104,8 @@ class DsItem extends StatelessWidget {
     this.media,
     required this.content,
     this.actions,
+    this.variant = DsItemVariant.normal,
+    this.alignStart = false,
   });
 
   /// `<ItemMedia>`.
@@ -84,6 +116,18 @@ class DsItem extends StatelessWidget {
 
   /// `<ItemActions>`.
   final Widget? actions;
+
+  /// `data-variant` — which border the row wears.
+  final DsItemVariant variant;
+
+  /// `items-start`, written at the call site over the base list's
+  /// `items-center`.
+  ///
+  /// It moves the **actions** and nothing else: [DsItemMedia] is already
+  /// `self-start` whenever the row has a description, and [DsItemContent] fills
+  /// the row either way. *(Measured on the history card: `item-actions` and
+  /// `item-content` share a top edge at y=801.25.)*
+  final bool alignStart;
 
   /// `gap-2.5` — 10px, between media, content and actions.
   static double get gap => ds(2.5);
@@ -96,31 +140,50 @@ class DsItem extends StatelessWidget {
   static double get radius => DsRadii.lg;
 
   @override
-  Widget build(BuildContext context) => Container(
-        padding: padding,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(radius),
-          // `border-transparent` — real, and paid for out of the row's width.
-          border: Border.all(color: dsTransparent, width: DsWidths.hairline),
-        ),
-        // `items-center` with one child overriding it to `self-start` is a
-        // per-child cross alignment, which a [Row] has no property for. Giving
-        // every child the row's height and letting each align inside its own
-        // slot is the same layout, and the only one Flutter spells.
-        child: IntrinsicHeight(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              if (media != null) ...<Widget>[media!, SizedBox(width: gap)],
-              Expanded(child: content),
-              if (actions != null) ...<Widget>[
-                SizedBox(width: gap),
-                Center(child: actions!),
-              ],
+  Widget build(BuildContext context) {
+    final DsThemeData theme = DsTheme.of(context);
+    // `border-transparent` on `default` — real, and paid for out of the row's
+    // width, which is why every variant keeps the same 1px.
+    final Color stroke = switch (variant) {
+      DsItemVariant.normal || DsItemVariant.muted => dsTransparent,
+      DsItemVariant.outline => theme.border,
+    };
+    return Container(
+      padding: padding,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(radius),
+        color: variant == DsItemVariant.muted
+            ? theme.muted.withValues(alpha: mutedFillAlpha)
+            : null,
+        border: Border.all(color: stroke, width: DsWidths.hairline),
+      ),
+      // `items-center` with one child overriding it to `self-start` is a
+      // per-child cross alignment, which a [Row] has no property for. Giving
+      // every child the row's height and letting each align inside its own
+      // slot is the same layout, and the only one Flutter spells.
+      child: IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            if (media != null) ...<Widget>[media!, SizedBox(width: gap)],
+            Expanded(child: content),
+            if (actions != null) ...<Widget>[
+              SizedBox(width: gap),
+              Align(
+                alignment:
+                    alignStart ? Alignment.topCenter : Alignment.center,
+                child: actions!,
+              ),
             ],
-          ),
+          ],
         ),
-      );
+      ),
+    );
+  }
+
+  /// `bg-muted/50` on [DsItemVariant.muted]. RECORDED, NOT BUILT beyond this
+  /// constant — no call site paints it.
+  static const double mutedFillAlpha = 0.50;
 }
 
 /// `<ItemMedia variant="icon">` — `flex shrink-0 items-center justify-center`

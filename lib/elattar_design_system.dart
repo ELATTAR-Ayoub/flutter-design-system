@@ -20,6 +20,18 @@ export 'src/theme_scope.dart';
 
 // ── components ──────────────────────────────────────────────────────────────
 export 'src/components/accordion.dart';
+export 'src/components/agent_attach_menu.dart';
+export 'src/components/agent_attachments.dart';
+export 'src/components/agent_avatar.dart';
+export 'src/components/agent_composer.dart';
+export 'src/components/agent_console.dart';
+export 'src/components/agent_core.dart';
+export 'src/components/agent_face.dart';
+export 'src/components/agent_history.dart';
+export 'src/components/agent_launcher.dart';
+export 'src/components/agent_markdown.dart';
+export 'src/components/agent_slash_palette.dart';
+export 'src/components/agent_transcript.dart';
 export 'src/components/alert.dart';
 export 'src/components/alert_dialog.dart';
 export 'src/components/aspect_ratio.dart';
@@ -70,6 +82,7 @@ export 'src/components/navigation_menu.dart';
 export 'src/components/pagination.dart';
 export 'src/components/popover.dart';
 export 'src/components/progress.dart';
+export 'src/components/questionnaire.dart';
 export 'src/components/radio.dart';
 export 'src/components/resizable.dart';
 export 'src/components/scroll_area.dart';
@@ -90,6 +103,7 @@ export 'src/components/toaster.dart';
 export 'src/components/toggle.dart';
 export 'src/components/toggle_group.dart';
 export 'src/components/tooltip.dart';
+export 'src/components/voice.dart';
 
 // ── effects ─────────────────────────────────────────────────────────────────
 export 'src/effects/bloom_cosmic.dart';
@@ -99,6 +113,7 @@ export 'src/effects/machine_surface.dart';
 export 'src/effects/page_glow.dart';
 export 'src/effects/sheen_action.dart';
 export 'src/effects/starfield.dart';
+export 'src/effects/voice_orb.dart';
 
 // ── motion ──────────────────────────────────────────────────────────────────
 export 'src/motion/keyframes.dart';

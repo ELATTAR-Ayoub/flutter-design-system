@@ -5,14 +5,19 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/main.dart';
 import 'package:example/nav.dart';
+import 'package:example/pages/agent_avatar.dart';
+import 'package:example/pages/agent_voice.dart';
 import 'package:example/pages/buttons.dart';
 import 'package:example/pages/charts.dart';
 import 'package:example/pages/chat.dart';
 import 'package:example/pages/colors.dart';
+import 'package:example/pages/composer.dart';
+import 'package:example/pages/console.dart';
 import 'package:example/pages/data.dart';
 import 'package:example/pages/dialogs.dart';
 import 'package:example/pages/feedback.dart';
 import 'package:example/pages/forms.dart';
+import 'package:example/pages/history.dart';
 import 'package:example/pages/icons.dart';
 import 'package:example/pages/inputs.dart';
 import 'package:example/pages/layout.dart';
@@ -25,7 +30,9 @@ import 'package:example/pages/selection.dart';
 import 'package:example/pages/selects.dart';
 import 'package:example/pages/shadows.dart';
 import 'package:example/pages/sidebar.dart';
+import 'package:example/pages/sidebar_demo.dart';
 import 'package:example/pages/spacing.dart';
+import 'package:example/pages/transcript.dart';
 import 'package:example/pages/typography.dart';
 import 'package:example/shell.dart';
 import 'package:flutter/widgets.dart';
@@ -62,7 +69,7 @@ extension on WidgetTester {
 /// Named as types rather than counted, because `isNotNull` cannot tell a real
 /// page from the [PlaceholderPage] every unbuilt href falls through to: a route
 /// arm dropped by a bad merge would still have satisfied it, and the page would
-/// have gone missing behind a title that looks right (ruling B11). Twenty-one
+/// have gone missing behind a title that looks right (ruling B11). Twenty-seven
 /// arms, in `pageFor`'s own order.
 const Map<String, Type> _wired = <String, Type>{
   dsRoot: OverviewPage,
@@ -86,6 +93,12 @@ const Map<String, Type> _wired = <String, Type>{
   '$dsRoot/components/base/charts': ChartsPage,
   '$dsRoot/components/base/layout': LayoutPage,
   '$dsRoot/components/base/sidebar': SidebarPage,
+  '$dsRoot/components/agent/console': ConsolePage,
+  '$dsRoot/components/agent/avatar': AgentAvatarPage,
+  '$dsRoot/components/agent/composer': ComposerPage,
+  '$dsRoot/components/agent/transcript': TranscriptPage,
+  '$dsRoot/components/agent/history': HistoryPage,
+  '$dsRoot/components/agent/voice': AgentVoicePage,
 };
 
 Iterable<({DsGroup group, DsCategory category})> get _everyCategory sync* {
@@ -312,13 +325,13 @@ void main() {
     }
 
     // …and the state this wiring pass reaches, said out loud rather than left
-    // to be inferred from the table's length: **Foundations and Base are
-    // finished**. Every category in either group mounts a real page, so the
-    // placeholder is now reachable only from Agent and Site. Asserted as a set
+    // to be inferred from the table's length: **Foundations, Base and Agent
+    // are finished**. Every category in all three mounts a real page, so the
+    // placeholder is now reachable only from Site. Asserted as a set
     // difference and not as a count, for the reason the table itself is typed
     // rather than counted: a category renamed out of Base and a category left
     // unbuilt are the same arithmetic and very different bugs.
-    for (final String id in const <String>['foundations', 'base']) {
+    for (final String id in const <String>['foundations', 'base', 'agent']) {
       final DsGroup group = dsGroupById(id);
       expect(
         <String>[
@@ -330,13 +343,55 @@ void main() {
         reason: 'every $id category is built, so none may be a placeholder',
       );
     }
-    // The converse, so the assertion above cannot pass by the group emptying:
-    // the two families that are genuinely unbuilt still are, indexes included.
+    // The converse, so the assertion above cannot pass by a group emptying —
+    // and with three of the four families finished it is now stated **exactly**
+    // rather than as "something is still left". What falls through to the
+    // placeholder is the Site group's six categories plus the group index
+    // routes: `base`, `agent` and `site`. Foundations' index is absent from
+    // that list because `dsRoot` *is* the Foundations index and it mounts the
+    // overview page — the one group href in the tree that is wired.
+    final DsGroup site = dsGroupById('site');
     expect(
-      hrefs.where((String href) => !_wired.containsKey(href)),
-      isNotEmpty,
-      reason: 'Agent and Site are not built yet — if that changed, this test '
-          'is what has to say so',
+      hrefs.where((String href) => !_wired.containsKey(href)).toSet(),
+      <String>{
+        for (final DsCategory category in site.categories)
+          categoryHref(site, category),
+        for (final DsGroup group in dsGroups)
+          if (group.id != 'foundations') group.href,
+      },
+      reason: 'Site and the group indexes are the whole of what is left — if '
+          'that changed, this test is what has to say so',
     );
+  });
+
+  testWidgets('/sidebar-demo renders outside the docs chrome entirely', (
+    WidgetTester tester,
+  ) async {
+    tester.useViewport(_desktop);
+    await tester.pumpApp();
+    expect(find.byType(DocsShell), findsOneWidget);
+
+    // The href is deliberately outside `$dsRoot`, and deliberately outside
+    // `pageFor`: the reference puts it at the root because a route under
+    // `app/design-system/layout.tsx` cannot opt out of the docs chrome, and a
+    // `fixed inset-y-0 h-svh` panel rendered inside the docs would land on top
+    // of the documentation's own sidebar. `_DocsHome` branches instead.
+    expect(sidebarDemoRoute.startsWith(dsRoot), isFalse);
+    expect(pageFor(sidebarDemoRoute), isA<PlaceholderPage>());
+
+    AppRouter.of(tester.element(find.byType(DocsShell)))
+        .navigate(sidebarDemoRoute);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(SidebarDemoPage), findsOneWidget);
+    // No header, no rail, no reading column — the whole point of the arm.
+    expect(find.byType(DocsShell), findsNothing);
+    expect(find.byType(NavTree), findsNothing);
+    expect(find.text('DESIGN SYSTEM V0.1'), findsNothing);
+
+    // The other half of the wiring — that the sidebar page's own §Shell button
+    // is what puts this href in the router — is pinned in
+    // `sidebar_page_test.dart`, which has the reduced-motion harness that page
+    // needs.
   });
 }

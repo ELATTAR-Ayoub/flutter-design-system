@@ -2372,6 +2372,72 @@ void main() {
       });
     });
 
+    group('DsButtonSurface — the class-list override', () {
+      /// `variant="outline"` under a class list appended to it, which is how
+      /// the reference restyles a `Button` and what this class is a parameter
+      /// for.
+      Future<void> mountSurface(WidgetTester t, DsButtonSurface surface) =>
+          t.pumpWidget(host(DsButton(
+            variant: DsButtonVariant.outline,
+            surface: surface,
+            onPressed: () {},
+            child: const DsIcon(DsIconGlyph.check),
+          )));
+
+      /// `--agent/50` — the colour both call sites of the fifth override name.
+      final Color agentRim = DsThemeData.dark.agent.withValues(
+        alpha: DsAgentLauncher.hoverRimAlpha,
+      );
+
+      testWidgets('hoverBorder moves the rim on hover, and only on hover',
+          (WidgetTester t) async {
+        // The assertion has teeth only if the two colours differ — a rim that
+        // happened to equal the outline variant's own would pass this test
+        // with the field deleted.
+        expect(agentRim, isNot(DsThemeData.dark.input));
+
+        await mountSurface(t, DsButtonSurface(hoverBorder: agentRim));
+        expect(borderOf(t), DsThemeData.dark.input,
+            reason: '`hover:border-*` is a hover utility: at rest the '
+                "variant's own hairline is untouched");
+
+        final TestGesture mouse = await hoverAndSettle(t);
+        expect(borderOf(t), agentRim);
+
+        // …and back off it, on the same 250ms `btn-spring` clock the fill and
+        // the ink ride. Nothing about the animation was taught this value —
+        // the border colour was already spring-carried and only the *value*
+        // was missing, which is why the KNOWN GAP closed as one field.
+        await mouse.moveTo(Offset.zero);
+        await t.pump();
+        await t.pump(DsDurations.base);
+        await t.pump(DsDurations.base);
+        expect(borderOf(t), DsThemeData.dark.input);
+      });
+
+      testWidgets('an absent hoverBorder leaves the resting override standing',
+          (WidgetTester t) async {
+        // CSS's own fallback, and [hoverFill]'s: a class list that names no
+        // `hover:border-*` keeps the border it does name. Every override in
+        // the corpus before this one was of exactly that shape, so this is the
+        // case that must not have regressed.
+        await mountSurface(t, DsButtonSurface(border: DsThemeData.dark.ring));
+        expect(borderOf(t), DsThemeData.dark.ring);
+        await hoverAndSettle(t);
+        expect(borderOf(t), DsThemeData.dark.ring);
+      });
+
+      testWidgets('hoverBorder alone does not disturb the other four slots',
+          (WidgetTester t) async {
+        await mountSurface(t, DsButtonSurface(hoverBorder: agentRim));
+        await hoverAndSettle(t);
+        // `outline`'s own hover fill and ink, unchanged: the fifth field is
+        // additive, not a replacement for the surface it lands on.
+        expect(surfaceOf(t).fill, DsThemeData.dark.muted);
+        expect(labelStyleOf(t).color, DsThemeData.dark.foreground);
+      });
+    });
+
     testWidgets('outline and ghost still take the base focus ring',
         (WidgetTester t) async {
       for (final DsButtonVariant variant in <DsButtonVariant>[

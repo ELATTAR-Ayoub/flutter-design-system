@@ -12,14 +12,19 @@ import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:flutter/material.dart';
 
 import 'nav.dart';
+import 'pages/agent_avatar.dart';
+import 'pages/agent_voice.dart';
 import 'pages/buttons.dart';
 import 'pages/charts.dart';
 import 'pages/chat.dart';
 import 'pages/colors.dart';
+import 'pages/composer.dart';
+import 'pages/console.dart';
 import 'pages/data.dart';
 import 'pages/dialogs.dart';
 import 'pages/feedback.dart';
 import 'pages/forms.dart';
+import 'pages/history.dart';
 import 'pages/icons.dart';
 import 'pages/inputs.dart';
 import 'pages/layout.dart';
@@ -32,7 +37,9 @@ import 'pages/selection.dart';
 import 'pages/selects.dart';
 import 'pages/shadows.dart';
 import 'pages/sidebar.dart';
+import 'pages/sidebar_demo.dart';
 import 'pages/spacing.dart';
+import 'pages/transcript.dart';
 import 'pages/typography.dart';
 import 'shell.dart';
 
@@ -214,10 +221,21 @@ class _DocsHome extends StatelessWidget {
     // together.
     final String route = AppRouter.of(context).route;
 
+    // `/sidebar-demo` is the one route that is **not** under `/design-system`,
+    // and the reason is upstream's: `app/design-system/layout.tsx` supplies the
+    // docs chrome, a nested route cannot opt out of a parent layout, and a
+    // `fixed inset-y-0 h-svh` panel rendered inside the docs would land on top
+    // of the documentation's own sidebar. So it sits at the root, where the
+    // only layout is theme + tooltips + toaster — which here is everything
+    // above this line. It is deliberately absent from `pageFor`: that switch is
+    // the docs route table, and `shell_test` spends it against the nav, where
+    // this href by construction does not appear.
     final Widget home = DefaultSelectionStyle(
       selectionColor: DsPalette.action.withValues(alpha: _selectionAlpha),
       cursorColor: theme.foreground,
-      child: DocsShell(route: route, child: pageFor(route)),
+      child: route == sidebarDemoRoute
+          ? const SidebarDemoPage()
+          : DocsShell(route: route, child: pageFor(route)),
     );
 
     if (!reduceMotion) return home;
@@ -228,7 +246,7 @@ class _DocsHome extends StatelessWidget {
   }
 }
 
-/// The twenty-one real routes; every other href in the nav gets a
+/// The twenty-seven real routes; every other href in the nav gets a
 /// [PlaceholderPage].
 ///
 /// Public because the shell test drives it directly, and because it is the one
@@ -237,13 +255,17 @@ class _DocsHome extends StatelessWidget {
 /// The arms follow the nav's own order (`nav.ts` foundations: colors →
 /// typography → spacing → shadows → motion → icons, then base components:
 /// buttons → inputs → forms → selects → selection → dialogs → menus →
-/// navigation → feedback → chat → data → charts → layout → sidebar), so this
-/// switch reads as the sidebar reads. `selects` sitting between `forms` and
-/// `selection` is the registry's order, not an alphabetisation; `feedback` sits
-/// between `navigation` and `chat` for the same reason, which is why neither of
-/// them is the last arm. With `sidebar` landed the whole Base group is built,
-/// so every arm below the foundations block is a base component and the
-/// placeholder is reached only by the Agent and Site groups.
+/// navigation → feedback → chat → data → charts → layout → sidebar, then the
+/// agent family: console → avatar → composer → transcript → history → voice),
+/// so this switch reads as the sidebar reads. `selects` sitting between `forms`
+/// and `selection` is the registry's order, not an alphabetisation; `feedback`
+/// sits between `navigation` and `chat` for the same reason. The agent block's
+/// order is the registry's too, and it is **not** the order the pages were
+/// built in: `avatar` sits second because `nav.ts` puts it there.
+///
+/// With the agent family landed, Foundations, Base **and** Agent are all built,
+/// so the placeholder is reached only by the Site group and by the four group
+/// index routes. `shell_test` is what says that out loud.
 Widget pageFor(String route) {
   return switch (route) {
     dsRoot => const OverviewPage(),
@@ -267,6 +289,12 @@ Widget pageFor(String route) {
     '$dsRoot/components/base/charts' => const ChartsPage(),
     '$dsRoot/components/base/layout' => const LayoutPage(),
     '$dsRoot/components/base/sidebar' => const SidebarPage(),
+    '$dsRoot/components/agent/console' => const ConsolePage(),
+    '$dsRoot/components/agent/avatar' => const AgentAvatarPage(),
+    '$dsRoot/components/agent/composer' => const ComposerPage(),
+    '$dsRoot/components/agent/transcript' => const TranscriptPage(),
+    '$dsRoot/components/agent/history' => const HistoryPage(),
+    '$dsRoot/components/agent/voice' => const AgentVoicePage(),
     _ => _placeholderFor(route),
   };
 }

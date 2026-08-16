@@ -95,6 +95,17 @@
 /// unmount. Newest sits closest to the corner; anything past the third waits
 /// its turn.
 ///
+/// ## The compact anchor — the one ordered departure
+///
+/// At or below [DsToaster.mobileBreakpoint] the stack anchors to the **top** of
+/// the screen. That is a user order, and it is the only place this file
+/// knowingly leaves the reference: sonner's mobile block reskins whichever
+/// y-position is already set and never moves it, and the app mounts
+/// `position="bottom-right"` as a literal, so **the reference's own phone
+/// behaviour is a bottom stack**. Everything else in that block is adopted
+/// verbatim — the 600px breakpoint, the 16px edge inset, the full-bleed width.
+/// [DsToaster]'s class doc carries the measurement and the reasoning.
+///
 /// Recorded rather than guessed, and still open:
 ///  * `[data-button]` — the action pill (`variant="secondary" size="sm"` by
 ///    hand, 32px on a pill). The live error toast on the `feedback` page has
@@ -150,6 +161,18 @@ const double _gap = 14;
 
 /// sonner's `VIEWPORT_OFFSET` — 24px from both edges of the corner it sits in.
 const double _offset = 24;
+
+/// sonner's `MOBILE_VIEWPORT_OFFSET` (`index.mjs` L415) — the inset every edge
+/// of the viewport takes once the mobile block is in force. It replaces
+/// [_offset] on all four sides at once, which is why one number covers both the
+/// side insets and the distance from the anchored edge.
+const double _mobileOffset = 16;
+
+/// `@media (max-width: 600px)` (`styles.css` L425) — sonner's own and only
+/// breakpoint, and the width at or below which [DsToaster] goes compact.
+///
+/// A `max-width` media query is inclusive, so 600 itself is mobile.
+const double _mobileBreakpoint = 600;
 
 /// sonner's `VISIBLE_TOASTS_AMOUNT`.
 const int _visible = 3;
@@ -586,6 +609,16 @@ enum DsToastPosition {
   /// the choreography is multiplied by it, which is the whole reason one set of
   /// rules serves four corners.
   double get lift => isBottom ? -1 : 1;
+
+  /// The same corner moved to the **top** edge, keeping the side it was on.
+  ///
+  /// This is the whole of the compact anchor swap: [lift] flips with it, and
+  /// every rule in the choreography is already written as a multiple of [lift],
+  /// so the stack grows downward, the entrance arrives from the top edge and
+  /// the swipe's "with the corner" direction becomes up — all from this one
+  /// substitution rather than from a second set of rules.
+  DsToastPosition get topAnchored =>
+      isRight ? DsToastPosition.topRight : DsToastPosition.topLeft;
 }
 
 /// `<Toaster position="bottom-right" />` — the host.
@@ -593,6 +626,35 @@ enum DsToastPosition {
 /// Mount it **once**, above everything else, the way the root layout does. It
 /// paints nothing until a toast is queued and never intercepts a pointer
 /// outside the stack's own box.
+///
+/// ## The compact anchor — user-ordered, sonner's geometry
+///
+/// **[position] is the wide-viewport corner only.** At or below
+/// [mobileBreakpoint] the stack re-anchors to the **top** of the screen.
+///
+/// What the reference actually does, measured rather than assumed:
+///
+///  * `styles.css` L425 opens `@media (max-width: 600px)` — sonner's one
+///    breakpoint. Inside it the toaster goes `left/right: var(--mobile-offset)`
+///    and `width: 100%`, each toast takes `width: calc(100% - offset * 2)`, and
+///    the anchored edge moves to `--mobile-offset-*`. `MOBILE_VIEWPORT_OFFSET`
+///    is `16px` against `VIEWPORT_OFFSET`'s `24px`.
+///  * **The y-position does not move.** The block has a rule for each of
+///    `[data-y-position=bottom]` and `[data-y-position=top]` and simply reskins
+///    whichever one is already set. `app/layout.tsx:39` mounts
+///    `<Toaster position="bottom-right" />` — a literal, with no `mobileOffset`
+///    and no responsive override anywhere in the app — so **the reference's own
+///    phone behaviour is a bottom stack**, full-bleed at a 16px inset.
+///
+/// The order was top-on-mobile, and the order wins over the reference here.
+/// What sonner's block *does* own is the geometry, and all of it is adopted:
+/// the 600px breakpoint, the 16px offset on every edge, and the toast widening
+/// to fill the viewport between those insets. Only the anchored edge is the
+/// port's own decision.
+///
+/// It is one substitution, not a fork: [DsToastPosition.topAnchored] flips
+/// `--lift`, and the collapse, the expand, all three exits, the entrance and
+/// the swipe axis are each already written as a multiple of it.
 class DsToaster extends StatefulWidget {
   const DsToaster({
     super.key,
@@ -602,9 +664,12 @@ class DsToaster extends StatefulWidget {
 
   final DsToastController controller;
 
+  /// The corner the stack sits in **on a wide viewport**. Below
+  /// [mobileBreakpoint] the anchor is the top edge regardless — see the class
+  /// doc — and only the side survives from this.
   final DsToastPosition position;
 
-  /// `width: 22.25rem`.
+  /// `width: 22.25rem` — the wide-viewport box.
   static double get width => _width;
 
   /// sonner's `GAP`.
@@ -612,6 +677,36 @@ class DsToaster extends StatefulWidget {
 
   /// sonner's `VIEWPORT_OFFSET`.
   static double get viewportOffset => _offset;
+
+  /// sonner's `MOBILE_VIEWPORT_OFFSET`.
+  static double get mobileViewportOffset => _mobileOffset;
+
+  /// `@media (max-width: 600px)` — inclusive, as a `max-width` query is.
+  static double get mobileBreakpoint => _mobileBreakpoint;
+
+  /// Whether a viewport of this width takes the compact treatment.
+  static bool isCompact(double viewportWidth) =>
+      viewportWidth <= _mobileBreakpoint;
+
+  /// The anchored corner for a viewport of this width — [position] as given
+  /// above the breakpoint, its [DsToastPosition.topAnchored] twin below it.
+  static DsToastPosition positionFor(
+    DsToastPosition position,
+    double viewportWidth,
+  ) => isCompact(viewportWidth) ? position.topAnchored : position;
+
+  /// The inset from every viewport edge at this width.
+  static double offsetFor(double viewportWidth) =>
+      isCompact(viewportWidth) ? _mobileOffset : _offset;
+
+  /// The toast box at this width — `356px`, or
+  /// `calc(100% - var(--mobile-offset) * 2)` once compact.
+  ///
+  /// Never negative: a viewport narrower than the two insets is not a layout
+  /// anyone has, but a negative `width` is a crash rather than a squeeze.
+  static double widthFor(double viewportWidth) => isCompact(viewportWidth)
+      ? math.max(viewportWidth - _mobileOffset * 2, 0)
+      : _width;
 
   /// sonner's `VISIBLE_TOASTS_AMOUNT`.
   static int get visibleLimit => _visible;
@@ -873,9 +968,22 @@ class _DsToasterState extends State<DsToaster>
 
   @override
   Widget build(BuildContext context) {
-    final DsToastPosition position = widget.position;
     final List<_LiveToast> all = widget.controller._toasts;
     if (all.isEmpty) return const SizedBox.shrink();
+
+    // The media query, not the incoming constraints: `@media (max-width:
+    // 600px)` asks the viewport, and a `position: fixed` toaster is measured
+    // against the viewport whatever box its slot happens to be. Absent a
+    // MediaQuery there is no viewport to read, and infinity is the honest
+    // answer — it resolves to the wide contract.
+    final double viewportWidth =
+        MediaQuery.maybeSizeOf(context)?.width ?? double.infinity;
+    final DsToastPosition position = DsToaster.positionFor(
+      widget.position,
+      viewportWidth,
+    );
+    final double offset = DsToaster.offsetFor(viewportWidth);
+    final double width = DsToaster.widthFor(viewportWidth);
 
     // The three most recent are on screen; the rest wait.
     final List<_LiveToast> shown = all.length <= _visible
@@ -994,7 +1102,7 @@ class _DsToasterState extends State<DsToaster>
       slots.add(
         Positioned(
           left: 0,
-          width: _width,
+          width: width,
           top: position.isBottom ? null : 0,
           bottom: position.isBottom ? 0 : null,
           child: _ToastSlot(
@@ -1034,7 +1142,8 @@ class _DsToasterState extends State<DsToaster>
 
     // Give this widget a full-size slot — `Positioned.fill` inside the shell's
     // `Stack`, or an `Overlay` entry — and it anchors itself in the corner the
-    // way sonner's fixed viewport does.
+    // way sonner's fixed viewport does. Compact, that corner is a top one, and
+    // the box spans the viewport between its two insets.
     return Align(
       alignment: switch (position) {
         DsToastPosition.bottomRight => AlignmentDirectional.bottomEnd,
@@ -1043,7 +1152,7 @@ class _DsToasterState extends State<DsToaster>
         DsToastPosition.topLeft => AlignmentDirectional.topStart,
       },
       child: Padding(
-        padding: const EdgeInsets.all(_offset),
+        padding: EdgeInsets.all(offset),
         child: MouseRegion(
           // `onMouseEnter`/`onMouseMove` → expand, `onMouseLeave` → collapse,
           // both on the container. `opaque: false` because this only watches:
@@ -1063,7 +1172,7 @@ class _DsToasterState extends State<DsToaster>
           child: AnimatedBuilder(
             animation: _extent.c,
             builder: (BuildContext context, Widget? child) =>
-                SizedBox(width: _width, height: _extent.at(0), child: child),
+                SizedBox(width: width, height: _extent.at(0), child: child),
             child: Stack(
               // Every toast is `position: absolute`, so nothing here sizes the
               // host; the host is sized to the stack's own reach above. A

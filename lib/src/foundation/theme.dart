@@ -81,6 +81,7 @@ class DsThemeData {
     required this.sidebarRing,
     required this.agent,
     required this.agentMuted,
+    required this.cube,
     required this.scrim,
     required this.bloomVoid,
     required this.bloomL,
@@ -341,6 +342,14 @@ class DsThemeData {
   /// `--agent-muted` — light `hsl(213 100% 97%)` L662 / dark `hsl(217 40% 13%)`
   /// L903. The agent's own turn in the transcript, one step off `--card`.
   final Color agentMuted;
+
+  /// The twelve `--agent-cube-*` tokens — see [DsAgentCubeTokens].
+  ///
+  /// Grouped into an object rather than spread across twelve fields here
+  /// because they are read as a **set**: every consumer is a cube face resolver
+  /// that needs the whole palette at once, and `bloom`'s five knobs above are
+  /// the opposite case — five unrelated scalars each read on its own.
+  final DsAgentCubeTokens cube;
 
   /// `--scrim` — light `hsl(240 10% 3.9% / 0.28)` L663 /
   /// dark `hsl(240 10% 3.9% / 0.66)` L906.
@@ -662,6 +671,12 @@ class DsThemeData {
       sidebarRing: ring,
       agent: agent,
       agentMuted: agentMuted,
+      // Resolved off the block being built rather than passed in, exactly as
+      // the eight sidebar tokens above are: the two sets are declared verbatim
+      // per theme block, so which one this is *is* the whole of the lookup.
+      cube: kind == DsThemeKind.dark
+          ? DsAgentCubeTokens.dark
+          : DsAgentCubeTokens.light,
       scrim: scrim,
       bloomVoid: bloomVoid,
       bloomL: bloomL,
@@ -672,4 +687,120 @@ class DsThemeData {
       starGlowMix: starGlowMix,
     );
   }
+}
+
+/// `--agent-cube-*` — globals.css L720–731 (light) and L914–932 (dark).
+///
+/// The one block in the system that is not re-derivable from the semantic
+/// tokens, and globals.css says why: *"the handoff draws these cubes for paper,
+/// and the dark set is already an inversion of that original. This is the
+/// original."*
+///
+/// FOLLOW-UP CLOSED. These lived in `components/agent_avatar.dart` under a
+/// standing note — they are theme tokens, declared in the two theme blocks
+/// beside every other one, and that file was not the avatar lane's to open.
+/// This pass is the opening, and it is `bloom_cosmic.dart`'s move one family
+/// over: the flat per-block values come here, the derivations stay with the
+/// effect that performs them (`DsAgentCubeFaces` mixes the accent's own top and
+/// right faces out of [accent] and [accentShade], so it cannot be flattened
+/// into a block and does not move).
+///
+/// The note also asked that `DsAgentCubeTokens.of(BuildContext)` come with
+/// them. It does not: it was a second resolver for what `DsTheme.of` already
+/// does, and the tokens now ride [DsThemeData.cube] like every other one. That
+/// is the whole of the API change — the two statics below are untouched, which
+/// is what the avatar tests spend.
+class DsAgentCubeTokens {
+  const DsAgentCubeTokens({
+    required this.top,
+    required this.left,
+    required this.right,
+    required this.stroke,
+    required this.accent,
+    required this.accentShade,
+    required this.back,
+    required this.ghostInk,
+    required this.errorTop,
+    required this.errorLeft,
+    required this.errorRight,
+    required this.errorStroke,
+  });
+
+  /// `--agent-cube-top` — light `hsl(240 20% 99%)` / dark `hsl(240 5% 21%)`.
+  final Color top;
+
+  /// `--agent-cube-left` — light `hsl(240 15% 94%)` / dark `hsl(240 5% 17%)`.
+  final Color left;
+
+  /// `--agent-cube-right` — light `hsl(240 14% 90%)` / dark `hsl(240 5% 14%)`.
+  final Color right;
+
+  /// `--agent-cube-stroke` — light `hsl(240 10% 79%)` / dark `hsl(240 5% 31%)`.
+  final Color stroke;
+
+  /// `--agent-cube-accent` — light `var(--color-action)` / dark
+  /// `var(--color-action-bright)`. The single knob; `DsCubeAvatar.accent`
+  /// overrides it.
+  final Color accent;
+
+  /// `--agent-cube-accent-shade` — light `hsl(217 45% 72%)` / dark
+  /// `hsl(217 40% 32%)`. *"Mixed into the accent's right face to shade it."*
+  final Color accentShade;
+
+  /// `--agent-cube-back` — light `hsl(240 14% 86%)` / dark `hsl(240 6% 10%)`.
+  /// *"The sixth face of the idle cube — the one plane the isometric scenes
+  /// never show, so it has no counterpart above."*
+  final Color back;
+
+  /// `--agent-cube-ghost-ink` — light `hsl(240 5% 54%)` / dark
+  /// `hsl(240 5% 45%)`. *"Mixed into the dashed cube's stroke to grey it back
+  /// from the accent."*
+  final Color ghostInk;
+
+  /// `--agent-cube-error-top` — light `hsl(0 70% 88%)` / dark `hsl(0 60% 46%)`.
+  final Color errorTop;
+
+  /// `--agent-cube-error-left` — light `hsl(0 65% 82%)` / dark `hsl(0 62% 39%)`.
+  final Color errorLeft;
+
+  /// `--agent-cube-error-right` — light `hsl(0 60% 75%)` / dark
+  /// `hsl(0 63% 33%)`.
+  final Color errorRight;
+
+  /// `--agent-cube-error-stroke` — light `hsl(0 55% 69%)` / dark
+  /// `hsl(0 68% 58%)`. *"Error is the one state that leaves the accent, because
+  /// it has to: a blue failure looks like a blue success."*
+  final Color errorStroke;
+
+  /// globals.css L720–731.
+  static final DsAgentCubeTokens light = DsAgentCubeTokens(
+    top: dsHsl(240, 20, 99),
+    left: dsHsl(240, 15, 94),
+    right: dsHsl(240, 14, 90),
+    stroke: dsHsl(240, 10, 79),
+    accent: DsPalette.action,
+    accentShade: dsHsl(217, 45, 72),
+    back: dsHsl(240, 14, 86),
+    ghostInk: dsHsl(240, 5, 54),
+    errorTop: dsHsl(0, 70, 88),
+    errorLeft: dsHsl(0, 65, 82),
+    errorRight: dsHsl(0, 60, 75),
+    errorStroke: dsHsl(0, 55, 69),
+  );
+
+  /// globals.css L914–932.
+  static final DsAgentCubeTokens dark = DsAgentCubeTokens(
+    top: dsHsl(240, 5, 21),
+    left: dsHsl(240, 5, 17),
+    right: dsHsl(240, 5, 14),
+    stroke: dsHsl(240, 5, 31),
+    accent: DsPalette.actionBright,
+    accentShade: dsHsl(217, 40, 32),
+    back: dsHsl(240, 6, 10),
+    ghostInk: dsHsl(240, 5, 45),
+    errorTop: dsHsl(0, 60, 46),
+    errorLeft: dsHsl(0, 62, 39),
+    errorRight: dsHsl(0, 63, 33),
+    errorStroke: dsHsl(0, 68, 58),
+  );
 }

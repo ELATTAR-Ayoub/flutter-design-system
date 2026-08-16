@@ -25,6 +25,7 @@ import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/kit.dart';
 import 'package:example/nav.dart';
 import 'package:example/pages/sidebar.dart';
+import 'package:example/pages/sidebar_demo.dart';
 import 'package:example/shell.dart';
 import 'package:flutter/gestures.dart' show PointerDeviceKind;
 import 'package:flutter/material.dart';
@@ -582,6 +583,29 @@ void main() {
         _in('shell', find.byType(DsTooltip)).first,
       );
       expect(collapsed.hidden, isFalse);
+    });
+
+    testWidgets('the shell link opens the full-viewport demo — DRIFT 10 '
+        'CLOSED', (WidgetTester tester) async {
+      await tester.pumpSidebarPage();
+
+      // `<Button variant="outline" asChild><Link href="/sidebar-demo">`. For
+      // two phases this button was wired to nothing, because the port carried
+      // no such route; `pages/sidebar_demo.dart` is now that route, and
+      // `main.dart` mounts it outside `DocsShell`.
+      final Finder open = _in(
+        'shell',
+        find.widgetWithText(DsButton, 'Open the full-viewport sidebar'),
+      );
+      expect(tester.widget<DsButton>(open).variant, DsButtonVariant.outline);
+
+      final AppRouter router =
+          AppRouter.of(tester.element(find.byType(SidebarPage)));
+      expect(router.route, _route);
+
+      await tester.tap(open);
+      await tester.pump();
+      expect(router.route, sidebarDemoRoute);
     });
 
     testWidgets('the header switchers open a menu on the right',

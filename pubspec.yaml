@@ -40,3 +40,16 @@ flutter:
       fonts:
         - asset: assets/fonts/Redaction35-Italic.ttf
           style: italic
+
+  # The voice orb's perlin field. `orb-vendor.tsx` edit 1 repointed upstream's
+  # Google-CDN fetch at the reference's own `public/textures/perlin-noise.png`
+  # so the orb renders offline; this is a byte copy of that file, bundled for
+  # the same reason. Reached as
+  # `packages/elattar_design_system/assets/textures/perlin-noise.png`.
+  assets:
+    - assets/textures/perlin-noise.png
+
+  # The orb's fragment stage — see the header of the file itself for the five
+  # edits made to the vendored GLSL and why each one was unavoidable.
+  shaders:
+    - shaders/orb.frag

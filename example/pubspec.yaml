@@ -29,6 +29,24 @@ flutter:
     # render `<Image src="/imgs/sample-card.png">`; the well is a 102px
     # `object-cover` crop and the preview is the whole 734x1024 frame.
     - assets/imgs/sample-card.png
+  # The voice orb's fragment stage, re-declared HERE and nowhere else by
+  # choice — this is the one thing a package pubspec cannot hand down.
+  #
+  # `fonts:` and `assets:` in a dependency's pubspec are bundled into every app
+  # that depends on it (which is why the faces and the perlin field are not
+  # repeated here). `shaders:` is not: flutter_tools reads it only from the ROOT
+  # project, so a `shaders:` entry in `../pubspec.yaml` compiles the programme
+  # for the package's OWN test bundle and never reaches this app's. Built and
+  # checked: without this block `assets/packages/elattar_design_system/shaders/`
+  # does not exist in `build/web`, `FragmentProgram.fromAsset` throws, and the
+  # orb silently paints nothing.
+  #
+  # `example/shaders/orb.frag` is therefore a byte copy of the package's file,
+  # not a second source: an asset path may not climb above its own project root,
+  # so a relative reference is not available. `test/agent_voice_test.dart` fails if
+  # the two ever differ.
+  shaders:
+    - shaders/orb.frag
   # Fonts are NOT re-declared here: they are registered in the package pubspec,
   # so flutter_tools bundles them for this app automatically under the family
   # name `packages/elattar_design_system/<Family>`.

@@ -88,6 +88,33 @@ const Map<String, double> _referenceHeight = <String, double>{
   'charts': 25584.6,
   'layout': 4316.06,
   'sidebar': 5483.7,
+  // The six agent-family routes, each one the number its own page test already
+  // holds — `console_page_test`'s `_columnHeight` and its five siblings. Two of
+  // them are recorded as the derivation the page test records rather than as
+  // the product, because that is the form the measurement was taken in: `main`
+  // was read whole and its `py-12` came off both edges afterwards.
+  //
+  // THE UNIT, said once because it is the trap this table sets: these are
+  // **reading columns**, not `document.documentElement.scrollHeight`. The two
+  // differ by exactly the shell — `py-12` twice plus the 64px header — and four
+  // of the six page tests publish the scroll height beside the column, which is
+  // the number that must NOT be copied here. `avatar`'s document is 3931 and
+  // its column is 3771.2; `voice`'s are 2393 and 2232.9. Compare `charts`
+  // above, where the same mistake is caught in the other direction.
+  //
+  // All six were measured into this harness before they were entered, and all
+  // six land inside the ±0.5 band with **residual: 0**: console +0.030,
+  // avatar +0.050, history +0.095 (the figure `history_page_test` predicted to
+  // the thousandth), composer +0.100, transcript +0.136, voice +0.000. Under
+  // half a pixel each, so none of them earns a named residual the way `chat`,
+  // `charts` and `sidebar` did — and saying so here is what stops the next
+  // reader from assuming the band was widened to fit them.
+  'console': 3044.97,
+  'avatar': 3867.2 - 96,
+  'composer': 2874.3,
+  'transcript': 10466.11,
+  'history': 5585.33,
+  'voice': 2328.9 - 96,
 };
 
 /// THREE MEASURED RESIDUALS, each carried by the route that owns it. This is
@@ -240,6 +267,35 @@ final Map<String, _Route> _routes = <String, _Route>{
     clock: null,
     residual: _sidebarStackResidual,
   ),
+  'console': (
+    route: '$dsRoot/components/agent/console',
+    clock: null,
+    residual: 0,
+  ),
+  'avatar': (route: '$dsRoot/components/agent/avatar', clock: null, residual: 0),
+  'composer': (
+    route: '$dsRoot/components/agent/composer',
+    clock: null,
+    residual: 0,
+  ),
+  'transcript': (
+    route: '$dsRoot/components/agent/transcript',
+    clock: null,
+    residual: 0,
+  ),
+  // `history` is the one agent route with a live clock in it — every card
+  // carries a relative timestamp off [DsClock] — and it still passes null,
+  // because the strings move with the clock and the **heights do not**: each
+  // timestamp is one line inside a fixed row. `history_page_test` states the
+  // same thing where it freezes the clock for the copy assertions it needs it
+  // for. `selects` above remains the only route whose height the wall clock can
+  // move.
+  'history': (
+    route: '$dsRoot/components/agent/history',
+    clock: null,
+    residual: 0,
+  ),
+  'voice': (route: '$dsRoot/components/agent/voice', clock: null, residual: 0),
 };
 
 Future<void> _loadFont(String family, String file) async {
