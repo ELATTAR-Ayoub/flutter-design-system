@@ -30,11 +30,15 @@ Widget host(
   DsThemeMode mode = DsThemeMode.dark,
   bool reducedMotion = false,
   Size viewport = const Size(1440, 900),
+  EdgeInsets padding = EdgeInsets.zero,
 }) {
   return MediaQuery(
     data: MediaQueryData(
       size: viewport,
       disableAnimations: reducedMotion,
+      // The system bars. Zero everywhere but the two compact-anchor probes, so
+      // every geometry pin in this file measures the box it always measured.
+      padding: padding,
     ),
     child: Directionality(
       textDirection: TextDirection.ltr,
@@ -123,7 +127,15 @@ Future<Raster> rasterise(
   ));
   await t.pump();
   if (settle > Duration.zero) await t.pump(settle);
+  return readRaster(t);
+}
 
+/// The `Key('raster')` boundary's pixels, for a host this file pumped by hand.
+///
+/// [rasterise] mounts its subject and reads it in one call, which a live
+/// [DsToaster] cannot use: it has to be mounted first and fired into
+/// afterwards, so the read is the half that has to stand on its own.
+Future<Raster> readRaster(WidgetTester t) async {
   final RenderRepaintBoundary box =
       t.renderObject(find.byKey(const Key('raster')));
   final ui.Image image = (await t.runAsync(() => box.toImage(pixelRatio: 1)))!;
@@ -1269,6 +1281,227 @@ void main() {
       await t.pump();
     });
 
+    // ──────────────────────────────────────────────────────────────────────
+    // The empty-plate bug, and the two transitions it was hiding behind.
+    //
+    // A toast's whole choreography lives in its `State` — `_mounted`, the four
+    // `_Track`s, the live swipe. The `Stack` that holds the slots re-indexes on
+    // every arrival and on every front departure, and it was carrying its
+    // `ValueKey` on the `_ToastSlot` **inside** an unkeyed `Positioned`: the
+    // unkeyed wrappers matched by position, the keyed children were then
+    // rejected by `Widget.canUpdate`, and every surviving toast's `State` was
+    // torn out and rebuilt from `initState`. That resets `_mounted` to false,
+    // `_opacity` to 0 and `_transform` to the entrance base — full scale, a
+    // whole box off the anchor — while the blanking is re-`set` rather than
+    // re-animated. What you saw was a full-size, contentless plate sliding
+    // through the stack, and a promoted toast blinking out instead of fading
+    // its title back in.
+    //
+    // Both tests below assert the CONTINUITY, not the endpoint: every one of
+    // them passes on the torn-out build if it only looks at where things came
+    // to rest. The bite is in the frames between.
+    // ──────────────────────────────────────────────────────────────────────
+    testWidgets(
+        'the toast a front exit promotes fades its content back in, at full '
+        'opacity throughout — it does not blink out and re-enter',
+        (WidgetTester t) async {
+      final DsToastController c = DsToastController();
+      addTearDown(c.dispose);
+      await t.pumpWidget(toaster(c));
+      const String front = 'Could not reach the vault';
+      const String back1 = 'Sold 3 cards for \$2,481.00';
+      const String back2 = 'Added to favourites';
+      c.show(const DsToastMessage(title: back2));
+      await arrive(t);
+      c.success(back1, description: 'Credited to your available balance.');
+      await arrive(t);
+      final int id = c.error(front,
+          description: 'Nothing was charged. Try again in a moment.');
+      await arrive(t);
+
+      // Blanked, scaled and pinned behind the front toast — the state the
+      // promotion has to travel out of.
+      expect(contentOpacityOf(t, back1), 0);
+      final Element element = t.element(toastWith(back1));
+
+      c.dismiss(id);
+      await t.pump();
+      // Nothing the leaving toast does touches the one behind it: sonner drops
+      // it from `heights` and the survivors close the gap, but `--opacity` is
+      // the toast's own and the back toast is not the one leaving.
+      for (int i = 0; i < 4; i++) {
+        await t.pump(DsToaster.unmountDelay ~/ 4);
+        expect(opacityOf(t, back1), 1,
+            reason: 'the back toast is not leaving; only the front is');
+      }
+      await t.pump();
+
+      // The promotion frame. The element is the SAME element — the whole point
+      // — so its clocks carry the blanked state forward instead of starting
+      // over from the entrance.
+      expect(identical(t.element(toastWith(back1)), element), isTrue,
+          reason: 'a re-indexed slot must MOVE its element, not rebuild it; a '
+              'rebuilt one restarts at opacity 0 on the entrance base');
+      expect(opacityOf(t, back1), 1,
+          reason: 'the promoted toast was already on screen and stays on it');
+      expect(contentOpacityOf(t, back1), lessThan(0.02),
+          reason: 'the content FADES in over the slow window; a torn-out state '
+              'would have re-`set` it to 1 in one frame');
+      // Where the promotion starts from: still the blanked slot, one gap up
+      // and scaled about its own centre.
+      final double from = raise(t, back1);
+      expect(from, greaterThan(DsToaster.gap));
+
+      // Mid-fade: content, scale and offset all part-way, on the one 400ms
+      // window they share.
+      await t.pump(DsToaster.transition ~/ 2);
+      final double half = DsCurves.cssEase.transform(0.5);
+      expect(contentOpacityOf(t, back1), closeTo(half, 0.02));
+      expect(opacityOf(t, back1), 1);
+      expect(scaleOf(t, back1),
+          closeTo(1 - DsToaster.stackScaleStep * (1 - half), 0.01),
+          reason: 'travelling 0.95 → 1, not restarting at 1');
+      expect(raise(t, back1), closeTo(from * (1 - half), 0.6));
+      expect(raise(t, back1), greaterThan(-0.01),
+          reason: 'it lifts into the front slot from above it; the entrance '
+              'base would put it a whole box BELOW the anchor');
+
+      // Landed: the front toast, legible, exactly where the front toast sits.
+      await t.pump(DsToaster.transition);
+      expect(contentOpacityOf(t, back1), 1);
+      expect(opacityOf(t, back1), 1);
+      expect(scaleOf(t, back1), closeTo(1, 1e-6));
+      expect(raise(t, back1), closeTo(0, 0.01));
+      expect(find.text(back1), findsOneWidget);
+      expect(find.text('Credited to your available balance.'), findsOneWidget);
+      // …and the one behind it has taken over the blanked slot.
+      expect(contentOpacityOf(t, back2), 0);
+
+      c.clear();
+      await t.pump();
+    });
+
+    testWidgets(
+        'the FRONT toast paints over the stack behind it — a back plate is '
+        'opaque, and a title under one is the empty plate',
+        (WidgetTester t) async {
+      // THE PAINTER RULE, and the one bug in this file that no widget-tree
+      // assertion above can see. `--z-index: toasts.length - index` puts the
+      // newest on top; a `Stack` paints in child order and `slots` is built
+      // newest-FIRST, because that is the order sonner's `index` counts in.
+      // Handed over unreversed, the OLDEST toast paints last — over the front
+      // one — and it is not a translucent hint but a whole opaque `--popover`
+      // plate, pinned to the front toast's height, 14px off it, with its own
+      // children at `opacity: 0`. Every assertion in this group still passes:
+      // the tree is right and only the canvas is wrong.
+      final DsToastController c = DsToastController();
+      addTearDown(c.dispose);
+      await t.pumpWidget(host(RepaintBoundary(
+        key: const Key('raster'),
+        // Smaller than the 1440 × 900 the other tests lay out in, and it
+        // changes nothing: the compact branch reads the MediaQuery, which
+        // `host` still puts at 1440, so this is the wide contract's 356px box
+        // in a cheaper raster.
+        child: SizedBox(
+          width: 700,
+          height: 400,
+          child: DsToaster(controller: c),
+        ),
+      )));
+
+      // The control: one toast, nothing over it. Its title is `--foreground`
+      // on `--popover`, so it is the brightest thing in its own band.
+      const String back = 'Added to favourites';
+      c.show(const DsToastMessage(title: back));
+      await arrive(t);
+      final Rect boundary = t.getRect(find.byKey(const Key('raster')));
+      final Rect backTitle = t.getRect(find.text(back));
+      final double legible =
+          (await readRaster(t)).maxLumaIn(backTitle.shift(-boundary.topLeft));
+      expect(legible, greaterThan(0.8),
+          reason: 'the control — what a title that reaches the canvas reads');
+
+      // A second toast arrives. The first is now the blanked back plate, and
+      // the new one is the front: its title has to survive to the canvas.
+      const String front = 'Sold 3 cards for \$2,481.00';
+      c.success(front);
+      await arrive(t);
+      final Rect frontTitle = t.getRect(find.text(front));
+      expect(t.getRect(toastWith(back)).overlaps(frontTitle), isTrue,
+          reason: 'the back plate genuinely covers this band — without that '
+              'overlap the assertion below would prove nothing');
+      expect(contentOpacityOf(t, back), 0,
+          reason: 'and it is blank, so what it covers it covers with nothing');
+
+      final double painted =
+          (await readRaster(t)).maxLumaIn(frontTitle.shift(-boundary.topLeft));
+      expect(painted, closeTo(legible, 0.05),
+          reason: 'the front toast reads exactly as it did alone. Painted '
+              'under the back plate this band reads 0.53 against 0.98 — and '
+              '0.13 where the plate covers a title outright, which is the '
+              'empty plate in the screenshot');
+
+      c.clear();
+      await t.pump();
+    });
+
+    testWidgets(
+        'an arrival lets the toast already on screen FADE into the stack, '
+        'rather than restarting its entrance', (WidgetTester t) async {
+      final DsToastController c = DsToastController();
+      addTearDown(c.dispose);
+      await t.pumpWidget(toaster(c));
+      const String first = 'Added to favourites';
+      c.show(const DsToastMessage(title: first));
+      await arrive(t);
+      final Element element = t.element(toastWith(first));
+      expect(contentOpacityOf(t, first), 1);
+
+      c.success('Sold 3 cards for \$2,481.00');
+      await t.pump();
+      await t.pump();
+
+      expect(identical(t.element(toastWith(first)), element), isTrue);
+      // It is on its way to blanked, and it is *on its way*: a torn-out state
+      // re-`set` this to 0 in the frame the newcomer mounted, which is the cut
+      // the collapse is not allowed to have.
+      expect(contentOpacityOf(t, first), greaterThan(0.5),
+          reason: 'the blanking rides the same 400ms transition as everything '
+              'else — it is not applied in one frame');
+      expect(opacityOf(t, first), 1,
+          reason: 'only the NEW toast enters; this one is already here');
+
+      await t.pump(DsToaster.transition ~/ 2);
+      final double half = DsCurves.cssEase.transform(0.5);
+      expect(contentOpacityOf(t, first), closeTo(1 - half, 0.06));
+      expect(contentOpacityOf(t, first), greaterThan(0),
+          reason: 'a cut to 0 is the empty plate this test exists to catch');
+      expect(opacityOf(t, first), 1);
+      // And it sinks back into the stack from its own slot, never from below
+      // the anchor — the entrance base a rebuilt state would start from.
+      final double mid = raise(t, first);
+      expect(mid, greaterThan(0), reason: 'it has left the front slot');
+
+      await t.pump(DsToaster.transition);
+      expect(contentOpacityOf(t, first), 0);
+      expect(opacityOf(t, first), 1);
+      expect(scaleOf(t, first), closeTo(1 - DsToaster.stackScaleStep, 1e-6));
+      // Where it was headed, measured rather than assumed — the pin is the
+      // newcomer's height and this file renders on the test fallback face, so
+      // how either title wraps is not a fact about anything.
+      final double blanked = raise(t, first);
+      expect(mid, lessThan(blanked),
+          reason: 'the mid-window sample was still on its way into the slot, '
+              'not already parked in it');
+      expect(mid, closeTo(blanked * half, 0.6));
+      expect(heightOf(t, first),
+          closeTo(heightOf(t, 'Sold 3 cards for \$2,481.00'), 0.05),
+          reason: 'pinned to the front toast, which is now the newcomer');
+
+      c.clear();
+      await t.pump();
+    });
+
     testWidgets(
         'hovering expands to translateY(-offset) at each toast\'s own height',
         (WidgetTester t) async {
@@ -1997,6 +2230,7 @@ void main() {
       DsToastController c, {
       Size viewport = const Size(1440, 900),
       DsToastPosition position = DsToastPosition.bottomRight,
+      EdgeInsets bars = EdgeInsets.zero,
     }) =>
         host(
           SizedBox(
@@ -2005,7 +2239,12 @@ void main() {
             child: DsToaster(controller: c, position: position),
           ),
           viewport: viewport,
+          padding: bars,
         );
+
+    /// An iPhone 14's own two obstructions, in logical pixels: the status bar
+    /// and notch above, the gesture bar below.
+    const EdgeInsets systemBars = EdgeInsets.only(top: 47, bottom: 34);
 
     /// Shrinks the test surface so a 375-wide host is not laid out inside an
     /// 800 × 600 window it overflows.
@@ -2097,6 +2336,129 @@ void main() {
       // a multiple of it, which is why there is one set of rules and not two.
       expect(DsToastPosition.bottomRight.lift, -1);
       expect(DsToastPosition.bottomRight.topAnchored.lift, 1);
+    });
+
+    // ──────────────────────────────────────────────────────────────────────
+    // The system bars — user-ordered, and with no reference to port. sonner's
+    // stylesheet never spells `env(safe-area-inset-*)` because a desktop
+    // browser has no bar to clear; the compact anchor above is what creates the
+    // problem, since 16px from `y = 0` on a phone is 16px INTO the status bar.
+    // The ruling is `DsSafeArea`'s, corpus-wide: the anchored edge pays
+    // `MediaQuery.padding` over sonner's own inset, and nothing else moves.
+    // ──────────────────────────────────────────────────────────────────────
+    test('the anchored edge pays the system bars over sonner\'s inset', () {
+      // Compact is top-anchored, so the status bar is the one that is paid.
+      final EdgeInsets compact = DsToaster.paddingFor(
+          375, systemBars, DsToastPosition.topRight);
+      expect(compact.top, 47 + DsToaster.mobileViewportOffset);
+      expect(compact.bottom, DsToaster.mobileViewportOffset,
+          reason: 'the stack does not reach the far edge; spending an inset '
+              'there would only cap how far it could expand');
+      expect(compact.left, DsToaster.mobileViewportOffset);
+      expect(compact.right, DsToaster.mobileViewportOffset,
+          reason: "the sides stay sonner's, because widthFor is 100% - 2 * 16 "
+              'and the toast box is that same arithmetic');
+
+      // The configured corner, not a pre-resolved one: which edge is anchored
+      // at 375 is `positionFor`'s answer, so the app's literal `bottom-right`
+      // pays the status bar it actually ends up under — the mistake a caller
+      // would otherwise make silently, and in the direction that reproduces
+      // the bug.
+      expect(
+        DsToaster.paddingFor(375, systemBars, DsToastPosition.bottomRight),
+        DsToaster.paddingFor(375, systemBars, DsToastPosition.topRight),
+      );
+      expect(
+          DsToaster.paddingFor(375, systemBars, DsToastPosition.bottomRight).top,
+          47 + DsToaster.mobileViewportOffset);
+
+      // The wide contract is bottom-anchored, so it is the gesture bar's turn.
+      final EdgeInsets wide = DsToaster.paddingFor(
+          1440, systemBars, DsToastPosition.bottomRight);
+      expect(wide.bottom, 34 + DsToaster.viewportOffset);
+      expect(wide.top, DsToaster.viewportOffset);
+      expect(wide.right, DsToaster.viewportOffset);
+
+      // Every desktop, every browser, every test that does not set
+      // `view.padding`: sonner's number, unchanged, and no second code path.
+      expect(
+        DsToaster.paddingFor(1440, EdgeInsets.zero, DsToastPosition.bottomRight),
+        EdgeInsets.all(DsToaster.viewportOffset),
+      );
+      expect(
+        DsToaster.paddingFor(375, EdgeInsets.zero, DsToastPosition.topRight),
+        EdgeInsets.all(DsToaster.mobileViewportOffset),
+      );
+
+      // `Padding` asserts on a negative inset, so a nonsense bar squeezes
+      // rather than crashing — `widthFor`'s own argument.
+      expect(
+        DsToaster.paddingFor(375, const EdgeInsets.only(top: -100),
+            DsToastPosition.topRight),
+        EdgeInsets.all(DsToaster.mobileViewportOffset),
+      );
+    });
+
+    testWidgets('a phone drops the stack BELOW the status bar, not under it',
+        (WidgetTester t) async {
+      useSurface(t, phone);
+      final DsToastController c = DsToastController();
+      addTearDown(c.dispose);
+      await t.pumpWidget(toaster(c, viewport: phone, bars: systemBars));
+      c.success('Sold 3 cards for \$2,481.00',
+          description: 'Credited to your available balance.');
+      await arrive(t);
+
+      const String title = 'Sold 3 cards for \$2,481.00';
+      final Rect toast = t.getRect(toastWith(title));
+      final Rect screen = t.getRect(find.byType(DsToaster));
+
+      // `MediaQuery.padding.top` + MOBILE_VIEWPORT_OFFSET. The whole ordered
+      // change, in one number.
+      expect(toast.top - screen.top,
+          closeTo(systemBars.top + DsToaster.mobileViewportOffset, 0.01));
+      expect(toast.top - screen.top, isNot(closeTo(16, 1)),
+          reason: '16px from y = 0 is 16px INTO the status bar — the title '
+              'lands under the clock, which is the screenshot that ordered '
+              'this');
+      expect(toast.top - screen.top, greaterThan(systemBars.top),
+          reason: 'clear of the bar, not merely overlapping it less');
+
+      // Nothing else moved: the two side insets and the full-bleed width are
+      // still sonner's own arithmetic.
+      expect(toast.left - screen.left,
+          closeTo(DsToaster.mobileViewportOffset, 0.01));
+      expect(screen.right - toast.right,
+          closeTo(DsToaster.mobileViewportOffset, 0.01));
+      expect(toast.width, closeTo(DsToaster.widthFor(phone.width), 0.01));
+
+      c.clear();
+      await t.pump();
+    });
+
+    testWidgets('a wide bottom stack clears the gesture bar the same way',
+        (WidgetTester t) async {
+      final DsToastController c = DsToastController();
+      addTearDown(c.dispose);
+      await t.pumpWidget(toaster(c, bars: systemBars));
+      c.success('Sold 3 cards for \$2,481.00');
+      await arrive(t);
+
+      const String title = 'Sold 3 cards for \$2,481.00';
+      final Rect toast = t.getRect(toastWith(title));
+      final Rect screen = t.getRect(find.byType(DsToaster));
+
+      // The bottom anchor pays `padding.bottom`; the sides keep VIEWPORT_OFFSET
+      // and the box keeps its 356px.
+      expect(screen.bottom - toast.bottom,
+          closeTo(systemBars.bottom + DsToaster.viewportOffset, 0.01));
+      expect(screen.bottom - toast.bottom, isNot(closeTo(24, 1)));
+      expect(screen.right - toast.right,
+          closeTo(DsToaster.viewportOffset, 0.01));
+      expect(toast.width, closeTo(DsToaster.width, 0.01));
+
+      c.clear();
+      await t.pump();
     });
 
     testWidgets('a phone anchors the stack to the TOP, 16px down, full bleed '

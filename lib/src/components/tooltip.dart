@@ -26,6 +26,35 @@
 /// *"anything inside a hover card must also be reachable another way"*. There
 /// is no long-press path here because there is none in the reference.
 ///
+/// ## USER-ORDERED MOBILE ADAPTATION — a tap opens it on touch
+///
+/// On the toast top-anchor's precedent (`toaster.dart`, *"the compact anchor —
+/// user-ordered"*): the reference is a mouse document, the order is a phone,
+/// and the order wins.
+///
+/// Hover does not exist on a touch screen. Everything above about the pointer
+/// is still true of a pointer — and on a finger it describes a label that can
+/// never open at all, which on an icon-only control (a collapsed sidebar rail,
+/// an `AlertDialogAction` whose text has truncated) is the only name the
+/// control has. So the port adds a second way in:
+///
+///  * **A tap on the trigger opens it, and a second tap closes it.** No dwell
+///    on the way in — `delayDuration` is a hover-intent filter, there to stop
+///    labels flashing as a cursor crosses a toolbar, and a tap has already
+///    declared its intent.
+///  * **A tap anywhere else closes it**, through a translucent barrier that
+///    observes the pointer without taking it: the tap it dismisses on still
+///    reaches whatever it landed on.
+///  * **It dismisses itself after [DsTooltip.touchDwell]** if nothing else
+///    closes it first, so a label can never be stranded on screen.
+///
+/// **Routed on the event's own [PointerDeviceKind], never on the platform.** A
+/// hybrid machine gets both paths at once and each pointer is judged as it
+/// arrives: a finger taps, a mouse hovers, a stylus hovers. Nothing about the
+/// hover path moves — same 200ms dwell, same enter/exit contract, same
+/// geometry — and the trigger keeps every gesture it had, because the tap is
+/// watched with a [Listener] rather than competed for with a recogniser.
+///
 /// Not ported: `TooltipProvider` as an object. Its one job is
 /// `delayDuration={200}`, which is set once for the whole application and is
 /// therefore a constant — [DsDurations.tooltipDelay] — rather than a scope. The
@@ -33,6 +62,14 @@
 /// in the root layout so timing cannot vary between screens."*
 library;
 
+import 'dart:async' show Timer;
+
+import 'package:flutter/gestures.dart'
+    show
+        PointerDeviceKind,
+        PointerDownEvent,
+        PointerEnterEvent,
+        PointerExitEvent;
 import 'package:flutter/widgets.dart';
 
 import '../foundation/motion.dart';
@@ -57,7 +94,8 @@ enum DsTooltipSide {
   right,
 }
 
-/// One `MouseRegion` around a trigger, and a labelled diamond beside it.
+/// One `MouseRegion` around a trigger, a [Listener] watching it for taps, and a
+/// labelled diamond beside it.
 class DsTooltip extends StatefulWidget {
   const DsTooltip({
     super.key,
@@ -107,6 +145,25 @@ class DsTooltip extends StatefulWidget {
   /// `slide-in-from-bottom-2` — two spacing units of travel.
   static double get slide => ds(2);
 
+  /// How long a **tap**-opened label stays up on its own — 1.5s.
+  ///
+  /// The reference cannot supply this number: it has no touch path, so there is
+  /// nothing to measure. The platform can, and does — Flutter's own
+  /// `Tooltip._defaultShowDuration` is `1500ms` and is passed as `touchDelay`,
+  /// which is exactly this quantity: how long a label lingers after a touch
+  /// opened it. Taking the host platform's answer for a question the reference
+  /// never asked is [DsCurves.cssEase]'s argument one layer up — a foreign
+  /// default, adopted rather than invented.
+  ///
+  /// Spelled as ten beats of [DsDurations.fast] rather than typed, because the
+  /// literal belongs in `foundation/` and this file is not it. The two agree to
+  /// the microsecond.
+  ///
+  /// Like [delay], it is **not** routed through [dsAnimationDuration]: a dwell
+  /// is not motion, and `prefers-reduced-motion` has nothing to say about how
+  /// long a label a finger asked for stays legible.
+  static Duration get touchDwell => DsDurations.fast * 10;
+
   @override
   State<DsTooltip> createState() => _DsTooltipState();
 }
@@ -123,6 +180,31 @@ class _DsTooltipState extends State<DsTooltip>
   /// The `delayDuration` timer, cancelled if the pointer leaves first.
   Object? _pending;
 
+  /// [DsTooltip.touchDwell]'s timer, cancelled the moment anything else closes
+  /// the label.
+  ///
+  /// A real [Timer] rather than [_pending]'s token-and-[Future.delayed] idiom,
+  /// and the difference is the duration: 200ms of dead token outlives nothing,
+  /// where 1.5s of it holds a callback long after the label it was counting for
+  /// has gone — and, under `flutter_test`, past the end of the test that armed
+  /// it, which the binding fails on.
+  Timer? _dwell;
+
+  /// Whether the label on screen was opened by a **tap**.
+  ///
+  /// The two dismissals must not cross: a hover-opened label is the pointer's
+  /// to close and a finger must not steal it, and a tap-opened one has no
+  /// pointer to leave, so nothing but another tap (or [DsTooltip.touchDwell])
+  /// may take it down.
+  bool _byTouch = false;
+
+  /// Whether the label is **meant** to be up.
+  ///
+  /// Not the same as `_portal.isShowing`, which stays true for the whole exit
+  /// animation — a toggle that read the portal would answer "still open" for
+  /// 320ms after a closing tap and refuse to reopen.
+  bool _open = false;
+
   @override
   void initState() {
     super.initState();
@@ -133,6 +215,7 @@ class _DsTooltipState extends State<DsTooltip>
   @override
   void dispose() {
     _pending = null;
+    _dwell?.cancel();
     _animation.dispose();
     super.dispose();
   }
@@ -140,22 +223,67 @@ class _DsTooltipState extends State<DsTooltip>
   /// The hover delay is **not** routed through [dsAnimationDuration]: it is a
   /// dwell time, not motion, and `prefers-reduced-motion` has nothing to say
   /// about how long a pointer must rest before a label appears.
-  void _enter() {
+  void _enter(PointerEnterEvent event) {
+    // The tap path owns touch. A finger raises no enter on the platforms this
+    // ships to, but a synthesised or hybrid one would, and it must not buy a
+    // second opening on top of the one [_down] already gave it.
+    if (event.kind == PointerDeviceKind.touch) return;
     if (widget.hidden) return;
     final Object token = Object();
     _pending = token;
     Future<void>.delayed(widget.delay, () {
       if (!mounted || _pending != token) return;
       _pending = null;
-      _portal.show();
-      _animation
-        ..duration = dsAnimationDuration(context, DsDurations.overlay)
-        ..forward(from: 0);
+      _show();
     });
   }
 
-  void _exit() {
+  void _exit(PointerExitEvent event) {
+    // Same rule read backwards, and the one that keeps a hybrid device honest:
+    // a mouse leaving the trigger closes what the mouse opened, and leaves what
+    // the finger did to [DsTooltip.touchDwell] and to the next tap.
+    if (event.kind == PointerDeviceKind.touch || _byTouch) return;
+    _hide();
+  }
+
+  /// The trigger's own pointer-downs — **watched, not competed for.** A
+  /// [Listener] never joins the gesture arena, so the control underneath keeps
+  /// every gesture it had: the button still fires, the row still navigates, and
+  /// the label arrives beside it.
+  void _down(PointerDownEvent event) {
+    if (event.kind != PointerDeviceKind.touch || widget.hidden) return;
+    if (_open) {
+      _hide();
+      return;
+    }
+    // No dwell on the way in: `delayDuration` is a hover-intent filter and a
+    // tap has already declared its intent.
+    _byTouch = true;
+    _show();
+    _dwell?.cancel();
+    _dwell = Timer(DsTooltip.touchDwell, () {
+      if (mounted) _hide();
+    });
+  }
+
+  void _show() {
+    // Any opening supersedes one still counting down — otherwise a finger that
+    // taps a control the cursor is already resting on gets the label now AND a
+    // replayed entrance 200ms later, on the hover timer it never cancelled.
     _pending = null;
+    _open = true;
+    _portal.show();
+    _animation
+      ..duration = dsAnimationDuration(context, DsDurations.overlay)
+      ..forward(from: 0);
+  }
+
+  void _hide() {
+    _pending = null;
+    _dwell?.cancel();
+    _dwell = null;
+    _open = false;
+    _byTouch = false;
     if (!_portal.isShowing) return;
     _animation.duration = dsAnimationDuration(context, DsDurations.overlay);
     _animation.reverse().whenComplete(() {
@@ -178,13 +306,33 @@ class _DsTooltipState extends State<DsTooltip>
         object.localToGlobal(Offset.zero, ancestor: theatre) & object.size;
 
     return Positioned.fill(
-      child: IgnorePointer(
-        child: CustomSingleChildLayout(
-          delegate: _TooltipLayout(anchor: anchor, side: widget.side),
-          child: _TooltipTransition(
-            animation: _animation,
-            side: widget.side,
-            child: DsTooltipContent(label: widget.label, side: widget.side),
+      // The outside-tap dismissal, and the reason it is a [Listener] on
+      // [HitTestBehavior.translucent] rather than a barrier: translucent puts
+      // this box in the hit-test result WITHOUT claiming the hit, so everything
+      // underneath is hit-tested exactly as it would have been. The tap that
+      // dismisses the label still reaches whatever it landed on — which is the
+      // difference between a tooltip and a modal, and a tooltip is not one.
+      //
+      // The handler reads [_byTouch] when the event arrives rather than at
+      // build time, so the hover path passes through it untouched and the
+      // overlay never has to be rebuilt to arm or disarm this.
+      child: Listener(
+        behavior: HitTestBehavior.translucent,
+        onPointerDown: (PointerDownEvent event) {
+          if (!_byTouch) return;
+          // A down on the trigger belongs to [_down], which toggles. Letting
+          // both fire would close and reopen on the same tap.
+          if (anchor.contains(event.localPosition)) return;
+          _hide();
+        },
+        child: IgnorePointer(
+          child: CustomSingleChildLayout(
+            delegate: _TooltipLayout(anchor: anchor, side: widget.side),
+            child: _TooltipTransition(
+              animation: _animation,
+              side: widget.side,
+              child: DsTooltipContent(label: widget.label, side: widget.side),
+            ),
           ),
         ),
       ),
@@ -195,10 +343,13 @@ class _DsTooltipState extends State<DsTooltip>
   Widget build(BuildContext context) => OverlayPortal(
         controller: _portal,
         overlayChildBuilder: _buildOverlay,
-        child: MouseRegion(
-          onEnter: (_) => _enter(),
-          onExit: (_) => _exit(),
-          child: KeyedSubtree(key: _anchorKey, child: widget.child),
+        child: Listener(
+          onPointerDown: _down,
+          child: MouseRegion(
+            onEnter: _enter,
+            onExit: _exit,
+            child: KeyedSubtree(key: _anchorKey, child: widget.child),
+          ),
         ),
       );
 }
@@ -297,26 +448,42 @@ class DsTooltipContent extends StatelessWidget {
       ),
     );
 
-    final Widget lane = CustomPaint(
-      painter: _ArrowPainter(color: theme.foreground, side: side),
+    // The lane is a `size-2.5` SQUARE, not a strip that spans the pill.
+    //
+    // It used to be sized by `crossAxisAlignment: stretch`, and that is a bug
+    // under an overlay's constraints: the positioner loosens the theatre's own
+    // box before it lays the content out, so `stretch` handed the flex's cross
+    // axis `constraints.maxWidth` — the whole viewport. The pill inherited it
+    // through `ConstrainedBox.enforce` (a parent's tight width beats a
+    // `max-w-xs`), and `getPositionForChild` then clamped a viewport-wide child
+    // to x = 0. What shipped on a 1915px window was a full-width white bar with
+    // its label at the far edge, over the sidebar, instead of a pill above its
+    // trigger — both halves of it, the width and the position, out of this one
+    // line.
+    //
+    // Nothing about the drawn geometry changes: the box's own centre is the
+    // pill's centre either way, so the diamond still lands on the trigger's
+    // centre line, still 2px inside the facing edge, and the lane still spends
+    // exactly [DsTooltip.arrowSize] of layout — which is where the measured
+    // 10px gap comes from. The 45° turn takes the diamond past its box on the
+    // diagonal (10 → ~14.1) and always did; a [CustomPaint] does not clip.
+    final Widget lane = SizedBox.square(
+      dimension: DsTooltip.arrowSize,
+      child: CustomPaint(
+        painter: _ArrowPainter(color: theme.foreground, side: side),
+      ),
     );
 
+    // Default cross-axis alignment — `center` — on both, so the box wraps its
+    // pill on the cross axis instead of the constraints it was offered.
     return switch (side) {
       DsTooltipSide.top => Column(
           mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            pill,
-            SizedBox(height: DsTooltip.arrowSize, child: lane),
-          ],
+          children: <Widget>[pill, lane],
         ),
       DsTooltipSide.right => Row(
           mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            SizedBox(width: DsTooltip.arrowSize, child: lane),
-            pill,
-          ],
+          children: <Widget>[lane, pill],
         ),
     };
   }

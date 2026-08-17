@@ -59,8 +59,42 @@
 /// `DialogFooter`'s own `showCloseButton` (nothing in the corpus passes it),
 /// and the `*:[a]:underline` rules on the description — no dialog in the corpus
 /// puts a link in one.
+///
+/// ## USER-ORDERED MOBILE ADAPTATIONS — two of them, and neither is measured
+///
+/// The reference is a desktop site and was probed at 1440x900. Nothing below
+/// 640 was ever traced, and the reference has no back button at all. Both of
+/// the following are **orders**, recorded as such so a later reader does not
+/// mistake them for transcription and does not "correct" them back:
+///
+///  1. **The compact clamp** — [DsModalCompact]. At or below 600 logical
+///     pixels of viewport width every centred modal takes `max-width: 90vw`
+///     and `max-height: 75vh`, and its body scrolls inside the panel rather
+///     than running off the screen. The trigger was a real overflow: the
+///     dialogs page's shipment form, 384 wide plus two 16px gutters and a
+///     three-band column, does not fit a 375x812 phone. Desktop geometry is
+///     untouched — above the breakpoint [DsModalCompact.constraintsFor]
+///     returns an unbounded box and every measured pin still holds.
+///  2. **Back dismisses the topmost overlay** — [DsModalPortalState]. An
+///     [OverlayPortal] is not a route, so Android's back button walks straight
+///     past an open dialog and leaves the app. Every open portal registers
+///     itself in one static stack and the host mounts a [PopScope] that
+///     refuses the route pop while anything is open; the entry that is
+///     **last** in the stack closes, so a dialog opened over a dialog unwinds
+///     topmost-first. One mechanism, in one place — the sheet, the drawer and
+///     the agent launcher's dialog all ride this host and inherit it.
+///
+/// **Back and Escape are deliberately not the same contract.** Escape is
+/// transcribed: it closes whatever the reference was measured closing,
+/// including the alert dialog that its own copy promises will not close (see
+/// `alert_dialog.dart`'s drift 1), and a modal that the reference held open
+/// under Escape would be held open here. Back is an order and admits no
+/// exceptions — on a phone the alternative to dismissing is *leaving the app*,
+/// which is never the intent behind a back press aimed at an overlay. So:
+/// Escape follows the reference, back always dismisses.
 library;
 
+import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/services.dart';
@@ -89,6 +123,74 @@ const double _ringAlpha = 0.10;
 /// `bg-popover/80` — the media variant's close button, which sits on the
 /// artwork rather than on a band.
 const double _mediaCloseAlpha = 0.80;
+
+/* ── The compact clamp ───────────────────────────────────────────────────── */
+
+/// USER-ORDERED MOBILE ADAPTATION — the phone-sized box every centred modal is
+/// held inside. See the library doc's adaptation 1.
+///
+/// Three numbers, and only the first of them has a precedent anywhere in the
+/// system:
+///
+/// | number | where it comes from |
+/// |---|---|
+/// | [breakpoint] 600 | the one compact breakpoint the port already keeps — sonner's `@media (max-width: 600px)`, which `toaster.dart` anchors its stack off. Named again here rather than imported so this family does not depend on the toaster, and inclusive for the same reason a `max-width` query is |
+/// | [maxWidthFraction] 0.90 | ordered — a 5% gutter each side, so the scrim reads as a scrim |
+/// | [maxHeightFraction] 0.75 | ordered — the panel never fills the screen, because a modal that reaches both edges stops looking modal |
+///
+/// The clamp is a **maximum**, never a size: a small dialog on a small screen
+/// is still exactly as big as its content. Above [breakpoint] every method
+/// here is the identity, which is what keeps the measured desktop geometry
+/// green.
+class DsModalCompact {
+  const DsModalCompact._();
+
+  /// At or below this viewport width the clamp is in force.
+  static const double breakpoint = 600;
+
+  /// `max-width: 90vw`.
+  static const double maxWidthFraction = 0.90;
+
+  /// `max-height: 75vh`.
+  static const double maxHeightFraction = 0.75;
+
+  /// Whether a viewport of this width takes the compact treatment.
+  ///
+  /// Inclusive at the edge, as a `max-width` media query is.
+  static bool isCompact(double viewportWidth) => viewportWidth <= breakpoint;
+
+  /// The same question asked of a [BuildContext].
+  static bool isCompactOf(BuildContext context) =>
+      isCompact(MediaQuery.sizeOf(context).width);
+
+  /// The box a centred modal may not exceed on [viewport] — and an unbounded
+  /// one above the breakpoint, which is a no-op wherever it is applied.
+  static BoxConstraints constraintsFor(Size viewport) => isCompact(
+        viewport.width,
+      )
+          ? BoxConstraints(
+              maxWidth: viewport.width * maxWidthFraction,
+              maxHeight: viewport.height * maxHeightFraction,
+            )
+          : const BoxConstraints();
+
+  /// [width] under the compact cap — for a panel that sizes itself rather than
+  /// taking the constraint, which is the sheet's case.
+  static double clampWidth(double width, Size viewport) => isCompact(
+        viewport.width,
+      )
+          ? math.min(width, viewport.width * maxWidthFraction)
+          : width;
+
+  /// [box] under both caps — for a panel that sets an explicit width *and*
+  /// height, which is the agent launcher's dialog.
+  static Size clampSize(Size box, Size viewport) => isCompact(viewport.width)
+      ? Size(
+          math.min(box.width, viewport.width * maxWidthFraction),
+          math.min(box.height, viewport.height * maxHeightFraction),
+        )
+      : box;
+}
 
 /* ── The portal ──────────────────────────────────────────────────────────── */
 
@@ -143,6 +245,7 @@ class DsModalPortal extends StatefulWidget {
     this.overlayDuration = DsDurations.overlay,
     this.overlayCurve = DsCurves.out,
     this.dismissOnOverlayTap = true,
+    this.clampToViewport = true,
     this.onOpenChange,
   });
 
@@ -173,6 +276,19 @@ class DsModalPortal extends StatefulWidget {
   /// *"cannot be dismissed by clicking outside"* and was measured refusing to.
   final bool dismissOnOverlayTap;
 
+  /// USER-ORDERED MOBILE ADAPTATION — whether the content is held inside
+  /// [DsModalCompact]'s 90vw x 75vh box on a phone.
+  ///
+  /// On for the centred modals, which is what the order names: dialog, alert
+  /// dialog, and the agent launcher's console dialog. **Off for the sheet and
+  /// the drawer**, and the reason is that an edge-anchored panel's size is
+  /// already viewport-relative and already an answer to the same question — a
+  /// side sheet is deliberately full-height, so a 75vh cap would crop it, and
+  /// the drawer is deliberately full-width under vaul's own `max-h-[80vh]`, so
+  /// a 90vw cap would un-bleed it. Those two clamp themselves instead; see
+  /// `sheet.dart` and `drawer.dart`.
+  final bool clampToViewport;
+
   /// Fires with the new state whenever the overlay opens or closes.
   final ValueChanged<bool>? onOpenChange;
 
@@ -184,6 +300,25 @@ class DsModalPortal extends StatefulWidget {
 /// from outside — which is what the drawer's drag-to-dismiss needs.
 class DsModalPortalState extends State<DsModalPortal>
     with TickerProviderStateMixin {
+  /// USER-ORDERED MOBILE ADAPTATION — every open portal in the app, oldest
+  /// first. See the library doc's adaptation 2.
+  ///
+  /// Static because *"the topmost open overlay"* is a property of the app and
+  /// not of any one portal. Two dialogs open at once are two unrelated
+  /// [DsModalPortal]s — a confirmation raised from inside another dialog's
+  /// content is a portal nested in the element tree but a **sibling** here —
+  /// and back has to pick exactly one of them. A per-widget [PopScope] cannot:
+  /// [ModalRoute] notifies *every* registered entry on a blocked pop, so
+  /// without this list a single back press would close the whole stack at
+  /// once. Each entry is notified, checks whether it is [_stack]'s last, and
+  /// all but one return.
+  static final List<DsModalPortalState> _stack = <DsModalPortalState>[];
+
+  /// The open portals, oldest first. Read-only, and exposed for the tests that
+  /// pin the unwind order.
+  static List<DsModalPortalState> get openModals =>
+      List<DsModalPortalState>.unmodifiable(_stack);
+
   final OverlayPortalController _portal = OverlayPortalController();
 
   /// Built in [initState] rather than lazily, on `DsPopover`'s hard-won
@@ -214,6 +349,9 @@ class DsModalPortalState extends State<DsModalPortal>
 
   @override
   void dispose() {
+    // A portal torn down while open — a route pushed over it and disposed, a
+    // hot reload — must not leave a dead entry for back to aim at.
+    _stack.remove(this);
     _content.dispose();
     _overlay.dispose();
     super.dispose();
@@ -223,6 +361,7 @@ class DsModalPortalState extends State<DsModalPortal>
 
   void open() {
     if (_open) return;
+    _stack.add(this);
     setState(() => _open = true);
     _portal.show();
     _content
@@ -237,6 +376,10 @@ class DsModalPortalState extends State<DsModalPortal>
 
   void close() {
     if (!_open) return;
+    // Off the stack the moment the dismissal is decided, not when the exit
+    // animation lands: a second back press 100ms later must reach whatever is
+    // underneath rather than this one again.
+    _stack.remove(this);
     setState(() => _open = false);
     _overlay.reverse();
     _content.reverse().whenComplete(() {
@@ -260,7 +403,44 @@ class DsModalPortalState extends State<DsModalPortal>
     return KeyEventResult.handled;
   }
 
+  /// USER-ORDERED MOBILE ADAPTATION — the Android back button and the
+  /// predictive-back gesture. See the library doc's adaptation 2.
+  ///
+  /// Reached through [PopScope] on the *page's* route, which is where this
+  /// widget lives even when its content is painted into the overlay theatre.
+  /// [didPop] is true only when the route actually popped, which [PopScope]'s
+  /// `canPop: !isOpen` has already prevented; the interesting call is the
+  /// cancelled one.
+  ///
+  /// **Unconditional**, unlike Escape: `dismissOnOverlayTap` and the
+  /// reference's Escape drifts do not reach here. On a phone the only other
+  /// outcome of a back press is leaving the app.
+  void _onPop(bool didPop, Object? result) {
+    if (didPop || !_open) return;
+    // Every entry on the route is notified; only the topmost acts.
+    if (_stack.isNotEmpty && !identical(_stack.last, this)) return;
+    close();
+  }
+
   Widget _buildOverlay(BuildContext context) {
+    // USER-ORDERED MOBILE ADAPTATION 1 — the compact clamp, applied once, at
+    // the host, so every modal that rides this portal inherits it and none of
+    // them re-states it. Outside the transition rather than inside because
+    // every transition in the family is paint-only: the constraint would land
+    // in the same place either way, and this way the panel's own build sees
+    // the clamped box directly.
+    Widget panel = widget.transition(
+      context,
+      _content,
+      Builder(builder: (BuildContext c) => widget.content(c, close)),
+    );
+    if (widget.clampToViewport) {
+      panel = ConstrainedBox(
+        constraints: DsModalCompact.constraintsFor(MediaQuery.sizeOf(context)),
+        child: panel,
+      );
+    }
+
     return Stack(
       fit: StackFit.expand,
       children: <Widget>[
@@ -285,11 +465,7 @@ class DsModalPortalState extends State<DsModalPortal>
             // nothing is painted either way. The scope is what makes Escape
             // reachable and what keeps Tab inside the overlay.
             onKeyEvent: _onKey,
-            child: widget.transition(
-              context,
-              _content,
-              Builder(builder: (BuildContext c) => widget.content(c, close)),
-            ),
+            child: panel,
           ),
         ),
       ],
@@ -297,10 +473,18 @@ class DsModalPortalState extends State<DsModalPortal>
   }
 
   @override
-  Widget build(BuildContext context) => OverlayPortal(
-        controller: _portal,
-        overlayChildBuilder: _buildOverlay,
-        child: widget.trigger(context, open),
+  Widget build(BuildContext context) => PopScope<Object?>(
+        // USER-ORDERED MOBILE ADAPTATION 2. [PopScope] paints nothing and
+        // measures nothing — it builds its child verbatim — so the trigger's
+        // box is untouched, which matters for the agent launcher whose trigger
+        // is required to measure [Size.zero].
+        canPop: !_open,
+        onPopInvokedWithResult: _onPop,
+        child: OverlayPortal(
+          controller: _portal,
+          overlayChildBuilder: _buildOverlay,
+          child: widget.trigger(context, open),
+        ),
       );
 }
 
@@ -580,13 +764,49 @@ class DsDialogContent extends StatelessWidget {
     final bool padBottom =
         !media && children.isNotEmpty && children.last is! DsDialogFooter;
 
+    final List<Widget> column = <Widget>[
+      if (padTop) SizedBox(height: padding),
+      ...rows,
+      if (padBottom) SizedBox(height: padding),
+    ];
+
+    // USER-ORDERED MOBILE ADAPTATION — the body scrolls, the bands do not.
+    //
+    // A leading band and a trailing band are lifted out of the column and the
+    // rest is put in a [SingleChildScrollView] under a **loose** [Flexible],
+    // which is the whole of it: loose fit means the scroller is offered the
+    // slack and takes only what its content needs, so with room to spare the
+    // column is laid out exactly as it was before this existed and every
+    // measured pin still reads the same number. The scroll only engages once
+    // the incoming maximum actually binds — [DsModalCompact]'s 75vh on a
+    // phone, or a viewport shorter than the panel anywhere else.
+    //
+    // Pinning the bands rather than scrolling the whole panel is the reference
+    // author's own reasoning, applied one screen size down: the header names
+    // the task and the footer *is* the decision, so they are the two things a
+    // reader must not have to scroll to find. `dialog.tsx` puts it as *"three
+    // readable zones"*, and on a phone only the middle one may move.
+    final bool bandFirst = children.isNotEmpty &&
+        (children.first is DsDialogHeader || children.first is DsDialogMedia);
+    final bool bandLast = children.isNotEmpty && children.last is DsDialogFooter;
+    final Widget? head = bandFirst ? column.removeAt(0) : null;
+    final Widget? foot = bandLast ? column.removeLast() : null;
+
     Widget panel = Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        if (padTop) SizedBox(height: padding),
-        ...rows,
-        if (padBottom) SizedBox(height: padding),
+        ?head,
+        Flexible(
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: column,
+            ),
+          ),
+        ),
+        ?foot,
       ],
     );
 

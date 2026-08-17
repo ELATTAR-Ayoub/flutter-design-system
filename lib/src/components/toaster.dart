@@ -55,6 +55,12 @@
 ///    measured height**. Measured, three deep: `scale(0.95) translateY(-14px)`
 ///    and `scale(0.9) translateY(-28px)`, both at `height: 93.875px` when the
 ///    front toast measured 93.875.
+///
+///    *"Only the front toast is legible"* is a statement about **paint order**
+///    as much as about opacity. A pinned back toast is a full-height opaque
+///    `--popover` plate sitting 14px off the front one, so `--z-index:
+///    toasts.length - index` is load-bearing: paint the stack the other way up
+///    and the oldest blank plate covers the front toast's title outright.
 ///  * **Expand on hover.** Hovering the stack lifts every toast to its own
 ///    `--offset` (`n × gap + Σ heights before it`), returns it to `scale(1)`
 ///    and to its own natural height, and fades its children back in. Measured:
@@ -106,6 +112,13 @@
 /// verbatim — the 600px breakpoint, the 16px edge inset, the full-bleed width.
 /// [DsToaster]'s class doc carries the measurement and the reasoning.
 ///
+/// The second ordered departure is the same order's consequence: 16px from the
+/// top of a **phone** is 16px into the status bar, so the anchored edge pays
+/// [MediaQueryData.padding] on top of sonner's inset — [DsToaster.paddingFor],
+/// and the corpus-wide ruling [DsSafeArea] states. sonner has no counterpart:
+/// `styles.css` never spells `env(safe-area-inset-*)`, because a desktop
+/// browser has no bar to clear.
+///
 /// Recorded rather than guessed, and still open:
 ///  * `[data-button]` — the action pill (`variant="secondary" size="sm"` by
 ///    hand, 32px on a pill). The live error toast on the `feedback` page has
@@ -150,6 +163,7 @@ import '../foundation/spacing.dart';
 import '../foundation/theme.dart';
 import '../foundation/typography.dart';
 import '../theme_scope.dart';
+import 'ds_safe_area.dart';
 import 'icon.dart';
 import 'icon_paths.dart';
 
@@ -655,6 +669,14 @@ enum DsToastPosition {
 /// It is one substitution, not a fork: [DsToastPosition.topAnchored] flips
 /// `--lift`, and the collapse, the expand, all three exits, the entrance and
 /// the swipe axis are each already written as a multiple of it.
+///
+/// ## The system bars
+///
+/// The anchored edge pays [MediaQueryData.padding] over sonner's inset —
+/// [paddingFor]. A top-anchored compact stack sits `padding.top + 16` down, a
+/// bottom-anchored one `padding.bottom + 24` up, and on any surface that
+/// reports no bars at all — every desktop, every browser, every test that does
+/// not set `view.padding` — the arithmetic is sonner's own number unchanged.
 class DsToaster extends StatefulWidget {
   const DsToaster({
     super.key,
@@ -698,6 +720,52 @@ class DsToaster extends StatefulWidget {
   /// The inset from every viewport edge at this width.
   static double offsetFor(double viewportWidth) =>
       isCompact(viewportWidth) ? _mobileOffset : _offset;
+
+  /// The host's own padding — [offsetFor] on all four sides, **plus whatever
+  /// system chrome stands between the anchored edge and the screen**.
+  ///
+  /// User-ordered, and the same ruling [DsSafeArea] states for the rest of the
+  /// corpus: nothing painted is letterboxed, but anything that has to be *read*
+  /// clears the bars. It matters here because of the compact anchor above —
+  /// 16px from `y = 0` on a phone is 16px **into** the status bar, and a
+  /// top-anchored toast puts its title under the clock. A bottom stack has the
+  /// same collision with the gesture bar on any device that has one.
+  ///
+  /// Only the **anchored** edge is paid, and the other three keep sonner's own
+  /// number:
+  ///
+  ///  * the two sides, because [widthFor] is `100% − offset * 2` and the
+  ///    toast's box is that arithmetic — widening the host's padding without
+  ///    widening the toast would leave the stack adrift inside a box it no
+  ///    longer fills;
+  ///  * the far edge, because the stack does not reach it. A bottom-anchored
+  ///    stack's top padding is inert under [Align], and spending an inset there
+  ///    would only cap how far the stack could expand.
+  ///
+  /// [systemBars] is [MediaQueryData.padding] — the always-there obstructions —
+  /// and never `viewInsets`: the keyboard belongs to whatever is focused, and a
+  /// toast is not it. Clamped at zero for the same reason [widthFor] is: a
+  /// negative [EdgeInsets] is an assertion in [Padding] rather than a squeeze.
+  ///
+  /// [position] is the **configured** corner, not the resolved one: which edge
+  /// is anchored at this width is [positionFor]'s answer and not the caller's,
+  /// so `bottomRight` on a phone pays the status bar it actually sits under.
+  /// Passing an already-resolved corner is the same answer — [positionFor] is
+  /// idempotent — which is what lets [build] hand it either one.
+  static EdgeInsets paddingFor(
+    double viewportWidth,
+    EdgeInsets systemBars,
+    DsToastPosition position,
+  ) {
+    final DsToastPosition anchored = positionFor(position, viewportWidth);
+    final double inset = offsetFor(viewportWidth);
+    return EdgeInsets.only(
+      left: inset,
+      right: inset,
+      top: inset + (anchored.isBottom ? 0 : math.max(systemBars.top, 0)),
+      bottom: inset + (anchored.isBottom ? math.max(systemBars.bottom, 0) : 0),
+    );
+  }
 
   /// The toast box at this width — `356px`, or
   /// `calc(100% - var(--mobile-offset) * 2)` once compact.
@@ -982,7 +1050,11 @@ class _DsToasterState extends State<DsToaster>
       widget.position,
       viewportWidth,
     );
-    final double offset = DsToaster.offsetFor(viewportWidth);
+    final EdgeInsets padding = DsToaster.paddingFor(
+      viewportWidth,
+      DsSafeArea.insetsOf(context),
+      position,
+    );
     final double width = DsToaster.widthFor(viewportWidth);
 
     // The three most recent are on screen; the rest wait.
@@ -991,8 +1063,11 @@ class _DsToasterState extends State<DsToaster>
         : all.sublist(all.length - _visible);
 
     // sonner's own order: `index` counts from the newest, which is the one
-    // nearest the corner. `--z-index: toasts.length - index` then puts the
-    // newest on top, which in a `Stack` is simply painting it last.
+    // nearest the corner. This is the order every rule below is written in —
+    // `isFront`, the `n` in `1 − 0.05n`, the gap multiple — and it is NOT the
+    // paint order. `--z-index: toasts.length - index` puts the newest on top,
+    // so the `Stack` at the end of this method takes the list reversed; the
+    // note there is the whole of that argument.
     final List<_LiveToast> byIndex = shown.reversed.toList(growable: false);
 
     // `heights` — mounted, not removed, newest first. A toast is dropped from
@@ -1101,12 +1176,25 @@ class _DsToasterState extends State<DsToaster>
 
       slots.add(
         Positioned(
+          // **On the `Positioned`, not on the `_ToastSlot` under it.** The
+          // stack re-indexes on every arrival and on every front departure —
+          // slot 0 stops being toast A and starts being toast B — and a
+          // `Stack`'s children are matched by key. An unkeyed `Positioned`
+          // matches its neighbour by *position*, and the keyed child inside it
+          // is then rejected by `Widget.canUpdate`, so every surviving toast's
+          // `State` is torn out and rebuilt: `_mounted` back to false,
+          // `_opacity` back to 0, `_transform` back to the entrance base. The
+          // promoted toast then blinks out and re-enters instead of animating
+          // from the blanked state to the front one, and for the frames in
+          // between the stack is a row of empty plates. Keying the `Positioned`
+          // is what lets the element *move* between slots with its clocks
+          // intact, which is what the whole choreography is written against.
+          key: ValueKey<int>(toast.id),
           left: 0,
           width: width,
           top: position.isBottom ? null : 0,
           bottom: position.isBottom ? 0 : null,
           child: _ToastSlot(
-            key: ValueKey<int>(toast.id),
             toast: toast,
             position: position,
             choreo: _Choreo(
@@ -1152,7 +1240,7 @@ class _DsToasterState extends State<DsToaster>
         DsToastPosition.topLeft => AlignmentDirectional.topStart,
       },
       child: Padding(
-        padding: EdgeInsets.all(offset),
+        padding: padding,
         child: MouseRegion(
           // `onMouseEnter`/`onMouseMove` → expand, `onMouseLeave` → collapse,
           // both on the container. `opaque: false` because this only watches:
@@ -1179,7 +1267,27 @@ class _DsToasterState extends State<DsToaster>
               // toast mid-transition can briefly overshoot that, and clipping
               // it would be visible.
               clipBehavior: Clip.none,
-              children: slots,
+              // **Reversed, and this is the z-index.** `--z-index:
+              // toasts.length - index` gives the newest — `index` 0 — the
+              // highest, so the front toast paints over the stack behind it. A
+              // `Stack` paints in child order, and `slots` is built newest-
+              // FIRST because that is the order `index` counts in, so handing
+              // it over as-is paints the newest first and therefore *bottom*.
+              //
+              // The back toast is not a translucent hint: it is a whole opaque
+              // `--popover` plate, pinned to the front toast's own height and
+              // sitting only 14px off it, and its children are at `opacity: 0`.
+              // Painted on top it covers the front toast's title and
+              // description with blank fill — the empty plate — while every
+              // widget-tree assertion still reads a legible front toast,
+              // because nothing about the tree is wrong. Only the canvas is.
+              // The rasterised pin in `feedback_effects_test.dart` is what
+              // holds this, for exactly that reason.
+              //
+              // Hit-testing reverses again on its own, so the front toast is
+              // also the one that now takes the tap and the swipe it was
+              // already drawn to receive.
+              children: slots.reversed.toList(growable: false),
             ),
           ),
         ),
@@ -1274,7 +1382,6 @@ const int _kSwipeFracY = 6;
 /// and the gesture that can throw it out.
 class _ToastSlot extends StatefulWidget {
   const _ToastSlot({
-    super.key,
     required this.toast,
     required this.position,
     required this.choreo,

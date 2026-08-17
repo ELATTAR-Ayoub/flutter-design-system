@@ -104,6 +104,19 @@
 /// register class rather than as a new standalone drift. The page test's case
 /// pins the behaviour exactly as it stands; it documents an accepted
 /// limitation, not an open defect.
+///
+/// ## USER-ORDERED MOBILE ADAPTATION — it keeps itself off the keyboard
+///
+/// The composer holds its own [EditableText] rather than a [DsInput], so it
+/// wears the field family's one keyboard-avoidance hook — [DsFieldVisibility] —
+/// directly, around [_ComposerStack]. On a phone, focusing it inside any
+/// scroller scrolls the whole shell (input, control row and all) clear of the
+/// software keyboard with a small margin. Inside [DsAgentConsole] the console's
+/// own spacer has usually done that already, and the two compose rather than
+/// compete: the hook measures how much of the scroller the keyboard actually
+/// covers, which is nothing once room has been made. With no keyboard on
+/// screen — every desktop frame, every existing test — the hook builds its
+/// child and does nothing at all.
 library;
 
 import 'package:flutter/rendering.dart';
@@ -580,18 +593,27 @@ class _DsAgentComposerState extends State<DsAgentComposer> {
       canRequestFocus: false,
       skipTraversal: true,
       onKeyEvent: _onKey,
-      child: _ComposerStack(
-        gap: DsAgentSlashPalette.bottomGap,
-        children: <Widget>[
-          dropTarget,
-          if (paletteOpen)
-            DsAgentSlashPalette(
-              commands: matches,
-              activeIndex: _activeIndex,
-              onSelect: _applyCommand,
-              onHover: (int i) => setState(() => _activeIndex = i),
-            ),
-        ],
+      // USER-ORDERED MOBILE ADAPTATION — the field family's one keyboard-
+      // avoidance hook, from [DsFieldVisibility]. The composer holds an
+      // [EditableText] of its own rather than a [DsInput], so it wears the
+      // mechanism directly; wrapped around the stack, so what is revealed is
+      // the shell and its control row and not just the line being typed into.
+      // Inert on every desktop frame — see the hook's own doc.
+      child: DsFieldVisibility(
+        focusNode: _focusNode,
+        child: _ComposerStack(
+          gap: DsAgentSlashPalette.bottomGap,
+          children: <Widget>[
+            dropTarget,
+            if (paletteOpen)
+              DsAgentSlashPalette(
+                commands: matches,
+                activeIndex: _activeIndex,
+                onSelect: _applyCommand,
+                onHover: (int i) => setState(() => _activeIndex = i),
+              ),
+          ],
+        ),
       ),
     );
   }

@@ -1840,4 +1840,208 @@ void main() {
       );
     });
   });
+
+  /* ── USER-ORDERED MOBILE ADAPTATION ──────────────────────────────────────
+     The field family keeps itself out from behind the software keyboard.
+     Nothing here translates the reference: a browser scrolls a focused input
+     back into its own shrunken visual viewport and this layer has to do it by
+     hand. What is pinned is the rule and its price — the rule works on a phone,
+     and it costs a desktop frame exactly nothing.                          */
+
+  group('DsFieldVisibility — a focused field is never behind the keyboard', () {
+    /// The phone the order names.
+    const Size phone = Size(375, 812);
+
+    /// A software keyboard of the height the order names.
+    const double keyboard = 300;
+
+    /// The spacer above and below the field. At rest the field's box is content
+    /// y 700–740, which on an 812pt window is **on screen** and squarely behind
+    /// a 300pt keyboard — the exact shape of the reported bug.
+    const double lead = 700;
+
+    /// Where the keyboard's top edge falls: 512.
+    final double keyboardTop = phone.height - keyboard;
+
+    Future<void> pumpPage(
+      WidgetTester t, {
+      required ScrollController controller,
+      required double viewInsetsBottom,
+      required Widget field,
+    }) async {
+      t.view.devicePixelRatio = 1;
+      t.view.physicalSize = phone;
+      addTearDown(t.view.reset);
+
+      await t.pumpWidget(MediaQuery(
+        data: MediaQueryData(
+          size: phone,
+          viewInsets: EdgeInsets.only(bottom: viewInsetsBottom),
+        ),
+        child: Directionality(
+          textDirection: TextDirection.ltr,
+          child: DsTheme(
+            controller: DsThemeController(mode: DsThemeMode.dark),
+            child: SingleChildScrollView(
+              controller: controller,
+              child: Column(
+                children: <Widget>[
+                  const SizedBox(height: lead),
+                  SizedBox(width: 320, child: field),
+                  const SizedBox(height: lead),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ));
+    }
+
+    testWidgets('focusing one deep in a scroller lifts it clear of the keyboard',
+        (WidgetTester t) async {
+      final FocusNode node = FocusNode();
+      final ScrollController controller = ScrollController();
+      await pumpPage(
+        t,
+        controller: controller,
+        viewInsetsBottom: keyboard,
+        field: DsInput(focusNode: node),
+      );
+
+      // The bug, reproduced first: on screen by the viewport's reckoning, and
+      // 228px of it behind the keyboard.
+      expect(controller.offset, 0);
+      expect(t.getRect(find.byType(DsInput)).bottom, lead + DsInput.height);
+      expect(lead + DsInput.height, greaterThan(keyboardTop));
+
+      node.requestFocus();
+      await t.pump();
+      await t.pumpAndSettle();
+
+      // Lifted to sit exactly one margin above the keyboard's top edge, and no
+      // further: the reveal is the minimum scroll that clears it.
+      final Rect field = t.getRect(find.byType(DsInput));
+      expect(field.bottom, closeTo(keyboardTop - DsFieldVisibility.margin, 0.01));
+      expect(
+        controller.offset,
+        closeTo(lead + DsInput.height - keyboardTop + DsFieldVisibility.margin, 0.01),
+      );
+      // Still whole — a reveal that clipped the top of the field would be no
+      // better than the keyboard covering the bottom of it.
+      expect(field.top, greaterThanOrEqualTo(0));
+    });
+
+    testWidgets('with no keyboard on screen it does not move a pixel',
+        (WidgetTester t) async {
+      final FocusNode node = FocusNode();
+      final ScrollController controller = ScrollController();
+      await pumpPage(
+        t,
+        controller: controller,
+        viewInsetsBottom: 0,
+        field: DsInput(focusNode: node),
+      );
+
+      final Rect before = t.getRect(find.byType(DsInput));
+      node.requestFocus();
+      await t.pump();
+      await t.pumpAndSettle();
+
+      // The desktop guarantee, stated as an equality rather than a tolerance:
+      // `viewInsets.bottom == 0` is the gate on every path in the mechanism.
+      expect(controller.offset, 0);
+      expect(t.getRect(find.byType(DsInput)), before);
+    });
+
+    testWidgets('a keyboard that opens AFTER the focus still lifts it',
+        (WidgetTester t) async {
+      // The real device order: the tap focuses the field, and the keyboard
+      // animates in a moment later. Focus alone is not the trigger, so this is
+      // the path that does the work on a phone.
+      final FocusNode node = FocusNode();
+      final ScrollController controller = ScrollController();
+      await pumpPage(
+        t,
+        controller: controller,
+        viewInsetsBottom: 0,
+        field: DsInput(focusNode: node),
+      );
+
+      node.requestFocus();
+      await t.pump();
+      await t.pumpAndSettle();
+      expect(controller.offset, 0, reason: 'no keyboard yet, nothing to avoid');
+
+      // Same tree, same state, same focus — only the inset changed.
+      await pumpPage(
+        t,
+        controller: controller,
+        viewInsetsBottom: keyboard,
+        field: DsInput(focusNode: node),
+      );
+      await t.pumpAndSettle();
+
+      expect(node.hasFocus, isTrue);
+      expect(
+        t.getRect(find.byType(DsInput)).bottom,
+        closeTo(keyboardTop - DsFieldVisibility.margin, 0.01),
+      );
+    });
+
+    testWidgets('a field already in the clear is left alone',
+        (WidgetTester t) async {
+      final FocusNode node = FocusNode();
+      final ScrollController controller = ScrollController();
+      await pumpPage(
+        t,
+        controller: controller,
+        viewInsetsBottom: keyboard,
+        field: DsInput(focusNode: node),
+      );
+      // Parked where the field is already whole, already inside its margin and
+      // already above the keyboard: the reveal's third branch runs and returns.
+      controller.jumpTo(400);
+      await t.pumpAndSettle();
+      final double parked = controller.offset;
+      final Rect resting = t.getRect(find.byType(DsInput));
+      expect(resting.bottom, lessThan(keyboardTop));
+      expect(resting.top, greaterThan(DsFieldVisibility.margin));
+
+      node.requestFocus();
+      await t.pump();
+      await t.pumpAndSettle();
+
+      expect(controller.offset, parked);
+    });
+
+    testWidgets('every field in the family wears the one hook',
+        (WidgetTester t) async {
+      // The point of the ruling: the mechanism lives in one place and each
+      // control routes through it, so a control added later inherits the
+      // behaviour instead of having to remember a rule. If one of these ever
+      // stops being wrapped, this fails before a phone does.
+      await t.pumpWidget(host(SizedBox(
+        width: 320,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            const DsInput(),
+            const DsTextarea(),
+            DsInputOtp(),
+          ],
+        ),
+      )));
+
+      for (final Type field in <Type>[DsInput, DsTextarea, DsInputOtp]) {
+        expect(
+          find.descendant(
+            of: find.byType(field),
+            matching: find.byType(DsFieldVisibility),
+          ),
+          findsOneWidget,
+          reason: '$field must route through the shared focus-visibility hook',
+        );
+      }
+    });
+  });
 }

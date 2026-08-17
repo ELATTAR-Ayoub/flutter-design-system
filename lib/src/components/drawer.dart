@@ -96,6 +96,20 @@ class _DsDrawerState extends State<DsDrawer> {
         key: _portal,
         trigger: widget.trigger,
         alignment: Alignment.bottomCenter,
+        // USER-ORDERED MOBILE ADAPTATION — out of the host's 90vw x 75vh box,
+        // because this component is already the answer the clamp is reaching
+        // for. The drawer *is* the phone container: `inset-x-0` is a full-bleed
+        // width that a 90vw cap would break, and `max-h-[80vh]` is vaul's own
+        // cap in the same units as the clamp's 75vh, applied in
+        // [DsDrawerContent].
+        //
+        // Its body is also the one panel in the family that is deliberately
+        // NOT scrollable: a [Scrollable] inside the panel would win the gesture
+        // arena against the drag-to-dismiss recognizer wrapped around it — the
+        // deepest vertical-drag recognizer takes the sweep — and vaul's own
+        // answer to that (only drag when the inner scroller is at its top) is
+        // not ported. The 80vh cap is what keeps it on screen.
+        clampToViewport: false,
         // vaul's clock, not `--duration-overlay` — see the library doc.
         enterDuration: DsDurations.drawer,
         exitDuration: DsDurations.drawer,

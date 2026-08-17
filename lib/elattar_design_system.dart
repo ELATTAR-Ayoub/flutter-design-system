@@ -57,6 +57,7 @@ export 'src/components/context_menu.dart';
 export 'src/components/dialog.dart';
 export 'src/components/drawer.dart';
 export 'src/components/ds_rule.dart';
+export 'src/components/ds_safe_area.dart';
 export 'src/components/dropdown_menu.dart';
 export 'src/components/empty.dart';
 export 'src/components/field.dart';

@@ -249,18 +249,25 @@ class _DsTextareaState extends State<DsTextarea> {
     // textarea still receives the pointer and shows `cursor-not-allowed` for it.
     body = Opacity(opacity: enabled ? 1 : _disabledOpacity, child: body);
 
-    if (label == null && hint == null && !invalid) return body;
-    return Semantics(
-      textField: true,
-      multiline: true,
-      label: label,
-      hint: hint,
-      readOnly: widget.readOnly,
-      enabled: enabled,
-      validationResult: invalid
-          ? SemanticsValidationResult.invalid
-          : SemanticsValidationResult.none,
-      child: body,
-    );
+    if (label != null || hint != null || invalid) {
+      body = Semantics(
+        textField: true,
+        multiline: true,
+        label: label,
+        hint: hint,
+        readOnly: widget.readOnly,
+        enabled: enabled,
+        validationResult: invalid
+            ? SemanticsValidationResult.invalid
+            : SemanticsValidationResult.none,
+        child: body,
+      );
+    }
+
+    // USER-ORDERED MOBILE ADAPTATION — the family's one hook, from
+    // [DsFieldVisibility]. This widget keeps its own copy of the focus plumbing
+    // (it always has, because the surface is shared and the state is not), so
+    // it wears the mechanism rather than restating it.
+    return DsFieldVisibility(focusNode: _focusNode, child: body);
   }
 }

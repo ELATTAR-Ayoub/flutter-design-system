@@ -338,6 +338,14 @@ class DsSheetOverlay extends StatelessWidget {
         trigger: trigger,
         content: content,
         alignment: _alignment,
+        // USER-ORDERED MOBILE ADAPTATION — out of the host's 90vw x 75vh box,
+        // and [DsSheetContent] clamps its own width instead. A side sheet is
+        // full-height by definition — that is the whole difference between a
+        // sheet and a dialog — so a 75vh cap would crop the one dimension the
+        // component exists to fill. What it *does* need on a phone is the
+        // width: `sm:max-w-sm` is 384 against a 375px viewport, which is the
+        // same overflow the dialog had. See [DsSheetContent.width].
+        clampToViewport: false,
         // The sheet's own clock, both ways: `--duration-overlay`.
         enterDuration: DsDurations.overlay,
         exitDuration: DsDurations.overlay,
@@ -435,6 +443,21 @@ class DsSheetContent extends StatelessWidget {
   /// `gap-4`.
   static double get gap => ds(4);
 
+  /// USER-ORDERED MOBILE ADAPTATION — the panel width for [viewport].
+  ///
+  /// [maxWidth] (or the [width] override) everywhere the reference was
+  /// measured, and [DsModalCompact.maxWidthFraction] of the viewport once
+  /// compact — 384 does not fit a 375px phone, and a panel wider than the
+  /// screen has no scrim left to tap.
+  ///
+  /// The reference reaches the same place by another road: `SheetContent`'s
+  /// base is `w-3/4` and only `sm:max-w-sm` pins it to 384, so below 640 the
+  /// live component is already a fraction of the viewport. The port renders
+  /// the `sm:` branch (see the header table), and this is the clamp that keeps
+  /// that decision from running off a phone.
+  static double widthFor(double width, Size viewport) =>
+      DsModalCompact.clampWidth(width, viewport);
+
   @override
   Widget build(BuildContext context) {
     final DsThemeData theme = DsTheme.of(context);
@@ -456,7 +479,9 @@ class DsSheetContent extends StatelessWidget {
     return DsSheetContentGroup(
       showCloseButton: showCloseButton,
       child: SizedBox(
-        width: side.isHorizontal ? (width ?? maxWidth) : null,
+        width: side.isHorizontal
+            ? widthFor(width ?? maxWidth, MediaQuery.sizeOf(context))
+            : null,
         height: side.isHorizontal ? double.infinity : null,
         child: DecoratedBox(
           decoration: BoxDecoration(

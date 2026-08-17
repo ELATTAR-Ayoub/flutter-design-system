@@ -13,6 +13,30 @@
 ///   its own.
 /// * **`background-attachment: fixed` on the body glow.** Bottom layer of the
 ///   same [Stack], outside both scroll views.
+///
+/// ## The fourth thing: system bars (user-ordered mobile adaptation)
+///
+/// Ordered 2026-08-16 against screenshots — the header was rendering behind the
+/// phone's clock and the reading column behind the gesture bar. A browser on a
+/// desktop has neither obstruction, so there is no reference behaviour to port;
+/// [DsSafeArea]'s library note carries the ruling and this file consumes it at
+/// three places:
+///
+///  * the header **grows** by the status-bar inset ([DsSafeArea.topBarHeightOf])
+///    and keeps painting across the whole of it, so the blur and the wash still
+///    run to the top of the screen and only the row of controls moves down;
+///  * both scroll views scroll *under* both bars and pay the bottom one at the
+///    end of their content ([DsSafeArea.scrollPaddingOf]), so the last section
+///    can be dragged clear of the gesture bar instead of hiding behind it;
+///  * the horizontal insets — a landscape notch — are spent once on the shell
+///    frame, which is also what stops the rail from paying for a bar it does
+///    not touch: [DsSafeArea] removes what it spends from the [MediaQuery] it
+///    hands down, so everything below reads zero for those two sides.
+///
+/// The glow is outside all of it and still bleeds off every edge, which is the
+/// half of the ruling that says what *not* to inset. Every inset is zero on a
+/// desktop, and [DsSafeArea] adds no widget at all when it is — so the geometry
+/// pins taken at 1440×900 measure the tree they always measured.
 library;
 
 import 'dart:ui' as ui;
@@ -129,6 +153,12 @@ class _DocsShellState extends State<DocsShell> {
     final DsThemeData theme = DsTheme.of(context);
     final double viewport = MediaQuery.sizeOf(context).width;
     final bool desktop = viewport >= DsBreakpoints.lg;
+    // What the header occupies, status bar included — the box it paints, the
+    // gap the rail starts below, and the room the reading column scrolls under.
+    // All three are the same number by construction, which is why it is read
+    // once here rather than three times below.
+    final double header =
+        DsSafeArea.topBarHeightOf(context, DsWidths.siteHeader);
 
     return DefaultTextStyle(
       // `<body class="… text-foreground">`. Only the colour is ever inherited
@@ -142,24 +172,38 @@ class _DocsShellState extends State<DocsShell> {
           // `background-attachment: fixed` — outside every scroll view.
           const Positioned.fill(child: DsPageGlow()),
           Positioned.fill(
-            child: Center(
-              // `mx-auto max-w-(--width-shell)`.
-              child: SizedBox(
-                width: DsWidths.shell,
-                height: double.infinity,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: <Widget>[
-                    if (desktop)
-                      _Sidebar(controller: _rail, route: widget.route),
-                    Expanded(
-                      child: _Main(
-                        controller: _main,
-                        desktop: desktop,
-                        child: widget.child,
+            // The landscape notch, spent once for the whole frame: both columns
+            // are inside it, and the two sides it pays are removed from the
+            // [MediaQuery] below — so the rail does not then pay a right-hand
+            // inset it is nowhere near. Vertical is *not* spent here; the header
+            // and the two scroll views each owe a different thing.
+            child: DsSafeArea(
+              top: false,
+              bottom: false,
+              child: Center(
+                // `mx-auto max-w-(--width-shell)`.
+                child: SizedBox(
+                  width: DsWidths.shell,
+                  height: double.infinity,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      if (desktop)
+                        _Sidebar(
+                          controller: _rail,
+                          route: widget.route,
+                          header: header,
+                        ),
+                      Expanded(
+                        child: _Main(
+                          controller: _main,
+                          desktop: desktop,
+                          header: header,
+                          child: widget.child,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -168,7 +212,7 @@ class _DocsShellState extends State<DocsShell> {
             top: 0,
             left: 0,
             right: 0,
-            height: DsWidths.siteHeader,
+            height: header,
             child: _Header(theme: theme, viewport: viewport, desktop: desktop),
           ),
           // `<Toaster position="bottom-right" />`, above everything, the way a
@@ -218,45 +262,56 @@ class _Header extends StatelessWidget {
             ),
           ),
           padding: EdgeInsets.symmetric(horizontal: ds(6)),
-          child: Row(
-            children: <Widget>[
-              // `lg:hidden` — the rail takes over above it.
-              if (!desktop) ...<Widget>[const _MobileNavTrigger(), gap],
-              DsPress(
-                onTap: () => AppRouter.of(context).navigate(dsRoot),
-                child: const Logo(),
-              ),
-              // `hidden sm:block`.
-              if (viewport >= DsBreakpoints.sm) ...<Widget>[
-                gap,
-                _VersionPill(theme: theme),
-              ],
-              // `ml-auto` on both the tagline and the toggle: the free space
-              // collects here and the pair sits against the right edge. The
-              // tagline is [Flexible] because a flex item's text wraps when
-              // the row runs out of room rather than pushing past it.
-              Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: <Widget>[
-                    // `hidden md:block`.
-                    if (viewport >= DsBreakpoints.md) ...<Widget>[
-                      Flexible(
-                        child: DsText(
-                          'Desktop-first · 1440 frame · Light & dark',
-                          DsType.micro,
-                        ),
-                      ),
-                      // The header's own `gap-4`…
-                      gap,
-                      // …then the toggle's `md:ml-4`.
-                      gap,
-                    ],
-                    const ThemeToggle(),
-                  ],
+          // Inside the decoration, so the wash, the blur and the bottom rule
+          // still cover the status bar and only the controls clear it — and
+          // inside the `px-6`, so a control clears the design padding *and* the
+          // notch rather than the larger of the two. `bottom` is false because
+          // a bar pinned to the top of the window owes the gesture bar nothing;
+          // the horizontal sides are this bar's own to pay, since it is a
+          // sibling of the shell frame and so inherits none of what the frame
+          // spent.
+          child: DsSafeArea(
+            bottom: false,
+            child: Row(
+              children: <Widget>[
+                // `lg:hidden` — the rail takes over above it.
+                if (!desktop) ...<Widget>[const _MobileNavTrigger(), gap],
+                DsPress(
+                  onTap: () => AppRouter.of(context).navigate(dsRoot),
+                  child: const Logo(),
                 ),
-              ),
-            ],
+                // `hidden sm:block`.
+                if (viewport >= DsBreakpoints.sm) ...<Widget>[
+                  gap,
+                  _VersionPill(theme: theme),
+                ],
+                // `ml-auto` on both the tagline and the toggle: the free space
+                // collects here and the pair sits against the right edge. The
+                // tagline is [Flexible] because a flex item's text wraps when
+                // the row runs out of room rather than pushing past it.
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: <Widget>[
+                      // `hidden md:block`.
+                      if (viewport >= DsBreakpoints.md) ...<Widget>[
+                        Flexible(
+                          child: DsText(
+                            'Desktop-first · 1440 frame · Light & dark',
+                            DsType.micro,
+                          ),
+                        ),
+                        // The header's own `gap-4`…
+                        gap,
+                        // …then the toggle's `md:ml-4`.
+                        gap,
+                      ],
+                      const ThemeToggle(),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -364,10 +419,17 @@ class _MobileNavSheet extends StatelessWidget {
 /// var(--height-site-header))] w-60 shrink-0 overflow-y-auto border-r
 /// border-border px-6 pt-10 scrollbar-thin lg:block`.
 class _Sidebar extends StatelessWidget {
-  const _Sidebar({required this.controller, required this.route});
+  const _Sidebar({
+    required this.controller,
+    required this.route,
+    required this.header,
+  });
 
   final ScrollController controller;
   final String route;
+
+  /// The header's occupied height — [DsWidths.siteHeader] plus the status bar.
+  final double header;
 
   @override
   Widget build(BuildContext context) {
@@ -377,7 +439,7 @@ class _Sidebar extends StatelessWidget {
       child: Column(
         children: <Widget>[
           // The header's own space in the flow; the rail is stuck below it.
-          SizedBox(height: DsWidths.siteHeader),
+          SizedBox(height: header),
           Expanded(
             child: Container(
               decoration: BoxDecoration(
@@ -390,10 +452,19 @@ class _Sidebar extends StatelessWidget {
                 controller: controller,
                 child: SingleChildScrollView(
                   controller: controller,
-                  padding: EdgeInsets.only(
-                    left: ds(6),
-                    right: ds(6),
-                    top: ds(10),
+                  // The rail runs to the bottom of the window, so its last row
+                  // is what the gesture bar would sit on. `NavTree`'s own
+                  // `pb-16` is not that clearance — it is the reference's, and
+                  // it is inside the scrolled content either way; this is
+                  // added to the viewport so the list can still be dragged
+                  // clear. Horizontal reads zero here: the frame spent it.
+                  padding: DsSafeArea.scrollPaddingOf(
+                    context,
+                    base: EdgeInsets.only(
+                      left: ds(6),
+                      right: ds(6),
+                      top: ds(10),
+                    ),
                   ),
                   child: NavTree(
                     route: route,
@@ -416,11 +487,16 @@ class _Main extends StatelessWidget {
   const _Main({
     required this.controller,
     required this.desktop,
+    required this.header,
     required this.child,
   });
 
   final ScrollController controller;
   final bool desktop;
+
+  /// The header's occupied height — [DsWidths.siteHeader] plus the status bar.
+  final double header;
+
   final Widget child;
 
   @override
@@ -429,9 +505,17 @@ class _Main extends StatelessWidget {
       controller: controller,
       child: SingleChildScrollView(
         controller: controller,
-        // What `position: sticky` reserves in the flow. Content scrolls under
-        // the header from here.
-        padding: EdgeInsets.only(top: DsWidths.siteHeader),
+        // Top: what `position: sticky` reserves in the flow. Content scrolls
+        // under the header from here — and on a phone the header is taller by
+        // the status bar, so this is too.
+        //
+        // Bottom: the gesture bar, which the page scrolls under in the same way
+        // and pays for at the end of its content. Both are zero-additions on a
+        // desktop, where this is `EdgeInsets.only(top: 64)` and nothing else.
+        padding: DsSafeArea.scrollPaddingOf(
+          context,
+          base: EdgeInsets.only(top: header),
+        ),
         child: Padding(
           padding: EdgeInsets.symmetric(
             horizontal: desktop ? ds(12) : ds(6),

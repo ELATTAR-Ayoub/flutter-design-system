@@ -139,72 +139,94 @@ class _SidebarDemoPageState extends State<SidebarDemoPage> {
       style: DsText.styleOf(context, DsType.body, color: theme.foreground),
       child: ColoredBox(
         color: theme.background,
-        child: DsSidebarProvider(
-        // `key={`${side}-${variant}-${collapsible}`}` — *"structural shell
-        // settings remount the provider so state from one geometry cannot leak
-        // into the next."*
-        key: ValueKey<String>(
-          '${_sides[_side.index]}-${_variants[_variant.index]}-'
-          '${_collapsibles[_collapsible.index]}',
-        ),
-          variant: _variant,
-          // `className="min-h-svh"`.
-          minHeight: MediaQuery.sizeOf(context).height,
-          children: <Widget>[
-            DsSidebar(
-              side: _side,
-              variant: _variant,
-              collapsible: _collapsible,
-              children: <Widget>[
-                const _DemoHeader(),
-                _DemoContent(
-                  active: _active,
-                  onSelect: (String label) => setState(() => _active = label),
-                ),
-                const _DemoFooter(),
-                // `{collapsible !== "none" && <SidebarRail />}`.
-                if (_collapsible != DsSidebarCollapsible.none)
-                  const DsSidebarRail(),
-              ],
+        // USER-ORDERED MOBILE ADAPTATION (2026-08-16). This route is the one
+        // page that *is* the viewport — no docs chrome above it — so the rule
+        // [DocsShell] follows has to be written here too, in the same shape:
+        // the background above paints to every edge, and the shell inside it
+        // clears the bars. Horizontal is spent once, here, for both columns;
+        // [DsSafeArea] removes it from the [MediaQuery] below, so the panel's
+        // header and footer pay only the two insets they actually touch.
+        //
+        // On a phone this whole page is under 768px, where the panel is a sheet
+        // rather than a column — and `DsSheetContent` insets nothing of its
+        // own, so the same two wrappers are what keep the sheet's rows off the
+        // clock and the gesture bar.
+        child: DsSafeArea(
+          top: false,
+          bottom: false,
+          child: DsSidebarProvider(
+            // `key={`${side}-${variant}-${collapsible}`}` — *"structural shell
+            // settings remount the provider so state from one geometry cannot
+            // leak into the next."*
+            key: ValueKey<String>(
+              '${_sides[_side.index]}-${_variants[_variant.index]}-'
+              '${_collapsibles[_collapsible.index]}',
             ),
-            DsSidebarInset(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+            variant: _variant,
+            // `className="min-h-svh"`.
+            minHeight: MediaQuery.sizeOf(context).height,
+            children: <Widget>[
+              DsSidebar(
+                side: _side,
+                variant: _variant,
+                collapsible: _collapsible,
                 children: <Widget>[
-                  _InsetHeader(active: _active),
-                  // `<div className="flex-1 p-6">` — the scroller, for the
-                  // reason the library note gives.
-                  Expanded(
-                    child: SingleChildScrollView(
-                      padding: EdgeInsets.all(ds(6)),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          const _BackLink(),
-                          _ShellSettings(
-                            side: _side,
-                            variant: _variant,
-                            collapsible: _collapsible,
-                            onSide: (int i) => setState(
-                              () => _side = DsSidebarSide.values[i],
-                            ),
-                            onVariant: (int i) => setState(
-                              () => _variant = DsSidebarVariant.values[i],
-                            ),
-                            onCollapsible: (int i) => setState(
-                              () => _collapsible =
-                                  DsSidebarCollapsible.values[i],
-                            ),
-                          ),
-                          const _Readout(),
-                        ],
-                      ),
-                    ),
+                  const _DemoHeader(),
+                  _DemoContent(
+                    active: _active,
+                    onSelect: (String label) => setState(() => _active = label),
                   ),
+                  const _DemoFooter(),
+                  // `{collapsible !== "none" && <SidebarRail />}`.
+                  if (_collapsible != DsSidebarCollapsible.none)
+                    const DsSidebarRail(),
                 ],
               ),
-            ),
-          ],
+              DsSidebarInset(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    _InsetHeader(active: _active),
+                    // `<div className="flex-1 p-6">` — the scroller, for the
+                    // reason the library note gives.
+                    Expanded(
+                      child: SingleChildScrollView(
+                        // …and the scroller is therefore what owes the gesture
+                        // bar: the readout's last line scrolls clear of it
+                        // instead of resting under it.
+                        padding: DsSafeArea.scrollPaddingOf(
+                          context,
+                          base: EdgeInsets.all(ds(6)),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            const _BackLink(),
+                            _ShellSettings(
+                              side: _side,
+                              variant: _variant,
+                              collapsible: _collapsible,
+                              onSide: (int i) => setState(
+                                () => _side = DsSidebarSide.values[i],
+                              ),
+                              onVariant: (int i) => setState(
+                                () => _variant = DsSidebarVariant.values[i],
+                              ),
+                              onCollapsible: (int i) => setState(
+                                () => _collapsible =
+                                    DsSidebarCollapsible.values[i],
+                              ),
+                            ),
+                            const _Readout(),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -220,49 +242,55 @@ class _DemoHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final DsThemeData theme = DsTheme.of(context);
-    return DsSidebarHeader(
-      children: <Widget>[
-        DsSidebarMenu(
-          children: <Widget>[
-            DsSidebarMenuItem(
-              button: DsSidebarMenuButton(
-                size: DsSidebarMenuButtonSize.lg,
-                tooltip: 'Lumen workspace',
-                child: DsSidebarMenuRow(
+    // The panel runs the full height of the window, so its first row is what
+    // the status bar lands on. The panel's own fill is painted by [DsSidebar]
+    // around this, and keeps reaching the top of the screen.
+    return DsSafeArea(
+      bottom: false,
+      child: DsSidebarHeader(
+        children: <Widget>[
+          DsSidebarMenu(
+            children: <Widget>[
+              DsSidebarMenuItem(
+                button: DsSidebarMenuButton(
                   size: DsSidebarMenuButtonSize.lg,
-                  // `flex size-8 shrink-0 items-center justify-center
-                  //  rounded-lg bg-secondary text-foreground shadow-chip`.
-                  leading: SizedBox(
-                    width: ds(8),
-                    height: ds(8),
-                    child: DsMachineSurface(
-                      spec: DsShadows.chip,
-                      radius: BorderRadius.circular(DsRadii.lg),
-                      fill: theme.secondary,
-                      child: Center(
-                        child: DsIcon(
-                          DsIconGlyph.sparkles,
-                          size: DsIconSize.sm,
-                          tone: DsIconTone.inherit,
+                  tooltip: 'Lumen workspace',
+                  child: DsSidebarMenuRow(
+                    size: DsSidebarMenuButtonSize.lg,
+                    // `flex size-8 shrink-0 items-center justify-center
+                    //  rounded-lg bg-secondary text-foreground shadow-chip`.
+                    leading: SizedBox(
+                      width: ds(8),
+                      height: ds(8),
+                      child: DsMachineSurface(
+                        spec: DsShadows.chip,
+                        radius: BorderRadius.circular(DsRadii.lg),
+                        fill: theme.secondary,
+                        child: Center(
+                          child: DsIcon(
+                            DsIconGlyph.sparkles,
+                            size: DsIconSize.sm,
+                            tone: DsIconTone.inherit,
+                          ),
                         ),
                       ),
                     ),
+                    label: const _WorkspaceLabel(),
+                    trailing: const DsIcon.lucide(DsLucide.chevronsUpDown),
                   ),
-                  label: const _WorkspaceLabel(),
-                  trailing: const DsIcon.lucide(DsLucide.chevronsUpDown),
                 ),
               ),
-            ),
-          ],
-        ),
-        // DRIFT 3: `group-data-[collapsible=icon]:hidden`, written at the call
-        // site here exactly as it is there.
-        if (!DsSidebarChrome.iconModeOf(context))
-          const DsSidebarInput(
-            placeholder: 'Search cards',
-            label: 'Search cards',
+            ],
           ),
-      ],
+          // DRIFT 3: `group-data-[collapsible=icon]:hidden`, written at the
+          // call site here exactly as it is there.
+          if (!DsSidebarChrome.iconModeOf(context))
+            const DsSidebarInput(
+              placeholder: 'Search cards',
+              label: 'Search cards',
+            ),
+        ],
+      ),
     );
   }
 }
@@ -399,42 +427,48 @@ class _DemoFooter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double glyph = DsButton.iconPxFor(DsSidebarMenuButtonSize.md.button);
-    return DsSidebarFooter(
-      children: <Widget>[
-        DsSidebarMenu(
-          children: <Widget>[
-            DsSidebarMenuItem(
-              button: DsSidebarMenuButton(
-                tooltip: "What's new",
-                child: DsSidebarMenuRow(
-                  leading: DsIcon(DsIconGlyph.bell, sizePx: glyph),
-                  label: const DsSidebarMenuLabel("What's new"),
+    // The panel's floor, and so the row the gesture bar would sit on. `top` is
+    // false: the status bar is the header's to pay, and paying it twice would
+    // push the footer up by the height of the clock.
+    return DsSafeArea(
+      top: false,
+      child: DsSidebarFooter(
+        children: <Widget>[
+          DsSidebarMenu(
+            children: <Widget>[
+              DsSidebarMenuItem(
+                button: DsSidebarMenuButton(
+                  tooltip: "What's new",
+                  child: DsSidebarMenuRow(
+                    leading: DsIcon(DsIconGlyph.bell, sizePx: glyph),
+                    label: const DsSidebarMenuLabel("What's new"),
+                  ),
+                ),
+                // `<SidebarMenuBadge variant="ghost">2</SidebarMenuBadge>`.
+                //
+                // The reference writes this one **inside** the button rather
+                // than beside it, and the two spellings render the same pixels:
+                // the badge is `absolute top-1/2 right-2`, and on a row with no
+                // submenu the button's box and the item's are the same box. The
+                // `pr-16` lane fires either way — it is
+                // `group-has-data-[sidebar=menu-badge]/menu-item`, which reads
+                // the item's whole subtree. The port has one slot for it.
+                badge: const DsSidebarMenuBadge('2',
+                    variant: DsBadgeVariant.ghost),
+              ),
+              DsSidebarMenuItem(
+                button: DsSidebarMenuButton(
+                  tooltip: 'Docs',
+                  child: DsSidebarMenuRow(
+                    leading: const DsIcon.lucide(DsLucide.bookOpen),
+                    label: const DsSidebarMenuLabel('Docs'),
+                  ),
                 ),
               ),
-              // `<SidebarMenuBadge variant="ghost">2</SidebarMenuBadge>`.
-              //
-              // The reference writes this one **inside** the button rather
-              // than beside it, and the two spellings render the same pixels:
-              // the badge is `absolute top-1/2 right-2`, and on a row with no
-              // submenu the button's box and the item's are the same box. The
-              // `pr-16` lane fires either way — it is
-              // `group-has-data-[sidebar=menu-badge]/menu-item`, which reads
-              // the item's whole subtree. The port has one slot for it.
-              badge: const DsSidebarMenuBadge('2',
-                  variant: DsBadgeVariant.ghost),
-            ),
-            DsSidebarMenuItem(
-              button: DsSidebarMenuButton(
-                tooltip: 'Docs',
-                child: DsSidebarMenuRow(
-                  leading: const DsIcon.lucide(DsLucide.bookOpen),
-                  label: const DsSidebarMenuLabel('Docs'),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ],
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
@@ -455,31 +489,42 @@ class _InsetHeader extends StatelessWidget {
     final bool wide = MediaQuery.sizeOf(context).width >= DsBreakpoints.sm;
 
     return Container(
-      height: DsWidths.siteHeader,
+      // The inset's own top bar, and on this route there is nothing above it —
+      // so it grows by the status bar exactly as [DocsShell]'s header does, and
+      // its bottom rule stays where the header ends rather than where the clock
+      // does. Under the `inset` variant the column carries an 8px margin above
+      // this box, so the trigger lands 8px lower than it strictly must; the
+      // overpay is the variant's margin and is left alone rather than
+      // subtracted, because a control below the bar is right and a control
+      // under it is not.
+      height: DsSafeArea.topBarHeightOf(context, DsWidths.siteHeader),
       padding: EdgeInsets.symmetric(horizontal: ds(6)),
       decoration: BoxDecoration(
         border: Border(
           bottom: BorderSide(color: theme.border, width: DsWidths.hairline),
         ),
       ),
-      child: Row(
-        children: <Widget>[
-          const DsSidebarTrigger(),
-          SizedBox(width: ds(3)),
-          DsText(active, DsType.label),
-          // `ml-auto flex items-center gap-2`.
-          const Spacer(),
-          if (wide) ...<Widget>[
-            // `.type-caption` declares no colour, so `text-muted-foreground`
-            // is doing real work at both caption sites on this page.
-            DsText('Toggle with', DsType.caption,
-                color: theme.mutedForeground),
+      child: DsSafeArea(
+        bottom: false,
+        child: Row(
+          children: <Widget>[
+            const DsSidebarTrigger(),
+            SizedBox(width: ds(3)),
+            DsText(active, DsType.label),
+            // `ml-auto flex items-center gap-2`.
+            const Spacer(),
+            if (wide) ...<Widget>[
+              // `.type-caption` declares no colour, so `text-muted-foreground`
+              // is doing real work at both caption sites on this page.
+              DsText('Toggle with', DsType.caption,
+                  color: theme.mutedForeground),
+              SizedBox(width: ds(2)),
+            ],
+            const DsKbd('⌘'),
             SizedBox(width: ds(2)),
+            const DsKbd('B'),
           ],
-          const DsKbd('⌘'),
-          SizedBox(width: ds(2)),
-          const DsKbd('B'),
-        ],
+        ),
       ),
     );
   }

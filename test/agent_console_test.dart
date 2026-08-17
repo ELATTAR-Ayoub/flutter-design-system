@@ -1165,4 +1165,267 @@ void main() {
       expect(rimOf(), light.input);
     });
   });
+
+  /* ── USER-ORDERED MOBILE ADAPTATION ──────────────────────────────────────
+     The console's composer is bottom-anchored, so on a phone it was the one
+     field guaranteed to sit behind the software keyboard — including inside
+     the launcher's dialog, which is where it was reported. The console pays it
+     with a spacer of `viewInsets.bottom` at the end of its own column: the
+     composer lifts by the keyboard's height and the `flex-1` scroller gives up
+     exactly that much. Nothing here is a translation; what is pinned is the
+     rule, the arithmetic, and the fact that a desktop frame is untouched.   */
+
+  group('AgentConsole — the composer rises off the software keyboard', () {
+    const Size phone = Size(375, 812);
+    const double keyboard = 300;
+
+    /// The console under a MediaQuery whose bottom inset a test can move
+    /// without rebuilding the console — the keyboard opening is a change of
+    /// dependency, not a change of tree, exactly as it is on a device.
+    Future<void> pumpConsole(
+      WidgetTester tester,
+      ValueNotifier<double> inset, {
+      required DsAgentTransport transport,
+    }) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = phone;
+      addTearDown(tester.view.reset);
+
+      final DsThemeController theme = DsThemeController(mode: DsThemeMode.light);
+      addTearDown(theme.dispose);
+
+      await tester.pumpWidget(
+        DsTheme(
+          controller: theme,
+          child: Directionality(
+            textDirection: TextDirection.ltr,
+            child: ValueListenableBuilder<double>(
+              valueListenable: inset,
+              // Held outside the builder, so the console's element — and its
+              // state, its scroll offset, its draft — survives the keyboard.
+              child: DsAgentConsole(transport: transport),
+              builder: (BuildContext context, double bottom, Widget? console) =>
+                  MediaQuery(
+                data: MediaQueryData(
+                  size: phone,
+                  viewInsets: EdgeInsets.only(bottom: bottom),
+                  disableAnimations: true,
+                ),
+                child: Builder(
+                  builder: (BuildContext context) => DefaultTextStyle(
+                    style: DsText.styleOf(
+                      context,
+                      DsType.body,
+                      color: DsTheme.of(context).foreground,
+                    ),
+                    child: console!,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+    }
+
+    ScrollPosition scrollerOf(WidgetTester tester) => tester
+        .state<ScrollableState>(
+          find
+              .descendant(
+                of: find.byType(DsAgentConsole),
+                matching: find.byType(Scrollable),
+              )
+              .first,
+        )
+        .position;
+
+    _FakeTransport chatty() => _FakeTransport(
+          turns: <DsAgentTurn>[
+            for (int i = 0; i < 20; i++)
+              DsUserTurn(id: 'u$i', text: 'A message long enough to stack up $i'),
+          ],
+        );
+
+    testWidgets('the composer sits fully above a 300pt keyboard at 375×812',
+        (WidgetTester tester) async {
+      await pumpConsole(
+        tester,
+        ValueNotifier<double>(keyboard),
+        transport: chatty(),
+      );
+
+      final Rect composer = tester.getRect(find.byType(DsAgentComposer));
+      // The order's own test: fully above the keyboard's top edge.
+      expect(composer.bottom, lessThanOrEqualTo(phone.height - keyboard));
+      // And by exactly the console's own `p-5` and not a pixel more — the lift
+      // is the keyboard's height, not a guess at it.
+      expect(
+        composer.bottom,
+        closeTo(phone.height - keyboard - DsAgentConsole.padding, 0.01),
+      );
+      // The console itself did not move or resize; the spacer is internal.
+      expect(tester.getRect(find.byType(DsAgentConsole)),
+          Rect.fromLTWH(0, 0, phone.width, phone.height));
+      // And the composer wears the family's own hook as well, so it is covered
+      // on the surfaces where nothing above it has made the room.
+      expect(
+        find.descendant(
+          of: find.byType(DsAgentComposer),
+          matching: find.byType(DsFieldVisibility),
+        ),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('the scroller gives up exactly what the composer gains',
+        (WidgetTester tester) async {
+      final ValueNotifier<double> inset = ValueNotifier<double>(0);
+      await pumpConsole(tester, inset, transport: chatty());
+
+      // The scroller's own box, read off its position rather than off the
+      // content it holds — the transcript is longer than the viewport here,
+      // which is the case the order is about.
+      final double restingScroller = scrollerOf(tester).viewportDimension;
+      final double restingComposer =
+          tester.getRect(find.byType(DsAgentComposer)).bottom;
+      // With no keyboard the composer sits on the console's own bottom inset.
+      expect(restingComposer,
+          closeTo(phone.height - DsAgentConsole.padding, 0.01));
+
+      inset.value = keyboard;
+      await tester.pump();
+
+      expect(
+        restingComposer - tester.getRect(find.byType(DsAgentComposer)).bottom,
+        closeTo(keyboard, 0.01),
+      );
+      expect(
+        restingScroller - scrollerOf(tester).viewportDimension,
+        closeTo(keyboard, 0.01),
+      );
+    });
+
+    testWidgets('stick-to-bottom survives the keyboard opening',
+        (WidgetTester tester) async {
+      final ValueNotifier<double> inset = ValueNotifier<double>(0);
+      final _FakeTransport transport = chatty();
+      await pumpConsole(tester, inset, transport: transport);
+
+      // Ride the bottom the way a reader does: any transport notification
+      // autoscrolls while pinned.
+      transport.abort();
+      await tester.pump();
+      await tester.pump();
+      // Read as numbers, not as a handle: the position object is live and
+      // would report the new extent under the old name.
+      final double restingExtent = scrollerOf(tester).maxScrollExtent;
+      expect(scrollerOf(tester).pixels, restingExtent);
+      expect(restingExtent, greaterThan(0));
+
+      inset.value = keyboard;
+      await tester.pump();
+      await tester.pump();
+
+      final ScrollPosition after = scrollerOf(tester);
+      // The viewport lost the keyboard's height, so there is more to scroll —
+      // and the reader is still at the bottom of it, which is the console's
+      // one scroll promise.
+      expect(after.maxScrollExtent - restingExtent, closeTo(keyboard, 0.01));
+      expect(after.pixels, after.maxScrollExtent);
+    });
+
+    testWidgets('and inside the launcher dialog, where it was reported',
+        (WidgetTester tester) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = phone;
+      addTearDown(tester.view.reset);
+
+      final DsThemeController theme = DsThemeController(mode: DsThemeMode.light);
+      addTearDown(theme.dispose);
+
+      await tester.pumpWidget(
+        DsTheme(
+          controller: theme,
+          child: Directionality(
+            textDirection: TextDirection.ltr,
+            child: MediaQuery(
+              data: const MediaQueryData(
+                size: phone,
+                viewInsets: EdgeInsets.only(bottom: keyboard),
+                disableAnimations: true,
+              ),
+              child: Builder(
+                builder: (BuildContext context) => DefaultTextStyle(
+                  style: DsText.styleOf(
+                    context,
+                    DsType.body,
+                    color: DsTheme.of(context).foreground,
+                  ),
+                  child: Overlay(
+                    initialEntries: <OverlayEntry>[
+                      OverlayEntry(
+                        builder: (BuildContext context) => Align(
+                          alignment: Alignment.topLeft,
+                          child: DsAgentLauncher(
+                            label: 'Ask the assistant',
+                            title: 'Vault',
+                            description: 'x',
+                            child: DsAgentConsole(transport: chatty()),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      // Open it: the console is now inside a dialog the console does not size,
+      // which is the surface the bug was reported against.
+      await tester.tap(find.byType(DsCubeAvatar));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(DsAgentComposer), findsOneWidget);
+      expect(
+        tester.getRect(find.byType(DsAgentComposer)).bottom,
+        lessThanOrEqualTo(phone.height - keyboard),
+      );
+    });
+
+    testWidgets('with no keyboard the console builds the tree it always did',
+        (WidgetTester tester) async {
+      await pumpConsole(
+        tester,
+        ValueNotifier<double>(0),
+        transport: chatty(),
+      );
+
+      // The spacer is built ONLY when there is a keyboard, so a desktop tree is
+      // identical widget for widget to the one before this change. Nothing but
+      // the composer's own gap sits under it.
+      expect(
+        tester.getRect(find.byType(DsAgentComposer)).bottom,
+        closeTo(phone.height - DsAgentConsole.padding, 0.01),
+      );
+      final Column column = tester.widget<Column>(
+        find
+            .descendant(
+              of: find.byType(DsAgentConsole),
+              matching: find.byType(Column),
+            )
+            .first,
+      );
+      expect(
+        column.children.whereType<SizedBox>().where(
+              (SizedBox box) => box.height == 0,
+            ),
+        isEmpty,
+      );
+    });
+  });
 }

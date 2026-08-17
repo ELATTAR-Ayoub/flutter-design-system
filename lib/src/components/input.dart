@@ -44,9 +44,18 @@
 /// field renders what was typed. Nothing on the ported pages shows it: the
 /// invite-code field carries a placeholder that is already uppercase and no
 /// seeded value.
+///
+/// USER-ORDERED MOBILE ADAPTATION: this file also owns [DsFieldVisibility], the
+/// whole family's one keyboard-avoidance mechanism — the field surface is
+/// shared here, so the focus plumbing that keeps a focused field off the
+/// software keyboard is shared here too. It is inert wherever there is no
+/// software keyboard, so nothing on a desktop frame changes by a pixel.
 library;
 
-import 'package:flutter/semantics.dart';
+// `rendering.dart` for [RenderAbstractViewport], which [DsFieldVisibility]
+// measures the keyboard against; it re-exports `semantics.dart`, which this
+// file used to import for [SemanticsValidationResult] alone.
+import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
 import '../effects/machine_surface.dart';
@@ -440,21 +449,28 @@ class _DsInputState extends State<DsInput> {
       child: IgnorePointer(ignoring: !enabled, child: field),
     );
 
-    if (label == null && hint == null && !invalid) return field;
-    return Semantics(
-      textField: true,
-      label: label,
-      hint: hint,
-      readOnly: widget.readOnly,
-      enabled: enabled,
-      // `aria-invalid`. `.valid` is deliberately never used: the web emits
-      // `aria-invalid="false"` on a valid field, which announces nothing, and
-      // `.valid` would announce a state the reference does not (forms-map §3.5).
-      validationResult: invalid
-          ? SemanticsValidationResult.invalid
-          : SemanticsValidationResult.none,
-      child: field,
-    );
+    if (label != null || hint != null || invalid) {
+      field = Semantics(
+        textField: true,
+        label: label,
+        hint: hint,
+        readOnly: widget.readOnly,
+        enabled: enabled,
+        // `aria-invalid`. `.valid` is deliberately never used: the web emits
+        // `aria-invalid="false"` on a valid field, which announces nothing, and
+        // `.valid` would announce a state the reference does not
+        // (forms-map §3.5).
+        validationResult: invalid
+            ? SemanticsValidationResult.invalid
+            : SemanticsValidationResult.none,
+        child: field,
+      );
+    }
+
+    // USER-ORDERED MOBILE ADAPTATION — see [DsFieldVisibility]. Outermost, so
+    // what gets revealed is the whole control including its socket, and free on
+    // every desktop frame.
+    return DsFieldVisibility(focusNode: _focusNode, child: field);
   }
 }
 
@@ -562,6 +578,253 @@ class DsFieldSurface extends StatelessWidget {
       ),
     );
   }
+}
+
+/* ── USER-ORDERED MOBILE ADAPTATION: a focused field is never behind the
+      software keyboard ──────────────────────────────────────────────────── */
+
+/// Keeps the focused field visible above the software keyboard.
+///
+/// **USER-ORDERED MOBILE ADAPTATION.** This translates nothing: the reference
+/// never needed it, because the *browser* does it. A phone browser shrinks the
+/// visual viewport when the on-screen keyboard opens and scrolls the focused
+/// `<input>` back into it, and no rule in `globals.css` asks for that — it is
+/// UA behaviour the web design system inherits for free. A Flutter widget layer
+/// with no `Scaffold` beneath it inherits nothing, so on a phone the console's
+/// composer was typed into from behind the keyboard.
+///
+/// **One place, so the class of bug cannot come back.** Every field in the
+/// family — [DsInput], `DsTextarea`, `DsInputOtp`, the agent composer — wraps
+/// itself in one of these and passes the focus node it actually resolved. A
+/// control added later inherits the behaviour by using the same plumbing rather
+/// than by remembering a rule; the mechanism is not restated anywhere.
+///
+/// **Desktop is byte-identical.** Every path is gated on
+/// `MediaQuery.viewInsets.bottom > 0`, which is the one honest signal that a
+/// software keyboard is on screen. With none, this widget builds its child and
+/// does nothing else: it owns no render object, adds no padding, changes no
+/// constraint, and never touches a scroll position. It is not a layout widget.
+///
+/// **Two triggers, because focus and the keyboard are not the same moment.** On
+/// a real device the tap focuses the field and the keyboard animates in
+/// *afterwards*, so the reveal that matters is the inset change, not the focus
+/// gain. Focusing a second field while the keyboard is already up is the other
+/// order, and both are handled.
+///
+/// **It composes with whoever else made room.** The reveal asks how much of the
+/// enclosing viewport the keyboard is actually standing on, so a scroller an
+/// ancestor has already lifted clear of the keyboard — [DsAgentConsole]'s own
+/// composer lift, a sheet that resized — contributes zero occlusion and the
+/// field is merely brought inside the viewport with a margin. Nothing
+/// double-counts.
+class DsFieldVisibility extends StatefulWidget {
+  const DsFieldVisibility({
+    super.key,
+    required this.focusNode,
+    required this.child,
+  });
+
+  /// The node whose focus decides when to reveal.
+  ///
+  /// A field that resolves its node from three places — its own prop, the
+  /// [DsFieldScope]'s, the one it owns — passes whichever won, so the reveal
+  /// follows the same node the caret does.
+  final FocusNode focusNode;
+
+  final Widget child;
+
+  /// The clearance left between the field and the edge it is pushed off — the
+  /// `gap-2` rung, the smallest gap in the system that reads as deliberate
+  /// rather than as a rounding error.
+  static double get margin => ds(2);
+
+  /// How long the reveal takes.
+  ///
+  /// [DsDurations.fast] rather than the transition default: the OS keyboard is
+  /// already sliding up over it, and a field that arrives first reads as having
+  /// been in the clear all along.
+  static Duration get travel => DsDurations.fast;
+
+  @override
+  State<DsFieldVisibility> createState() => _DsFieldVisibilityState();
+}
+
+class _DsFieldVisibilityState extends State<DsFieldVisibility> {
+  /// `MediaQuery.viewInsets.bottom` — how much of the window the keyboard has
+  /// taken.
+  ///
+  /// Cached from [didChangeDependencies] rather than read where it is used: the
+  /// reveal runs from a focus listener and a post-frame callback, and neither is
+  /// a place to be registering an inherited-widget dependency.
+  double _keyboardInset = 0;
+
+  /// `MediaQuery.size.height`, cached for the same reason. The keyboard's top
+  /// edge is this minus [_keyboardInset], in the global coordinates
+  /// `localToGlobal` speaks.
+  double _windowHeight = 0;
+
+  bool _focused = false;
+  bool _scheduled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.focusNode.addListener(_onFocusChanged);
+    _focused = widget.focusNode.hasFocus;
+  }
+
+  @override
+  void didUpdateWidget(DsFieldVisibility old) {
+    super.didUpdateWidget(old);
+    if (identical(old.focusNode, widget.focusNode)) return;
+    old.focusNode.removeListener(_onFocusChanged);
+    widget.focusNode.addListener(_onFocusChanged);
+    _focused = widget.focusNode.hasFocus;
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _windowHeight = MediaQuery.maybeSizeOf(context)?.height ?? 0;
+    final double next = MediaQuery.maybeViewInsetsOf(context)?.bottom ?? 0;
+    final bool opened = next > _keyboardInset;
+    _keyboardInset = next;
+    // The keyboard arrives *after* the tap that focused the field, so on a real
+    // device this — not the focus gain — is the trigger that does the work.
+    if (opened && _focused) _schedule();
+  }
+
+  @override
+  void dispose() {
+    widget.focusNode.removeListener(_onFocusChanged);
+    super.dispose();
+  }
+
+  void _onFocusChanged() {
+    final bool focused = widget.focusNode.hasFocus;
+    if (focused == _focused) return;
+    _focused = focused;
+    // Focus alone is not the trigger. With no keyboard on screen there is
+    // nothing for the field to be hidden behind, and a desktop field must not
+    // move a pixel — which is the whole of the desktop guarantee.
+    if (focused && _keyboardInset > 0) _schedule();
+  }
+
+  /// Runs the reveal after the frame that provoked it, so it measures the
+  /// layout the user is about to see rather than the one being replaced.
+  void _schedule() {
+    if (_scheduled) return;
+    _scheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((Duration _) {
+      _scheduled = false;
+      _reveal();
+    });
+  }
+
+  void _reveal() {
+    if (!mounted || _keyboardInset <= 0) return;
+    final RenderObject? box = context.findRenderObject();
+    if (box == null || !box.attached) return;
+
+    // Every scroller between the field and the root, innermost first — the walk
+    // `Scrollable.ensureVisible` makes, and for its reason: a field inside a
+    // scrolling card inside a scrolling page needs both of them to move.
+    RenderObject target = box;
+    BuildContext host = context;
+    ScrollableState? scrollable = Scrollable.maybeOf(host);
+    while (scrollable != null) {
+      _revealIn(scrollable, target);
+      host = scrollable.context;
+      final RenderObject? outer = host.findRenderObject();
+      if (outer == null) return;
+      target = outer;
+      scrollable = Scrollable.maybeOf(host);
+    }
+  }
+
+  /// Scrolls one viewport just far enough that [target] clears both its own
+  /// edges and the keyboard, and not one pixel further.
+  void _revealIn(ScrollableState scrollable, RenderObject target) {
+    final ScrollPosition position = scrollable.position;
+    // A horizontal scroller cannot move anything out from under a keyboard that
+    // occupies the bottom of the window, and a position with no dimensions yet
+    // has nothing to say.
+    if (position.axis != Axis.vertical || !position.hasPixels) return;
+    if (!position.hasContentDimensions) return;
+
+    final RenderAbstractViewport? viewport =
+        RenderAbstractViewport.maybeOf(target);
+    if (viewport == null) return;
+
+    final double margin = DsFieldVisibility.margin;
+    final Rect bounds = target.paintBounds;
+    // The rect is the field's own box grown by the margin, and grown again at
+    // the bottom by however much of THIS viewport the keyboard covers. Revealing
+    // the grown rect at the viewport's trailing edge therefore lands the real
+    // field a margin above the keyboard's top edge.
+    final Rect rect = Rect.fromLTRB(
+      bounds.left,
+      bounds.top - margin,
+      bounds.right,
+      bounds.bottom + margin + _occlusionOf(viewport),
+    );
+
+    final double leading = viewport.getOffsetToReveal(target, 0, rect: rect).offset;
+    final double trailing =
+        viewport.getOffsetToReveal(target, 1, rect: rect).offset;
+    final double pixels = position.pixels;
+
+    final double wanted;
+    if (pixels > leading) {
+      // Off the top: scroll back down to it.
+      wanted = leading;
+    } else if (pixels < trailing) {
+      // Under the keyboard, or off the bottom: scroll up.
+      wanted = trailing;
+    } else {
+      // Already in the clear — and this is the branch that runs on every
+      // already-visible field, which is why nothing moves when nothing must.
+      return;
+    }
+
+    final double landing =
+        wanted.clamp(position.minScrollExtent, position.maxScrollExtent);
+    if (landing == pixels) return;
+
+    final Duration travel =
+        dsAnimationDuration(context, DsFieldVisibility.travel);
+    // `prefers-reduced-motion` collapses the beat to nothing, and a driven
+    // scroll activity refuses a zero duration — so at zero it is a jump, which
+    // is what "no animation" means for a scroll offset.
+    if (travel == Duration.zero) {
+      position.jumpTo(landing);
+      return;
+    }
+    position.animateTo(landing, duration: travel, curve: DsCurves.out);
+  }
+
+  /// How much of [viewport]'s own box the keyboard is standing on.
+  ///
+  /// Zero once something above has already made the room — which is what lets
+  /// the console's composer lift and this reveal run at the same time without
+  /// paying for the keyboard twice.
+  ///
+  /// Typed [RenderObject] rather than [RenderAbstractViewport] so the `is
+  /// RenderBox` test can promote: `RenderBox` is not a subtype of the viewport
+  /// interface, and Dart only promotes downwards.
+  double _occlusionOf(RenderObject viewport) {
+    if (viewport is! RenderBox || !viewport.hasSize) return 0;
+    final double keyboardTop = _windowHeight - _keyboardInset;
+    final double viewportBottom =
+        viewport.localToGlobal(Offset.zero).dy + viewport.size.height;
+    final double overlap = viewportBottom - keyboardTop;
+    return overlap > 0 ? overlap : 0;
+  }
+
+  // No render object, no padding, no constraint: the child is returned exactly
+  // as it arrived. Everything this widget does, it does to a scroll offset.
+  @override
+  Widget build(BuildContext context) => widget.child;
 }
 
 /// [DsFieldSurface] at the pill radius, with the field's own padding inside it.

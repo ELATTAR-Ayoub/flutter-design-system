@@ -76,6 +76,24 @@
 ///    reference filters inside the card; `DsWelcomeCard` takes a capability
 ///    list with no group on it, so the filter moved up here. Same three chips
 ///    on screen, and `MAX_CAPABILITIES = 4` is still never binding.
+///
+/// ## USER-ORDERED MOBILE ADAPTATION — the composer rises off the keyboard
+///
+/// Not a translation of anything: the reference's composer is a `<textarea>` in
+/// a browser, and a browser shrinks its own visual viewport and scrolls the
+/// focused field back into it. A widget layer with no `Scaffold` under it does
+/// neither, so on a phone the composer — bottom-anchored by construction, and
+/// inside the launcher's dialog at that — sat *behind* the software keyboard
+/// and the user typed into a field they could not see.
+///
+/// The console pays it in the one place it can: a spacer of
+/// `MediaQuery.viewInsets.bottom` at the end of its column, so the composer
+/// lifts by the keyboard's height and the `flex-1` scroller gives up the same
+/// amount — the transcript stays whole, just shorter, and the stick-to-bottom
+/// promise is re-honoured across the change. The general rule for every *other*
+/// field in the system is [DsFieldVisibility], which this console's own
+/// composer also wears. Both are inert with no keyboard on screen: a desktop
+/// console builds the identical tree it built before.
 library;
 
 import 'package:flutter/widgets.dart';
@@ -306,11 +324,35 @@ class _DsAgentConsoleState extends State<DsAgentConsole> {
   /// Whether the reader is still riding the bottom.
   bool _pinned = true;
 
+  /// USER-ORDERED MOBILE ADAPTATION — `MediaQuery.viewInsets.bottom`, the
+  /// height the software keyboard has taken off the window.
+  ///
+  /// Read here rather than in [build] so the dependency is registered once, in
+  /// the callback the framework provides for it, and so a change can be
+  /// noticed: the scroller shrinks when the keyboard opens, and a reader who
+  /// was riding the bottom has to be put back there.
+  ///
+  /// Zero on every desktop frame, where the whole adaptation costs one
+  /// comparison and builds nothing.
+  double _keyboardInset = 0;
+
   @override
   void initState() {
     super.initState();
     widget.transport.addListener(_onTransport);
     _draft.addListener(_onDraft);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final double next = MediaQuery.maybeViewInsetsOf(context)?.bottom ?? 0;
+    if (next == _keyboardInset) return;
+    _keyboardInset = next;
+    // The composer just moved and the scroller just changed height. Stick-to-
+    // bottom is the console's one scroll promise, so it is re-honoured here for
+    // the same reason it is after a turn arrives.
+    _autoscroll();
   }
 
   @override
@@ -525,6 +567,34 @@ class _DsAgentConsoleState extends State<DsAgentConsole> {
                     )
                   : null,
             ),
+            // USER-ORDERED MOBILE ADAPTATION — the composer rises by exactly
+            // the keyboard's height, and the scroller above it (which is the
+            // only `Expanded` in this column) gives up exactly that much.
+            //
+            // Not padding and not a `SafeArea`: a spacer at the end of the
+            // column is the one expression that shrinks the transcript by the
+            // same amount it lifts the composer, which is what keeps the last
+            // turn readable while the user types a reply to it. The composer is
+            // bottom-anchored inside a box the console does not own — a dialog's
+            // in the launcher — so it moves within that box rather than asking
+            // the box to move.
+            //
+            // Built only when there is a keyboard, so a desktop tree is
+            // identical widget for widget to the one before this change.
+            // `viewInsets` is the ambient contract: an ancestor that has already
+            // made room is expected to have consumed it (`MediaQuery.removeView
+            // Insets`), and this then reads zero and nothing double-counts.
+            //
+            // BOUNDARY, recorded rather than patched: a console pinned to a
+            // height shorter than its own chrome plus the keyboard has nowhere
+            // to put the lift, and the column overflows — which is what
+            // `Scaffold(resizeToAvoidBottomInset: true)` does with a body too
+            // tall for what is left, since it pads rather than measures. Every
+            // surface that mounts a console on a phone sizes it from the
+            // viewport (the launcher's dialog, a full-bleed page); the two
+            // pinned heights are the docs page's own `h-152` and `h-80`
+            // specimens.
+            if (_keyboardInset > 0) SizedBox(height: _keyboardInset),
           ],
         ),
       ),

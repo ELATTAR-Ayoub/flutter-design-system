@@ -156,13 +156,25 @@ class DsAgentLauncher extends StatefulWidget {
   /// past ~2133px of viewport, `60vw` exceeds `80rem` and **the cap stops
   /// binding** — a 2400px window gets a 1440px dialog, not a 1280px one. A
   /// naive `clamp(min, max)` throws there rather than reproducing it.
+  ///
+  /// USER-ORDERED MOBILE ADAPTATION — and the `min-width` is exactly why the
+  /// clamp has to be applied here rather than left to the modal host. `60vw`
+  /// is a *floor*, so on a phone the CSS keeps the dialog at 88vh tall however
+  /// small the screen gets: at 375x812 the spec above resolves to 292.5 x
+  /// 714.6, and 714.6 is 88% of the viewport with nothing left for the scrim.
+  /// [DsModalCompact.clampSize] takes the last word — 292.5 x 609 — and the
+  /// host's identical box then binds nothing. Above the breakpoint the clamp
+  /// is the identity and every measured number here is unchanged.
   static Size dialogSize(Size viewport) {
     final double width = viewport.width * dialogViewportFraction;
     final double capped = math.min(width, dialogMaxWidth);
-    return Size(
-      math.max(viewport.width * dialogMinFraction, capped),
-      // `h-[min(88vh,52rem)]` — a plain `min()`, both arms non-negative.
-      math.min(viewport.height * dialogHeightFraction, dialogMaxHeight),
+    return DsModalCompact.clampSize(
+      Size(
+        math.max(viewport.width * dialogMinFraction, capped),
+        // `h-[min(88vh,52rem)]` — a plain `min()`, both arms non-negative.
+        math.min(viewport.height * dialogHeightFraction, dialogMaxHeight),
+      ),
+      viewport,
     );
   }
 

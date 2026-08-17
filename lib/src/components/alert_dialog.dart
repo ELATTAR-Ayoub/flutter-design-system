@@ -149,13 +149,32 @@ class DsAlertDialogContent extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              // The header is inside `p-4`, unlike the dialog's banded one.
-              Padding(
-                padding: EdgeInsets.fromLTRB(pad, pad, pad, 0),
-                child: header,
+              // USER-ORDERED MOBILE ADAPTATION — the question scrolls, the
+              // decision does not. Same mechanism and same reasoning as
+              // [DsDialogContent]'s, with one band instead of two: a loose
+              // [Flexible] leaves the layout untouched wherever there is room,
+              // and the footer is the one thing that must stay reachable when
+              // there is not. A long consequence — the danger zone's
+              // *"Delete my account and all files"* paragraph on a 375px
+              // phone — is exactly the case this exists for.
+              Flexible(
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      // The header is inside `p-4`, unlike the dialog's banded
+                      // one.
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(pad, pad, pad, 0),
+                        child: header,
+                      ),
+                      // `gap-4`.
+                      SizedBox(height: pad),
+                    ],
+                  ),
+                ),
               ),
-              // `gap-4`.
-              SizedBox(height: pad),
               // The footer bleeds: `-mx-4 -mb-4`.
               footer,
             ],

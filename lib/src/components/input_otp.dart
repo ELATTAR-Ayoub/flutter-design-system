@@ -60,6 +60,9 @@ import 'button.dart';
 import 'field.dart';
 import 'icon.dart';
 import 'icon_paths.dart';
+// [DsFieldVisibility] — the field family's one keyboard-avoidance hook, which
+// lives beside the shared field surface. USER-ORDERED MOBILE ADAPTATION.
+import 'input.dart';
 
 /// `data-[active=true]:ring-ring/50`.
 const double _activeRingAlpha = 0.50;
@@ -371,7 +374,7 @@ class _DsInputOtpState extends State<DsInputOtp> {
       child: field,
     );
 
-    return Semantics(
+    field = Semantics(
       textField: true,
       label: label,
       hint: hint,
@@ -381,6 +384,12 @@ class _DsInputOtpState extends State<DsInputOtp> {
           : SemanticsValidationResult.none,
       child: field,
     );
+
+    // USER-ORDERED MOBILE ADAPTATION — the family's one hook, from
+    // [DsFieldVisibility]. A one-time code arrives while the keyboard is open by
+    // definition, so this is the field of the three that could least afford to
+    // be the exception.
+    return DsFieldVisibility(focusNode: _focusNode, child: field);
   }
 
   /// One `InputOTPGroup` — `flex items-center rounded-lg`, plus the invalid
