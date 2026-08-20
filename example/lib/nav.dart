@@ -73,6 +73,12 @@ class DsGroup {
 /// `DS_ROOT` — every route in the tree hangs off this one segment.
 const String dsRoot = '/design-system';
 
+/// Product showcase route, deliberately outside the documentation tree.
+///
+/// The docs chrome links to it, but it is not a component specimen and must
+/// not appear as a design-system category.
+const String showcaseRoute = '/signal-studio';
+
 /// A page-foot / sidebar link: what [siblings] hands back for prev and next.
 typedef DsNavLink = ({String title, String href});
 
@@ -678,8 +684,8 @@ const List<DsGroup> dsGroups = <DsGroup>[
 /// the design system. Every other group nests under its own index.
 String categoryHref(DsGroup group, DsCategory category) =>
     group.id == 'foundations'
-        ? '$dsRoot/${category.slug}'
-        : '${group.href}/${category.slug}';
+    ? '$dsRoot/${category.slug}'
+    : '${group.href}/${category.slug}';
 
 /// The group with this id, or null. The reference inlines `DS_GROUPS.find`
 /// three times; the port names it once.
@@ -733,9 +739,7 @@ DsSiblings siblings(String groupId, String slug) {
   if (found == null) return (prev: null, next: null);
   final DsGroup group = found;
 
-  final int i = group.categories.indexWhere(
-    (DsCategory c) => c.slug == slug,
-  );
+  final int i = group.categories.indexWhere((DsCategory c) => c.slug == slug);
 
   DsNavLink? at(int n) {
     if (n < 0 || n >= group.categories.length) return null;

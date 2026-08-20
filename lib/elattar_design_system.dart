@@ -8,9 +8,11 @@ library;
 // ── foundation ──────────────────────────────────────────────────────────────
 export 'src/foundation/colors.dart';
 export 'src/foundation/date_format.dart';
+export 'src/foundation/media.dart';
 export 'src/foundation/motion.dart';
 export 'src/foundation/shadows.dart';
 export 'src/foundation/spacing.dart';
+export 'src/foundation/surfaces.dart';
 export 'src/foundation/theme.dart';
 export 'src/foundation/typography.dart';
 
@@ -111,6 +113,7 @@ export 'src/effects/bloom_cosmic.dart';
 export 'src/effects/foil_value.dart';
 export 'src/effects/glass.dart';
 export 'src/effects/machine_surface.dart';
+export 'src/effects/media_scrim.dart';
 export 'src/effects/page_glow.dart';
 export 'src/effects/sheen_action.dart';
 export 'src/effects/starfield.dart';

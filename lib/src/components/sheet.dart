@@ -26,6 +26,7 @@ import '../foundation/typography.dart';
 import '../theme_scope.dart';
 import 'button.dart';
 import 'dialog.dart';
+import 'ds_safe_area.dart';
 import 'icon.dart';
 import 'icon_paths.dart';
 
@@ -105,10 +106,7 @@ class DsSheetPanel extends StatelessWidget {
         decoration: BoxDecoration(
           color: theme.popover,
           border: Border(
-            right: BorderSide(
-              color: theme.border,
-              width: DsWidths.hairline,
-            ),
+            right: BorderSide(color: theme.border, width: DsWidths.hairline),
           ),
           boxShadow: DsShadows.tailwindLg.outerShadows(theme),
         ),
@@ -124,7 +122,7 @@ class DsSheetPanel extends StatelessWidget {
               DsComponentType.sheetBody,
               color: theme.popoverForeground,
             ),
-            child: SafeArea(
+            child: DsSafeArea(
               child: Stack(
                 children: <Widget>[
                   child,
@@ -327,35 +325,32 @@ class DsSheetOverlay extends StatelessWidget {
   final DsSheetSide side;
 
   Alignment get _alignment => switch (side) {
-        DsSheetSide.top => Alignment.topCenter,
-        DsSheetSide.right => Alignment.centerRight,
-        DsSheetSide.bottom => Alignment.bottomCenter,
-        DsSheetSide.left => Alignment.centerLeft,
-      };
+    DsSheetSide.top => Alignment.topCenter,
+    DsSheetSide.right => Alignment.centerRight,
+    DsSheetSide.bottom => Alignment.bottomCenter,
+    DsSheetSide.left => Alignment.centerLeft,
+  };
 
   @override
   Widget build(BuildContext context) => DsModalPortal(
-        trigger: trigger,
-        content: content,
-        alignment: _alignment,
-        // USER-ORDERED MOBILE ADAPTATION — out of the host's 90vw x 75vh box,
-        // and [DsSheetContent] clamps its own width instead. A side sheet is
-        // full-height by definition — that is the whole difference between a
-        // sheet and a dialog — so a 75vh cap would crop the one dimension the
-        // component exists to fill. What it *does* need on a phone is the
-        // width: `sm:max-w-sm` is 384 against a 375px viewport, which is the
-        // same overflow the dialog had. See [DsSheetContent.width].
-        clampToViewport: false,
-        // The sheet's own clock, both ways: `--duration-overlay`.
-        enterDuration: DsDurations.overlay,
-        exitDuration: DsDurations.overlay,
-        transition: (
-          BuildContext context,
-          Animation<double> animation,
-          Widget child,
-        ) =>
+    trigger: trigger,
+    content: content,
+    alignment: _alignment,
+    // USER-ORDERED MOBILE ADAPTATION — out of the host's 90vw x 75vh box,
+    // and [DsSheetContent] clamps its own width instead. A side sheet is
+    // full-height by definition — that is the whole difference between a
+    // sheet and a dialog — so a 75vh cap would crop the one dimension the
+    // component exists to fill. What it *does* need on a phone is the
+    // width: `sm:max-w-sm` is 384 against a 375px viewport, which is the
+    // same overflow the dialog had. See [DsSheetContent.width].
+    clampToViewport: false,
+    // The sheet's own clock, both ways: `--duration-overlay`.
+    enterDuration: DsDurations.overlay,
+    exitDuration: DsDurations.overlay,
+    transition:
+        (BuildContext context, Animation<double> animation, Widget child) =>
             DsSheetTransition(animation: animation, side: side, child: child),
-      );
+  );
 }
 
 /// `fade-in-0` + `slide-in-from-<side>-10`, and the exit twin the class list
@@ -378,26 +373,26 @@ class DsSheetTransition extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
-        animation: animation,
-        child: child,
-        builder: (BuildContext context, Widget? child) {
-          final double t = DsCurves.out.transform(animation.value.clamp(0, 1));
-          final double travel = (1 - t) * _slideFraction;
-          final Offset unit = switch (side) {
-            DsSheetSide.left => Offset(-travel, 0),
-            DsSheetSide.right => Offset(travel, 0),
-            DsSheetSide.top => Offset(0, -travel),
-            DsSheetSide.bottom => Offset(0, travel),
-          };
-          return Opacity(
-            opacity: t,
-            // A percentage translate is a fraction of the element's OWN box,
-            // which is exactly what [FractionalTranslation] means and what a
-            // pixel [Transform.translate] cannot say.
-            child: FractionalTranslation(translation: unit, child: child),
-          );
-        },
+    animation: animation,
+    child: child,
+    builder: (BuildContext context, Widget? child) {
+      final double t = DsCurves.out.transform(animation.value.clamp(0, 1));
+      final double travel = (1 - t) * _slideFraction;
+      final Offset unit = switch (side) {
+        DsSheetSide.left => Offset(-travel, 0),
+        DsSheetSide.right => Offset(travel, 0),
+        DsSheetSide.top => Offset(0, -travel),
+        DsSheetSide.bottom => Offset(0, travel),
+      };
+      return Opacity(
+        opacity: t,
+        // A percentage translate is a fraction of the element's OWN box,
+        // which is exactly what [FractionalTranslation] means and what a
+        // pixel [Transform.translate] cannot say.
+        child: FractionalTranslation(translation: unit, child: child),
       );
+    },
+  );
 }
 
 /// `SheetContent` — the panel, on one edge.
@@ -461,8 +456,10 @@ class DsSheetContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final DsThemeData theme = DsTheme.of(context);
-    final BorderSide edge =
-        BorderSide(color: theme.border, width: DsWidths.hairline);
+    final BorderSide edge = BorderSide(
+      color: theme.border,
+      width: DsWidths.hairline,
+    );
 
     final List<Widget> rows = <Widget>[];
     for (int i = 0; i < children.length; i++) {
@@ -508,26 +505,30 @@ class DsSheetContent extends StatelessWidget {
                 DsComponentType.sheetBody,
                 color: theme.popoverForeground,
               ),
-              child: Stack(
-                children: <Widget>[
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: rows,
-                  ),
-                  if (showCloseButton)
-                    Positioned(
-                      // `absolute top-3 right-3`.
-                      top: ds(3),
-                      right: ds(3),
-                      child: DsButton(
-                        variant: DsButtonVariant.ghost,
-                        size: DsButtonSize.iconSm,
-                        label: 'Close',
-                        onPressed: onClose,
-                        child: const DsIcon(DsIconGlyph.x),
-                      ),
+              child: DsSafeArea(
+                top: side != DsSheetSide.bottom,
+                bottom: side != DsSheetSide.top,
+                child: Stack(
+                  children: <Widget>[
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: rows,
                     ),
-                ],
+                    if (showCloseButton)
+                      Positioned(
+                        // `absolute top-3 right-3`.
+                        top: ds(3),
+                        right: ds(3),
+                        child: DsButton(
+                          variant: DsButtonVariant.ghost,
+                          size: DsButtonSize.iconSm,
+                          label: 'Close',
+                          onPressed: onClose,
+                          child: const DsIcon(DsIconGlyph.x),
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -582,8 +583,12 @@ class DsSheetHeader extends StatelessWidget {
         ),
       ),
       child: Padding(
-        padding:
-            EdgeInsets.fromLTRB(ds(4), ds(4), close ? ds(12) : ds(4), ds(4)),
+        padding: EdgeInsets.fromLTRB(
+          ds(4),
+          ds(4),
+          close ? ds(12) : ds(4),
+          ds(4),
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
@@ -642,10 +647,10 @@ class DsSheetTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => DsText(
-        text,
-        DsComponentType.overlayTitle,
-        color: DsTheme.of(context).foreground,
-      );
+    text,
+    DsComponentType.overlayTitle,
+    color: DsTheme.of(context).foreground,
+  );
 }
 
 /// `SheetDescription` — `text-sm text-muted-foreground`.
@@ -656,8 +661,8 @@ class DsSheetDescription extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => DsText(
-        text,
-        DsComponentType.sheetBody,
-        color: DsTheme.of(context).mutedForeground,
-      );
+    text,
+    DsComponentType.sheetBody,
+    color: DsTheme.of(context).mutedForeground,
+  );
 }

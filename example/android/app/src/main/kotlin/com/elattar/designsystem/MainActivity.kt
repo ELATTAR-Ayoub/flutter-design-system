@@ -1,4 +1,4 @@
-package com.example.example
+package com.elattar.designsystem
 
 import io.flutter.embedding.android.FlutterActivity
 

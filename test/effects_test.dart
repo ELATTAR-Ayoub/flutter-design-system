@@ -105,15 +105,21 @@ void main() {
     test('glass-panel: --card @74% over the page background', () {
       // dark: #09090B saturates to rgb(8.93, 8.93, 11.93), then the fill.
       final Color darkBackdrop = saturate(DsThemeData.dark.background, 1.5);
-      final Color darkFill =
-          DsOklab.mix(DsThemeData.dark.card, dsTransparent, 0.74);
+      final Color darkFill = DsOklab.mix(
+        DsThemeData.dark.card,
+        dsTransparent,
+        0.74,
+      );
       expect(hex(composite(darkFill, darkBackdrop)), '#141417');
 
       // light: white saturates to white (a neutral is fixed), and a 74% white
       // fill over white is invisible — only the rim and e2 describe the shape.
       final Color lightBackdrop = saturate(DsThemeData.light.background, 1.5);
-      final Color lightFill =
-          DsOklab.mix(DsThemeData.light.card, dsTransparent, 0.74);
+      final Color lightFill = DsOklab.mix(
+        DsThemeData.light.card,
+        dsTransparent,
+        0.74,
+      );
       expect(hex(lightBackdrop), '#FFFFFF');
       expect(hex(composite(lightFill, lightBackdrop)), '#FFFFFF');
     });
@@ -121,25 +127,37 @@ void main() {
     test('glass-control: --foreground @7% over --card, unfiltered', () {
       // No blur and no saturate on the control, so the backdrop is --card as
       // it stands.
-      final Color darkFill =
-          DsOklab.mix(DsThemeData.dark.foreground, dsTransparent, 0.07);
+      final Color darkFill = DsOklab.mix(
+        DsThemeData.dark.foreground,
+        dsTransparent,
+        0.07,
+      );
       expect(hex(composite(darkFill, DsThemeData.dark.card)), '#28282B');
 
-      final Color lightFill =
-          DsOklab.mix(DsThemeData.light.foreground, dsTransparent, 0.07);
+      final Color lightFill = DsOklab.mix(
+        DsThemeData.light.foreground,
+        dsTransparent,
+        0.07,
+      );
       expect(hex(composite(lightFill, DsThemeData.light.card)), '#EEEEEE');
     });
 
     test('the fills themselves are the CSS colour at the CSS alpha', () {
       // `color-mix(in oklab, X N%, transparent)` resolves to X at alpha N:
       // premultiplied interpolation zeroes `transparent`'s contribution.
-      final Color panelDark =
-          DsOklab.mix(DsThemeData.dark.card, dsTransparent, 0.74);
+      final Color panelDark = DsOklab.mix(
+        DsThemeData.dark.card,
+        dsTransparent,
+        0.74,
+      );
       expect(hex(panelDark), hex(DsThemeData.dark.card));
       expect(panelDark.a, closeTo(0.74, 1e-9));
 
-      final Color rimDark =
-          DsOklab.mix(DsThemeData.dark.foreground, dsTransparent, 0.12);
+      final Color rimDark = DsOklab.mix(
+        DsThemeData.dark.foreground,
+        dsTransparent,
+        0.12,
+      );
       expect(hex(rimDark), hex(DsThemeData.dark.foreground));
       expect(rimDark.a, closeTo(0.12, 1e-9));
     });
@@ -161,10 +179,13 @@ void main() {
       // linear-gradient(176deg, …) — every stop mixed from DsPalette at run
       // time, so a rebrand carries. These hexes are the oracle, not the source.
       expect(DsSheenAction.rampStops, <double>[0, 0.44, 0.53, 0.76, 1]);
-      expect(
-        DsSheenAction.rampColors.map(hex).toList(),
-        <String>['#3680F6', '#1A6EF4', '#1851C3', '#1A6EF4', '#2977F5'],
-      );
+      expect(DsSheenAction.rampColors.map(hex).toList(), <String>[
+        '#3680F6',
+        '#1A6EF4',
+        '#1851C3',
+        '#1A6EF4',
+        '#2977F5',
+      ]);
       // 44% and 76% are `--color-action` itself, not a mix.
       expect(DsSheenAction.rampColors[1], DsPalette.action);
       expect(DsSheenAction.rampColors[3], DsPalette.action);
@@ -187,20 +208,25 @@ void main() {
       const double tol = 1e-3;
       const List<({double at, double scale, double opacity})> stops =
           <({double at, double scale, double opacity})>[
-        (at: 0.00, scale: 0.55, opacity: 0),
-        (at: 0.10, scale: 1.00, opacity: 0.62),
-        (at: 0.24, scale: 1.32, opacity: 0),
-        (at: 0.30, scale: 0.70, opacity: 0),
-        (at: 0.40, scale: 1.06, opacity: 0.34),
-        (at: 0.54, scale: 1.38, opacity: 0),
-        (at: 1.00, scale: 1.38, opacity: 0),
-      ];
+            (at: 0.00, scale: 0.55, opacity: 0),
+            (at: 0.10, scale: 1.00, opacity: 0.62),
+            (at: 0.24, scale: 1.32, opacity: 0),
+            (at: 0.30, scale: 0.70, opacity: 0),
+            (at: 0.40, scale: 1.06, opacity: 0.34),
+            (at: 0.54, scale: 1.38, opacity: 0),
+            (at: 1.00, scale: 1.38, opacity: 0),
+          ];
       for (final ({double at, double scale, double opacity}) s in stops) {
-        expect(DsSheenAction.beatScale.transform(s.at), closeTo(s.scale, tol),
-            reason: 'scale at ${(s.at * 100).round()}%');
         expect(
-            DsSheenAction.beatOpacity.transform(s.at), closeTo(s.opacity, tol),
-            reason: 'opacity at ${(s.at * 100).round()}%');
+          DsSheenAction.beatScale.transform(s.at),
+          closeTo(s.scale, tol),
+          reason: 'scale at ${(s.at * 100).round()}%',
+        );
+        expect(
+          DsSheenAction.beatOpacity.transform(s.at),
+          closeTo(s.opacity, tol),
+          reason: 'opacity at ${(s.at * 100).round()}%',
+        );
       }
     });
 
@@ -213,23 +239,28 @@ void main() {
       }
     });
 
-    testWidgets('at rest nothing animates; hover starts the beat',
-        (WidgetTester t) async {
+    testWidgets('at rest nothing animates; hover starts the beat', (
+      WidgetTester t,
+    ) async {
       await t.pumpWidget(host(surface()));
       await t.pump(DsDurations.base);
-      expect(t.hasRunningAnimations, isFalse,
-          reason: 'the ramp and the texture are static');
+      expect(
+        t.hasRunningAnimations,
+        isFalse,
+        reason: 'the ramp and the texture are static',
+      );
 
       await t.pumpWidget(host(surface(hovered: true)));
       await t.pump(const Duration(milliseconds: 16));
-      expect(t.hasRunningAnimations, isTrue,
-          reason: 'action-beat 2.6s --ease-out infinite');
+      expect(
+        t.hasRunningAnimations,
+        isTrue,
+        reason: 'action-beat 2.6s --ease-out infinite',
+      );
     });
 
     testWidgets('reduced motion stills the beat', (WidgetTester t) async {
-      await t.pumpWidget(
-        host(surface(hovered: true), disableAnimations: true),
-      );
+      await t.pumpWidget(host(surface(hovered: true), disableAnimations: true));
       // Would never return if the beat were still looping.
       await t.pumpAndSettle();
       expect(t.hasRunningAnimations, isFalse);
@@ -261,7 +292,10 @@ void main() {
         repeats: false,
       );
       expect(pressed, closeTo(0.2216, 1e-4));
-      expect(DsSheenAction.beatScale.transform(pressed), closeTo(1.3197, 0.001));
+      expect(
+        DsSheenAction.beatScale.transform(pressed),
+        closeTo(1.3197, 0.001),
+      );
       expect(DsSheenAction.beatOpacity.transform(pressed), closeTo(0, 0.01));
 
       // One iteration and no `animation-fill-mode`: past the end, the element
@@ -276,12 +310,15 @@ void main() {
       );
     });
 
-    testWidgets('B8 — a press deep into a hover produces NO thump',
-        (WidgetTester t) async {
+    testWidgets('B8 — a press deep into a hover produces NO thump', (
+      WidgetTester t,
+    ) async {
       await t.pumpWidget(host(surface(hovered: true)));
       await t.pump(const Duration(milliseconds: 2500));
-      expect(phaseOf(t, find.byType(DsSheenAction), 'beat'),
-          closeTo(2500 / 2600, 1e-6));
+      expect(
+        phaseOf(t, find.byType(DsSheenAction), 'beat'),
+        closeTo(2500 / 2600, 1e-6),
+      );
 
       // The rule swaps to `action-beat 620ms ease-out 1`, same animation-name,
       // so the clock is kept and re-divided — and 2500ms is already past a
@@ -307,8 +344,10 @@ void main() {
 
       // Releasing hands the same elapsed clock back to the 2.6s rule.
       await t.pumpWidget(host(surface(hovered: true)));
-      expect(phaseOf(t, find.byType(DsSheenAction), 'beat'),
-          closeTo(137 / 2600, 1e-6));
+      expect(
+        phaseOf(t, find.byType(DsSheenAction), 'beat'),
+        closeTo(137 / 2600, 1e-6),
+      );
     });
 
     testWidgets('B7 — hover-out deletes the animation; the next hover starts '
@@ -324,15 +363,21 @@ void main() {
 
       // The port used to resume the controller from wherever it stopped.
       await t.pumpWidget(host(surface(hovered: true)));
-      expect(phaseOf(t, find.byType(DsSheenAction), 'beat'), 0,
-          reason: 'a fresh animation, at frame 0');
+      expect(
+        phaseOf(t, find.byType(DsSheenAction), 'beat'),
+        0,
+        reason: 'a fresh animation, at frame 0',
+      );
       await t.pump(const Duration(milliseconds: 100));
-      expect(phaseOf(t, find.byType(DsSheenAction), 'beat'),
-          closeTo(100 / 2600, 1e-6));
+      expect(
+        phaseOf(t, find.byType(DsSheenAction), 'beat'),
+        closeTo(100 / 2600, 1e-6),
+      );
     });
 
-    testWidgets('paints in both themes, at rest, hovered and pressed',
-        (WidgetTester t) async {
+    testWidgets('paints in both themes, at rest, hovered and pressed', (
+      WidgetTester t,
+    ) async {
       for (final DsThemeMode mode in <DsThemeMode>[
         DsThemeMode.dark,
         DsThemeMode.light,
@@ -353,28 +398,32 @@ void main() {
   // ── foil-value — shadows-map §5.4 ────────────────────────────────────────
   group('DsFoilValue', () {
     Widget surface({bool hovered = false}) => DsFoilValue(
-          spec: hovered ? DsShadows.glowValue : DsShadows.btnValue,
-          radius: BorderRadius.circular(DsRadii.pill),
-          border: Border.all(color: dsTransparent, width: DsWidths.hairline),
-          hovered: hovered,
-          child: const SizedBox(width: 140, height: 40),
-        );
+      spec: hovered ? DsShadows.glowValue : DsShadows.btnValue,
+      radius: BorderRadius.circular(DsRadii.pill),
+      border: Border.all(color: dsTransparent, width: DsWidths.hairline),
+      hovered: hovered,
+      child: const SizedBox(width: 140, height: 40),
+    );
 
     test('the metal ramp is seven derived stops on the map\'s hexes', () {
-      expect(DsFoilValue.rampStops,
-          <double>[0, 0.22, 0.44, 0.52, 0.62, 0.88, 1]);
-      expect(
-        DsFoilValue.rampColors.map(hex).toList(),
-        <String>[
-          '#DBF9A3',
-          '#D9F99D',
-          '#A3E635',
-          '#7EB825', // the edge of the metal — contrast-critical, do not move
-          '#A3E635',
-          '#D9F99D',
-          '#DDFAA8',
-        ],
-      );
+      expect(DsFoilValue.rampStops, <double>[
+        0,
+        0.22,
+        0.44,
+        0.52,
+        0.62,
+        0.88,
+        1,
+      ]);
+      expect(DsFoilValue.rampColors.map(hex).toList(), <String>[
+        '#DBF9A3',
+        '#D9F99D',
+        '#A3E635',
+        '#7EB825', // the edge of the metal — contrast-critical, do not move
+        '#A3E635',
+        '#D9F99D',
+        '#DDFAA8',
+      ]);
       expect(DsFoilValue.rampColors[1], DsPalette.valueBright);
       expect(DsFoilValue.rampColors[2], DsPalette.value);
       expect(DsFoilValue.rampColors[4], DsPalette.value);
@@ -409,8 +458,11 @@ void main() {
       // HOLDS at 135% through the idle and then sweeps to −55%.
       const double tol = 1e-3;
       for (final double t in <double>[0, 0.2, 0.4, 0.54]) {
-        expect(DsFoilValue.glintPosition.transform(t), closeTo(1.35, tol),
-            reason: 'held at 135% through ${(t * 100).round()}%');
+        expect(
+          DsFoilValue.glintPosition.transform(t),
+          closeTo(1.35, tol),
+          reason: 'held at 135% through ${(t * 100).round()}%',
+        );
         expect(DsFoilValue.glintOpacity.transform(t), closeTo(0, tol));
       }
       expect(DsFoilValue.glintPosition.transform(1), closeTo(-0.55, tol));
@@ -428,8 +480,11 @@ void main() {
     testWidgets('two forever-loops run at rest', (WidgetTester t) async {
       await t.pumpWidget(host(surface()));
       await t.pump(const Duration(milliseconds: 16));
-      expect(t.hasRunningAnimations, isTrue,
-          reason: 'value-foil-drift 11s + value-glint 5.5s, both infinite');
+      expect(
+        t.hasRunningAnimations,
+        isTrue,
+        reason: 'value-foil-drift 11s + value-glint 5.5s, both infinite',
+      );
     });
 
     // ── Elapsed-time semantics — behaviour-audit §3.7, B10b ────────────────
@@ -441,8 +496,10 @@ void main() {
       // elapsed time that reproduces the audit's own two sampled frames.
       const Duration elapsed = Duration(milliseconds: 2217);
       final double rest = DsFoilValue.phaseAt(elapsed, DsDurations.glint);
-      final double hovered =
-          DsFoilValue.phaseAt(elapsed, DsDurations.glintHover);
+      final double hovered = DsFoilValue.phaseAt(
+        elapsed,
+        DsDurations.glintHover,
+      );
       expect(rest, closeTo(0.4031, 1e-3));
       expect(hovered, closeTo(0.92375, 1e-5));
 
@@ -451,21 +508,28 @@ void main() {
       expect(DsFoilValue.glintOpacity.transform(rest), 0);
       expect(DsFoilValue.glintPosition.transform(rest), closeTo(1.35, 1e-6));
       expect(DsFoilValue.glintOpacity.transform(hovered), closeTo(1, 1e-9));
-      expect(DsFoilValue.glintPosition.transform(hovered),
-          closeTo(-0.4986, 1e-3));
+      expect(
+        DsFoilValue.glintPosition.transform(hovered),
+        closeTo(-0.4986, 1e-3),
+      );
 
       // The drift is on the same clock and never changes duration, so it never
       // jumps: 11s, hovered or not.
-      expect(DsFoilValue.phaseAt(elapsed, DsDurations.foilDrift),
-          closeTo(2217 / 11000, 1e-9));
+      expect(
+        DsFoilValue.phaseAt(elapsed, DsDurations.foilDrift),
+        closeTo(2217 / 11000, 1e-9),
+      );
     });
 
-    testWidgets('B10b — the glint TELEPORTS when hover retimes it',
-        (WidgetTester t) async {
+    testWidgets('B10b — the glint TELEPORTS when hover retimes it', (
+      WidgetTester t,
+    ) async {
       await t.pumpWidget(host(surface()));
       await t.pump(const Duration(milliseconds: 2217));
-      expect(phaseOf(t, find.byType(DsFoilValue), 'glint'),
-          closeTo(0.4031, 1e-3));
+      expect(
+        phaseOf(t, find.byType(DsFoilValue), 'glint'),
+        closeTo(0.4031, 1e-3),
+      );
 
       // One frame, no elapsed time, only `animation-duration: 2.4s`. The port
       // used to continue smoothly from the same phase at the new rate; the
@@ -475,12 +539,16 @@ void main() {
       final double glint = phaseOf(t, find.byType(DsFoilValue), 'glint');
       expect(glint, closeTo(0.92375, 1e-5));
       expect(DsFoilValue.glintOpacity.transform(glint), closeTo(1, 1e-9));
-      expect(DsFoilValue.glintPosition.transform(glint),
-          closeTo(-0.4986, 1e-3));
+      expect(
+        DsFoilValue.glintPosition.transform(glint),
+        closeTo(-0.4986, 1e-3),
+      );
 
       // The drift, on the same clock and the same 11s, does not move with it.
-      expect(phaseOf(t, find.byType(DsFoilValue), 'drift'),
-          closeTo(2217 / 11000, 1e-6));
+      expect(
+        phaseOf(t, find.byType(DsFoilValue), 'drift'),
+        closeTo(2217 / 11000, 1e-6),
+      );
     });
 
     testWidgets('reduced motion stills both loops', (WidgetTester t) async {
@@ -492,15 +560,21 @@ void main() {
       expect(t.hasRunningAnimations, isFalse);
     });
 
-    testWidgets('paints in both themes, at rest and hovered',
-        (WidgetTester t) async {
+    testWidgets('paints in both themes, at rest and hovered', (
+      WidgetTester t,
+    ) async {
       for (final DsThemeMode mode in <DsThemeMode>[
         DsThemeMode.dark,
         DsThemeMode.light,
       ]) {
         for (final bool hovered in <bool>[false, true]) {
-          await t.pumpWidget(host(surface(hovered: hovered),
-              mode: mode, disableAnimations: true));
+          await t.pumpWidget(
+            host(
+              surface(hovered: hovered),
+              mode: mode,
+              disableAnimations: true,
+            ),
+          );
           await t.pump(DsDurations.base);
           expect(t.takeException(), isNull, reason: '$mode hovered=$hovered');
         }
@@ -509,6 +583,53 @@ void main() {
   });
 
   // ── glass — shadows-map §7 ───────────────────────────────────────────────
+  group('media primitives', () {
+    test('portrait media is the named 9:16 contract', () {
+      expect(DsMediaRatios.portrait, 9 / 16);
+    });
+
+    test('scrim is transparent at the top and readable at the bottom', () {
+      final LinearGradient gradient = DsMediaScrim.debugGradient;
+      expect(gradient.begin, Alignment.topCenter);
+      expect(gradient.end, Alignment.bottomCenter);
+      expect(gradient.stops, DsMediaScrimTokens.stops);
+      expect(gradient.colors, hasLength(3));
+      expect(gradient.colors.first.a, 0);
+      expect(gradient.colors[1].a, DsMediaScrimTokens.middleAlpha);
+      expect(gradient.colors.last.a, DsMediaScrimTokens.bottomAlpha);
+      expect(DsMediaScrim.debugInk, DsMediaScrimTokens.ink);
+      expect(DsMediaScrimTokens.foreground.a, 1);
+    });
+
+    testWidgets('scrim preserves child sizing in both themes', (
+      WidgetTester t,
+    ) async {
+      for (final DsThemeMode mode in <DsThemeMode>[
+        DsThemeMode.dark,
+        DsThemeMode.light,
+      ]) {
+        await t.pumpWidget(
+          host(
+            const SizedBox(
+              width: 180,
+              height: 320,
+              child: DsMediaScrim(
+                child: SizedBox.expand(key: Key('media-scrim-child')),
+              ),
+            ),
+            mode: mode,
+          ),
+        );
+        expect(t.getSize(find.byType(DsMediaScrim)), const Size(180, 320));
+        expect(
+          t.getSize(find.byKey(const Key('media-scrim-child'))),
+          const Size(180, 320),
+        );
+        expect(t.takeException(), isNull, reason: '$mode');
+      }
+    });
+  });
+
   group('glass utilities', () {
     /// The twenty numbers behind a `ColorFilter.matrix`.
     ///
@@ -516,10 +637,11 @@ void main() {
     /// only public route to it is `toString()`, which prints the list
     /// verbatim. Coupled to a debug string on purpose: the alternative is
     /// rasterising a swatch to infer twenty coefficients from three channels.
-    List<double> matrixOf(Object filter) => RegExp(r'-?\d+(?:\.\d+)?(?:e-?\d+)?')
-        .allMatches(filter.toString())
-        .map((RegExpMatch m) => double.parse(m[0]!))
-        .toList();
+    List<double> matrixOf(Object filter) =>
+        RegExp(r'-?\d+(?:\.\d+)?(?:e-?\d+)?')
+            .allMatches(filter.toString())
+            .map((RegExpMatch m) => double.parse(m[0]!))
+            .toList();
 
     test('dsSaturate reproduces the feColorMatrix at s = 1.5', () {
       // shadows-map §13.5. `closeTo`, not `equals`: the coefficients are
@@ -558,25 +680,58 @@ void main() {
       // stronger claim: the layers are literally the same objects.
       expect(DsGlassPanel.debugShadow.layers.sublist(2), DsShadows.e2.layers);
       expect(
-          DsGlassPanelDeep.debugShadow.layers.sublist(2), DsShadows.e4.layers);
-      expect(DsGlassPanelDeep.debugShadow.insetLayers,
-          DsGlassPanel.debugShadow.insetLayers);
+        DsGlassPanelDeep.debugShadow.layers.sublist(2),
+        DsShadows.e4.layers,
+      );
+      expect(
+        DsGlassPanelDeep.debugShadow.insetLayers,
+        DsGlassPanel.debugShadow.insetLayers,
+      );
       expect(DsGlassPanel.debugShadow.insetLayers, hasLength(2));
+    });
+
+    test('clear glass keeps standard mechanics with a lower fill', () {
+      expect(DsGlassPanelClear.debugShadow, same(DsGlassPanel.debugShadow));
+      expect(DsGlassPanelClear.debugBackdrop, same(DsGlassPanel.debugBackdrop));
+      expect(DsGlassPanelClear.debugBackdrop, isNotNull);
+
+      for (final DsThemeData theme in <DsThemeData>[
+        DsThemeData.dark,
+        DsThemeData.light,
+      ]) {
+        final Color clear = DsGlassPanelClear.debugFill(theme);
+        final Color standard = DsGlassPanel.debugFill(theme);
+        expect(
+          clear,
+          DsOklab.mix(
+            theme.card,
+            dsTransparent,
+            DsSurfaceOpacity.navigationGlass,
+          ),
+        );
+        expect(clear.a, lessThan(standard.a));
+      }
     });
 
     test('the inner ring is a hard 1px: no offset, no blur, 1px spread', () {
       // `inset 0 0 0 1px color-mix(in oklab, var(--foreground) 12%, transparent)`
       final DsShadowLayer ring = DsGlassPanel.debugShadow.insetLayers[1];
-      expect(<double>[ring.dx, ring.dy, ring.blur, ring.spread],
-          <double>[0, 0, 0, 1]);
-      expect(ring.color(DsThemeData.dark),
-          DsOklab.mix(DsThemeData.dark.foreground, dsTransparent, 0.12));
+      expect(
+        <double>[ring.dx, ring.dy, ring.blur, ring.spread],
+        <double>[0, 0, 0, 1],
+      );
+      expect(
+        ring.color(DsThemeData.dark),
+        DsOklab.mix(DsThemeData.dark.foreground, dsTransparent, 0.12),
+      );
 
       // …and the top highlight above it is `--rim-strong`, the same token
       // every raised control carries.
       final DsShadowLayer rim = DsGlassPanel.debugShadow.insetLayers[0];
-      expect(<double>[rim.dx, rim.dy, rim.blur, rim.spread],
-          <double>[0, 1, 0, 0]);
+      expect(
+        <double>[rim.dx, rim.dy, rim.blur, rim.spread],
+        <double>[0, 1, 0, 0],
+      );
       expect(rim.color(DsThemeData.dark), DsThemeData.dark.rimStrong);
     });
 
@@ -585,33 +740,45 @@ void main() {
       expect(DsGlassControl.debugBackdrop, isNull);
       expect(DsGlassControl.debugShadow.hasInset, isTrue);
       expect(DsGlassControl.debugShadow.layers, hasLength(2));
-      expect(DsGlassControl.debugShadow.outerShadows(DsThemeData.dark),
-          isEmpty);
+      expect(
+        DsGlassControl.debugShadow.outerShadows(DsThemeData.dark),
+        isEmpty,
+      );
 
       final DsShadowLayer ring = DsGlassControl.debugShadow.insetLayers[1];
-      expect(ring.color(DsThemeData.light),
-          DsOklab.mix(DsThemeData.light.foreground, dsTransparent, 0.16));
+      expect(
+        ring.color(DsThemeData.light),
+        DsOklab.mix(DsThemeData.light.foreground, dsTransparent, 0.16),
+      );
     });
 
-    test('the panels carry the composed backdrop; the control carries none',
-        () {
-      expect(DsGlassPanel.debugBackdrop, isNotNull);
-      expect(DsGlassPanelDeep.debugBackdrop, isNotNull);
-      expect(DsGlassPanelDeep.debugBackdrop, DsGlassPanel.debugBackdrop);
-      expect(DsGlassControl.debugBackdrop, isNull);
-    });
+    test(
+      'the panels carry the composed backdrop; the control carries none',
+      () {
+        expect(DsGlassPanel.debugBackdrop, isNotNull);
+        expect(DsGlassPanelDeep.debugBackdrop, isNotNull);
+        expect(DsGlassPanelDeep.debugBackdrop, DsGlassPanel.debugBackdrop);
+        expect(DsGlassControl.debugBackdrop, isNull);
+      },
+    );
 
     test('the fills are the utilities\' own color-mix, per theme', () {
       for (final DsThemeData theme in <DsThemeData>[
         DsThemeData.dark,
         DsThemeData.light,
       ]) {
-        expect(DsGlassPanel.debugFill(theme),
-            DsOklab.mix(theme.card, dsTransparent, 0.74));
-        expect(DsGlassPanelDeep.debugFill(theme),
-            DsOklab.mix(theme.card, dsTransparent, 0.74));
-        expect(DsGlassControl.debugFill(theme),
-            DsOklab.mix(theme.foreground, dsTransparent, 0.07));
+        expect(
+          DsGlassPanel.debugFill(theme),
+          DsOklab.mix(theme.card, dsTransparent, 0.74),
+        );
+        expect(
+          DsGlassPanelDeep.debugFill(theme),
+          DsOklab.mix(theme.card, dsTransparent, 0.74),
+        );
+        expect(
+          DsGlassControl.debugFill(theme),
+          DsOklab.mix(theme.foreground, dsTransparent, 0.07),
+        );
       }
     });
 
@@ -627,22 +794,37 @@ void main() {
         shape,
         DsShadows.e2.layers.where((DsShadowLayer l) => !l.inset).toList(),
       );
-      expect(clip.contains(const Offset(100, 48)), isFalse,
-          reason: 'the centre of the panel takes no ambient ink');
-      expect(clip.contains(const Offset(100, 120)), isTrue,
-          reason: 'below the panel it does');
+      expect(
+        clip.contains(const Offset(100, 48)),
+        isFalse,
+        reason: 'the centre of the panel takes no ambient ink',
+      );
+      expect(
+        clip.contains(const Offset(100, 120)),
+        isTrue,
+        reason: 'below the panel it does',
+      );
     });
 
-    testWidgets('all three paint in both themes', (WidgetTester t) async {
+    testWidgets('all four paint in both themes', (WidgetTester t) async {
       final BorderRadius slab = BorderRadius.circular(DsRadii.xl4);
       for (final DsThemeMode mode in <DsThemeMode>[
         DsThemeMode.dark,
         DsThemeMode.light,
       ]) {
         for (final Widget glass in <Widget>[
-          DsGlassPanel(radius: slab, child: const SizedBox(width: 200, height: 96)),
+          DsGlassPanel(
+            radius: slab,
+            child: const SizedBox(width: 200, height: 96),
+          ),
+          DsGlassPanelClear(
+            radius: slab,
+            child: const SizedBox(width: 200, height: 96),
+          ),
           DsGlassPanelDeep(
-              radius: slab, child: const SizedBox(width: 200, height: 96)),
+            radius: slab,
+            child: const SizedBox(width: 200, height: 96),
+          ),
           DsGlassControl(
             radius: BorderRadius.circular(DsRadii.pill),
             padding: EdgeInsets.symmetric(horizontal: ds(4)),
@@ -658,21 +840,43 @@ void main() {
       }
     });
 
-    testWidgets('a panel mounts one BackdropFilter and a control mounts none',
-        (WidgetTester t) async {
+    testWidgets('a panel mounts one BackdropFilter and a control mounts none', (
+      WidgetTester t,
+    ) async {
       final BorderRadius slab = BorderRadius.circular(DsRadii.xl4);
-      await t.pumpWidget(host(
-        DsGlassPanel(radius: slab, child: const SizedBox(width: 200, height: 96)),
-      ));
+      await t.pumpWidget(
+        host(
+          DsGlassPanel(
+            radius: slab,
+            child: const SizedBox(width: 200, height: 96),
+          ),
+        ),
+      );
       expect(find.byType(BackdropFilter), findsOneWidget);
 
-      await t.pumpWidget(host(
-        DsGlassControl(
-          radius: BorderRadius.circular(DsRadii.pill),
-          child: const SizedBox(width: 120, height: 48),
+      await t.pumpWidget(
+        host(
+          DsGlassControl(
+            radius: BorderRadius.circular(DsRadii.pill),
+            child: const SizedBox(width: 120, height: 48),
+          ),
         ),
-      ));
+      );
       expect(find.byType(BackdropFilter), findsNothing);
+    });
+
+    testWidgets('clear glass mounts the shared backdrop filter', (
+      WidgetTester t,
+    ) async {
+      await t.pumpWidget(
+        host(
+          DsGlassPanelClear(
+            radius: BorderRadius.circular(DsRadii.xl4),
+            child: const SizedBox(width: 200, height: 96),
+          ),
+        ),
+      );
+      expect(find.byType(BackdropFilter), findsOneWidget);
     });
   });
 }

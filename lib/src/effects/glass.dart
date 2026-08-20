@@ -87,6 +87,7 @@ import 'package:flutter/widgets.dart';
 import '../foundation/colors.dart';
 import '../foundation/shadows.dart';
 import '../foundation/spacing.dart';
+import '../foundation/surfaces.dart';
 import '../foundation/theme.dart';
 import '../theme_scope.dart';
 import 'machine_surface.dart';
@@ -100,7 +101,7 @@ import 'machine_surface.dart';
 
 /// `background-color: color-mix(in oklab, var(--card) 74%, transparent)` —
 /// `glass-panel`, globals.css L1563–1584.
-const double _panelFillAlpha = 0.74;
+const double _panelFillAlpha = DsSurfaceOpacity.glassPanel;
 
 /// `inset 0 0 0 1px color-mix(in oklab, var(--foreground) 12%, transparent)` —
 /// the same block.
@@ -117,6 +118,9 @@ const double _controlRimAlpha = 0.16;
 
 Color _panelFill(DsThemeData t) =>
     DsOklab.mix(t.card, dsTransparent, _panelFillAlpha);
+
+Color _clearPanelFill(DsThemeData t) =>
+    DsOklab.mix(t.card, dsTransparent, DsSurfaceOpacity.navigationGlass);
 
 Color _controlFill(DsThemeData t) =>
     DsOklab.mix(t.foreground, dsTransparent, _controlFillAlpha);
@@ -168,11 +172,11 @@ const double _lumB = 0.072;
 /// sRGB values — not the linearRGB that a bare SVG `feColorMatrix` would
 /// default to — which is also the space [ui.ColorFilter.matrix] works in.
 ui.ColorFilter dsSaturate(double s) => ui.ColorFilter.matrix(<double>[
-      _lumR + (1 - _lumR) * s, _lumG - _lumG * s, _lumB - _lumB * s, 0, 0, //
-      _lumR - _lumR * s, _lumG + (1 - _lumG) * s, _lumB - _lumB * s, 0, 0, //
-      _lumR - _lumR * s, _lumG - _lumG * s, _lumB + (1 - _lumB) * s, 0, 0, //
-      0, 0, 0, 1, 0, //
-    ]);
+  _lumR + (1 - _lumR) * s, _lumG - _lumG * s, _lumB - _lumB * s, 0, 0, //
+  _lumR - _lumR * s, _lumG + (1 - _lumG) * s, _lumB - _lumB * s, 0, 0, //
+  _lumR - _lumR * s, _lumG - _lumG * s, _lumB + (1 - _lumB) * s, 0, 0, //
+  0, 0, 0, 1, 0, //
+]);
 
 /// `backdrop-blur-xl backdrop-saturate-150`, composed in CSS's own order.
 ///
@@ -197,30 +201,47 @@ final ui.ImageFilter _glassBackdrop = ui.ImageFilter.compose(
 /// `inset 0 1px 0 var(--rim-strong)` — the top highlight, carried by all three
 /// utilities. Shared rather than restated so the three specs are identical
 /// objects where the CSS is identical text.
-const DsShadowLayer _topHighlight =
-    DsShadowLayer(0, 1, 0, 0, _rimStrong, inset: true);
+const DsShadowLayer _topHighlight = DsShadowLayer(
+  0,
+  1,
+  0,
+  0,
+  _rimStrong,
+  inset: true,
+);
 
 /// `inset 0 0 0 1px …` — a **hard 1px inner ring**: no offset, no blur, 1px of
 /// spread. It is the hairline rim, and it is an inset layer rather than a
 /// [Border] because that is what the CSS declares and because it must sit
 /// inside the shape, under nothing.
-const DsShadowLayer _panelRingLayer =
-    DsShadowLayer(0, 0, 0, 1, _panelRing, inset: true);
+const DsShadowLayer _panelRingLayer = DsShadowLayer(
+  0,
+  0,
+  0,
+  1,
+  _panelRing,
+  inset: true,
+);
 
-const DsShadowLayer _controlRingLayer =
-    DsShadowLayer(0, 0, 0, 1, _controlRing, inset: true);
+const DsShadowLayer _controlRingLayer = DsShadowLayer(
+  0,
+  0,
+  0,
+  1,
+  _controlRing,
+  inset: true,
+);
 
 /// The two glass-panel insets plus whichever ambient the variant carries.
 ///
 /// The variants differ in [ambient] and in nothing else — expressed as one
 /// function of the ambient rather than two lists, so that stays structurally
 /// true instead of being asserted.
-DsShadowSpec _panelShadow(DsShadowSpec ambient) =>
-    DsShadowSpec(<DsShadowLayer>[
-      _topHighlight,
-      _panelRingLayer,
-      ...ambient.layers,
-    ]);
+DsShadowSpec _panelShadow(DsShadowSpec ambient) => DsShadowSpec(<DsShadowLayer>[
+  _topHighlight,
+  _panelRingLayer,
+  ...ambient.layers,
+]);
 
 final DsShadowSpec _panelSpec = _panelShadow(DsShadows.e2);
 final DsShadowSpec _panelDeepSpec = _panelShadow(DsShadows.e4);
@@ -302,8 +323,9 @@ class _AmbientShadowPainter extends CustomPainter {
     // CSS paints the first-listed shadow on top, so the list is walked
     // backwards — the same reversal `DsShadowSpec.outerShadows` makes.
     for (final DsShadowLayer layer in ambient.reversed) {
-      final Rect bounds =
-          shape.outerRect.shift(layer.offset).inflate(layer.spread);
+      final Rect bounds = shape.outerRect
+          .shift(layer.offset)
+          .inflate(layer.spread);
       if (bounds.isEmpty) continue;
 
       final Paint paint = Paint()..color = layer.color(theme);
@@ -369,8 +391,9 @@ class _DsGlassSurface extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final DsThemeData theme = DsTheme.of(context);
-    final Widget content =
-        padding == null ? child : Padding(padding: padding!, child: child);
+    final Widget content = padding == null
+        ? child
+        : Padding(padding: padding!, child: child);
 
     final ui.ImageFilter? filter = backdrop;
     if (filter == null) {
@@ -501,13 +524,58 @@ class DsGlassPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => _DsGlassSurface(
-        spec: _panelSpec,
-        fill: _panelFill,
-        backdrop: _glassBackdrop,
-        radius: radius,
-        padding: padding,
-        child: child,
-      );
+    spec: _panelSpec,
+    fill: _panelFill,
+    backdrop: _glassBackdrop,
+    radius: radius,
+    padding: padding,
+    child: child,
+  );
+}
+
+/// A clearer card-scale glass panel for floating navigation chrome.
+///
+/// Geometry, backdrop blur/saturation, rim, highlight and `e2` ambient are
+/// identical to [DsGlassPanel]. Only the foundation-owned fill opacity is
+/// lower, so content moving beneath remains visibly present through the blur.
+class DsGlassPanelClear extends StatelessWidget {
+  const DsGlassPanelClear({
+    super.key,
+    required this.radius,
+    this.padding,
+    required this.child,
+  });
+
+  final BorderRadius radius;
+  final EdgeInsetsGeometry? padding;
+  final Widget child;
+
+  /// The same highlight, ring and `e2` ambient as [DsGlassPanel].
+  @visibleForTesting
+  static DsShadowSpec get debugShadow => _panelSpec;
+
+  /// The same CSS-correct ambient exclusion as [DsGlassPanel].
+  @visibleForTesting
+  static Path debugAmbientClip(RRect shape, List<DsShadowLayer> ambient) =>
+      _outsideShape(shape, ambient);
+
+  /// The same composed blur and saturation as [DsGlassPanel].
+  @visibleForTesting
+  static ui.ImageFilter? get debugBackdrop => _glassBackdrop;
+
+  /// The live theme's card colour at the navigation-glass opacity.
+  @visibleForTesting
+  static Color debugFill(DsThemeData theme) => _clearPanelFill(theme);
+
+  @override
+  Widget build(BuildContext context) => _DsGlassSurface(
+    spec: _panelSpec,
+    fill: _clearPanelFill,
+    backdrop: _glassBackdrop,
+    radius: radius,
+    padding: padding,
+    child: child,
+  );
 }
 
 /// `@utility glass-panel-deep` — globals.css L1586–1609.
@@ -556,13 +624,13 @@ class DsGlassPanelDeep extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => _DsGlassSurface(
-        spec: _panelDeepSpec,
-        fill: _panelFill,
-        backdrop: _glassBackdrop,
-        radius: radius,
-        padding: padding,
-        child: child,
-      );
+    spec: _panelDeepSpec,
+    fill: _panelFill,
+    backdrop: _glassBackdrop,
+    radius: radius,
+    padding: padding,
+    child: child,
+  );
 }
 
 /// `@utility glass-control` — globals.css L1612–1617.
@@ -611,11 +679,11 @@ class DsGlassControl extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => _DsGlassSurface(
-        spec: _controlSpec,
-        fill: _controlFill,
-        backdrop: null,
-        radius: radius,
-        padding: padding,
-        child: child,
-      );
+    spec: _controlSpec,
+    fill: _controlFill,
+    backdrop: null,
+    radius: radius,
+    padding: padding,
+    child: child,
+  );
 }

@@ -14,6 +14,7 @@ import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart' show debugPaintBaselinesEnabled;
 import 'package:flutter/services.dart' show SystemChrome, SystemUiMode;
 
 import 'nav.dart';
@@ -47,6 +48,7 @@ import 'pages/spacing.dart';
 import 'pages/transcript.dart';
 import 'pages/typography.dart';
 import 'shell.dart';
+import 'showcase/showcase_app.dart';
 
 /// `::selection { background: color-mix(in oklab, var(--color-action) 35%,
 /// transparent); color: var(--foreground) }`.
@@ -75,19 +77,33 @@ const double _selectionAlpha = 0.35;
 /// Guarded to the two platforms that have system bars. The call is a platform
 /// channel message, and on the web — where the capture rig runs — there is no
 /// handler for it to reach.
-void main() {
+void main() => runDocsApp();
+
+/// Boots either the documentation index or a named integrated route.
+///
+/// [showcase_main.dart] uses this seam so the APK can open on Signal Studio
+/// while retaining the same router, theme, and return path as the docs app.
+void runDocsApp({String? initialRoute}) {
   WidgetsFlutterBinding.ensureInitialized();
+  // Flutter Inspector persists "Show baselines" through the VM service while
+  // a debug session is alive. Reset it on every fresh boot so the diagnostic
+  // ideographic/alphabetic rules can never be mistaken for product styling.
+  // This assignment is assert-scoped and therefore absent from release AOT.
+  assert(() {
+    debugPaintBaselinesEnabled = false;
+    return true;
+  }());
   if (!kIsWeb &&
       (defaultTargetPlatform == TargetPlatform.android ||
           defaultTargetPlatform == TargetPlatform.iOS)) {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   }
-  runApp(const DocsApp());
+  runApp(DocsApp(initialRoute: initialRoute));
 }
 
 /// Holds the two things that outlive every page.
 class DocsApp extends StatefulWidget {
-  const DocsApp({super.key, this.reduceMotion, this.clock});
+  const DocsApp({super.key, this.reduceMotion, this.clock, this.initialRoute});
 
   /// Overrides the `?motion=` boot parameter — see
   /// [_DocsAppState._reduceMotion] for what it does and why it exists.
@@ -101,6 +117,11 @@ class DocsApp extends StatefulWidget {
   /// Same shape and same reason as [reduceMotion]: null reads the URL, and a
   /// test that cannot set `Uri.base` sets this instead.
   final DateTime? clock;
+
+  /// Opens a known route without replacing the app or nesting a router.
+  ///
+  /// Null preserves the URL-driven documentation boot contract.
+  final String? initialRoute;
 
   /// Parses `?clock=<ISO-8601>` into the instant the app calls "now".
   ///
@@ -151,9 +172,15 @@ class _DocsAppState extends State<DocsApp> {
       _ => DsThemeMode.dark,
     },
   );
-  late final AppRouter _router = AppRouter(
-    route: Uri.base.queryParameters['route'] ?? dsRoot,
-  );
+  late final AppRouter _router;
+
+  @override
+  void initState() {
+    super.initState();
+    _router = AppRouter(
+      route: widget.initialRoute ?? Uri.base.queryParameters['route'] ?? dsRoot,
+    );
+  }
 
   /// `?motion=reduced` — the third boot parameter, and the only one that
   /// changes what paints rather than only what is on screen at boot.
@@ -269,9 +296,13 @@ class _DocsHome extends StatelessWidget {
     final Widget home = DefaultSelectionStyle(
       selectionColor: DsPalette.action.withValues(alpha: _selectionAlpha),
       cursorColor: theme.foreground,
-      child: route == sidebarDemoRoute
-          ? const SidebarDemoPage()
-          : DocsShell(route: route, child: pageFor(route)),
+      child: switch (route) {
+        showcaseRoute => SignalStudioShowcase(
+          onOpenDesignSystem: () => AppRouter.of(context).navigate(dsRoot),
+        ),
+        sidebarDemoRoute => const SidebarDemoPage(),
+        _ => DocsShell(route: route, child: pageFor(route)),
+      },
     );
 
     if (!reduceMotion) return home;

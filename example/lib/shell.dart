@@ -45,7 +45,7 @@ import 'package:elattar_design_system/elattar_design_system.dart';
 // `SelectionArea` is the one thing here that lives in Material rather than
 // Widgets: it is the port of `::selection`, and there is no widgets-layer
 // equivalent that brings its own handles and toolbar.
-import 'package:flutter/material.dart' show SelectionArea;
+import 'package:flutter/material.dart' show Navigator, SelectionArea;
 import 'package:flutter/widgets.dart';
 
 import 'logo.dart';
@@ -101,8 +101,8 @@ class AppRouterScope extends InheritedNotifier<AppRouter> {
   }) : super(notifier: router);
 
   static AppRouter of(BuildContext context) {
-    final AppRouterScope? scope =
-        context.dependOnInheritedWidgetOfExactType<AppRouterScope>();
+    final AppRouterScope? scope = context
+        .dependOnInheritedWidgetOfExactType<AppRouterScope>();
     assert(scope != null, 'No AppRouterScope found above this widget.');
     return scope!.notifier!;
   }
@@ -157,8 +157,10 @@ class _DocsShellState extends State<DocsShell> {
     // gap the rail starts below, and the room the reading column scrolls under.
     // All three are the same number by construction, which is why it is read
     // once here rather than three times below.
-    final double header =
-        DsSafeArea.topBarHeightOf(context, DsWidths.siteHeader);
+    final double header = DsSafeArea.topBarHeightOf(
+      context,
+      DsWidths.siteHeader,
+    );
 
     return DefaultTextStyle(
       // `<body class="… text-foreground">`. Only the colour is ever inherited
@@ -255,10 +257,7 @@ class _Header extends StatelessWidget {
           decoration: BoxDecoration(
             color: theme.background.withValues(alpha: _headerAlpha),
             border: Border(
-              bottom: BorderSide(
-                color: theme.border,
-                width: DsWidths.hairline,
-              ),
+              bottom: BorderSide(color: theme.border, width: DsWidths.hairline),
             ),
           ),
           padding: EdgeInsets.symmetric(horizontal: ds(6)),
@@ -304,6 +303,30 @@ class _Header extends StatelessWidget {
                         // The header's own `gap-4`…
                         gap,
                         // …then the toggle's `md:ml-4`.
+                        gap,
+                      ],
+                      if (desktop) ...<Widget>[
+                        DsButton(
+                          variant: DsButtonVariant.secondary,
+                          size: DsButtonSize.sm,
+                          label: 'Open example app',
+                          onPressed: () =>
+                              AppRouter.of(context).navigate(showcaseRoute),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              DsIcon.lucide(
+                                DsLucide.layoutDashboard,
+                                size: DsIconSize.sm,
+                              ),
+                              SizedBox(width: DsButton.gapFor(DsButtonSize.sm)),
+                              DsText(
+                                'Example app',
+                                DsComponentType.buttonLabel,
+                              ),
+                            ],
+                          ),
+                        ),
                         gap,
                       ],
                       const ThemeToggle(),
@@ -382,6 +405,11 @@ class _MobileNavSheet extends StatelessWidget {
     // that wraps its links in `SheetClose`; this one does not.)
     void go(String href) => router.navigate(href);
 
+    void openShowcase() {
+      Navigator.of(context).pop();
+      router.navigate(showcaseRoute);
+    }
+
     return SingleChildScrollView(
       padding: EdgeInsets.symmetric(horizontal: ds(6)),
       child: Column(
@@ -391,21 +419,37 @@ class _MobileNavSheet extends StatelessWidget {
           // padding, keeping the room the close button needs.
           Container(
             width: double.infinity,
-            padding: EdgeInsets.only(
-              top: ds(4),
-              bottom: ds(4),
-              right: ds(12),
-            ),
+            padding: EdgeInsets.only(top: ds(4), bottom: ds(4), right: ds(12)),
             decoration: BoxDecoration(
               color: theme.muted.withValues(alpha: _sheetHeaderAlpha),
               border: Border(
-                bottom:
-                    BorderSide(color: theme.border, width: DsWidths.hairline),
+                bottom: BorderSide(
+                  color: theme.border,
+                  width: DsWidths.hairline,
+                ),
               ),
             ),
             child: GestureDetector(
               onTap: () => go(dsRoot),
               child: const Logo(),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: ds(4)),
+            child: DsButton(
+              variant: DsButtonVariant.secondary,
+              size: DsButtonSize.md,
+              label: 'Open example app',
+              onPressed: openShowcase,
+              contentAlignment: Alignment.center,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  DsIcon.lucide(DsLucide.layoutDashboard, size: DsIconSize.sm),
+                  SizedBox(width: DsButton.gapFor(DsButtonSize.md)),
+                  DsText('Example app', DsComponentType.buttonLabel),
+                ],
+              ),
             ),
           ),
           NavTree(route: router.route, onNavigate: go),
@@ -444,8 +488,10 @@ class _Sidebar extends StatelessWidget {
             child: Container(
               decoration: BoxDecoration(
                 border: Border(
-                  right:
-                      BorderSide(color: theme.border, width: DsWidths.hairline),
+                  right: BorderSide(
+                    color: theme.border,
+                    width: DsWidths.hairline,
+                  ),
                 ),
               ),
               child: DsThinScrollbar(
@@ -621,9 +667,11 @@ class NavTree extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: <Widget>[
-                          for (int i = 0;
-                              i < group.categories.length;
-                              i++) ...<Widget>[
+                          for (
+                            int i = 0;
+                            i < group.categories.length;
+                            i++
+                          ) ...<Widget>[
                             if (i > 0) SizedBox(height: DsWidths.hairline),
                             _NavRow(
                               title: group.categories[i].title,
@@ -674,8 +722,8 @@ class _GroupLabelState extends State<_GroupLabel> {
     final Color ink = _hovered
         ? theme.mutedForeground
         : widget.active
-            ? theme.actionInk
-            : theme.mutedForeground;
+        ? theme.actionInk
+        : theme.mutedForeground;
 
     return MouseRegion(
       cursor: SystemMouseCursors.click,
@@ -730,8 +778,8 @@ class _NavRowState extends State<_NavRow> {
     final Color rule = active
         ? DsPalette.action
         : _hovered
-            ? theme.input
-            : dsTransparent;
+        ? theme.input
+        : dsTransparent;
     final Color wash = active
         ? DsPalette.action.withValues(alpha: _activeRowAlpha)
         : dsTransparent;
@@ -758,8 +806,7 @@ class _NavRowState extends State<_NavRow> {
                 decoration: BoxDecoration(
                   color: fill,
                   border: Border(
-                    left:
-                        BorderSide(color: border, width: DsWidths.hairline),
+                    left: BorderSide(color: border, width: DsWidths.hairline),
                   ),
                 ),
                 child: Padding(

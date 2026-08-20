@@ -48,8 +48,10 @@ List<MethodCall> _watchPlatform(WidgetTester t) {
     },
   );
   addTearDown(
-    () => t.binding.defaultBinaryMessenger
-        .setMockMethodCallHandler(SystemChannels.platform, null),
+    () => t.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+      SystemChannels.platform,
+      null,
+    ),
   );
   return calls;
 }
@@ -64,8 +66,9 @@ bool _askedToQuit(List<MethodCall> calls) =>
 /// The reference's own font binaries — load-bearing wherever a measured width
 /// is asserted.
 Future<void> _loadFont(String family, String file) async {
-  final ByteData bytes =
-      ByteData.sublistView(File('assets/fonts/$file').readAsBytesSync());
+  final ByteData bytes = ByteData.sublistView(
+    File('assets/fonts/$file').readAsBytesSync(),
+  );
   final FontLoader loader = FontLoader('packages/elattar_design_system/$family')
     ..addFont(Future<ByteData>.value(bytes));
   await loader.load();
@@ -74,104 +77,102 @@ Future<void> _loadFont(String family, String file) async {
 /// A host with a real [Overlay] under a [DsTheme], which is all any of these
 /// widgets needs.
 Widget _host(Widget child, {DsThemeMode mode = DsThemeMode.light}) => DsTheme(
-      controller: DsThemeController(mode: mode),
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: Scaffold(body: Center(child: child)),
-      ),
-    );
+  controller: DsThemeController(mode: mode),
+  child: MaterialApp(
+    debugShowCheckedModeBanner: false,
+    home: Scaffold(body: Center(child: child)),
+  ),
+);
 
 Widget _dialog({
   DsDialogVariant variant = DsDialogVariant.normal,
   bool showCloseButton = true,
   double body = 100,
-}) =>
-    DsDialog(
-      trigger: (BuildContext context, VoidCallback open) =>
-          DsButton(onPressed: open, child: const Text('open')),
-      content: (BuildContext context, VoidCallback close) => DsDialogContent(
-        variant: variant,
-        showCloseButton: showCloseButton,
-        onClose: close,
+}) => DsDialog(
+  trigger: (BuildContext context, VoidCallback open) =>
+      DsButton(onPressed: open, child: const Text('open')),
+  content: (BuildContext context, VoidCallback close) => DsDialogContent(
+    variant: variant,
+    showCloseButton: showCloseButton,
+    onClose: close,
+    children: <Widget>[
+      const DsDialogHeader(
         children: <Widget>[
-          const DsDialogHeader(
-            children: <Widget>[
-              DsDialogTitle('Title'),
-              DsDialogDescription('Description'),
-            ],
-          ),
-          // 100 is the measured case; a taller one is the shipment form that
-          // ran off a phone and is what the compact clamp exists for.
-          SizedBox(height: body),
-          DsDialogFooter(
-            children: <Widget>[
-              DsButton(onPressed: close, child: const Text('Cancel')),
-            ],
-          ),
+          DsDialogTitle('Title'),
+          DsDialogDescription('Description'),
         ],
       ),
-    );
+      // 100 is the measured case; a taller one is the shipment form that
+      // ran off a phone and is what the compact clamp exists for.
+      SizedBox(height: body),
+      DsDialogFooter(
+        children: <Widget>[
+          DsButton(onPressed: close, child: const Text('Cancel')),
+        ],
+      ),
+    ],
+  ),
+);
 
 /// The alert dialog, with a question long enough to outgrow a phone when the
 /// caller asks for one.
 Widget _alertDialog({String? description}) => DsAlertDialog(
-      trigger: (BuildContext context, VoidCallback open) =>
-          DsButton(onPressed: open, child: const Text('open')),
-      content: (BuildContext context, VoidCallback close) =>
-          DsAlertDialogContent(
-        header: DsAlertDialogHeader(
-          title: const DsAlertDialogTitle('Sure?'),
-          description: DsAlertDialogDescription(
-            description ?? 'It cannot be undone.',
-          ),
-        ),
-        footer: DsAlertDialogFooter(
-          cancel: DsAlertDialogCancel(label: 'Keep', onPressed: close),
-          action: DsAlertDialogAction(label: 'Delete', onPressed: close),
-        ),
+  trigger: (BuildContext context, VoidCallback open) =>
+      DsButton(onPressed: open, child: const Text('open')),
+  content: (BuildContext context, VoidCallback close) => DsAlertDialogContent(
+    header: DsAlertDialogHeader(
+      title: const DsAlertDialogTitle('Sure?'),
+      description: DsAlertDialogDescription(
+        description ?? 'It cannot be undone.',
       ),
-    );
+    ),
+    footer: DsAlertDialogFooter(
+      cancel: DsAlertDialogCancel(label: 'Keep', onPressed: close),
+      action: DsAlertDialogAction(label: 'Delete', onPressed: close),
+    ),
+  ),
+);
 
 /// The four-sided sheet, at file scope so the mobile group can reach it too.
 Widget _sheet(DsSheetSide side) => DsSheetOverlay(
-      side: side,
-      trigger: (BuildContext context, VoidCallback open) =>
-          DsButton(onPressed: open, child: const Text('open')),
-      content: (BuildContext context, VoidCallback close) => DsSheetContent(
-        side: side,
-        onClose: close,
-        children: const <Widget>[
-          DsSheetHeader(
-            children: <Widget>[
-              DsSheetTitle('Filter packs'),
-              DsSheetDescription('184 packs.'),
-            ],
-          ),
-          DsSheetFooter(children: <Widget>[SizedBox(height: 40)]),
+  side: side,
+  trigger: (BuildContext context, VoidCallback open) =>
+      DsButton(onPressed: open, child: const Text('open')),
+  content: (BuildContext context, VoidCallback close) => DsSheetContent(
+    side: side,
+    onClose: close,
+    children: const <Widget>[
+      DsSheetHeader(
+        children: <Widget>[
+          DsSheetTitle('Filter packs'),
+          DsSheetDescription('184 packs.'),
         ],
       ),
-    );
+      DsSheetFooter(children: <Widget>[SizedBox(height: 40)]),
+    ],
+  ),
+);
 
 /// The bottom drawer, likewise.
 Widget _drawer() => DsDrawer(
-      trigger: (BuildContext context, VoidCallback open) =>
-          DsButton(onPressed: open, child: const Text('open')),
-      content: (BuildContext context, VoidCallback close) => DsDrawerContent(
+  trigger: (BuildContext context, VoidCallback open) =>
+      DsButton(onPressed: open, child: const Text('open')),
+  content: (BuildContext context, VoidCallback close) => DsDrawerContent(
+    children: <Widget>[
+      const DsDrawerHeader(
         children: <Widget>[
-          const DsDrawerHeader(
-            children: <Widget>[
-              DsDrawerTitle('Voidwing Ascendant'),
-              DsDrawerDescription('Legendary'),
-            ],
-          ),
-          DsDrawerFooter(
-            children: <Widget>[
-              DsButton(onPressed: close, child: const Text('Close')),
-            ],
-          ),
+          DsDrawerTitle('Voidwing Ascendant'),
+          DsDrawerDescription('Legendary'),
         ],
       ),
-    );
+      DsDrawerFooter(
+        children: <Widget>[
+          DsButton(onPressed: close, child: const Text('Close')),
+        ],
+      ),
+    ],
+  ),
+);
 
 Future<void> _open(WidgetTester t) async {
   await t.tap(find.text('open'));
@@ -196,8 +197,9 @@ void main() {
   });
 
   group('DsModalPortal', () {
-    testWidgets('nothing is mounted until the trigger is pressed',
-        (WidgetTester t) async {
+    testWidgets('nothing is mounted until the trigger is pressed', (
+      WidgetTester t,
+    ) async {
       _useFrame(t);
       await t.pumpWidget(_host(_dialog()));
       expect(find.byType(DsDialogContent), findsNothing);
@@ -208,8 +210,9 @@ void main() {
       expect(find.byType(DsDialogOverlay), findsOneWidget);
     });
 
-    testWidgets('a tap on the scrim closes a dialog and Escape does too',
-        (WidgetTester t) async {
+    testWidgets('a tap on the scrim closes a dialog and Escape does too', (
+      WidgetTester t,
+    ) async {
       _useFrame(t);
       await t.pumpWidget(_host(_dialog()));
       await _open(t);
@@ -223,34 +226,53 @@ void main() {
       expect(find.byType(DsDialogContent), findsNothing);
     });
 
-    testWidgets('the alert dialog refuses the scrim and yields to Escape',
-        (WidgetTester t) async {
+    testWidgets('the alert dialog refuses the scrim and yields to Escape', (
+      WidgetTester t,
+    ) async {
       _useFrame(t);
-      await t.pumpWidget(_host(DsAlertDialog(
-        trigger: (BuildContext context, VoidCallback open) =>
-            DsButton(onPressed: open, child: const Text('open')),
-        content: (BuildContext context, VoidCallback close) =>
-            DsAlertDialogContent(
-          header: const DsAlertDialogHeader(
-            title: DsAlertDialogTitle('Sure?'),
-            description: DsAlertDialogDescription('It cannot be undone.'),
-          ),
-          footer: DsAlertDialogFooter(
-            cancel: DsAlertDialogCancel(label: 'Keep', onPressed: close),
-            action: DsAlertDialogAction(label: 'Delete', onPressed: close),
+      await t.pumpWidget(
+        _host(
+          DsAlertDialog(
+            trigger: (BuildContext context, VoidCallback open) =>
+                DsButton(onPressed: open, child: const Text('open')),
+            content: (BuildContext context, VoidCallback close) =>
+                DsAlertDialogContent(
+                  header: const DsAlertDialogHeader(
+                    title: DsAlertDialogTitle('Sure?'),
+                    description: DsAlertDialogDescription(
+                      'It cannot be undone.',
+                    ),
+                  ),
+                  footer: DsAlertDialogFooter(
+                    cancel: DsAlertDialogCancel(
+                      label: 'Keep',
+                      onPressed: close,
+                    ),
+                    action: DsAlertDialogAction(
+                      label: 'Delete',
+                      onPressed: close,
+                    ),
+                  ),
+                ),
           ),
         ),
-      )));
+      );
       await _open(t);
       await t.tapAt(const Offset(10, 10));
       await _settleExit(t);
-      expect(find.byType(DsAlertDialogContent), findsOneWidget,
-          reason: '*"cannot be dismissed by clicking outside"*');
+      expect(
+        find.byType(DsAlertDialogContent),
+        findsOneWidget,
+        reason: '*"cannot be dismissed by clicking outside"*',
+      );
 
       await t.sendKeyEvent(LogicalKeyboardKey.escape);
       await _settleExit(t);
-      expect(find.byType(DsAlertDialogContent), findsNothing,
-          reason: 'Radix blocks onPointerDownOutside only — measured');
+      expect(
+        find.byType(DsAlertDialogContent),
+        findsNothing,
+        reason: 'Radix blocks onPointerDownOutside only — measured',
+      );
     });
   });
 
@@ -278,13 +300,18 @@ void main() {
     });
 
     test('yuki-jelly-out stops at 0 / 30 / 100%', () {
-      expect(DsJellyTransition.sample(0, entering: false).scale,
-          closeTo(1, 0.001));
+      expect(
+        DsJellyTransition.sample(0, entering: false).scale,
+        closeTo(1, 0.001),
+      );
       final ({double scale, double shift, double opacity}) anticipate =
           DsJellyTransition.sample(0.3, entering: false);
       expect(anticipate.scale, closeTo(1.01, 0.001));
-      expect(anticipate.shift, closeTo(-4, 0.001),
-          reason: 'the exit anticipates UPWARD before it drops');
+      expect(
+        anticipate.shift,
+        closeTo(-4, 0.001),
+        reason: 'the exit anticipates UPWARD before it drops',
+      );
       expect(anticipate.opacity, closeTo(1, 0.001));
 
       final ({double scale, double shift, double opacity}) gone =
@@ -300,12 +327,16 @@ void main() {
       // `--ease-spring` puts it well beyond half the travel.
       final double half = DsJellyTransition.sample(0.3, entering: true).scale;
       final double linear = 0.92 + (1.02 - 0.92) * 0.5;
-      expect(half, greaterThan(linear),
-          reason: 'cubic-bezier(0.34, 1.56, 0.64, 1) is front-loaded');
+      expect(
+        half,
+        greaterThan(linear),
+        reason: 'cubic-bezier(0.34, 1.56, 0.64, 1) is front-loaded',
+      );
     });
 
-    testWidgets('the translate sits INSIDE the scale, so it is scaled with it',
-        (WidgetTester t) async {
+    testWidgets('the translate sits INSIDE the scale, so it is scaled with it', (
+      WidgetTester t,
+    ) async {
       _useFrame(t);
       await t.pumpWidget(_host(_dialog()));
       await t.tap(find.text('open'));
@@ -315,25 +346,29 @@ void main() {
       // composition is what makes the measured first frame
       // `matrix(0.92, 0, 0, 0.92, 0, 22.08)` — 0.92 x 24, not 24.
       final List<Transform> stack = t
-          .widgetList<Transform>(find.descendant(
-            of: find.byType(DsJellyTransition),
-            matching: find.byType(Transform),
-          ))
+          .widgetList<Transform>(
+            find.descendant(
+              of: find.byType(DsJellyTransition),
+              matching: find.byType(Transform),
+            ),
+          )
           .toList();
       // The outermost two are this transition's; anything below belongs to the
       // panel's own content.
       expect(stack.length, greaterThanOrEqualTo(2));
       expect(stack[0].transform.storage[0], closeTo(0.92, 0.001));
       expect(stack[1].transform.storage[13], closeTo(24, 0.001));
-      final Matrix4 composed =
-          stack[0].transform.multiplied(stack[1].transform);
+      final Matrix4 composed = stack[0].transform.multiplied(
+        stack[1].transform,
+      );
       expect(composed.storage[13], closeTo(0.92 * 24, 0.001));
     });
   });
 
   group('DsDialogContent', () {
-    testWidgets('the default is 384 wide and the media variant 448',
-        (WidgetTester t) async {
+    testWidgets('the default is 384 wide and the media variant 448', (
+      WidgetTester t,
+    ) async {
       _useFrame(t);
       await t.pumpWidget(_host(_dialog()));
       await _open(t);
@@ -345,8 +380,9 @@ void main() {
       expect(t.getSize(find.byType(DsDialogContent)).width, DsContainers.md);
     });
 
-    testWidgets('the bands bleed and cancel the padding on their own side',
-        (WidgetTester t) async {
+    testWidgets('the bands bleed and cancel the padding on their own side', (
+      WidgetTester t,
+    ) async {
       _useFrame(t);
       await t.pumpWidget(_host(_dialog()));
       await _open(t);
@@ -369,18 +405,24 @@ void main() {
       final Rect withX = t.getRect(find.text('Title'));
       final Rect header = t.getRect(find.byType(DsDialogHeader));
       // `p-4 pr-12` — the title column stops 48px from the band's right edge.
-      expect(header.right - withX.left - t.getSize(find.text('Title')).width,
-          greaterThan(ds(12) - 1));
+      expect(
+        header.right - withX.left - t.getSize(find.text('Title')).width,
+        greaterThan(ds(12) - 1),
+      );
 
       _useFrame(t);
       await t.pumpWidget(_host(_dialog(showCloseButton: false)));
       await _open(t);
-      expect(find.byType(DsIcon), findsNothing,
-          reason: 'no X, and the group-data hook drops the lane with it');
+      expect(
+        find.byType(DsIcon),
+        findsNothing,
+        reason: 'no X, and the group-data hook drops the lane with it',
+      );
     });
 
-    testWidgets('the media variant carries no bands and no padding',
-        (WidgetTester t) async {
+    testWidgets('the media variant carries no bands and no padding', (
+      WidgetTester t,
+    ) async {
       _useFrame(t);
       await t.pumpWidget(_host(_dialog(variant: DsDialogVariant.media)));
       await _open(t);
@@ -393,12 +435,15 @@ void main() {
   });
 
   group('DsBadge', () {
-    testWidgets('h-5 is a hard border box whatever the label does',
-        (WidgetTester t) async {
+    testWidgets('h-5 is a hard border box whatever the label does', (
+      WidgetTester t,
+    ) async {
       _useFrame(t);
-      await t.pumpWidget(_host(
-        const DsBadge(label: 'New release', variant: DsBadgeVariant.action),
-      ));
+      await t.pumpWidget(
+        _host(
+          const DsBadge(label: 'New release', variant: DsBadgeVariant.action),
+        ),
+      );
       final Size size = t.getSize(find.byType(DsBadge));
       expect(size.height, DsBadge.height);
       // `w-fit` — measured 89.06 for this label at 12px/500; the port is within
@@ -406,11 +451,12 @@ void main() {
       expect(size.width, closeTo(89.06, 3));
     });
 
-    testWidgets('the unfilled variants take neither ramp nor shadow',
-        (WidgetTester t) async {
+    testWidgets('the unfilled variants take neither ramp nor shadow', (
+      WidgetTester t,
+    ) async {
       for (final DsBadgeVariant v in DsBadgeVariant.values) {
         _useFrame(t);
-      await t.pumpWidget(_host(DsBadge(label: 'x', variant: v)));
+        await t.pumpWidget(_host(DsBadge(label: 'x', variant: v)));
         expect(
           find.descendant(
             of: find.byType(DsBadge),
@@ -425,30 +471,31 @@ void main() {
 
   group('DsSheet', () {
     Widget sheet(DsSheetSide side) => DsSheetOverlay(
-          side: side,
-          trigger: (BuildContext context, VoidCallback open) =>
-              DsButton(onPressed: open, child: const Text('open')),
-          content: (BuildContext context, VoidCallback close) => DsSheetContent(
-            side: side,
-            onClose: close,
-            children: const <Widget>[
-              DsSheetHeader(
-                children: <Widget>[
-                  DsSheetTitle('Filter packs'),
-                  DsSheetDescription('184 packs.'),
-                ],
-              ),
-              DsSheetFooter(children: <Widget>[SizedBox(height: 40)]),
+      side: side,
+      trigger: (BuildContext context, VoidCallback open) =>
+          DsButton(onPressed: open, child: const Text('open')),
+      content: (BuildContext context, VoidCallback close) => DsSheetContent(
+        side: side,
+        onClose: close,
+        children: const <Widget>[
+          DsSheetHeader(
+            children: <Widget>[
+              DsSheetTitle('Filter packs'),
+              DsSheetDescription('184 packs.'),
             ],
           ),
-        );
+          DsSheetFooter(children: <Widget>[SizedBox(height: 40)]),
+        ],
+      ),
+    );
 
     for (final DsSheetSide side in <DsSheetSide>[
       DsSheetSide.left,
       DsSheetSide.right,
     ]) {
-      testWidgets('the ${side.name} sheet pins itself to its own edge at 384',
-          (WidgetTester t) async {
+      testWidgets('the ${side.name} sheet pins itself to its own edge at 384', (
+        WidgetTester t,
+      ) async {
         _useFrame(t);
         await t.pumpWidget(_host(sheet(side)));
         await t.tap(find.text('open'));
@@ -466,8 +513,9 @@ void main() {
       });
     }
 
-    testWidgets('the entrance travels 10% of the panel, not 10 spacing units',
-        (WidgetTester t) async {
+    testWidgets('the entrance travels 10% of the panel, not 10 spacing units', (
+      WidgetTester t,
+    ) async {
       _useFrame(t);
       await t.pumpWidget(_host(sheet(DsSheetSide.right)));
       await t.tap(find.text('open'));
@@ -475,17 +523,22 @@ void main() {
       // First frame: `--tw-enter-translate-x: calc(.1 * 100%)` — measured 38.4
       // against a 384 panel, and NOT the 40 that `ds(10)` would give.
       final Rect first = t.getRect(find.byType(DsSheetContent));
-      expect(first.left - (_frame.width - DsContainers.sm),
-          closeTo(DsContainers.sm * DsSheetTransition.fraction, 0.5));
+      expect(
+        first.left - (_frame.width - DsContainers.sm),
+        closeTo(DsContainers.sm * DsSheetTransition.fraction, 0.5),
+      );
       expect(DsContainers.sm * DsSheetTransition.fraction, closeTo(38.4, 0.01));
 
       await t.pump(DsDurations.overlay);
-      expect(t.getRect(find.byType(DsSheetContent)).right,
-          closeTo(_frame.width, 0.5));
+      expect(
+        t.getRect(find.byType(DsSheetContent)).right,
+        closeTo(_frame.width, 0.5),
+      );
     });
 
-    testWidgets('the footer takes mt-auto and lands on the bottom edge',
-        (WidgetTester t) async {
+    testWidgets('the footer takes mt-auto and lands on the bottom edge', (
+      WidgetTester t,
+    ) async {
       _useFrame(t);
       await t.pumpWidget(_host(sheet(DsSheetSide.right)));
       await t.tap(find.text('open'));
@@ -496,32 +549,62 @@ void main() {
         closeTo(t.getRect(find.byType(DsSheetContent)).bottom, 0.5),
       );
     });
+
+    testWidgets('full-height sheet keeps chrome between Android system bars', (
+      WidgetTester t,
+    ) async {
+      _usePhone(t);
+      const double statusBar = 47;
+      const double gestureBar = 34;
+      t.view.padding = const FakeViewPadding(
+        top: statusBar,
+        bottom: gestureBar,
+      );
+      t.view.viewPadding = const FakeViewPadding(
+        top: statusBar,
+        bottom: gestureBar,
+      );
+      addTearDown(t.view.resetPadding);
+      addTearDown(t.view.resetViewPadding);
+
+      await t.pumpWidget(_host(sheet(DsSheetSide.right)));
+      await t.tap(find.text('open'));
+      await t.pump();
+      await t.pump(DsDurations.overlay);
+
+      expect(t.getRect(find.byType(DsSheetHeader)).top, statusBar);
+      expect(
+        t.getRect(find.byType(DsSheetFooter)).bottom,
+        _phone.height - gestureBar,
+      );
+      expect(t.getRect(find.byType(DsSheetContent)).height, _phone.height);
+    });
   });
 
   group('DsDrawer', () {
     Widget drawer() => DsDrawer(
-          trigger: (BuildContext context, VoidCallback open) =>
-              DsButton(onPressed: open, child: const Text('open')),
-          content: (BuildContext context, VoidCallback close) =>
-              DsDrawerContent(
+      trigger: (BuildContext context, VoidCallback open) =>
+          DsButton(onPressed: open, child: const Text('open')),
+      content: (BuildContext context, VoidCallback close) => DsDrawerContent(
+        children: <Widget>[
+          const DsDrawerHeader(
             children: <Widget>[
-              const DsDrawerHeader(
-                children: <Widget>[
-                  DsDrawerTitle('Voidwing Ascendant'),
-                  DsDrawerDescription('Legendary'),
-                ],
-              ),
-              DsDrawerFooter(
-                children: <Widget>[
-                  DsButton(onPressed: close, child: const Text('Close')),
-                ],
-              ),
+              DsDrawerTitle('Voidwing Ascendant'),
+              DsDrawerDescription('Legendary'),
             ],
           ),
-        );
+          DsDrawerFooter(
+            children: <Widget>[
+              DsButton(onPressed: close, child: const Text('Close')),
+            ],
+          ),
+        ],
+      ),
+    );
 
-    testWidgets('it is full-bleed, bottom-pinned, and capped at 80vh',
-        (WidgetTester t) async {
+    testWidgets('it is full-bleed, bottom-pinned, and capped at 80vh', (
+      WidgetTester t,
+    ) async {
       _useFrame(t);
       await t.pumpWidget(_host(drawer()));
       await t.tap(find.text('open'));
@@ -529,16 +612,23 @@ void main() {
       await t.pump(DsDurations.drawer);
 
       final Rect panel = t.getRect(find.byType(DsDrawerContent));
-      expect(panel.width, _frame.width,
-          reason: '`inset-x-0` with no `sm:` cap');
+      expect(
+        panel.width,
+        _frame.width,
+        reason: '`inset-x-0` with no `sm:` cap',
+      );
       expect(panel.bottom, closeTo(_frame.height, 0.5));
-      expect(panel.height,
-          lessThanOrEqualTo(_frame.height *
-              DsDrawerContent.maxHeightFraction + 0.5));
+      expect(
+        panel.height,
+        lessThanOrEqualTo(
+          _frame.height * DsDrawerContent.maxHeightFraction + 0.5,
+        ),
+      );
     });
 
-    testWidgets('the handle is 96 x 4 and only the bottom direction has one',
-        (WidgetTester t) async {
+    testWidgets('the handle is 96 x 4 and only the bottom direction has one', (
+      WidgetTester t,
+    ) async {
       _useFrame(t);
       await t.pumpWidget(_host(drawer()));
       await t.tap(find.text('open'));
@@ -554,52 +644,57 @@ void main() {
       expect(grip.height, DsDrawerHandle.height);
     });
 
-    testWidgets('a drag past the threshold dismisses; a short one springs back',
-        (WidgetTester t) async {
-      _useFrame(t);
-      await t.pumpWidget(_host(drawer()));
-      await t.tap(find.text('open'));
-      await t.pump();
-      await t.pump(DsDurations.drawer);
-      final Rect panel = t.getRect(find.byType(DsDrawerContent));
+    testWidgets(
+      'a drag past the threshold dismisses; a short one springs back',
+      (WidgetTester t) async {
+        _useFrame(t);
+        await t.pumpWidget(_host(drawer()));
+        await t.tap(find.text('open'));
+        await t.pump();
+        await t.pump(DsDurations.drawer);
+        final Rect panel = t.getRect(find.byType(DsDrawerContent));
 
-      // Short of vaul's 0.25 `closeThreshold`.
-      TestGesture drag =
-          await t.startGesture(panel.topCenter + const Offset(0, 8));
-      await t.pump();
-      await drag.moveBy(Offset(0, panel.height * 0.1));
-      await t.pump();
-      await drag.up();
-      await t.pump();
-      await t.pump(DsDurations.drawer);
-      expect(find.byType(DsDrawerContent), findsOneWidget);
+        // Short of vaul's 0.25 `closeThreshold`.
+        TestGesture drag = await t.startGesture(
+          panel.topCenter + const Offset(0, 8),
+        );
+        await t.pump();
+        await drag.moveBy(Offset(0, panel.height * 0.1));
+        await t.pump();
+        await drag.up();
+        await t.pump();
+        await t.pump(DsDurations.drawer);
+        expect(find.byType(DsDrawerContent), findsOneWidget);
 
-      drag = await t.startGesture(panel.topCenter + const Offset(0, 8));
-      await t.pump();
-      await drag.moveBy(Offset(0, panel.height * 0.6));
-      await t.pump();
-      await drag.up();
-      await t.pump();
-      await t.pump(DsDurations.drawer);
-      await t.pump();
-      await t.pump(DsDurations.drawer);
-      await t.pump();
-      expect(find.byType(DsDrawerContent), findsNothing);
-    });
+        drag = await t.startGesture(panel.topCenter + const Offset(0, 8));
+        await t.pump();
+        await drag.moveBy(Offset(0, panel.height * 0.6));
+        await t.pump();
+        await drag.up();
+        await t.pump();
+        await t.pump(DsDurations.drawer);
+        await t.pump();
+        await t.pump(DsDurations.drawer);
+        await t.pump();
+        expect(find.byType(DsDrawerContent), findsNothing);
+      },
+    );
   });
 
   group('DsTooltip', () {
     Widget tip() => DsTooltip(
-          label: 'Open this pack',
-          child: DsButton(onPressed: () {}, child: const Text('trigger')),
-        );
+      label: 'Open this pack',
+      child: DsButton(onPressed: () {}, child: const Text('trigger')),
+    );
 
-    testWidgets('it waits the provider delay, then labels the control',
-        (WidgetTester t) async {
+    testWidgets('it waits the provider delay, then labels the control', (
+      WidgetTester t,
+    ) async {
       _useFrame(t);
       await t.pumpWidget(_host(tip()));
-      final TestGesture pointer =
-          await t.createGesture(kind: PointerDeviceKind.mouse);
+      final TestGesture pointer = await t.createGesture(
+        kind: PointerDeviceKind.mouse,
+      );
       addTearDown(pointer.removePointer);
       await pointer.addPointer(location: Offset.zero);
 
@@ -621,12 +716,14 @@ void main() {
       expect(find.byType(DsTooltipContent), findsNothing);
     });
 
-    testWidgets('it sits above its trigger with the arrow lane between them',
-        (WidgetTester t) async {
+    testWidgets('it sits above its trigger with the arrow lane between them', (
+      WidgetTester t,
+    ) async {
       _useFrame(t);
       await t.pumpWidget(_host(tip()));
-      final TestGesture pointer =
-          await t.createGesture(kind: PointerDeviceKind.mouse);
+      final TestGesture pointer = await t.createGesture(
+        kind: PointerDeviceKind.mouse,
+      );
       addTearDown(pointer.removePointer);
       await pointer.addPointer(location: Offset.zero);
       await pointer.moveTo(t.getCenter(find.text('trigger')));
@@ -649,17 +746,26 @@ void main() {
     // how a viewport-wide bar pinned at x = 0 shipped. Both pins below put the
     // trigger somewhere other than the middle.
 
-    testWidgets('the pill wraps its label, not the viewport',
-        (WidgetTester t) async {
+    testWidgets('the pill wraps its label, not the viewport', (
+      WidgetTester t,
+    ) async {
       _useFrame(t);
       // Off-centre, but not against the edge: at x = 0 the positioner's own
       // on-screen clamp would answer for the geometry instead of the layout.
-      await t.pumpWidget(_host(Align(
-        alignment: Alignment.centerLeft,
-        child: Padding(padding: EdgeInsets.only(left: ds(50)), child: tip()),
-      )));
-      final TestGesture pointer =
-          await t.createGesture(kind: PointerDeviceKind.mouse);
+      await t.pumpWidget(
+        _host(
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Padding(
+              padding: EdgeInsets.only(left: ds(50)),
+              child: tip(),
+            ),
+          ),
+        ),
+      );
+      final TestGesture pointer = await t.createGesture(
+        kind: PointerDeviceKind.mouse,
+      );
       addTearDown(pointer.removePointer);
       await pointer.addPointer(location: Offset.zero);
       await pointer.moveTo(t.getCenter(find.text('trigger')));
@@ -680,17 +786,24 @@ void main() {
       expect(content.left, greaterThan(0));
     });
 
-    testWidgets('a long label still stops at `max-w-xs`',
-        (WidgetTester t) async {
+    testWidgets('a long label still stops at `max-w-xs`', (
+      WidgetTester t,
+    ) async {
       _useFrame(t);
-      await t.pumpWidget(_host(DsTooltip(
-        // The page's own longest specimen, doubled.
-        label: '412 packs remaining of a 2,000 print run, and then no more '
-            'of them will ever be printed again anywhere',
-        child: DsButton(onPressed: () {}, child: const Text('trigger')),
-      )));
-      final TestGesture pointer =
-          await t.createGesture(kind: PointerDeviceKind.mouse);
+      await t.pumpWidget(
+        _host(
+          DsTooltip(
+            // The page's own longest specimen, doubled.
+            label:
+                '412 packs remaining of a 2,000 print run, and then no more '
+                'of them will ever be printed again anywhere',
+            child: DsButton(onPressed: () {}, child: const Text('trigger')),
+          ),
+        ),
+      );
+      final TestGesture pointer = await t.createGesture(
+        kind: PointerDeviceKind.mouse,
+      );
       addTearDown(pointer.removePointer);
       await pointer.addPointer(location: Offset.zero);
       await pointer.moveTo(t.getCenter(find.text('trigger')));
@@ -703,19 +816,25 @@ void main() {
       expect(content.height, greaterThan(28 + DsTooltip.arrowSize));
     });
 
-    testWidgets('the right-side pill wraps its label height too',
-        (WidgetTester t) async {
+    testWidgets('the right-side pill wraps its label height too', (
+      WidgetTester t,
+    ) async {
       _useFrame(t);
-      await t.pumpWidget(_host(Align(
-        alignment: Alignment.topLeft,
-        child: DsTooltip(
-          label: 'Open this pack',
-          side: DsTooltipSide.right,
-          child: DsButton(onPressed: () {}, child: const Text('trigger')),
+      await t.pumpWidget(
+        _host(
+          Align(
+            alignment: Alignment.topLeft,
+            child: DsTooltip(
+              label: 'Open this pack',
+              side: DsTooltipSide.right,
+              child: DsButton(onPressed: () {}, child: const Text('trigger')),
+            ),
+          ),
         ),
-      )));
-      final TestGesture pointer =
-          await t.createGesture(kind: PointerDeviceKind.mouse);
+      );
+      final TestGesture pointer = await t.createGesture(
+        kind: PointerDeviceKind.mouse,
+      );
       addTearDown(pointer.removePointer);
       await pointer.addPointer(location: Offset.zero);
       await pointer.moveTo(t.getCenter(find.text('trigger')));
@@ -740,27 +859,29 @@ void main() {
       VoidCallback? onTrigger,
       VoidCallback? onElsewhere,
       bool hidden = false,
-    }) =>
-        _host(Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            DsTooltip(
-              label: 'Open this pack',
-              hidden: hidden,
-              child: DsButton(
-                onPressed: onTrigger ?? () {},
-                child: const Text('trigger'),
-              ),
+    }) => _host(
+      Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          DsTooltip(
+            label: 'Open this pack',
+            hidden: hidden,
+            child: DsButton(
+              onPressed: onTrigger ?? () {},
+              child: const Text('trigger'),
             ),
-            DsButton(
-              onPressed: onElsewhere ?? () {},
-              child: const Text('elsewhere'),
-            ),
-          ],
-        ));
+          ),
+          DsButton(
+            onPressed: onElsewhere ?? () {},
+            child: const Text('elsewhere'),
+          ),
+        ],
+      ),
+    );
 
-    testWidgets('a tap opens it on the spot and a second tap closes it',
-        (WidgetTester t) async {
+    testWidgets('a tap opens it on the spot and a second tap closes it', (
+      WidgetTester t,
+    ) async {
       _usePhone(t);
       int presses = 0;
       await t.pumpWidget(scene(onTrigger: () => presses++));
@@ -782,8 +903,9 @@ void main() {
       expect(presses, 2);
     });
 
-    testWidgets('a tap elsewhere closes it and still reaches what it hit',
-        (WidgetTester t) async {
+    testWidgets('a tap elsewhere closes it and still reaches what it hit', (
+      WidgetTester t,
+    ) async {
       _usePhone(t);
       int elsewhere = 0;
       await t.pumpWidget(scene(onElsewhere: () => elsewhere++));
@@ -801,8 +923,9 @@ void main() {
       expect(elsewhere, 1);
     });
 
-    testWidgets('it takes itself down after the touch dwell',
-        (WidgetTester t) async {
+    testWidgets('it takes itself down after the touch dwell', (
+      WidgetTester t,
+    ) async {
       _usePhone(t);
       await t.pumpWidget(scene());
 
@@ -827,12 +950,14 @@ void main() {
       expect(find.byType(DsTooltipContent), findsNothing);
     });
 
-    testWidgets('a mouse on the same viewport still waits the dwell',
-        (WidgetTester t) async {
+    testWidgets('a mouse on the same viewport still waits the dwell', (
+      WidgetTester t,
+    ) async {
       _usePhone(t);
       await t.pumpWidget(scene());
-      final TestGesture pointer =
-          await t.createGesture(kind: PointerDeviceKind.mouse);
+      final TestGesture pointer = await t.createGesture(
+        kind: PointerDeviceKind.mouse,
+      );
       addTearDown(pointer.removePointer);
       await pointer.addPointer(location: Offset.zero);
 
@@ -862,29 +987,40 @@ void main() {
   });
 
   group('DsHoverCard', () {
-    testWidgets('it waits 700ms, opens under the trigger, and closes on 300',
-        (WidgetTester t) async {
+    testWidgets('it waits 700ms, opens under the trigger, and closes on 300', (
+      WidgetTester t,
+    ) async {
       _useFrame(t);
-      await t.pumpWidget(_host(DsHoverCard(
-        trigger: DsButton(onPressed: () {}, child: const Text('trigger')),
-        content: const SizedBox(height: 120),
-      )));
-      final TestGesture pointer =
-          await t.createGesture(kind: PointerDeviceKind.mouse);
+      await t.pumpWidget(
+        _host(
+          DsHoverCard(
+            trigger: DsButton(onPressed: () {}, child: const Text('trigger')),
+            content: const SizedBox(height: 120),
+          ),
+        ),
+      );
+      final TestGesture pointer = await t.createGesture(
+        kind: PointerDeviceKind.mouse,
+      );
       addTearDown(pointer.removePointer);
       await pointer.addPointer(location: Offset.zero);
 
       await pointer.moveTo(t.getCenter(find.text('trigger')));
       await t.pump();
       await t.pump(const Duration(milliseconds: 600));
-      expect(find.byType(DsHoverCardContent), findsNothing,
-          reason: 'Radix\'s openDelay default is 700, measured 728.3');
+      expect(
+        find.byType(DsHoverCardContent),
+        findsNothing,
+        reason: 'Radix\'s openDelay default is 700, measured 728.3',
+      );
 
       await t.pump(const Duration(milliseconds: 200));
       await t.pump(DsDurations.overlay);
       expect(find.byType(DsHoverCardContent), findsOneWidget);
-      expect(t.getSize(find.byType(DsHoverCardContent)).width,
-          DsHoverCard.defaultWidth);
+      expect(
+        t.getSize(find.byType(DsHoverCardContent)).width,
+        DsHoverCard.defaultWidth,
+      );
       // `side="bottom" sideOffset={4}`.
       expect(
         t.getRect(find.byType(DsHoverCardContent)).top -
@@ -895,8 +1031,11 @@ void main() {
       await pointer.moveTo(const Offset(2, 2));
       await t.pump();
       await t.pump(const Duration(milliseconds: 200));
-      expect(find.byType(DsHoverCardContent), findsOneWidget,
-          reason: 'the closeDelay is the window for crossing the 4px gap');
+      expect(
+        find.byType(DsHoverCardContent),
+        findsOneWidget,
+        reason: 'the closeDelay is the window for crossing the 4px gap',
+      );
       await t.pump(const Duration(milliseconds: 200));
       await t.pump(DsDurations.overlay);
       await t.pump();
@@ -907,8 +1046,9 @@ void main() {
   });
 
   group('both themes', () {
-    testWidgets('every overlay paints in dark without error',
-        (WidgetTester t) async {
+    testWidgets('every overlay paints in dark without error', (
+      WidgetTester t,
+    ) async {
       _useFrame(t);
       await t.pumpWidget(_host(_dialog(), mode: DsThemeMode.dark));
       await _open(t);
@@ -933,10 +1073,14 @@ void main() {
 
       final Rect panel = t.getRect(find.byType(DsDialogContent));
       // 337.5 x 609 at 375 x 812.
-      expect(panel.width,
-          closeTo(_phone.width * DsModalCompact.maxWidthFraction, 0.01));
-      expect(panel.height,
-          closeTo(_phone.height * DsModalCompact.maxHeightFraction, 0.01));
+      expect(
+        panel.width,
+        closeTo(_phone.width * DsModalCompact.maxWidthFraction, 0.01),
+      );
+      expect(
+        panel.height,
+        closeTo(_phone.height * DsModalCompact.maxHeightFraction, 0.01),
+      );
       // The whole of the complaint: none of it is off the screen any more.
       expect(panel.top, greaterThanOrEqualTo(-0.01));
       expect(panel.bottom, lessThanOrEqualTo(_phone.height + 0.01));
@@ -956,8 +1100,11 @@ void main() {
         matching: find.byType(Scrollable),
       );
       final ScrollableState state = t.state<ScrollableState>(scroller);
-      expect(state.position.maxScrollExtent, greaterThan(0),
-          reason: 'a 1200px body inside a 609px panel has somewhere to go');
+      expect(
+        state.position.maxScrollExtent,
+        greaterThan(0),
+        reason: 'a 1200px body inside a 609px panel has somewhere to go',
+      );
 
       final Rect header = t.getRect(find.byType(DsDialogHeader));
       final Rect footer = t.getRect(find.byType(DsDialogFooter));
@@ -973,24 +1120,30 @@ void main() {
     testWidgets('the alert dialog clamps too, and scrolls its question under a '
         'pinned decision', (WidgetTester t) async {
       _usePhone(t);
-      await t.pumpWidget(_host(_alertDialog(
-        description: 'It cannot be undone. ' * 60,
-      )));
+      await t.pumpWidget(
+        _host(_alertDialog(description: 'It cannot be undone. ' * 60)),
+      );
       await _open(t);
 
       final Rect panel = t.getRect(find.byType(DsAlertDialogContent));
-      expect(panel.height,
-          closeTo(_phone.height * DsModalCompact.maxHeightFraction, 0.01));
+      expect(
+        panel.height,
+        closeTo(_phone.height * DsModalCompact.maxHeightFraction, 0.01),
+      );
       expect(panel.bottom, lessThanOrEqualTo(_phone.height + 0.01));
 
-      final ScrollableState state = t.state<ScrollableState>(find.descendant(
-        of: find.byType(DsAlertDialogContent),
-        matching: find.byType(Scrollable),
-      ));
+      final ScrollableState state = t.state<ScrollableState>(
+        find.descendant(
+          of: find.byType(DsAlertDialogContent),
+          matching: find.byType(Scrollable),
+        ),
+      );
       expect(state.position.maxScrollExtent, greaterThan(0));
       // *"the footer is the decision"* — and it is still reachable.
-      expect(t.getRect(find.byType(DsAlertDialogFooter)).bottom,
-          closeTo(panel.bottom, 0.01));
+      expect(
+        t.getRect(find.byType(DsAlertDialogFooter)).bottom,
+        closeTo(panel.bottom, 0.01),
+      );
     });
 
     test('above the breakpoint every clamp is the identity', () {
@@ -1001,16 +1154,24 @@ void main() {
       expect(DsModalCompact.isCompact(600.01), isFalse);
 
       expect(DsModalCompact.constraintsFor(_frame), const BoxConstraints());
-      expect(DsModalCompact.clampWidth(DsContainers.sm, _frame),
-          DsContainers.sm);
-      expect(DsModalCompact.clampSize(const Size(1123.2, 792), _frame),
-          const Size(1123.2, 792));
+      expect(
+        DsModalCompact.clampWidth(DsContainers.sm, _frame),
+        DsContainers.sm,
+      );
+      expect(
+        DsModalCompact.clampSize(const Size(1123.2, 792), _frame),
+        const Size(1123.2, 792),
+      );
 
       // …and on a phone it is those two fractions and nothing else.
-      expect(DsModalCompact.constraintsFor(_phone).maxWidth,
-          closeTo(337.5, 0.01));
-      expect(DsModalCompact.constraintsFor(_phone).maxHeight,
-          closeTo(609, 0.01));
+      expect(
+        DsModalCompact.constraintsFor(_phone).maxWidth,
+        closeTo(337.5, 0.01),
+      );
+      expect(
+        DsModalCompact.constraintsFor(_phone).maxHeight,
+        closeTo(609, 0.01),
+      );
     });
 
     testWidgets('the scroller is inert wherever there is room, so the measured '
@@ -1020,31 +1181,39 @@ void main() {
       await _open(t);
 
       expect(t.getSize(find.byType(DsDialogContent)).width, DsContainers.sm);
-      final ScrollableState state = t.state<ScrollableState>(find.descendant(
-        of: find.byType(DsDialogContent),
-        matching: find.byType(Scrollable),
-      ));
-      expect(state.position.maxScrollExtent, 0,
-          reason: 'a LOOSE Flexible takes only what its content needs');
+      final ScrollableState state = t.state<ScrollableState>(
+        find.descendant(
+          of: find.byType(DsDialogContent),
+          matching: find.byType(Scrollable),
+        ),
+      );
+      expect(
+        state.position.maxScrollExtent,
+        0,
+        reason: 'a LOOSE Flexible takes only what its content needs',
+      );
     });
 
-    test('the launcher dialog takes the clamp on a phone and nothing above it',
-        () {
-      // 1440x900 — the measured 1123.19 x 792, unchanged.
-      final Size wide = DsAgentLauncher.dialogSize(_frame);
-      expect(wide.width, closeTo(1123.2, 0.05));
-      expect(wide.height, closeTo(792, 0.05));
+    test(
+      'the launcher dialog takes the clamp on a phone and nothing above it',
+      () {
+        // 1440x900 — the measured 1123.19 x 792, unchanged.
+        final Size wide = DsAgentLauncher.dialogSize(_frame);
+        expect(wide.width, closeTo(1123.2, 0.05));
+        expect(wide.height, closeTo(792, 0.05));
 
-      // 375x812 — `78vw` still wins the width (292.5 is inside 90vw), and the
-      // 88vh height, which `60vw`'s floor would otherwise protect, is cut to
-      // 75vh.
-      final Size phone = DsAgentLauncher.dialogSize(_phone);
-      expect(phone.width, closeTo(292.5, 0.01));
-      expect(phone.height, closeTo(609, 0.01));
-    });
+        // 375x812 — `78vw` still wins the width (292.5 is inside 90vw), and the
+        // 88vh height, which `60vw`'s floor would otherwise protect, is cut to
+        // 75vh.
+        final Size phone = DsAgentLauncher.dialogSize(_phone);
+        expect(phone.width, closeTo(292.5, 0.01));
+        expect(phone.height, closeTo(609, 0.01));
+      },
+    );
 
-    testWidgets('a side sheet clamps its width and keeps its full height',
-        (WidgetTester t) async {
+    testWidgets('a side sheet clamps its width and keeps its full height', (
+      WidgetTester t,
+    ) async {
       _usePhone(t);
       await t.pumpWidget(_host(_sheet(DsSheetSide.right)));
       await t.tap(find.text('open'));
@@ -1052,16 +1221,22 @@ void main() {
       await t.pump(DsDurations.overlay);
 
       final Rect panel = t.getRect(find.byType(DsSheetContent));
-      expect(panel.width,
-          closeTo(_phone.width * DsModalCompact.maxWidthFraction, 0.01),
-          reason: '`sm:max-w-sm` is 384, which does not fit a 375px phone');
-      expect(panel.height, _phone.height,
-          reason: 'a side sheet is full-height by definition — no 75vh');
+      expect(
+        panel.width,
+        closeTo(_phone.width * DsModalCompact.maxWidthFraction, 0.01),
+        reason: '`sm:max-w-sm` is 384, which does not fit a 375px phone',
+      );
+      expect(
+        panel.height,
+        _phone.height,
+        reason: 'a side sheet is full-height by definition — no 75vh',
+      );
       expect(panel.right, closeTo(_phone.width, 0.01));
     });
 
-    testWidgets("the drawer stays full-bleed under vaul's own 80vh",
-        (WidgetTester t) async {
+    testWidgets("the drawer stays full-bleed under vaul's own 80vh", (
+      WidgetTester t,
+    ) async {
       _usePhone(t);
       await t.pumpWidget(_host(_drawer()));
       await t.tap(find.text('open'));
@@ -1081,8 +1256,9 @@ void main() {
   });
 
   group('back dismisses the topmost overlay — USER-ORDERED', () {
-    testWidgets('back closes the dialog and does NOT leave the app',
-        (WidgetTester t) async {
+    testWidgets('back closes the dialog and does NOT leave the app', (
+      WidgetTester t,
+    ) async {
       _usePhone(t);
       final List<MethodCall> platform = _watchPlatform(t);
       await t.pumpWidget(_host(_dialog()));
@@ -1091,11 +1267,18 @@ void main() {
       await _back(t);
       await _settleExit(t);
       expect(find.byType(DsDialogContent), findsNothing);
-      expect(find.text('open'), findsOneWidget,
-          reason: 'the page underneath is still mounted — the route did not pop');
-      expect(_askedToQuit(platform), isFalse,
-          reason: 'an OverlayPortal is not a route, and back must not fall '
-              'through it to SystemNavigator.pop');
+      expect(
+        find.text('open'),
+        findsOneWidget,
+        reason: 'the page underneath is still mounted — the route did not pop',
+      );
+      expect(
+        _askedToQuit(platform),
+        isFalse,
+        reason:
+            'an OverlayPortal is not a route, and back must not fall '
+            'through it to SystemNavigator.pop',
+      );
 
       // …and with nothing open the very same press bubbles all the way to the
       // platform, which is what leaving the app looks like. The mechanism is
@@ -1105,8 +1288,9 @@ void main() {
       expect(_askedToQuit(platform), isTrue);
     });
 
-    testWidgets('back closes the alert dialog even though the scrim cannot',
-        (WidgetTester t) async {
+    testWidgets('back closes the alert dialog even though the scrim cannot', (
+      WidgetTester t,
+    ) async {
       _usePhone(t);
       await t.pumpWidget(_host(_alertDialog()));
       await _open(t);
@@ -1123,43 +1307,57 @@ void main() {
       expect(find.byType(DsAlertDialogContent), findsNothing);
     });
 
-    testWidgets('stacked overlays unwind topmost-first',
-        (WidgetTester t) async {
+    testWidgets('stacked overlays unwind topmost-first', (
+      WidgetTester t,
+    ) async {
       _usePhone(t);
-      expect(DsModalPortalState.openModals, isEmpty,
-          reason: 'a disposed portal must not leave an entry behind');
+      expect(
+        DsModalPortalState.openModals,
+        isEmpty,
+        reason: 'a disposed portal must not leave an entry behind',
+      );
 
-      await t.pumpWidget(_host(DsDialog(
-        trigger: (BuildContext context, VoidCallback open) =>
-            DsButton(onPressed: open, child: const Text('open')),
-        content: (BuildContext context, VoidCallback close) => DsDialogContent(
-          onClose: close,
-          children: <Widget>[
-            const DsDialogHeader(
-              children: <Widget>[
-                DsDialogTitle('Outer'),
-                DsDialogDescription('The one underneath.'),
-              ],
-            ),
-            DsDialog(
-              trigger: (BuildContext context, VoidCallback open) =>
-                  DsButton(onPressed: open, child: const Text('open inner')),
-              content: (BuildContext context, VoidCallback close) =>
-                  DsDialogContent(
-                onClose: close,
-                children: const <Widget>[
-                  DsDialogHeader(
-                    children: <Widget>[
-                      DsDialogTitle('Inner'),
-                      DsDialogDescription('Raised over the other one.'),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
+      await t.pumpWidget(
+        _host(
+          DsDialog(
+            trigger: (BuildContext context, VoidCallback open) =>
+                DsButton(onPressed: open, child: const Text('open')),
+            content: (BuildContext context, VoidCallback close) =>
+                DsDialogContent(
+                  onClose: close,
+                  children: <Widget>[
+                    const DsDialogHeader(
+                      children: <Widget>[
+                        DsDialogTitle('Outer'),
+                        DsDialogDescription('The one underneath.'),
+                      ],
+                    ),
+                    DsDialog(
+                      trigger: (BuildContext context, VoidCallback open) =>
+                          DsButton(
+                            onPressed: open,
+                            child: const Text('open inner'),
+                          ),
+                      content: (BuildContext context, VoidCallback close) =>
+                          DsDialogContent(
+                            onClose: close,
+                            children: const <Widget>[
+                              DsDialogHeader(
+                                children: <Widget>[
+                                  DsDialogTitle('Inner'),
+                                  DsDialogDescription(
+                                    'Raised over the other one.',
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                    ),
+                  ],
+                ),
+          ),
         ),
-      )));
+      );
 
       await _open(t);
       expect(DsModalPortalState.openModals.length, 1);
@@ -1167,8 +1365,11 @@ void main() {
       await t.pump();
       await t.pump(DsDurations.jelly);
       expect(find.text('Inner'), findsOneWidget);
-      expect(DsModalPortalState.openModals.length, 2,
-          reason: 'a dialog raised from inside another is a SIBLING here');
+      expect(
+        DsModalPortalState.openModals.length,
+        2,
+        reason: 'a dialog raised from inside another is a SIBLING here',
+      );
 
       // One press, one overlay — the inner one.
       await _back(t);
@@ -1183,8 +1384,9 @@ void main() {
       expect(DsModalPortalState.openModals, isEmpty);
     });
 
-    testWidgets('the sheet and the drawer ride the same host',
-        (WidgetTester t) async {
+    testWidgets('the sheet and the drawer ride the same host', (
+      WidgetTester t,
+    ) async {
       _usePhone(t);
       await t.pumpWidget(_host(_sheet(DsSheetSide.right)));
       await t.tap(find.text('open'));
@@ -1208,15 +1410,20 @@ void main() {
       expect(find.byType(DsDrawerContent), findsNothing);
     });
 
-    testWidgets("the agent launcher's console dialog rides it too",
-        (WidgetTester t) async {
+    testWidgets("the agent launcher's console dialog rides it too", (
+      WidgetTester t,
+    ) async {
       _usePhone(t);
-      await t.pumpWidget(_host(const DsAgentLauncher(
-        label: 'Ask the assistant',
-        title: 'Vault',
-        description: 'Ask about packs, pulls, prices and your wallet.',
-        child: Text('the console'),
-      )));
+      await t.pumpWidget(
+        _host(
+          const DsAgentLauncher(
+            label: 'Ask the assistant',
+            title: 'Vault',
+            description: 'Ask about packs, pulls, prices and your wallet.',
+            child: Text('the console'),
+          ),
+        ),
+      );
 
       expect(find.text('the console'), findsNothing);
       await t.tap(find.byType(DsButton));

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Code-native Android rendering of example/lib/logo.dart's DsLogoMark.
+  Colors are the authoritative design-system tokens:
+  action #1A6EF4, primaryForeground #FFFFFF, valueBright #D9F99D.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#1A6EF4"
+        android:pathData="M0,0H108V108H0Z" />
+    <path
+        android:fillColor="@android:color/transparent"
+        android:pathData="M38.57,62.96L54,38.57L69.43,62.96"
+        android:strokeColor="#FFFFFF"
+        android:strokeLineCap="square"
+        android:strokeLineJoin="miter"
+        android:strokeWidth="6.17" />
+    <path
+        android:fillColor="@android:color/transparent"
+        android:pathData="M38.57,72L69.43,72"
+        android:strokeColor="#D9F99D"
+        android:strokeLineCap="butt"
+        android:strokeLineJoin="miter"
+        android:strokeWidth="6.17" />
+</vector>
