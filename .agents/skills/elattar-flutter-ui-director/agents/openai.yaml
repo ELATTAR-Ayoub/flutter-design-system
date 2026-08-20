@@ -1,0 +1,4 @@
+interface:
+  display_name: "Elattar Flutter UI Director"
+  short_description: "Build Flutter UI from the Elattar system"
+  default_prompt: "Use $elattar-flutter-ui-director to implement this Flutter UI entirely with the local design system."
