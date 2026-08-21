@@ -1,0 +1,21 @@
+{
+  "name": "icon",
+  "type": "component",
+  "version": "0.0.1",
+  "description": "Curated, token-sized icon renderer and generated path catalog used by interactive components.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {"source": "lib/src/components/icon.dart", "target": "@ui/icon.dart", "sha256": "619d0271af81d51b296a88bf8b1d20a86ab71ef298f15868a381f0d8aec86cb5"},
+    {"source": "lib/src/components/icon_paths.dart", "target": "@ui/icon_paths.dart", "sha256": "43c3161a2f0a91ba9ddf461d1f94646b92a75d933fa10a878411936140bda0b9"},
+    {"source": "lib/src/components/icon_paths.g.dart", "target": "@ui/icon_paths.g.dart", "sha256": "bb3a13ad4e625add61333ef61c080346b44a9678074d6be7e965e5e04c48c012"}
+  ],
+  "registryDependencies": ["source-foundation"],
+  "semanticDependencies": [],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "documentationRoute": "/components/icon",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/icon.dart"
+}

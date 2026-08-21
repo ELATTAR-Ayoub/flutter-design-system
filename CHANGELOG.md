@@ -1,6 +1,8 @@
 # Changelog
 
-## 0.0.1 (unreleased)
+## 0.0.1
+
+Initial public repository release for the maintained Flutter package.
 
 1:1 Flutter port of Elattar's Design System (web reference:
 `Design-System-2026-8/design-system`), verified side-by-side against the

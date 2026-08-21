@@ -1,0 +1,73 @@
+name: Bug report
+description: Report a defect in the Flutter package, example app, tests, or documented behavior.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for filing a bug. Please include enough detail for us to reproduce it from this repository.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What is broken, and what did you expect instead?
+      placeholder: DsButton focus ring disappears after keyboard navigation in dark mode...
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Flutter package
+        - Example app
+        - Tests or verification
+        - Documentation
+        - Build or tooling
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: List the exact steps, fixture, page, or component path.
+      placeholder: |
+        1. Run `flutter test test/slider_test.dart`
+        2. Open ...
+        3. Observe ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected_actual
+    attributes:
+      label: Expected vs actual
+      placeholder: Expected..., actual...
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Repository version or commit
+      placeholder: "0.0.1 / main / commit hash"
+  - type: textarea
+    id: verification
+    attributes:
+      label: Verification run
+      description: Paste the commands you ran and the result.
+      placeholder: |
+        flutter analyze
+        flutter test
+        flutter test test/token_guard_test.dart
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Flutter, Dart, platform, browser, device, or screen size if relevant.
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: Screenshots, logs, reduced test case, or anything else helpful.

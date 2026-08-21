@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "registryVersion": "0.0.1",
+  "items": [
+    {
+      "name": "alert-dialog",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/alert-dialog"
+    },
+    {
+      "name": "button",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/button"
+    },
+    {
+      "name": "card",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/card"
+    },
+    {
+      "name": "dialog",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/dialog"
+    },
+    {
+      "name": "ds-rule",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/docs/foundations/rules"
+    },
+    {
+      "name": "field",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/field"
+    },
+    {
+      "name": "foil-value",
+      "type": "effect",
+      "version": "0.0.1",
+      "documentationRoute": "/docs/effects/foil-value"
+    },
+    {
+      "name": "icon",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/icon"
+    },
+    {
+      "name": "input",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/input"
+    },
+    {
+      "name": "machine-surface",
+      "type": "effect",
+      "version": "0.0.1",
+      "documentationRoute": "/docs/effects/machine-surface"
+    },
+    {
+      "name": "popover",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/popover"
+    },
+    {
+      "name": "press-motion",
+      "type": "motion",
+      "version": "0.0.1",
+      "documentationRoute": "/docs/motion/press"
+    },
+    {
+      "name": "select",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/select"
+    },
+    {
+      "name": "sheen-action",
+      "type": "effect",
+      "version": "0.0.1",
+      "documentationRoute": "/docs/effects/sheen-action"
+    },
+    {
+      "name": "source-foundation",
+      "type": "foundation",
+      "version": "0.0.1",
+      "documentationRoute": "/docs/foundations"
+    },
+    {
+      "name": "spinner",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/spinner"
+    },
+    {
+      "name": "tooltip",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/tooltip"
+    }
+  ]
+}

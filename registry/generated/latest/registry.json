@@ -1,0 +1,569 @@
+{
+  "schemaVersion": 1,
+  "registryVersion": "0.0.1",
+  "items": [
+    {
+      "name": "alert-dialog",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "Confirmation dialog support component for consequential actions, composed with the dialog, button, and tooltip contracts.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/alert_dialog.dart",
+          "target": "@ui/alert_dialog.dart",
+          "sha256": "6487594ead885564f83f7abe5ad043b2d80de7b4ef4b542f53da2904dc9469b6"
+        }
+      ],
+      "registryDependencies": [
+        "source-foundation",
+        "button",
+        "dialog",
+        "tooltip"
+      ],
+      "semanticDependencies": [
+        "button",
+        "dialog",
+        "tooltip"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/alert-dialog",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/alert_dialog.dart",
+      "deprecated": false
+    },
+    {
+      "name": "button",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "Semantic pill button with primary, premium, secondary, outline, ghost, destructive, and link variants plus sizes, loading, focus, and disabled states.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/button.dart",
+          "target": "@ui/button.dart",
+          "sha256": "85313f89f3c68f98a94e3a72e2edce2a5c5474b2f48dc0b800bc5209ef898a2b"
+        }
+      ],
+      "registryDependencies": [
+        "source-foundation",
+        "press-motion",
+        "icon",
+        "spinner",
+        "foil-value",
+        "machine-surface",
+        "sheen-action"
+      ],
+      "semanticDependencies": [
+        "press-motion",
+        "icon"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/button",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/button.dart",
+      "deprecated": false
+    },
+    {
+      "name": "card",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "A neutral content surface with structured header, title, description, content, and footer regions.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/card.dart",
+          "target": "@ui/card.dart",
+          "sha256": "5df6ca1036ac6d3d446a40b35db943509259d4b5a0b4e8f37647a8b7c4d2eca0"
+        }
+      ],
+      "registryDependencies": [
+        "source-foundation"
+      ],
+      "semanticDependencies": [],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/card",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/card.dart",
+      "deprecated": false
+    },
+    {
+      "name": "dialog",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "Accessible modal composition with portal, overlay, jelly transition, compact sizing, media content, header, description, and footer regions.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/dialog.dart",
+          "target": "@ui/dialog.dart",
+          "sha256": "88fe5926b49d3b828f8e8346337db6f571094e05500dbafae41281bebcef0762"
+        }
+      ],
+      "registryDependencies": [
+        "source-foundation",
+        "button",
+        "icon",
+        "machine-surface"
+      ],
+      "semanticDependencies": [
+        "icon"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/dialog",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/dialog.dart",
+      "deprecated": false
+    },
+    {
+      "name": "ds-rule",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "Small validation rule and issue-mode support used by composed fields and forms.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/ds_rule.dart",
+          "target": "@ui/ds_rule.dart",
+          "sha256": "fd893a4e770d1a641c5af25ff8a135c92bc82086a01a2d5c0488f38319edb8d8"
+        }
+      ],
+      "registryDependencies": [
+        "source-foundation"
+      ],
+      "semanticDependencies": [],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/docs/foundations/rules",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/ds_rule.dart",
+      "deprecated": false
+    },
+    {
+      "name": "field",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "Accessible field composition with labels, descriptions, errors, orientation, grouping, and validation wiring.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/field.dart",
+          "target": "@ui/field.dart",
+          "sha256": "8b64fe758d7dae09ff46253dd1acacd95d2cdc63d573ae857d265c3e47482ef3"
+        }
+      ],
+      "registryDependencies": [
+        "source-foundation",
+        "ds-rule"
+      ],
+      "semanticDependencies": [
+        "ds-rule"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/field",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/field.dart",
+      "deprecated": false
+    },
+    {
+      "name": "foil-value",
+      "type": "effect",
+      "version": "0.0.1",
+      "description": "Rationed value foil effect for premium and reward surfaces.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/effects/foil_value.dart",
+          "target": "@effects/foil_value.dart",
+          "sha256": "4ef9eba6d431e54d3d3320f046e16806528b4e95f0780dd0ee9e88945c185413"
+        }
+      ],
+      "registryDependencies": [
+        "source-foundation",
+        "machine-surface"
+      ],
+      "semanticDependencies": [
+        "machine-surface"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/docs/effects/foil-value",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/effects/foil_value.dart",
+      "deprecated": false
+    },
+    {
+      "name": "icon",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "Curated, token-sized icon renderer and generated path catalog used by interactive components.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/icon.dart",
+          "target": "@ui/icon.dart",
+          "sha256": "619d0271af81d51b296a88bf8b1d20a86ab71ef298f15868a381f0d8aec86cb5"
+        },
+        {
+          "source": "lib/src/components/icon_paths.dart",
+          "target": "@ui/icon_paths.dart",
+          "sha256": "43c3161a2f0a91ba9ddf461d1f94646b92a75d933fa10a878411936140bda0b9"
+        },
+        {
+          "source": "lib/src/components/icon_paths.g.dart",
+          "target": "@ui/icon_paths.g.dart",
+          "sha256": "bb3a13ad4e625add61333ef61c080346b44a9678074d6be7e965e5e04c48c012"
+        }
+      ],
+      "registryDependencies": [
+        "source-foundation"
+      ],
+      "semanticDependencies": [],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/icon",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/icon.dart",
+      "deprecated": false
+    },
+    {
+      "name": "input",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "Token-backed text input with semantic field surfaces, validation, focus, disabled, obscured, and visibility states.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/input.dart",
+          "target": "@ui/input.dart",
+          "sha256": "997687ec2e4d1ccc526d77128dcbe4bd8613405c4c8f822f6e2689ddb5d62114"
+        }
+      ],
+      "registryDependencies": [
+        "source-foundation",
+        "button",
+        "field",
+        "ds-rule",
+        "machine-surface"
+      ],
+      "semanticDependencies": [
+        "button",
+        "field",
+        "ds-rule"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/input",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/input.dart",
+      "deprecated": false
+    },
+    {
+      "name": "machine-surface",
+      "type": "effect",
+      "version": "0.0.1",
+      "description": "Reusable raised and pressed machine-surface effect used by controls and overlays.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/effects/machine_surface.dart",
+          "target": "@effects/machine_surface.dart",
+          "sha256": "3b93ce4fd3a885c3bc991624e25f98a1b7a9f7dfaf2a6200aa018a21a6e52623"
+        }
+      ],
+      "registryDependencies": [
+        "source-foundation"
+      ],
+      "semanticDependencies": [],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/docs/effects/machine-surface",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/effects/machine_surface.dart",
+      "deprecated": false
+    },
+    {
+      "name": "popover",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "Anchored overlay surface with semantic placement, barrier, alignment, and token-backed transition behavior.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.12.2",
+      "files": [
+        {
+          "source": "lib/src/components/popover.dart",
+          "target": "@ui/popover.dart",
+          "sha256": "4d944d325f8fe5b0283b58c47d2918c26f3aaf4909001e5659ab30c70b04cdfe"
+        }
+      ],
+      "registryDependencies": [
+        "source-foundation"
+      ],
+      "semanticDependencies": [],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/popover",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/popover.dart",
+      "deprecated": false
+    },
+    {
+      "name": "press-motion",
+      "type": "motion",
+      "version": "0.0.1",
+      "description": "Reusable press interaction wrapper for token-backed scale and feedback behavior.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/motion/press.dart",
+          "target": "@motion/press.dart",
+          "sha256": "46085aa88fcaae36f0bfaf4c04515a5e8e3431671179896a104d5350da599784"
+        }
+      ],
+      "registryDependencies": [
+        "source-foundation"
+      ],
+      "semanticDependencies": [],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/docs/motion/press",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/motion/press.dart",
+      "deprecated": false
+    },
+    {
+      "name": "select",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "Generic typed select with grouped options, separators, labels, keyboard-friendly menu behavior, sizes, and scroll controls.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/select.dart",
+          "target": "@ui/select.dart",
+          "sha256": "7c2bf1d0a8d3c6fd859297a489c7dce4a6654ac0edd4d43a300eb90fce747b59"
+        }
+      ],
+      "registryDependencies": [
+        "source-foundation",
+        "button",
+        "field",
+        "icon",
+        "popover",
+        "machine-surface"
+      ],
+      "semanticDependencies": [
+        "field",
+        "icon",
+        "popover"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/select",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/select.dart",
+      "deprecated": false
+    },
+    {
+      "name": "sheen-action",
+      "type": "effect",
+      "version": "0.0.1",
+      "description": "Action sheen effect for primary interactive surfaces.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/effects/sheen_action.dart",
+          "target": "@effects/sheen_action.dart",
+          "sha256": "bde8fd6414a89866b893e397caa5dcebd902b012ac6b2a286430e1af7c944bb5"
+        }
+      ],
+      "registryDependencies": [
+        "source-foundation",
+        "machine-surface"
+      ],
+      "semanticDependencies": [
+        "machine-surface"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/docs/effects/sheen-action",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/effects/sheen_action.dart",
+      "deprecated": false
+    },
+    {
+      "name": "source-foundation",
+      "type": "foundation",
+      "version": "0.0.1",
+      "description": "The copy-first Flutter foundation: semantic colors, themes, typography, spacing, motion, shadows, surfaces, dates, and text layout.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/foundation/colors.dart",
+          "target": "@foundation/colors.dart",
+          "sha256": "4b8f176fdff07d749b3f43c22b41c86683a6c9dae916df7e52d0d4f8a82f876c"
+        },
+        {
+          "source": "lib/src/foundation/date_format.dart",
+          "target": "@foundation/date_format.dart",
+          "sha256": "33734b9b00b2ed5807b3b370658bb87e90d460d4ad03a94aa55748b721bbf50f"
+        },
+        {
+          "source": "lib/src/foundation/media.dart",
+          "target": "@foundation/media.dart",
+          "sha256": "52da61e72a5574b1cccd3c3dd62c19f9aa3840ca8bf486078a5cc71aadd1b9ae"
+        },
+        {
+          "source": "lib/src/foundation/motion.dart",
+          "target": "@foundation/motion.dart",
+          "sha256": "b329ca191e93f25ebdb3336cef66cb4cb1404f24e56f5c1be8a6250d49dc7481"
+        },
+        {
+          "source": "lib/src/foundation/shadows.dart",
+          "target": "@foundation/shadows.dart",
+          "sha256": "31dae82254cd97febe5241c6354412733342ba38348b66f9cb4d4a8d7e272457"
+        },
+        {
+          "source": "lib/src/foundation/spacing.dart",
+          "target": "@foundation/spacing.dart",
+          "sha256": "bf13f691d0adfe98c74fabcfd1f2eeddd063fbf2f0d4f3490e62f5f50fca0f27"
+        },
+        {
+          "source": "lib/src/foundation/surfaces.dart",
+          "target": "@foundation/surfaces.dart",
+          "sha256": "0dcc18f0ab7bf56c58fa85c90bdfe85880681344c9694463de2461b6733ed5f8"
+        },
+        {
+          "source": "lib/src/foundation/theme.dart",
+          "target": "@foundation/theme.dart",
+          "sha256": "df8c81a6b2565d2408ccef54518b37bdc9687e4b25959cb1aeee4464dbcfda3b"
+        },
+        {
+          "source": "lib/src/foundation/typography.dart",
+          "target": "@foundation/typography.dart",
+          "sha256": "eb2a93e1713a4ca4029c217486fb7f02387fc218abf45074484ba386d12e670c"
+        },
+        {
+          "source": "lib/src/text_layout.dart",
+          "target": "@foundation/text_layout.dart",
+          "sha256": "e38b11b1639d416c96f6749fc8d08d8f7e2bcf6a84decfbf3dce8d44e0eb6de0"
+        },
+        {
+          "source": "lib/src/theme_scope.dart",
+          "target": "@foundation/theme_scope.dart",
+          "sha256": "7524edf51bc2679a4b3dfbff8bca9777d2868813c532b72b52b0f9a29a27c2b9"
+        }
+      ],
+      "registryDependencies": [],
+      "semanticDependencies": [],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [
+        {
+          "source": "assets/fonts/InterVariable.ttf",
+          "target": "@foundation/fonts/InterVariable.ttf",
+          "sha256": "5f27757f43f9e9d371851c372ee2e70c5ac5c65fb915d603667c253de8d3f65a"
+        },
+        {
+          "source": "assets/fonts/GeistMono-Variable.ttf",
+          "target": "@foundation/fonts/GeistMono-Variable.ttf",
+          "sha256": "0e1af3f507a1c8dfbb03d13ffad585834cd45ed7ccb78c756c7ce7873d180d30"
+        },
+        {
+          "source": "assets/fonts/Redaction35-Italic.ttf",
+          "target": "@foundation/fonts/Redaction35-Italic.ttf",
+          "sha256": "a87aea4af107f393edf6fe198c4f961ec4ff955407fa62a70563ce403e1499d3"
+        }
+      ],
+      "shaders": [],
+      "documentationRoute": "/docs/foundations",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/elattar_design_system.dart",
+      "deprecated": false
+    },
+    {
+      "name": "spinner",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "Token-backed loading indicator used by button and feedback components.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/spinner.dart",
+          "target": "@ui/spinner.dart",
+          "sha256": "930d5c15c4b69cd06df252f0040cebeb67613653457572223ca9ffe5120dfaae"
+        }
+      ],
+      "registryDependencies": [
+        "source-foundation"
+      ],
+      "semanticDependencies": [],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/spinner",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/spinner.dart",
+      "deprecated": false
+    },
+    {
+      "name": "tooltip",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "Accessible hover and focus explanation surface with semantic side and transition behavior.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/tooltip.dart",
+          "target": "@ui/tooltip.dart",
+          "sha256": "02e0e9faf9d39be68ae1f3b369bce8eabcaf24e05649eba338c3d4903dae6631"
+        }
+      ],
+      "registryDependencies": [
+        "source-foundation"
+      ],
+      "semanticDependencies": [],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/tooltip",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/tooltip.dart",
+      "deprecated": false
+    }
+  ]
+}

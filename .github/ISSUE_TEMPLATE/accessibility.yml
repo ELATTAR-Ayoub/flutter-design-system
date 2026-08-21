@@ -1,0 +1,53 @@
+name: Accessibility issue
+description: Report an accessibility problem in the package, example app, docs, or planned interactions.
+title: "[Accessibility]: "
+labels:
+  - accessibility
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Accessibility problem
+      description: What barrier did you hit?
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Keyboard interaction
+        - Screen reader or semantics
+        - Focus order or visibility
+        - Color or contrast
+        - Motion or reduced motion
+        - Form error handling
+        - Documentation
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: location
+    attributes:
+      label: Affected component or page
+      description: Include the `Ds*` API, example route, test, or document section if known.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction details
+      description: Steps, assistive technology, platform, browser, viewport, and settings.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected accessible behavior
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Logs, announcements, screenshots, recordings, WCAG references, or failing tests.

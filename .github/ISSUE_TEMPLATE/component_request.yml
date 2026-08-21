@@ -1,0 +1,51 @@
+name: Component request
+description: Propose a new public component, specimen, effect, or API surface.
+title: "[Component]: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for new components or meaningful public API expansions in the Flutter design system.
+  - type: input
+    id: component_name
+    attributes:
+      label: Proposed component or API
+      placeholder: DsToast, DsTabs, command palette specimen, public token helper...
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem to solve
+      description: What workflow, screen, or repeated pattern is blocked today?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+      description: Describe the states, variants, semantics, and expected public API.
+    validations:
+      required: true
+  - type: textarea
+    id: design_constraints
+    attributes:
+      label: Design and token constraints
+      description: Mention any required `Ds*` APIs, token rules, or placement constraints.
+  - type: textarea
+    id: accessibility
+    attributes:
+      label: Accessibility considerations
+      description: Keyboard, screen reader, reduced-motion, contrast, error states, and focus handling.
+  - type: textarea
+    id: examples
+    attributes:
+      label: Reference examples
+      description: Comparable components, lineage references, screenshots, or package usage sketches.
+  - type: textarea
+    id: verification
+    attributes:
+      label: Suggested verification
+      description: What tests, examples, or screenshots should prove the work is complete?

@@ -18,6 +18,9 @@ import 'package:flutter/rendering.dart' show debugPaintBaselinesEnabled;
 import 'package:flutter/services.dart' show SystemChrome, SystemUiMode;
 
 import 'nav.dart';
+import 'components_docs/button_card_pages.dart';
+import 'components_docs/dialog_page.dart';
+import 'components_docs/input_select_pages.dart';
 import 'pages/agent_avatar.dart';
 import 'pages/agent_voice.dart';
 import 'pages/buttons.dart';
@@ -49,6 +52,9 @@ import 'pages/transcript.dart';
 import 'pages/typography.dart';
 import 'shell.dart';
 import 'showcase/showcase_app.dart';
+import 'site/pages/public_pages.dart';
+import 'site/site_routes.dart';
+import 'site/site_shell.dart';
 
 /// `::selection { background: color-mix(in oklab, var(--color-action) 35%,
 /// transparent); color: var(--foreground) }`.
@@ -178,7 +184,10 @@ class _DocsAppState extends State<DocsApp> {
   void initState() {
     super.initState();
     _router = AppRouter(
-      route: widget.initialRoute ?? Uri.base.queryParameters['route'] ?? dsRoot,
+      route:
+          widget.initialRoute ??
+          Uri.base.queryParameters['route'] ??
+          (kIsWeb ? homeRoute : dsRoot),
     );
   }
 
@@ -297,6 +306,13 @@ class _DocsHome extends StatelessWidget {
       selectionColor: DsPalette.action.withValues(alpha: _selectionAlpha),
       cursorColor: theme.foreground,
       child: switch (route) {
+        _ when siteRouteFor(route) != null => SiteShell(
+          route: route,
+          child: publicPageFor(
+            route,
+            onNavigate: AppRouter.of(context).navigate,
+          ),
+        ),
         showcaseRoute => SignalStudioShowcase(
           onOpenDesignSystem: () => AppRouter.of(context).navigate(dsRoot),
         ),
@@ -311,6 +327,24 @@ class _DocsHome extends StatelessWidget {
       child: home,
     );
   }
+}
+
+/// Resolves public website destinations without changing the
+/// established design-system specimen route table in [pageFor].
+Widget publicPageFor(String route, {PublicNavigate? onNavigate}) {
+  return switch (route) {
+    homeRoute => PublicHomePage(onNavigate: onNavigate),
+    docsRoute => PublicDocsPage(onNavigate: onNavigate),
+    componentsRoute => PublicComponentsPage(onNavigate: onNavigate),
+    shotsRoute => PublicShotsPage(onNavigate: onNavigate),
+    skillsRoute => PublicSkillsPage(onNavigate: onNavigate),
+    '/components/button' => const ButtonDocPage(),
+    '/components/input' => const InputDocPage(),
+    '/components/card' => const CardDocPage(),
+    '/components/dialog' => const DialogDocPage(),
+    '/components/select' => const SelectDocPage(),
+    _ => PublicHomePage(onNavigate: onNavigate),
+  };
 }
 
 /// The twenty-seven real routes; every other href in the nav gets a

@@ -1,0 +1,26 @@
+{
+  "name": "spinner",
+  "type": "component",
+  "version": "0.0.1",
+  "description": "Token-backed loading indicator used by button and feedback components.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/spinner.dart",
+      "target": "@ui/spinner.dart",
+      "sha256": "930d5c15c4b69cd06df252f0040cebeb67613653457572223ca9ffe5120dfaae"
+    }
+  ],
+  "registryDependencies": [
+    "source-foundation"
+  ],
+  "semanticDependencies": [],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "documentationRoute": "/components/spinner",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/spinner.dart",
+  "deprecated": false
+}

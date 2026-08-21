@@ -1,0 +1,29 @@
+{
+  "name": "foil-value",
+  "type": "effect",
+  "version": "0.0.1",
+  "description": "Rationed value foil effect for premium and reward surfaces.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/effects/foil_value.dart",
+      "target": "@effects/foil_value.dart",
+      "sha256": "4ef9eba6d431e54d3d3320f046e16806528b4e95f0780dd0ee9e88945c185413"
+    }
+  ],
+  "registryDependencies": [
+    "source-foundation",
+    "machine-surface"
+  ],
+  "semanticDependencies": [
+    "machine-surface"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "documentationRoute": "/docs/effects/foil-value",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/effects/foil_value.dart",
+  "deprecated": false
+}

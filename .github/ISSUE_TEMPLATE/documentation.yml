@@ -1,0 +1,43 @@
+name: Documentation improvement
+description: Report missing, unclear, or incorrect documentation.
+title: "[Docs]: "
+labels:
+  - documentation
+body:
+  - type: textarea
+    id: issue
+    attributes:
+      label: What is unclear or incorrect?
+      description: Point to the file, section, page, or command if you can.
+    validations:
+      required: true
+  - type: dropdown
+    id: doc_area
+    attributes:
+      label: Documentation area
+      options:
+        - README
+        - Package API docs
+        - Example app
+        - Contribution or governance docs
+        - Future CLI or registry docs
+        - Planning or research docs
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect to find?
+    validations:
+      required: true
+  - type: textarea
+    id: proposed_fix
+    attributes:
+      label: Suggested improvement
+      description: A rewrite, outline, missing example, command correction, or screenshot request.
+  - type: textarea
+    id: audience
+    attributes:
+      label: Who is affected?
+      description: New adopters, contributors, package consumers, maintainers, or future CLI users.

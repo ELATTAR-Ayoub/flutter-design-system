@@ -1,0 +1,26 @@
+{
+  "name": "ds-rule",
+  "type": "component",
+  "version": "0.0.1",
+  "description": "Small validation rule and issue-mode support used by composed fields and forms.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/ds_rule.dart",
+      "target": "@ui/ds_rule.dart",
+      "sha256": "fd893a4e770d1a641c5af25ff8a135c92bc82086a01a2d5c0488f38319edb8d8"
+    }
+  ],
+  "registryDependencies": [
+    "source-foundation"
+  ],
+  "semanticDependencies": [],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "documentationRoute": "/docs/foundations/rules",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/ds_rule.dart",
+  "deprecated": false
+}

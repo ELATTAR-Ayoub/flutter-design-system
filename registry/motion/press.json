@@ -1,0 +1,17 @@
+{
+  "name": "press-motion",
+  "type": "motion",
+  "version": "0.0.1",
+  "description": "Reusable press interaction wrapper for token-backed scale and feedback behavior.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [{"source": "lib/src/motion/press.dart", "target": "@motion/press.dart", "sha256": "46085aa88fcaae36f0bfaf4c04515a5e8e3431671179896a104d5350da599784"}],
+  "registryDependencies": ["source-foundation"],
+  "semanticDependencies": [],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "documentationRoute": "/docs/motion/press",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/motion/press.dart"
+}

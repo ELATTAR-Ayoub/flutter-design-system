@@ -1,0 +1,6 @@
+name: elattar_registry_builder
+description: Schema and validation tooling for the Elattar component registry.
+publish_to: none
+version: 0.0.1
+environment:
+  sdk: ^3.12.2

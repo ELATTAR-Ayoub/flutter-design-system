@@ -1,7 +1,9 @@
 name: elattar_design_system
-description: "Elattar's Design System — a 1:1 Flutter port of the web design system: one token source of truth, nothing hardcoded outside it."
+description: "Flutter design system package with Ds* foundations, components, effects, and motion primitives."
 version: 0.0.1
-homepage:
+homepage: https://github.com/ELATTAR-Ayoub/flutter-design-system
+repository: https://github.com/ELATTAR-Ayoub/flutter-design-system
+issue_tracker: https://github.com/ELATTAR-Ayoub/flutter-design-system/issues
 publish_to: 'none'
 
 environment:

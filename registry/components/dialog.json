@@ -1,0 +1,18 @@
+{
+  "name": "dialog",
+  "type": "component",
+  "version": "0.0.1",
+  "description": "Accessible modal composition with portal, overlay, jelly transition, compact sizing, media content, header, description, and footer regions.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [{"source": "lib/src/components/dialog.dart", "target": "@ui/dialog.dart", "sha256": "88fe5926b49d3b828f8e8346337db6f571094e05500dbafae41281bebcef0762"}],
+  "registryDependencies": ["source-foundation", "button", "icon", "machine-surface"],
+  "pubDependencies": {},
+  "semanticDependencies": ["icon"],
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "exports": ["DsModalPortal", "DsDialogOverlay", "DsJellyTransition", "DsDialog", "DsDialogVariant", "DsDialogContent", "DsDialogContentGroup", "DsDialogHeader", "DsDialogFooter", "DsDialogTitle", "DsDialogDescription", "DsDialogMedia"],
+  "documentationRoute": "/components/dialog",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/dialog.dart"
+}

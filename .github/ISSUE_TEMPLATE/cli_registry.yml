@@ -1,0 +1,53 @@
+name: CLI or registry issue
+description: Track future CLI, registry, package-install, or schema work for the public release roadmap.
+title: "[CLI/Registry]: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for the planned Dart CLI, install flow, registry schema, cache behavior, or website integration around those systems.
+  - type: dropdown
+    id: type
+    attributes:
+      label: Request type
+      options:
+        - CLI command behavior
+        - Registry schema or metadata
+        - Install or overwrite safety
+        - Config file behavior
+        - Cache or offline behavior
+        - Documentation
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: current_gap
+    attributes:
+      label: Current gap
+      description: What is missing, confusing, or unsafe in the current plan or implementation?
+    validations:
+      required: true
+  - type: textarea
+    id: desired_behavior
+    attributes:
+      label: Desired behavior
+      description: Describe the command, schema field, installation rule, or migration flow you want.
+    validations:
+      required: true
+  - type: textarea
+    id: compatibility
+    attributes:
+      label: Compatibility and migration concerns
+      description: Renames, aliases, file ownership, overwrite rules, or upgrade expectations.
+  - type: textarea
+    id: verification
+    attributes:
+      label: Suggested verification
+      description: Unit tests, dry-run output, schema validation, fixture installs, or docs examples.
+  - type: textarea
+    id: references
+    attributes:
+      label: Related references
+      description: Link the relevant plan section, issue, command sketch, or file path.

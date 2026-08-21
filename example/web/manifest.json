@@ -1,12 +1,12 @@
 {
-    "name": "example",
-    "short_name": "example",
+    "name": "Elattar UI — Flutter Design System",
+    "short_name": "Elattar UI",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
-    "orientation": "portrait-primary",
+    "background_color": "#0B0B0C",
+    "theme_color": "#0B0B0C",
+    "description": "Open Flutter foundations, accessible components, composed shots, and source-copy tooling.",
+    "orientation": "any",
     "prefer_related_applications": false,
     "icons": [
         {
