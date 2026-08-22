@@ -4,14 +4,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  // A bare `Material` has no `Overlay`, so `DsSelect`'s popover menu — which
+  // inserts into `Overlay.maybeOf(context)` and silently no-ops without one
+  // (see `DsSelectState._openMenu`) — would never open under test. `MaterialApp`
+  // supplies the `Navigator`/`Overlay` every other page harness in this suite
+  // relies on for the same reason (see `component_docs_dialog_test.dart`).
   Widget host(Widget child, {Size size = const Size(1280, 900)}) {
     return MediaQuery(
       data: MediaQueryData(size: size),
-      child: Directionality(
-        textDirection: TextDirection.ltr,
-        child: DsTheme(
-          controller: DsThemeController(mode: DsThemeMode.dark),
-          child: Material(child: SingleChildScrollView(child: child)),
+      child: DsTheme(
+        controller: DsThemeController(mode: DsThemeMode.dark),
+        child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          home: SingleChildScrollView(child: child),
         ),
       ),
     );
@@ -43,7 +48,9 @@ void main() {
     );
     expect(editable.readOnly, isTrue);
 
-    await tester.tap(find.widgetWithText(DsButton, 'Card').last);
+    final Finder cardLink = find.widgetWithText(DsButton, 'Card').last;
+    await tester.ensureVisible(cardLink);
+    await tester.tap(cardLink);
     await tester.pumpAndSettle();
     expect(navigated, contains('/components/card'));
   });
@@ -103,7 +110,9 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Selected: popular'), findsOneWidget);
 
-    await tester.tap(find.widgetWithText(DsButton, 'Dialog').last);
+    final Finder dialogLink = find.widgetWithText(DsButton, 'Dialog').last;
+    await tester.ensureVisible(dialogLink);
+    await tester.tap(dialogLink);
     await tester.pumpAndSettle();
     expect(navigated, contains('/components/dialog'));
   });
@@ -123,7 +132,9 @@ void main() {
       find.byKey(const ValueKey<String>('docs-layout-anchor-strip')),
       findsOneWidget,
     );
-    await tester.tap(find.widgetWithText(DsButton, 'Expand off').first);
+    final Finder expandToggle = find.widgetWithText(DsButton, 'Expand off').first;
+    await tester.ensureVisible(expandToggle);
+    await tester.tap(expandToggle);
     await tester.pumpAndSettle();
     expect(find.widgetWithText(DsButton, 'Expand on'), findsOneWidget);
   });

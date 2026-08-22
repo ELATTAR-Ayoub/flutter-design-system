@@ -208,6 +208,7 @@ class PublicComponentsPage extends StatelessWidget {
                   title: component.title,
                   body: component.description,
                   label: component.command,
+                  labelSpec: DsType.code,
                   onPressed: onNavigate == null
                       ? null
                       : () => onNavigate!(component.route),
@@ -518,12 +519,20 @@ class _PublicLinkCard extends StatelessWidget {
     required this.title,
     required this.body,
     required this.label,
+    this.labelSpec,
     this.onPressed,
   });
 
   final String title;
   final String body;
   final String label;
+
+  /// Typography for [label]. Defaults to the uppercase eyebrow style used by
+  /// the reference-count and shot-tag callers; pass [DsType.code] when the
+  /// label is a literal string a reader may copy, such as a CLI command,
+  /// since [DsType.label]'s `text-transform: uppercase` would otherwise
+  /// mangle it.
+  final DsTypeSpec? labelSpec;
   final VoidCallback? onPressed;
 
   @override
@@ -533,7 +542,11 @@ class _PublicLinkCard extends StatelessWidget {
       children: <Widget>[
         DsCardHeader(
           title: DsText(title, DsType.h4, color: theme.foreground),
-          description: DsText(label, DsType.label, color: theme.actionInk),
+          description: DsText(
+            label,
+            labelSpec ?? DsType.label,
+            color: theme.actionInk,
+          ),
         ),
         DsCardContent(child: DsText(body, DsType.small)),
         DsCardFooter(
