@@ -8,28 +8,52 @@
 ///
 /// Built on top of `docs_code.dart`'s public [DocsCodeFile] and
 /// [DocsSelectableCodeBlock] — imported, never modified; that file's
-/// copy/clipboard seam already carries its own failure-recovery tests.
+/// copy/clipboard seam already carries its own failure-recovery tests. The
+/// copy affordance below reuses the same public [DocsClipboardWriter] seam —
+/// `docs_code.dart`'s own copy header (`_DocsCodeHeader`) is private to that
+/// library, so an equivalent is composed here from public `Ds*` parts instead
+/// of duplicating its file.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
 import '../kit.dart';
 import 'docs_code.dart';
 
+Future<void> _systemClipboardWrite(String text) =>
+    Clipboard.setData(ClipboardData(text: text));
+
 /// Selectable file tree over a list of [DocsCodeFile]s, showing the selected
 /// file's source in a [DocsSelectableCodeBlock].
 ///
 /// Selection is internal state; the first file is selected on first build.
+///
+/// Callers that swap in a wholly different logical file list for the same
+/// tree slot (e.g. a documentation page that renders one [DocsFileTree] per
+/// catalog entry and swaps entries in place) should give each instance a
+/// distinct [key] — otherwise the framework reuses this widget's [State]
+/// across the swap and the newly-selected index carries over from whichever
+/// file was selected before.
 class DocsFileTree extends StatefulWidget {
-  DocsFileTree({super.key, required this.files, this.label = 'Files'})
-      : assert(files.isNotEmpty, 'DocsFileTree needs at least one file.');
+  const DocsFileTree({
+    super.key,
+    required this.files,
+    this.label = 'Files',
+    this.clipboardWriter = _systemClipboardWrite,
+  });
 
-  /// Files to list, in tree order.
+  /// Files to list, in tree order. May be empty — an empty list renders a
+  /// placeholder panel rather than indexing into nothing.
   final List<DocsCodeFile> files;
 
   /// The panel strip label.
   final String label;
+
+  /// Writes the selected file's source to the clipboard when its copy
+  /// control is pressed.
+  final DocsClipboardWriter clipboardWriter;
 
   @override
   State<DocsFileTree> createState() => _DocsFileTreeState();
@@ -41,6 +65,11 @@ class _DocsFileTreeState extends State<DocsFileTree> {
   @override
   void didUpdateWidget(DocsFileTree oldWidget) {
     super.didUpdateWidget(oldWidget);
+    // Guards a shrinking list under the *same* widget identity (e.g. a
+    // caller mutating its own `files` in place). Cross-entry reuse — a
+    // wholly different logical file list landing in this same tree slot —
+    // is the widget identity problem documented on [DocsFileTree] itself and
+    // is a caller's [key] concern, not this bounds check's.
     if (_selected >= widget.files.length) {
       _selected = 0;
     }
@@ -54,55 +83,85 @@ class _DocsFileTreeState extends State<DocsFileTree> {
   @override
   Widget build(BuildContext context) {
     final List<DocsCodeFile> files = widget.files;
-    final DocsCodeFile selectedFile = files[_selected];
-    final bool wide = MediaQuery.sizeOf(context).width >= DsBreakpoints.sm;
 
-    final Widget list = _FileList(
-      files: files,
-      selectedIndex: _selected,
-      axis: wide ? Axis.vertical : Axis.horizontal,
-      onSelect: _select,
-    );
-
-    final Widget pane = _SelectedFilePane(file: selectedFile);
-
-    final Widget body = wide
-        ? Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              SizedBox(width: DsWidths.rail, child: list),
-              SizedBox(width: ds(5)),
-              Expanded(child: pane),
-            ],
-          )
-        : Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              list,
-              SizedBox(height: ds(4)),
-              pane,
-            ],
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        if (files.isEmpty) {
+          return DsPanel(
+            key: const ValueKey<String>('docs-file-tree-empty'),
+            label: widget.label,
+            note: '0 files',
+            child: DsText(
+              'No files to show.',
+              DsType.small,
+              color: DsTheme.of(context).mutedForeground,
+            ),
           );
+        }
 
-    // No umbrella `Semantics(label: …)` here: with a single file it would
-    // merge with the lone file entry's own label into one concatenated
-    // string ("File list\nSelected file x.dart"), breaking exact-label
-    // lookups. `DsPanel`'s own strip already renders the file count as plain
-    // text, which is discoverable on its own.
-    return DsPanel(
-      label: widget.label,
-      note: '${files.length} ${files.length == 1 ? 'file' : 'files'}',
-      child: body,
+        // `_selected` is kept in range by `didUpdateWidget` above — indexing
+        // directly here (rather than re-clamping) is deliberate: it is what
+        // makes a shrinking `files` list without that override a genuine,
+        // catchable `RangeError` instead of a silently-absorbed one.
+        final DocsCodeFile selectedFile = files[_selected];
+
+        // The primitive's own available width, not the window's — so it
+        // reflows correctly nested inside a narrower column on an otherwise
+        // wide viewport instead of forcing the wide row's fixed rail width.
+        final bool wide = constraints.maxWidth >= DsBreakpoints.sm;
+
+        final Widget list = _FileList(
+          files: files,
+          selectedIndex: _selected,
+          axis: wide ? Axis.vertical : Axis.horizontal,
+          onSelect: _select,
+        );
+
+        final Widget pane = _SelectedFilePane(
+          file: selectedFile,
+          clipboardWriter: widget.clipboardWriter,
+        );
+
+        final Widget body = wide
+            ? Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  SizedBox(width: DsWidths.rail, child: list),
+                  SizedBox(width: ds(5)),
+                  Expanded(child: pane),
+                ],
+              )
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  list,
+                  SizedBox(height: ds(4)),
+                  pane,
+                ],
+              );
+
+        // No umbrella `Semantics(label: …)` here: with a single file it
+        // would merge with the lone file entry's own label into one
+        // concatenated string ("File list\nSelected file x.dart"), breaking
+        // exact-label lookups. `DsPanel`'s own strip already renders the
+        // file count as plain text, which is discoverable on its own.
+        return DsPanel(
+          label: widget.label,
+          note: '${files.length} ${files.length == 1 ? 'file' : 'files'}',
+          child: body,
+        );
+      },
     );
   }
 }
 
-/// The header restating which file the pane below is currently showing, plus
-/// the code itself.
+/// The header restating which file the pane below is currently showing, a
+/// copy control for its source, and the code itself.
 class _SelectedFilePane extends StatelessWidget {
-  const _SelectedFilePane({required this.file});
+  const _SelectedFilePane({required this.file, required this.clipboardWriter});
 
   final DocsCodeFile file;
+  final DocsClipboardWriter clipboardWriter;
 
   @override
   Widget build(BuildContext context) {
@@ -115,20 +174,117 @@ class _SelectedFilePane extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          DsText(
-            file.title ?? file.path,
-            DsType.label,
-            color: theme.foreground,
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            runSpacing: ds(3),
+            spacing: ds(3),
+            children: <Widget>[
+              // `container: true`: this plain text has no boundary of its
+              // own, and its only sibling here — the copy button — does.
+              // Without one, neither of them is a container either, so the
+              // title text has nowhere of its own to land and merges into
+              // the button's node instead, producing a label like
+              // "LIB/SHOTS/DEMO/A.DART\nCopy lib/shots/demo/a.dart".
+              Semantics(
+                container: true,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: DsWidths.prose),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      DsText(
+                        file.title ?? file.path,
+                        DsType.label,
+                        color: theme.foreground,
+                      ),
+                      if (file.description != null) ...<Widget>[
+                        SizedBox(height: ds(1)),
+                        DsText(
+                          file.description!,
+                          DsType.small,
+                          color: theme.mutedForeground,
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+              // `container: true` again, for the same reason as the title
+              // block above: this pane's outer `Semantics(liveRegion: true)`
+              // has no boundary of its own, and without one here the button
+              // doesn't just lose its label to a neighbour — it loses its
+              // own *geometry* too, inheriting the whole pane's bounding
+              // rect instead of its own small tap target, so a tap on it
+              // lands on whatever the pane's centre happens to be instead.
+              Semantics(
+                container: true,
+                child: _CopyFileButton(
+                  key: ValueKey<String>('docs-file-tree-copy:${file.path}'),
+                  file: file,
+                  clipboardWriter: clipboardWriter,
+                ),
+              ),
+            ],
           ),
-          if (file.description != null) ...<Widget>[
-            SizedBox(height: ds(1)),
-            DsText(file.description!, DsType.small, color: theme.mutedForeground),
-          ],
           SizedBox(height: ds(3)),
           DocsSelectableCodeBlock(
             key: ValueKey<String>('docs-file-tree-code:${file.path}'),
             code: file.code,
           ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Copies [file]'s source to the clipboard — the same affordance
+/// `docs_code.dart`'s `_ManualFileCard` pairs with every install file, kept
+/// here as its own small state machine since that file's header is private.
+class _CopyFileButton extends StatefulWidget {
+  const _CopyFileButton({
+    super.key,
+    required this.file,
+    required this.clipboardWriter,
+  });
+
+  final DocsCodeFile file;
+  final DocsClipboardWriter clipboardWriter;
+
+  @override
+  State<_CopyFileButton> createState() => _CopyFileButtonState();
+}
+
+class _CopyFileButtonState extends State<_CopyFileButton> {
+  bool _pending = false;
+
+  Future<void> _copy() async {
+    if (_pending) return;
+    setState(() => _pending = true);
+    try {
+      await widget.clipboardWriter(widget.file.code);
+    } finally {
+      if (mounted) setState(() => _pending = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return DsButton(
+      variant: DsButtonVariant.secondary,
+      size: DsButtonSize.sm,
+      label: 'Copy ${widget.file.path}',
+      onPressed: _pending ? null : _copy,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          DsIcon.lucide(
+            _pending ? DsLucide.loaderCircle : DsLucide.copy,
+            size: DsIconSize.sm,
+          ),
+          SizedBox(width: DsButton.gapFor(DsButtonSize.sm)),
+          DsText(_pending ? 'Copying' : 'Copy', DsComponentType.buttonLabelSm),
         ],
       ),
     );
@@ -150,17 +306,32 @@ class _FileList extends StatelessWidget {
   final Axis axis;
   final ValueChanged<int> onSelect;
 
-  static String _name(String path) {
+  static String _basename(String path) {
     final int slash = path.lastIndexOf('/');
     return slash < 0 ? path : path.substring(slash + 1);
   }
 
+  /// The label shown for [path] — its basename alone, unless that basename
+  /// is shared with another file in this tree, in which case the full path
+  /// is shown so the two remain tellable apart (both in the rendered text
+  /// and in the row's accessible name).
+  static String _displayName(String path, Map<String, int> basenameCounts) {
+    final String name = _basename(path);
+    return (basenameCounts[name] ?? 0) > 1 ? path : name;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final Map<String, int> basenameCounts = <String, int>{};
+    for (final DocsCodeFile file in files) {
+      final String name = _basename(file.path);
+      basenameCounts[name] = (basenameCounts[name] ?? 0) + 1;
+    }
+
     final List<Widget> entries = <Widget>[
       for (int i = 0; i < files.length; i++)
         _FileEntry(
-          name: _name(files[i].path),
+          name: _displayName(files[i].path, basenameCounts),
           path: files[i].path,
           selected: i == selectedIndex,
           expanded: axis == Axis.vertical,
@@ -223,7 +394,11 @@ class _FileEntry extends StatelessWidget {
           Flexible(
             child: DsText(
               name,
-              DsComponentType.buttonLabel,
+              // `sm` is this button's own rung — `buttonLabel` is the `md`
+              // rung and, substituted into an auto-height left-aligned row
+              // like this one, comes out short (typography.dart documents
+              // the measured gap).
+              DsComponentType.buttonLabelSm,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),

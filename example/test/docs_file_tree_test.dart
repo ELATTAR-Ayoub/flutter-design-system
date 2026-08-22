@@ -21,6 +21,17 @@ const List<DocsCodeFile> _twoFiles = <DocsCodeFile>[
   DocsCodeFile(path: 'lib/shots/demo/b.dart', code: 'class B {}'),
 ];
 
+const List<DocsCodeFile> _threeFiles = <DocsCodeFile>[
+  DocsCodeFile(path: 'lib/shots/demo/a.dart', code: 'class A {}'),
+  DocsCodeFile(path: 'lib/shots/demo/b.dart', code: 'class B {}'),
+  DocsCodeFile(path: 'lib/shots/demo/c.dart', code: 'class C {}'),
+];
+
+const List<DocsCodeFile> _duplicateBasenames = <DocsCodeFile>[
+  DocsCodeFile(path: 'lib/shots/one/config.dart', code: 'class ConfigOne {}'),
+  DocsCodeFile(path: 'lib/shots/two/config.dart', code: 'class ConfigTwo {}'),
+];
+
 Future<DsThemeController> _pumpTree(
   WidgetTester tester, {
   required List<DocsCodeFile> files,
@@ -93,7 +104,9 @@ void main() {
 
     expect(find.text('class Solo {}'), findsOneWidget);
     expect(find.bySemanticsLabel('Selected file solo.dart'), findsOneWidget);
-    expect(find.byType(DsButton), findsOneWidget);
+    // The one file-entry row, plus the copy control for its source — not
+    // the bare 1 this used to assert before the copy affordance existed.
+    expect(find.byType(DsButton), findsNWidgets(2));
 
     // Tapping the only, already-selected entry must not throw or blank the
     // pane.
@@ -164,16 +177,14 @@ void main() {
       await _pumpTree(tester, files: _twoFiles, mode: DsThemeMode.light);
 
       expect(find.text('class A {}'), findsOneWidget);
-      expect(find.byType(DsButton), findsNWidgets(2));
+      // 2 file-entry rows + 1 copy control for the selected file.
+      expect(find.byType(DsButton), findsNWidgets(3));
     });
 
     testWidgets('flipping the theme in place preserves selection', (
       WidgetTester tester,
     ) async {
-      final DsThemeController theme = await _pumpTree(
-        tester,
-        files: _twoFiles,
-      );
+      final DsThemeController theme = await _pumpTree(tester, files: _twoFiles);
 
       await tester.tap(find.bySemanticsLabel('Select file b.dart'));
       await tester.pump();
@@ -186,5 +197,147 @@ void main() {
       expect(find.text('class B {}'), findsOneWidget);
       expect(find.bySemanticsLabel('Selected file b.dart'), findsOneWidget);
     });
+  });
+
+  group('a shrinking files list', () {
+    testWidgets(
+      'resets an out-of-range selection to the first file instead of throwing',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = _wide;
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+
+        final DsThemeController theme = DsThemeController(
+          mode: DsThemeMode.dark,
+        );
+        addTearDown(theme.dispose);
+
+        Widget host(List<DocsCodeFile> files) => DsTheme(
+          controller: theme,
+          child: MaterialApp(
+            debugShowCheckedModeBanner: false,
+            home: Scaffold(
+              body: SingleChildScrollView(child: DocsFileTree(files: files)),
+            ),
+          ),
+        );
+
+        await tester.pumpWidget(host(_threeFiles));
+        await tester.pump();
+
+        await tester.tap(find.bySemanticsLabel('Select file c.dart'));
+        await tester.pump();
+        expect(find.bySemanticsLabel('Selected file c.dart'), findsOneWidget);
+
+        // Re-pump the *same* element tree (same widget types, no keys, so
+        // the framework updates rather than recreates it) with a shorter
+        // list. This is exactly what `didUpdateWidget` exists to guard:
+        // delete that override and `files[_selected]` — `files[2]` against a
+        // 1-file list — is a RangeError.
+        await tester.pumpWidget(host(<DocsCodeFile>[_threeFiles.first]));
+        await tester.pump();
+
+        expect(tester.takeException(), isNull);
+        expect(find.text('class A {}'), findsOneWidget);
+        expect(find.bySemanticsLabel('Selected file a.dart'), findsOneWidget);
+      },
+    );
+  });
+
+  group('an empty files list', () {
+    testWidgets('renders a placeholder instead of indexing into nothing', (
+      WidgetTester tester,
+    ) async {
+      await _pumpTree(tester, files: const <DocsCodeFile>[]);
+
+      expect(tester.takeException(), isNull);
+      expect(
+        find.byKey(const ValueKey<String>('docs-file-tree-empty')),
+        findsOneWidget,
+      );
+      expect(find.byType(DsButton), findsNothing);
+    });
+  });
+
+  group('files sharing a basename', () {
+    testWidgets('are shown with enough path to tell them apart', (
+      WidgetTester tester,
+    ) async {
+      await _pumpTree(tester, files: _duplicateBasenames);
+
+      expect(
+        find.bySemanticsLabel('Selected file lib/shots/one/config.dart'),
+        findsOneWidget,
+      );
+      expect(
+        find.bySemanticsLabel('Select file lib/shots/two/config.dart'),
+        findsOneWidget,
+      );
+      // The bare, ambiguous basename must not be used for either row once
+      // there is a collision — that was the whole bug.
+      expect(find.bySemanticsLabel('Selected file config.dart'), findsNothing);
+      expect(find.bySemanticsLabel('Select file config.dart'), findsNothing);
+    });
+  });
+
+  group('copy control', () {
+    testWidgets('the selected file has a copy control labelled for that file', (
+      WidgetTester tester,
+    ) async {
+      await _pumpTree(tester, files: _twoFiles);
+
+      expect(
+        find.bySemanticsLabel('Copy lib/shots/demo/a.dart'),
+        findsOneWidget,
+      );
+      expect(find.bySemanticsLabel('Copy lib/shots/demo/b.dart'), findsNothing);
+
+      await tester.tap(find.bySemanticsLabel('Select file b.dart'));
+      await tester.pump();
+
+      expect(
+        find.bySemanticsLabel('Copy lib/shots/demo/b.dart'),
+        findsOneWidget,
+      );
+      expect(find.bySemanticsLabel('Copy lib/shots/demo/a.dart'), findsNothing);
+    });
+
+    testWidgets(
+      "pressing copy writes the selected file's source through the injected writer",
+      (WidgetTester tester) async {
+        final List<String> copied = <String>[];
+        tester.view.physicalSize = _wide;
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+
+        final DsThemeController theme = DsThemeController(
+          mode: DsThemeMode.dark,
+        );
+        addTearDown(theme.dispose);
+
+        await tester.pumpWidget(
+          DsTheme(
+            controller: theme,
+            child: MaterialApp(
+              debugShowCheckedModeBanner: false,
+              home: Scaffold(
+                body: SingleChildScrollView(
+                  child: DocsFileTree(
+                    files: _twoFiles,
+                    clipboardWriter: (String text) async => copied.add(text),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pump();
+
+        await tester.tap(find.bySemanticsLabel('Copy lib/shots/demo/a.dart'));
+        await tester.pump();
+
+        expect(copied, <String>['class A {}']);
+      },
+    );
   });
 }
