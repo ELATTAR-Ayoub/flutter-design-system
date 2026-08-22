@@ -194,7 +194,7 @@ class PublicComponentsPage extends StatelessWidget {
           ),
           DsText('Ready to install', DsType.h3, color: theme.foreground),
           SizedBox(height: ds(3)),
-          const DsText(
+          DsText(
             'These pilot components have complete previews, installation paths, usage guidance, API tables, and accessibility notes.',
             DsType.body,
           ),
