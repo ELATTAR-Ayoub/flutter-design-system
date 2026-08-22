@@ -21,11 +21,11 @@ Workers did not overlap ownership. The root agent was the sole integrator and re
 
 ## Skill result
 
-- `.agents/skills/elattar-flutter-ui-director/SKILL.md` describes Flutter screen, page, component, migration, and review work.
+- `skills/elattar-flutter-ui-director/SKILL.md` describes Flutter screen, page, component, migration, and review work.
 - `references/system-map.md` and `references/verify.md` route implementation and proof against the actual Flutter package.
 - Guidance requires `DsTheme`, `DsSafeArea`, `DsText`, `ds(...)`, design-system colors, breakpoints, motion/reduced-motion, toast lifecycle, and reuse-before-extension decisions.
 - `AGENTS.md` requires the skill for repository Flutter UI work.
-- `quick_validate.py .agents\\skills\\elattar-flutter-ui-director` returned `Skill is valid!`.
+- `quick_validate.py .agents\\skills\\elattar-flutter-ui-director` returned `Skill is valid!` at the time of this build. The skill has since moved; see the relocation note below.
 
 ## Showcase result
 
@@ -101,4 +101,24 @@ flutter build apk --release --target lib/showcase_main.dart
 ```
 
 Run the `skill-creator` skill's `scripts/quick_validate.py` against
-`.agents\skills\elattar-flutter-ui-director` when validating the skill package.
+`skills\elattar-flutter-ui-director` when validating the skill package.
+
+## Relocation — 2026-08-23
+
+This record documents the skill as first built, under `.agents/skills/`. That
+path is not scanned by any harness, so the skill was never actually loaded by
+one; its only activation was `AGENTS.md` instructing an agent to read the file.
+
+The skill now lives at `skills/elattar-flutter-ui-director/`, and the repository
+root carries `.claude-plugin/marketplace.json` and `.claude-plugin/plugin.json`
+so that directory is itself the plugin payload — one copy, no generated mirror.
+`agents/openai.yaml` was deleted: hand-written metadata does not create a Codex
+install route, and unverified support is not claimed.
+
+The skill also became mode-aware in the same change. It now resolves the project
+layout before naming a path, so it works in a consumer application installed
+through the CLI (`lib/components/ui/`, `lib/design_system/`) as well as in this
+repository (`lib/src/components/`, `lib/src/foundation/`).
+
+Rationale and tradeoffs:
+`docs/superpowers/reports/public-release/decisions/005-public-skill-location.md`.

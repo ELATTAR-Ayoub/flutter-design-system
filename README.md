@@ -2,7 +2,7 @@
 
 Elattar's Flutter design system package: foundations, components, effects, and motion primitives exposed through public `Ds*` APIs.
 
-[Install](#install-today) • [Development](#development) • [Verification](#verification) • [Contributing](#contributing)
+[Install](#install-today) • [Agent Skill](#agent-skill) • [Development](#development) • [Verification](#verification) • [Contributing](#contributing)
 
 ## Status
 
@@ -95,6 +95,25 @@ The example app is the best place to inspect real specimens and integration patt
 
 - Local docs app entry: [`example/lib/main.dart`](example/lib/main.dart)
 - Showcase entry: [`example/lib/showcase_main.dart`](example/lib/showcase_main.dart)
+
+## Agent Skill
+
+This repository carries a coding-agent skill, `elattar-flutter-ui-director`, that teaches an agent to build Flutter UI from this design system: inventory the public `Ds*` APIs before inventing a widget, resolve every visual value from foundation tokens, cover loading/empty/error/success and accessibility states, respect responsive contracts, and run the right verification ladder.
+
+- Skill source: [`skills/elattar-flutter-ui-director/SKILL.md`](skills/elattar-flutter-ui-director/SKILL.md)
+- Repository contract: [`AGENTS.md`](AGENTS.md)
+
+The skill is mode-aware. In a checkout of this repository it uses the package layout (`lib/src/foundation/`, `lib/src/components/`, `example/lib/`). In an application that installed the design system through the CLI, it detects `elattar.yaml` and uses that project's layout instead. One skill directory serves both; there is no second copy to drift.
+
+### Using it here
+
+Clone the repository and point your agent at it. Agents that read `AGENTS.md` pick up the contract on their own; the file routes them into the skill. No installation step is involved, because the skill is already in the tree you cloned.
+
+### Using it elsewhere
+
+The repository also contains Claude Code plugin manifests (`.claude-plugin/marketplace.json` and `.claude-plugin/plugin.json`, plugin version `0.0.1`) that expose `skills/` as a plugin payload directly from the repository root.
+
+No external install command is published yet. Two things must land first: this repository has a placeholder `LICENSE`, so there is no grant attached to redistributing the skill, and each install route needs a recorded run before it is documented as working. A command that has not been demonstrated will not be printed here. See [`docs/superpowers/reports/public-release/decisions/005-public-skill-location.md`](docs/superpowers/reports/public-release/decisions/005-public-skill-location.md).
 
 ## Planned CLI And Registry
 

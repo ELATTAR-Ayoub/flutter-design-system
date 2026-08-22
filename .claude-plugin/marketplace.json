@@ -1,0 +1,28 @@
+{
+  "name": "elattar",
+  "owner": {
+    "name": "ELATTAR Ayoub",
+    "url": "https://github.com/ELATTAR-Ayoub"
+  },
+  "metadata": {
+    "description": "Agent skills for building Flutter UI with the Elattar design system."
+  },
+  "plugins": [
+    {
+      "name": "elattar-design-system",
+      "source": "./",
+      "description": "Directs coding agents to build Flutter UI from the Elattar design system: public Ds* API discovery, foundation tokens, component placement, state and accessibility coverage, responsive contracts, and a verification ladder.",
+      "homepage": "https://github.com/ELATTAR-Ayoub/flutter-design-system",
+      "repository": "https://github.com/ELATTAR-Ayoub/flutter-design-system",
+      "keywords": [
+        "flutter",
+        "dart",
+        "design-system",
+        "ui",
+        "tokens",
+        "accessibility"
+      ],
+      "category": "workflow"
+    }
+  ]
+}

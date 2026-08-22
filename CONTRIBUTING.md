@@ -8,9 +8,21 @@ This project is currently in its public-foundation stage and the package version
 
 - Search existing issues and pull requests before opening a new one.
 - Keep changes scoped. Small, reviewable pull requests move fastest.
-- If your change affects product UI, components, motion, responsive behavior, or accessibility, follow `AGENTS.md` and the `elattar-flutter-ui-director` skill contract.
+- If your change affects product UI, components, motion, responsive behavior, or accessibility, follow [`AGENTS.md`](AGENTS.md) and the [`elattar-flutter-ui-director`](skills/elattar-flutter-ui-director/SKILL.md) skill contract.
 - Do not move product UI into `lib/src/components/` unless that is already the correct package surface.
 - Do not add hardcoded visual or motion literals in `lib/` or `example/lib/` when the design-system tokens already cover the need. The repository enforces this with `test/token_guard_test.dart`.
+
+## Activating the agent skill locally
+
+The skill lives at [`skills/elattar-flutter-ui-director/`](skills/elattar-flutter-ui-director/). It moved there from `.agents/skills/` — that older path is gone, and nothing reads it. There is exactly one copy in this repository; do not create a second one.
+
+**If your agent reads `AGENTS.md`** — nothing to install. [`AGENTS.md`](AGENTS.md) sits at the repository root and routes to the skill, so cloning is the whole setup. This is the path to use when in doubt.
+
+**If your agent loads Claude Code plugins** — the repository root is also a plugin marketplace. `.claude-plugin/marketplace.json` declares one plugin sourced from `"./"`, and `.claude-plugin/plugin.json` points at `./skills/elattar-flutter-ui-director`. Adding your local clone as a marketplace therefore loads the skill straight from your working tree, with no copy step and no path to keep in sync.
+
+That plugin route is wired but not yet signed off: a recorded run per harness is tracked as release verification work, and until those exist, treat it as untested and fall back to the `AGENTS.md` path. If you do exercise it, note the harness and version in your pull request — that is exactly the evidence the sign-off needs.
+
+Do not copy the skill into a personal agent configuration directory and edit it there. Edit it in the tree and send a pull request, otherwise your changes cannot be reviewed and will drift from the repository the skill describes.
 
 ## Good first contribution areas
 

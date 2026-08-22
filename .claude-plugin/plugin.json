@@ -1,0 +1,22 @@
+{
+  "name": "elattar-design-system",
+  "version": "0.0.1",
+  "description": "Directs coding agents to build Flutter UI from the Elattar design system: public Ds* API discovery, foundation tokens, component placement, state and accessibility coverage, responsive contracts, and a verification ladder.",
+  "author": {
+    "name": "ELATTAR Ayoub",
+    "url": "https://github.com/ELATTAR-Ayoub"
+  },
+  "homepage": "https://github.com/ELATTAR-Ayoub/flutter-design-system",
+  "repository": "https://github.com/ELATTAR-Ayoub/flutter-design-system",
+  "keywords": [
+    "flutter",
+    "dart",
+    "design-system",
+    "ui",
+    "tokens",
+    "accessibility"
+  ],
+  "skills": [
+    "./skills/elattar-flutter-ui-director"
+  ]
+}
