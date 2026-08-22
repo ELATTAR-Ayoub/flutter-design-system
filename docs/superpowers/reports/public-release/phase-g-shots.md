@@ -2,8 +2,8 @@
 
 ## Status
 
-Accepted with follow-up — written by the Wave 2 worker, subject to supervisor
-confirmation and commit.
+Accepted with follow-up. Committed as `7860c58`, "feat(shots): wire Shots into
+the site and close Phase G".
 
 The Shots capability is complete and wired into the public site. The follow-up
 items are the Phase G entry-gate carryover recorded in the scope plan
@@ -84,12 +84,12 @@ Concretely:
 - `registry/generated/latest/index.json`
 - `registry/generated/latest/registry.json`
 
-`git status` also marks about thirty other files under
-`registry/generated/latest/` as modified. `git diff` reports no content change
-for any of them: the generator writes LF and the working copy is CRLF, so the
-only difference is line endings. The three Shots are the whole of the real
-change — 144 added lines across `index.json` and `registry.json`, plus the three
-new `versions/<shot>/` directories.
+Regeneration also touched about thirty other files under
+`registry/generated/latest/` without changing their content: the generator
+writes LF and the working copy is CRLF, so `git diff` reported nothing for them.
+The three Shots are the whole of the real change — 144 added lines across
+`index.json` and `registry.json`, plus the three new `versions/<shot>/`
+directories. Expect the same harmless churn on any future regeneration.
 
 ### Corrected during Wave 2 review
 

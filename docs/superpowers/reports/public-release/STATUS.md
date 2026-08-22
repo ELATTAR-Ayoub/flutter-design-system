@@ -18,26 +18,14 @@ Ready for next phase, with public-release blockers preserved.
 - Branch `public-release-v0.0.1-phase-f`. The previous entry in this file
   claimed branch `main` at `c20838e` with uncommitted Phase A–E files; that was
   stale and is corrected here.
-- Last commit `6c94bac` — "feat(shots): add the first three installable Shots".
-  Phase G Wave 0 and Wave 1 are committed.
-- **Uncommitted and to be preserved.** Phase G Wave 2 integration, awaiting
-  supervisor review and commit:
-  - `example/lib/main.dart`
-  - `example/lib/site/site_routes.dart`
-  - `example/lib/site/pages/public_pages.dart`
-  - `example/pubspec.yaml`
-  - `example/lib/shots_docs/shots_index_page.dart` (duplicate typedef removed)
-  - `example/lib/shots_docs/shot_detail_page.dart` (duplicate route constant removed)
-  - `example/test/site_routes_test.dart`, `example/test/public_pages_test.dart`,
-    `example/test/shots_index_test.dart`
-  - `example/test/shots_catalog_parity_test.dart` (new)
-  - `registry/generated/latest/**` (regenerated once, by the single Wave 2 writer)
-  - `docs/superpowers/reports/public-release/phase-g-shots.md` (new), this file
-- Nothing else is dirty. A concurrent worker briefly held changes in
-  `.github/workflows/ci.yml`, `example/lib/docs/docs_file_tree.dart`,
-  `example/test/docs_file_tree_test.dart`, `packages/elattar_cli/**` and
-  `tool/registry_builder/lib/generator.dart` during this session; those were
-  withdrawn and the tree is back at `HEAD` for all of them.
+- Last commit `7860c58` — "feat(shots): wire Shots into the site and close
+  Phase G", the Wave 2 integration. All of Phase G is committed.
+- The three commits that closed the phase, oldest first:
+  - `48c390b` — "fix(cli): rewrite imports only in the directive prologue"
+  - `611c7a9` — "fix(docs): restore copy affordance and cover the untested paths"
+  - `7860c58` — Wave 2: route wiring, asset-loaded Shot source, placeholder
+    retirement, repaired and new tests, registry regenerated once.
+- Working tree clean. Nothing to preserve.
 - Registry generates and validates **20** schema-v1 items (17 + 3 Shots).
 - Root `flutter analyze` clean; root `flutter test` 1473 passing.
 - Example `flutter analyze` clean; example `flutter test` 943 passing.
@@ -107,12 +95,13 @@ Known and non-blocking:
 
 ## Next three actions
 
-1. Review and commit the Phase G Wave 2 integration listed above.
-2. Start Phase H — Skills at finding 1 of its scope plan: move the skill out of
+1. Start Phase H — Skills at finding 1 of its scope plan: move the skill out of
    `.agents/skills/`, which no harness scans, and replace the `/skills`
    placeholder this phase left behind.
-3. Browser-review the Shots and component routes at narrow and wide viewports,
-   then resolve licensing and `elattar_core` before any deployment.
+2. Browser-review the Shots and component routes at narrow and wide viewports,
+   and close the accessibility findings.
+3. Resolve licensing and `elattar_core`, and add the registry validator and the
+   `packages/elattar_cli` suite to CI, before any deployment.
 
 ## Commands to resume
 
