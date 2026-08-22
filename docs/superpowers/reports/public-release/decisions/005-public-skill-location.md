@@ -98,6 +98,14 @@ collide.
   now discriminates on `elattar.yaml` / `.elattar/manifest.json` versus
   `lib/elattar_design_system.dart` before naming any path. One skill, two path
   sets — not two skills.
+- Writing the consumer path table surfaced a CLI defect. `elattar.yaml` carries
+  `paths:` and `barrels:` keys, but nothing outside `config.dart` reads them —
+  install destinations are hardcoded in `install/target_mapper.dart`, and the
+  `barrels.design_system` default names `lib/design_system/design_system.dart`,
+  a file the installer never creates (it writes `foundation.dart`). The skill
+  therefore routes agents to `.elattar/manifest.json` and the tree, not to
+  `elattar.yaml`'s path keys. Fixing the CLI is out of this decision's scope and
+  is filed separately; `packages/elattar_cli/**` was dirty under Phase G.
 - The package version and the plugin version are now coupled by convention at
   `0.0.1`. They can legitimately diverge later (a skill wording fix is not a
   package release); if they do, the coupling should be dropped explicitly rather
