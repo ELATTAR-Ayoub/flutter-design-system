@@ -47,6 +47,7 @@ class Installer {
         final String content = transformer.transform(
           sourcePath: source.path,
           targetPath: destination,
+          projectRoot: projectRoot.path,
           content: source.readAsStringSync(),
         );
         _queue(

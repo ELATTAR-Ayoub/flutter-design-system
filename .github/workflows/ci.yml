@@ -35,6 +35,34 @@ jobs:
       - name: Test package
         run: flutter test --reporter expanded
 
+      # The installer CLI and the registry builder live in their own packages,
+      # outside the root analysis context. Without these steps the import
+      # transformer, its end-to-end shot install proof and the registry
+      # generator are never exercised on a pull request.
+      - name: Install CLI dependencies
+        working-directory: packages/elattar_cli
+        run: dart pub get
+
+      - name: Check CLI formatting
+        working-directory: packages/elattar_cli
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: Analyze CLI
+        working-directory: packages/elattar_cli
+        run: dart analyze
+
+      # Includes shot_install_test.dart, which installs into a throwaway
+      # consumer project and runs `flutter analyze` over it.
+      - name: Test CLI
+        working-directory: packages/elattar_cli
+        run: dart test --reporter expanded
+
+      - name: Build registry
+        run: dart run tool/registry_builder/bin/build.dart .
+
+      - name: Validate registry
+        run: dart run tool/registry_builder/bin/validate.dart registry/generated/latest/registry.json
+
       - name: Install example dependencies
         working-directory: example
         run: flutter pub get

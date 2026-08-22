@@ -1,0 +1,8 @@
+# This package is pure Dart and is analysed on its own terms: CI runs
+# `dart analyze` and `dart test` from this directory.
+#
+# The file is intentionally empty. Its only job is to terminate the analysis
+# options walk-up. Without it the analyzer and the formatter fall back to the
+# repository root's `analysis_options.yaml`, which both `exclude: packages/**`
+# and `include: package:flutter_lints/flutter.yaml` — a package this one does
+# not depend on, so every invocation emits a package-resolution warning.

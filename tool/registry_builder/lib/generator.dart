@@ -277,6 +277,12 @@ class RegistryGenerator {
 }
 
 /// Plans conversion of registry logical imports without changing source.
+///
+/// ADVISORY ONLY — this has no production caller. The generator copies payload
+/// bytes verbatim (`_copyPayload`); the real rewrite happens at install time in
+/// `packages/elattar_cli/lib/src/install/import_transformer.dart`, which is the
+/// only implementation that must be kept correct. Do not extend this: teach the
+/// installer's transformer instead.
 ImportTransformationPlan planImportTransformations(
   String source, {
   required String fromTarget,

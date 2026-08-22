@@ -60,8 +60,21 @@ import 'package:flutter/widgets.dart';
 
 import 'package:elattar_design_system/elattar_design_system.dart';
 
+/// Shots are documentation-shaped code. The words below are a doc comment and
+/// a string literal, not directives, and the installer must leave both alone:
+/// rewriting them injects directives after a declaration has opened (which does
+/// not compile) or into the middle of a string, and the `as ds` form aborts the
+/// install outright.
+///
+/// ```dart
+/// import 'package:elattar_design_system/elattar_design_system.dart';
+/// ```
+// import 'package:elattar_design_system/elattar_design_system.dart' as ds;
 class ConsoleShot extends StatelessWidget {
   const ConsoleShot({super.key});
+
+  static const String snippet =
+      "import 'package:elattar_design_system/elattar_design_system.dart' as ds;";
 
   @override
   Widget build(BuildContext context) => const ShotFixturePanel(
@@ -73,10 +86,7 @@ class ConsoleShot extends StatelessWidget {
       // Installs one directory deep and deliberately uses ONLY the component
       // barrel, so the generated foundation import is genuinely unused. If the
       // fan-out were not suppressed, `flutter analyze` below would fail.
-      final File minimalShot = _write(
-        source,
-        'lib/shots/minimal_shot.dart',
-        '''
+      final File minimalShot = _write(source, 'lib/shots/minimal_shot.dart', '''
 import 'package:flutter/widgets.dart';
 
 import 'package:elattar_design_system/elattar_design_system.dart';
@@ -88,22 +98,26 @@ class MinimalShot extends StatelessWidget {
   Widget build(BuildContext context) =>
       const ShotFixturePanel(child: Text('minimal'));
 }
-''',
-      );
+''');
 
-      _manifest(source, 'registry/foundations/source-foundation.json', <
-        String,
-        Object?
-      >{
-        'name': 'source-foundation',
-        'type': 'foundation',
-        'description': 'Fixture foundation.',
-        'files': <Object?>[
-          _fileEntry(tokens, 'lib/src/foundation/tokens.dart', '@foundation/tokens.dart'),
-        ],
-        'registryDependencies': <String>[],
-        'documentationRoute': '/foundations/source',
-      });
+      _manifest(
+        source,
+        'registry/foundations/source-foundation.json',
+        <String, Object?>{
+          'name': 'source-foundation',
+          'type': 'foundation',
+          'description': 'Fixture foundation.',
+          'files': <Object?>[
+            _fileEntry(
+              tokens,
+              'lib/src/foundation/tokens.dart',
+              '@foundation/tokens.dart',
+            ),
+          ],
+          'registryDependencies': <String>[],
+          'documentationRoute': '/foundations/source',
+        },
+      );
       _manifest(source, 'registry/components/panel.json', <String, Object?>{
         'name': 'panel',
         'type': 'component',
@@ -160,14 +174,11 @@ class MinimalShot extends StatelessWidget {
       expect(build.stdout.toString(), contains('Generated 4 item(s)'));
 
       final String registryPath = '${source.path}/registry/generated/latest';
-      final ProcessResult validate = await Process.run(
-        Platform.resolvedExecutable,
-        <String>[
-          '${repoRoot.path}/tool/registry_builder/bin/validate.dart',
-          '$registryPath/registry.json',
-        ],
-        workingDirectory: repoRoot.path,
-      );
+      final ProcessResult validate =
+          await Process.run(Platform.resolvedExecutable, <String>[
+            '${repoRoot.path}/tool/registry_builder/bin/validate.dart',
+            '$registryPath/registry.json',
+          ], workingDirectory: repoRoot.path);
       expect(
         validate.exitCode,
         0,
@@ -243,11 +254,43 @@ flutter:
       expect(installedMinimal.existsSync(), isTrue);
 
       final String consoleText = installedConsole.readAsStringSync();
-      expect(consoleText, isNot(contains('package:elattar_design_system')));
       expect(consoleText, contains("import '../../components/ui/ui.dart';"));
       expect(
         consoleText,
         contains("import '../../design_system/foundation.dart';"),
+      );
+      // No directive still points at the package...
+      expect(
+        RegExp(
+          r"^\s*(import|export)\s+'package:elattar_design_system",
+          multiLine: true,
+        ).hasMatch(consoleText),
+        isFalse,
+      );
+      // ...the fan-out happened exactly once...
+      expect(
+        "import '../../components/ui/ui.dart';".allMatches(consoleText).length,
+        1,
+      );
+      // ...and the doc comment, line comment and string literal that merely
+      // mention an import survived byte for byte.
+      expect(
+        consoleText,
+        contains(
+          "/// import 'package:elattar_design_system/elattar_design_system.dart';",
+        ),
+      );
+      expect(
+        consoleText,
+        contains(
+          "// import 'package:elattar_design_system/elattar_design_system.dart' as ds;",
+        ),
+      );
+      expect(
+        consoleText,
+        contains(
+          r'''"import 'package:elattar_design_system/elattar_design_system.dart' as ds;";''',
+        ),
       );
 
       final String minimalText = installedMinimal.readAsStringSync();
@@ -282,9 +325,12 @@ flutter:
       final List<Object?> items = manifest['items']! as List<Object?>;
       final Map<String, Object?> shot = items
           .cast<Map<String, Object?>>()
-          .firstWhere((Map<String, Object?> item) => item['name'] == 'console-shot');
+          .firstWhere(
+            (Map<String, Object?> item) => item['name'] == 'console-shot',
+          );
       expect(
-        ((shot['files']! as List<Object?>).single as Map<String, Object?>)['target'],
+        ((shot['files']! as List<Object?>).single
+            as Map<String, Object?>)['target'],
         'lib/shots/console/console_shot.dart',
       );
 
