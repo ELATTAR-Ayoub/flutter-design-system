@@ -33,6 +33,11 @@ class LogicalTargetMapper {
         'lib/design_system/motion/${relative.substring(8)}',
       );
     }
+    // Application compositions (shots) land in the consumer's own `lib/`, not
+    // under the design-system folders: `@app/shots/x/y.dart` -> `lib/shots/x/y.dart`.
+    if (relative.startsWith('@app/')) {
+      return _join(projectRoot, 'lib/${relative.substring(5)}');
+    }
     throw ArgumentError.value(
       logicalTarget,
       'logicalTarget',

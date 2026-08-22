@@ -7,11 +7,15 @@ import 'cache.dart';
 import 'models.dart';
 import 'source.dart';
 
+// Keep in sync with `logicalTargetPrefixes` in the registry builder: this list
+// drives payload lookup for integrity verification, so a missing prefix makes
+// the payload unfindable rather than merely unverified.
 const List<String> _logicalTargetPrefixes = <String>[
   '@ui/',
   '@foundation/',
   '@effects/',
   '@motion/',
+  '@app/',
 ];
 
 class RegistryClient {

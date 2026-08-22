@@ -10,6 +10,11 @@ enum RegistryItemType {
   asset,
   block,
   preset,
+
+  /// An installable product-neutral application composition. Shots are
+  /// application screens, not design-system parts: they install under `@app/`
+  /// and are never exported from the generated `ui`/`foundation` barrels.
+  shot,
 }
 
 RegistryItemType registryItemTypeFromJson(String value) {

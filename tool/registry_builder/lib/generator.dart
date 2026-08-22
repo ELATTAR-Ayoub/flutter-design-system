@@ -172,6 +172,7 @@ class RegistryGenerator {
       'motion',
       'blocks',
       'presets',
+      'shots',
     ]) {
       final Directory directory = Directory(_join(_registry.path, folder));
       if (!directory.existsSync()) continue;
@@ -284,9 +285,10 @@ ImportTransformationPlan planImportTransformations(
   String foundationPath = 'lib/design_system/foundation',
   String effectsPath = 'lib/design_system/effects',
   String motionPath = 'lib/design_system/motion',
+  String appPath = 'lib',
 }) {
   final RegExp imports = RegExp(
-    r'''(['"])@(foundation|ui|effects|motion)/([^'"]+)\1''',
+    r'''(['"])@(foundation|ui|effects|motion|app)/([^'"]+)\1''',
   );
   final List<ImportTransformation> result = <ImportTransformation>[];
   for (final RegExpMatch match in imports.allMatches(source)) {
@@ -298,9 +300,13 @@ ImportTransformationPlan planImportTransformations(
       'ui' => componentsPath,
       'effects' => effectsPath,
       'motion' => motionPath,
+      'app' => appPath,
       _ => throw StateError('unreachable'),
     };
-    final String replacementPath = foundationMode == 'package' && family != 'ui'
+    // `@app/` is product code and never moves into the core package, so it
+    // stays relative in both foundation modes, exactly like `@ui/`.
+    final String replacementPath =
+        foundationMode == 'package' && family != 'ui' && family != 'app'
         ? 'package:elattar_core/${destination.split('/').skip(1).join('/')}/$leaf'
         : _relativePath(fromTarget, '$destination/$leaf');
     result.add(

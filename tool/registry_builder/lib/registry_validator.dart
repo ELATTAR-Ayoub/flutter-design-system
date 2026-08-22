@@ -8,6 +8,9 @@ const Set<String> logicalTargetPrefixes = <String>{
   '@foundation/',
   '@effects/',
   '@motion/',
+  // Application-level compositions (shots). These land in the consumer's own
+  // `lib/`, never inside the design-system folders.
+  '@app/',
 };
 
 final RegExp _sha256 = RegExp(r'^[0-9a-fA-F]{64}$');

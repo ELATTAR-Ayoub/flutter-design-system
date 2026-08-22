@@ -28,6 +28,99 @@ void main() {
       mapper.destination(root, '@motion/press.dart'),
       contains('lib/design_system/motion'),
     );
+    expect(
+      mapper
+          .destination(root, '@app/shots/console/console_shot.dart')
+          .replaceAll('\\', '/'),
+      endsWith('lib/shots/console/console_shot.dart'),
+    );
+  });
+
+  test('unknown logical prefixes are still rejected', () {
+    const LogicalTargetMapper mapper = LogicalTargetMapper();
+    expect(
+      () => mapper.destination(Directory.systemTemp.path, '@nope/x.dart'),
+      throwsArgumentError,
+    );
+  });
+
+  test('shot umbrella package import fans out to the generated barrels', () {
+    final DartImportTransformer transformer = DartImportTransformer();
+    const String source =
+        "import 'package:flutter/widgets.dart';\n"
+        "import 'package:elattar_design_system/elattar_design_system.dart';\n";
+    final String result = transformer.transform(
+      sourcePath: 'repo/lib/shots/console/console_shot.dart',
+      targetPath: 'consumer/lib/shots/console/console_shot.dart',
+      content: source,
+    );
+    expect(result, isNot(contains('package:elattar_design_system')));
+    expect(
+      result,
+      contains(
+        "// ignore: unused_import\nimport '../../components/ui/ui.dart';\n"
+        "// ignore: unused_import\nimport '../../design_system/foundation.dart';",
+      ),
+    );
+    // Unrelated package imports are untouched.
+    expect(result, contains("import 'package:flutter/widgets.dart';"));
+  });
+
+  test('barrel imports are relative to the shot install depth', () {
+    final DartImportTransformer transformer = DartImportTransformer();
+    const String source =
+        "import 'package:elattar_design_system/elattar_design_system.dart';\n";
+    final String shallow = transformer.transform(
+      sourcePath: 'repo/lib/shots/minimal_shot.dart',
+      targetPath: 'consumer/lib/shots/minimal_shot.dart',
+      content: source,
+    );
+    expect(shallow, contains("import '../components/ui/ui.dart';"));
+    expect(shallow, contains("import '../design_system/foundation.dart'"));
+
+    final String deep = transformer.transform(
+      sourcePath: 'repo/lib/shots/a/b/deep_shot.dart',
+      targetPath: 'consumer/lib/shots/a/b/deep_shot.dart',
+      content: source,
+    );
+    expect(deep, contains("import '../../../components/ui/ui.dart';"));
+    expect(deep, contains("import '../../../design_system/foundation.dart'"));
+  });
+
+  test('direct package library imports map onto their logical targets', () {
+    final DartImportTransformer transformer = DartImportTransformer();
+    const String source =
+        "import 'package:elattar_design_system/src/components/button.dart';\n"
+        "import 'package:elattar_design_system/src/foundation/colors.dart';\n";
+    final String result = transformer.transform(
+      sourcePath: 'repo/lib/shots/console/console_shot.dart',
+      targetPath: 'consumer/lib/shots/console/console_shot.dart',
+      content: source,
+    );
+    expect(result, contains("import '../../components/ui/button.dart'"));
+    expect(
+      result,
+      contains("import '../../design_system/foundation/colors.dart'"),
+    );
+  });
+
+  test('an umbrella import that cannot be split is refused, not mangled', () {
+    final DartImportTransformer transformer = DartImportTransformer();
+    expect(
+      () => transformer.transform(
+        sourcePath: 'repo/lib/shots/console/console_shot.dart',
+        targetPath: 'consumer/lib/shots/console/console_shot.dart',
+        content:
+            "import 'package:elattar_design_system/elattar_design_system.dart' as ds;\n",
+      ),
+      throwsA(
+        isA<StateError>().having(
+          (StateError error) => error.message,
+          'message',
+          contains('cannot be split'),
+        ),
+      ),
+    );
   });
 
   test('relative imports resolve from source layout to copied layout', () {

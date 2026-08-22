@@ -732,9 +732,12 @@ class _WritePlan {
 
 bool _copyInPackageMode(RegistryItem item) {
   return switch (item.type) {
+    // Shots are product code: they are copied into the consumer project even
+    // when the foundation itself is consumed as a package.
     RegistryItemType.component ||
     RegistryItemType.block ||
-    RegistryItemType.asset => true,
+    RegistryItemType.asset ||
+    RegistryItemType.shot => true,
     RegistryItemType.foundation ||
     RegistryItemType.effect ||
     RegistryItemType.motion ||
