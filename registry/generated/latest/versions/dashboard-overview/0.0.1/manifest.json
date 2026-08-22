@@ -1,0 +1,39 @@
+{
+  "name": "dashboard-overview",
+  "type": "shot",
+  "version": "0.0.1",
+  "description": "A metrics overview with a range picker, responsive stat tiles, and a row-detail drill-in.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "example/lib/shots/dashboard_overview/dashboard_overview_shot.dart",
+      "target": "@app/shots/dashboard_overview/dashboard_overview_shot.dart",
+      "sha256": "c25819c9f981511308e904db1f6689ddc22d4f6673ef9820ea6393e2bcf80e25"
+    }
+  ],
+  "registryDependencies": [
+    "source-foundation",
+    "card",
+    "button",
+    "select",
+    "icon",
+    "tooltip",
+    "dialog"
+  ],
+  "semanticDependencies": [
+    "card",
+    "button",
+    "select",
+    "icon",
+    "tooltip",
+    "dialog"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "documentationRoute": "/shots/dashboard-overview",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/example/lib/shots/dashboard_overview/dashboard_overview_shot.dart",
+  "deprecated": false
+}

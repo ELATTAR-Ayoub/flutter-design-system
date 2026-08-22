@@ -10,6 +10,9 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/shots_docs/catalog.dart';
 import 'package:example/shots_docs/shots_index_page.dart';
+// `PublicNavigate` is declared here, and only here. The index page used to
+// declare a second copy of the typedef; that duplicate is gone.
+import 'package:example/site/pages/public_pages.dart' show PublicNavigate;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -29,8 +32,9 @@ Finder _shotCard(ShotDocEntry entry) =>
     find.byKey(ValueKey<String>('shot-card-${entry.name}'));
 
 Finder _familyGroup = find.byKey(const ValueKey<String>('shots-filter-family'));
-Finder _platformGroup =
-    find.byKey(const ValueKey<String>('shots-filter-platform'));
+Finder _platformGroup = find.byKey(
+  const ValueKey<String>('shots-filter-platform'),
+);
 
 Widget _harness(DsThemeController controller, {PublicNavigate? onNavigate}) =>
     DsTheme(
@@ -123,9 +127,7 @@ void main() {
     ) async {
       await _pumpPage(tester, size: _wide);
 
-      final DsToggleGroup family = tester.widget<DsToggleGroup>(
-        _familyGroup,
-      );
+      final DsToggleGroup family = tester.widget<DsToggleGroup>(_familyGroup);
       final DsToggleGroup platform = tester.widget<DsToggleGroup>(
         _platformGroup,
       );
@@ -147,10 +149,7 @@ void main() {
 
       final ShotDocEntry first = shotDocs.first;
       await tester.tap(
-        find.descendant(
-          of: _shotCard(first),
-          matching: find.text('View shot'),
-        ),
+        find.descendant(of: _shotCard(first), matching: find.text('View shot')),
       );
       await tester.pump();
 
@@ -240,6 +239,16 @@ void main() {
       );
       expect(find.byType(DsCard), findsNothing);
       expect(find.text('No shots match those filters'), findsOneWidget);
+      // This path only ever narrows by a single filter (platform); the copy
+      // must not claim a two-filter cause ("this family and platform
+      // together") the reachable path here does not produce.
+      expect(
+        find.text(
+          'Nothing in the catalog matches the selected filters. Try a '
+          'different combination or reset the filters.',
+        ),
+        findsOneWidget,
+      );
 
       await tester.tap(find.text('Reset filters'));
       await tester.pump();
@@ -249,17 +258,12 @@ void main() {
         findsNothing,
       );
       expect(find.byType(DsCard), findsNWidgets(shotDocs.length));
-      expect(
-        tester.widget<DsToggleGroup>(_platformGroup).selectedIndex,
-        0,
-      );
+      expect(tester.widget<DsToggleGroup>(_platformGroup).selectedIndex, 0);
     });
   });
 
   group('responsive', () {
-    testWidgets('renders narrow without overflow', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('renders narrow without overflow', (WidgetTester tester) async {
       await _pumpPage(tester, size: _narrow);
       expect(tester.takeException(), isNull);
       expect(find.byType(DsCard), findsNWidgets(shotDocs.length));
@@ -294,6 +298,91 @@ void main() {
 
       expect(tester.takeException(), isNull);
       expect(find.byType(DsCard), findsNWidgets(shotDocs.length));
+    });
+  });
+
+  group('re-tapping the selected filter clears it', () {
+    // `DsToggleGroup` only emits `null` when the already-selected item is
+    // tapped again (`toggle_group.dart`'s `onChanged: (bool on) =>
+    // onChanged(on ? i : null)`), so this is the only way to exercise the
+    // `index ?? 0` fallback in `_ShotsIndexPageState` — no other tap ever
+    // passes `null` through.
+    testWidgets('re-tapping the selected family filter returns to All', (
+      WidgetTester tester,
+    ) async {
+      await _pumpPage(tester, size: _wide);
+
+      final ShotFamily first = ShotFamily.values.first;
+      final Finder item = find.descendant(
+        of: _familyGroup,
+        matching: find.text(_familyLabels[first]!),
+      );
+
+      await tester.tap(item);
+      await tester.pump();
+      expect(
+        tester.widget<DsToggleGroup>(_familyGroup).selectedIndex,
+        ShotFamily.values.indexOf(first) + 1,
+      );
+
+      await tester.tap(item);
+      await tester.pump();
+
+      expect(tester.widget<DsToggleGroup>(_familyGroup).selectedIndex, 0);
+      expect(find.byType(DsCard), findsNWidgets(shotDocs.length));
+    });
+
+    testWidgets('re-tapping the selected platform filter returns to All', (
+      WidgetTester tester,
+    ) async {
+      await _pumpPage(tester, size: _wide);
+
+      final ShotPlatform first = ShotPlatform.values.first;
+      final Finder item = find.descendant(
+        of: _platformGroup,
+        matching: find.text(_platformLabels[first]!),
+      );
+
+      await tester.tap(item);
+      await tester.pump();
+      expect(
+        tester.widget<DsToggleGroup>(_platformGroup).selectedIndex,
+        ShotPlatform.values.indexOf(first) + 1,
+      );
+
+      await tester.tap(item);
+      await tester.pump();
+
+      expect(tester.widget<DsToggleGroup>(_platformGroup).selectedIndex, 0);
+      expect(find.byType(DsCard), findsNWidgets(shotDocs.length));
+    });
+  });
+
+  group('accessibility', () {
+    testWidgets(
+      "each card's view-shot control has an accessible name including its title",
+      (WidgetTester tester) async {
+        await _pumpPage(tester, size: _wide);
+
+        for (final ShotDocEntry entry in shotDocs) {
+          expect(
+            find.descendant(
+              of: _shotCard(entry),
+              matching: find.bySemanticsLabel('View shot: ${entry.title}'),
+            ),
+            findsOneWidget,
+            reason: entry.name,
+          );
+        }
+      },
+    );
+
+    testWidgets('the FAMILY and PLATFORM filter groups are each named, '
+        'disambiguating their two "All" items', (WidgetTester tester) async {
+      await _pumpPage(tester, size: _wide);
+
+      expect(find.bySemanticsLabel('FAMILY filter'), findsOneWidget);
+      expect(find.bySemanticsLabel('PLATFORM filter'), findsOneWidget);
     });
   });
 }

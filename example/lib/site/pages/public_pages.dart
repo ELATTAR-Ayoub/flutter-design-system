@@ -17,7 +17,15 @@ typedef PublicNavigate = void Function(String route);
 const String publicHomeRoute = '/';
 const String publicDocsRoute = '/docs';
 const String publicComponentsRoute = '/components';
-const String publicShotsRoute = '/shots';
+
+/// `/shots` has no constant here on purpose. There is exactly one spelling of
+/// it — `shotsRoute` in `site/site_routes.dart`, which the header nav, the
+/// search index, the router and the Shot breadcrumb all read. `publicShotsRoute`
+/// was a second copy of that string and went with `PublicShotsPage`; the
+/// per-Shot routes below it belong to `shots_docs/catalog.dart`.
+///
+/// The remaining `public*Route` constants are pre-Phase-G aliases of the same
+/// paths and are left as they are: each still has a caller in this library.
 const String publicSkillsRoute = '/skills';
 
 final List<DsCategory> _featuredCategories = <DsCategory>[
@@ -244,60 +252,18 @@ class PublicComponentsPage extends StatelessWidget {
   }
 }
 
-class PublicShotsPage extends StatelessWidget {
-  const PublicShotsPage({super.key, this.onNavigate});
-
-  final PublicNavigate? onNavigate;
-
-  @override
-  Widget build(BuildContext context) => _PublicPage(
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        const DsPageHeader(
-          eyebrow: 'COMPOSED EXAMPLES',
-          title: 'Shots',
-          blurb:
-              'Small, complete screens that show how the primitives work together in a real surface.',
-        ),
-        DsGrid(
-          sm: 2,
-          children: <Widget>[
-            _ShotCard(
-              title: 'Signal Studio',
-              body:
-                  'A focused agent workspace built from the system’s chat and navigation primitives.',
-              route: showcaseRoute,
-              onNavigate: onNavigate,
-            ),
-            _ShotCard(
-              title: 'Design system overview',
-              body:
-                  'Foundations and component families arranged as a readable reference surface.',
-              route: dsRoot,
-              onNavigate: onNavigate,
-            ),
-            _ShotCard(
-              title: 'Form flow',
-              body:
-                  'Fields, feedback and confirmation states composed into one useful task.',
-              route: '$dsRoot/components/base/forms',
-              onNavigate: onNavigate,
-            ),
-            _ShotCard(
-              title: 'Conversation surface',
-              body:
-                  'Messages, attachments and composer states with room for product copy.',
-              route: '$dsRoot/components/base/chat',
-              onNavigate: onNavigate,
-            ),
-          ],
-        ),
-      ],
-    ),
-  );
-}
-
+/// `/skills`, until Phase H builds the real page.
+///
+/// This page used to print `npx skills add ELATTAR-Ayoub/flutter-design-system`
+/// — a command nothing in this repository implements, publishes or verifies.
+/// The IA plan forbids publishing an invented command, so it is gone, and this
+/// page deliberately renders **no** install instruction of any kind: the skill
+/// currently lives at `.agents/skills/elattar-flutter-ui-director/`, which no
+/// agent harness scans, and there is no install route to describe yet.
+/// `public_pages_test.dart` fails if a code block reappears here.
+///
+/// What survives is the part that was always true: the three steps the skill
+/// actually describes.
 class PublicSkillsPage extends StatelessWidget {
   const PublicSkillsPage({super.key, this.onNavigate});
 
@@ -314,10 +280,11 @@ class PublicSkillsPage extends StatelessWidget {
             eyebrow: 'AGENT WORKFLOW',
             title: 'Skills',
             blurb:
-                'Installable guidance for agents and teams that need to build with the same design-system contract.',
+                'The working agreement this design system is built with — the same one an agent or a teammate should follow when they extend it.',
           ),
           DsPanel(
             label: 'ELATTAR FLUTTER UI DIRECTOR',
+            note: 'NOT YET INSTALLABLE',
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
@@ -331,9 +298,10 @@ class PublicSkillsPage extends StatelessWidget {
                   'The skill teaches API inventory, token usage, responsive composition, accessibility states and the verification ladder. It keeps product UI in the example layer and the package as the source of truth.',
                   DsType.body,
                 ),
-                SizedBox(height: ds(5)),
-                const _CodeSnippet(
-                  code: 'npx skills add ELATTAR-Ayoub/flutter-design-system',
+                SizedBox(height: ds(3)),
+                DsText(
+                  'It is read from this repository today; there is no published install command, and this page will not print one until there is.',
+                  DsType.body,
                 ),
                 SizedBox(height: ds(5)),
                 DsButton(
@@ -528,7 +496,7 @@ class _PublicLinkCard extends StatelessWidget {
   final String label;
 
   /// Typography for [label]. Defaults to the uppercase eyebrow style used by
-  /// the reference-count and shot-tag callers; pass [DsType.code] when the
+  /// the reference-count and docs-tag callers; pass [DsType.code] when the
   /// label is a literal string a reader may copy, such as a CLI command,
   /// since [DsType.label]'s `text-transform: uppercase` would otherwise
   /// mangle it.
@@ -559,28 +527,6 @@ class _PublicLinkCard extends StatelessWidget {
       ],
     );
   }
-}
-
-class _ShotCard extends StatelessWidget {
-  const _ShotCard({
-    required this.title,
-    required this.body,
-    required this.route,
-    this.onNavigate,
-  });
-
-  final String title;
-  final String body;
-  final String route;
-  final PublicNavigate? onNavigate;
-
-  @override
-  Widget build(BuildContext context) => _PublicLinkCard(
-    title: title,
-    body: body,
-    label: 'LIVE COMPOSITION',
-    onPressed: onNavigate == null ? null : () => onNavigate!(route),
-  );
 }
 
 class _CodeSnippet extends StatelessWidget {
@@ -628,7 +574,9 @@ class _DocsList extends StatelessWidget {
         ),
         (
           title: 'Skills',
-          body: 'Install the workflow that keeps implementation consistent.',
+          // Not "install": the skill has no published install route yet, and
+          // the Skills page itself now says so. See [PublicSkillsPage].
+          body: 'The workflow that keeps implementation consistent.',
           route: publicSkillsRoute,
         ),
         (

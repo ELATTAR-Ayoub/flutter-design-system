@@ -1,5 +1,6 @@
 import 'package:example/nav.dart';
 import 'package:example/components_docs/catalog.dart';
+import 'package:example/shots_docs/catalog.dart';
 import 'package:example/site/site_routes.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -28,6 +29,33 @@ void main() {
       expect(siteRouteFor('/Docs'), isNull);
       expect(siteRouteFor('/docs/'), isNull);
       expect(() => requireSiteRoute('/missing'), throwsArgumentError);
+    });
+
+    test('every shot guide is a deep link under the Shots section', () {
+      for (final ShotDocEntry shot in shotDocs) {
+        final SiteRoute? route = siteRouteFor(shot.route);
+        expect(route, isNotNull, reason: '${shot.route} does not resolve.');
+        expect(route!.section, SiteSection.shots);
+        expect(route.title, shot.title);
+        expect(route.keywords, contains(shot.name));
+      }
+      // The header contract is unchanged: guides are pages beneath a
+      // destination, never a sixth destination.
+      expect(siteRoutes, hasLength(5));
+    });
+
+    test('a shot preview is not a site destination', () {
+      // The data half of the `main.dart` route-order contract. A preview route
+      // that resolved here would be wrapped in header, footer and search by the
+      // `siteRouteFor` guard — the exact chrome it exists to omit. The widget
+      // half is asserted in `public_pages_test.dart`.
+      for (final ShotDocEntry shot in shotDocs) {
+        expect(
+          siteRouteFor(shot.previewRoute),
+          isNull,
+          reason: '${shot.previewRoute} must not resolve as a site route.',
+        );
+      }
     });
 
     test('metadata is non-empty and route paths are unique', () {
@@ -92,6 +120,33 @@ void main() {
           .map((SearchRoute route) => route.path)
           .toSet();
       expect(indexed, containsAll(componentDocs.map((entry) => entry.route)));
+    });
+
+    test('contains every installable shot documentation route', () {
+      final Set<String> indexed = searchableRoutes
+          .where((SearchRoute route) => route.section == SiteSection.shots)
+          .map((SearchRoute route) => route.path)
+          .toSet();
+      expect(indexed, containsAll(shotDocs.map((ShotDocEntry e) => e.route)));
+      // Indexed by slug, family and platform, so the search box finds a shot
+      // the way a reader names one.
+      for (final ShotDocEntry shot in shotDocs) {
+        final List<SearchRoute> hits = searchSiteRoutes(shot.name)
+            .where((SearchRoute route) => route.path == shot.route)
+            .toList();
+        expect(hits, hasLength(1), reason: '${shot.name} is not searchable.');
+        expect(hits.single.keywords, contains(shot.family.name));
+        expect(hits.single.keywords, contains(shot.platform.name));
+      }
+    });
+
+    test('never indexes a chrome-free shot preview', () {
+      final Set<String> indexed = searchableRoutes
+          .map((SearchRoute route) => route.path)
+          .toSet();
+      for (final ShotDocEntry shot in shotDocs) {
+        expect(indexed, isNot(contains(shot.previewRoute)));
+      }
     });
 
     test('contains every existing group and category without changing nav', () {

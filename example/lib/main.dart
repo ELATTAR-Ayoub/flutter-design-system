@@ -15,7 +15,8 @@ import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart' show debugPaintBaselinesEnabled;
-import 'package:flutter/services.dart' show SystemChrome, SystemUiMode;
+import 'package:flutter/services.dart'
+    show SystemChrome, SystemUiMode, rootBundle;
 
 import 'nav.dart';
 import 'components_docs/button_card_pages.dart';
@@ -52,6 +53,10 @@ import 'pages/transcript.dart';
 import 'pages/typography.dart';
 import 'shell.dart';
 import 'showcase/showcase_app.dart';
+import 'shots_docs/catalog.dart';
+import 'shots_docs/shot_detail_page.dart';
+import 'shots_docs/shot_preview_host.dart';
+import 'shots_docs/shots_index_page.dart';
 import 'site/pages/public_pages.dart';
 import 'site/site_routes.dart';
 import 'site/site_shell.dart';
@@ -103,6 +108,13 @@ void runDocsApp({String? initialRoute}) {
       (defaultTargetPlatform == TargetPlatform.android ||
           defaultTargetPlatform == TargetPlatform.iOS)) {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  }
+  // Warms the Shot sources so `/shots/<slug>` has a filled file tree on its
+  // first frame instead of the "not loaded" placeholder for a beat. Three
+  // small text files; the strings land in the asset bundle's own cache, which
+  // is what the page reads a moment later.
+  for (final ShotDocEntry entry in shotDocs) {
+    shotSourceFor(entry);
   }
   runApp(DocsApp(initialRoute: initialRoute));
 }
@@ -302,10 +314,22 @@ class _DocsHome extends StatelessWidget {
     // above this line. It is deliberately absent from `pageFor`: that switch is
     // the docs route table, and `shell_test` spends it against the nav, where
     // this href by construction does not appear.
+
+    // Resolved before the switch because its arm has to win before the
+    // `siteRouteFor` guard is consulted — see the arm's own note below.
+    final Widget? shotPreview = shotPreviewHostForRoute(route);
+
     final Widget home = DefaultSelectionStyle(
       selectionColor: DsPalette.action.withValues(alpha: _selectionAlpha),
       cursorColor: theme.foreground,
       child: switch (route) {
+        // ABOVE the `siteRouteFor` guard, deliberately. `/shots/<slug>/preview`
+        // begins with the public shots prefix, so a guard that resolved it as a
+        // site destination first would wrap the composition in the header,
+        // footer and search chrome the preview exists to omit. It sits outside
+        // the guard for the same reason `showcaseRoute` and `sidebarDemoRoute`
+        // do: it is a full-bleed surface, not a page inside the site shell.
+        _ when shotPreview != null => shotPreview,
         _ when siteRouteFor(route) != null => SiteShell(
           route: route,
           child: publicPageFor(
@@ -332,11 +356,15 @@ class _DocsHome extends StatelessWidget {
 /// Resolves public website destinations without changing the
 /// established design-system specimen route table in [pageFor].
 Widget publicPageFor(String route, {PublicNavigate? onNavigate}) {
+  final ShotDocEntry? shot = shotDocForRoute(route);
+  if (shot != null) {
+    return _ShotDetailRoute(entry: shot, onNavigate: onNavigate);
+  }
   return switch (route) {
     homeRoute => PublicHomePage(onNavigate: onNavigate),
     docsRoute => PublicDocsPage(onNavigate: onNavigate),
     componentsRoute => PublicComponentsPage(onNavigate: onNavigate),
-    shotsRoute => PublicShotsPage(onNavigate: onNavigate),
+    shotsRoute => ShotsIndexPage(onNavigate: onNavigate),
     skillsRoute => PublicSkillsPage(onNavigate: onNavigate),
     '/components/button' => const ButtonDocPage(),
     '/components/input' => const InputDocPage(),
@@ -345,6 +373,97 @@ Widget publicPageFor(String route, {PublicNavigate? onNavigate}) {
     '/components/select' => const SelectDocPage(),
     _ => PublicHomePage(onNavigate: onNavigate),
   };
+}
+
+/// The asset key for a repository-relative Shot source path.
+///
+/// [ShotDocEntry.sourcePaths] is rooted at the **repository**, because that is
+/// what the registry manifests and the source guard need. An asset key is
+/// rooted at the package that declares the asset, which for these files is
+/// `example/`. Stripping that one segment is the whole translation, and doing
+/// it here keeps `shots_docs/catalog.dart` the single authority on layout.
+String shotSourceAssetKey(String sourcePath) {
+  const String packageRoot = 'example/';
+  if (!sourcePath.startsWith(packageRoot)) {
+    throw ArgumentError.value(
+      sourcePath,
+      'sourcePath',
+      'Expected a path inside the example package',
+    );
+  }
+  return sourcePath.substring(packageRoot.length);
+}
+
+/// The real source of every file in [entry], keyed by plain file name — the
+/// shape [ShotDetailPage.fileSource] takes.
+///
+/// The compositions are declared as assets in `example/pubspec.yaml`, so the
+/// bytes the page renders are the bytes the generator hashes and the CLI
+/// copies: there is no second copy of a Shot's source anywhere, and therefore
+/// nothing that can drift from it. Reading the files with `dart:io` instead is
+/// not an option — a widget cannot reach the filesystem on web or mobile, which
+/// is precisely where this page is read.
+///
+/// Deliberately *not* memoised here. [rootBundle] is a `CachingAssetBundle` and
+/// already holds the decoded string, so a second call costs one small map; a
+/// second cache would only add a way to hand out a `Future` created in a scope
+/// that has since ended — which in a widget test means a load that never
+/// completes.
+Future<Map<String, String>> shotSourceFor(ShotDocEntry entry) async {
+  final Map<String, String> files = <String, String>{};
+  final List<String> paths = entry.sourcePaths;
+  for (int index = 0; index < entry.files.length; index++) {
+    final String key = shotSourceAssetKey(paths[index]);
+    try {
+      files[entry.files[index]] = await rootBundle.loadString(key);
+    } catch (error) {
+      // A file the bundle does not carry falls through to ShotDetailPage's own
+      // placeholder rather than taking the page down. The undeclared-asset case
+      // is caught at test time by `shots_catalog_parity_test.dart`, which fails
+      // when a catalog entry has no asset entry in `example/pubspec.yaml`.
+      debugPrint('Shot source "$key" is not in the asset bundle: $error');
+    }
+  }
+  return files;
+}
+
+/// [ShotDetailPage] with its file tree filled from the asset bundle.
+///
+/// The page itself takes the source as data — deliberately, so it stays a pure
+/// widget — which leaves someone to do the loading. That is this, at the same
+/// layer that already owns routing the page in.
+class _ShotDetailRoute extends StatefulWidget {
+  const _ShotDetailRoute({required this.entry, this.onNavigate});
+
+  final ShotDocEntry entry;
+  final PublicNavigate? onNavigate;
+
+  @override
+  State<_ShotDetailRoute> createState() => _ShotDetailRouteState();
+}
+
+class _ShotDetailRouteState extends State<_ShotDetailRoute> {
+  late Future<Map<String, String>> _source = shotSourceFor(widget.entry);
+
+  @override
+  void didUpdateWidget(covariant _ShotDetailRoute oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.entry.name != widget.entry.name) {
+      _source = shotSourceFor(widget.entry);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => FutureBuilder<Map<String, String>>(
+    future: _source,
+    builder:
+        (BuildContext context, AsyncSnapshot<Map<String, String>> snapshot) =>
+            ShotDetailPage(
+              entry: widget.entry,
+              fileSource: snapshot.data ?? const <String, String>{},
+              onNavigate: widget.onNavigate,
+            ),
+  );
 }
 
 /// The twenty-seven real routes; every other href in the nav gets a

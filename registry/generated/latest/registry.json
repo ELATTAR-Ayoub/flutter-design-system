@@ -97,6 +97,45 @@
       "deprecated": false
     },
     {
+      "name": "dashboard-overview",
+      "type": "shot",
+      "version": "0.0.1",
+      "description": "A metrics overview with a range picker, responsive stat tiles, and a row-detail drill-in.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "example/lib/shots/dashboard_overview/dashboard_overview_shot.dart",
+          "target": "@app/shots/dashboard_overview/dashboard_overview_shot.dart",
+          "sha256": "c25819c9f981511308e904db1f6689ddc22d4f6673ef9820ea6393e2bcf80e25"
+        }
+      ],
+      "registryDependencies": [
+        "source-foundation",
+        "card",
+        "button",
+        "select",
+        "icon",
+        "tooltip",
+        "dialog"
+      ],
+      "semanticDependencies": [
+        "card",
+        "button",
+        "select",
+        "icon",
+        "tooltip",
+        "dialog"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/shots/dashboard-overview",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/example/lib/shots/dashboard_overview/dashboard_overview_shot.dart",
+      "deprecated": false
+    },
+    {
       "name": "dialog",
       "type": "component",
       "version": "0.0.1",
@@ -395,6 +434,50 @@
       "deprecated": false
     },
     {
+      "name": "settings-profile",
+      "type": "shot",
+      "version": "0.0.1",
+      "description": "An account settings panel with validation, typed selection, and a discard-confirmation flow.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "example/lib/shots/settings_profile/settings_profile_shot.dart",
+          "target": "@app/shots/settings_profile/settings_profile_shot.dart",
+          "sha256": "ab1f7e7cab2a04844537417ed85c5a36d79870b24cf085e140ac3c2342ced95b"
+        }
+      ],
+      "registryDependencies": [
+        "source-foundation",
+        "card",
+        "field",
+        "input",
+        "select",
+        "button",
+        "alert-dialog",
+        "dialog",
+        "icon",
+        "ds-rule"
+      ],
+      "semanticDependencies": [
+        "card",
+        "field",
+        "input",
+        "select",
+        "button",
+        "alert-dialog",
+        "icon",
+        "ds-rule"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/shots/settings-profile",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/example/lib/shots/settings_profile/settings_profile_shot.dart",
+      "deprecated": false
+    },
+    {
       "name": "sheen-action",
       "type": "effect",
       "version": "0.0.1",
@@ -421,6 +504,49 @@
       "shaders": [],
       "documentationRoute": "/docs/effects/sheen-action",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/effects/sheen_action.dart",
+      "deprecated": false
+    },
+    {
+      "name": "sign-in-flow",
+      "type": "shot",
+      "version": "0.0.1",
+      "description": "A centered authentication card with password reveal, submitting state, and a reset-password dialog.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "example/lib/shots/sign_in_flow/sign_in_flow_shot.dart",
+          "target": "@app/shots/sign_in_flow/sign_in_flow_shot.dart",
+          "sha256": "bc995368d00ea149e5f18d5cb54ef35f550b087666b48a18fd01d9a4229a2ac0"
+        }
+      ],
+      "registryDependencies": [
+        "source-foundation",
+        "card",
+        "field",
+        "input",
+        "button",
+        "dialog",
+        "icon",
+        "spinner",
+        "ds-rule"
+      ],
+      "semanticDependencies": [
+        "card",
+        "field",
+        "input",
+        "button",
+        "dialog",
+        "icon",
+        "spinner",
+        "ds-rule"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/shots/sign-in-flow",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/example/lib/shots/sign_in_flow/sign_in_flow_shot.dart",
       "deprecated": false
     },
     {

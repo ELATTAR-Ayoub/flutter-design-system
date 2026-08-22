@@ -7,6 +7,7 @@ library;
 
 import '../nav.dart';
 import '../components_docs/catalog.dart';
+import '../shots_docs/catalog.dart';
 
 /// The top-level destinations exposed by the public website.
 enum SiteSection { home, docs, components, shots, skills }
@@ -102,6 +103,14 @@ const List<SiteRoute> siteRoutes = <SiteRoute>[
 
 /// Finds a public route by its exact path. Matching is deliberately
 /// case-sensitive so malformed deep links do not silently resolve elsewhere.
+///
+/// Component and Shot guides are **synthesized** rather than listed in
+/// [siteRoutes]: the header contract is exactly five destinations, and a guide
+/// is a page beneath one of them, not a sixth tab.
+///
+/// A Shot's chrome-free preview route (`/shots/<slug>/preview`) deliberately
+/// resolves to null here. It is not a site destination — it carries no header,
+/// footer or search — and `main.dart` answers it above this guard.
 SiteRoute? siteRouteFor(String path) {
   for (final SiteRoute route in siteRoutes) {
     if (route.path == path) return route;
@@ -114,6 +123,16 @@ SiteRoute? siteRouteFor(String path) {
       title: component.title,
       description: component.description,
       keywords: <String>[component.name, 'component', 'registry', 'cli'],
+    );
+  }
+  final ShotDocEntry? shot = shotDocForRoute(path);
+  if (shot != null) {
+    return SiteRoute(
+      path: shot.route,
+      section: SiteSection.shots,
+      title: shot.title,
+      description: shot.description,
+      keywords: <String>[shot.name, 'shot', 'screen', 'registry', 'cli'],
     );
   }
   return null;
@@ -168,6 +187,23 @@ final List<SearchRoute> searchableRoutes = List<SearchRoute>.unmodifiable(
           'registry',
           'cli',
           ...component.exports,
+        ]),
+      ),
+    for (final ShotDocEntry shot in shotDocs)
+      SearchRoute(
+        path: shot.route,
+        title: shot.title,
+        description: shot.description,
+        section: SiteSection.shots,
+        keywords: List<String>.unmodifiable(<String>[
+          shot.name,
+          'shot',
+          'screen',
+          'registry',
+          'cli',
+          shot.family.name,
+          shot.platform.name,
+          ...shot.dependencies,
         ]),
       ),
     for (final DsGroup group in dsGroups)

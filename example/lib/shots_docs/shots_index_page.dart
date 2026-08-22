@@ -15,13 +15,8 @@ import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:flutter/widgets.dart';
 
 import '../kit.dart';
+import '../site/pages/public_pages.dart';
 import 'catalog.dart';
-
-/// Navigates to a route string.
-///
-/// A local declaration rather than an import: `PublicNavigate` in
-/// `site/pages/public_pages.dart` is private to that library.
-typedef PublicNavigate = void Function(String route);
 
 String _familyLabel(ShotFamily family) => switch (family) {
   ShotFamily.account => 'Account',
@@ -237,7 +232,15 @@ class _FilterGroup extends StatelessWidget {
       children: <Widget>[
         DsText(label, DsType.label, color: theme.mutedForeground),
         SizedBox(height: ds(2)),
-        child,
+        // A named container around the toggle group only — not the label
+        // above, which is a plain, non-boundary text node and would merge
+        // into this one's own label rather than stay separate (the same
+        // merge hazard `docs_file_tree.dart` documents on its own panel).
+        // Without this, the FAMILY and PLATFORM groups each lead with an
+        // item labelled "All", indistinguishable from one another to a
+        // screen-reader user; each toggle inside remains its own
+        // actionable node, so this only adds a group name around them.
+        Semantics(container: true, label: '$label filter', child: child),
       ],
     );
   }
@@ -269,6 +272,12 @@ class _ShotEntryCard extends StatelessWidget {
         DsCardFooter(
           child: DsButton(
             variant: DsButtonVariant.ghost,
+            // Every card's button otherwise shares the one accessible name
+            // "View shot" — indistinguishable to a screen-reader user
+            // skimming a grid of them (see `shot_detail_page.dart`'s
+            // "Open live preview of ${entry.title}" for the same fix
+            // elsewhere).
+            label: 'View shot: ${entry.title}',
             onPressed: onNavigate == null
                 ? null
                 : () => onNavigate!(entry.route),
@@ -295,9 +304,12 @@ class _EmptyFilterState extends StatelessWidget {
           children: <Widget>[
             DsEmptyMedia(glyph: DsIconGlyph.search, tone: DsIconTone.subtle),
             DsEmptyTitle('No shots match those filters'),
+            // Accurate for either a single active filter or both together —
+            // the reachable path is not always the two-filter combination
+            // the old copy implied.
             DsEmptyDescription(
-              'Nothing in the catalog has this family and platform '
-              'together. Try a different combination or reset the filters.',
+              'Nothing in the catalog matches the selected filters. Try a '
+              'different combination or reset the filters.',
             ),
           ],
         ),

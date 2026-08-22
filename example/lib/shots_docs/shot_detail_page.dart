@@ -16,15 +16,8 @@ import '../docs/docs_code.dart';
 import '../docs/docs_file_tree.dart';
 import '../docs/docs_layout.dart';
 import '../kit.dart';
+import '../site/site_routes.dart';
 import 'catalog.dart';
-
-/// The index route the "Shots" breadcrumb crumb points at.
-///
-/// `shots_docs/shots_index_page.dart` (a sibling Wave-1 file this worker does
-/// not own) is expected to answer at this route; Wave 2 wires the two
-/// together in `main.dart`. Kept private and file-local so it cannot collide
-/// with whatever route constant that sibling file declares for itself.
-const String _shotsIndexRoute = '/shots';
 
 class ShotDetailPage extends StatelessWidget {
   const ShotDetailPage({
@@ -57,10 +50,10 @@ class ShotDetailPage extends StatelessWidget {
   final ValueChanged<String>? onNavigate;
 
   static String _platformLabel(ShotPlatform platform) => switch (platform) {
-        ShotPlatform.responsive => 'RESPONSIVE',
-        ShotPlatform.desktop => 'DESKTOP',
-        ShotPlatform.mobile => 'MOBILE',
-      };
+    ShotPlatform.responsive => 'RESPONSIVE',
+    ShotPlatform.desktop => 'DESKTOP',
+    ShotPlatform.mobile => 'MOBILE',
+  };
 
   static ({ShotDocEntry? previous, ShotDocEntry? next}) _siblings(
     ShotDocEntry entry,
@@ -76,18 +69,19 @@ class ShotDetailPage extends StatelessWidget {
   }
 
   static List<DocsSidebarEntry> _sidebar(String route) => <DocsSidebarEntry>[
-        for (final ShotDocEntry shot in shotDocs)
-          DocsSidebarEntry(
-            title: shot.title,
-            route: shot.route,
-            selected: shot.route == route,
-          ),
-      ];
+    for (final ShotDocEntry shot in shotDocs)
+      DocsSidebarEntry(
+        title: shot.title,
+        route: shot.route,
+        selected: shot.route == route,
+      ),
+  ];
 
   @override
   Widget build(BuildContext context) {
-    final ({ShotDocEntry? previous, ShotDocEntry? next}) around =
-        _siblings(entry);
+    final ({ShotDocEntry? previous, ShotDocEntry? next}) around = _siblings(
+      entry,
+    );
 
     return DocsLayout(
       route: entry.route,
@@ -101,7 +95,10 @@ class ShotDetailPage extends StatelessWidget {
           'Shots',
           onTap: onNavigate == null
               ? null
-              : () => onNavigate!.call(_shotsIndexRoute),
+              // `shotsRoute` in `site/site_routes.dart` is the one spelling of
+              // `/shots`: the header nav, the search index, the router and this
+              // breadcrumb all read it from there.
+              : () => onNavigate!.call(shotsRoute),
         ),
         DsBreadcrumbEntry.page(entry.title),
       ],
@@ -142,13 +139,17 @@ class _ShotArticle extends StatelessWidget {
   final Map<String, String> fileSource;
   final ValueChanged<String>? onNavigate;
 
+  // Project-relative, like every other `DocsCodeFile` caller (see
+  // `button_card_pages.dart`'s `path: 'lib/components/ui/button.dart'`) —
+  // not the bare file name `entry.files` holds. `fileSource` stays keyed by
+  // the bare name (see the field doc above); only the display path changes.
   List<DocsCodeFile> get _files => <DocsCodeFile>[
-        for (final String file in entry.files)
-          DocsCodeFile(
-            path: file,
-            code: fileSource[file] ?? _placeholderSource(file),
-          ),
-      ];
+    for (final String file in entry.files)
+      DocsCodeFile(
+        path: 'lib/shots/${entry.directory}/$file',
+        code: fileSource[file] ?? _placeholderSource(file),
+      ),
+  ];
 
   String _placeholderSource(String file) =>
       '// Source for $file is not loaded in this build.\n'
@@ -159,40 +160,37 @@ class _ShotArticle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Column(
-        key: const ValueKey<String>('shot-doc-article'),
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          _Anchor(
-            'install',
-            child: DocsCodeExample(
-              title: 'Install',
-              description:
-                  'Installs ${entry.title} and its declared registry dependencies.',
-              command: DocsCodeCommand(
-                command: entry.command,
-                label: 'Install command',
-                description:
-                    'Copies the composition into @app/shots/${entry.directory}/.',
-              ),
-            ),
-          ),
-          SizedBox(height: ds(6)),
-          _Anchor(
-            'files',
-            child: DocsFileTree(label: 'Files', files: _files),
-          ),
-          SizedBox(height: ds(6)),
-          _Anchor(
-            'dependencies',
-            child: _DependencyPanel(dependencies: entry.dependencies),
-          ),
-          SizedBox(height: ds(6)),
-          _Anchor(
-            'preview',
-            child: _PreviewPanel(entry: entry, onNavigate: onNavigate),
-          ),
-        ],
-      );
+    key: const ValueKey<String>('shot-doc-article'),
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: <Widget>[
+      DocsCodeExample(
+        title: 'Install',
+        description:
+            'Installs ${entry.title} and its declared registry dependencies.',
+        command: DocsCodeCommand(
+          command: entry.command,
+          label: 'Install command',
+          description:
+              'Copies the composition into @app/shots/${entry.directory}/.',
+        ),
+      ),
+      SizedBox(height: ds(6)),
+      DocsFileTree(
+        // A distinct identity per shot: without this, navigating from
+        // one shot to another through the sidebar (same route slot, same
+        // widget shape) reuses the previous shot's `DocsFileTree` state,
+        // and its selected-file index can carry over onto a
+        // same-length-but-different file list.
+        key: ValueKey<String>('docs-file-tree:${entry.name}'),
+        label: 'Files',
+        files: _files,
+      ),
+      SizedBox(height: ds(6)),
+      _DependencyPanel(dependencies: entry.dependencies),
+      SizedBox(height: ds(6)),
+      _PreviewPanel(entry: entry, onNavigate: onNavigate),
+    ],
+  );
 }
 
 class _DependencyPanel extends StatelessWidget {
@@ -221,7 +219,8 @@ class _DependencyPanel extends StatelessWidget {
             SizedBox(height: ds(3)),
             DsRow(
               children: <Widget>[
-                for (final String dependency in dependencies) DsCode(dependency),
+                for (final String dependency in dependencies)
+                  DsCode(dependency),
               ],
             ),
           ],
@@ -277,15 +276,4 @@ class _PreviewPanel extends StatelessWidget {
       ),
     );
   }
-}
-
-class _Anchor extends StatelessWidget {
-  const _Anchor(this.name, {required this.child});
-
-  final String name;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) =>
-      KeyedSubtree(key: ValueKey<String>('docs-anchor:$name'), child: child);
 }
