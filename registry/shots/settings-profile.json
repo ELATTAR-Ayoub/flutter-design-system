@@ -1,0 +1,18 @@
+{
+  "name": "settings-profile",
+  "type": "shot",
+  "version": "0.0.1",
+  "description": "An account settings panel with validation, typed selection, and a discard-confirmation flow.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [{"source": "example/lib/shots/settings_profile/settings_profile_shot.dart", "target": "@app/shots/settings_profile/settings_profile_shot.dart", "sha256": "ab1f7e7cab2a04844537417ed85c5a36d79870b24cf085e140ac3c2342ced95b"}],
+  "registryDependencies": ["source-foundation", "card", "field", "input", "select", "button", "alert-dialog", "dialog", "icon", "ds-rule"],
+  "semanticDependencies": ["card", "field", "input", "select", "button", "alert-dialog", "icon", "ds-rule"],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "exports": ["SettingsProfileShot", "SettingsProfileValues"],
+  "documentationRoute": "/shots/settings-profile",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/example/lib/shots/settings_profile/settings_profile_shot.dart"
+}
