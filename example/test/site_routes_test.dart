@@ -1,6 +1,7 @@
 import 'package:example/nav.dart';
 import 'package:example/components_docs/catalog.dart';
 import 'package:example/shots_docs/catalog.dart';
+import 'package:example/skills_docs/catalog.dart';
 import 'package:example/site/site_routes.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -137,6 +138,55 @@ void main() {
         expect(hits, hasLength(1), reason: '${shot.name} is not searchable.');
         expect(hits.single.keywords, contains(shot.family.name));
         expect(hits.single.keywords, contains(shot.platform.name));
+      }
+    });
+
+    test('indexes the skill under the Skills destination, not beside it', () {
+      // `SkillDocEntry.route` is the literal `/skills`: one skill, no
+      // index/detail split. So the skill must NOT appear as a second row with
+      // the same path — a duplicate would make the search box answer "skills"
+      // twice and send both rows to the same page.
+      final List<SearchRoute> rows = searchableRoutes
+          .where((SearchRoute route) => route.path == skillsRoute)
+          .toList();
+      expect(rows, hasLength(1));
+      expect(rows.single.section, SiteSection.skills);
+
+      for (final SkillDocEntry skill in skillDocs) {
+        expect(skill.route, skillsRoute);
+        expect(rows.single.keywords, contains(skill.slug));
+      }
+    });
+
+    test('skill topics are searchable', () {
+      // The IA plan requires "Skill topics" in search. The topics are the
+      // skill's own reference titles, read from the catalog rather than spelled
+      // out here, so a renamed or added reference is indexed automatically and
+      // a stale list fails at the catalog instead of passing quietly.
+      for (final SkillDocEntry skill in skillDocs) {
+        for (final SkillReferenceFile file in skill.referenceFiles) {
+          final List<SearchRoute> hits = searchSiteRoutes(file.title)
+              .where((SearchRoute route) => route.path == skill.route)
+              .toList();
+          expect(
+            hits,
+            hasLength(1),
+            reason: '"${file.title}" does not find ${skill.route}.',
+          );
+        }
+        // The agents it is actually verified against are searchable too, and
+        // only those: `agents/openai.yaml` was deleted, so nothing may make
+        // Codex resolve to this page.
+        for (final String agent in skill.supportedAgents) {
+          expect(
+            searchSiteRoutes(agent).map((SearchRoute route) => route.path),
+            contains(skill.route),
+          );
+        }
+        expect(
+          searchSiteRoutes('codex').map((SearchRoute route) => route.path),
+          isNot(contains(skill.route)),
+        );
       }
     });
 

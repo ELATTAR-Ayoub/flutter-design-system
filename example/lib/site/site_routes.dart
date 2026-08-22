@@ -8,6 +8,7 @@ library;
 import '../nav.dart';
 import '../components_docs/catalog.dart';
 import '../shots_docs/catalog.dart';
+import '../skills_docs/catalog.dart';
 
 /// The top-level destinations exposed by the public website.
 enum SiteSection { home, docs, components, shots, skills }
@@ -163,6 +164,36 @@ String githubPagesHref(String route, {String basePath = ''}) {
   return '$base?route=${Uri.encodeQueryComponent(route)}';
 }
 
+/// Search keywords for a top-level destination, including anything the catalog
+/// that owns the destination's content contributes.
+///
+/// A component guide and a Shot guide each own a route of their own
+/// (`/components/<name>`, `/shots/<slug>`), so each is indexed below as its own
+/// [SearchRoute]. A Skill does not: [SkillDocEntry.route] is the literal
+/// `/skills` — there is one skill, and no index/detail split to model — so
+/// indexing it separately would put two rows with the same path in the results
+/// and make the search box answer "skills" twice.
+///
+/// Its topics are folded into the `/skills` destination instead, which is what
+/// the IA plan's "Skill topics" requirement actually asks for: the reference
+/// titles are the topics a reader would search by ("system map", "traps",
+/// "verify", "state & accessibility"), alongside the skill's own name, the
+/// agents it is verified against, and the ids of its install routes.
+List<String> _searchKeywordsFor(SiteRoute route) {
+  if (route.section != SiteSection.skills) return route.keywords;
+  return List<String>.unmodifiable(<String>[
+    ...route.keywords,
+    for (final SkillDocEntry skill in skillDocs) ...<String>[
+      skill.slug,
+      skill.title.toLowerCase(),
+      for (final String agent in skill.supportedAgents) agent.toLowerCase(),
+      for (final SkillReferenceFile file in skill.referenceFiles)
+        file.title.toLowerCase(),
+      for (final SkillInstallRoute install in skill.installRoutes) install.id,
+    ],
+  ]);
+}
+
 /// Immutable search index containing public destinations followed by all
 /// existing design-system groups and categories.
 final List<SearchRoute> searchableRoutes = List<SearchRoute>.unmodifiable(
@@ -173,7 +204,7 @@ final List<SearchRoute> searchableRoutes = List<SearchRoute>.unmodifiable(
         title: route.title,
         description: route.description,
         section: route.section,
-        keywords: route.keywords,
+        keywords: _searchKeywordsFor(route),
       ),
     for (final ComponentDocEntry component in componentDocs)
       SearchRoute(

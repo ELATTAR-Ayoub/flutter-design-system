@@ -51,6 +51,25 @@ flutter:
   assets:
     - assets/textures/perlin-noise.png
 
+    # The agent skill's own Markdown, declared HERE — in the package pubspec —
+    # and deliberately not in `example/pubspec.yaml`.
+    #
+    # An asset path may not climb above its own project root, and
+    # `skills/elattar-flutter-ui-director/` sits *above* `example/`, so the docs
+    # app cannot declare it and a widget cannot read the filesystem on web or
+    # mobile, which is where `/skills` is read. `skills/` is however inside
+    # THIS package's root, and a package's assets are bundled into every app
+    # that depends on it, reached as `packages/elattar_design_system/<path>`
+    # (the same mechanism as the perlin field above). So the docs app renders
+    # the real bytes of the one source of truth rather than a copy of them:
+    # there is no second tree to regenerate and nothing that can drift.
+    #
+    # One entry per directory, because a directory asset is non-recursive.
+    # `example/test/public_pages_test.dart` fails if either line goes missing —
+    # it compares what the bundle hands the page against what is on disk.
+    - skills/elattar-flutter-ui-director/
+    - skills/elattar-flutter-ui-director/references/
+
   # The orb's fragment stage — see the header of the file itself for the five
   # edits made to the vendored GLSL and why each one was unavoidable.
   shaders:

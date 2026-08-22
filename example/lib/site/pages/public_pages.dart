@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import '../../kit.dart';
 import '../../nav.dart';
 import '../../components_docs/catalog.dart';
+import '../site_routes.dart' show skillsRoute;
 
 typedef PublicNavigate = void Function(String route);
 
@@ -18,15 +19,17 @@ const String publicHomeRoute = '/';
 const String publicDocsRoute = '/docs';
 const String publicComponentsRoute = '/components';
 
-/// `/shots` has no constant here on purpose. There is exactly one spelling of
-/// it — `shotsRoute` in `site/site_routes.dart`, which the header nav, the
-/// search index, the router and the Shot breadcrumb all read. `publicShotsRoute`
-/// was a second copy of that string and went with `PublicShotsPage`; the
-/// per-Shot routes below it belong to `shots_docs/catalog.dart`.
+/// Neither `/shots` nor `/skills` has a constant here, on purpose. There is
+/// exactly one spelling of each — `shotsRoute` and `skillsRoute` in
+/// `site/site_routes.dart`, which the header nav, the search index and the
+/// router all read. `publicShotsRoute` was a second copy of the first and went
+/// with `PublicShotsPage` in Phase G; `publicSkillsRoute` was a second copy of
+/// the second and went with `PublicSkillsPage` in Phase H, when
+/// `skills_docs/skills_page.dart` took the route. This library imports
+/// `skillsRoute` for its one remaining caller — the docs link card below.
 ///
 /// The remaining `public*Route` constants are pre-Phase-G aliases of the same
 /// paths and are left as they are: each still has a caller in this library.
-const String publicSkillsRoute = '/skills';
 
 final List<DsCategory> _featuredCategories = <DsCategory>[
   findCategory('foundations', 'colors').category,
@@ -252,97 +255,23 @@ class PublicComponentsPage extends StatelessWidget {
   }
 }
 
-/// `/skills`, until Phase H builds the real page.
+/// `/skills` is no longer served from this library. `PublicSkillsPage` — a
+/// hand-written summary of the skill, with three cards restating its workflow —
+/// was retired when `skills_docs/skills_page.dart`'s `SkillsPage` took the
+/// route in Phase H. The real page reads the skill's own catalog entry, so the
+/// version, the supported agents, the reference file tree and the install
+/// routes cannot drift from the skill itself.
 ///
-/// This page used to print `npx skills add ELATTAR-Ayoub/flutter-design-system`
-/// — a command nothing in this repository implements, publishes or verifies.
-/// The IA plan forbids publishing an invented command, so it is gone, and this
-/// page deliberately renders **no** install instruction of any kind: the skill
-/// currently lives at `.agents/skills/elattar-flutter-ui-director/`, which no
-/// agent harness scans, and there is no install route to describe yet.
-/// `public_pages_test.dart` fails if a code block reappears here.
-///
-/// What survives is the part that was always true: the three steps the skill
-/// actually describes.
-class PublicSkillsPage extends StatelessWidget {
-  const PublicSkillsPage({super.key, this.onNavigate});
-
-  final PublicNavigate? onNavigate;
-
-  @override
-  Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
-    return _PublicPage(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          const DsPageHeader(
-            eyebrow: 'AGENT WORKFLOW',
-            title: 'Skills',
-            blurb:
-                'The working agreement this design system is built with — the same one an agent or a teammate should follow when they extend it.',
-          ),
-          DsPanel(
-            label: 'ELATTAR FLUTTER UI DIRECTOR',
-            note: 'NOT YET INSTALLABLE',
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                DsText(
-                  'A shared way of working.',
-                  DsType.h3,
-                  color: theme.foreground,
-                ),
-                SizedBox(height: ds(3)),
-                DsText(
-                  'The skill teaches API inventory, token usage, responsive composition, accessibility states and the verification ladder. It keeps product UI in the example layer and the package as the source of truth.',
-                  DsType.body,
-                ),
-                SizedBox(height: ds(3)),
-                DsText(
-                  'It is read from this repository today; there is no published install command, and this page will not print one until there is.',
-                  DsType.body,
-                ),
-                SizedBox(height: ds(5)),
-                DsButton(
-                  variant: DsButtonVariant.outline,
-                  onPressed: onNavigate == null
-                      ? null
-                      : () => onNavigate!(publicDocsRoute),
-                  child: const Text('Read the workflow'),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: ds(8)),
-          DsGrid(
-            sm: 3,
-            children: const <Widget>[
-              _FeatureCard(
-                index: '01',
-                title: 'Discover',
-                body:
-                    'Inspect the public barrel and existing specimens before adding a primitive.',
-              ),
-              _FeatureCard(
-                index: '02',
-                title: 'Compose',
-                body:
-                    'Use semantic Ds* APIs and foundation tokens for product surfaces.',
-              ),
-              _FeatureCard(
-                index: '03',
-                title: 'Verify',
-                body:
-                    'Run analysis, tests, responsive checks and the token guard before handoff.',
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
+/// The guard that page carried is not lost, and is not weakened: it published
+/// `npx skills add ELATTAR-Ayoub/flutter-design-system`, a command nothing in
+/// this repository implements, and the assertion that no code block could
+/// reappear was a proxy for "prints no unverified command". `SkillsPage` now
+/// prints commands legitimately, so the proxy is replaced by the thing it stood
+/// for: every command rendered at `/skills` must appear in
+/// `skills_docs/catalog.dart`'s `verifiedCommands` allowlist, and no `npx` text
+/// may be reachable there at all. Both are asserted in `public_pages_test.dart`
+/// against the mounted route, and again in `skills_docs_test.dart` against the
+/// widget.
 
 class _PublicPage extends StatelessWidget {
   const _PublicPage({required this.child});
@@ -574,10 +503,11 @@ class _DocsList extends StatelessWidget {
         ),
         (
           title: 'Skills',
-          // Not "install": the skill has no published install route yet, and
-          // the Skills page itself now says so. See [PublicSkillsPage].
+          // Not "install": the skill's routes are documented but not yet
+          // verified end to end, and the Skills page says so itself, route by
+          // route. `skillsRoute`, not a literal — one spelling of `/skills`.
           body: 'The workflow that keeps implementation consistent.',
-          route: publicSkillsRoute,
+          route: skillsRoute,
         ),
         (
           title: 'Repository',

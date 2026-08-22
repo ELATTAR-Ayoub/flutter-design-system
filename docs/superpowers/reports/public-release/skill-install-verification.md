@@ -135,10 +135,14 @@ three independently-cross-checked NIST test vectors (`hashlib.sha256`,
 self-check group in the same file, so a broken hash implementation cannot
 produce a false pass on the round trip below it.
 
-**Important caveat, recorded here rather than glossed over:** as of this
-writing, **no external install command is published anywhere in this
-repository.** `README.md` states so explicitly ("No external install
-command is published yet") and
+**Important caveat, recorded here rather than glossed over:** `README.md`
+publishes **no external install command** ("No external install command is
+published yet"). The Skills page added in `594bb25` does render commands for
+three routes, but only `cat AGENTS.md` is badged as working today; the plugin
+and manual-copy routes carry a pending badge and an explicit blocker note, and
+every string they render is drawn from a const `verifiedCommands` allowlist a
+human must consciously edit. See
+[`decisions/005-public-skill-location.md`](decisions/005-public-skill-location.md)
 [`decisions/005-public-skill-location.md`](decisions/005-public-skill-location.md)
 records why — the root `LICENSE` is a placeholder, and a copy-paste
 instruction with no grant attached is a redistribution invitation nobody has

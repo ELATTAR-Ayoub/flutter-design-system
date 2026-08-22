@@ -57,6 +57,8 @@ import 'shots_docs/catalog.dart';
 import 'shots_docs/shot_detail_page.dart';
 import 'shots_docs/shot_preview_host.dart';
 import 'shots_docs/shots_index_page.dart';
+import 'skills_docs/catalog.dart';
+import 'skills_docs/skills_page.dart';
 import 'site/pages/public_pages.dart';
 import 'site/site_routes.dart';
 import 'site/site_shell.dart';
@@ -115,6 +117,10 @@ void runDocsApp({String? initialRoute}) {
   // is what the page reads a moment later.
   for (final ShotDocEntry entry in shotDocs) {
     shotSourceFor(entry);
+  }
+  // Same, for `/skills` — eight Markdown files under 20 KB in total.
+  for (final SkillDocEntry entry in skillDocs) {
+    skillSourceFor(entry);
   }
   runApp(DocsApp(initialRoute: initialRoute));
 }
@@ -360,12 +366,22 @@ Widget publicPageFor(String route, {PublicNavigate? onNavigate}) {
   if (shot != null) {
     return _ShotDetailRoute(entry: shot, onNavigate: onNavigate);
   }
+  // Resolved from the catalog, exactly as the Shot above it is, and NOT as a
+  // `skillsRoute` arm in the switch below. [SkillDocEntry.route] is the literal
+  // `/skills` — there is one skill, and no index/detail split to model — so the
+  // catalog is already the authority on which entry answers this path, and a
+  // switch arm would be a second statement of the same fact. `/skills` is still
+  // a first-class site destination: `site_routes.dart` lists it, and
+  // `public_pages_test.dart` asserts this call resolves it to a [SkillsPage].
+  final SkillDocEntry? skill = skillDocForRoute(route);
+  if (skill != null) {
+    return _SkillsRoute(entry: skill, onNavigate: onNavigate);
+  }
   return switch (route) {
     homeRoute => PublicHomePage(onNavigate: onNavigate),
     docsRoute => PublicDocsPage(onNavigate: onNavigate),
     componentsRoute => PublicComponentsPage(onNavigate: onNavigate),
     shotsRoute => ShotsIndexPage(onNavigate: onNavigate),
-    skillsRoute => PublicSkillsPage(onNavigate: onNavigate),
     '/components/button' => const ButtonDocPage(),
     '/components/input' => const InputDocPage(),
     '/components/card' => const CardDocPage(),
@@ -459,6 +475,100 @@ class _ShotDetailRouteState extends State<_ShotDetailRoute> {
     builder:
         (BuildContext context, AsyncSnapshot<Map<String, String>> snapshot) =>
             ShotDetailPage(
+              entry: widget.entry,
+              fileSource: snapshot.data ?? const <String, String>{},
+              onNavigate: widget.onNavigate,
+            ),
+  );
+}
+
+/// The asset key for a repository-relative skill source path.
+///
+/// [SkillDocEntry.sourcePaths] is rooted at the **repository** — `skills/<slug>/…`
+/// — because that directory is the skill's single source of truth: the same
+/// bytes the repository's own agents read through `AGENTS.md`, the plugin route
+/// installs, and a manual copy copies (Decision 005). Nothing may duplicate it.
+///
+/// That directory sits *above* `example/`, and a Flutter asset path may not
+/// climb above its own project root, so the docs app cannot declare it. The
+/// **package** can: `skills/` is inside `elattar_design_system`'s root,
+/// `example/` depends on that package, and a package's assets are bundled into
+/// every dependent app under `packages/<name>/<path>` — the mechanism the orb's
+/// perlin field already uses. Prefixing is therefore the whole translation, and
+/// `pubspec.yaml` at the repository root is where the two lines that enable it
+/// live.
+String skillSourceAssetKey(String sourcePath) {
+  const String skillRoot = 'skills/';
+  if (!sourcePath.startsWith(skillRoot)) {
+    throw ArgumentError.value(
+      sourcePath,
+      'sourcePath',
+      'Expected a path under the repository\'s skills/ directory',
+    );
+  }
+  return 'packages/elattar_design_system/$sourcePath';
+}
+
+/// The real source of every file in [entry], keyed by the path relative to the
+/// skill's own directory — the shape [SkillsPage.fileSource] takes.
+///
+/// Same contract, and same reasoning, as [shotSourceFor]: the page renders the
+/// bytes on disk rather than a transcription of them, so there is no second
+/// copy to drift and no generation step to forget.
+/// `example/test/public_pages_test.dart` asserts that equality against
+/// `dart:io`, which is the only thing standing between this loader and a page
+/// that quietly shows stale text.
+///
+/// Deliberately *not* memoised, for the reason [shotSourceFor] records.
+Future<Map<String, String>> skillSourceFor(SkillDocEntry entry) async {
+  final Map<String, String> files = <String, String>{};
+  final List<String> paths = entry.sourcePaths;
+  for (int index = 0; index < entry.files.length; index++) {
+    final String key = skillSourceAssetKey(paths[index]);
+    try {
+      files[entry.files[index]] = await rootBundle.loadString(key);
+    } catch (error) {
+      // A file the bundle does not carry falls through to SkillsPage's own
+      // placeholder rather than taking the page down. The undeclared-asset case
+      // is caught at test time by `public_pages_test.dart`.
+      debugPrint('Skill source "$key" is not in the asset bundle: $error');
+    }
+  }
+  return files;
+}
+
+/// [SkillsPage] with its file tree filled from the asset bundle.
+///
+/// The mirror of [_ShotDetailRoute], and for the same reason: the page takes
+/// its source as data so it stays a pure widget, which leaves the loading to
+/// the layer that already owns routing the page in.
+class _SkillsRoute extends StatefulWidget {
+  const _SkillsRoute({required this.entry, this.onNavigate});
+
+  final SkillDocEntry entry;
+  final PublicNavigate? onNavigate;
+
+  @override
+  State<_SkillsRoute> createState() => _SkillsRouteState();
+}
+
+class _SkillsRouteState extends State<_SkillsRoute> {
+  late Future<Map<String, String>> _source = skillSourceFor(widget.entry);
+
+  @override
+  void didUpdateWidget(covariant _SkillsRoute oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.entry.slug != widget.entry.slug) {
+      _source = skillSourceFor(widget.entry);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => FutureBuilder<Map<String, String>>(
+    future: _source,
+    builder:
+        (BuildContext context, AsyncSnapshot<Map<String, String>> snapshot) =>
+            SkillsPage(
               entry: widget.entry,
               fileSource: snapshot.data ?? const <String, String>{},
               onNavigate: widget.onNavigate,
