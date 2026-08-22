@@ -459,14 +459,16 @@ flutter:
           name: 'source-foundation',
           version: '0.0.1',
           files: <InstallFile>[],
-          fonts: <InstallResource>[
-            InstallResource(
+          fonts: <InstallFont>[
+            InstallFont(
               source: 'assets/fonts/InterVariable.ttf',
               target: '@foundation/fonts/InterVariable.ttf',
+              family: 'InterLocal',
             ),
-            InstallResource(
+            InstallFont(
               source: 'assets/fonts/GeistMono-Variable.ttf',
               target: '@foundation/fonts/GeistMono-Variable.ttf',
+              family: 'GeistMono',
             ),
           ],
         ),

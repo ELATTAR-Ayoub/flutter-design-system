@@ -17,6 +17,12 @@ final RegExp _sha256 = RegExp(r'^[0-9a-fA-F]{64}$');
 final RegExp _name = RegExp(r'^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$');
 final RegExp _version = RegExp(r'^\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$');
 
+/// A `flutter: fonts: - family:` value. Deliberately excludes `/` so a
+/// package-prefixed family (`packages/<name>/<Family>`) can never be declared:
+/// registry fonts are copied into the consumer's own bundle and carry no
+/// package prefix there.
+final RegExp _fontFamily = RegExp(r'^[A-Za-z0-9][A-Za-z0-9 _-]*$');
+
 class RegistryValidationResult {
   const RegistryValidationResult(this.errors);
 
@@ -132,6 +138,19 @@ void _validateItem(
         item.name,
       );
       _validateHash(resource.sha256, '$path.$label[$i].sha256', errors);
+    }
+  }
+  for (int i = 0; i < item.fonts.length; i++) {
+    final RegistryFont font = item.fonts[i];
+    if (!_fontFamily.hasMatch(font.family)) {
+      errors.add(
+        '$path.fonts[$i].family must be a bare Flutter font family name '
+        '(letters, digits, spaces, "-" and "_"), not "${font.family}".',
+      );
+    }
+    final String? style = font.style;
+    if (style != null && style != 'normal' && style != 'italic') {
+      errors.add('$path.fonts[$i].style must be "normal" or "italic".');
     }
   }
   if (!item.documentationRoute.startsWith('/')) {

@@ -75,7 +75,11 @@ class ElattarManifest {
 
   final int schemaVersion;
   final FoundationMode foundation;
-  final String registry;
+
+  /// The registry this project pins, mirroring `elattar.yaml`'s `registry:`
+  /// key — and null for the same reason: the manifest is committed, so it
+  /// never records a machine-local absolute path.
+  final String? registry;
   final List<InstalledItem> items;
 
   factory ElattarManifest.fromJsonString(String source) {
@@ -96,7 +100,7 @@ class ElattarManifest {
     return ElattarManifest(
       schemaVersion: schema,
       foundation: foundation,
-      registry: _requiredString(json, 'registry'),
+      registry: _optionalString(json, 'registry'),
       items: <InstalledItem>[
         for (final Object? value in _list(json, 'items'))
           InstalledItem.fromJson(_map(value, 'items entry')),
@@ -108,7 +112,7 @@ class ElattarManifest {
       '${const JsonEncoder.withIndent('  ').convert(<String, Object?>{
         'schemaVersion': schemaVersion,
         'foundation': foundation.name,
-        'registry': registry,
+        if (registry case final String value) 'registry': value,
         'items': <Object?>[for (final InstalledItem item in items) item.toJson()],
       })}\n';
 
@@ -119,6 +123,15 @@ class ElattarManifest {
     file.parent.createSync(recursive: true);
     file.writeAsStringSync(toJsonString());
   }
+}
+
+String? _optionalString(Map<String, Object?> json, String key) {
+  final Object? value = json[key];
+  if (value == null) return null;
+  if (value is String && value.trim().isNotEmpty) return value;
+  throw ElattarManifestException(
+    'Manifest field $key must be a non-empty string when present.',
+  );
 }
 
 String _requiredString(Map<String, Object?> json, String key) {

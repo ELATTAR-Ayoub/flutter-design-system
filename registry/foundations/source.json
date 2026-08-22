@@ -24,9 +24,9 @@
   "pubDependencies": {},
   "assets": [],
   "fonts": [
-    {"source": "assets/fonts/InterVariable.ttf", "target": "@foundation/fonts/InterVariable.ttf", "sha256": "5f27757f43f9e9d371851c372ee2e70c5ac5c65fb915d603667c253de8d3f65a"},
-    {"source": "assets/fonts/GeistMono-Variable.ttf", "target": "@foundation/fonts/GeistMono-Variable.ttf", "sha256": "0e1af3f507a1c8dfbb03d13ffad585834cd45ed7ccb78c756c7ce7873d180d30"},
-    {"source": "assets/fonts/Redaction35-Italic.ttf", "target": "@foundation/fonts/Redaction35-Italic.ttf", "sha256": "a87aea4af107f393edf6fe198c4f961ec4ff955407fa62a70563ce403e1499d3"}
+    {"source": "assets/fonts/InterVariable.ttf", "target": "@foundation/fonts/InterVariable.ttf", "sha256": "5f27757f43f9e9d371851c372ee2e70c5ac5c65fb915d603667c253de8d3f65a", "family": "InterLocal"},
+    {"source": "assets/fonts/GeistMono-Variable.ttf", "target": "@foundation/fonts/GeistMono-Variable.ttf", "sha256": "0e1af3f507a1c8dfbb03d13ffad585834cd45ed7ccb78c756c7ce7873d180d30", "family": "GeistMono"},
+    {"source": "assets/fonts/Redaction35-Italic.ttf", "target": "@foundation/fonts/Redaction35-Italic.ttf", "sha256": "a87aea4af107f393edf6fe198c4f961ec4ff955407fa62a70563ce403e1499d3", "family": "Redaction35", "style": "italic"}
   ],
   "shaders": [],
   "documentationRoute": "/docs/foundations",

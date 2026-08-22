@@ -3,6 +3,7 @@ import 'dart:io';
 import 'import_transformer.dart';
 import 'models.dart';
 import 'pubspec_editor.dart';
+import 'source_rewrites.dart';
 import 'target_mapper.dart';
 
 class Installer {
@@ -10,15 +11,18 @@ class Installer {
     LogicalTargetMapper? mapper,
     DartImportTransformer? transformer,
     PubspecEditor? pubspecEditor,
+    SourceRewriter? sourceRewriter,
   }) : mapper = mapper ?? const LogicalTargetMapper(),
        transformer =
            transformer ??
            DartImportTransformer(mapper: mapper ?? const LogicalTargetMapper()),
-       pubspecEditor = pubspecEditor ?? const PubspecEditor();
+       pubspecEditor = pubspecEditor ?? const PubspecEditor(),
+       sourceRewriter = sourceRewriter ?? const SourceRewriter();
 
   final LogicalTargetMapper mapper;
   final DartImportTransformer transformer;
   final PubspecEditor pubspecEditor;
+  final SourceRewriter sourceRewriter;
 
   InstallPlan plan({
     required Directory projectRoot,
@@ -32,8 +36,7 @@ class Installer {
     final Set<String> foundationFiles = <String>{};
     final Map<String, String> pubDependencies = <String, String>{};
     final List<String> assets = <String>[];
-    final List<({String family, String asset})> fonts =
-        <({String family, String asset})>[];
+    final List<FontRegistration> fonts = <FontRegistration>[];
     for (final InstallItem item in items) {
       pubDependencies.addAll(item.pubDependencies);
       for (final InstallFile file in item.files) {
@@ -44,11 +47,14 @@ class Installer {
         final File source = File(_join(repositoryRoot.path, file.source));
         if (!source.existsSync())
           throw StateError('Missing registry source: ${file.source}');
-        final String content = transformer.transform(
-          sourcePath: source.path,
-          targetPath: destination,
-          projectRoot: projectRoot.path,
-          content: source.readAsStringSync(),
+        final String content = sourceRewriter.rewrite(
+          target: file.target,
+          content: transformer.transform(
+            sourcePath: source.path,
+            targetPath: destination,
+            projectRoot: projectRoot.path,
+            content: source.readAsStringSync(),
+          ),
         );
         _queue(
           operations,
@@ -77,7 +83,7 @@ class Installer {
         );
         assets.add(_relative(projectRoot.path, destination));
       }
-      for (final InstallResource resource in item.fonts) {
+      for (final InstallFont resource in item.fonts) {
         final String destination = mapper.destination(
           projectRoot.path,
           resource.target,
@@ -90,10 +96,16 @@ class Installer {
           repositoryRoot,
           overwrite,
         );
-        fonts.add((
-          family: resource.target.split('/').last.split('.').first,
-          asset: _relative(projectRoot.path, destination),
-        ));
+        // The family comes from the registry entry, never from the file name:
+        // `InterVariable.ttf` registers as `InterLocal`, and the installed
+        // typography asks for `InterLocal`.
+        fonts.add(
+          FontRegistration(
+            family: resource.family,
+            asset: _relative(projectRoot.path, destination),
+            style: resource.style,
+          ),
+        );
       }
       for (final InstallResource resource in item.shaders) {
         _queueResource(

@@ -74,7 +74,11 @@ flutter:
       expect(configFile.existsSync(), isTrue);
       final String configText = await configFile.readAsString();
       expect(configText, contains('foundation: source'));
-      expect(configText, contains('components: lib/components/ui'));
+      // elattar.yaml is committed, so it never records a machine-local
+      // absolute path, and it publishes no key that nothing reads.
+      expect(configText, isNot(contains(repoRoot.path)));
+      expect(configText, isNot(contains('paths:')));
+      expect(configText, isNot(contains('barrels:')));
 
       final File buttonFile = File(
         '${fixture.path}/lib/components/ui/button.dart',

@@ -24,13 +24,47 @@ class InstallResource {
   final String sha256;
 }
 
+/// A font file together with the family it must be registered under.
+///
+/// [family] is required rather than optional: the family a face renders as is
+/// a property of the registry entry, never of its file name, and a font whose
+/// family cannot be stated is a font the consumer cannot reach.
+class InstallFont extends InstallResource {
+  const InstallFont({
+    required super.source,
+    required super.target,
+    super.sha256,
+    required this.family,
+    this.style,
+  });
+
+  final String family;
+
+  /// `normal` or `italic`; null when the face declares no style.
+  final String? style;
+}
+
+/// One `flutter: fonts:` entry as it will be written into the consumer's
+/// `pubspec.yaml`: a family name and a project-relative asset path.
+class FontRegistration {
+  const FontRegistration({
+    required this.family,
+    required this.asset,
+    this.style,
+  });
+
+  final String family;
+  final String asset;
+  final String? style;
+}
+
 class InstallItem {
   const InstallItem({
     required this.name,
     required this.version,
     required this.files,
     this.assets = const <InstallResource>[],
-    this.fonts = const <InstallResource>[],
+    this.fonts = const <InstallFont>[],
     this.shaders = const <InstallResource>[],
     this.dependencies = const <String>[],
     this.pubDependencies = const <String, String>{},
@@ -40,7 +74,7 @@ class InstallItem {
   final String version;
   final List<InstallFile> files;
   final List<InstallResource> assets;
-  final List<InstallResource> fonts;
+  final List<InstallFont> fonts;
   final List<InstallResource> shaders;
   final List<String> dependencies;
   final Map<String, String> pubDependencies;

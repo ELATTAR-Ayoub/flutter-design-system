@@ -1,42 +1,53 @@
 import 'dart:io';
 
+/// Where each logical target lands in a consumer project, project-root
+/// relative and POSIX-separated.
+///
+/// These are FIXED. They were once mirrored by a configurable `paths:` block
+/// in `elattar.yaml` that nothing read, so a project could configure
+/// `lib/vendor/elattar` and silently receive `lib/components/ui` anyway. The
+/// keys are gone; these constants are the only statement of install location,
+/// and `.elattar/manifest.json` is the per-project record of what landed
+/// where.
+const String uiDirectory = 'lib/components/ui';
+const String foundationDirectory = 'lib/design_system/foundation';
+const String effectsDirectory = 'lib/design_system/effects';
+const String motionDirectory = 'lib/design_system/motion';
+const String fontsDirectory = 'assets/elattar/fonts';
+
+/// Application compositions (shots) land in the consumer's own `lib/`, not
+/// under the design-system folders: `@app/shots/x/y.dart` -> `lib/shots/x/y.dart`.
+const String appDirectory = 'lib';
+
 class LogicalTargetMapper {
   const LogicalTargetMapper();
 
   String destination(String projectRoot, String logicalTarget) {
     final String relative = logicalTarget.replaceAll('\\', '/');
     if (relative.startsWith('@ui/')) {
-      return _join(projectRoot, 'lib/components/ui/${relative.substring(4)}');
+      return _join(projectRoot, '$uiDirectory/${relative.substring(4)}');
     }
     if (relative.startsWith('@foundation/')) {
       if (relative.startsWith('@foundation/fonts/')) {
         const String prefix = '@foundation/fonts/';
         return _join(
           projectRoot,
-          'assets/elattar/fonts/${relative.substring(prefix.length)}',
+          '$fontsDirectory/${relative.substring(prefix.length)}',
         );
       }
       return _join(
         projectRoot,
-        'lib/design_system/foundation/${relative.substring(12)}',
+        '$foundationDirectory/${relative.substring(12)}',
       );
     }
     if (relative.startsWith('@effects/')) {
-      return _join(
-        projectRoot,
-        'lib/design_system/effects/${relative.substring(9)}',
-      );
+      return _join(projectRoot, '$effectsDirectory/${relative.substring(9)}');
     }
     if (relative.startsWith('@motion/')) {
-      return _join(
-        projectRoot,
-        'lib/design_system/motion/${relative.substring(8)}',
-      );
+      return _join(projectRoot, '$motionDirectory/${relative.substring(8)}');
     }
-    // Application compositions (shots) land in the consumer's own `lib/`, not
-    // under the design-system folders: `@app/shots/x/y.dart` -> `lib/shots/x/y.dart`.
     if (relative.startsWith('@app/')) {
-      return _join(projectRoot, 'lib/${relative.substring(5)}');
+      return _join(projectRoot, '$appDirectory/${relative.substring(5)}');
     }
     throw ArgumentError.value(
       logicalTarget,

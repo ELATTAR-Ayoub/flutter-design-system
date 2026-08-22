@@ -66,6 +66,43 @@ class RegistryResource {
   }
 }
 
+/// A font file plus the metadata a consumer's `pubspec.yaml` needs to register
+/// it.
+///
+/// [family] is authoritative and travels with the asset. It is NOT derivable
+/// from the file name: `InterVariable.ttf` registers as `InterLocal`,
+/// `GeistMono-Variable.ttf` as `GeistMono`, `Redaction35-Italic.ttf` as
+/// `Redaction35` — the names the installed `typography.dart` asks for. A
+/// guessed name silently renders every glyph in the platform fallback face,
+/// which no analyzer can see, because a font family is a string.
+class RegistryFont extends RegistryResource {
+  const RegistryFont({
+    required super.source,
+    required super.target,
+    required super.sha256,
+    required this.family,
+    this.style,
+  });
+
+  /// The `flutter: fonts: - family:` value this face registers under.
+  final String family;
+
+  /// `normal` or `italic`, mirroring `pubspec.yaml`'s per-asset `style` key.
+  /// Null means the face carries no style declaration.
+  final String? style;
+
+  factory RegistryFont.fromJson(Object? value, String path) {
+    final Map<String, Object?> json = _map(value, path);
+    return RegistryFont(
+      source: _string(json, 'source', path),
+      target: _string(json, 'target', path),
+      sha256: _string(json, 'sha256', path),
+      family: _string(json, 'family', path),
+      style: json['style'] as String?,
+    );
+  }
+}
+
 class RegistryIndexItem {
   const RegistryIndexItem({
     required this.name,
@@ -167,7 +204,7 @@ class RegistryItem {
   final List<String> semanticDependencies;
   final Map<String, String> pubDependencies;
   final List<RegistryResource> assets;
-  final List<RegistryResource> fonts;
+  final List<RegistryFont> fonts;
   final List<RegistryResource> shaders;
   final String documentationRoute;
   final String sourceLink;
@@ -195,7 +232,7 @@ class RegistryItem {
           : registryDependencies,
       pubDependencies: _stringMap(json, 'pubDependencies', path),
       assets: _resources(json, 'assets', path, RegistryResource.fromJson),
-      fonts: _resources(json, 'fonts', path, RegistryResource.fromJson),
+      fonts: _resources(json, 'fonts', path, RegistryFont.fromJson),
       shaders: _resources(json, 'shaders', path, RegistryResource.fromJson),
       documentationRoute: _string(json, 'documentationRoute', path),
       sourceLink: _string(json, 'sourceLink', path),

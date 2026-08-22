@@ -1,3 +1,17 @@
+import 'models.dart';
+
+/// The `flutter:` top-level block and its body, up to the next top-level key.
+///
+/// Written with real `multiLine`/`dotAll` flags rather than an inline `(?ms)`
+/// prefix: Dart's `RegExp` is V8-backed and rejects inline modifier groups
+/// with `FormatException: Invalid group`, so the inline form throws the moment
+/// it is constructed.
+final RegExp _flutterBlock = RegExp(
+  r'^flutter:\s*\n((?:(?!^[A-Za-z0-9_]+:).)*)(?=^[A-Za-z0-9_]+:|(?![\s\S]))',
+  multiLine: true,
+  dotAll: true,
+);
+
 class PubspecEditor {
   const PubspecEditor();
 
@@ -16,10 +30,7 @@ class PubspecEditor {
         .where((String value) => !source.contains('    - $value'))
         .toList();
     if (additions.isEmpty) return source;
-    final RegExp block = RegExp(
-      r'(?ms)^flutter:\s*\n((?:(?!^[A-Za-z0-9_]+:).)*)(?=^[A-Za-z0-9_]+:|(?![\s\S]))',
-    );
-    final Match? match = block.firstMatch(source);
+    final Match? match = _flutterBlock.firstMatch(source);
     if (match == null)
       return '$source\nflutter:\n  assets:\n${additions.map((String v) => '    - $v\n').join()}';
     final String body = match.group(1) ?? '';
@@ -36,29 +47,57 @@ class PubspecEditor {
     );
   }
 
-  String addFonts(
-    String source,
-    Iterable<({String family, String asset})> fonts,
-  ) {
-    final List<({String family, String asset})> additions = fonts
+  /// Declares [fonts] under `flutter: fonts:`, merging into an existing
+  /// section rather than emitting a second `fonts:` key, and grouping the
+  /// faces of one family under a single `- family:` entry.
+  String addFonts(String source, Iterable<FontRegistration> fonts) {
+    final List<FontRegistration> additions = fonts
         .where(
-          (({String family, String asset}) value) =>
-              !source.contains('    - asset: ${value.asset}'),
+          (FontRegistration value) =>
+              !source.contains('- asset: ${value.asset}'),
         )
         .toList();
     if (additions.isEmpty) return source;
-    final String block = additions
-        .map(
-          (({String family, String asset}) value) =>
-              '    - family: ${value.family}\n      fonts:\n        - asset: ${value.asset}\n',
-        )
-        .join();
-    final int flutter = _topLevelOffset(source, 'flutter');
-    if (flutter < 0) return '$source\nflutter:\n  fonts:\n$block';
-    final int insert = _sectionInsert(source, flutter);
-    return source.substring(0, insert) +
-        '  fonts:\n$block' +
-        source.substring(insert);
+    final String block = _fontsBlock(additions);
+    final Match? match = _flutterBlock.firstMatch(source);
+    if (match == null) return '$source\nflutter:\n  fonts:\n$block';
+    final String body = match.group(1) ?? '';
+    if (body.contains(RegExp(r'^  fonts:\s*$', multiLine: true))) {
+      final int end = _sectionEnd(body, '  fonts:');
+      final String updated =
+          '${body.substring(0, end)}$block${body.substring(end)}';
+      return source.replaceRange(match.start, match.end, 'flutter:\n$updated');
+    }
+    return source.replaceRange(
+      match.start,
+      match.end,
+      'flutter:\n$body  fonts:\n$block',
+    );
+  }
+
+  /// One `- family:` entry per family, in first-seen order, with every face of
+  /// that family beneath it. Two `- family:` entries with the same name are a
+  /// duplicate key that `flutter_tools` resolves by keeping only one.
+  static String _fontsBlock(List<FontRegistration> fonts) {
+    final Map<String, List<FontRegistration>> byFamily =
+        <String, List<FontRegistration>>{};
+    for (final FontRegistration font in fonts) {
+      byFamily.putIfAbsent(font.family, () => <FontRegistration>[]).add(font);
+    }
+    final StringBuffer out = StringBuffer();
+    for (final MapEntry<String, List<FontRegistration>> entry
+        in byFamily.entries) {
+      out
+        ..writeln('    - family: ${entry.key}')
+        ..writeln('      fonts:');
+      for (final FontRegistration font in entry.value) {
+        out.writeln('        - asset: ${font.asset}');
+        if (font.style case final String style) {
+          out.writeln('          style: $style');
+        }
+      }
+    }
+    return out.toString();
   }
 
   String _insertDependency(String source, String name, String constraint) {
@@ -82,22 +121,11 @@ class PubspecEditor {
   static bool _hasTopLevelKey(String source, String key) =>
       RegExp('^  ${RegExp.escape(key)}:', multiLine: true).hasMatch(source);
 
-  static int _topLevelOffset(String source, String key) =>
-      source.indexOf(RegExp('^${RegExp.escape(key)}:', multiLine: true));
-
   static int _sectionEnd(String body, String header) {
     final int start = body.indexOf(header);
     if (start < 0) return body.length;
     final RegExp next = RegExp(r'^  [A-Za-z0-9_]+:', multiLine: true);
     final Match? match = next.firstMatch(body.substring(start + header.length));
     return match == null ? body.length : start + header.length + match.start;
-  }
-
-  static int _sectionInsert(String source, int topLevelStart) {
-    final Match? next = RegExp(
-      r'^\S[^\n]*:',
-      multiLine: true,
-    ).firstMatch(source.substring(topLevelStart + 8));
-    return next == null ? source.length : topLevelStart + 8 + next.start;
   }
 }

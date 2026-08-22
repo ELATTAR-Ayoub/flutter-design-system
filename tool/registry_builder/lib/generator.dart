@@ -148,8 +148,8 @@ class RegistryGenerator {
         for (final RegistryResource resource in item.assets)
           if (resources.contains(resource)) resource,
       ],
-      fonts: <RegistryResource>[
-        for (final RegistryResource resource in item.fonts)
+      fonts: <RegistryFont>[
+        for (final RegistryFont resource in item.fonts)
           if (resources.contains(resource)) resource,
       ],
       shaders: <RegistryResource>[
@@ -533,7 +533,7 @@ Map<String, Object?> _itemJson(RegistryItem item) => <String, Object?>{
       _resourceJson(resource),
   ],
   'fonts': <Object?>[
-    for (final RegistryResource resource in item.fonts) _resourceJson(resource),
+    for (final RegistryFont resource in item.fonts) _fontJson(resource),
   ],
   'shaders': <Object?>[
     for (final RegistryResource resource in item.shaders)
@@ -551,6 +551,12 @@ Map<String, Object?> _resourceJson(RegistryResource resource) =>
       'target': resource.target,
       'sha256': resource.sha256,
     };
+
+Map<String, Object?> _fontJson(RegistryFont font) => <String, Object?>{
+  ..._resourceJson(font),
+  'family': font.family,
+  if (font.style case final String style) 'style': style,
+};
 
 Map<String, Object?> _asMap(Object value, String path) {
   if (value is Map<String, Object?>) return value;

@@ -3,6 +3,8 @@ library;
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:yaml/yaml.dart';
+
 import '../config.dart';
 import '../identity.dart';
 import '../install/installer.dart';
@@ -14,6 +16,25 @@ import '../registry/client.dart';
 import '../registry/models.dart';
 
 const LogicalTargetMapper _targetMapper = LogicalTargetMapper();
+
+/// Why `--foundation package` is refused rather than merely undocumented.
+///
+/// The mode wrote `elattar_core: ^0.0.1` into the consumer pubspec and
+/// rewrote foundation imports onto `package:elattar_core/...`. No such package
+/// exists on pub.dev or in this repository, so `flutter pub get` failed with
+/// exit 69 and the project could not build — and re-running `init --foundation
+/// source` did not undo either change, so the mode was a one-way door. It is
+/// refused up front until the package exists.
+const String packageModeUnavailable =
+    'The `package` foundation mode is not available in elattar '
+    '${CliIdentity.version}: it depends on a package named `elattar_core` '
+    'that does not exist yet, so `flutter pub get` cannot resolve the project '
+    'it produces. Use `--foundation source`, which copies the foundation into '
+    'your project.';
+
+/// A URI scheme, requiring at least two characters before the colon so a
+/// Windows drive letter (`C:\src\registry`) is a path, not a scheme.
+final RegExp _uriScheme = RegExp(r'^[A-Za-z][A-Za-z0-9+.-]+:');
 
 class ElattarCli {
   ElattarCli({
@@ -92,13 +113,14 @@ class ElattarCli {
         throw FormatException('Unknown init option: $value');
       }
     }
-    final FoundationMode mode = switch (foundation) {
-      'source' => FoundationMode.source,
-      'package' => FoundationMode.package,
-      _ => throw const FormatException(
-        'init --foundation must be source or package.',
-      ),
-    };
+    // Refused before the project is even discovered, so a refused init leaves
+    // nothing behind: no pubspec edit, no elattar.yaml, no manifest.
+    if (foundation == 'package') {
+      throw const FormatException(packageModeUnavailable);
+    }
+    if (foundation != 'source') {
+      throw const FormatException('init --foundation must be source.');
+    }
     final FlutterProject project = discoverFlutterProject();
     final Directory registryDirectory = _discoverRegistryDirectory(
       registryPath,
@@ -107,12 +129,12 @@ class ElattarCli {
       registryDirectory,
     );
     final ElattarConfig config = _configFor(
-      mode: mode,
+      project: project,
       registryDirectory: registryDirectory,
     );
-    final List<RegistryItem> resolved = mode == FoundationMode.source
-        ? await registry.client.resolve(<String>['source-foundation'])
-        : <RegistryItem>[];
+    final List<RegistryItem> resolved = await registry.client.resolve(<String>[
+      'source-foundation',
+    ]);
 
     final _MutationResult mutation = _planMutation(
       project: project,
@@ -121,10 +143,15 @@ class ElattarCli {
       resolvedItems: resolved,
       overwrite: false,
       dryRun: dryRun,
-      replaceFoundationWithPackageImports: false,
-      addCorePackageDependency: mode == FoundationMode.package,
     );
     _printMutationSummary(action: 'init', result: mutation, dryRun: dryRun);
+    if (config.registry == null && mutation.conflicts.isEmpty) {
+      _stdout(
+        'note: the registry is outside this project, so elattar.yaml pins no '
+        '`registry:` value. Pass --registry ${registryDirectory.path} to '
+        '`elattar add`.',
+      );
+    }
     return mutation.exitCode;
   }
 
@@ -161,6 +188,13 @@ class ElattarCli {
     final ElattarConfig config = ElattarConfig.fromYaml(
       configFile.readAsStringSync(),
     );
+    if (config.foundation == FoundationMode.package) {
+      throw const ElattarConfigException(
+        'elattar.yaml sets `foundation: package`. $packageModeUnavailable '
+        'Set `foundation: source` in elattar.yaml and run `elattar init` '
+        'again.',
+      );
+    }
     final Directory registryDirectory = registryPath == null
         ? _discoverRegistryDirectory(config.registry)
         : _discoverRegistryDirectory(registryPath);
@@ -177,7 +211,6 @@ class ElattarCli {
     config.validateAgainst(manifest);
 
     final List<RegistryItem> resolved = await registry.client.resolve(names);
-    final bool packageMode = config.foundation == FoundationMode.package;
     final _MutationResult mutation = _planMutation(
       project: project,
       registry: registry,
@@ -185,9 +218,6 @@ class ElattarCli {
       resolvedItems: resolved,
       overwrite: overwrite,
       dryRun: dryRun,
-      replaceFoundationWithPackageImports: packageMode,
-      addCorePackageDependency: packageMode,
-      filterForPackageMode: packageMode,
     );
     _printMutationSummary(action: 'add', result: mutation, dryRun: dryRun);
     return mutation.exitCode;
@@ -316,7 +346,12 @@ class ElattarCli {
           final ElattarConfig config = ElattarConfig.fromYaml(
             configFile.readAsStringSync(),
           );
-          _stdout('ok  config: foundation=${config.foundation.name}');
+          if (config.foundation == FoundationMode.package) {
+            _stderr('err config: foundation=package. $packageModeUnavailable');
+            issues++;
+          } else {
+            _stdout('ok  config: foundation=${config.foundation.name}');
+          }
         } on Object catch (error) {
           _stderr('err config: $error');
           issues++;
@@ -325,6 +360,8 @@ class ElattarCli {
         _stderr('err config: missing elattar.yaml');
         issues++;
       }
+
+      issues += _checkDependencies(project);
 
       final File manifestFile = _manifestFile(project.root);
       if (manifestFile.existsSync()) {
@@ -361,6 +398,77 @@ class ElattarCli {
     return issues == 0 ? 0 : 1;
   }
 
+  /// Reports whether the project's declared dependencies have actually
+  /// resolved.
+  ///
+  /// `doctor` used to answer only questions it asked of its own files —
+  /// config, manifest, registry — and so printed four `ok` lines and exited 0
+  /// for a project whose `flutter pub get` failed with exit 69. A diagnostic
+  /// that certifies a project which cannot build is worse than no diagnostic.
+  ///
+  /// `.dart_tool/package_config.json` is what `pub get` writes on success, so
+  /// a dependency named in `pubspec.yaml` and absent from it is a dependency
+  /// pub could not resolve. That is a general check, not a special case for
+  /// any one package name.
+  int _checkDependencies(FlutterProject project) {
+    final Set<String> declared = <String>{
+      for (final String section in const <String>[
+        'dependencies',
+        'dev_dependencies',
+      ])
+        if (project.data[section] case final YamlMap map)
+          for (final Object? key in map.keys) '$key',
+    };
+    if (declared.isEmpty) {
+      _stdout('ok  dependencies: none declared');
+      return 0;
+    }
+    final File packageConfig = File(
+      _join(project.root.path, '.dart_tool/package_config.json'),
+    );
+    if (!packageConfig.existsSync()) {
+      _stderr(
+        'err dependencies: .dart_tool/package_config.json is missing, so the '
+        '${declared.length} declared dependencies have never resolved. Run '
+        '`flutter pub get`.',
+      );
+      return 1;
+    }
+    final Set<String> resolved;
+    try {
+      final Object? decoded = jsonDecode(packageConfig.readAsStringSync());
+      final Object? packages = decoded is Map<String, Object?>
+          ? decoded['packages']
+          : null;
+      if (packages is! List<Object?>) {
+        throw const FormatException('packages must be an array');
+      }
+      resolved = <String>{
+        for (final Object? entry in packages)
+          if (entry is Map<String, Object?> && entry['name'] is String)
+            entry['name']! as String,
+      };
+    } on Object catch (error) {
+      _stderr(
+        'err dependencies: .dart_tool/package_config.json is unreadable: $error',
+      );
+      return 1;
+    }
+    final List<String> missing =
+        declared.where((String name) => !resolved.contains(name)).toList()
+          ..sort();
+    if (missing.isNotEmpty) {
+      _stderr(
+        'err dependencies: ${missing.join(', ')} declared in pubspec.yaml but '
+        'absent from .dart_tool/package_config.json — `flutter pub get` '
+        'cannot resolve this project.',
+      );
+      return 1;
+    }
+    _stdout('ok  dependencies: ${declared.length} declared, all resolved');
+    return 0;
+  }
+
   _MutationResult _planMutation({
     required FlutterProject project,
     required _RegistryContext registry,
@@ -368,16 +476,10 @@ class ElattarCli {
     required List<RegistryItem> resolvedItems,
     required bool overwrite,
     required bool dryRun,
-    required bool replaceFoundationWithPackageImports,
-    required bool addCorePackageDependency,
-    bool filterForPackageMode = false,
   }) {
     final Installer installer = Installer();
-    final List<RegistryItem> installableItems = filterForPackageMode
-        ? resolvedItems.where(_copyInPackageMode).toList(growable: false)
-        : resolvedItems;
     final List<InstallItem> installItems = <InstallItem>[
-      for (final RegistryItem item in installableItems) _toInstallItem(item),
+      for (final RegistryItem item in resolvedItems) _toInstallItem(item),
     ];
     final InstallPlan installPlan = installer.plan(
       projectRoot: project.root,
@@ -387,40 +489,11 @@ class ElattarCli {
     );
     final List<_WritePlan> writes = <_WritePlan>[
       for (final InstallOperation operation in installPlan.operations)
-        _WritePlan(
-          path: operation.destination,
-          content: _rewritePackageImportsIfNeeded(
-            operation.destination,
-            operation.content,
-            replaceFoundationWithPackageImports,
-          ),
-        ),
+        _WritePlan(path: operation.destination, content: operation.content),
     ];
 
     final String configPath = _join(project.root.path, 'elattar.yaml');
     writes.add(_WritePlan(path: configPath, content: config.toYaml()));
-
-    if (addCorePackageDependency) {
-      final File pubspecFile = File(_join(project.root.path, 'pubspec.yaml'));
-      final String current = pubspecFile.readAsStringSync();
-      final String updated = installPlan.pubspec.isEmpty
-          ? current
-          : installPlan.pubspec;
-      final String withCoreDependency = _ensureCoreDependency(updated);
-      final int existingPubspec = writes.indexWhere(
-        (_WritePlan write) => write.path == pubspecFile.path,
-      );
-      if (existingPubspec >= 0) {
-        writes[existingPubspec] = _WritePlan(
-          path: pubspecFile.path,
-          content: withCoreDependency,
-        );
-      } else if (withCoreDependency != current) {
-        writes.add(
-          _WritePlan(path: pubspecFile.path, content: withCoreDependency),
-        );
-      }
-    }
 
     final ElattarManifest currentManifest = _loadExistingManifest(
       project.root,
@@ -431,7 +504,6 @@ class ElattarCli {
       resolvedItems,
       writes,
       project.root.path,
-      filterForPackageMode: filterForPackageMode,
     );
     final ElattarManifest updatedManifest = ElattarManifest(
       foundation: config.foundation,
@@ -466,9 +538,8 @@ class ElattarCli {
     List<InstalledItem> existing,
     List<RegistryItem> resolvedItems,
     List<_WritePlan> writes,
-    String projectRoot, {
-    required bool filterForPackageMode,
-  }) {
+    String projectRoot,
+  ) {
     final Map<String, InstalledItem> merged = <String, InstalledItem>{
       for (final InstalledItem item in existing) item.name: item,
     };
@@ -476,9 +547,6 @@ class ElattarCli {
       for (final _WritePlan write in writes) write.path: write,
     };
     for (final RegistryItem item in resolvedItems) {
-      if (filterForPackageMode && !_copyInPackageMode(item)) {
-        continue;
-      }
       final List<InstalledFile> files = <InstalledFile>[
         ..._installedFilesFor(item.files, projectRoot, writeByPath),
         ..._installedFilesForResources(item.assets, projectRoot, writeByPath),
@@ -554,52 +622,6 @@ class ElattarCli {
     return sha256Hex(file.readAsBytesSync());
   }
 
-  Object _rewritePackageImportsIfNeeded(
-    String destination,
-    Object content,
-    bool enabled,
-  ) {
-    if (!enabled || content is! String || !destination.endsWith('.dart')) {
-      return content;
-    }
-    return content
-        .replaceAllMapped(
-          RegExp(r'''(['"])\.\./\.\./design_system/foundation/([^'"]+)\1'''),
-          (Match match) =>
-              "${match.group(1)}package:elattar_core/design_system/foundation/${match.group(2)}${match.group(1)}",
-        )
-        .replaceAllMapped(
-          RegExp(r'''(['"])\.\./\.\./design_system/effects/([^'"]+)\1'''),
-          (Match match) =>
-              "${match.group(1)}package:elattar_core/design_system/effects/${match.group(2)}${match.group(1)}",
-        )
-        .replaceAllMapped(
-          RegExp(r'''(['"])\.\./\.\./design_system/motion/([^'"]+)\1'''),
-          (Match match) =>
-              "${match.group(1)}package:elattar_core/design_system/motion/${match.group(2)}${match.group(1)}",
-        );
-  }
-
-  String _ensureCoreDependency(String pubspec) {
-    if (RegExp(r'^  elattar_core:', multiLine: true).hasMatch(pubspec)) {
-      return pubspec;
-    }
-    final int dependenciesAt = pubspec.indexOf(
-      RegExp(r'^dependencies:\s*$', multiLine: true),
-    );
-    if (dependenciesAt < 0) {
-      return '$pubspec\ndependencies:\n  elattar_core: ^0.0.1\n';
-    }
-    final Match? nextTopLevel = RegExp(
-      r'^\S[^\n]*:',
-      multiLine: true,
-    ).firstMatch(pubspec.substring(dependenciesAt + 13));
-    final int insertAt = nextTopLevel == null
-        ? pubspec.length
-        : dependenciesAt + 13 + nextTopLevel.start;
-    return '${pubspec.substring(0, insertAt)}  elattar_core: ^0.0.1\n${pubspec.substring(insertAt)}';
-  }
-
   ElattarManifest _loadExistingManifest(
     Directory projectRoot,
     ElattarConfig config,
@@ -616,14 +638,14 @@ class ElattarCli {
   }
 
   ElattarConfig _configFor({
-    required FoundationMode mode,
+    required FlutterProject project,
     required Directory registryDirectory,
   }) {
     return ElattarConfig(
-      registry: registryDirectory.path,
-      foundation: mode,
-      packageName: mode == FoundationMode.package ? 'elattar_core' : null,
-      packageVersion: mode == FoundationMode.package ? '^0.0.1' : null,
+      registry: projectRelativeRegistry(
+        project.root.absolute.path,
+        registryDirectory.absolute.path,
+      ),
     );
   }
 
@@ -632,7 +654,7 @@ class ElattarCli {
     _stdout('usage:');
     _stdout('  elattar --version');
     _stdout(
-      '  elattar init [--foundation source|package] [--yes] [--dry-run] [--registry PATH]',
+      '  elattar init [--foundation source] [--yes] [--dry-run] [--registry PATH]',
     );
     _stdout(
       '  elattar add <items...> [--overwrite] [--dry-run] [--registry PATH]',
@@ -730,21 +752,6 @@ class _WritePlan {
   final Object content;
 }
 
-bool _copyInPackageMode(RegistryItem item) {
-  return switch (item.type) {
-    // Shots are product code: they are copied into the consumer project even
-    // when the foundation itself is consumed as a package.
-    RegistryItemType.component ||
-    RegistryItemType.block ||
-    RegistryItemType.asset ||
-    RegistryItemType.shot => true,
-    RegistryItemType.foundation ||
-    RegistryItemType.effect ||
-    RegistryItemType.motion ||
-    RegistryItemType.preset => false,
-  };
-}
-
 InstallItem _toInstallItem(RegistryItem item) {
   return InstallItem(
     name: item.name,
@@ -765,12 +772,14 @@ InstallItem _toInstallItem(RegistryItem item) {
           sha256: resource.sha256,
         ),
     ],
-    fonts: <InstallResource>[
-      for (final RegistryResource resource in item.fonts)
-        InstallResource(
+    fonts: <InstallFont>[
+      for (final RegistryFont resource in item.fonts)
+        InstallFont(
           source: resource.source,
           target: resource.target,
           sha256: resource.sha256,
+          family: resource.family,
+          style: resource.style,
         ),
     ],
     shaders: <InstallResource>[
@@ -788,7 +797,19 @@ InstallItem _toInstallItem(RegistryItem item) {
 
 Directory _discoverRegistryDirectory(String? explicitPath) {
   if (explicitPath != null && explicitPath.trim().isNotEmpty) {
-    final Directory directory = Directory(explicitPath).absolute;
+    final String value = explicitPath.trim();
+    // A URL here used to reach `Directory(...)` and surface as an unhandled
+    // FileSystemException with a raw Dart stack trace. There is no HTTP
+    // fetcher, so a remote value can only fail; it fails with a sentence.
+    if (_uriScheme.hasMatch(value)) {
+      throw FormatException(
+        'Remote registries are not supported yet: $value\n'
+        'elattar ${CliIdentity.version} reads a local registry only. '
+        'Point --registry (or the `registry:` key in elattar.yaml) at a '
+        '`registry/generated/latest` directory.',
+      );
+    }
+    final Directory directory = Directory(value).absolute;
     if (!directory.existsSync()) {
       throw FormatException('Registry path does not exist: ${directory.path}');
     }
