@@ -127,7 +127,9 @@ No separate Phase A auditor was run. Licensing/provenance remains reserved as an
 Read:
 
 1. `AGENTS.md`
-2. `.agents/skills/elattar-flutter-ui-director/SKILL.md`
+2. `skills/elattar-flutter-ui-director/SKILL.md` (moved from
+   `.agents/skills/elattar-flutter-ui-director/SKILL.md` in Phase H; the old
+   path is deleted)
 3. `docs/superpowers/plans/2026-08-21-supervisor-multi-agent-execution.md`
 4. `docs/superpowers/plans/2026-08-21-public-website-ui-information-architecture.md`
 5. `docs/superpowers/reports/public-release/STATUS.md`

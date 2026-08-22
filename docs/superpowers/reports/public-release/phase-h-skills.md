@@ -337,8 +337,8 @@ rather than fixed, because both sit in files this wave must not edit.
 | An invented install command could return to the site | High — it shipped once already | `verifiedCommands` allowlist plus three guards, one of them at the mounted route with real source loaded | Closed |
 | Two spellings of `/skills` (`publicSkillsRoute`, `skillsRoute`) | Low | Collapsed to `skillsRoute` | Closed |
 | The site publishes `/plugin marketplace add ELATTAR-Ayoub/flutter-design-system` — a **GitHub-form** command against a repository that is currently **private** | Medium | Not fixed. The command is badged "Pending verification" with an explicit blocker note and the licensing statement above it, which is materially different from the unlabelled `npx` line — but a reader who runs it today gets a failure, and the Phase H scope's own blocker says a GitHub-based command is unverifiable end to end while the repository is unreachable. The catalog is accepted Wave work and outside this wave's edit scope. | **Open — supervisor decision** |
-| `skill-install-verification.md` states "no external install command is published anywhere in this repository" and "`README.md` prints none by design". The first half stopped being true at `594bb25`, when the Skills page shipped three routes' worth of commands | Low — a stale sentence in a verification document, not a product defect | Not fixed; that file is H3's and outside this wave's edit scope. `README.md` genuinely still prints none, so the second half stands. | **Open — one-line correction needed** |
-| CI runs neither the registry validator nor the `packages/elattar_cli` suite | Medium | Carried from Phase G, unchanged | Open |
+| `skill-install-verification.md` states "no external install command is published anywhere in this repository" and "`README.md` prints none by design". The first half stopped being true at `594bb25`, when the Skills page shipped three routes' worth of commands | Low — a stale sentence in a verification document, not a product defect | **Fixed in this same commit (`cb0cc2a`)**, which this report documents in its own summary above: `skill-install-verification.md` now reads "`README.md` publishes no external install command... The Skills page added in `594bb25` does render commands for three routes...". This row was left marked Open by mistake when the table was drafted; corrected per Phase I finding F23. | Closed (`cb0cc2a`) |
+| CI runs neither the registry validator nor the `packages/elattar_cli` suite | Medium | Carried from Phase G, unchanged | Open at time of writing — **closed in `48c390b`**, an ancestor of Phase G's own close (`7860c58`), so this was already false when Phase G's report shipped it and was copied here unverified. `ci.yml:42-64` runs the CLI suite plus registry build/validate. Corrected per Phase I finding F22. |
 
 ## Known limitations
 
@@ -391,9 +391,10 @@ Phase I. In order:
 3. Once the repository is public, collect Route B; once the LICENSE is chosen,
    publish a manual-copy command and collect Route C.
 4. Decide the audit's open GitHub-form-command question above.
-5. Clear the standing carryover: `elattar_core`, browser captures for the
-   component, Shots and Skills routes, and CI coverage for the registry
-   validator and the CLI suite.
+5. Clear the standing carryover: `elattar_core` and browser captures for the
+   component, Shots and Skills routes. (CI coverage for the registry
+   validator and the CLI suite is not carryover — it landed in `48c390b`;
+   see the audit table above, corrected per Phase I finding F22.)
 
 ## Restart instructions
 

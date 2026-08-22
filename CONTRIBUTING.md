@@ -29,7 +29,7 @@ Do not copy the skill into a personal agent configuration directory and edit it 
 - Fix a bug in a public `Ds*` API or its tests.
 - Improve documentation or examples for the package.
 - Add verification coverage for an existing component or effect.
-- Report or refine future-facing CLI and registry plans without claiming behavior that is not implemented yet.
+- Improve the CLI (`packages/elattar_cli/`) or the registry (`registry/`, `tool/registry_builder/`) — both are implemented and tested in this repository already, just not published (`publish_to: none`, private repository). Extending their test coverage or closing gaps in what they scaffold is welcome.
 - Improve accessibility, keyboard handling, semantics, focus order, or reduced-motion behavior.
 
 ## Workflow

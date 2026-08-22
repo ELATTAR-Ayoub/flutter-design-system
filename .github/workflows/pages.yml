@@ -1,9 +1,31 @@
+# GATED (Phase I, F27 — see docs/superpowers/reports/public-release/phase-i-audit-findings.md).
+#
+# The automatic `push: branches: [main]` trigger was removed because a single
+# merge to main would publish, simultaneously and publicly, every blocker that
+# audit records: a NOTICES file whose license notice is the literal string
+# "TODO: Add your license here." (F1); three SIL OFL fonts (Inter, Geist Mono,
+# Redaction 35) redistributed with no license text (F2); unattributed Lucide
+# icon geometry (F3), an unattributed MIT shader (F4), and a texture of
+# unknown provenance (F5); a homepage "OPEN SOURCE" badge that is false while
+# LICENSE is a placeholder (F11); a quickstart command that cannot work for
+# any reader (F8); and a developer-only toast string aimed at public readers
+# (F13).
+#
+# Do not restore the `push` trigger until ALL of the following are closed:
+#   - F1/F2/F3/F4/F5 (licensing owner decisions — a real LICENSE is chosen,
+#     the OFL notices are bundled, and the Lucide/orb/texture provenance is
+#     resolved or the assets are replaced)
+#   - F8 (the broken `dart run elattar_cli init` quickstart command)
+#   - F11 (the false "OPEN SOURCE" badge)
+#   - F13 (the developer toast string reachable by public readers)
+# F9/F10/F14/F15 are the same audit's site-copy findings and should be closed
+# before re-gating too, even though they are not independently blocking.
+#
+# Until then, deploy manually and deliberately: Actions tab -> "Deploy Docs"
+# -> "Run workflow".
 name: Deploy Docs
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 concurrency:

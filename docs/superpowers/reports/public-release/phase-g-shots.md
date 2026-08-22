@@ -213,7 +213,7 @@ purpose only.
 | Catalog and manifests never cross-checked | Medium — silent drift between documented and installed dependencies | `shots_catalog_parity_test.dart` | Closed |
 | A Shot installed into a consumer project did not compile (Ruling 3) | High | W0-A import rewriting | Closed |
 | `rootBundle` caches the `Future`, not the string, so a second `await` of the same asset in a later widget test never completes | Low — test infrastructure | Loader is not memoised; the parity test evicts between tests | Closed |
-| CI runs neither the registry validator nor the CLI suite | Medium — Phase G materially grew both | Out of scope for this phase; carried | Open |
+| CI runs neither the registry validator nor the CLI suite | Medium — Phase G materially grew both | Out of scope for this phase; carried | Open at time of writing — **closed in `48c390b`**, later in this same phase's commit range (`ci.yml:42-64` now runs the `packages/elattar_cli` suite plus registry build/validate). This row was inherited stale into `STATUS.md` and `phase-h-skills.md`; corrected in both per Phase I finding F22. |
 
 ## Known limitations
 
@@ -240,8 +240,11 @@ Phase H — Skills. In order:
    repository paths the current text routes an agent to.
 4. Build the real `/skills` page on top of whatever install route actually
    exists, replacing the placeholder this phase left.
-5. Close the carryover blockers before Phase I: licensing, `elattar_core`,
-   browser captures, and CI coverage for the registry validator and CLI suite.
+5. Close the carryover blockers before Phase I: licensing, `elattar_core`, and
+   browser captures. (CI coverage for the registry validator and CLI suite
+   was already closed in `48c390b`, an ancestor of this phase's own close —
+   this line was stale the moment it was written; corrected per Phase I
+   finding F22.)
 
 ## Restart instructions
 

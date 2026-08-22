@@ -143,7 +143,6 @@ and manual-copy routes carry a pending badge and an explicit blocker note, and
 every string they render is drawn from a const `verifiedCommands` allowlist a
 human must consciously edit. See
 [`decisions/005-public-skill-location.md`](decisions/005-public-skill-location.md)
-[`decisions/005-public-skill-location.md`](decisions/005-public-skill-location.md)
 records why — the root `LICENSE` is a placeholder, and a copy-paste
 instruction with no grant attached is a redistribution invitation nobody has
 authorized yet. There is therefore no published prose for this test to
@@ -221,7 +220,12 @@ Stated explicitly, per the brief:
   regardless, since no such instruction is published yet (LICENSE gate).
 
 **Blocked on the owner's licensing decision**, independent of visibility:
-- Any published manual-copy instruction at all. See
+- The Skills page (`594bb25`) *does* publish two `cp -r` commands
+  (`example/lib/skills_docs/catalog.dart`'s `verifiedCommands`), but both are
+  badged `pendingVerification`, not `verifiedToday`, and carry an explicit
+  blocker note pointing at the LICENSE gate — the page documents the route,
+  it does not sanction running it. Treat "published" and "blessed as safe to
+  run" as different claims. See
   [`decisions/005-public-skill-location.md`](decisions/005-public-skill-location.md)
   §"Publication gate".
 
@@ -275,22 +279,32 @@ update this row only after it flips.
 | Proof of activation | _(pending)_ |
 | Result | _(pending)_ |
 
-### Route C — Manual copy (BLOCKED — no command is published)
+### Route C — Manual copy (BLOCKED — published, but not badged working)
 
-No install command exists to test. `README.md` prints none by design; see
-the LICENSE gate above. This row stays blocked structurally, not just
-un-run — there is nothing yet for a human to type. Once the owner chooses a
-license and H1 (or whoever owns `README.md` at that point) publishes an
-exact command, add it here, then run it against a fresh
+**Correction (Phase I finding F17):** this row previously said no manual-copy
+command was published anywhere. That was true of `README.md` but not of the
+site as a whole — the Skills page (`594bb25`, `cb0cc2a`) publishes two exact
+`cp -r` commands from `verifiedCommands`:
+
+```
+cp -r skills/elattar-flutter-ui-director ~/.claude/skills/elattar-flutter-ui-director
+cp -r skills/elattar-flutter-ui-director .claude/skills/elattar-flutter-ui-director
+```
+
+Both are badged `pendingVerification` (rendered "Pending verification" with
+an explicit blocker note citing the placeholder `LICENSE`), not
+`verifiedToday` — the page documents the mechanism, it does not claim the
+route works. This row stays blocked on a **recorded run**, not on the
+absence of a command: run the exact command above against a fresh
 `~/.claude/skills/`-equivalent directory on a real machine and record the
-result. `test/skill_install_fixture_test.dart` verifies the underlying
-copy/delete mechanism today; it does not and cannot verify prose that does
-not exist.
+result below. `test/skill_install_fixture_test.dart` verifies the underlying
+copy/delete mechanism today; it does not and cannot substitute for that
+transcript.
 
 | Field | Value |
 | --- | --- |
-| Status | **BLOCKED** — no command published (LICENSE placeholder) |
-| Published command | _(none — fill in once README.md prints one)_ |
+| Status | **BLOCKED** — command published (site, `pendingVerification`) but no recorded run yet; also gated on the LICENSE decision before it can be re-badged as working |
+| Published command | `cp -r skills/elattar-flutter-ui-director ~/.claude/skills/elattar-flutter-ui-director` (or the `.claude/skills/` project-local form — see above) |
 | Harness / agent | _(pending)_ |
 | Date | _(pending)_ |
 | Exact commands run | _(pending)_ |

@@ -64,3 +64,41 @@ running reference at 1440×900 in both themes.
   `foundation/theme.dart` as `DsThemeData.cube` - the same follow-up
   `bloom_cosmic.dart` closed, one family over. Foundations, Base and Agent are
   all built; the placeholder is now reachable only from Site.
+
+* Public release infrastructure (2026-08-21): the source-first registry pilot
+  (`registry/`, `tool/registry_builder/`, schema v1, sha256-verified payloads)
+  and the `elattar_cli` package (`packages/elattar_cli/`, commands
+  `elattar init` and `elattar add <slug>`) landed alongside the public website
+  shell, the documentation system, per-component guide pages, and
+  public-repository governance (README, CONTRIBUTING, CODE_OF_CONDUCT,
+  SECURITY, issue templates, the CI and GitHub Pages workflows). Neither the
+  CLI nor the registry is published: `packages/elattar_cli/pubspec.yaml` sets
+  `publish_to: none` and the repository itself is private - both exist and are
+  tested in this repository, with no external route to obtain them yet.
+
+* Shots (2026-08-23): a `shot` registry item kind installs multi-file,
+  product-neutral application compositions into a consumer's `@app/`, with an
+  import-rewriting pass so an installed Shot compiles against the consumer's
+  own generated barrels rather than the package. Three Shots ship -
+  `settings-profile`, `sign-in-flow`, `dashboard-overview` - behind a
+  filterable `/shots` index, a per-Shot detail page (install command, file
+  tree, dependency list), and a chrome-free `/shots/<slug>/preview` route. The
+  import rewriter was later hardened (`48c390b`) after an independent review
+  found it rewrote text inside comments and string literals instead of
+  stopping at Dart's directive prologue; the same commit added CI coverage for
+  the `packages/elattar_cli` test suite (26 tests) and the registry
+  build/validate steps. Registry regenerated to 20 schema-v1 items.
+
+* Skills (2026-08-23): the `elattar-flutter-ui-director` coding-agent skill
+  moved from `.agents/skills/` - a path no agent harness scans - to `skills/`,
+  and the repository became its own single-plugin Claude Code marketplace
+  (`.claude-plugin/marketplace.json`, `.claude-plugin/plugin.json`, plugin
+  version `0.0.1`). The skill's references are now mode-aware, distinguishing
+  a checkout of this repository from a project that installed the design
+  system through the CLI. `/skills` on the public site documents
+  install/update/inspect/remove commands per route (Claude Code plugin,
+  manual copy, `AGENTS.md`), gated by a `verifiedCommands` allowlist so a
+  command cannot reach the page without a human adding it explicitly - the
+  same discipline that retired an earlier, invented `npx skills add …` line.
+  No skill install route is published as working today: `LICENSE` is a
+  placeholder and the repository is private.

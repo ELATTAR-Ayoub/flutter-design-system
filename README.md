@@ -14,11 +14,25 @@ What exists today:
 - A docs and specimen app under `example/`
 - Package and example test coverage in `test/` and `example/test/`
 
+What exists in this repository and works, but is not published for anyone
+outside it to obtain:
+
+- A CLI, `packages/elattar_cli/` (commands `elattar init` and
+  `elattar add <slug>`), that reads the registry below and scaffolds a
+  consumer project. It is real and tested — 26 tests green — but
+  `packages/elattar_cli/pubspec.yaml` sets `publish_to: none` and this
+  repository is private, so there is currently no route for anyone else to
+  install it.
+- A generated static component registry (`registry/`, built by
+  `tool/registry_builder/`) that the CLI reads from: 20 items, schema v1,
+  every declared sha256 verified against source.
+
 What is planned and not shipped yet:
 
-- A public CLI with commands like `elattar init` and `elattar add button`
-- A generated static component registry for source-copy installs
-- A hosted public documentation site built from the existing local `example/` app
+- A hosted public documentation site built from the existing local `example/`
+  app. The GitHub Pages workflow that would deploy it
+  (`.github/workflows/pages.yml`) is deliberately gated to manual dispatch
+  only — see the comment at the top of that file for what has to close first.
 
 ## Install Today
 
@@ -115,19 +129,39 @@ The repository also contains Claude Code plugin manifests (`.claude-plugin/marke
 
 No external install command is published yet. Two things must land first: this repository has a placeholder `LICENSE`, so there is no grant attached to redistributing the skill, and each install route needs a recorded run before it is documented as working. A command that has not been demonstrated will not be printed here. See [`docs/superpowers/reports/public-release/decisions/005-public-skill-location.md`](docs/superpowers/reports/public-release/decisions/005-public-skill-location.md).
 
-## Planned CLI And Registry
+## CLI And Registry (In This Repository, Not Published)
 
-The product direction for this repository includes a source-first installer flow, but it is not part of `0.0.1` yet.
+A source-first installer flow exists in this repository and works today, from
+inside a checkout. It is **not published**: `packages/elattar_cli/pubspec.yaml`
+sets `publish_to: none`, there is no pub.dev listing, and the repository is
+private — there is currently no route for a reader outside this repository to
+obtain the CLI. "Exists in this repository, not yet published" is the precise
+statement; do not read the commands below as installable from outside a clone
+you already have.
 
-These commands are planned, not currently available:
+From a checkout, without activating anything:
 
 ```console
-dart install elattar_cli
-elattar init
+dart run packages/elattar_cli/bin/elattar.dart init --foundation source
+dart run packages/elattar_cli/bin/elattar.dart add button
+```
+
+Or activate it locally so the bare `elattar` form works, the same way the
+package's own `executables:` entry is exercised in its test suite:
+
+```console
+dart pub global activate --source path packages/elattar_cli
+elattar init --foundation source
 elattar add button
 ```
 
-Today, the supported way to use the design system is as the maintained Flutter package from this repository.
+Both commands read the generated registry at `registry/generated/latest/`
+(20 items, schema v1, built by `tool/registry_builder/`) and scaffold a
+consumer project from it.
+
+Today, the supported way to use the design system from outside this
+repository is as the maintained Flutter package — see
+[Install Today](#install-today) above.
 
 ## Development
 
