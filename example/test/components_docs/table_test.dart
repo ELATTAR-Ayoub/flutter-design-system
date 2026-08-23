@@ -44,10 +44,7 @@ Widget _realisticTable({
               : const Text('Subscription renewal'),
         ),
         const DsTableCellSpec(child: Text('Studio Pro annual plan')),
-        const DsTableCellSpec(
-          align: DsTableAlign.end,
-          child: Text('\$129.00'),
-        ),
+        const DsTableCellSpec(align: DsTableAlign.end, child: Text('\$129.00')),
       ],
     ),
     DsTableRowSpec(
@@ -237,105 +234,108 @@ void main() {
   /// overflow; wrapping fixes it a specific way) is pinned to a real,
   /// independently-checkable widget test rather than asserted from reading
   /// the source alone.
-  group('DsTable overflow behaviour at 390px (backs the Responsive section)', () {
-    Future<void> pumpNarrow(WidgetTester tester, Widget child) async {
-      tester.view.physicalSize = const Size(390, 844);
-      tester.view.devicePixelRatio = 1;
-      addTearDown(tester.view.reset);
-      await tester.pumpWidget(
-        _harness(
-          controller: DsThemeController(mode: DsThemeMode.dark),
-          child: Padding(padding: const EdgeInsets.all(16), child: child),
-        ),
+  group(
+    'DsTable overflow behaviour at 390px (backs the Responsive section)',
+    () {
+      Future<void> pumpNarrow(WidgetTester tester, Widget child) async {
+        tester.view.physicalSize = const Size(390, 844);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+        await tester.pumpWidget(
+          _harness(
+            controller: DsThemeController(mode: DsThemeMode.dark),
+            child: Padding(padding: const EdgeInsets.all(16), child: child),
+          ),
+        );
+      }
+
+      testWidgets(
+        'un-wrapped: a plain-text cell reflows (wraps, grows taller) with no '
+        'exception, but a non-wrapping Row cell overflows',
+        (WidgetTester tester) async {
+          // Plain text: DsTable's own columns compress toward each cell's
+          // min-intrinsic width; a Text cell simply wraps.
+          await pumpNarrow(
+            tester,
+            _realisticTable(firstCellIsNonWrappingRow: false),
+          );
+          await tester.pump();
+          expect(
+            tester.takeException(),
+            isNull,
+            reason: 'wrappable text should reflow, not overflow',
+          );
+
+          // The same table, but its first cell is the icon+label Row every
+          // real call site in this repo actually uses for a typed leading
+          // cell (see example/lib/pages/data.dart's Transaction history and
+          // example/lib/data_table_demo.dart's Card column) — a Row with
+          // mainAxisSize.min has no give, so once its column is squeezed
+          // below the row's own minimum width it overflows for real.
+          await pumpNarrow(tester, _realisticTable());
+          await tester.pump();
+          final dynamic error = tester.takeException();
+          expect(error, isNotNull);
+          expect(error.toString(), contains('RenderFlex overflowed'));
+        },
       );
-    }
 
-    testWidgets(
-      'un-wrapped: a plain-text cell reflows (wraps, grows taller) with no '
-      'exception, but a non-wrapping Row cell overflows',
-      (WidgetTester tester) async {
-        // Plain text: DsTable's own columns compress toward each cell's
-        // min-intrinsic width; a Text cell simply wraps.
-        await pumpNarrow(
-          tester,
-          _realisticTable(firstCellIsNonWrappingRow: false),
-        );
-        await tester.pump();
-        expect(
-          tester.takeException(),
-          isNull,
-          reason: 'wrappable text should reflow, not overflow',
-        );
+      testWidgets(
+        'a bare horizontal SingleChildScrollView around DsTable throws — its '
+        'root Column stretches its cross axis, which needs a bounded width',
+        (WidgetTester tester) async {
+          // The failure repeats across layout and semantics, which is more
+          // than one exception — tester.takeException() then only hands back
+          // a "Multiple exceptions (N)" summary instead of the message
+          // itself. Installing a capturing FlutterError.onError first (and
+          // restoring the original afterwards) reads the real first message
+          // instead of that summary.
+          final List<FlutterErrorDetails> captured = <FlutterErrorDetails>[];
+          final FlutterExceptionHandler? previousHandler = FlutterError.onError;
+          FlutterError.onError = captured.add;
+          addTearDown(() => FlutterError.onError = previousHandler);
 
-        // The same table, but its first cell is the icon+label Row every
-        // real call site in this repo actually uses for a typed leading
-        // cell (see example/lib/pages/data.dart's Transaction history and
-        // example/lib/data_table_demo.dart's Card column) — a Row with
-        // mainAxisSize.min has no give, so once its column is squeezed
-        // below the row's own minimum width it overflows for real.
-        await pumpNarrow(tester, _realisticTable());
-        await tester.pump();
-        final dynamic error = tester.takeException();
-        expect(error, isNotNull);
-        expect(error.toString(), contains('RenderFlex overflowed'));
-      },
-    );
+          await pumpNarrow(
+            tester,
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: _realisticTable(),
+            ),
+          );
 
-    testWidgets(
-      'a bare horizontal SingleChildScrollView around DsTable throws — its '
-      'root Column stretches its cross axis, which needs a bounded width',
-      (WidgetTester tester) async {
-        // The failure repeats across layout and semantics, which is more
-        // than one exception — tester.takeException() then only hands back
-        // a "Multiple exceptions (N)" summary instead of the message
-        // itself. Installing a capturing FlutterError.onError first (and
-        // restoring the original afterwards) reads the real first message
-        // instead of that summary.
-        final List<FlutterErrorDetails> captured = <FlutterErrorDetails>[];
-        final FlutterExceptionHandler? previousHandler = FlutterError.onError;
-        FlutterError.onError = captured.add;
-        addTearDown(() => FlutterError.onError = previousHandler);
+          expect(captured, isNotEmpty);
+          expect(
+            captured.first.exceptionAsString(),
+            contains('forces an infinite width'),
+          );
+        },
+      );
 
-        await pumpNarrow(
-          tester,
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: _realisticTable(),
-          ),
-        );
+      testWidgets(
+        'SingleChildScrollView + IntrinsicWidth renders the table at its full '
+        'natural width, scrollable, with no exception — the working recipe',
+        (WidgetTester tester) async {
+          await pumpNarrow(
+            tester,
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: IntrinsicWidth(child: _realisticTable()),
+            ),
+          );
+          await tester.pump();
+          expect(tester.takeException(), isNull);
 
-        expect(captured, isNotEmpty);
-        expect(
-          captured.first.exceptionAsString(),
-          contains('forces an infinite width'),
-        );
-      },
-    );
-
-    testWidgets(
-      'SingleChildScrollView + IntrinsicWidth renders the table at its full '
-      'natural width, scrollable, with no exception — the working recipe',
-      (WidgetTester tester) async {
-        await pumpNarrow(
-          tester,
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: IntrinsicWidth(child: _realisticTable()),
-          ),
-        );
-        await tester.pump();
-        expect(tester.takeException(), isNull);
-
-        final RenderBox box = tester.renderObject<RenderBox>(
-          find.byType(Table),
-        );
-        // Wide enough that it could only have rendered at its natural,
-        // unconstrained width rather than the 390px (minus padding)
-        // available — i.e. it is genuinely scrolling, not clipped.
-        expect(box.size.width, greaterThan(390));
-      },
-    );
-  });
+          final RenderBox box = tester.renderObject<RenderBox>(
+            find.byType(Table),
+          );
+          // Wide enough that it could only have rendered at its natural,
+          // unconstrained width rather than the 390px (minus padding)
+          // available — i.e. it is genuinely scrolling, not clipped.
+          expect(box.size.width, greaterThan(390));
+        },
+      );
+    },
+  );
 
   group('DsTable row state (backs the States and feedback section)', () {
     testWidgets(
@@ -387,7 +387,9 @@ void main() {
         );
         addTearDown(pointer.removePointer);
         await pointer.addPointer(location: Offset.zero);
-        await pointer.moveTo(tester.getCenter(find.text('Studio Pro annual plan')));
+        await pointer.moveTo(
+          tester.getCenter(find.text('Studio Pro annual plan')),
+        );
         await tester.pumpAndSettle();
 
         final Color hovered = _decoration(cells()[3]).color!;
@@ -423,10 +425,7 @@ void main() {
         await tester.pumpWidget(
           MediaQuery(
             data: const MediaQueryData(disableAnimations: true),
-            child: _harness(
-              controller: controller,
-              child: _realisticTable(),
-            ),
+            child: _harness(controller: controller, child: _realisticTable()),
           ),
         );
         await tester.pumpAndSettle();
@@ -440,7 +439,9 @@ void main() {
         );
         addTearDown(pointer.removePointer);
         await pointer.addPointer(location: Offset.zero);
-        await pointer.moveTo(tester.getCenter(find.text('Studio Pro annual plan')));
+        await pointer.moveTo(
+          tester.getCenter(find.text('Studio Pro annual plan')),
+        );
         // A single, zero-time pump — a non-reduced hover would still be mid
         // fade-in at this point (see the test above's pumpAndSettle need).
         await tester.pump();
@@ -470,10 +471,7 @@ void main() {
                 DsTableCellSpec(child: Text('Card')),
               ],
               rows: <DsTableRowSpec>[
-                DsTableRowSpec.span(
-                  const Text('No results.'),
-                  spanHeight: 120,
-                ),
+                DsTableRowSpec.span(const Text('No results.'), spanHeight: 120),
               ],
             ),
           ),
@@ -482,10 +480,12 @@ void main() {
 
         expect(find.text('No results.'), findsOneWidget);
         final RenderBox box = tester.renderObject<RenderBox>(
-          find.ancestor(
-            of: find.text('No results.'),
-            matching: find.byType(SizedBox),
-          ).first,
+          find
+              .ancestor(
+                of: find.text('No results.'),
+                matching: find.byType(SizedBox),
+              )
+              .first,
         );
         expect(box.size.height, 120);
       },
