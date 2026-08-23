@@ -388,6 +388,9 @@ class _Anchor extends StatelessWidget {
   final Widget child;
 
   @override
+  // `docs_layout.dart`'s [docsAnchorKey], not a second spelling of the same
+  // string: the key this marks the section with is the key the table of
+  // contents looks it up by, and the two may not drift.
   Widget build(BuildContext context) =>
-      KeyedSubtree(key: ValueKey<String>('docs-anchor:$name'), child: child);
+      KeyedSubtree(key: docsAnchorKey(name), child: child);
 }

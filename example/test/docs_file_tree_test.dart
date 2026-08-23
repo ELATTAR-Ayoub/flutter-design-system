@@ -339,5 +339,176 @@ void main() {
         expect(copied, <String>['class A {}']);
       },
     );
+
+    // Catches: dropping the "Copied" state back to a bare press highlight.
+    // The audit's F7 — the control dipped and came back, and nothing on
+    // screen distinguished a successful copy from a mis-tap.
+    testWidgets('a successful copy is confirmed, then returns to rest', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = _wide;
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+
+      final DsThemeController theme = DsThemeController(mode: DsThemeMode.dark);
+      addTearDown(theme.dispose);
+
+      await tester.pumpWidget(
+        DsTheme(
+          controller: theme,
+          child: MaterialApp(
+            debugShowCheckedModeBanner: false,
+            home: Scaffold(
+              body: SingleChildScrollView(
+                child: DocsFileTree(
+                  files: _twoFiles,
+                  clipboardWriter: (String text) async {},
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+      expect(find.text('Copy'), findsOneWidget);
+
+      await tester.tap(find.bySemanticsLabel('Copy lib/shots/demo/a.dart'));
+      await tester.pump();
+
+      expect(find.text('Copied'), findsOneWidget);
+      expect(find.text('Copy'), findsNothing);
+      expect(
+        find.bySemanticsLabel('Copied lib/shots/demo/a.dart'),
+        findsOneWidget,
+      );
+
+      await tester.pumpAndSettle();
+      expect(find.text('Copy'), findsOneWidget);
+      expect(find.text('Copied'), findsNothing);
+    });
+  });
+
+  group('a source listing is readable, not clipped', () {
+    /// Wide enough to overflow any column, and deep enough that an uncapped
+    /// block would carry its scrollbar off the bottom of the screen.
+    final String longSource = <String>[
+      'class DashboardOverviewShot extends StatefulWidget with AVeryLongMixinName implements SomethingElseEntirely {',
+      for (int i = 0; i < 400; i++) '  // line $i',
+      '}',
+    ].join('\n');
+
+    List<DocsCodeFile> filesWith(String code) => <DocsCodeFile>[
+      DocsCodeFile(path: 'lib/shots/demo/long.dart', code: code),
+    ];
+
+    // Catches: removing the `maxHeight` the file tree passes, which is what
+    // put the horizontal scrollbar hundreds of pixels below the fold and left
+    // the reader with `class DashboardOverviewShot extends Statefu` and no way
+    // to reach the rest of the line.
+    testWidgets('the pane is capped and its long lines are reachable', (
+      WidgetTester tester,
+    ) async {
+      await _pumpTree(tester, files: filesWith(longSource));
+
+      final Size block = tester.getSize(find.byType(DocsSelectableCodeBlock));
+      expect(
+        block.height,
+        lessThanOrEqualTo(DocsSelectableCodeBlock.sourceMaxHeight + 2),
+        reason: 'an uncapped listing takes its scrollbar off screen with it',
+      );
+
+      final ScrollableState horizontal = tester.state<ScrollableState>(
+        find.descendant(
+          of: find.byKey(const ValueKey<String>('docs-code-scroll')),
+          matching: find.byType(Scrollable),
+        ),
+      );
+      expect(horizontal.position.axis, Axis.horizontal);
+      expect(
+        horizontal.position.maxScrollExtent,
+        greaterThan(0),
+        reason: 'the long line has somewhere to scroll to',
+      );
+
+      // Both thumbs ride the capped box rather than the 400-line column: no
+      // scrollbar is painted *inside* the scrolling content, which is exactly
+      // what put the horizontal thumb off screen before.
+      expect(
+        find.descendant(
+          of: find.byKey(const ValueKey<String>('docs-code-scroll-vertical')),
+          matching: find.byType(RawScrollbar),
+        ),
+        findsNothing,
+      );
+      expect(
+        find.ancestor(
+          of: find.byKey(const ValueKey<String>('docs-code-scroll-vertical')),
+          matching: find.byType(RawScrollbar),
+        ),
+        findsNWidgets(2),
+        reason: 'one bar per axis, both outside the content',
+      );
+
+      // And the wheel has a vertical viewport of its own now. `firstState`:
+      // the horizontal view is nested inside this one, so two `Scrollable`s
+      // answer the descendant query and the outer — vertical — one is first.
+      final ScrollableState vertical = tester.firstState<ScrollableState>(
+        find.descendant(
+          of: find.byKey(const ValueKey<String>('docs-code-scroll-vertical')),
+          matching: find.byType(Scrollable),
+        ),
+      );
+      expect(vertical.position.axis, Axis.vertical);
+      expect(vertical.position.maxScrollExtent, greaterThan(0));
+    });
+
+    // Catches: re-wrapping a multi-line listing in `DsLineBox`. That widget
+    // restores a paragraph's CSS height by growing the *paragraph* and
+    // centring the difference, so 400 lines of half-pixel correction landed as
+    // one lump of dead air above the first line — the audit's F6.
+    testWidgets('a multi-line listing starts at the top of its own padding', (
+      WidgetTester tester,
+    ) async {
+      await _pumpTree(tester, files: filesWith(longSource));
+
+      expect(
+        find.descendant(
+          of: find.byType(DocsSelectableCodeBlock),
+          matching: find.byType(DsLineBox),
+        ),
+        findsNothing,
+        reason: 'a whole-paragraph leading correction belongs to one line',
+      );
+
+      final double blockTop = tester
+          .getRect(find.byType(DocsSelectableCodeBlock))
+          .top;
+      final double firstLineTop = tester
+          .getRect(
+            find.descendant(
+              of: find.text(longSource),
+              matching: find.byType(RichText),
+            ),
+          )
+          .top;
+      // `p-5` and the hairline the frame is paid out of — nothing else.
+      expect(firstLineTop - blockTop, closeTo(ds(5) + DsWidths.hairline, 1));
+    });
+
+    // The single-line command block keeps its line box: there the correction
+    // is one line's worth, which is exactly what `DsLineBox` is for.
+    testWidgets('a one-line block keeps its CSS line box', (
+      WidgetTester tester,
+    ) async {
+      await _pumpTree(tester, files: filesWith('class A {}'));
+
+      expect(
+        find.descendant(
+          of: find.byType(DocsSelectableCodeBlock),
+          matching: find.byType(DsLineBox),
+        ),
+        findsOneWidget,
+      );
+    });
   });
 }

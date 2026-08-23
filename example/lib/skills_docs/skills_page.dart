@@ -121,27 +121,45 @@ class _SkillArticle extends StatelessWidget {
       '(see SkillDocEntry.sourcePaths).\n';
 
   @override
+  // Each section is marked with `docs_layout.dart`'s [docsAnchorKey] so the
+  // page's own table of contents can reach it — see the equivalent note in
+  // `shots_docs/shot_detail_page.dart` for what an unmarked anchor used to do.
   Widget build(BuildContext context) => Column(
     key: const ValueKey<String>('skill-doc-article'),
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
-      _OverviewPanel(entry: entry),
-      SizedBox(height: ds(6)),
-      _AgentsPanel(entry: entry),
-      SizedBox(height: ds(6)),
-      _InstallPanel(entry: entry),
-      SizedBox(height: ds(6)),
-      DocsFileTree(
-        // A distinct identity per skill, the same reasoning
-        // `shot_detail_page.dart` documents on its own `DocsFileTree` call:
-        // without this, swapping the `entry` in place could reuse this
-        // widget's selected-file state across a different file list.
-        key: ValueKey<String>('docs-file-tree:${entry.slug}'),
-        label: 'Files',
-        files: _files,
+      KeyedSubtree(
+        key: docsAnchorKey('overview'),
+        child: _OverviewPanel(entry: entry),
       ),
       SizedBox(height: ds(6)),
-      _VersionPanel(entry: entry),
+      KeyedSubtree(
+        key: docsAnchorKey('agents'),
+        child: _AgentsPanel(entry: entry),
+      ),
+      SizedBox(height: ds(6)),
+      KeyedSubtree(
+        key: docsAnchorKey('install'),
+        child: _InstallPanel(entry: entry),
+      ),
+      SizedBox(height: ds(6)),
+      KeyedSubtree(
+        key: docsAnchorKey('files'),
+        child: DocsFileTree(
+          // A distinct identity per skill, the same reasoning
+          // `shot_detail_page.dart` documents on its own `DocsFileTree` call:
+          // without this, swapping the `entry` in place could reuse this
+          // widget's selected-file state across a different file list.
+          key: ValueKey<String>('docs-file-tree:${entry.slug}'),
+          label: 'Files',
+          files: _files,
+        ),
+      ),
+      SizedBox(height: ds(6)),
+      KeyedSubtree(
+        key: docsAnchorKey('version'),
+        child: _VersionPanel(entry: entry),
+      ),
     ],
   );
 }

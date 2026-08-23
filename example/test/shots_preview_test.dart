@@ -28,6 +28,7 @@ import 'package:example/shots/sign_in_flow/sign_in_flow_shot.dart';
 import 'package:example/shots_docs/catalog.dart';
 import 'package:example/shots_docs/shot_preview_host.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart' show RenderParagraph;
 import 'package:flutter_test/flutter_test.dart';
 
 /// The phone frame the mobile pass shoots at.
@@ -45,10 +46,9 @@ List<CustomPainter> _painters(WidgetTester tester) => <CustomPainter>[
   for (final CustomPaint paint in tester.widgetList<CustomPaint>(
     find.byType(CustomPaint),
   ))
-    ...<CustomPainter?>[
-      paint.painter,
-      paint.foregroundPainter,
-    ].whereType<CustomPainter>().where((CustomPainter p) => p is! ScrollbarPainter),
+    ...<CustomPainter?>[paint.painter, paint.foregroundPainter]
+        .whereType<CustomPainter>()
+        .where((CustomPainter p) => p is! ScrollbarPainter),
 ];
 
 /// Asserts that not one painter on screen wants to repaint across [over].
@@ -242,8 +242,14 @@ void main() {
       expect(find.byType(SignInFlowShot), findsOneWidget);
       expect(find.byType(DsInput), findsNWidgets(2));
       expect(find.byType(DsFieldVisibility), findsAtLeastNWidgets(1));
-      expect(find.byKey(const ValueKey<String>('sign-in-reveal')), findsOneWidget);
-      expect(find.byKey(const ValueKey<String>('sign-in-forgot')), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey<String>('sign-in-reveal')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const ValueKey<String>('sign-in-forgot')),
+        findsOneWidget,
+      );
       expect(find.text('Continue with SSO'), findsOneWidget);
       // Empty: the reset dialog is not mounted until it is opened.
       expect(
@@ -302,11 +308,7 @@ void main() {
       expect(DashboardOverviewShot.columnsFor(_phone.width), 1);
       final List<double> narrow = _tileTops(tester);
       expect(narrow, hasLength(4));
-      expect(
-        narrow.toSet(),
-        hasLength(4),
-        reason: 'the tiles did not stack',
-      );
+      expect(narrow.toSet(), hasLength(4), reason: 'the tiles did not stack');
     });
 
     testWidgets('the settings pair splits at md and stacks below it', (
@@ -418,6 +420,54 @@ void main() {
       expect(find.byType(NavigationBar), findsNothing);
       expect(find.byType(BottomNavigationBar), findsNothing);
       expect(find.text('Search'), findsNothing);
+    });
+
+    // Catches: deleting the `DefaultTextStyle` from `ShotPreviewHost.build`.
+    //
+    // `/shots/<slug>/preview` is a top-level surface with no `Material` above
+    // it, so without that wrapper every string in the mounted composition
+    // inherits `WidgetsApp`'s error style: the flagship settings Shot rendered
+    // "Profile", both field labels and both placeholders in error red under a
+    // double yellow underline, and the dashboard rendered all four headline
+    // metrics the same way. The whole suite passed through it because no test
+    // resolved a style out of the tree — this one does, against a `.type-*`
+    // class that declares no colour and therefore inherits the ancestor's.
+    testWidgets('a preview does not inherit the SDK fallback text style', (
+      WidgetTester tester,
+    ) async {
+      final DsThemeController controller = DsThemeController();
+      addTearDown(controller.dispose);
+      tester.useViewport(_desktop);
+      await tester.pumpWidget(
+        DsTheme(
+          controller: controller,
+          child: MaterialApp(
+            debugShowCheckedModeBanner: false,
+            home: ShotPreviewHost(
+              name: 'probe',
+              shot: DsText('Inherited probe paragraph', DsType.body),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final TextStyle probe = tester
+          .firstRenderObject<RenderParagraph>(
+            find.descendant(
+              of: find.text('Inherited probe paragraph'),
+              matching: find.byType(RichText),
+            ),
+          )
+          .text
+          .style!;
+      // `WidgetsApp`'s `_errorTextStyle`, restated because it is private to
+      // the framework.
+      expect(probe.color, isNot(const Color(0xD0FF0000)));
+      expect(probe.color, DsThemeData.dark.foreground);
+      expect(probe.decoration ?? TextDecoration.none, TextDecoration.none);
+      expect(probe.decorationColor, isNot(const Color(0xFFFFFF00)));
+      expect(probe.decorationStyle, isNot(TextDecorationStyle.double));
     });
 
     testWidgets('every catalog slug resolves, and nothing else does', (

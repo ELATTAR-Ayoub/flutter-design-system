@@ -16,19 +16,20 @@ final DsToastController siteToasts = DsToastController();
 
 /// Header, search, mobile navigation, reading column, and footer for the
 /// public website.
+///
+/// There is deliberately **no** repository CTA here. The header, the mobile
+/// navigation sheet and the footer each carried a "GitHub" button behind an
+/// `onOpenGitHub` seam that no call site ever filled, so every visitor who
+/// pressed it got a developer's to-do note as a toast ("GitHub action not
+/// wired / Pass onOpenGitHub …"). The repository is private and its URL is not
+/// publishable yet, so the control was removed rather than disabled: a call to
+/// action that cannot act is not a state to render, it is a control that does
+/// not belong in the chrome. Bring it back with a real URL, not a seam.
 class SiteShell extends StatefulWidget {
-  const SiteShell({
-    super.key,
-    required this.route,
-    required this.child,
-    this.onOpenGitHub,
-  });
+  const SiteShell({super.key, required this.route, required this.child});
 
   final String route;
   final Widget child;
-
-  /// External-action seam for the open-source repository CTA.
-  final VoidCallback? onOpenGitHub;
 
   @override
   State<SiteShell> createState() => _SiteShellState();
@@ -68,22 +69,6 @@ class _SiteShellState extends State<SiteShell> {
     _closeSearch();
   }
 
-  void _openGitHub() {
-    _closeSearch();
-    final VoidCallback? action = widget.onOpenGitHub;
-    if (action != null) {
-      action();
-      return;
-    }
-    siteToasts.show(
-      const DsToastMessage(
-        title: 'GitHub action not wired',
-        description:
-            'Pass onOpenGitHub to the public site shell when the repository link is ready.',
-      ),
-    );
-  }
-
   void _openMobileNavigation() {
     DsSheet.showLeft(
       context,
@@ -94,16 +79,13 @@ class _SiteShellState extends State<SiteShell> {
           Navigator.of(sheetContext).pop();
           _navigate(href);
         },
-        onOpenGitHub: () {
-          Navigator.of(sheetContext).pop();
-          _openGitHub();
-        },
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final DsThemeData theme = DsTheme.of(context);
     final double viewport = MediaQuery.sizeOf(context).width;
     final bool desktop = viewport >= DsBreakpoints.lg;
     final double header = DsSafeArea.topBarHeightOf(
@@ -111,60 +93,69 @@ class _SiteShellState extends State<SiteShell> {
       DsWidths.siteHeader,
     );
 
-    return Stack(
-      children: <Widget>[
-        const Positioned.fill(child: DsPageGlow()),
-        Positioned.fill(
-          child: DsSafeArea(
-            top: false,
-            bottom: false,
-            child: Center(
-              child: SizedBox(
-                width: DsWidths.shell,
-                child: _SiteBody(
-                  controller: _main,
-                  header: header,
-                  desktop: desktop,
-                  footer: _SiteFooter(
-                    onNavigate: _navigate,
-                    onOpenGitHub: _openGitHub,
+    return DefaultTextStyle(
+      // `<body class="… text-foreground">`, exactly as `shell.dart:165` states
+      // it for the documentation shell and `showcase/showcase_app.dart:151`
+      // states it for Signal Studio. Without it this subtree has no
+      // [DefaultTextStyle] of its own, so every [DsText] inherits
+      // [WidgetsApp]'s fallback — 0xD0FF0000 ink under a double yellow
+      // underline, the "you forgot a Material" style — because [DsText] builds
+      // with `inherit: true` and never declares a `decoration`, and because its
+      // [DsTypeColor.none] classes resolve their ink from
+      // `DefaultTextStyle.of(context).style.color`. Both leaked onto every
+      // public route until this landed.
+      style: DsText.styleOf(context, DsType.body, color: theme.foreground),
+      child: Stack(
+        children: <Widget>[
+          const Positioned.fill(child: DsPageGlow()),
+          Positioned.fill(
+            child: DsSafeArea(
+              top: false,
+              bottom: false,
+              child: Center(
+                child: SizedBox(
+                  width: DsWidths.shell,
+                  child: _SiteBody(
+                    controller: _main,
+                    header: header,
+                    desktop: desktop,
+                    footer: _SiteFooter(onNavigate: _navigate),
+                    child: widget.child,
                   ),
-                  child: widget.child,
                 ),
               ),
             ),
           ),
-        ),
-        Positioned(
-          top: 0,
-          left: 0,
-          right: 0,
-          height: header,
-          child: _SiteHeader(
-            route: widget.route,
-            desktop: desktop,
-            viewport: viewport,
-            onNavigate: _navigate,
-            onOpenSearch: _openSearch,
-            onOpenGitHub: _openGitHub,
-            onOpenMobileNavigation: _openMobileNavigation,
-          ),
-        ),
-        if (_searchOpen)
           Positioned(
-            top: header,
+            top: 0,
             left: 0,
             right: 0,
-            child: _SearchOverlay(
-              query: _searchController.text,
-              controller: _searchController,
-              focusNode: _searchFocusNode,
-              onClose: _closeSearch,
+            height: header,
+            child: _SiteHeader(
+              route: widget.route,
+              desktop: desktop,
+              viewport: viewport,
               onNavigate: _navigate,
+              onOpenSearch: _openSearch,
+              onOpenMobileNavigation: _openMobileNavigation,
             ),
           ),
-        Positioned.fill(child: DsToaster(controller: siteToasts)),
-      ],
+          if (_searchOpen)
+            Positioned(
+              top: header,
+              left: 0,
+              right: 0,
+              child: _SearchOverlay(
+                query: _searchController.text,
+                controller: _searchController,
+                focusNode: _searchFocusNode,
+                onClose: _closeSearch,
+                onNavigate: _navigate,
+              ),
+            ),
+          Positioned.fill(child: DsToaster(controller: siteToasts)),
+        ],
+      ),
     );
   }
 }
@@ -225,7 +216,6 @@ class _SiteHeader extends StatelessWidget {
     required this.viewport,
     required this.onNavigate,
     required this.onOpenSearch,
-    required this.onOpenGitHub,
     required this.onOpenMobileNavigation,
   });
 
@@ -234,7 +224,6 @@ class _SiteHeader extends StatelessWidget {
   final double viewport;
   final ValueChanged<String> onNavigate;
   final VoidCallback onOpenSearch;
-  final VoidCallback onOpenGitHub;
   final VoidCallback onOpenMobileNavigation;
 
   @override
@@ -312,23 +301,6 @@ class _SiteHeader extends StatelessWidget {
               ),
               SizedBox(width: compactGap),
               const ThemeToggle(),
-              if (desktop) ...<Widget>[
-                SizedBox(width: ds(3)),
-                DsButton(
-                  variant: DsButtonVariant.secondary,
-                  size: DsButtonSize.sm,
-                  label: 'Open GitHub repository',
-                  onPressed: onOpenGitHub,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      DsIcon.lucide(DsLucide.gitBranch, size: DsIconSize.sm),
-                      SizedBox(width: DsButton.gapFor(DsButtonSize.sm)),
-                      DsText('GitHub', DsComponentType.buttonLabel),
-                    ],
-                  ),
-                ),
-              ],
             ],
           ),
         ),
@@ -497,12 +469,10 @@ class _SiteMobileNavigation extends StatelessWidget {
   const _SiteMobileNavigation({
     required this.currentRoute,
     required this.onNavigate,
-    required this.onOpenGitHub,
   });
 
   final String currentRoute;
   final ValueChanged<String> onNavigate;
-  final VoidCallback onOpenGitHub;
 
   @override
   Widget build(BuildContext context) {
@@ -518,22 +488,6 @@ class _SiteMobileNavigation extends StatelessWidget {
               child: const Logo(),
             ),
           ),
-          DsButton(
-            variant: DsButtonVariant.secondary,
-            size: DsButtonSize.md,
-            label: 'Open GitHub repository',
-            onPressed: onOpenGitHub,
-            contentAlignment: Alignment.center,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                DsIcon.lucide(DsLucide.gitBranch, size: DsIconSize.sm),
-                SizedBox(width: DsButton.gapFor(DsButtonSize.md)),
-                DsText('GitHub', DsComponentType.buttonLabel),
-              ],
-            ),
-          ),
-          SizedBox(height: ds(4)),
           for (final SiteNavGroup group in footerSiteNavigation) ...<Widget>[
             DsText(group.title, DsType.label),
             SizedBox(height: ds(3)),
@@ -562,10 +516,9 @@ class _SiteMobileNavigation extends StatelessWidget {
 }
 
 class _SiteFooter extends StatelessWidget {
-  const _SiteFooter({required this.onNavigate, required this.onOpenGitHub});
+  const _SiteFooter({required this.onNavigate});
 
   final ValueChanged<String> onNavigate;
-  final VoidCallback onOpenGitHub;
 
   @override
   Widget build(BuildContext context) {
@@ -608,8 +561,8 @@ class _SiteFooter extends StatelessWidget {
                 ),
                 DsButton(
                   variant: DsButtonVariant.secondary,
-                  onPressed: onOpenGitHub,
-                  child: const Text('Open GitHub'),
+                  onPressed: () => onNavigate(componentsRoute),
+                  child: const Text('Browse components'),
                 ),
               ],
             ),

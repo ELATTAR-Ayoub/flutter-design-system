@@ -74,26 +74,38 @@ class ShotPreviewHost extends StatelessWidget {
     final double gutter = gutterFor(MediaQuery.sizeOf(context).width);
     final Widget? composition = shot ?? shotPreviewFor(name);
 
-    return ColoredBox(
-      color: theme.background,
-      child: SafeArea(
-        child: composition == null
-            ? Center(
-                child: Padding(
-                  padding: EdgeInsets.all(gutter),
-                  child: DsText(
-                    'No Shot is registered under "$name".',
-                    DsType.body,
-                    color: theme.mutedForeground,
-                    align: TextAlign.center,
+    return DefaultTextStyle(
+      // `<body class="… text-foreground">`, the same line `shell.dart:165`
+      // gives the documentation shell and `showcase/showcase_app.dart:151`
+      // gives Signal Studio. This route is a top-level surface with no
+      // `Material` above it, so without this every [DsText] in the mounted
+      // composition inherits [WidgetsApp]'s fallback style — error-red ink
+      // under a double yellow underline — because [DsText] builds with
+      // `inherit: true` and never declares a `decoration`, and because its
+      // [DsTypeColor.none] classes read their ink straight off
+      // `DefaultTextStyle.of(context).style.color`.
+      style: DsText.styleOf(context, DsType.body, color: theme.foreground),
+      child: ColoredBox(
+        color: theme.background,
+        child: SafeArea(
+          child: composition == null
+              ? Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(gutter),
+                    child: DsText(
+                      'No Shot is registered under "$name".',
+                      DsType.body,
+                      color: theme.mutedForeground,
+                      align: TextAlign.center,
+                    ),
                   ),
+                )
+              : SingleChildScrollView(
+                  key: viewportKey,
+                  padding: EdgeInsets.all(gutter),
+                  child: composition,
                 ),
-              )
-            : SingleChildScrollView(
-                key: viewportKey,
-                padding: EdgeInsets.all(gutter),
-                child: composition,
-              ),
+        ),
       ),
     );
   }

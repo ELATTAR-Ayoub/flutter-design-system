@@ -232,6 +232,11 @@ class _SelectedFilePane extends StatelessWidget {
           DocsSelectableCodeBlock(
             key: ValueKey<String>('docs-file-tree-code:${file.path}'),
             code: file.code,
+            // A whole source file, not a command: capped, so its horizontal
+            // scrollbar sits on the bottom edge of the visible pane instead of
+            // hundreds of pixels below the fold. See the field's own note for
+            // what an uncapped listing did to the Files viewer.
+            maxHeight: DocsSelectableCodeBlock.sourceMaxHeight,
           ),
         ],
       ),
@@ -256,14 +261,50 @@ class _CopyFileButton extends StatefulWidget {
   State<_CopyFileButton> createState() => _CopyFileButtonState();
 }
 
-class _CopyFileButtonState extends State<_CopyFileButton> {
+class _CopyFileButtonState extends State<_CopyFileButton>
+    with SingleTickerProviderStateMixin {
   bool _pending = false;
+
+  /// Holds the "Copied" state on screen after a successful write.
+  ///
+  /// An [AnimationController] rather than a [Future.delayed], for two reasons
+  /// that are the same reason: it is driven by the scheduler, so it is torn
+  /// down with the widget and it advances under a widget test's own clock —
+  /// a bare timer would outlive a disposed tree and fail the test that copied.
+  ///
+  /// Built in [initState], not lazily: a `late final` initialiser that nothing
+  /// ever touched would first run inside [dispose], where creating a [Ticker]
+  /// means an inherited-widget lookup on a deactivated element.
+  ///
+  /// [DsDurations.attachmentSaving] is the token, not a number of its own:
+  /// it is already this system's answer to "how long does a control's glyph
+  /// stay on the check after the action it confirms".
+  late final AnimationController _confirmation;
+
+  bool get _copied => _confirmation.isAnimating;
+
+  @override
+  void initState() {
+    super.initState();
+    _confirmation =
+        AnimationController(vsync: this, duration: DsDurations.attachmentSaving)
+          ..addStatusListener((AnimationStatus status) {
+            if (status == AnimationStatus.completed && mounted) setState(() {});
+          });
+  }
+
+  @override
+  void dispose() {
+    _confirmation.dispose();
+    super.dispose();
+  }
 
   Future<void> _copy() async {
     if (_pending) return;
     setState(() => _pending = true);
     try {
       await widget.clipboardWriter(widget.file.code);
+      if (mounted) _confirmation.forward(from: 0);
     } finally {
       if (mounted) setState(() => _pending = false);
     }
@@ -271,20 +312,29 @@ class _CopyFileButtonState extends State<_CopyFileButton> {
 
   @override
   Widget build(BuildContext context) {
+    // A press state alone said nothing: the button dipped and came back, and
+    // the reader had no way to tell a copy from a mis-tap. The label and the
+    // glyph both change, so the confirmation survives a colour-blind reader
+    // and a screen reader alike — `label` is what the latter announces.
+    final (String text, DsLucideGlyph glyph) = switch ((_pending, _copied)) {
+      (true, _) => ('Copying', DsLucide.loaderCircle),
+      (_, true) => ('Copied', DsLucide.check),
+      _ => ('Copy', DsLucide.copy),
+    };
+
     return DsButton(
       variant: DsButtonVariant.secondary,
       size: DsButtonSize.sm,
-      label: 'Copy ${widget.file.path}',
+      label: _copied
+          ? 'Copied ${widget.file.path}'
+          : 'Copy ${widget.file.path}',
       onPressed: _pending ? null : _copy,
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          DsIcon.lucide(
-            _pending ? DsLucide.loaderCircle : DsLucide.copy,
-            size: DsIconSize.sm,
-          ),
+          DsIcon.lucide(glyph, size: DsIconSize.sm),
           SizedBox(width: DsButton.gapFor(DsButtonSize.sm)),
-          DsText(_pending ? 'Copying' : 'Copy', DsComponentType.buttonLabelSm),
+          DsText(text, DsComponentType.buttonLabelSm),
         ],
       ),
     );

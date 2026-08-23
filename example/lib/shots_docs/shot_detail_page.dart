@@ -159,36 +159,53 @@ class _ShotArticle extends StatelessWidget {
       '(see ShotDocEntry.sourcePaths).\n';
 
   @override
+  // Each section is marked with `docs_layout.dart`'s [docsAnchorKey] so the
+  // page's own table of contents can reach it. Without these the four TOC
+  // entries had no target: they used to hand their bare anchor id to the
+  // router, which does not route anchors, and the reader landed on the docs
+  // shell's "Not found" placeholder.
   Widget build(BuildContext context) => Column(
     key: const ValueKey<String>('shot-doc-article'),
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
-      DocsCodeExample(
-        title: 'Install',
-        description:
-            'Installs ${entry.title} and its declared registry dependencies.',
-        command: DocsCodeCommand(
-          command: entry.command,
-          label: 'Install command',
+      KeyedSubtree(
+        key: docsAnchorKey('install'),
+        child: DocsCodeExample(
+          title: 'Install',
           description:
-              'Copies the composition into @app/shots/${entry.directory}/.',
+              'Installs ${entry.title} and its declared registry dependencies.',
+          command: DocsCodeCommand(
+            command: entry.command,
+            label: 'Install command',
+            description:
+                'Copies the composition into @app/shots/${entry.directory}/.',
+          ),
         ),
       ),
       SizedBox(height: ds(6)),
-      DocsFileTree(
-        // A distinct identity per shot: without this, navigating from
-        // one shot to another through the sidebar (same route slot, same
-        // widget shape) reuses the previous shot's `DocsFileTree` state,
-        // and its selected-file index can carry over onto a
-        // same-length-but-different file list.
-        key: ValueKey<String>('docs-file-tree:${entry.name}'),
-        label: 'Files',
-        files: _files,
+      KeyedSubtree(
+        key: docsAnchorKey('files'),
+        child: DocsFileTree(
+          // A distinct identity per shot: without this, navigating from
+          // one shot to another through the sidebar (same route slot, same
+          // widget shape) reuses the previous shot's `DocsFileTree` state,
+          // and its selected-file index can carry over onto a
+          // same-length-but-different file list.
+          key: ValueKey<String>('docs-file-tree:${entry.name}'),
+          label: 'Files',
+          files: _files,
+        ),
       ),
       SizedBox(height: ds(6)),
-      _DependencyPanel(dependencies: entry.dependencies),
+      KeyedSubtree(
+        key: docsAnchorKey('dependencies'),
+        child: _DependencyPanel(dependencies: entry.dependencies),
+      ),
       SizedBox(height: ds(6)),
-      _PreviewPanel(entry: entry, onNavigate: onNavigate),
+      KeyedSubtree(
+        key: docsAnchorKey('preview'),
+        child: _PreviewPanel(entry: entry, onNavigate: onNavigate),
+      ),
     ],
   );
 }
