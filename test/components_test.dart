@@ -720,6 +720,25 @@ void main() {
       );
       expect(opacity.opacity, lessThan(1));
     });
+
+    testWidgets('shows the click cursor only while enabled', (
+      WidgetTester t,
+    ) async {
+      Widget button({required bool enabled}) => host(
+        DsButton(
+          variant: DsButtonVariant.outline,
+          onPressed: enabled ? () {} : null,
+          child: const DsIcon(DsIconGlyph.menu),
+        ),
+      );
+      MouseRegion region() => t.widget<MouseRegion>(find.byType(MouseRegion));
+
+      await t.pumpWidget(button(enabled: true));
+      expect(region().cursor, SystemMouseCursors.click);
+
+      await t.pumpWidget(button(enabled: false));
+      expect(region().cursor, isNot(SystemMouseCursors.click));
+    });
   });
 
   group('the nine-rung cva ladder', () {

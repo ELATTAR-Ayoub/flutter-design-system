@@ -1,11 +1,11 @@
-/// `/design-system/typography` — the Typography foundation page.
+/// `/design-system/typography`: the Typography foundation page.
 ///
 /// A transcript of `app/design-system/typography/page.tsx`: the two-face rule,
 /// the ten word-scale specimens, the five numeric ones, the tabular argument,
 /// the canonical pairings, the full `.prose` demo, and the rules.
 ///
 /// **The drift this page is built on.** Every line of visible copy here names
-/// *Space Grotesk* as the word face — the panel label, the rule note, the
+/// *Space Grotesk* as the word face: the panel label, the rule note, the
 /// pairing description, the second don't. The tokens say otherwise:
 /// `--font-sans` is `"Inter Local"`, the woff2 behind it is genuinely Inter
 /// Variable, and there is no Space Grotesk asset anywhere in the reference.
@@ -17,7 +17,7 @@
 ///
 /// `Spec` is a page-local component in the reference, so [_Spec] is local here
 /// too; `.prose` is a CSS layer with no component at all, so [_Prose] is this
-/// file's own — a Flutter widget set carrying the rhythm of globals.css
+/// file's own: a Flutter widget set carrying the rhythm of globals.css
 /// L1322–1507 and nothing else.
 library;
 
@@ -30,7 +30,7 @@ import 'package:flutter/widgets.dart';
 import '../kit.dart';
 import '../nav.dart';
 
-/// `lg:grid-cols-[15rem_1fr]` — the specimen row's left column.
+/// `lg:grid-cols-[15rem_1fr]`: the specimen row's left column.
 ///
 /// 15rem is 240px, which is `--width-rail`; the reference writes the length
 /// rather than the token, and they are the same measure.
@@ -50,7 +50,7 @@ class TypographyPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // `findCategory("foundations", "typography")` — the header's copy is the
+    // `findCategory("foundations", "typography")`: the header's copy is the
     // nav registry's, so the page cannot drift from the tree that links to it.
     final DsCategoryHit here = findCategory('foundations', 'typography');
 
@@ -182,7 +182,7 @@ class _FaceSpecimen extends StatelessWidget {
   final Widget specimen;
   final String copy;
 
-  /// The CSS variable, in `.type-code text-muted-foreground` — the class sets
+  /// The CSS variable, in `.type-code text-muted-foreground`: the class sets
   /// no colour of its own, so the call site states one.
   final String token;
 
@@ -208,7 +208,7 @@ class _FaceSpecimen extends StatelessWidget {
 /// One specimen row: the class name and what it is for, beside a live sample.
 ///
 /// `grid gap-4 border-b border-border px-6 py-7 last:border-b-0
-/// lg:grid-cols-[15rem_1fr] lg:gap-8` — the hairline and the corner clipping
+/// lg:grid-cols-[15rem_1fr] lg:gap-8`: the hairline and the corner clipping
 /// belong to the [DsDividedList] these are stacked in, so this is the cell
 /// padding and the two-column split only.
 class _Spec extends StatelessWidget {
@@ -262,7 +262,7 @@ class _Spec extends StatelessWidget {
 
 /* ── #words ──────────────────────────────────────────────────────────────── */
 
-/// Ten classes under a description that says nine — the reference's own slack.
+/// Ten classes under a description that says nine: the reference's own slack.
 class _WordScaleSection extends StatelessWidget {
   const _WordScaleSection();
 
@@ -638,7 +638,7 @@ class _PairingCard extends StatelessWidget {
 class _ProseSection extends StatelessWidget {
   const _ProseSection();
 
-  /// `Meta` — six rows, verbatim.
+  /// `Meta`: six rows, verbatim.
   static const List<DsMetaItem> _meta = <DsMetaItem>[
     (
       k: 'What it owns',
@@ -718,7 +718,7 @@ class _ProseSection extends StatelessWidget {
             child: Align(
               alignment: Alignment.topLeft,
               child: ConstrainedBox(
-                // `max-w-(--width-prose)` — the measure, stated once.
+                // `max-w-(--width-prose)`: the measure, stated once.
                 constraints: const BoxConstraints(maxWidth: DsWidths.prose),
                 child: const _Prose(),
               ),
@@ -779,7 +779,7 @@ class _ProseSection extends StatelessWidget {
 /// One block-level element and the `margin-block` its selector declares.
 typedef _ProseBlock = ({double top, double bottom, Widget child});
 
-/// `<div class="prose">` — unclassed markup, styled by element.
+/// `<div class="prose">`: unclassed markup, styled by element.
 ///
 /// Every value below is globals.css L1322–1507 (globals-map §6). Two CSS
 /// behaviours have to be performed rather than declared:
@@ -787,7 +787,7 @@ typedef _ProseBlock = ({double top, double bottom, Widget child});
 /// * **Margin collapsing.** Adjacent block margins collapse to the larger of
 ///   the two, so a `p` (16px bottom) before an `h3` (32px top) is separated by
 ///   32px, not 48. [_column] inserts `max(previous.bottom, next.top)` between
-///   blocks — and nothing before the first or after the last, which is the
+///   blocks: and nothing before the first or after the last, which is the
 ///   `> :first-child` / `> :last-child` reset.
 /// * **List markers.** `list-style-position: outside` puts the marker in the
 ///   list's `padding-inline-start`, so each item is a 24px gutter carrying a
@@ -810,7 +810,7 @@ class _Prose extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final DsThemeData theme = DsTheme.of(context);
-    // `.prose { color: var(--foreground) }` — inherited by every element that
+    // `.prose { color: var(--foreground) }`: inherited by every element that
     // does not state a colour, which is all of them but the blockquote.
     final TextStyle paragraph = DsText.styleOf(
       context,
@@ -819,7 +819,7 @@ class _Prose extends StatelessWidget {
     );
 
     return _column(<_ProseBlock>[
-      // h2 — `margin-block: 40px 16px`.
+      // h2, `margin-block: 40px 16px`.
       (
         top: ds(10),
         bottom: ds(4),
@@ -829,7 +829,7 @@ class _Prose extends StatelessWidget {
           color: theme.foreground,
         ),
       ),
-      // p — `margin-block: 16px`.
+      // p, `margin-block: 16px`.
       (
         top: ds(4),
         bottom: ds(4),
@@ -857,7 +857,7 @@ class _Prose extends StatelessWidget {
         ),
       ),
       (top: ds(4), bottom: ds(4), child: const _ProseLinkParagraph()),
-      // h3 — `margin-block: 32px 12px`.
+      // h3, `margin-block: 32px 12px`.
       (
         top: ds(8),
         bottom: ds(3),
@@ -876,7 +876,7 @@ class _Prose extends StatelessWidget {
             (text: 'A refund within fourteen days of purchase.', nested: null),
             (
               // The reference's JSX puts the nested list straight after the
-              // text with no space and no full stop — kept.
+              // text with no space and no full stop: kept.
               text: 'A written reason when a request is refused, including',
               nested: <String>[
                 'the clause it was refused under, and',
@@ -917,7 +917,7 @@ class _Prose extends StatelessWidget {
           ],
         ),
       ),
-      // h4 — `margin-block: 24px 8px`. The override demo: an `h4` carrying
+      // h4, `margin-block: 24px 8px`. The override demo: an `h4` carrying
       // `.type-label`, so it renders 11px uppercase muted, not 17px foreground.
       // `:where(.prose) h4` weighs one element; the class beats it.
       (
@@ -949,7 +949,7 @@ class _Prose extends StatelessWidget {
           color: theme.foreground,
         ),
       ),
-      // hr — `margin-block: 40px; border: 0; border-block-start: 1px solid
+      // hr, `margin-block: 40px; border: 0; border-block-start: 1px solid
       // var(--border)`.
       (
         top: ds(10),
@@ -964,7 +964,7 @@ class _Prose extends StatelessWidget {
   }
 }
 
-/// The one paragraph with a link in it — and the page's one prose animation.
+/// The one paragraph with a link in it: and the page's one prose animation.
 ///
 /// `:where(.prose) a` is action-ink and underlined at rest; hover fades
 /// `text-decoration-color` to transparent over 150ms on `--ease-out`. The href
@@ -1042,7 +1042,7 @@ class _ProseLinkParagraphState extends State<_ProseLinkParagraph> {
 /// One `<li>`: its text, and the nested list it may carry.
 typedef _ProseListItem = ({String text, List<String>? nested});
 
-/// `<ul>` / `<ol>` — disc or decimal markers in a 24px gutter.
+/// `<ul>` / `<ol>`: disc or decimal markers in a 24px gutter.
 class _ProseList extends StatelessWidget {
   const _ProseList({
     required this.items,
@@ -1073,7 +1073,7 @@ class _ProseList extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               SizedBox(
-                // `padding-inline-start: 24px` on the list — the marker sits
+                // `padding-inline-start: 24px` on the list: the marker sits
                 // inside it, set against the content edge.
                 width: ds(6),
                 child: Padding(
@@ -1118,7 +1118,7 @@ class _ProseList extends StatelessWidget {
   }
 }
 
-/// `<blockquote>` — the `--input` hairline, the interior step, muted italic.
+/// `<blockquote>`: the `--input` hairline, the interior step, muted italic.
 class _ProseQuote extends StatelessWidget {
   const _ProseQuote(this.text);
 
@@ -1127,7 +1127,7 @@ class _ProseQuote extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final DsThemeData theme = DsTheme.of(context);
-    // `blockquote` — `.type-body`, muted and italic.
+    // `blockquote`, `.type-body`, muted and italic.
     final TextStyle quote = DsText.styleOf(
       context,
       DsType.body,
@@ -1138,7 +1138,7 @@ class _ProseQuote extends StatelessWidget {
       padding: EdgeInsets.only(left: ds(4)),
       decoration: BoxDecoration(
         border: Border(
-          // `border-inline-start: 2px solid var(--input)` — the stronger
+          // `border-inline-start: 2px solid var(--input)`: the stronger
           // hairline, at double width.
           left: BorderSide(color: theme.input, width: ds(0.5)),
         ),
@@ -1151,12 +1151,12 @@ class _ProseQuote extends StatelessWidget {
   }
 }
 
-/// `<table>` — `display:block; width:max-content; max-width:100%;
+/// `<table>`, `display:block; width:max-content; max-width:100%;
 /// overflow-x:auto`.
 ///
 /// It is its own scroll port: [IntrinsicWidth] gives the [Table] the finite
 /// width it requires inside a horizontal viewport, and the viewport then takes
-/// the smaller of that width and the measure — content width when it fits,
+/// the smaller of that width and the measure: content width when it fits,
 /// a scroller when it does not.
 class _ProseTable extends StatelessWidget {
   const _ProseTable();

@@ -1,4 +1,4 @@
-/// `/design-system/components/base/charts` — seventy registry variants, two
+/// `/design-system/components/base/charts`: seventy registry variants, two
 /// discrete families, and the one page in this system whose motion has to be
 /// read out of the stylesheet rather than written as a class.
 ///
@@ -6,12 +6,12 @@
 ///
 /// The reference builds it out of eleven files: `components/ui/chart.tsx` (the
 /// shadcn wrapper), `components/ds/chart-motion.ts` (the timing hook) and nine
-/// modules under `components/ds/charts/` — `data.ts`, `area`, `bar`, `line`,
+/// modules under `components/ds/charts/`, `data.ts`, `area`, `bar`, `line`,
 /// `pie`, `radar`, `radial`, `tooltip`, `state`, `skeletons`, plus the two
 /// hand-built figures `unit-activity` and `conversion-funnel`. The wrapper and
 /// the drawing engine are ported into the package (`chart.dart`,
 /// `chart_geometry.dart`, `chart_cartesian.dart`, `chart_polar.dart`); every
-/// **specimen** lives here, because that is where the reference puts it — the
+/// **specimen** lives here, because that is where the reference puts it: the
 /// `components/ds/` tree is this file's counterpart, exactly as `kit.dart` is
 /// `components/ds/kit.tsx`'s.
 ///
@@ -27,11 +27,11 @@
 ///     `ChartStyle` mints a per-container custom property at runtime, which
 ///     exists in the browser and nowhere in source; `check:refs` fails it.
 ///     There is no `ChartStyle` here for the same reason the page's own note
-///     gives — the five tokens are already declared once per theme.
+///     gives: the five tokens are already declared once per theme.
 ///  3. Every animated element takes `{...useChartMotion()}`. Here that is
 ///     [DsChartMotion], and the caller never types a duration.
 ///
-/// ## Drift register — recorded, shipped as written
+/// ## Drift register: recorded, shipped as written
 ///
 ///  1. **The five token descriptions do not match the tokens.** `CHART_TOKENS`
 ///     calls `--chart-2` *"Action, one step away. Dark in light mode, bright in
@@ -43,7 +43,7 @@
 ///     written; the swatches render the real tokens, so the page contradicts
 ///     itself on screen exactly as the reference does.
 ///  2. **`aspect-video` is in `ChartContainer`'s class list and never
-///     applies** — `PLOT`'s `h-64` beats it at all seventy call sites.
+///     applies**, `PLOT`'s `h-64` beats it at all seventy call sites.
 ///     Recorded, not implemented.
 ///  3. **`AreaGradient`'s two `<linearGradient>`s are declared and one of them
 ///     is overridden.** Both `Area`s name a gradient `fill` **and** a
@@ -57,7 +57,7 @@
 ///     and the dataset is +100 on both.** `pie.tsx` flags this in its own
 ///     comment and does not reconcile it. Neither does this.
 ///  6. **`radial-shape`'s note says "a custom activeShape" and the vendored
-///     source has none** — it is `chart-radial-text` with a different sweep and
+///     source has none**: it is `chart-radial-text` with a different sweep and
 ///     a different number. `radial.tsx` flags it; the note ships as written.
 ///  7. **`RadarMultiple` and its four siblings paint the second polygon fully
 ///     opaque**, because the registry gives `mobile` no `fillOpacity`. The page
@@ -75,11 +75,11 @@
 ///     put a `Select` above the plot (+60px of panel), `Bar` and `Line` put a
 ///     pair of `Stat` tiles (+94.39px). CSS grid then lifts each strip's
 ///     row-mate to match, which is why `Axes` and `Negative` and `Custom label`
-///     are taller than their own content — measured 393.39 / 453.39 / 487.78.
+///     are taller than their own content: measured 393.39 / 453.39 / 487.78.
 /// 11. **The `states` section demonstrates nothing of its own.** It is three
 ///     blocks of prose about the switch every other panel already carries.
 /// 12. **`ChartStates` opens on `ready`, so nothing on the page is ever seen in
-///     its loading state unless a reader presses for it** — which is what makes
+///     its loading state unless a reader presses for it**: which is what makes
 ///     drift 10's layout jump invisible until you cycle all three.
 ///
 /// ## Divergence, flagged
@@ -87,7 +87,7 @@
 /// **The entrance easing is deliberately wrong, and being right would be the
 /// bug.** `chart-motion.ts` documents at length that recharts' types take five
 /// easing keywords and no `cubic-bezier`, so `--ease-out` could not be threaded
-/// through and the keyword `ease-out` was passed instead — a different curve,
+/// through and the keyword `ease-out` was passed instead: a different curve,
 /// documented on the page rather than hidden. The port has the token in hand
 /// and uses CSS's `ease-out` anyway ([DsChartMotion.curve]); reproducing the
 /// system's own `--ease-out` here would make these charts move differently from
@@ -104,12 +104,12 @@ import '../nav.dart';
 import '../token_swatch.dart';
 
 
-/// `max-w-3xl` — `--container-3xl`, 48rem. Every prose block in the Animation
+/// `max-w-3xl`, `--container-3xl`, 48rem. Every prose block in the Animation
 /// section.
 // allow-hardcoded: framework container scale with no token to read it from.
 const double _measure3xl = 768;
 
-/// `min-w-xl` — `--container-xl`, 36rem. The unit-activity scroller's floor.
+/// `min-w-xl`, `--container-xl`, 36rem. The unit-activity scroller's floor.
 // allow-hardcoded: framework container scale with no token to read it from.
 const double _measureXl = 576;
 
@@ -117,13 +117,13 @@ const double _measureXl = 576;
 /// in the [InlineSpan] the row renders.
 DsMetaItem _meta(String k, String v) => (k: k, v: TextSpan(text: v));
 
-/* ── Fixtures — `components/ds/charts/data.ts` ───────────────────────────── */
+/* ── Fixtures, `components/ds/charts/data.ts` ───────────────────────────── */
 
 /// One footprint, shared by every chart specimen and by the skeleton that
 /// stands in for it.
 ///
 /// `data.ts`'s own reasoning: §5 asks a skeleton to match what replaces it —
-/// same height, same padding, same radius — and the only way to be sure of that
+/// same height, same padding, same radius: and the only way to be sure of that
 /// across seventy charts is for all of them to name the same constant. It is
 /// [DsChartContainer.plotHeight], 256, and nothing here restates it.
 double get _plotHeight => DsChartContainer.plotHeight;
@@ -139,7 +139,7 @@ const List<Map<String, Object?>> _monthsDesktop = <Map<String, Object?>>[
   <String, Object?>{'month': 'June', 'desktop': 214},
 ];
 
-/// 17 variants — the most reused set in the registry.
+/// 17 variants: the most reused set in the registry.
 const List<Map<String, Object?>> _monthsDesktopMobile = <Map<String, Object?>>[
   <String, Object?>{'month': 'January', 'desktop': 186, 'mobile': 80},
   <String, Object?>{'month': 'February', 'desktop': 305, 'mobile': 200},
@@ -150,7 +150,7 @@ const List<Map<String, Object?>> _monthsDesktopMobile = <Map<String, Object?>>[
 ];
 
 /// 5 radar variants. Identical to [_monthsDesktop] except April, which is 273
-/// rather than 73 — *"a radar polygon whose fourth vertex sits at 27% of the
+/// rather than 73, *"a radar polygon whose fourth vertex sits at 27% of the
 /// radius reads as a fold rather than as a shape."*
 const List<Map<String, Object?>> _radarMonths = <Map<String, Object?>>[
   <String, Object?>{'month': 'January', 'desktop': 186},
@@ -177,7 +177,7 @@ const List<Map<String, Object?>> _radarMonthsFill = <Map<String, Object?>>[
 /// The reference carries `fill: "var(--color-chart-N)"` on the datum itself,
 /// because `Pie`, `RadialBar` and `Cell` all read it per row. A Dart map cannot
 /// hold an unresolved token, so the row carries the **slot** and [_ChartInk]
-/// resolves it — which is the same indirection with the theme lookup moved from
+/// resolves it: which is the same indirection with the theme lookup moved from
 /// CSS to the build.
 const List<Map<String, Object?>> _browsers = <Map<String, Object?>>[
   <String, Object?>{'browser': 'chrome', 'visitors': 275, 'slot': 1},
@@ -216,7 +216,7 @@ const List<Map<String, Object?>> _pieMonthsMobile = <Map<String, Object?>>[
   <String, Object?>{'month': 'may', 'mobile': 130, 'slot': 5},
 ];
 
-/// 91 days, 2024-04-01 to 2024-06-30 — *"long on purpose: the three
+/// 91 days, 2024-04-01 to 2024-06-30, *"long on purpose: the three
 /// interactive variants exist to demonstrate a range filter, and a filter over
 /// six points demonstrates nothing."*
 final List<Map<String, Object?>> _dailyVisits = _buildDailyVisits();
@@ -301,7 +301,7 @@ class _ChartInk {
         'mobile': DsChartSeries(label: 'Mobile', color: slot(2)),
       });
 
-  /// *"`visitors` carries the axis label and deliberately has no colour — it is
+  /// *"`visitors` carries the axis label and deliberately has no colour: it is
   /// the value key, not a series."*
   DsChartConfig get browser => DsChartConfig(<String, DsChartSeries>{
         'visitors': const DsChartSeries(label: 'Visitors'),
@@ -332,7 +332,7 @@ class _ChartInk {
 
 /* ── Formatters ──────────────────────────────────────────────────────────── */
 
-/// `value.slice(0, 3)` — the three-letter month every cartesian axis prints.
+/// `value.slice(0, 3)`: the three-letter month every cartesian axis prints.
 String _month3(Object? value) => '$value'.substring(0, 3);
 
 /// `new Date(v).toLocaleDateString("en-US", { month: "short", day: "numeric" })`.
@@ -341,13 +341,13 @@ String _shortDate(Object? value) {
   return '${DsDateFormat.monthsShort[d.month - 1]} ${d.day}';
 }
 
-/// …with `year: "numeric"` — the two interactive tooltips.
+/// …with `year: "numeric"`: the two interactive tooltips.
 String _shortDateYear(Object? value) {
   final DateTime d = DateTime.parse('$value');
   return '${DsDateFormat.monthsShort[d.month - 1]} ${d.day}, ${d.year}';
 }
 
-/// `{ weekday: "short" }` — the tooltip family's whole X axis.
+/// `{ weekday: "short" }`: the tooltip family's whole X axis.
 ///
 /// `DsDateFormat` carries the long names and the narrow ones; en-US's short
 /// weekday is the long name's first three letters, so this derives rather than
@@ -357,7 +357,7 @@ String _weekdayShort(Object? value) {
   return DsDateFormat.weekdaysLong[d.weekday % 7].substring(0, 3);
 }
 
-/// `{ day: "numeric", month: "long", year: "numeric" }` — `TooltipLabelFormatter`.
+/// `{ day: "numeric", month: "long", year: "numeric" }`, `TooltipLabelFormatter`.
 String _longDate(Object? value) {
   final DateTime d = DateTime.parse('$value');
   return '${DsDateFormat.monthsLong[d.month - 1]} ${d.day}, ${d.year}';
@@ -366,18 +366,18 @@ String _longDate(Object? value) {
 /// The bar's corner radius, off the ladder.
 ///
 /// `bar.tsx` reads `--radius-sm` from the live stylesheet rather than typing
-/// the registry's 8 / 5 / 4, and says why at length: *"§0's radius family — 2 ·
-/// 6 · 10 · 12 · 16 · 20 · 24 · 999 — has no 8, no 5 and no 4 in it… The
-/// registry's 8 / 5 / 4 are not a considered distinction — they are the same
-/// bar drawn three ways across ten files — and 6px is where they average."*
+/// the registry's 8 / 5 / 4, and says why at length: *"§0's radius family, 2 ·
+/// 6 · 10 · 12 · 16 · 20 · 24 · 999: has no 8, no 5 and no 4 in it… The
+/// registry's 8 / 5 / 4 are not a considered distinction: they are the same
+/// bar drawn three ways across ten files: and 6px is where they average."*
 /// The port names the rung instead of reading it, which is the same single
 /// source of truth with one fewer indirection.
 const double _barRadius = DsRadii.sm;
 
-/// `[0, 0, r, r]` — the bottom of a stack.
+/// `[0, 0, r, r]`: the bottom of a stack.
 const List<double> _radiiBottom = <double>[0, 0, _barRadius, _barRadius];
 
-/// `[r, r, 0, 0]` — the top of one.
+/// `[r, r, 0, 0]`: the top of one.
 const List<double> _radiiTop = <double>[_barRadius, _barRadius, 0, 0];
 
 /// All four corners.
@@ -394,7 +394,7 @@ const List<double> _radiiAll = <double>[
 const double _ringRadius = DsRadii.md;
 const double _stackRadius = DsRadii.sm;
 
-/* ── ChartStates — `components/ds/charts/state.tsx` ──────────────────────── */
+/* ── ChartStates, `components/ds/charts/state.tsx` ──────────────────────── */
 
 /// Which family's shape the loading placeholder draws.
 enum _SkeletonKind { area, bar, line, pie, radar, radial, tooltip }
@@ -408,13 +408,13 @@ enum _SkeletonKind { area, bar, line, pie, radar, radial, tooltip }
 ///  * **The buttons are a `ToggleGroup`, and that is a rule not a preference.**
 ///    §4: a group with an active option owns one pill that travels.
 ///  * **The swap is one event.** `anim-swap-in` on the arriving content and
-///    nothing on the leaving content, replayed by a changed key — which is also
+///    nothing on the leaving content, replayed by a changed key: which is also
 ///    what remounts the chart so its own entrance replays at the same moment.
 ///  * **`controls` is a component TYPE, not a node.** A control strip owns
 ///    state the chart underneath reads, so it has to sit ABOVE the keyed slot
 ///    to survive the swap. Rendered inside `children` it would exist only in
 ///    `ready`, and the panel would then GROW by the strip's height the moment
-///    you left `loading` — measured 393.39 → 453.39 on `AreaInteractive` and
+///    you left `loading`: measured 393.39 → 453.39 on `AreaInteractive` and
 ///    393.39 → 487.78 on `BarInteractive`, which is §5's *"a layout jump is
 ///    worse than the spinner it avoided"*.
 class _ChartStates extends StatefulWidget {
@@ -443,7 +443,7 @@ class _ChartStates extends StatefulWidget {
 enum _ChartState { empty, loading, ready }
 
 class _ChartStatesState extends State<_ChartStates> {
-  /// Opens on `ready` — which is drift 12: nothing on the page is ever seen
+  /// Opens on `ready`: which is drift 12: nothing on the page is ever seen
   /// loading unless a reader presses for it.
   _ChartState _state = _ChartState.ready;
 
@@ -552,7 +552,7 @@ class _ChartEmpty extends StatelessWidget {
 /// `EmptyMedia variant="icon"` carrying `ChartLineIcon`.
 ///
 /// **A page-local copy of `DsEmptyMedia`, and the reason is narrow.** That
-/// widget takes a [DsIconGlyph] — the curated set — and `chart-line` is not in
+/// widget takes a [DsIconGlyph]: the curated set: and `chart-line` is not in
 /// it; it lives only in the generated lucide registry. Widening `empty.dart`
 /// would be a change to the feedback family's file, so the tile is rebuilt here
 /// out of `DsEmptyMedia`'s own public geometry: nothing below restates a
@@ -584,20 +584,20 @@ class _ChartEmptyMedia extends StatelessWidget {
   }
 }
 
-/* ── Skeletons — `components/ds/charts/skeletons.tsx` ────────────────────── */
+/* ── Skeletons, `components/ds/charts/skeletons.tsx` ────────────────────── */
 
 /// One skeleton per chart family, each shaped like the family it stands in for.
 ///
 /// `skeletons.tsx` states the two requirements and their order: *"The footprint
-/// is the requirement, not the drawing"* — every skeleton renders at `PLOT`, so
-/// the box cannot move when the state changes — and the shape is the smaller,
+/// is the requirement, not the drawing"*: every skeleton renders at `PLOT`, so
+/// the box cannot move when the state changes: and the shape is the smaller,
 /// second one, because *"a grey rectangle would satisfy the footprint and tell
 /// the reader nothing about what is arriving"*.
 ///
 /// The reference draws each shape as a `Skeleton` div under a `clip-path`,
 /// because `anim-shimmer` is a background gradient and *"a background does not
 /// paint inside an SVG `<path>`, so a skeleton drawn as SVG geometry would be a
-/// still silhouette with the shimmer running behind it — the one thing on the
+/// still silhouette with the shimmer running behind it: the one thing on the
 /// page that looks loaded while it is loading."* Flutter has no such split: a
 /// [DsSkeleton] inside a [ClipPath] shimmers inside the curve, which is what
 /// the `clip-path` was for.
@@ -882,8 +882,8 @@ class _AnnulusClipper extends CustomClipper<Path> {
 
 /// A bar plot plus a floating tooltip block.
 ///
-/// *"The block mirrors `ChartTooltipContent`'s own frame — `min-w-32`, a `lg`
-/// radius, a half-strength border on `bg-background` — so what arrives lands in
+/// *"The block mirrors `ChartTooltipContent`'s own frame, `min-w-32`, a `lg`
+/// radius, a half-strength border on `bg-background`: so what arrives lands in
 /// the same outline the placeholder drew."*
 class _TooltipSkeleton extends StatelessWidget {
   const _TooltipSkeleton();
@@ -945,7 +945,7 @@ class _TooltipSkeleton extends StatelessWidget {
   }
 }
 
-/* ── Area — `components/ds/charts/area.tsx` ──────────────────────────────── */
+/* ── Area, `components/ds/charts/area.tsx` ──────────────────────────────── */
 
 /// The plot, in the container every specimen shares.
 Widget _plot(DsChartConfig config, Widget chart) =>
@@ -960,12 +960,12 @@ DsChartAxis _monthAxis() => const DsChartAxis(
       tickFormatter: _month3,
     );
 
-/// `chart-area-default` — one series, natural curve.
+/// `chart-area-default`: one series, natural curve.
 Widget _areaDefault(_ChartInk ink) => _plot(
       ink.desktop,
       DsCartesianChart(
         data: _monthsDesktop,
-        // Plot maths, not the 8-point scale — recharts' own margin box.
+        // Plot maths, not the 8-point scale: recharts' own margin box.
         margin: const DsChartMargin(left: 12, right: 12),
         grid: const DsChartGrid(vertical: false),
         xAxis: _monthAxis(),
@@ -1007,7 +1007,7 @@ Widget _areaLinear(_ChartInk ink) => _plot(
     );
 
 /// The registry's `chartConfig.desktop.icon` is `Activity`, unused by this
-/// variant's own markup but read by the tooltip's indicator slot — the gap
+/// variant's own markup but read by the tooltip's indicator slot: the gap
 /// `area.tsx` documents, where the config's icon bypasses `Icon` entirely.
 /// Flutter's builder slot has no such constraint, so it goes through [DsIcon].
 Widget _areaStep(_ChartInk ink) => _plot(
@@ -1073,7 +1073,7 @@ Widget _areaStacked(_ChartInk ink) => _plot(
       ),
     );
 
-/// `data.ts` deliberately does not carry this shape — `MONTHS_DESKTOP_MOBILE`
+/// `data.ts` deliberately does not carry this shape, `MONTHS_DESKTOP_MOBILE`
 /// plus an `other` series exists for exactly one variant, so it stays local
 /// rather than becoming a ninth shared export.
 const List<Map<String, Object?>> _areaExpandData = <Map<String, Object?>>[
@@ -1206,7 +1206,7 @@ Widget _areaGradient(_ChartInk ink) => _plot(
       ),
     );
 
-/// Both axes labelled — and the one chart on the page with a negative margin,
+/// Both axes labelled: and the one chart on the page with a negative margin,
 /// which claws 20 of the Y axis's 60px back out of the plot's left edge.
 Widget _areaAxes(_ChartInk ink) => _plot(
       ink.desktopMobile,
@@ -1230,7 +1230,7 @@ Widget _areaAxes(_ChartInk ink) => _plot(
 /// The range picker and the 91-day plot it filters.
 ///
 /// The registry sits this `Select` in a `CardHeader`. Stripped of `Card` it
-/// used to render inline above the plot, inside the component — which put it
+/// used to render inline above the plot, inside the component: which put it
 /// inside the swapped slot, where it exists only in `ready`, and the panel then
 /// grew 60px the moment you left Loading or Empty: 393.39 → 453.39, measured.
 /// So the strip is hoisted out of the slot and the state comes with it.
@@ -1292,7 +1292,7 @@ class _AreaInteractiveRange extends InheritedWidget {
   bool updateShouldNotify(_AreaInteractiveRange old) => old.range != range;
 }
 
-/// The plot only — no wrapper, so its footprint is `PLOT` exactly like the
+/// The plot only: no wrapper, so its footprint is `PLOT` exactly like the
 /// other nine.
 Widget _areaInteractive(BuildContext context, _ChartInk ink) => _plot(
       ink.desktopMobile.plus(<String, DsChartSeries>{
@@ -1400,7 +1400,7 @@ class _RangeStrip extends StatelessWidget {
       );
 }
 
-/* ── Bar — `components/ds/charts/bar.tsx` ────────────────────────────────── */
+/* ── Bar, `components/ds/charts/bar.tsx` ────────────────────────────────── */
 
 /// The X axis six of the ten bar variants share (`tickMargin` 10, not 8).
 const DsChartAxis _barMonthAxis = DsChartAxis(
@@ -1429,7 +1429,7 @@ Widget _barDefault(_ChartInk ink) => _plot(
       ),
     );
 
-/// `layout="vertical"`, `YAxis type="category"` — the same chart rotated, and
+/// `layout="vertical"`, `YAxis type="category"`: the same chart rotated, and
 /// the one the page warns *"reads backwards until you have hit it once"*.
 Widget _barHorizontal(_ChartInk ink) => _plot(
       ink.desktop,
@@ -1488,7 +1488,7 @@ Widget _barMultiple(_ChartInk ink) => _plot(
       ),
     );
 
-/// Two bars sharing a `stackId`. Only the zeros' position is geometry — the
+/// Two bars sharing a `stackId`. Only the zeros' position is geometry: the
 /// radius itself is `--radius-sm`, one rung for the whole family.
 Widget _barStacked(_ChartInk ink) => _plot(
       ink.desktopMobile,
@@ -1517,7 +1517,7 @@ Widget _barStacked(_ChartInk ink) => _plot(
       ),
     );
 
-/// The registry sets `fontSize={12}` on this `LabelList` — a raw SVG number
+/// The registry sets `fontSize={12}` on this `LabelList`: a raw SVG number
 /// for a value the type scale already owns. `text-xs` reaches the same size
 /// through CSS; here it is [DsChartText.xs], which is the same statement.
 Widget _barLabel(_ChartInk ink, DsThemeData theme) => _plot(
@@ -1592,7 +1592,7 @@ Widget _barLabelCustom(_ChartInk ink, DsThemeData theme) => _plot(
       ),
     );
 
-/// One `Bar`, a colour per datum. No `fill` on the series — each row in
+/// One `Bar`, a colour per datum. No `fill` on the series: each row in
 /// `BROWSERS` already carries its own.
 Widget _barMixed(_ChartInk ink) => _plot(
       ink.browser,
@@ -1626,7 +1626,7 @@ Widget _barMixed(_ChartInk ink) => _plot(
       ),
     );
 
-/// `BROWSER_CONFIG`'s labels, as a formatter — the registry writes the same
+/// `BROWSER_CONFIG`'s labels, as a formatter: the registry writes the same
 /// lookup inline on three axes.
 String _browserLabel(String key) => switch (key) {
       'chrome' => 'Chrome',
@@ -1647,7 +1647,7 @@ const List<Map<String, Object?>> _barActiveData = <Map<String, Object?>>[
   <String, Object?>{'browser': 'other', 'visitors': 90, 'slot': 5},
 ];
 
-/// `activeIndex` moved off `Bar` between recharts v2 and v3 — it is now
+/// `activeIndex` moved off `Bar` between recharts v2 and v3: it is now
 /// `Tooltip`'s `defaultIndex`, which is why this specimen shows a panel with no
 /// pointer anywhere near it.
 Widget _barActive(_ChartInk ink) => _plot(
@@ -1681,7 +1681,7 @@ Widget _barActive(_ChartInk ink) => _plot(
       ),
     );
 
-/// Kept local per `data.ts` — `{ month, visitors }` with two negative rows.
+/// Kept local per `data.ts`, `{ month, visitors }` with two negative rows.
 const List<Map<String, Object?>> _barNegativeData = <Map<String, Object?>>[
   <String, Object?>{'month': 'January', 'visitors': 186},
   <String, Object?>{'month': 'February', 'visitors': 205},
@@ -1691,7 +1691,7 @@ const List<Map<String, Object?>> _barNegativeData = <Map<String, Object?>>[
   <String, Object?>{'month': 'June', 'visitors': 214},
 ];
 
-/// §1.4 / §5 — *a delta is a shape before it is a hue*. A figure that can fall
+/// §1.4 / §5, *a delta is a shape before it is a hue*. A figure that can fall
 /// is not an error, so the falling half does not reach for `destructive`: the
 /// direction is already legible from each bar's own position above or below the
 /// zero baseline, and the registry's own choice separates the two with
@@ -1718,7 +1718,7 @@ Widget _barNegative(_ChartInk ink, DsThemeData theme) => _plot(
             ],
             labels: <DsChartLabelList>[
               // No explicit fill in the registry means recharts' own untokenised
-              // grey paints the month labels — the same class of failure
+              // grey paints the month labels: the same class of failure
               // `ui/chart.tsx` measured on the axis ticks. `fill-foreground`
               // closes it.
               DsChartLabelList(dataKey: 'month', color: theme.foreground),
@@ -1731,7 +1731,7 @@ Widget _barNegative(_ChartInk ink, DsThemeData theme) => _plot(
 /// The two clickable totals, and the series they switch between.
 ///
 /// Inline, this strip made the panel 94px taller in `ready` than in the other
-/// two states — measured 393.39 → 487.78 — which is §5's *"a layout jump is
+/// two states: measured 393.39 → 487.78: which is §5's *"a layout jump is
 /// worse than the spinner it was meant to avoid"*.
 ///
 /// **The selection travels.** §4: *"a group of options owns ONE pill that
@@ -1739,14 +1739,14 @@ Widget _barNegative(_ChartInk ink, DsThemeData theme) => _plot(
 /// their own selected background… Applies to `ToggleGroup` and `Tabs`, and to
 /// anything like them you add later."* `ToggleGroup` itself does not drop in —
 /// its variants are built for label-sized items and these tiles carry a
-/// `Stat`-sized figure — but the travel is [DsSlidingPillGroup]'s, and that is
+/// `Stat`-sized figure: but the travel is [DsSlidingPillGroup]'s, and that is
 /// reusable on its own.
 ///
 /// **The pill carries the series' colour, and only below the text.** `bar.tsx`
 /// derives it in full: `--muted-foreground` measures 4.83:1 on `--card`, so the
 /// only flat tint of a chart token that keeps an 11px `type-label` above AA is
 /// 4%, and at 4% the two active states are the same colour. So the tint stops
-/// before it reaches the text — the bottom half of the pill carries it, the top
+/// before it reaches the text: the bottom half of the pill carries it, the top
 /// half, where the label sits, carries none.
 class _SeriesStrip extends StatefulWidget {
   const _SeriesStrip({
@@ -1757,7 +1757,7 @@ class _SeriesStrip extends StatefulWidget {
 
   final _ChartInk ink;
 
-  /// Which key the strip is for — `bar-series-option` or `line-series-option`.
+  /// Which key the strip is for, `bar-series-option` or `line-series-option`.
   final String slot;
 
   final Widget child;
@@ -1778,14 +1778,14 @@ class _SeriesStrip extends StatefulWidget {
 class _SeriesStripState extends State<_SeriesStrip> {
   int _active = 0;
 
-  /// `to-50%` — the tint reaches exactly halfway and no further, which is what
+  /// `to-50%`: the tint reaches exactly halfway and no further, which is what
   /// keeps the `type-label` on `--card` rather than on `--muted`.
   static const double _tintStop = 0.5;
 
   /// `from-chart-N/40`.
   static const double _tintAlpha = 0.4;
 
-  /// `border-b-2` — full saturation where no text sits.
+  /// `border-b-2`: full saturation where no text sits.
   static const double _ruleHeight = 2;
 
   @override
@@ -1860,7 +1860,7 @@ class _SeriesTile extends StatelessWidget {
   final bool leadingBorder;
   final VoidCallback onTap;
 
-  /// `size-3 rounded-xs` — the same swatch `PieInteractiveControls` uses, so
+  /// `size-3 rounded-xs`: the same swatch `PieInteractiveControls` uses, so
   /// the two interactive pickers share one idiom rather than inventing a
   /// second.
   static double get swatchSize => ds(3);
@@ -1921,7 +1921,7 @@ class _SeriesScope extends InheritedWidget {
   bool updateShouldNotify(_SeriesScope old) => old.series != series;
 }
 
-/// The registry writes ``fill={`var(--color-${activeChart})`}`` — at runtime
+/// The registry writes ``fill={`var(--color-${activeChart})`}``: at runtime
 /// exactly `var(--color-desktop)`, the `--color-<seriesKey>` pattern rule 1
 /// forbids. A lookup keeps the per-series colour without assembling that string.
 Color _seriesColour(_ChartInk ink, String key) =>
@@ -1960,7 +1960,7 @@ Widget _barInteractive(BuildContext context, _ChartInk ink) {
   );
 }
 
-/* ── Line — `components/ds/charts/line.tsx` ──────────────────────────────── */
+/* ── Line, `components/ds/charts/line.tsx` ──────────────────────────────── */
 
 /// The one line every `dot={false}` variant draws.
 DsChartSeriesSpec _lineSeries(
@@ -2074,7 +2074,7 @@ Widget _lineDotsCustom(_ChartInk ink, DsThemeData theme) => _lineChart(
     );
 
 /// One line through five categorical points, coloured from each row rather than
-/// from a series palette — five rows, five tokens, no cycling.
+/// from a series palette: five rows, five tokens, no cycling.
 Widget _lineDotsColors(_ChartInk ink) => _lineChart(
       ink.browser,
       _browsers,
@@ -2186,7 +2186,7 @@ Widget _lineInteractive(BuildContext context, _ChartInk ink) {
   );
 }
 
-/* ── Pie — `components/ds/charts/pie.tsx` ────────────────────────────────── */
+/* ── Pie, `components/ds/charts/pie.tsx` ────────────────────────────────── */
 
 /// The bare `Pie` eight of the eleven variants start from.
 DsPieSpec _browserPie(
@@ -2225,7 +2225,7 @@ Widget _pieSimple(_ChartInk ink) => _plot(
       ),
     );
 
-/// `stroke="0"` is the registry's own value, kept verbatim — the wedge
+/// `stroke="0"` is the registry's own value, kept verbatim: the wedge
 /// separator is a stroke WIDTH here, not a hue, and there is nothing in it for
 /// a token to own.
 Widget _pieSeparatorNone(_ChartInk ink) => _plot(
@@ -2283,7 +2283,7 @@ Widget _pieLabelList(_ChartInk ink) => _plot(
       ),
     );
 
-/// No tooltip in this variant — the legend is the whole point.
+/// No tooltip in this variant: the legend is the whole point.
 Widget _pieLegend(_ChartInk ink) => _plot(
       ink.browser,
       DsPieChart(
@@ -2338,7 +2338,7 @@ const List<Map<String, Object?>> _pieDonutTextData = <Map<String, Object?>>[
   <String, Object?>{'browser': 'other', 'visitors': 190, 'slot': 5},
 ];
 
-/// The centred donut text — on the panel background rather than on any wedge
+/// The centred donut text: on the panel background rather than on any wedge
 /// fill, which is the slot `RadialText` already proved clears AA in both
 /// themes. `type-num-xl` replaces the registry's `text-3xl font-bold`, the
 /// weight already living in the class.
@@ -2405,7 +2405,7 @@ Widget _pieStacked(_ChartInk ink) => _plot(
     );
 
 /// The slice picker. `defaultIndex` is what makes the `Select`'s choice
-/// reactive — `Tooltip.js` re-dispatches whenever the prop's value changes,
+/// reactive, `Tooltip.js` re-dispatches whenever the prop's value changes,
 /// which is also what moves `activeShape` from one wedge to the next.
 class _PieInteractive extends StatefulWidget {
   const _PieInteractive({required this.ink, required this.builder});
@@ -2481,7 +2481,7 @@ Widget _pieInteractive(BuildContext context, _ChartInk ink, int activeIndex) =>
       ),
     );
 
-/* ── Radar — `components/ds/charts/radar.tsx` ────────────────────────────── */
+/* ── Radar, `components/ds/charts/radar.tsx` ────────────────────────────── */
 
 /// One `Radar`, at the registry's own `fillOpacity`.
 DsRadarSpec _radar(
@@ -2544,7 +2544,7 @@ Widget _radarDots(_ChartInk ink) => _radarChart(
       ],
     );
 
-/// `data.ts` keeps this shape local — a six-row `{ month, desktop, mobile }`
+/// `data.ts` keeps this shape local: a six-row `{ month, desktop, mobile }`
 /// set close to but not `MONTHS_DESKTOP_MOBILE` (every row differs).
 const List<Map<String, Object?>> _radarLinesOnlyData = <Map<String, Object?>>[
   <String, Object?>{'month': 'January', 'desktop': 186, 'mobile': 160},
@@ -2630,8 +2630,8 @@ Widget _radarLabelCustom(_ChartInk ink) => _radarChart(
       margin: const DsChartMargin(top: 10, right: 10, bottom: 10, left: 10),
     );
 
-/// `polarRadius`/`strokeWidth` are plot maths — the grid ring's own radius and
-/// line weight — not the 8-point scale.
+/// `polarRadius`/`strokeWidth` are plot maths: the grid ring's own radius and
+/// line weight: not the 8-point scale.
 Widget _radarGridCustom(_ChartInk ink) => _radarChart(
       ink.desktop,
       _radarMonths,
@@ -2699,7 +2699,7 @@ Widget _radarGridCircleNoLines(_ChartInk ink) => _radarChart(
 
 /// `className="fill-[--color-desktop] opacity-20"` in the registry is the
 /// `--color-<seriesKey>` pattern wearing Tailwind's arbitrary-property
-/// shorthand — and the direct swap to a bare custom property compiled to
+/// shorthand: and the direct swap to a bare custom property compiled to
 /// nothing at all, silently keeping recharts' `fill="none"`. `radar.tsx` found
 /// it by rasterising. Here the fill is simply a colour.
 Widget _radarGridCircleFill(_ChartInk ink) => _radarChart(
@@ -2721,7 +2721,7 @@ Widget _radarGridFill(_ChartInk ink) => _radarChart(
     );
 
 /// Drift 7: the registry gives `mobile` no `fillOpacity` at all, so the second
-/// polygon paints fully opaque over the first. Kept — it is the registry's own
+/// polygon paints fully opaque over the first. Kept: it is the registry's own
 /// choice, repeated identically on five variants.
 List<DsRadarSpec> _radarPair(_ChartInk ink) => <DsRadarSpec>[
       _radar(ink.slot(1), 'desktop', fillOpacity: 0.6),
@@ -2742,7 +2742,7 @@ Widget _radarLegend(_ChartInk ink) => _radarChart(
       margin: const DsChartMargin(top: -40, bottom: -10),
     );
 
-/// Drift 9: structurally identical to `RadarLegend` — the registry's own
+/// Drift 9: structurally identical to `RadarLegend`: the registry's own
 /// `chart-radar-icons` differs only in `chartConfig`.
 Widget _radarIcons(_ChartInk ink) => _plot(
       DsChartConfig(<String, DsChartSeries>{
@@ -2774,7 +2774,7 @@ Widget _radarIcons(_ChartInk ink) => _plot(
     );
 
 /// The first chart in the whole effort to render a `PolarRadiusAxis`'s own
-/// numeric ticks — five `<text>` nodes reading `0 80 160 240 320`, and the
+/// numeric ticks: five `<text>` nodes reading `0 80 160 240 320`, and the
 /// first real contact with `ui/chart.tsx`'s pre-emptive defence for that axis
 /// family. `stroke="hsla(var(--foreground))"` is the same invalid-colour trap
 /// as `hsl(var(--chart-N))` and becomes `--foreground`.
@@ -2793,7 +2793,7 @@ Widget _radarRadius(_ChartInk ink, DsThemeData theme) => _plot(
       ),
     );
 
-/* ── Radial — `components/ds/charts/radial.tsx` ──────────────────────────── */
+/* ── Radial, `components/ds/charts/radial.tsx` ──────────────────────────── */
 
 Widget _radialSimple(_ChartInk ink) => _plot(
       ink.browser,
@@ -2829,7 +2829,7 @@ Widget _radialGrid(_ChartInk ink) => _plot(
     );
 
 /// The labels sit at each arc's START angle, which is both the registry's own
-/// position and the only placement where five of them cannot collide — at the
+/// position and the only placement where five of them cannot collide: at the
 /// mid-angle they came out 19.9px apart for labels 48px wide.
 Widget _radialLabel(_ChartInk ink) => _plot(
       ink.browser,
@@ -2860,7 +2860,7 @@ const List<Map<String, Object?>> _radialTextData = <Map<String, Object?>>[
 ];
 
 /// Drift 6: the panel's note calls this "a custom activeShape" and the vendored
-/// source has none — it is `chart-radial-text` with a different sweep and a
+/// source has none: it is `chart-radial-text` with a different sweep and a
 /// different number (1260 rather than 200).
 const List<Map<String, Object?>> _radialShapeData = <Map<String, Object?>>[
   <String, Object?>{'browser': 'safari', 'visitors': 1260, 'slot': 2},
@@ -2926,7 +2926,7 @@ Widget _radialShape(_ChartInk ink, DsThemeData theme) => _plot(
     );
 
 /// A single `{ month, desktop, mobile }` row. The registry names it
-/// `"january"`; kept, though it plays no visual role — there is no category
+/// `"january"`; kept, though it plays no visual role: there is no category
 /// axis rendering it.
 const List<Map<String, Object?>> _radialStackedData = <Map<String, Object?>>[
   <String, Object?>{'month': 'january', 'desktop': 1260, 'mobile': 570},
@@ -2935,7 +2935,7 @@ const List<Map<String, Object?>> _radialStackedData = <Map<String, Object?>>[
 /// The explicit `PolarAngleAxis domain` is the fix for this family's headline
 /// error: left alone the angle-axis domain runs to the largest SINGLE series
 /// rather than to the stack total, so the first ring fills the whole sweep and
-/// the one behind it is clipped to nothing — no error, no warning.
+/// the one behind it is clipped to nothing: no error, no warning.
 Widget _radialStacked(_ChartInk ink) {
   const int total = 1260 + 570;
   return _plot(
@@ -2986,7 +2986,7 @@ Widget _radialStacked(_ChartInk ink) {
   );
 }
 
-/* ── Tooltips — `components/ds/charts/tooltip.tsx` ───────────────────────── */
+/* ── Tooltips, `components/ds/charts/tooltip.tsx` ───────────────────────── */
 
 /// Every one of the nine is the SAME two-series stacked bar chart, because the
 /// family's whole point is that only the tooltip's configuration changes. No
@@ -3092,7 +3092,7 @@ Widget _tooltipLabelNone(_ChartInk ink) => _tooltipChart(
     );
 
 /// Supplying `formatter` opts a row out of the default renderer entirely, so
-/// this one rebuilds by hand what the default already does — which is why
+/// this one rebuilds by hand what the default already does: which is why
 /// `min-w-[130px]` in the registry becomes `min-w-32`, the exact width the
 /// default box opens with.
 Widget _tooltipFormatter(_ChartInk ink) => _tooltipChart(
@@ -3182,7 +3182,7 @@ class _Kcal extends StatelessWidget {
       children: <Widget>[
         DsText(dsChartNumber(value), DsType.numSm, color: theme.foreground),
         SizedBox(width: ds(0.5)),
-        // `font-normal text-muted-foreground` — the unit steps down out of the
+        // `font-normal text-muted-foreground`: the unit steps down out of the
         // figure's own weight.
         DsText('kcal', DsChartText.xs, color: theme.mutedForeground),
       ],
@@ -3190,7 +3190,7 @@ class _Kcal extends StatelessWidget {
   }
 }
 
-/// Faithful to the registry's own pairing — `Footprints`/running,
+/// Faithful to the registry's own pairing, `Footprints`/running,
 /// `Waves`/swimming. `tooltip.tsx` routes both through `Icon` by wrapping them
 /// in a zero-arg component; the builder slot here needs no such wrapper.
 Widget _tooltipIcons(_ChartInk ink) => _tooltipChart(
@@ -3223,7 +3223,7 @@ Widget _tooltipIcons(_ChartInk ink) => _tooltipChart(
     );
 
 /// The most involved of the nine: a swatch, the series label, the value with
-/// its unit, and — after the last row — a totalled line.
+/// its unit, and: after the last row: a totalled line.
 Widget _tooltipAdvanced(_ChartInk ink) => _tooltipChart(
       ink,
       ink.sport,
@@ -3231,7 +3231,7 @@ Widget _tooltipAdvanced(_ChartInk ink) => _tooltipChart(
         cursor: false,
         defaultIndex: 1,
         hideLabel: true,
-        // `className="w-44"` — 176px, the nearest rung of the same scale
+        // `className="w-44"`, 176px, the nearest rung of the same scale
         // `min-w-32` uses, close enough that the fixed-width Total row does not
         // reflow between the two hovered series.
         width: ds(44),
@@ -3289,7 +3289,7 @@ class _AdvancedRow extends StatelessWidget {
   }
 }
 
-/* ── Unit activity — `components/ds/charts/unit-activity.tsx` ────────────── */
+/* ── Unit activity, `components/ds/charts/unit-activity.tsx` ────────────── */
 
 /// One labelled point in a day's row.
 @immutable
@@ -3312,7 +3312,7 @@ class _UnitDay {
   final List<_UnitPoint> points;
 }
 
-/// `SAMPLE` — the registry's own seven days, with the two flat days written as
+/// `SAMPLE`: the registry's own seven days, with the two flat days written as
 /// bare `current` values exactly as the source does.
 final List<_UnitDay> _unitSample = <_UnitDay>[
   _unitDay('Sun', const <List<int>>[
@@ -3360,19 +3360,19 @@ _UnitDay _unitDayFlat(String label, List<int> values) => _UnitDay(
 /// Twelve rows per column, counted from the top down, so a cell is "on" when
 /// its level is at or below the point's value. Current uses `chart-4`, the
 /// comparison remainder uses `--muted`, and softer muted cells preserve the
-/// complete matrix — three states out of two colours, which is what keeps the
+/// complete matrix: three states out of two colours, which is what keeps the
 /// grid readable without inventing another colour family.
 class _UnitActivityChart extends StatelessWidget {
   const _UnitActivityChart();
 
-  /// `LEVELS` — twelve discrete rows.
+  /// `LEVELS`: twelve discrete rows.
   static const int levels = 12;
 
   /// `min-w-xl` on the scroller, so the seven days never compress below the
   /// width the columns need.
   static double get minWidth => _measureXl;
 
-  /// The `bg-muted/40` remainder — the cells that are in neither period.
+  /// The `bg-muted/40` remainder: the cells that are in neither period.
   static const double _restAlpha = 0.4;
 
   @override
@@ -3515,7 +3515,7 @@ class _UnitColumn extends StatelessWidget {
   }
 }
 
-/* ── Conversion funnel — `components/ds/charts/conversion-funnel.tsx` ────── */
+/* ── Conversion funnel, `components/ds/charts/conversion-funnel.tsx` ────── */
 
 @immutable
 class _Stage {
@@ -3548,10 +3548,10 @@ class _ConversionFunnelChart extends StatelessWidget {
   /// never entered twice.
   static const int total = 24815;
 
-  /// `STRIP_UNITS` — how many segments the whole strip divides into.
+  /// `STRIP_UNITS`: how many segments the whole strip divides into.
   static const int stripUnits = 96;
 
-  /// `h-12` — the strip's own height.
+  /// `h-12`: the strip's own height.
   static double get stripHeight => ds(12);
 
   static String percentage(int value, int of) =>
@@ -3910,7 +3910,7 @@ class _TokensBlock extends StatelessWidget {
 
 /* ── Sections ────────────────────────────────────────────────────────────── */
 
-/// `lg:grid-cols-2` with `gap-4` — every family section's own grid.
+/// `lg:grid-cols-2` with `gap-4`: every family section's own grid.
 Widget _specimenGrid(List<Widget> children) =>
     DsGrid(lg: 2, children: children);
 
@@ -4167,7 +4167,7 @@ class _BarSection extends StatelessWidget {
 /// The reference's bars ARE square, because `radius` is a number of pixels and
 /// typing one would restate `--radius-sm` in a prop no guard reads. `bar.tsx`
 /// then solved exactly that by reading the token off the live stylesheet, and
-/// the note above it was never rewritten — so the page explains square corners
+/// the note above it was never rewritten: so the page explains square corners
 /// under a chart that has rounded ones. Both ship: the corners are the token,
 /// the copy is the reference's.
 class _SquareCorners extends StatelessWidget {
@@ -5111,7 +5111,7 @@ class _AaNote extends StatelessWidget {
 /// The reason this page exists.
 ///
 /// The readout prints what the port actually resolved, exactly as
-/// `MotionReadout` prints what the hook resolved — *"nothing on this row is
+/// `MotionReadout` prints what the hook resolved, *"nothing on this row is
 /// typed by hand, so the page cannot claim a timing the code did not use."*
 class _AnimationSection extends StatelessWidget {
   const _AnimationSection();
@@ -5249,8 +5249,8 @@ class _AnimationHeading extends StatelessWidget {
 /// [ConstrainedBox].
 ///
 /// CSS caps a block box's width and leaves it at the start of its line. A bare
-/// [ConstrainedBox] handed a **tight** width — which is what every
-/// `CrossAxisAlignment.stretch` column passes down — *enforces* that width and
+/// [ConstrainedBox] handed a **tight** width: which is what every
+/// `CrossAxisAlignment.stretch` column passes down, *enforces* that width and
 /// the cap is silently lost. Measured before this existed: four of the
 /// Animation section's thirteen paragraphs rendered at the full column instead
 /// of 768 and wrapped five lines short, which is `selection.dart`'s `_measured`
@@ -5267,7 +5267,7 @@ Widget _capped(Widget child) => Align(
 ///
 /// **The chips are not decoration and dropping them changes the layout.** A
 /// `DsCode` chip is `px-1.5` plus a hairline on each side, so every one of them
-/// is ~13px wider than the same characters set as prose — and this section
+/// is ~13px wider than the same characters set as prose: and this section
 /// carries about forty of them across six blocks. Written as plain strings the
 /// Animation section measured **2439.9** against the reference's 2646.9, and
 /// the whole page came out 227px short; the chips are most of that gap.
@@ -5286,7 +5286,7 @@ class _Prose extends StatelessWidget {
         DsRichText(_markup(context, text), DsType.small),
       );
 
-  /// `{{…}}` is a chip whose own text contains braces — the one instance is
+  /// `{{…}}` is a chip whose own text contains braces: the one instance is
   /// the spread `{...motion}` the Animation section quotes.
   static final RegExp _marker =
       RegExp(r'\{\{(.*?)\}\}|\{([^{}]*)\}|\*\*([^*]*)\*\*|\*([^*]*)\*');

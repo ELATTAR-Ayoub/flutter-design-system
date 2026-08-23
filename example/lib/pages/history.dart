@@ -1,9 +1,9 @@
-/// `/design-system/components/agent/history` — every conversation, as cards
+/// `/design-system/components/agent/history`: every conversation, as cards
 /// you can pin, rename, share and delete.
 ///
 /// **The fidelity bar is that every card is live.** The page's own lead Note
 /// says so: *"Rename them, pin them, delete them. Nothing resets between
-/// sections because each specimen owns its own state — which also means you can
+/// sections because each specimen owns its own state: which also means you can
 /// break one and see what that looks like."* A reader can rename a title inline
 /// and watch the row not move, delete one and watch the confirm slide in from
 /// the trailing edge and fade out where it stands, pin a row and watch the list
@@ -12,20 +12,20 @@
 ///
 /// ## The clock is load-bearing
 ///
-/// Every timestamp on this page is relative — *"14 minutes ago"*, *"yesterday"*,
-/// *"last week"* — so the rendered strings are a function of when the store was
+/// Every timestamp on this page is relative, *"14 minutes ago"*, *"yesterday"*,
+/// *"last week"*: so the rendered strings are a function of when the store was
 /// seeded. `useMockConversations` pins "now" to mount through `useState`'s
 /// initialiser; the port pins it to [DsClock.nowOf], which is the `?clock=`
 /// seam the parity rig freezes both renderers on.
 ///
-/// ## Drift register — recorded, shipped as written
+/// ## Drift register: recorded, shipped as written
 ///
 ///  1. **The eyebrow says "Components" after a group already called "Agent
-///     Components"** — `` `${group.title} · Components` ``. The agent family's
+///     Components"**, `` `${group.title} · Components` ``. The agent family's
 ///     version of the base pages' doubled eyebrow.
 ///  2. **`ItemDescription`'s `type-caption` never applies.** The card passes
 ///     `className="type-caption"` and `item.tsx` writes `text-sm
-///     leading-normal` — utilities beat an `@layer components` class, so the
+///     leading-normal`: utilities beat an `@layer components` class, so the
 ///     timestamp line renders **13px/19.5px**, not 10.5/14.175 *(measured)*.
 ///     Every other `.type-caption` on the page does apply, which is what makes
 ///     this one visible: the strip above the list is genuinely 10.5px.
@@ -47,15 +47,15 @@
 ///     contracts, and the page documents only the first.
 ///  7. **The inline confirm's copy is "Delete this?"** while the AlertDialog
 ///     beside it asks *"Delete this conversation?"*. The card's own source says
-///     the long form *"pushed them off the end of the card"* — so the two
+///     the long form *"pushed them off the end of the card"*: so the two
 ///     shapes ask different questions, and §3's prose treats them as the same
 ///     decision at two sizes.
 ///  8. **The rename dialog's Save is disabled on an empty draft; the inline
 ///     rename simply discards one.** `commit` drops a blank either way, so the
 ///     dialog surfaces a rule the inline form enforces silently.
 ///  9. **The AlertDialog's description interpolates the title into a
-///     `text-foreground` span** — `<span>{title}</span> and everything in it
-///     will be removed.` — which the port renders as one string, because
+///     `text-foreground` span**, `<span>{title}</span> and everything in it
+///     will be removed.`: which the port renders as one string, because
 ///     [DsAlertDialogDescription] takes text. Recorded; the words are the same.
 /// 10. **§6's Note calls `shouldFilter` off "which is also why"**, attributing
 ///     the flag to the preview matching. The flag is off because cmdk would
@@ -94,14 +94,14 @@ class HistoryPage extends StatelessWidget {
           blurb: here.category.blurb,
           contents: here.category.contents,
         ),
-        // `className="mb-12"` — 48px.
+        // `className="mb-12"`, 48px.
         Padding(
           padding: EdgeInsets.only(bottom: ds(12)),
           child: DsNote(
             title: 'Every card below is live',
             child: DsText(
               'Rename them, pin them, delete them. Nothing resets between '
-              'sections because each specimen owns its own state — which also '
+              'sections because each specimen owns its own state: which also '
               'means you can break one and see what that looks like.',
               DsType.small,
             ),
@@ -140,7 +140,7 @@ class _ListSection extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            // DRIFT 5 — the label names `ChatHistory`; the specimen is the
+            // DRIFT 5: the label names `ChatHistory`; the specimen is the
             // flat list, without the drawer's own two headings.
             const DsPanel(
               label: 'ChatHistory',
@@ -153,7 +153,7 @@ class _ListSection extends StatelessWidget {
                 children: <InlineSpan>[
                   const TextSpan(
                     text: 'The panel above the list shows which conversation '
-                        'is open. Click a title and watch it — the transcript '
+                        'is open. Click a title and watch it: the transcript '
                         'does not cut, it blurs out, swaps, and blurs back '
                         'in. See ',
                   ),
@@ -168,14 +168,14 @@ class _ListSection extends StatelessWidget {
       );
 }
 
-/// `HistoryListDemo` — the list, live, with every capability the store offers.
+/// `HistoryListDemo`: the list, live, with every capability the store offers.
 class HistoryListDemo extends StatefulWidget {
   const HistoryListDemo({super.key, this.capabilities = true});
 
   /// Drops `pin` and `share` from the store, to show the degraded list.
   final bool capabilities;
 
-  /// `flex flex-col gap-3` — the strip over the group.
+  /// `flex flex-col gap-3`: the strip over the group.
   static double get gap => ds(3);
 
   @override
@@ -332,7 +332,7 @@ class _RenameSection extends StatelessWidget {
               title: 'Why two',
               child: DsText(
                 'Inline is faster and keeps the list you are renaming inside '
-                'of on screen — Enter commits, Escape abandons, blur commits, '
+                'of on screen, Enter commits, Escape abandons, blur commits, '
                 'which is what every inline rename already does and therefore '
                 'needs no instructions. The dialog earns its ceremony when '
                 'titles are long enough that a row-width input is cramped, or '
@@ -347,7 +347,7 @@ class _RenameSection extends StatelessWidget {
       );
 }
 
-/// `HistoryCardSpecimen` — one card, with the destructive and rename shapes
+/// `HistoryCardSpecimen`: one card, with the destructive and rename shapes
 /// selectable.
 class HistoryCardSpecimen extends StatefulWidget {
   const HistoryCardSpecimen({
@@ -363,7 +363,7 @@ class HistoryCardSpecimen extends StatefulWidget {
   final bool pinned;
   final bool active;
 
-  /// The specimen's own timestamp — `Date.now() - 14 * 60_000`.
+  /// The specimen's own timestamp, `Date.now() - 14 * 60_000`.
   static const Duration age = Duration(minutes: 14);
 
   @override
@@ -376,7 +376,7 @@ class _HistoryCardSpecimenState extends State<HistoryCardSpecimen> {
   bool _gone = false;
 
   /// Pinned at mount rather than read during render. `relativeTime` needs a
-  /// real timestamp, and reading the clock in the render body is impure — it
+  /// real timestamp, and reading the clock in the render body is impure: it
   /// would also re-derive on every keystroke of a rename.
   DateTime? _updatedAt;
 
@@ -443,7 +443,7 @@ class _HistoryCardSpecimenState extends State<HistoryCardSpecimen> {
   }
 }
 
-/// `border-dashed` — the one dashed border in the corpus, and the reason this
+/// `border-dashed`: the one dashed border in the corpus, and the reason this
 /// is a `foregroundDecoration` rather than a `BoxDecoration.border`: Flutter's
 /// [Border] paints solid only.
 class _DashedRing extends Decoration {
@@ -558,7 +558,7 @@ class _DeleteSection extends StatelessWidget {
                 'Keep the confirmation inside the row for something '
                     'recoverable and cheap.',
                 'Reach for the system AlertDialog when deletion is genuinely '
-                    'costly — it takes the whole screen, which is the point.',
+                    'costly: it takes the whole screen, which is the point.',
               ],
               donts: <String>[
                 'Fade a row out and then let the list snap shut. Two motions '
@@ -636,7 +636,7 @@ class _CapabilitiesSection extends StatelessWidget {
               'Nothing about the list special-cases this. The affordances are '
               'absent because the functions are, which means a store backed by '
               'something that cannot persist a pin never has to pretend it '
-              'can — and nobody has to keep a second list of feature flags in '
+              'can: and nobody has to keep a second list of feature flags in '
               'sync with the first.',
               DsType.small,
             ),
@@ -658,7 +658,7 @@ class _SearchSection extends StatelessWidget {
         title: 'Search',
         description:
             'A palette rather than a filter box, because the list lives inside '
-            'a console inside a dialog — roughly forty characters wide — and '
+            'a console inside a dialog: roughly forty characters wide: and '
             'the thing being searched for is a sentence.',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -690,7 +690,7 @@ class _SearchSection extends StatelessWidget {
                     const TextSpan(
                       text: ', because what people remember about a '
                           'conversation is usually what they asked, not what '
-                          'it got named afterwards — which is also why ',
+                          'it got named afterwards: which is also why ',
                     ),
                     DsCode.span('shouldFilter'),
                     const TextSpan(
@@ -707,7 +707,7 @@ class _SearchSection extends StatelessWidget {
       );
 }
 
-/// `HistorySearchDemo` — the palette, opened from a button.
+/// `HistorySearchDemo`: the palette, opened from a button.
 class HistorySearchDemo extends StatefulWidget {
   const HistorySearchDemo({super.key});
 
@@ -773,7 +773,7 @@ class _HistorySearchDemoState extends State<HistorySearchDemo> {
                   style: TextStyle(fontStyle: FontStyle.italic),
                 ),
                 TextSpan(
-                  text: ' — it matches the preview text as well as the title.',
+                  text: ': it matches the preview text as well as the title.',
                 ),
               ],
             ),
@@ -807,7 +807,7 @@ class _SwitchSection extends StatelessWidget {
         title: 'Switching conversations',
         description:
             'The transcript defocuses, swaps, and refocuses. Blur rather than '
-            'fade: a fade to nothing reads as loading — the surface leaves and '
+            'fade: a fade to nothing reads as loading: the surface leaves and '
             'something arrives later. Blur holds the shape while making it '
             'unreadable, which reads as one surface changing what it holds.',
         child: Column(
@@ -821,8 +821,8 @@ class _SwitchSection extends StatelessWidget {
                 TextSpan(
                   children: <InlineSpan>[
                     const TextSpan(
-                      text: 'The obvious version — watch the conversation id, '
-                          'animate when it changes — cannot work. By the time '
+                      text: 'The obvious version: watch the conversation id, '
+                          'animate when it changes: cannot work. By the time '
                           'the id has changed the old messages are already '
                           'gone, so it would blur the ',
                     ),
@@ -837,7 +837,7 @@ class _SwitchSection extends StatelessWidget {
                     DsCode.span('useBlurSwitch'),
                     const TextSpan(
                       text: ' inverts the order. It owns the transition and '
-                          'calls the store in the middle of it — blur out '
+                          'calls the store in the middle of it: blur out '
                           'while the old conversation is still on screen, swap '
                           'at the point where nothing is legible anyway, then '
                           'blur in. The swap is hidden inside the movement '
@@ -882,23 +882,23 @@ class _SwitchSection extends StatelessWidget {
       );
 }
 
-/// `ConsoleWithHistory` — the console with history wired into its header slot.
+/// `ConsoleWithHistory`: the console with history wired into its header slot.
 ///
 /// **The one narrow surface this page has on `agent_console.dart`.** Every
 /// reference to [DsAgentConsole] on this page is inside this widget, so a
 /// signature drift in the console family costs one edit.
 ///
-/// KNOWN GAP — `switchPhase`. The reference passes `switchPhase={phase}` and
+/// KNOWN GAP, `switchPhase`. The reference passes `switchPhase={phase}` and
 /// the console wears `blurClass(switchPhase)` on its transcript;
 /// [DsAgentConsole] does not take one yet. The controller is built and driven
 /// here, and the drawer already calls [DsBlurSwitchController.switchTo], so the
 /// only missing wire is the prop. Until it lands the transcript swaps without
-/// blurring — named as a residual rather than faked by blurring the whole
+/// blurring: named as a residual rather than faked by blurring the whole
 /// console, which would take the header and the composer with it.
 class ConsoleWithHistory extends StatefulWidget {
   const ConsoleWithHistory({super.key});
 
-  /// `className="h-152"` — 608px *(measured: the console 1078 × 608 inside a
+  /// `className="h-152"`, 608px *(measured: the console 1078 × 608 inside a
   /// 1080 × 610 flush Panel)*.
   static double get height => ds(152);
 
@@ -907,7 +907,7 @@ class ConsoleWithHistory extends StatefulWidget {
 }
 
 class _ConsoleWithHistoryState extends State<ConsoleWithHistory> {
-  /// The box the drawer is laid over — the console's own root, which is
+  /// The box the drawer is laid over: the console's own root, which is
   /// `relative` on the reference for exactly this reason.
   final GlobalKey _surface = GlobalKey();
   final DsMockTransport _transport = DsMockTransport();
@@ -947,7 +947,7 @@ class _ConsoleWithHistoryState extends State<ConsoleWithHistory> {
             builder: (BuildContext context, Widget? _) => DsChatHistory(
               store: _store!,
               surfaceKey: _surface,
-              // `{ ...store, open: switchTo }` — the drawer opens through the
+              // `{ ...store, open: switchTo }`: the drawer opens through the
               // blur rather than through the store.
               onOpenConversation: _switch.switchTo,
             ),
@@ -957,7 +957,7 @@ class _ConsoleWithHistoryState extends State<ConsoleWithHistory> {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   Shared fixtures — `agent-demo.tsx`'s own
+   Shared fixtures, `agent-demo.tsx`'s own
    ═══════════════════════════════════════════════════════════════════════════ */
 
 /// `PERSONA`.
@@ -973,7 +973,7 @@ const DsAgentPersona agentPersona = DsAgentPersona(
   placeholder: 'Ask about a pack, a pull or your balance…',
 );
 
-/// `TOOL_STATES` — *"only the caller knows whether `export_activity` is
+/// `TOOL_STATES`, *"only the caller knows whether `export_activity` is
 /// reading, writing or running, and a status line that guesses is a status line
 /// that lies."*
 const DsToolStateMap agentToolStates = <String, DsAgentState>{
@@ -1021,7 +1021,7 @@ const List<DsAgentModel> agentModels = <DsAgentModel>[
   DsAgentModel(id: 'deep', label: 'Deep', hint: 'Slower, checks its work'),
 ];
 
-/// `describeApproval` — turns a held action into a sentence a human can decide
+/// `describeApproval`: turns a held action into a sentence a human can decide
 /// on.
 String describeAgentApproval(String action, Map<String, Object?> params) {
   if (action == 'purchase_pack') {
@@ -1036,7 +1036,7 @@ String describeAgentApproval(String action, Map<String, Object?> params) {
    The mock store
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/// `lib/agent/mock-conversations.ts` — a conversation store with nothing behind
+/// `lib/agent/mock-conversations.ts`: a conversation store with nothing behind
 /// it.
 ///
 /// It implements the whole [DsConversationStore] interface **including the two
@@ -1048,7 +1048,7 @@ String describeAgentApproval(String action, Map<String, Object?> params) {
 /// Timestamps are the one thing that cannot be a literal: `relativeTime`
 /// renders "3 hours ago" against the clock, so fixed ISO strings would drift
 /// into "8 months ago" and the page would quietly rot. They are offsets from
-/// [now] instead — and [now] comes from [DsClock], so the parity rig can freeze
+/// [now] instead: and [now] comes from [DsClock], so the parity rig can freeze
 /// both renderers on the same instant.
 class MockConversationStore extends DsConversationStore {
   MockConversationStore({required DateTime now, this.capabilities = true})
@@ -1057,7 +1057,7 @@ class MockConversationStore extends DsConversationStore {
   /// Drop `pin` and `share` from the store, to show the degraded list.
   final bool capabilities;
 
-  /// `ago(minutes, from)` — an instant N minutes before the store was created.
+  /// `ago(minutes, from)`: an instant N minutes before the store was created.
   static DateTime _ago(int minutes, DateTime from) =>
       from.subtract(Duration(minutes: minutes));
 
@@ -1173,11 +1173,11 @@ class MockConversationStore extends DsConversationStore {
   }
 
   /// A real store would mint a link or export a transcript. The interface does
-  /// not say which, on purpose — it only says the product has one.
+  /// not say which, on purpose: it only says the product has one.
   @override
   void Function(String id)? get share => capabilities ? _share : null;
 
   void _share(String id) {
-    // `window.console.info("[mock] share …")` — the reference's own no-op.
+    // `window.console.info("[mock] share …")`: the reference's own no-op.
   }
 }

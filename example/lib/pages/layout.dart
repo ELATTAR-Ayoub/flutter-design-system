@@ -1,4 +1,4 @@
-/// `/design-system/components/base/layout` — five structural helpers, and the
+/// `/design-system/components/base/layout`: five structural helpers, and the
 /// page where three of them are quietly broken on the reference.
 ///
 /// The four `components/ui/` files this page imports all land in the package
@@ -6,22 +6,22 @@
 /// [DsScrollArea], `carousel.tsx` → [DsCarousel], `resizable.tsx` →
 /// [DsResizablePanelGroup]. `badge.tsx` was already here.
 ///
-/// **The fidelity bar is that it moves — and that it does not move where the
+/// **The fidelity bar is that it moves: and that it does not move where the
 /// reference does not.** A reader can hover the rail into existence and drag
 /// its thumb, drag the carousel and click the 8px of arrow that survives the
 /// clip, and drag the admin split. A reader can also *fail* to reach 284px of
 /// the horizontal card rail, exactly as on the reference, because
 /// `overflow-x` is `hidden` there and no gesture opens it.
 ///
-/// ## Drift register — recorded, shipped as written
+/// ## Drift register: recorded, shipped as written
 ///
 ///  1. **The carousel's arrows are 8px wide, and the page says they are
 ///     "always visible".** `-left-12` / `-right-12` on a 32px button puts each
 ///     one 24px outside the `Panel`'s `overflow-hidden` frame. Measured:
 ///     `elementFromPoint` returns `<main>` at the button's own centre and the
 ///     button only across x ∈ [1372, 1379]; six real clicks at the centre
-///     moved nothing. §4's description — *"Arrows are always visible and it is
-///     fully keyboard navigable"* — describes the second half correctly and
+///     moved nothing. §4's description, *"Arrows are always visible and it is
+///     fully keyboard navigable"*: describes the second half correctly and
 ///     the first half not at all. Reproduced: the port clips the same 24px
 ///     and answers the same sliver.
 ///  2. **The horizontal `ScrollArea` cannot scroll.** `<ScrollArea>` renders
@@ -29,12 +29,12 @@
 ///     axis with no bar (measured inline `overflow: hidden scroll`). The rail
 ///     is 764px of cards in a 480px viewport: 284px are unreachable by wheel,
 ///     drag or keyboard, and only `scrollLeft = n` from a console moves it.
-///     The page's own API row — *"Add ScrollBar for a horizontal bar"* — is
+///     The page's own API row, *"Add ScrollBar for a horizontal bar"*: is
 ///     the instruction the specimen above it does not follow. Reproduced
 ///     ([DsScrollArea.horizontalBar] left false).
 ///  3. **`minSize={25}` is 25 pixels.** `react-resizable-panels@4` writes
-///     `defaultSize` into `flex-grow` — where 40 and 60 survive only as a
-///     ratio, and so *look* like percentages — while `minSize` stays in
+///     `defaultSize` into `flex-grow`: where 40 and 60 survive only as a
+///     ratio, and so *look* like percentages: while `minSize` stays in
 ///     pixels. Dragged hard left the first panel stops at 25.0px and the
 ///     separator reports `aria-valuemin="2.434"`. Two props on one component,
 ///     read in two units. Reproduced.
@@ -45,14 +45,14 @@
 ///     recording as an inconsistency between the chips and the rules.
 ///  5. **`ScrollArea` has no rail until you hover it.** Radix's `type`
 ///     defaults to `"hover"`, so `[data-slot="scroll-area-scrollbar"]` is not
-///     in the DOM at rest — a specimen whose entire subject is the scrollbar
+///     in the DOM at rest: a specimen whose entire subject is the scrollbar
 ///     shows no scrollbar in a screenshot. Measured: mounted within a frame of
 ///     `pointerenter`, unmounted 600ms after `pointerleave`. Reproduced.
 ///  6. **The two scrollbar sections reserve different amounts of nothing.**
 ///     `scrollbar-gutter-stable` on the vertical browser-scrollbar specimen
 ///     costs its content column 10px (measured `clientWidth` 470 against a
 ///     480px padding box); the horizontal one, which has no gutter class,
-///     loses none — its rail is drawn over the content. Both ship.
+///     loses none: its rail is drawn over the content. Both ship.
 ///  7. **`AspectRatio`'s `mb-4` shrinks the box instead of spacing it.** The
 ///     carousel card's ratio box is absolutely positioned to its slot's four
 ///     edges, so a bottom margin comes out of its own height: a 398.203px slot
@@ -63,10 +63,10 @@
 ///  9. **`ResizableHandle`'s `focus-visible:ring-1` is unreachable in
 ///     practice.** The separator is `tabIndex 0`, but the grab strip is 4px
 ///     wide and nothing on the page hints it can be tabbed to; the ring is
-///     never seen. Built anyway — the port focuses on tab and paints nothing
+///     never seen. Built anyway: the port focuses on tab and paints nothing
 ///     extra, which is what the reference does at rest (`box-shadow: none`).
 /// 10. **The group is `min-h-56` and its content is shorter**, so the two
-///     panels are exactly 222px tall — the 224px floor less the frame. Nothing
+///     panels are exactly 222px tall: the 224px floor less the frame. Nothing
 ///     on the page ever makes it taller.
 library;
 
@@ -94,17 +94,17 @@ const List<(String, String)> _packs = <(String, String)>[
 /// `action`.
 const double _actionTint = 0.12;
 
-/// `h-64` — the vertical `ScrollArea`'s frame.
+/// `h-64`: the vertical `ScrollArea`'s frame.
 double get _scrollAreaHeight => ds(64);
 
-/// `h-52` — the vertical browser-scrollbar frame.
+/// `h-52`: the vertical browser-scrollbar frame.
 double get _nativeScrollHeight => ds(52);
 
 /// `min-h-56` on the resizable group.
 double get _splitMinHeight => ds(56);
 
 /// `scrollbar-gutter: stable` under `scrollbar-width: thin`, measured at 10px
-/// — the same reservation `DsMessageScrollerViewport.gutter` names.
+///: the same reservation `DsMessageScrollerViewport.gutter` names.
 double get _scrollbarGutter => DsMessageScrollerViewport.gutter;
 
 /// `size-28` on the ScrollArea rail's cards, `h-28 w-36` on the browser
@@ -299,7 +299,7 @@ class _ScrollAreaSection extends StatelessWidget {
   }
 }
 
-/// `<ScrollArea className="h-64 rounded-lg border border-border">` — fourteen
+/// `<ScrollArea className="h-64 rounded-lg border border-border">`: fourteen
 /// rows of 43.5, thirteen hairlines, 622 of content in 254 of viewport.
 class _PossibleHits extends StatelessWidget {
   const _PossibleHits();
@@ -361,7 +361,7 @@ class _HitRow extends StatelessWidget {
   }
 }
 
-/// `<ScrollArea className="w-full rounded-lg border border-border">` — 764px
+/// `<ScrollArea className="w-full rounded-lg border border-border">`, 764px
 /// of cards behind an `overflow-x: hidden` viewport. Drift 2.
 class _CardSetRail extends StatelessWidget {
   const _CardSetRail();
@@ -473,7 +473,7 @@ class _BrowserScrollbarSection extends StatelessWidget {
   }
 }
 
-/// `scrollbar-thin scrollbar-gutter-stable h-52 overflow-y-scroll` — the
+/// `scrollbar-thin scrollbar-gutter-stable h-52 overflow-y-scroll`: the
 /// gutter is inside the frame, so the rows are 470 wide, not 480. Drift 6.
 class _ActivityList extends StatefulWidget {
   const _ActivityList();
@@ -556,7 +556,7 @@ class _ActivityRow extends StatelessWidget {
   }
 }
 
-/// `scrollbar-thin w-full overflow-x-scroll … p-4` — no gutter class, so the
+/// `scrollbar-thin w-full overflow-x-scroll … p-4`: no gutter class, so the
 /// rail is drawn over the shelf rather than beside it. Drift 6.
 class _WideShelf extends StatefulWidget {
   const _WideShelf();
@@ -659,7 +659,7 @@ class _CarouselSection extends StatelessWidget {
       child: DsPanel(
         label: 'Featured packs',
         // The `p-6` moves inside so the arrows can hang out of it and be
-        // clipped by this panel's own frame — drift 1, and the whole reason
+        // clipped by this panel's own frame: drift 1, and the whole reason
         // [DsCarousel] takes a padding of its own.
         flush: true,
         child: DsCarousel(
@@ -695,7 +695,7 @@ class _PackCard extends StatelessWidget {
         children: <Widget>[
           DsAspectRatio(
             ratio: 3 / 4,
-            // `mb-4` — drift 7: it shortens the box, it does not space it.
+            // `mb-4`: drift 7: it shortens the box, it does not space it.
             margin: EdgeInsets.only(bottom: ds(4)),
             child: DecoratedBox(
               decoration: BoxDecoration(
@@ -931,7 +931,7 @@ class _RulesSection extends StatelessWidget {
 
 /* ── Shared ──────────────────────────────────────────────────────────────── */
 
-/// `divide-y divide-border` — a hairline **between** rows, drawn as a row of
+/// `divide-y divide-border`: a hairline **between** rows, drawn as a row of
 /// its own so no child has to know it is not the first.
 ///
 /// Deliberately not [DsDividedList]: that fills with `--card` and rounds

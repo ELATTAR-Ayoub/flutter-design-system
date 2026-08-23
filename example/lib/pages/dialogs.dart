@@ -1,4 +1,4 @@
-/// `/design-system/components/base/dialogs` — nine overlays, and every one of
+/// `/design-system/components/base/dialogs`: nine overlays, and every one of
 /// them opens.
 ///
 /// The page the modal family arrives on. `DsPopover` shipped with `selects` and
@@ -9,7 +9,7 @@
 /// **The fidelity bar is that they open.** A reader can press Open Pack and
 /// watch the jelly, drag the drawer down to dismiss it, hover an icon button
 /// for 200ms and get a label, hover a link for 700 and get a card, press Delete
-/// account and take the confirmation through to a toast — and press the failing
+/// account and take the confirmation through to a toast: and press the failing
 /// one and watch the inline alert arrive. A page that renders these as stills
 /// fails, however exact the pixels.
 ///
@@ -19,9 +19,9 @@
 /// itself keeps out of `components/ui/`: *"It is a composition, not a new
 /// primitive… RULES §5 says a screen is composition before it is creation, and
 /// the pieces this needs all existed."* It stays here on the same reasoning and
-/// on the B10 precedent — kit promotion wants a second consuming page.
+/// on the B10 precedent: kit promotion wants a second consuming page.
 ///
-/// ## Drift register — recorded, shipped as written
+/// ## Drift register: recorded, shipped as written
 ///
 ///  1. **Nine chips, eleven sections, and the last two get none.** `contents`
 ///     is `[Dialog, Media Dialog, Alert Dialog, Danger Zone, Sheet, Drawer,
@@ -46,11 +46,11 @@
 ///     wrappers in the footer**, so the announcement has two buttons that both
 ///     close and no X. Reproduced: "Not now" and "See what's new" both dismiss.
 ///  6. **The tooltip section's prose says "opens after 200ms"** and the
-///     provider agrees — measured 232.5ms to first frame, which is 200 plus a
+///     provider agrees: measured 232.5ms to first frame, which is 200 plus a
 ///     frame. The one timing claim on the page that survives measurement
 ///     unchanged.
 ///  7. **The hover card's trigger is a `Button variant="link"`**, so the
-///     preview hangs off a 40px pill rather than off a run of text — the
+///     preview hangs off a 40px pill rather than off a run of text: the
 ///     component's own `h-10` wins over the inline look the copy implies.
 ///  8. **The drawer is full-bleed on a 1440 desktop.** `inset-x-0` has no
 ///     `sm:` cap, so *"the mobile bottom sheet"* renders 1440 wide with its
@@ -62,7 +62,7 @@
 /// 10. **`DsGrid` stretches where CSS grid does not.** The four bad-day zones
 ///     sit in `lg:grid-cols-2`, and the reference's two rows are sized by their
 ///     tallest cell while each zone keeps its own height. The port's grid hands
-///     each cell a tight height, so every cell is a plain [Column] — which
+///     each cell a tight height, so every cell is a plain [Column]: which
 ///     packs at the top and leaves its children their natural heights.
 library;
 
@@ -75,10 +75,10 @@ import '../shell.dart';
 
 /* ── Page constants ──────────────────────────────────────────────────────── */
 
-/// `max-w-2xl` — the settings column the first danger zone is centred in.
+/// `max-w-2xl`: the settings column the first danger zone is centred in.
 final double _measure2xl = DsContainers.xl2;
 
-/// `max-w-md` — the danger zone's description column.
+/// `max-w-md`: the danger zone's description column.
 final double _measureMd = DsContainers.md;
 
 /// `<strong>` inside a `.type-small` sentence. The same helper `feedback.dart`
@@ -96,10 +96,10 @@ TextStyle _strong(TextStyle base) => base.copyWith(
       ],
     );
 
-/// `<em>` — the alert-dialog note has one.
+/// `<em>`: the alert-dialog note has one.
 const TextStyle _em = TextStyle(fontStyle: FontStyle.italic);
 
-/// A `.type-small` paragraph under a specimen row — `className="type-small
+/// A `.type-small` paragraph under a specimen row, `className="type-small
 /// mt-5"`, which every panel on this page spells the same way.
 class _Prose extends StatelessWidget {
   const _Prose(this.text, {this.top});
@@ -133,10 +133,10 @@ class DialogsPage extends StatelessWidget {
           eyebrow: '${here.group.title} · Base',
           title: here.category.title,
           blurb: here.category.blurb,
-          // DRIFT 1 — nine chips against eleven sections.
+          // DRIFT 1: nine chips against eleven sections.
           contents: here.category.contents,
         ),
-        // `className="mb-12"` — 48px, the Note outside every section.
+        // `className="mb-12"`, 48px, the Note outside every section.
         Padding(
           padding: EdgeInsets.only(bottom: ds(12)),
           child: const DsNote(
@@ -262,7 +262,7 @@ class _DialogSection extends StatelessWidget {
       );
 }
 
-/// `gap-2` inside a `size="default"` button — the reference's own
+/// `gap-2` inside a `size="default"` button: the reference's own
 /// `[&_svg]:shrink-0` row.
 class _ButtonGap extends StatelessWidget {
   const _ButtonGap();
@@ -292,7 +292,7 @@ class _PurchaseDialog extends StatelessWidget {
             ),
           ],
         ),
-        // `my-2` — the one child on the page that carries a margin of its own,
+        // `my-2`: the one child on the page that carries a margin of its own,
         // which is why the measured gap above and below it is 24 and not 16.
         Padding(
           padding: EdgeInsets.symmetric(vertical: ds(2)),
@@ -337,7 +337,7 @@ class _PurchaseDialog extends StatelessWidget {
   }
 }
 
-/// `divide-y divide-border` — a 1px rule between rows and none at the ends.
+/// `divide-y divide-border`: a 1px rule between rows and none at the ends.
 class _Divider extends StatelessWidget {
   const _Divider({required this.theme});
 
@@ -486,7 +486,7 @@ class _MediaProse extends StatelessWidget {
         TextSpan(
           children: <InlineSpan>[
             const TextSpan(text: 'This is '),
-            // U+201C / U+201D — the reference writes `&quot;` inside the chip.
+            // U+201C / U+201D: the reference writes `&quot;` inside the chip.
             DsCode.span('DialogContent variant="media"'),
             const TextSpan(
               text: ', not a separate modal. It keeps the same focus trap, '
@@ -507,7 +507,7 @@ class _AnnouncementDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) => DsDialogContent(
         variant: DsDialogVariant.media,
-        // DRIFT 5 — no X, and both footer buttons close.
+        // DRIFT 5: no X, and both footer buttons close.
         showCloseButton: false,
         onClose: close,
         children: <Widget>[
@@ -522,7 +522,7 @@ class _AnnouncementDialog extends StatelessWidget {
           ),
           const DsDialogHeader(
             children: <Widget>[
-              // `w-fit` — the chip is as wide as its label.
+              // `w-fit`: the chip is as wide as its label.
               DsBadge(label: 'New release', variant: DsBadgeVariant.action),
               DsDialogTitle('Silver Tempest has arrived'),
               DsDialogDescription(
@@ -541,7 +541,7 @@ class _AnnouncementDialog extends StatelessWidget {
               ),
               DsButton(
                 onPressed: close,
-                // U+2019 — `See what&rsquo;s new`.
+                // U+2019, `See what&rsquo;s new`.
                 child: const Text('See what’s new'),
               ),
             ],
@@ -672,7 +672,7 @@ class _TwoZonesBody extends StatelessWidget {
             ),
             TextSpan(text: 'is', style: _em),
             TextSpan(
-              text: ' the content — putting it in a card box demotes the most '
+              text: ' the content: putting it in a card box demotes the most '
                   'important words on the screen into a caption for whatever '
                   'sits beneath them. Title and description sit straight on '
                   'the panel; only the footer is banded, because only the '
@@ -689,10 +689,10 @@ class _ConsequenceBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => DsText(
-        // U+201C / U+201D throughout — `&ldquo;` / `&rdquo;`.
+        // U+201C / U+201D throughout, `&ldquo;` / `&rdquo;`.
         '“Sell all for \$2,481.00” beats “Confirm”. The user should be able to '
         'read only the button and still know exactly what happens. The cancel '
-        'option is also phrased as the safe choice — “Keep my cards”, not just '
+        'option is also phrased as the safe choice, “Keep my cards”, not just '
         '“Cancel”.',
         DsType.small,
       );
@@ -740,7 +740,7 @@ class _DangerZoneSection extends StatelessWidget {
                     'already happened; the hairline and the heading say '
                     '“careful”, and the tint is spent on the button, which is '
                     'the thing that acts. Confirm it and the button spins, a '
-                    'success toast fires, and the row itself changes — because '
+                    'success toast fires, and the row itself changes: because '
                     'a toast is gone in four seconds and the page must still '
                     'show what happened.',
                   ),
@@ -858,7 +858,7 @@ class _AccountHeading extends StatelessWidget {
       );
 }
 
-/// One cell of `grid gap-6 lg:grid-cols-2` — a `.type-label mb-3` caption over
+/// One cell of `grid gap-6 lg:grid-cols-2`: a `.type-label mb-3` caption over
 /// a zone.
 class _BadDayCell extends StatelessWidget {
   const _BadDayCell({required this.label, required this.zone});
@@ -868,7 +868,7 @@ class _BadDayCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Column(
-        // DRIFT 10 — a plain [Column] packs at the top and leaves the zone its
+        // DRIFT 10: a plain [Column] packs at the top and leaves the zone its
         // own height inside the grid's tight cell.
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
@@ -891,7 +891,7 @@ class _FailurePathBody extends StatelessWidget {
             DsCode.span('onDelete'),
             TextSpan(
               text: '. That seam exists so the error state is reachable on the '
-                  'page instead of described in prose — press it and the '
+                  'page instead of described in prose: press it and the '
                   'toast, the inline alert and the return to rest all happen '
                   'for real. A destructive button whose only tested path is '
                   'success is the one that ships broken.',
@@ -942,7 +942,7 @@ class _DangerZone extends StatefulWidget {
   static const double bandAlpha = 0.08;
 
   /// `const DEFAULT_DELETE = () => new Promise((resolve) =>
-  /// setTimeout(resolve, 1400))` — the demo's own latency.
+  /// setTimeout(resolve, 1400))`: the demo's own latency.
   static const Duration defaultLatency = Duration(milliseconds: 1400); // allow-hardcoded: the page's own demo latency, a call-site constant and not a --duration-* token
 
   @override
@@ -1081,7 +1081,7 @@ class _DangerZoneState extends State<_DangerZone> {
   }
 }
 
-/// The heading band — icon, rule, `.type-label` in `--destructive-ink`.
+/// The heading band: icon, rule, `.type-label` in `--destructive-ink`.
 class _DangerHeading extends StatelessWidget {
   const _DangerHeading({required this.hairline});
 
@@ -1115,7 +1115,7 @@ class _DangerHeading extends StatelessWidget {
   }
 }
 
-/// The resting copy — `.type-body` over a `.type-small max-w-md`.
+/// The resting copy, `.type-body` over a `.type-small max-w-md`.
 class _DeleteCopy extends StatelessWidget {
   const _DeleteCopy();
 
@@ -1141,7 +1141,7 @@ class _DeleteCopy extends StatelessWidget {
       );
 }
 
-/// `flex flex-col items-end gap-1.5` — a disabled button and the sentence that
+/// `flex flex-col items-end gap-1.5`: a disabled button and the sentence that
 /// says why.
 class _Unavailable extends StatelessWidget {
   const _Unavailable({required this.reason});
@@ -1215,7 +1215,7 @@ class _DangerZoneRowSkeleton extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               // `<p className="type-body"><Skeleton as="span" className="h-4
-              // w-36 align-middle" /></p>` — an inline placeholder in a real
+              // w-36 align-middle" /></p>`: an inline placeholder in a real
               // line box, so the row keeps the resting row's 24px line.
               _SkeletonLine(
                 spec: DsType.body,
@@ -1415,7 +1415,7 @@ class _FilterSheetState extends State<_FilterSheet> {
 /// </label>
 /// ```
 ///
-/// A raw `label`, so the words are a target — the same thing the selection
+/// A raw `label`, so the words are a target: the same thing the selection
 /// page's option cards buy with `htmlFor`.
 class _RarityRow extends StatelessWidget {
   const _RarityRow({
@@ -1549,7 +1549,7 @@ class _PopoverSectionState extends State<_PopoverSection> {
   bool _odds = false;
   bool _sort = false;
 
-  /// `w-80` and `w-56` — the two `className` widths, which beat
+  /// `w-80` and `w-56`: the two `className` widths, which beat
   /// `PopoverContent`'s own `w-72`.
   static double get _oddsWidth => ds(80);
   static double get _sortWidth => ds(56);
@@ -1677,7 +1677,7 @@ class _PopoverSectionState extends State<_PopoverSection> {
       );
 }
 
-/// `PopoverContent` — the surface plus its `p-2.5`.
+/// `PopoverContent`: the surface plus its `p-2.5`.
 class _PopoverPanel extends StatelessWidget {
   const _PopoverPanel({required this.child});
 
@@ -1766,7 +1766,7 @@ class _HoverCardSection extends StatelessWidget {
               ),
               const _Prose(
                 'Because hover does not exist on touch, anything inside a '
-                'hover card must also be reachable another way — here, by '
+                'hover card must also be reachable another way: here, by '
                 'opening the card inspection modal.',
               ),
             ],
@@ -1896,7 +1896,7 @@ class _TooltipSection extends StatelessWidget {
 }
 
 /// `<span className="type-num-sm cursor-help border-b border-dashed
-/// border-input text-muted-foreground">` — the one tooltip trigger on the page
+/// border-input text-muted-foreground">`: the one tooltip trigger on the page
 /// that is not a button.
 ///
 /// The dashed underline is **not** ported as a dash pattern: Flutter's
@@ -1948,7 +1948,7 @@ class _ApiSection extends StatelessWidget {
                 text: 'Same shape, but AlertDialogCancel and AlertDialogAction '
                     'instead of a footer of buttons. Not dismissible by '
                     'overlay click. AlertDialogAction is destructive by '
-                    'default — that is what the component is for.',
+                    'default: that is what the component is for.',
               ),
             ),
             (
@@ -1994,7 +1994,7 @@ class _RulesSection extends StatelessWidget {
           children: <Widget>[
             const DsDoDont(
               dos: <String>[
-                'Use Alert Dialog for anything irreversible — selling, '
+                'Use Alert Dialog for anything irreversible: selling, '
                     'deleting, closing an account.',
                 'Let the confirming button stay destructive; it is the default '
                     'for a reason.',
@@ -2019,11 +2019,11 @@ class _RulesSection extends StatelessWidget {
                 "Don't stack a dialog on top of another dialog.",
                 "Don't use the media variant for destructive confirmation; the "
                     'image competes with the consequence.',
-                "Don't make hover the only way to reach information — touch "
+                "Don't make hover the only way to reach information: touch "
                     'users have no hover.',
                 "Don't use a Sheet where a Popover would do; sheets cover the "
                     'page.',
-                "Don't fill a danger zone with red — a tinted block reads as "
+                "Don't fill a danger zone with red: a tinted block reads as "
                     'an error that already happened.',
                 "Don't ship the destructive button without its failure path; "
                     'that is the one users hit on their worst day.',
@@ -2047,7 +2047,7 @@ class _MotionNoteBody extends StatelessWidget {
         TextSpan(
           children: <InlineSpan>[
             const TextSpan(
-              text: 'Modal overlays — Dialog, Alert Dialog — arrive on ',
+              text: 'Modal overlays, Dialog, Alert Dialog: arrive on ',
             ),
             DsCode.span('anim-jelly-in'),
             TextSpan(text: ' ('),
@@ -2060,7 +2060,7 @@ class _MotionNoteBody extends StatelessWidget {
             DsCode.span('--duration-base'),
             TextSpan(
               text: '. Leaving is deliberately faster than arriving. Anchored '
-                  'and edge overlays — Popover, Tooltip, Sheet, Drawer — keep '
+                  'and edge overlays, Popover, Tooltip, Sheet, Drawer: keep '
                   'their own fade or slide on ',
             ),
             DsCode.span('--duration-overlay'),

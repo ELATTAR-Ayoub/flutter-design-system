@@ -1,9 +1,9 @@
-/// `/design-system/components/base/feedback` — five ways of saying what
+/// `/design-system/components/base/feedback`: five ways of saying what
 /// happened, and sixty-nine of them are moving.
 ///
 /// The simplest page structure in the base group and the busiest render in the
 /// corpus. The reference is 520 lines with **no page-local components at all**
-/// — one module-level const and one default export — because everything hard
+///: one module-level const and one default export: because everything hard
 /// about it lives in the effects: two bloom drifts and two starfield sways on
 /// each of five Alerts, the same four on each of five toast previews,
 /// twenty-four shimmers and five spins. **Sixty-nine infinite animations before
@@ -23,21 +23,21 @@
 /// ## What is page-local, and why
 ///
 /// [_ToastPreview] and [_ToastPreviewStack] port `components/ds/toast-preview.tsx`
-/// — a **docs-side** component, like `Panel` and `Note`, and the port's docs
+///: a **docs-side** component, like `Panel` and `Note`, and the port's docs
 /// side is this package. It has exactly one consumer, so it stays here on the
 /// B10 precedent. Three things make it a different object from [DsToast] rather
 /// than a call of it:
 ///
 ///  * it renders **the preview's own numbers**, which are measurably not the
-///    live toast's — see the divergence note below;
+///    live toast's: see the divergence note below;
 ///  * it writes its own `[data-button]`. `toast-preview.tsx` L42–46 spells the
 ///    `<button>` inline rather than letting sonner render one, so
 ///    [_ToastActionPill] is that element and not a stand-in for the live pill.
 ///    The live one now comes from `DsToastAction`, which [_ToastSectionState._error]
-///    passes and `DsToast` paints — the two are the same 32px secondary pill
+///    passes and `DsToast` paints: the two are the same 32px secondary pill
 ///    because `.cn-toast [data-button]` styles both, exactly as the preview's
 ///    own doc-comment claims of the whole object;
-///  * it is static. No queue, no lifetime, no dismissal — a `<li>` in a list.
+///  * it is static. No queue, no lifetime, no dismissal: a `<li>` in a list.
 ///
 /// [_PackCardSkeleton]'s and [_PullRowSkeletons]'s containers are inline
 /// `div`s on the reference and stay inline here. [_SeamedList] is the
@@ -46,10 +46,10 @@
 /// on the row. This one declares no background at all, so its seams are the
 /// panel's `--background` showing through and every row supplies its own fill.
 ///
-/// ## PINNED DIVERGENCE — the preview is not the live toast
+/// ## PINNED DIVERGENCE: the preview is not the live toast
 ///
 /// The page states (`page.tsx` L186–190) that the two differ only by the
-/// missing `data-sonner-toast` attribute. *Measured, they do not* — drift 4
+/// missing `data-sonner-toast` attribute. *Measured, they do not*: drift 4
 /// below. The preview is `.cn-toast` **without sonner's stylesheet**, and
 /// sonner's stylesheet is injected unlayered at runtime, so on the live toast
 /// it adds `[data-icon] { margin-left: -3px; margin-right: 4px }` and a 1.4
@@ -66,36 +66,36 @@
 /// preview. The live toaster the five buttons fire into is `DsToaster`, mounted
 /// once by the shell, and its choreography is wave B2's.
 ///
-/// ## Drift register — recorded, shipped as written (feedback-map §16)
+/// ## Drift register: recorded, shipped as written (feedback-map §16)
 ///
 ///  1. **Seven chips, five content sections, and they do not correspond.**
 ///     `contents` promises `Alert · Toast · Skeleton · Progress · Progress
 ///     tones · Spinner · Empty`. "Progress tones" and "Spinner" are **Panel
 ///     labels inside `#progress`**, which is itself titled "Progress &
 ///     Spinner"; `API` and `Rules` get no chip. Rendered as written.
-///  2. **PINNED — the warning toast blooms lime under an amber glyph.** A
+///  2. **PINNED: the warning toast blooms lime under an amber glyph.** A
 ///     warning *Alert* blooms `--color-warning` over `--color-action`; a
 ///     warning *toast* still carries `--color-value-bright` over
 ///     `--color-value-dark`, the pair the Alert was moved off after
 ///     `alert.tsx` recorded that it *"worked only by accident"*. Both ship as
-///     written — [DsBloomCosmic.toastWarning] is that pair.
+///     written, [DsBloomCosmic.toastWarning] is that pair.
 ///  3. **Specimen 5 is `variant="info"` wearing an `AlertTriangle`** and
 ///     warning copy. A cyan triangle over a cyan bloom; every other specimen's
 ///     glyph matches its variant.
-///  4. **The toast preview is not the live toast** — the table above.
+///  4. **The toast preview is not the live toast**: the table above.
 ///  5. **The `Meta` in "Inline placeholders" has no margin.** `page.tsx` L313
 ///     writes `<Meta items={…}/>` with no `className`; every other `Meta` in
 ///     the corpus carries `mt-6`. The list butts straight into the paragraph.
 ///  6. **The first progress bar has no accessible name.** `page.tsx` L339 is a
 ///     bare `<Progress value={20.6} />`; the other six all pass an
 ///     `aria-label`, including the two beside an identical `type-label`. Its
-///     readout "412 / 2,000" is a sibling span, unassociated — so
+///     readout "412 / 2,000" is a sibling span, unassociated: so
 ///     [DsProgress.label] goes unpassed exactly once.
-///  7. **[_progressTones]' comment contradicts its contents** — see the
+///  7. **[_progressTones]' comment contradicts its contents**: see the
 ///     comment, transcribed verbatim above the array.
 ///  8. **`Empty`'s dashed border never paints.** `border-dashed` with no width
 ///     class; carried by `DsEmpty`.
-///  9. **`EmptyMedia` defeats `Icon size="xl"`** — a 16px box drawn with the
+///  9. **`EmptyMedia` defeats `Icon size="xl"`**: a 16px box drawn with the
 ///     24px rung's stroke; carried by `DsEmptyMedia`.
 /// 10. **`Spinner`'s `role="status"` and `aria-label="Loading"` are dropped**
 ///     by `Icon`'s destructure; carried by `DsSpinner` under ruling B9.
@@ -103,14 +103,14 @@
 ///     `strokeWidth` from the size **prop** and the class overrides only the
 ///     box, so the 20px and 24px spinners are drawn at 2.4 where the ladder
 ///     would give 2. The port's `DsSpinner` takes a box and derives its stroke
-///     from it, so it renders those two at the ladder's own 2 — the one place
+///     from it, so it renders those two at the ladder's own 2: the one place
 ///     on this page where the port is *more* consistent than the reference.
 ///     Recorded here rather than worked around from the call site: the fix is
 ///     one `strokeOverride` inside `spinner.dart`, which is not this file.
-/// 12. **`Alert` is `role="alert"` with no `aria-live`** — five permanently
+/// 12. **`Alert` is `role="alert"` with no `aria-live`**: five permanently
 ///     mounted live regions on one page. `DsAlert` already sets `liveRegion`.
 /// 13. **The live toast carries no role at all** and sonner announces through
-///     a separate visually-hidden region; `DsToast` labels itself instead — an
+///     a separate visually-hidden region; `DsToast` labels itself instead: an
 ///     already-shipped, deliberate divergence.
 /// 14. **Two reduced-motion regimes.** `globals.css` collapses durations to
 ///     0.01ms; sonner's own sheet sets `animation: none`. The port has one
@@ -121,7 +121,7 @@
 /// 16. **`.cn-toast`'s selector is written three times** to beat sonner's
 ///     unlayered sheet. The port has no cascade; the values are just the
 ///     values.
-/// 17. **`--front-toast-height` is measured, not declared** — sonner reads it
+/// 17. **`--front-toast-height` is measured, not declared**: sonner reads it
 ///     off the DOM and pins every collapsed back toast to it. A live-stack
 ///     fact, and wave B2's.
 /// 18. **The section is titled "Progress & Spinner" and its `id` is
@@ -140,11 +140,11 @@ import '../shell.dart';
 
 /* ── Page constants ──────────────────────────────────────────────────────── */
 
-/// `max-w-md` — `--container-md`, 28rem. Both progress panels.
+/// `max-w-md`, `--container-md`, 28rem. Both progress panels.
 // allow-hardcoded: framework container scale with no token to read it from.
 const double _measureMd = 448;
 
-/// `max-w-prose` — Tailwind's `65ch`, which is 65 advances of the `0` glyph in
+/// `max-w-prose`, Tailwind's `65ch`, which is 65 advances of the `0` glyph in
 /// the paragraph's own face and size and therefore not a px token anywhere.
 /// Measured at the one site that wears it: a `.type-body` paragraph, 15px
 /// Inter.
@@ -157,18 +157,18 @@ const double _measureProse = 614.136;
 // allow-hardcoded: Preflight's own `bolder`, resolved; there is no `--` token for it.
 const double _bolder = 700;
 
-/// `font-medium` — the weight `[data-title]` and `[data-button]` both declare.
+/// `font-medium`: the weight `[data-title]` and `[data-button]` both declare.
 // allow-hardcoded: `font-weight: 500`; the weight ladder has no `--` token.
 const double _medium = 500;
 
-/// `new Promise((res) => setTimeout(res, 1800))` — the Promise button's demo.
+/// `new Promise((res) => setTimeout(res, 1800))`: the Promise button's demo.
 const Duration _promiseLatency = Duration(milliseconds: 1800); // allow-hardcoded: the page's own demo latency, a call-site constant and not a --duration-* token
 
-/// `[data-title]` and `[data-button]` — 13px at **1.5**, at 500.
+/// `[data-title]` and `[data-button]`, 13px at **1.5**, at 500.
 ///
 /// The leading is `.cn-toast`'s own 1.5, which both slots inherit because
 /// neither declares one of their own; the size is `--text-small`. Both are
-/// read off [DsType.small] — the one spec that already transcribes that pair —
+/// read off [DsType.small]: the one spec that already transcribes that pair —
 /// so the only number written here is the weight.
 ///
 /// It is deliberately **not** `DsComponentType.buttonLabel`, which is the same
@@ -205,7 +205,7 @@ const List<_ToneRow> _progressTones = <_ToneRow>[
   ),
 ];
 
-/// One row of [_progressTones] — `as const`, so the shape is the array's.
+/// One row of [_progressTones], `as const`, so the shape is the array's.
 typedef _ToneRow = ({DsProgressTone tone, String label, double value});
 
 /* ── Page helpers ────────────────────────────────────────────────────────── */
@@ -225,13 +225,13 @@ TextStyle _strong(TextStyle base) => base.copyWith(
       ],
     );
 
-/// `<em>` — the page has two, both inside a Note.
+/// `<em>`: the page has two, both inside a Note.
 const TextStyle _em = TextStyle(fontStyle: FontStyle.italic);
 
 /// A block box with a width of its own, at the start of its line.
 ///
 /// The skeleton columns stretch, so their `w-full` placeholders take the
-/// measure the way a block element does — and a `w-24` box then has to be told
+/// measure the way a block element does: and a `w-24` box then has to be told
 /// not to. CSS needs no telling: an explicit width on a block box leaves the
 /// rest of the line empty, which is what this reproduces.
 Widget _atLineStart(Widget child) =>
@@ -240,8 +240,8 @@ Widget _atLineStart(Widget child) =>
 /// A block box wearing a `max-w-*`.
 ///
 /// CSS caps a block box's width and leaves it at the start of its line. A bare
-/// [ConstrainedBox] cannot say that here: handed a **tight** width — which is
-/// what every stretched column and every `Padding` inside one passes down — it
+/// [ConstrainedBox] cannot say that here: handed a **tight** width: which is
+/// what every stretched column and every `Padding` inside one passes down: it
 /// *enforces* that width and the cap is silently lost, so `max-w-md` renders at
 /// the panel's full 982. [Align] is what turns the incoming constraint loose
 /// again, and its own start alignment is the rest of the declaration.
@@ -272,10 +272,10 @@ class FeedbackPage extends StatelessWidget {
           eyebrow: '${here.group.title} · Base',
           title: here.category.title,
           blurb: here.category.blurb,
-          // DRIFT 1 — seven chips against five content sections.
+          // DRIFT 1: seven chips against five content sections.
           contents: here.category.contents,
         ),
-        // `className="mb-12"` — 48px. The only Note in the corpus that sits
+        // `className="mb-12"`, 48px. The only Note in the corpus that sits
         // outside every section, and therefore the only one at the full 1080.
         Padding(
           padding: EdgeInsets.only(bottom: ds(12)),
@@ -356,7 +356,7 @@ class _AlertSection extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            // `div.space-y-4` — five alerts, 16px between them.
+            // `div.space-y-4`: five alerts, 16px between them.
             const DsAlert(
               icon: DsIcon(
                 DsIconGlyph.info,
@@ -419,7 +419,7 @@ class _AlertSection extends StatelessWidget {
               ),
             ),
             SizedBox(height: ds(4)),
-            // DRIFT 3 — the `info` variant wearing an `AlertTriangle`, over
+            // DRIFT 3: the `info` variant wearing an `AlertTriangle`, over
             // warning copy. A cyan triangle on a cyan bloom.
             const DsAlert(
               variant: DsAlertVariant.info,
@@ -502,7 +502,7 @@ class _ToastSectionState extends State<_ToastSection> {
     super.dispose();
   }
 
-  /// `toast("Added to favourites")` — the untyped call, which is the one the
+  /// `toast("Added to favourites")`: the untyped call, which is the one the
   /// controller spells as [DsToastController.show].
   void _neutral() => docsToasts.show(
         const DsToastMessage(title: 'Added to favourites'),
@@ -527,7 +527,7 @@ class _ToastSectionState extends State<_ToastSection> {
   /// the preview one panel up is no longer the only place it can be looked at.
   ///
   /// No `onPressed`: the reference's handler is an empty arrow, and the
-  /// dismissal that follows a press is sonner's own — [DsToastAction] runs the
+  /// dismissal that follows a press is sonner's own, [DsToastAction] runs the
   /// handler and `DsToaster` deletes the toast after it, handler or not.
   void _error() => docsToasts.error(
         'Could not reach the vault',
@@ -544,7 +544,7 @@ class _ToastSectionState extends State<_ToastSection> {
   /// page owns the clock: `setTimeout` dies with the document, and a page that
   /// left a real timer running would settle a toast into whatever mounted
   /// after it. Disposed mid-flight the completer is simply never completed,
-  /// which is what navigating away from the reference does — the loading toast
+  /// which is what navigating away from the reference does: the loading toast
   /// goes with the page and nothing settles.
   void _firePromise() {
     _clock?.cancel();
@@ -659,7 +659,7 @@ class _ToastSectionState extends State<_ToastSection> {
   }
 }
 
-/// `ul.flex.list-none.flex-col.gap-4` — *"a `<li>` needs a list to be valid."*
+/// `ul.flex.list-none.flex-col.gap-4`, *"a `<li>` needs a list to be valid."*
 ///
 /// `align-items` defaults to `stretch`, and every child sets `width: 356px`, so
 /// the stack is left-aligned rather than full-bleed.
@@ -681,10 +681,10 @@ class _ToastPreviewStack extends StatelessWidget {
       );
 }
 
-/// `components/ds/toast-preview.tsx` — *"a toast, rendered where you can look
+/// `components/ds/toast-preview.tsx`, *"a toast, rendered where you can look
 /// at one."*
 ///
-/// The same tree sonner builds — `[data-icon]`, `[data-content]`,
+/// The same tree sonner builds, `[data-icon]`, `[data-content]`,
 /// `[data-title]`, `[data-description]`, `[data-button]` inside `.cn-toast` —
 /// minus the `data-sonner-toast` attribute that carries the fixed positioning
 /// and the enter animation. `.cn-toast` styles both; sonner's own stylesheet
@@ -692,13 +692,13 @@ class _ToastPreviewStack extends StatelessWidget {
 ///
 /// | declaration | value |
 /// |---|---|
-/// | `width: var(--width, 22.25rem)` | **356px** — [DsToaster.width] |
+/// | `width: var(--width, 22.25rem)` | **356px**, [DsToaster.width] |
 /// | `display: flex; align-items: flex-start` | icon beside content, both top-aligned |
 /// | `gap: calc(--spacing * 3)` | 12px |
 /// | `padding: calc(--spacing * 4)` | 16px |
 /// | `border-radius: var(--radius-lg)` | 12px |
 /// | `background-color: var(--popover)` | the shorthand would reset `background-image` too |
-/// | `box-shadow: var(--shadow-e3)` | — |
+/// | `box-shadow: var(--shadow-e3)` |, |
 /// | `font-size: var(--text-small)` + a 1.5 leading | 13 / 19.5 |
 /// | `overflow: hidden` | the bloom's clip |
 ///
@@ -714,7 +714,7 @@ class _ToastPreview extends StatelessWidget {
     this.action,
   });
 
-  /// `data-type` — `default` renders no glyph at all.
+  /// `data-type`, `default` renders no glyph at all.
   final DsToastType type;
 
   final String title;
@@ -739,7 +739,7 @@ class _ToastPreview extends StatelessWidget {
           // `[data-content] { gap: calc(--spacing * 1) }`.
           SizedBox(height: ds(1)),
           // `[data-description]` sets font-size and colour and **no leading**,
-          // so it keeps `.cn-toast`'s 1.5 — which is `.type-small` exactly.
+          // so it keeps `.cn-toast`'s 1.5: which is `.type-small` exactly.
           DsText(description!, DsType.small),
         ],
       ],
@@ -755,7 +755,7 @@ class _ToastPreview extends StatelessWidget {
               // `[data-icon] { margin-top: calc(--spacing * 0.5) }`.
               padding: EdgeInsets.only(top: ds(0.5)),
               child: type == DsToastType.loading
-                  // `className="size-4 anim-spin"` — `pulls-spin`, 900ms,
+                  // `className="size-4 anim-spin"`, `pulls-spin`, 900ms,
                   // linear, forever. Reduced motion holds it at 0°, which is
                   // where a fill-less animation reverts to.
                   ? DsKeyframePlayer(
@@ -771,7 +771,7 @@ class _ToastPreview extends StatelessWidget {
             // `gap: calc(--spacing * 3)`.
             SizedBox(width: ds(3)),
           ],
-          // `[data-content] { min-width: 0 }` — it shrinks, and the pill's
+          // `[data-content] { min-width: 0 }`: it shrinks, and the pill's
           // `margin-left: auto` takes whatever is left over.
           Expanded(child: content),
           if (action != null) ...<Widget>[
@@ -792,7 +792,7 @@ class _ToastPreview extends StatelessWidget {
 
     // `box-shadow: var(--shadow-e3)` and `border: 1px solid var(--border)`,
     // outside the bloom's clip because `overflow: hidden` clips to the padding
-    // box — so the border stroke sits outside the light (drift 15).
+    // box: so the border stroke sits outside the light (drift 15).
     toast = DsMachineSurface(
       spec: DsShadows.e3,
       radius: radius,
@@ -803,7 +803,7 @@ class _ToastPreview extends StatelessWidget {
     return SizedBox(width: DsToaster.width, child: toast);
   }
 
-  /// `<Icon className="size-4"/>`, raw — 16px at lucide's own stroke, in the
+  /// `<Icon className="size-4"/>`, raw, 16px at lucide's own stroke, in the
   /// type's `-ink`.
   Widget _previewGlyph(DsIconGlyph glyph, DsThemeData theme) => DsIcon(
         glyph,
@@ -815,7 +815,7 @@ class _ToastPreview extends StatelessWidget {
   /// `.cn-toast[data-type="…"]`'s `--bloom-1` / `--bloom-2` pair.
   ///
   /// Four of the five agree with the Alert variant of the same name. `warning`
-  /// does not — DRIFT 2, and [DsBloomCosmic.toastWarning] is the pair the Alert
+  /// does not, DRIFT 2, and [DsBloomCosmic.toastWarning] is the pair the Alert
   /// was moved off.
   static Widget _bloomFor(
     DsToastType type, {
@@ -839,7 +839,7 @@ class _ToastPreview extends StatelessWidget {
       };
 }
 
-/// `[data-button]` — `variant="secondary" size="sm"` written out by hand,
+/// `[data-button]`, `variant="secondary" size="sm"` written out by hand,
 /// because sonner renders the button itself and never sees the cva.
 ///
 /// **The preview's own element**, not the live pill: `toast-preview.tsx`
@@ -901,7 +901,7 @@ class _ToastActionPillState extends State<_ToastActionPill> {
           decoration: BoxDecoration(
             color: wash ?? fill,
             borderRadius: BorderRadius.circular(DsRadii.pill),
-            // `border: 1px solid transparent` — declared, and it still costs
+            // `border: 1px solid transparent`: declared, and it still costs
             // the pill its pixel on each side.
             border: Border.all(
               color: dsTransparent,
@@ -1059,7 +1059,7 @@ class _SkeletonSection extends StatelessWidget {
                     ),
                   ],
                 ),
-                // DRIFT 5 — no `mt-6`, and no gap at all. The list butts
+                // DRIFT 5: no `mt-6`, and no gap at all. The list butts
                 // straight into the paragraph above it.
                 const DsMeta(
                   items: <DsMetaItem>[
@@ -1090,7 +1090,7 @@ class _SkeletonSection extends StatelessWidget {
   }
 }
 
-/// `div.rounded-lg.border.border-border.bg-card.p-4` — seven placeholders in
+/// `div.rounded-lg.border.border-border.bg-card.p-4`: seven placeholders in
 /// the shape of a pack card. Measured 482 × 348.
 class _PackCardSkeleton extends StatelessWidget {
   const _PackCardSkeleton();
@@ -1114,15 +1114,15 @@ class _PackCardSkeleton extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            // `mb-4 h-32 w-full rounded-md` — the art.
+            // `mb-4 h-32 w-full rounded-md`: the art.
             DsSkeleton(height: ds(32)),
             SizedBox(height: ds(4)),
-            // `h-3 w-24` — the set name.
+            // `h-3 w-24`: the set name.
             _atLineStart(DsSkeleton(width: ds(24), height: ds(3))),
-            // `mt-2.5 h-4 w-40` — the card name.
+            // `mt-2.5 h-4 w-40`: the card name.
             SizedBox(height: ds(2.5)),
             _atLineStart(DsSkeleton(width: ds(40), height: ds(4))),
-            // `mt-4 flex gap-2` — two rarity pills.
+            // `mt-4 flex gap-2`: two rarity pills.
             SizedBox(height: ds(4)),
             Row(
               mainAxisSize: MainAxisSize.min,
@@ -1132,10 +1132,10 @@ class _PackCardSkeleton extends StatelessWidget {
                 DsSkeleton(width: ds(16), height: ds(5), radius: DsRadii.pill),
               ],
             ),
-            // `mt-4 h-6 w-20` — the price.
+            // `mt-4 h-6 w-20`: the price.
             SizedBox(height: ds(4)),
             _atLineStart(DsSkeleton(width: ds(20), height: ds(6))),
-            // `mt-4 h-10 w-full rounded-md` — the buy button.
+            // `mt-4 h-10 w-full rounded-md`: the buy button.
             SizedBox(height: ds(4)),
             DsSkeleton(height: ds(10)),
           ],
@@ -1168,7 +1168,7 @@ class _PullRowSkeletons extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  // `size-8 rounded-pill` — the avatar.
+                  // `size-8 rounded-pill`: the avatar.
                   DsSkeleton(
                     width: ds(8),
                     height: ds(8),
@@ -1205,7 +1205,7 @@ class _PullRowSkeletons extends StatelessWidget {
 /// `div.space-y-px.overflow-hidden.rounded-lg.border.border-border`.
 ///
 /// **The seams are not a fill.** The container declares no background, so what
-/// shows in each `space-y-px` gap is whatever is behind it — the panel's own
+/// shows in each `space-y-px` gap is whatever is behind it: the panel's own
 /// `--background`. `space-y-px` is a bottom **margin** on every child but the
 /// last, not a gap, and the measured height only works out with the container's
 /// own two border pixels: 4 × 58 + 3 × 1 + 2 × 1 = 237.
@@ -1260,7 +1260,7 @@ class _InlinePlaceholderBody extends StatelessWidget {
           ),
           DsCode.span('as="span"'),
           const TextSpan(text: ' — like '),
-          // `h-3.5 w-28 align-middle` — `inline-block`, centred on the
+          // `h-3.5 w-28 align-middle`, `inline-block`, centred on the
           // surrounding lowercase, which is what `vertical-align: middle` is.
           DsSkeleton.span(width: ds(28), height: ds(3.5)),
           const TextSpan(text: ' here — because a '),
@@ -1313,7 +1313,7 @@ class _ProgressSection extends StatelessWidget {
 
     return DsSection(
       id: 'progress',
-      // DRIFT 18 — the title and the `id` disagree, and the chip list splits
+      // DRIFT 18: the title and the `id` disagree, and the chip list splits
       // the two halves into separate entries.
       title: 'Progress & Spinner',
       description: 'Progress when the total is known — pack supply, XP toward '
@@ -1331,13 +1331,13 @@ class _ProgressSection extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: <Widget>[
-                      // DRIFT 6 — the one bar with no `aria-label`.
+                      // DRIFT 6: the one bar with no `aria-label`.
                       _ProgressReading(
                         label: 'Pack supply remaining',
                         readout: '412 / 2,000',
                         value: 20.6,
                       ),
-                      // `space-y-8` — 32px between rows.
+                      // `space-y-8`, 32px between rows.
                       SizedBox(height: ds(8)),
                       _ProgressReading(
                         label: 'XP to Rank 25',
@@ -1365,7 +1365,7 @@ class _ProgressSection extends StatelessWidget {
                   DsType.small,
                 ),
                 SizedBox(height: ds(4)),
-                // No title, default `action` tone — and inside the Panel.
+                // No title, default `action` tone: and inside the Panel.
                 const DsNote(child: _SunkenChannelBody()),
               ],
             ),
@@ -1414,7 +1414,7 @@ class _ProgressSection extends StatelessWidget {
                 DsRow(
                   children: <Widget>[
                     const DsSpinner(),
-                    // `className="size-5"` / `"size-6"` — the class beats the
+                    // `className="size-5"` / `"size-6"`: the class beats the
                     // attribute and only the box changes (drift 11).
                     DsSpinner(size: ds(5)),
                     DefaultTextStyle.merge(
@@ -1457,7 +1457,7 @@ class _ProgressReading extends StatelessWidget {
   /// `span.type-label`.
   final String label;
 
-  /// `span.type-num-sm` — the real figures, which RULES asks every bar to
+  /// `span.type-num-sm`: the real figures, which RULES asks every bar to
   /// carry.
   final String readout;
 
@@ -1468,7 +1468,7 @@ class _ProgressReading extends StatelessWidget {
 
   final DsProgressTone tone;
 
-  /// `aria-label`, absent exactly once — drift 6.
+  /// `aria-label`, absent exactly once: drift 6.
   final String? ariaLabel;
 
   @override
@@ -1492,7 +1492,7 @@ class _ProgressReading extends StatelessWidget {
             ),
           ],
         ),
-        // `mb-2.5` — 10px.
+        // `mb-2.5`, 10px.
         SizedBox(height: ds(2.5)),
         DsProgress(value: value, tone: tone, label: ariaLabel),
       ],
@@ -1506,7 +1506,7 @@ class _SunkenChannelBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DsText(
-      // `&rsquo;` — a real right single quotation mark.
+      // `&rsquo;`: a real right single quotation mark.
       'Same 10px sunken channel as the Slider’s track, because it is the same '
       'object — a filled channel. The only difference is the missing thumb, '
       'because you cannot grab this one. Stock shadcn ships a 4px hair, which '

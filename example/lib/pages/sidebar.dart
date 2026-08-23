@@ -1,4 +1,4 @@
-/// `/design-system/components/base/sidebar` — *"the app shell, taken apart."*
+/// `/design-system/components/base/sidebar`, *"the app shell, taken apart."*
 ///
 /// The page's own thesis, and the reason it has no second anatomy: **one
 /// composition, rendered repeatedly.** `FixtureHeader`, `FixtureMenu`,
@@ -12,13 +12,13 @@
 ///
 /// ## The two stages
 ///
-/// `PartStage` is `collapsible="none"` — *"the one mode upstream renders as a
+/// `PartStage` is `collapsible="none"`, *"the one mode upstream renders as a
 /// plain flex column: the real component, carrying the real tokens, with no
 /// fixed positioning and no viewport dependency."* Every resting specimen sits
 /// in one.
 ///
 /// `ShellStage` is the whole shell, boxed. On the reference `transform-gpu`
-/// traps a genuinely `position: fixed` panel inside a 384px frame — *"CSS doing
+/// traps a genuinely `position: fixed` panel inside a 384px frame, *"CSS doing
 /// its documented job rather than a hack, and it is the whole reason
 /// `SidebarRail` and `SidebarInset` can be documented in a panel instead of
 /// behind a link."* The port needs no trap: [DsSidebar] renders its container
@@ -27,10 +27,10 @@
 /// ## Oracle (light, 1440 × 900, 2026-08-16)
 ///
 /// `node tool/verify/section-oracle.js /design-system/components/base/sidebar`
-/// — document `scrollHeight` **5644**, `main` 64 → 5579.7. Section tops and
+///: document `scrollHeight` **5644**, `main` 64 → 5579.7. Section tops and
 /// border-box heights are pinned in `example/test/sidebar_page_test.dart`.
 ///
-/// ## Drift register — reproduced, recorded, never fixed
+/// ## Drift register: reproduced, recorded, never fixed
 ///
 ///  1. **The chip list is the export inventory, not the section list.**
 ///     `contents` names twenty-one *components* while the page has nine
@@ -42,37 +42,37 @@
 ///     `px-0`; tailwind-merge drops `pr-10` with it.
 ///  3. **The badge is typed twice and loses both properties it shares.**
 ///     `.type-num-xs` (11/600) against `Badge`'s `text-xs font-medium`
-///     (12/500) — measured 12px at 500, mono, tabular. Carried by
+///     (12/500): measured 12px at 500, mono, tabular. Carried by
 ///     [DsComponentType.sidebarMenuBadge].
-///  4. **`NavUser`'s avatar fallback splits the difference** — 13px from
+///  4. **`NavUser`'s avatar fallback splits the difference**, 13px from
 ///     `text-sm`, 600 from `.type-num-sm`, mono from `.type-num-sm`.
 ///  5. **Every row on the page is a `<button>` with no `onClick`.** The active
 ///     row is fixed by prop, so the travelling pill never travels here: it
-///     places once, squashes once, and stays. Reproduced exactly — the rows
+///     places once, squashes once, and stays. Reproduced exactly: the rows
 ///     answer a pointer (hover, press, focus) and change nothing.
 ///  6. **The pill lands on the parent row in §Submenu, not on the list item.**
 ///     Both the parent and the "Open" sub-link carry `data-active`;
 ///     `querySelector` takes the first, so the 149.5px item holds a 37.5px
 ///     pill.
 ///  7. **`SidebarMenuAction` appears exactly once**, in §Badges and actions,
-///     and `showOnHover` is never passed — so the `md:opacity-0` branch is
+///     and `showOnHover` is never passed: so the `md:opacity-0` branch is
 ///     declared and unreachable from this page.
 ///  8. **`SidebarMenuSkeleton` is exported and never rendered.** It is in
 ///     `contents`; no section shows one.
-///  9. **`SidebarInput` is `h-8 bg-background shadow-none`** — the one field in
+///  9. **`SidebarInput` is `h-8 bg-background shadow-none`**: the one field in
 ///     the system with no socket. It reads as a well only because the panel
 ///     around it is `--sidebar`.
-/// 10. **~~The shell link goes nowhere here.~~ — CLOSED.** *"Open the
+/// 10. **~~The shell link goes nowhere here.~~, CLOSED.** *"Open the
 ///     full-viewport sidebar"* points at `/sidebar-demo`, which the port now
 ///     carries: `pages/sidebar_demo.dart`, mounted outside [DocsShell] by the
 ///     one route arm in `main.dart` that renders no docs chrome. The button
 ///     navigates. Kept in the register rather than deleted, because the drift
 ///     was real for two phases and the entry is where its close is recorded.
-/// 11. **`duration-base` is inert, five times over** — closed corpus-wide by
+/// 11. **`duration-base` is inert, five times over**: closed corpus-wide by
 ///     the sweep. All five sites still run 250ms, because
 ///     `--default-transition-duration` **is** `--duration-base`.
 /// 12. **The `sidebar_state` cookie has no counterpart**, and the readout copy
-///     that mentions it is not on this page — the page shows the shell matrix
+///     that mentions it is not on this page: the page shows the shell matrix
 ///     only.
 library;
 
@@ -97,7 +97,7 @@ const List<({String label, DsIconGlyph glyph, String? count})> _nav =
 ];
 
 /// `FOOT_NAV`. `Receipt` is not on the icons page's curated whitelist, so it
-/// comes off the generated registry — the same split `DsIcon.lucide` carries.
+/// comes off the generated registry: the same split `DsIcon.lucide` carries.
 const List<({String label, DsIconGlyph? glyph, DsLucideGlyph? lucide})>
     _footNav = <({String label, DsIconGlyph? glyph, DsLucideGlyph? lucide})>[
   (label: 'Orders', glyph: null, lucide: DsLucide.receipt),
@@ -105,7 +105,7 @@ const List<({String label, DsIconGlyph? glyph, DsLucideGlyph? lucide})>
   (label: 'Settings', glyph: DsIconGlyph.settings, lucide: null),
 ];
 
-/// `ACCOUNT` — *"the account the footer specimens show. Sample data, never a
+/// `ACCOUNT`, *"the account the footer specimens show. Sample data, never a
 /// default."*
 const DsNavUserAccount _account = DsNavUserAccount(
   name: 'Ayoub Elattar',
@@ -120,7 +120,7 @@ const List<DsNavUserItem> _accountItems = <DsNavUserItem>[
   DsNavUserItem(label: 'Sign out', icon: DsLucide.logOut, destructive: true),
 ];
 
-/// `BUTTON_VARIANTS`, in the page's own order — `ghost` first, `default`
+/// `BUTTON_VARIANTS`, in the page's own order, `ghost` first, `default`
 /// second.
 const List<({String label, DsButtonVariant variant})> _buttonVariants =
     <({String label, DsButtonVariant variant})>[
@@ -149,29 +149,29 @@ const List<({String label, DsBadgeVariant variant})> _badgeVariants =
   (label: 'info', variant: DsBadgeVariant.info),
 ];
 
-/// `h-160` — the anatomy stage. 640px.
+/// `h-160`: the anatomy stage. 640px.
 const double _stageTall = 640;
 
-/// `h-40` — the header-in-context stage. 160px.
+/// `h-40`: the header-in-context stage. 160px.
 const double _stageShort = 160;
 
-/// `h-80` — the two footer stages. 320px.
+/// `h-80`: the two footer stages. 320px.
 const double _stageFooter = 320;
 
-/// `h-96` — the shell frame. 384px.
+/// `h-96`: the shell frame. 384px.
 const double _shellHeight = 384;
 
-/// `lg:grid-cols-[20rem_1fr]` — the anatomy's fixed first column, 20rem.
+/// `lg:grid-cols-[20rem_1fr]`: the anatomy's fixed first column, 20rem.
 // allow-hardcoded: framework rem measure with no token to read it from.
 const double _railColumn = 320;
 
 /* ── Stages ──────────────────────────────────────────────────────────────── */
 
-/// `PartStage` — one part, shown on its own.
+/// `PartStage`: one part, shown on its own.
 ///
 /// Upstream this is a `SidebarProvider` at `min-h-0 w-auto` around a
 /// `Sidebar collapsible="none"` at `rounded-lg border border-sidebar-border`,
-/// and **every call site on the page passes `rounded-none border-0`** — so the
+/// and **every call site on the page passes `rounded-none border-0`**: so the
 /// declared frame never renders and the stage is a bare `--sidebar` block. The
 /// `w-full` each of them also passes is what makes a 256px component fill the
 /// panel it sits in.
@@ -205,7 +205,7 @@ class _PartStage extends StatelessWidget {
   }
 }
 
-/// `ShellStage` — the whole shell, boxed.
+/// `ShellStage`: the whole shell, boxed.
 class _ShellStage extends StatelessWidget {
   const _ShellStage({required this.children, required this.variant});
 
@@ -226,7 +226,7 @@ class _ShellStage extends StatelessWidget {
           borderRadius: BorderRadius.circular(DsRadii.lg),
           border: Border.all(color: theme.border, width: DsWidths.hairline),
         ),
-        // `box-sizing: border-box` — the frame is paid out of the 384.
+        // `box-sizing: border-box`: the frame is paid out of the 384.
         child: Padding(
           padding: const EdgeInsets.all(DsWidths.hairline),
           child: ClipRRect(
@@ -243,7 +243,7 @@ class _ShellStage extends StatelessWidget {
 
 /* ── The shared composition ──────────────────────────────────────────────── */
 
-/// `FixtureHeader` — *"one workspace button and one SidebarInput."*
+/// `FixtureHeader`, *"one workspace button and one SidebarInput."*
 class _FixtureHeader extends StatelessWidget {
   const _FixtureHeader();
 
@@ -339,11 +339,11 @@ class _WorkspaceLabel extends StatelessWidget {
   }
 }
 
-/// `FixtureMenu` — *"every non-variant specimen uses this exact function."*
+/// `FixtureMenu`, *"every non-variant specimen uses this exact function."*
 class _FixtureMenu extends StatelessWidget {
   const _FixtureMenu();
 
-  /// `activeLabel = NAV[0].label` — the page never overrides either default,
+  /// `activeLabel = NAV[0].label`: the page never overrides either default,
   /// so both are stated once here rather than carried as unused props.
   static const String activeLabel = 'All cards';
 
@@ -375,7 +375,7 @@ class _FixtureMenu extends StatelessWidget {
   }
 }
 
-/// The `FOOT_NAV` menu — the second group of `FixtureContent`.
+/// The `FOOT_NAV` menu: the second group of `FixtureContent`.
 class _ActivityMenu extends StatelessWidget {
   const _ActivityMenu();
 
@@ -402,7 +402,7 @@ class _ActivityMenu extends StatelessWidget {
   }
 }
 
-/// `FixtureContent` — *"no section owns a private copy of these groups."*
+/// `FixtureContent`, *"no section owns a private copy of these groups."*
 class _FixtureContent extends StatelessWidget {
   const _FixtureContent();
 
@@ -439,7 +439,7 @@ class _AddCollection extends StatelessWidget {
       );
 }
 
-/// `FixtureFooter` — *"one NavUser composition, pinned by SidebarFooter."*
+/// `FixtureFooter`, *"one NavUser composition, pinned by SidebarFooter."*
 class _FixtureFooter extends StatelessWidget {
   const _FixtureFooter();
 
@@ -1355,7 +1355,7 @@ class _ShellSection extends StatelessWidget {
               alignment: AlignmentDirectional.centerStart,
               child: DsButton(
                 variant: DsButtonVariant.outline,
-                // `asChild` + `<Link href="/sidebar-demo">` — the B4
+                // `asChild` + `<Link href="/sidebar-demo">`: the B4
                 // divergence, so the href is the button's own handler.
                 onPressed: () =>
                     AppRouter.of(context).navigate(sidebarDemoRoute),

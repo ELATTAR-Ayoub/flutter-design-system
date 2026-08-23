@@ -1,4 +1,4 @@
-/// `/design-system/components/agent/console` — the whole component, live, on a
+/// `/design-system/components/agent/console`: the whole component, live, on a
 /// scripted transport.
 ///
 /// **The specimens are not pictures.** The page's own opening note is the thesis
@@ -15,7 +15,7 @@
 ///
 /// `page.tsx` renders `live` → `transport` → `features` → `launcher`. The nav
 /// registry's `contents` for this category reads *Live console · The four seams
-/// · Feature flags · Personas · Launcher · Transport contract* — **six chips, a
+/// · Feature flags · Personas · Launcher · Transport contract*, **six chips, a
 /// different order, and two of them (`The four seams`, `Personas`) have no
 /// section behind them at all.** That is the exact failure the selects page's
 /// own §6 is a postmortem of, and it is reproduced here on both sides: the chip
@@ -34,12 +34,12 @@
 /// launcher  top 2571.2  h 404.8
 /// ```
 ///
-/// The two demo boxes carry explicit heights — `h-152` (608) on [LiveConsole],
-/// `h-80` (320) on [MinimalConsole], `h-56` (224) on the launcher panel — so the
+/// The two demo boxes carry explicit heights, `h-152` (608) on [LiveConsole],
+/// `h-80` (320) on [MinimalConsole], `h-56` (224) on the launcher panel: so the
 /// document height does **not** depend on the console's internals. Fidelity
 /// does; parity does not. `console_page_test.dart` pins both.
 ///
-/// ## Drift register — recorded, shipped as written
+/// ## Drift register: recorded, shipped as written
 ///
 ///  1. **The eyebrow says the group twice over.** `` `${group.title} ·
 ///     Components` `` with `group.title = "Agent"`, so it reads *"Agent ·
@@ -52,7 +52,7 @@
 ///     advertised in the header and rendered nowhere. Six chips, four anchors.
 ///  4. **The section descriptions count features differently from the Panel
 ///     note.** §features says *"Nine switches, all on by default"* and its Panel
-///     note lists nine names — but [MinimalConsole] turns **eight** of them off
+///     note lists nine names: but [MinimalConsole] turns **eight** of them off
 ///     and leaves `reset` on, which is the one the note lists last and the demo
 ///     never touches. The copy is right about the count and silent about which
 ///     one survives.
@@ -62,18 +62,18 @@
 ///  6. **The transport section documents `restore?`, which the console never
 ///     calls.** `AgentConsole` has no history control and reads no `restore`;
 ///     the mock transport implements it anyway and the `Meta` list documents it
-///     as optional. Ported into the list as written — the port's
+///     as optional. Ported into the list as written: the port's
 ///     [DsAgentTransport] does not declare it, so the row documents a member of
 ///     the reference's interface that this one does not have, which is itself
 ///     the honest reading of *"a transport with no history behind it omits it"*.
 ///  7. **The approval gate never reaches `awaiting_approval`.** Probed live: the
 ///     status line reads `Processing` while the card is up. See
-///     [DsAgentConsole]'s own register — one of the twenty states is unreachable
+///     [DsAgentConsole]'s own register: one of the twenty states is unreachable
 ///     through this transport.
 ///  8. **The launcher's label does not slide.** `translate-x-2` compiles to the
 ///     standalone `translate` property, which is not in the element's
 ///     `transition-property`; the 8px offset snaps on the first hover frame and
-///     only the opacity fades. Traced with a real pointer — see
+///     only the opacity fades. Traced with a real pointer: see
 ///     [DsAgentLauncher].
 library;
 
@@ -85,7 +85,7 @@ import 'package:flutter/widgets.dart';
 
 /* ── Shared fixtures ─────────────────────────────────────────────────────── */
 
-/// `PERSONA` — `components/ds/agent-demo.tsx`.
+/// `PERSONA`, `components/ds/agent-demo.tsx`.
 const DsAgentPersona kVaultPersona = DsAgentPersona(
   name: 'Vault',
   blurb: 'Ask about packs, pulls, prices and your wallet.',
@@ -98,9 +98,9 @@ const DsAgentPersona kVaultPersona = DsAgentPersona(
   placeholder: 'Ask about a pack, a pull or your balance…',
 );
 
-/// `TOOL_STATES` — *"how this product's tools map onto the state machine.
+/// `TOOL_STATES`, *"how this product's tools map onto the state machine.
 /// Supplied by the caller rather than guessed, because only the caller knows
-/// whether `export_activity` is reading, writing or running — and a status line
+/// whether `export_activity` is reading, writing or running: and a status line
 /// that guesses is a status line that lies."*
 const DsToolStateMap kVaultToolStates = <String, DsAgentState>{
   'search_inventory': DsAgentState.searching,
@@ -109,7 +109,7 @@ const DsToolStateMap kVaultToolStates = <String, DsAgentState>{
   'fetch_market_price': DsAgentState.retrieving,
 };
 
-/// `COMMANDS` — three skills and one command, which is why the welcome card
+/// `COMMANDS`: three skills and one command, which is why the welcome card
 /// shows three chips (drift 5).
 const List<DsAgentCommand> kVaultCommands = <DsAgentCommand>[
   DsAgentCommand(
@@ -148,7 +148,7 @@ const List<DsAgentModel> kVaultModels = <DsAgentModel>[
   DsAgentModel(id: 'deep', label: 'Deep', hint: 'Slower, checks its work'),
 ];
 
-/// `describeApproval` — *"turns a held action into a sentence a human can decide
+/// `describeApproval`, *"turns a held action into a sentence a human can decide
 /// on."*
 String describeVaultApproval(String action, Map<String, Object?> params) {
   if (action == 'purchase_pack') {
@@ -176,17 +176,14 @@ class ConsolePage extends StatelessWidget {
           eyebrow: '${here.group.title} · Components',
           title: here.category.title,
           blurb: here.category.blurb,
-          // DRIFT 2 and 3 — six chips, a different order, two with no anchor.
+          // DRIFT 2 and 3: six chips, a different order, two with no anchor.
           contents: here.category.contents,
         ),
-        // `className="mb-12"` — 48px, above the first section rather than
+        // `className="mb-12"`, 48px, above the first section rather than
         // inside it.
         Padding(
           padding: EdgeInsets.only(bottom: ds(12)),
-          child: const DsNote(
-            title: 'This is running',
-            child: _OpeningNote(),
-          ),
+          child: const DsNote(title: 'This is running', child: _OpeningNote()),
         ),
         const _LiveSection(),
         const _TransportSection(),
@@ -203,36 +200,35 @@ class _OpeningNote extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => DsRichText(
-        TextSpan(
-          children: <InlineSpan>[
-            const TextSpan(
-              text: 'Nothing on this page is a screenshot. The console below is '
-                  'the real component on a scripted transport, so every state '
-                  'is reachable by typing. Ask it ',
-            ),
-            _em(context, 'what is left'),
-            const TextSpan(text: ' and it searches. Ask it to '),
-            _em(context, 'export'),
-            const TextSpan(
-              text: ' and it hands back a file. Ask it to ',
-            ),
-            _em(context, 'buy'),
-            const TextSpan(
-              text: ' something and it stops and asks you first. Ask about a ',
-            ),
-            _em(context, 'price'),
-            const TextSpan(text: ' and it fails, on purpose.'),
-          ],
+    TextSpan(
+      children: <InlineSpan>[
+        const TextSpan(
+          text:
+              'Nothing on this page is a screenshot. The console below is '
+              'the real component on a scripted transport, so every state '
+              'is reachable by typing. Ask it ',
         ),
-        DsType.small,
-      );
+        _em(context, 'what is left'),
+        const TextSpan(text: ' and it searches. Ask it to '),
+        _em(context, 'export'),
+        const TextSpan(text: ' and it hands back a file. Ask it to '),
+        _em(context, 'buy'),
+        const TextSpan(
+          text: ' something and it stops and asks you first. Ask about a ',
+        ),
+        _em(context, 'price'),
+        const TextSpan(text: ' and it fails, on purpose.'),
+      ],
+    ),
+    DsType.small,
+  );
 }
 
-/// `<em>` — italic, inheriting everything else from the sentence.
+/// `<em>`: italic, inheriting everything else from the sentence.
 InlineSpan _em(BuildContext context, String text) => TextSpan(
-      text: text,
-      style: const TextStyle(fontStyle: FontStyle.italic),
-    );
+  text: text,
+  style: const TextStyle(fontStyle: FontStyle.italic),
+);
 
 /* ── #live ───────────────────────────────────────────────────────────────── */
 
@@ -241,20 +237,21 @@ class _LiveSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const DsSection(
-        id: 'live',
-        title: 'The console',
-        description: 'Transcript, composer, face and voice in one component. It '
-            'owns the conversation and nothing else — the persona, the tools, '
-            'the models and the agent itself all arrive as props.',
-        child: DsPanel(flush: true, child: LiveConsole()),
-      );
+    id: 'live',
+    title: 'The console',
+    description:
+        'Transcript, composer, face and voice in one component. It '
+        'owns the conversation and nothing else — the persona, the tools, '
+        'the models and the agent itself all arrive as props.',
+    child: DsPanel(flush: true, child: LiveConsole()),
+  );
 }
 
-/// `LiveConsole` — *"the console, live."* `className="h-152"`.
+/// `LiveConsole`, *"the console, live."* `className="h-152"`.
 class LiveConsole extends StatefulWidget {
   const LiveConsole({super.key});
 
-  /// `h-152` — 608px.
+  /// `h-152`, 608px.
   static double get height => ds(152);
 
   @override
@@ -272,14 +269,14 @@ class _LiveConsoleState extends State<LiveConsole> {
 
   @override
   Widget build(BuildContext context) => DsAgentConsole(
-        transport: _transport,
-        persona: kVaultPersona,
-        toolStates: kVaultToolStates,
-        commands: kVaultCommands,
-        models: kVaultModels,
-        describeApproval: describeVaultApproval,
-        height: LiveConsole.height,
-      );
+    transport: _transport,
+    persona: kVaultPersona,
+    toolStates: kVaultToolStates,
+    commands: kVaultCommands,
+    models: kVaultModels,
+    describeApproval: describeVaultApproval,
+    height: LiveConsole.height,
+  );
 }
 
 /* ── #transport ──────────────────────────────────────────────────────────── */
@@ -289,90 +286,97 @@ class _TransportSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => DsSection(
-        id: 'transport',
-        title: 'The transport contract',
-        description: 'One interface stands between this component and whatever '
-            'is actually answering. Implement it and the console points at your '
-            'agent; nothing else in the family moves.',
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            DsMeta(
-              items: <DsMetaItem>[
-                (
-                  k: 'turns',
-                  v: const TextSpan(
-                    text: 'AgentTurn[] — the transcript, in order. Owned by the '
-                        'transport so it can settle its own tool calls.',
-                  ),
-                ),
-                (
-                  k: 'send',
-                  v: const TextSpan(text: '(text, options) => Promise<void>'),
-                ),
-                (
-                  k: 'abort',
-                  v: const TextSpan(
-                    text: '() => void — the user pressed stop. Not an error.',
-                  ),
-                ),
-                (k: 'reset', v: const TextSpan(text: '() => void')),
-                (k: 'isLoading', v: const TextSpan(text: 'boolean')),
-                (
-                  k: 'isReady',
-                  v: const TextSpan(
-                    text: 'boolean — false while acquiring a session, socket or '
-                        'handler. The composer disables rather than dropping '
-                        'the first message.',
-                  ),
-                ),
-                (k: 'error', v: const TextSpan(text: 'Error | null')),
-                (
-                  k: 'pendingApprovals',
-                  v: const TextSpan(
-                    text: 'PendingApproval[] — requests held at a gate, keyed by '
-                        'turn id.',
-                  ),
-                ),
-                (
-                  k: 'capabilities',
-                  v: const TextSpan(
-                    text: 'TransportCapabilities — attachments, models, '
-                        'approvals. Advertised so the console renders only what '
-                        'this agent can do.',
-                  ),
-                ),
-                // DRIFT 6 — documented here, absent from the port's own
-                // interface, and never called by the console either way.
-                (
-                  k: 'restore?',
-                  v: const TextSpan(
-                    text: '(messages) => void — optional. A transport with no '
-                        'history behind it omits it, and the console renders no '
-                        'history control.',
-                  ),
-                ),
-              ],
-            ),
-            // `<p className="type-small mt-6">`.
-            SizedBox(height: ds(6)),
-            DsRichText(
-              TextSpan(
-                children: <InlineSpan>[
-                  DsCode.span('lib/agent/mock-transport.ts'),
-                  const TextSpan(
-                    text: ' is a complete implementation of all of it, in about '
-                        'three hundred lines. Read that before writing a real '
-                        'one — everything a live transport must do is written '
-                        'down there and nowhere else.',
-                  ),
-                ],
+    id: 'transport',
+    title: 'The transport contract',
+    description:
+        'One interface stands between this component and whatever '
+        'is actually answering. Implement it and the console points at your '
+        'agent; nothing else in the family moves.',
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        DsMeta(
+          items: <DsMetaItem>[
+            (
+              k: 'turns',
+              v: const TextSpan(
+                text:
+                    'AgentTurn[] — the transcript, in order. Owned by the '
+                    'transport so it can settle its own tool calls.',
               ),
-              DsType.small,
+            ),
+            (
+              k: 'send',
+              v: const TextSpan(text: '(text, options) => Promise<void>'),
+            ),
+            (
+              k: 'abort',
+              v: const TextSpan(
+                text: '() => void — the user pressed stop. Not an error.',
+              ),
+            ),
+            (k: 'reset', v: const TextSpan(text: '() => void')),
+            (k: 'isLoading', v: const TextSpan(text: 'boolean')),
+            (
+              k: 'isReady',
+              v: const TextSpan(
+                text:
+                    'boolean — false while acquiring a session, socket or '
+                    'handler. The composer disables rather than dropping '
+                    'the first message.',
+              ),
+            ),
+            (k: 'error', v: const TextSpan(text: 'Error | null')),
+            (
+              k: 'pendingApprovals',
+              v: const TextSpan(
+                text:
+                    'PendingApproval[] — requests held at a gate, keyed by '
+                    'turn id.',
+              ),
+            ),
+            (
+              k: 'capabilities',
+              v: const TextSpan(
+                text:
+                    'TransportCapabilities — attachments, models, '
+                    'approvals. Advertised so the console renders only what '
+                    'this agent can do.',
+              ),
+            ),
+            // DRIFT 6: documented here, absent from the port's own
+            // interface, and never called by the console either way.
+            (
+              k: 'restore?',
+              v: const TextSpan(
+                text:
+                    '(messages) => void — optional. A transport with no '
+                    'history behind it omits it, and the console renders no '
+                    'history control.',
+              ),
             ),
           ],
         ),
-      );
+        // `<p className="type-small mt-6">`.
+        SizedBox(height: ds(6)),
+        DsRichText(
+          TextSpan(
+            children: <InlineSpan>[
+              DsCode.span('lib/agent/mock-transport.ts'),
+              const TextSpan(
+                text:
+                    ' is a complete implementation of all of it, in about '
+                    'three hundred lines. Read that before writing a real '
+                    'one — everything a live transport must do is written '
+                    'down there and nowhere else.',
+              ),
+            ],
+          ),
+          DsType.small,
+        ),
+      ],
+    ),
+  );
 }
 
 /* ── #features ───────────────────────────────────────────────────────────── */
@@ -382,28 +386,30 @@ class _FeaturesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const DsSection(
-        id: 'features',
-        title: 'Feature flags',
-        description: 'Nine switches, all on by default. A console with '
-            'everything turned off is still a console — which is the test that '
-            'the parts are genuinely separable rather than merely arranged.',
-        child: DsPanel(
-          label: 'features',
-          // DRIFT 4 — nine names listed, eight of them switched off below.
-          note: 'avatar · suggestions · toolTrace · microphone · speech · '
-              'attachments · commands · models · reset',
-          flush: true,
-          child: MinimalConsole(),
-        ),
-      );
+    id: 'features',
+    title: 'Feature flags',
+    description:
+        'Nine switches, all on by default. A console with '
+        'everything turned off is still a console — which is the test that '
+        'the parts are genuinely separable rather than merely arranged.',
+    child: DsPanel(
+      label: 'features',
+      // DRIFT 4: nine names listed, eight of them switched off below.
+      note:
+          'avatar · suggestions · toolTrace · microphone · speech · '
+          'attachments · commands · models · reset',
+      flush: true,
+      child: MinimalConsole(),
+    ),
+  );
 }
 
-/// `MinimalConsole` — *"the same console with most of it switched off, to show
+/// `MinimalConsole`, *"the same console with most of it switched off, to show
 /// the flags do work."* `className="h-80"`.
 class MinimalConsole extends StatefulWidget {
   const MinimalConsole({super.key});
 
-  /// `h-80` — 320px.
+  /// `h-80`, 320px.
   static double get height => ds(80);
 
   /// The eight flags the demo turns off. `reset` is the ninth and stays on.
@@ -433,15 +439,15 @@ class _MinimalConsoleState extends State<MinimalConsole> {
 
   @override
   Widget build(BuildContext context) => DsAgentConsole(
-        transport: _transport,
-        persona: const DsAgentPersona(
-          name: 'Vault',
-          placeholder: 'Ask a question…',
-        ),
-        toolStates: kVaultToolStates,
-        features: MinimalConsole.features,
-        height: MinimalConsole.height,
-      );
+    transport: _transport,
+    persona: const DsAgentPersona(
+      name: 'Vault',
+      placeholder: 'Ask a question…',
+    ),
+    toolStates: kVaultToolStates,
+    features: MinimalConsole.features,
+    height: MinimalConsole.height,
+  );
 }
 
 /* ── #launcher ───────────────────────────────────────────────────────────── */
@@ -451,51 +457,53 @@ class _LauncherSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => DsSection(
-        id: 'launcher',
-        title: 'Launcher',
-        description: 'How the agent appears on a working page: the avatar '
-            'itself, in the corner, rather than a button with a label on it. '
-            'The thing you click is the thing that then talks to you, and a '
-            'glance at it tells you whether it is idle or still working on the '
-            'last thing you asked.',
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            const LauncherDemo(),
-            SizedBox(height: ds(6)),
-            DsRichText(
-              TextSpan(
-                children: <InlineSpan>[
-                  const TextSpan(text: 'The launcher takes the console as '),
-                  DsCode.span('children'),
-                  const TextSpan(
-                    text: ' rather than building one. A launcher that '
-                        'constructed its own console would have to know about '
-                        'transports, personas and tools — all of which are the '
-                        'product’s business — and every product would then fork '
-                        'it. This way the entrance is system-owned and what it '
-                        'opens is not.',
-                  ),
-                ],
+    id: 'launcher',
+    title: 'Launcher',
+    description:
+        'How the agent appears on a working page: the avatar '
+        'itself, in the corner, rather than a button with a label on it. '
+        'The thing you click is the thing that then talks to you, and a '
+        'glance at it tells you whether it is idle or still working on the '
+        'last thing you asked.',
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        const LauncherDemo(),
+        SizedBox(height: ds(6)),
+        DsRichText(
+          TextSpan(
+            children: <InlineSpan>[
+              const TextSpan(text: 'The launcher takes the console as '),
+              DsCode.span('children'),
+              const TextSpan(
+                text:
+                    ' rather than building one. A launcher that '
+                    'constructed its own console would have to know about '
+                    'transports, personas and tools — all of which are the '
+                    'product’s business — and every product would then fork '
+                    'it. This way the entrance is system-owned and what it '
+                    'opens is not.',
               ),
-              DsType.small,
-            ),
-          ],
+            ],
+          ),
+          DsType.small,
         ),
-      );
+      ],
+    ),
+  );
 }
 
-/// `LauncherDemo` — *"the floating launcher, opening the real console in a
+/// `LauncherDemo`, *"the floating launcher, opening the real console in a
 /// dialog."*
 ///
 /// The panel is `relative h-56 overflow-hidden rounded-lg border bg-background`
 /// and the launcher inside it is `position: fixed`, so it escapes the panel
-/// entirely and sits in the viewport's bottom-right corner — which is the joke
+/// entirely and sits in the viewport's bottom-right corner: which is the joke
 /// the panel's own copy makes.
 class LauncherDemo extends StatefulWidget {
   const LauncherDemo({super.key});
 
-  /// `h-56` — 224px.
+  /// `h-56`, 224px.
   static double get height => ds(56);
 
   /// `p-5` on the absolutely-positioned paragraph.

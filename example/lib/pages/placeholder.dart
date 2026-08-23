@@ -2,7 +2,7 @@
 ///
 /// Design spec §2: *"Routes referenced by nav/foot-nav but out of scope
 /// (shadows, motion, icons, component families) render a minimal placeholder
-/// using the same shell — links must not dead-end."* A 404 would be a lie: the
+/// using the same shell: links must not dead-end."* A 404 would be a lie: the
 /// route exists, the page is simply not ported.
 library;
 
@@ -13,7 +13,7 @@ import 'package:flutter/widgets.dart';
 class PlaceholderPage extends StatelessWidget {
   const PlaceholderPage({super.key, required this.title, this.eyebrow});
 
-  /// The page's own name — the nav category, or the group for an index route.
+  /// The page's own name: the nav category, or the group for an index route.
   final String title;
 
   /// The group above it, rendered the way `DsPageHeader` renders one.

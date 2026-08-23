@@ -1,4 +1,4 @@
-/// `/design-system/components/base/forms` — four forms, all of them live.
+/// `/design-system/components/base/forms`: four forms, all of them live.
 ///
 /// The first ported page whose reference is `"use client"`, and the first with
 /// **no static gallery at all**: nine specimens, six of them interactive, and
@@ -6,23 +6,23 @@
 /// bullets appear. Three cells in `#submit-states` are the page's only stills,
 /// and one of those is still animating.
 ///
-/// What this page owns and what it borrows: the *composition* is here — four
+/// What this page owns and what it borrows: the *composition* is here: four
 /// controllers, four rule lists, five hand-wired controls and the toast calls —
 /// and every pixel is a package component. `DsForm` / `DsRule` are the
 /// `useForm` + Zod pair, `DsField` is the `Field` family, and `DsToaster` is
 /// mounted once by the shell (ruling F8) exactly as `<Toaster/>` is mounted once
 /// by the root layout.
 ///
-/// **The measure is `max-w-md` — 448px** ([_measureMd]), on all four forms. The
+/// **The measure is `max-w-md`, 448px** ([_measureMd]), on all four forms. The
 /// inputs page's is `max-w-lg`; these are different rungs of Tailwind's
 /// container scale and neither is the spacing ladder.
 ///
-/// ## Divergences — reproduced behaviour the reference does not have
+/// ## Divergences: reproduced behaviour the reference does not have
 ///
 /// * **Focus-on-error lands on every field (ruling F4).** `DsForm.submit`
 ///   focuses the first invalid field in registration order whatever its shape,
 ///   so submitting the composed form untouched puts focus on the Plan trigger.
-///   The reference focuses nothing at all there — see drift 7 — because RHF
+///   The reference focuses nothing at all there: see drift 7: because RHF
 ///   needs a DOM ref and all three failing fields are hand-wired. An invisible
 ///   accessibility regression is the one drift class this port does not ship.
 /// * **`form.reset(values)`** has no single call in the port: `DsForm.reset`
@@ -44,10 +44,10 @@
 /// rhythm" and the radios is **6px**, not 6 + the fieldset's own `gap-3`: a
 /// rendered legend is lifted out of the fieldset's anonymous content box, so
 /// only its `mb-1.5` applies. [DsFieldSet] is therefore given the content box's
-/// children — the group and its message — and the legend sits above it. That is
+/// children: the group and its message: and the legend sits above it. That is
 /// the CSS box tree, not a workaround.
 ///
-/// ## Drift register — recorded, shipped as written (forms-map §15)
+/// ## Drift register: recorded, shipped as written (forms-map §15)
 ///
 /// Where a drift belongs to a component rather than to this page it is recorded
 /// at its own source and named here so the register stays complete.
@@ -56,7 +56,7 @@
 ///    `group.title = "Base Components"` → **"Base Components · Base"**. All
 ///    fourteen base pages; the foundations pages print one clean word.
 /// 2. **`Button`'s `loading` JSDoc contradicts every call site.** *"The label
-///    stays in place so the button does not change width mid-action"* — yet
+///    stays in place so the button does not change width mid-action"*: yet
 ///    Save Account → Saving and Claim Handle → Claiming both swap. In the forms
 ///    the width happens to be pinned by flex `stretch`; in `#submit-states` the
 ///    buttons are intrinsically sized and Idle and Pending are visibly
@@ -68,7 +68,7 @@
 /// 4. **`#validation`'s Note argues against `mode: "onChange"`; `#field-errors`
 ///    uses it.** *"Validating on the first keystroke tells someone their email
 ///    is invalid while they are still typing the third character, which is true
-///    and useless"* — and the password form two sections later asks on the
+///    and useless"*: and the password form two sections later asks on the
 ///    first keystroke. Defensible, unremarked, and both ship.
 /// 5. **The `#validation` Panel label advertises a default as configuration.**
 ///    Both of the account form's modes are RHF defaults written out longhand,
@@ -76,19 +76,19 @@
 ///    one"* while the label presents both as settings.
 /// 6. **`aria-invalid` erases focus.** *(measured)* On an invalid field the
 ///    destructive border and ring already own both properties the focus ring
-///    would set, and they are emitted later at equal specificity — so focusing
+///    would set, and they are emitted later at equal specificity: so focusing
 ///    an errored control produces **no visible change**, against RULES §7's
 ///    opening line. Ruling F5, carried by `input.dart`, `textarea.dart`,
 ///    `select.dart` and `selection_control.dart`.
 /// 7. **Focus-on-error is a no-op in the composed form.** All three fields that
 ///    fail at defaults are hand-wired, so RHF finds no ref with a `focus`
-///    method. **Not reproduced** — ruling F4, see the divergence above.
+///    method. **Not reproduced**: ruling F4, see the divergence above.
 /// 8. **The two server-error surfaces have different lifetimes and the copy
 ///    does not say so.** The Alert survives keystrokes until the next submit;
 ///    the field error is wiped by the first one, because re-validation runs and
 ///    `"taken"` passes `min(3)`. Both behaviours ship.
 /// 9. **`<Textarea rows={3}/>` is inert.** `field-sizing: content` replaces
-///    rows-based sizing and the visible floor is `min-h-20` — 80px, which is
+///    rows-based sizing and the visible floor is `min-h-20`, 80px, which is
 ///    roughly three lines by coincidence. Carried by `textarea.dart`.
 /// 10. **`SelectContent` ships a dead animation set.** Six animation utilities
 ///    and four `translate-*` nudges, all cancelled because `position` defaults
@@ -96,21 +96,21 @@
 ///    appears. Carried by `select.dart`.
 /// 11. **`SelectTrigger`'s `w-fit` never applies.** *(measured)* The vertical
 ///    `Field`'s `*:w-full` is emitted later at equal specificity and wins, so
-///    the trigger renders at the full 448px — which is why the Plan field here
+///    the trigger renders at the full 448px: which is why the Plan field here
 ///    passes `expand: true`.
 /// 12. **Three line-heights on three consecutive lines.** Label 1.375,
-///    description 1.5, error 1.428571 — and none of them is `.type-small`'s
+///    description 1.5, error 1.428571: and none of them is `.type-small`'s
 ///    1.5-at-13px used everywhere else in the kit.
 /// 13. **The textarea deviates from its siblings on three axes.**
 ///    `border-primary/50` not `border-ring`, `ring-ring/35` not `/50`,
-///    `opacity-45` not `-50` — it follows `Input` where the other four follow
+///    `opacity-45` not `-50`: it follows `Input` where the other four follow
 ///    the shadcn default.
 /// 14. **`Switch` disables on `data-disabled:`; `Checkbox`, `Radio` and
 ///    `Select` on `disabled:`.** Same intent, two selector families.
 /// 15. **`Checkbox` carries `group-has-disabled/field:opacity-50` and
-///    `RadioGroupItem` does not** — a disabled field dims the checkbox and not
+///    `RadioGroupItem` does not**: a disabled field dims the checkbox and not
 ///    the radio.
-/// 16. **`SelectContent` uses Tailwind's stock `shadow-md`** — the only
+/// 16. **`SelectContent` uses Tailwind's stock `shadow-md`**: the only
 ///    elevation on the page outside the `--shadow-*` set, fixed black at 10%
 ///    under a popover whose fill flips with the theme.
 /// 17. **`Select` is the only control with `dark:` variants.** Its dark resting
@@ -122,10 +122,10 @@
 /// 19. **`AccountForm` appears twice with identical Panel content.**
 ///    `#form` and `#validation` render the same component; the sections differ
 ///    only in prose and Panel label. Both are live and independent (ruling F9)
-///    — the `#validation` Note's argument is only demonstrable if the second
+///   : the `#validation` Note's argument is only demonstrable if the second
 ///    one really asks nothing until you submit.
 /// 20. **`alerts` is the one field with no `FormError`**, and `plan`, `payout`
-///    and `alerts` are the three with no `FormDescription` — against
+///    and `alerts` are the three with no `FormDescription`: against
 ///    `#field-errors`' own do, *"Keep FormDescription present while the field is
 ///    valid; it is the only guidance there."*
 library;
@@ -139,13 +139,13 @@ import '../shell.dart';
 
 /* ── Page constants ──────────────────────────────────────────────────────── */
 
-/// `max-w-md` — `--container-md`, 28rem. Tailwind's **container** scale, which
+/// `max-w-md`, `--container-md`, 28rem. Tailwind's **container** scale, which
 /// `globals.css` does not override, so it is not the spacing ladder even where
 /// the two coincide. The measure all four `<form>`s are cut to.
 // allow-hardcoded: framework container scale with no token to read it from.
 const double _measureMd = 448;
 
-/// `await new Promise(r => setTimeout(r, 900))` — the account form's simulated
+/// `await new Promise(r => setTimeout(r, 900))`: the account form's simulated
 /// round trip, and the window its spinner is visible in.
 ///
 /// A page constant, not a duration token: it is a fake network, and putting it
@@ -153,36 +153,40 @@ const double _measureMd = 448;
 /// network. Same reasoning `toaster.dart` gives for sonner's unmount window.
 ///
 /// The guard scans per line, so the escape sits on the declaration itself.
-const Duration _accountLatency = Duration(milliseconds: 900); // allow-hardcoded: the reference's simulated submit latency, not a --duration-* token
+const Duration _accountLatency = Duration(
+  milliseconds: 900,
+); // allow-hardcoded: the reference's simulated submit latency, not a --duration-* token
 
-/// `await new Promise(r => setTimeout(r, 800))` — the server form's. See
+/// `await new Promise(r => setTimeout(r, 800))`: the server form's. See
 /// [_accountLatency].
-const Duration _serverLatency = Duration(milliseconds: 800); // allow-hardcoded: the reference's simulated server latency, not a --duration-* token
+const Duration _serverLatency = Duration(
+  milliseconds: 800,
+); // allow-hardcoded: the reference's simulated server latency, not a --duration-* token
 
 /* ── Schemas (`page.tsx` L58–93) ─────────────────────────────────────────── */
 
-/// `accountSchema.handle` — three checks, in declaration order.
+/// `accountSchema.handle`: three checks, in declaration order.
 ///
 /// Zod 4 runs every string check without aborting and `criteriaMode` is left at
 /// `firstError`, so `""` raises `too_small` **and** `invalid_format` and renders
 /// only the first of them.
 List<DsRule<String>> _handleRules() => <DsRule<String>>[
-      DsRule.minLength(3, 'At least 3 characters.'),
-      DsRule.maxLength(20, 'No more than 20 characters.'),
-      DsRule.pattern(
-        RegExp(r'^[a-z0-9_]+$'),
-        'Lowercase letters, numbers and underscores only.',
-      ),
-    ];
+  DsRule.minLength(3, 'At least 3 characters.'),
+  DsRule.maxLength(20, 'No more than 20 characters.'),
+  DsRule.pattern(
+    RegExp(r'^[a-z0-9_]+$'),
+    'Lowercase letters, numbers and underscores only.',
+  ),
+];
 
-/// `passwordSchema.password` — four checks and `criteriaMode: "all"`, which is
+/// `passwordSchema.password`: four checks and `criteriaMode: "all"`, which is
 /// the only place in the corpus `FieldError`'s list branch fires.
 List<DsRule<String>> _passwordRules() => <DsRule<String>>[
-      DsRule.minLength(10, 'At least 10 characters.'),
-      DsRule.pattern(RegExp('[A-Z]'), 'One capital letter.'),
-      DsRule.pattern(RegExp('[0-9]'), 'One number.'),
-      DsRule.pattern(RegExp('[^A-Za-z0-9]'), 'One symbol.'),
-    ];
+  DsRule.minLength(10, 'At least 10 characters.'),
+  DsRule.pattern(RegExp('[A-Z]'), 'One capital letter.'),
+  DsRule.pattern(RegExp('[0-9]'), 'One number.'),
+  DsRule.pattern(RegExp('[^A-Za-z0-9]'), 'One symbol.'),
+];
 
 /* ── Page ────────────────────────────────────────────────────────────────── */
 
@@ -226,16 +230,14 @@ class _FormSection extends StatelessWidget {
     return DsSection(
       id: 'form',
       title: 'Form',
-      description: 'React Hook Form for state, Zod for the schema, and the '
+      description:
+          'React Hook Form for state, Zod for the schema, and the '
           'Field family for everything you can see. form.tsx contributes no '
           'presentation at all — only ids and aria attributes.',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          const DsPanel(
-            label: 'A whole form, live',
-            child: _AccountForm(),
-          ),
+          const DsPanel(label: 'A whole form, live', child: _AccountForm()),
           // `className="mt-6"` on the Note, the Meta and every DoDont on the
           // page.
           SizedBox(height: ds(6)),
@@ -255,14 +257,16 @@ class _FormSection extends StatelessWidget {
               (
                 k: 'FormField',
                 v: TextSpan(
-                  text: 'Controller, plus a useId() so two forms on one page '
+                  text:
+                      'Controller, plus a useId() so two forms on one page '
                       'cannot collide on ids.',
                 ),
               ),
               (
                 k: 'FormControl',
                 v: TextSpan(
-                  text: 'A Slot. Stamps id, aria-invalid and aria-describedby '
+                  text:
+                      'A Slot. Stamps id, aria-invalid and aria-describedby '
                       'onto whatever control it wraps — input, trigger, switch '
                       'or checkbox alike.',
                 ),
@@ -270,14 +274,16 @@ class _FormSection extends StatelessWidget {
               (
                 k: 'FormLabel / FormDescription / FormError',
                 v: TextSpan(
-                  text: 'FieldLabel / FieldDescription / FieldError, bound to '
+                  text:
+                      'FieldLabel / FieldDescription / FieldError, bound to '
                       'this field. Zero added styling.',
                 ),
               ),
               (
                 k: 'useFormField()',
                 v: TextSpan(
-                  text: 'The ids and fieldState, for anything the three above '
+                  text:
+                      'The ids and fieldState, for anything the three above '
                       'do not cover. Throws outside a FormField.',
                 ),
               ),
@@ -299,7 +305,8 @@ class _WhyNoFormItemBody extends StatelessWidget {
       TextSpan(
         children: <InlineSpan>[
           const TextSpan(
-            text: 'Stock shadcn ships a second generation of these primitives '
+            text:
+                'Stock shadcn ships a second generation of these primitives '
                 '— ',
           ),
           DsCode.span('FormItem'),
@@ -310,7 +317,8 @@ class _WhyNoFormItemBody extends StatelessWidget {
           const TextSpan(text: ', '),
           DsCode.span('FormMessage'),
           const TextSpan(
-            text: ' — each carrying its own presentation. This system already '
+            text:
+                ' — each carrying its own presentation. This system already '
                 'has that presentation in ',
           ),
           DsCode.span('field.tsx'),
@@ -330,7 +338,8 @@ class _WhyNoFormItemBody extends StatelessWidget {
           const TextSpan(text: ' and adds one attribute: '),
           DsCode.span('htmlFor'),
           const TextSpan(
-            text: '. Two vocabularies for one idea is what RULES §1.1 forbids; '
+            text:
+                '. Two vocabularies for one idea is what RULES §1.1 forbids; '
                 'a binding layer over one vocabulary is not that.',
           ),
         ],
@@ -350,13 +359,14 @@ class _ValidationSection extends StatelessWidget {
     return DsSection(
       id: 'validation',
       title: 'Validation',
-      description: 'The schema is the source of truth. Zod owns what valid '
+      description:
+          'The schema is the source of truth. Zod owns what valid '
           'means; React Hook Form owns when the question gets asked.',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           // DRIFT 19 / ruling F9. The same component as `#form`, live and
-          // independent — two controllers, so nothing they hold is shared.
+          // independent: two controllers, so nothing they hold is shared.
           // DRIFT 5. The label advertises two RHF defaults as configuration;
           // the separator is U+00B7.
           const DsPanel(
@@ -387,8 +397,11 @@ class _ValidationSection extends StatelessWidget {
             items: <DsMetaItem>[
               (
                 k: 'mode',
-                v: TextSpan(text: '"onSubmit" — the default, and the right '
-                    'one.'),
+                v: TextSpan(
+                  text:
+                      '"onSubmit" — the default, and the right '
+                      'one.',
+                ),
               ),
               (
                 k: 'reValidateMode',
@@ -399,14 +412,16 @@ class _ValidationSection extends StatelessWidget {
               (
                 k: 'resolver',
                 v: TextSpan(
-                  text: 'zodResolver(schema). The schema also types the form: '
+                  text:
+                      'zodResolver(schema). The schema also types the form: '
                       'z.infer<typeof schema>.',
                 ),
               ),
               (
                 k: 'criteriaMode',
                 v: TextSpan(
-                  text: '"all" collects every failing rule into error.types '
+                  text:
+                      '"all" collects every failing rule into error.types '
                       'instead of only the first.',
                 ),
               ),
@@ -453,7 +468,8 @@ class _FieldErrorsSection extends StatelessWidget {
     return DsSection(
       id: 'field-errors',
       title: 'Field errors',
-      description: 'One rule fails, you get a sentence. Several fail, you get '
+      description:
+          'One rule fails, you get a sentence. Several fail, you get '
           'a list — the same component, deciding on its own.',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -486,7 +502,8 @@ class _WiringGuaranteesBody extends StatelessWidget {
       TextSpan(
         children: <InlineSpan>[
           const TextSpan(
-            text: 'Every field above ships the three things RULES §7 demands, '
+            text:
+                'Every field above ships the three things RULES §7 demands, '
                 'and none of them were typed at the call site. The control '
                 'carries ',
           ),
@@ -494,14 +511,16 @@ class _WiringGuaranteesBody extends StatelessWidget {
           const TextSpan(text: ' and an '),
           DsCode.span('aria-describedby'),
           const TextSpan(
-            text: ' that points at the description while valid and at '
+            text:
+                ' that points at the description while valid and at '
                 'description + error once it is not. The error itself is a ',
           ),
           DsCode.span('FieldError'),
           const TextSpan(text: ' with '),
           DsCode.span('role="alert"'),
           const TextSpan(
-            text: ', and it renders nothing at all when the field is valid '
+            text:
+                ', and it renders nothing at all when the field is valid '
                 'rather than leaving an empty live region behind.',
           ),
         ],
@@ -513,7 +532,7 @@ class _WiringGuaranteesBody extends StatelessWidget {
 
 /* ── #submit-states ──────────────────────────────────────────────────────── */
 
-/// The only section with no `Panel` — the lattice is the section's direct
+/// The only section with no `Panel`: the lattice is the section's direct
 /// child.
 class _SubmitStatesSection extends StatelessWidget {
   const _SubmitStatesSection();
@@ -523,7 +542,8 @@ class _SubmitStatesSection extends StatelessWidget {
     return DsSection(
       id: 'submit-states',
       title: 'Submit states',
-      description: 'Every action needs two signals: the control confirms it '
+      description:
+          'Every action needs two signals: the control confirms it '
           'heard you, the outcome confirms it worked.',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -550,12 +570,14 @@ class _BothSignalsBody extends StatelessWidget {
         children: <InlineSpan>[
           DsCode.span('loading'),
           const TextSpan(
-            text: ' on the Button is the first signal — it swaps in a spinner, '
+            text:
+                ' on the Button is the first signal — it swaps in a spinner, '
                 'sets ',
           ),
           DsCode.span('aria-busy'),
           const TextSpan(
-            text: ' and disables the control, so a slow save cannot be '
+            text:
+                ' and disables the control, so a slow save cannot be '
                 'double-submitted. The toast is the second. A form with only '
                 'the spinner leaves you wondering whether it worked; one with '
                 'only the toast leaves the click feeling dead for as long as '
@@ -578,7 +600,8 @@ class _ServerErrorsSection extends StatelessWidget {
     return DsSection(
       id: 'server-errors',
       title: 'Server errors',
-      description: 'The field is valid and the submit still failed. This is '
+      description:
+          'The field is valid and the submit still failed. This is '
           'the state most forms never draw, and the only one your users will '
           'actually hit.',
       child: Column(
@@ -600,14 +623,16 @@ class _ServerErrorsSection extends StatelessWidget {
               (
                 k: 'setError("root.serverError")',
                 v: TextSpan(
-                  text: 'Form-level. Never sent to the server, cleared on the '
+                  text:
+                      'Form-level. Never sent to the server, cleared on the '
                       'next submit.',
                 ),
               ),
               (
                 k: 'clearErrors',
                 v: TextSpan(
-                  text: 'Called first on every submit, or the last failure '
+                  text:
+                      'Called first on every submit, or the last failure '
                       'outlives the attempt that caused it.',
                 ),
               ),
@@ -638,7 +663,8 @@ class _TwoPlacesBody extends StatelessWidget {
           const TextSpan(text: ' holds what went wrong with the '),
           const TextSpan(text: 'submission', style: italic),
           const TextSpan(
-            text: ' and renders as an Alert — a persistent condition worth '
+            text:
+                ' and renders as an Alert — a persistent condition worth '
                 'explaining, which is exactly what RULES §5 reserves Alert '
                 'for. ',
           ),
@@ -646,7 +672,8 @@ class _TwoPlacesBody extends StatelessWidget {
           const TextSpan(text: ' holds what is wrong with the '),
           const TextSpan(text: 'field', style: italic),
           const TextSpan(
-            text: ', so the error sits next to the thing you have to change. A '
+            text:
+                ', so the error sits next to the thing you have to change. A '
                 'form that only does the first makes you hunt; one that only '
                 'does the second cannot explain a failure that belongs to no '
                 'field.',
@@ -669,7 +696,8 @@ class _ComposedFieldsSection extends StatelessWidget {
       id: 'composed-fields',
       title: 'Composed fields',
       // The angle brackets are a JSX string attribute, so they are text.
-      description: 'Select, RadioGroup, Textarea, Switch and Checkbox — none '
+      description:
+          'Select, RadioGroup, Textarea, Switch and Checkbox — none '
           'of them an <input>, all of them wired the same way.',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -698,7 +726,8 @@ class _WhyFormControlIsSlotBody extends StatelessWidget {
       TextSpan(
         children: <InlineSpan>[
           const TextSpan(
-            text: 'A Slot merges its props onto its child rather than '
+            text:
+                'A Slot merges its props onto its child rather than '
                 'rendering a wrapper, which is what lets one component carry '
                 'the wiring for five controls that share no DOM shape. Note '
                 'where it sits on the Select: around the ',
@@ -707,7 +736,8 @@ class _WhyFormControlIsSlotBody extends StatelessWidget {
           const TextSpan(text: ', not the '),
           DsCode.span('Select'),
           const TextSpan(
-            text: ' — the trigger is the focusable thing, so it is the thing '
+            text:
+                ' — the trigger is the focusable thing, so it is the thing '
                 'that needs the id. Controls that are not ',
           ),
           DsCode.span('<input>'),
@@ -715,9 +745,7 @@ class _WhyFormControlIsSlotBody extends StatelessWidget {
           DsCode.span('onValueChange'),
           const TextSpan(text: ' or '),
           DsCode.span('onCheckedChange'),
-          const TextSpan(
-            text: ', so they are wired by hand from ',
-          ),
+          const TextSpan(text: ', so they are wired by hand from '),
           DsCode.span('field'),
           const TextSpan(text: ' rather than spread.'),
         ],
@@ -727,7 +755,7 @@ class _WhyFormControlIsSlotBody extends StatelessWidget {
   }
 }
 
-/* ── 1 · AccountForm — instantiated twice ────────────────────────────────── */
+/* ── 1 · AccountForm: instantiated twice ────────────────────────────────── */
 
 /// `mode: "onSubmit"`, `reValidateMode: "onChange"`, both written out longhand
 /// because the `#validation` Panel label prints them (drift 5).
@@ -750,9 +778,7 @@ class _AccountFormState extends State<_AccountForm> {
       DsTextFormField(name: 'handle', rules: _handleRules()),
       DsTextFormField(
         name: 'email',
-        rules: <DsRule<String>>[
-          DsRule.email('That is not an email address.'),
-        ],
+        rules: <DsRule<String>>[DsRule.email('That is not an email address.')],
       ),
     ],
   );
@@ -811,7 +837,7 @@ class _AccountFormState extends State<_AccountForm> {
                 ),
               ),
               // DRIFT 2. The label swaps and the button would grow by the
-              // spinner's 24px — except that `FieldGroup` stretches it to the
+              // spinner's 24px: except that `FieldGroup` stretches it to the
               // form's 448px, which pins the width by accident.
               DsButton(
                 loading: busy,
@@ -826,12 +852,12 @@ class _AccountFormState extends State<_AccountForm> {
   }
 }
 
-/// `form.reset(values)` — the just-saved values become the new baseline.
+/// `form.reset(values)`: the just-saved values become the new baseline.
 ///
 /// `DsForm.reset` goes back to `defaultValues`, which is the one thing RHF's
 /// `reset(values)` does *not* do, so the strings are read first and written
 /// back through the controllers afterwards. Writing them back at a zeroed
-/// submit count re-validates nothing — `mode` governs again — which is exactly
+/// submit count re-validates nothing, `mode` governs again: which is exactly
 /// the state a reset form is in: values kept, messages gone, asking late.
 void _resetToSavedValues(DsForm form) {
   final Map<String, String> saved = <String, String>{
@@ -844,9 +870,9 @@ void _resetToSavedValues(DsForm form) {
   }
 }
 
-/* ── 2 · PasswordForm — the multi-error list ─────────────────────────────── */
+/* ── 2 · PasswordForm: the multi-error list ─────────────────────────────── */
 
-/// `criteriaMode: "all"` + `mode: "onChange"` — the only place in the corpus
+/// `criteriaMode: "all"` + `mode: "onChange"`: the only place in the corpus
 /// where `FieldError` renders a list rather than a sentence (drift 4).
 class _PasswordForm extends StatefulWidget {
   const _PasswordForm();
@@ -857,7 +883,7 @@ class _PasswordForm extends StatefulWidget {
 
 class _PasswordFormState extends State<_PasswordForm> {
   late final DsForm _form = DsForm(
-    // `mode: "onChange"` — asked on the first keystroke.
+    // `mode: "onChange"`: asked on the first keystroke.
     mode: DsValidateMode.onChange,
     fields: <DsFormFieldBase>[
       DsTextFormField(
@@ -919,7 +945,7 @@ class _PasswordFormState extends State<_PasswordForm> {
   }
 }
 
-/* ── 3 · ServerErrorForm — two surfaces, two lifetimes ───────────────────── */
+/* ── 3 · ServerErrorForm: two surfaces, two lifetimes ───────────────────── */
 
 /// The field is **valid** and the submit still fails. `"taken"` is the default
 /// value, so the demo fails on the very first press with no typing.
@@ -941,7 +967,7 @@ class _ServerErrorFormState extends State<_ServerErrorForm> {
     ],
   );
 
-  /// `formState.errors.root?.serverError` — a slot outside the schema, so it
+  /// `formState.errors.root?.serverError`: a slot outside the schema, so it
   /// lives outside the controller too. No resolver run can touch it; only the
   /// next submit clears it.
   String? _rootError;
@@ -954,7 +980,7 @@ class _ServerErrorFormState extends State<_ServerErrorForm> {
 
   Future<void> _submit() async {
     await _form.submit(() async {
-      // `form.clearErrors("root.serverError")` — first, unconditionally, *"or
+      // `form.clearErrors("root.serverError")`: first, unconditionally, *"or
       // the last failure outlives the attempt that caused it"*.
       setState(() => _rootError = null);
       await Future<void>.delayed(_serverLatency);
@@ -963,7 +989,7 @@ class _ServerErrorFormState extends State<_ServerErrorForm> {
       final String handle = _form.text('handle').value;
       if (handle == 'taken') {
         setState(() => _rootError = 'That handle belongs to someone else.');
-        // DRIFT 8. This one evaporates on the next keystroke — re-validation
+        // DRIFT 8. This one evaporates on the next keystroke: re-validation
         // runs, `"taken"` passes `min(3)`, and the clean result replaces it —
         // while the Alert above survives until the next submit.
         _form.setError('handle', 'Already registered.');
@@ -973,10 +999,7 @@ class _ServerErrorFormState extends State<_ServerErrorForm> {
         );
         return;
       }
-      docsToasts.success(
-        'Claimed @$handle',
-        glyph: DsIconGlyph.circleCheck,
-      );
+      docsToasts.success('Claimed @$handle', glyph: DsIconGlyph.circleCheck);
     });
   }
 
@@ -997,7 +1020,7 @@ class _ServerErrorFormState extends State<_ServerErrorForm> {
                 DsAlert(
                   variant: DsAlertVariant.destructive,
                   // The page supplies the glyph and the variant only says what
-                  // colour it comes out — `tone="inherit"` is `text-current`.
+                  // colour it comes out, `tone="inherit"` is `text-current`.
                   icon: const DsIcon(
                     DsIconGlyph.circleX,
                     tone: DsIconTone.inherit,
@@ -1026,12 +1049,12 @@ class _ServerErrorFormState extends State<_ServerErrorForm> {
   }
 }
 
-/* ── 4 · ComposedForm — five control shapes ──────────────────────────────── */
+/* ── 4 · ComposedForm: five control shapes ──────────────────────────────── */
 
 /// Five controls, none of them an `<input>`, all of them wired the same way.
 ///
-/// Submitting untouched fails three fields at once — `plan`, `payout` and
-/// `terms` — and focus lands on the first of them (ruling F4). On the reference
+/// Submitting untouched fails three fields at once, `plan`, `payout` and
+/// `terms`: and focus lands on the first of them (ruling F4). On the reference
 /// it lands nowhere.
 class _ComposedForm extends StatefulWidget {
   const _ComposedForm();
@@ -1055,10 +1078,10 @@ class _ComposedFormState extends State<_ComposedForm> {
         name: 'payout',
         initialValue: null,
         rules: <DsRule<String?>>[
-          DsRule.oneOf<String>(
-            <String>['daily', 'weekly'],
-            'Pick a payout rhythm.',
-          ),
+          DsRule.oneOf<String>(<String>[
+            'daily',
+            'weekly',
+          ], 'Pick a payout rhythm.'),
         ],
       ),
       DsTextFormField(
@@ -1067,7 +1090,7 @@ class _ComposedFormState extends State<_ComposedForm> {
           DsRule.maxLength(160, '160 characters is the ceiling.'),
         ],
       ),
-      // DRIFT 20. `z.boolean()` — no message, and the only field on the page
+      // DRIFT 20. `z.boolean()`: no message, and the only field on the page
       // with no `FormError` beneath it.
       DsFormField<bool>(name: 'alerts', initialValue: true),
       // `.refine`, not `z.literal(true)`: a literal types the field as `true`,
@@ -1076,15 +1099,12 @@ class _ComposedFormState extends State<_ComposedForm> {
       DsFormField<bool>(
         name: 'terms',
         initialValue: false,
-        rules: <DsRule<bool>>[
-          DsRule.accepted('You have to accept the terms.'),
-        ],
+        rules: <DsRule<bool>>[DsRule.accepted('You have to accept the terms.')],
       ),
     ],
   );
 
-  static const List<DsSelectOption<String>> _plans =
-      <DsSelectOption<String>>[
+  static const List<DsSelectOption<String>> _plans = <DsSelectOption<String>>[
     DsSelectOption<String>(value: 'free', label: 'Free'),
     DsSelectOption<String>(value: 'pro', label: 'Pro'),
     DsSelectOption<String>(value: 'vault', label: 'Vault'),
@@ -1119,7 +1139,7 @@ class _ComposedFormState extends State<_ComposedForm> {
         return _Measure(
           child: DsFieldGroup(
             children: <Widget>[
-              // `plan` — no description (drift 20). `FormControl` wraps the
+              // `plan`: no description (drift 20). `FormControl` wraps the
               // trigger, not the Select, so the trigger is what takes the focus
               // node and the wiring.
               DsField(
@@ -1145,7 +1165,7 @@ class _ComposedFormState extends State<_ComposedForm> {
                 // DRIFT 9. `rows={3}` is inert; `min-h-20` is the floor.
                 child: DsTextarea(controller: bio.controller),
               ),
-              // `alerts` — a horizontal field, no description, no error, and
+              // `alerts`: a horizontal field, no description, no error, and
               // nothing that can fail. The label is the field's, so the switch
               // states no name of its own: the reference's `<Switch/>` carries
               // no `aria-label` either and is named by the `FormLabel` beside
@@ -1159,7 +1179,7 @@ class _ComposedFormState extends State<_ComposedForm> {
                   onChanged: (bool next) => alerts.value = next,
                 ),
               ),
-              // `terms` — **one** horizontal field where the reference nests
+              // `terms`, **one** horizontal field where the reference nests
               // two.
               //
               // It nests because its horizontal `Field` is `flex-row`: a
@@ -1167,13 +1187,13 @@ class _ComposedFormState extends State<_ComposedForm> {
               // than under the row, so the message needs an outer vertical
               // `Field` to fall into. [DsField]'s horizontal branch is already
               // a column holding the row, and the description/message slots
-              // append to that column — so the wrapper collapses into it and
+              // append to that column: so the wrapper collapses into it and
               // the rendered box tree is the same one: row, `gap-2`, message.
               //
               // Collapsing it is also what keeps the wiring intact. A nested
               // [DsField] publishes a *new* [DsFieldScope] that shadows the
               // outer one, so the checkbox would adopt a null focus node and a
-              // valid state — focus-on-error (ruling F4) would stop landing on
+              // valid state: focus-on-error (ruling F4) would stop landing on
               // it and the message would stop being announced with it.
               DsField(
                 label: 'I accept the terms',
@@ -1207,7 +1227,7 @@ class _ComposedFormState extends State<_ComposedForm> {
 /// RadioGroup container is a `div`, so the usual `FormLabel` pattern would emit
 /// markup that validates nowhere and announces nothing (`page.tsx` L322–325).
 ///
-/// The legend sits **outside** [DsFieldSet] on purpose — see the library note:
+/// The legend sits **outside** [DsFieldSet] on purpose: see the library note:
 /// a rendered `<legend>` is lifted out of the fieldset's anonymous content box,
 /// so the fieldset's `gap-3` never applies to it and only its `mb-1.5` does.
 /// [DsFieldSet] is that content box, holding the group and its message.
@@ -1243,7 +1263,7 @@ class _PayoutFieldSet extends StatelessWidget {
               // One labelled horizontal field per option, which is the shape
               // the reference uses: `<label for="payout-daily">` selects that
               // radio outright, so each item registers its own selection on
-              // its own field rather than on the group's — the group's field
+              // its own field rather than on the group's: the group's field
               // belongs to the legend.
               children: const <Widget>[
                 DsField(
@@ -1268,7 +1288,7 @@ class _PayoutFieldSet extends StatelessWidget {
 
 /* ── 5 · SubmitStates ────────────────────────────────────────────────────── */
 
-/// `StateGrid cols={4}` — four cells, one of them live.
+/// `StateGrid cols={4}`: four cells, one of them live.
 ///
 /// The one `useState` on the page outside the four forms, and it is one-way:
 /// once clicked, cell 3 reads **Saved** in `secondary` for the rest of the
@@ -1290,12 +1310,9 @@ class _SubmitStatesState extends State<_SubmitStates> {
         DsStateCell(
           label: 'Idle',
           note: 'Nothing pending',
-          // Clickable with no handler — a bare `<button>` is not a disabled
+          // Clickable with no handler: a bare `<button>` is not a disabled
           // one, so it keeps full opacity and the pointer.
-          child: DsButton(
-            onPressed: () {},
-            child: const Text('Save Account'),
-          ),
+          child: DsButton(onPressed: () {}, child: const Text('Save Account')),
         ),
         // Static, but animating: the spinner never stops and `loading` implies
         // `disabled`, so the cell also shows the 45% dim.
@@ -1312,8 +1329,9 @@ class _SubmitStatesState extends State<_SubmitStates> {
           label: 'Success',
           note: 'Outcome confirmed',
           child: DsButton(
-            variant:
-                _saved ? DsButtonVariant.secondary : DsButtonVariant.primary,
+            variant: _saved
+                ? DsButtonVariant.secondary
+                : DsButtonVariant.primary,
             onPressed: () {
               setState(() => _saved = true);
               docsToasts.success(
@@ -1336,7 +1354,7 @@ class _SubmitStatesState extends State<_SubmitStates> {
 
 /* ── Page-local composition ──────────────────────────────────────────────── */
 
-/// `<form className="max-w-md">` — 448px, left-aligned in a 1030px panel body.
+/// `<form className="max-w-md">`, 448px, left-aligned in a 1030px panel body.
 class _Measure extends StatelessWidget {
   const _Measure({required this.child});
 
@@ -1344,10 +1362,10 @@ class _Measure extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Align(
-        alignment: AlignmentDirectional.centerStart,
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: _measureMd),
-          child: child,
-        ),
-      );
+    alignment: AlignmentDirectional.centerStart,
+    child: ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: _measureMd),
+      child: child,
+    ),
+  );
 }

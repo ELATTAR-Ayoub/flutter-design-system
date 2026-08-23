@@ -1,12 +1,12 @@
-/// `/design-system/components/base/selects` — seven ways to choose from a
+/// `/design-system/components/base/selects`: seven ways to choose from a
 /// known set, and every one of them answers a pointer.
 ///
 /// The page four new components and one new primitive were built for, and the
 /// last of the base-component pages the port owed a route. `DsSelect` shipped
 /// with `forms` at *"the fidelity the forms page renders"* and deferred its
 /// groups, labels, separators, scroll caps and explicit width to here; the
-/// other six specimens — [DsNativeSelect], [DsCombobox], [DsCommand],
-/// [DsCalendar] twice and [DsDatePicker] — arrive with this page.
+/// other six specimens, [DsNativeSelect], [DsCombobox], [DsCommand],
+/// [DsCalendar] twice and [DsDatePicker]: arrive with this page.
 ///
 /// **The fidelity bar is that all ten specimens are live** (selects-map §11).
 /// A reader can open a grouped menu with two labels and a separator, type into
@@ -23,13 +23,13 @@
 /// page's own §6 is a postmortem of what happens when a `contents` entry has
 /// no section behind it. So the route stayed on `PlaceholderPage` until every
 /// one of the seven existed rather than shipping a page that advertises
-/// Calendar and renders nothing — repeating the exact bug the page exists to
+/// Calendar and renders nothing: repeating the exact bug the page exists to
 /// document.
 ///
 /// ## The clock is load-bearing (ruling L2)
 ///
 /// None of the three calendars is passed `month` or `defaultMonth`, so all
-/// three open on **the reader's current month** — [DsCalendar] reproduces
+/// three open on **the reader's current month**, [DsCalendar] reproduces
 /// `getInitialMonth` through [DsClock]. That makes this page's rendered height
 /// a function of the wall clock: a four-, five- or six-week month differs by
 /// one 36px row per on-page calendar, ×2 (the third is in a popover and does
@@ -37,7 +37,7 @@
 /// frozen clock, and the capture rig freezes both renderers on the same
 /// instant.
 ///
-/// ## Drift register — recorded, shipped as written
+/// ## Drift register: recorded, shipped as written
 ///
 /// selects-map §16's twenty-seven, with **two rewordings** and **five
 /// additions** the build-time probes turned up (B1's palette probes and C1's
@@ -46,17 +46,17 @@
 ///  1. **The eyebrow says "Base" twice.** `` `${group.title} · Base` `` with
 ///     `group.title = "Base Components"`. All fourteen base pages.
 ///  2. **All three calendars open on the reader's current month, not on the
-///     month of their own selected value** — and the consequence is worse than
+///     month of their own selected value**: and the consequence is worse than
 ///     the map recorded. *(Probed under the frozen August 2026 clock:)* August
 ///     opens with six outside days, 26–31 July, so §5's and §7's seeded
 ///     **30 Jul 2026 is on screen**, at full `--primary`, as a leading outside
-///     day. Only §6's 12–20 Jul band is off-screen entirely — while the Panel
+///     day. Only §6's 12–20 Jul band is off-screen entirely: while the Panel
 ///     note above it still prints "12 Jul – 20 Jul". A selection that is
 ///     visible in one month and invisible in the next is not a stable
 ///     specimen; it is what passing neither `month` nor `defaultMonth` buys.
 ///  3. **`Ctrl + K` is decorative.** The §4 Panel note advertises it and the
 ///     section description says the palette is *"Opened with Ctrl+K from
-///     anywhere"* — and no keydown listener exists on the page, in `Command`,
+///     anywhere"*: and no keydown listener exists on the page, in `Command`,
 ///     or in `cmdk`'s inline mode. The page's own Don't 3 forbids hiding the
 ///     palette without surfacing its shortcut; the shortcut is surfaced and
 ///     bound to nothing.
@@ -74,7 +74,7 @@
 ///     `CommandSeparator` **1px with no margin at all**, `ComboboxSeparator`
 ///     9px (unused here).
 ///  8. **`NativeSelect` is the only control in the family that is not a pill
-///     over a socket** — 32px and 12px-cornered, transparent, no
+///     over a socket**, 32px and 12px-cornered, transparent, no
 ///     `shadow-pressed`, two sections away from a 40px pill, on a page whose
 ///     whole subject is that they are the same kind of control.
 ///  9. **The Select menu is the only overlay here that does not animate.** It
@@ -84,12 +84,12 @@
 ///     In the Panel it loses to the vertical field's `*:w-full`; in the three
 ///     state cells it loses to `w-40` through twMerge. It never once applies —
 ///     which is why every [DsSelect] below passes `expand` or `width`.
-/// 11. **Tailwind's stock `shadow-md` is now on three overlays** — fixed
+/// 11. **Tailwind's stock `shadow-md` is now on three overlays**: fixed
 ///     black, no theme response, under three surfaces whose fill flips.
 /// 12. **`Command`'s `bg-popover` is discarded by the call site; its
 ///     `rounded-xl!` is not.** The map derived that twMerge strips the
 ///     important modifier and the palette renders at 12px. *(Measured: 16px in
-///     both themes)* — twMerge keeps `rounded-xl!` under its own group key and
+///     both themes)*: twMerge keeps `rounded-xl!` under its own group key and
 ///     `!important` then wins the cascade over the later `rounded-lg`. Half
 ///     the drift stands (the fill really is `--card`), half was wrong, and the
 ///     port ships [DsRadii.xl].
@@ -103,11 +103,11 @@
 ///     while `strokeWidth` stays at the 14px-derived 2.4. Four sites here.
 /// 16. **Two dim levels inside one disabled field.** `<Field data-disabled>`
 ///     dims the label to 0.50; the disabled Button dims itself to 0.45; the
-///     description is dimmed by neither — which is exactly what its own copy
+///     description is dimmed by neither: which is exactly what its own copy
 ///     claims, while the first two are reconciled nowhere.
 /// 17. **`aria-invalid` beats focus-visible** on both selects. Unreachable
 ///     from this page: nothing validates.
-/// 18. **The "Disabled" state cell ships an empty `<SelectContent />`** — a
+/// 18. **The "Disabled" state cell ships an empty `<SelectContent />`**: a
 ///     menu with no rows behind a trigger that cannot open it (ruling L5:
 ///     nothing-opens is the parity, and [DsSelect] already renders nothing).
 /// 19. **`Select` is no longer the only control with `dark:` variants** —
@@ -115,9 +115,9 @@
 /// 20. **The date-picker trigger is the one Button on the page that does not
 ///     scale on press.** `PopoverTrigger` stamps `aria-haspopup="dialog"`,
 ///     which cancels `active:not-aria-[haspopup]:scale-95`. Its disabled twin
-///     beside it — same variant, same classes, no popover — would squish if it
+///     beside it: same variant, same classes, no popover: would squish if it
 ///     were not disabled. Assertable as [DsDatePicker.pressScaleSuppressed].
-/// 21. **`Combobox` is the corpus's only `@base-ui/react` component** — a
+/// 21. **`Combobox` is the corpus's only `@base-ui/react` component**: a
 ///     second state vocabulary, a second positioner variable set and a second
 ///     filter philosophy, in one section.
 /// 22. **The combobox popup is always 28px wider than its own input.**
@@ -125,7 +125,7 @@
 ///     `min-w-[calc(var(--anchor-width)+--spacing(7))]` overrules it, so the
 ///     popup overhangs to the right.
 /// 23. **The combobox has no way back to an empty query.** `showClear`
-///     defaults false — while the Meta three sections later says *"A date
+///     defaults false: while the Meta three sections later says *"A date
 ///     picker with no way back to empty is a trap."*
 /// 24. **`nav.ts`'s own source comment documents this page's §6 as a shipped
 ///     bug**, found the same way as the missing Chart section. `nav.dart`
@@ -134,14 +134,14 @@
 ///     a 10px rounded `--muted` square on the cell; the button inside it is a
 ///     pill; so a selected today is a circle on a rounded square.
 /// 26. **`CalendarDayButton` passes `size="icon"` and immediately throws it
-///     away** — `size-10` loses to `size-auto` in the same className.
+///     away**, `size-10` loses to `size-auto` in the same className.
 /// 27. **`duration-base` is a class that does nothing.** Tailwind v4 has no
 ///     `--duration-*` namespace, so every `duration-<word>` falls through to
-///     the 250ms default — closed corpus-wide by the sweep.
+///     the 250ms default: closed corpus-wide by the sweep.
 /// 28. **cmdk's group re-sort is dead code.** *(Probed)* `sort()` looks groups
 ///     up by `[cmdk-group=""][data-value="<useId>"]` while the element's
 ///     `data-value` holds its heading, so the selector never matches. Item
-///     sort is real — typing `t` lifts "Go to Stash" over "Open Wallet" — and
+///     sort is real: typing `t` lifts "Go to Stash" over "Open Wallet": and
 ///     group order never changes.
 /// 29. **The command input has no focus affordance.** *(Probed)* the group's
 ///     `has-[[data-slot=input-group-control]:focus-visible]` selector misses,
@@ -150,7 +150,7 @@
 /// 30. **The palette's separator unmounts on the first keystroke.** *(Probed)*
 ///     cmdk renders `Separator` only when `!state.search`, so the 1px rule
 ///     leaves the DOM the moment anything is typed and returns when the input
-///     is cleared — a height swing on a control that has no other.
+///     is cleared: a height swing on a control that has no other.
 /// 31. **Outside days are a visual no-op.** *(Probed)* the `outside` slot asks
 ///     for `text-muted-foreground`, and the day button inside it declares its
 ///     own colour, so a 30 July in an August grid is painted exactly like a
@@ -170,32 +170,32 @@ import '../nav.dart';
 
 /* ── Page constants ──────────────────────────────────────────────────────── */
 
-/// `max-w-sm` — `--container-sm`, 24rem. §1's and §2's `FieldGroup`, and §3's
+/// `max-w-sm`, `--container-sm`, 24rem. §1's and §2's `FieldGroup`, and §3's
 /// bare `div`. Tailwind's **container** scale, which `globals.css` does not
 /// override, so it is not the spacing ladder even where the two coincide.
 // allow-hardcoded: framework container scale with no token to read it from.
 const double _measureSm = 384;
 
-/// `max-w-xs` — `--container-xs`, 20rem. §7's `FieldGroup`, and the only place
+/// `max-w-xs`, `--container-xs`, 20rem. §7's `FieldGroup`, and the only place
 /// on the page that steps down from `sm`.
 // allow-hardcoded: framework container scale with no token to read it from.
 const double _measureXs = 320;
 
-/// `w-40` on the three state-cell triggers — the third width case, and the one
+/// `w-40` on the three state-cell triggers: the third width case, and the one
 /// [DsSelect.expand] could not spell.
 final double _triggerWidth = ds(40);
 
-/// `useState(new Date(2026, 6, 30))` — §5's `selected` and §7's `picked`.
+/// `useState(new Date(2026, 6, 30))`, §5's `selected` and §7's `picked`.
 ///
 /// **July**, seeded when the page was written, and read by a calendar that
 /// opens on the reader's own month. Drift 2.
 DateTime get _seedDay => DateTime(2026, 7, 30);
 
-/// `useState({from: new Date(2026, 6, 12), to: new Date(2026, 6, 20)})` — §6.
+/// `useState({from: new Date(2026, 6, 12), to: new Date(2026, 6, 20)})`, §6.
 DsDateRange get _seedRange =>
     DsDateRange(from: DateTime(2026, 7, 12), to: DateTime(2026, 7, 20));
 
-/// The disabled twin's frozen value — *"Locked to the tax year"*, and the
+/// The disabled twin's frozen value, *"Locked to the tax year"*, and the
 /// start of the UK one.
 DateTime get _taxYearStart => DateTime(2026, 4, 6);
 
@@ -228,7 +228,7 @@ class SelectsPage extends StatelessWidget {
           blurb: here.category.blurb,
           contents: here.category.contents,
         ),
-        // `className="mb-12"` — 48px, above the first section rather than
+        // `className="mb-12"`, 48px, above the first section rather than
         // inside it.
         Padding(
           padding: EdgeInsets.only(bottom: ds(12)),
@@ -255,7 +255,7 @@ class SelectsPage extends StatelessWidget {
 /// A `max-w-*` block: as wide as its measure, no wider, and flush left.
 ///
 /// [Align] and not a bare [ConstrainedBox]: a constrained box under a **tight**
-/// width is still tight — the max never gets a chance to bind — and the panel
+/// width is still tight: the max never gets a chance to bind: and the panel
 /// body hands its child exactly that. Align relaxes the incoming constraint to
 /// loose first, which is what lets the measure win. Same shape the forms page
 /// uses, and the shape a shrink-wrapping specimen needs too (§5, §6).
@@ -319,7 +319,7 @@ class _SelectSection extends StatefulWidget {
 }
 
 class _SelectSectionState extends State<_SelectSection> {
-  /// `defaultValue="popular"` — uncontrolled on the reference, so a commit
+  /// `defaultValue="popular"`: uncontrolled on the reference, so a commit
   /// really does move it.
   String? _sort = 'popular';
 
@@ -333,7 +333,7 @@ class _SelectSectionState extends State<_SelectSection> {
   String? _cellSelected = 'a';
 
   /// The grouped menu, in DOM order: label, three rows, separator, label, two
-  /// rows. The heterogeneous list `_placement()` was rewritten for — the
+  /// rows. The heterogeneous list `_placement()` was rewritten for: the
   /// chosen row sits 40px into the content, not `8 + 0.5 × 34.571`.
   static const List<DsSelectChild<String>> _sortOptions =
       <DsSelectChild<String>>[
@@ -355,7 +355,7 @@ class _SelectSectionState extends State<_SelectSection> {
     ),
   ];
 
-  /// `[…].map((r) => <SelectItem value={r.toLowerCase()}>)` — six flat rows,
+  /// `[…].map((r) => <SelectItem value={r.toLowerCase()}>)`: six flat rows,
   /// the labels cased and the values not.
   static const List<String> _rarities = <String>[
     'Common',
@@ -435,7 +435,7 @@ class _SelectSectionState extends State<_SelectSection> {
                   // DRIFT 10, second direction: `w-40` beats `w-fit` through
                   // twMerge, before CSS is consulted.
                   width: _triggerWidth,
-                  // `aria-label` — the trigger has no visible label of its own,
+                  // `aria-label`: the trigger has no visible label of its own,
                   // and this page is the first consumer of that parameter.
                   label: 'Default',
                 ),
@@ -516,7 +516,7 @@ class _NativeSectionState extends State<_NativeSection> {
               DsField(
                 label: 'Country',
                 description: 'Used in shipping and account settings.',
-                // DRIFT 8. 32px, 12px radius, transparent, no socket — beside
+                // DRIFT 8. 32px, 12px radius, transparent, no socket: beside
                 // §1's 40px pill over one. The port's own menu stands in for
                 // the OS list (ruling L6, the first by-construction
                 // divergence); the *specimen* is the closed control, and that
@@ -576,7 +576,7 @@ class _ComboboxSectionState extends State<_ComboboxSection> {
                 emptyLabel: 'No matching set.',
               ),
             ),
-            // `<p className="type-small mt-5">` — a bare paragraph, not a
+            // `<p className="type-small mt-5">`: a bare paragraph, not a
             // `Note`, and the only caption on the page.
             SizedBox(height: ds(5)),
             DsText(
@@ -606,7 +606,7 @@ class _CommandSection extends StatelessWidget {
       heading: 'Packs',
       items: <DsCommandItem>[
         // DRIFT 4: the prices ride `CommandShortcut`, which is 12px sans at
-        // 0.1em — not the numerical foundation Do 5 asks for.
+        // 0.1em: not the numerical foundation Do 5 asks for.
         DsCommandItem(
           label: 'Eclipse Vault',
           icon: DsIconGlyph.search,
@@ -623,7 +623,7 @@ class _CommandSection extends StatelessWidget {
       heading: 'Actions',
       separatorBefore: true,
       items: <DsCommandItem>[
-        // DRIFT 14: two platform idioms on one specimen — U+2318 here, and
+        // DRIFT 14: two platform idioms on one specimen, U+2318 here, and
         // "Ctrl + K" in the Panel's own header strip.
         DsCommandItem(label: 'Open Wallet', shortcut: '⌘W'),
         DsCommandItem(label: 'Go to Stash', shortcut: '⌘S'),
@@ -678,7 +678,7 @@ class _CalendarSectionState extends State<_CalendarSection> {
       child: DsPanel(
         label: 'Single',
         // `root` is `w-fit` and here that is real: the calendar is 222px wide
-        // and the panel body is 1030. Aligned, never stretched — a calendar
+        // and the panel body is 1030. Aligned, never stretched: a calendar
         // that fills its panel is a different component.
         child: Align(
           alignment: AlignmentDirectional.centerStart,
@@ -707,7 +707,7 @@ class _DateRangeSection extends StatefulWidget {
 class _DateRangeSectionState extends State<_DateRangeSection> {
   DsDateRange? _range = _seedRange;
 
-  /// `rangeLabel` (page:82–85) — the Panel's own `note`, derived from the live
+  /// `rangeLabel` (page:82–85): the Panel's own `note`, derived from the live
   /// range.
   ///
   /// The separator is U+2013 EN DASH, not a hyphen. Clicking two days rewrites
@@ -756,7 +756,7 @@ class _DateRangeSectionState extends State<_DateRangeSection> {
   }
 }
 
-/// §6's Note — the postmortem `nav.dart` already carries verbatim.
+/// §6's Note: the postmortem `nav.dart` already carries verbatim.
 class _PromiseBody extends StatelessWidget {
   const _PromiseBody();
 
@@ -803,7 +803,7 @@ class _DatePickerSection extends StatefulWidget {
 class _DatePickerSectionState extends State<_DatePickerSection> {
   DateTime? _picked = _seedDay;
 
-  /// `htmlFor="picker-empty"` — the label activates the trigger, which is a
+  /// `htmlFor="picker-empty"`: the label activates the trigger, which is a
   /// Button rather than an Input (the Meta says why).
   final FocusNode _pickerFocus = FocusNode(debugLabel: 'picker-empty');
 
@@ -852,7 +852,7 @@ class _DatePickerSectionState extends State<_DatePickerSection> {
                       label: 'Acquired after',
                     ),
                   ),
-                  // `{picked && <Button …>Clear date</Button>}` — a direct
+                  // `{picked && <Button …>Clear date</Button>}`: a direct
                   // child of the `FieldGroup`, so it takes the group's own
                   // 20px above and below, and `self-start` beats the group's
                   // stretch. It **unmounts** when the field goes empty, which
@@ -868,7 +868,7 @@ class _DatePickerSectionState extends State<_DatePickerSection> {
                         child: const Text('Clear date'),
                       ),
                     ),
-                  // `<Field data-disabled>` — DRIFT 16. The field dims the
+                  // `<Field data-disabled>`, DRIFT 16. The field dims the
                   // label to 0.50, the disabled trigger dims itself to 0.45,
                   // and the description is dimmed by neither.
                   DsField(
@@ -1029,7 +1029,7 @@ class _RulesSection extends StatelessWidget {
     return const DsSection(
       id: 'rules',
       title: 'Rules',
-      // Five dos against four don'ts — unequal columns, as `selection` has
+      // Five dos against four don'ts: unequal columns, as `selection` has
       // them too.
       child: DsDoDont(
         dos: <String>[

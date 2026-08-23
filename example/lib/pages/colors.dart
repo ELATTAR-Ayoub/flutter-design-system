@@ -1,10 +1,10 @@
-/// `/design-system/colors` — the whole colour system on one page, and nothing
+/// `/design-system/colors`: the whole colour system on one page, and nothing
 /// else (`app/design-system/colors/page.tsx`).
 ///
 /// The reference's premise is *measured, not asserted*: no hex on this page is
 /// typed by hand and no contrast claim is written down. The engine that reads
 /// the live theme and does the WCAG arithmetic lives in `token_swatch.dart`;
-/// this file is the page itself — its copy, and the order it runs in.
+/// this file is the page itself: its copy, and the order it runs in.
 /// Eighteen swatches across four ramps, four notes, two panels naming the two
 /// things this system refuses to express as a colour, and the foot nav.
 ///
@@ -12,7 +12,7 @@
 /// disagrees with what the page then measures (colors-map §12): the muted
 /// foreground note says "about 13:1" where the badge above it computes 13.5,
 /// the accent row claims an alias that only holds on dark, and the state note
-/// ships the doubled word "in the same same row" — JSX collapses the line
+/// ships the doubled word "in the same same row", JSX collapses the line
 /// break, so that is what a reader sees. The header's chips are the page's own
 /// five, not the nav registry's eight.
 ///
@@ -34,12 +34,12 @@ import '../token_swatch.dart';
 /// The header's eyebrow and title come from the nav registry rather than from
 /// this file, so a page cannot end up named one thing in the sidebar and
 /// another at the top of itself. The blurb and the chips below are the page's
-/// own — the registry's differ, and that drift is the reference's (§12.1).
+/// own: the registry's differ, and that drift is the reference's (§12.1).
 final DsCategoryHit _here = findCategory('foundations', 'colors');
 
 /* ── The four ramps, as the reference declares them ──────────────────────── */
 
-/// `#monochrome` — six steps on shadcn's own token names.
+/// `#monochrome`: six steps on shadcn's own token names.
 ///
 /// The first four are pure fills: nothing is ever written in `--background`,
 /// `--card`, `--muted` or `--accent`, so a ratio for them would be a number
@@ -86,7 +86,7 @@ const List<Widget> _monochrome = <Widget>[
   ),
 ];
 
-/// `#action` — the ink first, then the three ends of the ramp.
+/// `#action`: the ink first, then the three ends of the ramp.
 const List<Widget> _action = <Widget>[
   DsTokenSwatch(
     token: '--color-action-ink',
@@ -115,7 +115,7 @@ const List<Widget> _action = <Widget>[
   ),
 ];
 
-/// `#value` — ink, mid, bright, dark.
+/// `#value`: ink, mid, bright, dark.
 ///
 /// The order is not the action ramp's: mid comes second here and last-but-one
 /// there. Kept as shipped.
@@ -143,7 +143,7 @@ const List<Widget> _value = <Widget>[
   ),
 ];
 
-/// `#state` — four meanings, fixed.
+/// `#state`: four meanings, fixed.
 ///
 /// Three of the four are `@theme static` hues; the fourth queries the semantic
 /// `--destructive`, which is shadcn's own and the only one of the four with a
@@ -190,7 +190,7 @@ class ColorsPage extends StatelessWidget {
               'worth, four state colours, and nothing else. Two roles, two '
               'themes, and every value on this page measured rather than '
               'claimed.',
-          // The page's own list — the nav registry's eight are what the
+          // The page's own list: the nav registry's eight are what the
           // sidebar and the index card show (colors-map §12).
           contents: const <String>[
             'Monochrome',
@@ -346,7 +346,7 @@ class ColorsPage extends StatelessWidget {
               DsNote(
                 tone: DsNoteTone.value,
                 title: 'Why info is cyan and success is emerald',
-                // "in the same same row" — the source breaks the line between
+                // "in the same same row": the source breaks the line between
                 // the two, JSX collapses it, and the doubled word ships.
                 child: DsText(
                   'A state colour has one job: to be unmistakable for anything '
@@ -384,7 +384,7 @@ class ColorsPage extends StatelessWidget {
                         text: 'A surface that has to feel rare, precious or '
                             'alive is a ',
                       ),
-                      // `<em>` — the browser slants the same face; so does
+                      // `<em>`: the browser slants the same face; so does
                       // Flutter, and neither has a real italic Inter.
                       const TextSpan(
                         text: 'texture',

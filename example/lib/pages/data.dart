@@ -1,4 +1,4 @@
-/// `/design-system/components/base/data` — nine families on one page: table,
+/// `/design-system/components/base/data`: nine families on one page: table,
 /// data table, badge, avatar, card, stat, item, marker, separator.
 ///
 /// Everything here is live. The data table sorts on a real button, filters to a
@@ -7,7 +7,7 @@
 /// and swap back; the transaction rows light on hover; the navigating stat
 /// squishes under a press.
 ///
-/// ## Drift register — recorded, shipped as written
+/// ## Drift register: recorded, shipped as written
 ///
 ///  1. **The eyebrow says "Base" twice.** `` `${group.title} · Base` `` with
 ///     `group.title = "Base Components"`. All fourteen base pages.
@@ -38,15 +38,15 @@
 ///     *(Measured on all three multi-row tables: 37 / 37 / 37 / 37 / **36.5**.)*
 ///     See [DsTable] for the whole model.
 ///  7. **`Stat`'s API list is one row longer than the component.** §API names
-///     *"Badge variant: default · blue · premium …"* — `blue` is not one of the
+///     *"Badge variant: default · blue · premium …"*, `blue` is not one of the
 ///     cva's ten, and `link` is. The copy ships as written.
 ///  8. **The empty state's dashed border never paints.** `Empty` carries
 ///     `border-dashed` with no `border-*` width, so the filtered-to-nothing
-///     panel is a bordered rectangle in prose only — the `DsEmpty` family's
+///     panel is a bordered rectangle in prose only: the `DsEmpty` family's
 ///     own recorded gap, reached here for the first time by a call site.
 ///  9. **The reload button's `disabled` is the only thing that stops a second
 ///     click.** `RELOAD_MS` is 1100 and the comment beside it says it is *"a
-///     fake network wait, not a motion value"* — so it is not on the motion
+///     fake network wait, not a motion value"*: so it is not on the motion
 ///     scale and does not move with it. Ported as the literal it is.
 library;
 
@@ -59,25 +59,25 @@ import '../nav.dart';
 
 /* ── Page constants ──────────────────────────────────────────────────────── */
 
-/// `max-w-md` — `--container-md`, 28rem.
+/// `max-w-md`, `--container-md`, 28rem.
 // allow-hardcoded: framework container scale with no token to read it from.
 const double _measureMd = 448;
 
 /// *"A fake network wait, not a motion value. The motion scale describes how
 /// long a thing takes to move; this is how long a server takes to answer, and
-/// the two are unrelated — `--duration-slow` is 400ms and no API is that
+/// the two are unrelated, `--duration-slow` is 400ms and no API is that
 /// polite."*
 const Duration _reloadWait =
-    Duration(milliseconds: 1100); // allow-hardcoded: RELOAD_MS — a network
+    Duration(milliseconds: 1100); // allow-hardcoded: RELOAD_MS: a network
 // wait, not a motion value; the source says so beside it.
 
-/// `mt-5` — the caption under a specimen.
+/// `mt-5`: the caption under a specimen.
 double get _captionGap => ds(5);
 
-/// `mt-6` — the wider caption gap, and the gap over a trailing Note.
+/// `mt-6`: the wider caption gap, and the gap over a trailing Note.
 double get _wideGap => ds(6);
 
-/// `mt-4` — between two panels.
+/// `mt-4`: between two panels.
 double get _panelGap => ds(4);
 
 /// `space-y-6` in the marker panel, and `gap-8` in the stat grids.
@@ -85,7 +85,7 @@ double get _markerGap => ds(6);
 
 /// `filter: grayscale(1)`, in Flutter's vocabulary.
 ///
-/// The Filter Effects luminance coefficients — the same numbers the browser
+/// The Filter Effects luminance coefficients: the same numbers the browser
 /// uses for `grayscale(1)`, which is a saturate matrix at amount 0.
 // allow-hardcoded: the CSS Filter Effects grayscale matrix, quoted.
 const ColorFilter _grayscale = ColorFilter.matrix(<double>[
@@ -95,7 +95,7 @@ const ColorFilter _grayscale = ColorFilter.matrix(<double>[
   0, 0, 0, 1, 0, //
 ]);
 
-/// `TX` — the five transaction rows, in the page's own order.
+/// `TX`: the five transaction rows, in the page's own order.
 ///
 /// `dir` decides three things at once: the glyph, its tone, and whether the
 /// amount takes the value ramp.
@@ -149,7 +149,7 @@ class DataPage extends StatefulWidget {
 }
 
 class _DataPageState extends State<DataPage> {
-  /// *"The whole grid reloads together — ONE reveal rather than a stagger.
+  /// *"The whole grid reloads together, ONE reveal rather than a stagger.
   /// Both are legal (§4); mixing them without deciding is what looks
   /// accidental."*
   DsStatState _live = DsStatState.ready;
@@ -244,8 +244,8 @@ class _ChartsNoteBody extends StatelessWidget {
             const TextSpan(text: ' tokens have a page to themselves: '),
             DsCode.span('/design-system/components/base/charts'),
             const TextSpan(
-              text: '. Every family is there — area, bar, line, pie, radar, '
-                  'radial — along with the one thing that could not live here, '
+              text: '. Every family is there: area, bar, line, pie, radar, '
+                  'radial: along with the one thing that could not live here, '
                   'which is how a library that animates in JavaScript reads '
                   'this system’s motion tokens instead of copying them.',
             ),
@@ -372,8 +372,8 @@ class _MoneyNoteBody extends StatelessWidget {
             ),
             _em('value'),
             const TextSpan(
-              text: ' ramp — money arriving is worth, which is what that ramp '
-                  'means — and outgoing is plain text. Never red for outgoing, '
+              text: ' ramp: money arriving is worth, which is what that ramp '
+                  'means: and outgoing is plain text. Never red for outgoing, '
                   'because a purchase is not an error. Not ',
             ),
             DsCode.span('success'),
@@ -399,7 +399,7 @@ class _DataTableSection extends StatelessWidget {
         description: 'Sorting, filtering, selection and pagination composed '
             'over the Table above. shadcn ships this as a recipe rather than a '
             'file, because the interesting part is always the column '
-            'definitions — and those belong to whatever is being listed.',
+            'definitions: and those belong to whatever is being listed.',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
@@ -409,7 +409,7 @@ class _DataTableSection extends StatelessWidget {
             ),
             SizedBox(height: _wideGap),
             const DsPanel(
-              label: 'Loading — skeleton rows on the real footprint',
+              label: 'Loading: skeleton rows on the real footprint',
               child: DataTableDemo(loading: true),
             ),
             SizedBox(height: _wideGap),
@@ -431,7 +431,7 @@ class _DataTableSection extends StatelessWidget {
                   k: 'useReactTable',
                   v: const TextSpan(
                     text: 'The hook. Feed it data, columns and one get*RowModel '
-                        'per feature you want — core, sorted, filtered, '
+                        'per feature you want: core, sorted, filtered, '
                         'paginated.',
                   ),
                 ),
@@ -454,7 +454,7 @@ class _DataTableSection extends StatelessWidget {
                   k: 'state + on…Change',
                   v: const TextSpan(
                     text: 'Always a pair. A controlled slice handed in without '
-                        'its writer is read once and then ignored — the filter '
+                        'its writer is read once and then ignored: the filter '
                         'box types fine and never filters.',
                   ),
                 ),
@@ -482,7 +482,7 @@ class _PinnedNoteBody extends StatelessWidget {
           children: <InlineSpan>[
             const TextSpan(
               text: 'Data Table is the one shadcn entry that is not a file you '
-                  'own — it is a recipe driving ',
+                  'own: it is a recipe driving ',
             ),
             DsCode.span('@tanstack/react-table'),
             const TextSpan(
@@ -604,8 +604,8 @@ class _BadgeSection extends StatelessWidget {
                         const TextSpan(text: 'Rank and tier badges are '),
                         _em('not'),
                         const TextSpan(
-                          text: ' here. Anything that carries product meaning — '
-                              'a pip count, a scarcity step — belongs to the '
+                          text: ' here. Anything that carries product meaning, '
+                              'a pip count, a scarcity step: belongs to the '
                               'product that means it, built on top of this '
                               'Badge rather than added to it.',
                         ),
@@ -647,7 +647,7 @@ class _AvatarSection extends StatelessWidget {
                   align: DsRowAlign.center,
                   children: <Widget>[
                     // `className="size-6"` with `.type-caption` on the
-                    // fallback — the class beats the class, twice.
+                    // fallback: the class beats the class, twice.
                     DsAvatar(
                       fallback: 'VW',
                       sizePx: ds(6),
@@ -668,7 +668,7 @@ class _AvatarSection extends StatelessWidget {
                     DsAvatar(
                       fallback: '#1',
                       sizePx: ds(10),
-                      // `ring-2 ring-value` — *"one of lime's permitted jobs."*
+                      // `ring-2 ring-value`, *"one of lime's permitted jobs."*
                       ring: (color: DsPalette.value, width: dsAvatarRingWidth),
                       fallbackFill:
                           DsPalette.value.withValues(alpha: _valueTint),
@@ -678,14 +678,14 @@ class _AvatarSection extends StatelessWidget {
                 ),
                 const _Caption(
                   'The lime ring on the last avatar marks the leaderboard '
-                  'leader — one of lime’s permitted jobs.',
+                  'leader: one of lime’s permitted jobs.',
                 ),
               ],
             ),
           ),
           SizedBox(height: _panelGap),
           DsPanel(
-            label: 'Avatar group — who opened this pack',
+            label: 'Avatar group: who opened this pack',
             child: Builder(
               builder: (BuildContext context) => DsAvatarGroup(
                 children: <Widget>[
@@ -968,7 +968,7 @@ class _StatSection extends StatelessWidget {
                         const TextSpan(
                           text: ' draws, exported so the cell composes it '
                               'instead of redrawing an arrow and a sign of its '
-                              'own — which would be a fork every guard here '
+                              'own: which would be a fork every guard here '
                               'stays green on. The two columns above move in '
                               'the ',
                         ),
@@ -1117,7 +1117,7 @@ class _StatSection extends StatelessWidget {
                           text: 'Only the figure and the delta are skeletons. '
                               'The label and the hint are chrome you already '
                               'know before the request returns, so they stay '
-                              'real text — which is also what makes the '
+                              'real text: which is also what makes the '
                               'footprint provably identical in both states '
                               'rather than approximately so. The last stat has '
                               'no delta and reserves no delta line, in either '
@@ -1152,7 +1152,7 @@ class _StatSection extends StatelessWidget {
                       children: <InlineSpan>[
                         const TextSpan(
                           text: 'A Stat is not a control and carries no hover, '
-                              'focus or pressed state of its own — applying one '
+                              'focus or pressed state of its own: applying one '
                               'would promise an affordance that is not there. '
                               'When a figure navigates, the ',
                         ),
@@ -1163,7 +1163,7 @@ class _StatSection extends StatelessWidget {
                         ),
                         DsCode.span('press-spring'),
                         const TextSpan(text: ' for the press. One transform '
-                            'utility, not two — '),
+                            'utility, not two, '),
                         DsCode.span('lift'),
                         const TextSpan(text: ' and '),
                         DsCode.span('press-spring'),
@@ -1204,7 +1204,7 @@ class _OneSignalBody extends StatelessWidget {
               'it still reads. Direction is carried by the glyph’s shape, by '
               'the sign the component writes onto the number, and by a visually '
               'hidden word for assistive tech. Colour is the fourth signal, not '
-              'the first — and it is never a red/green pair: the unfavourable '
+              'the first: and it is never a red/green pair: the unfavourable '
               'direction is plain text, exactly as money leaving a wallet is '
               '(§1.4). Red means error, and a dip is not an error.',
         ),
@@ -1264,7 +1264,7 @@ class _DeltaCellTable extends StatelessWidget {
 }
 
 /// The `<button className="group press-spring rounded-xl text-left">` wrapping
-/// a `Card` — *"the wrapper is the control; the CONTAINER is still a Card."*
+/// a `Card`, *"the wrapper is the control; the CONTAINER is still a Card."*
 ///
 /// Drift 4 lives here: the fill travels 250ms and the ring does not.
 class _NavigatingStat extends StatefulWidget {
@@ -1292,7 +1292,7 @@ class _NavigatingStatState extends State<_NavigatingStat> {
         upDuration: DsDurations.pressSpringUp,
         onTap: () {},
         child: TweenAnimationBuilder<Color?>(
-          // `transition-colors duration-fast` — DRIFT 3.
+          // `transition-colors duration-fast`, DRIFT 3.
           duration: dsAnimationDuration(context, DsDurations.transitionDefault),
           curve: DsCurves.out,
           tween: ColorTween(end: _hovered ? theme.accent : theme.card),
@@ -1411,25 +1411,25 @@ class _MarkerSection extends StatelessWidget {
                       size: DsIconSize.sm,
                       tone: DsIconTone.muted,
                     ),
-                    label: 'default — bare row, for a container that already '
+                    label: 'default: bare row, for a container that already '
                         'frames it',
                   ),
                   SizedBox(height: _markerGap),
                   const DsMarker(
                     variant: DsMarkerVariant.separator,
-                    label: 'separator — divides before from after',
+                    label: 'separator: divides before from after',
                   ),
                   SizedBox(height: _markerGap),
                   const DsMarker(
                     variant: DsMarkerVariant.border,
-                    label: 'border — heads what follows',
+                    label: 'border: heads what follows',
                   ),
                 ],
               ),
             ),
             SizedBox(height: _panelGap),
             DsPanel(
-              label: 'In use — the agent console, where a stream was stopped',
+              label: 'In use: the agent console, where a stream was stopped',
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
@@ -1479,7 +1479,7 @@ class _NotAnAlertBody extends StatelessWidget {
             const TextSpan(text: ', that is an '),
             DsCode.span('Alert'),
             const TextSpan(
-              text: ' — §5’s table is explicit that a persistent condition '
+              text: ', §5’s table is explicit that a persistent condition '
                   'worth explaining gets its own surface.',
             ),
           ],
@@ -1591,7 +1591,7 @@ class _ApiSection extends StatelessWidget {
               k: 'Stat',
               v: const TextSpan(
                 text: 'label + value, plus optional delta, hint and message. '
-                    'Draws no container — put it in a Card, a Panel or a '
+                    'Draws no container: put it in a Card, a Panel or a '
                     'header.',
               ),
             ),
@@ -1599,7 +1599,7 @@ class _ApiSection extends StatelessWidget {
               k: 'Stat delta',
               v: const TextSpan(
                 text: '{ value: "8.2%", direction: "up" | "down" | "flat" }. '
-                    'Unsigned — the component writes the + or the −.',
+                    'Unsigned: the component writes the + or the −.',
               ),
             ),
             (
@@ -1650,21 +1650,21 @@ class _RulesSection extends StatelessWidget {
             'Right-align numeric table columns and use the shared tabular '
                 'type-num foundation.',
             'Show money direction with a sign, a glyph and colour together.',
-            'Use initials as the avatar fallback — never a generic silhouette.',
+            'Use initials as the avatar fallback: never a generic silhouette.',
             'Keep badges to one or two words.',
             'Say what a table is showing and out of how many, in the caption.',
             'Give a Stat’s delta a glyph and a sign, so it reads without '
                 'colour.',
-            'Say which direction is good — betterWhen="down" for churn and '
+            'Say which direction is good: betterWhen="down" for churn and '
                 'refunds.',
           ],
           donts: <String>[
             'Don’t colour an outgoing purchase red; red means error, not '
                 'spending.',
-            'Don’t colour a falling figure red either — a dip is not an error.',
+            'Don’t colour a falling figure red either: a dip is not an error.',
             'Don’t put a border or a fill on a Stat; the container it sits in '
                 'owns that.',
-            'Don’t encode rank or tier in a base Badge — anything carrying '
+            'Don’t encode rank or tier in a base Badge: anything carrying '
                 'pips belongs to the product, not the chassis.',
             'Don’t left-align a column of prices.',
             'Don’t use a Card where an Item row would be denser and clearer.',

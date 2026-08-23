@@ -1,4 +1,4 @@
-/// Single source of truth for the design-system tree — a verbatim port of the
+/// Single source of truth for the design-system tree: a verbatim port of the
 /// reference's `lib/ds/nav.ts` (615 lines).
 ///
 /// That file's own header states the contract, which this port inherits
@@ -37,12 +37,12 @@ class DsCategory {
   /// The component sets shown on that page, in display order.
   ///
   /// The reference states the consequence on the `data` category below: *adding
-  /// a string here is a commitment, not a label* — it renders as the page's
+  /// a string here is a commitment, not a label*: it renders as the page's
   /// chip list, so an entry is a promise that the section exists.
   final List<String> contents;
 }
 
-/// One family of pages — a labelled block in the sidebar and one card on the
+/// One family of pages: a labelled block in the sidebar and one card on the
 /// overview page.
 class DsGroup {
   const DsGroup({
@@ -70,7 +70,7 @@ class DsGroup {
   final List<DsCategory> categories;
 }
 
-/// `DS_ROOT` — every route in the tree hangs off this one segment.
+/// `DS_ROOT`: every route in the tree hangs off this one segment.
 const String dsRoot = '/design-system';
 
 /// Product showcase route, deliberately outside the documentation tree.
@@ -128,8 +128,8 @@ const List<DsCategory> _foundations = <DsCategory>[
       'Labels',
       'Numerics',
       // The one entry that is not a `.type-*` class. `.prose` is the same
-      // scale reached a second way — for content nobody writes the elements
-      // of — so it is documented beside the classes it shares its declaration
+      // scale reached a second way: for content nobody writes the elements
+      // of: so it is documented beside the classes it shares its declaration
       // blocks with rather than on a page of its own.
       'Prose',
       'Rules',
@@ -193,7 +193,7 @@ const List<DsCategory> _foundations = <DsCategory>[
   ),
 ];
 
-/* ── Base components — the shadcn chassis, restyled ──────────────────────── */
+/* ── Base components: the shadcn chassis, restyled ──────────────────────── */
 
 const List<DsCategory> _base = <DsCategory>[
   DsCategory(
@@ -253,7 +253,7 @@ const List<DsCategory> _base = <DsCategory>[
       'Combobox',
       'Command Palette',
       // The two raw calendar modes first, then the recipe that composes one
-      // into a popover — which is the order a reader needs them in.
+      // into a popover: which is the order a reader needs them in.
       'Calendar',
       'Date Range',
       'Date Picker',
@@ -343,7 +343,7 @@ const List<DsCategory> _base = <DsCategory>[
   // built now, as its own `charts` category below, and this page links across.
   //
   // "Date Range" on `selects` was the same bug, found the same way and fixed
-  // the other way round — by building the range calendar the entry had been
+  // the other way round: by building the range calendar the entry had been
   // promising. Nothing checks this direction, so it is worth saying twice:
   // adding a string here is a commitment, not a label.
   DsCategory(
@@ -399,7 +399,7 @@ const List<DsCategory> _base = <DsCategory>[
       'Resizable',
     ],
   ),
-  // Component names, in the order the page reaches them — the same
+  // Component names, in the order the page reaches them: the same
   // convention `buttons` uses, where `contents` is what is shown rather than
   // what the headings are called. On this page it doubles as the export
   // inventory: every name below has a specimen you can design against.
@@ -486,7 +486,7 @@ const List<DsCategory> _agent = <DsCategory>[
       'Model picker',
     ],
   ),
-  // In the page's order — `contents` is documented above as display order, and
+  // In the page's order, `contents` is documented above as display order, and
   // this list had drifted out of it as sections were added: it read Markdown
   // second and Welcome card last while the page rendered Markdown fifth and
   // Attachments last. The page's order is the one kept, because Approval card
@@ -642,7 +642,7 @@ const List<DsCategory> _site = <DsCategory>[
   ),
 ];
 
-/// `DS_GROUPS` — the whole tree, in the order the sidebar renders it.
+/// `DS_GROUPS`: the whole tree, in the order the sidebar renders it.
 const List<DsGroup> dsGroups = <DsGroup>[
   DsGroup(
     id: 'foundations',
@@ -679,8 +679,8 @@ const List<DsGroup> dsGroups = <DsGroup>[
 
 /// Absolute href for a category page.
 ///
-/// Foundations pages sit directly under the root — `/design-system/colors`, not
-/// `/design-system/foundations/colors` — because Foundations *is* the index of
+/// Foundations pages sit directly under the root, `/design-system/colors`, not
+/// `/design-system/foundations/colors`: because Foundations *is* the index of
 /// the design system. Every other group nests under its own index.
 String categoryHref(DsGroup group, DsCategory category) =>
     group.id == 'foundations'
@@ -696,7 +696,7 @@ DsGroup? _groupOrNull(String id) {
   return null;
 }
 
-/// The group with this id, or a throw — the strict half of [_groupOrNull].
+/// The group with this id, or a throw: the strict half of [_groupOrNull].
 ///
 /// Not in the reference (which has no caller that needs a group alone), but the
 /// shell keys its sidebar off group ids and a typo there should fail loudly for
@@ -728,11 +728,11 @@ DsCategoryHit findCategory(String groupId, String slug) {
 ///
 /// Two behaviours are the reference's rather than this port's, and both are
 /// kept because the pages are built against them:
-/// * an unknown *group* returns `(null, null)` instead of throwing — unlike
+/// * an unknown *group* returns `(null, null)` instead of throwing: unlike
 ///   [findCategory], the foot nav degrades to nothing rather than breaking a
 ///   page;
 /// * an unknown *slug* leaves `findIndex` at −1, so `prev` is null and `next`
-///   resolves to index 0 — the group's first category. A foot nav on a page
+///   resolves to index 0: the group's first category. A foot nav on a page
 ///   that is not in the tree therefore points at the top of the group.
 DsSiblings siblings(String groupId, String slug) {
   final DsGroup? found = _groupOrNull(groupId);

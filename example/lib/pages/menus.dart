@@ -1,4 +1,4 @@
-/// `/design-system/components/base/menus` — three roots, one menu.
+/// `/design-system/components/base/menus`: three roots, one menu.
 ///
 /// The page that `dropdown_menu.dart`, `context_menu.dart`, `menubar.dart` and
 /// the shared `menu.dart` were built for. Every specimen on it is live: the
@@ -8,12 +8,12 @@
 /// settles on it, and the admin menubar hands one open menu between three
 /// triggers on hover.
 ///
-/// ## Drift register — recorded, shipped as written
+/// ## Drift register: recorded, shipped as written
 ///
 ///  1. **The eyebrow says "Base" twice.** `` `${group.title} · Base` `` with
 ///     `group.title = "Base Components"`. All fourteen base pages.
 ///  2. **The menubar's triggers overflow the bar they sit in.** The root is
-///     `h-8 p-1` — a 24px content box — and every `MenubarTrigger` is `h-8`.
+///     `h-8 p-1`: a 24px content box: and every `MenubarTrigger` is `h-8`.
 ///     *(Measured: root `y=1531.63 h=32`, first trigger `y=1531.63 h=32`, so
 ///     the padding is spent entirely on overflow.)* Reproduced; the reference
 ///     writes no `overflow-hidden`, so nothing clips.
@@ -23,15 +23,15 @@
 ///     `MenubarSubContent` all carry is absent. A menubar menu zooms in and
 ///     vanishes.
 ///  4. **`ContextMenuSubContent` is the one overlay in the corpus that writes
-///     `border`** instead of `ring-1 ring-foreground/10` — a real 1px line that
+///     `border`** instead of `ring-1 ring-foreground/10`: a real 1px line that
 ///     costs its box 2px. *(Measured: a submenu holding two 34.5625 rows is
 ///     87.125 tall, not 85.125.)* Its two siblings in the other files write the
 ///     ring at the same `shadow-lg`.
 ///  5. **The menubar's check rows mirror everyone else's.** `MenubarCheckboxItem`
 ///     is `pr-3 pl-9` with `absolute left-1.5`; `DropdownMenuCheckboxItem` and
 ///     `ContextMenuCheckboxItem` are `pr-9 pl-3` with `absolute right-3`. One
-///     role, two mirror images, three files. Unreachable from this page — no
-///     menubar menu carries a check row — and recorded because the three files
+///     role, two mirror images, three files. Unreachable from this page: no
+///     menubar menu carries a check row: and recorded because the three files
 ///     are otherwise identical.
 ///  6. **Both check menus are controlled with no handler.**
 ///     `<DropdownMenuCheckboxItem checked>` and
@@ -41,12 +41,12 @@
 ///     `checked, checked, unchecked, unchecked` before the click and
 ///     identically after reopening; the radio value never leaves "Highest
 ///     value".)* This is the selection page's S4 "controlled-no-handler"
-///     precedent, in menu form — and it lands under a Panel captioned
+///     precedent, in menu form: and it lands under a Panel captioned
 ///     *"Checkbox items for independent toggles, radio items for one-of-many"*,
 ///     next to a section that demonstrates neither toggling nor selecting.
 ///  7. **`DropdownMenuContent`'s declared width is unreachable here.** The class
-///     list opens with `w-(--radix-dropdown-menu-trigger-width)` — a menu as
-///     wide as the button that opened it — and twMerge deletes it the moment a
+///     list opens with `w-(--radix-dropdown-menu-trigger-width)`: a menu as
+///     wide as the button that opened it: and twMerge deletes it the moment a
 ///     call site passes any `w-*`. *(Measured: the resolved class list on both
 ///     of the page's dropdowns ends in `w-60` / `w-52` with no `w-(--radix-…)`
 ///     left in it.)* Neither menu is ever the trigger's width, and no
@@ -54,7 +54,7 @@
 ///     never renders.
 ///  8. **The account trigger does not squish.** `DropdownMenuTrigger` stamps
 ///     `aria-haspopup="menu"` *(probed on all three)*, which cancels the
-///     Button's `active:not-aria-[haspopup]:scale-95` — selects-map drift 20,
+///     Button's `active:not-aria-[haspopup]:scale-95`: selects-map drift 20,
 ///     one component over. Reproduced: every trigger on this page passes
 ///     [DsButton.suppressPressScale], and the open fill beside it comes from
 ///     [DsMenuTriggerScope] (GAP CLOSED 1 and 2 on [DsDropdownMenu]).
@@ -62,7 +62,7 @@
 ///     `[&_svg:not([class*='size-'])]:size-4` beats the SVG's own attributes
 ///     while `strokeWidth` stays at the 14px-derived 2.4. Seven sites here;
 ///     selects-map drift 15, again. The `size="xs"` tick in the account label
-///     is the exception that proves it — the label carries no such rule, so it
+///     is the exception that proves it: the label carries no such rule, so it
 ///     really is 12px.
 /// 10. **The menu rows do not transition.** Every one computes
 ///     `transition-property: all` at `transition-duration: 0s`, so the accent
@@ -71,7 +71,7 @@
 /// 11. **The API list names five props and the page demonstrates four.**
 ///     `ContextMenuSub` is on the card; `DropdownMenuItem variant`,
 ///     `DropdownMenuShortcut`, `DropdownMenuCheckboxItem` and
-///     `DropdownMenuRadioGroup` are all shown — but the Rules Note below
+///     `DropdownMenuRadioGroup` are all shown: but the Rules Note below
 ///     promises *"the same rhythm … applied to Dropdown, Context Menu, Menubar,
 ///     Select and Command"* and the last two live on other pages, where the
 ///     reader cannot compare them.
@@ -79,7 +79,7 @@
 ///     paints a 1px `--border` circle under `mix-blend-darken` (light) /
 ///     `mix-blend-lighten` (dark), over a `--muted` fill. `darken(#e4e4e7,
 ///     #f4f4f5)` is `#e4e4e7` and `lighten(#27272a, #27272a)` is `#27272a`, so
-///     in both themes the blend resolves to the border colour itself — the
+///     in both themes the blend resolves to the border colour itself: the
 ///     ring is exactly a plain 1px `--border`, and the two blend modes are
 ///     ceremony. Reproduced as the plain border they compute to.
 library;
@@ -92,23 +92,23 @@ import '../nav.dart';
 
 /* ── Page constants ──────────────────────────────────────────────────────── */
 
-/// `max-w-xs` — `--container-xs`, 20rem. The context-menu card.
+/// `max-w-xs`, `--container-xs`, 20rem. The context-menu card.
 // allow-hardcoded: framework container scale with no token to read it from.
 const double _measureXs = 320;
 
-/// `className="w-60"` on the account menu — 240.
+/// `className="w-60"` on the account menu, 240.
 double get _accountMenuWidth => ds(60);
 
-/// `className="w-52"` on the Columns and Sort menus — 208.
+/// `className="w-52"` on the Columns and Sort menus, 208.
 double get _optionMenuWidth => ds(52);
 
-/// `size-7` on the avatar — 28, one off the component's own `size-8` default.
+/// `size-7` on the avatar, 28, one off the component's own `size-8` default.
 double get _avatarSize => ds(7);
 
 /// `h-40` on the card.
 double get _cardHeight => ds(40);
 
-/// `mt-5` — the caption under every specimen.
+/// `mt-5`: the caption under every specimen.
 double get _captionGap => ds(5);
 
 /* ── Page ────────────────────────────────────────────────────────────────── */
@@ -165,12 +165,12 @@ class _DropdownSection extends StatelessWidget {
   static List<DsMenuChild> _account(BuildContext context) => <DsMenuChild>[
         const DsMenuLabel('voidwing', child: _AccountLabel()),
         const DsMenuSeparator(),
-        // `DropdownMenuGroup` — a `role="group"` that paints nothing.
+        // `DropdownMenuGroup`: a `role="group"` that paints nothing.
         const DsMenuGroup(children: <DsMenuChild>[
           DsMenuItem(
             label: 'Wallet',
             icon: DsIconGlyph.wallet,
-            // *"The balance rides in the shortcut slot on the right — a real
+            // *"The balance rides in the shortcut slot on the right: a real
             // number in the normal product face with tabular numerals"*, says
             // the caption. The class is `text-xs tracking-widest` **sans**;
             // the caption describes a face the slot does not use.
@@ -188,7 +188,7 @@ class _DropdownSection extends StatelessWidget {
       ];
 
   /// `<DropdownMenuCheckboxItem checked>` ×2 then ×2 unchecked, with no
-  /// handler — DRIFT 6.
+  /// handler, DRIFT 6.
   static const List<DsMenuChild> _columns = <DsMenuChild>[
     DsMenuLabel('Visible columns'),
     DsMenuSeparator(),
@@ -234,7 +234,7 @@ class _DropdownSection extends StatelessWidget {
                   trigger: const _AccountTrigger(),
                 ),
                 const _Caption(
-                  'The balance rides in the shortcut slot on the right — a '
+                  'The balance rides in the shortcut slot on the right: a '
                   'real number in the normal product face with tabular '
                   'numerals, not decoration.',
                 ),
@@ -280,7 +280,7 @@ class _DropdownSection extends StatelessWidget {
 }
 
 /// `DropdownMenuTrigger asChild` over a `Button variant="ghost"` carrying
-/// `gap-2.5 px-2` — an avatar, a name, and a button that never squishes
+/// `gap-2.5 px-2`: an avatar, a name, and a button that never squishes
 /// (DRIFT 8).
 class _AccountTrigger extends StatelessWidget {
   const _AccountTrigger();
@@ -291,8 +291,8 @@ class _AccountTrigger extends StatelessWidget {
     return DsButton(
       variant: DsButtonVariant.ghost,
       // The two attributes `asChild` merges into this element. `aria-haspopup`
-      // is a constant of the arrangement — DRIFT 8, the trigger does not
-      // squish — and `aria-expanded` is the menu's own state, read from the
+      // is a constant of the arrangement, DRIFT 8, the trigger does not
+      // squish: and `aria-expanded` is the menu's own state, read from the
       // scope [DsDropdownMenu] publishes it on: `ghost` holds
       // `bg-secondary text-foreground` for as long as the menu is open,
       // pointer or no pointer.
@@ -302,7 +302,7 @@ class _AccountTrigger extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: ds(2)),
       // The menu opens on **pointer-down**, one level up in
       // `DsMenuPointerDown`: Radix's trigger never waits for the click. This
-      // handler is the `asChild` arrangement itself — the page's `<Button>` has
+      // handler is the `asChild` arrangement itself: the page's `<Button>` has
       // no `onClick` of its own and is enabled all the same, and a `null` here
       // would dim it to 45% and stop the press ever reaching the trigger.
       onPressed: () {},
@@ -310,7 +310,7 @@ class _AccountTrigger extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           const _Avatar('VW'),
-          // `gap-2.5` — 10, not the rung's own 8.
+          // `gap-2.5`, 10, not the rung's own 8.
           SizedBox(width: ds(2.5)),
           // `<span className="type-small text-foreground">`.
           DsText('voidwing', DsType.small, color: theme.foreground),
@@ -320,7 +320,7 @@ class _AccountTrigger extends StatelessWidget {
   }
 }
 
-/// `<Button variant="outline">` — the Columns and Sort triggers.
+/// `<Button variant="outline">`: the Columns and Sort triggers.
 class _OutlineTrigger extends StatelessWidget {
   const _OutlineTrigger(this.label);
 
@@ -329,7 +329,7 @@ class _OutlineTrigger extends StatelessWidget {
   @override
   Widget build(BuildContext context) => DsButton(
         variant: DsButtonVariant.outline,
-        // See [_AccountTrigger] — the press is handled on pointer-down, and
+        // See [_AccountTrigger]: the press is handled on pointer-down, and
         // the same two `asChild` attributes land here. `outline`'s open fill is
         // `aria-expanded:bg-muted`, which is its hover fill.
         suppressPressScale: true,
@@ -371,7 +371,7 @@ class _Avatar extends StatelessWidget {
   }
 }
 
-/// The account menu's `DropdownMenuLabel` body — two lines, and the second one
+/// The account menu's `DropdownMenuLabel` body: two lines, and the second one
 /// carries a 12px success tick.
 class _AccountLabel extends StatelessWidget {
   const _AccountLabel();
@@ -383,7 +383,7 @@ class _AccountLabel extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        // `<span className="block text-foreground">` — no `font-*` of its own,
+        // `<span className="block text-foreground">`: no `font-*` of its own,
         // so it inherits the label's own 12px / 500.
         DsText('voidwing', DsComponentType.menuHeading, color: theme.foreground),
         // `mt-1`.
@@ -393,7 +393,7 @@ class _AccountLabel extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            // `size="xs"` — and the label carries no `size-4` rule, so this
+            // `size="xs"`: and the label carries no `size-4` rule, so this
             // one really is 12px. DRIFT 9's exception.
             const DsIcon(
               DsIconGlyph.shieldCheck,
@@ -440,7 +440,7 @@ class _ContextSection extends StatelessWidget {
       id: 'context',
       title: 'Context Menu',
       description: 'Right-click on a card in the Stash. It is always a '
-          'shortcut to actions that exist elsewhere too — never the only route '
+          'shortcut to actions that exist elsewhere too: never the only route '
           'to something.',
       child: DsPanel(
         label: 'Right-click the card',
@@ -543,7 +543,7 @@ class _MenubarSection extends StatelessWidget {
       id: 'menubar',
       title: 'Menubar',
       description: 'Not used in the collector-facing product. It is here '
-          'because the admin surface will need it — pack management, card '
+          'because the admin surface will need it: pack management, card '
           'management and audit logs.',
       child: const DsPanel(
         label: 'Admin menubar',
@@ -551,7 +551,7 @@ class _MenubarSection extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            // DRIFT 2 — 32px triggers in a 32px bar with 4px of padding.
+            // DRIFT 2, 32px triggers in a 32px bar with 4px of padding.
             DsMenubar(menus: _admin),
             _Caption(
               'Included so the design system can absorb the admin panel later '
@@ -593,12 +593,12 @@ class _ApiSection extends StatelessWidget {
           (
             k: 'DropdownMenuCheckboxItem',
             v: const TextSpan(
-              text: 'Independent toggles — visible columns, active filters.',
+              text: 'Independent toggles: visible columns, active filters.',
             ),
           ),
           (
             k: 'DropdownMenuRadioGroup',
-            v: const TextSpan(text: 'One-of-many — sort order, view mode.'),
+            v: const TextSpan(text: 'One-of-many: sort order, view mode.'),
           ),
           (
             k: 'ContextMenuSub',
@@ -630,14 +630,14 @@ class _RulesSection extends StatelessWidget {
             dos: <String>[
               'Put destructive items last, separated from everything above '
                   'them.',
-              'Use the shortcut slot for real information — a balance, a '
+              'Use the shortcut slot for real information: a balance, a '
                   'value, a key hint.',
               'Keep context menus as accelerators for actions that exist '
                   'elsewhere too.',
               'Label groups when a menu passes about five items.',
             ],
             donts: <String>[
-              "Don't make a right-click menu the only path to an action — "
+              "Don't make a right-click menu the only path to an action, "
                   'touch users cannot reach it.',
               "Don't nest submenus more than one level deep.",
               "Don't mix checkbox and radio items in the same group; the "
@@ -659,7 +659,7 @@ class _RulesSection extends StatelessWidget {
   }
 }
 
-/// The first Rules Note — two `<Code>` chips in one sentence.
+/// The first Rules Note: two `<Code>` chips in one sentence.
 class _AccentNoteBody extends StatelessWidget {
   const _AccentNoteBody();
 
@@ -683,7 +683,7 @@ class _AccentNoteBody extends StatelessWidget {
   }
 }
 
-/// The second Rules Note — the 8-point rhythm, and what `npx shadcn add`
+/// The second Rules Note: the 8-point rhythm, and what `npx shadcn add`
 /// undoes.
 class _GeometryNoteBody extends StatelessWidget {
   const _GeometryNoteBody();
@@ -695,7 +695,7 @@ class _GeometryNoteBody extends StatelessWidget {
         children: <InlineSpan>[
           const TextSpan(text: '8px container inset, '),
           DsCode.span('px-3 py-2'),
-          const TextSpan(text: ' items, 8px gap — a 36px row. Stock shadcn '
+          const TextSpan(text: ' items, 8px gap: a 36px row. Stock shadcn '
               'ships '),
           DsCode.span('p-1'),
           const TextSpan(text: ' and '),

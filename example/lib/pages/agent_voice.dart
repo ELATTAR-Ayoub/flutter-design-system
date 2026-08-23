@@ -1,8 +1,8 @@
-/// `/design-system/components/agent/voice` — the listening and speaking
+/// `/design-system/components/agent/voice`: the listening and speaking
 /// surface: live waveform, bar visualiser, and the controls that arm them.
 ///
 /// Four sections, and two of them are prose about contracts rather than
-/// specimens — which is the page's own shape, not an abbreviation of it.
+/// specimens: which is the page's own shape, not an abbreviation of it.
 ///
 /// ## Probes
 ///
@@ -15,15 +15,15 @@
 /// live orbs' own colour statistics) and `tool/verify/section-oracle.js` for
 /// the geometry.
 ///
-/// ## Probe corrections — what the source said and the browser did not
+/// ## Probe corrections: what the source said and the browser did not
 ///
 ///  1. **`MicControl` renders as a single 34 × 34 button, never a pair.** The
 ///     component's whole doc-comment is about *"one pill, always"* with a
 ///     chevron half beside the mic, and `hasMenu` gates that half on
 ///     `devices.length > 1 || canPickVoice || canToggleSpeech`. `VoiceDemo`
 ///     passes no voices, no speech toggle and no device list, so the branch is
-///     dead on this page: measured 34 × 34 — 1px border, a 32px button, 1px
-///     border — with one child. A pair would have been 59 wide.
+///     dead on this page: measured 34 × 34, 1px border, a 32px button, 1px
+///     border: with one child. A pair would have been 59 wide.
 ///  2. **The mic button's glyph does not follow its size.** `size="icon"` is
 ///     the 40px cva rung; `className="size-8"` overrides the box to 32 and
 ///     `className="size-4"` pins the svg at 16, where a 32px icon button's own
@@ -31,7 +31,7 @@
 ///     2.4px stroke.
 ///  3. **The four labelled orbs are not four states.** `Orb.tsx` always passes
 ///     `volumeMode: "manual"`, and in manual mode the vendored shader never
-///     reads `agentState` — with no analyser both volumes are 0 for all four.
+///     reads `agentState`: with no analyser both volumes are 0 for all four.
 ///     Screenshotted, the four discs' mean colours are (55.7, 68.9, 151.2),
 ///     (25.3, 39.6, 130.7), (56.9, 70.1, 152.4) and (45.6, 59.1, 143.8): four
 ///     draws from one distribution, differing only in the random phase each
@@ -48,50 +48,50 @@
 ///     live 112px canvases render a disc exactly **102px** across.
 ///  6. **`dictation.isSupported` is TRUE in this browser**, so the placeholder
 ///     reads *"Arm the microphone and say something."* rather than *"This
-///     browser has no speech recognition."* — Chrome always exposes
+///     browser has no speech recognition."*, Chrome always exposes
 ///     `webkitSpeechRecognition`, permission or not.
 ///  7. **The waveform does not fill its lane.** Its wrapper is
 ///     `min-w-0 flex-1` and measures 852, while the canvas inside it is the
 ///     fixed 320 the call site asks for. The row is 34 + 24 + 852 + 24 + 96.
 ///  8. **The bars sit at their floor, not at zero.** With no analyser every
 ///     level is 0 and the smoothing settles to 0, but the paint takes
-///     `max(0.06, …)` — so twelve 6.167 × 1.44 pills, and a radius asked for
+///     `max(0.06, …)`: so twelve 6.167 × 1.44 pills, and a radius asked for
 ///     as 3.08 that the canvas scales down to fit.
 ///
-/// ## Divergence — flagged for sign-off
+/// ## Divergence: flagged for sign-off
 ///
 /// **This page cannot open a microphone, and no port of it can.** Web Audio,
 /// `getUserMedia` and `SpeechRecognition` are three browser APIs with no
 /// Flutter equivalent that does not cost a plugin, and the package takes no
 /// third-party dependency. The reference's own note says the specimen is
-/// worthless if the data is fake — *"A waveform drawn from fake data would
-/// prove nothing about whether the waveform works"* — so nothing here
+/// worthless if the data is fake, *"A waveform drawn from fake data would
+/// prove nothing about whether the waveform works"*: so nothing here
 /// fabricates one.
 ///
 /// What that costs is smaller than it sounds, because the components specify
 /// the silent branch themselves: *"they flatten to a resting line rather than
 /// inventing a signal."* So the port renders exactly what the reference renders
 /// **before you arm it**, which is also the only state the capture rig ever
-/// sees. The control still arms — the pill tints, the glyph goes agent-blue and
-/// the live ring pulses — and the waveform stays flat because there is
+/// sees. The control still arms: the pill tints, the glyph goes agent-blue and
+/// the live ring pulses: and the waveform stays flat because there is
 /// genuinely nothing to draw. `DsLiveWaveform.samples` and
 /// `DsBarVisualizer.spectrum` are the seam a product with a real audio plugin
 /// feeds.
 ///
-/// ## Drift register — recorded, shipped as written
+/// ## Drift register: recorded, shipped as written
 ///
 ///  1. **The eyebrow says "Components" after a group already called that.**
 ///     `` `${group.title} · Components` `` with `group.title = "Agent"`, so it
 ///     reads *"Agent · Components"* while every base page reads *"Base
 ///     Components · Base"*. Two different drifts, one per family.
 ///  2. **The note promises a microphone the specimen may not get.** *"Arming
-///     the control below asks the browser for microphone access"* — true of the
+///     the control below asks the browser for microphone access"*: true of the
 ///     reference in a browser that grants it, and the copy makes no allowance
 ///     for a refusal. Reproduced verbatim; the divergence above is the port's
 ///     own footnote, not an edit to theirs.
 ///  3. **`§orb`'s caption contradicts the component underneath it.** *"It
 ///     reacts to level rather than to state"* sits above four orbs labelled by
-///     state, which — per probe 3 — is exactly right and exactly why they all
+///     state, which: per probe 3: is exactly right and exactly why they all
 ///     look the same. The page is describing the bug as a feature and it is
 ///     neither; it is the manual-mode contract.
 ///  4. **`§dictation` and `§speech` document an API the page never runs.** The
@@ -112,7 +112,7 @@ import 'package:flutter/widgets.dart';
 import '../kit.dart';
 import '../nav.dart';
 
-/// `AGENT_STATE` in `OrbStates` — the four the specimen draws, in its order.
+/// `AGENT_STATE` in `OrbStates`: the four the specimen draws, in its order.
 const List<(DsOrbState, String)> _orbStates = <(DsOrbState, String)>[
   (DsOrbState.idle, 'idle'),
   (DsOrbState.listening, 'listening'),
@@ -123,7 +123,7 @@ const List<(DsOrbState, String)> _orbStates = <(DsOrbState, String)>[
 /// A fixed phase per cell.
 ///
 /// Upstream seeds each mount from `Math.random()`, so the four orbs are never
-/// in phase with each other — which is the visible fact probe 3 turns on. The
+/// in phase with each other: which is the visible fact probe 3 turns on. The
 /// port keeps four *different* seeds for the same reason, and keeps them
 /// *stable* so the capture rig and the page test see one image rather than a
 /// new one per boot. `seed` is the vendor's own prop; passing it is upstream's
@@ -147,7 +147,7 @@ class AgentVoicePage extends StatelessWidget {
           blurb: here.category.blurb,
           contents: here.category.contents,
         ),
-        // `className="mb-12"` — 48px, above the first section rather than
+        // `className="mb-12"`, 48px, above the first section rather than
         // inside it.
         Padding(
           padding: EdgeInsets.only(bottom: ds(12)),
@@ -175,7 +175,7 @@ class _MicrophoneNote extends StatelessWidget {
   Widget build(BuildContext context) => DsText(
         'Arming the control below asks the browser for microphone access and '
         'reads the level from a live analyser. Nothing is recorded, stored or '
-        'sent anywhere — the amplitude drives the waveform and the transcript '
+        'sent anywhere: the amplitude drives the waveform and the transcript '
         'is written into the box beside it, both in this tab. A waveform drawn '
         'from fake data would prove nothing about whether the waveform works, '
         'which is why this one is real.',
@@ -201,11 +201,11 @@ class _LiveSection extends StatelessWidget {
       );
 }
 
-/// `agent-demo.tsx` L741 — `export function VoiceDemo`.
+/// `agent-demo.tsx` L741, `export function VoiceDemo`.
 ///
 /// The reference holds one piece of state (`heard`) and one hook
 /// (`useDictation`). Here the hook is the seam that does not cross, so the
-/// state is the arm switch alone — see the divergence note in the library
+/// state is the arm switch alone: see the divergence note in the library
 /// comment. Every visual state the demo has is still reachable: press the mic.
 class _VoiceDemo extends StatefulWidget {
   const _VoiceDemo();
@@ -224,7 +224,7 @@ class _VoiceDemoState extends State<_VoiceDemo> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        // `flex flex-wrap items-center gap-6` — 34 + 24 + 852 + 24 + 96 across
+        // `flex flex-wrap items-center gap-6`, 34 + 24 + 852 + 24 + 96 across
         // 1030, the waveform's lane taking the slack (probe 7).
         Row(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -268,7 +268,7 @@ class _VoiceDemoState extends State<_VoiceDemo> {
                     color: theme.mutedForeground,
                   ),
                 ),
-                // `min-h-6` — the line is reserved whether or not it is
+                // `min-h-6`: the line is reserved whether or not it is
                 // filled (DRIFT 5). The placeholder is the supported branch:
                 // probe 6.
                 ConstrainedBox(
@@ -304,7 +304,7 @@ class _OrbSection extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            // `grid grid-cols-2 gap-px … sm:grid-cols-4` — the kit's lattice
+            // `grid grid-cols-2 gap-px … sm:grid-cols-4`: the kit's lattice
             // is the same frame, but the cell is the page's own: `p-6 gap-4`
             // with the label UNDER the specimen, where [DsStateCell]'s block
             // is `p-5` with a well above a name.
@@ -356,7 +356,7 @@ class _OrbCell extends StatelessWidget {
         children: <Widget>[
           DsVoiceOrb(state: state, size: orbSize, seed: seed),
           SizedBox(height: ds(4)),
-          // `.type-micro` carries everything but the transform — the call site
+          // `.type-micro` carries everything but the transform: the call site
           // uppercases, because a Flutter TextStyle cannot.
           DsText(
             label.toUpperCase(),
@@ -385,7 +385,7 @@ class _OrbNote extends StatelessWidget {
               text: ' calls on the same device is a permission prompt the user '
                   'has already answered and a second stream the browser may or '
                   'may not give you, so the orb runs in manual mode and is fed '
-                  'from the analyser that is already open — one stream, two '
+                  'from the analyser that is already open: one stream, two '
                   'consumers.',
             ),
           ],
@@ -412,7 +412,7 @@ class _DictationSection extends StatelessWidget {
             (
               k: 'isSupported',
               v: TextSpan(
-                text: 'boolean — false is a normal outcome, not an error '
+                text: 'boolean: false is a normal outcome, not an error '
                     'state',
               ),
             ),
@@ -420,20 +420,20 @@ class _DictationSection extends StatelessWidget {
             (
               k: 'level',
               v: TextSpan(
-                text: 'number — 0 to 1, smoothed. Drives the scalar meter.',
+                text: 'number, 0 to 1, smoothed. Drives the scalar meter.',
               ),
             ),
             (
               k: 'analyser',
               v: TextSpan(
-                text: 'AnalyserNode | null — live node for the waveform; null '
+                text: 'AnalyserNode | null: live node for the waveform; null '
                     'while the microphone is closed',
               ),
             ),
             (
               k: 'devices / deviceId / setDeviceId',
               v: TextSpan(
-                text: 'AudioInput[] — labels are blank until permission has '
+                text: 'AudioInput[]: labels are blank until permission has '
                     'been granted once',
               ),
             ),
@@ -454,7 +454,7 @@ class _SpeechSection extends StatelessWidget {
         id: 'speech',
         title: 'Speaking back',
         description: 'The fourth seam. useBrowserSpeech is one SpeechAdapter, '
-            'not the only one — a product with its own voice implements the '
+            'not the only one: a product with its own voice implements the '
             'same interface and the controls do not move.',
         child: DsNote(
           title: 'Markdown is not speakable',

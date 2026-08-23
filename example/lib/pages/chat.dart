@@ -1,4 +1,4 @@
-/// `/design-system/components/base/chat` — four product-agnostic conversation
+/// `/design-system/components/base/chat`: four product-agnostic conversation
 /// primitives, only one of which this system itself uses.
 ///
 /// The page whose fifth section is the point of the other four: `Message`,
@@ -28,7 +28,7 @@
 /// smooth-scroll distance), `ba2-chat-hover.js` (the hovers the first pass
 /// mis-drove) and `ba2-chat-dialog.js` (the media preview panel).
 ///
-/// ## Probe corrections — what the source said and the browser did not
+/// ## Probe corrections: what the source said and the browser did not
 ///
 ///  1. **The scroller button's own transition never applies.**
 ///     `transition-[translate,scale,opacity]` loses to `Button`'s list through
@@ -37,7 +37,7 @@
 ///  2. **`duration-fast` on the reaction count is a no-op, confirmed live** —
 ///     the pair runs 250ms on `--ease-out`, not 150. Same for the button's
 ///     `duration-base` / `duration-slow`. (`bubble.tsx:203`,
-///     `message-scroller.tsx:109` — the two sites the sweep flagged.)
+///     `message-scroller.tsx:109`: the two sites the sweep flagged.)
 ///  3. **`scroll-fade-b` is scroll-driven, not static.** The mask holds at
 ///     38.4px for the first 302px of travel and closes over the last 96 on the
 ///     CSS `ease-in-out` **keyword**, which is not this system's `--ease-in-out`
@@ -50,12 +50,12 @@
 ///     cells render a 16px spinner beside three cells rendering 24px glyphs, in
 ///     identical 32px wells, because `Icon` drops `data-slot` before the DOM.
 ///  6. **The `sm` vertical media well is not full width.** 32px in a 120px
-///     tile — the size rule is written after `vertical:w-full` and wins.
+///     tile: the size rule is written after `vertical:w-full` and wins.
 ///  7. **Attachment padding is uniform.** `px-2.5 py-2` and its two siblings
 ///     are dead: the `has-media` `p-*` rule takes the whole shorthand. Measured
 ///     8 / 6 / 4 on all four sides.
 ///  8. **`Command`-style `has-[>a,>button]:hover` on `Attachment` is
-///     unreachable** — probed across all eighteen, not one has a direct `<a>`
+///     unreachable**: probed across all eighteen, not one has a direct `<a>`
 ///     or `<button>` child.
 ///  9. **The smooth scroll is distance-dependent**, ~one frame per √px: 100px
 ///     settles in 168ms and 398px in 335ms.
@@ -63,7 +63,7 @@
 ///     the preview panel is `[data-slot=attachment-preview]`, which is why a
 ///     `dialog-content` query finds nothing while the dialog is open.
 ///
-/// ## Drift register — recorded, shipped as written
+/// ## Drift register: recorded, shipped as written
 ///
 ///  1. **The eyebrow says "Base" twice.** `` `${group.title} · Base` `` with
 ///     `group.title = "Base Components"`. All fourteen base pages.
@@ -72,16 +72,16 @@
 ///     `--primary-foreground`, so every primary button shares it) and
 ///     `destructive` is 4.12:1 on light. §7 exempts only disabled controls, so
 ///     both are failures rather than sanctioned exceptions. Reported, not
-///     corrected — the fix is a token move that lands on every call site.
+///     corrected: the fix is a token move that lands on every call site.
 ///  3. **`BubbleReactions` rings in `--card` and the page has to compensate.**
 ///     Two specimen panels carry `bodyClassName="bg-card"` so the ring is
 ///     invisible; on `--background` in dark it reads as a halo, which the
 ///     page's own source comment says.
 ///  4. **The reactions rail's `has-[button]:p-0` changes the rail's height.**
-///     The bare form is 22.5625 tall and the data form 28 — same component,
+///     The bare form is 22.5625 tall and the data form 28: same component,
 ///     same side, two different overhangs.
 ///  5. **`Bubble ghost` keeps its 1px transparent border.** No fill, no
-///     padding, no radius — and still a border, so its box is 23.13 rather than
+///     padding, no radius: and still a border, so its box is 23.13 rather than
 ///     21.125.
 ///  6. **The transcript's eleven turns pass `align` twice.** Every
 ///     `MessageScrollerItem` sets it on the `Message` *and* on the `Bubble`,
@@ -90,8 +90,8 @@
 ///     The component only guarantees `min-w-8`, so an avatar with a taller
 ///     child would be a taller circle.
 ///  8. **The eleven-turn transcript never scrolls past the fade.** It opens at
-///     `defaultScrollPosition="start"` — a fade at the bottom, a button in the
-///     way — which is the caption's own stated intent and also the one state
+///     `defaultScrollPosition="start"`: a fade at the bottom, a button in the
+///     way: which is the caption's own stated intent and also the one state
 ///     in which neither of the component's two edge behaviours is at rest.
 ///  9. **`Attachment` advertises five states and the console's domain type can
 ///     produce two.** The page says so in §5: `error` and `uploading` are shown
@@ -100,7 +100,7 @@
 ///     quoted as rasterised measurements against surfaces the page does not
 ///     name; reproduced verbatim as copy.
 /// 11. **`duration-fast` / `duration-base` / `duration-slow` are classes that
-///     do nothing.** Tailwind v4 has no `--duration-*` namespace — closed
+///     do nothing.** Tailwind v4 has no `--duration-*` namespace: closed
 ///     corpus-wide by the sweep, and re-measured on this page's two sites.
 library;
 
@@ -113,7 +113,7 @@ import '../shell.dart';
 
 /* ── Specimen data ───────────────────────────────────────────────────────── */
 
-/// `BUBBLE_VARIANTS` — the seven, with the reference's own notes.
+/// `BUBBLE_VARIANTS`: the seven, with the reference's own notes.
 const List<(DsBubbleVariant, String)> _bubbleVariants =
     <(DsBubbleVariant, String)>[
   (DsBubbleVariant.normal, "the sender's own turn"),
@@ -128,7 +128,7 @@ const List<(DsBubbleVariant, String)> _bubbleVariants =
 /// One turn of `TRANSCRIPT`.
 typedef _Turn = ({String id, bool user, String text});
 
-/// *"Long enough that the viewport genuinely overflows — a fade over nothing
+/// *"Long enough that the viewport genuinely overflows: a fade over nothing
 /// proves nothing."*
 const List<_Turn> _transcript = <_Turn>[
   (
@@ -161,7 +161,7 @@ const List<_Turn> _transcript = <_Turn>[
   (
     id: 'm9',
     user: false,
-    text: 'Flat on price, but the float shrank — nine sealed packs left '
+    text: 'Flat on price, but the float shrank: nine sealed packs left '
         'listed, down from thirty-one.'
   ),
   (id: 'm10', user: true, text: 'Watch it and tell me if it drops below five.'),
@@ -176,17 +176,17 @@ const List<_Turn> _transcript = <_Turn>[
 /// `ATTACHMENT_STATES`.
 const List<(DsAttachmentState, String, String)> _attachmentStates =
     <(DsAttachmentState, String, String)>[
-  (DsAttachmentState.idle, 'idle', 'dashed — nothing chosen yet'),
+  (DsAttachmentState.idle, 'idle', 'dashed: nothing chosen yet'),
   (DsAttachmentState.uploading, 'uploading', 'spinner + shimmer'),
   (DsAttachmentState.processing, 'processing', 'sent, being read'),
   (DsAttachmentState.error, 'error', 'border and media turn'),
   (DsAttachmentState.done, 'done', 'the resting state'),
 ];
 
-/// `WHY` — the fifth section, as data.
+/// `WHY`: the fifth section, as data.
 ///
 /// *"`what` is what the primitive is for; `instead` is what the console does
-/// and why. Both halves matter — a reader who only has the second half
+/// and why. Both halves matter: a reader who only has the second half
 /// concludes the component is useless rather than unused."*
 const List<(String name, String what, String instead)> _why =
     <(String, String, String)>[
@@ -194,14 +194,14 @@ const List<(String name, String what, String instead)> _why =
     'Message',
     'The layout of one turn: avatar, header, content, footer, and an align '
         "that mirrors the whole row for the sender's own messages. It holds no "
-        'state and knows nothing about what is inside it — six flex containers '
+        'state and knows nothing about what is inside it: six flex containers '
         'sharing one group/message.',
     'components/agent/parts/message.tsx is not a layout, it is a renderer. '
         'UserMessage and AgentMessage both push their text through Markdown; '
         'AgentMessage first strips the tool protocol out of the stream and '
         'appends a blinking cursor for as long as turn.streaming is true. And '
         "a turn is not the console's unit of layout at all: agent-console.tsx "
-        'maps five kinds — user, text, tool, action, error — as flat siblings '
+        'maps five kinds: user, text, tool, action, error: as flat siblings '
         'in one column, so a tool chip is a peer of a message rather than a '
         'child of one. There is no row for Message to be.',
   ),
@@ -215,7 +215,7 @@ const List<(String name, String what, String instead)> _why =
         'like body copy, because it is often long, frequently contains lists '
         'and tables, and three hundred words in a speech bubble are harder to '
         "read for no gain. Only the user's turn is bubble-shaped, and it is "
-        'drawn by hand — bg-agent-muted, border-agent/20, and rounded-br-sm to '
+        'drawn by hand: bg-agent-muted, border-agent/20, and rounded-br-sm to '
         'square the corner nearest the sender. Bubble has no agent surface and '
         'no tail; every corner is rounded-xl. Adopting it would mean adding a '
         "variant to a generic primitive to carry one product's accent, which "
@@ -229,12 +229,12 @@ const List<(String name, String what, String instead)> _why =
         'to a named message, hold position while older turns are prepended, '
         'and peek the previous item.',
     "The console's transcript is one plain div it owns outright: a ref, an "
-        'onScroll, and blurClass(switchPhase) — the cross-fade the transcript '
+        'onScroll, and blurClass(switchPhase): the cross-fade the transcript '
         'runs while a conversation is swapped underneath it. Its pin test '
         'allows 32px rather than the default 8, so a reader who is essentially '
         'at the bottom stays pinned, and it re-runs on [transport.turns, '
         'state] so a phase change moves the view too, not only a new turn. The '
-        'API is not the obstacle — Viewport forwards ref, onScroll and '
+        'API is not the obstacle, Viewport forwards ref, onScroll and '
         'className, and scrollEdgeThreshold would cover the 32px. The reason '
         'is smaller and better: the console needs none of what this adds. It '
         'never jumps to a cited message and never prepends history, so a '
@@ -250,14 +250,14 @@ const List<(String name, String what, String instead)> _why =
         'button.',
     'This is the one of the four the console actually imports. '
         'components/agent/parts/attachments.tsx is a thin wrapper: '
-        'AttachmentCard renders this primitive directly — Attachment, '
-        'AttachmentMedia, AttachmentContent, AttachmentActions — and adds '
+        'AttachmentCard renders this primitive directly, Attachment, '
+        'AttachmentMedia, AttachmentContent, AttachmentActions: and adds '
         'exactly the one thing it cannot express, the delivery badge, which '
         "says whether the file's bytes reached the model or only its filename "
         'did. That is agent semantics rather than file semantics, which is why '
         'it could not simply move into ui/. State is always "done": '
         "core/types.ts's Attachment carries no upload lifecycle, so there is "
-        'no error or uploading value the wrapper could pass honestly — those '
+        'no error or uploading value the wrapper could pass honestly: those '
         'two states are real on this primitive, shown above with data this '
         "domain type could never produce. One piece stayed separate: the "
         "transcript's full-width image preview keeps its own module-private "
@@ -286,7 +286,7 @@ class ChatPage extends StatelessWidget {
           blurb: here.category.blurb,
           contents: here.category.contents,
         ),
-        // `className="mb-12"` — 48px, above the first section rather than
+        // `className="mb-12"`, 48px, above the first section rather than
         // inside it.
         Padding(
           padding: EdgeInsets.only(bottom: ds(12)),
@@ -342,7 +342,7 @@ class _OpeningNote extends StatelessWidget {
                 DsCode.span('components/agent/parts/attachments.tsx'),
                 const TextSpan(
                   text: ' composes it directly, and that row below says what '
-                      'it adds on top — see ',
+                      'it adds on top: see ',
                 ),
                 DsCode.span(
                   '/design-system/components/agent/transcript#attachments',
@@ -366,7 +366,7 @@ class _MessageSection extends StatelessWidget {
     return DsSection(
       id: 'message',
       title: 'Message',
-      description: 'One turn, laid out. Avatar, header, content, footer — and '
+      description: 'One turn, laid out. Avatar, header, content, footer: and '
           'a single align prop that flips the whole row, so the sender’s own '
           'messages need no second component.',
       child: Column(
@@ -473,7 +473,7 @@ class _MessageSection extends StatelessWidget {
               (
                 k: 'MessageGroup',
                                 v: TextSpan(
-                  text: 'The column. flex-col with an 8px gap — one per '
+                  text: 'The column. flex-col with an 8px gap: one per '
                     'conversation, or one per run of turns from the same '
                     'sender.',
                 ),
@@ -484,7 +484,7 @@ class _MessageSection extends StatelessWidget {
                   text: 'start (default) or end. end sets flex-row-reverse and, '
                     'through group-data, pushes every slot inside '
                     'MessageContent to self-end. It is the only alignment '
-                    'control — nothing below it takes an align of its own '
+                    'control: nothing below it takes an align of its own '
                     'except Bubble, which mirrors it.',
                 ),
               ),
@@ -534,7 +534,7 @@ class _BubbleSection extends StatelessWidget {
       id: 'bubble',
       title: 'Bubble',
       description: 'The surface a message sits on. Seven variants, two '
-          'alignments, and a reactions rail — all of it driven off data-slot, '
+          'alignments, and a reactions rail: all of it driven off data-slot, '
           'so BubbleContent can be swapped for a button or a link without '
           'restating a single class.',
       child: Column(
@@ -553,7 +553,7 @@ class _BubbleSection extends StatelessWidget {
                 ),
               DsStateCell(
                 label: 'asChild',
-                note: 'hover — the whole bubble is the control',
+                note: 'hover: the whole bubble is the control',
                 child: DsBubble(
                   child: DsBubbleContent(
                     onPressed: () {},
@@ -571,7 +571,7 @@ class _BubbleSection extends StatelessWidget {
           SizedBox(height: ds(4)),
           const DsNote(
             tone: DsNoteTone.error,
-            title: 'Two of the seven fail AA — known, and not yet fixed',
+            title: 'Two of the seven fail AA: known, and not yet fixed',
             child: _ContrastNote(),
           ),
           SizedBox(height: ds(4)),
@@ -604,14 +604,14 @@ class _BubbleSection extends StatelessWidget {
           // as a halo.
           DsPanel(
             label: 'Reactions',
-            note: 'side × align — on a card, which is what the ring assumes',
+            note: 'side × align: on a card, which is what the ring assumes',
             bodyFill: theme.card,
             child: const _ReactionRails(),
           ),
           SizedBox(height: ds(4)),
           DsPanel(
             label: 'Reactions with counts',
-            note: 'reactions + showCount — hover or focus a pill',
+            note: 'reactions + showCount: hover or focus a pill',
             bodyFill: theme.card,
             child: const _ReactionCounts(),
           ),
@@ -623,7 +623,7 @@ class _BubbleSection extends StatelessWidget {
                                 v: TextSpan(
                   text: 'default · secondary · muted · tinted · outline · ghost · '
                     'destructive. ghost drops the fill, the padding and the '
-                    'radius, and is the only variant allowed the full width — '
+                    'radius, and is the only variant allowed the full width, '
                     'it is how you set a long answer flush in the column.',
                 ),
               ),
@@ -640,7 +640,7 @@ class _BubbleSection extends StatelessWidget {
                                 v: TextSpan(
                   text: 'The painted surface: 12px / 8px padding, rounded-xl, '
                     'text-sm. Takes asChild, which is how a bubble becomes a '
-                    'button or a link — the hover fill and the focus ring are '
+                    'button or a link: the hover fill and the focus ring are '
                     'already written for both.',
                 ),
               ),
@@ -684,7 +684,7 @@ class _TintedNote extends StatelessWidget {
             ),
             DsCode.span('dark:'),
             const TextSpan(
-              text: ' variant is a token that has not been written yet — §1, ',
+              text: ' variant is a token that has not been written yet, §1, ',
             ),
             const TextSpan(text: 'What light mode actually costs'),
             const TextSpan(
@@ -814,7 +814,7 @@ class _ReactionRails extends StatelessWidget {
       );
 }
 
-/// The two data rails — `showCount` on hover and always.
+/// The two data rails, `showCount` on hover and always.
 class _ReactionCounts extends StatelessWidget {
   const _ReactionCounts();
 
@@ -834,7 +834,7 @@ class _ReactionCounts extends StatelessWidget {
             children: <Widget>[
               _CountRail(
                 showCount: DsShowCount.hover,
-                caption: 'showCount="hover" — the default',
+                caption: 'showCount="hover": the default',
               ),
               _CountRail(
                 showCount: DsShowCount.always,
@@ -891,7 +891,7 @@ class _CountNote extends StatelessWidget {
               children: <InlineSpan>[
                 const TextSpan(
                   text: 'Collapsing the number until hover or focus is a '
-                      'density decision — a rail can hold six of these. It is '
+                      'density decision: a rail can hold six of these. It is '
                       'not where the information lives. Every pill carries ',
                 ),
                 DsCode.span('8 reacted with a heart'),
@@ -913,7 +913,7 @@ class _CountNote extends StatelessWidget {
                 const TextSpan(text: 'The first pill is '),
                 DsCode.span('mine'),
                 const TextSpan(
-                  text: ' — the reader already reacted that way. It carries a '
+                  text: ': the reader already reacted that way. It carries a '
                       'border, a fill and ',
                 ),
                 DsCode.span('aria-pressed'),
@@ -962,7 +962,7 @@ class _ScrollerSectionState extends State<_ScrollerSection> {
     defaultScrollPosition: DsScrollPosition.start,
   );
 
-  /// `bodyClassName="h-80"` — 320px, and the number every measured fact in
+  /// `bodyClassName="h-80"`, 320px, and the number every measured fact in
   /// `message_scroller.dart` is relative to.
   static double get viewportHeight => ds(80);
 
@@ -1002,7 +1002,7 @@ class _ScrollerSectionState extends State<_ScrollerSection> {
                           DsMessageScrollerItem(
                             messageId: t.id,
                             child: DsMessage(
-                              // DRIFT 6 — the align is set here and again on
+                              // DRIFT 6: the align is set here and again on
                               // the bubble below.
                               align: t.user
                                   ? DsBubbleAlign.end
@@ -1035,7 +1035,7 @@ class _ScrollerSectionState extends State<_ScrollerSection> {
           SizedBox(height: ds(4)),
           const DsNote(
             tone: DsNoteTone.value,
-            title: 'The fade is not defined in globals.css — do not delete it',
+            title: 'The fade is not defined in globals.css: do not delete it',
             child: _FadeNote(),
           ),
           SizedBox(height: ds(4)),
@@ -1079,8 +1079,8 @@ class _ScrollerSectionState extends State<_ScrollerSection> {
               (
                 k: 'MessageScrollerButton',
                                 v: TextSpan(
-                  text: 'direction start | end. Renders a Button and hides itself — '
-                    'scale, opacity and a translate off its own edge — the '
+                  text: 'direction start | end. Renders a Button and hides itself, '
+                    'scale, opacity and a translate off its own edge: the '
                     'moment that direction has nowhere left to go.',
                 ),
               ),
@@ -1148,7 +1148,7 @@ class _FadeNote extends StatelessWidget {
                 const TextSpan(text: 'So grepping '),
                 DsCode.span('globals.css'),
                 const TextSpan(
-                  text: ' answers only “is it defined here” — of these six it '
+                  text: ' answers only “is it defined here”: of these six it '
                       'finds one and misses five. The only authority on '
                       'whether a class resolves is the built stylesheet, or ',
                 ),
@@ -1492,7 +1492,7 @@ class _PreviewNote extends StatelessWidget {
                 ),
                 DsCode.span('secondary'),
                 const TextSpan(
-                  text: ' Button, not the stock ghost ✕ — this panel has no '
+                  text: ' Button, not the stock ghost ✕: this panel has no '
                       'header band for the ✕ to sit on, and a ghost control '
                       'disappears into whatever pixel of the photograph it '
                       'lands on. The trigger is ',
@@ -1524,7 +1524,7 @@ class _PreviewNote extends StatelessWidget {
                 DsCode.span('IconSwap'),
                 const TextSpan(
                   text: ' so the control confirms it heard you, and a toast '
-                      'reports the outcome. It says Saving, never Saved — a '
+                      'reports the outcome. It says Saving, never Saved: a '
                       'plain ',
                 ),
                 DsCode.span('download'),
@@ -1544,7 +1544,7 @@ class _PreviewNote extends StatelessWidget {
                 const TextSpan(
                   text: 'Both were briefly written as new exports and then '
                       'folded back. §5 grows a base component with a variant '
-                      'or a parameter — that is how ',
+                      'or a parameter: that is how ',
                 ),
                 DsCode.span('Button'),
                 const TextSpan(text: ', '),
@@ -1552,7 +1552,7 @@ class _PreviewNote extends StatelessWidget {
                 const TextSpan(text: ' and '),
                 DsCode.span('Alert'),
                 const TextSpan(
-                  text: ' already work — and a new component for one more '
+                  text: ' already work: and a new component for one more '
                       'branch is the wrong direction.',
                 ),
               ],
@@ -1623,13 +1623,13 @@ class _WhySection extends StatelessWidget {
           const DsDoDont(
             dos: <String>[
               'Reach for these when you need a chat surface that is not the '
-                  'agent — a support thread, a comment column, two humans '
+                  'agent: a support thread, a comment column, two humans '
                   'talking.',
               'Read parts/message.tsx and agent-console.tsx before concluding '
                   'the console could just use these. The differences are '
                   'behavioural, not cosmetic.',
               'Check components/agent/parts/attachments.tsx before assuming a '
-                  'ui/ primitive is unused — Attachment is already composed '
+                  'ui/ primitive is unused, Attachment is already composed '
                   'there, with the delivery badge as the one thing layered on '
                   'top.',
             ],
@@ -1672,7 +1672,7 @@ class _TravelNote extends StatelessWidget {
                 const TextSpan(
                   text: ' and the foundations all travel as-is. The next '
                       'project may want a support inbox, a comment thread or a '
-                      'two-person chat and no agent console at all — and for '
+                      'two-person chat and no agent console at all: and for '
                       'every one of those, these four are the right starting '
                       'point and ',
                 ),
@@ -1693,7 +1693,7 @@ class _TravelNote extends StatelessWidget {
                 DsCode.span('npx shadcn add'),
                 const TextSpan(
                   text: ' from coming back. That is not a reason to delete '
-                      'them — it is a reason the delete looks free, which is a '
+                      'them: it is a reason the delete looks free, which is a '
                       'different thing. What does not come back is the sweep '
                       'onto these tokens: a regenerated file arrives on stock '
                       'shadcn’s spacing, type and motion scales and fails ',

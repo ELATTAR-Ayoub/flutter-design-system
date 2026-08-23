@@ -1,4 +1,4 @@
-/// `/design-system` — the overview page (`app/design-system/page.tsx`).
+/// `/design-system`: the overview page (`app/design-system/page.tsx`).
 ///
 /// The index of the whole system, and the only page in the tree that carries no
 /// specimens: a header, the six foundations as index cards, the three component
@@ -6,13 +6,13 @@
 /// closing scope note.
 ///
 /// Nothing here retypes a card's copy. The reference maps `DS_GROUPS` straight
-/// into the grids — titles, blurbs and chip lists all come out of
-/// `lib/ds/nav.ts` — so this page reads [dsGroups] for exactly the same reason:
+/// into the grids: titles, blurbs and chip lists all come out of
+/// `lib/ds/nav.ts`: so this page reads [dsGroups] for exactly the same reason:
 /// a card that disagreed with the sidebar would be the drift that file exists
 /// to prevent. The only strings authored here are the ones the reference itself
 /// authors inline: the header, the three section headings, and the rules.
 ///
-/// Copy is verbatim, drift included — rule 4 names **Space Grotesk** while the
+/// Copy is verbatim, drift included: rule 4 names **Space Grotesk** while the
 /// tokens load Inter (fonts follow tokens, copy follows the reference).
 library;
 
@@ -52,7 +52,7 @@ const List<_Rule> _rules = <_Rule>[
         'Only selected packs, rare cards, primary CTAs, opening moments and reward moments may glow. Ordinary surfaces stay flat and readable.',
   ),
   // The typeface drift, kept: the copy says Space Grotesk, the token says
-  // Inter, and this page renders both — these words, in that face.
+  // Inter, and this page renders both: these words, in that face.
   (
     lead: 'Two faces only.',
     detail:
@@ -111,7 +111,7 @@ class OverviewPage extends StatelessWidget {
           title: 'Components',
           description:
               'Three families, deliberately separated. Base is the generic chassis any product could use. Agent is a complete AI console, written from scratch and pointed at a transport you supply. Site pages own no visual values of their own — only the composition rules that assemble the other two into a page.',
-          // `grid gap-4 md:grid-cols-2` — the third card wraps to the left cell
+          // `grid gap-4 md:grid-cols-2`: the third card wraps to the left cell
           // of row two.
           child: DsGrid(
             base: 1,
@@ -121,7 +121,7 @@ class OverviewPage extends StatelessWidget {
               for (final DsGroup group in _componentGroups)
                 DsIndexCard.group(
                   href: group.href,
-                  // `{group.categories.length} sets` — counted, never typed.
+                  // `{group.categories.length} sets`: counted, never typed.
                   label: '${group.categories.length} sets',
                   title: group.title,
                   blurb: group.blurb,
@@ -139,7 +139,7 @@ class OverviewPage extends StatelessWidget {
           description:
               'Six non-negotiables. If a screen breaks one of these, the screen is wrong — not the rule.',
           // `ol.divide-y.divide-border.overflow-hidden.rounded-xl.border.bg-card`
-          // — one card, hairlines between the rows and none at its edges.
+          //: one card, hairlines between the rows and none at its edges.
           child: DsDividedList(
             radius: DsRadii.xl,
             children: <Widget>[
@@ -166,7 +166,7 @@ class OverviewPage extends StatelessWidget {
   }
 }
 
-/// `li.flex.gap-5.px-6.py-5` — a zero-padded serial beside its rule.
+/// `li.flex.gap-5.px-6.py-5`: a zero-padded serial beside its rule.
 class _RuleRow extends StatelessWidget {
   const _RuleRow({required this.number, required this.rule});
 
@@ -197,7 +197,7 @@ class _RuleRow extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          // `shrink-0` — the serial keeps its width, the copy takes the slack.
+          // `shrink-0`: the serial keeps its width, the copy takes the slack.
           DsText(number, DsType.numSm, color: theme.actionInk),
           SizedBox(width: ds(5)),
           Expanded(

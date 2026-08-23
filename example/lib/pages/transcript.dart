@@ -1,4 +1,4 @@
-/// `/design-system/components/agent/transcript` — everything above the
+/// `/design-system/components/agent/transcript`: everything above the
 /// composer: turns, tool chips, approval cards, a questionnaire, the markdown
 /// contract, the welcome card, and attachments in both directions.
 ///
@@ -8,7 +8,7 @@
 /// a dimmed page. A port that rendered these as stills fails, however exact the
 /// pixels.
 ///
-/// ## Drift register — recorded, shipped as written
+/// ## Drift register: recorded, shipped as written
 ///
 ///  1. **`<QuestionnaireError />` with no children is not empty.** The
 ///     primitive supplies `Choose an answer to continue.` for a required item,
@@ -16,8 +16,8 @@
 ///     appears in no page source.
 ///  2. **The bare-URL rule swallows the sentence's full stop.** `MARKDOWN_
 ///     COMPLETE_SAMPLE` ends a sentence with `https://example.com.`; the
-///     `[^\s<>()]+` class does not exclude `.`, so the link label — measured
-///     149.22px wide — is `https://example.com.` including the period.
+///     `[^\s<>()]+` class does not exclude `.`, so the link label: measured
+///     149.22px wide: is `https://example.com.` including the period.
 ///  3. **`markdown-not-supported` is a `DsSection` nested inside a
 ///     `DsSection`.** Its 701.8px is part of `#markdown`'s 4706.3, and its own
 ///     `mb-20` collapses with the outer section's rather than adding to it.
@@ -27,15 +27,15 @@
 ///     carries a `Skip` button and a note) sets 186.67 for the first row while
 ///     *Invalid* sets 177.69 for the second.
 ///  5. **The welcome card's capability chip loses its own font size.** It is
-///     written `type-caption` and renders at **13px/17.55px** — the `sm` rung's
+///     written `type-caption` and renders at **13px/17.55px**: the `sm` rung's
 ///     `text-small` wins the size from the utility layer while `.type-caption`
 ///     keeps the 1.35 leading.
-///  6. **`duration-fast` on the chip's chevron is inert** — the class-list
+///  6. **`duration-fast` on the chip's chevron is inert**: the class-list
 ///     transition runs the 250ms socket default, confirmed live.
 ///  7. **The stand-in photograph is not on this system's tokens, on purpose.**
 ///     The reference's own source says so: *"these are the pixels of a stand-in
 ///     PHOTOGRAPH, not colours this system is choosing. A file the user
-///     actually uploads carries whatever colours their camera recorded — it
+///     actually uploads carries whatever colours their camera recorded: it
 ///     does not follow the theme, and it must not, or the specimen would prove
 ///     the wrong thing."* The three values are carried across with that
 ///     reasoning attached.
@@ -66,10 +66,10 @@ const List<String> _suggestions = <String>[
   'What is Eclipse Vault worth right now?',
 ];
 
-/// `TOOL_STATES` — how this product's tools map onto the state machine.
+/// `TOOL_STATES`: how this product's tools map onto the state machine.
 ///
 /// Supplied by the caller rather than guessed, because only the caller knows
-/// whether `export_activity` is reading, writing or running — and a status line
+/// whether `export_activity` is reading, writing or running: and a status line
 /// that guesses is a status line that lies.
 const DsToolStateMap _toolStates = <String, DsAgentState>{
   'search_inventory': DsAgentState.searching,
@@ -78,7 +78,7 @@ const DsToolStateMap _toolStates = <String, DsAgentState>{
   'fetch_market_price': DsAgentState.retrieving,
 };
 
-/// `COMMANDS.filter(c => c.group === "skill")` — the three the welcome card
+/// `COMMANDS.filter(c => c.group === "skill")`: the three the welcome card
 /// advertises.
 const List<DsAgentCapability> _skills = <DsAgentCapability>[
   DsAgentCapability(
@@ -101,7 +101,7 @@ const List<DsAgentCapability> _skills = <DsAgentCapability>[
   ),
 ];
 
-/// `describeApproval` — turns a held action into a sentence a human can decide
+/// `describeApproval`: turns a held action into a sentence a human can decide
 /// on.
 String _describeApproval(String action, Map<String, Object?> params) {
   if (action == 'purchase_pack') {
@@ -120,7 +120,8 @@ const DsUserTurn _userTurn = DsUserTurn(
 
 const DsTextTurn _agentTurn = DsTextTurn(
   id: 'spec-agent',
-  text: 'Three sealed boxes match. The strongest is '
+  text:
+      'Three sealed boxes match. The strongest is '
       '**Eclipse Vault — 1st Edition**, with 24 packs left of an original '
       '250.\n\nWant me to put one on hold?',
 );
@@ -187,7 +188,7 @@ const DsToolTurn _toolWithFile = DsToolTurn(
 /// `content` and `reference` use the same kind/mime logic `serialiseAttachments`
 /// actually runs: a CSV is textual and gets inlined, a PDF is not and only its
 /// name travels. `produced` is the shape `extractProduced` stamps on a tool's
-/// own output. No `error` or `uploading` example lives here — the domain type
+/// own output. No `error` or `uploading` example lives here: the domain type
 /// cannot express either.
 const List<DsAgentAttachment> _deliverySpecimens = <DsAgentAttachment>[
   DsAgentAttachment(
@@ -218,8 +219,8 @@ const List<DsAgentAttachment> _deliverySpecimens = <DsAgentAttachment>[
   ),
 ];
 
-/// The reference's `SPEC_IMAGE_URL`. Nothing fetches it — [_StandInPhotograph]
-/// draws the same picture — but the model carries a url because a url is what
+/// The reference's `SPEC_IMAGE_URL`. Nothing fetches it, [_StandInPhotograph]
+/// draws the same picture: but the model carries a url because a url is what
 /// unlocks both behaviours this panel exists to prove.
 const String _specImageUrl = 'data:image/svg+xml;utf8,pull-of-the-week';
 
@@ -354,8 +355,10 @@ const List<(String, String)> _markdownLimits = <(String, String)>[
 
 /* ── Page-local geometry ─────────────────────────────────────────────────── */
 
-Widget _mt(double steps, Widget child) =>
-    Padding(padding: EdgeInsets.only(top: ds(steps)), child: child);
+Widget _mt(double steps, Widget child) => Padding(
+  padding: EdgeInsets.only(top: ds(steps)),
+  child: child,
+);
 
 /// `p-6` inside a flush panel.
 double get _panelInset => ds(6);
@@ -398,25 +401,25 @@ class _TurnsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => DsSection(
-        id: 'turns',
-        title: 'Turns',
-        description:
-            "The user's turn sits on --card; the agent's sits on --agent-muted, "
-            'one step toward the action ramp. Enough that whose turn it is '
-            'survives a squint, not so much that a long answer becomes a '
-            'coloured slab.',
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            const DsPanel(
-              label: 'Message',
-              note: 'user · agent · streaming',
-              child: _TranscriptTurns(),
-            ),
-            _mt(6, const _TurnsNote()),
-          ],
+    id: 'turns',
+    title: 'Turns',
+    description:
+        "The user's turn sits on --card; the agent's sits on --agent-muted, "
+        'one step toward the action ramp. Enough that whose turn it is '
+        'survives a squint, not so much that a long answer becomes a '
+        'coloured slab.',
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        const DsPanel(
+          label: 'Message',
+          note: 'user · agent · streaming',
+          child: _TranscriptTurns(),
         ),
-      );
+        _mt(6, const _TurnsNote()),
+      ],
+    ),
+  );
 }
 
 class _TranscriptTurns extends StatelessWidget {
@@ -427,15 +430,15 @@ class _TranscriptTurns extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          const DsUserMessage(turn: _userTurn),
-          SizedBox(height: gap),
-          const DsAgentMessage(turn: _agentTurn),
-          SizedBox(height: gap),
-          const DsAgentMessage(turn: _streamingTurn),
-        ],
-      );
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: <Widget>[
+      const DsUserMessage(turn: _userTurn),
+      SizedBox(height: gap),
+      const DsAgentMessage(turn: _agentTurn),
+      SizedBox(height: gap),
+      const DsAgentMessage(turn: _streamingTurn),
+    ],
+  );
 }
 
 class _TurnsNote extends StatelessWidget {
@@ -443,24 +446,25 @@ class _TurnsNote extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => DsRichText(
-        TextSpan(
-          children: <InlineSpan>[
-            const TextSpan(
-              text: 'The third turn is mid-stream. The caret is the one place ',
-            ),
-            DsCode.span('--agent'),
-            const TextSpan(
-              text: ' is used as a solid fill rather than as a foreground — a '
-                  'mark a pixel and a half wide, pulsing on ',
-            ),
-            DsCode.span('anim-pulse-live'),
-            const TextSpan(
-              text: '. It is what tells a reader the agent has not stalled.',
-            ),
-          ],
+    TextSpan(
+      children: <InlineSpan>[
+        const TextSpan(
+          text: 'The third turn is mid-stream. The caret is the one place ',
         ),
-        DsType.small,
-      );
+        DsCode.span('--agent'),
+        const TextSpan(
+          text:
+              ' is used as a solid fill rather than as a foreground — a '
+              'mark a pixel and a half wide, pulsing on ',
+        ),
+        DsCode.span('anim-pulse-live'),
+        const TextSpan(
+          text: '. It is what tells a reader the agent has not stalled.',
+        ),
+      ],
+    ),
+    DsType.small,
+  );
 }
 
 /* ── §2 Tool chips ───────────────────────────────────────────────────────── */
@@ -470,32 +474,32 @@ class _ToolsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => DsSection(
-        id: 'tools',
-        title: 'Tool chips',
-        description:
-            'What the agent did, while it is doing it. The glyph comes from the '
-            'state the tool maps to, so one capability carries one mark '
-            'everywhere it appears — in the chip, in the plus menu and in the '
-            'slash palette.',
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            const DsPanel(
-              label: 'ToolChip',
-              note: 'running · ok · produced a file · failed',
-              child: _ToolChips(),
-            ),
-            _mt(
-              6,
-              const DsNote(
-                tone: DsNoteTone.value,
-                title: 'The failed chip is not decoration',
-                child: _FailedChipNote(),
-              ),
-            ),
-          ],
+    id: 'tools',
+    title: 'Tool chips',
+    description:
+        'What the agent did, while it is doing it. The glyph comes from the '
+        'state the tool maps to, so one capability carries one mark '
+        'everywhere it appears — in the chip, in the plus menu and in the '
+        'slash palette.',
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        const DsPanel(
+          label: 'ToolChip',
+          note: 'running · ok · produced a file · failed',
+          child: _ToolChips(),
         ),
-      );
+        _mt(
+          6,
+          const DsNote(
+            tone: DsNoteTone.value,
+            title: 'The failed chip is not decoration',
+            child: _FailedChipNote(),
+          ),
+        ),
+      ],
+    ),
+  );
 }
 
 class _FailedChipNote extends StatelessWidget {
@@ -503,11 +507,11 @@ class _FailedChipNote extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => DsText(
-        'It carries the attempt count. A tool that succeeded on its second try '
-        'is a different fact from one that succeeded outright, and hiding the '
-        'retry makes an agent look more reliable than it is.',
-        DsType.small,
-      );
+    'It carries the attempt count. A tool that succeeded on its second try '
+    'is a different fact from one that succeeded outright, and hiding the '
+    'retry makes an agent look more reliable than it is.',
+    DsType.small,
+  );
 }
 
 class _ToolChips extends StatelessWidget {
@@ -518,17 +522,17 @@ class _ToolChips extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          const DsToolChip(turn: _toolRunning, toolStates: _toolStates),
-          SizedBox(height: gap),
-          const DsToolChip(turn: _toolOk, toolStates: _toolStates),
-          SizedBox(height: gap),
-          const DsToolChip(turn: _toolWithFile, toolStates: _toolStates),
-          SizedBox(height: gap),
-          const DsToolChip(turn: _toolError, toolStates: _toolStates),
-        ],
-      );
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: <Widget>[
+      const DsToolChip(turn: _toolRunning, toolStates: _toolStates),
+      SizedBox(height: gap),
+      const DsToolChip(turn: _toolOk, toolStates: _toolStates),
+      SizedBox(height: gap),
+      const DsToolChip(turn: _toolWithFile, toolStates: _toolStates),
+      SizedBox(height: gap),
+      const DsToolChip(turn: _toolError, toolStates: _toolStates),
+    ],
+  );
 }
 
 /* ── §3 Approval ─────────────────────────────────────────────────────────── */
@@ -538,46 +542,46 @@ class _ApprovalSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => DsSection(
-        id: 'approval',
-        title: 'Approval card',
-        description:
-            'Where the agent stops. Anything irreversible is held here rather '
-            "than run, and the card's whole job is to turn a function call into "
-            'a sentence a human can actually decide on.',
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            const DsPanel(
-              label: 'ApprovalCard',
-              note: 'purchase_pack — held',
-              child: DsApprovalCard(
-                approval: _heldAction,
-                describe: _describeApproval,
-              ),
-            ),
-            _mt(
-              6,
-              const DsDoDont(
-                dos: <String>[
-                  "Describe the consequence in the user's language — what it "
-                      'costs, what it changes, whether it can be undone.',
-                  'Make declining a normal outcome. The user said no; the agent '
-                      'should say so, not throw.',
-                  'Hold anything that spends money, sends a message, or deletes.',
-                ],
-                donts: <String>[
-                  'Print the raw action name and its JSON parameters and call '
-                      'that a prompt.',
-                  'Default the confirming button to safe styling when the action '
-                      'is not safe.',
-                  'Ask for approval on something reversible — an approval the '
-                      'user learns to click through is worse than none.',
-                ],
-              ),
-            ),
-          ],
+    id: 'approval',
+    title: 'Approval card',
+    description:
+        'Where the agent stops. Anything irreversible is held here rather '
+        "than run, and the card's whole job is to turn a function call into "
+        'a sentence a human can actually decide on.',
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        const DsPanel(
+          label: 'ApprovalCard',
+          note: 'purchase_pack — held',
+          child: DsApprovalCard(
+            approval: _heldAction,
+            describe: _describeApproval,
+          ),
         ),
-      );
+        _mt(
+          6,
+          const DsDoDont(
+            dos: <String>[
+              "Describe the consequence in the user's language — what it "
+                  'costs, what it changes, whether it can be undone.',
+              'Make declining a normal outcome. The user said no; the agent '
+                  'should say so, not throw.',
+              'Hold anything that spends money, sends a message, or deletes.',
+            ],
+            donts: <String>[
+              'Print the raw action name and its JSON parameters and call '
+                  'that a prompt.',
+              'Default the confirming button to safe styling when the action '
+                  'is not safe.',
+              'Ask for approval on something reversible — an approval the '
+                  'user learns to click through is worse than none.',
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
 }
 
 /* ── §4 Questionnaire ────────────────────────────────────────────────────── */
@@ -587,65 +591,59 @@ class _QuestionnaireSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => DsSection(
-        id: 'questionnaire',
-        title: 'Questionnaire',
-        description:
-            'A structured question is the same interaction shape as an approval '
-            'card — the agent speaks, the user answers inline — so it lives '
-            'right beside it. Press A, B or C to answer the first question '
-            'without a mouse; the keys are the ones drawn on the choices.',
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            const DsPanel(
-              label: 'Questionnaire',
-              note:
-                  'unanswered · answered · skipped · invalid · submitting · complete',
-              child: _QuestionnaireDemo(),
-            ),
-            _mt(
-              6,
-              const DsStateGrid(
-                cols: 3,
-                children: <Widget>[
-                  DsStateCell(
-                    label: 'Unanswered',
-                    child: _QuestionnaireCell(),
-                  ),
-                  DsStateCell(
-                    label: 'Answered',
-                    child: _QuestionnaireCell(checked: true),
-                  ),
-                  DsStateCell(
-                    label: 'Skipped',
-                    note: 'optional questions only',
-                    child: _QuestionnaireCell(withSkip: true),
-                  ),
-                  DsStateCell(
-                    label: 'Invalid',
-                    child: _QuestionnaireInvalidCell(),
-                  ),
-                  DsStateCell(
-                    label: 'Submitting',
-                    child: DsQuestionnaireSubmittingView(),
-                  ),
-                  DsStateCell(
-                    label: 'Complete',
-                    child: DsQuestionnaireCompleteView(),
-                  ),
-                ],
-              ),
-            ),
-            _mt(
-              6,
-              const DsNote(
-                title: 'Shortcuts are drawn, not just bound',
-                child: _ShortcutsNoteBody(),
-              ),
-            ),
-          ],
+    id: 'questionnaire',
+    title: 'Questionnaire',
+    description:
+        'A structured question is the same interaction shape as an approval '
+        'card — the agent speaks, the user answers inline — so it lives '
+        'right beside it. Press A, B or C to answer the first question '
+        'without a mouse; the keys are the ones drawn on the choices.',
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        const DsPanel(
+          label: 'Questionnaire',
+          note:
+              'unanswered · answered · skipped · invalid · submitting · complete',
+          child: _QuestionnaireDemo(),
         ),
-      );
+        _mt(
+          6,
+          const DsStateGrid(
+            cols: 3,
+            children: <Widget>[
+              DsStateCell(label: 'Unanswered', child: _QuestionnaireCell()),
+              DsStateCell(
+                label: 'Answered',
+                child: _QuestionnaireCell(checked: true),
+              ),
+              DsStateCell(
+                label: 'Skipped',
+                note: 'optional questions only',
+                child: _QuestionnaireCell(withSkip: true),
+              ),
+              DsStateCell(label: 'Invalid', child: _QuestionnaireInvalidCell()),
+              DsStateCell(
+                label: 'Submitting',
+                child: DsQuestionnaireSubmittingView(),
+              ),
+              DsStateCell(
+                label: 'Complete',
+                child: DsQuestionnaireCompleteView(),
+              ),
+            ],
+          ),
+        ),
+        _mt(
+          6,
+          const DsNote(
+            title: 'Shortcuts are drawn, not just bound',
+            child: _ShortcutsNoteBody(),
+          ),
+        ),
+      ],
+    ),
+  );
 }
 
 class _ShortcutsNoteBody extends StatelessWidget {
@@ -653,34 +651,35 @@ class _ShortcutsNoteBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => DsRichText(
-        TextSpan(
-          children: <InlineSpan>[
-            DsCode.span('Questionnaire'),
-            const TextSpan(text: ' can bind '),
-            DsCode.span('A'),
-            const TextSpan(text: '/'),
-            DsCode.span('B'),
-            const TextSpan(text: '/'),
-            DsCode.span('C'),
-            const TextSpan(text: ' (or '),
-            DsCode.span('1'),
-            const TextSpan(text: '/'),
-            DsCode.span('2'),
-            const TextSpan(text: '/'),
-            DsCode.span('3'),
-            const TextSpan(
-              text: ') to each choice without showing anything for it — the key '
-                  'still works, it is just invisible. That is the same failure '
-                  '§7 rules out for a progress bar that announces nothing: a '
-                  'shortcut nobody can see is a shortcut nobody uses. Every '
-                  'choice above renders its key in a ',
-            ),
-            DsCode.span('Kbd'),
-            const TextSpan(text: '.'),
-          ],
+    TextSpan(
+      children: <InlineSpan>[
+        DsCode.span('Questionnaire'),
+        const TextSpan(text: ' can bind '),
+        DsCode.span('A'),
+        const TextSpan(text: '/'),
+        DsCode.span('B'),
+        const TextSpan(text: '/'),
+        DsCode.span('C'),
+        const TextSpan(text: ' (or '),
+        DsCode.span('1'),
+        const TextSpan(text: '/'),
+        DsCode.span('2'),
+        const TextSpan(text: '/'),
+        DsCode.span('3'),
+        const TextSpan(
+          text:
+              ') to each choice without showing anything for it — the key '
+              'still works, it is just invisible. That is the same failure '
+              '§7 rules out for a progress bar that announces nothing: a '
+              'shortcut nobody can see is a shortcut nobody uses. Every '
+              'choice above renders its key in a ',
         ),
-        DsType.small,
-      );
+        DsCode.span('Kbd'),
+        const TextSpan(text: '.'),
+      ],
+    ),
+    DsType.small,
+  );
 }
 
 /// The full flow, live. All six states are reachable by clicking through it.
@@ -697,7 +696,7 @@ class _QuestionnaireDemoState extends State<_QuestionnaireDemo> {
   _Phase _phase = _Phase.form;
   int _generation = 0;
 
-  /// `setTimeout(() => setPhase("complete"), 900)` — the transport round trip
+  /// `setTimeout(() => setPhase("complete"), 900)`: the transport round trip
   /// this specimen fakes so `submitting` and `complete` are both reachable.
   ///
   /// It is latency, not motion: nothing interpolates over it, no easing reads
@@ -705,8 +704,8 @@ class _QuestionnaireDemoState extends State<_QuestionnaireDemo> {
   /// `forms.dart`'s `_accountLatency` / `_serverLatency`, and annotated the
   /// same way for the same reason.
   static const Duration _roundTrip = Duration(
-      milliseconds:
-          900); // allow-hardcoded: the reference's simulated submit latency, not a --duration-* token
+    milliseconds: 900,
+  ); // allow-hardcoded: the reference's simulated submit latency, not a --duration-* token
 
   void _submit() {
     setState(() => _phase = _Phase.submitting);
@@ -787,7 +786,7 @@ class _QuestionnaireDemoState extends State<_QuestionnaireDemo> {
 }
 
 /// One state per cell, for the reference matrix. Each is its own isolated root
-/// — `onSubmit` swallows the event on every one of them, because a single-item
+///, `onSubmit` swallows the event on every one of them, because a single-item
 /// root with a visible Skip or Submit control will submit the moment it is
 /// pressed, and this cell only exists to be looked at.
 class _QuestionnaireCell extends StatelessWidget {
@@ -801,28 +800,28 @@ class _QuestionnaireCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => DsQuestionnaire(
-        gap: gap,
+    gap: gap,
+    children: <Widget>[
+      DsQuestionnaireItem(
+        name: 'demo',
         children: <Widget>[
-          DsQuestionnaireItem(
-            name: 'demo',
-            children: <Widget>[
-              DsQuestionnaireChoices(
-                children: <DsQuestionnaireChoice>[
-                  DsQuestionnaireChoice(
-                    value: 'a',
-                    label: 'Option A',
-                    defaultChecked: checked,
-                  ),
-                ],
+          DsQuestionnaireChoices(
+            children: <DsQuestionnaireChoice>[
+              DsQuestionnaireChoice(
+                value: 'a',
+                label: 'Option A',
+                defaultChecked: checked,
               ),
-              if (withSkip)
-                const DsQuestionnaireActions(
-                  children: <Widget>[DsQuestionnaireSkip()],
-                ),
             ],
           ),
+          if (withSkip)
+            const DsQuestionnaireActions(
+              children: <Widget>[DsQuestionnaireSkip()],
+            ),
         ],
-      );
+      ),
+    ],
+  );
 }
 
 class _QuestionnaireInvalidCell extends StatelessWidget {
@@ -830,23 +829,23 @@ class _QuestionnaireInvalidCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => DsQuestionnaire(
-        gap: _QuestionnaireCell.gap,
-        children: const <Widget>[
-          DsQuestionnaireItem(
-            name: 'demo',
-            required: true,
-            invalid: true,
-            title: DsQuestionnaireTitle('Budget'),
-            children: <Widget>[
-              DsQuestionnaireInput(placeholder: r'$'),
-              DsQuestionnaireError(text: 'Enter an amount before continuing.'),
-            ],
-          ),
+    gap: _QuestionnaireCell.gap,
+    children: const <Widget>[
+      DsQuestionnaireItem(
+        name: 'demo',
+        required: true,
+        invalid: true,
+        title: DsQuestionnaireTitle('Budget'),
+        children: <Widget>[
+          DsQuestionnaireInput(placeholder: r'$'),
+          DsQuestionnaireError(text: 'Enter an amount before continuing.'),
         ],
-      );
+      ),
+    ],
+  );
 }
 
-/// `QuestionnaireSubmittingView` — `submitting` is not a state the primitive
+/// `QuestionnaireSubmittingView`, `submitting` is not a state the primitive
 /// tracks. It is the shape a transport's round trip actually takes once the
 /// form validates, so this specimen owns it the same way a real integration
 /// would.
@@ -873,11 +872,7 @@ class DsQuestionnaireSubmittingView extends StatelessWidget {
             child: DsSpinner(size: spinnerPx),
           ),
           SizedBox(height: gap),
-          DsText(
-            'Saving your answers…',
-            DsType.small,
-            align: TextAlign.center,
-          ),
+          DsText('Saving your answers…', DsType.small, align: TextAlign.center),
         ],
       ),
     );
@@ -885,7 +880,7 @@ class DsQuestionnaireSubmittingView extends StatelessWidget {
 }
 
 /// `QuestionnaireCompleteView`. The blurb and the restart control appear only
-/// when a caller supplies [onRestart] — which is why the state-grid cell shows
+/// when a caller supplies [onRestart]: which is why the state-grid cell shows
 /// the icon and the headline alone.
 class DsQuestionnaireCompleteView extends StatelessWidget {
   const DsQuestionnaireCompleteView({super.key, this.onRestart});
@@ -945,44 +940,41 @@ class _MarkdownSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => DsSection(
-        id: 'markdown',
-        title: 'Markdown',
-        description:
-            'The complete contract of the hand-written, injection-safe Markdown '
-            'subset used for both user and agent turns. Each row shows the '
-            'source the transport supplies beside the React output the '
-            'transcript renders.',
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            const DsPanel(
-              label: 'Transcript example',
-              note: 'table · code · ordered list',
-              child: DsAgentMarkdown(text: _markdownSample),
-            ),
-            _mt(
-              4,
-              const DsNote(
-                title: 'A deliberate subset',
-                child: _SubsetNoteBody(),
-              ),
-            ),
-            _mt(8, const _MarkdownCaseList(_blockCases)),
-            _mt(8, const _MarkdownCaseList(_inlineCases)),
-            _mt(8, const _TablesPanel()),
-            _mt(
-              8,
-              const DsPanel(
-                label: 'Everything together',
-                child: DsAgentMarkdown(text: _markdownComplete),
-              ),
-            ),
-            // `mt-12` on a section already inside a section: its own `mb-20`
-            // collapses with the outer one's rather than adding to it.
-            _mt(12, const _MarginCollapse(child: _NotSupportedSection())),
-          ],
+    id: 'markdown',
+    title: 'Markdown',
+    description:
+        'The complete contract of the hand-written, injection-safe Markdown '
+        'subset used for both user and agent turns. Each row shows the '
+        'source the transport supplies beside the React output the '
+        'transcript renders.',
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        const DsPanel(
+          label: 'Transcript example',
+          note: 'table · code · ordered list',
+          child: DsAgentMarkdown(text: _markdownSample),
         ),
-      );
+        _mt(
+          4,
+          const DsNote(title: 'A deliberate subset', child: _SubsetNoteBody()),
+        ),
+        _mt(8, const _MarkdownCaseList(_blockCases)),
+        _mt(8, const _MarkdownCaseList(_inlineCases)),
+        _mt(8, const _TablesPanel()),
+        _mt(
+          8,
+          const DsPanel(
+            label: 'Everything together',
+            child: DsAgentMarkdown(text: _markdownComplete),
+          ),
+        ),
+        // `mt-12` on a section already inside a section: its own `mb-20`
+        // collapses with the outer one's rather than adding to it.
+        _mt(12, const _MarginCollapse(child: _NotSupportedSection())),
+      ],
+    ),
+  );
 }
 
 class _SubsetNoteBody extends StatelessWidget {
@@ -990,21 +982,22 @@ class _SubsetNoteBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => DsRichText(
-        TextSpan(
-          children: <InlineSpan>[
-            const TextSpan(
-              text: 'This is not a CommonMark or GitHub-Flavored Markdown '
-                  'package. It recognizes the syntax an agent routinely writes, '
-                  'builds React elements directly, and leaves everything else '
-                  'as visible text. That smaller contract is what makes raw '
-                  'model output safe without',
-            ),
-            DsCode.span('dangerouslySetInnerHTML'),
-            const TextSpan(text: ' or an HTML sanitizer.'),
-          ],
+    TextSpan(
+      children: <InlineSpan>[
+        const TextSpan(
+          text:
+              'This is not a CommonMark or GitHub-Flavored Markdown '
+              'package. It recognizes the syntax an agent routinely writes, '
+              'builds React elements directly, and leaves everything else '
+              'as visible text. That smaller contract is what makes raw '
+              'model output safe without',
         ),
-        DsType.small,
-      );
+        DsCode.span('dangerouslySetInnerHTML'),
+        const TextSpan(text: ' or an HTML sanitizer.'),
+      ],
+    ),
+    DsType.small,
+  );
 }
 
 typedef _Case = ({String syntax, String use, String source});
@@ -1012,45 +1005,56 @@ typedef _Case = ({String syntax, String use, String source});
 const List<_Case> _blockCases = <_Case>[
   (
     syntax: '# through ####',
-    use: 'Heading levels one through four are accepted. All four use the '
+    use:
+        'Heading levels one through four are accepted. All four use the '
         "transcript's type-h4 treatment, so model output cannot create "
         'page-level hierarchy inside a message.',
-    source: '# Heading one\n## Heading two\n### Heading three\n#### Heading four',
+    source:
+        '# Heading one\n## Heading two\n### Heading three\n#### Heading four',
   ),
   (
     syntax: 'Paragraphs',
-    use: 'Adjacent non-empty lines join into one paragraph. A blank line starts '
+    use:
+        'Adjacent non-empty lines join into one paragraph. A blank line starts '
         'a new paragraph.',
-    source: 'A wrapped sentence can continue\non the next source line.\n\n'
+    source:
+        'A wrapped sentence can continue\non the next source line.\n\n'
         'A blank line starts the next paragraph.',
   ),
   (
     syntax: '-  *  •',
-    use: 'Dash, asterisk and literal bullet markers create one unordered list. '
+    use:
+        'Dash, asterisk and literal bullet markers create one unordered list. '
         'A plain line after an item continues that item.',
-    source: '- Dash marker\n* Asterisk marker\n• Literal bullet\n'
+    source:
+        '- Dash marker\n* Asterisk marker\n• Literal bullet\n'
         'This line continues the bullet above.',
   ),
   (
     syntax: '1.  2)',
-    use: 'Period and closing-parenthesis markers create ordered lists. Authored '
+    use:
+        'Period and closing-parenthesis markers create ordered lists. Authored '
         'numbers are preserved, including a list that starts above one or skips '
         'a value.',
     source: '4. Inspect the file\n5) Compare the totals\n7. Record the gap',
   ),
   (
     syntax: '> quote',
-    use: 'Consecutive quote lines join into one blockquote. Inline formatting is '
+    use:
+        'Consecutive quote lines join into one blockquote. Inline formatting is '
         'supported inside it.',
-    source: '> **Value** is not the same as price.\n'
+    source:
+        '> **Value** is not the same as price.\n'
         '> Keep the distinction explicit.',
   ),
   (
     syntax: '```lang',
-    use: 'Fenced code preserves whitespace and scrolls horizontally. A supported '
+    use:
+        'Fenced code preserves whitespace and scrolls horizontally. A supported '
         'language selects Prism tokenization with the VS Code Dark Plus '
         'palette. An unfinished streaming fence safely runs to the end.',
-    source: '```ts\nconst total = rows.reduce((sum, row) => sum + row.value, 0);'
+    source:
+        '```ts\nconst total = rows.reduce((sum, row) => sum + row.value, 0);'
         '\n```',
   ),
 ];
@@ -1058,27 +1062,32 @@ const List<_Case> _blockCases = <_Case>[
 const List<_Case> _inlineCases = <_Case>[
   (
     syntax: '**strong** and *emphasis*',
-    use: 'Double asterisks make strong text. Single asterisks or boundary-safe '
+    use:
+        'Double asterisks make strong text. Single asterisks or boundary-safe '
         'underscores make emphasis.',
     source: 'A **strong result**, an *emphasized note*, and _another note_.',
   ),
   (
     syntax: '`inline code`',
-    use: 'Single-backtick spans render as code and are matched before other '
+    use:
+        'Single-backtick spans render as code and are matched before other '
         'inline syntax, so asterisks inside code stay literal.',
     source: 'Call `calculate("**raw**")` before rendering the total.',
   ),
   (
     syntax: '[label](url)',
-    use: 'Markdown links accept root-relative paths, page fragments and absolute '
+    use:
+        'Markdown links accept root-relative paths, page fragments and absolute '
         'HTTP(S) URLs. Unsafe or malformed destinations keep their label but '
         'lose the link.',
-    source: 'Open [the design system](/design-system), [this section](#markdown),'
+    source:
+        'Open [the design system](/design-system), [this section](#markdown),'
         ' or [the web](https://example.com).',
   ),
   (
     syntax: 'https://example.com',
-    use: 'Bare HTTP and HTTPS URLs become external links. Other schemes do not. '
+    use:
+        'Bare HTTP and HTTPS URLs become external links. Other schemes do not. '
         'External links open in a new tab with noopener and noreferrer.',
     source: 'Reference: https://example.com/docs',
   ),
@@ -1188,7 +1197,11 @@ class _MarkdownCase extends StatelessWidget {
             )
           : Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[left, SizedBox(height: gapNarrow), right],
+              children: <Widget>[
+                left,
+                SizedBox(height: gapNarrow),
+                right,
+              ],
             ),
     );
   }
@@ -1213,7 +1226,7 @@ class _SourceBlock extends StatelessWidget {
       ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
-        // The `pre` keeps the page's own 16px/24px strut — `.type-code` is on
+        // The `pre` keeps the page's own 16px/24px strut, `.type-code` is on
         // the `<code>` inside it, not on the block. Measured 122 for four
         // lines, which is 24 + 2 + 4 × 24.
         child: DsPreformattedCode(code: source, color: theme.foreground),
@@ -1278,42 +1291,42 @@ class _NotSupportedSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => DsSection(
-        id: 'markdown-not-supported',
-        title: 'Markdown not supported',
-        description:
-            'These forms are outside the transcript contract today. They remain '
-            'readable text or degrade to an ordinary list; none should be '
-            'generated when a richer supported form exists.',
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            DsMeta(
-              items: <DsMetaItem>[
-                for (final (String k, String v) in _markdownLimits)
-                  (k: k, v: TextSpan(text: v)),
-              ],
-            ),
-            const DsDoDont(
-              dos: <String>[
-                'Use headings one through four, flat lists, quotes, fenced code '
-                    'and delimiter-row tables.',
-                'Send images and files through Attachment rather than embedding '
-                    'Markdown image syntax.',
-                'Treat Markdown as untrusted text; keep the renderer on React '
-                    'elements and safe URL schemes.',
-              ],
-              donts: <String>[
-                'Promise full CommonMark or GFM compatibility—the parser '
-                    'intentionally implements a smaller contract.',
-                'Depend on nested lists, checkboxes, strike-through, footnotes '
-                    'or raw HTML.',
-                'Put meaningful formatting inside another inline mark; nested '
-                    'inline syntax is not recursively parsed.',
-              ],
-            ),
+    id: 'markdown-not-supported',
+    title: 'Markdown not supported',
+    description:
+        'These forms are outside the transcript contract today. They remain '
+        'readable text or degrade to an ordinary list; none should be '
+        'generated when a richer supported form exists.',
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        DsMeta(
+          items: <DsMetaItem>[
+            for (final (String k, String v) in _markdownLimits)
+              (k: k, v: TextSpan(text: v)),
           ],
         ),
-      );
+        const DsDoDont(
+          dos: <String>[
+            'Use headings one through four, flat lists, quotes, fenced code '
+                'and delimiter-row tables.',
+            'Send images and files through Attachment rather than embedding '
+                'Markdown image syntax.',
+            'Treat Markdown as untrusted text; keep the renderer on React '
+                'elements and safe URL schemes.',
+          ],
+          donts: <String>[
+            'Promise full CommonMark or GFM compatibility—the parser '
+                'intentionally implements a smaller contract.',
+            'Depend on nested lists, checkboxes, strike-through, footnotes '
+                'or raw HTML.',
+            'Put meaningful formatting inside another inline mark; nested '
+                'inline syntax is not recursively parsed.',
+          ],
+        ),
+      ],
+    ),
+  );
 }
 
 /// CSS margin collapsing, as a render object.
@@ -1346,8 +1359,7 @@ class _RenderMarginCollapse extends RenderProxyBox {
     markNeedsLayout();
   }
 
-  double _shrink(double height) =>
-      (height - _amount).clamp(0, double.infinity);
+  double _shrink(double height) => (height - _amount).clamp(0, double.infinity);
 
   @override
   double computeMinIntrinsicHeight(double width) =>
@@ -1386,30 +1398,30 @@ class _WelcomeSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => DsSection(
-        id: 'welcome',
-        title: 'Welcome card',
-        description:
-            'The empty transcript. Starter prompts send immediately because each '
-            'one is already a whole question; skills only write themselves into '
-            'the composer, because a skill on its own is not a question and '
-            "firing 'search the catalogue' with nothing to search for wastes a "
-            'turn.',
-        child: DsPanel(
-          label: 'WelcomeCard',
-          flush: true,
-          child: Padding(
-            padding: EdgeInsets.all(_panelInset),
-            child: DsWelcomeCard(
-              name: _personaName,
-              blurb: _personaBlurb,
-              suggestions: _suggestions,
-              capabilities: _skills,
-              onPick: (String _) {},
-              onUseCapability: (DsAgentCapability _) {},
-            ),
-          ),
+    id: 'welcome',
+    title: 'Welcome card',
+    description:
+        'The empty transcript. Starter prompts send immediately because each '
+        'one is already a whole question; skills only write themselves into '
+        'the composer, because a skill on its own is not a question and '
+        "firing 'search the catalogue' with nothing to search for wastes a "
+        'turn.',
+    child: DsPanel(
+      label: 'WelcomeCard',
+      flush: true,
+      child: Padding(
+        padding: EdgeInsets.all(_panelInset),
+        child: DsWelcomeCard(
+          name: _personaName,
+          blurb: _personaBlurb,
+          suggestions: _suggestions,
+          capabilities: _skills,
+          onPick: (String _) {},
+          onUseCapability: (DsAgentCapability _) {},
         ),
-      );
+      ),
+    ),
+  );
 }
 
 /* ── §7 Attachments ──────────────────────────────────────────────────────── */
@@ -1424,104 +1436,105 @@ class _AttachmentsSection extends StatelessWidget {
   /// completion event, so claiming the bytes reached the disk would assert a
   /// capability this component does not have.
   static void _saving(String name) => docsToasts.show(
-        DsToastMessage(
-          title: 'Saving $name',
-          description: 'Your browser is handling the download.',
-        ),
-      );
+    DsToastMessage(
+      title: 'Saving $name',
+      description: 'Your browser is handling the download.',
+    ),
+  );
 
   @override
   Widget build(BuildContext context) => DsSection(
-        id: 'attachments',
-        title: 'Attachments travel in both directions',
-        description:
-            'A file the user picks and a file the agent produced are the same '
-            'object to everything that draws them, which is what stops the '
-            'transcript growing two parallel renderers that drift apart.',
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            const DsNote(
-              title: 'Delivery is stated, never implied',
-              child: _DeliveryNoteBody(),
-            ),
-            _mt(
-              4,
-              const DsPanel(
-                label: 'AttachmentList',
-                note: 'content · reference · produced',
-                child: DsAgentAttachmentList(
-                  attachments: _deliverySpecimens,
-                ),
-              ),
-            ),
-            _mt(
-              4,
-              DsPanel(
-                label: 'Openable — media expands, documents download',
-                note: 'both need a url',
-                child: DsAgentAttachmentList(
-                  attachments: _openableSpecimens,
-                  imageBuilder: _photograph,
-                  onDownload: _saving,
-                ),
-              ),
-            ),
-            _mt(
-              4,
-              const DsNote(
-                title: 'A url changes what an attachment can do',
-                child: _UrlNoteBody(),
-              ),
-            ),
-            _mt(
-              4,
-              const DsNote(
-                tone: DsNoteTone.value,
-                title: 'Built on ui/attachment.tsx, not beside it',
-                child: _BuiltOnNoteBody(),
-              ),
-            ),
-            _mt(
-              4,
-              DsMeta(
-                items: <DsMetaItem>[
-                  (
-                    k: 'AttachmentCard',
-                    v: const TextSpan(
-                      text: 'One file. Renders through ui/attachment.tsx at its '
-                          'default size and horizontal orientation, state always '
-                          '"done". Shows a download action when url and no '
-                          'onRemove, a remove action when onRemove is passed — '
-                          'never both.',
-                    ),
-                  ),
-                  (
-                    k: 'AttachmentList',
-                    v: const TextSpan(
-                      text: 'attachments, onRemove?, compact?. Splits images '
-                          '(kind === "image" && url) from everything else and '
-                          'lays each group out separately — a picture wants '
-                          'width, a spreadsheet wants a row.',
-                    ),
-                  ),
-                  (
-                    k: 'ImageAttachment',
-                    v: const TextSpan(
-                      text: 'Module-private, kept outside ui/attachment.tsx on '
-                          'purpose. Its AttachmentMedia is a fixed 40px well; a '
-                          'screenshot shown at that size is not the thing '
-                          'someone attached a screenshot to show. compact caps '
-                          'it at 128px in the composer tray, 320px in the '
-                          'transcript.',
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+    id: 'attachments',
+    title: 'Attachments travel in both directions',
+    description:
+        'A file the user picks and a file the agent produced are the same '
+        'object to everything that draws them, which is what stops the '
+        'transcript growing two parallel renderers that drift apart.',
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        const DsNote(
+          title: 'Delivery is stated, never implied',
+          child: _DeliveryNoteBody(),
         ),
-      );
+        _mt(
+          4,
+          const DsPanel(
+            label: 'AttachmentList',
+            note: 'content · reference · produced',
+            child: DsAgentAttachmentList(attachments: _deliverySpecimens),
+          ),
+        ),
+        _mt(
+          4,
+          DsPanel(
+            label: 'Openable — media expands, documents download',
+            note: 'both need a url',
+            child: DsAgentAttachmentList(
+              attachments: _openableSpecimens,
+              imageBuilder: _photograph,
+              onDownload: _saving,
+            ),
+          ),
+        ),
+        _mt(
+          4,
+          const DsNote(
+            title: 'A url changes what an attachment can do',
+            child: _UrlNoteBody(),
+          ),
+        ),
+        _mt(
+          4,
+          const DsNote(
+            tone: DsNoteTone.value,
+            title: 'Built on ui/attachment.tsx, not beside it',
+            child: _BuiltOnNoteBody(),
+          ),
+        ),
+        _mt(
+          4,
+          DsMeta(
+            items: <DsMetaItem>[
+              (
+                k: 'AttachmentCard',
+                v: const TextSpan(
+                  text:
+                      'One file. Renders through ui/attachment.tsx at its '
+                      'default size and horizontal orientation, state always '
+                      '"done". Shows a download action when url and no '
+                      'onRemove, a remove action when onRemove is passed — '
+                      'never both.',
+                ),
+              ),
+              (
+                k: 'AttachmentList',
+                v: const TextSpan(
+                  text:
+                      'attachments, onRemove?, compact?. Splits images '
+                      '(kind === "image" && url) from everything else and '
+                      'lays each group out separately — a picture wants '
+                      'width, a spreadsheet wants a row.',
+                ),
+              ),
+              (
+                k: 'ImageAttachment',
+                v: const TextSpan(
+                  text:
+                      'Module-private, kept outside ui/attachment.tsx on '
+                      'purpose. Its AttachmentMedia is a fixed 40px well; a '
+                      'screenshot shown at that size is not the thing '
+                      'someone attached a screenshot to show. compact caps '
+                      'it at 128px in the composer tray, 320px in the '
+                      'transcript.',
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
 }
 
 class _DeliveryNoteBody extends StatelessWidget {
@@ -1529,13 +1542,16 @@ class _DeliveryNoteBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextStyle italic = DsText.styleOf(context, DsType.small)
-        .copyWith(fontStyle: FontStyle.italic);
+    final TextStyle italic = DsText.styleOf(
+      context,
+      DsType.small,
+    ).copyWith(fontStyle: FontStyle.italic);
     return DsRichText(
       TextSpan(
         children: <InlineSpan>[
           const TextSpan(
-            text: 'The honest answer to “can the agent see this file?” '
+            text:
+                'The honest answer to “can the agent see this file?” '
                 'varies by transport and by file type, and a paperclip that '
                 'means ',
           ),
@@ -1551,7 +1567,8 @@ class _DeliveryNoteBody extends StatelessWidget {
           const TextSpan(text: ' with a reason, or '),
           DsCode.span('produced'),
           const TextSpan(
-            text: ' — and the transcript renders it. A 40MB PDF that only '
+            text:
+                ' — and the transcript renders it. A 40MB PDF that only '
                 'travelled as a name says so.',
           ),
         ],
@@ -1566,8 +1583,10 @@ class _UrlNoteBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextStyle italic = DsText.styleOf(context, DsType.small)
-        .copyWith(fontStyle: FontStyle.italic);
+    final TextStyle italic = DsText.styleOf(
+      context,
+      DsType.small,
+    ).copyWith(fontStyle: FontStyle.italic);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
@@ -1579,7 +1598,8 @@ class _UrlNoteBody extends StatelessWidget {
               const TextSpan(text: ', in a '),
               DsCode.span('Dialog'),
               const TextSpan(
-                text: ' over a dimmed page — §5’s table calls a dialog the '
+                text:
+                    ' over a dimmed page — §5’s table calls a dialog the '
                     'reversible one, and there is nothing here to decide. '
                     'Opening a new tab instead would hand the reader to the '
                     'browser’s own viewer and lose the conversation. The '
@@ -1587,7 +1607,8 @@ class _UrlNoteBody extends StatelessWidget {
               ),
               DsCode.span('secondary'),
               const TextSpan(
-                text: ' Button rather than the stock ghost ✕: this panel has no '
+                text:
+                    ' Button rather than the stock ghost ✕: this panel has no '
                     'header band for the ✕ to sit on, and a ghost control '
                     'disappears into whatever pixel of the photograph it lands '
                     'on.',
@@ -1602,13 +1623,15 @@ class _UrlNoteBody extends StatelessWidget {
             TextSpan(
               children: <InlineSpan>[
                 const TextSpan(
-                  text: 'Everything else — a PDF, a spreadsheet, a document — '
+                  text:
+                      'Everything else — a PDF, a spreadsheet, a document — '
                       'gets a download control with both signals §5 demands. '
                       'The glyph rolls to a check through ',
                 ),
                 DsCode.span('IconSwap'),
                 const TextSpan(
-                  text: ' so the control confirms it heard you, and a toast '
+                  text:
+                      ' so the control confirms it heard you, and a toast '
                       'reports the outcome. It says ',
                 ),
                 TextSpan(text: 'Saving', style: italic),
@@ -1617,7 +1640,8 @@ class _UrlNoteBody extends StatelessWidget {
                 const TextSpan(text: ': a plain '),
                 DsCode.span('download'),
                 const TextSpan(
-                  text: ' anchor gives the page no completion event, so claiming '
+                  text:
+                      ' anchor gives the page no completion event, so claiming '
                       'the bytes landed would be a capability this component '
                       'does not have — the same honesty the delivery badge above '
                       'exists for.',
@@ -1637,8 +1661,10 @@ class _BuiltOnNoteBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextStyle italic = DsText.styleOf(context, DsType.small)
-        .copyWith(fontStyle: FontStyle.italic);
+    final TextStyle italic = DsText.styleOf(
+      context,
+      DsType.small,
+    ).copyWith(fontStyle: FontStyle.italic);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
@@ -1647,7 +1673,8 @@ class _BuiltOnNoteBody extends StatelessWidget {
             children: <InlineSpan>[
               DsCode.span('components/agent/parts/attachments.tsx'),
               const TextSpan(
-                text: ' is a thin wrapper over the vendored primitive documented '
+                text:
+                    ' is a thin wrapper over the vendored primitive documented '
                     'on ',
               ),
               DsCode.span('/design-system/components/base/chat#attachment'),
@@ -1660,18 +1687,24 @@ class _BuiltOnNoteBody extends StatelessWidget {
               const TextSpan(text: ' and '),
               DsCode.span('AttachmentContent'),
               const TextSpan(
-                text: ' directly rather than drawing its own row. The one '
+                text:
+                    ' directly rather than drawing its own row. The one '
                     'addition is the delivery badge above: ',
               ),
               TextSpan(text: 'Read', style: italic),
-              const TextSpan(text: ' (content, hover for nothing more to say), '),
+              const TextSpan(
+                text: ' (content, hover for nothing more to say), ',
+              ),
               TextSpan(text: 'Name only', style: italic),
-              const TextSpan(text: ' (reference — hover it, the tooltip carries '),
+              const TextSpan(
+                text: ' (reference — hover it, the tooltip carries ',
+              ),
               DsCode.span('delivery.reason'),
               const TextSpan(text: '), and nothing at all for '),
               DsCode.span('produced'),
               const TextSpan(
-                text: ', since delivery does not apply to a file the agent made '
+                text:
+                    ', since delivery does not apply to a file the agent made '
                     'itself.',
               ),
             ],
@@ -1692,18 +1725,21 @@ class _BuiltOnNoteBody extends StatelessWidget {
                 const TextSpan(text: '’s '),
                 DsCode.span('Attachment'),
                 const TextSpan(
-                  text: ' carries no upload lifecycle at all — every attachment '
+                  text:
+                      ' carries no upload lifecycle at all — every attachment '
                       'this console can construct has already arrived by the '
                       'time it renders, so the wrapper always passes ',
                 ),
                 DsCode.span('state="done"'),
                 const TextSpan(
-                  text: '. Those two states are real on the primitive and shown '
+                  text:
+                      '. Those two states are real on the primitive and shown '
                       'honestly on the ',
                 ),
                 DsCode.span('base/chat'),
                 const TextSpan(
-                  text: ' page, against data this domain type cannot produce — '
+                  text:
+                      ' page, against data this domain type cannot produce — '
                       'putting them here would be a lie this component tells '
                       'about itself.',
                 ),
@@ -1722,19 +1758,18 @@ class _BuiltOnNoteBody extends StatelessWidget {
 /*
  * allow-hardcoded: these are the pixels of a stand-in PHOTOGRAPH, not colours
  * this system is choosing. A file the user actually uploads carries whatever
- * colours their camera recorded — it does not follow the theme, and it must
+ * colours their camera recorded: it does not follow the theme, and it must
  * not, or the specimen would prove the wrong thing: that media in the
  * transcript is token-coloured. The token rule governs the frame around it,
  * which is where the image well and the lightbox both draw from `--card` and
  * `--muted`. Carried across from the reference's own `agent-demo.tsx`, which
  * states exactly this reasoning above the same three values.
  */
-const Color _photoBase =
-    Color(0xFF1E293B); // allow-hardcoded: a stand-in photograph's own pixels
-const Color _photoSubject =
-    Color(0xFF1A6EF4); // allow-hardcoded: as above
-const Color _photoCaption =
-    Color(0xFFE2E8F0); // allow-hardcoded: as above
+const Color _photoBase = Color(
+  0xFF1E293B,
+); // allow-hardcoded: a stand-in photograph's own pixels
+const Color _photoSubject = Color(0xFF1A6EF4); // allow-hardcoded: as above
+const Color _photoCaption = Color(0xFFE2E8F0); // allow-hardcoded: as above
 
 /// The reference's inline SVG, drawn.
 ///
@@ -1754,19 +1789,19 @@ class _StandInPhotograph extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SizedBox.fromSize(
-        size: viewBox,
-        child: CustomPaint(
-          painter: _PhotoPainter(
-            caption: DsText.styleOf(
-              context,
-              DsType.body,
-              color: _photoCaption,
-              // `font-size="22"` on the SVG's own text node.
-              fontSize: 22, // allow-hardcoded: the stand-in photograph's own SVG
-            ),
-          ),
+    size: viewBox,
+    child: CustomPaint(
+      painter: _PhotoPainter(
+        caption: DsText.styleOf(
+          context,
+          DsType.body,
+          color: _photoCaption,
+          // `font-size="22"` on the SVG's own text node.
+          fontSize: 22, // allow-hardcoded: the stand-in photograph's own SVG
         ),
-      );
+      ),
+    ),
+  );
 }
 
 class _PhotoPainter extends CustomPainter {
@@ -1776,7 +1811,7 @@ class _PhotoPainter extends CustomPainter {
   static const Offset subjectCentre = Offset(320, 180);
   static const double subjectRadius = 96;
 
-  /// `x="320" y="330"` — an SVG text baseline.
+  /// `x="320" y="330"`: an SVG text baseline.
   static const Offset captionAnchor = Offset(320, 330);
 
   final TextStyle caption;

@@ -1,4 +1,4 @@
-/// `/design-system/components/agent/avatar` — twenty isometric cube scenes,
+/// `/design-system/components/agent/avatar`: twenty isometric cube scenes,
 /// one per state, plus the voice orb.
 ///
 /// The shortest agent page and the busiest render in the corpus: §states alone
@@ -13,10 +13,10 @@
 ///
 /// [_StatusLine] ports `parts/agent-face.tsx`'s `StatusLine`, which belongs to
 /// the console family. It has exactly one consumer here, so it stays on this
-/// page on the B10 precedent — promotion to the package needs a second one.
+/// page on the B10 precedent: promotion to the package needs a second one.
 /// Its shimmer is `@utility anim-shimmer-text`, which is `pulls-shimmer` (the
 /// keyframes `DsSkeleton` already runs) at [DsDurations.shimmerText] over a
-/// **three-stop, 100deg, 220%-wide** gradient clipped to the glyphs — a
+/// **three-stop, 100deg, 220%-wide** gradient clipped to the glyphs: a
 /// different utility from both `anim-shimmer` and the `shimmer` one
 /// `DsShimmerText` carries, and the reason it is spelled out rather than
 /// reused.
@@ -37,7 +37,7 @@
 /// shorthand; the idle cube was read separately for `perspective`, face size
 /// and its six face transforms. Both themes report identical geometry.
 ///
-/// ## Probe corrections — what the source said and the browser did not
+/// ## Probe corrections: what the source said and the browser did not
 ///
 ///  1. **`--agent-cube-error-right` is one 8-bit step apart.**
 ///     `hsl(0 60% 75%)` puts the red channel on 0.9 × 255 = **229.5 exactly**;
@@ -59,19 +59,19 @@
 ///  5. **`type-chip` is 11.5px, not the 12 the class name suggests**, and the
 ///     status line is the only `.type-chip` on the page.
 ///
-/// ## Drift register — recorded, shipped as written
+/// ## Drift register: recorded, shipped as written
 ///
 ///  1. **The eyebrow says "Agent" against a group already called "Agent".**
 ///     `` `${group.title} · Components` `` with `group.title = "Agent"`, so the
-///     header reads *Agent · Components* — the base pages' *"Base twice"* drift
+///     header reads *Agent · Components*: the base pages' *"Base twice"* drift
 ///     in its agent-group form.
 ///  2. **Five contents chips against seven sections.** `nav.ts` lists *State
 ///     set*, *Sizes*, *Accent knob*, *Voice orb* and *Reduced motion*;
 ///     §playground and §renderer are unlisted, and not one chip's text matches
 ///     the section title it points at (*State set* against *Twenty states*).
 ///  3. **The playground's buttons are labelled with wire ids, not labels.**
-///     `{s}` renders `awaiting_approval` and `calling_tools` — snake_case, in
-///     a system whose every other control is sentence case — while the status
+///     `{s}` renders `awaiting_approval` and `calling_tools`: snake_case, in
+///     a system whose every other control is sentence case: while the status
 ///     line beside them renders the sentence. Both are correct for what they
 ///     are and the page never says so.
 ///  4. **§renderer documents a `className` prop the page does not list.**
@@ -86,7 +86,7 @@
 ///     is shown, one avatar at a time.
 ///  7. **The `sm` breakpoint of §states is the one grid in the corpus the kit
 ///     cannot express.** `grid-cols-2 sm:grid-cols-4 lg:grid-cols-5` against
-///     `StateGrid cols={5}`'s `2 / 3 / 5` — a page-local map in the reference
+///     `StateGrid cols={5}`'s `2 / 3 / 5`: a page-local map in the reference
 ///     too, so the drift is that two grids that look identical at 1440 part
 ///     company at 640.
 ///  8. **§orb's Panel note names three.js.** It is the one caption in the
@@ -99,7 +99,7 @@
 /// 10. **The reduced-motion Note describes a rule the page cannot show.**
 ///     Its whole subject is what `globals.css` does under
 ///     `prefers-reduced-motion`, which is by construction invisible to a reader
-///     who does not have it set — the one section on the page with no specimen.
+///     who does not have it set: the one section on the page with no specimen.
 library;
 
 import 'dart:math' as math;
@@ -124,14 +124,14 @@ class AgentAvatarPage extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         DsPageHeader(
-          // DRIFT 1 — the group is already called "Agent".
+          // DRIFT 1: the group is already called "Agent".
           eyebrow: '${here.group.title} · Components',
           title: here.category.title,
           blurb: here.category.blurb,
-          // DRIFT 2 — five chips against seven sections.
+          // DRIFT 2: five chips against seven sections.
           contents: here.category.contents,
         ),
-        // `className="mb-12"` — 48px, and the only Note on this page outside a
+        // `className="mb-12"`, 48px, and the only Note on this page outside a
         // section, so the only one at the full 1080.
         Padding(
           padding: EdgeInsets.only(bottom: ds(12)),
@@ -153,7 +153,7 @@ class AgentAvatarPage extends StatelessWidget {
   }
 }
 
-/// The page Note — three `<Code>` chips in one paragraph.
+/// The page Note: three `<Code>` chips in one paragraph.
 class _BlueBody extends StatelessWidget {
   const _BlueBody();
 
@@ -173,7 +173,7 @@ class _BlueBody extends StatelessWidget {
             DsCode.span('oklab'),
             const TextSpan(text: ', so re-pointing a single line in '),
             DsCode.span('globals.css'),
-            // DRIFT 5 — nineteen scenes and one 3D cube.
+            // DRIFT 5: nineteen scenes and one 3D cube.
             const TextSpan(
               text: ' recolours all twenty scenes correctly — three lit faces, '
                   'not three unrelated colours.',
@@ -203,7 +203,7 @@ class _StatesSection extends StatelessWidget {
       );
 }
 
-/// `AvatarMatrix` — *"Every state in the machine, drawn at once."*
+/// `AvatarMatrix`, *"Every state in the machine, drawn at once."*
 ///
 /// DRIFT 7. `grid-cols-2 sm:grid-cols-4 lg:grid-cols-5` is a page-local column
 /// map, so only the lattice frame comes from the kit.
@@ -214,7 +214,7 @@ class _Matrix extends StatelessWidget {
   // ignore: unused_element_parameter
   const _Matrix({this.accent});
 
-  /// DRIFT 6 — the prop exists and the page never passes it.
+  /// DRIFT 6: the prop exists and the page never passes it.
   final Color? accent;
 
   @override
@@ -272,7 +272,7 @@ class _PlaygroundSection extends StatelessWidget {
       );
 }
 
-/// `AvatarPlayground` — *"The face plus its status line, cycling under the
+/// `AvatarPlayground`, *"The face plus its status line, cycling under the
 /// reader's control."*
 class _Playground extends StatefulWidget {
   const _Playground();
@@ -325,7 +325,7 @@ class _PlaygroundState extends State<_Playground> {
                     ? DsButtonVariant.primary
                     : DsButtonVariant.outline,
                 onPressed: () => setState(() => _state = s),
-                // DRIFT 3 — the wire id, not the label.
+                // DRIFT 3: the wire id, not the label.
                 child: Text(s.wire),
               ),
           ],
@@ -335,7 +335,7 @@ class _PlaygroundState extends State<_Playground> {
   }
 }
 
-/// `StatusLine` — *"The sentence beside the face."*
+/// `StatusLine`, *"The sentence beside the face."*
 ///
 /// *"Shimmers while the agent is working and sits still when it is not, so the
 /// status can be read at a glance without parsing the word."*
@@ -354,7 +354,7 @@ class _PlaygroundState extends State<_Playground> {
 /// Three mechanics, all of them measured on the live line:
 ///
 /// * `background-clip: text` with `color: transparent` is a [ShaderMask] in
-///   [BlendMode.srcIn] over the painted glyphs — the gradient shows *through*
+///   [BlendMode.srcIn] over the painted glyphs: the gradient shows *through*
 ///   the letters and nowhere else.
 /// * `pulls-shimmer` is [DsShimmer]'s own table, `200% 0 → −200% 0`, and a
 ///   `background-position` percentage resolves against `container − image`. At
@@ -362,7 +362,7 @@ class _PlaygroundState extends State<_Playground> {
 ///   `±2.4W` and not `±2W`; [DsShimmer.offsetAt] assumes the 200% tile, so the
 ///   offset is computed here from the same two stops.
 /// * `background-repeat` defaults to `repeat`, so the box is never empty at the
-///   extremes — the same fact [DsSkeleton]'s own note records.
+///   extremes: the same fact [DsSkeleton]'s own note records.
 ///
 /// The gradient's `100deg` leans the band ten degrees off vertical. Over a
 /// 13.8px line box that is 2.4px of vertical run against ~130px of horizontal,
@@ -396,7 +396,7 @@ class _StatusLineState extends State<_StatusLine>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // `animation: none` under reduced motion, with no fill mode — so the band
+    // `animation: none` under reduced motion, with no fill mode: so the band
     // reverts to stop 0 rather than holding wherever it was.
     if (dsAnimationDuration(context, DsDurations.shimmerText) ==
         Duration.zero) {
@@ -420,13 +420,13 @@ class _StatusLineState extends State<_StatusLine>
       widget.state.label,
       DsType.chip,
       color: theme.mutedForeground,
-      // `truncate` — `overflow:hidden white-space:nowrap text-overflow:ellipsis`.
+      // `truncate`, `overflow:hidden white-space:nowrap text-overflow:ellipsis`.
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
       softWrap: false,
     );
 
-    // *"…while the agent is working"* — `isBusy(state)`, so the three resting
+    // *"…while the agent is working"*, `isBusy(state)`, so the three resting
     // states sit still in `--muted-foreground`.
     if (!widget.state.isBusy) return label;
 
@@ -591,7 +591,7 @@ class _OrbSection extends StatelessWidget {
         children: <Widget>[
           const DsPanel(
             label: 'Orb',
-            // DRIFT 8 — the one caption in the system naming a renderer.
+            // DRIFT 8: the one caption in the system naming a renderer.
             note: 'three.js · reads --orb-from and --orb-to',
             child: _OrbWell(),
           ),
@@ -604,7 +604,7 @@ class _OrbSection extends StatelessWidget {
   }
 }
 
-/// `<div className="flex items-center justify-center py-8">` — 32px of vertical
+/// `<div className="flex items-center justify-center py-8">`, 32px of vertical
 /// padding inside the Panel's own `p-6`, measured 1030 × 224.
 class _OrbWell extends StatelessWidget {
   const _OrbWell();
@@ -664,7 +664,7 @@ class _RendererSection extends StatelessWidget {
             'genuinely swappable. A mascot, a video, a Lottie or a photograph '
             'is one module satisfying this type, and nothing in the state '
             'machine, the transcript or the transport moves.',
-        // DRIFT 4 — four rows for a five-member type.
+        // DRIFT 4: four rows for a five-member type.
         child: DsMeta(
           items: <DsMetaItem>[
             (

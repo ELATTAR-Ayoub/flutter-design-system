@@ -1,4 +1,4 @@
-/// `/sidebar-demo` — *"the live sidebar, and the one design-system page that is
+/// `/sidebar-demo`, *"the live sidebar, and the one design-system page that is
 /// not under `/design-system`."*
 ///
 /// The reference's own note explains why it lives where it does, and every word
@@ -10,10 +10,10 @@
 /// fixed sidebar on top of the documentation's own one."* Flutter has the same
 /// problem and the same shape of answer: [DocsShell] is a widget rather than a
 /// layout file, so this page is mounted **beside** it in `main.dart` instead of
-/// inside it — the single route arm that renders no docs chrome at all.
+/// inside it: the single route arm that renders no docs chrome at all.
 ///
 /// *"This route is the only place the four things that genuinely need a viewport
-/// can be shown — collapsing, the rail, the mobile sheet, ⌘B."*
+/// can be shown: collapsing, the rail, the mobile sheet, ⌘B."*
 ///
 /// ## What the port does with `min-h-svh`
 ///
@@ -25,18 +25,18 @@
 /// window rather than a document, and it is the same reading either way at the
 /// 900px frame the port is verified at.
 ///
-/// ## Drift register — reproduced, recorded, never fixed
+/// ## Drift register: reproduced, recorded, never fixed
 ///
 ///  1. **Readout 4 describes a cookie the port does not have.** *"The open state
 ///     is written to a cookie for seven days, so a reload keeps it. Toggle it and
 ///     refresh."* `sidebar.dart`'s own drift 6 says the provider's
-///     `sidebar_state` cookie has no counterpart here — there is no store to put
+///     `sidebar_state` cookie has no counterpart here: there is no store to put
 ///     one in. The copy ships as written, which is the standing rule for prose
 ///     the port cannot make true.
 ///  2. **Six of the demo's glyphs are off the generated registry.**
 ///     `CircleGauge`, `Funnel`, `Users`, `Receipt`, `ChevronsUpDown` and
 ///     `BookOpen` are not on the icons page's curated whitelist, so they come
-///     through [DsIcon.lucide] — the same split the sidebar page's own `FOOT_NAV`
+///     through [DsIcon.lucide]: the same split the sidebar page's own `FOOT_NAV`
 ///     carries for `Receipt`.
 ///  3. **`group-data-[collapsible=icon]:hidden` on `SidebarInput` is a call-site
 ///     class**, not a component prop, so the port writes it at the call site too:
@@ -45,9 +45,9 @@
 /// ## No oracle
 ///
 /// `section-oracle.js` measures document height for a docs route inside the
-/// reading column; this page has neither. Its contract is behavioural — it
+/// reading column; this page has neither. Its contract is behavioural: it
 /// mounts full-viewport, the panel collapses and expands, and the three shell
-/// knobs remount it — and that is what `example/test/sidebar_demo_test.dart`
+/// knobs remount it: and that is what `example/test/sidebar_demo_test.dart`
 /// pins.
 library;
 
@@ -59,7 +59,7 @@ import '../shell.dart';
 
 /// The route this page answers to.
 ///
-/// `app/sidebar-demo/page.tsx` — at the **root**, deliberately outside
+/// `app/sidebar-demo/page.tsx`: at the **root**, deliberately outside
 /// `$dsRoot`, for the reason the library note gives.
 const String sidebarDemoRoute = '/sidebar-demo';
 
@@ -90,7 +90,7 @@ const List<String> _variants = <String>['sidebar', 'floating', 'inset'];
 /// `COLLAPSIBLES`.
 const List<String> _collapsibles = <String>['offcanvas', 'icon', 'none'];
 
-/// `<strong className="text-foreground">` inside a `.type-small` line — the
+/// `<strong className="text-foreground">` inside a `.type-small` line: the
 /// helper `dialogs.dart` and `feedback.dart` both carry, and for the same
 /// reason: a bare [FontWeight.bold] would drop the `opsz` entry
 /// `font-optical-sizing: auto` puts on the variable face.
@@ -109,7 +109,7 @@ TextStyle _strong(TextStyle base, Color ink) => base.copyWith(
 
 /* ── The page ────────────────────────────────────────────────────────────── */
 
-/// `SidebarDemoPage` — the whole screen, no docs chrome.
+/// `SidebarDemoPage`: the whole screen, no docs chrome.
 class SidebarDemoPage extends StatefulWidget {
   const SidebarDemoPage({super.key});
 
@@ -132,15 +132,15 @@ class _SidebarDemoPageState extends State<SidebarDemoPage> {
       //
       // [DocsShell] installs this for every other route; nothing installs it
       // here, because nothing else is above this page. Only the colour is ever
-      // inherited — every string goes through a `.type-*` class that states its
-      // own family, size and leading — but a class that declares no `color`
+      // inherited: every string goes through a `.type-*` class that states its
+      // own family, size and leading: but a class that declares no `color`
       // (`.type-caption`, `.type-body`) would otherwise take the framework's
       // debug ink instead of the token.
       style: DsText.styleOf(context, DsType.body, color: theme.foreground),
       child: ColoredBox(
         color: theme.background,
         // USER-ORDERED MOBILE ADAPTATION (2026-08-16). This route is the one
-        // page that *is* the viewport — no docs chrome above it — so the rule
+        // page that *is* the viewport: no docs chrome above it: so the rule
         // [DocsShell] follows has to be written here too, in the same shape:
         // the background above paints to every edge, and the shell inside it
         // clears the bars. Horizontal is spent once, here, for both columns;
@@ -148,14 +148,14 @@ class _SidebarDemoPageState extends State<SidebarDemoPage> {
         // header and footer pay only the two insets they actually touch.
         //
         // On a phone this whole page is under 768px, where the panel is a sheet
-        // rather than a column — and `DsSheetContent` insets nothing of its
+        // rather than a column: and `DsSheetContent` insets nothing of its
         // own, so the same two wrappers are what keep the sheet's rows off the
         // clock and the gesture bar.
         child: DsSafeArea(
           top: false,
           bottom: false,
           child: DsSidebarProvider(
-            // `key={`${side}-${variant}-${collapsible}`}` — *"structural shell
+            // `key={`${side}-${variant}-${collapsible}`}`, *"structural shell
             // settings remount the provider so state from one geometry cannot
             // leak into the next."*
             key: ValueKey<String>(
@@ -187,7 +187,7 @@ class _SidebarDemoPageState extends State<SidebarDemoPage> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[
                     _InsetHeader(active: _active),
-                    // `<div className="flex-1 p-6">` — the scroller, for the
+                    // `<div className="flex-1 p-6">`: the scroller, for the
                     // reason the library note gives.
                     Expanded(
                       child: SingleChildScrollView(
@@ -235,7 +235,7 @@ class _SidebarDemoPageState extends State<SidebarDemoPage> {
 
 /* ── The panel ───────────────────────────────────────────────────────────── */
 
-/// `<SidebarHeader>` — the workspace row and the search field.
+/// `<SidebarHeader>`: the workspace row and the search field.
 class _DemoHeader extends StatelessWidget {
   const _DemoHeader();
 
@@ -327,7 +327,7 @@ class _WorkspaceLabel extends StatelessWidget {
   }
 }
 
-/// `<SidebarContent>` — the two collapsible groups.
+/// `<SidebarContent>`: the two collapsible groups.
 class _DemoContent extends StatelessWidget {
   const _DemoContent({required this.active, required this.onSelect});
 
@@ -362,7 +362,7 @@ class _DemoContent extends StatelessWidget {
       );
 }
 
-/// One group's `<SidebarMenu>` — the same map over both lists.
+/// One group's `<SidebarMenu>`: the same map over both lists.
 class _DemoMenu extends StatelessWidget {
   const _DemoMenu({
     required this.items,
@@ -420,7 +420,7 @@ class _AddView extends StatelessWidget {
       );
 }
 
-/// `<SidebarFooter>` — two rows, the first carrying a `ghost` badge.
+/// `<SidebarFooter>`: two rows, the first carrying a `ghost` badge.
 class _DemoFooter extends StatelessWidget {
   const _DemoFooter();
 
@@ -450,7 +450,7 @@ class _DemoFooter extends StatelessWidget {
                 // than beside it, and the two spellings render the same pixels:
                 // the badge is `absolute top-1/2 right-2`, and on a row with no
                 // submenu the button's box and the item's are the same box. The
-                // `pr-16` lane fires either way — it is
+                // `pr-16` lane fires either way: it is
                 // `group-has-data-[sidebar=menu-badge]/menu-item`, which reads
                 // the item's whole subtree. The port has one slot for it.
                 badge: const DsSidebarMenuBadge('2',
@@ -530,7 +530,7 @@ class _InsetHeader extends StatelessWidget {
   }
 }
 
-/// `<Button variant="outline" size="sm" asChild><Link …>` — the B4 divergence:
+/// `<Button variant="outline" size="sm" asChild><Link …>`: the B4 divergence:
 /// `asChild` is not ported, so the link is the button's own handler.
 class _BackLink extends StatelessWidget {
   const _BackLink();
@@ -637,7 +637,7 @@ class _ShellSettings extends StatelessWidget {
   }
 }
 
-/// `ShellSetting` — one caption over a wrapped row of `default` / `outline`
+/// `ShellSetting`: one caption over a wrapped row of `default` / `outline`
 /// buttons.
 class _ShellSetting extends StatelessWidget {
   const _ShellSetting({
@@ -684,7 +684,7 @@ class _ShellSetting extends StatelessWidget {
       );
 }
 
-/// `<div className="max-w-2xl space-y-4">` — the four things that need a
+/// `<div className="max-w-2xl space-y-4">`: the four things that need a
 /// viewport, said out loud.
 class _Readout extends StatelessWidget {
   const _Readout();
@@ -700,7 +700,7 @@ class _Readout extends StatelessWidget {
     ),
     (
       lead: 'The rail.',
-      rest: " The strip down the panel's right edge is a hit target — click "
+      rest: " The strip down the panel's right edge is a hit target: click "
           'anywhere on it to toggle without aiming.',
     ),
     (
@@ -709,7 +709,7 @@ class _Readout extends StatelessWidget {
           'it becomes a Sheet over a scrim, at 18rem.',
     ),
     (
-      // DRIFT 1: there is no cookie here — `sidebar.dart` drift 6.
+      // DRIFT 1: there is no cookie here, `sidebar.dart` drift 6.
       lead: 'Persistence.',
       rest: ' The open state is written to a cookie for seven days, so a '
           'reload keeps it. Toggle it and refresh.',

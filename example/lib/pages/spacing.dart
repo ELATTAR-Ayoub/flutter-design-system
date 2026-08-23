@@ -1,4 +1,4 @@
-/// `/design-system/spacing` — the Spacing & Layout foundation page.
+/// `/design-system/spacing`: the Spacing & Layout foundation page.
 ///
 /// Every number on this page is a demo of itself: the bars in `#scale` are the
 /// step they name, the boxes in `#radius` are cut to the corner they print, and
@@ -6,9 +6,9 @@
 /// picture of a value; it is the value.
 ///
 /// Three claims disagree with the tokens, and all three ship as written
-/// (spacing-map §11 — copy is the page, tokens are the system):
-/// * the Meta copy calls `--width-page` **1320px** — twice, in `#grid` and in
-///   the `2xl` breakpoint row — while the token declares 1200
+/// (spacing-map §11: copy is the page, tokens are the system):
+/// * the Meta copy calls `--width-page` **1320px**: twice, in `#grid` and in
+///   the `2xl` breakpoint row: while the token declares 1200
 ///   ([DsWidths.page], which carries the same drift note);
 /// * `#radius` is labelled "Seven steps" and calls `3xl` the largest allowed,
 ///   while [DsRadii] carries nine (`xs` 2px and `4xl` 32px are undocumented
@@ -23,10 +23,10 @@ import 'package:flutter/widgets.dart';
 import '../kit.dart';
 import '../nav.dart';
 
-/// `bg-action/12` — the grid demo's cells.
+/// `bg-action/12`: the grid demo's cells.
 const double _gridCellAlpha = 0.12;
 
-/// `border-action/40`, `border-value/40` — the two glow boxes' rims.
+/// `border-action/40`, `border-value/40`: the two glow boxes' rims.
 const double _glowBorderAlpha = 0.40;
 
 /// Tailwind's `leading-snug` ratio, which the two specimen captions override
@@ -35,10 +35,10 @@ const double _glowBorderAlpha = 0.40;
 // allow-hardcoded: framework default with no token to read it from.
 const double _leadingSnug = 1.375;
 
-/// `w-36` — the column one radius specimen occupies.
+/// `w-36`: the column one radius specimen occupies.
 final double _radiusCellWidth = ds(36);
 
-/// `h-24` — the height every specimen box on this page shares.
+/// `h-24`: the height every specimen box on this page shares.
 final double _specimenHeight = ds(24);
 
 /* ── Page data (the reference's three module-level arrays) ───────────────── */
@@ -46,7 +46,7 @@ final double _specimenHeight = ds(24);
 /// One row of the spacing table.
 ///
 /// [n] is the Tailwind class number, which *is* the pixel value divided by
-/// four — the page's whole argument — so the bar's width, the printed px and
+/// four: the page's whole argument: so the bar's width, the printed px and
 /// the class name all derive from it through [ds] rather than being restated.
 typedef _Step = ({int n, String use});
 
@@ -247,11 +247,11 @@ class _ScaleRow extends StatelessWidget {
       DsType.numSm,
       color: theme.actionInk,
     );
-    // `flex items-center gap-4` — the bar, then what the step is for.
+    // `flex items-center gap-4`: the bar, then what the step is for.
     final Widget demo = Row(
       children: <Widget>[
         SizedBox(
-          // `style={{ width: s.px }}` — the specimen is the measure, so this
+          // `style={{ width: s.px }}`: the specimen is the measure, so this
           // is the one width on the page that is stated in pixels.
           width: px,
           height: ds(3),
@@ -323,7 +323,7 @@ class _RadiusSection extends StatelessWidget {
   }
 }
 
-/// `999` for the pill, `6px`… for every other rung — the reference's own
+/// `999` for the pill, `6px`… for every other rung: the reference's own
 /// special case, printed off the token either way.
 String _radiusLabel(double px) =>
     px == DsRadii.pill ? '${px.toInt()}' : '${px.toInt()}px';
@@ -348,7 +348,7 @@ class _RadiusCell extends StatelessWidget {
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: theme.muted,
-              // `style={{ borderRadius: r.px }}` — the specimen is the value.
+              // `style={{ borderRadius: r.px }}`: the specimen is the value.
               borderRadius: BorderRadius.circular(radius.px),
               border: Border.all(color: theme.input, width: DsWidths.hairline),
             ),
@@ -454,7 +454,7 @@ class _ElevationCell extends StatelessWidget {
   }
 }
 
-/// `glow-action` — selection, and the one caption that names what it means.
+/// `glow-action`: selection, and the one caption that names what it means.
 class _ActionGlowCell extends StatelessWidget {
   const _ActionGlowCell();
 
@@ -472,7 +472,7 @@ class _ActionGlowCell extends StatelessWidget {
   }
 }
 
-/// `glow-value` — reward, mirrored on the value ramp.
+/// `glow-value`: reward, mirrored on the value ramp.
 class _ValueGlowCell extends StatelessWidget {
   const _ValueGlowCell();
 
@@ -765,7 +765,7 @@ class _BreakpointsSection extends StatelessWidget {
 
 /* ── Shared ──────────────────────────────────────────────────────────────── */
 
-/// `type-small mt-1 leading-snug` — the one-line note under a specimen.
+/// `type-small mt-1 leading-snug`: the one-line note under a specimen.
 ///
 /// The only place on this page a `.type-*` class is overridden, and it is
 /// overridden in exactly one property: the leading tightens so a two-line
@@ -779,7 +779,7 @@ class _UseCopy extends StatelessWidget {
   Widget build(BuildContext context) {
     final TextStyle style = DsText.styleOf(context, DsType.small)
         .copyWith(height: _leadingSnug);
-    // Not a `.type-*` class, so it cannot go through [DsText] — but the line
+    // Not a `.type-*` class, so it cannot go through [DsText]: but the line
     // box still has to be the one CSS lays out.
     return DsLineBox(style: style, child: Text(text, style: style));
   }

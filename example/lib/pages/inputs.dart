@@ -1,11 +1,11 @@
-/// `/design-system/components/base/inputs` — text entry, in every shape.
+/// `/design-system/components/base/inputs`: text entry, in every shape.
 ///
 /// Eight sections and thirty-one live fields. Almost nothing here is a picture
 /// of a control: every specimen in the state grid takes text, all nine type
 /// demos are real, the password toggle really toggles, both textareas grow, and
 /// both OTP strips accept six digits through one hidden field. Two cells are
-/// deliberately **stills** — the drifted Hover and Focus specimens, entries 4
-/// and 5 below — and ruling I3 keeps them page-local paint rather than a fake
+/// deliberately **stills**: the drifted Hover and Focus specimens, entries 4
+/// and 5 below: and ruling I3 keeps them page-local paint rather than a fake
 /// focus API nobody else would ever want.
 ///
 /// Three shell facts differ from the foundations pages, the same three the
@@ -19,12 +19,12 @@
 /// `.type-*` classes live in `@layer components`; Tailwind's `text-sm` is a
 /// `@layer utilities` rule on the same element, and utilities win every property
 /// they share. *(Measured on the running reference: an `InputGroupText` computes
-/// 13px at an 18.5714px line box — the utility takes the size **and** the
+/// 13px at an 18.5714px line box: the utility takes the size **and** the
 /// leading.)* What survives is the family, the tabular figures, the 600 weight
 /// and the −0.01em tracking, which is why "the shared mono foundation" is
 /// two-thirds true and drift 8 records the third. [DsComponentType.inputNum] and
 /// [DsComponentType.inputSerial] are that collapse already resolved in the
-/// foundation layer — passing `DsType.numBase` to any field on this page renders
+/// foundation layer: passing `DsType.numBase` to any field on this page renders
 /// two pixels large.
 ///
 /// **What is not ported, and why.**
@@ -34,7 +34,7 @@
 ///   neither attribute paints a pixel. Recorded rather than approximated with an
 ///   input formatter, which would change the value the reference never changes.
 /// * **`aria-describedby` on the errored textarea.** The reference omits it
-///   (drift 12) — an error that is visually paired and programmatically
+///   (drift 12): an error that is visually paired and programmatically
 ///   unlinked. The port folds every description and message into the control's
 ///   `Semantics(hint:)` uniformly, so this one is *linked* here. An invisible
 ///   accessibility regression is the one drift class this port does not ship
@@ -45,53 +45,53 @@
 /// belongs to a component rather than to this page it is recorded at its own
 /// source and named here so the register stays complete.
 /// 1. **The eyebrow says "Base" twice.** `eyebrow={`${group.title} · Base`}`
-///    with `group.title = "Base Components"` — see [InputsPage.build].
+///    with `group.title = "Base Components"`: see [InputsPage.build].
 /// 2. **The opening Note's radius claim.** *"Both were changed: 40px and
-///    10px"* — `input.tsx` is `rounded-pill`, **999px**, not 10. The 10 is
+///    10px"*, `input.tsx` is `rounded-pill`, **999px**, not 10. The 10 is
 ///    `--radius`, which only `input-group.tsx` reads and only through `calc()`.
 /// 3. **The opening Note's fill claim.** *"Fields are also filled with
-///    `bg-muted`"* — every field in the family is `bg-card`. Stated twice on
+///    `bg-muted`"*: every field in the family is `bg-card`. Stated twice on
 ///    one page: the `#api` `Input` row repeats it.
 /// 4. **The Hover specimen changes nothing.** `className="border-input"` is
 ///    already in the base class list and no member of this family declares a
 ///    `hover:` rule at all, so the cell is pixel-identical to Default. The note
 ///    "Border strengthens" describes an appearance the system does not have.
 /// 5. **The Focus specimen shows the wrong focus.** It paints `border-ring
-///    ring-3 ring-ring/50` — the *Button*'s recipe. The real one is
+///    ring-3 ring-ring/50`: the *Button*'s recipe. The real one is
 ///    `border-primary/50` + `ring-ring/35`, which is what a focused field one
 ///    section down actually does. See [_FocusStill].
 /// 6. **The invalid ring alpha differs by wrapper.** Bare `Input`/`Textarea`
 ///    ring at `--destructive`/20 in both themes; `InputGroup` and the OTP group
 ///    ring at 20 light and **40 dark**. Visible side by side in `#validation`,
 ///    fields 1 and 2. Carried by `input.dart` and `input_group.dart`.
-/// 7. **Disabled opacity differs by wrapper** — 45% on `Input`/`Textarea`, 50%
+/// 7. **Disabled opacity differs by wrapper**, 45% on `Input`/`Textarea`, 50%
 ///    on `InputGroup`/`InputOTP`.
-/// 8. **"the numerical mono foundation" is 13px, not 15** — the collapse above.
+/// 8. **"the numerical mono foundation" is 13px, not 15**: the collapse above.
 ///    Three places on this page assert the foundation is in use: the Quantity
 ///    field's description, the `#otp` section description, and Do #2.
 /// 9. **Addon icons are requested at 14 and painted at 16.** `size="sm"` sets
 ///    presentational attributes; the addon's `[&>svg:not([class*='size-'])]
 ///    :size-4` overrides them with a class while `strokeWidth` stays computed
 ///    from 14. Seven icons here. In this port it collapses to an identity —
-///    `DsIcon.strokeFor` snaps 48/16 and 48/14 to the same 2.4 rung — so the
+///    `DsIcon.strokeFor` snaps 48/16 and 48/14 to the same 2.4 rung: so the
 ///    cell is `DsIconSize.md` and nothing else.
 /// 10. **The password field has a visible label bound to nothing.** Its
 ///    `FieldLabel` carries no `htmlFor`; the control is named by `aria-label`
-///    instead, so clicking the label does nothing — while Do #1 on the same
+///    instead, so clicking the label does nothing: while Do #1 on the same
 ///    page says *"Label every field visibly"*. Reproduced by withholding the
 ///    focus node every other field on the page is given.
 /// 11. **`Field`'s invalid colouring never fires.** `fieldVariants` keys off
-///    `data-[invalid=true]`, which this page never sets — it marks the control
+///    `data-[invalid=true]`, which this page never sets: it marks the control
 ///    with `aria-invalid` instead. No label on this page turns red, despite the
 ///    `#api` row claiming Field *"handles the invalid colouring for the whole
 ///    group"*. Every [DsField] here therefore passes `invalid: false`.
 /// 12. **The textarea error is not linked.** `#textarea` field 2 has
 ///    `aria-invalid` and a `FieldError`, and neither an `id` on the error nor
-///    an `aria-describedby` on the control — the three-signal contract the
+///    an `aria-describedby` on the control: the three-signal contract the
 ///    `#validation` Note insists on, missing its third signal two sections
 ///    earlier. See the divergence note above.
-/// 13. **The OTP digits are not mono.** `InputOTPSlot` is `text-sm` — Inter
-///    13/400 — with no `type-num*` class, while the section description says
+/// 13. **The OTP digits are not mono.** `InputOTPSlot` is `text-sm`, Inter
+///    13/400: with no `type-num*` class, while the section description says
 ///    *"using the numerical mono foundation"*. The only mono in the component
 ///    is the invisible overlay's `font-family`, which paints nothing.
 /// 14. **`.cn-input-otp` matches no rule** anywhere in the project or its
@@ -116,18 +116,18 @@ import '../nav.dart';
 
 /* ── Page constants ──────────────────────────────────────────────────────── */
 
-/// `max-w-lg` — `--container-lg`, 32rem. Tailwind's **container** scale, which
+/// `max-w-lg`, `--container-lg`, 32rem. Tailwind's **container** scale, which
 /// `globals.css` does not override, so it is not the spacing ladder even where
 /// the two coincide. The measure every `FieldGroup` and the composed `<form>`
 /// are cut to.
 // allow-hardcoded: framework container scale with no token to read it from.
 const double _measureLg = 512;
 
-/// `max-w-40` — the Quantity and Referral groups. This one *is* the spacing
+/// `max-w-40`: the Quantity and Referral groups. This one *is* the spacing
 /// scale, so it reads off it.
 final double _measure40 = ds(40);
 
-/// `#api` — six rows.
+/// `#api`: six rows.
 ///
 /// The `Input` row repeats both of the opening Note's false claims (drifts 2
 /// and 3) and the `Field` row claims a colouring this page never triggers
@@ -163,7 +163,7 @@ const List<(String, String)> _apiRows = <(String, String)>[
   ),
 ];
 
-/// `#rules` — the first page in the corpus with **five** of each rather than
+/// `#rules`: the first page in the corpus with **five** of each rather than
 /// four. Do #3's dashes are U+2014; every apostrophe in the donts is the
 /// straight ASCII one, as the source array has them.
 const List<String> _dos = <String>[
@@ -207,7 +207,7 @@ class InputsPage extends StatelessWidget {
           blurb: here.category.blurb,
           contents: here.category.contents,
         ),
-        // `<Note … className="mb-12">` — page level, between the header and the
+        // `<Note … className="mb-12">`: page level, between the header and the
         // first section, exactly where the shadows page puts its own.
         Padding(
           padding: EdgeInsets.only(bottom: ds(12)),
@@ -230,7 +230,7 @@ class InputsPage extends StatelessWidget {
   }
 }
 
-/// The opening Note's body — two `Code` chips, and every specific claim in it
+/// The opening Note's body: two `Code` chips, and every specific claim in it
 /// false against the component it describes (drifts 2 and 3).
 class _RestyledNoteBody extends StatelessWidget {
   const _RestyledNoteBody();
@@ -241,15 +241,19 @@ class _RestyledNoteBody extends StatelessWidget {
       TextSpan(
         children: <InlineSpan>[
           const TextSpan(
-            text: 'Inputs ship from shadcn at 32px tall with a 12px radius. '
+            text:
+                'Inputs ship from shadcn at 32px tall with a 12px radius. '
                 'Both were changed: 40px and 10px, so a field sits level with '
                 'a default ',
           ),
           DsCode.span('Button'),
-          const TextSpan(text: ' in the same row. Fields are also filled with '),
+          const TextSpan(
+            text: ' in the same row. Fields are also filled with ',
+          ),
           DsCode.span('bg-muted'),
           const TextSpan(
-            text: ' rather than transparent, so they read as editable against '
+            text:
+                ' rather than transparent, so they read as editable against '
                 'a card without a heavy border.',
           ),
         ],
@@ -261,7 +265,7 @@ class _RestyledNoteBody extends StatelessWidget {
 
 /* ── #states ─────────────────────────────────────────────────────────────── */
 
-/// The eight appearances, in a `cols={4}` lattice — two full rows at this
+/// The eight appearances, in a `cols={4}` lattice: two full rows at this
 /// frame, no orphan cell.
 ///
 /// Six of the eight are a bare [DsInput] and nothing else. The two that are not
@@ -279,7 +283,8 @@ class _StatesSection extends StatelessWidget {
     return DsSection(
       id: 'states',
       title: 'States',
-      description: 'The full matrix. Every input in the product must be able '
+      description:
+          'The full matrix. Every input in the product must be able '
           'to show all eight — a form that cannot express an error is not '
           'finished.',
       child: DsStateGrid(
@@ -331,7 +336,7 @@ class _StatesSection extends StatelessWidget {
           DsStateCell(
             label: 'Read only',
             note: 'Value, not editable',
-            // `readOnly` alone changes nothing visually — `input.tsx` has no
+            // `readOnly` alone changes nothing visually, `input.tsx` has no
             // `read-only:` variant. The whole of this cell's difference is
             // `className="text-muted-foreground"`, and an input's colour is
             // `inherit` (Preflight), so the class arrives the way inheritance
@@ -354,7 +359,7 @@ class _StatesSection extends StatelessWidget {
 
 /// A live field wearing a pill this page painted itself.
 ///
-/// [DsInput.bare] is `InputGroupInput`'s strip list — no surface at all — so
+/// [DsInput.bare] is `InputGroupInput`'s strip list: no surface at all: so
 /// what is left is a padded editable line, and the caller supplies the border,
 /// the fill and the socket. That is the same split `DsInputGroup` uses, reached
 /// for here because two state cells override the border through `className` and
@@ -395,7 +400,7 @@ class _PaintedField extends StatelessWidget {
   }
 }
 
-/// DRIFT 5 — `className="border-ring ring-3 ring-ring/50"`.
+/// DRIFT 5, `className="border-ring ring-3 ring-ring/50"`.
 ///
 /// A real `:focus-visible` on this component is `border-primary/50` +
 /// `ring-ring/35`; this cell paints the *Button*'s recipe instead, so a reader
@@ -423,7 +428,7 @@ class _FocusStill extends StatelessWidget {
   }
 }
 
-/// `className="border-value/50"` — the one green border in the family.
+/// `className="border-value/50"`: the one green border in the family.
 ///
 /// Not a drift, and it is still page-local: `Input` has no success state, and
 /// the same override reappears on `#validation` field 3, which is the only
@@ -435,7 +440,7 @@ class _SuccessStill extends StatelessWidget {
   final String value;
   final String? label;
 
-  /// `border-value/50` — `rgba(163, 230, 53, 0.50)`.
+  /// `border-value/50`, `rgba(163, 230, 53, 0.50)`.
   static const double _borderAlpha = 0.50;
 
   @override
@@ -475,7 +480,7 @@ class _FieldNodes {
   }
 }
 
-/// `<FieldGroup className="max-w-lg">` and the two `max-w-40` groups — a cap on
+/// `<FieldGroup className="max-w-lg">` and the two `max-w-40` groups: a cap on
 /// the measure, hard against the leading edge.
 ///
 /// A `max-w-*` is a *maximum* on a block that is otherwise `w-full`, so it
@@ -491,12 +496,12 @@ class _Measure extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Align(
-        alignment: AlignmentDirectional.centerStart,
-        child: ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: width ?? _measureLg),
-          child: child,
-        ),
-      );
+    alignment: AlignmentDirectional.centerStart,
+    child: ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: width ?? _measureLg),
+      child: child,
+    ),
+  );
 }
 
 /// `aria-invalid` on the control, with the `Field` left valid.
@@ -509,7 +514,7 @@ class _Measure extends StatelessWidget {
 /// scope, so nothing is duplicated.
 ///
 /// It is also the only way to reach `DsInputGroupInput`, which takes no
-/// `invalid` of its own — the wrapper paints every pixel of the error state, so
+/// `invalid` of its own: the wrapper paints every pixel of the error state, so
 /// the prop would have had nothing left to do but announce.
 class _InvalidControl extends StatelessWidget {
   const _InvalidControl({required this.child});
@@ -557,7 +562,8 @@ class _TypesSectionState extends State<_TypesSection> {
     return DsSection(
       id: 'types',
       title: 'Input types',
-      description: 'Every text-entry shape the product needs. The type '
+      description:
+          'Every text-entry shape the product needs. The type '
           'attribute is not cosmetic — it drives the mobile keyboard, autofill '
           'and validation.',
       child: DsPanel(
@@ -576,7 +582,7 @@ class _TypesSectionState extends State<_TypesSection> {
               ),
 
               // 2 · Email. One leading addon, so the value's left padding drops
-              // from 16 to 8 — the gap to the glyph, not to the curve.
+              // from 16 to 8: the gap to the glyph, not to the curve.
               DsField(
                 label: 'Email',
                 invalid: false,
@@ -597,11 +603,12 @@ class _TypesSectionState extends State<_TypesSection> {
                 ),
               ),
 
-              // 3 · Password. DRIFT 10 — no `htmlFor`, so no focus node, so the
+              // 3 · Password. DRIFT 10: no `htmlFor`, so no focus node, so the
               // visible label is bound to nothing and clicking it does nothing.
               const DsField(
                 label: 'Password',
-                description: 'Visibility toggle is a real control with an '
+                description:
+                    'Visibility toggle is a real control with an '
                     'aria-pressed state, not a decorative icon.',
                 invalid: false,
                 child: _PasswordField(),
@@ -627,10 +634,11 @@ class _TypesSectionState extends State<_TypesSection> {
               ),
 
               // 5 · Quantity. `max-w-40`, a trailing text addon, and the first
-              // of six `type-num` values on the page — 13px, not 15.
+              // of six `type-num` values on the page, 13px, not 15.
               DsField(
                 label: 'Quantity',
-                description: 'Numerical values use the shared mono foundation, '
+                description:
+                    'Numerical values use the shared mono foundation, '
                     'even inside inputs.',
                 invalid: false,
                 focusNode: _nodes['i-num'],
@@ -651,11 +659,12 @@ class _TypesSectionState extends State<_TypesSection> {
               ),
 
               // 6 · Phone number. The `+1` addon is `type-num-sm`, which under
-              // `text-sm` collapses to the same 13px the value uses — the class
+              // `text-sm` collapses to the same 13px the value uses: the class
               // loses its size *and* its leading, and keeps everything else.
               DsField(
                 label: 'Phone number',
-                description: 'Country code is a separate addon so it never '
+                description:
+                    'Country code is a separate addon so it never '
                     'gets validated as part of the number.',
                 invalid: false,
                 focusNode: _nodes['i-phone'],
@@ -698,15 +707,16 @@ class _TypesSectionState extends State<_TypesSection> {
                   ),
                   child: DsInputGroupInput(
                     placeholder: '0.00',
-                    keyboardType:
-                        const TextInputType.numberWithOptions(decimal: true),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
                     textSpec: DsComponentType.inputNum,
                   ),
                 ),
               ),
 
               // 8 · Invite code. A trailing addon holding a button, which pulls
-              // its own clearance back 2px — 14, not 16.
+              // its own clearance back 2px, 14, not 16.
               DsField(
                 label: 'Invite code',
                 invalid: false,
@@ -722,7 +732,7 @@ class _TypesSectionState extends State<_TypesSection> {
                   endAddon: DsInputGroupAddon(
                     align: DsInputGroupAlign.end,
                     child: DsInputGroupButton(
-                      // No `onClick` in the reference either — it is an enabled
+                      // No `onClick` in the reference either: it is an enabled
                       // `type="button"` that does nothing. `null` would disable
                       // it and fade it to 45%.
                       onPressed: () {},
@@ -769,7 +779,7 @@ class _TypesSectionState extends State<_TypesSection> {
   }
 }
 
-/// `PasswordField` (`page.tsx:54–77`) — the page's only stateful child.
+/// `PasswordField` (`page.tsx:54–77`): the page's only stateful child.
 ///
 /// One boolean drives four things at once: the input's `type`, the glyph, the
 /// button's `aria-label` and its `aria-pressed`. The field's own description
@@ -844,7 +854,8 @@ class _TextareaSectionState extends State<_TextareaSection> {
     return DsSection(
       id: 'textarea',
       title: 'Textarea',
-      description: 'Auto-grows with content via field-sizing. Used for '
+      description:
+          'Auto-grows with content via field-sizing. Used for '
           'shipping notes and support messages.',
       child: DsPanel(
         label: 'Textarea',
@@ -861,7 +872,7 @@ class _TextareaSectionState extends State<_TextareaSection> {
                 ),
               ),
               // DRIFT 12. `aria-invalid` and a `FieldError`, with no `id` on
-              // the error and no `aria-describedby` on the control — the
+              // the error and no `aria-describedby` on the control: the
               // three-signal contract the `#validation` Note insists on, two
               // sections before it is stated, missing its third signal. The
               // port links it; see the library note.
@@ -870,7 +881,7 @@ class _TextareaSectionState extends State<_TextareaSection> {
                 errors: const <String>[
                   'Please provide at least 20 characters.',
                 ],
-                // DRIFT 11 — `data-invalid` is never set on this page, so the
+                // DRIFT 11, `data-invalid` is never set on this page, so the
                 // label above stays `--foreground` and only the control reddens.
                 invalid: false,
                 focusNode: _nodes['ta-err'],
@@ -890,7 +901,7 @@ class _TextareaSectionState extends State<_TextareaSection> {
 
 /// Two six-digit strips, `[3, 3]`, 208px each.
 ///
-/// DRIFT 16 — both are **static as rendered**. The active ring and the fake
+/// DRIFT 16: both are **static as rendered**. The active ring and the fake
 /// caret are focus-only and nothing on the page autofocuses, so "Partially
 /// filled" describes the value and not a caret position. Focus either one and
 /// the ring and the 1s square-wave caret arrive exactly where the package's own
@@ -898,10 +909,10 @@ class _TextareaSectionState extends State<_TextareaSection> {
 class _OtpSection extends StatelessWidget {
   const _OtpSection();
 
-  /// `space-y-8` — 32px between the two demos.
+  /// `space-y-8`, 32px between the two demos.
   static double get _demoGap => ds(8);
 
-  /// `<p className="type-label mb-4">` — 16px under each demo's own label.
+  /// `<p className="type-label mb-4">`, 16px under each demo's own label.
   static double get _labelGap => ds(4);
 
   @override
@@ -911,7 +922,8 @@ class _OtpSection extends StatelessWidget {
       title: 'Verification code',
       // DRIFT 13 lives in this sentence: the slots are `text-sm` Inter, and the
       // only mono in the component paints nothing.
-      description: 'Email verification and two-factor authentication. Six '
+      description:
+          'Email verification and two-factor authentication. Six '
           'digits, grouped three and three, using the numerical mono '
           'foundation.',
       child: DsPanel(
@@ -981,7 +993,8 @@ class _ValidationSectionState extends State<_ValidationSection> {
     return DsSection(
       id: 'validation',
       title: 'Validation messages',
-      description: 'An error must say what is wrong and what to do about it. '
+      description:
+          'An error must say what is wrong and what to do about it. '
           'Errors appear below the field, never as a tooltip, and never only '
           'as a red border.',
       child: Column(
@@ -1008,7 +1021,7 @@ class _ValidationSectionState extends State<_ValidationSection> {
                       child: DsInput(initialValue: 'collector@pulls'),
                     ),
                   ),
-                  // 2 · The same error state inside a group — DRIFT 6, visible
+                  // 2 · The same error state inside a group, DRIFT 6, visible
                   // one field below drift 6's other half: this one rings at 40%
                   // on dark, the field above it at 20%, and the only difference
                   // between them is that an addon happens to be present.
@@ -1054,7 +1067,7 @@ class _ValidationSectionState extends State<_ValidationSection> {
   }
 }
 
-/// `#validation` field 3 — a green border and a `text-value-ink` description.
+/// `#validation` field 3: a green border and a `text-value-ink` description.
 ///
 /// Hand-composed rather than a [DsField], because `FieldDescription` states its
 /// own `--muted-foreground` and this is the corpus's only instance that
@@ -1108,7 +1121,7 @@ class _AvailableField extends StatelessWidget {
   }
 }
 
-/// The `tone="error"` Note's body — two `Code` chips, and DRIFT 17: nothing
+/// The `tone="error"` Note's body: two `Code` chips, and DRIFT 17: nothing
 /// inside a Note ever renders in the tone's ink, so this is a red-tinted box
 /// with entirely grey text.
 class _NeverColourAloneBody extends StatelessWidget {
@@ -1120,7 +1133,8 @@ class _NeverColourAloneBody extends StatelessWidget {
       TextSpan(
         children: <InlineSpan>[
           const TextSpan(
-            text: 'A red border on its own is invisible to a colour-blind '
+            text:
+                'A red border on its own is invisible to a colour-blind '
                 'user. Errors always ship three signals: ',
           ),
           DsCode.span('aria-invalid'),
@@ -1138,12 +1152,12 @@ class _NeverColourAloneBody extends StatelessWidget {
 
 /* ── #form ───────────────────────────────────────────────────────────────── */
 
-/// `<form onSubmit={e => e.preventDefault()}>` — two fields, a rule, two
+/// `<form onSubmit={e => e.preventDefault()}>`: two fields, a rule, two
 /// buttons, and no validation at all.
 ///
 /// The `<form>` element contributes nothing here: no schema, no resolver, no
 /// submit handler beyond swallowing the event. Ported as what it is, which is a
-/// layout — the form/validator layer belongs to the forms page.
+/// layout: the form/validator layer belongs to the forms page.
 class _FormSection extends StatefulWidget {
   const _FormSection();
 
@@ -1167,7 +1181,8 @@ class _FormSectionState extends State<_FormSection> {
     return DsSection(
       id: 'form',
       title: 'A complete form',
-      description: 'Everything assembled: labels above fields, 20px between '
+      description:
+          'Everything assembled: labels above fields, 20px between '
           'fields, description under the field it describes, and the primary '
           'action separated by a rule.',
       child: DsPanel(
@@ -1198,8 +1213,9 @@ class _FormSectionState extends State<_FormSection> {
                       ),
                       child: DsInputGroupInput(
                         placeholder: '0.00',
-                        keyboardType:
-                            const TextInputType.numberWithOptions(decimal: true),
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
                         textSpec: DsComponentType.inputNum,
                       ),
                     ),
@@ -1213,7 +1229,7 @@ class _FormSectionState extends State<_FormSection> {
                 ],
               ),
               // `<div className="mt-8 flex gap-3 border-t border-border pt-6">`
-              // — 32px above the rule, 24 below it, 12 between the buttons.
+              //, 32px above the rule, 24 below it, 12 between the buttons.
               SizedBox(height: ds(8)),
               Container(
                 padding: EdgeInsets.only(top: ds(6)),

@@ -1,14 +1,14 @@
-/// `/design-system/shadows` — the Shadows foundation page.
+/// `/design-system/shadows`: the Shadows foundation page.
 ///
 /// Two families, and the page exists to make the difference physical. Ambient
 /// depth says how far a surface floats; machine depth says whether it can be
 /// pressed. Nothing here is a drawing of a shadow: every specimen is the real
 /// `--shadow-*` token painted by [DsMachineSurface], and `#in-use` is five live
-/// [DsButton]s and one genuinely editable [DsInput] — so "press the buttons and
+/// [DsButton]s and one genuinely editable [DsInput]: so "press the buttons and
 /// focus the field" is a thing the reader can do rather than a thing the page
 /// claims.
 ///
-/// ## Drifts (shadows-map §12 — recorded, shipped as written, never fixed)
+/// ## Drifts (shadows-map §12: recorded, shipped as written, never fixed)
 ///
 /// 1. **`--shadow-btn`'s use copy against the buttons.** The specimen says
 ///    *"Secondary, outline and destructive buttons."* Only
@@ -16,13 +16,13 @@
 ///    `destructive` declare no shadow class at all. Visible in `#in-use` on
 ///    this very page: "View Hits" is flat, "Filters" is a machine surface.
 /// 2. **The `#in-use` caption against its own specimens.** *"Buttons carry
-///    `shadow-btn` or `shadow-btn-primary`…"* — the premium button carries
+///    `shadow-btn` or `shadow-btn-primary`…"*: the premium button carries
 ///    `shadow-btn-value` (swapping to `shadow-glow-value` on hover), and two of
 ///    the five carry nothing.
 /// 3. **`glass-control` says 44px; the specimen is `h-12`.** The copy, the CSS
 ///    comment and the utility's own rationale all say 44; the render is 48.
-///    Supervisor ruling S8: print 44, render 48 — [_glassControlHeight].
-/// 4. **"Two utilities, one material" — there are three.** `glass-panel`,
+///    Supervisor ruling S8: print 44, render 48, [_glassControlHeight].
+/// 4. **"Two utilities, one material": there are three.** `glass-panel`,
 ///    `glass-panel-deep` and `glass-control` all exist ([DsGlassPanelDeep] has
 ///    a home in the package). The Panel label narrows honestly to
 ///    "glass-panel and glass-control"; the section description does not.
@@ -35,7 +35,7 @@
 ///    "Signals …" and "Legendary or mythic reveal, reward unlock, premium
 ///    action". Same two glows, two copies.
 /// 7. **The Input's own JSDoc claims "a placeholder at 60% muted".** The class
-///    is `placeholder:text-muted-foreground` at full opacity — prose describing
+///    is `placeholder:text-muted-foreground` at full opacity: prose describing
 ///    an intent the class never carried. [DsInput] renders the class.
 /// 8. **`--shadow-key` / `--shadow-key-down` name the `press-key` utility**,
 ///    which exists in globals.css and is never demonstrated. The two tokens
@@ -43,14 +43,14 @@
 ///    positions, so this page ships them as stills too.
 /// 9. **`--radius-4xl` renders here (32px) while the spacing page's ladder is
 ///    labelled "Seven steps" and stops at `3xl`.** This is the page where the
-///    undocumented rung actually appears — [DsRadii.xl4], on both glass cells.
+///    undocumented rung actually appears, [DsRadii.xl4], on both glass cells.
 /// 10. **Fonts.** The globals prose and the nav blurbs say Space Grotesk;
 ///    `--font-sans` / `--font-heading` are "Inter Local". Per the project
 ///    decision, fonts follow tokens, not prose.
 ///
 /// One correction to the map, made against the reference source: shadows-map
 /// §5 counts *four* `Code` chips in the `#in-use` caption. `page.tsx` has
-/// **five** — `shadow-btn`, `shadow-btn-primary`, `shadow-btn-down`, `:active`
+/// **five**, `shadow-btn`, `shadow-btn-primary`, `shadow-btn-down`, `:active`
 /// and `shadow-pressed`. Five ship.
 library;
 
@@ -60,7 +60,7 @@ import 'package:flutter/widgets.dart';
 import '../kit.dart';
 import '../nav.dart';
 
-/// `border-primary/40`, `border-value/40` — the two glow boxes' rims. Drift 5
+/// `border-primary/40`, `border-value/40`: the two glow boxes' rims. Drift 5
 /// lives in the class name, not the number: the spacing page spells the first
 /// one `border-action/40` and paints the identical colour.
 const double _glowBorderAlpha = 0.40;
@@ -78,16 +78,16 @@ const double _leadingSnug = 1.375;
 // allow-hardcoded: framework default with no token to read it from.
 const double _bolder = 700;
 
-/// `max-w-sm` — 24rem. Tailwind's **container** scale, which `globals.css` does
+/// `max-w-sm`, 24rem. Tailwind's **container** scale, which `globals.css` does
 /// not override (shadows-map §0); it is not the spacing scale, so it is not
 /// `ds(96)` even though the two coincide here.
 // allow-hardcoded: framework default with no token to read it from.
 const double _measureSm = 384;
 
-/// `h-24` — the height every specimen box on this page shares.
+/// `h-24`: the height every specimen box on this page shares.
 final double _specimenHeight = ds(24);
 
-/// `h-12` — the `glass-control` specimen. **Drift 3:** the caption beside it
+/// `h-12`: the `glass-control` specimen. **Drift 3:** the caption beside it
 /// says 44px. Ruling S8 is to print the copy and render the class.
 final double _glassControlHeight = ds(12);
 
@@ -95,14 +95,9 @@ final double _glassControlHeight = ds(12);
 
 /// One shadow specimen: the class the box wears, the token it prints, the spec
 /// that paints it, and what it is for.
-typedef _Specimen = ({
-  String token,
-  String cls,
-  DsShadowSpec spec,
-  String use,
-});
+typedef _Specimen = ({String token, String cls, DsShadowSpec spec, String use});
 
-/// `const ambient` — four ambient steps. The four `use` strings are
+/// `const ambient`: four ambient steps. The four `use` strings are
 /// **character-identical** to the spacing page's Elevation panel; only the
 /// section description differs between the two pages, and both ship as written.
 final List<_Specimen> _ambient = <_Specimen>[
@@ -132,7 +127,7 @@ final List<_Specimen> _ambient = <_Specimen>[
   ),
 ];
 
-/// `const machine` — the eight machine surfaces. Every one of these carries at
+/// `const machine`: the eight machine surfaces. Every one of these carries at
 /// least one `inset` layer, which is why the cells go through
 /// [DsMachineSurface] rather than a plain decoration.
 final List<_Specimen> _machine = <_Specimen>[
@@ -141,7 +136,8 @@ final List<_Specimen> _machine = <_Specimen>[
     cls: 'shadow-btn',
     spec: DsShadows.btn,
     // DRIFT 1, kept: only `outline` carries this class.
-    use: 'Secondary, outline and destructive buttons. An inner top highlight '
+    use:
+        'Secondary, outline and destructive buttons. An inner top highlight '
         'and inner bottom shade make the surface read as a physical key.',
   ),
   (
@@ -160,7 +156,8 @@ final List<_Specimen> _machine = <_Specimen>[
     token: '--shadow-btn-down',
     cls: 'shadow-btn-down',
     spec: DsShadows.btnDown,
-    use: 'Any button while pressed. The surface sinks into its socket instead '
+    use:
+        'Any button while pressed. The surface sinks into its socket instead '
         'of merely dimming.',
   ),
   (
@@ -168,7 +165,8 @@ final List<_Specimen> _machine = <_Specimen>[
     cls: 'shadow-key',
     spec: DsShadows.key,
     // DRIFT 8, kept: `press-key` exists and is never demonstrated.
-    use: 'A raised key with a visible side wall. Used by the press-key '
+    use:
+        'A raised key with a visible side wall. Used by the press-key '
         'utility.',
   ),
   (
@@ -211,7 +209,7 @@ class ShadowsPage extends StatelessWidget {
           blurb: here.category.blurb,
           contents: here.category.contents,
         ),
-        // `<Note … className="mb-12">` — the only page-level Note in the
+        // `<Note … className="mb-12">`: the only page-level Note in the
         // foundations set that carries a margin of its own. It sits between the
         // header and the first section, at page level.
         Padding(
@@ -238,7 +236,7 @@ class ShadowsPage extends StatelessWidget {
               'Keep every field in a sunken shadow-pressed socket.',
               'Reserve the two glows for selection and reward.',
             ],
-            // Straight apostrophes, as the source array has them — only the
+            // Straight apostrophes, as the source array has them: only the
             // panel heading uses the curly `&rsquo;`, and [DsDoDont] owns that.
             donts: <String>[
               "Don't put an ambient shadow on a control — it will read as "
@@ -256,12 +254,12 @@ class ShadowsPage extends StatelessWidget {
   }
 }
 
-/// The opening Note's body — the one `<strong>` and one of the three `<em>`s on
+/// The opening Note's body: the one `<strong>` and one of the three `<em>`s on
 /// the page.
 ///
 /// There is no italic face for Inter, so the emphasis renders as a synthesised
 /// oblique rather than a designed italic; and `globals.css` styles neither
-/// element outside `.prose`, so both fall through to Preflight — see [_bolder].
+/// element outside `.prose`, so both fall through to Preflight: see [_bolder].
 class _PageNoteBody extends StatelessWidget {
   const _PageNoteBody();
 
@@ -282,7 +280,8 @@ class _PageNoteBody extends StatelessWidget {
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
           const TextSpan(
-            text: '. That second family is what gives the interface its '
+            text:
+                '. That second family is what gives the interface its '
                 'tactility: controls you operate stand proud with an inner '
                 'highlight, and fields you type into are recessed. Get the two '
                 'the wrong way round and everything feels like flat cardboard.',
@@ -298,17 +297,17 @@ class _PageNoteBody extends StatelessWidget {
 ///
 /// The `wght` axis entry is replaced in place rather than a bare
 /// `fontVariations` override being handed to the span, because that would drop
-/// the `opsz` entry `font-optical-sizing: auto` puts there — the same reason
+/// the `opsz` entry `font-optical-sizing: auto` puts there: the same reason
 /// `button.dart` writes its `font-semibold` override this way.
 TextStyle _strong(TextStyle base) => base.copyWith(
-      fontWeight: FontWeight.bold,
-      fontVariations: <FontVariation>[
-        for (final FontVariation v
-            in base.fontVariations ?? const <FontVariation>[])
-          if (v.axis != 'wght') v,
-        const FontVariation('wght', _bolder),
-      ],
-    );
+  fontWeight: FontWeight.bold,
+  fontVariations: <FontVariation>[
+    for (final FontVariation v
+        in base.fontVariations ?? const <FontVariation>[])
+      if (v.axis != 'wght') v,
+    const FontVariation('wght', _bolder),
+  ],
+);
 
 /* ── #ambient ────────────────────────────────────────────────────────────── */
 
@@ -322,7 +321,8 @@ class _AmbientSection extends StatelessWidget {
     return DsSection(
       id: 'ambient',
       title: 'Ambient depth',
-      description: 'Four steps. On a near-black page a shadow reads as a soft '
+      description:
+          'Four steps. On a near-black page a shadow reads as a soft '
           'darkening, so depth mostly comes from the surface ladder — these '
           'only confirm it.',
       // An actual U+2192 arrow, not `->`.
@@ -337,7 +337,7 @@ class _AmbientSection extends StatelessWidget {
               _SpecimenCell(
                 specimen: specimen,
                 radius: DsRadii.lg,
-                // `border border-border` — the ambient cells have one and the
+                // `border border-border`: the ambient cells have one and the
                 // machine cells do not.
                 border: Border.all(
                   color: theme.border,
@@ -361,7 +361,8 @@ class _MachineSection extends StatelessWidget {
     return DsSection(
       id: 'machine',
       title: 'Machine surfaces',
-      description: 'Depth that implies a mechanism. These carry inset '
+      description:
+          'Depth that implies a mechanism. These carry inset '
           'highlights and shades, so a control looks like it has a top face '
           'and a side wall.',
       child: DsPanel(
@@ -393,7 +394,8 @@ class _InUseSection extends StatelessWidget {
     return DsSection(
       id: 'in-use',
       title: 'Raised against recessed',
-      description: 'The rule in one panel. Press the buttons and focus the '
+      description:
+          'The rule in one panel. Press the buttons and focus the '
           'field — the button sinks, the field is already sunken and only its '
           'ring changes.',
       child: DsPanel(
@@ -445,7 +447,7 @@ class _InUseSection extends StatelessWidget {
 ///
 /// `onPressed` is a no-op rather than `null`: the reference renders five
 /// *enabled* `<button>`s with no `onClick`, and `null` here would mean
-/// `disabled:pointer-events-none disabled:opacity-45` — which would take the
+/// `disabled:pointer-events-none disabled:opacity-45`: which would take the
 /// press states the section is written about off the page.
 class _LiveButton extends StatelessWidget {
   const _LiveButton(this.variant, this.label);
@@ -460,14 +462,14 @@ class _LiveButton extends StatelessWidget {
       onPressed: () {},
       // A bare [Text]: the button installs its own `DefaultTextStyle`, which
       // already carries the resolved class, `btn-spring`'s animated ink and —
-      // on premium — the `font-semibold` override. Re-resolving the class
+      // on premium: the `font-semibold` override. Re-resolving the class
       // through [DsText] here would silently drop both.
       child: Text(label),
     );
   }
 }
 
-/// `<p class="type-small mt-6">` — five `Code` chips (drift 2 lives in what it
+/// `<p class="type-small mt-6">`: five `Code` chips (drift 2 lives in what it
 /// claims about them).
 class _InUseCaption extends StatelessWidget {
   const _InUseCaption();
@@ -509,7 +511,8 @@ class _GlowSection extends StatelessWidget {
     return DsSection(
       id: 'glow',
       title: 'Rationed glow',
-      description: 'Two glows, and they are the scarcest thing in the system. '
+      description:
+          'Two glows, and they are the scarcest thing in the system. '
           'Both derive from the accent tokens, so they follow the palette '
           'automatically.',
       child: DsPanel(
@@ -528,7 +531,8 @@ class _GlowSection extends StatelessWidget {
               ink: theme.actionInk,
               // DRIFT 6: the spacing page says "Signals" and names different
               // occasions for the same two glows.
-              lead: 'Selected pack, focused primary CTA, active opening stage. '
+              lead:
+                  'Selected pack, focused primary CTA, active opening stage. '
                   'Says ',
               emphasis: 'this is the thing you chose',
             ),
@@ -586,7 +590,7 @@ class _GlowCell extends StatelessWidget {
           child: DsText(label, DsType.numSm, color: ink),
         ),
         SizedBox(height: ds(3)),
-        // `.type-small` at its own 1.5 leading — the glow captions carry no
+        // `.type-small` at its own 1.5 leading: the glow captions carry no
         // `leading-snug`, unlike the twelve specimen captions above.
         DsRichText(
           TextSpan(
@@ -616,8 +620,9 @@ class _GlassSection extends StatelessWidget {
     return DsSection(
       id: 'glass',
       title: 'Glass',
-      // DRIFT 4: "Two utilities" — there are three.
-      description: 'A surface in front of the page rather than cut out of it. '
+      // DRIFT 4: "Two utilities": there are three.
+      description:
+          'A surface in front of the page rather than cut out of it. '
           'Two utilities, one material — the split is scale, not taste.',
       child: DsPanel(
         // …which the label, unlike the description, narrows honestly.
@@ -642,7 +647,7 @@ class _GlassSection extends StatelessWidget {
   }
 }
 
-/// `glass-panel grid h-24 place-items-center rounded-4xl` — no `bg-*` and no
+/// `glass-panel grid h-24 place-items-center rounded-4xl`: no `bg-*` and no
 /// border class of its own, because the utility supplies both.
 class _GlassPanelCell extends StatelessWidget {
   const _GlassPanelCell();
@@ -660,7 +665,7 @@ class _GlassPanelCell extends StatelessWidget {
             // DRIFT 9: `--radius-4xl`, the rung the spacing page's ladder does
             // not document, renders here.
             radius: BorderRadius.circular(DsRadii.xl4),
-            // `text-foreground`, not `text-muted-foreground` — the one
+            // `text-foreground`, not `text-muted-foreground`: the one
             // specimen label on the page that is not muted.
             child: Center(
               child: DsText(
@@ -678,12 +683,14 @@ class _GlassPanelCell extends StatelessWidget {
               const TextSpan(text: 'Card scale. Translucent '),
               DsCode.span('--card'),
               const TextSpan(
-                text: ', a backdrop blur, a hairline rim of the ink colour '
+                text:
+                    ', a backdrop blur, a hairline rim of the ink colour '
                     'and ',
               ),
               DsCode.span('--shadow-e2'),
               const TextSpan(
-                text: ' beneath. The page’s own light shows through it, which '
+                text:
+                    ' beneath. The page’s own light shows through it, which '
                     'is the whole reason to reach for this over ',
               ),
               DsCode.span('bg-card'),
@@ -700,7 +707,7 @@ class _GlassPanelCell extends StatelessWidget {
 /// `grid h-24 place-items-center rounded-4xl bg-card` holding a
 /// `glass-control inline-flex h-12 items-center rounded-pill px-4`.
 ///
-/// The outer box is opaque `--card` and carries no shadow at all — it is a
+/// The outer box is opaque `--card` and carries no shadow at all: it is a
 /// backdrop for the control, not a specimen. **Drift 3** is the inner one: the
 /// caption says 44px and [_glassControlHeight] is 48.
 class _GlassControlCell extends StatelessWidget {
@@ -748,12 +755,14 @@ class _GlassControlCell extends StatelessWidget {
             children: <InlineSpan>[
               // DRIFT 3, printed as written against a 48px render.
               const TextSpan(
-                text: 'Control scale. No blur and no ambient shadow: at 44px '
+                text:
+                    'Control scale. No blur and no ambient shadow: at 44px '
                     'there is nothing behind it worth blurring, and ',
               ),
               DsCode.span('e2'),
               const TextSpan(
-                text: ' under something that small reads as grime rather than '
+                text:
+                    ' under something that small reads as grime rather than '
                     'as depth.',
               ),
             ],
@@ -765,7 +774,7 @@ class _GlassControlCell extends StatelessWidget {
   }
 }
 
-/// `<Note className="mt-6" title="Neither needs a dark: variant">` — a bare
+/// `<Note className="mt-6" title="Neither needs a dark: variant">`: a bare
 /// `dark:` with its colon, which is the class-variant prefix, not a typo.
 class _GlassNoteBody extends StatelessWidget {
   const _GlassNoteBody();
@@ -780,12 +789,14 @@ class _GlassNoteBody extends StatelessWidget {
           const TextSpan(text: ' and '),
           DsCode.span('--foreground'),
           const TextSpan(
-            text: ', so a light edge on dark and a dark edge on light fall out '
+            text:
+                ', so a light edge on dark and a dark edge on light fall out '
                 'of the same expression. The top highlight is ',
           ),
           DsCode.span('--rim-strong'),
           const TextSpan(
-            text: ' — the same token every raised control carries, which is '
+            text:
+                ' — the same token every raised control carries, which is '
                 'what keeps a glass card in the same world as a button.',
           ),
         ],
@@ -808,7 +819,7 @@ class _SpecimenCell extends StatelessWidget {
 
   final _Specimen specimen;
 
-  /// `rounded-lg` in `#ambient`, `rounded-pill` in `#machine` — where the pill
+  /// `rounded-lg` in `#ambient`, `rounded-pill` in `#machine`: where the pill
   /// is clamped by the shape to a 48px stadium end on a 96px-tall box.
   final double radius;
 
@@ -841,12 +852,12 @@ class _SpecimenCell extends StatelessWidget {
   }
 }
 
-/// `grid h-24 place-items-center … bg-card ${cls}` — the specimen itself.
+/// `grid h-24 place-items-center … bg-card ${cls}`: the specimen itself.
 ///
 /// Every box on this page goes through [DsMachineSurface], the ambient four
 /// included. Half of these tokens carry `inset` layers that a [BoxDecoration]
 /// cannot paint at all, and the other half would need a second code path to say
-/// the same thing — so there is one path, and the difference between the two
+/// the same thing: so there is one path, and the difference between the two
 /// families stays what the reference says it is: the shape and the border.
 class _SpecimenBox extends StatelessWidget {
   const _SpecimenBox({
@@ -877,7 +888,7 @@ class _SpecimenBox extends StatelessWidget {
   }
 }
 
-/// `type-small mt-1 leading-snug` — the one-line note under a specimen.
+/// `type-small mt-1 leading-snug`: the one-line note under a specimen.
 ///
 /// The only place on this page a `.type-*` class is overridden, and it is
 /// overridden in exactly one property: the leading tightens so a two-line
@@ -890,10 +901,15 @@ class _UseCopy extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextStyle style =
-        DsText.styleOf(context, DsType.small).copyWith(height: _leadingSnug);
-    // Not a `.type-*` class, so it cannot go through [DsText] — but the line
+    final TextStyle style = DsText.styleOf(
+      context,
+      DsType.small,
+    ).copyWith(height: _leadingSnug);
+    // Not a `.type-*` class, so it cannot go through [DsText]: but the line
     // box still has to be the one CSS lays out.
-    return DsLineBox(style: style, child: Text(text, style: style));
+    return DsLineBox(
+      style: style,
+      child: Text(text, style: style),
+    );
   }
 }

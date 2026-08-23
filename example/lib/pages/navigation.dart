@@ -1,4 +1,4 @@
-/// `/design-system/components/base/navigation` — six components, nine
+/// `/design-system/components/base/navigation`: six components, nine
 /// sections, and one indicator that points at the wrong thing.
 ///
 /// The page opens by ruling out the thing the rest of the system is built on:
@@ -14,13 +14,13 @@
 /// folds, and a collapsible pushes the rest of its panel down. A port that
 /// renders these as stills fails, however exact the pixels.
 ///
-/// ## Drift register — recorded, shipped as written
+/// ## Drift register: recorded, shipped as written
 ///
 ///  1. **The navigation-menu indicator never travels.** Radix positions it from
 ///     the active trigger's `offsetLeft`, and `NavigationMenuItem` carries
 ///     `relative`, so every trigger reports **0**. Probed: opening *Packs*
-///     writes `left: 0px; width: 93px`, opening *Marketplace* — 96.89px further
-///     along — writes `left: 0px; width: 134px`. Only the width follows. The
+///     writes `left: 0px; width: 93px`, opening *Marketplace*, 96.89px further
+///     along: writes `left: 0px; width: 134px`. Only the width follows. The
 ///     caret sits over the list's left edge under a panel labelled *"the caret
 ///     that names the open trigger"*. Carried by `navigation_menu.dart`.
 ///  2. **`origin-top-center` is not a Tailwind utility**, so the viewport zooms
@@ -33,7 +33,7 @@
 ///     does not, and the chevrons render `--foreground`. Carried by
 ///     `accordion.dart`.
 ///  4. **`data-icon="inline-start"` on the pagination chevrons is doubly
-///     dead** — not forwarded by `Icon`, and the only `[data-icon]` rules in
+///     dead**: not forwarded by `Icon`, and the only `[data-icon]` rules in
 ///     globals.css are scoped under `.cn-toast`. Carried by `pagination.dart`.
 ///  5. **`text-nav` is not `.type-nav`.** The navigation-menu triggers wear the
 ///     utility (13.5px / **1.5** = 20.25) and the top-nav buttons the component
@@ -44,10 +44,10 @@
 ///     duration-fast` is emitted after it at equal specificity, so
 ///     `transition-property` becomes the colour list and `transform` is not in
 ///     it. Probed with a real pointer: `none → matrix(0.94, …) → none`, each in
-///     a single frame, with no intermediate matrix — where the navigation-menu
+///     a single frame, with no intermediate matrix: where the navigation-menu
 ///     trigger beside it reported 0.937591 mid-flight. Reproduced with
 ///     [DsPress] at zero on both legs, the `theme_toggle.dart` pattern.
-///  7. **`duration-fast` / `duration-base` are inert system-wide** — closed by
+///  7. **`duration-fast` / `duration-base` are inert system-wide**: closed by
 ///     the sweep. The two sites on this page (`tabs.tsx` L113 and
 ///     `navigation-menu.tsx` L125) run [DsDurations.transitionDefault].
 ///  8. **Nothing about a navigation-menu trigger's paint transitions.** `press`
@@ -66,7 +66,7 @@
 ///     the label is hidden along with the box, so *"More pages"* is announced
 ///     nowhere. Reproduced: nothing is announced.
 /// 12. **The `h-16` top-nav buttons overflow their own `h-16` row by half a
-///     pixel each way** — measured: the row at 663.14, its buttons at 662.64.
+///     pixel each way**: measured: the row at 663.14, its buttons at 662.64.
 ///     The row's `border-b` eats a pixel of its 64, leaving a 63px content box
 ///     that `items-center` centres a 64px button in, so the active underline
 ///     ends up half a pixel over the row's own border.
@@ -89,9 +89,9 @@ import '../kit.dart';
 import '../logo.dart';
 import '../nav.dart';
 
-/* ── Page data — the four const tables at the top of `page.tsx` ──────────── */
+/* ── Page data: the four const tables at the top of `page.tsx` ──────────── */
 
-/// `NAV` — the signed-in top bar.
+/// `NAV`: the signed-in top bar.
 const List<({String label, DsIconGlyph icon, bool active})> _nav =
     <({String label, DsIconGlyph icon, bool active})>[
       (label: 'Packs', icon: DsIconGlyph.package, active: true),
@@ -108,7 +108,7 @@ const List<String> _signedOut = <String>[
   'Leaderboard',
 ];
 
-/// `PACK_LINKS` — the two-column panel.
+/// `PACK_LINKS`: the two-column panel.
 const List<({String title, String blurb})>
 _packLinks = <({String title, String blurb})>[
   (
@@ -120,7 +120,7 @@ _packLinks = <({String title, String blurb})>[
   (title: 'Draft Bundle', blurb: 'Six packs at a set price, opened together.'),
 ];
 
-/// `MARKET_LINKS` — the one-column panel, and the page's only `active` link.
+/// `MARKET_LINKS`: the one-column panel, and the page's only `active` link.
 const List<({String title, DsIconGlyph icon, bool active})> _marketLinks =
     <({String title, DsIconGlyph icon, bool active})>[
       (title: 'Browse all', icon: DsIconGlyph.layers, active: true),
@@ -138,14 +138,14 @@ const List<String> _walletLinks = <String>[
 
 /* ── Page constants ──────────────────────────────────────────────────────── */
 
-/// `w-140` — the Packs panel's grid. Tailwind's spacing scale, so `ds` reaches
+/// `w-140`: the Packs panel's grid. Tailwind's spacing scale, so `ds` reaches
 /// it, unlike the `max-w-*` container scale the other pages need literals for.
 final double _packsGridWidth = ds(140);
 
-/// `w-80` — the Marketplace panel's list.
+/// `w-80`: the Marketplace panel's list.
 final double _marketGridWidth = ds(80);
 
-/// `w-72` — the two `viewport={false}` panels and the indicator panel.
+/// `w-72`: the two `viewport={false}` panels and the indicator panel.
 final double _narrowGridWidth = ds(72);
 
 /// The specimen stage under a navigation menu: `flex min-h-N items-start
@@ -190,7 +190,7 @@ class NavigationPage extends StatelessWidget {
           blurb: here.category.blurb,
           contents: here.category.contents,
         ),
-        // `className="mb-12"` — 48px.
+        // `className="mb-12"`, 48px.
         Padding(
           padding: EdgeInsets.only(bottom: ds(12)),
           child: DsNote(
@@ -265,7 +265,7 @@ class _TopNavRow extends StatelessWidget {
 
   final bool signedIn;
 
-  /// `h-16` — the row's border box, `border-b` included.
+  /// `h-16`: the row's border box, `border-b` included.
   static double get height => ds(16);
 
   @override
@@ -275,7 +275,7 @@ class _TopNavRow extends StatelessWidget {
     return SizedBox(
       height: height,
       // `border-b` painted over the row's last pixel rather than subtracted
-      // from its content box — see drift 12. The row's border box is 64 either
+      // from its content box: see drift 12. The row's border box is 64 either
       // way; what moves is where the 64px buttons sit inside it.
       child: Stack(
         children: <Widget>[
@@ -304,7 +304,7 @@ class _TopNavRow extends StatelessWidget {
                       glyph: item.icon,
                       active: item.active,
                     ),
-                    // `gap-1` — the row's own, paid between every pair.
+                    // `gap-1`: the row's own, paid between every pair.
                     SizedBox(width: ds(1)),
                   ]
                 else
@@ -346,13 +346,13 @@ class _TopNavRow extends StatelessWidget {
   }
 }
 
-/// One item in the bar — and drift 6's site.
+/// One item in the bar: and drift 6's site.
 class _TopNavButton extends StatefulWidget {
   const _TopNavButton({required this.label, this.glyph, this.active = false});
 
   final String label;
 
-  /// The signed-out bar carries no icons at all — and no `gap-2` either.
+  /// The signed-out bar carries no icons at all: and no `gap-2` either.
   final DsIconGlyph? glyph;
 
   final bool active;
@@ -392,7 +392,7 @@ class _TopNavButtonState extends State<_TopNavButton> {
             DsIcon(
               widget.glyph!,
               size: DsIconSize.sm,
-              // `tone={n.active ? "action" : "subtle"}` — the glyph keeps its
+              // `tone={n.active ? "action" : "subtle"}`: the glyph keeps its
               // own tone and does **not** follow the label's hover.
               tone: widget.active ? DsIconTone.action : DsIconTone.subtle,
             ),
@@ -422,12 +422,12 @@ class _TopNavButtonState extends State<_TopNavButton> {
       onExit: (_) => _hover(false),
       child: Semantics(
         button: true,
-        // `aria-current={n.active ? "page" : undefined}` — and §8's own API row
+        // `aria-current={n.active ? "page" : undefined}`: and §8's own API row
         // says why: *"the blue underline alone is not announced."*
         selected: widget.active ? true : null,
         label: widget.label,
         child: DsPress(
-          // DRIFT 6 / sweep X1 — the squish snaps here.
+          // DRIFT 6 / sweep X1: the squish snaps here.
           downDuration: Duration.zero,
           upDuration: Duration.zero,
           onTap: () {},
@@ -444,9 +444,9 @@ class _TopNavButtonState extends State<_TopNavButton> {
                     height: _TopNavButton.underlineHeight,
                     child: DecoratedBox(
                       decoration: BoxDecoration(
-                        // `bg-action` — the palette ramp, not `--primary`.
+                        // `bg-action`: the palette ramp, not `--primary`.
                         color: DsPalette.action,
-                        // `rounded-t-sm` — the two top corners only.
+                        // `rounded-t-sm`: the two top corners only.
                         borderRadius: BorderRadius.vertical(
                           top: Radius.circular(DsRadii.sm),
                         ),
@@ -512,7 +512,7 @@ class _DirectionSection extends StatelessWidget {
         label: 'RTL context',
         note: 'direction=rtl',
         child: Directionality(
-          // `<DirectionProvider direction="rtl"><div dir="rtl">` — one
+          // `<DirectionProvider direction="rtl"><div dir="rtl">`: one
           // statement in Flutter, where Radix needs the context provider and
           // the DOM attribute separately.
           textDirection: TextDirection.rtl,
@@ -538,7 +538,7 @@ class _TabsSection extends StatefulWidget {
 }
 
 class _TabsSectionState extends State<_TabsSection> {
-  /// `defaultValue="live"` / `"overview"` / `"all"` — all three are the first
+  /// `defaultValue="live"` / `"overview"` / `"all"`: all three are the first
   /// trigger in their set.
   int _live = 0;
   int _account = 0;
@@ -912,7 +912,7 @@ class _NavigationMenuSection extends StatelessWidget {
   }
 }
 
-/// `<ul className="grid w-140 gap-1 md:grid-cols-2">` — four two-line links.
+/// `<ul className="grid w-140 gap-1 md:grid-cols-2">`: four two-line links.
 class _PackGrid extends StatelessWidget {
   const _PackGrid({required this.theme});
 
@@ -929,7 +929,7 @@ class _PackGrid extends StatelessWidget {
         for (final ({String title, String blurb}) link in _packLinks)
           DsNavigationMenuLink(
             onTap: () {},
-            // `className="flex-col items-start"` on the anchor — the row's own
+            // `className="flex-col items-start"` on the anchor: the row's own
             // `flex items-center` inverted for the two-line shape.
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -946,7 +946,7 @@ class _PackGrid extends StatelessWidget {
   }
 }
 
-/// `<ul className="grid w-80 gap-1">` / `w-72` — an icon and a label per row.
+/// `<ul className="grid w-80 gap-1">` / `w-72`: an icon and a label per row.
 class _IconLinkList extends StatelessWidget {
   const _IconLinkList({required this.links, this.honourActive = true});
 
@@ -986,7 +986,7 @@ class _IconLinkList extends StatelessWidget {
   }
 }
 
-/// `<ul className="grid w-72 gap-1">` — three words.
+/// `<ul className="grid w-72 gap-1">`: three words.
 class _PlainLinkList extends StatelessWidget {
   const _PlainLinkList({required this.labels});
 
@@ -1056,7 +1056,7 @@ class _KeyboardBody extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         for (int i = 0; i < rows.length; i++) ...<Widget>[
-          // `space-y-1.5` — a margin between siblings, not a gap around them.
+          // `space-y-1.5`: a margin between siblings, not a gap around them.
           if (i > 0) SizedBox(height: ds(1.5)),
           DsRichText(rows[i], DsType.small),
         ],
@@ -1128,7 +1128,7 @@ class _DisclosureSection extends StatefulWidget {
 }
 
 class _DisclosureSectionState extends State<_DisclosureSection> {
-  /// `defaultValue="odds"` — the first question.
+  /// `defaultValue="odds"`: the first question.
   int? _open = 0;
 
   /// `Collapsible` with no `defaultOpen`.

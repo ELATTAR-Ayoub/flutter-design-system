@@ -2149,6 +2149,40 @@ void main() {
       expect(find.byType(DsToast), findsNothing);
     });
 
+    testWidgets(
+        'the card shows the click cursor only while a tap would dismiss it',
+        (WidgetTester t) async {
+      // The tap-to-dismiss is the port's own affordance, not sonner's (see
+      // [DsToast.onDismiss]), so the cursor that marks it is the port's own
+      // choice too: click while a tap does something, basic while it does not.
+      await t.pumpWidget(host(DsToast(
+        message: const DsToastMessage(title: 'Saved'),
+        onDismiss: () {},
+      )));
+      await t.pump();
+      final MouseRegion enabled = t.widget<MouseRegion>(
+        find.ancestor(
+          of: find.byType(GestureDetector),
+          matching: find.byType(MouseRegion),
+        ).first,
+      );
+      expect(enabled.cursor, SystemMouseCursors.click);
+
+      // No handler: the static-preview case the class doc names.
+      await t.pumpWidget(host(const DsToast(
+        message: DsToastMessage(title: 'Saved'),
+      )));
+      await t.pump();
+      final MouseRegion disabled = t.widget<MouseRegion>(
+        find.ancestor(
+          of: find.byType(GestureDetector),
+          matching: find.byType(MouseRegion),
+        ).first,
+      );
+      expect(disabled.cursor, isNot(SystemMouseCursors.click));
+      expect(disabled.cursor, SystemMouseCursors.basic);
+    });
+
     testWidgets('a spinner keeps the 16px stroke at every box — drift 11',
         (WidgetTester t) async {
       // `Icon` computes strokeWidth from the size PROP and `spinner.tsx` never

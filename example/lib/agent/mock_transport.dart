@@ -1,15 +1,15 @@
-/// `lib/agent/mock-transport.ts` — a complete agent, with nothing behind it.
+/// `lib/agent/mock-transport.ts`: a complete agent, with nothing behind it.
 ///
 /// > The design system has no backend, no key and no socket, but `AgentConsole`
 /// > is a shell around a transport and shows nothing without one. So this is a
-/// > real `AgentTransport` — the same interface a live agent implements — that
+/// > real `AgentTransport`: the same interface a live agent implements: that
 /// > answers from a script instead of from a model.
 /// >
 /// > It exists for two reasons, and the second is the important one:
 /// >
 /// >  1. Every state in the machine becomes reachable on the documentation
 /// >     page. Thinking, calling a tool, producing a file, holding an action for
-/// >     approval, failing — none of those can be demonstrated by a transport
+/// >     approval, failing: none of those can be demonstrated by a transport
 /// >     that only echoes, and a design system that cannot show a state cannot
 /// >     be said to specify it.
 /// >  2. **It is the reference implementation.** This is the file to read before
@@ -29,7 +29,7 @@
 ///
 /// ## `reduceEvent` travels with it
 ///
-/// `core/timeline.ts`'s reducer is not in `agent_core.dart` — that library's own
+/// `core/timeline.ts`'s reducer is not in `agent_core.dart`: that library's own
 /// header records the decision and the reason (*"porting a 228-line state
 /// machine no page exercises would be shipping untested surface"*). It is
 /// exercised **here**, by this file and only by this file, so the four cases the
@@ -101,7 +101,7 @@ class _Fail extends _Beat {
   final String error;
 }
 
-/// The CSV `export_activity` hands back — *"so the attachment renderer has
+/// The CSV `export_activity` hands back, *"so the attachment renderer has
 /// something to draw in the direction that is easy to forget: agent to user."*
 final DsAgentAttachment _activityCsv = DsAgentAttachment(
   id: 'mock-activity-csv',
@@ -130,9 +130,11 @@ const List<_Beat> _defaultScript = <_Beat>[
       'topResult': 'Eclipse Vault — 1st Edition',
     },
   ),
-  _Say('Three sealed boxes match. The strongest is **Eclipse Vault — 1st '
-      'Edition**, with 24 packs left of an original 250.\n\nWant me to put one '
-      'on hold?'),
+  _Say(
+    'Three sealed boxes match. The strongest is **Eclipse Vault — 1st '
+    'Edition**, with 24 packs left of an original 250.\n\nWant me to put one '
+    'on hold?',
+  ),
 ];
 
 /// *"The path that ends at a decision a human has to make."*
@@ -144,8 +146,10 @@ const List<_Beat> _approvalScript = <_Beat>[
     ms: 700,
     result: <String, Object?>{'available': 2481, 'currency': 'USD'},
   ),
-  _Say('There is enough available. This one spends real money, so it is yours '
-      'to confirm rather than mine.'),
+  _Say(
+    'There is enough available. This one spends real money, so it is yours '
+    'to confirm rather than mine.',
+  ),
   _Ask(
     action: 'purchase_pack',
     params: <String, Object?>{
@@ -170,23 +174,27 @@ const List<_Beat> _errorScript = <_Beat>[
 ];
 
 List<_Beat> get _reportScript => <_Beat>[
-      const _Say('Pulling the last thirty days.'),
-      _Tool(
-        name: 'export_activity',
-        params: const <String, Object?>{'window': '30d', 'format': 'csv'},
-        ms: 1200,
-        result: const <String, Object?>{'rows': 148},
-        attachments: <DsAgentAttachment>[_activityCsv],
-      ),
-      const _Say('148 rows, attached above. Net position over the window is '
-          '**+\$123.50**.'),
-    ];
+  const _Say('Pulling the last thirty days.'),
+  _Tool(
+    name: 'export_activity',
+    params: const <String, Object?>{'window': '30d', 'format': 'csv'},
+    ms: 1200,
+    result: const <String, Object?>{'rows': 148},
+    attachments: <DsAgentAttachment>[_activityCsv],
+  ),
+  const _Say(
+    '148 rows, attached above. Net position over the window is '
+    '**+\$123.50**.',
+  ),
+];
 
 final RegExp _approvalWords = RegExp(r'\b(buy|purchase|order|hold|reserve)\b');
-final RegExp _reportWords =
-    RegExp(r'\b(report|export|csv|activity|download)\b');
-final RegExp _errorWords =
-    RegExp(r'\b(price|worth|value|market|fail|error|broken)\b');
+final RegExp _reportWords = RegExp(
+  r'\b(report|export|csv|activity|download)\b',
+);
+final RegExp _errorWords = RegExp(
+  r'\b(price|worth|value|market|fail|error|broken)\b',
+);
 
 /// *"Which script a message runs, chosen by keyword so the page can drive it."*
 List<_Beat> _scriptFor(String text) {
@@ -203,7 +211,7 @@ List<_Beat> _scriptFor(String text) {
 /// returning."*
 // allow-hardcoded: `CHUNK`, `CHAR_MS` and `THINK_MS` are this mock's own
 // pacing, tuned by eye in `mock-transport.ts` and stated there. They are not
-// design tokens — nothing renders them and no other surface shares them.
+// design tokens: nothing renders them and no other surface shares them.
 const int _chunk = 3;
 const int _charMs = 12;
 const int _thinkMs = 420;
@@ -257,7 +265,7 @@ class DsMockTransport extends ChangeNotifier implements DsAgentTransport {
   @override
   bool get isLoading => _isLoading;
 
-  /// *"`isReady: true`"* — nothing to acquire.
+  /// *"`isReady: true`"*: nothing to acquire.
   @override
   bool get isReady => true;
 
@@ -274,7 +282,7 @@ class DsMockTransport extends ChangeNotifier implements DsAgentTransport {
 
   /* ── The reducer ───────────────────────────────────────────────────────── */
 
-  /// `closeStreaming` — *"mark the trailing text turn as finished streaming.
+  /// `closeStreaming`, *"mark the trailing text turn as finished streaming.
   /// Called whenever something other than more text arrives. Without it the
   /// cursor keeps blinking on a paragraph the model stopped writing several
   /// tool calls ago, and `resolveState` cannot tell 'writing' from 'wrote'."*
@@ -285,7 +293,7 @@ class DsMockTransport extends ChangeNotifier implements DsAgentTransport {
     _turns[_turns.length - 1] = last.notStreaming();
   }
 
-  /// `priorFailures` — *"a model that calls the same tool again after an error
+  /// `priorFailures`, *"a model that calls the same tool again after an error
   /// is retrying, and that is worth showing… The count is scoped to the tool
   /// name rather than to its arguments, because a retry with corrected
   /// arguments is still a retry."*
@@ -321,18 +329,20 @@ class DsMockTransport extends ChangeNotifier implements DsAgentTransport {
   /// `reduceEvent`'s `tool_call` arm.
   void _emitToolCall(String name, Map<String, Object?> params) {
     _closeStreaming();
-    _turns.add(DsToolTurn(
-      id: _nextId,
-      name: name,
-      params: params,
-      status: DsAgentTurnStatus.running,
-      startedAt: DateTime.now().millisecondsSinceEpoch,
-      attempt: _priorFailures(name) + 1,
-    ));
+    _turns.add(
+      DsToolTurn(
+        id: _nextId,
+        name: name,
+        params: params,
+        status: DsAgentTurnStatus.running,
+        startedAt: DateTime.now().millisecondsSinceEpoch,
+        attempt: _priorFailures(name) + 1,
+      ),
+    );
     notifyListeners();
   }
 
-  /// `reduceEvent`'s `tool_result` arm — settles the **last** running call of
+  /// `reduceEvent`'s `tool_result` arm: settles the **last** running call of
   /// that name, in place.
   void _emitToolResult(
     String name, {
@@ -356,8 +366,7 @@ class DsMockTransport extends ChangeNotifier implements DsAgentTransport {
         startedAt: turn.startedAt,
         result: result,
         error: error,
-        attachments:
-            attachments.isNotEmpty ? attachments : turn.attachments,
+        attachments: attachments.isNotEmpty ? attachments : turn.attachments,
         ms: DateTime.now().millisecondsSinceEpoch - turn.startedAt,
         attempt: turn.attempt,
       );
@@ -372,24 +381,26 @@ class DsMockTransport extends ChangeNotifier implements DsAgentTransport {
   /// bridge will quote back when the browser reports the outcome."* Note what
   /// it does **not** set: `approval`. The card is on screen and the turn is
   /// merely `running`, which is why `resolveState` answers `processing` rather
-  /// than `awaiting_approval` — see the console's drift register.
+  /// than `awaiting_approval`: see the console's drift register.
   void _emitActionRequest(
     String correlationId,
     String action,
     Map<String, Object?> params,
   ) {
     _closeStreaming();
-    _turns.add(DsActionTurn(
-      id: correlationId,
-      action: action,
-      params: params,
-      status: DsAgentTurnStatus.running,
-      startedAt: DateTime.now().millisecondsSinceEpoch,
-    ));
+    _turns.add(
+      DsActionTurn(
+        id: correlationId,
+        action: action,
+        params: params,
+        status: DsAgentTurnStatus.running,
+        startedAt: DateTime.now().millisecondsSinceEpoch,
+      ),
+    );
     notifyListeners();
   }
 
-  /// `settleAction` — *"called once the browser has actually performed a DOM
+  /// `settleAction`, *"called once the browser has actually performed a DOM
   /// action."*
   void _settleAction(String action, {required bool success, String? error}) {
     for (int i = _turns.length - 1; i >= 0; i -= 1) {
@@ -414,7 +425,7 @@ class DsMockTransport extends ChangeNotifier implements DsAgentTransport {
     }
   }
 
-  /// `markApproval` — *"flag an action turn as held at an approval gate."*
+  /// `markApproval`, *"flag an action turn as held at an approval gate."*
   void _markApproval(String turnId, DsApprovalOutcome outcome) {
     for (int i = _turns.length - 1; i >= 0; i -= 1) {
       final DsAgentTurn turn = _turns[i];
@@ -458,7 +469,7 @@ class DsMockTransport extends ChangeNotifier implements DsAgentTransport {
 
   /// *"An approval is a promise the agent is blocked on. The console renders the
   /// card; answering it resolves this, and the script continues. Rejecting is a
-  /// normal outcome, not an error — the user said no, and the agent should say
+  /// normal outcome, not an error: the user said no, and the agent should say
   /// so rather than throw."*
   Future<bool> _askPermission(
     String turnId,
@@ -476,31 +487,33 @@ class DsMockTransport extends ChangeNotifier implements DsAgentTransport {
       completer.complete(approved);
     }
 
-    _pending.add(DsPendingApproval(
-      turnId: turnId,
-      action: action,
-      params: params,
-      approve: () => settle(true),
-      reject: ([String? reason]) => settle(false),
-    ));
+    _pending.add(
+      DsPendingApproval(
+        turnId: turnId,
+        action: action,
+        params: params,
+        approve: () => settle(true),
+        reject: ([String? reason]) => settle(false),
+      ),
+    );
     notifyListeners();
     return completer.future;
   }
 
   @override
-  Future<void> send(String text, [DsAgentSendOptions options =
-      const DsAgentSendOptions()]) async {
+  Future<void> send(
+    String text, [
+    DsAgentSendOptions options = const DsAgentSendOptions(),
+  ]) async {
     _abort?.cancelled = true;
     final _Abort signal = _Abort();
     _abort = signal;
 
     _error = null;
     _isLoading = true;
-    _turns.add(DsUserTurn(
-      id: _nextId,
-      text: text,
-      attachments: options.attachments,
-    ));
+    _turns.add(
+      DsUserTurn(id: _nextId, text: text, attachments: options.attachments),
+    );
     notifyListeners();
 
     try {
@@ -529,11 +542,13 @@ class DsMockTransport extends ChangeNotifier implements DsAgentTransport {
           case _Ask():
             // *"Counted per request so asking twice in one conversation
             // produces two turns rather than one that gets answered twice."*
-            final String correlationId =
-                'mock-${beat.action}-${++_askCount}';
+            final String correlationId = 'mock-${beat.action}-${++_askCount}';
             _emitActionRequest(correlationId, beat.action, beat.params);
-            final bool approved =
-                await _askPermission(correlationId, beat.action, beat.params);
+            final bool approved = await _askPermission(
+              correlationId,
+              beat.action,
+              beat.params,
+            );
             _settleAction(
               beat.action,
               success: approved,
@@ -543,19 +558,19 @@ class DsMockTransport extends ChangeNotifier implements DsAgentTransport {
               approved
                   ? '\n\nDone — it is on hold under your name for 24 hours.'
                   : '\n\nUnderstood, nothing was bought. Say the word if you '
-                      'change your mind.',
+                        'change your mind.',
               signal,
             );
 
           case _Fail():
-            /* A turn that failed, not a transport that broke — and the two are
+            /* A turn that failed, not a transport that broke: and the two are
                rendered differently, so a transport must not report both.
 
                An `error` event becomes a turn in the transcript: this question
                did not work out, the conversation continues, and the failure
                stays in place in the history where it happened.
                `transport.error` is the standing banner above the composer and
-               means something else entirely — the connection is down, nothing
+               means something else entirely: the connection is down, nothing
                will work until it is fixed. Setting both for one upstream
                timeout printed the same sentence twice, once in each place. */
             _emitError(beat.error, fatal: false);

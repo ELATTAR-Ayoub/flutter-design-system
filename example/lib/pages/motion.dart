@@ -1,17 +1,17 @@
-/// `/design-system/motion` — the Motion foundation page.
+/// `/design-system/motion`: the Motion foundation page.
 ///
 /// The only foundation page with state, and the only one whose specimens are
 /// clocks: a duration is not a number here, it is a bar you watch cross a
 /// track. `"use client"` in the reference, `StatefulWidget` here, and the
-/// state is one integer — [_MotionPageState._run].
+/// state is one integer, [_MotionPageState._run].
 ///
 /// **The replay mechanism is the page's spine** (motion-map §11). One counter,
 /// three buttons, all calling the same `replay`. React remounts any element
 /// whose `key` changes and a freshly mounted element starts its CSS animation
 /// at t=0; [KeyedSubtree] with a `ValueKey('$name-$run')` reproduces that
 /// exactly, because [DsKeyframePlayer] creates its controller in `initState`.
-/// Sixteen elements are keyed — six duration bars, four easing chips, six of
-/// the nine named demos — and the three infinite demos (ratchet, shimmer,
+/// Sixteen elements are keyed: six duration bars, four easing chips, six of
+/// the nine named demos: and the three infinite demos (ratchet, shimmer,
 /// pulse-live) are deliberately not: a loop has nothing to replay. There is no
 /// `replay()` API to call instead, on purpose; a broadcast `forward(from: 0)`
 /// cannot express `ds-sweep`'s `both` fill on a demo that has not been built.
@@ -30,7 +30,7 @@
 ///
 /// ## The seventeen drifts, all shipped as written (motion-map §13)
 ///
-/// 1. **D1 — the easing chips do not move.** `ds-travel` animates
+/// 1. **D1: the easing chips do not move.** `ds-travel` animates
 ///    `translateX(calc(100% − 1.5rem))`, and a percentage inside `translateX`
 ///    resolves against the transformed element's **own** border box. The chip
 ///    is `size-6` = 24px, so `100%` is 24px and the `calc` is 0px. Verified
@@ -38,72 +38,72 @@
 ///    `matrix(1,0,0,1,0,0)` across the run on a 482px track. [_TravelChip]
 ///    ships the no-op by passing the *chip's* width to
 ///    [DsTravel.translationAt]; if upstream ever fixes it, the intended
-///    reading — travel the track, less the chip's own width — is that one
+///    reading: travel the track, less the chip's own width: is that one
 ///    argument changed to the track's width.
-/// 2. **D2 — "40ms down, 250ms spring back" is true of two of six.** The
+/// 2. **D2, "40ms down, 250ms spring back" is true of two of six.** The
 ///    `#interaction` description promises it for the family; `press-spring`
 ///    releases in 220ms ([DsDurations.pressSpringUp], a raw `0.22s` off the
 ///    scale entirely) and `press-key` is 80ms linear both ways. The
 ///    description ships verbatim, the panel notes print the real numbers, and
 ///    the demos run at their real numbers.
-/// 3. **D3 — "overlays get up to 350ms"** in the `#durations` description,
+/// 3. **D3, "overlays get up to 350ms"** in the `#durations` description,
 ///    while `--duration-overlay` is **320ms** and no 350ms token exists.
-/// 4. **D4 — "things you operate use ease-standard"** in the `#easing`
+/// 4. **D4, "things you operate use ease-standard"** in the `#easing`
 ///    description, while `--ease-standard` is not one of the four panels and
 ///    controls actually run `--ease-spring`.
-/// 5. **D5 — `--ease-spring`'s use copy calls it "THE curve … every press
+/// 5. **D5, `--ease-spring`'s use copy calls it "THE curve … every press
 ///    release, every jelly entrance"**, which is true of the utilities and is
 ///    contradicted by Do #2 four sections below.
-/// 6. **D6 — Do #2 says "Reserve ease-spring for reward moments"**, which is
+/// 6. **D6, Do #2 says "Reserve ease-spring for reward moments"**, which is
 ///    the same claim from the other side: ease-spring is the *control* release
 ///    curve in `btn-spring`, `press`, `click-spring` and `press-spring`. Both
 ///    sentences ship, unreconciled.
-/// 7. **D7 — Do #1 lists 100 and 200ms**, neither of which is a token, and
-///    omits 80 (`tick`) and 400 (`slow`), which are — and which this page
+/// 7. **D7, Do #1 lists 100 and 200ms**, neither of which is a token, and
+///    omits 80 (`tick`) and 400 (`slow`), which are: and which this page
 ///    tables three sections above.
-/// 8. **D8 — Don't #1 forbids anything over 550ms**, on a page running
+/// 8. **D8, Don't #1 forbids anything over 550ms**, on a page running
 ///    `anim-jelly` 600ms, `anim-spring-up` 800ms, `anim-sign-on` 900ms,
 ///    `anim-ratchet` and `anim-shimmer` 1.4s, `anim-pulse-live` 2s and the
 ///    travel chips at 1000ms.
-/// 9. **D9 — Don't #3 forbids alternating brightness**, which is exactly what
+/// 9. **D9, Don't #3 forbids alternating brightness**, which is exactly what
 ///    `anim-sign-on` does: six hard cuts of opacity and `brightness()` in
 ///    900ms, about 3.3 alternations per second.
-/// 10. **D10 — "Looping animations run exactly once, then hold"** is half true.
+/// 10. **D10, "Looping animations run exactly once, then hold"** is half true.
 ///    `animation-iteration-count: 1` does make a loop run once, but only
 ///    `forwards`/`both` *hold*; all three loopers here declare no fill mode
 ///    and revert. Copy verbatim, mechanism per-demo.
-/// 11. **D11 — "550ms each, staggered 60ms … roughly 900ms"** — 550 + 5×60 is
+/// 11. **D11, "550ms each, staggered 60ms … roughly 900ms"**, 550 + 5×60 is
 ///    850ms.
-/// 12. **D12 — Turbo "collapses stages 3–6 to 300ms total"**, and 300ms is not
+/// 12. **D12, Turbo "collapses stages 3–6 to 300ms total"**, and 300ms is not
 ///    a duration token.
-/// 13. **D13 — three header chips do not name their section, and one section
+/// 13. **D13: three header chips do not name their section, and one section
 ///    has no chip.** "Interaction utilities" is `#interaction` *"The click
 ///    feel"*, "Reveal choreography" is `#choreography` *"Pack-opening
 ///    choreography"*, and `#rules` has no chip at all. Six chips, seven
 ///    sections; the nav registry's six `contents` strings render unchanged.
-/// 14. **D14 — the live dot and its ring are different greens.**
+/// 14. **D14: the live dot and its ring are different greens.**
 ///    `pulls-pulse-live` rings in `rgba(61, 220, 151, …)` #3DDC97, a palette
 ///    orphan; the dot is `bg-success` #10b981. Both themes, one 8px indicator.
-/// 15. **D15 — the CurveGraph's dashed line is never visible.** The `<line>`
+/// 15. **D15: the CurveGraph's dashed line is never visible.** The `<line>`
 ///    at y=0 lies exactly on the `<rect>`'s own top edge, same colour, same
 ///    width, and the rect's solid stroke paints over it. [_CurveGraphPainter]
-///    draws both in source order — dead ink, not a missing feature.
-/// 16. **D16 — six of the nine named animations set raw time literals**, not
+///    draws both in source order: dead ink, not a missing feature.
+/// 16. **D16: six of the nine named animations set raw time literals**, not
 ///    tokens; only `anim-jelly-in` and `anim-reveal` read one. The port keeps
 ///    the literals in the foundation layer ([DsDurations.popIn], `.springUp`,
 ///    `.signOn`, `.ratchet`, `.shimmer`, `.pulseLive`) rather than inlining
 ///    them here, which is the guard's rule, not a correction of the drift.
-/// 17. **D17 — the prose says Space Grotesk; `--font-sans` is Inter.** Tokens
+/// 17. **D17: the prose says Space Grotesk; `--font-sans` is Inter.** Tokens
 ///    win (recorded port decision). Applies to "LEGENDARY", "Press and hold"
 ///    and "Hover me".
 ///
 /// ## Two supervisor rulings the code carries rather than the copy
 ///
-/// * **M4 — `pulls-reveal` is orthographic.** The element carries no
+/// * **M4, `pulls-reveal` is orthographic.** The element carries no
 ///   `perspective` and neither does any ancestor, so the Y rotation is a flat
 ///   horizontal squash with no foreshortening. [DsReveal.transformAt] never
 ///   sets the perspective entry; adding it would look better and be wrong.
-/// * **M5 — the press buttons inherit 16px.** They carry no `.type-*` class,
+/// * **M5: the press buttons inherit 16px.** They carry no `.type-*` class,
 ///   so their label is the browser default at `font-semibold`.
 ///   [_inheritedFontSize] holds the `integration-verify` marker the supervisor
 ///   clears by computed-style probe on the rig.
@@ -119,32 +119,32 @@ import '../nav.dart';
 
 /* ── Measures ────────────────────────────────────────────────────────────── */
 
-/// `h-24` — every demo stage on this page, and the three press buttons.
+/// `h-24`: every demo stage on this page, and the three press buttons.
 final double _demoHeight = ds(24);
 
-/// `h-8` — a duration bar's track.
+/// `h-8`: a duration bar's track.
 final double _sweepTrackHeight = ds(8);
 
-/// `h-6` — the easing panels' travel track, and `size-6` the chip on it.
+/// `h-6`: the easing panels' travel track, and `size-6` the chip on it.
 final double _travelTrackHeight = ds(6);
 final double _chipSize = ds(6);
 
-/// `h-28` — the `<svg>` box a [_CurveGraph] is drawn inside.
+/// `h-28`: the `<svg>` box a [_CurveGraph] is drawn inside.
 final double _graphHeight = ds(28);
 
-/// `sm:grid-cols-[13rem_4rem_1fr]` — a duration row's two fixed columns.
+/// `sm:grid-cols-[13rem_4rem_1fr]`: a duration row's two fixed columns.
 final double _tokenColumn = ds(52);
 final double _msColumn = ds(16);
 
-/// `max-w-sm` — the `.lift` card's cap.
+/// `max-w-sm`: the `.lift` card's cap.
 final double _liftMaxWidth = ds(96);
 
-/// `size-10` and its `h-4 w-0.5` needle — the ratchet.
+/// `size-10` and its `h-4 w-0.5` needle: the ratchet.
 final double _ratchetSquare = ds(10);
 final double _needleHeight = ds(4);
 final double _needleWidth = ds(0.5);
 
-/// `mt-2 size-1.5` — a reduced-motion bullet's dot.
+/// `mt-2 size-1.5`: a reduced-motion bullet's dot.
 final double _bulletSize = ds(1.5);
 final double _bulletTop = ds(2);
 
@@ -153,7 +153,7 @@ final double _bulletTop = ds(2);
 /// `font-sans` and `body` sets no size, so the computed value is the browser
 /// default.
 ///
-// integration-verify: ruling M5 — the supervisor confirms 16px by
+// integration-verify: ruling M5: the supervisor confirms 16px by
 // computed-style probe on the rig and clears this marker.
 // allow-hardcoded: the browser's own default font-size, which no token names.
 const double _inheritedFontSize = 16;
@@ -161,7 +161,7 @@ const double _inheritedFontSize = 16;
 /// `--font-weight-semibold: 600` (globals.css L179).
 const double _semiboldWght = 600;
 
-/// `font-semibold` at the inherited size — see [_inheritedFontSize].
+/// `font-semibold` at the inherited size: see [_inheritedFontSize].
 final DsTypeSpec _inheritedSemibold = DsTypeSpec(
   family: DsFonts.sans,
   size: _inheritedFontSize,
@@ -170,14 +170,14 @@ final DsTypeSpec _inheritedSemibold = DsTypeSpec(
 
 /* ── Alphas ──────────────────────────────────────────────────────────────── */
 
-/// `border-value/40` / `bg-value/12` — the `.anim-jelly` stage.
+/// `border-value/40` / `bg-value/12`: the `.anim-jelly` stage.
 const double _valueBorderAlpha = 0.40;
 const double _valueWashAlpha = 0.12;
 
-/// `border-primary/40` — `.anim-jelly-in` and `.anim-reveal`.
+/// `border-primary/40`, `.anim-jelly-in` and `.anim-reveal`.
 const double _primaryBorderAlpha = 0.40;
 
-/// `border-success/30` / `bg-success/10` — the live pill.
+/// `border-success/30` / `bg-success/10`: the live pill.
 const double _successBorderAlpha = 0.30;
 const double _successWashAlpha = 0.10;
 
@@ -195,7 +195,8 @@ final List<_Duration> _durations = <_Duration>[
   (
     token: '--duration-tick',
     duration: DsDurations.tick,
-    use: 'The machine beat. A press registers in this long, and nothing else '
+    use:
+        'The machine beat. A press registers in this long, and nothing else '
         'uses it.',
   ),
   (
@@ -206,7 +207,8 @@ final List<_Duration> _durations = <_Duration>[
   (
     token: '--duration-base',
     duration: DsDurations.base,
-    use: 'The default. Spring release, card hover lift, tab underline, focus '
+    use:
+        'The default. Spring release, card hover lift, tab underline, focus '
         'fade.',
   ),
   (
@@ -229,7 +231,7 @@ final List<_Duration> _durations = <_Duration>[
 /// One easing panel: the token, the string it prints, the curve it runs, and
 /// what it is for.
 ///
-/// [curve] is printed **verbatim** — spaces after commas, `1` not `1.0` — and
+/// [curve] is printed **verbatim**: spaces after commas, `1` not `1.0`: and
 /// is not derived from [cubic]. The two agreeing is what the page asserts;
 /// deriving one from the other would make the assertion unfalsifiable.
 typedef _Easing = ({String token, String curve, Cubic cubic, String use});
@@ -239,14 +241,16 @@ final List<_Easing> _easings = <_Easing>[
     token: '--ease-spring',
     curve: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
     cubic: DsCurves.spring,
-    use: 'THE curve. Overshoots then settles. Every press release, every jelly '
+    use:
+        'THE curve. Overshoots then settles. Every press release, every jelly '
         'entrance.',
   ),
   (
     token: '--ease-out',
     curve: 'cubic-bezier(0.22, 1, 0.36, 1)',
     cubic: DsCurves.out,
-    use: 'Anything that arrives. Cards, rows, overlays. Fast start, long '
+    use:
+        'Anything that arrives. Cards, rows, overlays. Fast start, long '
         'settle.',
   ),
   (
@@ -275,7 +279,7 @@ class MotionPage extends StatefulWidget {
   /// letterbox is the single detail of this page most likely to be got wrong,
   /// and "the painter fills its box" is a bug no copy assertion can catch. At
   /// the reference's 482 × 112 panel this returns
-  /// `Rect.fromLTWH(208.44, 37.77, 65.116, 65.116)` — a **65px square adrift in
+  /// `Rect.fromLTWH(208.44, 37.77, 65.116, 65.116)`: a **65px square adrift in
   /// the middle of a 482px panel**, with roughly 85% of the SVG's width empty.
   @visibleForTesting
   static Rect debugCurveBox(Size size) {
@@ -314,7 +318,7 @@ class _MotionPageState extends State<MotionPage> {
           eyebrow: here.group.title,
           title: here.category.title,
           blurb: here.category.blurb,
-          // Six chips, seven sections — drift D13. The registry's strings ship
+          // Six chips, seven sections: drift D13. The registry's strings ship
           // exactly as registered; no chip is added for `#rules`.
           contents: here.category.contents,
         ),
@@ -426,7 +430,8 @@ class _DurationsSection extends StatelessWidget {
       id: 'durations',
       title: 'Durations',
       // D3: `--duration-overlay` is 320ms, and there is no 350ms token.
-      description: 'Six steps. Standard interface motion sits between 150 and '
+      description:
+          'Six steps. Standard interface motion sits between 150 and '
           '250ms, overlays get up to 350ms, and only reward moments are '
           'allowed past 400ms.',
       child: DsPanel(
@@ -486,7 +491,11 @@ class _DurationRow extends StatelessWidget {
     final DsThemeData theme = DsTheme.of(context);
     final bool wide = MediaQuery.sizeOf(context).width >= DsBreakpoints.sm;
 
-    final Widget token = DsText(row.token, DsType.numSm, color: theme.actionInk);
+    final Widget token = DsText(
+      row.token,
+      DsType.numSm,
+      color: theme.actionInk,
+    );
     final Widget ms = DsText(
       '${row.duration.inMilliseconds}ms',
       DsType.numSm,
@@ -556,11 +565,11 @@ class _SweepBar extends StatelessWidget {
             fill: DsSweep.fill,
             builder: (BuildContext context, double t, Widget? child) =>
                 FractionallySizedBox(
-              alignment: Alignment.centerLeft,
-              widthFactor: DsSweep.widthFactor.transform(t),
-              heightFactor: 1,
-              child: child,
-            ),
+                  alignment: Alignment.centerLeft,
+                  widthFactor: DsSweep.widthFactor.transform(t),
+                  heightFactor: 1,
+                  child: child,
+                ),
             child: DecoratedBox(
               decoration: BoxDecoration(
                 color: DsPalette.action,
@@ -574,7 +583,7 @@ class _SweepBar extends StatelessWidget {
   }
 }
 
-/// `<p class="type-small"><span class="type-num-sm …">{ms}ms</span> — {use}</p>`.
+/// `<p class="type-small"><span class="type-num-sm …">{ms}ms</span>, {use}</p>`.
 class _DurationUse extends StatelessWidget {
   const _DurationUse({required this.row});
 
@@ -618,7 +627,8 @@ class _EasingSection extends StatelessWidget {
       title: 'Easing',
       // D4: `--ease-standard` is not one of the four panels, and the controls
       // this sentence describes actually run `--ease-spring`.
-      description: 'Four curves, each with a job. The rule of thumb: things '
+      description:
+          'Four curves, each with a job. The rule of thumb: things '
           'you operate use ease-standard, things that arrive use ease-out, and '
           'only rewards may overshoot.',
       child: Column(
@@ -672,7 +682,7 @@ class _EasingPanel extends StatelessWidget {
 
 /* ── #easing · the curve graph ───────────────────────────────────────────── */
 
-/// `viewBox="-8 -58 116 172"` — 58 units of headroom that exist for
+/// `viewBox="-8 -58 116 172"`, 58 units of headroom that exist for
 /// `--ease-spring`'s **control point** at −56, not for the curve, which peaks
 /// only 9.78 units above the box.
 const double _viewBoxMinX = -8;
@@ -718,8 +728,8 @@ _Letterbox _letterbox(Size size) {
 ///
 /// The detail most likely to be got wrong is the letterbox. With
 /// `preserveAspectRatio="xMidYMid meet"` (the default) and a viewport of
-/// 482 × 112, the scale is `min(482/116, 112/172) = 0.651163` — **height
-/// bound** — so the 100×100 unit box renders as a **65.1px square centred in
+/// 482 × 112, the scale is `min(482/116, 112/172) = 0.651163`, **height
+/// bound**: so the 100×100 unit box renders as a **65.1px square centred in
 /// the panel**, and roughly 85% of the SVG's width is empty. A painter that
 /// fills its box is visibly wrong.
 class _CurveGraph extends StatelessWidget {
@@ -727,11 +737,10 @@ class _CurveGraph extends StatelessWidget {
 
   final Cubic cubic;
 
-  /// `aria-label={`Easing curve ${pts.join(", ")}`}` — JS `join` prints `1`,
+  /// `aria-label={`Easing curve ${pts.join(", ")}`}`, JS `join` prints `1`,
   /// not `1.0`, so an integral control point loses its fraction.
   static String labelFor(Cubic cubic) {
-    String point(double v) =>
-        v == v.truncateToDouble() ? '${v.toInt()}' : '$v';
+    String point(double v) => v == v.truncateToDouble() ? '${v.toInt()}' : '$v';
     return 'Easing curve '
         '${point(cubic.a)}, ${point(cubic.b)}, '
         '${point(cubic.c)}, ${point(cubic.d)}';
@@ -768,10 +777,10 @@ class _CurveGraphPainter extends CustomPainter {
 
   final Cubic cubic;
 
-  /// `stroke="var(--border)"` — the box and the dead dashed line.
+  /// `stroke="var(--border)"`: the box and the dead dashed line.
   final Color frame;
 
-  /// `stroke="var(--color-action)"` — the curve itself.
+  /// `stroke="var(--color-action)"`: the curve itself.
   final Color curve;
 
   @override
@@ -791,12 +800,9 @@ class _CurveGraphPainter extends CustomPainter {
       ..strokeWidth = _frameStrokeUnits;
 
     // 1 · the unit box.
-    canvas.drawRect(
-      const Rect.fromLTWH(0, 0, _unitBox, _unitBox),
-      framePaint,
-    );
+    canvas.drawRect(const Rect.fromLTWH(0, 0, _unitBox, _unitBox), framePaint);
 
-    // 2 · the dashed reference line at output = 1 — drift D15. It lies exactly
+    // 2 · the dashed reference line at output = 1: drift D15. It lies exactly
     // on the rect's own top edge, in the same colour at the same width, so the
     // solid stroke just painted covers it. Drawn in source order anyway: it is
     // dead ink in the reference, and a port that silently dropped it would be
@@ -810,7 +816,7 @@ class _CurveGraphPainter extends CustomPainter {
     }
 
     // 3 · the curve. `M 0 100 C x1·100 (100−y1·100) x2·100 (100−y2·100) 100 0`
-    // — the Y flip is what puts more output higher up the box.
+    //: the Y flip is what puts more output higher up the box.
     canvas.drawPath(
       Path()
         ..moveTo(0, _unitBox)
@@ -826,7 +832,7 @@ class _CurveGraphPainter extends CustomPainter {
         ..color = curve
         ..style = PaintingStyle.stroke
         // SVG defaults are `butt` caps and `miter` joins, which Flutter also
-        // defaults to — unlike `DsIcon`'s glyph painter, which sets round caps
+        // defaults to: unlike `DsIcon`'s glyph painter, which sets round caps
         // for lucide.
         ..strokeWidth = _curveStrokeUnits,
     );
@@ -841,7 +847,7 @@ class _CurveGraphPainter extends CustomPainter {
 
 /* ── #easing · the travel chip ───────────────────────────────────────────── */
 
-/// `ds-travel var(--duration-bloom) {curve} both` on a `size-6` chip — **and a
+/// `ds-travel var(--duration-bloom) {curve} both` on a `size-6` chip, **and a
 /// verified no-op** (drift D1, ruling M1).
 ///
 /// The chip is handed its **own** width, because that is what a percentage
@@ -850,7 +856,7 @@ class _CurveGraphPainter extends CustomPainter {
 /// The four panels communicate their curve through [_CurveGraph] alone.
 ///
 /// If upstream ever fixes it, the intended reading is "travel the track, minus
-/// the chip's own width" — pass the track's width here instead of
+/// the chip's own width": pass the track's width here instead of
 /// [_chipSize], and nothing else changes.
 class _TravelChip extends StatelessWidget {
   const _TravelChip({required this.curve});
@@ -878,12 +884,12 @@ class _TravelChip extends StatelessWidget {
             fill: DsTravel.fill,
             builder: (BuildContext context, double t, Widget? child) =>
                 Transform.translate(
-              offset: Offset(
-                DsTravel.translationAt(t, _chipSize, curve: curve),
-                0,
-              ),
-              child: child,
-            ),
+                  offset: Offset(
+                    DsTravel.translationAt(t, _chipSize, curve: curve),
+                    0,
+                  ),
+                  child: child,
+                ),
             child: SizedBox(
               width: _chipSize,
               height: _chipSize,
@@ -912,9 +918,10 @@ class _InteractionSection extends StatelessWidget {
       id: 'interaction',
       title: 'The click feel',
       // D2: true of `press` and `click-spring` only. `press-spring` releases
-      // in 220ms and `press-key` is 80ms linear both ways — which the panel
+      // in 220ms and `press-key` is 80ms linear both ways: which the panel
       // notes below state correctly, on this same page.
-      description: 'Ported from Yukirhythm, and the single most important '
+      description:
+          'Ported from Yukirhythm, and the single most important '
           'thing in the motion system. Instant squish in, springy return out — '
           '40ms down, 250ms spring back. That asymmetry is what makes the '
           'interface feel alive rather than animated.',
@@ -935,7 +942,7 @@ class _InteractionSection extends StatelessWidget {
           DsNote(
             title: 'Content bounces; controls click',
             child: DsText(
-              // `Yuki&rsquo;s` — a real right single quotation mark.
+              // `Yuki&rsquo;s`: a real right single quotation mark.
               'Yuki’s governing rule, and ours now. Springy motion for things '
               'that appear, react or reward. Machine motion for things you '
               'operate. Never mix them — a button that jellies feels broken, '
@@ -981,7 +988,7 @@ class _PressPanel extends StatelessWidget {
   }
 }
 
-/// `.click-spring` — 40ms down to scale 0.9, 250ms spring back.
+/// `.click-spring`, 40ms down to scale 0.9, 250ms spring back.
 class _ClickSpringPanel extends StatelessWidget {
   const _ClickSpringPanel();
 
@@ -992,7 +999,8 @@ class _ClickSpringPanel extends StatelessWidget {
     return _PressPanel(
       label: '.click-spring',
       note: '40ms down · scale 0.9',
-      copy: 'The global click feel. Goes on anything clickable that is not a '
+      copy:
+          'The global click feel. Goes on anything clickable that is not a '
           'Button — avatars, chips, badges, rows, nav items.',
       button: DsPress(
         scale: DsTransforms.clickSpringScale,
@@ -1008,7 +1016,7 @@ class _ClickSpringPanel extends StatelessWidget {
   }
 }
 
-/// `.press-spring` — same 40ms down, scale 0.92, and a **220ms** release: a
+/// `.press-spring`: same 40ms down, scale 0.92, and a **220ms** release: a
 /// raw `0.22s` that is not on the duration scale at all (drift D2).
 class _PressSpringPanel extends StatelessWidget {
   const _PressSpringPanel();
@@ -1020,7 +1028,8 @@ class _PressSpringPanel extends StatelessWidget {
     return _PressPanel(
       label: '.press-spring',
       note: '40ms down · scale 0.92',
-      copy: 'Same feel, less travel. For larger surfaces where 0.9 would look '
+      copy:
+          'Same feel, less travel. For larger surfaces where 0.9 would look '
           'comical.',
       button: DsPress(
         scale: DsTransforms.pressSpringScale,
@@ -1036,7 +1045,7 @@ class _PressSpringPanel extends StatelessWidget {
   }
 }
 
-/// `.press-key` — machine motion: 80ms linear both ways, 3px of travel, and a
+/// `.press-key`: machine motion: 80ms linear both ways, 3px of travel, and a
 /// `--shadow-key` → `--shadow-key-down` swap. No spring, it just lands.
 class _PressKeyPanel extends StatelessWidget {
   const _PressKeyPanel();
@@ -1046,7 +1055,8 @@ class _PressKeyPanel extends StatelessWidget {
     return const _PressPanel(
       label: '.press-key',
       note: '80ms linear · 3px travel',
-      copy: 'A physical key travelling into its socket. Machine motion — '
+      copy:
+          'A physical key travelling into its socket. Machine motion — '
           'linear, no spring, it just lands.',
       button: _PressKeyButton(),
     );
@@ -1088,13 +1098,13 @@ class _PressSurface extends StatelessWidget {
 /// `press-key`'s own clock.
 ///
 /// Not [DsPress]: this utility springs nothing. `transition: transform
-/// var(--duration-tick) linear, box-shadow var(--duration-tick) linear` — so
+/// var(--duration-tick) linear, box-shadow var(--duration-tick) linear`: so
 /// the controller's raw value **is** the progress, with no curve applied in
 /// either direction, and the same 80ms governs press and release.
 ///
 /// The shadow swap is discrete on purpose. `--shadow-key`'s second layer is an
 /// outer shadow and `--shadow-key-down`'s is `inset`, and CSS cannot
-/// interpolate a shadow list whose insetness differs — the property falls back
+/// interpolate a shadow list whose insetness differs: the property falls back
 /// to discrete interpolation, which flips at 50% of the transition. So the key
 /// travels smoothly and its shadow cuts over at 40ms.
 class _PressKeyButton extends StatefulWidget {
@@ -1168,7 +1178,7 @@ class _PressKeyButtonState extends State<_PressKeyButton>
   }
 }
 
-/// `.lift` — rises three pixels onto `--shadow-e3`. Hover-only in CSS, so on a
+/// `.lift`: rises three pixels onto `--shadow-e3`. Hover-only in CSS, so on a
 /// touch platform this demo is simply static, exactly as the web is.
 class _LiftPanel extends StatelessWidget {
   const _LiftPanel();
@@ -1187,21 +1197,21 @@ class _LiftPanel extends StatelessWidget {
             child: LayoutBuilder(
               builder: (BuildContext context, BoxConstraints constraints) =>
                   SizedBox(
-                // `max-w-sm`: a block box takes what it is offered, up to the
-                // cap.
-                width: math.min(constraints.maxWidth, _liftMaxWidth),
-                height: _demoHeight,
-                child: DsLiftCard(
-                  radius: BorderRadius.circular(DsRadii.lg),
-                  builder: (BuildContext context, bool hovered) => Center(
-                    child: DsText(
-                      'Hover me',
-                      _inheritedSemibold,
-                      color: theme.foreground,
+                    // `max-w-sm`: a block box takes what it is offered, up to the
+                    // cap.
+                    width: math.min(constraints.maxWidth, _liftMaxWidth),
+                    height: _demoHeight,
+                    child: DsLiftCard(
+                      radius: BorderRadius.circular(DsRadii.lg),
+                      builder: (BuildContext context, bool hovered) => Center(
+                        child: DsText(
+                          'Hover me',
+                          _inheritedSemibold,
+                          color: theme.foreground,
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              ),
             ),
           ),
           SizedBox(height: ds(5)),
@@ -1229,7 +1239,8 @@ class _NamedSection extends StatelessWidget {
     return DsSection(
       id: 'named',
       title: 'Named animations',
-      description: "Yukirhythm's set, plus the three this product needed. "
+      description:
+          "Yukirhythm's set, plus the three this product needed. "
           'Anything that animates should reach for one of these before a new '
           'keyframe is written.',
       child: Column(
@@ -1244,7 +1255,8 @@ class _NamedSection extends StatelessWidget {
               _NamedPanel(
                 label: '.anim-pop-in',
                 note: '550ms · from 25%',
-                copy: 'Pops from 25%, never from 0, so it always reads as '
+                copy:
+                    'Pops from 25%, never from 0, so it always reads as '
                     'arriving rather than materialising.',
                 demo: KeyedSubtree(
                   key: ValueKey<String>('pop-$run'),
@@ -1254,7 +1266,8 @@ class _NamedSection extends StatelessWidget {
               _NamedPanel(
                 label: '.anim-jelly',
                 note: '600ms · squash & stretch',
-                copy: 'The reward. Squashes to 1.18×0.82 and wobbles back. '
+                copy:
+                    'The reward. Squashes to 1.18×0.82 and wobbles back. '
                     'Reserve it for wins.',
                 demo: KeyedSubtree(
                   key: ValueKey<String>('jelly-$run'),
@@ -1264,7 +1277,8 @@ class _NamedSection extends StatelessWidget {
               _NamedPanel(
                 label: '.anim-spring-up',
                 note: '800ms · settle',
-                copy: 'Rises 32px, overshoots by 4, then settles in three '
+                copy:
+                    'Rises 32px, overshoots by 4, then settles in three '
                     'decreasing bounces.',
                 demo: KeyedSubtree(
                   key: ValueKey<String>('springup-$run'),
@@ -1274,7 +1288,8 @@ class _NamedSection extends StatelessWidget {
               _NamedPanel(
                 label: '.anim-jelly-in',
                 note: '420ms · spring',
-                copy: 'Scale plus rise with an overshoot. The screens-level '
+                copy:
+                    'Scale plus rise with an overshoot. The screens-level '
                     'entrance.',
                 demo: KeyedSubtree(
                   key: ValueKey<String>('jellyin-$run'),
@@ -1285,14 +1300,16 @@ class _NamedSection extends StatelessWidget {
               const _NamedPanel(
                 label: '.anim-ratchet',
                 note: '1.4s · steps(8)',
-                copy: 'Stepped mechanical spin. Eight discrete positions, not '
+                copy:
+                    'Stepped mechanical spin. Eight discrete positions, not '
                     'a smooth rotation — it reads as a mechanism.',
                 demo: _RatchetDemo(),
               ),
               _NamedPanel(
                 label: '.anim-sign-on',
                 note: '900ms · TEXT only',
-                copy: 'Neon power-up: flickers on, drops out, catches. Drives '
+                copy:
+                    'Neon power-up: flickers on, drops out, catches. Drives '
                     'text-shadow, so it only works on text.',
                 demo: KeyedSubtree(
                   key: ValueKey<String>('sign-$run'),
@@ -1302,7 +1319,8 @@ class _NamedSection extends StatelessWidget {
               _NamedPanel(
                 label: '.anim-reveal',
                 note: '550ms · our own',
-                copy: 'The card turning face-up. Rotates on the Y axis. Ours, '
+                copy:
+                    'The card turning face-up. Rotates on the Y axis. Ours, '
                     'not Yuki’s.',
                 demo: KeyedSubtree(
                   key: ValueKey<String>('reveal-$run'),
@@ -1312,14 +1330,16 @@ class _NamedSection extends StatelessWidget {
               const _NamedPanel(
                 label: '.anim-shimmer',
                 note: '1.4s loop · our own',
-                copy: 'Skeleton loading. Must match the footprint of the '
+                copy:
+                    'Skeleton loading. Must match the footprint of the '
                     'content it replaces.',
                 demo: _ShimmerDemo(),
               ),
               const _NamedPanel(
                 label: '.anim-pulse-live',
                 note: '2s loop · our own',
-                copy: 'The only animation allowed to run forever, and only on '
+                copy:
+                    'The only animation allowed to run forever, and only on '
                     'the live indicator.',
                 demo: _PulseLiveDemo(),
               ),
@@ -1363,7 +1383,7 @@ class _NamedPanel extends StatelessWidget {
 }
 
 /// CSS clamps `opacity` to `[0,1]` when it uses the value, not when it
-/// interpolates it — and on this page that is load-bearing exactly once.
+/// interpolates it: and on this page that is load-bearing exactly once.
 /// `.anim-jelly-in` runs its `0 → 1` opacity on `--ease-spring`, whose 1.56
 /// control point carries the interpolated value **above 1** for most of the
 /// first 60%. The keyframe track reports that overshoot faithfully, because
@@ -1401,7 +1421,7 @@ class _DemoStage extends StatelessWidget {
   }
 }
 
-/// `.anim-pop-in` — opacity 0→1 by 55%, and a `scale3d` that overshoots twice
+/// `.anim-pop-in`: opacity 0→1 by 55%, and a `scale3d` that overshoots twice
 /// before landing. Opacity is declared at two stops only and holds 1 from 55%.
 class _PopInDemo extends StatelessWidget {
   const _PopInDemo();
@@ -1431,7 +1451,7 @@ class _PopInDemo extends StatelessWidget {
   }
 }
 
-/// `.anim-jelly` — the reward. Squashes to 1.18×0.82 and wobbles back.
+/// `.anim-jelly`: the reward. Squashes to 1.18×0.82 and wobbles back.
 class _JellyDemo extends StatelessWidget {
   const _JellyDemo();
 
@@ -1459,7 +1479,7 @@ class _JellyDemo extends StatelessWidget {
   }
 }
 
-/// `.anim-spring-up` — the one table on `--ease-settle`, and the one whose
+/// `.anim-spring-up`: the one table on `--ease-settle`, and the one whose
 /// copy is arithmetically exact: 32px rise, −4, +1.5, −0.5.
 class _SpringUpDemo extends StatelessWidget {
   const _SpringUpDemo();
@@ -1479,13 +1499,17 @@ class _SpringUpDemo extends StatelessWidget {
         ),
       ),
       child: _DemoStage(
-        child: DsText('Section entering', DsType.small, color: theme.foreground),
+        child: DsText(
+          'Section entering',
+          DsType.small,
+          color: theme.foreground,
+        ),
       ),
     );
   }
 }
 
-/// `.anim-jelly-in` — `transform: scale(s) translateY(y)`, in that order.
+/// `.anim-jelly-in`, `transform: scale(s) translateY(y)`, in that order.
 ///
 /// CSS applies a transform list left to right, so the translation happens
 /// inside the scaled frame: the scale is the **outer** [Transform] here and
@@ -1518,7 +1542,7 @@ class _JellyInDemo extends StatelessWidget {
   }
 }
 
-/// `.anim-ratchet` — eight held 45° positions of 175ms each. 360° is never
+/// `.anim-ratchet`: eight held 45° positions of 175ms each. 360° is never
 /// displayed; the cycle wraps to 0°.
 ///
 /// Driven through [DsRatchet.radiansAt] rather than a `CurvedAnimation`,
@@ -1526,7 +1550,7 @@ class _JellyInDemo extends StatelessWidget {
 /// would paint the one frame `steps(8, jump-end)` exists to skip.
 ///
 /// Unkeyed and infinite. Under reduced motion it runs one collapsed iteration
-/// and, having no fill mode, reverts to the element's own transform — 0°
+/// and, having no fill mode, reverts to the element's own transform, 0°
 /// (ruling M7).
 class _RatchetDemo extends StatelessWidget {
   const _RatchetDemo();
@@ -1566,7 +1590,7 @@ class _RatchetDemo extends StatelessWidget {
   }
 }
 
-/// `.anim-sign-on` — six hard cuts, no tweening.
+/// `.anim-sign-on`: six hard cuts, no tweening.
 ///
 /// `steps(1, end)` applied between every pair of stops means no interpolation
 /// at all, so this reads [DsSignOn.frameAt] rather than a tween. Render order
@@ -1575,7 +1599,7 @@ class _RatchetDemo extends StatelessWidget {
 ///
 /// The resting state is not neutral. `both` holds the 70% frame, so after
 /// 900ms the word keeps a `0 0 6px` + `0 0 18px` glow at brightness 1.15
-/// forever — and that is also the frame reduced motion freezes it on.
+/// forever: and that is also the frame reduced motion freezes it on.
 class _SignOnDemo extends StatelessWidget {
   const _SignOnDemo();
 
@@ -1616,7 +1640,7 @@ class _SignOnDemo extends StatelessWidget {
   }
 }
 
-/// `.anim-reveal` — the card turning face-up, **orthographically** (ruling M4).
+/// `.anim-reveal`: the card turning face-up, **orthographically** (ruling M4).
 class _RevealDemo extends StatelessWidget {
   const _RevealDemo();
 
@@ -1648,11 +1672,11 @@ class _RevealDemo extends StatelessWidget {
   }
 }
 
-/// `.anim-shimmer` — an empty box; all the paint comes from the utility.
+/// `.anim-shimmer`: an empty box; all the paint comes from the utility.
 ///
 /// The tile is `2W` wide and its bright `--accent` midpoint crosses from `−W`
 /// to `+3W`, left to right, once per cycle. `background-repeat` defaults to
-/// `repeat`, which is why the box is never empty at the extremes — and why
+/// `repeat`, which is why the box is never empty at the extremes: and why
 /// [TileMode.repeated] rather than a single band.
 class _ShimmerDemo extends StatelessWidget {
   const _ShimmerDemo();
@@ -1670,12 +1694,15 @@ class _ShimmerDemo extends StatelessWidget {
           fill: DsShimmer.fill,
           repeat: DsShimmer.loops,
           // No child: a childless [CustomPaint] takes `constraints.smallest`,
-          // and the constraints here are tight on both axes — the stretched
+          // and the constraints here are tight on both axes: the stretched
           // panel column for width, the `h-24` above for height.
           builder: (BuildContext context, double t, Widget? child) =>
               CustomPaint(
-            painter: _ShimmerPainter(t: t, gradient: DsShimmer.gradient(theme)),
-          ),
+                painter: _ShimmerPainter(
+                  t: t,
+                  gradient: DsShimmer.gradient(theme),
+                ),
+              ),
         ),
       ),
     );
@@ -1707,7 +1734,7 @@ class _ShimmerPainter extends CustomPainter {
       old.t != t || old.gradient != gradient;
 }
 
-/// `.anim-pulse-live` — the only animation allowed to run forever.
+/// `.anim-pulse-live`: the only animation allowed to run forever.
 ///
 /// The `box-shadow` is offset 0, blur 0, **spread** 0 → 5px at alpha 0.5 → 0:
 /// a hard-edged ring growing out of the 8px dot as it fades. Flutter has no
@@ -1742,9 +1769,9 @@ class _PulseLiveDemo extends StatelessWidget {
                 repeat: DsPulseLive.loops,
                 builder: (BuildContext context, double t, Widget? child) =>
                     CustomPaint(
-                  painter: _PulseRingPainter(t: t),
-                  child: child,
-                ),
+                      painter: _PulseRingPainter(t: t),
+                      child: child,
+                    ),
                 child: SizedBox(
                   width: DsPulseLive.dotDiameter,
                   height: DsPulseLive.dotDiameter,
@@ -1780,8 +1807,9 @@ class _PulseRingPainter extends CustomPainter {
       centre,
       DsPulseLive.dotRadius,
       Paint()
-        ..color = DsPulseLive.dotColor
-            .withValues(alpha: DsPulseLive.dotOpacityAt(t)),
+        ..color = DsPulseLive.dotColor.withValues(
+          alpha: DsPulseLive.dotOpacityAt(t),
+        ),
     );
   }
 
@@ -1801,7 +1829,8 @@ class _ChoreographySection extends StatelessWidget {
     return const DsSection(
       id: 'choreography',
       title: 'Pack-opening choreography',
-      description: 'The one sequence allowed to take real time. It is built '
+      description:
+          'The one sequence allowed to take real time. It is built '
           'from the same tokens, and every stage is skippable.',
       child: DsMeta(
         items: <DsMetaItem>[
@@ -1820,14 +1849,16 @@ class _ChoreographySection extends StatelessWidget {
           (
             k: '3 · Pack enters',
             v: TextSpan(
-              text: '550ms ease-out — pack scales up into the centre of the '
+              text:
+                  '550ms ease-out — pack scales up into the centre of the '
                   'stage.',
             ),
           ),
           (
             k: '4 · Tear',
             v: TextSpan(
-              text: '400ms — blue bloom expands from the pack; particles are '
+              text:
+                  '400ms — blue bloom expands from the pack; particles are '
                   'capped and never flash.',
             ),
           ),
@@ -1835,14 +1866,16 @@ class _ChoreographySection extends StatelessWidget {
           (
             k: '5 · Cards reveal',
             v: TextSpan(
-              text: '550ms each, staggered 60ms. Six cards resolve in roughly '
+              text:
+                  '550ms each, staggered 60ms. Six cards resolve in roughly '
                   '900ms.',
             ),
           ),
           (
             k: '6 · Rare escalation',
             v: TextSpan(
-              text: 'Legendary and mythic cards add glow-value and anim-pop-in '
+              text:
+                  'Legendary and mythic cards add glow-value and anim-pop-in '
                   'on top of the reveal — nothing longer.',
             ),
           ),
@@ -1856,7 +1889,8 @@ class _ChoreographySection extends StatelessWidget {
           (
             k: 'Skip / Turbo',
             v: TextSpan(
-              text: 'Available from stage 3 onward. Turbo collapses stages 3–6 '
+              text:
+                  'Available from stage 3 onward. Turbo collapses stages 3–6 '
                   'to 300ms total.',
             ),
           ),
@@ -1893,7 +1927,8 @@ class _ReducedSection extends StatelessWidget {
     return DsSection(
       id: 'reduced',
       title: 'Reduced motion',
-      description: 'A required behaviour, not a nicety. The product must stay '
+      description:
+          'A required behaviour, not a nicety. The product must stay '
           'fully usable and every value must stay legible with motion switched '
           'off.',
       child: DsPanel(
@@ -1923,7 +1958,8 @@ class _ReducedSection extends StatelessWidget {
                     const TextSpan(text: 'Implemented globally in '),
                     DsCode.span('app/globals.css'),
                     const TextSpan(
-                      text: ', so a new component inherits it without opting '
+                      text:
+                          ', so a new component inherits it without opting '
                           'in.',
                     ),
                   ],
@@ -1938,7 +1974,7 @@ class _ReducedSection extends StatelessWidget {
   }
 }
 
-/// `li.type-small.flex.gap-2.5` — a 6px `bg-action` dot on an 8px top margin,
+/// `li.type-small.flex.gap-2.5`: a 6px `bg-action` dot on an 8px top margin,
 /// then the text.
 class _ReducedBullet extends StatelessWidget {
   const _ReducedBullet({required this.text});

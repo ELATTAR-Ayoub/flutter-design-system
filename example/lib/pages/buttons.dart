@@ -1,98 +1,98 @@
-/// `/design-system/components/base/buttons` — the first non-foundations page
+/// `/design-system/components/base/buttons`: the first non-foundations page
 /// in the port.
 ///
 /// Nine sections, and almost nothing on it is a picture of a control: the
 /// eight variant cells are live [DsButton]s, the ladder is five real rungs, the
 /// six live buttons press and take focus, the three toggles toggle, the segment
 /// group's pill travels, and all four IconSwap wheels roll. Two cells are
-/// deliberately **stills** — see the drift register, entries 13 and 14.
+/// deliberately **stills**: see the drift register, entries 13 and 14.
 ///
 /// Three shell facts differ from the six foundations pages, and only three
 /// (buttons-map §0): the route nests two levels deeper; the eyebrow is
 /// composed rather than literal, which is why it says "Base" twice; and `Row`,
 /// `StateGrid` and `StateCell` render for the first time in the corpus. All
 /// three of those are kit primitives in the reference, so they were promoted
-/// into `kit.dart` — the lattice out of the icons page's own private fork
+/// into `kit.dart`: the lattice out of the icons page's own private fork
 /// rather than copied a third time (supervisor ruling B10).
 ///
 /// **What is not ported, and why.**
 /// * **`asChild`** (ruling B4). Radix `Slot` renders the child in the button's
 ///   place, for links dressed as buttons. There is no Flutter analogue and no
-///   anchor element to delegate to, so the `#api` row ships verbatim — a
+///   anchor element to delegate to, so the `#api` row ships verbatim: a
 ///   printed API row is copy, and the fidelity bar is the reference's own copy
-///   — and the divergence is recorded here instead of an invented API.
+///  : and the divergence is recorded here instead of an invented API.
 /// * **`aria-pressed` on the IconSwap demos.** Three of the four set it (the
 ///   fourth does not; drift 23). `DsButton` exposes `label` and `enabled` and
 ///   the pinned SDK's `SemanticsProperties` has no pressed-button flag that is
 ///   not also a checkbox or a switch, so a toggling *button* cannot announce
-///   its state without announcing the wrong role. Recorded, not faked — the
+///   its state without announcing the wrong role. Recorded, not faked: the
 ///   same call `button.dart` makes for `aria-busy` (ruling B9).
 /// * **`fill-value-ink`** on the favourited heart is page-local painting, not a
-///   component API — see [_FilledGlyph], and ruling I3 for the precedent.
+///   component API: see [_FilledGlyph], and ruling I3 for the precedent.
 ///
 /// Reference drifts, all shipped as written (buttons-map §14). Where a drift
 /// belongs to a component rather than to this page, it is recorded at its own
 /// source and named here so the register stays complete.
 /// 1. **The eyebrow says "Base" twice.** `eyebrow={`${group.title} · Base`}`
-///    with `group.title = "Base Components"` — see [ButtonsPage.build].
+///    with `group.title = "Base Components"`: see [ButtonsPage.build].
 /// 2. **"Press scales to 97% over 150ms"** in the `#states` caption, against
 ///    `scale-95` and `btn-spring`'s asymmetric in/out. Three numbers, none of
 ///    them the one that runs. The caption ships; the spring is what presses.
-/// 3. **"the width stays stable"**, said four times — the `#states` cell note,
-///    the `#api` `loading` row, Do #4, and the prop's own JSDoc — against a
+/// 3. **"the width stays stable"**, said four times: the `#states` cell note,
+///    the `#api` `loading` row, Do #4, and the prop's own JSDoc: against a
 ///    **prepended** spinner that adds its own width plus the rung's gap. All
 ///    four ship. Stated once more in `DsButton.loading`.
 /// 4. **The spinner is silent.** `Spinner` hands `role="status"` and
 ///    `aria-label="Loading"` to `Icon`, which destructures neither; only
 ///    `aria-busy` survives, and Flutter has no `aria-busy` (ruling B9).
 /// 5. **"selection is always blue"** in the `#toggle` caption, against
-///    `data-[state=on]:bg-muted` — the pressed Toggle is **grey**. Blue
+///    `data-[state=on]:bg-muted`: the pressed Toggle is **grey**. Blue
 ///    selection is real one panel further down and only there.
-/// 6. **`Icon size="sm"` renders 16px** inside a button — the base class list's
+/// 6. **`Icon size="sm"` renders 16px** inside a button: the base class list's
 ///    `size-4` beats the attribute, while `strokeWidth` keeps the 14px value.
 ///    Seven glyphs on this page. Carried by `DsButton.iconPxFor`.
-/// 7. **ButtonGroup end radii are asymmetric** — the trailing member is forced
+/// 7. **ButtonGroup end radii are asymmetric**: the trailing member is forced
 ///    to the container radius while the leading one keeps its own pill.
 /// 8. **`ButtonGroupText` sets no `data-slot`**, so the rule that rounds the
 ///    trailing member reaches straight past it.
 /// 9. **The travelling pill is a stadium; the item under it is a rounded
 ///    rect.** Hover-on-unselected and selected are two shapes in one slot.
-/// 10. **Three inert declarations on `Toggle variant="default"`** — a border
+/// 10. **Three inert declarations on `Toggle variant="default"`**: a border
 ///    colour with no border, and a hover ink the element already inherits.
 /// 11. **Two press feels on one page.** A Button springs and scales; a Toggle
 ///    and a ToggleGroupItem cross-fade every property and do not scale at all.
-/// 12. **Disabled opacity differs by component** — 45% on a Button, 50% on a
+/// 12. **Disabled opacity differs by component**, 45% on a Button, 50% on a
 ///    Toggle. The `#states` cell note says "45% opacity", which is true of the
 ///    Button three sections above the disabled Toggle.
 /// 13. **The "Hover" state cell does not show hover.** `className="bg-action"`
 ///    repaints the colour `--primary` already is, so the cell is
-///    pixel-identical to "Default" — see [_StatesSection].
+///    pixel-identical to "Default": see [_StatesSection].
 /// 14. **The "Focus" state cell is a hand-drawn still**, not a focused
 ///    control: it reproduces the ring and the border, and not the transition a
 ///    real `:focus-visible` runs. See [_FocusStill].
 /// 15. **Five size rungs, three type sizes, and only three of six type classes
 ///    carry a line-height at all.** Stated in full on `DsButtonSize`.
 /// 16. **`ButtonGroupText className="type-num"` does not render as
-///    `type-num`** — the utilities beat the component layer on size and
+///    `type-num`**: the utilities beat the component layer on size and
 ///    weight, and the mono family, the tabular figures and the tracking
 ///    survive. Pre-resolved as `DsComponentType.buttonGroupNum`.
 /// 17. **`icon-xs` is documented and never rendered.** The cva declares it,
 ///    the `#api` table prints it, the page shows eight of the nine. Built
 ///    anyway (ruling B3), so the printed row stays true.
-/// 18. **`Kbd` is flat** — no border, no shadow — while `--shadow-key`,
+/// 18. **`Kbd` is flat**: no border, no shadow: while `--shadow-key`,
 ///    `--shadow-key-down` and `press-key` exist for exactly this object and
 ///    are documented one foundations page away.
 /// 19. **`KbdGroup` renders a `<kbd>`** while typed as a `div`, so the first
 ///    row of `#kbd` is a `<kbd>` nesting two `<kbd>`s.
 /// 20. **"No crossfades, no instant swaps"** in the IconSwap intro, against a
 ///    roll that transitions opacity on the same spring as the transform.
-/// 21. **`swap-roll`'s comment is not a comment** — the rule opens with a
+/// 21. **`swap-roll`'s comment is not a comment**: the rule opens with a
 ///    backslash, so the parser discards it. Nothing renders differently; it is
 ///    recorded because the utility below it is what this page's wheels use.
 /// 22. **`emphasis="caps"` shrinks the type**, and cell 8 sits in the same
 ///    four-up grid as seven larger labels.
 /// 23. **`PlayPauseDemo` omits `aria-pressed`** while the panel's own closing
-///    copy says to add it "when it is a toggle" — and its caption reads
+///    copy says to add it "when it is a toggle": and its caption reads
 ///    "Playing"/"Paused", which is state. See [_PlayPauseDemo].
 /// 24. **`--shadow-btn`'s use copy names three variants and one wears it.** In
 ///    the eight-cell variants grid, `outline` is a machine surface while
@@ -107,10 +107,10 @@ import '../nav.dart';
 
 /* ── Page data ───────────────────────────────────────────────────────────── */
 
-/// `#sizes` block B — the inline array literal at `page:125–131`, the page's
+/// `#sizes` block B: the inline array literal at `page:125–131`, the page's
 /// only module-level data.
 ///
-/// Rendered as `<span class="type-num-sm">{k}</span> — {v}`, where the
+/// Rendered as `<span class="type-num-sm">{k}</span>, {v}`, where the
 /// separator is a literal space, U+2014, and another space.
 const List<(String, String)> _sizeUse = <(String, String)>[
   ('xs · 24px', 'Chips inside a combobox. Internal use only.'),
@@ -120,13 +120,13 @@ const List<(String, String)> _sizeUse = <(String, String)>[
   ('xl · 56px', 'Landing hero and headline moments. Once per screen.'),
 ];
 
-/// `#api` — five rows, every separator U+00B7.
+/// `#api`: five rows, every separator U+00B7.
 ///
 /// The `size` row is the authority for the nine-rung ladder and it prints
 /// `icon-xs`, which the page never renders (drift 17); the `loading` row
 /// repeats the width claim `DsButton.loading` disproves (drift 3); and
 /// `asChild` describes a prop this port does not have (ruling B4). All three
-/// ship as written — a printed API row is copy.
+/// ship as written: a printed API row is copy.
 const List<(String, String)> _apiRows = <(String, String)>[
   (
     'variant',
@@ -191,7 +191,7 @@ class ButtonsPage extends StatelessWidget {
         DsPageHeader(
           // DRIFT 1. The foundations pages pass `group.title` alone; this one
           // interpolates a second literal after it, and the group is already
-          // called "Base Components" — so the eyebrow reads "Base Components ·
+          // called "Base Components": so the eyebrow reads "Base Components ·
           // Base". The separator is U+00B7.
           eyebrow: '${here.group.title} · Base',
           title: here.category.title,
@@ -211,7 +211,7 @@ class ButtonsPage extends StatelessWidget {
         const _ApiSection(),
         const _RulesSection(),
         // `buttons` is index 0 of `base`, so `prev` is null and the kit renders
-        // the bare spacer in its place — the first one-sided foot nav that is
+        // the bare spacer in its place: the first one-sided foot nav that is
         // missing its *left* half.
         const DsPageFootNav(groupId: 'base', slug: 'buttons'),
       ],
@@ -229,13 +229,14 @@ class _VariantsSection extends StatelessWidget {
     return DsSection(
       id: 'variants',
       title: 'Variants',
-      description: 'Seven variants, ordered by emphasis. Only one primary or '
+      description:
+          'Seven variants, ordered by emphasis. Only one primary or '
           'premium button should be visible in any single decision area — if '
           'two compete, the user cannot tell what the screen wants.',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          // `cols={4}` — `grid-cols-2 sm:grid-cols-4`, so 4×2 at this frame.
+          // `cols={4}`, `grid-cols-2 sm:grid-cols-4`, so 4×2 at this frame.
           DsStateGrid(
             cols: 4,
             children: <Widget>[
@@ -296,7 +297,7 @@ class _VariantsSection extends StatelessWidget {
                 label: 'link',
                 note: 'Inline text action.',
                 // Still a 40px pill with 16px of horizontal padding that
-                // scales on press and takes the blue ring — a "text button"
+                // scales on press and takes the blue ring: a "text button"
                 // only in what it paints.
                 child: DsButton(
                   variant: DsButtonVariant.link,
@@ -307,7 +308,7 @@ class _VariantsSection extends StatelessWidget {
               DsStateCell(
                 label: 'premium + caps',
                 note: 'Hero CTA treatment.',
-                // DRIFT 22: `caps` is an axis, not a rung — it beats the
+                // DRIFT 22: `caps` is an axis, not a rung: it beats the
                 // size's own class, so this label is *smaller* than the seven
                 // beside it, and uppercased.
                 child: DsButton(
@@ -328,7 +329,8 @@ class _VariantsSection extends StatelessWidget {
                 children: <InlineSpan>[
                   DsCode.span('premium'),
                   const TextSpan(
-                    text: ' is the only variant permitted to glow, and only on '
+                    text:
+                        ' is the only variant permitted to glow, and only on '
                         'hover. Use it for depositing, claiming, purchasing '
                         'and confirming a withdrawal. A lime Cancel button '
                         'would be a bug.',
@@ -352,12 +354,12 @@ class _SizesSection extends StatelessWidget {
   /// The five rungs the ladder shows, with the caption printed under each.
   static const List<(DsButtonSize, String, String)> _ladder =
       <(DsButtonSize, String, String)>[
-    (DsButtonSize.xs, 'Extra small', 'xs · 24px'),
-    (DsButtonSize.sm, 'Small', 'sm · 32px'),
-    (DsButtonSize.md, 'Medium', 'default · 40px'),
-    (DsButtonSize.lg, 'Large', 'lg · 48px'),
-    (DsButtonSize.xl, 'Hero', 'xl · 56px'),
-  ];
+        (DsButtonSize.xs, 'Extra small', 'xs · 24px'),
+        (DsButtonSize.sm, 'Small', 'sm · 32px'),
+        (DsButtonSize.md, 'Medium', 'default · 40px'),
+        (DsButtonSize.lg, 'Large', 'lg · 48px'),
+        (DsButtonSize.xl, 'Hero', 'xl · 56px'),
+      ];
 
   @override
   Widget build(BuildContext context) {
@@ -367,7 +369,8 @@ class _SizesSection extends StatelessWidget {
       id: 'sizes',
       title: 'Sizes',
       // The straight apostrophe in "product's" is the reference's.
-      description: '32 / 40 / 48 / 56, plus a 24px step for dense internals. '
+      description:
+          '32 / 40 / 48 / 56, plus a 24px step for dense internals. '
           'This ladder is intentionally taller than stock shadcn — a premium '
           "product's primary action cannot be 32px.",
       child: DsPanel(
@@ -377,16 +380,20 @@ class _SizesSection extends StatelessWidget {
           children: <Widget>[
             // `align="end"`. The caption block is the same height under all
             // five columns, so aligning the columns' bottoms aligns the
-            // buttons' bottoms too — the ladder gets a shared baseline free.
+            // buttons' bottoms too: the ladder gets a shared baseline free.
             DsRow(
               align: DsRowAlign.end,
               children: <Widget>[
                 for (final (DsButtonSize, String, String) rung in _ladder)
-                  _LadderColumn(size: rung.$1, label: rung.$2, caption: rung.$3),
+                  _LadderColumn(
+                    size: rung.$1,
+                    label: rung.$2,
+                    caption: rung.$3,
+                  ),
               ],
             ),
             Container(
-              // `mt-6 … border-t border-border pt-5` — margin outside the
+              // `mt-6 … border-t border-border pt-5`: margin outside the
               // rule, padding inside it, which is the order a border box
               // stacks them in.
               margin: EdgeInsets.only(top: ds(6)),
@@ -417,7 +424,7 @@ class _SizesSection extends StatelessWidget {
   }
 }
 
-/// `<div className="text-center">` — one rung, over its caption.
+/// `<div className="text-center">`: one rung, over its caption.
 class _LadderColumn extends StatelessWidget {
   const _LadderColumn({
     required this.size,
@@ -438,11 +445,7 @@ class _LadderColumn extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
-        DsButton(
-          size: size,
-          onPressed: () {},
-          child: Text(label),
-        ),
+        DsButton(size: size, onPressed: () {}, child: Text(label)),
         SizedBox(height: ds(3)),
         DsText(caption, DsType.micro, align: TextAlign.center),
       ],
@@ -450,7 +453,7 @@ class _LadderColumn extends StatelessWidget {
   }
 }
 
-/// `<p className="type-small"><span className="type-num-sm …">{k}</span> — {v}`.
+/// `<p className="type-small"><span className="type-num-sm …">{k}</span>, {v}`.
 ///
 /// Two families on one line, both landing on `--muted-foreground`: the mono
 /// span states that colour itself and `.type-small` brings its own.
@@ -474,7 +477,7 @@ class _SizeUseLine extends StatelessWidget {
               color: theme.mutedForeground,
             ),
           ),
-          TextSpan(text: ' — ${entry.$2}'),
+          TextSpan(text: ': ${entry.$2}'),
         ],
       ),
       DsType.small,
@@ -488,28 +491,29 @@ class _StatesSection extends StatelessWidget {
   const _StatesSection();
 
   /// The six live variants, in the order the panel renders them. `link` is
-  /// absent — the one variant of the seven this row leaves out.
+  /// absent: the one variant of the seven this row leaves out.
   static const List<(DsButtonVariant, String)> _live =
       <(DsButtonVariant, String)>[
-    (DsButtonVariant.primary, 'Primary'),
-    (DsButtonVariant.premium, 'Premium'),
-    (DsButtonVariant.secondary, 'Secondary'),
-    (DsButtonVariant.outline, 'Outline'),
-    (DsButtonVariant.ghost, 'Ghost'),
-    (DsButtonVariant.destructive, 'Destructive'),
-  ];
+        (DsButtonVariant.primary, 'Primary'),
+        (DsButtonVariant.premium, 'Premium'),
+        (DsButtonVariant.secondary, 'Secondary'),
+        (DsButtonVariant.outline, 'Outline'),
+        (DsButtonVariant.ghost, 'Ghost'),
+        (DsButtonVariant.destructive, 'Destructive'),
+      ];
 
   @override
   Widget build(BuildContext context) {
     return DsSection(
       id: 'states',
       title: 'States',
-      description: 'Hover, focus and active are live below — interact with '
+      description:
+          'Hover, focus and active are live below: interact with '
           'them directly. Disabled and loading are shown as rendered.',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          // `cols={5}` — `grid-cols-2 sm:grid-cols-3 lg:grid-cols-5`, so one
+          // `cols={5}`, `grid-cols-2 sm:grid-cols-3 lg:grid-cols-5`, so one
           // clean row at this frame and only at this frame.
           DsStateGrid(
             cols: 5,
@@ -525,7 +529,7 @@ class _StatesSection extends StatelessWidget {
                 label: 'Hover',
                 note: 'Hover it',
                 // DRIFT 13. The reference adds `className="bg-action"` here,
-                // and `--primary` **is** `var(--color-action)` — so the class
+                // and `--primary` **is** `var(--color-action)`: so the class
                 // repaints the colour the button already paints and this cell
                 // is pixel-identical to the one before it. Reproduced as the
                 // no-op it is (ruling B8); the note admits it is live rather
@@ -541,7 +545,7 @@ class _StatesSection extends StatelessWidget {
                 note: 'Tab to it',
                 child: _FocusStill(),
               ),
-              // No handler and `loading` — the reference passes neither an
+              // No handler and `loading`: the reference passes neither an
               // `onClick` nor `disabled`, and `disabled = disabled || loading`
               // does the rest.
               const DsStateCell(
@@ -594,7 +598,7 @@ class _StatesSection extends StatelessWidget {
 /// DRIFT 14, reproduced exactly (ruling B8). The reference hands the button
 /// three utility classes and no focus: the border is recoloured, a `0 0 0 3px`
 /// ring is composited in front of the variant's own shadow, and nothing else
-/// about the control changes — it is a **still** of `:focus-visible`, not a
+/// about the control changes: it is a **still** of `:focus-visible`, not a
 /// focused control, and it does not run the border transition a real focus
 /// would.
 ///
@@ -602,7 +606,7 @@ class _StatesSection extends StatelessWidget {
 /// and traversable: a genuinely focused specimen would steal the page's focus
 /// on load and lose the state on the first Tab, which is not what the
 /// reference renders. The overlay is a [DsMachineSurface] filling the button's
-/// own box — same box, same pill, so the ring lands where the class puts it and
+/// own box: same box, same pill, so the ring lands where the class puts it and
 /// the 1px border paints over the transparent one the base class list carries,
 /// with no effect on layout. Painting after the button is what "composited in
 /// front of the shadow" means.
@@ -649,11 +653,11 @@ class _IconsSection extends StatelessWidget {
   /// The four labelled buttons. Icon leads, label follows.
   static const List<(DsButtonVariant, DsIconGlyph, String)> _labelled =
       <(DsButtonVariant, DsIconGlyph, String)>[
-    (DsButtonVariant.primary, DsIconGlyph.packageOpen, 'Open Pack'),
-    (DsButtonVariant.premium, DsIconGlyph.wallet, 'Deposit Funds'),
-    (DsButtonVariant.secondary, DsIconGlyph.share2, 'Share Pull'),
-    (DsButtonVariant.destructive, DsIconGlyph.trash2, 'Sell Selected'),
-  ];
+        (DsButtonVariant.primary, DsIconGlyph.packageOpen, 'Open Pack'),
+        (DsButtonVariant.premium, DsIconGlyph.wallet, 'Deposit Funds'),
+        (DsButtonVariant.secondary, DsIconGlyph.share2, 'Share Pull'),
+        (DsButtonVariant.destructive, DsIconGlyph.trash2, 'Sell Selected'),
+      ];
 
   @override
   Widget build(BuildContext context) {
@@ -661,7 +665,8 @@ class _IconsSection extends StatelessWidget {
       id: 'icons',
       title: 'Icons and icon-only buttons',
       // Straight apostrophe in "button's", as the reference has it.
-      description: "An icon inside a button inherits the button's colour. An "
+      description:
+          "An icon inside a button inherits the button's colour. An "
           'icon-only button must carry an accessible name, or it is unusable '
           'with a screen reader.',
       child: Column(
@@ -732,7 +737,7 @@ class _IconsSection extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: ds(5)),
-                // `lime&rsquo;s` — a right single quotation mark.
+                // `lime&rsquo;s`: a right single quotation mark.
                 DsText(
                   'The last button uses the lime tone deliberately — a '
                   'favourited card is a value signal, and that is one of '
@@ -750,7 +755,7 @@ class _IconsSection extends StatelessWidget {
 
 /// A button holding an icon and a label, spaced by the rung's own `gap-*`.
 ///
-/// DRIFT 6: the reference asks for `size="sm"` — a declared 14px — and the
+/// DRIFT 6: the reference asks for `size="sm"`: a declared 14px: and the
 /// base class list's `size-4` overrides the box to 16 while `strokeWidth`
 /// keeps being computed from 14. The two coincide, so the rung's own
 /// `iconPxFor` is what is written.
@@ -794,14 +799,15 @@ class _GroupsSection extends StatelessWidget {
     return DsSection(
       id: 'groups',
       title: 'Button Group',
-      description: 'Joins related actions into one control. Used for view '
+      description:
+          'Joins related actions into one control. Used for view '
           'switching, quantity steppers and split actions.',
       child: DsPanel(
         label: 'Segmented actions',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            // `w-fit` — a group shrinks to its members rather than filling the
+            // `w-fit`: a group shrinks to its members rather than filling the
             // panel, so the column starts them rather than stretching them.
             DsButtonGroup(
               children: <Widget>[
@@ -883,7 +889,8 @@ class _ToggleSection extends StatelessWidget {
       id: 'toggle',
       // A literal ampersand in the heading.
       title: 'Toggle & Toggle Group',
-      description: 'For state that persists rather than actions that fire. '
+      description:
+          'For state that persists rather than actions that fire. '
           'View mode, favourite, and filter chips that stay on.',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -905,7 +912,7 @@ class _ToggleSection extends StatelessWidget {
   }
 }
 
-/// Three toggles: off, on, disabled — and the first two are live.
+/// Three toggles: off, on, disabled: and the first two are live.
 class _TogglePanel extends StatefulWidget {
   const _TogglePanel();
 
@@ -918,10 +925,7 @@ class _TogglePanelState extends State<_TogglePanel> {
   /// never moves, so it needs no slot.
   final List<bool> _pressed = <bool>[false, true];
 
-  Widget _heart() => const DsIcon(
-        DsIconGlyph.heart,
-        size: DsIconSize.md,
-      );
+  Widget _heart() => const DsIcon(DsIconGlyph.heart, size: DsIconSize.md);
 
   @override
   Widget build(BuildContext context) {
@@ -972,7 +976,7 @@ class _ToggleGroupPanel extends StatefulWidget {
 }
 
 class _ToggleGroupPanelState extends State<_ToggleGroupPanel> {
-  /// `defaultValue="newest"` — index 0.
+  /// `defaultValue="newest"`: index 0.
   int? _selected = 0;
 
   @override
@@ -1014,7 +1018,7 @@ class _IconSwapPanel extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        // DRIFT 20: "No crossfades" — and the roll transitions opacity on the
+        // DRIFT 20: "No crossfades": and the roll transitions opacity on the
         // same spring as the transform, which clamps to full about a third of
         // the way through.
         DsText(
@@ -1063,7 +1067,7 @@ class _IconSwapPanel extends StatelessWidget {
   }
 }
 
-/// `<div className="flex flex-col items-center gap-3">` — a wheel over its
+/// `<div className="flex flex-col items-center gap-3">`: a wheel over its
 /// caption.
 class _SwapDemo extends StatelessWidget {
   const _SwapDemo({required this.control, required this.caption});
@@ -1075,17 +1079,17 @@ class _SwapDemo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          control,
-          SizedBox(height: ds(3)),
-          DsText(caption, DsType.micro, align: TextAlign.center),
-        ],
-      );
+    mainAxisSize: MainAxisSize.min,
+    crossAxisAlignment: CrossAxisAlignment.center,
+    children: <Widget>[
+      control,
+      SizedBox(height: ds(3)),
+      DsText(caption, DsType.micro, align: TextAlign.center),
+    ],
+  );
 }
 
-/// `ViewSwitchDemo` — an outline icon button, grid ⇄ list.
+/// `ViewSwitchDemo`: an outline icon button, grid ⇄ list.
 class _ViewSwitchDemo extends StatefulWidget {
   const _ViewSwitchDemo();
 
@@ -1106,12 +1110,12 @@ class _ViewSwitchDemoState extends State<_ViewSwitchDemo> {
       control: DsButton(
         variant: DsButtonVariant.outline,
         size: size,
-        // `aria-pressed={view === "list"}` has no port — see the library note.
+        // `aria-pressed={view === "list"}` has no port: see the library note.
         label: _list ? 'Switch to grid view' : 'Switch to list view',
         onPressed: () => setState(() => _list = !_list),
         child: DsIconSwap(
           activeIndex: _list ? 1 : 0,
-          // `className="size-5"` — the clip window, 4px wider than the glyph.
+          // `className="size-5"`: the clip window, 4px wider than the glyph.
           window: ds(5),
           cell: glyph,
           icons: <Widget>[
@@ -1124,7 +1128,7 @@ class _ViewSwitchDemoState extends State<_ViewSwitchDemo> {
   }
 }
 
-/// `PlayPauseDemo` — the one demo on a 48px button, and the one that omits
+/// `PlayPauseDemo`: the one demo on a 48px button, and the one that omits
 /// `aria-pressed` (drift 23) while captioning itself with state.
 class _PlayPauseDemo extends StatefulWidget {
   const _PlayPauseDemo();
@@ -1162,7 +1166,7 @@ class _PlayPauseDemoState extends State<_PlayPauseDemo> {
   }
 }
 
-/// `FavouriteDemo` — the only wheel whose two cells differ in colour as well
+/// `FavouriteDemo`: the only wheel whose two cells differ in colour as well
 /// as in shape, and the only filled glyph on the page.
 class _FavouriteDemo extends StatefulWidget {
   const _FavouriteDemo();
@@ -1191,11 +1195,7 @@ class _FavouriteDemoState extends State<_FavouriteDemo> {
           window: ds(5),
           cell: glyph,
           icons: <Widget>[
-            DsIcon(
-              DsIconGlyph.heart,
-              sizePx: glyph,
-              tone: DsIconTone.subtle,
-            ),
+            DsIcon(DsIconGlyph.heart, sizePx: glyph, tone: DsIconTone.subtle),
             _FilledGlyph(
               glyph: DsIconGlyph.heart,
               px: glyph,
@@ -1208,7 +1208,7 @@ class _FavouriteDemoState extends State<_FavouriteDemo> {
   }
 }
 
-/// `MuteDemo` — a ghost icon button, sound ⇄ muted.
+/// `MuteDemo`: a ghost icon button, sound ⇄ muted.
 class _MuteDemo extends StatefulWidget {
   const _MuteDemo();
 
@@ -1245,14 +1245,14 @@ class _MuteDemoState extends State<_MuteDemo> {
   }
 }
 
-/// `<Icon … className="fill-value-ink" />` — a glyph whose interior is
+/// `<Icon … className="fill-value-ink" />`: a glyph whose interior is
 /// painted as well as stroked.
 ///
 /// `fill` is an SVG paint property, not a size or a tone: lucide's paths ship
 /// `fill="none"` and [DsIcon] has no parameter that would override it, because
 /// exactly one glyph in the curated set fills anything and it fills a dot.
 /// So the interior is painted here, under the real glyph, out of the **same**
-/// transcribed path — page-local painting rather than a component API, which
+/// transcribed path: page-local painting rather than a component API, which
 /// is the call ruling I3 makes for the inputs page's drawn focus ring.
 ///
 /// Order matters and matches the browser's: fill first, stroke over it.
@@ -1322,7 +1322,8 @@ class _KbdSection extends StatelessWidget {
     return DsSection(
       id: 'kbd',
       title: 'Kbd',
-      description: 'Keyboard hints. The product is fully keyboard navigable, '
+      description:
+          'Keyboard hints. The product is fully keyboard navigable, '
           'so shortcuts are surfaced rather than hidden.',
       child: DsPanel(
         label: 'Shortcut hints',
@@ -1331,11 +1332,9 @@ class _KbdSection extends StatelessWidget {
           children: <Widget>[
             DsRow(
               children: <Widget>[
-                // DRIFT 19: a `<kbd>` nesting two `<kbd>`s — the group renders
+                // DRIFT 19: a `<kbd>` nesting two `<kbd>`s: the group renders
                 // the same element its members do while typed as a `div`.
-                DsKbdGroup(
-                  children: <Widget>[DsKbd('Ctrl'), DsKbd('K')],
-                ),
+                DsKbdGroup(children: <Widget>[DsKbd('Ctrl'), DsKbd('K')]),
                 DsText('Open search', DsType.small),
               ],
             ),

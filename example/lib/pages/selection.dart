@@ -1,4 +1,4 @@
-/// `/design-system/components/base/selection` — four control families, and
+/// `/design-system/components/base/selection`: four control families, and
 /// seventeen of the twenty specimens answer a pointer.
 ///
 /// The page the fourth family arrives on. `DsCheckbox`, `DsRadioGroup` and
@@ -14,22 +14,22 @@
 ///
 /// The bulk header and the option card are compositions the reference builds
 /// inline out of `div`s and a raw `Label`; neither is exported from
-/// `components/ui/`. They stay here until a second page wants them — the B10
+/// `components/ui/`. They stay here until a second page wants them: the B10
 /// precedent. [_BulkList] in particular **cannot** reuse `DsDividedList`:
 /// that fills with `theme.card` and draws each seam as a border on the row,
 /// which is `divide-y`. This container declares no background at all, so its
 /// `space-y-px` seams are the *parent* showing through, and every row supplies
 /// its own fill.
 ///
-/// ## Drift register — recorded, shipped as written (selection-map §14)
+/// ## Drift register: recorded, shipped as written (selection-map §14)
 ///
 ///  1. **Five chips, six sections, and they do not correspond.** `contents` is
 ///     `[Checkbox, Radio Group, Switch, Slider, Range Slider]`; the sections are
 ///     `checkbox, radio, switch, slider, api, rules`. **"Range Slider" names no
-///     section** — the range is cell 2 of §4's matrix and the first slider
-///     panel — and `API` and `Rules` get no chip. On `forms` the two lists were
+///     section**: the range is cell 2 of §4's matrix and the first slider
+///     panel: and `API` and `Rules` get no chip. On `forms` the two lists were
 ///     identical. Both render as written.
-///  2. **The page calls a 20px control "16px", twice** — §2's trailing
+///  2. **The page calls a 20px control "16px", twice**, §2's trailing
 ///     paragraph and §6's second do. Both `DsCheckbox` and `DsRadioGroupItem`
 ///     are `size-5` = 20px, and `checkbox.tsx`'s own docstring gives *"16px is
 ///     a fiddly target"* as the reason they are not. The copy quotes the number
@@ -38,14 +38,14 @@
 ///     checkboxes** (ruling S6). Rows 2–4 carry `bg-action/12` as a literal
 ///     class and rows 5–6 `bg-background`, while every checkbox inside them is
 ///     uncontrolled. Uncheck a tinted row and it stays blue; check an untinted
-///     one and it stays plain — which is exactly what §6's fourth don't
+///     one and it stays plain: which is exactly what §6's fourth don't
 ///     forbids. Reproduced exactly: [_BulkRow.tinted] is a constructor
 ///     argument, never a function of [_BulkRow.checked].
-///  4. **Ids contain spaces** — `` id={`f-${label}`} `` gives `f-Available now`.
+///  4. **Ids contain spaces**, `` id={`f-${label}`} `` gives `f-Available now`.
 ///     Valid HTML5 and `htmlFor` matches, so the labels work; no unescaped CSS
 ///     selector can reach them. Flutter has no id graph, so this one is
 ///     recorded and not reproducible.
-///  5. **`duration-fast` / `duration-base` are inert system-wide** — closed by
+///  5. **`duration-fast` / `duration-base` are inert system-wide**: closed by
 ///     the sweep; every transition here runs [DsDurations.transitionDefault].
 ///  6. **The Focus cells are painted, not focused.** `cn()` is
 ///     `extendTailwindMerge` and `border-input` / `border-ring` are one
@@ -53,7 +53,7 @@
 ///     Nothing holds focus; the ring is a permanent box-shadow. Two such cells
 ///     exist and Flutter can only focus one thing, which is what
 ///     `forceFocusRing` is for. The note still says *"Tab to it"*.
-///  7. **The Indeterminate cell is inert and undimmed** — controlled with no
+///  7. **The Indeterminate cell is inert and undimmed**: controlled with no
 ///     handler, carrying no `disabled`. It looks operable, is not, and gives no
 ///     signal. `DsCheckbox.inert` is that state.
 ///  8. **The slider's range and thumb use different coordinate spaces**, and so
@@ -62,13 +62,13 @@
 ///     symmetric `after:-inset-2` against their `-inset-x-3 -inset-y-2`, so the
 ///     44px floor RULES §7 asks for is met by the other three and missed here.
 /// 10. **The slider does not jelly and does not join the field layer.**
-/// 11. **The slider thumb's `disabled:` classes never fire** — Radix renders a
+/// 11. **The slider thumb's `disabled:` classes never fire**, Radix renders a
 ///     `<span>`, which `:disabled` cannot match. One dimming, at the root.
 ///     Carried by `slider.dart` (ruling S7).
-/// 12. **`DoDont` gets unequal columns for the first time** — 5 dos against 4
+/// 12. **`DoDont` gets unequal columns for the first time**, 5 dos against 4
 ///     don'ts, so the two panels are different heights and the shorter one's
 ///     border stops early.
-/// 13. **`Label` is used raw for the option cards** — the only page in the
+/// 13. **`Label` is used raw for the option cards**: the only page in the
 ///     corpus that imports `components/ui/label` directly instead of going
 ///     through `FieldLabel`, so the cards restate their layout from scratch.
 ///     [_OptionCard] does the same.
@@ -85,17 +85,17 @@ import '../nav.dart';
 
 /* ── Page constants ──────────────────────────────────────────────────────── */
 
-/// `max-w-sm` — `--container-sm`, 24rem. Tailwind's **container** scale, which
+/// `max-w-sm`, `--container-sm`, 24rem. Tailwind's **container** scale, which
 /// `globals.css` does not override, so it is not the spacing ladder even where
 /// the two coincide.
 // allow-hardcoded: framework container scale with no token to read it from.
 const double _measureSm = 384;
 
-/// `max-w-md` — `--container-md`, 28rem. Both slider panels.
+/// `max-w-md`, `--container-md`, 28rem. Both slider panels.
 // allow-hardcoded: framework container scale with no token to read it from.
 const double _measureMd = 448;
 
-/// `max-w-lg` — `--container-lg`, 32rem. The bulk header, the withdrawal cards
+/// `max-w-lg`, `--container-lg`, 32rem. The bulk header, the withdrawal cards
 /// and the preferences list.
 // allow-hardcoded: framework container scale with no token to read it from.
 const double _measureLg = 512;
@@ -103,13 +103,13 @@ const double _measureLg = 512;
 /// A block box wearing a `max-w-*`.
 ///
 /// CSS caps a block box's width and leaves it at the start of its line. A bare
-/// [ConstrainedBox] cannot say that: handed a **tight** width — which is what
+/// [ConstrainedBox] cannot say that: handed a **tight** width: which is what
 /// every `CrossAxisAlignment.stretch` column and every `Padding` inside one
-/// passes down — it *enforces* that width and the cap is silently lost, so
+/// passes down: it *enforces* that width and the cap is silently lost, so
 /// `max-w-sm` renders at the panel's full 1030. Measured: all six sites on this
 /// page rendered 1030 against the reference's 384 / 512 / 512 / 512 / 448 /
 /// 448. [Align] is what turns the incoming constraint loose again, and its own
-/// start alignment is the rest of the declaration — the reference's boxes all
+/// start alignment is the rest of the declaration: the reference's boxes all
 /// begin at the panel's content edge, 24px in.
 ///
 /// The same shape `feedback.dart` names `_measured` and `selects.dart` wraps
@@ -122,19 +122,19 @@ Widget _measured(double maxWidth, Widget child) => Align(
       ),
     );
 
-/// `w-40` — the three slider matrix cells.
+/// `w-40`: the three slider matrix cells.
 final double _matrixSlider = ds(40);
 
-/// `bg-action/12` — the selected tint, on a bulk row and on a chosen card.
+/// `bg-action/12`: the selected tint, on a bulk row and on a chosen card.
 ///
 /// Read off [DsPalette.action] rather than `theme.primary` (ruling S3). The two
-/// are numerically identical today — `--primary` is `var(--color-action)` in
-/// **both** theme blocks — but they are different names for different jobs, and
+/// are numerically identical today, `--primary` is `var(--color-action)` in
+/// **both** theme blocks: but they are different names for different jobs, and
 /// `--ring` already proves the aliases can diverge per theme. The page says
 /// `action`, so the port says `action`.
 const double _actionTint = 0.12;
 
-/// `border-action/50` — the chosen card's rim, from the same ramp.
+/// `border-action/50`: the chosen card's rim, from the same ramp.
 const double _actionRim = 0.50;
 
 /// `--strong`, as Preflight sets it: `b, strong { font-weight: bolder }`, which
@@ -179,7 +179,7 @@ class SelectionPage extends StatelessWidget {
           blurb: here.category.blurb,
           contents: here.category.contents,
         ),
-        // `className="mb-12"` — 48px, and the only ported page that opens with
+        // `className="mb-12"`, 48px, and the only ported page that opens with
         // a Note above its first section.
         Padding(
           padding: EdgeInsets.only(bottom: ds(12)),
@@ -229,7 +229,7 @@ class _WhichControlBody extends StatelessWidget {
           TextSpan(text: 'Slider', style: strong),
           const TextSpan(
             text: ' for ranges where the exact number matters less than the '
-                'feel — price filters, odds explainers.',
+                'feel: price filters, odds explainers.',
           ),
         ],
       ),
@@ -328,7 +328,7 @@ class _CheckboxSectionState extends State<_CheckboxSection> {
               DsStateCell(
                 label: 'Focus',
                 note: 'Tab to it',
-                // DRIFT 6. The ring is painted, not focused — and the box is
+                // DRIFT 6. The ring is painted, not focused: and the box is
                 // still a live, uncontrolled checkbox underneath it.
                 child: DsCheckbox(
                   state: _focus,
@@ -439,7 +439,7 @@ class _CheckboxSectionState extends State<_CheckboxSection> {
                     ],
                   ),
                 ),
-                // `className="mt-5"` — 20px.
+                // `className="mt-5"`, 20px.
                 SizedBox(height: ds(5)),
                 DsText(
                   'The indeterminate state is what makes a bulk header honest '
@@ -463,7 +463,7 @@ class _CheckboxSectionState extends State<_CheckboxSection> {
 /// Composed here rather than through `DsField(orientation: horizontal)`
 /// because the reference's `Field` holds **three** children and `DsField`
 /// holds a control and a label. The label takes the top rung of
-/// [DsFieldLabel]'s activation ladder — an explicit `onTap` — which is what
+/// [DsFieldLabel]'s activation ladder: an explicit `onTap`: which is what
 /// `<label for>` buys: clicking the words ticks the box.
 class _FilterRow extends StatelessWidget {
   const _FilterRow({
@@ -493,7 +493,7 @@ class _FilterRow extends StatelessWidget {
               onChanged(next == DsCheckboxState.checked),
         ),
         SizedBox(width: DsField.gap),
-        // `*:data-[slot=field-label]:flex-auto` — the label grows, which is
+        // `*:data-[slot=field-label]:flex-auto`: the label grows, which is
         // what makes the rest of the row a target.
         Expanded(
           child: DsFieldLabel(
@@ -514,7 +514,7 @@ class _FilterRow extends StatelessWidget {
 /// `div.max-w-lg.space-y-px.overflow-hidden.rounded-lg.border.border-border`.
 ///
 /// **The seams are not a fill.** The container declares no background, so what
-/// shows in each `space-y-px` gap is whatever is behind it — the `DsPanel`'s
+/// shows in each `space-y-px` gap is whatever is behind it: the `DsPanel`'s
 /// own `--background`. `space-y-px` is a bottom **margin** on every child but
 /// the last, not a gap, and the measured height confirms it:
 /// 6 × 44 + 5 × 1 + 2 × 1 border = 271.
@@ -558,7 +558,7 @@ class _BulkList extends StatelessWidget {
   }
 }
 
-/// One 44px bulk row — `flex items-center gap-3 px-4 py-3`.
+/// One 44px bulk row, `flex items-center gap-3 px-4 py-3`.
 class _BulkRow extends StatelessWidget {
   const _BulkRow({
     required this.fill,
@@ -569,7 +569,7 @@ class _BulkRow extends StatelessWidget {
   });
 
   /// The row's own background. **Stated by the caller, never derived from the
-  /// checkbox** — drift 3.
+  /// checkbox**: drift 3.
   final Color fill;
 
   final Widget checkbox;
@@ -607,7 +607,7 @@ class _RadioSection extends StatefulWidget {
 }
 
 class _RadioSectionState extends State<_RadioSection> {
-  /// Each matrix cell wraps its item in **its own** `RadioGroup` — four
+  /// Each matrix cell wraps its item in **its own** `RadioGroup`: four
   /// independent groups of one.
   String? _unselected;
   String? _selected = 'a';
@@ -663,7 +663,7 @@ class _RadioSectionState extends State<_RadioSection> {
               ),
               DsStateCell(
                 label: 'Focus',
-                // DRIFT 6 again — the second painted ring on the page.
+                // DRIFT 6 again: the second painted ring on the page.
                 child: DsRadioGroup<String>(
                   value: _focus,
                   onChanged: (String next) => setState(() => _focus = next),
@@ -702,7 +702,7 @@ class _RadioSectionState extends State<_RadioSection> {
                   _measureLg,
                   DsRadioGroup<String>(
                     value: _method,
-                    // `className="max-w-lg gap-3"` — tw-merges over the Root's
+                    // `className="max-w-lg gap-3"`: tw-merges over the Root's
                     // own `gap-2`.
                     gap: ds(3),
                     onChanged: (String next) => setState(() => _method = next),
@@ -737,12 +737,12 @@ class _RadioSectionState extends State<_RadioSection> {
   }
 }
 
-/// A withdrawal option — a raw `<Label>` wrapping a radio, and **the first
+/// A withdrawal option: a raw `<Label>` wrapping a radio, and **the first
 /// hover state in this family**.
 ///
 /// `DsSelectionControl`'s own doc records that no control on the forms page
 /// authors a hover. That is still true of the *controls*; the card around one
-/// does. `hover:border-input` runs `transition-colors` — probed at
+/// does. `hover:border-input` runs `transition-colors`: probed at
 /// [DsDurations.transitionDefault] on `--ease-out`, and confirmed by driving a
 /// real pointer onto the card and sampling every frame: the border walks
 /// `--border` → `--input` across roughly fifteen frames rather than cutting.
@@ -785,7 +785,7 @@ class _OptionCardState extends State<_OptionCard> {
     final DsThemeData theme = DsTheme.of(context);
 
     // `has-[[data-state=checked]]:border-action/50` beats `hover:border-input`
-    // — it is emitted later at equal specificity, so a selected card does not
+    //: it is emitted later at equal specificity, so a selected card does not
     // lose its rim to a pointer.
     final Color border = widget.selected
         ? DsPalette.action.withValues(alpha: _actionRim)
@@ -837,17 +837,17 @@ class _OptionCardState extends State<_OptionCard> {
             // padding inside a border that still occupies the box, so a card
             // measures content + 2 x 16 + 2 x 1 = 81.3 and not 79.3.
             // [DecoratedBox] paints its border over the child without
-            // reserving space for it — [Container] adds `decoration.padding`
-            // for its callers and this does not — so the hairline is added
+            // reserving space for it, [Container] adds `decoration.padding`
+            // for its callers and this does not: so the hairline is added
             // here. Three cards deep, forgetting it costs the section 6px.
             padding: EdgeInsets.all(ds(4) + DsWidths.hairline),
             child: Row(
-              // `items-start` — the card is the one row on the page that does
+              // `items-start`: the card is the one row on the page that does
               // not centre.
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Padding(
-                  // `className="mt-0.5"` on the item — 2px.
+                  // `className="mt-0.5"` on the item, 2px.
                   padding: EdgeInsets.only(top: ds(0.5)),
                   child: DsRadioGroupItem<String>(
                     value: widget.value,
@@ -978,7 +978,7 @@ class _SwitchSectionState extends State<_SwitchSection> {
   }
 }
 
-/// One preferences row — label and description on the left, switch on the
+/// One preferences row: label and description on the left, switch on the
 /// right.
 ///
 /// The **opposite** order to `DsField`'s horizontal branch, which puts the
@@ -1047,7 +1047,7 @@ class _SliderSectionState extends State<_SliderSection> {
   List<double> _default = <double>[40];
   List<double> _range = <double>[20, 70];
 
-  /// `$10 – $240` — U+2013, **spaced**, unlike the two en dashes in §2's
+  /// `$10 – $240`, U+2013, **spaced**, unlike the two en dashes in §2's
   /// descriptions.
   String get _priceReadout =>
       '\$${_price[0].toInt()} – \$${_price[1].toInt()}';
@@ -1058,7 +1058,7 @@ class _SliderSectionState extends State<_SliderSection> {
       id: 'slider',
       title: 'Slider',
       description: 'Ranges. The current value is always shown as a number '
-          'beside the track — a slider without a readout is guesswork.',
+          'beside the track: a slider without a readout is guesswork.',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
@@ -1080,7 +1080,7 @@ class _SliderSectionState extends State<_SliderSection> {
                     onChanged: (List<double> next) =>
                         setState(() => _price = next),
                   ),
-                  // `className="mt-3"` — 12px.
+                  // `className="mt-3"`, 12px.
                   SizedBox(height: ds(3)),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1105,7 +1105,7 @@ class _SliderSectionState extends State<_SliderSection> {
                     label: 'Auto-sell below rarity',
                     value: '${_odds.single.toInt()}%',
                   ),
-                  // No `min` — the component defaults it to 0 — and no footer.
+                  // No `min`: the component defaults it to 0: and no footer.
                   DsSlider(
                     values: _odds,
                     label: 'Auto-sell threshold',
@@ -1163,7 +1163,7 @@ class _SliderSectionState extends State<_SliderSection> {
   }
 }
 
-/// `div.mb-4.flex.items-baseline.justify-between` — the label and its number.
+/// `div.mb-4.flex.items-baseline.justify-between`: the label and its number.
 class _Readout extends StatelessWidget {
   const _Readout({required this.label, required this.value});
 
@@ -1175,7 +1175,7 @@ class _Readout extends StatelessWidget {
     final DsThemeData theme = DsTheme.of(context);
 
     return Padding(
-      // `mb-4` — 16px.
+      // `mb-4`, 16px.
       padding: EdgeInsets.only(bottom: ds(4)),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.baseline,
@@ -1234,7 +1234,7 @@ class _ApiSection extends StatelessWidget {
             k: 'has-[[data-state=checked]]:',
             v: TextSpan(
               text: 'The Tailwind pattern for styling a wrapper based on the '
-                  'control inside it — used for selected option cards.',
+                  'control inside it: used for selected option cards.',
             ),
           ),
         ],
@@ -1256,7 +1256,7 @@ class _RulesSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          // DRIFT 12. Five against four — the first `DoDont` in the corpus
+          // DRIFT 12. Five against four: the first `DoDont` in the corpus
           // whose columns are different lengths.
           const DsDoDont(
             dos: <String>[
@@ -1270,7 +1270,7 @@ class _RulesSection extends StatelessWidget {
               'Tint selected rows blue so selection reads at a glance.',
             ],
             donts: <String>[
-              "Don't use a Switch next to a Save button — that is a "
+              "Don't use a Switch next to a Save button: that is a "
                   'checkbox.',
               "Don't use a radio group for two options that are really on "
                   'and off.',

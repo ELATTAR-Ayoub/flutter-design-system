@@ -1,14 +1,14 @@
-/// `/design-system/components/agent/composer` — everything below the
+/// `/design-system/components/agent/composer`: everything below the
 /// transcript.
 ///
 /// Five sections and four live composers. **Nothing on this page is a
 /// picture**: a reader can type into any of them and watch the box grow, open
 /// the slash palette by typing `/` and walk it with the arrow keys, open the
 /// plus menu, take the attachment back out of the tray, and see busy and
-/// disabled differ in the two things they actually differ in — which button
+/// disabled differ in the two things they actually differ in: which button
 /// the right-hand slot holds, and whether the input is dimmed.
 ///
-/// ## Drift register — recorded, shipped as written
+/// ## Drift register: recorded, shipped as written
 ///
 ///  1. **The eyebrow says "Components" where every base page says "Base".**
 ///     `` `${group.title} · Components` `` with `group.title = "Agent"`, so
@@ -20,7 +20,7 @@
 ///     palette", "Dictation", "Model picker"]`; the page renders `rest`,
 ///     `states`, `attachments`, `slash` and `props`. **Dictation** and **Model
 ///     picker** have no section behind them at all, and *"Attach menu"* has
-///     none either — the plus is only visible inside the composers. This is the
+///     none either: the plus is only visible inside the composers. This is the
 ///     exact bug the selects page's own §6 is a postmortem of, one family over,
 ///     and `nav.dart` already carries the list verbatim.
 ///  3. **The slash-palette section shows almost no slash palette.** §4's Panel
@@ -31,7 +31,7 @@
 ///     `overflow-hidden`.)* The port reproduces both halves: the paragraph, and
 ///     the clipping.
 ///  4. **`Panel note="idle"` is the only status any composer here declares**,
-///     and it is on the one composer that is neither busy nor disabled — so the
+///     and it is on the one composer that is neither busy nor disabled: so the
 ///     word describes the absence of the other two rather than a state the
 ///     component has.
 ///  5. **The Props table documents `value / onChange` and `inputRef`**, which
@@ -48,11 +48,11 @@ import '../nav.dart';
 
 /* ── Fixtures ────────────────────────────────────────────────────────────── */
 
-/// `PERSONA.placeholder` from `agent-demo.tsx` — the one field of the persona
+/// `PERSONA.placeholder` from `agent-demo.tsx`: the one field of the persona
 /// this page's specimen reads.
 const String _placeholder = 'Ask about a pack, a pull or your balance…';
 
-/// `COMMANDS` from `agent-demo.tsx`, verbatim — three skills and one command,
+/// `COMMANDS` from `agent-demo.tsx`, verbatim: three skills and one command,
 /// each carrying the glyph its capability carries everywhere else.
 const List<DsAgentCommand> _commands = <DsAgentCommand>[
   DsAgentCommand(
@@ -97,7 +97,7 @@ const DsAgentAttachment _seeded = DsAgentAttachment(
 
 /* ── The specimen ────────────────────────────────────────────────────────── */
 
-/// `ComposerSpecimen` (`agent-demo.tsx` L686) — the real component, holding its
+/// `ComposerSpecimen` (`agent-demo.tsx` L686): the real component, holding its
 /// own draft and its own attachment list.
 ///
 /// *"Nothing here is a mock-up. Every specimen is the real component; what is
@@ -134,7 +134,7 @@ class _ComposerSpecimenState extends State<ComposerSpecimen> {
   Widget build(BuildContext context) {
     return DsAgentComposer(
       controller: _controller,
-      // `onSubmit={() => setValue("")}` — the specimen has nowhere to send it,
+      // `onSubmit={() => setValue("")}`: the specimen has nowhere to send it,
       // so sending is emptying.
       onSubmit: _controller.clear,
       onStop: () {},
@@ -168,11 +168,11 @@ class ComposerPage extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         DsPageHeader(
-          // DRIFT 1 — "Components", not "Base".
+          // DRIFT 1, "Components", not "Base".
           eyebrow: '${here.group.title} · Components',
           title: here.category.title,
           blurb: here.category.blurb,
-          // DRIFT 2 — five chips, three of which name no section.
+          // DRIFT 2: five chips, three of which name no section.
           contents: here.category.contents,
         ),
         const _RestSection(),
@@ -196,7 +196,8 @@ class _RestSection extends StatelessWidget {
     return const DsSection(
       id: 'rest',
       title: 'At rest',
-      description: 'Grows to fit as you type, up to a cap, then scrolls. Enter '
+      description:
+          'Grows to fit as you type, up to a cap, then scrolls. Enter '
           'sends and Shift-Enter breaks the line — the convention every chat '
           'surface has agreed on, and breaking it is a novelty nobody asked '
           'for.',
@@ -220,7 +221,8 @@ class _StatesSection extends StatelessWidget {
     return DsSection(
       id: 'states',
       title: 'Busy and disabled',
-      description: 'Two different facts, drawn differently. Busy means the '
+      description:
+          'Two different facts, drawn differently. Busy means the '
           'agent is answering and send becomes stop. Disabled means the '
           'transport is not ready to carry a message at all — which the '
           'composer says by refusing input rather than by dropping the first '
@@ -256,7 +258,8 @@ class _AttachmentsSection extends StatelessWidget {
     return DsSection(
       id: 'attachments',
       title: 'File tray',
-      description: 'Files arrive by picker, by drag-and-drop onto the console, '
+      description:
+          'Files arrive by picker, by drag-and-drop onto the console, '
           'or by paste. They sit above the input until sent, and each one '
           'states whether its contents can actually travel.',
       child: Column(
@@ -293,9 +296,10 @@ class _DropTargetBody extends StatelessWidget {
           const TextSpan(text: 'Dragging a file over the console lights '),
           DsCode.span('border-agent bg-agent/8'),
           const TextSpan(
-            text: ' on the composer rather than overlaying a dashed rectangle '
+            text:
+                ' on the composer rather than overlaying a dashed rectangle '
                 'across the transcript. The transcript is what the user is '
-                // `&ldquo;` / `&rdquo;` — real curly quotes.
+                // `&ldquo;` / `&rdquo;`: real curly quotes.
                 'reading; covering it to say “you may drop here” hides the '
                 'thing they dropped the file because of.',
           ),
@@ -316,11 +320,12 @@ class _SlashSection extends StatelessWidget {
     return const DsSection(
       id: 'slash',
       title: 'Slash palette',
-      description: 'Typing / at the start of the input opens the palette. '
+      description:
+          'Typing / at the start of the input opens the palette. '
           'Skills are things the agent can do; commands run in the browser. '
           'Both carry the same glyph they carry in the tool chip, so one '
           'capability has one mark everywhere.',
-      // DRIFT 3 — the section about the palette holds a paragraph about it.
+      // DRIFT 3: the section about the palette holds a paragraph about it.
       child: DsPanel(
         label: 'SlashPalette',
         note: 'type / in any composer above',
@@ -339,7 +344,8 @@ class _SlashBody extends StatelessWidget {
       TextSpan(
         children: <InlineSpan>[
           const TextSpan(
-            text: 'The palette is filtered by what follows the slash and is '
+            text:
+                'The palette is filtered by what follows the slash and is '
                 'anchored to the composer rather than portalled, so it moves '
                 'with the input as it grows. ',
           ),
@@ -347,7 +353,8 @@ class _SlashBody extends StatelessWidget {
           const TextSpan(text: ' and '),
           DsCode.span('slashQuery'),
           const TextSpan(
-            text: ' are exported separately — the matching is a pure function '
+            text:
+                ' are exported separately — the matching is a pure function '
                 'and can be tested without a DOM.',
           ),
         ],
@@ -367,27 +374,19 @@ class _PropsSection extends StatelessWidget {
     return const DsSection(
       id: 'props',
       title: 'Props',
-      description: 'The composer is controlled and stateless apart from its '
+      description:
+          'The composer is controlled and stateless apart from its '
           'own measurement. The console owns the draft, the attachments and '
           'the dictation session, which is what lets a caller compose a '
           'different shell around the same input.',
       child: DsMeta(
         items: <DsMetaItem>[
-          // DRIFT 5 — the reference's own API, reproduced as written.
-          (
-            k: 'value / onChange',
-            v: TextSpan(text: 'string — controlled'),
-          ),
+          // DRIFT 5: the reference's own API, reproduced as written.
+          (k: 'value / onChange', v: TextSpan(text: 'string — controlled')),
           (k: 'onSubmit / onStop', v: TextSpan(text: '() => void')),
           (k: 'busy', v: TextSpan(text: 'boolean — send becomes stop')),
-          (
-            k: 'disabled',
-            v: TextSpan(text: 'boolean — transport not ready'),
-          ),
-          (
-            k: 'commands',
-            v: TextSpan(text: 'AgentCommand[] — the / palette'),
-          ),
+          (k: 'disabled', v: TextSpan(text: 'boolean — transport not ready')),
+          (k: 'commands', v: TextSpan(text: 'AgentCommand[] — the / palette')),
           (
             k: 'attachments',
             v: TextSpan(
@@ -403,21 +402,24 @@ class _PropsSection extends StatelessWidget {
           (
             k: 'accessory',
             v: TextSpan(
-              text: 'ReactNode — slot for the model picker, left of the '
+              text:
+                  'ReactNode — slot for the model picker, left of the '
                   'control row',
             ),
           ),
           (
             k: 'micControl',
             v: TextSpan(
-              text: 'ReactNode — supplied by the console because it also '
+              text:
+                  'ReactNode — supplied by the console because it also '
                   'carries the speech settings',
             ),
           ),
           (
             k: 'inputRef',
             v: TextSpan(
-              text: 'RefObject — for callers that write into it from outside, '
+              text:
+                  'RefObject — for callers that write into it from outside, '
                   'like the welcome card arming a skill',
             ),
           ),
