@@ -32,3 +32,10 @@ migrate_working_dir/
 
 # Supervisor scratch (SDD ledger)
 .superpowers/
+
+# Captured test output. Runs are redirected to a file rather than piped through
+# `tail`, which silently discards early failures. Those captures are scratch and
+# must never be committed: two of them nearly went in under `git add -A` on
+# 2026-08-24. New briefs should write captures into `.captures/`.
+.captures/
+*.capture.txt
