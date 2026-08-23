@@ -2,7 +2,7 @@
 ///
 /// `icon` has a real `registry/components/icon.json` manifest —
 /// [dependencies] is the manifest's own `registryDependencies` list,
-/// verbatim — `['source-foundation']` — so `page.dart`'s installation
+/// verbatim, `['source-foundation']`: so `page.dart`'s installation
 /// section can render the real `elattar add icon` command.
 library;
 

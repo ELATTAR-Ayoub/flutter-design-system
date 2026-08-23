@@ -1,9 +1,9 @@
-/// Tests for `components_docs/scroll_area/page.dart`'s [ScrollAreaDocPage] —
+/// Tests for `components_docs/scroll_area/page.dart`'s [ScrollAreaDocPage]:
 /// the ONE page documenting THREE layout components: [DsScrollArea],
 /// [DsResizablePanelGroup], and [DsAspectRatio].
 ///
 /// All three read from `lib/src/components/scroll_area.dart`,
-/// `resizable.dart`, and `aspect_ratio.dart` directly — every public class,
+/// `resizable.dart`, and `aspect_ratio.dart` directly, every public class,
 /// enum, and constructor parameter enumerated below is one this page's API
 /// tables must cover.
 ///
@@ -19,6 +19,7 @@ import 'package:example/components_docs/scroll_area/meta.dart';
 import 'package:example/components_docs/scroll_area/page.dart';
 import 'package:example/docs/docs_code.dart';
 import 'package:example/docs/docs_facts.dart';
+import 'package:example/kit.dart' show DsSection;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -76,6 +77,48 @@ Future<DsThemeController> _pump(
 }
 
 void main() {
+  testWidgets(
+    'sections render in the shadcn-mirrored order, section for section, '
+    'with each of the three families\' own sections grouped under its own '
+    'name',
+    (WidgetTester tester) async {
+      await _pump(tester);
+
+      final List<String> titles = tester
+          .widgetList<DsSection>(find.byType(DsSection))
+          .map((DsSection section) => section.title)
+          .toList();
+
+      expect(titles, <String>[
+        'Installation',
+        'Usage',
+        'Composition',
+        'Scroll area: Horizontal scrolling',
+        'Scroll area: RTL',
+        'Resizable: Handle',
+        'Resizable: RTL',
+        'Aspect ratio: Square',
+        'Aspect ratio: Portrait',
+        'Aspect ratio: RTL',
+        'API Reference',
+        'States',
+        'Accessibility',
+        'Responsive',
+        'Dependencies',
+        'Theming',
+        'Source',
+      ]);
+
+      // The exact-order equality above already proves the old house shape
+      // (Overview, Status, Preview, Variants) is gone: any leftover section
+      // would show up as an extra or misplaced title. DsSection is the only
+      // heading-producing wrapper on this page, so no separate find.text
+      // check is needed (and 'Preview' is also DocsCodeExample's own
+      // internal tab label, so a bare find.text('Preview') would be
+      // ambiguous rather than meaningful).
+    },
+  );
+
   testWidgets(
     'renders the article at wide and narrow widths with no exceptions',
     (WidgetTester tester) async {
@@ -157,13 +200,14 @@ void main() {
   );
 
   testWidgets(
-    'DsResizablePanelGroup renders two resizable panels with a draggable '
-    'separator',
+    'DsResizablePanelGroup renders resizable panels with a draggable '
+    'separator, in the live demo and the Handle and RTL specimens',
     (WidgetTester tester) async {
       await _pump(tester);
 
+      // Live demo, Resizable: Handle (two groups), Resizable: RTL.
       final Finder panelGroup = find.byType(DsResizablePanelGroup);
-      expect(panelGroup, findsOneWidget);
+      expect(panelGroup, findsAtLeastNWidgets(4));
 
       // The group should render and be ready for interaction.
       expect(tester.takeException(), isNull);
@@ -201,7 +245,7 @@ void main() {
 
   testWidgets(
     'installation is honest that none of the three has a registry manifest '
-    'yet — no elattar add command is presented as working',
+    'yet, no elattar add command is presented as working',
     (WidgetTester tester) async {
       await _pump(tester);
 

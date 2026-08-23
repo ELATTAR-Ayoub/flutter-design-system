@@ -1,10 +1,10 @@
 /// Tests for `components_docs/collapsible/page.dart`'s [CollapsibleDocPage]
-/// — the public documentation page for `DsCollapsible` (and the [DsUnfold]
+/// the public documentation page for `DsCollapsible` (and the [DsUnfold]
 /// animation it shares with `DsAccordion`).
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery` for
-/// layout — the discipline `buttons_page_test.dart` established and
+/// layout: the discipline `buttons_page_test.dart` established and
 /// `docs_file_tree_test.dart` / `skills_docs_test.dart` carry forward. Motion
 /// is frozen through `MediaQuery(disableAnimations: true)`, mounted below
 /// `MaterialApp` so it reaches every descendant `DsUnfold`, rather than
@@ -15,8 +15,27 @@ import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/collapsible/meta.dart';
 import 'package:example/components_docs/collapsible/page.dart';
 import 'package:example/docs/docs_code.dart';
+import 'package:example/kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+/// The section headings this page must render, in this order: the shadcn
+/// `base/collapsible` shape (Preview stands in for its heading-less live
+/// demo, Installation, Usage, Composition, API Reference) followed by the
+/// six sections shadcn does not have.
+const List<String> _expectedSectionOrder = <String>[
+  'Installation',
+  'Usage',
+  'Composition',
+  'Independent instances',
+  'API Reference',
+  'States',
+  'Accessibility',
+  'Responsive',
+  'Dependencies',
+  'Theming',
+  'Source',
+];
 
 const Size _wide = Size(1440, 900);
 const Size _narrow = Size(390, 844);
@@ -71,6 +90,20 @@ void main() {
 
   group('page', () {
     testWidgets(
+      'renders the shadcn-parity section order top to bottom',
+      (WidgetTester tester) async {
+        await _pumpCollapsible(tester, size: const Size(1440, 3200));
+
+        final List<String> rendered = tester
+            .widgetList<DsSection>(find.byType(DsSection))
+            .map((DsSection section) => section.title)
+            .toList();
+
+        expect(rendered, _expectedSectionOrder);
+      },
+    );
+
+    testWidgets(
       'renders the article at 1440x900 and flips a live theme controller in place',
       (WidgetTester tester) async {
         final DsThemeController theme = await _pumpCollapsible(
@@ -90,7 +123,7 @@ void main() {
         expect(find.byType(DsCollapsible), findsWidgets);
         expect(tester.takeException(), isNull);
 
-        // Same controller, flipped in place rather than rebuilt — dark then
+        // Same controller, flipped in place rather than rebuilt: dark then
         // light must both render the same tree without throwing.
         theme.setMode(DsThemeMode.light);
         await tester.pump();
@@ -141,7 +174,7 @@ void main() {
       (WidgetTester tester) async {
         await _pumpCollapsible(tester);
 
-        // The phrase may appear in explanatory prose (it does — the install
+        // The phrase may appear in explanatory prose (it does: the install
         // section explains why the command does not exist yet), but it must
         // never be rendered as a standalone, copyable command block.
         expect(
@@ -180,20 +213,20 @@ void main() {
     );
 
     testWidgets(
-      'two independent collapsibles in the composition example do not '
-      'affect each other — the whole point versus an accordion',
+      'two independent collapsibles in the Independent instances example '
+      'do not affect each other: the whole point versus an accordion',
       (WidgetTester tester) async {
         await _pumpCollapsible(tester, size: const Size(900, 1600));
 
         final Finder triggers = find.byKey(
-          const ValueKey<String>('collapsible-doc-composition'),
+          const ValueKey<String>('collapsible-doc-independent'),
         );
         expect(triggers, findsOneWidget);
 
         final Finder firstTrigger = find.descendant(
           of: triggers,
           matching: find.byKey(
-            const ValueKey<String>('collapsible-doc-composition-a-trigger'),
+            const ValueKey<String>('collapsible-doc-independent-a-trigger'),
           ),
         );
         await tester.ensureVisible(firstTrigger);
@@ -202,13 +235,13 @@ void main() {
 
         expect(
           find.byKey(
-            const ValueKey<String>('collapsible-doc-composition-a-panel'),
+            const ValueKey<String>('collapsible-doc-independent-a-panel'),
           ),
           findsOneWidget,
         );
         expect(
           find.byKey(
-            const ValueKey<String>('collapsible-doc-composition-b-panel'),
+            const ValueKey<String>('collapsible-doc-independent-b-panel'),
           ),
           findsNothing,
         );

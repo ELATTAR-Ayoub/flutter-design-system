@@ -29,18 +29,16 @@ class AccordionDocPage extends StatelessWidget {
         DsBreadcrumbEntry.page('Accordion'),
       ],
       toc: const <DocsTocEntry>[
-        DocsTocEntry(title: 'Purpose', anchor: 'purpose'),
-        DocsTocEntry(title: 'Status', anchor: 'status'),
-        DocsTocEntry(title: 'Preview', anchor: 'preview'),
-        DocsTocEntry(title: 'Installation', anchor: 'install'),
+          DocsTocEntry(title: 'Installation', anchor: 'install'),
         DocsTocEntry(title: 'Usage', anchor: 'usage'),
-        DocsTocEntry(title: 'API', anchor: 'api'),
-        DocsTocEntry(title: 'Variants and sizes', anchor: 'variants'),
+        DocsTocEntry(title: 'Composition', anchor: 'composition'),
+        DocsTocEntry(title: 'Basic', anchor: 'basic'),
+        DocsTocEntry(title: 'Card', anchor: 'card'),
+        DocsTocEntry(title: 'API Reference', anchor: 'api'),
         DocsTocEntry(title: 'States', anchor: 'states'),
         DocsTocEntry(title: 'Accessibility', anchor: 'accessibility'),
-        DocsTocEntry(title: 'Responsive behavior', anchor: 'responsive'),
+        DocsTocEntry(title: 'Responsive', anchor: 'responsive'),
         DocsTocEntry(title: 'Dependencies', anchor: 'dependencies'),
-        DocsTocEntry(title: 'Composition', anchor: 'composition'),
         DocsTocEntry(title: 'Theming', anchor: 'theming'),
         DocsTocEntry(title: 'Source', anchor: 'source'),
       ],
@@ -66,61 +64,29 @@ class _AccordionArticle extends StatelessWidget {
     key: const ValueKey<String>('accordion-doc-article'),
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
-      DsSection(
-        id: 'purpose',
-        title: 'When to reach for it',
-        description:
-            'Three disclosure patterns live in this system and they are '
-            'not interchangeable — picking the wrong one is the most '
-            'common misuse.',
-        child: const _DecisionGuide(),
+      ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: DsWidths.prose),
+        child: DsText(accordionExpandedDescription, DsType.body),
       ),
-      SizedBox(height: ds(2)),
-      DsSection(
-        id: 'status',
-        title: 'Status',
-        child: const DocsInstallFacts(
-          title: 'Status',
-          facts: <DocsInstallFact>[
-            DocsInstallFact(
-              label: 'Status',
-              value: 'Experimental',
-              description:
-                  'No registry manifest yet — see Installation below for '
-                  'what that does and does not block.',
-            ),
-            DocsInstallFact(
-              label: 'Version',
-              value: '0.0.1',
-              description: 'Tracks the package version this page ships with.',
-            ),
-            DocsInstallFact(
-              label: 'Platforms',
-              value: 'Android, iOS, Web, macOS, Windows, Linux',
-              description:
-                  'Pure widgets layer — no platform channel of its own, so '
-                  'behavior does not vary by platform.',
-            ),
-          ],
+      SizedBox(height: ds(4)),
+      ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: DsWidths.prose),
+        child: DsText(
+          'type="single" collapsible: one open panel, or none. Opening a '
+          'second panel closes whichever was open; tapping the open '
+          'panel\'s own trigger closes it too.',
+          DsType.body,
         ),
       ),
-      SizedBox(height: ds(2)),
-      DsSection(
-        id: 'preview',
-        title: 'Live preview',
+      SizedBox(height: ds(6)),
+      DocsCodeExample(
+        title: 'Accordion specimen',
         description:
-            'type="single" collapsible — one open panel, or none. Opening a '
-            'second panel closes whichever was open; tapping the open '
-            'panel\'s own trigger closes it too.',
-        child: DocsCodeExample(
-          title: 'Accordion specimen',
-          description:
-              'A three-item accordion with the first panel open by default.',
-          preview: const _AccordionPreview(),
-          manualFiles: const <DocsCodeFile>[
-            DocsCodeFile(path: 'accordion_preview.dart', code: _previewCode),
-          ],
-        ),
+            'A three-item accordion with the first panel open by default.',
+        preview: const _AccordionPreview(),
+        manualFiles: const <DocsCodeFile>[
+          DocsCodeFile(path: 'accordion_preview.dart', code: _previewCode),
+        ],
       ),
       SizedBox(height: ds(2)),
       DsSection(
@@ -128,7 +94,7 @@ class _AccordionArticle extends StatelessWidget {
         title: 'Installation',
         description:
             'accordion is already reachable today through the published '
-            'package — it is exported from the barrel — but it is not yet '
+            'package: it is exported from the barrel: but it is not yet '
             'installable through the elattar CLI.',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -191,11 +157,65 @@ class _AccordionArticle extends StatelessWidget {
       ),
       SizedBox(height: ds(2)),
       DsSection(
+        id: 'composition',
+        title: 'Composition',
+        description:
+            'DsAccordion takes data, not children: items is a '
+            'List<DsAccordionItem>, each one a title and a content widget, '
+            'rather than a tree of separate Accordion/AccordionItem/'
+            'AccordionTrigger sub-widgets to assemble by hand. content still '
+            'accepts any Widget, not just a string: this specimen nests more '
+            'than one paragraph inside a single panel.',
+        child: DocsCodeExample(
+          title: 'Multi-paragraph content',
+          preview: const _AccordionCompositionPreview(),
+          manualFiles: const <DocsCodeFile>[
+            DocsCodeFile(
+              path: 'accordion_composition.dart',
+              code: _compositionCode,
+            ),
+          ],
+        ),
+      ),
+      SizedBox(height: ds(2)),
+      DsSection(
+        id: 'basic',
+        title: 'Basic',
+        description:
+            'A basic accordion that shows one item at a time, the first '
+            'item open by default: the same collapsible behavior as the '
+            'preview above, with different copy.',
+        child: DocsCodeExample(
+          title: 'Shipping and returns',
+          preview: const _AccordionBasicPreview(),
+          manualFiles: const <DocsCodeFile>[
+            DocsCodeFile(path: 'accordion_basic.dart', code: _basicCode),
+          ],
+        ),
+      ),
+      SizedBox(height: ds(2)),
+      DsSection(
+        id: 'card',
+        title: 'Card',
+        description:
+            'DsAccordion has no surface of its own: wrap it in DsCard when '
+            'the FAQ needs a header and an edge, same as any other content.',
+        child: DocsCodeExample(
+          title: 'Accordion inside a card',
+          preview: const _AccordionCardPreview(),
+          manualFiles: const <DocsCodeFile>[
+            DocsCodeFile(path: 'accordion_card.dart', code: _cardCode),
+          ],
+        ),
+      ),
+      SizedBox(height: ds(2)),
+      DsSection(
         id: 'api',
-        title: 'API',
+        title: 'API Reference',
         description:
             'Every public constructor parameter on DsAccordion and '
-            'DsAccordionItem.',
+            'DsAccordionItem, plus the fixed layout constants that stand in '
+            'for a variant or size enum, since DsAccordion has neither.',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
@@ -211,7 +231,7 @@ class _AccordionArticle extends StatelessWidget {
                   name: 'openIndex',
                   type: 'int?',
                   description:
-                      'Which item is open, or null for none. Required — '
+                      'Which item is open, or null for none. Required, '
                       'the caller must state "nothing open" explicitly '
                       'rather than leaving it implicit.',
                 ),
@@ -220,7 +240,7 @@ class _AccordionArticle extends StatelessWidget {
                   type: 'ValueChanged<int?>',
                   description:
                       'Reports the new openIndex. Tapping the already-open '
-                      'item reports null, not its own index — that is '
+                      'item reports null, not its own index: that is '
                       'what "collapsible" means here.',
                 ),
               ],
@@ -233,50 +253,46 @@ class _AccordionArticle extends StatelessWidget {
                   name: 'title',
                   type: 'String',
                   description:
-                      'The trigger\'s label and its only accessible name — '
+                      'The trigger\'s label and its only accessible name, '
                       'there is no separate label parameter.',
                 ),
                 DocsApiFact(
                   name: 'content',
                   type: 'Widget',
                   description:
-                      'The panel\'s child. Any widget, not just text — see '
-                      'Composition below.',
+                      'The panel\'s child. Any widget, not just text: see '
+                      'Composition above.',
                 ),
               ],
             ),
-          ],
-        ),
-      ),
-      SizedBox(height: ds(2)),
-      DsSection(
-        id: 'variants',
-        title: 'Variants and sizes',
-        description:
-            'N/A — DsAccordion exposes no variant or size enum. Every '
-            'accordion in the corpus renders through the same trigger and '
-            'padding ladder; nothing here varies by prop.',
-        child: const DocsApiTable(
-          title: 'Fixed layout tokens (not variants)',
-          facts: <DocsApiFact>[
-            DocsApiFact(
-              name: 'DsAccordion.triggerPaddingY',
-              type: 'static double',
-              description:
-                  '10px of vertical padding on the trigger (py-2.5), '
-                  'reusable if you need to match the rhythm elsewhere.',
-            ),
-            DocsApiFact(
-              name: 'DsAccordion.contentPaddingBottom',
-              type: 'static double',
-              description: '10px under the open panel\'s content (pb-2.5).',
-            ),
-            DocsApiFact(
-              name: 'DsAccordion.chevronPx',
-              type: 'static double',
-              description:
-                  '16px chevron size — the icon widget\'s own default, '
-                  'not an accordion-specific variant.',
+            SizedBox(height: ds(4)),
+            const DocsApiTable(
+              title: 'DsAccordion static layout tokens',
+              facts: <DocsApiFact>[
+                DocsApiFact(
+                  name: 'DsAccordion.triggerPaddingY',
+                  type: 'static double',
+                  description:
+                      '10px of vertical padding on the trigger (py-2.5), '
+                      'reusable if you need to match the rhythm elsewhere.',
+                ),
+                DocsApiFact(
+                  name: 'DsAccordion.contentPaddingBottom',
+                  type: 'static double',
+                  description:
+                      '10px under the open panel\'s content (pb-2.5).',
+                ),
+                DocsApiFact(
+                  name: 'DsAccordion.chevronPx',
+                  type: 'static double',
+                  description:
+                      '16px chevron size: the icon widget\'s own default, '
+                      'not an accordion-specific variant. DsAccordion '
+                      'exposes no variant or size enum: every accordion '
+                      'renders through this same trigger and padding '
+                      'ladder.',
+                ),
+              ],
             ),
           ],
         ),
@@ -320,8 +336,8 @@ class _AccordionArticle extends StatelessWidget {
             DocsStateFact(
               state: 'Selected (open)',
               treatment:
-                  'The chevron swaps from chevron-down to chevron-up — a '
-                  'glyph swap, not a rotation — and the content mounts and '
+                  'The chevron swaps from chevron-down to chevron-up: a '
+                  'glyph swap, not a rotation: and the content mounts and '
                   'plays its unfold animation.',
               userSignal:
                   'Semantics(expanded: true) is published alongside the '
@@ -331,11 +347,11 @@ class _AccordionArticle extends StatelessWidget {
               state: 'Empty',
               treatment: 'items: const [] renders a zero-height column.',
               userSignal:
-                  'No built-in placeholder copy — compose one yourself if '
+                  'No built-in placeholder copy: compose one yourself if '
                   'an empty accordion needs messaging.',
             ),
             DocsStateFact(
-              state: 'Disabled — N/A',
+              state: 'Disabled, N/A',
               treatment:
                   'DsAccordion and DsAccordionItem expose no enabled or '
                   'disabled parameter.',
@@ -344,13 +360,13 @@ class _AccordionArticle extends StatelessWidget {
                   'the component.',
             ),
             DocsStateFact(
-              state: 'Loading — N/A',
+              state: 'Loading, N/A',
               treatment:
                   'The toggle is synchronous; there is nothing to await.',
               userSignal: 'No async state exists to invent here.',
             ),
             DocsStateFact(
-              state: 'Error / Success — N/A',
+              state: 'Error / Success, N/A',
               treatment: 'A disclosure list carries no validation concept.',
               userSignal: 'Neither state applies to this primitive.',
             ),
@@ -361,7 +377,7 @@ class _AccordionArticle extends StatelessWidget {
                   'close animation route through dsAnimationDuration.',
               userSignal:
                   'That duration collapses to zero when the platform\'s '
-                  'disable-animations flag is on — transitions still '
+                  'disable-animations flag is on: transitions still '
                   'happen, instantly.',
             ),
           ],
@@ -375,11 +391,11 @@ class _AccordionArticle extends StatelessWidget {
           items: <String>[
             'Each trigger publishes one merged Semantics node: '
                 'button: true, expanded: <open state>, label: <title>.',
-            'title is the only accessible name a trigger has — there is '
+            'title is the only accessible name a trigger has: there is '
                 'no separate label parameter, so it cannot be left as '
                 'placeholder-style copy.',
             'Keyboard: Tab moves focus between triggers and paints the '
-                'ring. Enter and Space are not wired to activation — only '
+                'ring. Enter and Space are not wired to activation: only '
                 'a pointer or touch tap toggles the panel today.',
             'The measured trigger height is about 40.56px, under the '
                 'common 44–48px touch-target guidance; treat tap targets '
@@ -394,11 +410,11 @@ class _AccordionArticle extends StatelessWidget {
       SizedBox(height: ds(2)),
       DsSection(
         id: 'responsive',
-        title: 'Responsive behavior',
+        title: 'Responsive',
         child: const _Bullets(
           items: <String>[
             'DsAccordion is a stretched Column with no breakpoints of its '
-                'own — it always fills the width its parent gives it.',
+                'own: it always fills the width its parent gives it.',
             'A trigger title has no maxLines or overflow set, so a long '
                 'question wraps onto more than one line instead of '
                 'truncating.',
@@ -410,14 +426,14 @@ class _AccordionArticle extends StatelessWidget {
       SizedBox(height: ds(2)),
       DsSection(
         id: 'dependencies',
-        title: 'Dependencies, files, and assets',
+        title: 'Dependencies',
         child: DocsInstallFacts(
           title: 'Dependencies',
           facts: <DocsInstallFact>[
             DocsInstallFact(
               label: 'Files',
               value: accordionDoc.sourcePath,
-              description: 'One file — no companion sources.',
+              description: 'One file: no companion sources.',
             ),
             DocsInstallFact(
               label: 'Component dependencies',
@@ -437,7 +453,7 @@ class _AccordionArticle extends StatelessWidget {
               label: 'Assets, fonts, shaders',
               value: 'None',
               description:
-                  'No image, font, or shader assets — text renders through '
+                  'No image, font, or shader assets: text renders through '
                   'the ambient typography tokens already loaded elsewhere.',
             ),
           ],
@@ -445,38 +461,20 @@ class _AccordionArticle extends StatelessWidget {
       ),
       SizedBox(height: ds(2)),
       DsSection(
-        id: 'composition',
-        title: 'Composition',
-        description:
-            'content takes any Widget, not just a string — this specimen '
-            'nests more than one paragraph inside a single panel.',
-        child: DocsCodeExample(
-          title: 'Multi-paragraph content',
-          preview: const _AccordionCompositionPreview(),
-          manualFiles: const <DocsCodeFile>[
-            DocsCodeFile(
-              path: 'accordion_composition.dart',
-              code: _compositionCode,
-            ),
-          ],
-        ),
-      ),
-      SizedBox(height: ds(2)),
-      DsSection(
         id: 'theming',
-        title: 'Theming notes',
+        title: 'Theming',
         child: const _Bullets(
           items: <String>[
             'theme.border paints the 1px seam under every item but the '
                 'last (not-last:border-b).',
             'theme.foreground paints both the trigger label and the '
-                'chevron — the reference\'s own muted-foreground variant '
+                'chevron: the reference\'s own muted-foreground variant '
                 'on the chevron is dead CSS, so this port renders the '
                 'measured color rather than the unreachable one.',
             'theme.ring, at the system\'s standard 0.50 alpha, is the only '
                 'color the focus state adds; there is no separate hover '
                 'or pressed fill.',
-            'DsShadows.none is the trigger\'s resting elevation — the '
+            'DsShadows.none is the trigger\'s resting elevation: the '
                 'focus ring is the only shadow layer it ever gains.',
           ],
         ),
@@ -515,67 +513,6 @@ class _AccordionArticle extends StatelessWidget {
       ),
     ],
   );
-}
-
-class _DecisionGuide extends StatelessWidget {
-  const _DecisionGuide();
-
-  @override
-  Widget build(BuildContext context) => DsPanel(
-    label: 'DECISION GUIDE',
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: const <Widget>[
-        _ComparisonRow(
-          name: 'Accordion (this component)',
-          body:
-              'A set of related disclosures — an FAQ list is the '
-              'canonical case — where only one panel should stay open at '
-              'a time.',
-        ),
-        _ComparisonRow(
-          name: 'Collapsible',
-          body:
-              'One independent disclosure with nothing else to coordinate '
-              'with, like a lone advanced-filters panel. Accordion is '
-              'built on the same DsUnfold animation, so open/close pacing '
-              'matches exactly.',
-        ),
-        _ComparisonRow(
-          name: 'Tabs',
-          body:
-              'Replaces the visible content outright behind persistent, '
-              'always-visible triggers. Reach for tabs when the choices '
-              'are peers; reach for accordion when the content is meant '
-              'to be read top-to-bottom with one section expanded at a '
-              'time.',
-        ),
-      ],
-    ),
-  );
-}
-
-class _ComparisonRow extends StatelessWidget {
-  const _ComparisonRow({required this.name, required this.body});
-
-  final String name;
-  final String body;
-
-  @override
-  Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
-    return Padding(
-      padding: EdgeInsets.only(bottom: ds(4)),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          DsText(name, DsType.label, color: theme.actionInk),
-          SizedBox(height: ds(1.5)),
-          DsText(body, DsType.small),
-        ],
-      ),
-    );
-  }
 }
 
 class _Bullets extends StatelessWidget {
@@ -618,7 +555,7 @@ class _Bullets extends StatelessWidget {
   }
 }
 
-/// The primary live specimen — three items, the first open by default,
+/// The primary live specimen: three items, the first open by default,
 /// matching the reference's own `defaultValue="odds"` mount.
 class _AccordionPreview extends StatefulWidget {
   const _AccordionPreview();
@@ -691,7 +628,7 @@ class _FaqAccordionState extends State<FaqAccordion> {
         ),
         DsAccordionItem(
           title: 'Does the chevron rotate?',
-          content: Text('No — it swaps between two glyphs.'),
+          content: Text('No: it swaps between two glyphs.'),
         ),
       ],
       openIndex: _openIndex,
@@ -779,4 +716,139 @@ DsAccordion(
   ],
   openIndex: openIndex,
   onChanged: (int? next) => setState(() => openIndex = next),
+)''';
+
+/// The literal "Basic" example: a second, smaller FAQ set demonstrating the
+/// exact same single-open behavior as [_AccordionPreview] with different
+/// copy, mirroring the reference's own repeated first example.
+class _AccordionBasicPreview extends StatefulWidget {
+  const _AccordionBasicPreview();
+
+  @override
+  State<_AccordionBasicPreview> createState() =>
+      _AccordionBasicPreviewState();
+}
+
+class _AccordionBasicPreviewState extends State<_AccordionBasicPreview> {
+  int? _openIndex = 0;
+
+  static final List<DsAccordionItem> _items = <DsAccordionItem>[
+    DsAccordionItem(
+      title: 'How long does shipping take?',
+      content: DsText(
+        'Orders ship within two business days and arrive in five to seven.',
+        DsType.body,
+      ),
+    ),
+    DsAccordionItem(
+      title: 'Can I return an item?',
+      content: DsText(
+        'Yes, within thirty days of delivery, unworn and in its original '
+        'packaging.',
+        DsType.body,
+      ),
+    ),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return DsAccordion(
+      items: _items,
+      openIndex: _openIndex,
+      onChanged: (int? next) => setState(() => _openIndex = next),
+    );
+  }
+}
+
+const String _basicCode = '''
+DsAccordion(
+  items: const <DsAccordionItem>[
+    DsAccordionItem(
+      title: 'How long does shipping take?',
+      content: Text('Orders ship within two business days.'),
+    ),
+    DsAccordionItem(
+      title: 'Can I return an item?',
+      content: Text('Yes, within thirty days of delivery.'),
+    ),
+  ],
+  openIndex: openIndex,
+  onChanged: (int? next) => setState(() => openIndex = next),
+)''';
+
+/// `DsAccordion` has no surface of its own: this specimen wraps it in
+/// [DsCard] to show the FAQ with a header and an edge.
+class _AccordionCardPreview extends StatefulWidget {
+  const _AccordionCardPreview();
+
+  @override
+  State<_AccordionCardPreview> createState() => _AccordionCardPreviewState();
+}
+
+class _AccordionCardPreviewState extends State<_AccordionCardPreview> {
+  int? _openIndex = 0;
+
+  static final List<DsAccordionItem> _items = <DsAccordionItem>[
+    DsAccordionItem(
+      title: 'What plans are available?',
+      content: DsText(
+        'Starter, Pro, and Enterprise. Every plan bills monthly and can be '
+        'changed at any time.',
+        DsType.body,
+      ),
+    ),
+    DsAccordionItem(
+      title: 'Can I cancel anytime?',
+      content: DsText(
+        'Yes. Cancelling stops the next renewal; the current period stays '
+        'active until it ends.',
+        DsType.body,
+      ),
+    ),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return DsCard(
+      children: <Widget>[
+        DsCardHeader(
+          title: const DsCardTitle('Subscription & Billing'),
+          description: const DsCardDescription(
+            'Common questions about plans and billing.',
+          ),
+        ),
+        DsCardContent(
+          child: DsAccordion(
+            items: _items,
+            openIndex: _openIndex,
+            onChanged: (int? next) => setState(() => _openIndex = next),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+const String _cardCode = '''
+DsCard(
+  children: [
+    DsCardHeader(
+      title: const DsCardTitle('Subscription & Billing'),
+      description: const DsCardDescription(
+        'Common questions about plans and billing.',
+      ),
+    ),
+    DsCardContent(
+      child: DsAccordion(
+        items: const <DsAccordionItem>[
+          DsAccordionItem(
+            title: 'What plans are available?',
+            content: Text('Starter, Pro, and Enterprise.'),
+          ),
+        ],
+        openIndex: openIndex,
+        onChanged: (int? next) => setState(() => openIndex = next),
+      ),
+    ),
+  ],
 )''';

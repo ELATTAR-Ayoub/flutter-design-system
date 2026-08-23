@@ -1,24 +1,30 @@
 /// Public component documentation for the toaster component.
 ///
-/// Follows `docs/superpowers/plans/2026-08-21-public-website-ui-information-
-/// architecture.md` §9.1's eighteen-section template, composed from the
-/// Phase C docs primitives the same way `alert/page.dart` does — the alert,
-/// alert-dialog and toaster trio share one decision-guidance story, and this
-/// page's Purpose section agrees with alert's own rather than restating it.
+/// Section shape mirrors `https://ui.shadcn.com/docs/components/base/toast`
+/// section for section: a live demo ahead of any heading, Installation,
+/// Usage, then the component's own sections -- When to use it, Types
+/// (`DsToastType`'s six values), Action, Promise -- then API Reference.
+/// shadcn's Toast API Reference links out to Base UI's own docs; this page
+/// tables the equivalent surface directly instead, since [DsToaster] and
+/// [DsToastController] are this package's own implementation rather than a
+/// wrapper over a third-party primitive. States, Accessibility, Responsive,
+/// Dependencies, Theming, and Source are this package's own six sections,
+/// added after API Reference. Each gets its own [DsSection]; title/
+/// description and previous/next come from [DocsLayout].
 ///
 /// [DsToaster] and [DsToastController] are the Flutter analogue of sonner's
-/// own split — `lib/src/components/toaster.dart`'s own library doc states it
+/// own split, `lib/src/components/toaster.dart`'s own library doc states it
 /// plainly: a host mounted once, and a controller a caller fires into from
 /// anywhere. Both halves are documented in full below: the host's own two
 /// constructor parameters, its 21 static timing-and-layout constants, and
 /// every method [DsToastController] exposes as the actual imperative surface
-/// (`controller.success(...)` and friends) — nothing here manufactures a
+/// (`controller.success(...)` and friends): nothing here manufactures a
 /// shadcn/sonner example the Dart API does not support.
 ///
-/// The live specimen mounts [DsToaster] the same way the real app does —
+/// The live specimen mounts [DsToaster] the same way the real app does --
 /// `Positioned.fill` inside a `Stack`, exactly as `example/lib/site/
 /// site_shell.dart`'s `SiteShell` and `example/lib/showcase/
-/// showcase_app.dart`'s `SignalStudioApp` both mount it — over a
+/// showcase_app.dart`'s `SignalStudioApp` both mount it: over a
 /// [DsToastController] this page owns and disposes itself, rather than
 /// reaching into the site's shared `siteToasts` singleton.
 library;
@@ -50,24 +56,23 @@ class ToasterDocPage extends StatelessWidget {
       DsBreadcrumbEntry.page('Toaster'),
     ],
     toc: const <DocsTocEntry>[
-      DocsTocEntry(title: 'Purpose', anchor: 'purpose'),
-      DocsTocEntry(title: 'Status', anchor: 'status'),
-      DocsTocEntry(title: 'Preview', anchor: 'preview'),
-      DocsTocEntry(title: 'Install', anchor: 'install'),
+      DocsTocEntry(title: 'Installation', anchor: 'install'),
       DocsTocEntry(title: 'Usage', anchor: 'usage'),
-      DocsTocEntry(title: 'API', anchor: 'api'),
-      DocsTocEntry(title: 'Variants', anchor: 'variants'),
+      DocsTocEntry(title: 'When to use it', anchor: 'when-to-use'),
+      DocsTocEntry(title: 'Types', anchor: 'types'),
+      DocsTocEntry(title: 'Action', anchor: 'action'),
+      DocsTocEntry(title: 'Promise', anchor: 'promise'),
+      DocsTocEntry(title: 'API Reference', anchor: 'api'),
       DocsTocEntry(title: 'States', anchor: 'states'),
       DocsTocEntry(title: 'Accessibility', anchor: 'a11y'),
       DocsTocEntry(title: 'Responsive', anchor: 'responsive'),
       DocsTocEntry(title: 'Dependencies', anchor: 'dependencies'),
-      DocsTocEntry(title: 'Composition', anchor: 'composition'),
       DocsTocEntry(title: 'Theming', anchor: 'theming'),
       DocsTocEntry(title: 'Source', anchor: 'source'),
     ],
     // toaster is the last entry in Wave 3's own list
     // (docs/superpowers/plans/2026-08-23-phase-j-full-component-
-    // documentation.md) — nothing to link forward to yet.
+    // documentation.md): nothing to link forward to yet.
     previous: const DocsPageLink(title: 'Tabs', route: '/components/tabs'),
     onNavigate: onNavigate,
     child: const _ToasterArticle(),
@@ -82,10 +87,122 @@ class _ToasterArticle extends StatelessWidget {
     key: const ValueKey<String>('toaster-doc-article'),
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
-      // 4. Expanded purpose and decision guidance.
+      // Live demo, ahead of any heading -- exactly as shadcn's own "Show
+      // Toast" trigger sits above its first Installation heading. A real
+      // DsToastController, fired into by the controls below, over a real
+      // DsToaster mounted the same Positioned.fill-inside-a-Stack way the
+      // public site's own shell mounts it. Nothing paints until a control is
+      // pressed -- DsToaster.build returns an empty box while its controller
+      // is queue-empty, the same as it does at the app root.
+      Padding(
+        padding: EdgeInsets.only(bottom: ds(20)),
+        child: DocsCodeExample(
+          title: 'Live specimen',
+          description:
+              'Each control calls a different DsToastController method; '
+              '"Clear all" calls DsToastController.clear(). Resize the '
+              'window below 600px (DsToaster.mobileBreakpoint) to see the '
+              'compact, top-anchored, full-width treatment take over.',
+          preview: const _ToasterPreview(),
+          manualFiles: const <DocsCodeFile>[
+            DocsCodeFile(
+              path: 'preview.dart',
+              title: 'Specimen source',
+              description: 'The exact Dart that produced the preview above.',
+              code: _previewCode,
+            ),
+          ],
+        ),
+      ),
+
+      // Installation with Command/Manual tabs, plus the status facts a
+      // caller needs before copying the source (no CLI item yet).
       DsSection(
-        id: 'purpose',
-        title: 'Purpose and when to use it',
+        id: 'install',
+        title: 'Installation',
+        description:
+            'toaster has no registry/components/toaster.json manifest yet, '
+            'so elattar add toaster is not yet available -- copy the '
+            'component source file directly until that manifest lands.',
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            DocsCodeExample(
+              title: 'Manual installation',
+              description:
+                  'Copy the component source into your project; its '
+                  'relative imports resolve once the file sits beside the '
+                  'rest of the package foundation and components.',
+              manualFiles: <DocsCodeFile>[
+                DocsCodeFile(
+                  path: toasterDoc.sourcePath,
+                  title: 'lib/components/ui/toaster.dart',
+                  description:
+                      'Paste the full toaster.dart source here; its '
+                      'imports (effects/bloom_cosmic.dart, effects/'
+                      'machine_surface.dart, foundation/*, theme_scope.dart, '
+                      'ds_safe_area.dart, icon.dart, icon_paths.dart) '
+                      'resolve once the file sits beside the rest of '
+                      'components/ui.',
+                  code:
+                      "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
+                      '// Copy the generated toaster.dart payload here. No CLI item\n'
+                      '// exists for toaster yet -- see the facts below.',
+                ),
+              ],
+            ),
+            SizedBox(height: ds(5)),
+            const DocsInstallFacts(
+              title: 'Installation facts',
+              facts: <DocsInstallFact>[
+                DocsInstallFact(
+                  label: 'Status',
+                  value: 'Source-available, not registry-listed',
+                  description:
+                      'Ships in the package today; elattar add toaster is '
+                      'not wired up yet.',
+                ),
+                DocsInstallFact(
+                  label: 'Version',
+                  value: '0.0.1',
+                  description: 'Tracks the package version in pubspec.yaml.',
+                ),
+                DocsInstallFact(
+                  label: 'Platforms',
+                  value: 'Android, iOS, Web, macOS, Windows, Linux',
+                  description:
+                      'dart:async, dart:math, and flutter/widgets.dart, '
+                      'flutter/gestures.dart, flutter/rendering.dart, '
+                      'flutter/scheduler.dart -- no platform channel, so '
+                      'every Flutter target renders and drives the same '
+                      'choreography.',
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+
+      // Usage: the smallest correct example, matching shadcn's own import +
+      // basic-construction Usage section. Action and Promise get their own
+      // sections below, mirroring the counterpart's own split.
+      DsSection(
+        id: 'usage',
+        title: 'Usage',
+        child: DsPanel(
+          label: 'DART',
+          note: 'SMALLEST CORRECT EXAMPLE',
+          child: const DocsSelectableCodeBlock(code: _smallestUsageCode),
+        ),
+      ),
+
+      // When to use it: decision guidance shadcn's own toast page has no
+      // counterpart for, since DsAlert and DsAlertDialog are this package's
+      // own siblings rather than Base UI primitives shadcn's page would
+      // cross-link to.
+      DsSection(
+        id: 'when-to-use',
+        title: 'When to use it',
         description:
             'A message that announces itself once, near a screen corner, '
             'and clears itself on a timer -- never a question, and never '
@@ -94,11 +211,11 @@ class _ToasterArticle extends StatelessWidget {
           'DsToaster and DsToastController together are the Flutter '
               'analogue of sonner\'s own split: DsToaster is a host, '
               'mounted once near the app root -- Positioned.fill inside a '
-              'Stack, exactly as this page\'s own Preview does it -- and it '
-              'paints nothing until something is queued. Every toast is '
-              'fired into it from anywhere by holding a reference to the '
-              'DsToastController it is mounted with, the way toast(...) is '
-              'a module-level singleton on the web. At most '
+              'Stack, exactly as this page\'s own live specimen does it -- '
+              'and it paints nothing until something is queued. Every '
+              'toast is fired into it from anywhere by holding a reference '
+              'to the DsToastController it is mounted with, the way '
+              'toast(...) is a module-level singleton on the web. At most '
               'DsToaster.visibleLimit (3) are ever on screen at once; a '
               'fourth toast waits its turn with its own auto-dismiss clock '
               'unstarted.',
@@ -119,128 +236,132 @@ class _ToasterArticle extends StatelessWidget {
         ]),
       ),
 
-      // 5. Status/version/platform metadata.
+      // Types: the six DsToastType values (five typed, one default) -- the
+      // status variants shadcn's own Types section demonstrates.
       DsSection(
-        id: 'status',
-        title: 'Status',
-        child: const DocsInstallFacts(
-          title: 'Status facts',
-          facts: <DocsInstallFact>[
-            DocsInstallFact(
-              label: 'Status',
-              value: 'Source-available, not registry-listed',
-              description:
-                  'Ships in the package today; elattar add toaster is not '
-                  'wired up yet -- see Install below.',
-            ),
-            DocsInstallFact(
-              label: 'Version',
-              value: '0.0.1',
-              description: 'Tracks the package version in pubspec.yaml.',
-            ),
-            DocsInstallFact(
-              label: 'Platforms',
-              value: 'Android, iOS, Web, macOS, Windows, Linux',
-              description:
-                  'dart:async, dart:math, and flutter/widgets.dart, '
-                  'flutter/gestures.dart, flutter/rendering.dart, '
-                  'flutter/scheduler.dart -- no platform channel, so every '
-                  'Flutter target renders and drives the same choreography.',
-            ),
-          ],
-        ),
-      ),
-
-      // 6. Primary live specimen with Preview/Code tabs.
-      DsSection(
-        id: 'preview',
-        title: 'Preview',
+        id: 'types',
+        title: 'Types',
         description:
-            'A real DsToastController, fired into by the controls below, '
-            'over a real DsToaster mounted the same Positioned.fill-inside-'
-            'a-Stack way the public site\'s own shell mounts it. Nothing '
-            'paints until a control is pressed -- DsToaster.build returns '
-            'an empty box while its controller is queue-empty, the same as '
-            'it does at the app root.',
-        child: DocsCodeExample(
-          title: 'Live specimen',
-          description:
-              'Each control calls a different DsToastController method; '
-              '"Clear all" calls DsToastController.clear(). Resize the '
-              'window below 600px (DsToaster.mobileBreakpoint) to see the '
-              'compact, top-anchored, full-width treatment take over.',
-          preview: const _ToasterPreview(),
-          manualFiles: const <DocsCodeFile>[
-            DocsCodeFile(
-              path: 'preview.dart',
-              title: 'Specimen source',
-              description: 'The exact Dart that produced the preview above.',
-              code: _previewCode,
-            ),
-          ],
-        ),
-      ),
-
-      // 7. Installation with Command/Manual tabs.
-      DsSection(
-        id: 'install',
-        title: 'Installation',
-        description:
-            'toaster has no registry/components/toaster.json manifest yet, '
-            'so elattar add toaster is not yet available -- copy the '
-            'component source file directly until that manifest lands.',
-        child: DocsCodeExample(
-          title: 'Manual installation',
-          description:
-              'Copy the component source into your project; its relative '
-              'imports resolve once the file sits beside the rest of the '
-              'package foundation and components.',
-          manualFiles: <DocsCodeFile>[
-            DocsCodeFile(
-              path: toasterDoc.sourcePath,
-              title: 'lib/components/ui/toaster.dart',
+            'Six DsToastType values (five typed, one default), each '
+            'selecting an icon glyph, an ink color, and the bloom\'s two '
+            'stops -- the card fill, border, radius and padding never '
+            'change.',
+        child: const DocsApiTable(
+          title: 'DsToastType',
+          facts: <DocsApiFact>[
+            DocsApiFact(
+              name: 'success',
+              type: 'DsToastType',
               description:
-                  'Paste the full toaster.dart source here; its imports '
-                  '(effects/bloom_cosmic.dart, effects/machine_surface.dart, '
-                  'foundation/*, theme_scope.dart, ds_safe_area.dart, '
-                  'icon.dart, icon_paths.dart) resolve once the file sits '
-                  'beside the rest of components/ui.',
-              code:
-                  "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
-                  '// Copy the generated toaster.dart payload here. No CLI item\n'
-                  '// exists for toaster yet -- see the Status panel above.',
+                  'data-type="success". Icon: DsIconGlyph.circleCheck. '
+                  'Ink: theme.successInk. Bloom: --color-success / '
+                  '--color-value.',
+            ),
+            DocsApiFact(
+              name: 'info',
+              type: 'DsToastType',
+              description:
+                  'data-type="info". Icon: DsIconGlyph.info. Ink: '
+                  'theme.infoInk.',
+            ),
+            DocsApiFact(
+              name: 'warning',
+              type: 'DsToastType',
+              description:
+                  'data-type="warning". Icon: DsIconGlyph.alertTriangle. '
+                  'Ink: theme.warningInk. Its bloom pair '
+                  '(DsBloomCosmic.toastWarning) is the one variant that '
+                  'does not match DsAlert\'s own warning bloom.',
+            ),
+            DocsApiFact(
+              name: 'error',
+              type: 'DsToastType',
+              description:
+                  'data-type="error". Icon: DsIconGlyph.octagonX. Ink: '
+                  'theme.destructiveInk.',
+            ),
+            DocsApiFact(
+              name: 'loading',
+              type: 'DsToastType',
+              description:
+                  'data-type="loading". Icon: DsIconGlyph.loaderCircle, '
+                  'and it does not spin -- the source ships it with no '
+                  'spin animation, confirmed against the live reference '
+                  'too. The one type with no auto-dismiss clock at all.',
+            ),
+            DocsApiFact(
+              name: 'normal',
+              type: 'DsToastType',
+              description:
+                  'The default (label reads "default" -- default is a '
+                  'Dart keyword). No data-type attribute is ever set, and '
+                  'no icon slot renders at all unless the message '
+                  'supplies its own glyph -- TOAST_ICONS has no default '
+                  'key on the reference either.',
             ),
           ],
         ),
       ),
 
-      // 8. Usage.
+      // Action: adding an action pill via DsToastAction, mirroring shadcn's
+      // own actionProps section.
       DsSection(
-        id: 'usage',
-        title: 'Usage',
+        id: 'action',
+        title: 'Action',
+        description:
+            'Pass action to any DsToastController call to add a pill at '
+            'the far right of the row. Pressing it runs onPressed first '
+            'and dismisses the toast right after, whether or not '
+            'onPressed is null.',
+        child: DsPanel(
+          label: 'DART',
+          note: 'ERROR TOAST WITH AN ACTION',
+          child: const DocsSelectableCodeBlock(code: _actionUsageCode),
+        ),
+      ),
+
+      // Promise: DsToastController.promise, mirroring shadcn's own Promise
+      // section (loading, then a success or error transition). The manual
+      // loading + settle flow is the same shape written by hand, for an
+      // async sequence that does not reduce to a single Future.
+      DsSection(
+        id: 'promise',
+        title: 'Promise',
+        description:
+            'DsToastController.promise shows the loading message '
+            'immediately and swaps the settled one into the SAME toast '
+            'when the future completes -- same id, same box, same '
+            'position in the stack, no exit and no second entrance. The '
+            '4000ms clock only starts once it has settled, because a '
+            'loading toast has none. Call settle by hand instead when the '
+            'async flow does not fit a single Future, exactly as this '
+            'save flow does.',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             DsPanel(
               label: 'DART',
-              note: 'SMALLEST CORRECT EXAMPLE',
-              child: const DocsSelectableCodeBlock(code: _smallestUsageCode),
+              note: 'PROMISE-BACKED SAVE',
+              child: const DocsSelectableCodeBlock(code: _promiseUsageCode),
             ),
             SizedBox(height: ds(5)),
             DsPanel(
               label: 'DART',
-              note: 'WITH A DESCRIPTION, AN ACTION, AND A PROMISE',
-              child: const DocsSelectableCodeBlock(code: _actionUsageCode),
+              note: 'MANUAL LOADING + SETTLE',
+              child: const DocsSelectableCodeBlock(code: _compositionCode),
             ),
           ],
         ),
       ),
 
-      // 9. API reference -- both halves of the split: the host widget and
-      // the imperative controller/message/action surface it is fired into.
+      // API reference -- both halves of the split: the host widget and the
+      // imperative controller/message/action surface it is fired into.
+      // shadcn's own Toast API Reference links out to Base UI's docs; this
+      // page tables the equivalent surface directly, since it is this
+      // package's own implementation rather than a third-party wrapper.
       DsSection(
         id: 'api',
-        title: 'API reference',
+        title: 'API Reference',
         description:
             'Every DsToaster constructor parameter and static member, '
             'every DsToastController method, and every DsToastMessage / '
@@ -559,7 +680,7 @@ class _ToasterArticle extends StatelessWidget {
                   description:
                       'Optional, defaults to DsToastType.normal. Selects '
                       'the icon, its ink color, and the bloom\'s two '
-                      'stops -- see Variants.',
+                      'stops -- see Types.',
                 ),
                 DocsApiFact(
                   name: 'glyph',
@@ -592,7 +713,7 @@ class _ToasterArticle extends StatelessWidget {
                   type: 'DsToastAction?',
                   description:
                       'Optional, defaults to null. The action pill at the '
-                      'far right of the row.',
+                      'far right of the row -- see Action.',
                 ),
               ],
             ),
@@ -619,78 +740,10 @@ class _ToasterArticle extends StatelessWidget {
         ),
       ),
 
-      // 10. Variants and sizes -- DsToastType is the variant axis DsAlert's
-      // DsAlertVariant plays for alert.
-      DsSection(
-        id: 'variants',
-        title: 'Variants',
-        description:
-            'Six DsToastType values (five typed, one default), each '
-            'selecting an icon glyph, an ink color, and the bloom\'s two '
-            'stops -- the card fill, border, radius and padding never '
-            'change. DsToaster has no size axis; every toast is '
-            'DsToaster.width (356px) wide on a wide viewport.',
-        child: const DocsApiTable(
-          title: 'DsToastType',
-          facts: <DocsApiFact>[
-            DocsApiFact(
-              name: 'success',
-              type: 'DsToastType',
-              description:
-                  'data-type="success". Icon: DsIconGlyph.circleCheck. '
-                  'Ink: theme.successInk. Bloom: --color-success / '
-                  '--color-value.',
-            ),
-            DocsApiFact(
-              name: 'info',
-              type: 'DsToastType',
-              description:
-                  'data-type="info". Icon: DsIconGlyph.info. Ink: '
-                  'theme.infoInk.',
-            ),
-            DocsApiFact(
-              name: 'warning',
-              type: 'DsToastType',
-              description:
-                  'data-type="warning". Icon: DsIconGlyph.alertTriangle. '
-                  'Ink: theme.warningInk. Its bloom pair '
-                  '(DsBloomCosmic.toastWarning) is the one variant that '
-                  'does not match DsAlert\'s own warning bloom.',
-            ),
-            DocsApiFact(
-              name: 'error',
-              type: 'DsToastType',
-              description:
-                  'data-type="error". Icon: DsIconGlyph.octagonX. Ink: '
-                  'theme.destructiveInk.',
-            ),
-            DocsApiFact(
-              name: 'loading',
-              type: 'DsToastType',
-              description:
-                  'data-type="loading". Icon: DsIconGlyph.loaderCircle, '
-                  'and it does not spin -- the source ships it with no '
-                  'spin animation, confirmed against the live reference '
-                  'too. The one type with no auto-dismiss clock at all.',
-            ),
-            DocsApiFact(
-              name: 'normal',
-              type: 'DsToastType',
-              description:
-                  'The default (label reads "default" -- default is a '
-                  'Dart keyword). No data-type attribute is ever set, and '
-                  'no icon slot renders at all unless the message '
-                  'supplies its own glyph -- TOAST_ICONS has no default '
-                  'key on the reference either.',
-            ),
-          ],
-        ),
-      ),
-
-      // 11. States and feedback.
+      // States and feedback.
       DsSection(
         id: 'states',
-        title: 'States and feedback',
+        title: 'States',
         description:
             'Unlike DsAlert, DsToaster is not purely presentational -- it '
             'owns a lifetime clock, a hover-pause, and a swipe gesture. '
@@ -805,10 +858,10 @@ class _ToasterArticle extends StatelessWidget {
         ),
       ),
 
-      // 12. Accessibility and keyboard behavior.
+      // Accessibility and keyboard behavior.
       DsSection(
         id: 'a11y',
-        title: 'Accessibility and keyboard behavior',
+        title: 'Accessibility',
         child: const _LabeledFacts(<(String, String)>[
           (
             'Semantic role',
@@ -891,10 +944,10 @@ class _ToasterArticle extends StatelessWidget {
         ]),
       ),
 
-      // 13. Responsive/platform behavior.
+      // Responsive and platform behavior.
       DsSection(
         id: 'responsive',
-        title: 'Responsive and platform behavior',
+        title: 'Responsive',
         child: const _Prose(<String>[
           'DsToaster.position (default DsToastPosition.bottomRight) '
               'chooses the corner only on a wide viewport. At or below '
@@ -921,10 +974,10 @@ class _ToasterArticle extends StatelessWidget {
         ]),
       ),
 
-      // 14. Dependencies, files, assets, fonts, and shaders.
+      // Dependencies, files, assets, fonts, and shaders.
       DsSection(
         id: 'dependencies',
-        title: 'Dependencies, files, assets, fonts, and shaders',
+        title: 'Dependencies',
         child: const DocsInstallFacts(
           title: 'Source dependencies',
           facts: <DocsInstallFact>[
@@ -971,25 +1024,10 @@ class _ToasterArticle extends StatelessWidget {
         ),
       ),
 
-      // 15. Composition examples.
-      DsSection(
-        id: 'composition',
-        title: 'Composition examples',
-        description:
-            'A realistic sequence -- an optimistic save, then a typed '
-            'result -- fired from a handler that holds the same '
-            'controller DsToaster is mounted with.',
-        child: DsPanel(
-          label: 'DART',
-          note: 'A SAVE FLOW',
-          child: const DocsSelectableCodeBlock(code: _compositionCode),
-        ),
-      ),
-
-      // 16. Theming notes.
+      // Theming notes.
       DsSection(
         id: 'theming',
-        title: 'Theming notes',
+        title: 'Theming',
         child: const _Prose(<String>[
           'Every toast shares one card surface -- the same --popover '
               'fill, the same 1px border, the same e3 shadow -- and a '
@@ -1004,10 +1042,10 @@ class _ToasterArticle extends StatelessWidget {
         ]),
       ),
 
-      // 17. Source, tests, report issue, and edit docs.
+      // Source, tests, report issue, and edit docs.
       DsSection(
         id: 'source',
-        title: 'Source, tests, and reporting an issue',
+        title: 'Source',
         child: DocsInstallFacts(
           title: 'Source facts',
           facts: <DocsInstallFact>[
@@ -1041,8 +1079,8 @@ class _ToasterArticle extends StatelessWidget {
           ],
         ),
       ),
-      // 18. Previous/Next component navigation is DocsLayout's own chrome
-      // (see the `previous` argument above).
+      // Previous/Next component navigation is DocsLayout's own chrome (see
+      // the `previous` argument above).
     ],
   );
 }
@@ -1249,9 +1287,9 @@ const String _actionUsageCode = '''toasts.error(
   'Payment failed',
   description: 'We could not process your card ending in 4242.',
   action: DsToastAction(label: 'Retry', onPressed: retryPayment),
-);
+);''';
 
-toasts.promise<void>(
+const String _promiseUsageCode = '''toasts.promise<void>(
   saveProfile(),
   loading: 'Saving…',
   success: 'Saved',

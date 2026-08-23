@@ -1,20 +1,24 @@
 /// Public component documentation for the breadcrumb component.
 ///
 /// `breadcrumb` is Wave 1 of the component-documentation plan and carries no
-/// `registry/components/breadcrumb.json` manifest yet — the Installation
+/// `registry/components/breadcrumb.json` manifest yet: the Installation
 /// section says so plainly rather than rendering `elattar add breadcrumb` as
 /// if it worked. See `meta.dart` for the same note against
 /// [ComponentDocEntry.command].
 ///
-/// The eighteen IA §9.1 sections map onto this page as: breadcrumb/family,
-/// title and short description come from [DocsLayout] itself; the expanded
-/// "when to use this instead of a neighbour" guidance lives in
-/// [DocsPageIntro.description] below; status/version/platform metadata get
-/// their own compact panel; preview, installation, usage, API, entry types
-/// (this component's honest answer to "variants and sizes"), states,
-/// accessibility, responsive behaviour, the full install-facts disclosure,
-/// a composition example, theming notes, and source/tests each get a
-/// [DsSection]; previous/next comes from [DocsLayout] again.
+/// Section shape mirrors `https://ui.shadcn.com/docs/components/base/breadcrumb`
+/// section for section. A live demo renders ahead of any heading, the same
+/// as the reference's own top-of-page preview: no Overview, Status, or
+/// Preview heading precedes Installation. Then Installation, Usage,
+/// Composition, Basic, Link component, RTL, and API Reference, in that
+/// order. Custom separator, Dropdown, and Collapsed have no counterpart
+/// here: DsBreadcrumb has no separator override, no widget slot for a
+/// crumb-embedded trigger, and no widget that collapses a trail (see the
+/// Composition, Link component, and Responsive sections respectively).
+/// States, Accessibility, Responsive, Dependencies, Theming, and Source are
+/// this package's own six sections, added after API Reference, named
+/// exactly that with no extra words. Each gets its own [DsSection];
+/// title/description and previous/next come from [DocsLayout].
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
@@ -43,7 +47,7 @@ class BreadcrumbDocPage extends StatelessWidget {
         description:
             'Breadcrumb shows where the current page sits inside a '
             'hierarchy and gives a way back to each ancestor. Reach for it on '
-            'a detail page the user drilled into — not for switching between '
+            'a detail page the user drilled into: not for switching between '
             'sibling views (that is Tabs), paging through one list '
             '(Pagination), or a site\'s top-level sections (Navigation Menu). '
             'The trail derives its own separators and wraps onto a new line '
@@ -63,17 +67,17 @@ class BreadcrumbDocPage extends StatelessWidget {
         DocsSidebarEntry(title: 'Checkbox', route: '/components/checkbox'),
       ],
       toc: const <DocsTocEntry>[
-        DocsTocEntry(title: 'Status', anchor: 'status'),
-        DocsTocEntry(title: 'Preview', anchor: 'preview'),
-        DocsTocEntry(title: 'Install', anchor: 'install'),
+        DocsTocEntry(title: 'Installation', anchor: 'install'),
         DocsTocEntry(title: 'Usage', anchor: 'usage'),
-        DocsTocEntry(title: 'API', anchor: 'api'),
-        DocsTocEntry(title: 'Entry types', anchor: 'entry-types'),
+        DocsTocEntry(title: 'Composition', anchor: 'composition'),
+        DocsTocEntry(title: 'Basic', anchor: 'basic'),
+        DocsTocEntry(title: 'Link component', anchor: 'link-component'),
+        DocsTocEntry(title: 'RTL', anchor: 'rtl'),
+        DocsTocEntry(title: 'API Reference', anchor: 'api'),
         DocsTocEntry(title: 'States', anchor: 'states'),
         DocsTocEntry(title: 'Accessibility', anchor: 'accessibility'),
         DocsTocEntry(title: 'Responsive', anchor: 'responsive'),
         DocsTocEntry(title: 'Dependencies', anchor: 'dependencies'),
-        DocsTocEntry(title: 'Composition', anchor: 'composition'),
         DocsTocEntry(title: 'Theming', anchor: 'theming'),
         DocsTocEntry(title: 'Source', anchor: 'source'),
       ],
@@ -98,60 +102,30 @@ class _BreadcrumbArticle extends StatelessWidget {
     key: const ValueKey<String>('breadcrumb-doc-article'),
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
-      DsSection(
-        id: 'status',
-        title: 'Status',
-        child: const DocsInstallFacts(
-          title: 'Status',
-          facts: <DocsInstallFact>[
-            DocsInstallFact(
-              label: 'Status',
-              value: 'Stable primitive — no variants, sizes, or async states',
-              description:
-                  'DsBreadcrumb and DsBreadcrumbEntry are both exported from '
-                  'the public barrel today.',
-            ),
-            DocsInstallFact(
-              label: 'Version',
-              value: '0.0.1',
-              description: 'Package version this page was written against.',
-            ),
-            DocsInstallFact(
-              label: 'Platforms',
-              value: 'Android, iOS, Web, macOS, Windows, Linux',
-              description:
-                  'Pure Flutter composition — nothing here is platform-gated.',
-            ),
-          ],
-        ),
-      ),
-      DsSection(
-        id: 'preview',
-        title: 'Preview',
+      // The live demo, ahead of any heading: the same shape the reference
+      // page itself opens with. No DsSection wraps it, so it carries no
+      // Overview/Status/Preview heading of its own before Installation.
+      DocsCodeExample(
+        title: 'Breadcrumb specimens',
         description:
-            'A typical multi-step trail, a single current-page crumb '
-            '(which renders no separator at all), and the same composition '
-            'read right-to-left under a Directionality — the port\'s own '
-            'proof that direction is context, not a second set of controls.',
-        child: const DocsCodeExample(
-          title: 'Breadcrumb specimens',
-          description:
-              'Hover a link crumb to see the ink brighten; the current page '
-              'never responds to hover or tap.',
-          preview: _BreadcrumbPreview(),
-          manualFiles: <DocsCodeFile>[
-            DocsCodeFile(
-              path: 'lib/components/ui/breadcrumb.dart',
-              code:
-                  "import 'package:flutter/widgets.dart';\n\n"
-                  '// No registry manifest exists for breadcrumb yet — copy\n'
-                  '// lib/src/components/breadcrumb.dart directly and update its\n'
-                  '// relative imports (foundation/*, theme_scope.dart, icon.dart)\n'
-                  '// to wherever you land them. See the Installation section below.',
-            ),
-          ],
-        ),
+            'A typical multi-step trail, and a single current-page crumb, '
+            'which renders no separator at all. Hover a link crumb to see '
+            'the ink brighten; the current page never responds to hover '
+            'or tap.',
+        preview: const _BreadcrumbPreview(),
+        manualFiles: const <DocsCodeFile>[
+          DocsCodeFile(
+            path: 'lib/components/ui/breadcrumb.dart',
+            code:
+                "import 'package:flutter/widgets.dart';\n\n"
+                '// No registry manifest exists for breadcrumb yet: copy\n'
+                '// lib/src/components/breadcrumb.dart directly and update its\n'
+                '// relative imports (foundation/*, theme_scope.dart, icon.dart)\n'
+                '// to wherever you land them. See the Installation section below.',
+          ),
+        ],
       ),
+      SizedBox(height: ds(8)),
       DsSection(
         id: 'install',
         title: 'Installation',
@@ -191,7 +165,7 @@ class _BreadcrumbArticle extends StatelessWidget {
         id: 'usage',
         title: 'Usage',
         description:
-            'The smallest correct composition — three steps, the last one '
+            'The smallest correct composition: three steps, the last one '
             'the current page.',
         child: DsPanel(
           label: 'DART',
@@ -200,11 +174,87 @@ class _BreadcrumbArticle extends StatelessWidget {
         ),
       ),
       DsSection(
+        id: 'composition',
+        title: 'Composition',
+        description:
+            'DsBreadcrumb has no BreadcrumbList, BreadcrumbItem, or '
+            'BreadcrumbSeparator to assemble by hand: items builds the '
+            'whole trail, and a chevron separator is derived between every '
+            'adjacent pair. What follows is what that single call builds '
+            'internally, and how it composes into a real page.',
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            DsPanel(
+              label: 'What DsBreadcrumb(items: …) assembles',
+              child: DocsSelectableCodeBlock(code: _compositionCode),
+            ),
+            SizedBox(height: ds(6)),
+            const DocsCodeExample(
+              title: 'Page header composition',
+              description:
+                  'Breadcrumb sitting above a page title and an action: '
+                  'its usual home, rather than the isolated specimen above.',
+              preview: _BreadcrumbComposition(),
+            ),
+          ],
+        ),
+      ),
+      DsSection(
+        id: 'basic',
+        title: 'Basic',
+        description:
+            'The simplest real trail: two ancestor links and the current, '
+            'non-clickable page.',
+        child: const DocsCodeExample(
+          title: 'Basic breadcrumb',
+          preview: _BreadcrumbBasic(),
+          manualFiles: <DocsCodeFile>[
+            DocsCodeFile(path: 'basic_breadcrumb.dart', code: _usageCode),
+          ],
+        ),
+      ),
+      DsSection(
+        id: 'link-component',
+        title: 'Link component',
+        description:
+            'Flutter has no anchor tag to swap in: onTap is the '
+            'equivalent seam. DsBreadcrumbEntry.link(label, {onTap}) hands '
+            'you a bare VoidCallback, so plugging in a router (go_router, '
+            'Navigator, or anything else) is the caller\'s own onTap body, '
+            'not a render prop DsBreadcrumb has to know about.',
+        child: DsPanel(
+          label: 'DART',
+          note: 'ROUTE',
+          child: DocsSelectableCodeBlock(code: _linkComponentCode),
+        ),
+      ),
+      DsSection(
+        id: 'rtl',
+        title: 'RTL',
+        description:
+            'The same composition read right-to-left under a '
+            'Directionality: the port\'s own proof that direction is '
+            'context, not a second set of controls. The chevron does not '
+            'flip: nothing in the source mirrors it, and it points the '
+            'same way in both directions.',
+        child: const DocsCodeExample(
+          title: 'Right-to-left breadcrumb',
+          preview: _BreadcrumbRtl(),
+          manualFiles: <DocsCodeFile>[
+            DocsCodeFile(path: 'rtl_breadcrumb.dart', code: _rtlCode),
+          ],
+        ),
+      ),
+      DsSection(
         id: 'api',
-        title: 'API',
+        title: 'API Reference',
         description:
             'Every public class, constructor, field, and static layout '
-            'constant the source declares.',
+            'constant the source declares. There is no DsBreadcrumbVariant '
+            'or DsBreadcrumbSize to choose from: the only per-crumb '
+            'decision is which constructor built the entry, .link or '
+            '.page, both named below.',
         child: const DocsApiTable(
           facts: <DocsApiFact>[
             DocsApiFact(
@@ -212,27 +262,27 @@ class _BreadcrumbArticle extends StatelessWidget {
               type: 'List<DsBreadcrumbEntry>',
               description:
                   'Required. The ordered trail. A chevron separator is '
-                  'derived between every adjacent pair — there is no way to '
+                  'derived between every adjacent pair: there is no way to '
                   'place two crumbs with no separator between them.',
             ),
             DocsApiFact(
               name: 'gap',
               type: 'static double (get)',
               description:
-                  "6px — the list's own Wrap spacing and runSpacing, on "
+                  "6px: the list's own Wrap spacing and runSpacing, on "
                   'both axes, since it can wrap onto more than one line.',
             ),
             DocsApiFact(
               name: 'separatorPx',
               type: 'static double (get)',
-              description: "14px — the derived chevron separator's own box.",
+              description: "14px: the derived chevron separator's own box.",
             ),
             DocsApiFact(
               name: 'DsBreadcrumbEntry.link(label, {onTap})',
               type: 'const factory',
               description:
                   'A step back in the trail. label is required and '
-                  'positional; onTap is optional (default null) — a link '
+                  'positional; onTap is optional (default null): a link '
                   'with no onTap is inert but still styled and semantically '
                   'a link.',
             ),
@@ -262,43 +312,15 @@ class _BreadcrumbArticle extends StatelessWidget {
               name: 'isPage',
               type: 'bool',
               description:
-                  'Derived, not a constructor parameter of its own — true '
+                  'Derived, not a constructor parameter of its own: true '
                   'for entries built with .page, false for .link. Read-only.',
             ),
           ],
         ),
       ),
       DsSection(
-        id: 'entry-types',
-        title: 'Entry types — no variant or size enum',
-        description:
-            'There is no DsBreadcrumbVariant or DsBreadcrumbSize to choose '
-            'from. The only per-crumb decision is which constructor built '
-            'the entry, and the API table above already names both.',
-        child: DsPanel(
-          label: 'The two constructors, side by side',
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              DsText(
-                'DsBreadcrumbEntry.link — a step in the trail. Muted at '
-                'rest, brightens on hover, and calls onTap when pressed.',
-                DsType.small,
-              ),
-              SizedBox(height: ds(2)),
-              DsText(
-                'DsBreadcrumbEntry.page — the current page. Always at full '
-                "ink strength, never a link, and inert to both hover and "
-                'tap.',
-                DsType.small,
-              ),
-            ],
-          ),
-        ),
-      ),
-      DsSection(
         id: 'states',
-        title: 'States and feedback',
+        title: 'States',
         description:
             'Rows that do not apply to a synchronous, variant-free '
             'primitive are marked N/A with the reason, rather than invented.',
@@ -332,17 +354,17 @@ class _BreadcrumbArticle extends StatelessWidget {
             DocsStateFact(
               state: 'Focus-visible',
               treatment:
-                  'N/A — the link crumb wraps a MouseRegion and a '
+                  'N/A: the link crumb wraps a MouseRegion and a '
                   'GestureDetector but no Focus/FocusNode, so it never '
                   'enters keyboard Tab order and paints no focus ring.',
               userSignal:
-                  'A keyboard-only visitor cannot reach a crumb today — see '
+                  'A keyboard-only visitor cannot reach a crumb today: see '
                   'Accessibility.',
             ),
             DocsStateFact(
               state: 'Pressed',
               treatment:
-                  'N/A — GestureDetector.onTap fires with no intermediate '
+                  'N/A, GestureDetector.onTap fires with no intermediate '
                   'pressed-state paint; there is no DsPress scale or '
                   'opacity step here.',
               userSignal: 'A tap or click resolves in a single frame.',
@@ -350,14 +372,14 @@ class _BreadcrumbArticle extends StatelessWidget {
             DocsStateFact(
               state: 'Loading / Error / Success',
               treatment:
-                  'N/A — DsBreadcrumb is a synchronous rendering primitive '
+                  'N/A, DsBreadcrumb is a synchronous rendering primitive '
                   'with no future, stream, or error boundary of its own.',
               userSignal: 'Not applicable.',
             ),
             DocsStateFact(
               state: 'Empty items',
               treatment:
-                  'N/A as a dedicated state — DsBreadcrumb(items: const '
+                  'N/A as a dedicated state, DsBreadcrumb(items: const '
                   '[]) renders a zero-size Wrap: no crumbs, no separators, '
                   'no placeholder text.',
               userSignal:
@@ -367,7 +389,7 @@ class _BreadcrumbArticle extends StatelessWidget {
             DocsStateFact(
               state: 'Disabled',
               treatment:
-                  'N/A as a whole-widget state — the nearest equivalent is '
+                  'N/A as a whole-widget state: the nearest equivalent is '
                   'per-entry: DsBreadcrumbEntry.page is permanently '
                   'non-interactive.',
               userSignal: 'See Current page above.',
@@ -387,7 +409,7 @@ class _BreadcrumbArticle extends StatelessWidget {
       ),
       DsSection(
         id: 'accessibility',
-        title: 'Accessibility and keyboard behavior',
+        title: 'Accessibility',
         child: DsPanel(
           label: 'What the semantics tree actually carries',
           child: Column(
@@ -396,7 +418,7 @@ class _BreadcrumbArticle extends StatelessWidget {
               _A11yRow(
                 'Semantic role',
                 'The root wraps every crumb in Semantics(container: true, '
-                    "label: 'breadcrumb', explicitChildNodes: true) — a "
+                    "label: 'breadcrumb', explicitChildNodes: true): a "
                     'labelled container, read by a screen reader as a group '
                     "named \"breadcrumb\".",
               ),
@@ -404,7 +426,7 @@ class _BreadcrumbArticle extends StatelessWidget {
                 'Per-crumb role',
                 'Each link crumb carries Semantics(link: true); the current '
                     'page adds enabled: false on top of that. Both derive '
-                    'their accessible name from the rendered label — no '
+                    'their accessible name from the rendered label: no '
                     'separate override is passed.',
               ),
               _A11yRow(
@@ -416,12 +438,12 @@ class _BreadcrumbArticle extends StatelessWidget {
               ),
               _A11yRow(
                 'Focus behavior',
-                'Nothing to describe beyond Keyboard above — the widget '
+                'Nothing to describe beyond Keyboard above: the widget '
                     'never receives focus.',
               ),
               _A11yRow(
                 'Touch target',
-                "No minimum tap-area padding is applied — the hit region "
+                "No minimum tap-area padding is applied: the hit region "
                     "is exactly the rendered text's box. Keep crumb labels "
                     'short on mobile rather than relying on a generous tap '
                     'target.',
@@ -435,7 +457,7 @@ class _BreadcrumbArticle extends StatelessWidget {
               ),
               _A11yRow(
                 'Error wiring',
-                'None — DsBreadcrumb never participates in form validation '
+                'None, DsBreadcrumb never participates in form validation '
                     'or an error state.',
               ),
               _A11yRow(
@@ -445,7 +467,7 @@ class _BreadcrumbArticle extends StatelessWidget {
               ),
               _A11yRow(
                 'Platform differences',
-                'None observed — the same Semantics tree renders '
+                'None observed: the same Semantics tree renders '
                     'identically across every Flutter platform target.',
                 last: true,
               ),
@@ -455,7 +477,7 @@ class _BreadcrumbArticle extends StatelessWidget {
       ),
       DsSection(
         id: 'responsive',
-        title: 'Responsive and platform behavior',
+        title: 'Responsive',
         description:
             "Breadcrumb's real overflow story: it wraps, it does not "
             'truncate or collapse.',
@@ -466,7 +488,7 @@ class _BreadcrumbArticle extends StatelessWidget {
             children: <Widget>[
               DsText(
                 'The list lays out as a Wrap (spacing and runSpacing both '
-                'set to DsBreadcrumb.gap, crossAxisAlignment centered) — '
+                'set to DsBreadcrumb.gap, crossAxisAlignment centered), '
                 "the same shape Tailwind's flex flex-wrap gives the "
                 'reference, not a fixed single-line Row.',
                 DsType.small,
@@ -482,7 +504,7 @@ class _BreadcrumbArticle extends StatelessWidget {
               DsText(
                 'BreadcrumbEllipsis is recorded in the source\'s own doc '
                 'comment as an export the underlying reference carries, but '
-                'no Flutter widget builds a collapsed trail — the port '
+                'no Flutter widget builds a collapsed trail: the port '
                 'renders none because the page it was measured against '
                 'never mounts one either. Do not reach for a collapsing '
                 'behavior this component does not have.',
@@ -501,20 +523,32 @@ class _BreadcrumbArticle extends StatelessWidget {
       ),
       DsSection(
         id: 'dependencies',
-        title: 'Dependencies, files, and disclosure',
+        title: 'Dependencies',
         description:
-            "Elattar's own technical-transparency panel — what this "
+            "Elattar's own technical-transparency panel: what this "
             'component needs, and what has not been wired into the '
             'registry yet.',
         child: DocsInstallFacts(
           title: 'Install facts',
           facts: <DocsInstallFact>[
             const DocsInstallFact(
+              label: 'Status',
+              value: 'Stable primitive: no variants, sizes, or async states',
+              description:
+                  'DsBreadcrumb and DsBreadcrumbEntry are both exported from '
+                  'the public barrel today.',
+            ),
+            const DocsInstallFact(
+              label: 'Version',
+              value: '0.0.1',
+              description: 'Package version this page was written against.',
+            ),
+            const DocsInstallFact(
               label: 'Registry item',
               value: 'Not yet published',
               description:
                   'No registry/components/breadcrumb.json exists in this '
-                  'checkout — breadcrumb has not been wired into the CLI '
+                  'checkout: breadcrumb has not been wired into the CLI '
                   'registry yet.',
             ),
             const DocsInstallFact(
@@ -522,7 +556,7 @@ class _BreadcrumbArticle extends StatelessWidget {
               value: 'lib/components/ui/breadcrumb.dart',
               description:
                   'The same lib/components/ui/ target every other '
-                  'component installs to, in both foundation modes — once a '
+                  'component installs to, in both foundation modes: once a '
                   'manifest exists to carry it there.',
             ),
             const DocsInstallFact(
@@ -530,14 +564,14 @@ class _BreadcrumbArticle extends StatelessWidget {
               value: 'source or package compatible',
               description:
                   'The source only imports foundation/*, theme_scope.dart, '
-                  'and icon.dart — nothing package-mode-only.',
+                  'and icon.dart: nothing package-mode-only.',
             ),
             DocsInstallFact(
               label: 'Dependencies',
               value: entry.dependencies.join(', '),
               description:
-                  'Real transitive needs — the foundation modules and the '
-                  'already-published icon registry item — not yet resolved '
+                  'Real transitive needs: the foundation modules and the '
+                  'already-published icon registry item: not yet resolved '
                   'automatically, because no manifest names them.',
             ),
             const DocsInstallFact(
@@ -569,19 +603,8 @@ class _BreadcrumbArticle extends StatelessWidget {
         ),
       ),
       DsSection(
-        id: 'composition',
-        title: 'Composition example',
-        description:
-            'Breadcrumb sitting above a page title and an action — its '
-            'usual home, rather than the isolated specimen above.',
-        child: const DocsCodeExample(
-          title: 'Page header composition',
-          preview: _BreadcrumbComposition(),
-        ),
-      ),
-      DsSection(
         id: 'theming',
-        title: 'Theming notes',
+        title: 'Theming',
         child: DsPanel(
           label: 'What actually varies with the theme',
           child: Column(
@@ -589,7 +612,7 @@ class _BreadcrumbArticle extends StatelessWidget {
             children: <Widget>[
               DsText(
                 'DsBreadcrumb carries no fill, border, or surface of its '
-                'own — it only sets type and ink. Every crumb, link and '
+                'own: it only sets type and ink. Every crumb, link and '
                 'page alike, renders at DsComponentType.textSm; the weight '
                 'never changes.',
                 DsType.small,
@@ -600,7 +623,7 @@ class _BreadcrumbArticle extends StatelessWidget {
                 'theme.foreground on hover or for the current page. Both '
                 'come from the DefaultTextStyle that wraps the entire Wrap, '
                 'and the separator\'s DsIconTone.inherit reads that same '
-                'ambient style — the Flutter equivalent of a currentColor '
+                'ambient style: the Flutter equivalent of a currentColor '
                 'stroke.',
                 DsType.small,
               ),
@@ -608,7 +631,7 @@ class _BreadcrumbArticle extends StatelessWidget {
               DsText(
                 'Because color is the only token in play, a custom theme '
                 'only has to keep mutedForeground and foreground legibly '
-                'distinct in both light and dark — there is no dedicated '
+                'distinct in both light and dark: there is no dedicated '
                 'breadcrumb-*, background, or border role to override.',
                 DsType.small,
               ),
@@ -618,7 +641,7 @@ class _BreadcrumbArticle extends StatelessWidget {
       ),
       DsSection(
         id: 'source',
-        title: 'Source and tests',
+        title: 'Source',
         child: DocsInstallFacts(
           title: 'Source and tests',
           facts: <DocsInstallFact>[
@@ -669,6 +692,35 @@ DsBreadcrumb(
   ],
 )''';
 
+const String _compositionCode =
+    '''// nav: Semantics(container: true, label: 'breadcrumb')
+//  ol: DefaultTextStyle(text-sm, muted-foreground) around a Wrap
+//   li: one _DsCrumb per entry, gap 6px
+//    a / span: DsBreadcrumbEntry.link renders a tappable crumb,
+//              DsBreadcrumbEntry.page renders the inert current page
+//   li (separator): a derived 14px chevron between every adjacent pair,
+//                   excluded from the semantics tree''';
+
+const String _linkComponentCode =
+    '''DsBreadcrumbEntry.link(
+  'Projects',
+  // Swap in whatever routing this app already uses: go_router,
+  // Navigator, or anything else. DsBreadcrumb never imports a router
+  // itself, onTap is the whole seam.
+  onTap: () => Navigator.of(context).pushNamed('/projects'),
+)''';
+
+const String _rtlCode =
+    '''Directionality(
+  textDirection: TextDirection.rtl,
+  child: DsBreadcrumb(
+    items: <DsBreadcrumbEntry>[
+      DsBreadcrumbEntry.link('الرئيسية'),
+      DsBreadcrumbEntry.page('الإعدادات'),
+    ],
+  ),
+)''';
+
 class _A11yRow extends StatelessWidget {
   const _A11yRow(this.label, this.body, {this.last = false});
 
@@ -710,24 +762,40 @@ class _BreadcrumbPreview extends StatelessWidget {
         ],
       ),
       SizedBox(height: ds(6)),
-      DsText('Single crumb — no separator to derive', DsType.label),
+      DsText('Single crumb: no separator to derive', DsType.label),
       SizedBox(height: ds(2)),
       const DsBreadcrumb(
         items: <DsBreadcrumbEntry>[DsBreadcrumbEntry.page('Only crumb')],
       ),
-      SizedBox(height: ds(6)),
-      DsText('Right-to-left, same composition', DsType.label),
-      SizedBox(height: ds(2)),
-      const Directionality(
-        textDirection: TextDirection.rtl,
-        child: DsBreadcrumb(
-          items: <DsBreadcrumbEntry>[
-            DsBreadcrumbEntry.link('الرئيسية'),
-            DsBreadcrumbEntry.page('الإعدادات'),
-          ],
-        ),
-      ),
     ],
+  );
+}
+
+class _BreadcrumbBasic extends StatelessWidget {
+  const _BreadcrumbBasic();
+
+  @override
+  Widget build(BuildContext context) => const DsBreadcrumb(
+    items: <DsBreadcrumbEntry>[
+      DsBreadcrumbEntry.link('Dashboard'),
+      DsBreadcrumbEntry.link('Projects'),
+      DsBreadcrumbEntry.page('Nova Redesign'),
+    ],
+  );
+}
+
+class _BreadcrumbRtl extends StatelessWidget {
+  const _BreadcrumbRtl();
+
+  @override
+  Widget build(BuildContext context) => const Directionality(
+    textDirection: TextDirection.rtl,
+    child: DsBreadcrumb(
+      items: <DsBreadcrumbEntry>[
+        DsBreadcrumbEntry.link('الرئيسية'),
+        DsBreadcrumbEntry.page('الإعدادات'),
+      ],
+    ),
   );
 }
 

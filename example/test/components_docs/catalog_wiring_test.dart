@@ -8,7 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 /// Proves every entry in [componentDocs] is actually reachable.
 ///
 /// A page can exist on disk, compile, and pass its own widget test while
-/// still being unreachable from the site — nothing routes to it. This is the
+/// still being unreachable from the site: nothing routes to it. This is the
 /// test that closes that gap: for every catalog entry it checks the route
 /// resolves, the route dispatches to a real page rather than the home-page
 /// fallback `publicPageFor` returns for an unknown route, the route is

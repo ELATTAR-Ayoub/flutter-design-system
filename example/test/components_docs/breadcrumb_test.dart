@@ -1,17 +1,18 @@
 /// Tests for `components_docs/breadcrumb/meta.dart` and
-/// `components_docs/breadcrumb/page.dart` — the public Breadcrumb component
+/// `components_docs/breadcrumb/page.dart`: the public Breadcrumb component
 /// documentation page.
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
-/// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery` — the
-/// discipline `skills_docs_test.dart` and `shot_detail_test.dart` already
-/// carry. Theme coverage uses a live `DsThemeController` flipped in place
-/// rather than two independent pumps.
+/// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`: the
+/// discipline `skills_docs_test.dart` already carries. Theme coverage uses a
+/// live `DsThemeController` flipped in place rather than two independent
+/// pumps.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/breadcrumb/meta.dart';
 import 'package:example/components_docs/breadcrumb/page.dart';
+import 'package:example/kit.dart' show DsSection;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -66,6 +67,34 @@ void main() {
   });
 
   group('rendered page', () {
+    testWidgets(
+      'sections render in the shadcn-mirrored order, section for section',
+      (WidgetTester tester) async {
+        await _pumpBreadcrumbDoc(tester);
+
+        final List<String> titles = tester
+            .widgetList<DsSection>(find.byType(DsSection))
+            .map((DsSection section) => section.title)
+            .toList();
+
+        expect(titles, <String>[
+          'Installation',
+          'Usage',
+          'Composition',
+          'Basic',
+          'Link component',
+          'RTL',
+          'API Reference',
+          'States',
+          'Accessibility',
+          'Responsive',
+          'Dependencies',
+          'Theming',
+          'Source',
+        ]);
+      },
+    );
+
     testWidgets('renders the article and a live multi-crumb specimen', (
       WidgetTester tester,
     ) async {

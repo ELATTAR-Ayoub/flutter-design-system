@@ -1,15 +1,15 @@
 /// Tests for `components_docs/tooltip/meta.dart` and
-/// `components_docs/tooltip/page.dart` — the public Tooltip component
+/// `components_docs/tooltip/page.dart`: the public Tooltip component
 /// documentation page.
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
-/// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery` — the
+/// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`: the
 /// discipline `breadcrumb_test.dart` already carries. Theme coverage uses a
 /// live `DsThemeController` flipped in place rather than two independent
 /// pumps.
 ///
 /// `DsTooltip` mounts its content through an `OverlayPortal`, so the live
-/// specimens need a real `Overlay` — the harness wraps the page in a
+/// specimens need a real `Overlay`: the harness wraps the page in a
 /// `MaterialApp`, the same fix a sibling worker needed for `DsSelect` earlier
 /// in this program. A bare `Directionality`/`Material` host would let the
 /// page render but the tooltip would never actually open.
@@ -18,6 +18,7 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/tooltip/meta.dart';
 import 'package:example/components_docs/tooltip/page.dart';
+import 'package:example/kit.dart' show DsSection;
 import 'package:flutter/gestures.dart' show PointerDeviceKind;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -68,7 +69,7 @@ void main() {
         containsAll(<String>['DsTooltip', 'DsTooltipSide', 'DsTooltipContent']),
       );
       // Matches registry/components/tooltip.json's registryDependencies
-      // verbatim — tooltip is one of the rare Wave 1 components that already
+      // verbatim: tooltip is one of the rare Wave 1 components that already
       // has a real manifest.
       expect(tooltipDoc.dependencies, <String>['source-foundation']);
       // Short description: one sentence, no trailing ellipsis.
@@ -105,6 +106,36 @@ void main() {
     });
 
     testWidgets(
+      'sections render in the shadcn-tooltip-mirrored order, Status gone, '
+      'the six Elattar sections trailing API',
+      (WidgetTester tester) async {
+        await _pumpTooltipDoc(tester);
+
+        final List<String> titles = tester
+            .widgetList<DsSection>(find.byType(DsSection))
+            .map((DsSection section) => section.title)
+            .toList();
+
+        expect(titles, <String>[
+          'Installation',
+          'Usage',
+          'Composition',
+          'Side',
+          'In a toolbar',
+          'Disabled button',
+          'Hidden trigger',
+          'API Reference',
+          'States and feedback',
+          'Accessibility and keyboard behavior',
+          'Responsive and platform behavior',
+          'Dependencies, files, and disclosure',
+          'Theming notes',
+          'Source and tests',
+        ]);
+      },
+    );
+
+    testWidgets(
       'the API table documents every constructor parameter found in the source',
       (WidgetTester tester) async {
         await _pumpTooltipDoc(tester);
@@ -119,7 +150,7 @@ void main() {
         // DsTooltipContent's constructor (label, side already covered above
         // as duplicated cells).
         expect(find.textContaining('DsTooltipContent'), findsWidgets);
-        // DsTooltipSide's two values, in the Variants section.
+        // DsTooltipSide's two values, in the Side section.
         expect(find.text('top'), findsOneWidget);
         expect(find.text('right'), findsOneWidget);
       },
@@ -170,7 +201,7 @@ void main() {
     );
   });
 
-  group('live specimen — pointer and touch', () {
+  group('live specimen: pointer and touch', () {
     testWidgets(
       'a pointer hovering the top specimen opens the label after the delay',
       (WidgetTester tester) async {

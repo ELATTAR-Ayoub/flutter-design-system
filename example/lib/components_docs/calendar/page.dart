@@ -1,27 +1,50 @@
 /// Public documentation page for the `calendar` component.
 ///
-/// The reference's selects page has three calendars — `DsCalendar.single` in a
+/// Section shape mirrors
+/// `https://ui.shadcn.com/docs/components/base/calendar` section for
+/// section: a live demo renders ahead of any heading, then Installation,
+/// Usage, Composition, About, Date picker, Selected date (with timezone),
+/// Range calendar, Presets, and API Reference, in that order. Persian /
+/// Hijri / Jalali Calendar, Month and Year Selector, Date and Time Picker,
+/// and Booked dates have no counterpart here: DsCalendar has no locale
+/// parameter, no month/year dropdown or year jump, no time-of-day input,
+/// and no per-day disabled predicate (the last two are named again in
+/// Accessibility's known gaps). Presets, unlike those four, is buildable:
+/// DsCalendar's controlled `month` / `selected` pair is exactly the seam
+/// the reference's own preset buttons drive, so this page builds a specimen
+/// for it rather than skipping it. Basic folds into the unheaded live demo
+/// rather than repeating it, because this port has only one single-date
+/// calendar shape to show, not a richer dropdown-driven default plus a
+/// plain fallback. States, Accessibility, Responsive, Dependencies,
+/// Theming, and Source are this package's own six sections, added after
+/// API Reference, named exactly that with no extra words.
+///
+/// The reference's selects page has three calendars, `DsCalendar.single` in a
 /// Panel, `DsCalendar.range` in another Panel, and a `DsDatePicker` inside a
-/// Popover. This page mounts exactly those three as interactive specimens with
-/// live readouts of what the reader picked.
+/// Popover. This page mounts those three as interactive specimens with live
+/// readouts of what the reader picked, plus a fourth, the Presets specimen,
+/// built new for this reshape because the reference has no counterpart demo
+/// to carry forward.
 ///
 /// Two things make calendar peculiar:
 ///
 /// 1. **The clock must be frozen.** `DsCalendar` opens on `month ?? defaultMonth
-///    ?? today`, and the page's three specimens pass neither month nor
-///    defaultMonth intentionally — that is what the reference does. A test that
-///    lets the wall clock through would pass in August 2026 and fail in
-///    September. The test harness pins a [DsClock] to a fixed date and time,
-///    the same instant the capture rig freezes, so rendered months are
-///    reproducible. The two seeded specimens below read that same clock through
-///    [DsClock.nowOf] rather than `DateTime.now()`, so the seed and the opening
-///    month can never disagree.
+///    ?? today`. The single and range specimens pass neither month nor
+///    defaultMonth intentionally: that is what the reference does. The
+///    presets specimen is the one exception, its whole point is a
+///    controlled `month`, seeded from the same clock rather than left null.
+///    A test that let the wall clock through would pass in August 2026 and
+///    fail in September. The test harness pins a [DsClock] to a fixed date
+///    and time, the same instant the capture rig freezes, so rendered
+///    months are reproducible. The three seeded specimens below read that
+///    same clock through [DsClock.nowOf] rather than `DateTime.now()`, so
+///    the seed and the opening month can never disagree.
 /// 2. **The date picker needs a real Overlay.** `DsDatePicker` mounts its
 ///    calendar through a `DsPopover`, which uses an `OverlayPortal`, which
 ///    needs a real Material `Overlay` to work. The test wraps the page in a
 ///    `MaterialApp` for that reason.
 ///
-/// `calendar` has no registry manifest yet — the Installation section discloses
+/// `calendar` has no registry manifest yet: the Installation section discloses
 /// this honestly rather than inventing a CLI command.
 library;
 
@@ -53,17 +76,22 @@ class CalendarDocPage extends StatelessWidget {
     ],
     sidebar: _sidebar,
     toc: const <DocsTocEntry>[
-      DocsTocEntry(title: 'Overview', anchor: 'overview'),
-      DocsTocEntry(title: 'Preview', anchor: 'preview'),
-      DocsTocEntry(title: 'Install', anchor: 'install'),
+      DocsTocEntry(title: 'Installation', anchor: 'install'),
       DocsTocEntry(title: 'Usage', anchor: 'usage'),
-      DocsTocEntry(title: 'API', anchor: 'api'),
-      DocsTocEntry(title: 'Variants', anchor: 'variants'),
+      DocsTocEntry(title: 'Composition', anchor: 'composition'),
+      DocsTocEntry(title: 'About', anchor: 'about'),
+      DocsTocEntry(title: 'Date picker', anchor: 'date-picker'),
+      DocsTocEntry(
+        title: 'Selected date (with timezone)',
+        anchor: 'selected-date-timezone',
+      ),
+      DocsTocEntry(title: 'Range calendar', anchor: 'range-calendar'),
+      DocsTocEntry(title: 'Presets', anchor: 'presets'),
+      DocsTocEntry(title: 'API Reference', anchor: 'api'),
       DocsTocEntry(title: 'States', anchor: 'states'),
       DocsTocEntry(title: 'Accessibility', anchor: 'accessibility'),
       DocsTocEntry(title: 'Responsive', anchor: 'responsive'),
       DocsTocEntry(title: 'Dependencies', anchor: 'dependencies'),
-      DocsTocEntry(title: 'Composition', anchor: 'composition'),
       DocsTocEntry(title: 'Theming', anchor: 'theming'),
       DocsTocEntry(title: 'Source', anchor: 'source'),
     ],
@@ -94,96 +122,48 @@ class _CalendarArticle extends StatelessWidget {
     key: const ValueKey<String>('calendar-doc-article'),
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
-      _overview(),
-      _preview(),
+      // The live demo, ahead of any heading: the same shape the reference
+      // page itself opens with. No DsSection wraps it, so it carries no
+      // Overview/Status/Preview heading of its own before Installation.
+      // Basic folds into this same demo rather than repeating it further
+      // down: this port has only one single-date calendar shape, not a
+      // richer dropdown-driven default plus a separate plain fallback.
+      _liveDemo(),
+      SizedBox(height: ds(8)),
       _install(),
       _usage(),
+      _composition(),
+      _about(),
+      _datePicker(),
+      _selectedDateTimezone(),
+      _rangeCalendar(),
+      _presets(),
       _api(),
-      _variants(),
       _states(),
       _accessibility(),
       _responsive(),
       _dependencies(),
-      _composition(),
       _theming(),
       _source(),
     ],
   );
 
-  Widget _overview() => DsSection(
-    id: 'overview',
-    title: 'Overview',
-    child: ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: DsWidths.prose),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          DsText(
-            'DsCalendar renders a month grid: a fixed-size day picker for '
-            'selecting a single date or a date range. Two modes — single and '
-            'range — shape what it holds and what it reports, and three '
-            'surface treatments let it render on card, background, or inside '
-            'a popover. DsDatePicker wraps the calendar inside a popover '
-            'behind a button, and is the shape most forms reach for.',
-            DsType.body,
-          ),
-          SizedBox(height: ds(4)),
-          DsText(
-            'The calendar reads local calendar dates, never instants: a July '
-            'date stays July everywhere on earth. The opening month is the '
-            'reader\'s current month by default, chosen on first render and '
-            'never moved by a later tick of the clock — a calendar opened on '
-            'the 31st and left open past midnight still shows the month it '
-            'opened on.',
-            DsType.body,
-          ),
-          SizedBox(height: ds(4)),
-          DsText(
-            'Status: stable primitive, not yet registered in the CLI. '
-            'Platforms: Android, iOS, Web, macOS, Windows, Linux.',
-            DsType.small,
-          ),
-        ],
-      ),
-    ),
-  );
-
-  Widget _preview() => DsSection(
-    id: 'preview',
-    title: 'Preview',
+  Widget _liveDemo() => DocsCodeExample(
+    title: 'Single date selection',
     description:
-        'Single date selection, range selection, and a date picker — all '
-        'three live, each with a readout of exactly what it reports back.',
-    child: DocsCodeExample(
-      title: 'Three calendar arrangements',
-      manualFiles: const <DocsCodeFile>[
-        DocsCodeFile(
-          path: 'lib/components/ui/calendar.dart',
-          code:
-              "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
-              '// Copy lib/src/components/calendar.dart from the package\n'
-              '// source directly. There is no generated CLI payload yet.',
-        ),
-      ],
-      preview: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          DsText('Single date selection', DsType.label),
-          SizedBox(height: ds(2)),
-          const _SingleCalendarSpecimen(),
-          SizedBox(height: ds(6)),
-          DsText('Range selection', DsType.label),
-          SizedBox(height: ds(2)),
-          const _RangeCalendarSpecimen(),
-          SizedBox(height: ds(6)),
-          DsText('Date picker', DsType.label),
-          SizedBox(height: ds(2)),
-          const _DatePickerSpecimen(),
-          SizedBox(height: ds(3)),
-          const _DatePickerDisabledSpecimen(),
-        ],
+        'DsCalendar.single, live: pick a day and the readout below prints '
+        'both the human label and the day key. Range selection and the '
+        'date picker each get their own section further down.',
+    preview: const _SingleCalendarSpecimen(),
+    manualFiles: const <DocsCodeFile>[
+      DocsCodeFile(
+        path: 'lib/components/ui/calendar.dart',
+        code:
+            "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
+            '// Copy lib/src/components/calendar.dart from the package\n'
+            '// source directly. There is no generated CLI payload yet.',
       ),
-    ),
+    ],
   );
 
   Widget _install() => DsSection(
@@ -191,7 +171,7 @@ class _CalendarArticle extends StatelessWidget {
     title: 'Installation',
     description:
         'calendar has no registry manifest yet, so the CLI cannot install '
-        'this component — copy the source file by hand instead.',
+        'this component: copy the source file by hand instead.',
     child: DocsInstallFacts(
       title: 'Installation facts',
       facts: <DocsInstallFact>[
@@ -255,7 +235,9 @@ class _CalendarArticle extends StatelessWidget {
   Widget _usage() => DsSection(
     id: 'usage',
     title: 'Usage',
-    description: 'The three arrangements in the preview.',
+    description:
+        'The three arrangements documented on this page: single selection, '
+        'range selection, and the date picker.',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
@@ -288,16 +270,20 @@ class _CalendarArticle extends StatelessWidget {
 
   Widget _api() => DsSection(
     id: 'api',
-    title: 'API',
+    title: 'API Reference',
     description:
         'Every public class, enum, static, and constructor parameter the '
-        'source declares — plus the half of source-foundation this component '
-        'cannot be understood without.',
+        'source declares: plus the half of source-foundation this component '
+        'cannot be understood without. The reference has no formal props '
+        'table on this page and defers to the React DayPicker docs instead; '
+        'DsCalendar owns every one of its props outright, so this table '
+        'stays in full, including the two enums, mode and surface, that an '
+        'earlier draft gave their own Variants heading.',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         const DocsApiTable(
-          title: 'DsCalendar.single / DsCalendar.range — parameters',
+          title: 'DsCalendar.single / DsCalendar.range: parameters',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'selected',
@@ -310,7 +296,7 @@ class _CalendarArticle extends StatelessWidget {
               name: 'onSelected',
               type: 'ValueChanged<DateTime?>? / ValueChanged<DsDateRange?>?',
               description:
-                  'Called on every pick. Null makes the grid read-only — '
+                  'Called on every pick. Null makes the grid read-only, '
                   'there is no separate enabled flag.',
             ),
             DocsApiFact(
@@ -339,8 +325,8 @@ class _CalendarArticle extends StatelessWidget {
               name: 'surface',
               type: 'DsCalendarSurface',
               description:
-                  'Defaults to card. Selects fill, border, and padding — see '
-                  'Variants.',
+                  'Defaults to card. Selects fill, border, and padding: see '
+                  'the DsCalendarSurface table below.',
             ),
             DocsApiFact(
               name: 'autoFocus',
@@ -354,14 +340,14 @@ class _CalendarArticle extends StatelessWidget {
         ),
         SizedBox(height: ds(6)),
         const DocsApiTable(
-          title: 'DsCalendar — the fields the two constructors resolve onto',
+          title: 'DsCalendar: the fields the two constructors resolve onto',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'mode',
               type: 'DsCalendarMode',
               description:
                   'single or range, fixed by which constructor was used. Not '
-                  'a parameter — it cannot be passed or changed.',
+                  'a parameter: it cannot be passed or changed.',
             ),
             DocsApiFact(
               name: 'selectedDay',
@@ -395,18 +381,18 @@ class _CalendarArticle extends StatelessWidget {
         ),
         SizedBox(height: ds(6)),
         const DocsApiTable(
-          title: 'DsCalendar — statics',
+          title: 'DsCalendar: statics',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'cellSize',
               type: 'static double',
-              description: 'One day square — 28 logical pixels.',
+              description: 'One day square, 28 logical pixels.',
             ),
             DocsApiFact(
               name: 'contentWidth',
               type: 'static double',
               description:
-                  'The seven-column grid before surface padding — 196 '
+                  'The seven-column grid before surface padding, 196 '
                   'logical pixels.',
             ),
             DocsApiFact(
@@ -470,7 +456,7 @@ class _CalendarArticle extends StatelessWidget {
         ),
         SizedBox(height: ds(6)),
         const DocsApiTable(
-          title: 'DsCalendarDay — date arithmetic on local fields',
+          title: 'DsCalendarDay: date arithmetic on local fields',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'of',
@@ -487,7 +473,7 @@ class _CalendarArticle extends StatelessWidget {
             DocsApiFact(
               name: 'isSameDay',
               type: 'static bool',
-              description: 'Same year, month, and day — not the same instant.',
+              description: 'Same year, month, and day: not the same instant.',
             ),
             DocsApiFact(
               name: 'isSameMonth',
@@ -504,7 +490,7 @@ class _CalendarArticle extends StatelessWidget {
               type: 'static DateTime',
               description:
                   'Move by whole months, clamping the day into the target '
-                  'month — 31 January plus one month is 28 February.',
+                  'month, 31 January plus one month is 28 February.',
             ),
             DocsApiFact(
               name: 'daysInMonth',
@@ -515,7 +501,7 @@ class _CalendarArticle extends StatelessWidget {
         ),
         SizedBox(height: ds(6)),
         const DocsApiTable(
-          title: 'DsCalendarMonth — the grid geometry',
+          title: 'DsCalendarMonth: the grid geometry',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'leadingDays',
@@ -566,7 +552,7 @@ class _CalendarArticle extends StatelessWidget {
         ),
         SizedBox(height: ds(6)),
         const DocsApiTable(
-          title: 'DsCalendarBandPainter — the range band and today marker',
+          title: 'DsCalendarBandPainter: the range band and today marker',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'muted',
@@ -586,7 +572,7 @@ class _CalendarArticle extends StatelessWidget {
               name: 'selected',
               type: 'bool',
               description:
-                  'This cell also carries the selected fill — which squares '
+                  'This cell also carries the selected fill: which squares '
                   'off the today marker underneath it.',
             ),
             DocsApiFact(
@@ -608,7 +594,7 @@ class _CalendarArticle extends StatelessWidget {
               name: 'bleed',
               type: 'double',
               description:
-                  'DsCalendar.rangeBleed — the square drawn past the cap so '
+                  'DsCalendar.rangeBleed: the square drawn past the cap so '
                   'the band meets its neighbour.',
             ),
             DocsApiFact(
@@ -634,7 +620,7 @@ class _CalendarArticle extends StatelessWidget {
               name: 'onChanged',
               type: 'ValueChanged<DateTime?>?',
               description:
-                  'Null disables the trigger outright — the popover never '
+                  'Null disables the trigger outright: the popover never '
                   'opens. This is the only per-instance disabling the family '
                   'offers.',
             ),
@@ -667,7 +653,7 @@ class _CalendarArticle extends StatelessWidget {
         ),
         SizedBox(height: ds(6)),
         const DocsApiTable(
-          title: 'DsDateFormat — source-foundation, hardcoded en-US',
+          title: 'DsDateFormat: source-foundation, hardcoded en-US',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'monthsShort',
@@ -677,39 +663,39 @@ class _CalendarArticle extends StatelessWidget {
             DocsApiFact(
               name: 'monthsLong',
               type: 'static const List<String>',
-              description: 'January…December — what the caption prints.',
+              description: 'January…December: what the caption prints.',
             ),
             DocsApiFact(
               name: 'weekdaysNarrow',
               type: 'static const List<String>',
-              description: 'Su Mo Tu We Th Fr Sa — the header row, in order.',
+              description: 'Su Mo Tu We Th Fr Sa: the header row, in order.',
             ),
             DocsApiFact(
               name: 'weekdaysLong',
               type: 'static const List<String>',
-              description: 'Sunday…Saturday — used by dayLabel.',
+              description: 'Sunday…Saturday: used by dayLabel.',
             ),
             DocsApiFact(
               name: 'weekIndex',
               type: 'static int',
               description:
-                  'date.weekday % 7 — the column a date lands in, Sunday '
+                  'date.weekday % 7: the column a date lands in, Sunday '
                   'being column zero.',
             ),
             DocsApiFact(
               name: 'dayMonth',
               type: 'static String',
-              description: '"16 Aug" — the range readout\'s own format.',
+              description: '"16 Aug": the range readout\'s own format.',
             ),
             DocsApiFact(
               name: 'dayMonthYear',
               type: 'static String',
-              description: '"16 Aug 2026" — the date picker\'s trigger label.',
+              description: '"16 Aug 2026": the date picker\'s trigger label.',
             ),
             DocsApiFact(
               name: 'monthYear',
               type: 'static String',
-              description: '"August 2026" — the caption.',
+              description: '"August 2026": the caption.',
             ),
             DocsApiFact(
               name: 'weekdayNarrow',
@@ -721,14 +707,14 @@ class _CalendarArticle extends StatelessWidget {
               type: 'static String',
               description:
                   '"2026-08-16", built from the local year/month/day fields. '
-                  'The string to store — see Accessibility for why this is '
-                  'not toIso8601String().',
+                  'The string to store: see Selected date (with timezone) '
+                  'for why this is not toIso8601String().',
             ),
             DocsApiFact(
               name: 'dayLabel',
               type: 'static String',
               description:
-                  '"Sunday, August 16th, 2026" — every day cell\'s '
+                  '"Sunday, August 16th, 2026": every day cell\'s '
                   'accessible name.',
             ),
             DocsApiFact(
@@ -740,14 +726,14 @@ class _CalendarArticle extends StatelessWidget {
         ),
         SizedBox(height: ds(6)),
         const DocsApiTable(
-          title: 'DsClock and DsCalendarType — source-foundation',
+          title: 'DsClock and DsCalendarType: source-foundation',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'now',
               type: 'DateTime',
               description:
                   'The instant this scope calls the present. An InheritedWidget '
-                  'field, not a global — which is what makes the month a test '
+                  'field, not a global: which is what makes the month a test '
                   'can pin.',
             ),
             DocsApiFact(
@@ -762,7 +748,7 @@ class _CalendarArticle extends StatelessWidget {
               name: 'maybeOf',
               type: 'static DsClock?',
               description:
-                  'The scope itself, or null — for callers that need to know '
+                  'The scope itself, or null: for callers that need to know '
                   'whether a clock was pinned at all.',
             ),
             DocsApiFact(
@@ -773,27 +759,17 @@ class _CalendarArticle extends StatelessWidget {
             ),
           ],
         ),
-      ],
-    ),
-  );
-
-  Widget _variants() => DsSection(
-    id: 'variants',
-    title: 'Variants',
-    description:
-        'Two enums. The mode is fixed by the constructor and cannot change '
-        'over an instance\'s life; the surface is an ordinary parameter.',
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
+        SizedBox(height: ds(6)),
         const DocsApiTable(
-          title: 'DsCalendarMode',
+          title:
+              'DsCalendarMode: fixed by the constructor, cannot change over '
+              'an instance\'s life',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'single',
               type: 'DsCalendarMode',
               description:
-                  'One date. Re-picking the selected day clears it — there '
+                  'One date. Re-picking the selected day clears it: there '
                   'is no required flag to prevent that.',
             ),
             DocsApiFact(
@@ -807,7 +783,7 @@ class _CalendarArticle extends StatelessWidget {
         ),
         SizedBox(height: ds(6)),
         const DocsApiTable(
-          title: 'DsCalendarSurface',
+          title: 'DsCalendarSurface: an ordinary parameter, the surface field',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'card',
@@ -825,7 +801,7 @@ class _CalendarArticle extends StatelessWidget {
               name: 'popover',
               type: 'DsCalendarSurface',
               description:
-                  'Transparent — the DsPopoverSurface around it already '
+                  'Transparent: the DsPopoverSurface around it already '
                   'paints the fill, ring, and shadow. What DsDatePicker '
                   'passes.',
             ),
@@ -837,12 +813,12 @@ class _CalendarArticle extends StatelessWidget {
 
   Widget _states() => DsSection(
     id: 'states',
-    title: 'States and feedback',
+    title: 'States',
     child: const DocsStateMatrix(
       facts: <DocsStateFact>[
         DocsStateFact(
           state: 'Rest',
-          treatment: 'A ghost day cell — no fill, no border.',
+          treatment: 'A ghost day cell: no fill, no border.',
           userSignal: 'Every in-month day reads as selectable.',
         ),
         DocsStateFact(
@@ -883,13 +859,13 @@ class _CalendarArticle extends StatelessWidget {
           state: 'Disabled',
           treatment:
               'Pass a null onSelected (or, for the picker, a null onChanged). '
-              'There is no per-day disabling — see Accessibility.',
+              'There is no per-day disabling: see Accessibility.',
           userSignal: 'The whole grid goes read-only, or the trigger does.',
         ),
         DocsStateFact(
           state: 'Loading / Empty / Error / Success',
           treatment:
-              'N/A — the grid is computed synchronously from a month and has '
+              'N/A: the grid is computed synchronously from a month and has '
               'no async, empty, or validation state of its own.',
           userSignal: 'N/A',
         ),
@@ -907,56 +883,14 @@ class _CalendarArticle extends StatelessWidget {
 
   Widget _accessibility() => DsSection(
     id: 'accessibility',
-    title: 'Accessibility and keyboard behavior',
+    title: 'Accessibility',
+    description:
+        'The day-key-versus-instant ruling has its own section now, '
+        'Selected date (with timezone): this section covers keyboard, '
+        'semantics, and the gaps that remain.',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        DsPanel(
-          label: 'The ruling this page exists to teach',
-          note: 'DAY KEYS, NOT INSTANTS',
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              DsText(
-                'A calendar date is not an instant, and the two must not be '
-                'stored the same way. DsDateFormat.dayKey builds "2026-08-16" '
-                'out of the local year, month, and day fields. It never calls '
-                'toIso8601String() and never converts to UTC, because both of '
-                'those turn a day into a moment and a moment reads back as a '
-                'different day depending on where the reader is standing.',
-                DsType.small,
-              ),
-              SizedBox(height: ds(3)),
-              DsText(
-                'The bug this prevents, concretely: a reader in New York picks '
-                '16 August and the app stores '
-                'date.toUtc().toIso8601String(), which is '
-                '2026-08-16T04:00:00Z. Read back in London that is still the '
-                '16th, so the bug hides. Now the New York reader picks a date '
-                'and the app stores it at local midnight — '
-                '2026-08-16T00:00:00-04:00, i.e. 2026-08-16T04:00:00Z — while '
-                'a reader in Los Angeles storing the same calendar day writes '
-                '2026-08-16T07:00:00Z, and a reader in Tokyo writes '
-                '2026-08-15T15:00:00Z. Slice the date half off any of those '
-                'ISO strings after a UTC conversion and one of the three reads '
-                'back as the 15th. The day the reader tapped is gone, and it '
-                'is gone only for some readers, which is why this class of bug '
-                'survives review.',
-                DsType.small,
-              ),
-              SizedBox(height: ds(3)),
-              DsText(
-                'So: report and store DsDateFormat.dayKey(date). Compare with '
-                'DsCalendarDay.isSameDay, never with DateTime equality. The '
-                'single specimen above prints both halves — the human label '
-                'and the key — so the difference is visible rather than '
-                'asserted.',
-                DsType.small,
-              ),
-            ],
-          ),
-        ),
-        SizedBox(height: ds(5)),
         DsPanel(
           label: 'Keyboard',
           child: Column(
@@ -983,7 +917,7 @@ class _CalendarArticle extends StatelessWidget {
               const _KeyRow('End', 'Jump to the last day of the week row.'),
               const _KeyRow(
                 'Enter',
-                'Select the focused day — the same path a tap takes.',
+                'Select the focused day: the same path a tap takes.',
               ),
               const _KeyRow(
                 'Space',
@@ -1001,8 +935,8 @@ class _CalendarArticle extends StatelessWidget {
             children: <Widget>[
               DsText(
                 'Every day cell is a button whose accessible name is the '
-                'whole date — "Sunday, August 16th, 2026", from '
-                'DsDateFormat.dayLabel — not the bare number, so a screen '
+                'whole date, "Sunday, August 16th, 2026", from '
+                'DsDateFormat.dayLabel: not the bare number, so a screen '
                 'reader user never has to infer the month from context. The '
                 'two chevrons are named "Go to the previous month" and "Go to '
                 'the next month". The grid carries one FocusNode for all '
@@ -1045,7 +979,7 @@ class _CalendarArticle extends StatelessWidget {
               ),
               SizedBox(height: ds(3)),
               DsText(
-                'Touch target. A day cell is 28 by 28 logical pixels — under '
+                'Touch target. A day cell is 28 by 28 logical pixels: under '
                 'the 44 and 48 pixel minimum that iOS and Android '
                 'respectively ask for. This is a faithful port of the '
                 'reference\'s own cell size, and it is a real accessibility '
@@ -1076,7 +1010,7 @@ class _CalendarArticle extends StatelessWidget {
                 'Every string this component prints is hardcoded en-US, in '
                 'DsDateFormat: the month names, the weekday names, the '
                 '"16 Aug 2026" ordering, and the 1st/2nd/3rd ordinals. There '
-                'is no locale parameter and no intl dependency — this package '
+                'is no locale parameter and no intl dependency: this package '
                 'does not depend on intl at all, and adding it is the real '
                 'work behind localising this grid, not a switch to flip.',
                 DsType.small,
@@ -1085,7 +1019,7 @@ class _CalendarArticle extends StatelessWidget {
               DsText(
                 'The week always starts on Sunday. weekIndex is '
                 'date.weekday % 7 and the header row is a fixed list, so '
-                'there is no weekStartsOn parameter to move it to Monday — '
+                'there is no weekStartsOn parameter to move it to Monday, '
                 'which is what most of Europe, and the ISO week itself, '
                 'expects. A caller needing a Monday-first grid or non-English '
                 'month names cannot get either from this component today.',
@@ -1100,15 +1034,15 @@ class _CalendarArticle extends StatelessWidget {
 
   Widget _responsive() => DsSection(
     id: 'responsive',
-    title: 'Responsive and platform behavior',
+    title: 'Responsive',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         DsText(
           'No responsive branching: the grid reads no breakpoint and renders '
-          'identically at 390 and 1440 logical pixels. Its width is intrinsic '
-          '— seven 28px columns, 196px of content, about 222px once the card '
-          'surface adds its padding and border — which is why it fits a phone '
+          'identically at 390 and 1440 logical pixels. Its width is intrinsic: '
+          'seven 28px columns, 196px of content, about 222px once the card '
+          'surface adds its padding and border: which is why it fits a phone '
           'viewport without any special case.',
           DsType.small,
         ),
@@ -1123,7 +1057,7 @@ class _CalendarArticle extends StatelessWidget {
         SizedBox(height: ds(3)),
         DsText(
           'Inside the date picker, the popover positions itself against the '
-          'trigger and is clamped to the viewport by dsPopoverPlacement — the '
+          'trigger and is clamped to the viewport by dsPopoverPlacement: the '
           'calendar itself does not shrink, so on a very narrow screen the '
           'popup shifts rather than reflows.',
           DsType.small,
@@ -1141,12 +1075,12 @@ class _CalendarArticle extends StatelessWidget {
 
   Widget _dependencies() => DsSection(
     id: 'dependencies',
-    title: 'Dependencies, files, and assets',
+    title: 'Dependencies',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         DsText(
-          'File: lib/src/components/calendar.dart — one file, carrying '
+          'File: lib/src/components/calendar.dart: one file, carrying '
           'DsCalendar, DsDatePicker, and the four helper types.',
           DsType.small,
         ),
@@ -1165,7 +1099,7 @@ class _CalendarArticle extends StatelessWidget {
         ),
         SizedBox(height: ds(3)),
         DsText(
-          'Assets: none. Shaders: none — the range band is a CustomPainter.',
+          'Assets: none. Shaders: none: the range band is a CustomPainter.',
           DsType.small,
         ),
       ],
@@ -1174,7 +1108,7 @@ class _CalendarArticle extends StatelessWidget {
 
   Widget _composition() => DsSection(
     id: 'composition',
-    title: 'Composition example',
+    title: 'Composition',
     description:
         'DsDatePicker is itself the composition: a DsButton trigger, a '
         'DsPopover, and a popover-surfaced DsCalendar that autofocuses so '
@@ -1186,9 +1120,126 @@ class _CalendarArticle extends StatelessWidget {
     ),
   );
 
+  Widget _about() => DsSection(
+    id: 'about',
+    title: 'About',
+    child: ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: DsWidths.prose),
+      child: DsText(
+        'DsCalendar and DsDatePicker are native Flutter widgets built '
+        'directly on this system\'s own foundation tokens: neither wraps a '
+        'third-party date-picking package. The reference is different: it '
+        'is built on top of React DayPicker, and its own About section says '
+        'so.',
+        DsType.body,
+      ),
+    ),
+  );
+
+  Widget _datePicker() => DsSection(
+    id: 'date-picker',
+    title: 'Date picker',
+    description:
+        'The reference splits this into its own page: a Calendar wrapped '
+        'in a Popover behind a Button. This port keeps both symbols in the '
+        'one source file, lib/src/components/calendar.dart, so the '
+        'specimen lives here rather than behind a second page.',
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        DsText('Enabled', DsType.label),
+        SizedBox(height: ds(2)),
+        const _DatePickerSpecimen(),
+        SizedBox(height: ds(5)),
+        DsText('Disabled', DsType.label),
+        SizedBox(height: ds(2)),
+        const _DatePickerDisabledSpecimen(),
+      ],
+    ),
+  );
+
+  Widget _selectedDateTimezone() => DsSection(
+    id: 'selected-date-timezone',
+    title: 'Selected date (with timezone)',
+    description:
+        'The reference demonstrates hydration-safe timezone handling for a '
+        'controlled Calendar. Flutter has no hydration step, but the same '
+        'underlying trap is real here too: a calendar date is not an '
+        'instant.',
+    child: DsPanel(
+      label: 'The ruling this page exists to teach',
+      note: 'DAY KEYS, NOT INSTANTS',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          DsText(
+            'A calendar date is not an instant, and the two must not be '
+            'stored the same way. DsDateFormat.dayKey builds "2026-08-16" '
+            'out of the local year, month, and day fields. It never calls '
+            'toIso8601String() and never converts to UTC, because both of '
+            'those turn a day into a moment and a moment reads back as a '
+            'different day depending on where the reader is standing.',
+            DsType.small,
+          ),
+          SizedBox(height: ds(3)),
+          DsText(
+            'The bug this prevents, concretely: a reader in New York picks '
+            '16 August and the app stores '
+            'date.toUtc().toIso8601String(), which is '
+            '2026-08-16T04:00:00Z. Read back in London that is still the '
+            '16th, so the bug hides. Now the New York reader picks a date '
+            'and the app stores it at local midnight, '
+            '2026-08-16T00:00:00-04:00, i.e. 2026-08-16T04:00:00Z: while '
+            'a reader in Los Angeles storing the same calendar day writes '
+            '2026-08-16T07:00:00Z, and a reader in Tokyo writes '
+            '2026-08-15T15:00:00Z. Slice the date half off any of those '
+            'ISO strings after a UTC conversion and one of the three reads '
+            'back as the 15th. The day the reader tapped is gone, and it '
+            'is gone only for some readers, which is why this class of bug '
+            'survives review.',
+            DsType.small,
+          ),
+          SizedBox(height: ds(3)),
+          DsText(
+            'So: report and store DsDateFormat.dayKey(date). Compare with '
+            'DsCalendarDay.isSameDay, never with DateTime equality. The '
+            'single specimen at the top of this page prints both halves: '
+            'the human label and the key: so the difference is visible '
+            'rather than asserted.',
+            DsType.small,
+          ),
+        ],
+      ),
+    ),
+  );
+
+  Widget _rangeCalendar() => DsSection(
+    id: 'range-calendar',
+    title: 'Range calendar',
+    description:
+        'DsCalendar.range: two taps set a from/to pair, and a third '
+        're-homes it. One month renders at a time; the reference\'s own '
+        'Range Calendar demo spans two months side by side, which this '
+        'port does not do, there is no numberOfMonths parameter.',
+    child: const _RangeCalendarSpecimen(),
+  );
+
+  Widget _presets() => DsSection(
+    id: 'presets',
+    title: 'Presets',
+    description:
+        'The reference pairs its calendar with quick-pick buttons that set '
+        'the selected day without the reader touching the grid at all. '
+        'DsCalendar has no built-in preset row, but the same controlled '
+        'month/selected API the date picker composition already uses '
+        'covers it: this specimen owns the state, and each button just '
+        'calls onSelected with a computed day.',
+    child: const _PresetsSpecimen(),
+  );
+
   Widget _theming() => DsSection(
     id: 'theming',
-    title: 'Theming notes',
+    title: 'Theming',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -1210,8 +1261,8 @@ class _CalendarArticle extends StatelessWidget {
         ),
         SizedBox(height: ds(3)),
         DsText(
-          'Type comes from DsCalendarType — dayNumber for the digits, and the '
-          'caption and weekday specs beside it — so a type-scale change moves '
+          'Type comes from DsCalendarType: dayNumber for the digits, and the '
+          'caption and weekday specs beside it: so a type-scale change moves '
           'the calendar with the rest of the system.',
           DsType.small,
         ),
@@ -1221,7 +1272,7 @@ class _CalendarArticle extends StatelessWidget {
 
   Widget _source() => DsSection(
     id: 'source',
-    title: 'Source, tests, and docs',
+    title: 'Source',
     child: DocsInstallFacts(
       title: 'Reference',
       facts: <DocsInstallFact>[
@@ -1257,7 +1308,7 @@ class _CalendarArticle extends StatelessWidget {
 
 /// One keyboard row: the key on its own line, then what it does.
 ///
-/// The key name is deliberately **not** [DsType.label] — that spec is
+/// The key name is deliberately **not** [DsType.label]: that spec is
 /// `uppercase`, and `DsText` performs the transform on the string itself
 /// (`theme_scope.dart`), so `PageUp` would reach the tree as `PAGEUP`. Key
 /// names are case-carrying identifiers, not decorative eyebrows: they are
@@ -1312,7 +1363,7 @@ const String _usageDayKeyCode = '''
 // Store the day the reader tapped, not the moment your process was in.
 final String key = DsDateFormat.dayKey(picked);   // '2026-08-16'
 
-// NOT this — a UTC conversion moves the day for half the planet:
+// NOT this: a UTC conversion moves the day for half the planet:
 // final String wrong = picked.toUtc().toIso8601String().substring(0, 10);
 
 // Compare on fields, never on DateTime equality:
@@ -1346,7 +1397,7 @@ DsPopover(
 /// day is on the month the grid opens on rather than in some other month.
 ///
 /// The readout prints the two halves of the timezone ruling as two separate
-/// lines — the human label and the day key — because they are two different
+/// lines: the human label and the day key: because they are two different
 /// strings serving two different jobs, and running them together in one
 /// sentence would hide exactly the distinction this page is about.
 class _SingleCalendarSpecimen extends StatefulWidget {
@@ -1465,6 +1516,112 @@ class _RangeCalendarSpecimenState extends State<_RangeCalendarSpecimen> {
   }
 }
 
+/// Preset specimen: five buttons each set the selected day directly,
+/// exercising the controlled `month` / `selected` pair rather than the
+/// grid's own navigation. A preset landing outside the currently displayed
+/// month moves `_month` along with `_selected`, so the picked day is always
+/// visible the moment a button is pressed, the same way the reference's own
+/// preset buttons drive its controlled Calendar.
+class _PresetsSpecimen extends StatefulWidget {
+  const _PresetsSpecimen();
+
+  @override
+  State<_PresetsSpecimen> createState() => _PresetsSpecimenState();
+}
+
+class _PresetsSpecimenState extends State<_PresetsSpecimen> {
+  DateTime? _selected;
+  DateTime? _month;
+  bool _seeded = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_seeded) return;
+    _seeded = true;
+    _selected = DsCalendarDay.of(DsClock.nowOf(context));
+    _month = DsCalendarDay.startOfMonth(_selected!);
+  }
+
+  void _pick(int daysAhead) {
+    final DateTime today = DsCalendarDay.of(DsClock.nowOf(context));
+    final DateTime day = DsCalendarDay.addDays(today, daysAhead);
+    setState(() {
+      _selected = day;
+      _month = DsCalendarDay.startOfMonth(day);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final DsThemeData theme = DsTheme.of(context);
+    final DateTime? selected = _selected;
+    return KeyedSubtree(
+      key: const ValueKey<String>('calendar-doc-presets-specimen'),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          DsCalendar.single(
+            selected: selected,
+            month: _month,
+            onSelected: (DateTime? day) => setState(() {
+              _selected = day;
+              if (day != null) _month = DsCalendarDay.startOfMonth(day);
+            }),
+            onMonthChanged: (DateTime next) => setState(() => _month = next),
+          ),
+          SizedBox(height: ds(3)),
+          Wrap(
+            spacing: ds(2),
+            runSpacing: ds(2),
+            children: <Widget>[
+              DsButton(
+                variant: DsButtonVariant.outline,
+                size: DsButtonSize.sm,
+                onPressed: () => _pick(0),
+                child: const Text('Today'),
+              ),
+              DsButton(
+                variant: DsButtonVariant.outline,
+                size: DsButtonSize.sm,
+                onPressed: () => _pick(1),
+                child: const Text('Tomorrow'),
+              ),
+              DsButton(
+                variant: DsButtonVariant.outline,
+                size: DsButtonSize.sm,
+                onPressed: () => _pick(3),
+                child: const Text('In 3 days'),
+              ),
+              DsButton(
+                variant: DsButtonVariant.outline,
+                size: DsButtonSize.sm,
+                onPressed: () => _pick(7),
+                child: const Text('In a week'),
+              ),
+              DsButton(
+                variant: DsButtonVariant.outline,
+                size: DsButtonSize.sm,
+                onPressed: () => _pick(14),
+                child: const Text('In 2 weeks'),
+              ),
+            ],
+          ),
+          SizedBox(height: ds(3)),
+          if (selected == null)
+            DsText(
+              'Nothing selected',
+              DsType.small,
+              color: theme.mutedForeground,
+            )
+          else
+            DsText(DsDateFormat.dayMonthYear(selected), DsType.small),
+        ],
+      ),
+    );
+  }
+}
+
 class _DatePickerSpecimen extends StatefulWidget {
   const _DatePickerSpecimen();
 
@@ -1488,7 +1645,7 @@ class _DatePickerSpecimenState extends State<_DatePickerSpecimen> {
   );
 }
 
-/// The disabled twin — a null [DsDatePicker.onChanged], which is the only
+/// The disabled twin: a null [DsDatePicker.onChanged], which is the only
 /// per-instance disabling this family offers.
 ///
 /// The placeholder is deliberately short: the trigger sizes to its label, and

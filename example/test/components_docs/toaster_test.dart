@@ -7,7 +7,7 @@
 ///
 /// **No `pumpAndSettle` anywhere in this file.** [DsToaster]'s own choreology
 /// mixes forever-loop effects ([DsBloomCosmic]'s drift/starfield) with timed,
-/// non-looping clocks (the 4000ms lifetime, the 200ms unmount window) — the
+/// non-looping clocks (the 4000ms lifetime, the 200ms unmount window): the
 /// forever loops mean `pumpAndSettle` would hang, so every timed assertion
 /// below drives the clock with an explicit `tester.pump(duration)` using the
 /// real durations read off `lib/src/components/toaster.dart`
@@ -33,12 +33,33 @@ Widget _harness(Widget child, {required DsThemeController controller}) =>
       ),
     );
 
+/// The shadcn-parity section order (worker brief, `toaster` component,
+/// counterpart `https://ui.shadcn.com/docs/components/base/toast`): a live
+/// demo ahead of any heading (no entry here), Installation, Usage, When to
+/// use it (this component's own decision-guidance addition), Types, Action,
+/// Promise, API Reference, then the six fixed extras.
+const List<String> _expectedSectionHeadings = <String>[
+  'Installation',
+  'Usage',
+  'When to use it',
+  'Types',
+  'Action',
+  'Promise',
+  'API Reference',
+  'States',
+  'Accessibility',
+  'Responsive',
+  'Dependencies',
+  'Theming',
+  'Source',
+];
+
 void main() {
   test('toasterDoc exposes accurate, non-registry metadata', () {
     expect(toasterDoc.name, 'toaster');
     expect(toasterDoc.title, 'Toaster');
     expect(toasterDoc.sourcePath, 'lib/src/components/toaster.dart');
-    // Both halves of the public surface — the overlay host and the
+    // Both halves of the public surface: the overlay host and the
     // imperative controller/message/action/type/position types it takes —
     // are named as exports, not just the widget.
     expect(
@@ -53,7 +74,7 @@ void main() {
         'DsToast',
       ]),
     );
-    // No registry/components/toaster.json manifest exists yet — a worker
+    // No registry/components/toaster.json manifest exists yet: a worker
     // must not invent registry dependency names for it.
     expect(toasterDoc.dependencies, isEmpty);
   });
@@ -95,7 +116,7 @@ void main() {
         // DsToaster's own two constructor parameters.
         'controller',
         'position',
-        // DsToastController — the imperative entry point ("toast(...)").
+        // DsToastController: the imperative entry point ("toast(...)").
         'show',
         'success',
         'error',
@@ -123,7 +144,7 @@ void main() {
         );
       }
       // 'promise' names both a DsToastController method (`promise<T>(...)`)
-      // and a DsToastMessage field (`final bool promise`) — a real collision
+      // and a DsToastMessage field (`final bool promise`): a real collision
       // in the source itself, not a test bug, so it is asserted present
       // rather than asserted unique.
       expect(
@@ -134,12 +155,10 @@ void main() {
             'documented',
       );
 
-      // Every DsToastType value is documented as the component's variant
-      // axis, the same role DsAlertVariant plays on the alert page.
-      final Finder variantsSection = find.byKey(
-        DsSection.anchorKey('variants'),
-      );
-      expect(variantsSection, findsOneWidget);
+      // Every DsToastType value is documented as the component's status
+      // variants, mirroring shadcn's own Types section.
+      final Finder typesSection = find.byKey(DsSection.anchorKey('types'));
+      expect(typesSection, findsOneWidget);
       for (final String type in <String>[
         'success',
         'info',
@@ -149,13 +168,35 @@ void main() {
         'normal',
       ]) {
         expect(
-          find.descendant(of: variantsSection, matching: find.text(type)),
+          find.descendant(of: typesSection, matching: find.text(type)),
           findsOneWidget,
           reason: 'DsToastType.$type should be documented',
         );
       }
 
-      // The real timing values — not invented ones — are on the page. 4000ms
+      // Action and Promise are each mirrored as their own top-level
+      // sections, matching shadcn's own split rather than one combined
+      // "Usage" example.
+      final Finder actionSection = find.byKey(DsSection.anchorKey('action'));
+      expect(actionSection, findsOneWidget);
+      expect(
+        find.descendant(
+          of: actionSection,
+          matching: find.textContaining('DsToastAction'),
+        ),
+        findsWidgets,
+      );
+      final Finder promiseSection = find.byKey(DsSection.anchorKey('promise'));
+      expect(promiseSection, findsOneWidget);
+      expect(
+        find.descendant(
+          of: promiseSection,
+          matching: find.textContaining('DsToastController.promise'),
+        ),
+        findsWidgets,
+      );
+
+      // The real timing values: not invented ones, are on the page. 4000ms
       // is DsToastMessage's default duration/DsToaster.lifetime; 3 is
       // DsToaster.visibleLimit.
       expect(
@@ -180,14 +221,16 @@ void main() {
         findsWidgets,
       );
 
-      // The purpose section names its neighbours instead of restating the
-      // component's own name (IA 9.2's decision-guidance contract) — the
-      // alert/alert-dialog/toaster trio.
-      final Finder purposeSection = find.byKey(DsSection.anchorKey('purpose'));
-      expect(purposeSection, findsOneWidget);
+      // The "When to use it" section names its neighbours instead of
+      // restating the component's own name (IA 9.2's decision-guidance
+      // contract): the alert/alert-dialog/toaster trio.
+      final Finder whenToUseSection = find.byKey(
+        DsSection.anchorKey('when-to-use'),
+      );
+      expect(whenToUseSection, findsOneWidget);
       expect(
         find.descendant(
-          of: purposeSection,
+          of: whenToUseSection,
           matching: find.textContaining('alert'),
         ),
         findsWidgets,
@@ -204,7 +247,7 @@ void main() {
         findsWidgets,
       );
 
-      // No prose link fires the router — onNavigate stays untouched.
+      // No prose link fires the router: onNavigate stays untouched.
       expect(destination, isNull);
       expect(tester.takeException(), isNull);
     },
@@ -229,7 +272,7 @@ void main() {
       await tester.pump();
 
       // The preview section mounts a real DsToaster over a real
-      // DsToastController — nothing is queued until a specimen control fires
+      // DsToastController: nothing is queued until a specimen control fires
       // one, exactly like the package's own DsToaster.build, which paints
       // nothing while its controller is empty.
       expect(find.byType(DsToaster), findsOneWidget);
@@ -250,11 +293,11 @@ void main() {
       // requests focus (no FocusScope call exists anywhere in toaster.dart —
       // nothing here steals focus while it does). `Semantics(container:
       // true, label: message.title)` is a semantics boundary, so the
-      // title/description DsText children below it — which are not
-      // boundaries of their own — merge their literal text upward into this
+      // title/description DsText children below it: which are not
+      // boundaries of their own: merge their literal text upward into this
       // one node rather than staying separate: the real announced label is
       // the explicit title, the title again (from the merged DsText), then
-      // the description — not just the title alone.
+      // the description: not just the title alone.
       final SemanticsNode node = tester.getSemantics(find.byType(DsToast));
       expect(node.flagsCollection.isLiveRegion, isTrue);
       expect(
@@ -265,13 +308,13 @@ void main() {
       // FocusScope) widget anywhere in its subtree to hold it. Checked on
       // the widget tree itself rather than on FocusManager.primaryFocus,
       // which would just as truthfully report the trigger button's own
-      // ordinary post-tap focus — a fact about the button, not the toast.
+      // ordinary post-tap focus: a fact about the button, not the toast.
       expect(
         find.descendant(of: find.byType(DsToast), matching: find.byType(Focus)),
         findsNothing,
       );
 
-      // The real 4000ms lifetime — DsToaster.lifetime — expires the clock;
+      // The real 4000ms lifetime: DsToaster.lifetime, expires the clock;
       // one more pump lets the completion listener call
       // DsToastController.dismiss, which starts the 200ms unmount window.
       await tester.pump(DsToaster.lifetime);
@@ -282,7 +325,7 @@ void main() {
       await tester.pump(DsToaster.unmountDelay);
       await tester.pump();
 
-      // Gone on its own — nothing here tapped a dismiss control.
+      // Gone on its own: nothing here tapped a dismiss control.
       expect(find.byType(DsToast), findsNothing);
       expect(find.text('Changes saved'), findsNothing);
       expect(tester.takeException(), isNull);
@@ -329,5 +372,47 @@ void main() {
     );
     expect(find.byType(DsToaster), findsOneWidget);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('toaster docs page renders the shadcn-parity section headings '
+      'in order, with no heading before Installation', (
+    WidgetTester tester,
+  ) async {
+    tester.view.physicalSize = const Size(1440, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    final DsThemeController controller = DsThemeController(
+      mode: DsThemeMode.dark,
+    );
+    addTearDown(controller.dispose);
+
+    await tester.pumpWidget(
+      _harness(const ToasterDocPage(), controller: controller),
+    );
+    await tester.pump();
+
+    final List<String> headings = tester
+        .widgetList<DsText>(find.byType(DsText))
+        .where((DsText text) => text.spec == DsType.h3)
+        .map((DsText text) => text.text)
+        .toList();
+
+    expect(headings, _expectedSectionHeadings);
+
+    // The old convention's own headings must not survive the reshape.
+    // Section headings only: DocsCodeExample renders its own "Preview" tab
+    // label as free text, so a plain find.text('Preview') finds that
+    // affordance rather than a leftover heading. Read the mounted DsSection
+    // titles instead, which are immune to that collision.
+    final List<String> sectionTitles = tester
+        .widgetList<DsSection>(find.byType(DsSection))
+        .map((DsSection section) => section.title)
+        .toList();
+    expect(sectionTitles, isNot(contains('Purpose')));
+    expect(sectionTitles, isNot(contains('Status')));
+    expect(sectionTitles, isNot(contains('Preview')));
+    expect(sectionTitles, isNot(contains('Composition')));
+    expect(sectionTitles, isNot(contains('Composition examples')));
   });
 }

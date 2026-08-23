@@ -1,13 +1,39 @@
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/switch/page.dart';
+import 'package:example/docs/docs_layout.dart';
+import 'package:example/kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// The `switch` documentation page: renders the eighteen-section template,
-/// the API table lists every real [DsSwitch] constructor parameter, and the
-/// live specimen actually toggles — under a real, live [DsThemeController]
-/// rather than a rebuilt one, and under real `tester.view` sizing rather than
-/// a synthetic [MediaQuery].
+/// The `switch` documentation page: renders the shadcn-parity section order
+/// (Installation, Usage, Description, Choice card, Disabled, Invalid, Size,
+/// API Reference, States, Accessibility, Responsive, Dependencies, Theming,
+/// Source, behind the un-headed hero demo), the API table lists every real
+/// [DsSwitch] constructor parameter, and the live specimen actually toggles
+/// under a real, live [DsThemeController] rather than a rebuilt one, and
+/// under real `tester.view` sizing rather than a synthetic [MediaQuery].
+///
+/// Section order, matching https://ui.shadcn.com/docs/components/base/switch:
+/// RTL is skipped (DsSwitch's thumb travel is not direction-aware); every
+/// other shadcn section is mirrored, plus the six sections shadcn does not
+/// carry (States, Accessibility, Responsive, Dependencies, Theming, Source).
+const List<String> _sectionOrder = <String>[
+  'install',
+  'usage',
+  'description',
+  'choice-card',
+  'disabled',
+  'invalid',
+  'size',
+  'api',
+  'states',
+  'accessibility',
+  'responsive',
+  'dependencies',
+  'theming',
+  'source',
+];
+
 Widget _harness({
   required Widget child,
   required Size size,
@@ -82,6 +108,26 @@ void main() {
       expect(find.textContaining('DsSwitchSize.sm'), findsWidgets);
       expect(find.textContaining('DsSwitchSize.md'), findsWidgets);
 
+      // The shadcn-parity section list renders in order: the un-headed hero
+      // demo first (no DsSection, no TOC entry), then every DsSection this
+      // page declares, top to bottom, matching the anchors in page.dart's
+      // own `toc:` list.
+      final double previewTop = tester
+          .getTopLeft(find.byKey(docsAnchorKey('preview')))
+          .dy;
+      double previousTop = previewTop;
+      for (final String id in _sectionOrder) {
+        final Finder section = find.byKey(DsSection.anchorKey(id));
+        expect(section, findsOneWidget, reason: 'missing section: $id');
+        final double top = tester.getTopLeft(section).dy;
+        expect(
+          top,
+          greaterThan(previousTop),
+          reason: 'section "$id" is not below the previous section',
+        );
+        previousTop = top;
+      }
+
       // The live specimen mounts and actually toggles on tap.
       final Finder specimen = find.byKey(
         const ValueKey<String>('switch-doc-live-specimen'),
@@ -97,7 +143,7 @@ void main() {
 
       // Previous/Next pager navigates through DocsLayout.onNavigate. The
       // specimen scroll above may have carried the sidebar's "Select" link
-      // out of view — scroll it back into frame before tapping it.
+      // out of view: scroll it back into frame before tapping it.
       final Finder selectLink = find.text('Select').first;
       await tester.ensureVisible(selectLink);
       await tester.pumpAndSettle();
@@ -150,14 +196,14 @@ void main() {
         const ValueKey<String>('switch-doc-live-specimen'),
       );
       expect(specimen, findsOneWidget);
-      // The specimen sits well below the fold at 390 × 844 — scroll it into
+      // The specimen sits well below the fold at 390 × 844: scroll it into
       // view before tapping, the same as a real touch reader would have to.
       await tester.ensureVisible(specimen);
       await tester.pumpAndSettle();
       final bool before = tester.widget<DsSwitch>(specimen).value;
       await tester.tap(specimen);
       // MediaQueryData.disableAnimations collapses dsAnimationDuration to
-      // zero, so one pump is enough to land on the end state — no spring
+      // zero, so one pump is enough to land on the end state: no spring
       // overshoot to wait out, and no arbitrary duration to pump past.
       await tester.pump();
       expect(tester.widget<DsSwitch>(specimen).value, !before);

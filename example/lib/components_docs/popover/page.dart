@@ -1,7 +1,7 @@
 /// Public component documentation for the popover component.
 ///
-/// `popover` is Wave 3 of the component-documentation plan, and — like
-/// `tooltip` before it — already carries a real
+/// `popover` is Wave 3 of the component-documentation plan, and: like
+/// `tooltip` before it: already carries a real
 /// `registry/components/popover.json` manifest, so the Installation section
 /// below renders the genuine `elattar add popover` command rather than a
 /// "not available yet" disclosure.
@@ -16,7 +16,7 @@
 /// notes, and source/tests each get their own [DsSection]; previous/next
 /// comes from [DocsLayout] again.
 ///
-/// No Wave 3 sibling has landed yet at the time this page was written — the
+/// No Wave 3 sibling has landed yet at the time this page was written: the
 /// sidebar and previous link therefore reuse the same already-routed pages
 /// `switch/page.dart` does (Button, Card, Input, Dialog, Select) rather than
 /// guessing at a Wave 3 route that may not exist, the same caution that
@@ -28,7 +28,7 @@
 /// without mounting the widget itself, and nine other components —
 /// `DropdownMenu`, `ContextMenu`, `Menubar`, `Menu`, the agent attach menu,
 /// `Combobox`, `NativeSelect`, `Calendar`'s date picker, and
-/// `NavigationMenu` — mount their popups through [DsPopover] directly. Both
+/// `NavigationMenu`: mount their popups through [DsPopover] directly. Both
 /// facts are cited from the real source comments and are reflected in the
 /// Composition and Dependencies sections below, not invented.
 library;
@@ -64,17 +64,16 @@ class PopoverDocPage extends StatelessWidget {
       ],
       sidebar: _sidebar(entry.route),
       toc: const <DocsTocEntry>[
-        DocsTocEntry(title: 'Status', anchor: 'status'),
-        DocsTocEntry(title: 'Preview', anchor: 'preview'),
-        DocsTocEntry(title: 'Install', anchor: 'install'),
+        DocsTocEntry(title: 'Installation', anchor: 'install'),
         DocsTocEntry(title: 'Usage', anchor: 'usage'),
-        DocsTocEntry(title: 'API', anchor: 'api'),
+        DocsTocEntry(title: 'Composition', anchor: 'composition'),
+        DocsTocEntry(title: 'Align', anchor: 'align'),
         DocsTocEntry(title: 'Variants', anchor: 'variants'),
+        DocsTocEntry(title: 'API Reference', anchor: 'api'),
         DocsTocEntry(title: 'States', anchor: 'states'),
         DocsTocEntry(title: 'Accessibility', anchor: 'accessibility'),
         DocsTocEntry(title: 'Responsive', anchor: 'responsive'),
         DocsTocEntry(title: 'Dependencies', anchor: 'dependencies'),
-        DocsTocEntry(title: 'Composition', anchor: 'composition'),
         DocsTocEntry(title: 'Theming', anchor: 'theming'),
         DocsTocEntry(title: 'Source', anchor: 'source'),
       ],
@@ -84,7 +83,7 @@ class PopoverDocPage extends StatelessWidget {
       ),
       // No next page is wired: no other Wave 3 (overlay and navigation)
       // component had landed a route when this page was written, and a
-      // guessed one would risk pointing at a page that does not exist — the
+      // guessed one would risk pointing at a page that does not exist: the
       // same caution `switch/page.dart`'s own comment documents.
       onNavigate: onNavigate,
       child: _PopoverArticle(entry: entry),
@@ -115,49 +114,15 @@ class _PopoverArticle extends StatelessWidget {
     key: const ValueKey<String>('popover-doc-article'),
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
-      DsSection(
-        id: 'status',
-        title: 'Status',
-        child: const DocsInstallFacts(
-          title: 'Status',
-          facts: <DocsInstallFact>[
-            DocsInstallFact(
-              label: 'Status',
-              value: 'Stable — registered in the registry',
-              description:
-                  'DsPopover, its four enums, DsPopoverSurface, and the '
-                  'dsPopoverPlacement positioning function are all exported '
-                  'from the public barrel and installable through the CLI '
-                  'today.',
-            ),
-            DocsInstallFact(
-              label: 'Version',
-              value: '0.0.1',
-              description: "The registry manifest's own version field.",
-            ),
-            DocsInstallFact(
-              label: 'Dart / Flutter',
-              value: '>=3.12.2 <4.0.0 / >=3.12.2',
-              description: "The manifest's minDart and minFlutter constraints.",
-            ),
-            DocsInstallFact(
-              label: 'Platforms',
-              value: 'Android, iOS, Web, macOS, Windows, Linux',
-              description:
-                  'Pure widget composition — nothing here is platform-gated.',
-            ),
-          ],
-        ),
-      ),
-      DsSection(
-        id: 'preview',
-        title: 'Preview',
-        description:
-            'A trigger button that owns its own open state, and a popup '
-            'anchored to it with real interactive content — two DsInput '
-            'fields and a Done button. Tap the trigger to open it; tap '
-            'anywhere outside the popup, or press Escape once focus is '
-            'inside it, to dismiss it.',
+      // The live demo sits above the first heading, unheaded, the same
+      // shape https://ui.shadcn.com/docs/components/base/popover itself
+      // uses before its own Installation heading: a trigger button that
+      // owns its own open state, and a popup anchored to it with real
+      // interactive content (two DsInput fields and a Done button). Tap
+      // the trigger to open it; tap anywhere outside the popup, or press
+      // Escape once focus is inside it, to dismiss it.
+      Padding(
+        padding: EdgeInsets.only(bottom: ds(20)),
         child: DocsCodeExample(
           title: 'Popover specimen',
           description: 'Tap to open. Tap outside, or press Escape, to close.',
@@ -169,7 +134,7 @@ class _PopoverArticle extends StatelessWidget {
         id: 'install',
         title: 'Installation',
         description:
-            'popover already has a registry manifest — this installs '
+            'popover already has a registry manifest: this installs '
             'lib/src/components/popover.dart and its one dependency, '
             'source-foundation, resolved automatically.',
         child: DocsCodeExample(
@@ -205,27 +170,187 @@ class _PopoverArticle extends StatelessWidget {
           children: <Widget>[
             DsPanel(
               label: 'DART',
-              note: 'MINIMAL — inside a State',
+              note: 'MINIMAL: inside a State',
               child: DocsSelectableCodeBlock(code: _usageBasicCode),
             ),
             SizedBox(height: ds(5)),
             DsPanel(
               label: 'DART',
-              note: 'VIRTUAL ANCHOR — a context menu',
+              note: 'VIRTUAL ANCHOR: a context menu',
               child: DocsSelectableCodeBlock(code: _usageAnchorPointCode),
             ),
             SizedBox(height: ds(5)),
             DsPanel(
               label: 'DART',
-              note: 'NON-MODAL BARRIER — a menu strip handoff',
+              note: 'NON-MODAL BARRIER: a menu strip handoff',
               child: DocsSelectableCodeBlock(code: _usageNonModalCode),
             ),
           ],
         ),
       ),
       DsSection(
+        id: 'composition',
+        title: 'Composition',
+        description:
+            'shadcn splits Popover into Popover, PopoverTrigger, and '
+            'PopoverContent. DsPopover is one widget instead: anchor is '
+            'the trigger, rendered verbatim, and content is a builder that '
+            'returns the popup, almost always wrapped in DsPopoverSurface '
+            'for the shared fill, ring, and radius. The real shape below '
+            'is DsCombobox\'s own popup wiring, not an invented one.',
+        child: DsPanel(
+          label: 'DART',
+          note: 'REAL CONSUMER, DsCombobox’s own popup',
+          child: DocsSelectableCodeBlock(code: _compositionCode),
+        ),
+      ),
+      DsSection(
+        id: 'align',
+        title: 'Align',
+        description:
+            "shadcn's own live demo for this section is a Start / Center / "
+            'End tab switcher. Every variant table on this docs site is a '
+            'data table rather than a re-rendered live tab strip, so the '
+            'three values below carry the same facts in that established '
+            'format: DsPopoverAlign is the one enum that lines up exactly '
+            "with shadcn's own Align section.",
+        child: const DocsApiTable(
+          title: 'DsPopoverAlign',
+          facts: <DocsApiFact>[
+            DocsApiFact(
+              name: 'start',
+              type: 'DsPopoverAlign',
+              description:
+                  "Leading edges flush: what the combobox's own popover "
+                  'positioner uses.',
+            ),
+            DocsApiFact(
+              name: 'center',
+              type: 'DsPopoverAlign',
+              description: 'Centred on the trigger. The default.',
+            ),
+            DocsApiFact(
+              name: 'end',
+              type: 'DsPopoverAlign',
+              description: 'Trailing edges flush.',
+            ),
+          ],
+        ),
+      ),
+      DsSection(
+        id: 'variants',
+        title: 'Variants',
+        description:
+            'The reference has no section for these: DsPopover carries '
+            'three more real behavioral forks beyond align, each a fact '
+            'measured on the reference this system ports, not a tuning '
+            'knob invented for symmetry.',
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            const DocsApiTable(
+              title: 'DsPopoverSide',
+              facts: <DocsApiFact>[
+                DocsApiFact(
+                  name: 'top',
+                  type: 'DsPopoverSide',
+                  description:
+                      'Above the trigger. opposite resolves to bottom.',
+                ),
+                DocsApiFact(
+                  name: 'bottom',
+                  type: 'DsPopoverSide',
+                  description:
+                      "The default: both consumers on the selects page "
+                      'use it. opposite resolves to top.',
+                ),
+                DocsApiFact(
+                  name: 'left',
+                  type: 'DsPopoverSide',
+                  description:
+                      'To the left of the trigger. opposite resolves to '
+                      'right.',
+                ),
+                DocsApiFact(
+                  name: 'right',
+                  type: 'DsPopoverSide',
+                  description:
+                      'To the right: a context-menu submenu opens here. '
+                      'opposite resolves to left.',
+                ),
+              ],
+            ),
+            SizedBox(height: ds(5)),
+            const DocsApiTable(
+              title: 'DsPopoverOriginModel',
+              facts: <DocsApiFact>[
+                DocsApiFact(
+                  name: 'anchor',
+                  type: 'DsPopoverOriginModel',
+                  description:
+                      "The default. The zoom grows from a point on the "
+                      "trigger's own centre line, measured from base-ui's "
+                      'popups (the combobox, the date picker).',
+                ),
+                DocsApiFact(
+                  name: 'corner',
+                  type: 'DsPopoverOriginModel',
+                  description:
+                      "The zoom grows from the popup's own nearest corner "
+                      "to the trigger: what every menu family's Radix "
+                      'positioner measures instead.',
+                ),
+                DocsApiFact(
+                  name: 'selfCenter',
+                  type: 'DsPopoverOriginModel',
+                  description:
+                      "The popup's own middle, CSS's initial "
+                      "transform-origin value, reached on the reference by "
+                      'an unmatched Tailwind class rather than a deliberate '
+                      'choice, and reproduced here as a named model rather '
+                      'than a wrong side.',
+                ),
+              ],
+            ),
+            SizedBox(height: ds(5)),
+            const DocsApiTable(
+              title: 'DsPopoverBarrier',
+              facts: <DocsApiFact>[
+                DocsApiFact(
+                  name: 'modal',
+                  type: 'DsPopoverBarrier',
+                  description:
+                      'The default. An opaque layer under the popup, '
+                      'nothing outside it can be hovered or clicked while '
+                      "it is open, and a pointer there dismisses instead. "
+                      "Every popover shipped in this port uses this.",
+                ),
+                DocsApiFact(
+                  name: 'nonModal',
+                  type: 'DsPopoverBarrier',
+                  description:
+                      "A translucent layer: an outside pointer both "
+                      "dismisses and still reaches whatever it landed on. "
+                      "What lets a menubar hand its open menu over to a "
+                      'sibling trigger on hover.',
+                ),
+                DocsApiFact(
+                  name: 'none',
+                  type: 'DsPopoverBarrier',
+                  description:
+                      "No layer at all: a submenu. A layer here would sit "
+                      "over the parent's own rows and a pointer moving "
+                      "from the submenu back onto a sibling row would hit "
+                      'the barrier instead of the row.',
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+      DsSection(
         id: 'api',
-        title: 'API',
+        title: 'API Reference',
         description:
             'Every public class, enum, top-level function, and constructor '
             'parameter the source declares.',
@@ -239,7 +364,7 @@ class _PopoverArticle extends StatelessWidget {
                   name: 'open',
                   type: 'bool',
                   description:
-                      'Required. Caller-owned — DsPopover mounts on the '
+                      'Required. Caller-owned, DsPopover mounts on the '
                       'frame after this turns true and unmounts after it '
                       'turns false and any exit animation finishes.',
                 ),
@@ -248,7 +373,7 @@ class _PopoverArticle extends StatelessWidget {
                   type: 'Widget',
                   description:
                       'Required. The trigger. Measured, never wrapped in a '
-                      "gesture of its own — it renders verbatim and keeps "
+                      "gesture of its own: it renders verbatim and keeps "
                       'whatever onPressed the caller already gave it.',
                 ),
                 DocsApiFact(
@@ -278,7 +403,7 @@ class _PopoverArticle extends StatelessWidget {
                   type: 'double',
                   description:
                       'Default 0. The gap between the anchor and the popup '
-                      'along the main axis — 6px on the combobox '
+                      'along the main axis, 6px on the combobox '
                       "positioner, 4px on the date picker's.",
                 ),
                 DocsApiFact(
@@ -294,7 +419,7 @@ class _PopoverArticle extends StatelessWidget {
                   description:
                       'Default true. Whether the fade/zoom/slide transition '
                       'runs at all. False is what DsNativeSelect mounts its '
-                      "menu under — the popup appears whole, in one frame, "
+                      "menu under: the popup appears whole, in one frame, "
                       'the way an operating-system picker does not zoom.',
                 ),
                 DocsApiFact(
@@ -303,7 +428,7 @@ class _PopoverArticle extends StatelessWidget {
                   description:
                       'Default true. Whether the exit half of that '
                       'transition exists. False unmounts the popup on the '
-                      'frame open goes false — the one shipped consumer of '
+                      'frame open goes false: the one shipped consumer of '
                       'this is a menubar menu, which zooms in and simply '
                       'vanishes.',
                 ),
@@ -327,7 +452,7 @@ class _PopoverArticle extends StatelessWidget {
                   type: 'Offset?',
                   description:
                       'Default null. A virtual, zero-size anchor at this '
-                      'point instead of the measured anchor box — how a '
+                      'point instead of the measured anchor box: how a '
                       'context menu opens at the pointer rather than at a '
                       "widget's corner. anchor still renders and is still "
                       'hit-tested; it is simply no longer the placement box.',
@@ -363,7 +488,7 @@ class _PopoverArticle extends StatelessWidget {
                   type: 'BorderRadius?',
                   description:
                       'Default null, which resolves to '
-                      'BorderRadius.circular(DsRadii.lg) — 12px.',
+                      'BorderRadius.circular(DsRadii.lg), 12px.',
                 ),
                 DocsApiFact(
                   name: 'shadow',
@@ -377,7 +502,7 @@ class _PopoverArticle extends StatelessWidget {
                   name: 'ring',
                   type: 'bool',
                   description:
-                      'Default true — a 1px theme.foreground at 10% alpha '
+                      'Default true: a 1px theme.foreground at 10% alpha '
                       'ring. False for the one overlay in the corpus that '
                       "writes a real border instead of a ring "
                       '(ContextMenuSubContent).',
@@ -387,7 +512,7 @@ class _PopoverArticle extends StatelessWidget {
                   type: 'BoxBorder?',
                   description:
                       'Default null. A real border, when a caller writes '
-                      'one — it costs the box extra width the way '
+                      'one: it costs the box extra width the way '
                       'box-sizing: border-box does not.',
                 ),
                 DocsApiFact(
@@ -401,14 +526,14 @@ class _PopoverArticle extends StatelessWidget {
                   name: 'specOf({shadow, ring})',
                   type: 'static DsShadowSpec',
                   description:
-                      'The same recipe with either half swapped out — what '
+                      'The same recipe with either half swapped out: what '
                       'radius and shadow above are built from.',
                 ),
               ],
             ),
             SizedBox(height: ds(5)),
             const DocsApiTable(
-              title: 'dsPopoverPlacement() — the positioner',
+              title: 'dsPopoverPlacement(): the positioner',
               facts: <DocsApiFact>[
                 DocsApiFact(
                   name: 'anchor',
@@ -426,7 +551,7 @@ class _PopoverArticle extends StatelessWidget {
                   name: 'viewport',
                   type: 'Size',
                   description:
-                      "Required. The overlay's own box — the collision "
+                      "Required. The overlay's own box: the collision "
                       'boundary.',
                 ),
                 DocsApiFact(
@@ -471,7 +596,7 @@ class _PopoverArticle extends StatelessWidget {
                   name: 'side',
                   type: 'DsPopoverSide',
                   description:
-                      "The side it actually landed on — the requested "
+                      "The side it actually landed on: the requested "
                       'side, or its opposite when the flip fired.',
                 ),
                 DocsApiFact(
@@ -511,7 +636,7 @@ class _PopoverArticle extends StatelessWidget {
                   type: 'double',
                   description:
                       'How much room the requested side leaves, read '
-                      'before the flip — the number a content builder '
+                      'before the flip: the number a content builder '
                       'caps its own max height against, the way the '
                       "combobox popup's maxHeight does.",
                 ),
@@ -532,7 +657,7 @@ class _PopoverArticle extends StatelessWidget {
                   name: 'content',
                   type: 'Widget Function(BuildContext, DsPopoverAnchorMetrics)',
                   description:
-                      "The content parameter's own signature — the popup "
+                      "The content parameter's own signature: the popup "
                       "is built from the caller's own build scope, so a "
                       'list that narrows on a keystroke narrows in the '
                       'same frame the keystroke was handled in.',
@@ -543,141 +668,8 @@ class _PopoverArticle extends StatelessWidget {
         ),
       ),
       DsSection(
-        id: 'variants',
-        title: 'Variants',
-        description:
-            'Four enums, each a real behavioral fork rather than a paint '
-            'swap. Every value below is a fact measured on the reference '
-            'this system ports, not a tuning knob invented for symmetry.',
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            const DocsApiTable(
-              title: 'DsPopoverSide',
-              facts: <DocsApiFact>[
-                DocsApiFact(
-                  name: 'top',
-                  type: 'DsPopoverSide',
-                  description:
-                      'Above the trigger. opposite resolves to bottom.',
-                ),
-                DocsApiFact(
-                  name: 'bottom',
-                  type: 'DsPopoverSide',
-                  description:
-                      "The default — both consumers on the selects page "
-                      'use it. opposite resolves to top.',
-                ),
-                DocsApiFact(
-                  name: 'left',
-                  type: 'DsPopoverSide',
-                  description:
-                      'To the left of the trigger. opposite resolves to '
-                      'right.',
-                ),
-                DocsApiFact(
-                  name: 'right',
-                  type: 'DsPopoverSide',
-                  description:
-                      'To the right — a context-menu submenu opens here. '
-                      'opposite resolves to left.',
-                ),
-              ],
-            ),
-            SizedBox(height: ds(5)),
-            const DocsApiTable(
-              title: 'DsPopoverAlign',
-              facts: <DocsApiFact>[
-                DocsApiFact(
-                  name: 'start',
-                  type: 'DsPopoverAlign',
-                  description:
-                      "Leading edges flush — what the combobox's own "
-                      'popover positioner uses.',
-                ),
-                DocsApiFact(
-                  name: 'center',
-                  type: 'DsPopoverAlign',
-                  description: 'Centred on the trigger. The default.',
-                ),
-                DocsApiFact(
-                  name: 'end',
-                  type: 'DsPopoverAlign',
-                  description: 'Trailing edges flush.',
-                ),
-              ],
-            ),
-            SizedBox(height: ds(5)),
-            const DocsApiTable(
-              title: 'DsPopoverOriginModel',
-              facts: <DocsApiFact>[
-                DocsApiFact(
-                  name: 'anchor',
-                  type: 'DsPopoverOriginModel',
-                  description:
-                      "The default. The zoom grows from a point on the "
-                      "trigger's own centre line, measured from base-ui's "
-                      'popups (the combobox, the date picker).',
-                ),
-                DocsApiFact(
-                  name: 'corner',
-                  type: 'DsPopoverOriginModel',
-                  description:
-                      "The zoom grows from the popup's own nearest corner "
-                      "to the trigger — what every menu family's Radix "
-                      'positioner measures instead.',
-                ),
-                DocsApiFact(
-                  name: 'selfCenter',
-                  type: 'DsPopoverOriginModel',
-                  description:
-                      "The popup's own middle — CSS's initial "
-                      "transform-origin value, reached on the reference by "
-                      'an unmatched Tailwind class rather than a deliberate '
-                      'choice, and reproduced here as a named model rather '
-                      'than a wrong side.',
-                ),
-              ],
-            ),
-            SizedBox(height: ds(5)),
-            const DocsApiTable(
-              title: 'DsPopoverBarrier',
-              facts: <DocsApiFact>[
-                DocsApiFact(
-                  name: 'modal',
-                  type: 'DsPopoverBarrier',
-                  description:
-                      'The default. An opaque layer under the popup — '
-                      'nothing outside it can be hovered or clicked while '
-                      "it is open, and a pointer there dismisses instead. "
-                      "Every popover shipped in this port uses this.",
-                ),
-                DocsApiFact(
-                  name: 'nonModal',
-                  type: 'DsPopoverBarrier',
-                  description:
-                      "A translucent layer — an outside pointer both "
-                      "dismisses and still reaches whatever it landed on. "
-                      "What lets a menubar hand its open menu over to a "
-                      'sibling trigger on hover.',
-                ),
-                DocsApiFact(
-                  name: 'none',
-                  type: 'DsPopoverBarrier',
-                  description:
-                      "No layer at all — a submenu. A layer here would sit "
-                      "over the parent's own rows and a pointer moving "
-                      "from the submenu back onto a sibling row would hit "
-                      'the barrier instead of the row.',
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-      DsSection(
         id: 'states',
-        title: 'States and feedback',
+        title: 'States',
         description:
             'DsPopover opens and closes on a caller-owned boolean, not on a '
             "pointer gesture of its own. Rows describing an internal "
@@ -695,7 +687,7 @@ class _PopoverArticle extends StatelessWidget {
             DocsStateFact(
               state: 'Hover',
               treatment:
-                  'N/A — anchor is rendered verbatim with no MouseRegion '
+                  'N/A: anchor is rendered verbatim with no MouseRegion '
                   "or gesture of DsPopover's own added to it; a hover "
                   "effect on the trigger is entirely the caller's own "
                   'widget.',
@@ -704,7 +696,7 @@ class _PopoverArticle extends StatelessWidget {
             DocsStateFact(
               state: 'Focus-visible',
               treatment:
-                  'N/A on the trigger — same reason as Hover. Inside the '
+                  'N/A on the trigger: same reason as Hover. Inside the '
                   'popup, Escape is wired only once something in content '
                   'already holds focus; see Accessibility below for what '
                   'that means in practice.',
@@ -713,7 +705,7 @@ class _PopoverArticle extends StatelessWidget {
             DocsStateFact(
               state: 'Pressed',
               treatment:
-                  "N/A — DsPopover applies no press paint of its own to "
+                  "N/A, DsPopover applies no press paint of its own to "
                   "anchor; open is a prop the caller flips from whatever "
                   "gesture its own trigger widget already wires (a "
                   'DsButton onPressed, in every shipped consumer).',
@@ -722,40 +714,40 @@ class _PopoverArticle extends StatelessWidget {
             DocsStateFact(
               state: 'Selected',
               treatment:
-                  'N/A — open/closed is the only binary state this '
+                  'N/A: open/closed is the only binary state this '
                   'primitive represents; there is no selection concept.',
               userSignal: 'N/A',
             ),
             DocsStateFact(
               state: 'Loading',
               treatment:
-                  'N/A — content is built synchronously from the current '
+                  'N/A: content is built synchronously from the current '
                   'frame; there is no async step to represent.',
               userSignal: 'N/A',
             ),
             DocsStateFact(
               state: 'Empty',
               treatment:
-                  'N/A — content is a required builder; the API has no '
+                  'N/A: content is a required builder; the API has no '
                   'path to an empty popup to design for.',
               userSignal: 'N/A',
             ),
             DocsStateFact(
               state: 'Error',
               treatment:
-                  'N/A — no validation or error state exists on this '
+                  'N/A: no validation or error state exists on this '
                   'component.',
               userSignal: 'N/A',
             ),
             DocsStateFact(
               state: 'Success',
-              treatment: 'N/A — no async outcome to confirm.',
+              treatment: 'N/A: no async outcome to confirm.',
               userSignal: 'N/A',
             ),
             DocsStateFact(
               state: 'Disabled',
               treatment:
-                  'N/A — DsPopover has no enabled or disabled parameter; a '
+                  'N/A, DsPopover has no enabled or disabled parameter; a '
                   'caller wanting a disabled trigger disables its own '
                   'anchor widget and never sets open to true.',
               userSignal: 'N/A',
@@ -765,7 +757,7 @@ class _PopoverArticle extends StatelessWidget {
               treatment:
                   'The fade/zoom/slide transition runs through '
                   'dsAnimationDuration, so its DsDurations.overlay '
-                  'duration collapses to zero under reduced motion — the '
+                  'duration collapses to zero under reduced motion: the '
                   'same collapse animate and animateOut already model at '
                   'false.',
               userSignal:
@@ -777,7 +769,7 @@ class _PopoverArticle extends StatelessWidget {
       ),
       DsSection(
         id: 'accessibility',
-        title: 'Accessibility and keyboard behavior',
+        title: 'Accessibility',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
@@ -788,7 +780,7 @@ class _PopoverArticle extends StatelessWidget {
                 children: <Widget>[
                   const _A11yRow(
                     'Semantic role',
-                    'DsPopover renders no Semantics node of its own — no '
+                    'DsPopover renders no Semantics node of its own: no '
                         'dialog or popup role, and no aria-expanded-style '
                         'relationship wired between anchor and its popup.',
                   ),
@@ -801,7 +793,7 @@ class _PopoverArticle extends StatelessWidget {
                   const _A11yRow(
                     'Keyboard interactions',
                     'Escape closes the popup, but only once focus is '
-                        'already inside content — key events travel up '
+                        'already inside content: key events travel up '
                         'from whichever node holds focus, and the Focus '
                         'DsPopover wraps around content only listens; it '
                         'never requests focus for itself '
@@ -809,7 +801,7 @@ class _PopoverArticle extends StatelessWidget {
                   ),
                   const _A11yRow(
                     'Focus behavior',
-                    "Focus is the content's own business, by design — the "
+                    "Focus is the content's own business, by design: the "
                         "source's own words. Nothing here moves focus into "
                         'the popup when it opens or restores it to anchor '
                         'when it closes; each real consumer decides for '
@@ -831,7 +823,7 @@ class _PopoverArticle extends StatelessWidget {
                   ),
                   const _A11yRow(
                     'Error wiring',
-                    'None — DsPopover never participates in form '
+                    'None, DsPopover never participates in form '
                         'validation or an error state of its own.',
                   ),
                   const _A11yRow(
@@ -843,7 +835,7 @@ class _PopoverArticle extends StatelessWidget {
                   ),
                   _A11yRow(
                     'Known platform differences',
-                    'None observed in the paint or gesture logic — the '
+                    'None observed in the paint or gesture logic: the '
                         'barrier and layout code route on geometry and '
                         'DsPopoverBarrier, never on platform.',
                     last: true,
@@ -855,7 +847,7 @@ class _PopoverArticle extends StatelessWidget {
             DsNote(
               tone: DsNoteTone.error,
               title:
-                  'Known gap — Escape does nothing unless a caller '
+                  'Known gap, Escape does nothing unless a caller '
                   'moves focus itself',
               child: DsText(
                 'Focus is the content’s business is a deliberate '
@@ -879,10 +871,10 @@ class _PopoverArticle extends StatelessWidget {
       ),
       DsSection(
         id: 'responsive',
-        title: 'Responsive and platform behavior',
+        title: 'Responsive',
         description:
             'The one behavior this primitive must not produce is a popup '
-            'that hangs off the screen — the positioner runs a real '
+            'that hangs off the screen: the positioner runs a real '
             'flip-then-shift-then-clamp algorithm against the overlay’s '
             'own box on every layout pass, not a fixed offset.',
         child: DsPanel(
@@ -891,19 +883,19 @@ class _PopoverArticle extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               DsText(
-                "Main axis — the flip: dsPopoverPlacement measures the "
+                "Main axis: the flip: dsPopoverPlacement measures the "
                 'room side leaves against the anchor and the collision '
                 'boundary. If the requested side has enough room for the '
                 "content's size, it is used as-is. If not, the opposite "
                 'side is tried. If neither side has enough room, whichever '
                 'of the two has more room wins, and the popup is capped '
-                'instead — CustomSingleChildLayout constrains the popup to '
+                'instead, CustomSingleChildLayout constrains the popup to '
                 'that available space rather than letting it overflow.',
                 DsType.small,
               ),
               SizedBox(height: ds(3)),
               DsText(
-                'Cross axis — the shift: align places the popup relative '
+                'Cross axis: the shift: align places the popup relative '
                 'to the anchor (leading edge, centred, or trailing edge), '
                 'then the result is clamped back inside '
                 'viewport − collisionPadding on both ends. A popup '
@@ -914,7 +906,7 @@ class _PopoverArticle extends StatelessWidget {
               SizedBox(height: ds(3)),
               DsText(
                 'The result is reported back out as DsPopoverPlacement '
-                'once layout knows it, on the next frame — a popup whose '
+                'once layout knows it, on the next frame: a popup whose '
                 'side flips therefore zooms from the requested corner for '
                 'one frame and the resolved one for the rest of the '
                 'transition; every popup on a page with room to spare is '
@@ -923,7 +915,7 @@ class _PopoverArticle extends StatelessWidget {
               ),
               SizedBox(height: ds(3)),
               DsText(
-                'None of this branches on platform or pointer kind — the '
+                'None of this branches on platform or pointer kind: the '
                 'same geometry runs whether the app is a phone, a tablet, '
                 'or a desktop window, and content builders that want to '
                 'respond to the room available read it themselves off '
@@ -938,9 +930,9 @@ class _PopoverArticle extends StatelessWidget {
       ),
       DsSection(
         id: 'dependencies',
-        title: 'Dependencies, files, and disclosure',
+        title: 'Dependencies',
         description:
-            "Elattar's own technical-transparency panel — what this "
+            "Elattar's own technical-transparency panel: what this "
             'component needs to install and run.',
         child: DocsInstallFacts(
           facts: <DocsInstallFact>[
@@ -962,7 +954,7 @@ class _PopoverArticle extends StatelessWidget {
               label: 'Foundation',
               value: 'source or package compatible',
               description:
-                  'The manifest names only source-foundation — nothing '
+                  'The manifest names only source-foundation: nothing '
                   'here is package-mode-only.',
             ),
             DocsInstallFact(
@@ -995,15 +987,15 @@ class _PopoverArticle extends StatelessWidget {
                   'picker, NavigationMenu',
               description:
                   'Every real DsPopover(...) call site in the package '
-                  'source — mounts the widget directly and inherits its '
+                  'source: mounts the widget directly and inherits its '
                   'placement, animation, and barrier behavior whole.',
             ),
             const DocsInstallFact(
               label: 'Reused in part by',
               value: 'DsSelect, HoverCard',
               description:
-                  'Reuse dsPopoverPlacement and/or DsPopoverSurface — the '
-                  "positioning math and the paint — without mounting "
+                  'Reuse dsPopoverPlacement and/or DsPopoverSurface: the '
+                  "positioning math and the paint: without mounting "
                   'DsPopover itself. HoverCard cannot: its outside-tap '
                   'barrier would fight a hover-driven open/close cycle.',
             ),
@@ -1011,7 +1003,7 @@ class _PopoverArticle extends StatelessWidget {
               label: 'Verified',
               value:
                   "test/selects_test.dart's DsPopover group, "
-                  "test/menus_test.dart's DsPopover — what the menus "
+                  "test/menus_test.dart's DsPopover: what the menus "
                   'added group, plus this docs specimen',
               description:
                   'Package-level behavioral coverage: placement, the flip, '
@@ -1023,22 +1015,8 @@ class _PopoverArticle extends StatelessWidget {
         ),
       ),
       DsSection(
-        id: 'composition',
-        title: 'Composition example',
-        description:
-            "The real shape DsCombobox's own popup wires — side, align, "
-            'sideOffset, collisionPadding, and a content builder that '
-            'sizes itself off the metrics DsPopover hands it, not an '
-            'invented shape.',
-        child: DsPanel(
-          label: 'DART',
-          note: 'REAL CONSUMER — DsCombobox’s own popup',
-          child: DocsSelectableCodeBlock(code: _compositionCode),
-        ),
-      ),
-      DsSection(
         id: 'theming',
-        title: 'Theming notes',
+        title: 'Theming',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
@@ -1050,7 +1028,7 @@ class _PopoverArticle extends StatelessWidget {
                   DsText(
                     "DsPopoverSurface fills with theme.popover and inks "
                     "its text with theme.popoverForeground through a "
-                    'DefaultTextStyle — content built inside content picks '
+                    'DefaultTextStyle: content built inside content picks '
                     'this up automatically unless it overrides its own '
                     'color.',
                     DsType.small,
@@ -1059,7 +1037,7 @@ class _PopoverArticle extends StatelessWidget {
                   DsText(
                     'The ring is a flat 10% of theme.foreground over the '
                     'shadow layer, on every instance that leaves ring at '
-                    'its true default — the corner radius (DsRadii.lg, '
+                    'its true default: the corner radius (DsRadii.lg, '
                     '12px) and the elevation (DsShadows.tailwindMd) are '
                     'each overridable per instance through radius and '
                     'shadow, unlike the fixed pill DsTooltip renders.',
@@ -1067,9 +1045,9 @@ class _PopoverArticle extends StatelessWidget {
                   ),
                   SizedBox(height: ds(3)),
                   DsText(
-                    'The open/close transition — an 8px slide on whichever '
+                    'The open/close transition: an 8px slide on whichever '
                     'sides slideSides names, a 95%→100% zoom, and a '
-                    'fade — runs over DsDurations.overlay through '
+                    'fade: runs over DsDurations.overlay through '
                     'dsAnimationDuration on DsCurves.out, so it resolves '
                     'instantly under reduced motion rather than being '
                     'skipped as a special case.',
@@ -1083,7 +1061,7 @@ class _PopoverArticle extends StatelessWidget {
       ),
       DsSection(
         id: 'source',
-        title: 'Source and tests',
+        title: 'Source',
         child: DocsInstallFacts(
           title: 'Source and tests',
           facts: <DocsInstallFact>[
@@ -1103,7 +1081,7 @@ class _PopoverArticle extends StatelessWidget {
               label: 'Tests',
               value:
                   "test/selects_test.dart (DsPopover) and "
-                  "test/menus_test.dart (DsPopover — what the menus added)",
+                  "test/menus_test.dart (DsPopover: what the menus added)",
               description:
                   'Package-level behavioral coverage: placement, the '
                   'collision flip, the barrier, and the four knobs the '
@@ -1155,7 +1133,7 @@ class _ShareButtonState extends State<_ShareButton> {
 }''';
 
 const String _usageAnchorPointCode =
-    '''// A context menu has no trigger box to anchor to — Radix anchors it to a
+    '''// A context menu has no trigger box to anchor to, Radix anchors it to a
 // virtual element at the pointer instead, which is what anchorPoint is for.
 DsPopover(
   open: _at != null,
@@ -1177,7 +1155,7 @@ DsPopover(
 )''';
 
 const String _usageNonModalCode =
-    '''// A menubar's own menus hand over to a sibling trigger on hover — a modal
+    '''// A menubar's own menus hand over to a sibling trigger on hover: a modal
 // barrier would swallow that hover before it ever reached the next trigger.
 DsPopover(
   open: _openIndex == index,
@@ -1233,7 +1211,7 @@ class _A11yRow extends StatelessWidget {
 }
 
 /// The live specimen: a trigger that owns its own `open` state, and a
-/// popup with real interactive content anchored to it — a genuine
+/// popup with real interactive content anchored to it: a genuine
 /// [DsPopover] mounted through a real [Overlay], not a static illustration.
 class _PopoverPreview extends StatefulWidget {
   const _PopoverPreview();

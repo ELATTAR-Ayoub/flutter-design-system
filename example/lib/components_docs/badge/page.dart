@@ -3,13 +3,13 @@
 /// Mirrors `button_card_pages.dart`'s use of the Phase C docs primitives
 /// (`DocsLayout`, `DocsCodeExample`, `DocsApiTable`, `DocsStateMatrix`,
 /// `DocsInstallFacts`) and `dialog_page.dart`'s use of `kit.dart`'s
-/// `DsSection` for titled, anchor-registered content blocks — `badge` needs
+/// `DsSection` for titled, anchor-registered content blocks, `badge` needs
 /// enough distinct sections (IA §9.1's eighteen) that `DsSection`'s built-in
 /// heading and anchor registration earns its keep over hand-rolling a title
 /// plus a `docsAnchorKey` wrap per block.
 ///
 /// `badge` has no registry manifest yet (`registry/components/badge.json`
-/// does not exist) — every install-facing panel below says so honestly
+/// does not exist): every install-facing panel below says so honestly
 /// rather than presenting a CLI command that would fail.
 library;
 
@@ -41,17 +41,21 @@ class BadgeDocPage extends StatelessWidget {
     ],
     sidebar: _sidebar,
     toc: const <DocsTocEntry>[
-      DocsTocEntry(title: 'Overview', anchor: 'overview'),
-      DocsTocEntry(title: 'Preview', anchor: 'preview'),
-      DocsTocEntry(title: 'Install', anchor: 'install'),
+      DocsTocEntry(title: 'Installation', anchor: 'install'),
       DocsTocEntry(title: 'Usage', anchor: 'usage'),
-      DocsTocEntry(title: 'API', anchor: 'api'),
       DocsTocEntry(title: 'Variants', anchor: 'variants'),
+      DocsTocEntry(title: 'With icon', anchor: 'with-icon'),
+      DocsTocEntry(title: 'With spinner', anchor: 'with-spinner'),
+      DocsTocEntry(title: 'RTL', anchor: 'rtl'),
+      DocsTocEntry(
+        title: 'Composed with other primitives',
+        anchor: 'composition',
+      ),
+      DocsTocEntry(title: 'API Reference', anchor: 'api'),
       DocsTocEntry(title: 'States', anchor: 'states'),
       DocsTocEntry(title: 'Accessibility', anchor: 'accessibility'),
       DocsTocEntry(title: 'Responsive', anchor: 'responsive'),
       DocsTocEntry(title: 'Dependencies', anchor: 'dependencies'),
-      DocsTocEntry(title: 'Composition', anchor: 'composition'),
       DocsTocEntry(title: 'Theming', anchor: 'theming'),
       DocsTocEntry(title: 'Source', anchor: 'source'),
     ],
@@ -67,7 +71,7 @@ class BadgeDocPage extends StatelessWidget {
 
 /// The Wave 1 "base primitives" group this page belongs to (IA §7.3),
 /// listed in the plan's own order. Routes other workers are producing this
-/// same wave, not routes this page can verify are wired yet — the supervisor
+/// same wave, not routes this page can verify are wired yet: the supervisor
 /// aggregates the real sidebar in `catalog.dart` and `site_routes.dart`.
 const List<DocsSidebarEntry> _sidebar = <DocsSidebarEntry>[
   DocsSidebarEntry(title: 'Accordion', route: '/components/accordion'),
@@ -88,7 +92,7 @@ const List<DocsSidebarEntry> _sidebar = <DocsSidebarEntry>[
 ];
 
 /// One specimen of every [DsBadgeVariant], each wrapped in a
-/// [KeyedSubtree] the docs test locates directly — see the test file's own
+/// [KeyedSubtree] the docs test locates directly: see the test file's own
 /// note on why: it reads the resolved ink straight off the rendered
 /// [DsText] rather than re-deriving `DsBadge`'s private colour mapping.
 class _VariantLabel {
@@ -97,7 +101,7 @@ class _VariantLabel {
   final String label;
 }
 
-/// Realistic copy per variant — the same words the variant's own docstring
+/// Realistic copy per variant: the same words the variant's own docstring
 /// in `badge.dart` uses as its example call site, where one exists (`action`
 /// → "New release", `premium` → "Featured").
 const List<_VariantLabel> _variantSpecimens = <_VariantLabel>[
@@ -124,125 +128,111 @@ class _BadgeArticle extends StatelessWidget {
       key: const ValueKey<String>('badge-doc-article'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        _overview(theme),
-        _preview(),
+        _preview(theme),
         _install(),
         _usage(),
-        _api(),
         _variants(),
+        _withIcon(),
+        _withSpinner(),
+        _rtl(),
+        _composition(),
+        _api(),
         _states(),
         _accessibility(theme),
         _responsive(theme),
         _dependencies(theme),
-        _composition(),
         _theming(theme),
         _source(),
       ],
     );
   }
 
-  Widget _overview(DsThemeData theme) => DsSection(
-    id: 'overview',
-    title: 'Overview',
-    child: ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: DsWidths.prose),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          DsText(
-            'DsBadge renders a small pill: a fixed 20px-tall, label-sized '
-            'chip used to mark a status, a count, or a category — never an '
-            'action. Eleven variants map to six semantic fills (success, '
-            'warning, info, destructive, action, premium) plus primary and '
-            'secondary, and three unfilled treatments (outline, ghost, link) '
-            'for contexts that want restraint.',
-            DsType.body,
+  /// The live-demo slot shadcn's own badge page renders before its first
+  /// heading: this port's `DsSection` always carries a heading, so `Preview`
+  /// stands in for it, carrying the component's own framing prose (what it
+  /// is, when to reach for it instead of `DsKbd` or `DsButton`) ahead of a
+  /// small representative demo. The full eleven-variant grid lives under
+  /// `Variants` below, mirroring shadcn's own split between its top demo
+  /// (four badges) and its later `Variants` section (all five).
+  Widget _preview(DsThemeData theme) => Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: DsWidths.prose),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              DsText(
+                'DsBadge renders a small pill: a fixed 20px-tall, '
+                'label-sized chip used to mark a status, a count, or a '
+                'category: never an action. Eleven variants map to six '
+                'semantic fills (success, warning, info, destructive, '
+                'action, premium) plus primary and secondary, and three '
+                'unfilled treatments (outline, ghost, link) for contexts '
+                'that want restraint.',
+                DsType.body,
+              ),
+              SizedBox(height: ds(4)),
+              DsText(
+                'Reach for it over DsKbd when the content is a status word '
+                'or a count rather than a literal keystroke: kbd renders a '
+                'monospace key cap, badge renders a semantic chip. Reach '
+                'for it over a plain label when the value needs its own '
+                'filled, bordered, or coloured surface to separate it from '
+                'surrounding prose. And reach for DsButton instead the '
+                'moment the chip needs to respond to a tap: DsBadge '
+                'carries no GestureDetector, no FocusNode, and no pressed '
+                'or hover state by design: its own source docstring puts '
+                'it plainly: "a badge is a label, not a button, and it '
+                'must not invite a click."',
+                DsType.body,
+              ),
+              SizedBox(height: ds(4)),
+              DsText(
+                'Status: stable primitive, not yet registered in the CLI '
+                '(see Installation). Platforms: Android, iOS, Web, macOS, '
+                'Windows, Linux, the same six every widget in this package '
+                'targets.',
+                DsType.small,
+                color: theme.mutedForeground,
+              ),
+            ],
           ),
-          SizedBox(height: ds(4)),
-          DsText(
-            'Reach for it over DsKbd when the content is a status word or a '
-            'count rather than a literal keystroke — kbd renders a '
-            'monospace key cap, badge renders a semantic chip. Reach for it '
-            'over a plain label when the value needs its own filled, '
-            'bordered, or coloured surface to separate it from surrounding '
-            'prose — a badge always paints something (the ramp-chip '
-            'highlight and shadow-chip on every filled variant), where bare '
-            'text paints nothing. And reach for DsButton instead the moment '
-            'the chip needs to respond to a tap: DsBadge carries no '
-            'GestureDetector, no FocusNode, and no pressed or hover state by '
-            'design — its own source docstring puts it plainly: "a badge is '
-            'a label, not a button, and it must not invite a click."',
-            DsType.body,
-          ),
-          SizedBox(height: ds(4)),
-          DsText(
-            'Status: stable primitive, not yet registered in the CLI (see '
-            'Install). Platforms: Android, iOS, Web, macOS, Windows, Linux — '
-            'the same six every widget in this package targets.',
-            DsType.small,
-            color: theme.mutedForeground,
-          ),
-        ],
-      ),
-    ),
-  );
-
-  Widget _preview() => DsSection(
-    id: 'preview',
-    title: 'Preview',
-    description:
-        'All eleven DsBadgeVariant values, plus the leading-glyph '
-        'composition the data page uses for "Featured".',
-    child: DocsCodeExample(
-      title: 'Badge specimens',
-      manualFiles: const <DocsCodeFile>[
-        DocsCodeFile(
-          path: 'lib/components/ui/badge.dart',
-          code:
-              "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
-              '// Badge has no registry manifest yet — copy\n'
-              '// lib/src/components/badge.dart from the package source\n'
-              '// directly. There is no generated CLI payload to fetch.',
         ),
-      ],
-      preview: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Wrap(
+        SizedBox(height: ds(6)),
+        DocsCodeExample(
+          title: 'Badge specimens',
+          manualFiles: const <DocsCodeFile>[
+            DocsCodeFile(
+              path: 'lib/components/ui/badge.dart',
+              code:
+                  "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
+                  '// Badge has no registry manifest yet: copy\n'
+                  '// lib/src/components/badge.dart from the package source\n'
+                  '// directly. There is no generated CLI payload to fetch.',
+            ),
+          ],
+          preview: Wrap(
             spacing: ds(3),
             runSpacing: ds(3),
             crossAxisAlignment: WrapCrossAlignment.center,
-            children: <Widget>[
-              for (final _VariantLabel spec in _variantSpecimens)
-                KeyedSubtree(
-                  key: ValueKey<String>('badge-preview:${spec.variant.name}'),
-                  child: DsBadge(label: spec.label, variant: spec.variant),
-                ),
+            children: const <Widget>[
+              DsBadge(label: 'New'),
+              DsBadge(label: 'Draft', variant: DsBadgeVariant.secondary),
+              DsBadge(label: 'Failed', variant: DsBadgeVariant.destructive),
+              DsBadge(label: 'Outline', variant: DsBadgeVariant.outline),
             ],
           ),
-          SizedBox(height: ds(5)),
-          DsText('With a leading glyph', DsType.label),
-          SizedBox(height: ds(2)),
-          const DsBadge(
-            label: 'Featured',
-            variant: DsBadgeVariant.premium,
-            glyph: DsIcon(
-              DsIconGlyph.star,
-              size: DsIconSize.xs,
-              tone: DsIconTone.inherit,
-            ),
-          ),
-        ],
-      ),
-    ),
-  );
+        ),
+      ],
+    );
 
   Widget _install() => DsSection(
     id: 'install',
     title: 'Installation',
     description:
         'badge has no registry manifest yet, so `elattar add badge` is not '
-        'available — install by copying the source file manually.',
+        'available: install by copying the source file manually.',
     child: DocsInstallFacts(
       title: 'Installation facts',
       facts: <DocsInstallFact>[
@@ -267,7 +257,7 @@ class _BadgeArticle extends StatelessWidget {
           label: 'Dependencies',
           value: 'source-foundation, machine-surface',
           description:
-              'What a future manifest would need to resolve — colors, '
+              'What a future manifest would need to resolve: colors, '
               'shadows, spacing, theme, typography, and the '
               'DsMachineSurface effect. None of this is resolved '
               'automatically today; copy the imports by hand.',
@@ -295,7 +285,7 @@ class _BadgeArticle extends StatelessWidget {
           description:
               'This page\'s live preview and example/test/components_docs/'
               'badge_test.dart. No dedicated package-level unit test and no '
-              'registry fixture install exist yet — there is nothing to '
+              'registry fixture install exist yet: there is nothing to '
               'install.',
         ),
       ],
@@ -315,7 +305,7 @@ class _BadgeArticle extends StatelessWidget {
 
   Widget _api() => DsSection(
     id: 'api',
-    title: 'API',
+    title: 'API Reference',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
@@ -332,7 +322,7 @@ class _BadgeArticle extends StatelessWidget {
               type: 'DsBadgeVariant',
               description:
                   'Defaults to primary. Selects the fill, ink, and '
-                  'shadow — see Variants.',
+                  'shadow: see Variants.',
             ),
             DocsApiFact(
               name: 'spec',
@@ -378,17 +368,17 @@ class _BadgeArticle extends StatelessWidget {
             DocsApiFact(
               name: 'DsBadge.horizontalPadding',
               type: 'static double',
-              description: 'The default paddingX — 8px.',
+              description: 'The default paddingX, 8px.',
             ),
             DocsApiFact(
               name: 'DsBadge.glyphSize',
               type: 'static double',
-              description: 'The forced glyph square — 12px.',
+              description: 'The forced glyph square, 12px.',
             ),
             DocsApiFact(
               name: 'DsBadge.glyphGap',
               type: 'static double',
-              description: 'The gap between glyph and label — 4px.',
+              description: 'The gap between glyph and label, 4px.',
             ),
           ],
         ),
@@ -398,94 +388,192 @@ class _BadgeArticle extends StatelessWidget {
 
   Widget _variants() => DsSection(
     id: 'variants',
-    title: 'Variants and sizes',
+    title: 'Variants',
     description:
-        'Badge has no size axis — every chip is the same hard 20px border '
-        'box (DsBadge.height); content never grows it. Use paddingX or '
-        'minWidth to adjust footprint instead of a size enum.',
-    child: const DocsApiTable(
-      title: 'DsBadgeVariant',
-      facts: <DocsApiFact>[
-        DocsApiFact(
-          name: 'primary',
-          type: 'filled',
-          description:
-              'Fills with theme.primary. ramp-chip highlight + shadow-chip. '
-              'The constructor default.',
+        'All eleven DsBadgeVariant values. Badge has no size axis: every '
+        'chip is the same hard 20px border box (DsBadge.height); content '
+        'never grows it. Use paddingX or minWidth to adjust footprint '
+        'instead of a size enum.',
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        DsPanel(
+          label: 'PREVIEW',
+          child: Wrap(
+            spacing: ds(3),
+            runSpacing: ds(3),
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: <Widget>[
+              for (final _VariantLabel spec in _variantSpecimens)
+                KeyedSubtree(
+                  key: ValueKey<String>('badge-preview:${spec.variant.name}'),
+                  child: DsBadge(label: spec.label, variant: spec.variant),
+                ),
+            ],
+          ),
         ),
-        DocsApiFact(
-          name: 'secondary',
-          type: 'filled',
-          description: 'Fills with theme.secondary. ramp-chip + shadow-chip.',
-        ),
-        DocsApiFact(
-          name: 'destructive',
-          type: 'filled',
-          description:
-              'A 12%-alpha tint of theme.destructive. ramp-chip + '
-              'shadow-chip.',
-        ),
-        DocsApiFact(
-          name: 'outline',
-          type: 'unfilled',
-          description:
-              'No fill, no ramp, no shadow. A 1px border in theme.input; '
-              'ink is theme.mutedForeground.',
-        ),
-        DocsApiFact(
-          name: 'ghost',
-          type: 'unfilled',
-          description:
-              'No fill, no border, no ramp, no shadow. Ink is '
-              'theme.mutedForeground — same ink as outline.',
-        ),
-        DocsApiFact(
-          name: 'link',
-          type: 'unfilled',
-          description:
-              'No fill, no ramp, no shadow. Ink is theme.actionInk — '
-              'coloured text in a pill-shaped box.',
-        ),
-        DocsApiFact(
-          name: 'action',
-          type: 'filled',
-          description:
-              'Added for this system (not in the original shadcn set). A '
-              '12%-alpha tint of DsPalette.action; ink is theme.actionInk — '
-              'same ink as link. ramp-chip + shadow-chip. The media '
-              'dialog\'s "New release".',
-        ),
-        DocsApiFact(
-          name: 'premium',
-          type: 'filled',
-          description:
-              'A 12%-alpha tint of DsPalette.value; ink is theme.valueInk. '
-              'The one variant using shadow-btn-value instead of '
-              'shadow-chip — used for Featured, Limited, and anything '
-              'carrying value.',
-        ),
-        DocsApiFact(
-          name: 'success',
-          type: 'filled',
-          description:
-              'A 12%-alpha tint of DsPalette.success; ink is '
-              'theme.successInk. ramp-chip + shadow-chip.',
-        ),
-        DocsApiFact(
-          name: 'warning',
-          type: 'filled',
-          description:
-              'A 12%-alpha tint of DsPalette.warning; ink is '
-              'theme.warningInk. ramp-chip + shadow-chip.',
-        ),
-        DocsApiFact(
-          name: 'info',
-          type: 'filled',
-          description:
-              'A 12%-alpha tint of DsPalette.info; ink is theme.infoInk. '
-              'ramp-chip + shadow-chip.',
+        SizedBox(height: ds(6)),
+        const DocsApiTable(
+          title: 'DsBadgeVariant',
+          facts: <DocsApiFact>[
+            DocsApiFact(
+              name: 'primary',
+              type: 'filled',
+              description:
+                  'Fills with theme.primary. ramp-chip highlight + shadow-chip. '
+                  'The constructor default.',
+            ),
+            DocsApiFact(
+              name: 'secondary',
+              type: 'filled',
+              description:
+                  'Fills with theme.secondary. ramp-chip + shadow-chip.',
+            ),
+            DocsApiFact(
+              name: 'destructive',
+              type: 'filled',
+              description:
+                  'A 12%-alpha tint of theme.destructive. ramp-chip + '
+                  'shadow-chip.',
+            ),
+            DocsApiFact(
+              name: 'outline',
+              type: 'unfilled',
+              description:
+                  'No fill, no ramp, no shadow. A 1px border in theme.input; '
+                  'ink is theme.mutedForeground.',
+            ),
+            DocsApiFact(
+              name: 'ghost',
+              type: 'unfilled',
+              description:
+                  'No fill, no border, no ramp, no shadow. Ink is '
+                  'theme.mutedForeground: same ink as outline.',
+            ),
+            DocsApiFact(
+              name: 'link',
+              type: 'unfilled',
+              description:
+                  'No fill, no ramp, no shadow. Ink is theme.actionInk, '
+                  'coloured text in a pill-shaped box.',
+            ),
+            DocsApiFact(
+              name: 'action',
+              type: 'filled',
+              description:
+                  'Added for this system (not in the original shadcn set). A '
+                  '12%-alpha tint of DsPalette.action; ink is theme.actionInk, '
+                  'same ink as link. ramp-chip + shadow-chip. The media '
+                  'dialog\'s "New release".',
+            ),
+            DocsApiFact(
+              name: 'premium',
+              type: 'filled',
+              description:
+                  'A 12%-alpha tint of DsPalette.value; ink is theme.valueInk. '
+                  'The one variant using shadow-btn-value instead of '
+                  'shadow-chip: used for Featured, Limited, and anything '
+                  'carrying value.',
+            ),
+            DocsApiFact(
+              name: 'success',
+              type: 'filled',
+              description:
+                  'A 12%-alpha tint of DsPalette.success; ink is '
+                  'theme.successInk. ramp-chip + shadow-chip.',
+            ),
+            DocsApiFact(
+              name: 'warning',
+              type: 'filled',
+              description:
+                  'A 12%-alpha tint of DsPalette.warning; ink is '
+                  'theme.warningInk. ramp-chip + shadow-chip.',
+            ),
+            DocsApiFact(
+              name: 'info',
+              type: 'filled',
+              description:
+                  'A 12%-alpha tint of DsPalette.info; ink is theme.infoInk. '
+                  'ramp-chip + shadow-chip.',
+            ),
+          ],
         ),
       ],
+    ),
+  );
+
+  Widget _withIcon() => DsSection(
+    id: 'with-icon',
+    title: 'With icon',
+    description:
+        'A leading glyph, forced to 12px square with a 4px gap before the '
+        'label regardless of the icon\'s own size: the data page\'s '
+        '"Featured" chips.',
+    child: DsPanel(
+      label: 'PREVIEW',
+      child: const DsBadge(
+        label: 'Featured',
+        variant: DsBadgeVariant.premium,
+        glyph: DsIcon(
+          DsIconGlyph.star,
+          size: DsIconSize.xs,
+          tone: DsIconTone.inherit,
+        ),
+      ),
+    ),
+  );
+
+  Widget _withSpinner() => DsSection(
+    id: 'with-spinner',
+    title: 'With spinner',
+    description:
+        'The glyph slot takes any widget, including DsSpinner: sized down '
+        'to DsBadge.glyphSize (12px) so it fills the same square an icon '
+        'would.',
+    child: DsPanel(
+      label: 'PREVIEW',
+      child: Wrap(
+        spacing: ds(3),
+        runSpacing: ds(3),
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: <Widget>[
+          DsBadge(
+            label: 'Deleting',
+            variant: DsBadgeVariant.destructive,
+            glyph: DsSpinner(size: DsBadge.glyphSize),
+          ),
+          DsBadge(
+            label: 'Generating',
+            variant: DsBadgeVariant.action,
+            glyph: DsSpinner(size: DsBadge.glyphSize),
+          ),
+        ],
+      ),
+    ),
+  );
+
+  Widget _rtl() => DsSection(
+    id: 'rtl',
+    title: 'RTL',
+    description:
+        'DsBadge paints no direction-specific layout of its own: it sizes '
+        'to its label and centres its content either way, the same '
+        'composition read right-to-left under a Directionality.',
+    child: DsPanel(
+      label: 'PREVIEW',
+      child: Directionality(
+        textDirection: TextDirection.rtl,
+        child: Wrap(
+          spacing: ds(3),
+          runSpacing: ds(3),
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: <Widget>[
+            DsBadge(label: 'جديد'),
+            DsBadge(label: 'مسودة', variant: DsBadgeVariant.secondary),
+            DsBadge(label: 'فشل', variant: DsBadgeVariant.destructive),
+          ],
+        ),
+      ),
     ),
   );
 
@@ -507,12 +595,12 @@ class _BadgeArticle extends StatelessWidget {
               'light-from-above gradient) and shadow-chip (shadow-btn-value '
               'for premium). Unfilled variants (outline, ghost, link) paint '
               'no ramp and no shadow.',
-          userSignal: 'The resting paint is the only paint — see below.',
+          userSignal: 'The resting paint is the only paint: see below.',
         ),
         DocsStateFact(
           state: 'Error / Success',
           treatment:
-              'Not a live transition on one badge — choose '
+              'Not a live transition on one badge: choose '
               'DsBadgeVariant.destructive or .success at construction time '
               'instead. See Variants.',
           userSignal: 'A different badge instance, not a state change.',
@@ -520,7 +608,7 @@ class _BadgeArticle extends StatelessWidget {
         DocsStateFact(
           state: 'Reduced motion',
           treatment:
-              'N/A — no AnimationController and no motion token appears in '
+              'N/A: no AnimationController and no motion token appears in '
               'DsBadge.build.',
           userSignal: 'Nothing animates, so nothing needs to still.',
         ),
@@ -529,12 +617,12 @@ class _BadgeArticle extends StatelessWidget {
               'Hover / Focus-visible / Pressed / Selected / Loading / '
               'Empty / Disabled',
           treatment:
-              'N/A — DsBadge is a StatelessWidget with no gesture, focus, '
+              'N/A, DsBadge is a StatelessWidget with no gesture, focus, '
               'or async wiring; there is no onPressed/enabled parameter to '
               'hold any of these.',
           userSignal:
               'Wrap in DsButton (or your own GestureDetector) at the call '
-              'site if the chip must respond to input — DsBadge '
+              'site if the chip must respond to input, DsBadge '
               'intentionally does not.',
         ),
       ],
@@ -545,30 +633,30 @@ class _BadgeArticle extends StatelessWidget {
     id: 'accessibility',
     title: 'Accessibility and keyboard behavior',
     child: _bullets(theme, <String>[
-      'Semantic role: none of its own — DsBadge builds no Semantics node. '
+      'Semantic role: none of its own, DsBadge builds no Semantics node. '
           'The label reaches assistive tech as ordinary static text, not as '
           'a button, link, or image.',
-      'Required labels: none beyond `label` itself — there is no separate '
+      'Required labels: none beyond `label` itself: there is no separate '
           'semanticLabel or tooltip parameter.',
       'Keyboard interactions: none. DsBadge is never in the tab order.',
-      'Focus behavior: never receives focus — no Focus widget or FocusNode '
+      'Focus behavior: never receives focus: no Focus widget or FocusNode '
           'exists in its build method.',
-      'Touch target: not applicable — a badge is not tappable, so it makes '
+      'Touch target: not applicable: a badge is not tappable, so it makes '
           'no target-size guarantee. A caller that wraps one to be tappable '
           '(e.g. inside a GestureDetector) owns that guarantee, not '
           'DsBadge.',
-      'Non-colour signals: the label word itself is the signal — every '
+      'Non-colour signals: the label word itself is the signal: every '
           'variant reads correctly from its text alone ("Failed", "Active", '
           '"Pending"), and outline/ghost/link additionally drop the fill '
           'entirely so colour is never the only cue.',
-      'Error wiring: none — a badge is not a form control and cannot '
+      'Error wiring: none: a badge is not a form control and cannot '
           'associate with a field\'s error text; use DsInput\'s own invalid '
           'state for that.',
-      'Screen-reader announcements: none — there is no liveRegion. A badge '
+      'Screen-reader announcements: none: there is no liveRegion. A badge '
           'whose label changes across a rebuild (e.g. "Pending" → "Active") '
           'is not announced as a change; wire that explicitly at the call '
           'site if it matters.',
-      'Known platform differences: none observed — the same widget tree '
+      'Known platform differences: none observed: the same widget tree '
           'renders on every target platform; nothing in badge.dart branches '
           'on platform.',
     ]),
@@ -578,13 +666,13 @@ class _BadgeArticle extends StatelessWidget {
     id: 'responsive',
     title: 'Responsive and platform behavior',
     child: _bullets(theme, <String>[
-      'No responsive branching — DsBadge reads no breakpoint from '
+      'No responsive branching, DsBadge reads no breakpoint from '
           'BuildContext and renders identically at 390px and 1440px; only '
           'the label string can change the width it occupies.',
       'Height is fixed at 20px (DsBadge.height) everywhere; width is '
           'intrinsic to the label plus 16px of horizontal padding unless '
           'paddingX/minWidth override it.',
-      'Long labels are not truncated by DsBadge itself — overflow-hidden '
+      'Long labels are not truncated by DsBadge itself: overflow-hidden '
           'clips the 16px line box to the 14px content box vertically, but '
           'there is no horizontal ellipsis. A very long label simply widens '
           'the chip; constrain the surrounding layout if the label is '
@@ -603,22 +691,24 @@ class _BadgeArticle extends StatelessWidget {
           'foundation/shadows.dart (DsShadows.chip, DsShadows.btnValue), '
           'foundation/spacing.dart (ds()), foundation/theme.dart '
           '(DsThemeData), foundation/typography.dart (DsComponentType).',
-      'Effect import: effects/machine_surface.dart (DsMachineSurface) — '
+      'Effect import: effects/machine_surface.dart (DsMachineSurface), '
           'paints the fill, border, and shadow together for every filled '
           'variant.',
       'Scope import: theme_scope.dart (DsText, DsTheme).',
       'Assets: none. Fonts: none beyond the system type scale every DsText '
-          'call already depends on. Shaders: none — the ramp-chip highlight '
+          'call already depends on. Shaders: none: the ramp-chip highlight '
           'is a LinearGradient, not a fragment shader.',
     ]),
   );
 
   Widget _composition() => DsSection(
     id: 'composition',
-    title: 'Composition examples',
+    title: 'Composed with other primitives',
     description:
-        'Two real shapes badges are composed into elsewhere in this '
-        'package: a labelled metadata row, and a tag list.',
+        'Not a shadcn section, badge is a leaf widget with no sub-parts of '
+        'its own, but two real shapes badges are composed into elsewhere '
+        'in this package are worth showing: a labelled metadata row, and a '
+        'tag list.',
     child: DocsCodeExample(
       title: 'Composed with other primitives',
       preview: Column(
@@ -674,17 +764,17 @@ class _BadgeArticle extends StatelessWidget {
           'three fills, DsPalette.action/value/success/warning/info for the '
           'six semantic tints, and the matching *Ink getters for text. '
           'Flipping DsThemeController between light and dark re-resolves '
-          'every one — nothing is cached.',
+          'every one: nothing is cached.',
       'The ramp-chip highlight is NOT theme-aware: it is a fixed white-to-'
           'black alpha gradient (18% white top, 5% white mid, 14% black '
-          'bottom) painted as its own layer over the fill in both themes — '
+          'bottom) painted as its own layer over the fill in both themes, '
           'a deliberate port of the reference\'s own utility, not a token '
           'gap.',
-      'The two shadow specs — DsShadows.chip and, for premium only, '
-          'DsShadows.btnValue — are the badge entries in the machine-shadow '
+      'The two shadow specs, DsShadows.chip and, for premium only, '
+          'DsShadows.btnValue: are the badge entries in the machine-shadow '
           'family. Overriding them is not exposed as a DsBadge parameter.',
       'DsBadge declares no colour-override parameter of its own (no fill '
-          'or color argument) — every fill is variant-derived. A call site '
+          'or color argument): every fill is variant-derived. A call site '
           'that needs a colour outside the eleven variants is a signal to '
           'add a new DsBadgeVariant, not to bypass the token system.',
     ]),
@@ -700,7 +790,7 @@ class _BadgeArticle extends StatelessWidget {
           label: 'Source',
           value: badgeDoc.sourcePath,
           description:
-              'Authoritative implementation — the truth this page '
+              'Authoritative implementation: the truth this page '
               'was written from.',
         ),
         const DocsInstallFact(
@@ -741,7 +831,7 @@ Widget _bullets(DsThemeData theme, List<String> lines) => Column(
 );
 
 const String _usageCode = '''
-// The smallest correct call — variant defaults to primary.
+// The smallest correct call: variant defaults to primary.
 DsBadge(label: 'New')
 
 // A semantic variant with a leading glyph, matching the data page's

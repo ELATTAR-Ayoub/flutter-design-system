@@ -2,9 +2,29 @@
 /// and hover_card.
 ///
 /// These four anchored overlays are documented together because they all build
-/// on [DsPopover] for their placement, animation, and barrier logic. The page
-/// explains which overlay to reach for, when, documents the real public API of
-/// all four, and covers their individual keyboard, touch, and state behaviors.
+/// on [DsPopover] for their placement, animation, and barrier logic. One page,
+/// reshaped to mirror all four of their shadcn counterparts section for
+/// section: `https://ui.shadcn.com/docs/components/navigation-menu`,
+/// `/menubar`, `/context-menu`, and `/hover-card`. Installation, Usage, and
+/// Composition are each a single merged section (one shared story, four
+/// sub-blocks); every body section that follows belongs to exactly one of the
+/// four components and is named for it (`Menubar: Checkbox`, `Context Menu:
+/// Groups`, and so on) so the reader always knows which component a section
+/// is about. API Reference closes out the shadcn-mirrored part of the page,
+/// one table per exported class across all four. States, Accessibility,
+/// Responsive, Dependencies, Theming, and Source are this package's own six
+/// sections, each covering all four components once rather than four times.
+///
+/// **Skipped from the counterparts**, and why:
+///  - Navigation Menu's `Link Component` composes a Next.js `Link`; there is
+///    no Flutter render-prop equivalent, so it is not built.
+///  - Context Menu's `Sides` configures `side`/`align` on `ContextMenuContent`;
+///    [DsContextMenu] hardcodes `side: DsPopoverSide.right, align:
+///    DsPopoverAlign.start` and passes neither through, so there is nothing to
+///    demonstrate.
+///  - Hover Card's `Positioning` and `Sides` configure `side`/`align` on
+///    `HoverCardContent`; [DsHoverCard] has no such parameters, placement is
+///    fully automatic (collision-aware, via [dsPopoverPlacement]).
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
@@ -38,17 +58,59 @@ class NavigationMenuDocPage extends StatelessWidget {
       ],
       sidebar: _sidebar(entry.route),
       toc: const <DocsTocEntry>[
-        DocsTocEntry(title: 'Status', anchor: 'status'),
-        DocsTocEntry(title: 'Preview', anchor: 'preview'),
-        DocsTocEntry(title: 'Install', anchor: 'install'),
+        DocsTocEntry(title: 'Installation', anchor: 'install'),
         DocsTocEntry(title: 'Usage', anchor: 'usage'),
-        DocsTocEntry(title: 'API', anchor: 'api'),
-        DocsTocEntry(title: 'Variants', anchor: 'variants'),
+        DocsTocEntry(title: 'Composition', anchor: 'composition'),
+        DocsTocEntry(title: 'Navigation Menu: RTL', anchor: 'nav-menu-rtl'),
+        DocsTocEntry(title: 'Menubar: Checkbox', anchor: 'menubar-checkbox'),
+        DocsTocEntry(title: 'Menubar: Radio', anchor: 'menubar-radio'),
+        DocsTocEntry(title: 'Menubar: Submenu', anchor: 'menubar-submenu'),
+        DocsTocEntry(title: 'Menubar: With icons', anchor: 'menubar-icons'),
+        DocsTocEntry(title: 'Menubar: RTL', anchor: 'menubar-rtl'),
+        DocsTocEntry(
+          title: 'Context Menu: Basic',
+          anchor: 'context-menu-basic',
+        ),
+        DocsTocEntry(
+          title: 'Context Menu: Submenu',
+          anchor: 'context-menu-submenu',
+        ),
+        DocsTocEntry(
+          title: 'Context Menu: Shortcuts',
+          anchor: 'context-menu-shortcuts',
+        ),
+        DocsTocEntry(
+          title: 'Context Menu: Groups',
+          anchor: 'context-menu-groups',
+        ),
+        DocsTocEntry(
+          title: 'Context Menu: Icons',
+          anchor: 'context-menu-icons',
+        ),
+        DocsTocEntry(
+          title: 'Context Menu: Checkboxes',
+          anchor: 'context-menu-checkboxes',
+        ),
+        DocsTocEntry(
+          title: 'Context Menu: Radio',
+          anchor: 'context-menu-radio',
+        ),
+        DocsTocEntry(
+          title: 'Context Menu: Destructive',
+          anchor: 'context-menu-destructive',
+        ),
+        DocsTocEntry(title: 'Context Menu: RTL', anchor: 'context-menu-rtl'),
+        DocsTocEntry(
+          title: 'Hover Card: Trigger delays',
+          anchor: 'hover-card-delays',
+        ),
+        DocsTocEntry(title: 'Hover Card: Basic', anchor: 'hover-card-basic'),
+        DocsTocEntry(title: 'Hover Card: RTL', anchor: 'hover-card-rtl'),
+        DocsTocEntry(title: 'API Reference', anchor: 'api'),
         DocsTocEntry(title: 'States', anchor: 'states'),
         DocsTocEntry(title: 'Accessibility', anchor: 'accessibility'),
         DocsTocEntry(title: 'Responsive', anchor: 'responsive'),
         DocsTocEntry(title: 'Dependencies', anchor: 'dependencies'),
-        DocsTocEntry(title: 'Composition', anchor: 'composition'),
         DocsTocEntry(title: 'Theming', anchor: 'theming'),
         DocsTocEntry(title: 'Source', anchor: 'source'),
       ],
@@ -82,89 +144,85 @@ class _Article extends StatelessWidget {
     key: const ValueKey<String>('navigation-menu-doc-article'),
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
-      DsSection(
-        id: 'status',
-        title: 'Status',
-        child: const DocsInstallFacts(
-          title: 'Status',
-          facts: <DocsInstallFact>[
-            DocsInstallFact(
-              label: 'Status',
-              value: 'Unregistered — source only',
-              description:
-                  'DsNavigationMenu, DsMenubar, DsContextMenu, and DsHoverCard '
-                  'are all exported from the public barrel but have no registry '
-                  'manifest and cannot be installed through the CLI yet.',
-            ),
-            DocsInstallFact(
-              label: 'Version',
-              value: '0.0.1',
-              description: 'Committed alongside Popover in the same wave.',
-            ),
-            DocsInstallFact(
-              label: 'Dart / Flutter',
-              value: '>=3.12.2 <4.0.0 / >=3.12.2',
-              description: 'Same constraints as the port.',
-            ),
-            DocsInstallFact(
-              label: 'Platforms',
-              value: 'Android, iOS, Web, macOS, Windows, Linux',
-              description:
-                  'Pure widget composition — nothing is platform-gated.',
-            ),
-          ],
-        ),
-      ),
-      DsSection(
-        id: 'preview',
-        title: 'Preview',
+      // Unheaded, ahead of the first heading, exactly as shadcn puts its own
+      // live demo above `Installation`.
+      DocsCodeExample(
+        title: 'All four specimens',
         description:
-            'The four components side by side: Navigation Menu with a shared '
-            'viewport and indicator, Menubar as a strip, Context Menu opened by '
-            'right-click, and Hover Card showing on pointer entry. All four are '
-            'anchored overlays built on DsPopover.',
-        child: DocsCodeExample(
-          title: 'All four specimens',
-          description:
-              'Navigation Menu: hover or tap to open panels. Menubar: click or '
-              'hover to cycle menus. Context Menu: right-click the card. Hover '
-              'Card: move your pointer over the text (not on touch).',
-          preview: const _AllFourPreview(),
-        ),
+            'Navigation Menu: hover or tap to open panels. Menubar: click or '
+            'hover to cycle menus. Context Menu: right-click the card. Hover '
+            'Card: move your pointer over the text (not on touch).',
+        preview: const _AllFourPreview(),
       ),
+      SizedBox(height: ds(6)),
       DsSection(
         id: 'install',
         title: 'Installation',
         description:
             'All four components are in the main package but have no registry '
-            'manifest yet — `elattar add navigation-menu` does not work. Import '
+            'manifest yet, `elattar add navigation-menu` does not work. Import '
             'from the barrel and copy the source files manually.',
-        child: DocsCodeExample(
-          title: 'Manual installation',
-          manualFiles: const <DocsCodeFile>[
-            DocsCodeFile(
-              path: 'lib/components/ui/navigation_menu.dart',
-              code:
-                  "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
-                  '// Copy navigation-menu source from the package when needed.',
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            DocsCodeExample(
+              title: 'Manual installation',
+              manualFiles: const <DocsCodeFile>[
+                DocsCodeFile(
+                  path: 'lib/components/ui/navigation_menu.dart',
+                  code:
+                      "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
+                      '// Copy navigation-menu source from the package when needed.',
+                ),
+                DocsCodeFile(
+                  path: 'lib/components/ui/menubar.dart',
+                  code:
+                      "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
+                      '// Copy menubar source from the package when needed.',
+                ),
+                DocsCodeFile(
+                  path: 'lib/components/ui/context_menu.dart',
+                  code:
+                      "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
+                      '// Copy context-menu source from the package when needed.',
+                ),
+                DocsCodeFile(
+                  path: 'lib/components/ui/hover_card.dart',
+                  code:
+                      "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
+                      '// Copy hover-card source from the package when needed.',
+                ),
+              ],
             ),
-            DocsCodeFile(
-              path: 'lib/components/ui/menubar.dart',
-              code:
-                  "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
-                  '// Copy menubar source from the package when needed.',
-            ),
-            DocsCodeFile(
-              path: 'lib/components/ui/context_menu.dart',
-              code:
-                  "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
-                  '// Copy context-menu source from the package when needed.',
-            ),
-            DocsCodeFile(
-              path: 'lib/components/ui/hover_card.dart',
-              code:
-                  "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
-                  '// Copy hover-card source from the package when needed.',
+            SizedBox(height: ds(4)),
+            const DocsInstallFacts(
+              title: 'Status',
+              facts: <DocsInstallFact>[
+                DocsInstallFact(
+                  label: 'Status',
+                  value: 'Unregistered: source only',
+                  description:
+                      'DsNavigationMenu, DsMenubar, DsContextMenu, and DsHoverCard '
+                      'are all exported from the public barrel but have no registry '
+                      'manifest and cannot be installed through the CLI yet.',
+                ),
+                DocsInstallFact(
+                  label: 'Version',
+                  value: '0.0.1',
+                  description: 'Committed alongside Popover in the same wave.',
+                ),
+                DocsInstallFact(
+                  label: 'Dart / Flutter',
+                  value: '>=3.12.2 <4.0.0 / >=3.12.2',
+                  description: 'Same constraints as the port.',
+                ),
+                DocsInstallFact(
+                  label: 'Platforms',
+                  value: 'Android, iOS, Web, macOS, Windows, Linux',
+                  description:
+                      'Pure widget composition: nothing is platform-gated.',
+                ),
+              ],
             ),
           ],
         ),
@@ -183,33 +241,369 @@ class _Article extends StatelessWidget {
           children: <Widget>[
             DsPanel(
               label: 'DART',
-              note: 'NAVIGATION MENU — with a shared viewport',
+              note: 'NAVIGATION MENU: with a shared viewport',
               child: DocsSelectableCodeBlock(code: _navMenuCode),
             ),
             SizedBox(height: ds(5)),
             DsPanel(
               label: 'DART',
-              note: 'MENUBAR — a strip that hands the menu between triggers',
+              note: 'MENUBAR: a strip that hands the menu between triggers',
               child: DocsSelectableCodeBlock(code: _menubarCode),
             ),
             SizedBox(height: ds(5)),
             DsPanel(
               label: 'DART',
-              note: 'CONTEXT MENU — right-click to open at the pointer',
+              note: 'CONTEXT MENU: right-click to open at the pointer',
               child: DocsSelectableCodeBlock(code: _contextMenuCode),
             ),
             SizedBox(height: ds(5)),
             DsPanel(
               label: 'DART',
-              note: 'HOVER CARD — opens on pointer entry, closes on exit',
+              note: 'HOVER CARD: opens on pointer entry, closes on exit',
               child: DocsSelectableCodeBlock(code: _hoverCardCode),
             ),
           ],
         ),
       ),
       DsSection(
+        id: 'composition',
+        title: 'Composition',
+        description:
+            'What each constructor assembles internally, one tree per '
+            'component. None of the four takes a caller-assembled tree of '
+            'sub-widgets the way shadcn\'s NavigationMenuList / MenubarMenu / '
+            'ContextMenuSub markup does: each one takes a flat list (items, '
+            'menus, or children) and builds the tree below from it.',
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            DsPanel(
+              label: 'Navigation Menu',
+              child: DocsSelectableCodeBlock(code: _navMenuCompositionCode),
+            ),
+            SizedBox(height: ds(5)),
+            DsPanel(
+              label: 'Menubar',
+              child: DocsSelectableCodeBlock(code: _menubarCompositionCode),
+            ),
+            SizedBox(height: ds(5)),
+            DsPanel(
+              label: 'Context Menu',
+              child: DocsSelectableCodeBlock(code: _contextMenuCompositionCode),
+            ),
+            SizedBox(height: ds(5)),
+            DsPanel(
+              label: 'Hover Card',
+              child: DocsSelectableCodeBlock(code: _hoverCardCompositionCode),
+            ),
+          ],
+        ),
+      ),
+      DsSection(
+        id: 'nav-menu-rtl',
+        title: 'Navigation Menu: RTL',
+        description:
+            'The same trigger-and-panel composition read right-to-left under a '
+            'Directionality. Nothing in DsNavigationMenu mirrors by hand: the '
+            'chevron rotation and the panel anchoring both follow direction '
+            'automatically.',
+        child: const DocsCodeExample(
+          title: 'Right-to-left navigation menu',
+          preview: _NavMenuRtl(),
+          manualFiles: <DocsCodeFile>[
+            DocsCodeFile(path: 'nav_menu_rtl.dart', code: _navMenuRtlCode),
+          ],
+        ),
+      ),
+      DsSection(
+        id: 'menubar-checkbox',
+        title: 'Menubar: Checkbox',
+        description:
+            'DsMenuCheckboxItem inside a DsMenubarMenu, for a toggleable '
+            'option. checked is controlled: the caller owns the state and the '
+            'row reports back through onSelect.',
+        child: const DocsCodeExample(
+          title: 'Checkbox rows',
+          preview: _MenubarCheckbox(),
+          manualFiles: <DocsCodeFile>[
+            DocsCodeFile(
+              path: 'menubar_checkbox.dart',
+              code: _menubarCheckboxCode,
+            ),
+          ],
+        ),
+      ),
+      DsSection(
+        id: 'menubar-radio',
+        title: 'Menubar: Radio',
+        description:
+            'DsMenuRadioGroup and DsMenuRadioItem for a single-select group of '
+            'rows. The group paints nothing: it exists so exactly one child row '
+            'wears the tick.',
+        child: const DocsCodeExample(
+          title: 'Radio rows',
+          preview: _MenubarRadio(),
+          manualFiles: <DocsCodeFile>[
+            DocsCodeFile(path: 'menubar_radio.dart', code: _menubarRadioCode),
+          ],
+        ),
+      ),
+      DsSection(
+        id: 'menubar-submenu',
+        title: 'Menubar: Submenu',
+        description:
+            'DsMenuSub nests one level of rows behind a trigger row. Allowed '
+            'one level deep by editorial convention, not by a depth check the '
+            'source enforces.',
+        child: const DocsCodeExample(
+          title: 'Nested menu',
+          preview: _MenubarSubmenu(),
+          manualFiles: <DocsCodeFile>[
+            DocsCodeFile(
+              path: 'menubar_submenu.dart',
+              code: _menubarSubmenuCode,
+            ),
+          ],
+        ),
+      ),
+      DsSection(
+        id: 'menubar-icons',
+        title: 'Menubar: With icons',
+        description:
+            'DsMenuItem.icon puts a 16px leading glyph on a row, forced to that '
+            'size regardless of what DsIconSize the call site names.',
+        child: const DocsCodeExample(
+          title: 'Rows with leading icons',
+          preview: _MenubarIcons(),
+          manualFiles: <DocsCodeFile>[
+            DocsCodeFile(path: 'menubar_icons.dart', code: _menubarIconsCode),
+          ],
+        ),
+      ),
+      DsSection(
+        id: 'menubar-rtl',
+        title: 'Menubar: RTL',
+        description:
+            'The same strip read right-to-left. The one thing that does not '
+            'mirror: menu drift 5, the menubar\'s check-row indicator sits on '
+            'the row\'s start edge in both directions, because it is a drift in '
+            'the reference\'s own class list, not a property of direction.',
+        child: const DocsCodeExample(
+          title: 'Right-to-left menubar',
+          preview: _MenubarRtl(),
+          manualFiles: <DocsCodeFile>[
+            DocsCodeFile(path: 'menubar_rtl.dart', code: _menubarRtlCode),
+          ],
+        ),
+      ),
+      DsSection(
+        id: 'context-menu-basic',
+        title: 'Context Menu: Basic',
+        description:
+            'The simplest right-click menu: two plain DsMenuItem rows, no '
+            'checkboxes, radios, or submenus.',
+        child: const DocsCodeExample(
+          title: 'Basic context menu',
+          preview: _ContextMenuBasic(),
+          manualFiles: <DocsCodeFile>[
+            DocsCodeFile(
+              path: 'context_menu_basic.dart',
+              code: _contextMenuBasicCode,
+            ),
+          ],
+        ),
+      ),
+      DsSection(
+        id: 'context-menu-submenu',
+        title: 'Context Menu: Submenu',
+        description:
+            'A DsMenuSub row opens a second content anchored to its own right '
+            'edge, roughly 100ms after the pointer rests on it.',
+        child: const DocsCodeExample(
+          title: 'Nested actions',
+          preview: _ContextMenuSubmenu(),
+          manualFiles: <DocsCodeFile>[
+            DocsCodeFile(
+              path: 'context_menu_submenu.dart',
+              code: _contextMenuSubmenuCode,
+            ),
+          ],
+        ),
+      ),
+      DsSection(
+        id: 'context-menu-shortcuts',
+        title: 'Context Menu: Shortcuts',
+        description:
+            'DsMenuItem.shortcut right-aligns a key hint. It is display only: '
+            'the source does not wire the shortcut to a real key handler.',
+        child: const DocsCodeExample(
+          title: 'Rows with shortcuts',
+          preview: _ContextMenuShortcuts(),
+          manualFiles: <DocsCodeFile>[
+            DocsCodeFile(
+              path: 'context_menu_shortcuts.dart',
+              code: _contextMenuShortcutsCode,
+            ),
+          ],
+        ),
+      ),
+      DsSection(
+        id: 'context-menu-groups',
+        title: 'Context Menu: Groups',
+        description:
+            'DsMenuGroup paints nothing: its rows sit flush with their '
+            'neighbours. It exists to mark related actions and to give a '
+            'future accessible label something to hang off.',
+        child: const DocsCodeExample(
+          title: 'Grouped actions',
+          preview: _ContextMenuGroups(),
+          manualFiles: <DocsCodeFile>[
+            DocsCodeFile(
+              path: 'context_menu_groups.dart',
+              code: _contextMenuGroupsCode,
+            ),
+          ],
+        ),
+      ),
+      DsSection(
+        id: 'context-menu-icons',
+        title: 'Context Menu: Icons',
+        description:
+            'The same DsMenuItem.icon slot Menubar uses: a leading glyph for '
+            'faster visual scanning.',
+        child: const DocsCodeExample(
+          title: 'Rows with icons',
+          preview: _ContextMenuIcons(),
+          manualFiles: <DocsCodeFile>[
+            DocsCodeFile(
+              path: 'context_menu_icons.dart',
+              code: _contextMenuIconsCode,
+            ),
+          ],
+        ),
+      ),
+      DsSection(
+        id: 'context-menu-checkboxes',
+        title: 'Context Menu: Checkboxes',
+        description:
+            'DsMenuCheckboxItem for a toggleable option, right-click style. '
+            'Same indicator side as a dropdown menu: the right edge, not '
+            'Menubar\'s left.',
+        child: const DocsCodeExample(
+          title: 'Checkbox rows',
+          preview: _ContextMenuCheckboxes(),
+          manualFiles: <DocsCodeFile>[
+            DocsCodeFile(
+              path: 'context_menu_checkboxes.dart',
+              code: _contextMenuCheckboxesCode,
+            ),
+          ],
+        ),
+      ),
+      DsSection(
+        id: 'context-menu-radio',
+        title: 'Context Menu: Radio',
+        description:
+            'DsMenuRadioGroup for a mutually exclusive choice, right-click '
+            'style.',
+        child: const DocsCodeExample(
+          title: 'Radio rows',
+          preview: _ContextMenuRadio(),
+          manualFiles: <DocsCodeFile>[
+            DocsCodeFile(
+              path: 'context_menu_radio.dart',
+              code: _contextMenuRadioCode,
+            ),
+          ],
+        ),
+      ),
+      DsSection(
+        id: 'context-menu-destructive',
+        title: 'Context Menu: Destructive',
+        description:
+            'DsMenuItemVariant.destructive tints a row\'s ink and, once '
+            'highlighted, its fill: 10% of theme.destructive in light, 20% in '
+            'dark. The same specimen shown at the top of this page.',
+        child: const DocsCodeExample(
+          title: 'Destructive action',
+          preview: _ContextMenuSpecimen(
+            specimenKey: 'context-menu-destructive-specimen',
+          ),
+          manualFiles: <DocsCodeFile>[
+            DocsCodeFile(
+              path: 'context_menu_destructive.dart',
+              code: _contextMenuCode,
+            ),
+          ],
+        ),
+      ),
+      DsSection(
+        id: 'context-menu-rtl',
+        title: 'Context Menu: RTL',
+        description:
+            'The right-click position itself does not mirror: DsContextMenu '
+            'anchors to the pointer\'s literal client coordinates, which have no '
+            'reading direction. Only the menu content reads right-to-left.',
+        child: const DocsCodeExample(
+          title: 'Right-to-left context menu',
+          preview: _ContextMenuRtl(),
+          manualFiles: <DocsCodeFile>[
+            DocsCodeFile(
+              path: 'context_menu_rtl.dart',
+              code: _contextMenuRtlCode,
+            ),
+          ],
+        ),
+      ),
+      DsSection(
+        id: 'hover-card-delays',
+        title: 'Hover Card: Trigger delays',
+        description:
+            'openDelay (default 700ms, Radix\'s own default) is how long the '
+            'pointer must rest on the trigger before the card opens. '
+            'closeDelay (default 300ms) is the window in which the pointer can '
+            'cross the gap into the card itself before it closes. Both are '
+            'named constructor parameters; see API Reference below for the '
+            'full signature.',
+        child: const DocsCodeExample(
+          title: 'Default delays',
+          preview: _HoverCardSpecimen(
+            specimenKey: 'hover-card-delays-specimen',
+          ),
+        ),
+      ),
+      DsSection(
+        id: 'hover-card-basic',
+        title: 'Hover Card: Basic',
+        description:
+            'The same specimen shown at the top of this page: hover the '
+            'trigger text to see the preview.',
+        child: const DocsCodeExample(
+          title: 'Basic hover card',
+          preview: _HoverCardSpecimen(specimenKey: 'hover-card-basic-specimen'),
+          manualFiles: <DocsCodeFile>[
+            DocsCodeFile(path: 'hover_card_basic.dart', code: _hoverCardCode),
+          ],
+        ),
+      ),
+      DsSection(
+        id: 'hover-card-rtl',
+        title: 'Hover Card: RTL',
+        description:
+            'The card\'s content reads right-to-left. Placement is unaffected: '
+            'DsHoverCard positions from the trigger\'s own box, which '
+            'Directionality does not move.',
+        child: const DocsCodeExample(
+          title: 'Right-to-left hover card',
+          preview: _HoverCardRtl(),
+          manualFiles: <DocsCodeFile>[
+            DocsCodeFile(path: 'hover_card_rtl.dart', code: _hoverCardRtlCode),
+          ],
+        ),
+      ),
+      DsSection(
         id: 'api',
-        title: 'API',
+        title: 'API Reference',
         description:
             'Every public class, enum, and constructor parameter the source '
             'declares. All four components build on DsPopover.',
@@ -251,14 +645,14 @@ class _Article extends StatelessWidget {
                   name: 'DsNavigationMenuItem.trigger()',
                   type: 'constructor',
                   description:
-                      'A trigger that opens a panel of content — requires '
+                      'A trigger that opens a panel of content: requires '
                       'label and content.',
                 ),
                 DocsApiFact(
                   name: 'DsNavigationMenuItem.link()',
                   type: 'constructor',
                   description:
-                      'A plain destination link, no panel — requires label, '
+                      'A plain destination link, no panel: requires label, '
                       'optional onTap.',
                 ),
                 DocsApiFact(
@@ -270,7 +664,7 @@ class _Article extends StatelessWidget {
                   name: 'content',
                   type: 'Widget?',
                   description:
-                      'The panel body for a trigger — the ul of rows. Null for '
+                      'The panel body for a trigger: the ul of rows. Null for '
                       'a link.',
                 ),
                 DocsApiFact(
@@ -288,14 +682,14 @@ class _Article extends StatelessWidget {
                   name: 'child',
                   type: 'Widget',
                   description:
-                      'Required. The row content — icon-and-label or '
+                      'Required. The row content: icon-and-label or '
                       'title-and-blurb.',
                 ),
                 DocsApiFact(
                   name: 'active',
                   type: 'bool',
                   description:
-                      'Default false. Marks the current destination — '
+                      'Default false. Marks the current destination, '
                       'sets the background to accent.',
                 ),
                 DocsApiFact(
@@ -313,7 +707,7 @@ class _Article extends StatelessWidget {
                   name: 'menus',
                   type: 'List<DsMenubarMenu>',
                   description:
-                      'Required. The triggers and their menu rows — a strip of '
+                      'Required. The triggers and their menu rows: a strip of '
                       'menu openers.',
                 ),
               ],
@@ -331,7 +725,7 @@ class _Article extends StatelessWidget {
                   name: 'children',
                   type: 'List<DsMenuChild>',
                   description:
-                      'The menu rows — items, labels, separators, submenus. '
+                      'The menu rows: items, labels, separators, submenus. '
                       'Managed by DsMenu.',
                 ),
               ],
@@ -344,14 +738,14 @@ class _Article extends StatelessWidget {
                   name: 'child',
                   type: 'Widget',
                   description:
-                      'Required. The trigger — right-click it to open the menu '
+                      'Required. The trigger: right-click it to open the menu '
                       'at the pointer.',
                 ),
                 DocsApiFact(
                   name: 'children',
                   type: 'List<DsMenuChild>',
                   description:
-                      'The menu rows — items, labels, separators, submenus. '
+                      'The menu rows: items, labels, separators, submenus. '
                       'Managed by DsMenu.',
                 ),
                 DocsApiFact(
@@ -377,13 +771,13 @@ class _Article extends StatelessWidget {
                   name: 'trigger',
                   type: 'Widget',
                   description:
-                      'Required. The target — pointer entry opens the card.',
+                      'Required. The target: pointer entry opens the card.',
                 ),
                 DocsApiFact(
                   name: 'content',
                   type: 'Widget',
                   description:
-                      'Required. The preview content — laid out inside '
+                      'Required. The preview content: laid out inside '
                       'DsHoverCardContent.',
                 ),
                 DocsApiFact(
@@ -405,7 +799,7 @@ class _Article extends StatelessWidget {
                   type: 'Duration',
                   description:
                       'Default 300ms. How long the card stays open after the '
-                      'pointer leaves — the gap-crossing window.',
+                      'pointer leaves: the gap-crossing window.',
                 ),
               ],
             ),
@@ -417,7 +811,7 @@ class _Article extends StatelessWidget {
                   name: 'child',
                   type: 'Widget',
                   description:
-                      'Required. The preview content — laid out inside '
+                      'Required. The preview content: laid out inside '
                       'p-2.5 padding.',
                 ),
               ],
@@ -426,59 +820,8 @@ class _Article extends StatelessWidget {
         ),
       ),
       DsSection(
-        id: 'variants',
-        title: 'Which overlay to reach for',
-        description:
-            'All four are anchored overlays. The choice is about the trigger '
-            'gesture, the content type, and the platform reach.',
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            DsPanel(
-              label: 'Decision tree',
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  DsText(
-                    'Navigation Menu: Click or hover to open a rich panel of '
-                    'destinations. Includes a caret indicator (with a known bug) '
-                    'and supports both shared and per-item viewports. Works on '
-                    'click and hover.',
-                    DsType.small,
-                  ),
-                  SizedBox(height: ds(3)),
-                  DsText(
-                    'Menubar: A traditional menu strip for admin surfaces. '
-                    'Triggers hand the open menu between them on hover. Arrow '
-                    'keys step through menus. Supports nested submenus. No touch '
-                    'path — menubar is a desktop pattern.',
-                    DsType.small,
-                  ),
-                  SizedBox(height: ds(3)),
-                  DsText(
-                    'Context Menu: Right-click only. Opens at the pointer with '
-                    'no trigger box. Has no touch path — long-press is a Radix '
-                    'feature not ported. Do not make it the only way to an '
-                    'action.',
-                    DsType.small,
-                  ),
-                  SizedBox(height: ds(3)),
-                  DsText(
-                    'Hover Card: Pointer-only preview that opens on entry, '
-                    'closes on exit. Not available on touch — the component '
-                    'itself is invisible on a phone. Use it for optional detail '
-                    'that does not block the main flow.',
-                    DsType.small,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-      DsSection(
         id: 'states',
-        title: 'States and feedback',
+        title: 'States',
         description:
             'All four are state machines: open or closed. The row model '
             '(DsMenuChild and its variants) carries item states inside them.',
@@ -487,7 +830,7 @@ class _Article extends StatelessWidget {
             DocsStateFact(
               state: 'Rest',
               treatment:
-                  'Closed — the trigger is visible, the panel or menu is not '
+                  'Closed: the trigger is visible, the panel or menu is not '
                   'mounted.',
               userSignal:
                   'Navigation Menu: trigger shows muted text. Menubar: trigger '
@@ -524,7 +867,7 @@ class _Article extends StatelessWidget {
                   'Navigation Menu: focus goes to panel rows; Escape closes. '
                   'Menubar: arrow keys step through menus; Escape closes. '
                   'Context Menu: focus goes to menu rows; Escape closes. Hover '
-                  'Card: cannot receive focus — hover only.',
+                  'Card: cannot receive focus: hover only.',
               userSignal:
                   'Keyboard navigation works for the menu families. Context '
                   'Menu: typeahead searches the rows.',
@@ -535,7 +878,7 @@ class _Article extends StatelessWidget {
                   'Navigation Menu / Menubar: trigger stays lit while the '
                   'panel/menu is open. Nothing transitions. Context Menu: '
                   'child shows whatever press state it defines.',
-              userSignal: 'Snap — no transition. The fill appears instantly.',
+              userSignal: 'Snap: no transition. The fill appears instantly.',
             ),
             DocsStateFact(
               state: 'Disabled',
@@ -545,7 +888,7 @@ class _Article extends StatelessWidget {
                   'parameters. Context Menu has enabled (default true). Hover '
                   'Card has no disable path.',
               userSignal:
-                  'N/A — disabling is per-item in the menu family, and '
+                  'N/A: disabling is per-item in the menu family, and '
                   'context of the trigger in Navigation Menu and Menubar.',
             ),
             DocsStateFact(
@@ -575,7 +918,7 @@ class _Article extends StatelessWidget {
       ),
       DsSection(
         id: 'accessibility',
-        title: 'Accessibility and keyboard behavior',
+        title: 'Accessibility',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
@@ -587,13 +930,13 @@ class _Article extends StatelessWidget {
                   _A11yHeader('Navigation Menu'),
                   _A11yRow(
                     'Keyboard: Hover opens on delay',
-                    'No keyboard opener — only click or hover. Arrow keys do '
+                    'No keyboard opener: only click or hover. Arrow keys do '
                         'not step triggers.',
                   ),
                   _A11yRow(
                     'Escape behavior',
                     'Escape closes the panel if focus is inside it. Focus is '
-                        'the content\'s business — the component does not move '
+                        'the content\'s business: the component does not move '
                         'it.',
                   ),
                   _A11yRow(
@@ -616,7 +959,7 @@ class _Article extends StatelessWidget {
                   _A11yRow(
                     'Hover on keyboard',
                     'Moving to a sibling menu with arrow keys while a menu is '
-                        'open swaps instantly — no hover delay.',
+                        'open swaps instantly: no hover delay.',
                     last: true,
                   ),
                   SizedBox(height: ds(4)),
@@ -628,7 +971,7 @@ class _Article extends StatelessWidget {
                   ),
                   _A11yRow(
                     'Menu navigation',
-                    'Same as Menubar — Up/Down, Home/End, typeahead, no wrap.',
+                    'Same as Menubar, Up/Down, Home/End, typeahead, no wrap.',
                   ),
                   _A11yRow(
                     'Escape behavior',
@@ -645,7 +988,7 @@ class _Article extends StatelessWidget {
                   ),
                   _A11yRow(
                     'No focus',
-                    'The card does not trap focus — it is announcement-only. '
+                    'The card does not trap focus: it is announcement-only. '
                         'A screen reader must read the trigger to learn about '
                         'the preview.',
                   ),
@@ -676,9 +1019,9 @@ class _Article extends StatelessWidget {
       ),
       DsSection(
         id: 'responsive',
-        title: 'Responsive and platform behavior',
+        title: 'Responsive',
         description:
-            'All four rely on [DsPopover]\'s collision algorithm — they flip '
+            'All four rely on [DsPopover]\'s collision algorithm: they flip '
             'sides and shift along the cross axis to stay visible. All four '
             'snap without transition.',
         child: Column(
@@ -710,7 +1053,7 @@ class _Article extends StatelessWidget {
                   SizedBox(height: ds(3)),
                   DsText(
                     'Hover Card: Pointer entry and exit only. Completely '
-                    'hidden on touch — not just disabled, but unmounted.',
+                    'hidden on touch: not just disabled, but unmounted.',
                     DsType.small,
                   ),
                 ],
@@ -721,14 +1064,14 @@ class _Article extends StatelessWidget {
       ),
       DsSection(
         id: 'dependencies',
-        title: 'Dependencies, files, and disclosure',
+        title: 'Dependencies',
         description:
             'All four build on [DsPopover]. None has a registry manifest yet.',
         child: DocsInstallFacts(
           facts: <DocsInstallFact>[
             const DocsInstallFact(
               label: 'Registry item',
-              value: 'None — unregistered',
+              value: 'None: unregistered',
               description:
                   'All four components are in the package but have no manifest '
                   'and cannot be installed through the CLI yet.',
@@ -762,7 +1105,7 @@ class _Article extends StatelessWidget {
             const DocsInstallFact(
               label: 'Verified',
               value:
-                  'test/components_docs/navigation_menu_test.dart — the four '
+                  'test/components_docs/navigation_menu_test.dart: the four '
                   'live specimens on this page',
               description:
                   'Real test-view sizing at 390x844 and 1440x900, both themes '
@@ -772,26 +1115,8 @@ class _Article extends StatelessWidget {
         ),
       ),
       DsSection(
-        id: 'composition',
-        title: 'Real examples',
-        description:
-            'Each component is shown live on this page. Study the preview '
-            'section above for working code you can copy.',
-        child: DsPanel(
-          label: 'Live specimens',
-          child: DsText(
-            'All four components are rendered live in the Preview section at '
-            'the top of this page. Scroll up to interact with them: click the '
-            'Navigation Menu triggers, hover the Menubar, right-click the '
-            'Context Menu card, and hover over the Hover Card text to see all '
-            'four behaviors.',
-            DsType.small,
-          ),
-        ),
-      ),
-      DsSection(
         id: 'theming',
-        title: 'Theming notes',
+        title: 'Theming',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
@@ -834,7 +1159,7 @@ class _Article extends StatelessWidget {
       ),
       DsSection(
         id: 'source',
-        title: 'Source and tests',
+        title: 'Source',
         child: DocsInstallFacts(
           title: 'Source and tests',
           facts: <DocsInstallFact>[
@@ -857,7 +1182,7 @@ class _Article extends StatelessWidget {
               value: 'example/test/components_docs/navigation_menu_test.dart',
               description:
                   'This page\'s own responsive, theme, and live open/close '
-                  'coverage — all four specimens live.',
+                  'coverage: all four specimens live.',
             ),
             const DocsInstallFact(
               label: 'Menu rows source',
@@ -947,6 +1272,12 @@ class _AllFourPreviewState extends State<_AllFourPreview> {
 }
 
 class _NavigationMenuSpecimen extends StatelessWidget {
+  /// Mounted exactly once on this page. The key below is baked into `build`,
+  /// which is only safe while that stays true: a second mount would give both
+  /// instances the same key and any finder for it would match two widgets.
+  /// If you add one, give this a `specimenKey` field the way
+  /// [_ContextMenuSpecimen] and [_HoverCardSpecimen] already do, and pass a
+  /// distinct key at the new site.
   const _NavigationMenuSpecimen();
 
   @override
@@ -984,7 +1315,38 @@ class _NavigationMenuSpecimen extends StatelessWidget {
   }
 }
 
+class _NavMenuRtl extends StatelessWidget {
+  const _NavMenuRtl();
+
+  @override
+  Widget build(BuildContext context) {
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: DsNavigationMenu(
+        viewport: true,
+        items: <DsNavigationMenuItem>[
+          DsNavigationMenuItem.trigger(
+            label: 'المنتجات',
+            content: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                DsNavigationMenuLink(child: DsText('العنصر 1', DsType.small)),
+                DsNavigationMenuLink(child: DsText('العنصر 2', DsType.small)),
+              ],
+            ),
+          ),
+          DsNavigationMenuItem.link(label: 'اتصل بنا'),
+        ],
+      ),
+    );
+  }
+}
+
 class _MenubarSpecimen extends StatelessWidget {
+  /// Mounted exactly once. See [_NavigationMenuSpecimen] for why the baked-in
+  /// key below is safe only while that remains true, and what to do instead
+  /// if a second mount is ever added.
   const _MenubarSpecimen();
 
   @override
@@ -1011,13 +1373,139 @@ class _MenubarSpecimen extends StatelessWidget {
   }
 }
 
+class _MenubarCheckbox extends StatelessWidget {
+  const _MenubarCheckbox();
+
+  @override
+  Widget build(BuildContext context) {
+    return DsMenubar(
+      menus: <DsMenubarMenu>[
+        DsMenubarMenu(
+          label: 'View',
+          children: <DsMenuChild>[
+            DsMenuCheckboxItem(
+              label: 'Always Show Bookmarks Bar',
+              checked: true,
+            ),
+            DsMenuCheckboxItem(label: 'Always Show Full URLs', checked: false),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _MenubarRadio extends StatelessWidget {
+  const _MenubarRadio();
+
+  @override
+  Widget build(BuildContext context) {
+    return DsMenubar(
+      menus: <DsMenubarMenu>[
+        DsMenubarMenu(
+          label: 'Profiles',
+          children: <DsMenuChild>[
+            DsMenuRadioGroup(
+              value: 'benoit',
+              children: <DsMenuRadioItem>[
+                DsMenuRadioItem(value: 'andy', label: 'Andy'),
+                DsMenuRadioItem(value: 'benoit', label: 'Benoit'),
+                DsMenuRadioItem(value: 'luis', label: 'Luis'),
+              ],
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _MenubarSubmenu extends StatelessWidget {
+  const _MenubarSubmenu();
+
+  @override
+  Widget build(BuildContext context) {
+    return DsMenubar(
+      menus: <DsMenubarMenu>[
+        DsMenubarMenu(
+          label: 'File',
+          children: <DsMenuChild>[
+            DsMenuItem(label: 'New Tab'),
+            DsMenuSub(
+              label: 'Share',
+              children: <DsMenuChild>[
+                DsMenuItem(label: 'Email link'),
+                DsMenuItem(label: 'Messages'),
+              ],
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _MenubarIcons extends StatelessWidget {
+  const _MenubarIcons();
+
+  @override
+  Widget build(BuildContext context) {
+    return DsMenubar(
+      menus: <DsMenubarMenu>[
+        DsMenubarMenu(
+          label: 'File',
+          children: <DsMenuChild>[
+            DsMenuItem(label: 'New File', icon: DsIconGlyph.plus),
+            DsMenuItem(label: 'Open', icon: DsIconGlyph.packageOpen),
+            DsMenuItem(label: 'Download', icon: DsIconGlyph.download),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _MenubarRtl extends StatelessWidget {
+  const _MenubarRtl();
+
+  @override
+  Widget build(BuildContext context) {
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: DsMenubar(
+        menus: <DsMenubarMenu>[
+          DsMenubarMenu(
+            label: 'ملف',
+            children: <DsMenuChild>[
+              DsMenuItem(label: 'جديد'),
+              DsMenuItem(label: 'فتح'),
+            ],
+          ),
+          DsMenubarMenu(
+            label: 'تحرير',
+            children: <DsMenuChild>[
+              DsMenuItem(label: 'تراجع'),
+              DsMenuItem(label: 'إعادة'),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _ContextMenuSpecimen extends StatelessWidget {
-  const _ContextMenuSpecimen();
+  const _ContextMenuSpecimen({this.specimenKey = 'context-menu-specimen'});
+
+  /// Distinguishes this mount from the other sections that reuse the same
+  /// specimen for illustration: a [ValueKey] must be unique across the
+  /// whole page, since it is rendered as one continuous scroll.
+  final String specimenKey;
 
   @override
   Widget build(BuildContext context) {
     return DsContextMenu(
-      key: const ValueKey<String>('context-menu-specimen'),
+      key: ValueKey<String>(specimenKey),
       children: <DsMenuChild>[
         DsMenuItem(label: 'Copy'),
         DsMenuItem(label: 'Paste'),
@@ -1042,13 +1530,178 @@ class _ContextMenuSpecimen extends StatelessWidget {
   }
 }
 
+Widget _contextMenuTarget(BuildContext context, String label) => Container(
+  width: 200,
+  height: 100,
+  decoration: BoxDecoration(
+    border: Border.all(color: DsTheme.of(context).border),
+    borderRadius: BorderRadius.circular(ds(2)),
+  ),
+  child: Center(
+    child: DsText(
+      label,
+      DsType.small,
+      color: DsTheme.of(context).mutedForeground,
+    ),
+  ),
+);
+
+class _ContextMenuBasic extends StatelessWidget {
+  const _ContextMenuBasic();
+
+  @override
+  Widget build(BuildContext context) {
+    return DsContextMenu(
+      children: <DsMenuChild>[
+        DsMenuItem(label: 'Copy'),
+        DsMenuItem(label: 'Paste'),
+      ],
+      child: _contextMenuTarget(context, 'Right-click here'),
+    );
+  }
+}
+
+class _ContextMenuSubmenu extends StatelessWidget {
+  const _ContextMenuSubmenu();
+
+  @override
+  Widget build(BuildContext context) {
+    return DsContextMenu(
+      children: <DsMenuChild>[
+        DsMenuItem(label: 'Back'),
+        DsMenuSub(
+          label: 'More Tools',
+          children: <DsMenuChild>[
+            DsMenuItem(label: 'Save Page As...'),
+            DsMenuItem(label: 'Create Shortcut...'),
+          ],
+        ),
+      ],
+      child: _contextMenuTarget(context, 'Right-click here'),
+    );
+  }
+}
+
+class _ContextMenuShortcuts extends StatelessWidget {
+  const _ContextMenuShortcuts();
+
+  @override
+  Widget build(BuildContext context) {
+    return DsContextMenu(
+      children: <DsMenuChild>[
+        DsMenuItem(label: 'Back', shortcut: '⌘['),
+        DsMenuItem(label: 'Forward', shortcut: '⌘]'),
+        DsMenuItem(label: 'Reload', shortcut: '⌘R'),
+      ],
+      child: _contextMenuTarget(context, 'Right-click here'),
+    );
+  }
+}
+
+class _ContextMenuGroups extends StatelessWidget {
+  const _ContextMenuGroups();
+
+  @override
+  Widget build(BuildContext context) {
+    return DsContextMenu(
+      children: <DsMenuChild>[
+        DsMenuGroup(
+          children: <DsMenuChild>[
+            DsMenuItem(label: 'Copy'),
+            DsMenuItem(label: 'Paste'),
+          ],
+        ),
+        DsMenuSeparator(),
+        DsMenuGroup(children: <DsMenuChild>[DsMenuItem(label: 'Select All')]),
+      ],
+      child: _contextMenuTarget(context, 'Right-click here'),
+    );
+  }
+}
+
+class _ContextMenuIcons extends StatelessWidget {
+  const _ContextMenuIcons();
+
+  @override
+  Widget build(BuildContext context) {
+    return DsContextMenu(
+      children: <DsMenuChild>[
+        DsMenuItem(label: 'Copy', icon: DsIconGlyph.copy),
+        DsMenuItem(label: 'Share', icon: DsIconGlyph.share2),
+        DsMenuItem(label: 'Download', icon: DsIconGlyph.download),
+      ],
+      child: _contextMenuTarget(context, 'Right-click here'),
+    );
+  }
+}
+
+class _ContextMenuCheckboxes extends StatelessWidget {
+  const _ContextMenuCheckboxes();
+
+  @override
+  Widget build(BuildContext context) {
+    return DsContextMenu(
+      children: <DsMenuChild>[
+        DsMenuCheckboxItem(label: 'Show Bookmarks', checked: true),
+        DsMenuCheckboxItem(label: 'Show Full URLs', checked: false),
+      ],
+      child: _contextMenuTarget(context, 'Right-click here'),
+    );
+  }
+}
+
+class _ContextMenuRadio extends StatelessWidget {
+  const _ContextMenuRadio();
+
+  @override
+  Widget build(BuildContext context) {
+    return DsContextMenu(
+      children: <DsMenuChild>[
+        DsMenuRadioGroup(
+          value: 'medium',
+          children: <DsMenuRadioItem>[
+            DsMenuRadioItem(value: 'small', label: 'Small'),
+            DsMenuRadioItem(value: 'medium', label: 'Medium'),
+            DsMenuRadioItem(value: 'large', label: 'Large'),
+          ],
+        ),
+      ],
+      child: _contextMenuTarget(context, 'Right-click here'),
+    );
+  }
+}
+
+class _ContextMenuRtl extends StatelessWidget {
+  const _ContextMenuRtl();
+
+  @override
+  Widget build(BuildContext context) {
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: DsContextMenu(
+        children: <DsMenuChild>[
+          DsMenuItem(label: 'نسخ'),
+          DsMenuItem(label: 'لصق'),
+          DsMenuItem(label: 'حذف', variant: DsMenuItemVariant.destructive),
+        ],
+        child: _contextMenuTarget(context, 'انقر بزر الفأرة الأيمن هنا'),
+      ),
+    );
+  }
+}
+
 class _HoverCardSpecimen extends StatelessWidget {
-  const _HoverCardSpecimen();
+  const _HoverCardSpecimen({this.specimenKey = 'hover-card-specimen'});
+
+  /// Distinguishes this mount from the other sections that reuse the same
+  /// specimen for illustration: a [ValueKey] must be unique across the
+  /// whole page, since it is rendered as one continuous scroll.
+  final String specimenKey;
 
   @override
   Widget build(BuildContext context) {
     return DsHoverCard(
-      key: const ValueKey<String>('hover-card-specimen'),
+      key: ValueKey<String>(specimenKey),
       trigger: DsText(
         'Hover here to see a preview',
         DsType.small,
@@ -1061,12 +1714,43 @@ class _HoverCardSpecimen extends StatelessWidget {
           DsText('Preview Title', DsType.label),
           SizedBox(height: ds(1)),
           DsText(
-            'This is a hover card — it opens on pointer entry and closes when '
+            'This is a hover card: it opens on pointer entry and closes when '
             'the pointer leaves. Not available on touch.',
             DsType.small,
             color: DsTheme.of(context).mutedForeground,
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _HoverCardRtl extends StatelessWidget {
+  const _HoverCardRtl();
+
+  @override
+  Widget build(BuildContext context) {
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: DsHoverCard(
+        trigger: DsText(
+          'مرر فوق هذا النص للمعاينة',
+          DsType.small,
+          color: DsTheme.of(context).actionInk,
+        ),
+        content: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            DsText('عنوان المعاينة', DsType.label),
+            SizedBox(height: ds(1)),
+            DsText(
+              'هذه بطاقة معاينة تظهر عند دخول المؤشر وتختفي عند خروجه.',
+              DsType.small,
+              color: DsTheme.of(context).mutedForeground,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -1094,6 +1778,76 @@ return DsNavigationMenu(
   items: items,
 );''';
 
+const String _navMenuCompositionCode = '''DsNavigationMenu(
+  items: <DsNavigationMenuItem>[
+    DsNavigationMenuItem.trigger(       // opens a shared or per-item panel
+      label: '...',
+      content: Column(
+        children: <Widget>[
+          DsNavigationMenuLink(child: ...),  // one row per destination
+        ],
+      ),
+    ),
+    DsNavigationMenuItem.link(label: '...'), // a plain destination, no panel
+  ],
+  indicator: false,  // when true, mounts a DsNavigationMenuIndicator
+)''';
+
+const String _menubarCompositionCode = '''DsMenubar(
+  menus: <DsMenubarMenu>[
+    DsMenubarMenu(
+      label: '...',          // the trigger text
+      children: <DsMenuChild>[
+        DsMenuItem(...),          // a plain row
+        DsMenuCheckboxItem(...),  // a toggleable row
+        DsMenuRadioGroup(children: <DsMenuRadioItem>[...]),
+        DsMenuSub(children: <DsMenuChild>[...]), // one nested level
+        DsMenuLabel(...),
+        DsMenuSeparator(),
+        DsMenuGroup(children: <DsMenuChild>[...]),
+      ],
+    ),
+  ],
+)''';
+
+const String _contextMenuCompositionCode = '''DsContextMenu(
+  child: ...,             // right-click this to open the menu at the pointer
+  children: <DsMenuChild>[
+    DsMenuItem(...),
+    DsMenuCheckboxItem(...),
+    DsMenuRadioGroup(children: <DsMenuRadioItem>[...]),
+    DsMenuSub(children: <DsMenuChild>[...]),
+    DsMenuGroup(children: <DsMenuChild>[...]),
+    DsMenuSeparator(),
+  ],
+)''';
+
+const String _hoverCardCompositionCode = '''DsHoverCard(
+  trigger: ...,                        // pointer entry opens the card
+  content: ...,                        // laid out inside DsHoverCardContent
+)''';
+
+const String _navMenuRtlCode = '''Directionality(
+  textDirection: TextDirection.rtl,
+  child: DsNavigationMenu(
+    viewport: true,
+    items: <DsNavigationMenuItem>[
+      DsNavigationMenuItem.trigger(
+        label: 'المنتجات',
+        content: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            DsNavigationMenuLink(child: const DsText('العنصر 1', DsType.small)),
+            DsNavigationMenuLink(child: const DsText('العنصر 2', DsType.small)),
+          ],
+        ),
+      ),
+      DsNavigationMenuItem.link(label: 'اتصل بنا'),
+    ],
+  ),
+)''';
+
 const String _menubarCode = '''return DsMenubar(
   menus: <DsMenubarMenu>[
     DsMenubarMenu(
@@ -1115,6 +1869,95 @@ const String _menubarCode = '''return DsMenubar(
   ],
 );''';
 
+const String _menubarCheckboxCode = '''return DsMenubar(
+  menus: <DsMenubarMenu>[
+    DsMenubarMenu(
+      label: 'View',
+      children: <DsMenuChild>[
+        DsMenuCheckboxItem(
+          label: 'Always Show Bookmarks Bar',
+          checked: true,
+        ),
+        DsMenuCheckboxItem(
+          label: 'Always Show Full URLs',
+          checked: false,
+        ),
+      ],
+    ),
+  ],
+);''';
+
+const String _menubarRadioCode = '''return DsMenubar(
+  menus: <DsMenubarMenu>[
+    DsMenubarMenu(
+      label: 'Profiles',
+      children: <DsMenuChild>[
+        DsMenuRadioGroup(
+          value: 'benoit',
+          children: <DsMenuRadioItem>[
+            DsMenuRadioItem(value: 'andy', label: 'Andy'),
+            DsMenuRadioItem(value: 'benoit', label: 'Benoit'),
+            DsMenuRadioItem(value: 'luis', label: 'Luis'),
+          ],
+        ),
+      ],
+    ),
+  ],
+);''';
+
+const String _menubarSubmenuCode = '''return DsMenubar(
+  menus: <DsMenubarMenu>[
+    DsMenubarMenu(
+      label: 'File',
+      children: <DsMenuChild>[
+        DsMenuItem(label: 'New Tab'),
+        DsMenuSub(
+          label: 'Share',
+          children: <DsMenuChild>[
+            DsMenuItem(label: 'Email link'),
+            DsMenuItem(label: 'Messages'),
+          ],
+        ),
+      ],
+    ),
+  ],
+);''';
+
+const String _menubarIconsCode = '''return DsMenubar(
+  menus: <DsMenubarMenu>[
+    DsMenubarMenu(
+      label: 'File',
+      children: <DsMenuChild>[
+        DsMenuItem(label: 'New File', icon: DsIconGlyph.plus),
+        DsMenuItem(label: 'Open', icon: DsIconGlyph.packageOpen),
+        DsMenuItem(label: 'Download', icon: DsIconGlyph.download),
+      ],
+    ),
+  ],
+);''';
+
+const String _menubarRtlCode = '''Directionality(
+  textDirection: TextDirection.rtl,
+  child: DsMenubar(
+    menus: <DsMenubarMenu>[
+      DsMenubarMenu(
+        label: 'ملف',
+        children: <DsMenuChild>[
+          DsMenuItem(label: 'جديد'),
+          DsMenuItem(label: 'فتح'),
+        ],
+      ),
+      DsMenubarMenu(
+        label: 'تحرير',
+        children: <DsMenuChild>[
+          DsMenuItem(label: 'تراجع'),
+          DsMenuItem(label: 'إعادة'),
+        ],
+      ),
+    ],
+  ),
+)''';
+
 const String _contextMenuCode = '''return DsContextMenu(
   child: const Text('Right-click here'),
   children: <DsMenuChild>[
@@ -1128,6 +1971,96 @@ const String _contextMenuCode = '''return DsContextMenu(
   ],
 );''';
 
+const String _contextMenuBasicCode = '''return DsContextMenu(
+  child: const Text('Right-click here'),
+  children: <DsMenuChild>[
+    DsMenuItem(label: 'Copy'),
+    DsMenuItem(label: 'Paste'),
+  ],
+);''';
+
+const String _contextMenuSubmenuCode = '''return DsContextMenu(
+  child: const Text('Right-click here'),
+  children: <DsMenuChild>[
+    DsMenuItem(label: 'Back'),
+    DsMenuSub(
+      label: 'More Tools',
+      children: <DsMenuChild>[
+        DsMenuItem(label: 'Save Page As...'),
+        DsMenuItem(label: 'Create Shortcut...'),
+      ],
+    ),
+  ],
+);''';
+
+const String _contextMenuShortcutsCode = '''return DsContextMenu(
+  child: const Text('Right-click here'),
+  children: <DsMenuChild>[
+    DsMenuItem(label: 'Back', shortcut: '⌘['),
+    DsMenuItem(label: 'Forward', shortcut: '⌘]'),
+    DsMenuItem(label: 'Reload', shortcut: '⌘R'),
+  ],
+);''';
+
+const String _contextMenuGroupsCode = '''return DsContextMenu(
+  child: const Text('Right-click here'),
+  children: <DsMenuChild>[
+    DsMenuGroup(
+      children: <DsMenuChild>[
+        DsMenuItem(label: 'Copy'),
+        DsMenuItem(label: 'Paste'),
+      ],
+    ),
+    DsMenuSeparator(),
+    DsMenuGroup(
+      children: <DsMenuChild>[DsMenuItem(label: 'Select All')],
+    ),
+  ],
+);''';
+
+const String _contextMenuIconsCode = '''return DsContextMenu(
+  child: const Text('Right-click here'),
+  children: <DsMenuChild>[
+    DsMenuItem(label: 'Copy', icon: DsIconGlyph.copy),
+    DsMenuItem(label: 'Share', icon: DsIconGlyph.share2),
+    DsMenuItem(label: 'Download', icon: DsIconGlyph.download),
+  ],
+);''';
+
+const String _contextMenuCheckboxesCode = '''return DsContextMenu(
+  child: const Text('Right-click here'),
+  children: <DsMenuChild>[
+    DsMenuCheckboxItem(label: 'Show Bookmarks', checked: true),
+    DsMenuCheckboxItem(label: 'Show Full URLs', checked: false),
+  ],
+);''';
+
+const String _contextMenuRadioCode = '''return DsContextMenu(
+  child: const Text('Right-click here'),
+  children: <DsMenuChild>[
+    DsMenuRadioGroup(
+      value: 'medium',
+      children: <DsMenuRadioItem>[
+        DsMenuRadioItem(value: 'small', label: 'Small'),
+        DsMenuRadioItem(value: 'medium', label: 'Medium'),
+        DsMenuRadioItem(value: 'large', label: 'Large'),
+      ],
+    ),
+  ],
+);''';
+
+const String _contextMenuRtlCode = '''Directionality(
+  textDirection: TextDirection.rtl,
+  child: DsContextMenu(
+    child: const Text('انقر بزر الفأرة الأيمن هنا'),
+    children: <DsMenuChild>[
+      DsMenuItem(label: 'نسخ'),
+      DsMenuItem(label: 'لصق'),
+      DsMenuItem(label: 'حذف', variant: DsMenuItemVariant.destructive),
+    ],
+  ),
+)''';
+
 const String _hoverCardCode = '''return DsHoverCard(
   trigger: const DsText('Hover to preview'),
   content: Column(
@@ -1137,9 +2070,28 @@ const String _hoverCardCode = '''return DsHoverCard(
       DsText('Card Title', DsType.label),
       SizedBox(height: ds(1)),
       DsText(
-        'A preview that opens on hover. Pointer-only — not on touch.',
+        'A preview that opens on hover. Pointer-only: not on touch.',
         DsType.small,
       ),
     ],
   ),
 );''';
+
+const String _hoverCardRtlCode = '''Directionality(
+  textDirection: TextDirection.rtl,
+  child: DsHoverCard(
+    trigger: const DsText('مرر فوق هذا النص للمعاينة'),
+    content: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        DsText('عنوان المعاينة', DsType.label),
+        SizedBox(height: ds(1)),
+        DsText(
+          'هذه بطاقة معاينة تظهر عند دخول المؤشر وتختفي عند خروجه.',
+          DsType.small,
+        ),
+      ],
+    ),
+  ),
+)''';

@@ -4,13 +4,33 @@
 /// Command is inline with nothing to anchor to; Combobox is a form control
 /// anchored to a DsPopover. The distinction is the reason this page exists.
 ///
+/// Section shape mirrors both shadcn counterparts, section for section:
+/// `https://ui.shadcn.com/docs/components/base/command` and
+/// `https://ui.shadcn.com/docs/components/base/combobox`. The live demo sits
+/// unheaded above Installation, exactly as both of theirs do; Installation,
+/// Usage, Composition and Filtering are shared, cross-cutting sections that
+/// name both components; Shortcuts, Groups, Scrollable and In a panel are
+/// Command's own; Invalid and Disabled are Combobox's own. Command's shadcn
+/// `About`, `Basic` (the `CommandDialog` demo) and `RTL` have no counterpart
+/// here: the port credits `cmdk` in Installation rather than a separate
+/// heading, `inDialog` is documented but the dialog wrapper itself is
+/// recorded, not built, and no `Directionality`-aware behaviour exists to
+/// demonstrate. Combobox's shadcn `Multiple Selection`, `Clear Button`,
+/// `Groups`, `Custom Items`, `Auto Highlight`, `Popup`, `Input Group` and
+/// `RTL` have no counterpart either: `DsCombobox` is a flat single-select
+/// list with no multi-select, no clear button, no grouped items, no custom
+/// item renderer, no fixed highlight-on-open, no button-trigger variant and
+/// no exposed input-group customisation. API Reference is the last mirrored
+/// section; States, Accessibility, Responsive, Dependencies, Theming and
+/// Source are this package's own six, unchanged in content.
+///
 /// `DsCombobox` mounts its list through a `DsPopover` (an `OverlayPortal`), so
-/// the live combobox specimen needs a real `Overlay` — the test harness wraps
+/// the live combobox specimen needs a real `Overlay`: the test harness wraps
 /// the page in a `MaterialApp`. `DsCommand` has nothing to anchor to and mounts
 /// inline, but the shared harness still supplies MaterialApp for the combobox.
 ///
 /// Neither component has a registry manifest yet, and neither `elattar add`
-/// command works — the Installation section says so without printing a command
+/// command works: the Installation section says so without printing a command
 /// line that would fail if a reader copied it.
 library;
 
@@ -42,18 +62,21 @@ class CommandDocPage extends StatelessWidget {
     ],
     sidebar: _sidebar,
     toc: const <DocsTocEntry>[
-      DocsTocEntry(title: 'Overview', anchor: 'overview'),
-      DocsTocEntry(title: 'Preview', anchor: 'preview'),
-      DocsTocEntry(title: 'Install', anchor: 'install'),
+      DocsTocEntry(title: 'Installation', anchor: 'install'),
       DocsTocEntry(title: 'Usage', anchor: 'usage'),
+      DocsTocEntry(title: 'Composition', anchor: 'composition'),
       DocsTocEntry(title: 'Filtering', anchor: 'filtering'),
-      DocsTocEntry(title: 'API', anchor: 'api'),
-      DocsTocEntry(title: 'Variants', anchor: 'variants'),
+      DocsTocEntry(title: 'Shortcuts', anchor: 'shortcuts'),
+      DocsTocEntry(title: 'Groups', anchor: 'groups'),
+      DocsTocEntry(title: 'Scrollable', anchor: 'scrollable'),
+      DocsTocEntry(title: 'In a panel', anchor: 'in-a-panel'),
+      DocsTocEntry(title: 'Invalid', anchor: 'invalid'),
+      DocsTocEntry(title: 'Disabled', anchor: 'disabled'),
+      DocsTocEntry(title: 'API Reference', anchor: 'api'),
       DocsTocEntry(title: 'States', anchor: 'states'),
       DocsTocEntry(title: 'Accessibility', anchor: 'accessibility'),
       DocsTocEntry(title: 'Responsive', anchor: 'responsive'),
       DocsTocEntry(title: 'Dependencies', anchor: 'dependencies'),
-      DocsTocEntry(title: 'Composition', anchor: 'composition'),
       DocsTocEntry(title: 'Theming', anchor: 'theming'),
       DocsTocEntry(title: 'Source', anchor: 'source'),
     ],
@@ -88,68 +111,38 @@ class _CommandArticle extends StatelessWidget {
     key: const ValueKey<String>('command-doc-article'),
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
-      _overview(),
-      _preview(),
+      _hero(),
       _install(),
       _usage(),
+      _composition(),
       _filtering(),
+      _shortcuts(),
+      _groups(),
+      _scrollable(),
+      _inAPanel(),
+      _invalid(),
+      _disabled(),
       _api(),
-      _variants(),
       _states(),
       _accessibility(),
       _responsive(),
       _dependencies(),
-      _composition(),
       _theming(),
       _source(),
     ],
   );
 
-  Widget _overview() => DsSection(
-    id: 'overview',
-    title: 'Overview',
-    child: ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: DsWidths.prose),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          DsText(
-            'Two paired "filter as you type" surfaces. DsCommand is an '
-            'inline, always-open action launcher with nothing to anchor to: '
-            'no trigger, no popover, no positioner. DsCombobox is the '
-            'opposite shape — a form control that anchors its popup to its '
-            'own input through DsPopover, and holds a controlled value that '
-            'survives the popup closing.',
-            DsType.body,
-          ),
-          SizedBox(height: ds(4)),
-          DsText(
-            'Both narrow a list as you type, and that is the only thing they '
-            'share. They do not even filter the same way: Command runs a '
-            'ported fuzzy scorer that re-ranks rows on every keystroke, while '
-            'Combobox runs a plain folded substring match that preserves the '
-            'source order. Filtering, below, shows both on a worked example.',
-            DsType.body,
-          ),
-          SizedBox(height: ds(4)),
-          DsText(
-            'Status: stable primitives, not yet registered in the CLI. '
-            'Platforms: Android, iOS, Web, macOS, Windows, Linux.',
-            DsType.small,
-          ),
-        ],
-      ),
-    ),
-  );
-
-  Widget _preview() => DsSection(
-    id: 'preview',
-    title: 'Preview',
-    description:
-        'Command inline with nothing around it, and Combobox anchored to its '
-        'own input. Both are live: type in either one.',
+  /// The live-demo slot both shadcn pages render before their first heading.
+  /// `DsSection` always carries a heading, so this is a plain widget instead:
+  /// no `DsSection`, no title text, no TOC entry, exactly as unheaded as the
+  /// reference.
+  Widget _hero() => Padding(
+    padding: EdgeInsets.only(bottom: ds(20)),
     child: DocsCodeExample(
       title: 'Command and Combobox specimens',
+      description:
+          'Command inline with nothing around it, and Combobox anchored to '
+          'its own input. Both are live: type in either one.',
       manualFiles: const <DocsCodeFile>[
         DocsCodeFile(
           path: 'lib/components/ui/command.dart',
@@ -163,11 +156,11 @@ class _CommandArticle extends StatelessWidget {
       preview: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          DsText('Command — inline, always visible', DsType.label),
+          DsText('Command: inline, always visible', DsType.label),
           SizedBox(height: ds(2)),
           const _CommandSpecimen(),
           SizedBox(height: ds(6)),
-          DsText('Combobox — anchored to its own input', DsType.label),
+          DsText('Combobox: anchored to its own input', DsType.label),
           SizedBox(height: ds(2)),
           const _ComboboxSpecimen(),
         ],
@@ -179,9 +172,11 @@ class _CommandArticle extends StatelessWidget {
     id: 'install',
     title: 'Installation',
     description:
-        'Neither component has a registry manifest, so the CLI cannot install '
-        'either one today. Both are exported from the package barrel and '
-        'usable through the published package right now.',
+        'Command ports cmdk\'s own filter and re-sort scorer; Combobox has '
+        'no such upstream library. Neither component has a registry '
+        'manifest, so the CLI cannot install either one today. Both are '
+        'exported from the package barrel and usable through the published '
+        'package right now.',
     child: DocsInstallFacts(
       title: 'Installation facts',
       facts: <DocsInstallFact>[
@@ -213,7 +208,7 @@ class _CommandArticle extends StatelessWidget {
               'select',
           description:
               'What the two sources really import from lib/src/components/. '
-              'Not a validated registryDependencies list — there is no '
+              'Not a validated registryDependencies list: there is no '
               'manifest for it to come from.',
         ),
         const DocsInstallFact(
@@ -246,20 +241,48 @@ class _CommandArticle extends StatelessWidget {
   Widget _usage() => DsSection(
     id: 'usage',
     title: 'Usage',
-    description: 'Both shapes as they appear in the preview.',
+    description: 'Both shapes as they appear in the demo above.',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         DsPanel(
           label: 'DART',
-          note: 'COMMAND — inline, fires callbacks',
+          note: 'COMMAND: inline, fires callbacks',
           child: DocsSelectableCodeBlock(code: _usageCommandCode),
         ),
         SizedBox(height: ds(5)),
         DsPanel(
           label: 'DART',
-          note: 'COMBOBOX — anchored, holds a value',
+          note: 'COMBOBOX: anchored, holds a value',
           child: DocsSelectableCodeBlock(code: _usageComboboxCode),
+        ),
+      ],
+    ),
+  );
+
+  Widget _composition() => DsSection(
+    id: 'composition',
+    title: 'Composition',
+    description:
+        'shadcn assembles Command from five caller-composed pieces (Command, '
+        'CommandInput, CommandList, CommandGroup, CommandItem) and Combobox '
+        'from four (Combobox.Root, Combobox.Input, Combobox.List, '
+        'Combobox.Item). Both ports are one widget instead, configured '
+        'through data: the shape below is that data hierarchy, not a widget '
+        'tree.',
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        DsPanel(
+          label: 'SHAPE',
+          note: 'COMMAND',
+          child: DocsSelectableCodeBlock(code: _compositionTreeCommandCode),
+        ),
+        SizedBox(height: ds(5)),
+        DsPanel(
+          label: 'SHAPE',
+          note: 'COMBOBOX',
+          child: DocsSelectableCodeBlock(code: _compositionTreeComboboxCode),
         ),
       ],
     ),
@@ -267,7 +290,7 @@ class _CommandArticle extends StatelessWidget {
 
   Widget _filtering() => DsSection(
     id: 'filtering',
-    title: 'Filtering — two different algorithms',
+    title: 'Filtering',
     description:
         'The single most common way to reach for the wrong one of these two '
         'is to assume they filter alike. They do not.',
@@ -275,7 +298,7 @@ class _CommandArticle extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         DsPanel(
-          label: 'Command — dsCommandScore, a ported fuzzy ranker',
+          label: 'Command: dsCommandScore, a ported fuzzy ranker',
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
@@ -283,7 +306,7 @@ class _CommandArticle extends StatelessWidget {
                 'dsCommandScore(string, abbreviation, [aliases]) is cmdk\'s '
                 'own scorer, ported whole. It returns a double: 0 hides the '
                 'row, and anything above it ranks the row. Letters need not '
-                'be adjacent, so "gts" still finds "Go to Stash" — but where '
+                'be adjacent, so "gts" still finds "Go to Stash": but where '
                 'a letter lands matters enormously, because a match at the '
                 'start of a word scores far higher than the same letter '
                 'inside one.',
@@ -297,17 +320,7 @@ class _CommandArticle extends StatelessWidget {
                 'the source order, because the "t" beginning the word "to" '
                 'scores 0.891 while the "t" buried inside "Wallet" scores '
                 '0.17. Rows re-sort inside their own group on every '
-                'keystroke.',
-                DsType.small,
-              ),
-              SizedBox(height: ds(3)),
-              DsText(
-                'Groups, however, do not re-sort — a faithfully reproduced '
-                'upstream bug rather than a port decision. cmdk\'s second '
-                'sort pass builds a selector from a React useId while the '
-                'element carries its heading instead, so the selector matches '
-                'nothing and the pass is a silent no-op. DsCommand.sortsGroups '
-                'is a static false that records it.',
+                'keystroke: see Groups below for what does not re-sort.',
                 DsType.small,
               ),
               SizedBox(height: ds(3)),
@@ -325,7 +338,7 @@ class _CommandArticle extends StatelessWidget {
         ),
         SizedBox(height: ds(5)),
         DsPanel(
-          label: 'Combobox — dsCollatorContains, a plain substring match',
+          label: 'Combobox: dsCollatorContains, a plain substring match',
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
@@ -339,7 +352,7 @@ class _CommandArticle extends StatelessWidget {
               ),
               SizedBox(height: ds(3)),
               DsText(
-                'It is a substring test, not a prefix test — typing "rift" '
+                'It is a substring test, not a prefix test: typing "rift" '
                 'finds Golden Rift even though the query starts in the middle '
                 'of the second word. Before comparing, both sides are folded '
                 'the way a base-sensitivity collator folds them: case is '
@@ -365,9 +378,118 @@ class _CommandArticle extends StatelessWidget {
     ),
   );
 
+  Widget _shortcuts() => DsSection(
+    id: 'shortcuts',
+    title: 'Shortcuts',
+    description:
+        'shadcn renders a CommandShortcut, a right-aligned key hint, beside '
+        'a row. DsCommandItem.shortcut is the same slot, and it plays no '
+        'part in filtering. meta (a price, a count) is a second, independent '
+        'trailing slot: a row can carry both at once.',
+    child: DsPanel(
+      label: 'DART',
+      note: 'SHORTCUT',
+      child: DocsSelectableCodeBlock(code: _shortcutsCode),
+    ),
+  );
+
+  Widget _groups() => DsSection(
+    id: 'groups',
+    title: 'Groups',
+    description:
+        'DsCommandGroup renders an optional heading above its rows, and '
+        'separatorBefore draws a rule above the whole group: both visible in '
+        'the demo above, where Actions carries a separator before it and '
+        'Packs does not.',
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        DsText(
+          'A group whose rows are all filtered away hides its heading with '
+          'them: type a query neither group\'s rows can match, and both '
+          'headings disappear along with every row.',
+          DsType.small,
+        ),
+        SizedBox(height: ds(3)),
+        DsText(
+          'Rows re-sort inside their own group on every keystroke, but the '
+          'groups themselves do not: a faithfully reproduced upstream bug '
+          'rather than a design choice. cmdk\'s second sort pass builds a '
+          'selector from a React useId while the element carries its '
+          'heading instead, so the selector matches nothing and the pass is '
+          'a silent no-op. DsCommand.sortsGroups is a static false that '
+          'records it.',
+          DsType.small,
+        ),
+      ],
+    ),
+  );
+
+  Widget _scrollable() => DsSection(
+    id: 'scrollable',
+    title: 'Scrollable',
+    description:
+        'Once the rows need more room than the palette allows, the list '
+        'caps its height and scrolls internally instead of growing the page '
+        'around it, the same shape shadcn\'s own Scrollable example '
+        'demonstrates. DsCommand.listMaxHeight is the cap; nothing above it '
+        'changes the palette\'s outer size.',
+    child: ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: DsWidths.prose),
+      child: DsText(
+        'The demo above stays short enough that this never triggers; a '
+        'caller feeding it twenty rows would see the same internal scroll, '
+        'not a taller palette.',
+        DsType.small,
+      ),
+    ),
+  );
+
+  Widget _inAPanel() => DsSection(
+    id: 'in-a-panel',
+    title: 'In a panel',
+    description:
+        'This site\'s own header search: Command mounted in a panel that '
+        'owns both opening and dismissal, because Command owns neither.',
+    child: DsPanel(
+      label: 'DART',
+      note: 'COMMAND IN A SEARCH PANEL',
+      child: DocsSelectableCodeBlock(code: _compositionCommandCode),
+    ),
+  );
+
+  Widget _invalid() => DsSection(
+    id: 'invalid',
+    title: 'Invalid',
+    description:
+        'The same control wearing the error ring, for a failed field '
+        'validation. The message itself belongs to the surrounding DsField, '
+        'the way DsInput and DsSelect already work.',
+    child: DsPanel(
+      label: 'DART',
+      note: 'COMBOBOX, INVALID',
+      child: DocsSelectableCodeBlock(code: _compositionComboboxCode),
+    ),
+  );
+
+  Widget _disabled() => DsSection(
+    id: 'disabled',
+    title: 'Disabled',
+    description:
+        'Non-interactive: the popup never opens. enabled: false and a null '
+        'onChanged both reach the same state; a null onChanged is the more '
+        'common real cause, because it usually falls out of a form that has '
+        'nothing to submit to yet.',
+    child: DsPanel(
+      label: 'DART',
+      note: 'COMBOBOX, DISABLED',
+      child: DocsSelectableCodeBlock(code: _disabledComboboxCode),
+    ),
+  );
+
   Widget _api() => DsSection(
     id: 'api',
-    title: 'API',
+    title: 'API Reference',
     description:
         'Every constructor parameter and top-level function both source '
         'files declare.',
@@ -445,7 +567,7 @@ class _CommandArticle extends StatelessWidget {
               name: 'onValueChanged',
               type: 'ValueChanged<String>?',
               description:
-                  'Called with the query on every keystroke — how a caller '
+                  'Called with the query on every keystroke: how a caller '
                   'drives its own async search.',
             ),
             DocsApiFact(
@@ -453,7 +575,9 @@ class _CommandArticle extends StatelessWidget {
               type: 'bool',
               description:
                   'Defaults to false. True adjusts the palette for the '
-                  'centred-dialog presentation cmdk also ships.',
+                  'centred-dialog presentation cmdk also ships. The dialog '
+                  'wrapper itself is recorded, not built: this only changes '
+                  'the palette\'s own fill and border.',
             ),
           ],
         ),
@@ -493,7 +617,7 @@ class _CommandArticle extends StatelessWidget {
               name: 'meta',
               type: 'String?',
               description:
-                  'Trailing metadata — a price, a count, a timestamp — set '
+                  'Trailing metadata: a price, a count, a timestamp: set '
                   'apart from the shortcut.',
             ),
             DocsApiFact(
@@ -512,7 +636,7 @@ class _CommandArticle extends StatelessWidget {
               name: 'keywords',
               type: 'List<String>',
               description:
-                  'Defaults to empty. Appended to the searchable text — see '
+                  'Defaults to empty. Appended to the searchable text: see '
                   'Filtering.',
             ),
             DocsApiFact(
@@ -527,7 +651,7 @@ class _CommandArticle extends StatelessWidget {
               type: 'VoidCallback?',
               description:
                   'Fired when the row is committed by Enter or by a tap. '
-                  'Command holds no value of its own — this callback is the '
+                  'Command holds no value of its own: this callback is the '
                   'entire result.',
             ),
           ],
@@ -594,7 +718,7 @@ class _CommandArticle extends StatelessWidget {
               type: 'T?',
               description:
                   'Required. The controlled selection, which persists after '
-                  'the popup closes — the thing Command has no equivalent of.',
+                  'the popup closes: the thing Command has no equivalent of.',
             ),
             DocsApiFact(
               name: 'onChanged',
@@ -673,62 +797,9 @@ class _CommandArticle extends StatelessWidget {
     ),
   );
 
-  Widget _variants() => DsSection(
-    id: 'variants',
-    title: 'Variants',
-    description:
-        'Neither component has a variant enum. What varies is structural, and '
-        'these are the real forks.',
-    child: const DocsApiTable(
-      title: 'The behavioural forks',
-      facts: <DocsApiFact>[
-        DocsApiFact(
-          name: 'Command, inline',
-          type: 'default',
-          description:
-              'Mounted directly in a panel. Nothing anchors it and nothing '
-              'dismisses it — the container owns both.',
-        ),
-        DocsApiFact(
-          name: 'Command, inDialog',
-          type: 'inDialog: true',
-          description:
-              'The centred-dialog presentation, for a palette summoned by a '
-              'global shortcut rather than living on a page.',
-        ),
-        DocsApiFact(
-          name: 'Command, unfiltered',
-          type: 'shouldFilter: false',
-          description:
-              'Rows are rendered exactly as passed; the caller filters, '
-              'usually against a server, and feeds new groups in.',
-        ),
-        DocsApiFact(
-          name: 'Combobox, enabled',
-          type: 'default',
-          description:
-              'A text input that opens its popup on focus and commits on '
-              'pick.',
-        ),
-        DocsApiFact(
-          name: 'Combobox, invalid',
-          type: 'invalid: true',
-          description:
-              'The same control wearing the error ring, for a failed field '
-              'validation.',
-        ),
-        DocsApiFact(
-          name: 'Combobox, disabled',
-          type: 'enabled: false or a null onChanged',
-          description: 'Non-interactive; the popup never opens.',
-        ),
-      ],
-    ),
-  );
-
   Widget _states() => DsSection(
     id: 'states',
-    title: 'States and feedback',
+    title: 'States',
     child: const DocsStateMatrix(
       facts: <DocsStateFact>[
         DocsStateFact(
@@ -771,7 +842,7 @@ class _CommandArticle extends StatelessWidget {
           state: 'Disabled',
           treatment:
               'Combobox: enabled: false, or a null onChanged. Command has no '
-              'disabled flag of its own — individual rows do (enabled), and '
+              'disabled flag of its own: individual rows do (enabled), and '
               'the container disables the whole palette.',
           userSignal: 'No highlight, no commit.',
         ),
@@ -796,7 +867,7 @@ class _CommandArticle extends StatelessWidget {
 
   Widget _accessibility() => DsSection(
     id: 'accessibility',
-    title: 'Accessibility and keyboard behavior',
+    title: 'Accessibility',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
@@ -827,19 +898,19 @@ class _CommandArticle extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               DsText(
-                'Known gap — no live region. Neither component announces how '
+                'Known gap: no live region. Neither component announces how '
                 'many rows survived the filter. A sighted reader sees the '
                 'list collapse from twenty rows to two; a screen-reader user '
                 'is told nothing at all, and finds out only by arrowing '
                 'through what is left. The reference has the same hole, and '
                 'closing it means adding a live region that speaks the '
-                'result count on each keystroke — a real change to both '
+                'result count on each keystroke: a real change to both '
                 'components, not a prop.',
                 DsType.small,
               ),
               SizedBox(height: ds(3)),
               DsText(
-                'Known gap — the combobox highlight is not announced. The '
+                'Known gap: the combobox highlight is not announced. The '
                 'highlighted row is painted, but no relationship is wired '
                 'from the input to the row that Enter would commit, so '
                 'assistive tech does not read the active option as the '
@@ -849,7 +920,7 @@ class _CommandArticle extends StatelessWidget {
               ),
               SizedBox(height: ds(3)),
               DsText(
-                'Known gap — no role wiring between the field and the popup. '
+                'Known gap: no role wiring between the field and the popup. '
                 'Neither surface declares itself as a listbox with an owned '
                 'set of options, so the popup reads as ordinary content that '
                 'happens to have appeared.',
@@ -864,13 +935,13 @@ class _CommandArticle extends StatelessWidget {
 
   Widget _responsive() => DsSection(
     id: 'responsive',
-    title: 'Responsive and platform behavior',
+    title: 'Responsive',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         DsText(
           'Command fills the width it is given and caps its list height, '
-          'scrolling inside it — so a phone viewport shows the same palette '
+          'scrolling inside it: so a phone viewport shows the same palette '
           'as a desktop one, just shorter.',
           DsType.small,
         ),
@@ -888,7 +959,7 @@ class _CommandArticle extends StatelessWidget {
 
   Widget _dependencies() => DsSection(
     id: 'dependencies',
-    title: 'Dependencies, files, and assets',
+    title: 'Dependencies',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -900,7 +971,7 @@ class _CommandArticle extends StatelessWidget {
         SizedBox(height: ds(3)),
         DsText(
           'Command imports icon and input from the component layer. Combobox '
-          'imports input_group, field, popover, and select — the last of '
+          'imports input_group, field, popover, and select: the last of '
           'those because DsComboboxItem is a typedef for DsSelectOption and '
           'the two share their row paint.',
           DsType.small,
@@ -915,33 +986,9 @@ class _CommandArticle extends StatelessWidget {
     ),
   );
 
-  Widget _composition() => DsSection(
-    id: 'composition',
-    title: 'Composition examples',
-    description:
-        'Command inside a panel — the shape this site\'s own header search '
-        'uses — and Combobox inside a field.',
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        DsPanel(
-          label: 'DART',
-          note: 'COMMAND IN A SEARCH PANEL',
-          child: DocsSelectableCodeBlock(code: _compositionCommandCode),
-        ),
-        SizedBox(height: ds(5)),
-        DsPanel(
-          label: 'DART',
-          note: 'COMBOBOX IN A FORM FIELD',
-          child: DocsSelectableCodeBlock(code: _compositionComboboxCode),
-        ),
-      ],
-    ),
-  );
-
   Widget _theming() => DsSection(
     id: 'theming',
-    title: 'Theming notes',
+    title: 'Theming',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -956,7 +1003,7 @@ class _CommandArticle extends StatelessWidget {
         DsText(
           'Combobox\'s popup is a DsPopoverSurface, so its radius, shadow, '
           'and ring are the shared overlay recipe rather than anything this '
-          'component owns — a change there moves every popup in the system '
+          'component owns: a change there moves every popup in the system '
           'together.',
           DsType.small,
         ),
@@ -966,17 +1013,17 @@ class _CommandArticle extends StatelessWidget {
 
   Widget _source() => DsSection(
     id: 'source',
-    title: 'Source, tests, and docs',
+    title: 'Source',
     child: DocsInstallFacts(
       title: 'Reference',
       facts: <DocsInstallFact>[
         DocsInstallFact(
-          label: 'Source — Command',
+          label: 'Source, Command',
           value: commandDoc.sourcePath,
           description: 'DsCommand, its item and group types, dsCommandScore.',
         ),
         const DocsInstallFact(
-          label: 'Source — Combobox',
+          label: 'Source, Combobox',
           value: comboboxSourcePath,
           description: 'DsCombobox and dsCollatorContains.',
         ),
@@ -1048,6 +1095,30 @@ DsCombobox<String>(
 )
 ''';
 
+const String _compositionTreeCommandCode =
+    '''DsCommand                       // one widget, not five
+├─ groups: List<DsCommandGroup>
+│  └─ DsCommandGroup
+│     ├─ heading                    the group label
+│     └─ items: List<DsCommandItem>
+│        └─ DsCommandItem           one filterable, selectable row
+└─ (built for you) the search field, the empty state, the scrolling list''';
+
+const String _compositionTreeComboboxCode =
+    '''DsCombobox<T>                   // one widget, not four
+├─ items: List<DsComboboxItem<T>>
+│  └─ DsComboboxItem<T>             one option (a DsSelectOption<T>)
+└─ (built for you) the input, the DsPopover, and the filtered list''';
+
+const String _shortcutsCode = '''
+DsCommandItem(
+  label: 'Open Wallet',
+  keywords: <String>['money'],
+  shortcut: 'Ctrl+W',
+  onSelect: openWallet,
+)
+''';
+
 const String _compositionCommandCode = '''
 // This site's own header search: Command mounted in a panel that owns both
 // opening and dismissal, because Command owns neither.
@@ -1075,6 +1146,15 @@ DsField(
     invalid: submitted && selectedSet == null,
     onChanged: (String next) => setState(() => selectedSet = next),
   ),
+)
+''';
+
+const String _disabledComboboxCode = '''
+DsCombobox<String>(
+  items: cardSets,
+  value: selectedSet,
+  onChanged: null,
+  placeholder: 'Search sets...',
 )
 ''';
 

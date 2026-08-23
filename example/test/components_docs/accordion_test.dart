@@ -2,10 +2,11 @@ import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/accordion/meta.dart';
 import 'package:example/components_docs/accordion/page.dart';
 import 'package:example/docs/docs_code.dart';
+import 'package:example/kit.dart' show DsSection;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// Real test-view sizing only — [tester.view.physicalSize] plus
+/// Real test-view sizing only: [tester.view.physicalSize] plus
 /// [WidgetTester.view]'s own reset, never a synthetic `MediaQuery` override.
 /// [controller] is a single live [DsThemeController] the caller can flip in
 /// place with [DsThemeController.setMode] instead of rebuilding a second tree
@@ -36,6 +37,43 @@ void main() {
   });
 
   group('AccordionDocPage', () {
+    testWidgets(
+      'sections render in the shadcn-mirrored order, section for section',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(1440, 900);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+
+        final DsThemeController controller = DsThemeController(
+          mode: DsThemeMode.dark,
+        );
+        await tester.pumpWidget(
+          _harness(controller: controller, child: const AccordionDocPage()),
+        );
+        await tester.pumpAndSettle();
+
+        final List<String> titles = tester
+            .widgetList<DsSection>(find.byType(DsSection))
+            .map((DsSection section) => section.title)
+            .toList();
+
+        expect(titles, <String>[
+          'Installation',
+          'Usage',
+          'Composition',
+          'Basic',
+          'Card',
+          'API Reference',
+          'States',
+          'Accessibility',
+          'Responsive',
+          'Dependencies',
+          'Theming',
+          'Source',
+        ]);
+      },
+    );
+
     testWidgets('renders the article at desktop width with every '
         'documented constructor parameter', (WidgetTester tester) async {
       tester.view.physicalSize = const Size(1440, 900);

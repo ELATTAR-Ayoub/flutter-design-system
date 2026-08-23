@@ -1,29 +1,46 @@
 /// Public component documentation for the tooltip component.
 ///
-/// `tooltip` is Wave 1 of the component-documentation plan, and — unlike
-/// most of its Wave 1 siblings — already carries a real
+/// `tooltip` is Wave 1 of the component-documentation plan, and: unlike
+/// most of its Wave 1 siblings: already carries a real
 /// `registry/components/tooltip.json` manifest, so the Installation section
 /// below renders the genuine `elattar add tooltip` command rather than a
 /// "not available yet" disclosure.
 ///
-/// The eighteen IA §9.1 sections map onto this page as: breadcrumb/family
-/// comes from the eyebrow and [DocsLayout.breadcrumbs]; title and short
-/// description come from [DocsLayout] itself; the expanded "when to use
-/// this instead of a neighbour" guidance is [tooltipExpandedDescription];
-/// status, preview, installation, usage, API, variants, states,
-/// accessibility, responsive behaviour, the install-facts disclosure, a
-/// composition example, theming notes, and source/tests each get their own
-/// [DsSection]; previous/next comes from [DocsLayout] again.
+/// **Reshaped to mirror `https://ui.shadcn.com/docs/components/tooltip`**
+/// (also resolves at the `/base/` path), section for section: Preview
+/// (their unlabelled live demo), Installation, Usage, Composition, Side, In
+/// a toolbar, Disabled button, Hidden trigger, API, then the six
+/// Elattar-specific sections (States, Accessibility, Responsive,
+/// Dependencies, Theming, Source). Two of their sections are not carried
+/// over, and both stay out for a real capability gap rather than a fake
+/// one:
+///
+///  * **With Keyboard Shortcut**: skipped. Their `TooltipContent` takes
+///    arbitrary children, so their demo pairs a label with a separately
+///    styled `<kbd>` chip. `DsTooltip.label` and `DsTooltipContent.label`
+///    are both a single `String`: there is no child slot to hold a second,
+///    differently styled element, so their demo cannot be composed here
+///    without inventing an API surface the source does not have.
+///  * **RTL**: skipped. `_TooltipLayout.getPositionForChild` positions
+///    `DsTooltipSide.right` off `anchor.right`, a physical, LTR-only
+///    coordinate: the source never reads `Directionality`, so there is no
+///    flip to demonstrate.
+///
+/// The former "Status" section is gone too: its two facts that were not
+/// already covered elsewhere (Version, Dart / Flutter) now live at the top
+/// of Dependencies, where the rest of the install-facts panel already
+/// lives, rather than as a section shadcn's own page has no counterpart
+/// for.
 ///
 /// Two corrections against the task brief, both resolved in favour of the
 /// real source (`lib/src/components/tooltip.dart`), which is the documented
 /// source of truth here:
 ///
-///  * The touch path is a **tap**, not a long press — [DsTooltip] opens on
+///  * The touch path is a **tap**, not a long press, [DsTooltip] opens on
 ///    a `PointerDownEvent`, immediately, with no dwell. The Responsive
 ///    section below documents this as measured from the source, not as the
 ///    brief's assumption.
-///  * The component wires **no `Semantics`** anywhere in its source — no
+///  * The component wires **no `Semantics`** anywhere in its source: no
 ///    `Semantics(tooltip: ...)`, no accessible-name propagation to the
 ///    trigger. When a tooltip is a control's only label (the collapsed
 ///    sidebar-rail row the source's own top-of-file comment names), that is
@@ -70,17 +87,18 @@ class TooltipDocPage extends StatelessWidget {
         ),
       ],
       toc: const <DocsTocEntry>[
-        DocsTocEntry(title: 'Status', anchor: 'status'),
-        DocsTocEntry(title: 'Preview', anchor: 'preview'),
-        DocsTocEntry(title: 'Install', anchor: 'install'),
+        DocsTocEntry(title: 'Installation', anchor: 'install'),
         DocsTocEntry(title: 'Usage', anchor: 'usage'),
-        DocsTocEntry(title: 'API', anchor: 'api'),
-        DocsTocEntry(title: 'Variants', anchor: 'variants'),
+        DocsTocEntry(title: 'Composition', anchor: 'composition'),
+        DocsTocEntry(title: 'Side', anchor: 'side'),
+        DocsTocEntry(title: 'In a toolbar', anchor: 'toolbar'),
+        DocsTocEntry(title: 'Disabled button', anchor: 'disabled-button'),
+        DocsTocEntry(title: 'Hidden trigger', anchor: 'hidden-trigger'),
+        DocsTocEntry(title: 'API Reference', anchor: 'api'),
         DocsTocEntry(title: 'States', anchor: 'states'),
         DocsTocEntry(title: 'Accessibility', anchor: 'accessibility'),
         DocsTocEntry(title: 'Responsive', anchor: 'responsive'),
         DocsTocEntry(title: 'Dependencies', anchor: 'dependencies'),
-        DocsTocEntry(title: 'Composition', anchor: 'composition'),
         DocsTocEntry(title: 'Theming', anchor: 'theming'),
         DocsTocEntry(title: 'Source', anchor: 'source'),
       ],
@@ -88,7 +106,7 @@ class TooltipDocPage extends StatelessWidget {
         title: 'Toggle',
         route: '/components/toggle',
       ),
-      // tooltip is the last entry in Wave 1's own list — nothing to link
+      // tooltip is the last entry in Wave 1's own list: nothing to link
       // forward to yet.
       onNavigate: onNavigate,
       child: _TooltipArticle(entry: entry),
@@ -106,61 +124,30 @@ class _TooltipArticle extends StatelessWidget {
     key: const ValueKey<String>('tooltip-doc-article'),
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
-      DsSection(
-        id: 'status',
-        title: 'Status',
-        child: const DocsInstallFacts(
-          title: 'Status',
-          facts: <DocsInstallFact>[
-            DocsInstallFact(
-              label: 'Status',
-              value: 'Stable — registered in the registry',
-              description:
-                  'DsTooltip, DsTooltipSide, and DsTooltipContent are all '
-                  'exported from the public barrel and installable through '
-                  'the CLI today.',
-            ),
-            DocsInstallFact(
-              label: 'Version',
-              value: '0.0.1',
-              description: "The registry manifest's own version field.",
-            ),
-            DocsInstallFact(
-              label: 'Dart / Flutter',
-              value: '>=3.12.2 <4.0.0 / >=3.44.8',
-              description: "The manifest's minDart and minFlutter constraints.",
-            ),
-            DocsInstallFact(
-              label: 'Platforms',
-              value: 'Android, iOS, Web, macOS, Windows, Linux',
-              description:
-                  'Pure widget composition — nothing here is platform-gated.',
-            ),
-          ],
-        ),
-      ),
-      DsSection(
-        id: 'preview',
-        title: 'Preview',
-        description:
-            'A pointer resting on a trigger for 200ms opens the label; a '
+      ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: DsWidths.prose),
+        child: DsText(
+          'A pointer resting on a trigger for 200ms opens the label; a '
             'finger opens it on the spot with a single tap, no dwell. Both '
-            'paths close automatically — hover on pointer-exit, touch on a '
+            'paths close automatically: hover on pointer-exit, touch on a '
             'second tap, a tap elsewhere, or after a 1.5s dwell if nothing '
             'else closes it first.',
-        child: DocsCodeExample(
+          DsType.body,
+        ),
+      ),
+      SizedBox(height: ds(6)),
+      DocsCodeExample(
           title: 'Tooltip specimens',
           description:
               'Hover a trigger with a mouse, or tap one on a touch device.',
           preview: const _TooltipPreview(),
           command: DocsCodeCommand(command: entry.command),
         ),
-      ),
       DsSection(
         id: 'install',
         title: 'Installation',
         description:
-            'tooltip already has a registry manifest — this installs '
+            'tooltip already has a registry manifest: this installs '
             'lib/src/components/tooltip.dart and its one dependency, '
             'source-foundation, resolved automatically.',
         child: DocsCodeExample(
@@ -185,37 +172,119 @@ class _TooltipArticle extends StatelessWidget {
       DsSection(
         id: 'usage',
         title: 'Usage',
+        description: 'The smallest correct composition: a label and a child.',
+        child: DsPanel(
+          label: 'DART',
+          note: 'MINIMAL',
+          child: DocsSelectableCodeBlock(code: _usageBasicCode),
+        ),
+      ),
+      DsSection(
+        id: 'composition',
+        title: 'Composition',
         description:
-            'The smallest correct composition, then the two real shapes '
-            'this component ships for: a collapsed sidebar rail row, and '
-            'the hidden flag that keeps hover behavior alive without '
-            'painting anything.',
+            "shadcn's Tooltip composes three pieces the caller assembles: "
+            'Tooltip, TooltipTrigger asChild, and TooltipContent. '
+            'DsTooltip is one widget instead: it owns the hover and tap '
+            "wiring itself and builds DsTooltipContent through an "
+            'OverlayPortal for you. DsTooltipContent is exported and '
+            'public, but a caller does not normally construct it by hand.',
+        child: DsPanel(
+          label: 'SHAPE',
+          child: DocsSelectableCodeBlock(code: _compositionTreeCode),
+        ),
+      ),
+      DsSection(
+        id: 'side',
+        title: 'Side',
+        description:
+            "shadcn's Side section offers four positions: left, top, "
+            'bottom, right. DsTooltipSide has two: top, the default seen '
+            "above, and right, the shape a collapsed sidebar rail row "
+            'needs when it has no other label.',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            DsPanel(
-              label: 'DART',
-              note: 'MINIMAL',
-              child: DocsSelectableCodeBlock(code: _usageBasicCode),
+            const DocsApiTable(
+              title: 'DsTooltipSide',
+              facts: <DocsApiFact>[
+                DocsApiFact(
+                  name: 'top',
+                  type: 'DsTooltipSide',
+                  description:
+                      'The default. Content sits above the trigger, '
+                      "centered, with the arrow lane below it: the "
+                      "reference's own measured shape.",
+                ),
+                DocsApiFact(
+                  name: 'right',
+                  type: 'DsTooltipSide',
+                  description:
+                      "Content sits to the trigger's right, vertically "
+                      'centered, arrow lane on its left: the shape a '
+                      'collapsed sidebar rail row needs when it has no '
+                      'other label.',
+                ),
+              ],
             ),
             SizedBox(height: ds(5)),
             DsPanel(
               label: 'DART',
-              note: 'COLLAPSED RAIL',
-              child: DocsSelectableCodeBlock(code: _usageRightSideCode),
-            ),
-            SizedBox(height: ds(5)),
-            DsPanel(
-              label: 'DART',
-              note: 'HIDDEN',
-              child: DocsSelectableCodeBlock(code: _usageHiddenCode),
+              note: 'RIGHT',
+              child: DocsSelectableCodeBlock(code: _sideRightCode),
             ),
           ],
         ),
       ),
       DsSection(
+        id: 'toolbar',
+        title: 'In a toolbar',
+        description:
+            'A toolbar row above a list: the shape the two icon-only '
+            "actions in the Preview section actually come from, in the "
+            'reference dialogs page.',
+        child: const DocsCodeExample(
+          title: 'Toolbar composition',
+          preview: _TooltipComposition(),
+        ),
+      ),
+      DsSection(
+        id: 'disabled-button',
+        title: 'Disabled button',
+        description:
+            "shadcn's own Disabled Button demo needs a span wrapper "
+            'around the trigger: a native disabled button drops pointer '
+            "events entirely, so TooltipTrigger asChild would have "
+            "nothing left to hover. DsTooltip needs no such workaround: "
+            'its MouseRegion and Listener sit around the trigger, not '
+            "inside it, and a disabled DsButton's own IgnorePointer only "
+            "removes the button's own input, not the region watching it "
+            'from outside. A disabled trigger still opens its tooltip on '
+            'hover or tap.',
+        child: const DocsCodeExample(
+          title: 'Disabled trigger',
+          preview: _TooltipDisabledPreview(),
+        ),
+      ),
+      DsSection(
+        id: 'hidden-trigger',
+        title: 'Hidden trigger',
+        description:
+            "shadcn has no counterpart for this: it is SidebarMenuButton's "
+            'own pattern, where every row stays wrapped in a DsTooltip '
+            "from the start and hidden only turns false once the panel "
+            "has collapsed to a rail and the row's own text label has "
+            'gone. hidden keeps the hover and tap wiring alive; it just '
+            'paints nothing.',
+        child: DsPanel(
+          label: 'DART',
+          note: 'HIDDEN',
+          child: DocsSelectableCodeBlock(code: _hiddenTriggerCode),
+        ),
+      ),
+      DsSection(
         id: 'api',
-        title: 'API',
+        title: 'API Reference',
         description:
             'Every public class, constructor parameter, and static layout '
             'constant the source declares.',
@@ -229,7 +298,7 @@ class _TooltipArticle extends StatelessWidget {
                   name: 'label',
                   type: 'String',
                   description:
-                      'Required. The content — a short line of text, not a '
+                      'Required. The content: a short line of text, not a '
                       'place for rich or interactive content.',
                 ),
                 DocsApiFact(
@@ -259,7 +328,7 @@ class _TooltipArticle extends StatelessWidget {
                   type: 'bool',
                   description:
                       "Default false. Keeps the trigger's hover and tap "
-                      'behavior but renders nothing — mirrors a collapsed '
+                      'behavior but renders nothing: mirrors a collapsed '
                       'SidebarMenuButton.',
                 ),
               ],
@@ -281,35 +350,6 @@ class _TooltipArticle extends StatelessWidget {
                       'lane sits on relative to the pill.',
                 ),
               ],
-            ),
-          ],
-        ),
-      ),
-      DsSection(
-        id: 'variants',
-        title: 'Variants',
-        description:
-            'DsTooltipSide is the only variant knob on this component — '
-            'there is no size or color variant to choose.',
-        child: const DocsApiTable(
-          title: 'DsTooltipSide',
-          facts: <DocsApiFact>[
-            DocsApiFact(
-              name: 'top',
-              type: 'DsTooltipSide',
-              description:
-                  'The default. Content sits above the trigger, centered, '
-                  "with the arrow lane below it — the reference's own "
-                  'measured shape.',
-            ),
-            DocsApiFact(
-              name: 'right',
-              type: 'DsTooltipSide',
-              description:
-                  "Content sits to the trigger's right, vertically "
-                  'centered, arrow lane on its left — the shape a '
-                  'collapsed sidebar rail row needs when it has no other '
-                  'label.',
             ),
           ],
         ),
@@ -343,10 +383,10 @@ class _TooltipArticle extends StatelessWidget {
             DocsStateFact(
               state: 'Focus-visible',
               treatment:
-                  'N/A — the source wires no Focus or FocusNode; opening '
+                  'N/A: the source wires no Focus or FocusNode; opening '
                   'is driven only by pointer hover and touch taps, never '
                   'by keyboard focus.',
-              userSignal: 'N/A — see Accessibility below.',
+              userSignal: 'N/A: see Accessibility below.',
             ),
             DocsStateFact(
               state: 'Pressed',
@@ -359,38 +399,38 @@ class _TooltipArticle extends StatelessWidget {
             DocsStateFact(
               state: 'Selected',
               treatment:
-                  'N/A — a tooltip is either showing or not; there is no '
+                  'N/A: a tooltip is either showing or not; there is no '
                   'selection concept to represent.',
               userSignal: 'N/A',
             ),
             DocsStateFact(
               state: 'Loading',
-              treatment: 'N/A — label is static text with no async step.',
+              treatment: 'N/A: label is static text with no async step.',
               userSignal: 'N/A',
             ),
             DocsStateFact(
               state: 'Empty',
               treatment:
-                  'N/A — label is a required String; the API has no path '
+                  'N/A: label is a required String; the API has no path '
                   'to an empty label to design for.',
               userSignal: 'N/A',
             ),
             DocsStateFact(
               state: 'Error',
               treatment:
-                  'N/A — no validation or error state exists on this '
+                  'N/A: no validation or error state exists on this '
                   'component.',
               userSignal: 'N/A',
             ),
             DocsStateFact(
               state: 'Success',
-              treatment: 'N/A — no async outcome to confirm.',
+              treatment: 'N/A: no async outcome to confirm.',
               userSignal: 'N/A',
             ),
             DocsStateFact(
               state: 'Disabled',
               treatment:
-                  'N/A — DsTooltip has no enabled or disabled parameter of '
+                  'N/A, DsTooltip has no enabled or disabled parameter of '
                   'its own; a caller wraps whatever trigger it likes, '
                   'including a disabled one, and the label still opens.',
               userSignal: 'N/A',
@@ -423,7 +463,7 @@ class _TooltipArticle extends StatelessWidget {
                   _A11yRow(
                     'Semantic role',
                     'DsTooltip renders no Semantics node of its own '
-                        'anywhere in its source — not on the trigger, not '
+                        'anywhere in its source: not on the trigger, not '
                         'on the pill, and nothing wires the label into the '
                         "accessible name of whatever child it wraps.",
                   ),
@@ -438,12 +478,12 @@ class _TooltipArticle extends StatelessWidget {
                     'Keyboard interactions',
                     'None. There is no Focus or FocusNode in the source, '
                         'so Tab-ing to the trigger never shows the label, '
-                        'and there is no Escape-to-close path — dismissal '
+                        'and there is no Escape-to-close path: dismissal '
                         'is pointer and touch only.',
                   ),
                   const _A11yRow(
                     'Focus behavior',
-                    'Nothing to describe beyond Keyboard above — the '
+                    'Nothing to describe beyond Keyboard above: the '
                         'tooltip itself never receives focus and never '
                         'moves it.',
                   ),
@@ -455,12 +495,12 @@ class _TooltipArticle extends StatelessWidget {
                   ),
                   const _A11yRow(
                     'Non-color signal',
-                    'The label is plain text on a solid pill — no '
+                    'The label is plain text on a solid pill: no '
                         'information is carried by color alone.',
                   ),
                   const _A11yRow(
                     'Error wiring',
-                    'None — DsTooltip never participates in form '
+                    'None, DsTooltip never participates in form '
                         'validation or an error state.',
                   ),
                   const _A11yRow(
@@ -471,7 +511,7 @@ class _TooltipArticle extends StatelessWidget {
                   ),
                   _A11yRow(
                     'Known platform differences',
-                    'None observed in the paint or gesture logic — '
+                    'None observed in the paint or gesture logic, '
                         'routing is by PointerDeviceKind, not by platform.',
                     last: true,
                   ),
@@ -481,7 +521,7 @@ class _TooltipArticle extends StatelessWidget {
             SizedBox(height: ds(5)),
             DsNote(
               tone: DsNoteTone.error,
-              title: "Known gap — a tooltip cannot be a control's only name",
+              title: "Known gap: a tooltip cannot be a control's only name",
               child: DsText(
                 'The source itself composes exactly the risky case: a '
                 "SidebarMenuButton-style collapsed rail row, where the "
@@ -489,11 +529,11 @@ class _TooltipArticle extends StatelessWidget {
                 "once its own visible text has collapsed away. A sighted "
                 'mouse user gets the name after a 200ms hover; a touch '
                 'user gets it after a tap; a screen-reader or '
-                'keyboard-only user gets nothing — the control has no '
+                'keyboard-only user gets nothing: the control has no '
                 'accessible name at all in that state. If a trigger has '
                 'no other name, pair the tooltip label with a real '
                 'accessible name on the trigger itself (for example '
-                'DsButton.label) — do not rely on the tooltip alone to '
+                'DsButton.label): do not rely on the tooltip alone to '
                 'supply it.',
                 DsType.small,
               ),
@@ -506,7 +546,7 @@ class _TooltipArticle extends StatelessWidget {
         title: 'Responsive and platform behavior',
         description:
             "Routed on the event's own PointerDeviceKind, never on the "
-            'platform — a hybrid machine gets both paths at once, and '
+            'platform: a hybrid machine gets both paths at once, and '
             'each pointer is judged as it arrives.',
         child: DsPanel(
           label: 'Pointer versus touch',
@@ -523,7 +563,7 @@ class _TooltipArticle extends StatelessWidget {
               SizedBox(height: ds(3)),
               DsText(
                 'Touch: this is a tap, not a long press. A single tap on '
-                'the trigger opens the label immediately, with no dwell — '
+                'the trigger opens the label immediately, with no dwell, '
                 'delayDuration is a hover-intent filter, and a tap has '
                 'already declared its intent. A second tap on the same '
                 'trigger closes it. A tap anywhere else also closes it, '
@@ -536,14 +576,14 @@ class _TooltipArticle extends StatelessWidget {
               DsText(
                 'If nothing else closes it first, a tap-opened label '
                 'takes itself down automatically after '
-                'DsTooltip.touchDwell (1500ms — ten steps of '
+                'DsTooltip.touchDwell (1500ms: ten steps of '
                 'DsDurations.fast) so it can never be stranded on screen.',
                 DsType.small,
               ),
               SizedBox(height: ds(3)),
               DsText(
                 'This is a deliberate mobile adaptation ordered on top of '
-                'a reference that has no touch path of its own — hover '
+                'a reference that has no touch path of its own: hover '
                 'does not exist on a touch screen. It is documented in '
                 "the source's own top-of-file comment.",
                 DsType.small,
@@ -556,7 +596,7 @@ class _TooltipArticle extends StatelessWidget {
         id: 'dependencies',
         title: 'Dependencies, files, and disclosure',
         description:
-            "Elattar's own technical-transparency panel — what this "
+            "Elattar's own technical-transparency panel: what this "
             'component needs to install and run.',
         child: DocsInstallFacts(
           facts: <DocsInstallFact>[
@@ -566,6 +606,16 @@ class _TooltipArticle extends StatelessWidget {
               description:
                   'registry/components/tooltip.json exists and is '
                   'installable through the CLI today.',
+            ),
+            const DocsInstallFact(
+              label: 'Version',
+              value: '0.0.1',
+              description: "The registry manifest's own version field.",
+            ),
+            const DocsInstallFact(
+              label: 'Dart / Flutter',
+              value: '>=3.12.2 <4.0.0 / >=3.44.8',
+              description: "The manifest's minDart and minFlutter constraints.",
             ),
             const DocsInstallFact(
               label: 'Destination',
@@ -578,7 +628,7 @@ class _TooltipArticle extends StatelessWidget {
               label: 'Foundation',
               value: 'source or package compatible',
               description:
-                  'The manifest names only source-foundation — nothing '
+                  'The manifest names only source-foundation: nothing '
                   'here is package-mode-only.',
             ),
             DocsInstallFact(
@@ -608,23 +658,11 @@ class _TooltipArticle extends StatelessWidget {
               value: 'package tests + this docs specimen',
               description:
                   "test/dialogs_test.dart's DsTooltip and "
-                  "'DsTooltip — the tap path' groups, plus this page's "
+                  "'DsTooltip: the tap path' groups, plus this page's "
                   'own live specimens. No fixture install was run as part '
                   'of writing this page.',
             ),
           ],
-        ),
-      ),
-      DsSection(
-        id: 'composition',
-        title: 'Composition example',
-        description:
-            'A toolbar row above a list — the shape the two icon-only '
-            "actions in the Preview section actually come from, in the "
-            'reference dialogs page.',
-        child: const DocsCodeExample(
-          title: 'Toolbar composition',
-          preview: _TooltipComposition(),
         ),
       ),
       DsSection(
@@ -639,8 +677,8 @@ class _TooltipArticle extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   DsText(
-                    'The pill is a fixed, inverted pairing — '
-                    'theme.foreground fill, theme.background ink — the '
+                    'The pill is a fixed, inverted pairing, '
+                    'theme.foreground fill, theme.background ink: the '
                     'same relationship a native OS tooltip uses, and it '
                     'does not change with a surface or variant parameter '
                     'because DsTooltip has none.',
@@ -650,7 +688,7 @@ class _TooltipArticle extends StatelessWidget {
                   DsText(
                     'The label always renders at '
                     'DsComponentType.tooltipLabel (12px, weight 400) and '
-                    'the pill corner radius is always DsRadii.md — '
+                    'the pill corner radius is always DsRadii.md, '
                     'neither is configurable per instance.',
                     DsType.small,
                   ),
@@ -672,7 +710,7 @@ class _TooltipArticle extends StatelessWidget {
                   name: 'arrowSize',
                   type: 'static double (get)',
                   description:
-                      "size-2.5, ~10px — the arrow's square before its "
+                      "size-2.5, ~10px: the arrow's square before its "
                       '45° turn.',
                 ),
                 DocsApiFact(
@@ -691,25 +729,25 @@ class _TooltipArticle extends StatelessWidget {
                 DocsApiFact(
                   name: 'horizontalPadding',
                   type: 'static double (get)',
-                  description: "px-3 — the pill's horizontal padding.",
+                  description: "px-3: the pill's horizontal padding.",
                 ),
                 DocsApiFact(
                   name: 'verticalPadding',
                   type: 'static double (get)',
-                  description: "py-1.5 — the pill's vertical padding.",
+                  description: "py-1.5: the pill's vertical padding.",
                 ),
                 DocsApiFact(
                   name: 'slide',
                   type: 'static double (get)',
                   description:
-                      'slide-in-from-bottom-2 — the entrance travel '
+                      'slide-in-from-bottom-2: the entrance travel '
                       'distance, toward the trigger.',
                 ),
                 DocsApiFact(
                   name: 'touchDwell',
                   type: 'static Duration (get)',
                   description:
-                      '1500ms (ten steps of DsDurations.fast) — how long '
+                      '1500ms (ten steps of DsDurations.fast): how long '
                       'a tap-opened label stays up on its own before it '
                       'closes itself.',
                 ),
@@ -739,7 +777,7 @@ class _TooltipArticle extends StatelessWidget {
             const DocsInstallFact(
               label: 'Tests',
               value:
-                  'test/dialogs_test.dart (DsTooltip, DsTooltip — the '
+                  'test/dialogs_test.dart (DsTooltip, DsTooltip: the '
                   'tap path)',
               description:
                   'Package-level behavioral coverage: geometry, the '
@@ -774,7 +812,15 @@ DsTooltip(
   ),
 )''';
 
-const String _usageRightSideCode = '''DsTooltip(
+/// The real shape: one widget wrapping a trigger, no separate Trigger or
+/// Content pieces for the caller to assemble.
+const String _compositionTreeCode =
+    '''DsTooltip                              // one widget, not three
+├─ child                              the trigger, rendered verbatim
+└─ (built for you) DsTooltipContent   never constructed by the caller
+   └─ label                          the pill's text, positioned by `side`''';
+
+const String _sideRightCode = '''DsTooltip(
   label: 'Dashboard',
   side: DsTooltipSide.right,
   child: DsButton(
@@ -786,7 +832,7 @@ const String _usageRightSideCode = '''DsTooltip(
   ),
 )''';
 
-const String _usageHiddenCode =
+const String _hiddenTriggerCode =
     '''// SidebarMenuButton's own pattern: every row stays wrapped in a
 // DsTooltip from the start, and `hidden` only turns false once the panel
 // has collapsed to a rail and the row's own text label has gone.
@@ -822,7 +868,7 @@ class _A11yRow extends StatelessWidget {
 }
 
 /// The live specimen: a hover-driven top-side pair, and the right-side,
-/// collapsed-rail shape — both real compositions from the reference
+/// collapsed-rail shape: both real compositions from the reference
 /// dialogs page, not invented ones.
 class _TooltipPreview extends StatelessWidget {
   const _TooltipPreview();
@@ -833,7 +879,7 @@ class _TooltipPreview extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        DsText('Top side — the default', DsType.label),
+        DsText('Top side: the default', DsType.label),
         SizedBox(height: ds(3)),
         Wrap(
           spacing: ds(4),
@@ -863,7 +909,7 @@ class _TooltipPreview extends StatelessWidget {
           ],
         ),
         SizedBox(height: ds(6)),
-        DsText("Right side — a collapsed rail row's only label", DsType.label),
+        DsText("Right side: a collapsed rail row's only label", DsType.label),
         SizedBox(height: ds(3)),
         DsTooltip(
           key: const ValueKey<String>('tooltip-doc-specimen-right'),
@@ -889,7 +935,7 @@ class _TooltipPreview extends StatelessWidget {
   }
 }
 
-/// A realistic toolbar row — the exact icon/label pairing the reference
+/// A realistic toolbar row: the exact icon/label pairing the reference
 /// dialogs page composes above a pack list.
 class _TooltipComposition extends StatelessWidget {
   const _TooltipComposition();
@@ -935,6 +981,42 @@ class _TooltipComposition extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ],
+    );
+  }
+}
+
+/// A disabled trigger, still wrapped in a live [DsTooltip]. Unlike the
+/// reference, which needs a `<span>` wrapper for a disabled button to stay
+/// hoverable, this needs no workaround: the tooltip's MouseRegion and
+/// Listener sit around the trigger, not inside it.
+class _TooltipDisabledPreview extends StatelessWidget {
+  const _TooltipDisabledPreview();
+
+  @override
+  Widget build(BuildContext context) {
+    final DsThemeData theme = DsTheme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        DsTooltip(
+          key: const ValueKey<String>('tooltip-doc-specimen-disabled'),
+          label: 'Add to favourites',
+          child: DsButton(
+            variant: DsButtonVariant.ghost,
+            size: DsButtonSize.icon,
+            label: 'Add to favourites',
+            onPressed: null,
+            child: const DsIcon(DsIconGlyph.heart, size: DsIconSize.md),
+          ),
+        ),
+        SizedBox(height: ds(3)),
+        DsText(
+          'Faded and inert to a click, still hoverable: the label opens '
+          'the same way it does on an enabled trigger.',
+          DsType.small,
+          color: theme.mutedForeground,
         ),
       ],
     );

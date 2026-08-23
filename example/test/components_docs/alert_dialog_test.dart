@@ -1,23 +1,23 @@
 /// Tests for `components_docs/alert_dialog/meta.dart` and
-/// `components_docs/alert_dialog/page.dart` — the public Alert Dialog
+/// `components_docs/alert_dialog/page.dart`: the public Alert Dialog
 /// component documentation page.
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
-/// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery` — the
+/// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`: the
 /// discipline `tooltip_test.dart` already carries. Theme coverage uses a
 /// live `DsThemeController` flipped in place rather than two independent
 /// pumps.
 ///
 /// `DsAlertDialog` mounts its content through an `OverlayPortal` (via
-/// `DsModalPortal`), so the live specimens need a real `Overlay` — the
+/// `DsModalPortal`), so the live specimens need a real `Overlay`: the
 /// harness wraps the page in a `MaterialApp`, the same fix `tooltip_test.dart`
 /// and `dialogs_test.dart` both needed. A bare `Directionality`/`Material`
 /// host would let the page render but the dialog would never actually open.
 ///
 /// A dedicated `_FocusHarness` widget (private to this file, built from the
-/// real public API) answers the brief's own question — does focus move into
+/// real public API) answers the brief's own question: does focus move into
 /// the panel on open, stay trapped while open, and return to the trigger on
-/// close? — by identity-comparing `FocusManager.instance.primaryFocus`
+/// close?: by identity-comparing `FocusManager.instance.primaryFocus`
 /// against the real internal `FocusNode`s of the trigger, Cancel, Action and
 /// an outside control, recovered via `Focus.of` from each button's own text
 /// descendant (`DsAlertDialogAction`/`DsAlertDialogCancel` accept no
@@ -73,7 +73,7 @@ Future<void> _open(WidgetTester tester, Finder trigger) async {
   await tester.pump(DsDurations.jelly);
 }
 
-/// Runs the exit and lets the portal's post-completion `setState` land — the
+/// Runs the exit and lets the portal's post-completion `setState` land: the
 /// same two-pump shape `dialogs_test.dart`'s own `_settleExit` uses.
 Future<void> _settleExit(WidgetTester tester) async {
   await tester.pump();
@@ -81,8 +81,8 @@ Future<void> _settleExit(WidgetTester tester) async {
   await tester.pump();
 }
 
-/// A page built directly on the public `DsAlertDialog` family — not the
-/// docs page's own specimen — wired with an outside control and real
+/// A page built directly on the public `DsAlertDialog` family: not the
+/// docs page's own specimen: wired with an outside control and real
 /// `FocusNode`s recovered from each button's text descendant, so a focus
 /// assertion can compare node *identity* rather than guess from geometry.
 class _FocusHarness extends StatelessWidget {
@@ -137,7 +137,7 @@ class _FocusHarness extends StatelessWidget {
   );
 }
 
-/// The real internal [FocusNode] behind the text inside [text] — recovered
+/// The real internal [FocusNode] behind the text inside [text]: recovered
 /// via [Focus.of] walking up from that text's own [BuildContext], since
 /// neither `DsAlertDialogAction` nor `DsAlertDialogCancel` exposes a
 /// `focusNode` parameter of its own to inject one directly.
@@ -210,12 +210,61 @@ void main() {
     });
 
     testWidgets(
-      'the decision guide distinguishes alert dialog, dialog, and alert',
+      'section headings render top to bottom in shadcn-parity order',
       (WidgetTester tester) async {
         await _pumpAlertDialogDoc(tester);
 
-        expect(find.textContaining('Dialog'), findsWidgets);
-        expect(find.textContaining('Alert'), findsWidgets);
+        // The shadcn alert-dialog page's own shape, section for section:
+        // a live demo before any heading (Preview), Installation, Usage, a
+        // Composition tree, this component's own Sizes and Destructive
+        // specimens, then API Reference, followed by this system's six
+        // extra sections.
+        const List<String> expectedOrder = <String>[
+          'Installation',
+          'Usage',
+          'Composition',
+          'Sizes',
+          'Destructive',
+          'API Reference',
+          'States and feedback',
+          'Accessibility and keyboard behavior',
+          'Responsive and platform behavior',
+          'Dependencies, files, and disclosure',
+          'Theming notes',
+          'Source and tests',
+        ];
+
+        final List<double> tops = <double>[];
+        for (final String heading in expectedOrder) {
+          final Finder finder = find.byWidgetPredicate(
+            (Widget widget) =>
+                widget is DsText &&
+                widget.text == heading &&
+                widget.spec == DsType.h3,
+          );
+          expect(finder, findsOneWidget, reason: 'missing heading: $heading');
+          tops.add(tester.getTopLeft(finder).dy);
+        }
+
+        for (int i = 1; i < tops.length; i++) {
+          expect(
+            tops[i],
+            greaterThan(tops[i - 1]),
+            reason:
+                '"${expectedOrder[i]}" did not render below '
+                '"${expectedOrder[i - 1]}": observed offsets $tops',
+          );
+        }
+      },
+    );
+
+    testWidgets(
+      'the page intro distinguishes alert dialog, dialog, and alert',
+      (WidgetTester tester) async {
+        await _pumpAlertDialogDoc(tester);
+
+        expect(find.textContaining('Reach for Dialog instead'), findsWidgets);
+        expect(find.textContaining('Reach for Alert instead'), findsWidgets);
         expect(find.textContaining('cannot be undone'), findsWidgets);
       },
     );
@@ -263,14 +312,14 @@ void main() {
       expect(find.textContaining('tooltip'), findsWidgets);
     });
 
-    testWidgets('variants documents that sm only narrows the panel, honestly', (
+    testWidgets('sizes documents that sm only narrows the panel, honestly', (
       WidgetTester tester,
     ) async {
       await _pumpAlertDialogDoc(tester);
 
       expect(find.textContaining('DsAlertDialogSize'), findsWidgets);
-      // The header/footer do not receive `size` at all — a real gap
-      // against the enum's own "grid-cols-2 footer" doc comment.
+      // The header/footer do not receive `size` at all, a real gap against
+      // the enum's own "grid-cols-2 footer" doc comment.
       expect(find.textContaining('no size'), findsWidgets);
     });
 
@@ -298,7 +347,7 @@ void main() {
     });
   });
 
-  group('live specimen — open, decide, close', () {
+  group('live specimen: open, decide, close', () {
     testWidgets('opening mounts the real question, and Cancel closes it', (
       WidgetTester tester,
     ) async {
@@ -363,7 +412,7 @@ void main() {
     });
   });
 
-  group('focus behavior — moved in, trapped, and returned (or not)', () {
+  group('focus behavior: moved in, trapped, and returned (or not)', () {
     testWidgets('opening moves focus onto a control inside the panel', (
       WidgetTester tester,
     ) async {
@@ -386,7 +435,7 @@ void main() {
 
       // Verified, not assumed: `FocusScope(autofocus: true)` with no
       // previously-focused descendant makes the FocusScopeNode ITSELF the
-      // primary focus — not a leaf control such as Cancel. `FocusScope.of`
+      // primary focus: not a leaf control such as Cancel. `FocusScope.of`
       // from inside the panel recovers that same scope node for comparison.
       final FocusScopeNode panelScope = FocusScope.of(
         tester.element(find.text('Keep')),
@@ -426,7 +475,7 @@ void main() {
             isNot(same(outside)),
             reason:
                 'Tab press #${i + 1} reached the control behind the '
-                'overlay — the trap has a hole. Sequence so far: $observed',
+                'overlay: the trap has a hole. Sequence so far: $observed',
           );
         }
         // Once Tab has moved at least once, focus has left the bare scope
@@ -440,7 +489,7 @@ void main() {
     );
 
     testWidgets(
-      'closing via Cancel — where focus lands afterward, reported as-is',
+      'closing via Cancel: where focus lands afterward, reported as-is',
       (WidgetTester tester) async {
         await tester.pumpWidget(const _FocusHarness());
         await tester.pump();
@@ -467,7 +516,7 @@ void main() {
           reason:
               'if this starts failing, DsModalPortal gained an explicit '
               'restore-focus step and the Accessibility section needs to '
-              'stop calling it a gap — observed after close: $focused',
+              'stop calling it a gap: observed after close: $focused',
         );
       },
     );

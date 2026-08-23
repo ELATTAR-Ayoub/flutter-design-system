@@ -6,9 +6,17 @@
 /// four share one theme: static presentation with almost no state of its own.
 /// This page documents all four together rather than four separate ones.
 ///
+/// `stat` has no shadcn counterpart, so its sections below are named for what
+/// they do rather than mirrored from a reference page. `item`, `empty`, and
+/// `kbd` each have one (`ui.shadcn.com/docs/components/item`, `/empty`,
+/// `/kbd`), and their promoted sections below carry a `Component: Section`
+/// title, the same convention `separator/page.dart` uses for its own
+/// `empty`/`kbd` coverage. Sections shadcn shows that this port genuinely
+/// cannot do are skipped, not faked: see each section's own note.
+///
 /// None of the four has a registry manifest yet
 /// (`registry/components/stat.json`, `item.json`, `empty.json`, `kbd.json` do
-/// not exist) — every install-facing panel below says so honestly rather than
+/// not exist): every install-facing panel below says so honestly rather than
 /// presenting a CLI command that would fail.
 library;
 
@@ -40,17 +48,29 @@ class StatDocPage extends StatelessWidget {
     ],
     sidebar: _sidebar,
     toc: const <DocsTocEntry>[
-      DocsTocEntry(title: 'Overview', anchor: 'overview'),
-      DocsTocEntry(title: 'Preview', anchor: 'preview'),
-      DocsTocEntry(title: 'Install', anchor: 'install'),
+      DocsTocEntry(title: 'Installation', anchor: 'install'),
       DocsTocEntry(title: 'Usage', anchor: 'usage'),
-      DocsTocEntry(title: 'API', anchor: 'api'),
-      DocsTocEntry(title: 'Variants', anchor: 'variants'),
+      DocsTocEntry(title: 'Composition', anchor: 'composition'),
+      DocsTocEntry(title: 'Stat: Delta and direction', anchor: 'stat-delta'),
+      DocsTocEntry(
+        title: 'Stat: Loading, error, and empty',
+        anchor: 'stat-states',
+      ),
+      DocsTocEntry(title: 'Item: Item vs Field', anchor: 'item-vs-field'),
+      DocsTocEntry(title: 'Item: Variant', anchor: 'item-variant'),
+      DocsTocEntry(title: 'Item: Icon', anchor: 'item-icon'),
+      DocsTocEntry(title: 'Item: Avatar', anchor: 'item-avatar'),
+      DocsTocEntry(title: 'Item: Group', anchor: 'item-group'),
+      DocsTocEntry(title: 'Empty: Input group', anchor: 'empty-input-group'),
+      DocsTocEntry(title: 'Kbd: Group', anchor: 'kbd-group'),
+      DocsTocEntry(title: 'Kbd: Button', anchor: 'kbd-button'),
+      DocsTocEntry(title: 'Kbd: Input group', anchor: 'kbd-input-group'),
+      DocsTocEntry(title: 'RTL', anchor: 'rtl'),
+      DocsTocEntry(title: 'API Reference', anchor: 'api'),
       DocsTocEntry(title: 'States', anchor: 'states'),
       DocsTocEntry(title: 'Accessibility', anchor: 'accessibility'),
       DocsTocEntry(title: 'Responsive', anchor: 'responsive'),
       DocsTocEntry(title: 'Dependencies', anchor: 'dependencies'),
-      DocsTocEntry(title: 'Composition', anchor: 'composition'),
       DocsTocEntry(title: 'Theming', anchor: 'theming'),
       DocsTocEntry(title: 'Source', anchor: 'source'),
     ],
@@ -61,7 +81,7 @@ class StatDocPage extends StatelessWidget {
 
 /// The Wave 1 "base primitives" group this page belongs to (IA §7.3), listed
 /// in the plan's own order. These are not routes other workers are producing
-/// this same wave verified as wired — the supervisor aggregates the real
+/// this same wave verified as wired: the supervisor aggregates the real
 /// sidebar in `catalog.dart` and `site_routes.dart`.
 const List<DocsSidebarEntry> _sidebar = <DocsSidebarEntry>[
   DocsSidebarEntry(title: 'Accordion', route: '/components/accordion'),
@@ -92,270 +112,280 @@ class _StatArticle extends StatelessWidget {
       key: const ValueKey<String>('stat-doc-article'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        _overview(theme),
-        _preview(),
+        _preview(theme),
         _install(),
         _usage(),
-        _api(),
-        _variants(theme),
+        _composition(),
+        _statDelta(),
+        _statStates(),
+        _itemVsField(),
+        _itemVariant(),
+        _itemIcon(),
+        _itemAvatar(),
+        _itemGroup(),
+        _emptyInputGroup(),
+        _kbdGroup(),
+        _kbdButton(),
+        _kbdInputGroup(),
+        _rtl(theme),
+        _api(theme),
         _states(),
         _accessibility(theme),
         _responsive(theme),
         _dependencies(theme),
-        _composition(),
         _theming(theme),
         _source(),
       ],
     );
   }
 
-  Widget _overview(DsThemeData theme) => DsSection(
-    id: 'overview',
-    title: 'Overview',
-    child: ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: DsWidths.prose),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          DsText(
-            'Four components that share one theme: almost no state, and a '
-            'single visual job each. None of the four owns a GestureDetector, '
-            'a FocusNode, or an async flag anywhere in its build method — every '
-            'row below that looks empty in the State matrix is empty for that '
-            'reason, not because the template was left unfilled.',
-            DsType.body,
-          ),
-          SizedBox(height: ds(5)),
-          DsText('Stat', DsType.h4, color: theme.foreground),
-          SizedBox(height: ds(2)),
-          DsText(
-            'DsStat renders a labelled metric figure with an optional delta '
-            'and trailing hint. The metric sits in a fixed-height slot, the '
-            'delta row is optional and wraps if the delta overflows, and the '
-            'footprint is identical across all states (ready, loading, error, '
-            'empty, disabled) — the layout does not reflow when the state '
-            'changes.',
-            DsType.body,
-          ),
-          SizedBox(height: ds(2)),
-          DsText(
-            'Reach for it on a dashboard, a summary card, or a data page to '
-            'show a metric with direction — revenue with a trend, an uptime '
-            'percentage with a change. Use DsStatState.empty or .error and a '
-            'message to explain why the value is not available. The delta\'s '
-            'direction is conveyed three ways — glyph shape (up arrow, down '
-            'arrow, minus), the sign character (+/−/nothing), and a visually '
-            'hidden word ("Up", "Down", "No change") — so the direction reads '
-            'correctly even when colour is removed.',
-            DsType.body,
-          ),
-          SizedBox(height: ds(5)),
-          DsText('Item', DsType.h4, color: theme.foreground),
-          SizedBox(height: ds(2)),
-          DsText(
-            'DsItem is a structured list row: optional media (usually an '
-            'icon), required content (usually a title and description), and '
-            'optional actions. The row carries a border option (normal, outline, '
-            'muted) and an alignment override (center or top).',
-            DsType.body,
-          ),
-          SizedBox(height: ds(2)),
-          DsText(
-            'Reach for it over a bare Row when the content has a standard '
-            'shape — icon, title, description, buttons — and the container '
-            'needs semantic consistency across several rows. DsItemGroup is '
-            'the list wrapper: it enforces a vertical gap and stretches all '
-            'children to the column width. Reach for whitespace alone when the '
-            'row is one-off or the layout does not repeat.',
-            DsType.body,
-          ),
-          SizedBox(height: ds(5)),
-          DsText('Empty', DsType.h4, color: theme.foreground),
-          SizedBox(height: ds(2)),
-          DsText(
-            'DsEmpty is a structured empty state: an optional media tile, a '
-            'title, a description, and one clear way out (DsEmptyContent), '
-            'centred in a column with 16px between its parts.',
-            DsType.body,
-          ),
-          SizedBox(height: ds(2)),
-          DsText(
-            'Reach for it whenever a collection, search, or workspace has '
-            'nothing to show and the user needs to know why and what to do '
-            'next. The text itself announces its content through normal text '
-            'semantics, but there is no live-region announcement when the empty '
-            'state arrives — wire that at the call site if it matters. Reach '
-            'for a spinner/skeleton instead when the empty appearance is '
-            'temporary; reach for no render at all only when the state never '
-            'changes and there is no next step.',
-            DsType.body,
-          ),
-          SizedBox(height: ds(5)),
-          DsText('Kbd', DsType.h4, color: theme.foreground),
-          SizedBox(height: ds(2)),
-          DsText(
-            'DsKbd renders a 20px-tall, 20px-minimum-wide key cap: muted fill, '
-            '6px corners, 12px/500 label, inert to touch and text selection.',
-            DsType.body,
-          ),
-          SizedBox(height: ds(2)),
-          DsText(
-            'Reach for it when the content is a literal key the reader would '
-            'press — Ctrl, K, Esc — never a status word (that is DsBadge) or '
-            'a code snippet (that is DsType.code or a code block). A screen '
-            'reader reads it as the text alone with no "key" label — it is '
-            'solely visual markup. DsKbdGroup composes several keys into one '
-            'shortcut and merges their semantics into a single announcement.',
-            DsType.body,
-          ),
-          SizedBox(height: ds(4)),
-          DsText(
-            'Status: stable primitives, not yet registered in the CLI (see '
-            'Install). Platforms: Android, iOS, Web, macOS, Windows, Linux — '
-            'the same six every widget in this package targets.',
-            DsType.small,
-            color: theme.mutedForeground,
-          ),
-        ],
-      ),
-    ),
-  );
-
-  Widget _preview() => DsSection(
-    id: 'preview',
-    title: 'Preview',
-    description:
-        'One representative specimen of each: a revenue metric with a trend, '
+  /// The live-demo slot shadcn's own component pages render before their
+  /// first heading: this port's `DsSection` always carries a heading, so
+  /// `Preview` stands in for it, carrying the framing prose for all four
+  /// primitives (what each is, when to reach for it) ahead of one
+  /// representative specimen of each.
+  Widget _preview(DsThemeData theme) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: <Widget>[
+      ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: DsWidths.prose),
+        child: DsText(
+          'One representative specimen of each: a revenue metric with a trend, '
         'a history card row, a no-results empty state, and a shortcut hint.',
-    child: DocsCodeExample(
-      title: 'Stat, Item, Empty, and Kbd specimens',
-      manualFiles: const <DocsCodeFile>[
-        DocsCodeFile(
-          path: 'lib/components/ui/stat.dart',
-          code:
-              "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
-              '// None of the four has a registry manifest yet — copy\n'
-              '// lib/src/components/stat.dart, item.dart, empty.dart, and\n'
-              '// kbd.dart from the package source directly. There is no\n'
-              '// generated CLI payload to fetch.',
+          DsType.body,
+        ),
+      ),
+      SizedBox(height: ds(6)),
+      Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: DsWidths.prose),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              DsText(
+                'Four components that share one theme: almost no state, and '
+                'a single visual job each. None of the four owns a '
+                'GestureDetector, a FocusNode, or an async flag anywhere in '
+                'its build method: every row below that looks empty in the '
+                'State matrix is empty for that reason, not because the '
+                'template was left unfilled.',
+                DsType.body,
+              ),
+              SizedBox(height: ds(5)),
+              DsText('Stat', DsType.h4, color: theme.foreground),
+              SizedBox(height: ds(2)),
+              DsText(
+                'DsStat renders a labelled metric figure with an optional '
+                'delta and trailing hint. The metric sits in a fixed-height '
+                'slot, the delta row is optional and wraps if the delta '
+                'overflows, and the footprint is identical across all '
+                'states (ready, loading, error, empty, disabled): the '
+                'layout does not reflow when the state changes.',
+                DsType.body,
+              ),
+              SizedBox(height: ds(2)),
+              DsText(
+                'Reach for it on a dashboard, a summary card, or a data page '
+                'to show a metric with direction: revenue with a trend, an '
+                'uptime percentage with a change. Use DsStatState.empty or '
+                '.error and a message to explain why the value is not '
+                'available.',
+                DsType.body,
+              ),
+              SizedBox(height: ds(5)),
+              DsText('Item', DsType.h4, color: theme.foreground),
+              SizedBox(height: ds(2)),
+              DsText(
+                'DsItem is a structured list row: optional media (usually an '
+                'icon), required content (usually a title and description), '
+                'and optional actions. The row carries a border option '
+                '(normal, outline, muted) and an alignment override (center '
+                'or top).',
+                DsType.body,
+              ),
+              SizedBox(height: ds(2)),
+              DsText(
+                'Reach for it over a bare Row when the content has a '
+                'standard shape: icon, title, description, buttons, and the '
+                'container needs semantic consistency across several rows. '
+                'DsItemGroup is the list wrapper: it enforces a vertical gap '
+                'and stretches all children to the column width.',
+                DsType.body,
+              ),
+              SizedBox(height: ds(5)),
+              DsText('Empty', DsType.h4, color: theme.foreground),
+              SizedBox(height: ds(2)),
+              DsText(
+                'DsEmpty is a structured empty state: an optional media '
+                'tile, a title, a description, and one clear way out '
+                '(DsEmptyContent), centred in a column with 16px between '
+                'its parts.',
+                DsType.body,
+              ),
+              SizedBox(height: ds(2)),
+              DsText(
+                'Reach for it whenever a collection, search, or workspace '
+                'has nothing to show and the user needs to know why and '
+                'what to do next. Reach for a spinner or skeleton instead '
+                'when the empty appearance is temporary.',
+                DsType.body,
+              ),
+              SizedBox(height: ds(5)),
+              DsText('Kbd', DsType.h4, color: theme.foreground),
+              SizedBox(height: ds(2)),
+              DsText(
+                'DsKbd renders a 20px-tall, 20px-minimum-wide key cap: muted '
+                'fill, 6px corners, 12px/500 label, inert to touch and text '
+                'selection.',
+                DsType.body,
+              ),
+              SizedBox(height: ds(2)),
+              DsText(
+                'Reach for it when the content is a literal key the reader '
+                'would press, Ctrl, K, Esc: never a status word (that is '
+                'DsBadge) or a code snippet. DsKbdGroup composes several '
+                'keys into one shortcut and merges their semantics into a '
+                'single announcement.',
+                DsType.body,
+              ),
+            ],
+          ),
+        ),
+        SizedBox(height: ds(6)),
+        DocsCodeExample(
+          title: 'Stat, Item, Empty, and Kbd specimens',
+          manualFiles: const <DocsCodeFile>[
+            DocsCodeFile(
+              path: 'lib/components/ui/stat.dart',
+              code:
+                  "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
+                  '// None of the four has a registry manifest yet: copy\n'
+                  '// lib/src/components/stat.dart, item.dart, empty.dart, and\n'
+                  '// kbd.dart from the package source directly. There is no\n'
+                  '// generated CLI payload to fetch.',
+            ),
+          ],
+          preview: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              DsText('Stat: a metric with direction', DsType.label),
+              SizedBox(height: ds(3)),
+              KeyedSubtree(
+                key: const ValueKey<String>('stat-preview'),
+                child: DsPanel(
+                  child: Padding(
+                    padding: EdgeInsets.all(ds(4)),
+                    child: DsStat(
+                      label: 'Revenue',
+                      value: '\$12,480',
+                      delta: (value: '8.2%', direction: DsStatDirection.up),
+                      hint: 'vs last month',
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: ds(8)),
+              DsText('Item: a structured list row', DsType.label),
+              SizedBox(height: ds(3)),
+              KeyedSubtree(
+                key: const ValueKey<String>('item-preview'),
+                child: DsItem(
+                  media: DsItemMedia(
+                    child: DsIcon.lucide(
+                      DsLucide.messageSquare,
+                      size: DsIconSize.sm,
+                      tone: DsIconTone.normal,
+                    ),
+                  ),
+                  content: DsItemContent(
+                    children: <Widget>[
+                      const DsItemTitle('Draft response'),
+                      DsItemDescription(
+                        'You started typing something here on August 14',
+                      ),
+                    ],
+                  ),
+                  actions: DsItemActions(
+                    children: <Widget>[
+                      DsButton(
+                        variant: DsButtonVariant.ghost,
+                        size: DsButtonSize.sm,
+                        onPressed: () {},
+                        child: DsText('Edit', DsComponentType.buttonLabel),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(height: ds(8)),
+              DsText('Empty: no results, with a way out', DsType.label),
+              SizedBox(height: ds(3)),
+              KeyedSubtree(
+                key: const ValueKey<String>('empty-preview'),
+                child: DsEmpty(
+                  children: <Widget>[
+                    const DsEmptyHeader(
+                      children: <Widget>[
+                        DsEmptyMedia(
+                          glyph: DsIconGlyph.search,
+                          tone: DsIconTone.subtle,
+                        ),
+                        DsEmptyTitle('No results found'),
+                        DsEmptyDescription(
+                          'Try a different search term or clear your filters.',
+                        ),
+                      ],
+                    ),
+                    DsEmptyContent(
+                      children: <Widget>[
+                        DsButton(
+                          variant: DsButtonVariant.secondary,
+                          size: DsButtonSize.sm,
+                          onPressed: () {},
+                          child: DsText(
+                            'Clear filters',
+                            DsComponentType.buttonLabel,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: ds(8)),
+              DsText('Kbd: shortcut hints', DsType.label),
+              SizedBox(height: ds(3)),
+              KeyedSubtree(
+                key: const ValueKey<String>('kbd-preview'),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    DsRow(
+                      children: <Widget>[
+                        const DsKbdGroup(
+                          children: <Widget>[DsKbd('Ctrl'), DsKbd('K')],
+                        ),
+                        DsText('Open search', DsType.small),
+                      ],
+                    ),
+                    SizedBox(height: ds(4)),
+                    DsRow(
+                      children: <Widget>[
+                        const DsKbd('Esc'),
+                        DsText('Close dialog', DsType.small),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ],
-      preview: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          DsText('Stat — a metric with direction', DsType.label),
-          SizedBox(height: ds(3)),
-          KeyedSubtree(
-            key: const ValueKey<String>('stat-preview'),
-            child: DsPanel(
-              child: Padding(
-                padding: EdgeInsets.all(ds(4)),
-                child: DsStat(
-                  label: 'Revenue',
-                  value: '\$12,480',
-                  delta: (value: '8.2%', direction: DsStatDirection.up),
-                  hint: 'vs last month',
-                ),
-              ),
-            ),
-          ),
-          SizedBox(height: ds(8)),
-          DsText('Item — a structured list row', DsType.label),
-          SizedBox(height: ds(3)),
-          KeyedSubtree(
-            key: const ValueKey<String>('item-preview'),
-            child: DsItem(
-              media: DsItemMedia(
-                child: DsIcon.lucide(
-                  DsLucide.messageSquare,
-                  size: DsIconSize.sm,
-                  tone: DsIconTone.normal,
-                ),
-              ),
-              content: DsItemContent(
-                children: <Widget>[
-                  const DsItemTitle('Draft response'),
-                  DsItemDescription(
-                    'You started typing something here on August 14',
-                  ),
-                ],
-              ),
-              actions: DsItemActions(
-                children: <Widget>[
-                  DsButton(
-                    variant: DsButtonVariant.ghost,
-                    size: DsButtonSize.sm,
-                    onPressed: () {},
-                    child: DsText('Edit', DsComponentType.buttonLabel),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          SizedBox(height: ds(8)),
-          DsText('Empty — no results, with a way out', DsType.label),
-          SizedBox(height: ds(3)),
-          KeyedSubtree(
-            key: const ValueKey<String>('empty-preview'),
-            child: DsEmpty(
-              children: <Widget>[
-                const DsEmptyHeader(
-                  children: <Widget>[
-                    DsEmptyMedia(
-                      glyph: DsIconGlyph.search,
-                      tone: DsIconTone.subtle,
-                    ),
-                    DsEmptyTitle('No results found'),
-                    DsEmptyDescription(
-                      'Try a different search term or clear your filters.',
-                    ),
-                  ],
-                ),
-                DsEmptyContent(
-                  children: <Widget>[
-                    DsButton(
-                      variant: DsButtonVariant.secondary,
-                      size: DsButtonSize.sm,
-                      onPressed: () {},
-                      child: DsText(
-                        'Clear filters',
-                        DsComponentType.buttonLabel,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: ds(8)),
-          DsText('Kbd — shortcut hints', DsType.label),
-          SizedBox(height: ds(3)),
-          KeyedSubtree(
-            key: const ValueKey<String>('kbd-preview'),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                DsRow(
-                  children: <Widget>[
-                    const DsKbdGroup(
-                      children: <Widget>[DsKbd('Ctrl'), DsKbd('K')],
-                    ),
-                    DsText('Open search', DsType.small),
-                  ],
-                ),
-                SizedBox(height: ds(4)),
-                DsRow(
-                  children: <Widget>[
-                    const DsKbd('Esc'),
-                    DsText('Close dialog', DsType.small),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
     ),
+    ],
   );
 
   Widget _install() => DsSection(
@@ -363,7 +393,7 @@ class _StatArticle extends StatelessWidget {
     title: 'Installation',
     description:
         'None of the four has a registry manifest yet, so `elattar add stat` / '
-        '`item` / `empty` / `kbd` is not available — install by copying the '
+        '`item` / `empty` / `kbd` is not available: install by copying the '
         'source files manually.',
     child: DocsInstallFacts(
       title: 'Installation facts',
@@ -423,7 +453,7 @@ class _StatArticle extends StatelessWidget {
               'This page\'s live preview and '
               'example/test/components_docs/stat_test.dart. No dedicated '
               'package-level unit test and no registry fixture install exist '
-              'yet for any of the four — there is nothing to install.',
+              'yet for any of the four: there is nothing to install.',
         ),
       ],
     ),
@@ -440,9 +470,578 @@ class _StatArticle extends StatelessWidget {
     ),
   );
 
-  Widget _api() => DsSection(
+  /// shadcn shows Composition as a tree diagram for Item, Empty, and Kbd;
+  /// Stat's own counterpart page has no such section, since Stat has no
+  /// counterpart page at all. Below is the same idea for all four: the tree
+  /// each one nests into, read top down, then one real composed shape (a
+  /// card header that reaches for DsStat, not a list of parts).
+  Widget _composition() => DsSection(
+    id: 'composition',
+    title: 'Composition',
+    description:
+        'None of the four has a size or variant axis that reshapes the '
+        'tree: Empty and Kbd get their shape entirely from which parts a '
+        'caller includes, Item\'s only axis is the border (see Item: '
+        'Variant), and Stat is a single leaf that takes data, not children.',
+    child: DocsCodeExample(
+      title: 'Composed with other primitives',
+      manualFiles: const <DocsCodeFile>[
+        DocsCodeFile(
+          path: 'stat_tree.txt',
+          title: 'Stat',
+          description: 'A leaf widget: no nested part-widgets to assemble.',
+          code: '''DsStat
+├─ label
+├─ value
+├─ delta        → DsStatDeltaMark (exported separately, see API Reference)
+└─ hint / message''',
+        ),
+        DocsCodeFile(
+          path: 'item_tree.txt',
+          title: 'Item',
+          code: '''DsItemGroup
+└─ DsItem
+   ├─ DsItemMedia      (optional)
+   ├─ DsItemContent
+   │  ├─ DsItemTitle
+   │  └─ DsItemDescription
+   └─ DsItemActions    (optional)''',
+        ),
+        DocsCodeFile(
+          path: 'empty_tree.txt',
+          title: 'Empty',
+          code: '''DsEmpty
+├─ DsEmptyHeader
+│  ├─ DsEmptyMedia        (optional)
+│  ├─ DsEmptyTitle
+│  └─ DsEmptyDescription
+└─ DsEmptyContent''',
+        ),
+        DocsCodeFile(
+          path: 'kbd_tree.txt',
+          title: 'Kbd',
+          code: '''DsKbdGroup
+├─ DsKbd
+└─ DsKbd    (one or more)''',
+        ),
+      ],
+      preview: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          DsText('Stat on a card header', DsType.label),
+          SizedBox(height: ds(3)),
+          DsCard(
+            children: <Widget>[
+              DsCardContent(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    DsStat(
+                      label: 'Monthly revenue',
+                      value: '\$52,840',
+                      delta: (value: '12.5%', direction: DsStatDirection.up),
+                      hint: 'vs last month',
+                    ),
+                    SizedBox(height: ds(4)),
+                    const DsSeparator(),
+                    SizedBox(height: ds(4)),
+                    DsText('In the last 30 days', DsType.small),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    ),
+  );
+
+  Widget _statDelta() => DsSection(
+    id: 'stat-delta',
+    title: 'Stat: Delta and direction',
+    description:
+        'Direction is conveyed three ways before colour is considered: the '
+        'glyph\'s shape, the sign written onto the number, and a visually '
+        'hidden word for assistive tech (see Accessibility). betterWhen '
+        'chooses which direction earns the success ink; the other gets plain '
+        'foreground, and flat is always muted.',
+    child: DsPanel(
+      label: 'PREVIEW',
+      child: Wrap(
+        spacing: ds(10),
+        runSpacing: ds(6),
+        children: <Widget>[
+          const KeyedSubtree(
+            key: ValueKey<String>('stat-example:up'),
+            child: DsStat(
+              label: 'Revenue',
+              value: '\$12,480',
+              delta: (value: '8.2%', direction: DsStatDirection.up),
+              hint: 'vs last month',
+            ),
+          ),
+          KeyedSubtree(
+            key: const ValueKey<String>('stat-example:down'),
+            child: DsStat(
+              label: 'Refunds',
+              value: '\$1,204',
+              delta: (value: '3.1%', direction: DsStatDirection.down),
+              betterWhen: DsStatDirection.down,
+              hint: 'vs last month',
+            ),
+          ),
+          const KeyedSubtree(
+            key: ValueKey<String>('stat-example:flat'),
+            child: DsStat(
+              label: 'Signups',
+              value: '482',
+              delta: (value: '0.0%', direction: DsStatDirection.flat),
+              hint: 'vs last month',
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+
+  Widget _statStates() => DsSection(
+    id: 'stat-states',
+    title: 'Stat: Loading, error, and empty',
+    description:
+        'The figure slot holds the same line-box height in every state, so '
+        'the layout never reflows when a metric moves from loading to ready. '
+        'error and empty both replace the figure with an em dash and swap '
+        'the delta row for a message; disabled dims the whole row and marks '
+        'it Semantics(enabled: false).',
+    child: DsPanel(
+      label: 'PREVIEW',
+      child: Wrap(
+        spacing: ds(10),
+        runSpacing: ds(6),
+        children: <Widget>[
+          const KeyedSubtree(
+            key: ValueKey<String>('stat-example:loading'),
+            child: DsStat(
+              label: 'Revenue',
+              value: '\$12,480',
+              delta: (value: '8.2%', direction: DsStatDirection.up),
+              state: DsStatState.loading,
+            ),
+          ),
+          const KeyedSubtree(
+            key: ValueKey<String>('stat-example:error'),
+            child: DsStat(
+              label: 'Uptime',
+              value: 'N/A',
+              state: DsStatState.error,
+              message: 'Failed to load',
+            ),
+          ),
+          const KeyedSubtree(
+            key: ValueKey<String>('stat-example:empty'),
+            child: DsStat(
+              label: 'Uptime',
+              value: 'N/A',
+              state: DsStatState.empty,
+              message: 'No data yet',
+            ),
+          ),
+          KeyedSubtree(
+            key: const ValueKey<String>('stat-example:disabled'),
+            child: DsStat(
+              label: 'Churn',
+              value: '4.1%',
+              delta: (value: '0.4%', direction: DsStatDirection.down),
+              betterWhen: DsStatDirection.down,
+              hint: 'vs last month',
+              disabled: true,
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+
+  Widget _itemVsField() => DsSection(
+    id: 'item-vs-field',
+    title: 'Item: Item vs Field',
+    description:
+        'Both stack a label-like part over supporting text, and it is easy '
+        'to reach for the wrong one.',
+    child: ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: DsWidths.prose),
+      child: DsText(
+        'DsItem is a display row: media, a title, a description, and '
+        'actions, with no form semantics and no validation state. DsField '
+        '(documented on its own page) is a form control wrapper: it owns a '
+        'label, a control, a description, and an error, wired so a screen '
+        'reader announces them as one field with Semantics(hint:) and '
+        'Semantics(validationResult:). Reach for DsItem for a notification, '
+        'a search result, or a list row a user reads. Reach for DsField the '
+        'moment the row holds something the user types into, checks, or '
+        'submits.',
+        DsType.body,
+      ),
+    ),
+  );
+
+  Widget _itemVariant() => DsSection(
+    id: 'item-variant',
+    title: 'Item: Variant',
+    description:
+        'DsItemVariant is Item\'s only enum: no separate size axis exists '
+        '(sm and xs are byte-identical to the default and were never built; '
+        'see API Reference).',
+    child: DsPanel(
+      label: 'PREVIEW',
+      child: DsItemGroup(
+        children: <Widget>[
+          KeyedSubtree(
+            key: const ValueKey<String>('item-example:variant-normal'),
+            child: const DsItem(
+              content: DsItemContent(
+                children: <Widget>[
+                  DsItemTitle('Normal'),
+                  DsItemDescription('border-transparent: no border, no fill.'),
+                ],
+              ),
+            ),
+          ),
+          KeyedSubtree(
+            key: const ValueKey<String>('item-example:variant-outline'),
+            child: const DsItem(
+              variant: DsItemVariant.outline,
+              content: DsItemContent(
+                children: <Widget>[
+                  DsItemTitle('Outline'),
+                  DsItemDescription('A 1px border in theme.border.'),
+                ],
+              ),
+            ),
+          ),
+          KeyedSubtree(
+            key: const ValueKey<String>('item-example:variant-muted'),
+            child: const DsItem(
+              variant: DsItemVariant.muted,
+              content: DsItemContent(
+                children: <Widget>[
+                  DsItemTitle('Muted'),
+                  DsItemDescription('A semi-transparent muted fill.'),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+
+  Widget _itemIcon() => DsSection(
+    id: 'item-icon',
+    title: 'Item: Icon',
+    description:
+        'DsItemMedia forces its child into a 16px square and, whenever the '
+        'row carries a description, nudges it 2px down so it lines up with '
+        'the title\'s cap height instead of the row\'s centre.',
+    child: DsPanel(
+      label: 'PREVIEW',
+      child: KeyedSubtree(
+        key: const ValueKey<String>('item-example:icon'),
+        child: DsItem(
+          media: DsItemMedia(
+            child: DsIcon.lucide(
+              DsLucide.bell,
+              size: DsIconSize.sm,
+              tone: DsIconTone.normal,
+            ),
+          ),
+          content: const DsItemContent(
+            children: <Widget>[
+              DsItemTitle('New comment'),
+              DsItemDescription('Sarah replied to your thread'),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
+
+  Widget _itemAvatar() => DsSection(
+    id: 'item-avatar',
+    title: 'Item: Avatar',
+    description:
+        'DsItemMedia takes any widget, including DsAvatar: passing '
+        'sizePx: DsItemMedia.size keeps the fallback initials centred in '
+        'the same 16px square an icon would occupy, instead of relying on '
+        'the forced square to squash a larger default.',
+    child: DsPanel(
+      label: 'PREVIEW',
+      child: KeyedSubtree(
+        key: const ValueKey<String>('item-example:avatar'),
+        child: DsItem(
+          media: DsItemMedia(
+            child: DsAvatar(fallback: 'JD', sizePx: DsItemMedia.size),
+          ),
+          content: const DsItemContent(
+            children: <Widget>[
+              DsItemTitle('Jordan Diaz'),
+              DsItemDescription('Commented 2 hours ago'),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
+
+  Widget _itemGroup() => DsSection(
+    id: 'item-group',
+    title: 'Item: Group',
+    description:
+        'DsItemGroup is the list wrapper: it enforces a vertical gap and '
+        'stretches every row to the column width. The gap tightens from '
+        '10px to a hidden 2.5px when the rows contain size=sm buttons, a '
+        'CSS descendant-selector quirk reproduced as measured (see '
+        'Theming).',
+    child: DsPanel(
+      label: 'PREVIEW',
+      child: KeyedSubtree(
+        key: const ValueKey<String>('item-example:group'),
+        child: DsItemGroup(
+          children: <Widget>[
+            DsItem(
+              media: DsItemMedia(
+                child: DsIcon.lucide(DsLucide.fileText, size: DsIconSize.sm),
+              ),
+              content: const DsItemContent(
+                children: <Widget>[
+                  DsItemTitle('Quarterly report'),
+                  DsItemDescription('Jan 1 – Mar 31, 2026'),
+                ],
+              ),
+            ),
+            DsItem(
+              media: DsItemMedia(
+                child: DsIcon.lucide(DsLucide.download, size: DsIconSize.sm),
+              ),
+              content: const DsItemContent(
+                children: <Widget>[DsItemTitle('Download Q4 data')],
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+
+  Widget _emptyInputGroup() => DsSection(
+    id: 'empty-input-group',
+    title: 'Empty: Input group',
+    description:
+        'DsEmptyContent\'s "way out" does not have to be a button: any '
+        'widget is a valid child, including a DsInputGroup that lets the '
+        'reader search again in place.',
+    child: DsPanel(
+      label: 'PREVIEW',
+      child: KeyedSubtree(
+        key: const ValueKey<String>('empty-example:input-group'),
+        child: DsEmpty(
+          children: <Widget>[
+            const DsEmptyHeader(
+              children: <Widget>[
+                DsEmptyMedia(
+                  glyph: DsIconGlyph.search,
+                  tone: DsIconTone.subtle,
+                ),
+                DsEmptyTitle('No components matched'),
+                DsEmptyDescription(
+                  'Try a different name, or browse the full catalog.',
+                ),
+              ],
+            ),
+            DsEmptyContent(
+              children: <Widget>[
+                DsInputGroup(
+                  startAddon: DsInputGroupAddon(
+                    child: DsIcon(
+                      DsIconGlyph.search,
+                      size: DsIconSize.sm,
+                      tone: DsIconTone.inherit,
+                    ),
+                  ),
+                  child: const DsInputGroupInput(
+                    placeholder: 'Search components...',
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+
+  Widget _kbdGroup() => DsSection(
+    id: 'kbd-group',
+    title: 'Kbd: Group',
+    description:
+        'DsKbdGroup composes several keys into one shortcut, read by '
+        'assistive tech as a single combination rather than unrelated '
+        'letters (see Accessibility).',
+    child: DsPanel(
+      label: 'PREVIEW',
+      child: KeyedSubtree(
+        key: const ValueKey<String>('kbd-example:group'),
+        child: DsRow(
+          children: <Widget>[
+            const DsKbdGroup(
+              children: <Widget>[DsKbd('⌘'), DsKbd('⇧'), DsKbd('P')],
+            ),
+            DsText('Command palette', DsType.small),
+          ],
+        ),
+      ),
+    ),
+  );
+
+  Widget _kbdButton() => DsSection(
+    id: 'kbd-button',
+    title: 'Kbd: Button',
+    description:
+        'A DsKbd composed inside a DsButton\'s own child, so the key cap '
+        'rides along with the label as one control.',
+    child: DsPanel(
+      label: 'PREVIEW',
+      child: KeyedSubtree(
+        key: const ValueKey<String>('kbd-example:button'),
+        child: DsButton(
+          onPressed: () {},
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              DsText('Save', DsComponentType.buttonLabel),
+              SizedBox(width: ds(2)),
+              const DsKbd('⌘S'),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
+
+  Widget _kbdInputGroup() => DsSection(
+    id: 'kbd-input-group',
+    title: 'Kbd: Input group',
+    description:
+        'A DsKbd inside a DsInputGroupAddon, hinting at the shortcut that '
+        'focuses the field it sits in.',
+    child: DsPanel(
+      label: 'PREVIEW',
+      child: KeyedSubtree(
+        key: const ValueKey<String>('kbd-example:input-group'),
+        child: DsInputGroup(
+          endAddon: const DsInputGroupAddon(
+            align: DsInputGroupAlign.end,
+            child: DsKbd('⌘K'),
+          ),
+          child: const DsInputGroupInput(placeholder: 'Jump to component...'),
+        ),
+      ),
+    ),
+  );
+
+  Widget _rtl(DsThemeData theme) => DsSection(
+    id: 'rtl',
+    title: 'RTL',
+    description:
+        'None of the four paints direction-specific layout of its own: '
+        'each sizes to its content and reads right-to-left under a plain '
+        'Directionality, the same composition either way.',
+    child: DsPanel(
+      label: 'PREVIEW',
+      child: Directionality(
+        textDirection: TextDirection.rtl,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            DsText('Item', DsType.label, color: theme.actionInk),
+            SizedBox(height: ds(3)),
+            const KeyedSubtree(
+              key: ValueKey<String>('rtl-example:item'),
+              child: DsItem(
+                content: DsItemContent(
+                  children: <Widget>[
+                    DsItemTitle('المستند النهائي'),
+                    DsItemDescription('تم التحديث اليوم'),
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(height: ds(6)),
+            DsText('Empty', DsType.label, color: theme.actionInk),
+            SizedBox(height: ds(3)),
+            KeyedSubtree(
+              key: const ValueKey<String>('rtl-example:empty'),
+              child: DsEmpty(
+                children: <Widget>[
+                  const DsEmptyHeader(
+                    children: <Widget>[
+                      DsEmptyMedia(glyph: DsIconGlyph.search),
+                      DsEmptyTitle('لا توجد نتائج'),
+                      DsEmptyDescription('جرب كلمة بحث مختلفة.'),
+                    ],
+                  ),
+                  DsEmptyContent(
+                    children: <Widget>[
+                      DsButton(
+                        variant: DsButtonVariant.secondary,
+                        size: DsButtonSize.sm,
+                        onPressed: () {},
+                        child: DsText(
+                          'مسح الفلاتر',
+                          DsComponentType.buttonLabel,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: ds(6)),
+            DsText('Kbd', DsType.label, color: theme.actionInk),
+            SizedBox(height: ds(3)),
+            KeyedSubtree(
+              key: const ValueKey<String>('rtl-example:kbd'),
+              child: DsRow(
+                children: <Widget>[
+                  const DsKbdGroup(
+                    children: <Widget>[DsKbd('Ctrl'), DsKbd('K')],
+                  ),
+                  DsText('فتح البحث', DsType.small),
+                ],
+              ),
+            ),
+            SizedBox(height: ds(6)),
+            DsText('Stat', DsType.label, color: theme.actionInk),
+            SizedBox(height: ds(3)),
+            const KeyedSubtree(
+              key: ValueKey<String>('rtl-example:stat'),
+              child: DsStat(
+                label: 'الإيرادات',
+                value: '\$12,480',
+                delta: (value: '8.2%', direction: DsStatDirection.up),
+                hint: 'مقارنة بالشهر الماضي',
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+
+  Widget _api(DsThemeData theme) => DsSection(
     id: 'api',
-    title: 'API',
+    title: 'API Reference',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
@@ -452,20 +1051,20 @@ class _StatArticle extends StatelessWidget {
             DocsApiFact(
               name: 'label',
               type: 'String',
-              description: 'Required. The metric name — "Revenue".',
+              description: 'Required. The metric name, "Revenue".',
             ),
             DocsApiFact(
               name: 'value',
               type: 'String',
               description:
-                  'Required. The figure to display — "\$12,480". '
+                  'Required. The figure to display, "\$12,480". '
                   'Slot height is fixed regardless of content.',
             ),
             DocsApiFact(
               name: 'delta',
               type: 'DsStatDelta?',
               description:
-                  'Optional. A value and direction (up/down/flat) — '
+                  'Optional. A value and direction (up/down/flat), '
                   '(value: "8.2%", direction: DsStatDirection.up). '
                   'Presence reserves the delta row even while loading.',
             ),
@@ -481,7 +1080,7 @@ class _StatArticle extends StatelessWidget {
               name: 'hint',
               type: 'String?',
               description:
-                  'Optional comparison, one word or phrase — "vs last month". '
+                  'Optional comparison, one word or phrase, "vs last month". '
                   'Shown below the delta when the state is ready.',
             ),
             DocsApiFact(
@@ -489,7 +1088,7 @@ class _StatArticle extends StatelessWidget {
               type: 'DsStatState',
               description:
                   'Defaults to ready. Controls what the figure and delta '
-                  'render as — a skeleton while loading, an em dash while '
+                  'render as: a skeleton while loading, an em dash while '
                   'error or empty, the real value while ready.',
             ),
             DocsApiFact(
@@ -530,7 +1129,7 @@ class _StatArticle extends StatelessWidget {
               type: 'static double',
               description:
                   'Fixed line-box height the figure slot maintains in every '
-                  'state — prevents reflow when loading → ready.',
+                  'state: prevents reflow when loading → ready.',
             ),
             DocsApiFact(
               name: 'DsStatDeltaMark',
@@ -539,6 +1138,41 @@ class _StatArticle extends StatelessWidget {
                   'Exported for callers that already have a label and want to '
                   'reuse just the direction mark. Takes required delta and '
                   'betterWhen parameters.',
+            ),
+          ],
+        ),
+        SizedBox(height: ds(6)),
+        const DocsApiTable(
+          title: 'DsStatState',
+          facts: <DocsApiFact>[
+            DocsApiFact(
+              name: 'ready',
+              type: 'the default',
+              description:
+                  'Renders the value, the delta mark, and the hint: the full '
+                  'metric.',
+            ),
+            DocsApiFact(
+              name: 'loading',
+              type: 'skeleton state',
+              description:
+                  'Renders skeleton placeholders for the value and delta, '
+                  'keeping the full slot height so the layout does not '
+                  'reflow.',
+            ),
+            DocsApiFact(
+              name: 'error',
+              type: 'blank state',
+              description:
+                  'Renders an em dash in the value slot and the error message '
+                  'with a triangle-alert icon in the delta row.',
+            ),
+            DocsApiFact(
+              name: 'empty',
+              type: 'blank state',
+              description:
+                  'Renders an em dash and a plain-text message (no icon) in '
+                  'the delta row.',
             ),
           ],
         ),
@@ -562,8 +1196,8 @@ class _StatArticle extends StatelessWidget {
               name: 'DsItem.media',
               type: 'Widget?',
               description:
-                  'Optional. Usually a DsItemMedia with an icon. Sits at the '
-                  'row start.',
+                  'Optional. Usually a DsItemMedia with an icon or avatar. '
+                  'Sits at the row start.',
             ),
             DocsApiFact(
               name: 'DsItem.content',
@@ -583,8 +1217,10 @@ class _StatArticle extends StatelessWidget {
               name: 'DsItem.variant',
               type: 'DsItemVariant',
               description:
-                  'Defaults to normal. Selects the border — transparent, '
-                  'border colour, or muted fill.',
+                  'Defaults to normal. Selects the border: transparent, '
+                  'border colour, or muted fill. Item\'s only enum: no '
+                  'separate size axis (sm/xs are byte-identical to default, '
+                  'not built).',
             ),
             DocsApiFact(
               name: 'DsItem.alignStart',
@@ -617,7 +1253,7 @@ class _StatArticle extends StatelessWidget {
               type: 'static double',
               description:
                   '10px between rows. Tightens to 2.5px (hidden) when the '
-                  'rows contain size=sm buttons — read Composition for the '
+                  'rows contain size=sm buttons: read Item: Group for the '
                   'drift.',
             ),
             DocsApiFact(
@@ -647,6 +1283,13 @@ class _StatArticle extends StatelessWidget {
           ],
         ),
         SizedBox(height: ds(6)),
+        DsText(
+          'Empty has no DsEmptyVariant: its shape comes entirely from '
+          'which of the six parts a caller includes, not from a prop.',
+          DsType.small,
+          color: theme.mutedForeground,
+        ),
+        SizedBox(height: ds(3)),
         const DocsApiTable(
           title: 'Empty family properties',
           facts: <DocsApiFact>[
@@ -667,7 +1310,11 @@ class _StatArticle extends StatelessWidget {
             DocsApiFact(
               name: 'DsEmptyMedia.glyph',
               type: 'DsIconGlyph',
-              description: 'Required. The icon drawn inside the 32px tile.',
+              description:
+                  'Required. The icon drawn inside the 32px tile. Not an '
+                  'arbitrary widget slot: DsEmptyMedia cannot host a '
+                  'DsAvatar (see Empty: Input group\'s note on what it can '
+                  'hold instead).',
             ),
             DocsApiFact(
               name: 'DsEmptyMedia.tone',
@@ -677,21 +1324,20 @@ class _StatArticle extends StatelessWidget {
             DocsApiFact(
               name: 'DsEmptyTitle.text',
               type: 'String (positional)',
-              description:
-                  'Required. The heading — 13px/500, −0.26px tracking.',
+              description: 'Required. The heading, 13px/500, −0.26px tracking.',
             ),
             DocsApiFact(
               name: 'DsEmptyDescription.text',
               type: 'String (positional)',
               description:
-                  'Required. The supporting sentence — 13px/400, 1.625 line '
+                  'Required. The supporting sentence, 13px/400, 1.625 line '
                   'height, theme.mutedForeground.',
             ),
             DocsApiFact(
               name: 'DsEmptyContent.children',
               type: 'List<Widget>',
               description:
-                  'Required. The way out — one or more actions, capped at '
+                  'Required. The way out: one or more actions, capped at '
                   'the same 384px measure, joined by a 10px gap.',
             ),
           ],
@@ -705,7 +1351,7 @@ class _StatArticle extends StatelessWidget {
               type: 'static double',
               description:
                   '24px outer padding, 16px between children, 16px corner '
-                  'radius (shapes nothing today — see Theming).',
+                  'radius (shapes nothing today: see Theming).',
             ),
             DocsApiFact(
               name: 'DsEmptyHeader.gap / .maxWidth',
@@ -719,7 +1365,7 @@ class _StatArticle extends StatelessWidget {
               type: 'static double',
               description:
                   '32px tile, 12px corners, 8px gap to the title, a 16px '
-                  'glyph drawn with the stroke width computed for 24px — a '
+                  'glyph drawn with the stroke width computed for 24px: a '
                   'deliberate drift, see Theming.',
             ),
             DocsApiFact(
@@ -730,19 +1376,26 @@ class _StatArticle extends StatelessWidget {
           ],
         ),
         SizedBox(height: ds(6)),
+        DsText(
+          'Kbd has no DsKbdSize or DsKbdVariant: DsKbdGroup composes many '
+          'keys, it is not a variant of DsKbd.',
+          DsType.small,
+          color: theme.mutedForeground,
+        ),
+        SizedBox(height: ds(3)),
         const DocsApiTable(
           title: 'Kbd family properties',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'DsKbd.text',
               type: 'String (positional)',
-              description: 'Required. The legend, as authored — "Ctrl", "K".',
+              description: 'Required. The legend, as authored, "Ctrl", "K".',
             ),
             DocsApiFact(
               name: 'DsKbdGroup.children',
               type: 'List<Widget>',
               description:
-                  'Required. The keys, in order — typically DsKbd widgets.',
+                  'Required. The keys, in order: typically DsKbd widgets.',
             ),
           ],
         ),
@@ -769,88 +1422,9 @@ class _StatArticle extends StatelessWidget {
     ),
   );
 
-  Widget _variants(DsThemeData theme) => DsSection(
-    id: 'variants',
-    title: 'Variants and sizes',
-    description:
-        'None of the four has a size axis. Stat and Item have enums; Empty '
-        'and Kbd have none — their shape comes from composition, not a variant '
-        'switch.',
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        const DocsApiTable(
-          title: 'DsStatState',
-          facts: <DocsApiFact>[
-            DocsApiFact(
-              name: 'ready',
-              type: 'the default',
-              description:
-                  'Renders the value, the delta mark, and the hint — the full '
-                  'metric.',
-            ),
-            DocsApiFact(
-              name: 'loading',
-              type: 'skeleton state',
-              description:
-                  'Renders skeleton placeholders for the value and delta, '
-                  'keeping the full slot height so the layout does not '
-                  'reflow.',
-            ),
-            DocsApiFact(
-              name: 'error',
-              type: 'blank state',
-              description:
-                  'Renders an em dash in the value slot and the error message '
-                  'with a triangle-alert icon in the delta row.',
-            ),
-            DocsApiFact(
-              name: 'empty',
-              type: 'blank state',
-              description:
-                  'Renders an em dash and a plain-text message (no icon) in '
-                  'the delta row.',
-            ),
-          ],
-        ),
-        SizedBox(height: ds(4)),
-        const DocsApiTable(
-          title: 'DsItemVariant',
-          facts: <DocsApiFact>[
-            DocsApiFact(
-              name: 'normal',
-              type: 'the default',
-              description: 'A transparent border; no background.',
-            ),
-            DocsApiFact(
-              name: 'outline',
-              type: 'bordered',
-              description: 'A 1px border in theme.border.',
-            ),
-            DocsApiFact(
-              name: 'muted',
-              type: 'filled',
-              description: 'A semi-transparent muted background.',
-            ),
-          ],
-        ),
-        SizedBox(height: ds(4)),
-        _bullets(theme, <String>[
-          'Empty has no DsEmptyVariant. Its "variants" are which of the six '
-              'parts a caller includes — a media tile is optional, multiple '
-              'actions in DsEmptyContent are optional — not an enum switch.',
-          'Kbd has no DsKbdSize or DsKbdVariant either. DsKbdGroup is the '
-              '"many keys" composition, not a variant of DsKbd — it renders '
-              'its own children unchanged and only adds the 4px gap and the '
-              'MergeSemantics wrapper.',
-        ]),
-      ],
-    ),
-  );
-
   Widget _states() => DsSection(
     id: 'states',
-    title: 'States and feedback',
+    title: 'States',
     description:
         'All four are static, presentational StatelessWidgets: none owns '
         'onPressed/enabled, a GestureDetector, a FocusNode, or an async flag '
@@ -874,7 +1448,7 @@ class _StatArticle extends StatelessWidget {
           treatment:
               'Stat owns a loading state (skeleton placeholders) and error/empty '
               'states (em dash + message). Item, Empty, and Kbd carry no concept '
-              'of these states — a caller renders a different specimen, the same '
+              'of these states: a caller renders a different specimen, the same '
               'way DsBadge swaps variant instead of transitioning in place.',
           userSignal:
               'A different specimen for Item/Empty/Kbd, a live state for Stat.',
@@ -883,7 +1457,7 @@ class _StatArticle extends StatelessWidget {
           state: 'Disabled',
           treatment:
               'Stat owns a disabled flag that sets opacity and disables '
-              'semantics.enabled. Item, Empty, and Kbd carry no disabled state — '
+              'semantics.enabled. Item, Empty, and Kbd carry no disabled state, '
               'wrap them in an interactive control at the call site if the rows '
               'must be disabled as a group.',
           userSignal: 'A state property on Stat only.',
@@ -891,20 +1465,20 @@ class _StatArticle extends StatelessWidget {
         DocsStateFact(
           state: 'Hover / Focus-visible / Pressed / Selected',
           treatment:
-              'N/A for all four — none owns a GestureDetector, FocusNode, or '
+              'N/A for all four: none owns a GestureDetector, FocusNode, or '
               'onPressed/enabled parameter. Item.content and Empty.children can '
               '*hold* interactive children (buttons) whose own states apply to '
               'them, not to the parent.',
           userSignal:
-              'Compose with an interactive component at the call site — the '
+              'Compose with an interactive component at the call site: the '
               'parent components do not.',
         ),
         DocsStateFact(
           state: 'Reduced motion',
           treatment:
-              'N/A — no AnimationController and no motion token appears in any '
+              'N/A: no AnimationController and no motion token appears in any '
               'of the four build methods. (Stat mentions DsSwapIn for a loading '
-              '→ ready transition in the source, but no motion is involved — it '
+              '→ ready transition in the source, but no motion is involved: it '
               'is a key-change that replays the swapIn effect, not an '
               'AnimationController.)',
           userSignal: 'Nothing animates, so nothing needs to still.',
@@ -915,7 +1489,7 @@ class _StatArticle extends StatelessWidget {
 
   Widget _accessibility(DsThemeData theme) => DsSection(
     id: 'accessibility',
-    title: 'Accessibility and keyboard behavior',
+    title: 'Accessibility',
     description:
         'This is where the four genuinely differ, and where some sources have '
         'real gaps worth naming plainly rather than papering over.',
@@ -925,12 +1499,12 @@ class _StatArticle extends StatelessWidget {
         DsText('Stat', DsType.label, color: theme.actionInk),
         SizedBox(height: ds(2)),
         _bullets(theme, <String>[
-          'Semantic role: none of its own — DsStat and DsStatDeltaMark render '
+          'Semantic role: none of its own, DsStat and DsStatDeltaMark render '
               'plain Column/Row widgets and static text via DsText, with no '
               'custom Semantics wrapper.',
           'Delta direction is conveyed three ways, not colour alone. '
               'DsStatDeltaMark wraps the mark in Semantics(label: direction.word) '
-              'where the word is "Up", "Down", or "No change" — read before '
+              'where the word is "Up", "Down", or "No change": read before '
               'the number by assistive tech. The glyph shape (arrow up, arrow '
               'down, minus) and the sign character (+/−/nothing) provide two '
               'additional signals, so the direction reads even if colour is '
@@ -941,19 +1515,19 @@ class _StatArticle extends StatelessWidget {
               'announces itself.',
           'Disabled: opacity 45% plus Semantics(enabled: false) makes disabled '
               'clear to assistive tech.',
-          'Keyboard: never focusable — no Focus widget or FocusNode exists.',
+          'Keyboard: never focusable: no Focus widget or FocusNode exists.',
           'Known platform differences: none observed.',
         ]),
         SizedBox(height: ds(5)),
         DsText('Item', DsType.label, color: theme.actionInk),
         SizedBox(height: ds(2)),
         _bullets(theme, <String>[
-          'Semantic role: none of its own — DsItem, DsItemContent, and '
+          'Semantic role: none of its own, DsItem, DsItemContent, and '
               'DsItemActions are plain Row/Column widgets with no Semantics '
               'wrapper.',
           'Text is not silent: DsItemTitle and DsItemDescription render '
               'through DsText, which carries Flutter\'s default static-text '
-              'semantics — both are individually reachable by a screen reader.',
+              'semantics: both are individually reachable by a screen reader.',
           'Actions inherit semantics from DsItemActions\' children (buttons), '
               'which own their own focus and labels.',
           'Keyboard: DsItemActions typically holds button children that own '
@@ -964,7 +1538,7 @@ class _StatArticle extends StatelessWidget {
         DsText('Empty', DsType.label, color: theme.actionInk),
         SizedBox(height: ds(2)),
         _bullets(theme, <String>[
-          'Semantic role: none of its own — DsEmpty, DsEmptyHeader, and '
+          'Semantic role: none of its own, DsEmpty, DsEmptyHeader, and '
               'DsEmptyContent are plain Column/Padding widgets with no Semantics '
               'wrapper.',
           'Title and description are readable: DsEmptyTitle and '
@@ -974,12 +1548,12 @@ class _StatArticle extends StatelessWidget {
               'no Semantics(liveRegion: true) in empty.dart and no heading '
               'semantics on DsEmptyTitle. When an app swaps a loading state for '
               'a "no results" DsEmpty, nothing in this component tells an '
-              'assistive-tech user that the content changed — they only discover '
+              'assistive-tech user that the content changed: they only discover '
               'the new text if they navigate back to that region. The text is '
               'not silent; its *arrival* is. Wire a live announcement at the '
               'call site (e.g. Semantics(liveRegion: true) around the swap, or '
               'SemanticsService.announce) if it matters.',
-          'Media icon: carries no separate label parameter — the adjacent title '
+          'Media icon: carries no separate label parameter: the adjacent title '
               'already states the same information.',
           'Keyboard: DsEmptyContent commonly holds an interactive child (button) '
               'that supplies its own focus and keyboard behavior; Empty adds '
@@ -990,12 +1564,12 @@ class _StatArticle extends StatelessWidget {
         DsText('Kbd', DsType.label, color: theme.actionInk),
         SizedBox(height: ds(2)),
         _bullets(theme, <String>[
-          'Semantic role: none of its own — DsKbd wraps its text in '
+          'Semantic role: none of its own, DsKbd wraps its text in '
               'IgnorePointer and SelectionContainer.disabled only; no Semantics '
               'override. The legend reaches assistive tech as ordinary static '
               'text.',
           'The gap: nothing marks it as "a key you press." There is no '
-              'semanticLabel such as "key: Esc" and no custom Semantics role — '
+              'semanticLabel such as "key: Esc" and no custom Semantics role, '
               'a screen reader reads "Esc" exactly as it would read the word '
               '"Esc" anywhere else, with no signal that it names a keyboard key.',
           'One exception: DsKbdGroup wraps its children in MergeSemantics, so a '
@@ -1005,8 +1579,12 @@ class _StatArticle extends StatelessWidget {
               'of two."',
           'IgnorePointer and SelectionContainer.disabled match the reference\'s '
               'CSS pointer-events-none and select-none exactly.',
-          'Keyboard: never focusable — no Focus widget or FocusNode exists.',
-          'Touch target: not applicable — inert to touch by design (IgnorePointer).',
+          'Keyboard: never focusable: no Focus widget or FocusNode exists.',
+          'Touch target: not applicable: inert to touch by design (IgnorePointer).',
+          'No tooltip integration: kbd.dart\'s own doc comment records a '
+              'tooltip-context recolour class as not built, because this port '
+              'has no DsTooltip for the context selector to match against yet '
+              '(this is why Kbd: Tooltip is skipped above).',
           'Known platform differences: none observed.',
         ]),
       ],
@@ -1015,20 +1593,20 @@ class _StatArticle extends StatelessWidget {
 
   Widget _responsive(DsThemeData theme) => DsSection(
     id: 'responsive',
-    title: 'Responsive and platform behavior',
+    title: 'Responsive',
     child: _bullets(theme, <String>[
-      'Stat: no responsive branching — renders identically at 390px and 1440px. '
+      'Stat: no responsive branching: renders identically at 390px and 1440px. '
           'The slot heights are fixed, the figure width is intrinsic to the '
           'string (subject to DsType.numLg\'s own line breaking), and the '
           'label row and delta row wrap if needed.',
-      'Item: no responsive branching — renders identically across widths. Media '
+      'Item: no responsive branching: renders identically across widths. Media '
           'is fixed-square, content fills flex space, actions are right-aligned '
           'or top-aligned depending on the alignStart flag. Long titles/descriptions '
           'clip to one or two lines and ellipsize.',
-      'Empty: no responsive branching — the centred column adapts to available '
+      'Empty: no responsive branching: the centred column adapts to available '
           'width up to the 384px measure cap. The media tile, title, description, '
           'and actions all reflow within that constraint.',
-      'Kbd: no responsive branching — 20px height everywhere, 20px minimum width, '
+      'Kbd: no responsive branching, 20px height everywhere, 20px minimum width, '
           'content-width capped by the legend text. DsKbdGroup wraps on a new '
           'line if space is tight.',
       'Platform parity: Android, iOS, Web, macOS, Windows, and Linux all render '
@@ -1038,7 +1616,7 @@ class _StatArticle extends StatelessWidget {
 
   Widget _dependencies(DsThemeData theme) => DsSection(
     id: 'dependencies',
-    title: 'Dependencies, files, and assets',
+    title: 'Dependencies',
     child: _bullets(theme, <String>[
       'Files: lib/src/components/stat.dart, item.dart, empty.dart, kbd.dart '
           '(four files, no companion parts).',
@@ -1051,113 +1629,13 @@ class _StatArticle extends StatelessWidget {
       'Kbd imports: foundation/* (shadows, spacing, theme, typography), '
           'effects/machine_surface.dart (DsMachineSurface).',
       'Assets: none. Fonts: none beyond the system type scale every DsText '
-          'call already depends on. Shaders: none — flat fills and borders.',
+          'call already depends on. Shaders: none: flat fills and borders.',
     ]),
-  );
-
-  Widget _composition() => DsSection(
-    id: 'composition',
-    title: 'Composition examples',
-    description:
-        'Real shapes these four compose into elsewhere in this package.',
-    child: DocsCodeExample(
-      title: 'Composed with other primitives',
-      preview: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          DsText('Stat on a card header', DsType.label),
-          SizedBox(height: ds(3)),
-          DsCard(
-            children: <Widget>[
-              DsCardContent(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    DsStat(
-                      label: 'Monthly revenue',
-                      value: '\$52,840',
-                      delta: (value: '12.5%', direction: DsStatDirection.up),
-                      hint: 'vs last month',
-                    ),
-                    SizedBox(height: ds(4)),
-                    const DsSeparator(),
-                    SizedBox(height: ds(4)),
-                    DsText('In the last 30 days', DsType.small),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: ds(8)),
-          DsText('Item group with multiple rows', DsType.label),
-          SizedBox(height: ds(3)),
-          DsItemGroup(
-            children: <Widget>[
-              DsItem(
-                media: DsItemMedia(
-                  child: DsIcon.lucide(DsLucide.fileText, size: DsIconSize.sm),
-                ),
-                content: const DsItemContent(
-                  children: <Widget>[
-                    DsItemTitle('Quarterly report'),
-                    DsItemDescription('Jan 1 – Mar 31, 2026'),
-                  ],
-                ),
-              ),
-              DsItem(
-                media: DsItemMedia(
-                  child: DsIcon.lucide(DsLucide.download, size: DsIconSize.sm),
-                ),
-                content: const DsItemContent(
-                  children: <Widget>[DsItemTitle('Download Q4 data')],
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-      manualFiles: const <DocsCodeFile>[
-        DocsCodeFile(
-          path: 'stat_item_composition_note.md',
-          title: 'Composition notes',
-          description:
-              'DsItem is a generic row; when the rows have a standard shape '
-              'repeated across several rows, DsItemGroup enforces consistency '
-              'and spacing. DsStat is a labelled metric, self-contained; on a '
-              'card header it sits alongside separator lines and headings '
-              'rather than inside a list. Reach for DsItemGroup when you have '
-              'a list of structured rows; reach for individual components '
-              'when rows are one-off or the layout does not repeat.',
-          code:
-              '''// A group of item rows — consistent spacing, alignment, and borders.
-DsItemGroup(
-  children: [
-    DsItem(
-      media: ...,
-      content: ...,
-      actions: ...,
-    ),
-    DsItem(...),
-  ],
-)
-
-// A stat on its own — a card header, a dashboard cell.
-DsCard(
-  child: DsStat(
-    label: 'Revenue',
-    value: '\$12,480',
-    delta: (value: '8.2%', direction: DsStatDirection.up),
-  ),
-)''',
-        ),
-      ],
-    ),
   );
 
   Widget _theming(DsThemeData theme) => DsSection(
     id: 'theming',
-    title: 'Theming notes',
+    title: 'Theming',
     child: _bullets(theme, <String>[
       'Stat: every colour comes from the live theme. DsStatDeltaMark uses '
           'theme.successInk when the move is favourable, theme.foreground when '
@@ -1173,14 +1651,14 @@ DsCard(
           'than built.',
       'Kbd: the fill is theme.muted, the text is theme.mutedForeground. The '
           'component owns an elevation token (DsShadows.key, DsShadows.keyDown) '
-          'and never wears it — Kbd renders with DsShadows.none, so the shadow '
+          'and never wears it, Kbd renders with DsShadows.none, so the shadow '
           'is aspirational and the component is flat.',
     ]),
   );
 
   Widget _source() => DsSection(
     id: 'source',
-    title: 'Source, tests, and docs',
+    title: 'Source',
     child: DocsInstallFacts(
       title: 'Reference',
       facts: <DocsInstallFact>[
@@ -1188,7 +1666,7 @@ DsCard(
           label: 'Source',
           value: statDoc.sourcePath,
           description:
-              'Four authoritative implementations — the truth this page was '
+              'Four authoritative implementations: the truth this page was '
               'written from. (Note: sourcePath names stat.dart; item.dart, '
               'empty.dart, and kbd.dart are siblings.)',
         ),
@@ -1231,7 +1709,7 @@ Widget _bullets(DsThemeData theme, List<String> lines) => Column(
 );
 
 const String _usageCode = '''
-// Stat — the smallest call, then a full metric with delta and hint.
+// Stat: the smallest call, then a full metric with delta and hint.
 DsStat(
   label: 'Revenue',
   value: '\$12,480',
@@ -1245,7 +1723,7 @@ DsStat(
   hint: 'vs last month',
 )
 
-// Item — a row in a group or standalone.
+// Item: a row in a group or standalone.
 DsItemGroup(
   children: [
     DsItem(
@@ -1263,7 +1741,7 @@ DsItemGroup(
   ],
 )
 
-// Empty — a no-results state with a way out.
+// Empty: a no-results state with a way out.
 DsEmpty(
   children: [
     DsEmptyHeader(
@@ -1285,7 +1763,7 @@ DsEmpty(
   ],
 )
 
-// Kbd — single key or group.
+// Kbd: single key or group.
 DsKbd('Escape')
 
 DsKbdGroup(

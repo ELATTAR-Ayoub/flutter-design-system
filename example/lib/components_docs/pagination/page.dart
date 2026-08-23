@@ -1,27 +1,34 @@
 /// Public documentation page for the `pagination` component.
 ///
-/// Mirrors `badge/page.dart`'s use of the Phase C docs primitives
-/// (`DocsLayout`, `DocsCodeExample`, `DocsApiTable`, `DocsStateMatrix`,
-/// `DocsInstallFacts`) and `kit.dart`'s `DsSection` for titled,
-/// anchor-registered content blocks, and `switch/meta.dart`'s two-constant
-/// description split (`paginationDoc.description` for nav/search,
-/// [paginationExpandedDescription] for "when to use this instead of a
-/// neighbour").
+/// Section shape mirrors `https://ui.shadcn.com/docs/components/base/pagination`
+/// section for section. A live demo renders ahead of any heading, the same
+/// as the reference's own top-of-page preview: no Overview, Status, or
+/// Preview heading precedes Installation. Then Installation, Usage,
+/// Composition, Truncation, Simple, Icons only, and RTL, in that order,
+/// then API Reference. Next.js has no counterpart here: DsPaginationLink
+/// and DsPaginationStep take onTap, not an href/asChild slot a router
+/// component could be swapped into, so there is no router-integration
+/// seam to document (see Composition). Changelog has no counterpart
+/// either: it is the reference's own release history, not usage
+/// documentation, and this port carries no parallel version log. States,
+/// Accessibility, Responsive, Dependencies, Theming, and Source are this
+/// package's own six sections, added after API Reference, named exactly
+/// that with no extra words.
 ///
 /// **The one fact this page exists to get right:** `lib/src/components/`
 /// `pagination.dart` contains zero truncation logic. There is no
 /// `siblingCount`, no `boundaryCount`, and no `generatePagination`-style
-/// helper anywhere in that file — [DsPagination.children] is a bare
+/// helper anywhere in that file, [DsPagination.children] is a bare
 /// `List<Widget>` and the caller decides, before it ever reaches the widget,
 /// exactly which [DsPaginationLink] / [DsPaginationEllipsis] /
 /// [DsPaginationStep] cells appear and in what order. The `1 … 46 47 48 …
-/// 100` recipe this page's Preview and Truncation sections render with is
-/// **this documentation page's own function** (`_truncatedPageRange` below),
-/// not a package API — see the Truncation section for the worked example and
-/// the exact rule it implements.
+/// 100` recipe the live demo and Truncation section render with is **this
+/// documentation page's own function** (`_truncatedPageRange` below), not a
+/// package API: see Truncation for the worked example and the exact rule
+/// it implements.
 ///
 /// `pagination` has no registry manifest yet
-/// (`registry/components/pagination.json` does not exist) — the Installation
+/// (`registry/components/pagination.json` does not exist): the Installation
 /// section says so honestly rather than presenting an `elattar add
 /// pagination` command that would fail.
 library;
@@ -46,7 +53,17 @@ class PaginationDocPage extends StatelessWidget {
     intro: DocsPageIntro(
       eyebrow: 'COMPONENTS / BASE',
       title: paginationDoc.title,
-      description: paginationDoc.description,
+      description:
+          'DsPagination is a centred row of cells, page links, an optional '
+          'ellipsis, and a Previous/Next step, built entirely out of '
+          'DsButton: "every cell is a Button asChild wrapped around an '
+          '<a>, so the pill, the spring, the focus ring and the press are '
+          'the button\'s and are not restated." Reach for it when the '
+          'list is bounded and addressable, a grid or table with a known '
+          'total page count, not for a feed that only grows from the top '
+          '(that is a load-more button). Pair it with a range label at '
+          'the call site: DsPagination renders the page links only and '
+          'has no count or total of its own.',
     ),
     breadcrumbs: const <DsBreadcrumbEntry>[
       DsBreadcrumbEntry.link('Components'),
@@ -54,18 +71,18 @@ class PaginationDocPage extends StatelessWidget {
     ],
     sidebar: _sidebar,
     toc: const <DocsTocEntry>[
-      DocsTocEntry(title: 'Overview', anchor: 'overview'),
-      DocsTocEntry(title: 'Preview', anchor: 'preview'),
-      DocsTocEntry(title: 'Truncation', anchor: 'truncation'),
-      DocsTocEntry(title: 'Install', anchor: 'install'),
+      DocsTocEntry(title: 'Installation', anchor: 'install'),
       DocsTocEntry(title: 'Usage', anchor: 'usage'),
-      DocsTocEntry(title: 'API', anchor: 'api'),
-      DocsTocEntry(title: 'Variants', anchor: 'variants'),
+      DocsTocEntry(title: 'Composition', anchor: 'composition'),
+      DocsTocEntry(title: 'Truncation', anchor: 'truncation'),
+      DocsTocEntry(title: 'Simple', anchor: 'simple'),
+      DocsTocEntry(title: 'Icons only', anchor: 'icons-only'),
+      DocsTocEntry(title: 'RTL', anchor: 'rtl'),
+      DocsTocEntry(title: 'API Reference', anchor: 'api'),
       DocsTocEntry(title: 'States', anchor: 'states'),
       DocsTocEntry(title: 'Accessibility', anchor: 'accessibility'),
       DocsTocEntry(title: 'Responsive', anchor: 'responsive'),
       DocsTocEntry(title: 'Dependencies', anchor: 'dependencies'),
-      DocsTocEntry(title: 'Composition', anchor: 'composition'),
       DocsTocEntry(title: 'Theming', anchor: 'theming'),
       DocsTocEntry(title: 'Source', anchor: 'source'),
     ],
@@ -83,8 +100,8 @@ class PaginationDocPage extends StatelessWidget {
 
 /// The Wave 3 "overlay and navigation" group pagination belongs to (IA
 /// §7.3), narrowed to routes this worker can confirm exist on disk as of
-/// this page — `example/lib/components_docs/<name>/page.dart` files that
-/// have actually landed — plus the five already-routed pages from Phase F.
+/// this page, `example/lib/components_docs/<name>/page.dart` files that
+/// have actually landed: plus the five already-routed pages from Phase F.
 /// The supervisor aggregates the real, complete sidebar in `catalog.dart`
 /// and `site_routes.dart`; this list is not wired into either.
 const List<DocsSidebarEntry> _sidebar = <DocsSidebarEntry>[
@@ -106,12 +123,12 @@ const List<DocsSidebarEntry> _sidebar = <DocsSidebarEntry>[
 /// The demo-only truncation recipe this page renders its specimens with.
 ///
 /// **Nothing in `pagination.dart` computes this.** It lives in this
-/// documentation file only, so the Preview and Truncation sections have a
-/// realistic large-page-count specimen to show and tap through. The shape —
+/// documentation file only, so the live demo and Truncation section have a
+/// realistic large-page-count specimen to show and tap through. The shape:
 /// always show page 1 and the last page, keep [siblingCount] neighbours on
 /// each side of [currentPage], and collapse a gap into a single ellipsis
 /// only when it hides two or more pages (a one-page gap just shows that page
-/// — an ellipsis would take the same width as the number it is hiding) — is
+///: an ellipsis would take the same width as the number it is hiding): is
 /// the same family of recipe shadcn's own (unported) `usePagination` hook
 /// produces, chosen because it is the standard, unsurprising rule, not
 /// because anything here requires it.
@@ -139,7 +156,7 @@ List<int?> _truncatedPageRange({
     if (i > 0) {
       final int gap = sorted[i] - sorted[i - 1];
       if (gap == 2) {
-        // Exactly one page is hidden — show it plainly rather than
+        // Exactly one page is hidden: show it plainly rather than
         // collapsing a single number into a dots glyph of the same width.
         result.add(sorted[i - 1] + 1);
       } else if (gap > 2) {
@@ -161,148 +178,182 @@ class _PaginationArticle extends StatelessWidget {
       key: const ValueKey<String>('pagination-doc-article'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        _overview(theme),
-        _preview(),
-        _truncation(theme),
+        _liveDemo(),
+        SizedBox(height: ds(8)),
         _install(),
         _usage(),
+        _composition(),
+        _truncation(theme),
+        _simple(),
+        _iconsOnly(),
+        _rtl(),
         _api(),
-        _variants(theme),
         _states(),
         _accessibility(theme),
         _responsive(theme),
-        _dependencies(theme),
-        _composition(),
+        _dependencies(),
         _theming(theme),
         _source(),
       ],
     );
   }
 
-  Widget _overview(DsThemeData theme) => DsSection(
-    id: 'overview',
-    title: 'Overview',
-    child: ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: DsWidths.prose),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          DsText(
-            'DsPagination is a centred row of cells — page links, an '
-            'optional ellipsis, and a Previous/Next step — built entirely '
-            'out of DsButton. Its own library doc puts the composition '
-            'plainly: "every cell is a Button asChild wrapped around an '
-            '<a>, so the pill, the spring, the focus ring and the press '
-            'are the button\'s and are not restated." DsPagination itself '
-            'contributes exactly one thing: the 2px gap between cells and '
-            'the centring.',
-            DsType.body,
-          ),
-          SizedBox(height: ds(4)),
-          DsText(paginationExpandedDescription, DsType.body),
-          SizedBox(height: ds(4)),
-          DsText(
-            'Status: stable primitive, not yet registered in the CLI (see '
-            'Install). Version: tracks the package version — no '
-            'independent versioning of its own. Platforms: Android, iOS, '
-            'Web, macOS, Windows, Linux — the same six every widget in '
-            'this package targets; nothing in pagination.dart branches on '
-            'platform.',
-            DsType.small,
-            color: theme.mutedForeground,
-          ),
-        ],
+  // The live demo, ahead of any heading: the same shape the reference page
+  // itself opens with (Previous, numbers, an ellipsis, Next). No DsSection
+  // wraps it, so it carries no Overview/Status/Preview heading of its own
+  // before Installation.
+  Widget _liveDemo() => DocsCodeExample(
+    title: 'Pagination specimen',
+    description:
+        'A live, tappable specimen, 100 pages, starting on page 47. Tap '
+        'any page number, or Previous/Next, and the row re-truncates '
+        'around the new current page. At narrow widths the row scrolls '
+        'horizontally instead of overflowing: see Responsive.',
+    manualFiles: const <DocsCodeFile>[
+      DocsCodeFile(
+        path: 'lib/components/ui/pagination.dart',
+        code:
+            "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
+            '// Pagination has no registry manifest yet: copy\n'
+            '// lib/src/components/pagination.dart from the package\n'
+            '// source directly. There is no generated CLI payload to\n'
+            '// fetch.',
       ),
+    ],
+    preview: const KeyedSubtree(
+      key: ValueKey<String>('pagination-preview:worked-example'),
+      child: _TruncatedPaginationSpecimen(),
     ),
   );
 
-  Widget _preview() => DsSection(
-    id: 'preview',
-    title: 'Preview',
+  Widget _install() => DsSection(
+    id: 'install',
+    title: 'Installation',
     description:
-        'A live, tappable specimen — 100 pages, starting on page 47. Tap '
-        'any page number, or Previous/Next, and the row re-truncates '
-        'around the new current page. At narrow widths the row scrolls '
-        'horizontally instead of overflowing — see Responsive.',
-    child: DocsCodeExample(
-      title: 'Pagination specimen',
-      manualFiles: const <DocsCodeFile>[
-        DocsCodeFile(
-          path: 'lib/components/ui/pagination.dart',
-          code:
-              "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
-              '// Pagination has no registry manifest yet — copy\n'
-              '// lib/src/components/pagination.dart from the package\n'
-              '// source directly. There is no generated CLI payload to\n'
-              '// fetch.',
+        'pagination has no registry manifest yet, so `elattar add '
+        'pagination` is not available: install by copying the source '
+        'file manually.',
+    child: DocsInstallFacts(
+      title: 'Installation',
+      facts: <DocsInstallFact>[
+        const DocsInstallFact(
+          label: 'CLI',
+          value: 'Not available yet',
+          description:
+              'registry/components/pagination.json does not exist in '
+              'this checkout, so `elattar add pagination` has nothing to '
+              'resolve and will fail against the real registry client.',
+        ),
+        const DocsInstallFact(
+          label: 'Manual',
+          value: 'lib/components/ui/pagination.dart',
+          description:
+              'Copy lib/src/components/pagination.dart from the package '
+              'source directly, then update its relative imports '
+              '(button.dart, icon.dart, icon_paths.dart, '
+              'foundation/spacing.dart) to wherever you land them.',
+        ),
+        DocsInstallFact(
+          label: 'Barrel export',
+          value: paginationDoc.exports.join(', '),
+          description:
+              'Export all four symbols from your ui barrel so callers '
+              'only import one file.',
         ),
       ],
-      preview: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          const KeyedSubtree(
-            key: ValueKey<String>('pagination-preview:worked-example'),
-            child: _TruncatedPaginationSpecimen(),
-          ),
-          SizedBox(height: ds(6)),
-          DsText('Boundary specimens', DsType.label),
-          SizedBox(height: ds(3)),
-          KeyedSubtree(
-            key: const ValueKey<String>('pagination-preview:first-page'),
-            child: _EdgeCaseSpecimen(
-              caption: 'First page — Previous omitted entirely',
-              child: DsPagination(
-                children: <Widget>[
-                  const DsPaginationLink(label: '1', isActive: true),
-                  const DsPaginationLink(label: '2'),
-                  const DsPaginationLink(label: '3'),
-                  const DsPaginationEllipsis(),
-                  const DsPaginationLink(label: '10'),
-                  const DsPaginationStep.next(),
-                ],
+    ),
+  );
+
+  Widget _usage() => DsSection(
+    id: 'usage',
+    title: 'Usage',
+    description:
+        'The smallest correct call: a fixed row with no computed range at '
+        'all: then the shape a real caller with a page count builds.',
+    child: DsPanel(
+      label: 'DART',
+      note: 'COMPOSE',
+      child: DocsSelectableCodeBlock(code: _usageCode),
+    ),
+  );
+
+  Widget _composition() => DsSection(
+    id: 'composition',
+    title: 'Composition',
+    description:
+        'DsPagination has no PaginationContent, PaginationItem, or '
+        'PaginationLink to assemble by hand: children is a bare '
+        'List<Widget> and the caller builds each cell directly. The tree '
+        'below is what a full row looks like once built; beneath it, the '
+        'real shape this package\'s own navigation reference page builds, '
+        'reproduced verbatim from example/lib/pages/navigation.dart.',
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        DsPanel(
+          label: 'What a DsPagination(children: […]) row assembles',
+          child: DocsSelectableCodeBlock(code: _compositionTree),
+        ),
+        SizedBox(height: ds(6)),
+        DocsCodeExample(
+          title: 'Composed with other primitives',
+          description:
+              'Paired with the range label the Rules section of the same '
+              'reference page recommends: "Showing 25–48 of 184 '
+              'packs."',
+          preview: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              // Wrapped in the same horizontal scroll every specimen on
+              // this page uses, DsPagination's own Row neither wraps nor
+              // scrolls; see Responsive.
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: const DsPagination(
+                  children: <Widget>[
+                    DsPaginationStep.previous(),
+                    DsPaginationLink(label: '1'),
+                    DsPaginationLink(label: '2', isActive: true),
+                    DsPaginationLink(label: '3'),
+                    DsPaginationEllipsis(),
+                    DsPaginationLink(label: '12'),
+                    DsPaginationStep.next(),
+                  ],
+                ),
               ),
-            ),
+            ],
           ),
-          SizedBox(height: ds(4)),
-          KeyedSubtree(
-            key: const ValueKey<String>('pagination-preview:last-page'),
-            child: _EdgeCaseSpecimen(
-              caption: 'Last page — Next omitted entirely',
-              child: DsPagination(
-                children: <Widget>[
-                  const DsPaginationStep.previous(),
-                  const DsPaginationLink(label: '1'),
-                  const DsPaginationEllipsis(),
-                  const DsPaginationLink(label: '8'),
-                  const DsPaginationLink(label: '9'),
-                  const DsPaginationLink(label: '10', isActive: true),
-                ],
-              ),
+          manualFiles: const <DocsCodeFile>[
+            DocsCodeFile(
+              path: 'navigation_reference_precedent.dart',
+              title: 'example/lib/pages/navigation.dart, verbatim',
+              description:
+                  'The marketplace/Stash pagination row this package '
+                  'ships, unchanged: a hard-coded shape, not a derived one.',
+              code: '''const DsPagination(
+  children: <Widget>[
+    DsPaginationStep.previous(),
+    DsPaginationLink(label: '1'),
+    DsPaginationLink(label: '2', isActive: true),
+    DsPaginationLink(label: '3'),
+    DsPaginationEllipsis(),
+    DsPaginationLink(label: '12'),
+    DsPaginationStep.next(),
+  ],
+)''',
             ),
-          ),
-          SizedBox(height: ds(4)),
-          KeyedSubtree(
-            key: const ValueKey<String>('pagination-preview:single-page'),
-            child: _EdgeCaseSpecimen(
-              caption: 'A single page — no siblings, no ellipsis, no steps',
-              child: const DsPagination(
-                children: <Widget>[
-                  DsPaginationLink(label: '1', isActive: true),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
+          ],
+        ),
+      ],
     ),
   );
 
   Widget _truncation(DsThemeData theme) => DsSection(
     id: 'truncation',
-    title: 'The truncation rule',
+    title: 'Truncation',
     description:
-        'This is the one thing this page exists to get right — read it '
-        'before Usage.',
+        'This is the one thing this page exists to get right: read it '
+        'before reaching for Simple or Icons only.',
     child: ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: DsWidths.prose),
       child: Column(
@@ -316,10 +367,10 @@ class _PaginationArticle extends StatelessWidget {
               'them compute a page range. There is no siblingCount, no '
               'boundaryCount, and no generatePagination-shaped helper '
               'anywhere in the file. DsPagination.children is a bare '
-              'List<Widget> — the caller decides, before construction, '
+              'List<Widget>: the caller decides, before construction, '
               'exactly which DsPaginationLink, DsPaginationEllipsis, and '
               'DsPaginationStep cells appear and in what order. If a page '
-              'range needs computing, the call site computes it — the way '
+              'range needs computing, the call site computes it: the way '
               "example/lib/pages/navigation.dart's own reference section "
               'hard-codes one fixed shape (1, 2•, 3, …, 12) rather than '
               'deriving it from a page count.',
@@ -328,19 +379,19 @@ class _PaginationArticle extends StatelessWidget {
           ),
           SizedBox(height: ds(4)),
           DsText(
-            'The rule the specimens on this page render with — '
+            'The rule the specimens on this page render with, '
             '_truncatedPageRange in pagination/page.dart, this '
-            'documentation page\'s own function, not a package API — is: ',
+            'documentation page\'s own function, not a package API: is: ',
             DsType.body,
           ),
           SizedBox(height: ds(2)),
           _bulletColumn(theme, <String>[
             'Page 1 and the last page are always shown.',
             'The current page keeps one sibling on each side '
-                '(siblingCount: 1 — a call-site parameter of the demo '
+                '(siblingCount: 1: a call-site parameter of the demo '
                 'function, not of DsPagination).',
             'A gap that hides exactly one page shows that page plainly '
-                'instead of an ellipsis — collapsing a single number into '
+                'instead of an ellipsis: collapsing a single number into '
                 'a dots glyph the same width as the number would save '
                 'nothing.',
             'A gap that hides two or more pages collapses to exactly one '
@@ -383,97 +434,198 @@ class _PaginationArticle extends StatelessWidget {
               ),
             ),
           ),
+          SizedBox(height: ds(6)),
+          DsText(
+            'The same rule at the two boundaries a caller must decide by '
+            'omission, not by a disabled parameter: DsPaginationLink and '
+            'DsPaginationStep have no enabled flag; see States.',
+            DsType.body,
+          ),
+          SizedBox(height: ds(4)),
+          KeyedSubtree(
+            key: const ValueKey<String>('pagination-preview:first-page'),
+            child: _EdgeCaseSpecimen(
+              caption: 'First page, Previous omitted entirely',
+              child: DsPagination(
+                children: <Widget>[
+                  const DsPaginationLink(label: '1', isActive: true),
+                  const DsPaginationLink(label: '2'),
+                  const DsPaginationLink(label: '3'),
+                  const DsPaginationEllipsis(),
+                  const DsPaginationLink(label: '10'),
+                  const DsPaginationStep.next(),
+                ],
+              ),
+            ),
+          ),
+          SizedBox(height: ds(4)),
+          KeyedSubtree(
+            key: const ValueKey<String>('pagination-preview:last-page'),
+            child: _EdgeCaseSpecimen(
+              caption: 'Last page, Next omitted entirely',
+              child: DsPagination(
+                children: <Widget>[
+                  const DsPaginationStep.previous(),
+                  const DsPaginationLink(label: '1'),
+                  const DsPaginationEllipsis(),
+                  const DsPaginationLink(label: '8'),
+                  const DsPaginationLink(label: '9'),
+                  const DsPaginationLink(label: '10', isActive: true),
+                ],
+              ),
+            ),
+          ),
+          SizedBox(height: ds(4)),
+          KeyedSubtree(
+            key: const ValueKey<String>('pagination-preview:single-page'),
+            child: _EdgeCaseSpecimen(
+              caption: 'A single page: no siblings, no ellipsis, no steps',
+              child: const DsPagination(
+                children: <Widget>[
+                  DsPaginationLink(label: '1', isActive: true),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     ),
   );
 
-  Widget _install() => DsSection(
-    id: 'install',
-    title: 'Installation',
+  Widget _simple() => DsSection(
+    id: 'simple',
+    title: 'Simple',
     description:
-        'pagination has no registry manifest yet, so `elattar add '
-        'pagination` is not available — install by copying the source '
-        'file manually.',
-    child: DocsInstallFacts(
-      title: 'Installation facts',
-      facts: <DocsInstallFact>[
-        const DocsInstallFact(
-          label: 'Registry item',
-          value: 'not yet registered',
-          description:
-              'No registry/components/pagination.json exists. This is a '
-              'source-only component today.',
+        'The bare minimum: page links only, no Previous/Next step and no '
+        'ellipsis, for a page count small enough that nothing ever needs '
+        'truncating.',
+    child: DocsCodeExample(
+      title: 'Simple pagination',
+      preview: KeyedSubtree(
+        key: const ValueKey<String>('pagination-simple'),
+        child: const DsPagination(
+          children: <Widget>[
+            DsPaginationLink(label: '1'),
+            DsPaginationLink(label: '2', isActive: true),
+            DsPaginationLink(label: '3'),
+            DsPaginationLink(label: '4'),
+            DsPaginationLink(label: '5'),
+          ],
         ),
-        const DocsInstallFact(
-          label: 'Destination',
-          value: 'lib/components/ui/pagination.dart',
-          description: 'Where a manual copy of the source belongs.',
-        ),
-        const DocsInstallFact(
-          label: 'Foundation',
-          value: 'source only',
-          description: 'No package-backed alternative is offered yet.',
-        ),
-        const DocsInstallFact(
-          label: 'Dependencies',
-          value: 'button, icon, icon_paths, source-foundation',
-          description:
-              'What a future manifest would need to resolve — pagination '
-              'imports button.dart, icon.dart, and icon_paths.dart '
-              'directly, plus foundation/spacing.dart for ds(). None of '
-              'this is resolved automatically today; copy the imports by '
-              'hand.',
-        ),
-        const DocsInstallFact(
-          label: 'Assets',
-          value: 'none',
-          description:
-              'The chevron and ellipsis glyphs are vector path data '
-              'compiled into icon_paths.g.dart, not image or font assets.',
-        ),
-        const DocsInstallFact(
-          label: 'Shaders',
-          value: 'none',
-          description: 'Pagination paints no color or gradient of its own.',
-        ),
-        DocsInstallFact(
-          label: 'Platforms',
-          value: 'Android, iOS, Web, macOS, Windows, Linux',
-          description: 'No platform-conditional code in pagination.dart.',
-        ),
-        const DocsInstallFact(
-          label: 'Verified',
-          value: 'docs specimen only',
-          description:
-              'This page\'s live preview and '
-              'example/test/components_docs/pagination_test.dart. No '
-              'dedicated package-level unit test and no registry fixture '
-              'install exist yet — there is nothing to install.',
+      ),
+      manualFiles: const <DocsCodeFile>[
+        DocsCodeFile(
+          path: 'simple_pagination.dart',
+          code: '''const DsPagination(
+  children: <Widget>[
+    DsPaginationLink(label: '1'),
+    DsPaginationLink(label: '2', isActive: true),
+    DsPaginationLink(label: '3'),
+    DsPaginationLink(label: '4'),
+    DsPaginationLink(label: '5'),
+  ],
+)''',
         ),
       ],
     ),
   );
 
-  Widget _usage() => DsSection(
-    id: 'usage',
-    title: 'Usage',
+  Widget _iconsOnly() => DsSection(
+    id: 'icons-only',
+    title: 'Icons only',
     description:
-        'The smallest correct call — a fixed row with no computed range at '
-        'all — then the shape a real caller with a page count builds.',
-    child: DsPanel(
-      label: 'DART',
-      note: 'COMPOSE',
-      child: DocsSelectableCodeBlock(code: _usageCode),
+        'Previous and Next with no page numbers between them: useful for '
+        'a data table with its own rows-per-page control, where a page '
+        'link row would only repeat what the table already shows. '
+        'DsPagination renders no rows-per-page picker of its own; pair '
+        'it with whatever selection control the table already owns, the '
+        'same way Composition pairs the numbered row with a range label.',
+    child: DocsCodeExample(
+      title: 'Previous and Next only',
+      preview: KeyedSubtree(
+        key: const ValueKey<String>('pagination-icons-only'),
+        child: const DsPagination(
+          children: <Widget>[
+            DsPaginationStep.previous(),
+            DsPaginationStep.next(),
+          ],
+        ),
+      ),
+      manualFiles: const <DocsCodeFile>[
+        DocsCodeFile(
+          path: 'icons_only_pagination.dart',
+          code: '''const DsPagination(
+  children: <Widget>[
+    DsPaginationStep.previous(),
+    DsPaginationStep.next(),
+  ],
+)''',
+        ),
+      ],
+    ),
+  );
+
+  Widget _rtl() => DsSection(
+    id: 'rtl',
+    title: 'RTL',
+    description:
+        'A genuinely direction-aware cell, not a recorded gap: '
+        'DsPaginationStep builds its tight/loose padding from '
+        'EdgeInsetsDirectional and resolves it against '
+        'Directionality.of(context), so the tightened edge swaps sides '
+        'under RTL the same way the reference\'s own pl-1.5!/pr-1.5! '
+        'pair does. The chevron glyph itself does not mirror: '
+        'DsPaginationStep.previous always draws chevronLeft, regardless '
+        'of direction, exactly as the port\'s own source records.',
+    child: DocsCodeExample(
+      title: 'Right-to-left pagination',
+      // Same mitigation as every other specimen on this page: DsPagination's
+      // own Row neither wraps nor scrolls, and Arabic Previous/Next words
+      // plus three numbered cells overflow a 390px viewport unmitigated.
+      preview: const Directionality(
+        textDirection: TextDirection.rtl,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: KeyedSubtree(
+            key: ValueKey<String>('pagination-rtl'),
+            child: DsPagination(
+              children: <Widget>[
+                DsPaginationStep.previous(text: 'السابق'),
+                DsPaginationLink(label: '1'),
+                DsPaginationLink(label: '2', isActive: true),
+                DsPaginationLink(label: '3'),
+                DsPaginationStep.next(text: 'التالي'),
+              ],
+            ),
+          ),
+        ),
+      ),
+      manualFiles: const <DocsCodeFile>[
+        DocsCodeFile(
+          path: 'rtl_pagination.dart',
+          code: '''Directionality(
+  textDirection: TextDirection.rtl,
+  child: DsPagination(
+    children: <Widget>[
+      DsPaginationStep.previous(text: 'السابق'),
+      DsPaginationLink(label: '1'),
+      DsPaginationLink(label: '2', isActive: true),
+      DsPaginationLink(label: '3'),
+      DsPaginationStep.next(text: 'التالي'),
+    ],
+  ),
+)''',
+        ),
+      ],
     ),
   );
 
   Widget _api() => DsSection(
     id: 'api',
-    title: 'API',
+    title: 'API Reference',
     description:
-        'Every public class and constructor parameter the source declares '
-        '— four classes, no enums.',
+        'Every public class and constructor parameter the source '
+        'declares: four classes, no enums.',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
@@ -484,7 +636,7 @@ class _PaginationArticle extends StatelessWidget {
               name: 'children',
               type: 'List<Widget>',
               description:
-                  'Required. One cell each, in order — DsPaginationLink, '
+                  'Required. One cell each, in order, DsPaginationLink, '
                   'DsPaginationEllipsis, and/or DsPaginationStep, already '
                   'decided by the caller. DsPagination lays them out; it '
                   'does not choose them.',
@@ -504,10 +656,11 @@ class _PaginationArticle extends StatelessWidget {
               name: 'isActive',
               type: 'bool',
               description:
-                  'Defaults to false. Picks the DsButton variant — '
-                  'outline when true, ghost when false — and sets '
+                  'Defaults to false. Picks the DsButton variant, '
+                  'outline when true, ghost when false, and sets '
                   'Semantics.selected, which is what an assistive '
-                  'technology reads as "current."',
+                  'technology reads as "current." There is no third '
+                  'option and no way to pick a variant directly.',
             ),
             DocsApiFact(
               name: 'onTap',
@@ -515,7 +668,7 @@ class _PaginationArticle extends StatelessWidget {
               description:
                   'Defaults to null, which DsPaginationLink itself '
                   'replaces with an empty closure before handing it to '
-                  'DsButton.onPressed — so the cell is always tappable. '
+                  'DsButton.onPressed: so the cell is always tappable. '
                   'There is no way to make one inert; see States.',
             ),
           ],
@@ -543,15 +696,17 @@ class _PaginationArticle extends StatelessWidget {
               type: 'String',
               description:
                   'Defaults to "Previous" / "Next" per constructor. Both '
-                  'defaults are the reference\'s own; this page never '
-                  'overrides either.',
+                  'defaults are the reference\'s own; this page overrides '
+                  'them only in the RTL section, to show a translated '
+                  'word.',
             ),
             DocsApiFact(
               name: 'onTap',
               type: 'VoidCallback?',
               description:
-                  'Same fallback-to-no-op behavior as DsPaginationLink.onTap '
-                  '— always tappable, never truly disabled.',
+                  'Same fallback-to-no-op behavior as '
+                  'DsPaginationLink.onTap: always tappable, never truly '
+                  'disabled.',
             ),
           ],
         ),
@@ -561,10 +716,10 @@ class _PaginationArticle extends StatelessWidget {
           facts: <DocsApiFact>[
             DocsApiFact(
               name: '(no fields)',
-              type: '—',
+              type: 'n/a',
               description:
                   'Takes only a key. A fixed 32px square holding a 16px '
-                  'ellipsis glyph, in a 40px-tall row — it carries no '
+                  'ellipsis glyph, in a 40px-tall row: it carries no '
                   'page-count or "how many hidden" information of its '
                   'own.',
             ),
@@ -583,14 +738,14 @@ class _PaginationArticle extends StatelessWidget {
               name: 'DsPaginationStep.tightPadding',
               type: 'static double',
               description:
-                  'The 6px !important-tightened edge — the side the '
+                  'The 6px !important-tightened edge: the side the '
                   'chevron sits against.',
             ),
             DocsApiFact(
               name: 'DsPaginationStep.loosePadding',
               type: 'static double',
               description:
-                  'The untouched edge — DsButtonSize.md\'s own 16px '
+                  'The untouched edge, DsButtonSize.md\'s own 16px '
                   'horizontal padding, unchanged.',
             ),
             DocsApiFact(
@@ -609,42 +764,20 @@ class _PaginationArticle extends StatelessWidget {
     ),
   );
 
-  Widget _variants(DsThemeData theme) => DsSection(
-    id: 'variants',
-    title: 'Variants and sizes',
-    description:
-        'Pagination has no variant enum and no size axis of its own. Every '
-        'cell is DsButtonSize.icon (the numbers, the ellipsis box) or '
-        'DsButtonSize.md (Previous/Next) — fixed rungs, not a parameter a '
-        'caller can change on this component.',
-    child: _bulletColumn(theme, <String>[
-      'DsPaginationLink has exactly two looks, chosen by isActive: '
-          'DsButtonVariant.outline for the current page, '
-          'DsButtonVariant.ghost for every other one. There is no third '
-          'option and no way to pick a variant directly.',
-      'The page numbers inherit their type from the page rather than '
-          'declaring their own — DsButtonSize.icon sets no text-* class '
-          'at all, so "1", "2", "3" and "12" render at the ambient body '
-          'type, while Previous and Next sit one size class smaller '
-          '(DsButtonSize.md\'s own text-sm) because they carry a word, '
-          'not a bare number. One row, two effective type sizes — a fact '
-          'about DsButton\'s rungs, not a knob pagination exposes.',
-      'DsPaginationEllipsis is a fixed 32px square in the 40px row — '
-          '4px shorter on every side than the number cells beside it, '
-          'always.',
-    ]),
-  );
-
   Widget _states() => DsSection(
     id: 'states',
-    title: 'States and feedback',
+    title: 'States',
     description:
         'Every cell is a DsButton, so hover, focus-visible, and pressed '
-        'are inherited wholesale — the source\'s own words are "the pill, '
+        'are inherited wholesale: the source\'s own words are "the pill, '
         'the spring, the focus ring and the press are the button\'s and '
         'are not restated," and that is reflected here rather than '
-        're-described. The rows below are grouped and reasoned rather '
-        'than invented for the ones that genuinely do not apply.',
+        're-described. There is no DsPaginationVariant and no size axis '
+        'of its own: DsPaginationLink\'s only look decision is isActive, '
+        'and every cell sits on a fixed DsButtonSize rung (icon for the '
+        'numbers and the ellipsis box, md for Previous/Next) that a '
+        'caller cannot override. The rows below are grouped and reasoned '
+        'rather than invented for the ones that genuinely do not apply.',
     child: const DocsStateMatrix(
       facts: <DocsStateFact>[
         DocsStateFact(
@@ -655,12 +788,12 @@ class _PaginationArticle extends StatelessWidget {
               'paints those variants elsewhere.',
           userSignal:
               'The resting variant already distinguishes the '
-              'current page from the rest — see Selected.',
+              'current page from the rest: see Selected.',
         ),
         DocsStateFact(
           state: 'Hover / Focus-visible / Pressed',
           treatment:
-              'Not repainted by pagination.dart — inherited entirely '
+              'Not repainted by pagination.dart: inherited entirely '
               'from DsButton\'s own hover fill, focus ring, and press '
               'spring for whichever variant (ghost or outline) the cell '
               'resolved to.',
@@ -672,7 +805,7 @@ class _PaginationArticle extends StatelessWidget {
           state: 'Selected',
           treatment:
               'isActive: true on DsPaginationLink switches the variant '
-              'to outline and sets Semantics(selected: true) — a real '
+              'to outline and sets Semantics(selected: true): a real '
               'semantic flag, not styling alone. See Accessibility for '
               'what "selected" does and does not announce.',
           userSignal:
@@ -682,7 +815,7 @@ class _PaginationArticle extends StatelessWidget {
         DocsStateFact(
           state: 'Disabled',
           treatment:
-              'N/A by design gap, not by choice — DsPaginationLink and '
+              'N/A by design gap, not by choice, DsPaginationLink and '
               'DsPaginationStep have no enabled/disabled parameter at '
               'all. onTap ?? () {} means DsButton.onPressed is never '
               'null, so DsButton\'s own _enabled is always true: a cell '
@@ -690,14 +823,14 @@ class _PaginationArticle extends StatelessWidget {
               'and pressable, it just does nothing when pressed.',
           userSignal:
               'A caller wanting a "disabled Previous" on page 1 must '
-              'omit the DsPaginationStep.previous cell entirely — see '
-              'the Preview section\'s boundary specimens — because '
+              'omit the DsPaginationStep.previous cell entirely: see '
+              'the Truncation section\'s boundary specimens, because '
               'nothing here renders a dimmed, inert version of it.',
         ),
         DocsStateFact(
           state: 'Loading / Empty / Error / Success',
           treatment:
-              'N/A — DsPagination and its three cell types are all '
+              'N/A, DsPagination and its three cell types are all '
               'StatelessWidgets with no async parameter, no error state, '
               'and no empty-state rendering. A caller building a loading '
               'or empty list state owns that entirely outside this '
@@ -707,7 +840,7 @@ class _PaginationArticle extends StatelessWidget {
         DocsStateFact(
           state: 'Reduced motion',
           treatment:
-              'Not reimplemented here — whatever DsButton\'s own press '
+              'Not reimplemented here: whatever DsButton\'s own press '
               'spring does under a reduced-motion preference is what '
               'every pagination cell does too, because every cell is a '
               'DsButton.',
@@ -719,56 +852,58 @@ class _PaginationArticle extends StatelessWidget {
 
   Widget _accessibility(DsThemeData theme) => DsSection(
     id: 'accessibility',
-    title: 'Accessibility and keyboard behavior',
+    title: 'Accessibility',
     child: _bulletColumn(theme, <String>[
       'Semantic role and name: DsPagination wraps its row in '
           "Semantics(container: true, label: 'pagination', "
-          'explicitChildNodes: true) — a named, boundary-marked group '
+          'explicitChildNodes: true): a named, boundary-marked group '
           'with a real accessible name. It does not set role: '
-          'SemanticsRole.navigation, and — checked against this '
-          "package's own Flutter SDK (3.44.8) — that framework's "
+          'SemanticsRole.navigation, and: checked against this '
+          "package's own Flutter SDK (3.44.8): that framework's "
           'SemanticsRole enum has no navigation value to set even if it '
           'wanted to. The practical ceiling here is a labelled generic '
           'container, not a native nav landmark; that is a real gap '
           'against the web reference\'s role="navigation", not an '
           'oversight left undone.',
       'Current-page announcement: the current page IS announced as a '
-          'state, not styling alone — DsPaginationLink wraps every cell '
+          'state, not styling alone, DsPaginationLink wraps every cell '
           'in Semantics(link: true, selected: isActive). The underlying '
-          'flag is "selected," not the web reference\'s aria-current="page" '
-          '— different attribute name, same practical outcome: assistive '
-          'tech distinguishes the current page from the rest.',
+          'flag is "selected," not the web reference\'s '
+          'aria-current="page": a different attribute name, same '
+          'practical outcome, assistive tech distinguishes the current '
+          'page from the rest.',
       'A merged role: DsButton itself also declares Semantics(button: '
           'true, enabled: true, ...) inside every cell, and neither '
           'wrapper sets its own container: true, so Flutter merges the '
           'two into one node carrying both link and button flags '
-          'together. Recorded as observed, not corrected — the merge is '
+          'together. Recorded as observed, not corrected: the merge is '
           'a property of how DsButton is composed into, not a defect '
           'unique to pagination.',
-      'Keyboard interactions: inherited from DsButton — focusable '
+      'Keyboard interactions: inherited from DsButton: focusable '
           '(DsButton\'s canRequestFocus tracks its own _enabled, which is '
           'always true here; see States), and activated the same way '
           'any other DsButton is, by keyboard or pointer. Pagination '
-          'adds no arrow-key roving-tabindex behavior of its own — every '
+          'adds no arrow-key roving-tabindex behavior of its own: every '
           'cell is its own stop in the tab order.',
       'Focus behavior: never moved automatically. Tapping a page number '
           'does not shift focus to a new location or announce the page '
           'change beyond the selected flag updating.',
       'Touch target: whatever DsButtonSize.icon (40×40) and '
-          'DsButtonSize.md (Previous/Next, auto-width) already guarantee '
-          '— pagination adds no padding of its own around a cell.',
+          'DsButtonSize.md (Previous/Next, auto-width) already '
+          'guarantee, pagination adds no padding of its own around a '
+          'cell.',
       'Non-colour signal: the outline vs. ghost variant border, plus '
           'the label text itself ("1" vs. "2"), are the visible '
-          'signals — colour is never the only cue for which page is '
+          'signals: colour is never the only cue for which page is '
           'current.',
       'Screen-reader announcements for the ellipsis: DsPaginationEllipsis '
           'wraps its glyph in ExcludeSemantics, so nothing is announced '
-          'for it at all — no "more pages," no count of hidden pages. '
+          'for it at all: no "more pages," no count of hidden pages. '
           'The source\'s own comment records the same intent the '
           'reference ships (an aria-hidden span around an sr-only label, '
           'which is a contradiction that hides the label too): "the port '
-          'reproduces the outcome — nothing is announced."',
-      'Known platform differences: none observed — pagination.dart '
+          'reproduces the outcome: nothing is announced."',
+      'Known platform differences: none observed: pagination.dart '
           'branches on nothing platform-specific; the same widget tree '
           'renders everywhere.',
     ]),
@@ -776,10 +911,10 @@ class _PaginationArticle extends StatelessWidget {
 
   Widget _responsive(DsThemeData theme) => DsSection(
     id: 'responsive',
-    title: 'Responsive and platform behavior',
+    title: 'Responsive',
     child: _bulletColumn(theme, <String>[
       'DsPagination lays its children out in a plain Row with '
-          'mainAxisAlignment.center — a Row, not a Wrap. It does not '
+          'mainAxisAlignment.center: a Row, not a Wrap. It does not '
           'wrap onto a second line and it does not scroll on its own. A '
           'long page range at a narrow width (the classic case: this '
           "page's own 100-page worked example, at 390px) will overflow "
@@ -789,10 +924,10 @@ class _PaginationArticle extends StatelessWidget {
           'wrap DsPagination in a horizontally scrollable region '
           '(SingleChildScrollView(scrollDirection: Axis.horizontal)). '
           'That is docs-authored composition, not a DsPagination '
-          'feature — the alternative most callers reach for instead is '
+          'feature: the alternative most callers reach for instead is '
           'shrinking siblingCount at narrow widths so the row simply has '
           'fewer cells to lay out.',
-      'Cell sizes do not change with width — DsButtonSize.icon stays a '
+      'Cell sizes do not change with width, DsButtonSize.icon stays a '
           'fixed 40×40 and DsButtonSize.md keeps its own padding at '
           'every breakpoint; nothing here reflows or shrinks a cell for '
           'a small screen.',
@@ -802,80 +937,79 @@ class _PaginationArticle extends StatelessWidget {
     ]),
   );
 
-  Widget _dependencies(DsThemeData theme) => DsSection(
+  Widget _dependencies() => DsSection(
     id: 'dependencies',
-    title: 'Dependencies, files, and assets',
-    child: _bulletColumn(theme, <String>[
-      'File: lib/src/components/pagination.dart (one file, four public '
-          'classes, no companion parts).',
-      'Direct imports: button.dart (DsButton, DsButtonVariant, '
-          'DsButtonSize — every cell is one), icon.dart (DsIcon, '
-          'DsIconTone) and icon_paths.dart (DsIconGlyph — the chevrons '
-          'and the ellipsis glyph), and foundation/spacing.dart (ds()) '
-          'for every measurement on this page.',
-      'No import of theme.dart, colors.dart, or shadows.dart directly — '
-          'pagination paints no fill, border, or shadow of its own; see '
-          'Theming.',
-      'Assets: none. Fonts: none beyond the system type scale every '
-          'DsText/Text call already depends on. Shaders: none.',
-    ]),
-  );
-
-  Widget _composition() => DsSection(
-    id: 'composition',
-    title: 'Composition examples',
+    title: 'Dependencies',
     description:
-        'The real shape this package\'s own navigation reference page '
-        'builds — a fixed row, not a computed range — reproduced verbatim '
-        'from example/lib/pages/navigation.dart.',
-    child: DocsCodeExample(
-      title: 'Composed with other primitives',
-      preview: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          // Wrapped in the same horizontal scroll every specimen on this
-          // page uses — DsPagination's own Row neither wraps nor scrolls;
-          // see Responsive.
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: const DsPagination(
-              children: <Widget>[
-                DsPaginationStep.previous(),
-                DsPaginationLink(label: '1'),
-                DsPaginationLink(label: '2', isActive: true),
-                DsPaginationLink(label: '3'),
-                DsPaginationEllipsis(),
-                DsPaginationLink(label: '12'),
-                DsPaginationStep.next(),
-              ],
-            ),
-          ),
-          SizedBox(height: ds(3)),
-          DsText(
-            'Paired with the range label the Rules section of the same '
-            'reference page recommends: "Showing 25–48 of 184 packs."',
-            DsType.small,
-          ),
-        ],
-      ),
-      manualFiles: const <DocsCodeFile>[
-        DocsCodeFile(
-          path: 'navigation_reference_precedent.dart',
-          title: 'example/lib/pages/navigation.dart, verbatim',
+        "Elattar's own technical-transparency panel: what this "
+        'component needs, and what has not been wired into the registry '
+        'yet.',
+    child: DocsInstallFacts(
+      title: 'Install facts',
+      facts: <DocsInstallFact>[
+        const DocsInstallFact(
+          label: 'Status',
+          value: 'Stable primitive, not yet registered in the CLI',
           description:
-              'The marketplace/Stash pagination row this package ships, '
-              'unchanged — a hard-coded shape, not a derived one.',
-          code: '''const DsPagination(
-  children: <Widget>[
-    DsPaginationStep.previous(),
-    DsPaginationLink(label: '1'),
-    DsPaginationLink(label: '2', isActive: true),
-    DsPaginationLink(label: '3'),
-    DsPaginationEllipsis(),
-    DsPaginationLink(label: '12'),
-    DsPaginationStep.next(),
-  ],
-)''',
+              'DsPagination, DsPaginationLink, DsPaginationStep, and '
+              'DsPaginationEllipsis are all exported from the public '
+              'barrel today.',
+        ),
+        const DocsInstallFact(
+          label: 'Version',
+          value: '0.0.1',
+          description:
+              'Package version this page was written against: '
+              'pagination has no independent versioning of its own.',
+        ),
+        const DocsInstallFact(
+          label: 'Registry item',
+          value: 'not yet registered',
+          description:
+              'No registry/components/pagination.json exists. This is a '
+              'source-only component today.',
+        ),
+        const DocsInstallFact(
+          label: 'File',
+          value: 'lib/src/components/pagination.dart',
+          description: 'One file, four public classes, no companion parts.',
+        ),
+        const DocsInstallFact(
+          label: 'Direct imports',
+          value: 'button, icon, icon_paths, foundation/spacing',
+          description:
+              'button.dart (DsButton, DsButtonVariant, DsButtonSize: '
+              'every cell is one), icon.dart (DsIcon, DsIconTone) and '
+              'icon_paths.dart (DsIconGlyph: the chevrons and the '
+              'ellipsis glyph), and foundation/spacing.dart (ds()) for '
+              'every measurement on this page. No import of theme.dart, '
+              'colors.dart, or shadows.dart directly: see Theming.',
+        ),
+        const DocsInstallFact(
+          label: 'Assets',
+          value: 'none',
+          description:
+              'The chevron and ellipsis glyphs are vector path data '
+              'compiled into icon_paths.g.dart, not image or font assets.',
+        ),
+        const DocsInstallFact(
+          label: 'Shaders',
+          value: 'none',
+          description: 'Pagination paints no color or gradient of its own.',
+        ),
+        const DocsInstallFact(
+          label: 'Platforms',
+          value: 'Android, iOS, Web, macOS, Windows, Linux',
+          description: 'No platform-conditional code in pagination.dart.',
+        ),
+        const DocsInstallFact(
+          label: 'Verified',
+          value: 'docs specimen only',
+          description:
+              'This page\'s live preview and '
+              'example/test/components_docs/pagination_test.dart. No '
+              'dedicated package-level unit test and no registry fixture '
+              'install exist yet: there is nothing to install.',
         ),
       ],
     ),
@@ -883,20 +1017,30 @@ class _PaginationArticle extends StatelessWidget {
 
   Widget _theming(DsThemeData theme) => DsSection(
     id: 'theming',
-    title: 'Theming notes',
+    title: 'Theming',
     child: _bulletColumn(theme, <String>[
       'DsPagination, DsPaginationLink, DsPaginationStep, and '
-          'DsPaginationEllipsis paint no colour of their own — no '
+          'DsPaginationEllipsis paint no colour of their own: no '
           'DecoratedBox, no BoxDecoration, no direct theme.* read '
           'anywhere in pagination.dart. Every fill, border, and ink a '
           'cell shows comes from the DsButton it wraps (outline or '
           'ghost variant) or from DsIcon(tone: inherit) reading the '
           'button\'s own DefaultTextStyle.',
+      'Type is inherited, not owned: DsButtonSize.icon sets no text-* '
+          'class of its own, so the page numbers ("1", "2", "12") render '
+          'at the ambient body type, while Previous and Next sit one '
+          'size class smaller (DsButtonSize.md\'s own text-sm) because '
+          'they carry a word, not a bare number, a fact about '
+          'DsButton\'s size rungs, not a themeable pagination property.',
+      'DsPaginationEllipsis is a fixed 32px square in the 40px row, 4px '
+          'shorter on every side than the number cells beside it, at '
+          'every theme and breakpoint: sizing is not a themeable token '
+          'here.',
       'Flipping DsThemeController between light and dark re-resolves '
           'DsButton\'s own outline/ghost tokens exactly as it does '
-          'anywhere else DsButton is used — pagination has no cached or '
+          'anywhere else DsButton is used: pagination has no cached or '
           'independent colour of its own to go stale.',
-      'There is no pagination-specific theming surface to override — a '
+      'There is no pagination-specific theming surface to override: a '
           'caller who needs a different look for a cell is overriding '
           'DsButton\'s variant tokens, not a parameter this component '
           'exposes.',
@@ -905,7 +1049,7 @@ class _PaginationArticle extends StatelessWidget {
 
   Widget _source() => DsSection(
     id: 'source',
-    title: 'Source, tests, and docs',
+    title: 'Source',
     child: DocsInstallFacts(
       title: 'Reference',
       facts: <DocsInstallFact>[
@@ -913,7 +1057,7 @@ class _PaginationArticle extends StatelessWidget {
           label: 'Source',
           value: paginationDoc.sourcePath,
           description:
-              'Authoritative implementation — the truth this page was '
+              'Authoritative implementation: the truth this page was '
               'written from.',
         ),
         const DocsInstallFact(
@@ -944,7 +1088,7 @@ class _PaginationArticle extends StatelessWidget {
 
 /// The interactive worked example: 100 pages, starting on page 47. Tapping
 /// any rendered page number (or Previous/Next) moves the current page and
-/// re-truncates the row around it — a real, mounted [DsPagination], not an
+/// re-truncates the row around it: a real, mounted [DsPagination], not an
 /// illustration.
 class _TruncatedPaginationSpecimen extends StatefulWidget {
   const _TruncatedPaginationSpecimen();
@@ -975,7 +1119,7 @@ class _TruncatedPaginationSpecimenState
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         // Horizontal scroll is this page's own mitigation for the Row that
-        // DsPagination itself never wraps or scrolls — see Responsive.
+        // DsPagination itself never wraps or scrolls: see Responsive.
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: DsPagination(
@@ -1005,7 +1149,7 @@ class _TruncatedPaginationSpecimenState
   }
 }
 
-/// A static, non-interactive [DsPagination] specimen plus its own caption —
+/// A static, non-interactive [DsPagination] specimen plus its own caption:
 /// the shape for a boundary or degenerate composition (first page, last
 /// page, a single page) that the caller decides by which cells it includes,
 /// not by a parameter DsPagination reads.
@@ -1042,8 +1186,16 @@ Widget _bulletColumn(DsThemeData theme, List<String> lines) => Column(
   ],
 );
 
+const String _compositionTree =
+    '''DsPagination(children: [ … ])
+ // each cell in children is one of:
+ DsPaginationStep.previous()   // chevron + word, before the numbers
+ DsPaginationLink(label: '1')  // one numbered page
+ DsPaginationEllipsis()        // a collapsed run of hidden pages
+ DsPaginationStep.next()       // chevron + word, after the numbers''';
+
 const String _usageCode = '''
-// The smallest correct call — a fixed row, no computed range at all.
+// The smallest correct call: a fixed row, no computed range at all.
 const DsPagination(
   children: <Widget>[
     DsPaginationStep.previous(),
@@ -1054,8 +1206,8 @@ const DsPagination(
   ],
 )
 
-// A real caller with a page count computes the range itself — pagination
-// does not do this for you (see Truncation) — then builds the same shapes:
+// A real caller with a page count computes the range itself: pagination
+// does not do this for you (see Truncation): then builds the same shapes:
 DsPagination(
   children: <Widget>[
     DsPaginationStep.previous(onTap: page > 1 ? () => goTo(page - 1) : null),
@@ -1074,6 +1226,6 @@ DsPagination(
   ],
 )
 
-// onTap: null above is still tappable — it just becomes a no-op via
+// onTap: null above is still tappable: it just becomes a no-op via
 // `onTap ?? () {}`. Omit the whole DsPaginationStep cell instead if the
 // boundary must render as genuinely inert; see States.''';

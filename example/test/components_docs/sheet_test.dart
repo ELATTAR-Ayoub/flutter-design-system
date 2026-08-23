@@ -1,20 +1,51 @@
 /// Tests for the combined Sheet + Drawer documentation page.
 ///
 /// Sheet and drawer are documented on one page because they are the same
-/// idea — an edge-anchored panel that keeps the page behind it in place — at
+/// idea: an edge-anchored panel that keeps the page behind it in place, at
 /// different edges. This file proves both real widgets actually mount, open
 /// and dismiss inside the page, not just that their names appear in prose.
+///
+/// Reshaped to mirror https://ui.shadcn.com/docs/components/base/sheet and
+/// https://ui.shadcn.com/docs/components/base/drawer, section for section:
+/// Purpose / Status (ours only, ahead of the live demo) / Preview /
+/// Installation / Usage / Composition (shared, both components), then
+/// Sheet's own Side / No close button / RTL, then Drawer's own Sizing (the
+/// reference's Custom Sizes, honestly narrower: see the SKIPPED panel
+/// inside it for Styling / Position / Swipe handle / Nested / Non modal /
+/// Snap points / Responsive-by-composition / Migrating from Vaul, none of
+/// which this component can do), then API reference, then our States /
+/// Accessibility / Responsive / Dependencies / Theming / Source. The
+/// ordering test below asserts that literal sequence.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/sheet/meta.dart';
 import 'package:example/components_docs/sheet/page.dart';
 import 'package:example/docs/docs_code.dart';
+import 'package:example/kit.dart' show DsSection;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// Real test-view sizing only — [tester.view.physicalSize] plus
+/// The full section list, in the order the reshaped page must render them.
+const List<String> _sectionOrder = <String>[
+  'install',
+  'usage',
+  'composition',
+  'side',
+  'no-close-button',
+  'rtl',
+  'sizing',
+  'api',
+  'states',
+  'accessibility',
+  'responsive',
+  'dependencies',
+  'theming',
+  'source',
+];
+
+/// Real test-view sizing only: [tester.view.physicalSize] plus
 /// [WidgetTester.view]'s own reset, never a synthetic `MediaQuery` override.
 /// [controller] is a single live [DsThemeController] the caller can flip in
 /// place with [DsThemeController.setMode].
@@ -34,8 +65,22 @@ Widget _harness({
   );
 }
 
+/// Matches only the [DsSheetContent] that [DsSheetOverlay] mounts when its
+/// trigger opens it: the reshaped page also keeps two static, always-mounted
+/// [DsSheetContent] specimens on screen (the No close button and RTL
+/// sections' own presentational panels, keyed 'sheet-no-close-button' and
+/// 'sheet-rtl'; see `_NoCloseButtonPreview`/`_RtlPreview` in page.dart), so
+/// `find.byType(DsSheetContent)` alone is never unique on this page. Scoping
+/// to the live overlay's own (unkeyed) content excludes both statics.
+Finder _liveOverlaySheet() => find.byWidgetPredicate(
+  (Widget widget) =>
+      widget is DsSheetContent &&
+      widget.key != const ValueKey<String>('sheet-no-close-button') &&
+      widget.key != const ValueKey<String>('sheet-rtl'),
+);
+
 /// Every constructor parameter name declared on the public classes of
-/// `lib/src/components/sheet.dart` — from [DsSheet.showLeft] and
+/// `lib/src/components/sheet.dart`: from [DsSheet.showLeft] and
 /// [DsSheetPanel] through [DsSheetOverlay], [DsSheetTransition],
 /// [DsSheetContent], [DsSheetContentGroup], [DsSheetHeader], [DsSheetFooter],
 /// [DsSheetTitle] and [DsSheetDescription].
@@ -55,7 +100,7 @@ const List<String> _sheetParamNames = <String>[
 ];
 
 /// Every constructor parameter name declared on the public classes of
-/// `lib/src/components/drawer.dart` — [DsDrawer], [DsDrawerContent],
+/// `lib/src/components/drawer.dart`: [DsDrawer], [DsDrawerContent],
 /// [DsDrawerHeader], [DsDrawerFooter], [DsDrawerTitle], [DsDrawerDescription].
 /// [DsDrawerHandle] takes no constructor parameters.
 const List<String> _drawerParamNames = <String>[
@@ -100,6 +145,119 @@ void main() {
             'DsDrawerDescription',
           ]),
         );
+      },
+    );
+  });
+
+  group('SheetDocPage shadcn-parity section order', () {
+    testWidgets(
+      'renders every shadcn-parity section, in order, for both components',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(1440, 3200);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+
+        final DsThemeController controller = DsThemeController(
+          mode: DsThemeMode.dark,
+        );
+        await tester.pumpWidget(
+          _harness(controller: controller, child: const SheetDocPage()),
+        );
+        await tester.pump();
+
+        double previousTop = -1;
+        for (final String anchor in _sectionOrder) {
+          final Finder section = find.byKey(DsSection.anchorKey(anchor));
+          expect(section, findsOneWidget, reason: 'section "$anchor" missing');
+          final double top = tester.getTopLeft(section).dy;
+          expect(
+            top,
+            greaterThan(previousTop),
+            reason:
+                'section "$anchor" should render after the previous section',
+          );
+          previousTop = top;
+        }
+
+        expect(tester.takeException(), isNull);
+      },
+    );
+
+    testWidgets(
+      'No close button and RTL sections each mount their own live specimen',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(1440, 3200);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+
+        final DsThemeController controller = DsThemeController(
+          mode: DsThemeMode.dark,
+        );
+        await tester.pumpWidget(
+          _harness(controller: controller, child: const SheetDocPage()),
+        );
+        await tester.pump();
+
+        // No close button: the specimen mounts, real showCloseButton: false
+        // content, and no "Close" DsButton anywhere inside it.
+        final Finder noCloseSpecimen = find.byKey(
+          const ValueKey<String>('sheet-no-close-button'),
+        );
+        expect(noCloseSpecimen, findsOneWidget);
+        expect(
+          find.descendant(
+            of: noCloseSpecimen,
+            matching: find.text('Share link'),
+          ),
+          findsOneWidget,
+        );
+        expect(
+          tester.widget<DsSheetContent>(noCloseSpecimen).showCloseButton,
+          isFalse,
+        );
+        expect(
+          find.descendant(
+            of: find.byKey(DsSection.anchorKey('no-close-button')),
+            matching: find.byType(DsButton),
+          ),
+          findsNothing,
+        );
+
+        // RTL: a real Directionality.rtl ancestor, real Arabic text.
+        final Finder rtlSpecimen = find.byKey(
+          const ValueKey<String>('sheet-rtl'),
+        );
+        expect(rtlSpecimen, findsOneWidget);
+        expect(
+          find.descendant(
+            of: find.byKey(DsSection.anchorKey('rtl')),
+            matching: find.byWidgetPredicate(
+              (Widget widget) =>
+                  widget is Directionality &&
+                  widget.textDirection == TextDirection.rtl,
+            ),
+          ),
+          findsOneWidget,
+        );
+        expect(
+          find.descendant(
+            of: rtlSpecimen,
+            matching: find.text('مشاركة الرابط'),
+          ),
+          findsOneWidget,
+        );
+
+        // Sizing carries the consolidated, honest SKIPPED note for the
+        // Drawer sections this component genuinely cannot do.
+        expect(
+          find.descendant(
+            of: find.byKey(DsSection.anchorKey('sizing')),
+            matching: find.textContaining('SKIPPED'),
+          ),
+          findsWidgets,
+        );
+
+        expect(tester.takeException(), isNull);
       },
     );
   });
@@ -199,7 +357,7 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.byType(DsSheetContent), findsNothing);
+        expect(_liveOverlaySheet(), findsNothing);
         final Finder trigger = find.byKey(
           const ValueKey<String>('sheet-trigger:right'),
         );
@@ -207,16 +365,16 @@ void main() {
         await tester.tap(trigger);
         await tester.pumpAndSettle();
 
-        expect(find.byType(DsSheetContent), findsOneWidget);
+        expect(_liveOverlaySheet(), findsOneWidget);
         expect(find.text('Notification settings'), findsOneWidget);
-        final Rect panel = tester.getRect(find.byType(DsSheetContent));
-        // side: right — pinned to the trailing edge of a 1440-wide viewport.
+        final Rect panel = tester.getRect(_liveOverlaySheet());
+        // side: right, pinned to the trailing edge of a 1440-wide viewport.
         expect(panel.right, closeTo(1440, 1));
 
         // Tap the scrim, well clear of the right-hand panel, to dismiss.
         await tester.tapAt(const Offset(20, 20));
         await tester.pumpAndSettle();
-        expect(find.byType(DsSheetContent), findsNothing);
+        expect(_liveOverlaySheet(), findsNothing);
       },
     );
 
@@ -239,11 +397,11 @@ void main() {
       await tester.ensureVisible(trigger);
       await tester.tap(trigger);
       await tester.pumpAndSettle();
-      expect(find.byType(DsSheetContent), findsOneWidget);
+      expect(_liveOverlaySheet(), findsOneWidget);
 
       await tester.sendKeyEvent(LogicalKeyboardKey.escape);
       await tester.pumpAndSettle();
-      expect(find.byType(DsSheetContent), findsNothing);
+      expect(_liveOverlaySheet(), findsNothing);
     });
 
     testWidgets(
@@ -290,7 +448,7 @@ void main() {
         // AnimationController reaches value 0 within that frame, but its
         // whenComplete callback (which calls _portal.hide()) needs one more
         // pump to actually flush the OverlayPortal's removal from the tree.
-        // pumpAndSettle is safe here — this is a bounded exit animation, not
+        // pumpAndSettle is safe here: this is a bounded exit animation, not
         // a loop.
         await tester.pumpAndSettle();
         expect(find.byType(DsDrawerContent), findsNothing);
@@ -364,14 +522,12 @@ void main() {
 
       await tester.tap(trigger);
       await tester.pumpAndSettle();
-      expect(find.byType(DsSheetContent), findsOneWidget);
+      expect(_liveOverlaySheet(), findsOneWidget);
 
       // DsModalPortal wraps its content in FocusScope(autofocus: true) —
       // the trigger's own node loses primary focus to that scope's own
       // FocusScopeNode (not to a leaf control inside it).
-      final BuildContext panelContext = tester.element(
-        find.byType(DsSheetContent),
-      );
+      final BuildContext panelContext = tester.element(_liveOverlaySheet());
       final FocusScopeNode panelScope = FocusScope.of(panelContext);
       expect(
         FocusManager.instance.primaryFocus,
@@ -382,7 +538,7 @@ void main() {
       );
 
       // Tab from the scope node itself moves focus to a real control inside
-      // the panel — the scope still traps focus while Tab cycles through
+      // the panel: the scope still traps focus while Tab cycles through
       // the sheet's real controls.
       await tester.sendKeyEvent(LogicalKeyboardKey.tab);
       await tester.pump();
@@ -396,14 +552,14 @@ void main() {
 
       await tester.sendKeyEvent(LogicalKeyboardKey.escape);
       await tester.pumpAndSettle();
-      expect(find.byType(DsSheetContent), findsNothing);
+      expect(_liveOverlaySheet(), findsNothing);
 
       // Confirmed rather than assumed, against the initial expectation:
       // DsModalPortal contains no explicit "restore focus to the trigger"
       // code, yet closing the sheet DOES return primary focus to the
       // trigger's own node. This is Flutter's FocusManager falling back to
       // the scope's previously-focused child once the overlay's own
-      // FocusScope is removed from the tree — not something DsModalPortal
+      // FocusScope is removed from the tree: not something DsModalPortal
       // wires itself, and it depends on the trigger's FocusNode still being
       // mounted when the overlay closes.
       expect(FocusManager.instance.primaryFocus, same(triggerFocusNode));

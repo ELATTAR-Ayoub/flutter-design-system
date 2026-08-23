@@ -17,6 +17,7 @@ import 'package:example/components_docs/native_select/meta.dart';
 import 'package:example/components_docs/native_select/page.dart';
 import 'package:example/docs/docs_code.dart';
 import 'package:example/docs/docs_facts.dart';
+import 'package:example/kit.dart' show DsSection;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -120,6 +121,54 @@ Future<DsThemeController> _pump(
 }
 
 void main() {
+  testWidgets(
+    'sections render in the shadcn-mirrored order, section for section',
+    (WidgetTester tester) async {
+      await _pump(tester);
+
+      final List<String> titles = tester
+          .widgetList<DsSection>(find.byType(DsSection))
+          .map((DsSection section) => section.title)
+          .toList();
+
+      expect(titles, <String>[
+        'Installation',
+        'Usage',
+        'Composition',
+        'Groups',
+        'Disabled',
+        'Invalid',
+        'Native select vs select',
+        'RTL',
+        'API Reference',
+        'States',
+        'Accessibility',
+        'Responsive',
+        'Dependencies',
+        'Theming',
+        'Source',
+      ]);
+    },
+  );
+
+  testWidgets('the Groups, Disabled, Invalid, and RTL specimens render without '
+      'exceptions', (WidgetTester tester) async {
+    await _pump(tester);
+
+    for (final String key in <String>[
+      'native-select-groups-preview',
+      'native-select-disabled-preview',
+      'native-select-disabled-option-preview',
+      'native-select-invalid-preview',
+      'native-select-rtl-preview',
+    ]) {
+      final Finder finder = find.byKey(ValueKey<String>(key));
+      await tester.ensureVisible(finder);
+      expect(finder, findsOneWidget, reason: 'missing specimen "$key"');
+    }
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets(
     'renders the article at wide and narrow widths with no exceptions',
     (WidgetTester tester) async {
@@ -253,7 +302,12 @@ void main() {
       await _pump(tester);
 
       expect(find.textContaining('not yet in the registry'), findsWidgets);
-      expect(find.textContaining('no registry manifests'), findsWidgets);
+      // Dependencies section's own disclosure, sentence-initial capital:
+      // `find.textContaining` is case-sensitive, so this must match verbatim.
+      expect(
+        find.textContaining('No registry manifests exist yet'),
+        findsWidgets,
+      );
     },
   );
 }

@@ -1,6 +1,20 @@
+/// Tests for `components_docs/pagination/meta.dart` and
+/// `components_docs/pagination/page.dart`: the public Pagination component
+/// documentation page.
+///
+/// The page mirrors `https://ui.shadcn.com/docs/components/base/pagination`
+/// section for section: a live demo ahead of any heading, then
+/// Installation, Usage, Composition, Truncation, Simple, Icons only, RTL,
+/// API Reference, then this package's own six (States, Accessibility,
+/// Responsive, Dependencies, Theming, Source). The first test below asserts
+/// that exact order renders; it is the test the brief calls out as the one
+/// that must fail against the pre-reshape page.
+library;
+
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/pagination/meta.dart';
 import 'package:example/components_docs/pagination/page.dart';
+import 'package:example/kit.dart' show DsSection;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -13,7 +27,7 @@ Widget _harness({
 );
 
 /// Every constructor parameter [pagination.dart](../../../lib/src/components/pagination.dart)
-/// declares across its four public classes — [DsPagination], [DsPaginationLink],
+/// declares across its four public classes: [DsPagination], [DsPaginationLink],
 /// [DsPaginationStep] (both named constructors share the same field set) and
 /// [DsPaginationEllipsis] (key only). The API table must render each of
 /// these names somewhere.
@@ -25,6 +39,45 @@ const List<String> _apiParamNames = <String>[
 
 void main() {
   group('pagination docs page', () {
+    testWidgets(
+      'sections render in the shadcn-mirrored order, section for section',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(1440, 900);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+
+        await tester.pumpWidget(
+          _harness(
+            controller: DsThemeController(mode: DsThemeMode.dark),
+            child: const PaginationDocPage(),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        final List<String> titles = tester
+            .widgetList<DsSection>(find.byType(DsSection))
+            .map((DsSection section) => section.title)
+            .toList();
+
+        expect(titles, <String>[
+          'Installation',
+          'Usage',
+          'Composition',
+          'Truncation',
+          'Simple',
+          'Icons only',
+          'RTL',
+          'API Reference',
+          'States',
+          'Accessibility',
+          'Responsive',
+          'Dependencies',
+          'Theming',
+          'Source',
+        ]);
+      },
+    );
+
     testWidgets(
       'renders the article, the full API table, and the truncation worked '
       'example, and reports a tapped page',
@@ -55,7 +108,7 @@ void main() {
           expect(find.text(param), findsWidgets, reason: 'missing $param');
         }
         // The two named constructors are the real public surface of
-        // DsPaginationStep — both must be documented as their own rows.
+        // DsPaginationStep: both must be documented as their own rows.
         for (final String ctor in <String>[
           'DsPaginationStep.previous',
           'DsPaginationStep.next',
@@ -81,9 +134,9 @@ void main() {
           );
         }
 
-        // The worked-example specimen: 100 pages, current page 47, one
-        // sibling each side — the truncation section's own worked example.
-        // It must render as 1 … 46 47 48 … 100, exactly two ellipses.
+        // The live-demo worked example, ahead of any heading: 100 pages,
+        // current page 47, one sibling each side. It must render as
+        // 1 … 46 47 48 … 100, exactly two ellipses.
         final Finder worked = find.byKey(
           const ValueKey<String>('pagination-preview:worked-example'),
         );
@@ -103,7 +156,7 @@ void main() {
           findsNWidgets(2),
         );
 
-        // A live specimen mounts and clicking a page number reports it —
+        // A live specimen mounts and clicking a page number reports it:
         // tapping page 48 in the worked example moves the current page and
         // the on-screen "current page" readout updates to match.
         expect(
@@ -137,8 +190,9 @@ void main() {
           );
         }
 
-        // Edge-case specimens: first page (no Previous cell), last page (no
-        // Next cell), a single page (no siblings, no ellipsis at all).
+        // Boundary specimens now live in the Truncation section: first
+        // page (no Previous cell), last page (no Next cell), a single page
+        // (no siblings, no ellipsis at all).
         expect(
           find.byKey(const ValueKey<String>('pagination-preview:first-page')),
           findsOneWidget,
@@ -163,8 +217,8 @@ void main() {
           findsNothing,
         );
 
-        // DsPagination declares an accessible container name — the page's
-        // own accessibility section claims this and the test proves it.
+        // DsPagination declares an accessible container name: the page's
+        // own Accessibility section claims this and the test proves it.
         expect(find.bySemanticsLabel('pagination'), findsWidgets);
 
         expect(paginationDoc.name, 'pagination');
@@ -178,6 +232,90 @@ void main() {
           ]),
         );
         expect(destination, isNull);
+      },
+    );
+
+    testWidgets(
+      'Simple, Icons only, and RTL each mount a real, distinct specimen',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(1440, 900);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+
+        await tester.pumpWidget(
+          _harness(
+            controller: DsThemeController(mode: DsThemeMode.dark),
+            child: const PaginationDocPage(),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // Simple: page links only, no Previous/Next, no ellipsis.
+        final Finder simple = find.byKey(
+          const ValueKey<String>('pagination-simple'),
+        );
+        expect(simple, findsOneWidget);
+        expect(
+          find.descendant(of: simple, matching: find.byType(DsPaginationStep)),
+          findsNothing,
+        );
+        expect(
+          find.descendant(
+            of: simple,
+            matching: find.byType(DsPaginationEllipsis),
+          ),
+          findsNothing,
+        );
+        expect(
+          find.descendant(
+            of: simple,
+            matching: find.byType(DsPaginationLink),
+          ),
+          findsNWidgets(5),
+        );
+
+        // Icons only: Previous/Next only, no page-number links.
+        final Finder iconsOnly = find.byKey(
+          const ValueKey<String>('pagination-icons-only'),
+        );
+        expect(iconsOnly, findsOneWidget);
+        expect(
+          find.descendant(
+            of: iconsOnly,
+            matching: find.byType(DsPaginationLink),
+          ),
+          findsNothing,
+        );
+        expect(
+          find.descendant(
+            of: iconsOnly,
+            matching: find.byType(DsPaginationStep),
+          ),
+          findsNWidgets(2),
+        );
+
+        // RTL: composed under a real Directionality.rtl ancestor.
+        final Finder rtl = find.byKey(const ValueKey<String>('pagination-rtl'));
+        expect(rtl, findsOneWidget);
+        expect(
+          find.ancestor(
+            of: rtl,
+            matching: find.byWidgetPredicate(
+              (Widget widget) =>
+                  widget is Directionality &&
+                  widget.textDirection == TextDirection.rtl,
+            ),
+          ),
+          findsWidgets,
+        );
+        expect(
+          find.descendant(of: rtl, matching: find.text('السابق')),
+          findsOneWidget,
+        );
+        expect(
+          find.descendant(of: rtl, matching: find.text('التالي')),
+          findsOneWidget,
+        );
       },
     );
 
@@ -210,7 +348,7 @@ void main() {
           findsNothing,
         );
         // Flutter reports a RenderFlex overflow through FlutterError, which
-        // flutter_test surfaces via takeException — the classic 390px
+        // flutter_test surfaces via takeException: the classic 390px
         // failure mode for a long page range the brief calls out. Reaching
         // this line with no exception is the proof the page's own
         // horizontal-scroll mitigation works at this width.
@@ -274,8 +412,8 @@ void main() {
 
         expect(activeVariant(), DsButtonVariant.outline);
 
-        // Flip the SAME controller in place — not a fresh widget tree —
-        // the same object every real theme toggle mutates.
+        // Flip the SAME controller in place, not a fresh widget tree: the
+        // same object every real theme toggle mutates.
         controller.setMode(DsThemeMode.light);
         await tester.pumpAndSettle();
 

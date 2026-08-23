@@ -12,12 +12,12 @@ import '../catalog.dart';
 
 /// [ComponentDocEntry.description] is the one-sentence form for nav and
 /// search. The page's own "Purpose" section carries the expanded,
-/// decision-guidance description IA §9.2 also asks for — agreeing with the
+/// decision-guidance description IA §9.2 also asks for: agreeing with the
 /// same trio (alert / alert-dialog / toaster) the alert page's own Purpose
 /// section already states.
 ///
 /// [ComponentDocEntry.exports] names both halves of the public surface:
-/// [DsToaster] itself is only the overlay host — every constructor a caller
+/// [DsToaster] itself is only the overlay host: every constructor a caller
 /// actually fires (`toast.success(...)` and friends) lives on
 /// [DsToastController], and both are documented in full on the page.
 const ComponentDocEntry toasterDoc = ComponentDocEntry(

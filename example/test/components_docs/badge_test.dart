@@ -4,6 +4,29 @@ import 'package:example/components_docs/badge/page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+/// The shadcn-parity section order (worker brief, `badge` component):
+/// live demo (`Preview`), Installation, Usage, Variants, With icon, With
+/// spinner, RTL, our own Composed-with-other-primitives addition, API
+/// Reference, then the six fixed extras. `Link` and `Custom Colors` are
+/// shadcn sections this component genuinely cannot do (DsBadge has no
+/// href/asChild and no colour-override parameter) and are asserted absent.
+const List<String> _expectedSectionHeadings = <String>[
+  'Installation',
+  'Usage',
+  'Variants',
+  'With icon',
+  'With spinner',
+  'RTL',
+  'Composed with other primitives',
+  'API Reference',
+  'States and feedback',
+  'Accessibility and keyboard behavior',
+  'Responsive and platform behavior',
+  'Dependencies, files, and assets',
+  'Theming notes',
+  'Source, tests, and docs',
+];
+
 Widget _harness({
   required Widget child,
   required DsThemeController controller,
@@ -28,7 +51,7 @@ Color _inkOf(WidgetTester tester, DsBadgeVariant variant) {
   return text.color!;
 }
 
-/// Pairs whose ink is expected to coincide — asserted in the source itself
+/// Pairs whose ink is expected to coincide: asserted in the source itself
 /// (`badge.dart`'s `_ink`): outline/ghost both fall back to
 /// `mutedForeground`, and link/action both resolve to `actionInk`.
 const List<(DsBadgeVariant, DsBadgeVariant)> _sharedInkPairs =
@@ -103,7 +126,7 @@ void main() {
         }
 
         // A live specimen of every DsBadgeVariant mounts somewhere on the
-        // page — not just the ones with distinct ink.
+        // page: not just the ones with distinct ink.
         final Set<DsBadgeVariant> mounted = tester
             .widgetList<DsBadge>(find.byType(DsBadge))
             .map((DsBadge badge) => badge.variant)
@@ -168,7 +191,7 @@ void main() {
         };
         _assertVariantsDistinguishable(darkInks);
 
-        // Flip the SAME controller in place — not a fresh widget tree — the
+        // Flip the SAME controller in place: not a fresh widget tree, the
         // same object every real theme toggle mutates.
         controller.setMode(DsThemeMode.light);
         await tester.pump();
@@ -180,7 +203,7 @@ void main() {
         _assertVariantsDistinguishable(lightInks);
 
         // The semantic inks are theme-resolved tokens (DsPalette.*Deep in
-        // light, DsPalette.* in dark) — they must actually move when the
+        // light, DsPalette.* in dark): they must actually move when the
         // theme flips, not just stay internally distinguishable.
         for (final DsBadgeVariant v in <DsBadgeVariant>[
           DsBadgeVariant.destructive,
@@ -199,6 +222,34 @@ void main() {
             reason: '$v ink did not change when the theme flipped',
           );
         }
+      },
+    );
+
+    testWidgets(
+      'renders the shadcn-parity section headings in order, and skips '
+      'Link and Custom Colors',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(1440, 900);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+
+        await tester.pumpWidget(
+          _harness(
+            controller: DsThemeController(mode: DsThemeMode.dark),
+            child: const BadgeDocPage(),
+          ),
+        );
+
+        final List<String> headings = tester
+            .widgetList<DsText>(find.byType(DsText))
+            .where((DsText text) => text.spec == DsType.h3)
+            .map((DsText text) => text.text)
+            .toList();
+
+        expect(headings, _expectedSectionHeadings);
+
+        expect(find.text('Link'), findsNothing);
+        expect(find.text('Custom Colors'), findsNothing);
       },
     );
   });

@@ -5,7 +5,7 @@
 ///
 /// All three read from `lib/src/components/input_group.dart`,
 /// `button_group.dart`, and `input_otp.dart` directly (Step 1 of the task
-/// cycle) — every public class, enum, and constructor parameter enumerated
+/// cycle): every public class, enum, and constructor parameter enumerated
 /// below is one this page's API tables must cover.
 ///
 /// The completeness test checks each class's own [DocsApiTable] by title —
@@ -23,9 +23,52 @@ import 'package:example/components_docs/input_group/meta.dart';
 import 'package:example/components_docs/input_group/page.dart';
 import 'package:example/docs/docs_code.dart';
 import 'package:example/docs/docs_facts.dart';
+import 'package:example/kit.dart' show DsSection;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+/// The full section list, in order, this page must render: shared frame
+/// first (Preview, Installation, Usage, Composition), each family's own
+/// sections grouped under its own name (Input group, Button group, Input
+/// OTP), one merged API Reference, then the six sections shadcn does not
+/// have (States, Accessibility, Responsive, Dependencies, Theming, Source).
+/// Mirrors https://ui.shadcn.com/docs/components/base/input-group,
+/// https://ui.shadcn.com/docs/components/base/button-group, and
+/// https://ui.shadcn.com/docs/components/base/input-otp, merged.
+const List<String> _expectedSectionOrder = <String>[
+  'Installation',
+  'Usage',
+  'Composition',
+  'Input group',
+  'Addon position',
+  'Addon content',
+  'Custom input',
+  'RTL',
+  'Button group',
+  'Composing other members',
+  'Separator',
+  'Split',
+  'Nested',
+  'Sizes',
+  'Vs. selection control',
+  'RTL',
+  'Input OTP',
+  'Groups and separators',
+  'Disabled',
+  'Controlled',
+  'Invalid',
+  'Four digits',
+  'Verification form',
+  'RTL',
+  'API Reference',
+  'States and feedback',
+  'Accessibility and keyboard behavior',
+  'Responsive and platform behavior',
+  'Dependencies, files, and assets',
+  'Theming notes',
+  'Source and tests',
+];
 
 const Size _wide = Size(1440, 900);
 const Size _narrow = Size(390, 844);
@@ -35,7 +78,7 @@ const Size _narrow = Size(390, 844);
 /// `lib/src/components/input_group.dart`, `button_group.dart`, and
 /// `input_otp.dart`. The two enums (`DsInputGroupAlign`,
 /// `DsInputGroupButtonSize`) are documented in Variants, but checked the same
-/// way — by their own table title.
+/// way: by their own table title.
 const Map<String, List<String>> _expectedApiTables = <String, List<String>>{
   // ── input_group.dart ──
   'DsInputGroup': <String>[
@@ -163,7 +206,14 @@ void main() {
       expect(tester.takeException(), isNull);
 
       await _pump(tester, size: _narrow);
-      await tester.pumpAndSettle();
+      // Not pumpAndSettle(): the "Spinner addon: loading state" specimen
+      // holds a live DsSpinner, which repeat()s its AnimationController
+      // forever and never reaches quiescence. Bounded pumps instead, the
+      // same idiom test/components_docs/icon_test.dart uses throughout for
+      // its own DsSpinner specimens (see its "spinner rotates under normal
+      // motion" test).
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
 
       expect(
         find.byKey(const ValueKey<String>('docs-layout-anchor-strip')),
@@ -174,6 +224,53 @@ void main() {
         findsNothing,
       );
       expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'the spinner addon specimen animates under normal motion: no TickerMode '
+    'above it mutes the loading spinner it exists to demonstrate',
+    (WidgetTester tester) async {
+      await _pump(tester);
+
+      final Finder spinner = find.byType(DsSpinner);
+      expect(spinner, findsWidgets);
+
+      // No ancestor disables this specimen's ticker. A TickerMode(enabled:
+      // false) wrapper would freeze the spinner mid-rotation on a page whose
+      // whole point is to demonstrate a loading state.
+      expect(
+        find.ancestor(
+          of: spinner.first,
+          matching: find.byWidgetPredicate(
+            (Widget w) => w is TickerMode && !w.enabled,
+          ),
+        ),
+        findsNothing,
+      );
+
+      await tester.pump();
+
+      final Finder rotationFinder = find.byType(RotationTransition);
+      expect(rotationFinder, findsWidgets);
+
+      final RotationTransition rotation1 = tester.widget<RotationTransition>(
+        rotationFinder.first,
+      );
+      final double value1 = rotation1.turns.value;
+
+      await tester.pump(const Duration(milliseconds: 100));
+
+      final RotationTransition rotation2 = tester.widget<RotationTransition>(
+        rotationFinder.first,
+      );
+      final double value2 = rotation2.turns.value;
+
+      expect(
+        value2,
+        greaterThan(value1),
+        reason: 'spinner did not rotate under normal motion',
+      );
     },
   );
 
@@ -215,6 +312,23 @@ void main() {
   );
 
   testWidgets(
+    'renders the shadcn-parity section list in order: shared frame, each '
+    'family grouped under its own name, one merged API Reference, then the '
+    'six sections shadcn does not have',
+    (WidgetTester tester) async {
+      await _pump(tester);
+
+      final List<String> rendered = tester
+          .widgetList<DsSection>(find.byType(DsSection))
+          .map((DsSection section) => section.title)
+          .toList();
+
+      expect(rendered, _expectedSectionOrder);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
     'the live input group specimen: a password DsInputGroupInput with a '
     'DsInputGroupButton visibility toggle that flips obscureText',
     (WidgetTester tester) async {
@@ -241,7 +355,7 @@ void main() {
 
   testWidgets(
     'the live button group specimen: a quantity stepper where the app, not '
-    'DsButtonGroup, owns the count — proving the group coordinates no state '
+    'DsButtonGroup, owns the count: proving the group coordinates no state '
     'of its own',
     (WidgetTester tester) async {
       await _pump(tester);
@@ -292,7 +406,7 @@ void main() {
       final BorderRadius middle = DsButtonGroup.radiiOf(members, 1);
       final BorderRadius last = DsButtonGroup.radiiOf(members, 2);
 
-      // The left end keeps the member's own radius — a pill button's 999px —
+      // The left end keeps the member's own radius, a pill button's 999px,
       // while every interior/right corner not forced by the last-slotted rule
       // is squared to zero.
       expect(first.topLeft, const Radius.circular(DsRadii.pill));
@@ -333,7 +447,7 @@ void main() {
         matching: find.byType(EditableText),
       );
 
-      // One call sets the whole string at once — exactly what a paste or an
+      // One call sets the whole string at once: exactly what a paste or an
       // OS one-time-code autofill delivers over the platform channel, and
       // exactly what DsInputOtp has no separate code path for: it is the
       // same EditableText.onChanged a single keystroke would have driven.
@@ -351,7 +465,7 @@ void main() {
         contains('Complete: 408215'),
       );
 
-      // Deleting the last character — what a backspace produces — retreats
+      // Deleting the last character. What a backspace produces retreats
       // the strip: the active selection recomputes from the shorter string,
       // with no separate "move focus back one slot" call of its own.
       await tester.enterText(editable, '40821');
@@ -403,7 +517,7 @@ void main() {
       final SemanticsNode node = tester.getSemantics(find.byKey(otpKey));
       expect(node.flagsCollection.isTextField, isTrue);
 
-      // The six painted boxes contribute no semantics of their own — they sit
+      // The six painted boxes contribute no semantics of their own, they sit
       // under an IgnorePointer whose ignoringSemantics follows ignoring
       // (true), so a screen reader never sees them as separate fields.
       int textFieldNodes = 0;
@@ -478,7 +592,7 @@ void main() {
 
   testWidgets(
     'installation is honest that none of the three has a registry manifest '
-    'yet — no elattar add command is presented as working',
+    'yet: no elattar add command is presented as working',
     (WidgetTester tester) async {
       await _pump(tester);
 

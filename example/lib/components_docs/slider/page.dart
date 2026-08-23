@@ -1,7 +1,7 @@
 /// Public component documentation for the slider component.
 ///
 /// `sliderDoc` (from `meta.dart`) is the data source, not
-/// `componentDoc('slider')` — slider is not yet registered in
+/// `componentDoc('slider')`: slider is not yet registered in
 /// `catalog.dart`'s `componentDocs` list, so calling that would throw. Adding
 /// it there is a supervisor-owned aggregation step (Phase J plan). Structure
 /// mirrors `components_docs/checkbox/page.dart`: one `DocsLayout` shell, one
@@ -37,23 +37,24 @@ class SliderDocPage extends StatelessWidget {
         DsBreadcrumbEntry.page('Slider'),
       ],
       toc: const <DocsTocEntry>[
-        DocsTocEntry(title: 'Overview', anchor: 'overview'),
-        DocsTocEntry(title: 'Status', anchor: 'status'),
-        DocsTocEntry(title: 'Preview', anchor: 'preview'),
         DocsTocEntry(title: 'Installation', anchor: 'install'),
         DocsTocEntry(title: 'Usage', anchor: 'usage'),
-        DocsTocEntry(title: 'API', anchor: 'api'),
         DocsTocEntry(title: 'Variants and sizes', anchor: 'variants'),
+        DocsTocEntry(title: 'Range', anchor: 'range'),
+        DocsTocEntry(title: 'Multiple thumbs', anchor: 'multiple-thumbs'),
+        DocsTocEntry(title: 'Controlled', anchor: 'controlled'),
+        DocsTocEntry(title: 'Disabled', anchor: 'disabled'),
+        DocsTocEntry(title: 'Composition', anchor: 'composition'),
+        DocsTocEntry(title: 'API Reference', anchor: 'api'),
         DocsTocEntry(title: 'States', anchor: 'states'),
         DocsTocEntry(title: 'Accessibility', anchor: 'accessibility'),
-        DocsTocEntry(title: 'Responsive behavior', anchor: 'responsive'),
-        DocsTocEntry(title: 'Dependencies and files', anchor: 'dependencies'),
-        DocsTocEntry(title: 'Composition', anchor: 'composition'),
+        DocsTocEntry(title: 'Responsive', anchor: 'responsive'),
+        DocsTocEntry(title: 'Dependencies', anchor: 'dependencies'),
         DocsTocEntry(title: 'Theming', anchor: 'theming'),
         DocsTocEntry(title: 'Source', anchor: 'source'),
       ],
       // Wave 2's alphabetical neighbours (Phase J plan inventory). Neither
-      // route is registered yet either — the whole wave's previous/next chain
+      // route is registered yet either: the whole wave's previous/next chain
       // is stitched together once the supervisor aggregates every meta.dart,
       // the same as this page's own route is not reachable until then.
       previous: const DocsPageLink(
@@ -81,19 +82,18 @@ class _SliderArticle extends StatelessWidget {
       key: const ValueKey<String>('slider-doc-article'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        DsSection(
-          id: 'overview',
-          title: 'When to use a slider',
-          description:
-              'What it solves, and when a neighbouring control answers the '
+        ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: DsWidths.prose),
+        child: DsText(
+          'What it solves, and when a neighbouring control answers the '
               'same interaction better.',
-          child: DsText(sliderExpandedDescription, DsType.body),
+          DsType.body,
         ),
+      ),
+      SizedBox(height: ds(6)),
+      DsText(sliderExpandedDescription, DsType.body),
         SizedBox(height: ds(6)),
-        DsSection(
-          id: 'status',
-          title: 'Status',
-          child: DocsInstallFacts(
+        DocsInstallFacts(
             title: 'Status',
             facts: <DocsInstallFact>[
               const DocsInstallFact(
@@ -102,7 +102,7 @@ class _SliderArticle extends StatelessWidget {
                 description:
                     'Ported and tested against lib/src/components/slider.dart. '
                     'It is not yet a registry item, so elattar add slider '
-                    'will not resolve — see Installation below.',
+                    'will not resolve: see Installation below.',
               ),
               DocsInstallFact(
                 label: 'Version',
@@ -115,25 +115,27 @@ class _SliderArticle extends StatelessWidget {
                 label: 'Platforms',
                 value: 'Android, iOS, Web, macOS, Windows, Linux',
                 description:
-                    'A pure Flutter widget tree — a Listener/MouseRegion for '
+                    'A pure Flutter widget tree: a Listener/MouseRegion for '
                     'pointer input and DsMachineSurface fills for the track, '
                     'range and thumb. No platform channel and no '
                     'platform-specific branch.',
               ),
             ],
           ),
-        ),
         SizedBox(height: ds(6)),
-        DsSection(
-          id: 'preview',
-          title: 'Preview',
-          description:
-              'Four live specimens, all built from the same DsSlider '
+        ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: DsWidths.prose),
+        child: DsText(
+          'Four live specimens, all built from the same DsSlider '
               'constructor. Single value, Range and Custom range are '
-              'operable — drag a knob, or focus it (tap and Tab, or see the '
+              'operable: drag a knob, or focus it (tap and Tab, or see the '
               'Accessibility section) and use the arrow, Page and Home/End '
               'keys. Disabled is deliberately inert.',
-          child: DocsCodeExample(
+          DsType.body,
+        ),
+      ),
+      SizedBox(height: ds(6)),
+      DocsCodeExample(
             title: 'Slider specimens',
             description: 'Every cell below renders a real DsSlider.',
             preview: const _SliderPreview(),
@@ -147,13 +149,12 @@ class _SliderArticle extends StatelessWidget {
               ),
             ],
           ),
-        ),
         SizedBox(height: ds(6)),
         DsSection(
           id: 'install',
           title: 'Installation',
           description:
-              'Command install is not available yet — read this before '
+              'Command install is not available yet: read this before '
               'reaching for elattar add slider.',
           child: DocsInstallFacts(
             facts: <DocsInstallFact>[
@@ -163,11 +164,11 @@ class _SliderArticle extends StatelessWidget {
                 description:
                     'slider is not yet a registry item, so `elattar add '
                     'slider` will not resolve. It is one of the Wave 2 form '
-                    'components still awaiting a manifest — see the Phase J '
+                    'components still awaiting a manifest: see the Phase J '
                     'documentation plan.',
               ),
               const DocsInstallFact(
-                label: 'Manual — package mode (supported today)',
+                label: 'Manual: package mode (supported today)',
                 value:
                     "import 'package:elattar_design_system/elattar_design_system.dart';",
                 description:
@@ -175,10 +176,10 @@ class _SliderArticle extends StatelessWidget {
                     'exactly as this page does.',
               ),
               DocsInstallFact(
-                label: 'Manual — source mode (not recommended yet)',
+                label: 'Manual: source mode (not recommended yet)',
                 value: sliderDoc.sourcePath,
                 description:
-                    'Copying this one file will not compile on its own — it '
+                    'Copying this one file will not compile on its own: it '
                     'needs eight sibling files with it (see Dependencies and '
                     'files below), and no manifest exists yet to resolve '
                     'them for you.',
@@ -191,41 +192,116 @@ class _SliderArticle extends StatelessWidget {
           id: 'usage',
           title: 'Usage',
           description:
-              'The smallest correct example, then a range, then a labelled '
-              'composition.',
+              'Import DsSlider and construct the smallest correct example.',
+          child: DsPanel(
+            label: 'DART',
+            note: 'SMALLEST CORRECT EXAMPLE',
+            child: DocsSelectableCodeBlock(code: _smallestUsageCode),
+          ),
+        ),
+        SizedBox(height: ds(6)),
+        DsSection(
+          id: 'variants',
+          title: 'Variants and sizes',
+          description:
+              'No size or style variant: recorded rather than '
+              'silently skipped.',
+          child: DsText(
+            'DsSlider fixes one geometry, like its checkbox/switch/radio '
+            'siblings: DsSlider.trackHeight at 10px and DsSlider.thumbSize '
+            'at 20px, with nothing smaller or larger to choose between. The '
+            'source also carries dormant data-vertical classes for a '
+            'vertical orientation, but no orientation parameter is exposed '
+            'on DsSlider and no call site in the corpus used it: recorded '
+            'as unbuilt rather than shipped, the same ruling the source\'s '
+            'own docstring states for the reference\'s vertical branch, so '
+            'this page has no Vertical section to show.',
+            DsType.small,
+            color: theme.mutedForeground,
+          ),
+        ),
+        SizedBox(height: ds(6)),
+        DsSection(
+          id: 'range',
+          title: 'Range',
+          description:
+              'Pass two entries in values and DsSlider renders a range '
+              'slider: one thumb per entry, each stopping at its neighbour '
+              'rather than crossing it.',
+          child: DsPanel(
+            label: 'DART',
+            note: 'A RANGE, TWO THUMBS',
+            child: DocsSelectableCodeBlock(code: _rangeUsageCode),
+          ),
+        ),
+        SizedBox(height: ds(6)),
+        DsSection(
+          id: 'multiple-thumbs',
+          title: 'Multiple thumbs',
+          description:
+              'values is not limited to one or two entries: any length '
+              'renders that many thumbs, each still clamped against its '
+              'immediate neighbours by index.',
+          child: DsPanel(
+            label: 'DART',
+            note: 'THREE THUMBS',
+            child: DocsSelectableCodeBlock(code: _multipleThumbsCode),
+          ),
+        ),
+        SizedBox(height: ds(6)),
+        DsSection(
+          id: 'controlled',
+          title: 'Controlled',
+          description:
+              'DsSlider renders no visible numeric readout of its own, '
+              'label only supplies the accessible name, never on-screen '
+              'text. Pair it with a DsText showing the current value(s) '
+              'when the user needs to see the number, not just feel the '
+              'position.',
+          child: const _VolumeExample(),
+        ),
+        SizedBox(height: ds(6)),
+        DsSection(
+          id: 'disabled',
+          title: 'Disabled',
+          description:
+              'enabled: false dims the whole control and withdraws pointer '
+              'and keyboard handling; see the live Disabled cell in Preview '
+              'above.',
+          child: DsPanel(
+            label: 'DART',
+            note: 'DISABLED',
+            child: DocsSelectableCodeBlock(code: _disabledUsageCode),
+          ),
+        ),
+        SizedBox(height: ds(6)),
+        DsSection(
+          id: 'composition',
+          title: 'Composition',
+          description:
+              'Two larger, real patterns built from the same constructor, '
+              'not manufactured examples the Dart API cannot support.',
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               DsPanel(
                 label: 'DART',
-                note: 'SMALLEST CORRECT EXAMPLE',
-                child: DocsSelectableCodeBlock(code: _smallestUsageCode),
+                note: 'PRICE FILTER (RANGE, CUSTOM STEP)',
+                child: DocsSelectableCodeBlock(code: _priceFilterCode),
               ),
               SizedBox(height: ds(5)),
               DsPanel(
                 label: 'DART',
-                note: 'A RANGE — TWO THUMBS',
-                child: DocsSelectableCodeBlock(code: _rangeUsageCode),
+                note: 'RATING (SINGLE VALUE, STEP OF 1 ACROSS 0–5)',
+                child: DocsSelectableCodeBlock(code: _ratingCode),
               ),
-              SizedBox(height: ds(5)),
-              DsText(
-                'DsSlider renders no visible numeric readout of its own — '
-                'label only supplies the accessible name, never on-screen '
-                'text. Pair it with a DsText showing the current value(s) '
-                'when the user needs to see the number, not just feel the '
-                'position:',
-                DsType.small,
-                color: theme.mutedForeground,
-              ),
-              SizedBox(height: ds(3)),
-              const _VolumeExample(),
             ],
           ),
         ),
         SizedBox(height: ds(6)),
         DsSection(
           id: 'api',
-          title: 'API',
+          title: 'API Reference',
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
@@ -240,7 +316,7 @@ class _SliderArticle extends StatelessWidget {
                         'two or more render a range slider, one thumb per '
                         'entry, in ascending order. Each thumb\'s own moves '
                         'are clamped against its neighbours by INDEX, not by '
-                        'magnitude — the source never sorts this list, so '
+                        'magnitude: the source never sorts this list, so '
                         'the caller is expected to keep it ascending.',
                   ),
                   DocsApiFact(
@@ -249,7 +325,7 @@ class _SliderArticle extends StatelessWidget {
                     description:
                         'Called with the full next values list (same length) '
                         'after a legal move. Null makes the control '
-                        'inoperable — the same "no handler, no operation" '
+                        'inoperable: the same "no handler, no operation" '
                         'rule DsButton follows.',
                   ),
                   DocsApiFact(
@@ -261,7 +337,7 @@ class _SliderArticle extends StatelessWidget {
                     name: 'max',
                     type: 'double',
                     description:
-                        'Defaults to 100 — the component\'s own default, not '
+                        'Defaults to 100: the component\'s own default, not '
                         'a design token.',
                   ),
                   DocsApiFact(
@@ -278,8 +354,8 @@ class _SliderArticle extends StatelessWidget {
                     name: 'enabled',
                     type: 'bool',
                     description:
-                        'Defaults to true. false dims the WHOLE control — '
-                        'track, fill and every thumb together — through one '
+                        'Defaults to true. false dims the WHOLE control, '
+                        'track, fill and every thumb together: through one '
                         'Opacity at 50%, and withdraws pointer and keyboard '
                         'handling. Separate from a null onChanged, which '
                         'leaves it at full opacity but still inoperable.',
@@ -290,7 +366,7 @@ class _SliderArticle extends StatelessWidget {
                     description:
                         'Optional accessible name, read by every thumb\'s '
                         'own Semantics node. On a range slider both thumbs '
-                        'announce the identical string — there is no '
+                        'announce the identical string: there is no '
                         'separate "minimum"/"maximum" label. Left null, a '
                         'thumb has no accessible name at all, only a raw '
                         'numeric value.',
@@ -305,14 +381,14 @@ class _SliderArticle extends StatelessWidget {
                     name: 'DsSlider.trackHeight',
                     type: 'static double',
                     description:
-                        '10px — the height of the whole control, since the '
+                        '10px: the height of the whole control, since the '
                         'root box IS the track.',
                   ),
                   DocsApiFact(
                     name: 'DsSlider.thumbSize',
                     type: 'static double',
                     description:
-                        '20px — each thumb overflows the 10px track by 5px '
+                        '20px: each thumb overflows the 10px track by 5px '
                         'top and bottom.',
                   ),
                 ],
@@ -321,9 +397,9 @@ class _SliderArticle extends StatelessWidget {
               DsText(
                 'What happens with an out-of-range value: DsSlider does not '
                 'clamp the List<double> you pass into values. A number '
-                'below min or above max still renders — pinned to the near '
+                'below min or above max still renders: pinned to the near '
                 'edge of the track, because the fraction used to position '
-                'the thumb and the fill is clamped to [0, 1] — but the '
+                'the thumb and the fill is clamped to [0, 1]: but the '
                 'accessibility value it announces is the raw, unclamped '
                 'number you passed in, not the visual position. The moment '
                 'the user actually moves that thumb, though, the move is '
@@ -331,7 +407,7 @@ class _SliderArticle extends StatelessWidget {
                 'and by the neighbouring thumb elsewhere), so an '
                 'out-of-range value is corrected on the very first '
                 'interaction and can never be produced by dragging or the '
-                'keyboard — only by a caller supplying it directly.',
+                'keyboard: only by a caller supplying it directly.',
                 DsType.small,
                 color: theme.mutedForeground,
               ),
@@ -340,38 +416,11 @@ class _SliderArticle extends StatelessWidget {
         ),
         SizedBox(height: ds(6)),
         DsSection(
-          id: 'variants',
-          title: 'Variants and sizes',
-          description:
-              'No size or style variant — recorded rather than '
-              'silently skipped.',
-          child: DsText(
-            'DsSlider fixes one geometry, like its checkbox/switch/radio '
-            'siblings: DsSlider.trackHeight at 10px and DsSlider.thumbSize '
-            'at 20px, with nothing smaller or larger to choose between. The '
-            'one real structural variant is how many thumbs values carries: '
-            'a single entry is a single-value slider (the fill always '
-            'starts at min); two or more entries is a range slider, one '
-            'thumb per entry, each stopping at its neighbour rather than '
-            'crossing it — dragging the low thumb of a [0, 500] range past '
-            'its neighbour lands both thumbs on the same value ([500, 500]) '
-            'rather than swapping their order. The source also carries '
-            'dormant data-vertical classes for a vertical orientation, but '
-            'no orientation parameter is exposed on DsSlider and no call '
-            'site in the corpus used it — recorded as unbuilt rather than '
-            'shipped, the same ruling the source\'s own docstring states for '
-            'the reference\'s vertical branch.',
-            DsType.small,
-            color: theme.mutedForeground,
-          ),
-        ),
-        SizedBox(height: ds(6)),
-        DsSection(
           id: 'states',
           title: 'States and feedback',
           description:
               'Selected, Loading, Empty, Error and Success are omitted '
-              'below — reasons follow the table.',
+              'below: reasons follow the table.',
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
@@ -395,7 +444,7 @@ class _SliderArticle extends StatelessWidget {
                         'Entering the thumb\'s 34x34 hit area (not the '
                         'painted 20px knob) fades a theme.ring ring in at '
                         '50% alpha over 250ms on DsCurves.spring, and the '
-                        'knob SNAPS — not tweens — to 1.10x scale in a '
+                        'knob SNAPS: not tweens: to 1.10x scale in a '
                         'single frame.',
                     userSignal:
                         'A visible ring plus a knob that instantly looks '
@@ -406,7 +455,7 @@ class _SliderArticle extends StatelessWidget {
                     state: 'Active (pressed / dragging)',
                     treatment:
                         'The same ring, held lit, and the knob snaps to '
-                        '1.25x scale instead of 1.10x — "grabbing it '
+                        '1.25x scale instead of 1.10x, "grabbing it '
                         'springs the knob up, like picking it out of the '
                         'groove," in the source\'s own words.',
                     userSignal:
@@ -418,7 +467,7 @@ class _SliderArticle extends StatelessWidget {
                     state: 'Focus-visible',
                     treatment:
                         'Focusing a thumb lights the identical ring the '
-                        'hover and active states use — DsSlider has no '
+                        'hover and active states use, DsSlider has no '
                         'separate focus-only ring.',
                     userSignal:
                         'A visible ring with no scale change, since focus '
@@ -427,13 +476,13 @@ class _SliderArticle extends StatelessWidget {
                   DocsStateFact(
                     state: 'Disabled',
                     treatment:
-                        'enabled: false wraps the ENTIRE control — track, '
-                        'fill and every thumb together — in one Opacity at '
+                        'enabled: false wraps the ENTIRE control: track, '
+                        'fill and every thumb together: in one Opacity at '
                         '50%, and gates the whole gesture/keyboard surface '
                         'with IgnorePointer; canRequestFocus turns false '
                         'too, so a disabled thumb leaves the tab order.',
                     userSignal:
-                        'Dimmed as one flat unit and completely inert — a '
+                        'Dimmed as one flat unit and completely inert: a '
                         'click or a step key does nothing.',
                   ),
                   DocsStateFact(
@@ -452,19 +501,19 @@ class _SliderArticle extends StatelessWidget {
               ),
               SizedBox(height: ds(4)),
               DsText(
-                'Omitted: Selected — a slider has no boolean "on" state to '
+                'Omitted: Selected: a slider has no boolean "on" state to '
                 'select; its whole value IS the state, covered above and in '
-                'API. Error — DsSlider defines no invalid parameter and no '
+                'API. Error, DsSlider defines no invalid parameter and no '
                 'DsFieldScope participation at all; it is, in the source\'s '
                 'own words, the one control in this family with "no field '
                 'participation ... no aria-invalid, no data-invalid, no '
-                'FieldScope" — so there is no destructive-ring row to show, '
-                'and this page will not invent one. Loading and Empty — '
+                'FieldScope": so there is no destructive-ring row to show, '
+                'and this page will not invent one. Loading and Empty, '
                 'DsSlider is a synchronous primitive with no async '
-                'operation and nothing to list. Success — the component '
+                'operation and nothing to list. Success: the component '
                 'defines no success semantics of its own. Also unlike its '
                 'checkbox/switch/radio siblings, DsSlider never imports '
-                'DsJellyReplay — there is no post-change squash animation '
+                'DsJellyReplay: there is no post-change squash animation '
                 'anywhere in this control.',
                 DsType.small,
                 color: theme.mutedForeground,
@@ -488,14 +537,14 @@ class _SliderArticle extends StatelessWidget {
                     'Each thumb gets its own Semantics node with slider: '
                     'true, container: true and enabled: reflecting whether '
                     'the control is actually operable (enabled && '
-                    'onChanged != null) — not DsSlider.enabled alone.',
+                    'onChanged != null): not DsSlider.enabled alone.',
               ),
               const DocsInstallFact(
                 label: 'Label association',
                 value: 'label',
                 description:
                     'Fed directly to every thumb\'s Semantics.label. It is '
-                    'optional — leave it null and a thumb announces a '
+                    'optional: leave it null and a thumb announces a '
                     'numeric value with NO accessible name at all. On a '
                     'range slider the identical string is read by both '
                     'thumbs; there is no per-thumb "minimum"/"maximum" '
@@ -507,12 +556,12 @@ class _SliderArticle extends StatelessWidget {
                 value: 'Semantics.value, recomputed on every rebuild',
                 description:
                     'DsSlider does supply a live value announcement that '
-                    'updates as the thumb moves — printed as a bare '
+                    'updates as the thumb moves: printed as a bare '
                     'integer ("40") when the value lands on a whole number '
                     'and as Dart\'s default decimal string otherwise, with '
                     'no percentage sign, no unit and no surrounding words. '
                     'A caller who needs "40%" or "\$40" has to say so '
-                    'themselves — the control announces the number alone.',
+                    'themselves: the control announces the number alone.',
               ),
               const DocsInstallFact(
                 label: 'Keyboard activation',
@@ -523,13 +572,13 @@ class _SliderArticle extends StatelessWidget {
                     'Right/Up add a step, Left/Down take one away, Page Up/'
                     'Page Down move ten steps, and Home/End jump straight '
                     'to min/max. Wired by hand through Focus.onKeyEvent per '
-                    'thumb — verified directly against the shipped '
+                    'thumb: verified directly against the shipped '
                     'implementation, both here and in the package\'s own '
                     'test/slider_test.dart "keyboard" group.',
               ),
               const DocsInstallFact(
                 label: 'Focus behavior',
-                value: 'One FocusNode per thumb — a range is two tab stops',
+                value: 'One FocusNode per thumb: a range is two tab stops',
                 description:
                     'Each thumb\'s own Focus widget requests and reports '
                     'its own focus; arrow keys only move whichever thumb '
@@ -541,7 +590,7 @@ class _SliderArticle extends StatelessWidget {
                 value: '34 x 34, centred on each 20 x 20 thumb',
                 description:
                     'DsHitArea grows the pointer AND hover target past the '
-                    'painted knob — 8px past its 18px padding box on every '
+                    'painted knob, 8px past its 18px padding box on every '
                     'side, per selection_control.dart\'s own measured '
                     'table. The track itself carries no extra inset of its '
                     'own.',
@@ -560,7 +609,7 @@ class _SliderArticle extends StatelessWidget {
                 description:
                     'DsSlider has no invalid parameter and does not read '
                     'or fold in an enclosing DsFieldScope\'s invalid flag '
-                    'at all — the one control in this family with no field '
+                    'at all: the one control in this family with no field '
                     'participation, stated in the source\'s own docstring. '
                     'A caller who needs an error state around a slider has '
                     'to build one outside the control, not through the '
@@ -572,7 +621,7 @@ class _SliderArticle extends StatelessWidget {
                 description:
                     'State changes are exposed purely through the value/'
                     'increasedValue/decreasedValue on each thumb\'s own '
-                    'Semantics node — there is no extra '
+                    'Semantics node: there is no extra '
                     'SemanticsService.announce call.',
               ),
               const DocsInstallFact(
@@ -595,7 +644,7 @@ class _SliderArticle extends StatelessWidget {
             'Unlike its checkbox/switch/radio siblings, DsSlider is not a '
             'fixed-size atom: DsSlider.trackHeight (10px) and '
             'DsSlider.thumbSize (20px) are fixed, but the control\'s WIDTH '
-            'is fluid — a LayoutBuilder measures whatever width its parent '
+            'is fluid: a LayoutBuilder measures whatever width its parent '
             'constrains it to, and every fraction (thumb position, fill '
             'length) is computed against that measured width on every '
             'layout pass. The same DsSlider genuinely stretches from a '
@@ -603,7 +652,7 @@ class _SliderArticle extends StatelessWidget {
             'breakpoint logic of its own; what changes with layout belongs '
             'entirely to whatever composes it. Keyboard and pointer '
             'activation behave identically on every Flutter target this '
-            'package supports — there is no platform channel and nothing '
+            'package supports: there is no platform channel and nothing '
             'here is web-only or desktop-only, though a coarse (touch) '
             'pointer still has to land within the same 34 x 34 hit area a '
             'mouse does; there is no separate touch-specific target.',
@@ -616,7 +665,7 @@ class _SliderArticle extends StatelessWidget {
           id: 'dependencies',
           title: 'Dependencies, files, assets, fonts and shaders',
           child: DocsInstallFacts(
-            title: 'Dependencies and files',
+            title: 'Dependencies',
             facts: <DocsInstallFact>[
               DocsInstallFact(
                 label: 'Source file',
@@ -633,7 +682,7 @@ class _SliderArticle extends StatelessWidget {
                     'helper the thumb uses) and selection_control.dart for '
                     'DsHitArea, the shared hit-area/expander machinery '
                     'every control in this family relies on. Neither is '
-                    'copyable in isolation — see Installation.',
+                    'copyable in isolation: see Installation.',
               ),
               const DocsInstallFact(
                 label: 'Foundation dependencies',
@@ -651,7 +700,7 @@ class _SliderArticle extends StatelessWidget {
                 label: 'Exports',
                 value: sliderDoc.exports.join(', '),
                 description:
-                    'The public symbols this component makes available — a '
+                    'The public symbols this component makes available: a '
                     'single class, unlike checkbox/switch which each also '
                     'export a state enum.',
               ),
@@ -677,30 +726,6 @@ class _SliderArticle extends StatelessWidget {
         ),
         SizedBox(height: ds(6)),
         DsSection(
-          id: 'composition',
-          title: 'Composition examples',
-          description:
-              'Two larger, real patterns built from the same constructor — '
-              'not manufactured examples the Dart API cannot support.',
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              DsPanel(
-                label: 'DART',
-                note: 'PRICE FILTER (RANGE, CUSTOM STEP)',
-                child: DocsSelectableCodeBlock(code: _priceFilterCode),
-              ),
-              SizedBox(height: ds(5)),
-              DsPanel(
-                label: 'DART',
-                note: 'RATING (SINGLE VALUE, STEP OF 1 ACROSS 0–5)',
-                child: DocsSelectableCodeBlock(code: _ratingCode),
-              ),
-            ],
-          ),
-        ),
-        SizedBox(height: ds(6)),
-        DsSection(
           id: 'theming',
           title: 'Theming notes',
           child: DocsInstallFacts(
@@ -713,7 +738,7 @@ class _SliderArticle extends StatelessWidget {
               ),
               DocsInstallFact(
                 label: 'Filled range',
-                value: 'theme.actionInk — never theme.primary',
+                value: 'theme.actionInk: never theme.primary',
                 description:
                     'The source measures theme.primary at 1.63:1 contrast '
                     'against theme.muted on this palette and theme.actionInk '
@@ -732,7 +757,7 @@ class _SliderArticle extends StatelessWidget {
                     'focused',
                 description:
                     'Prepended in front of DsShadows.btn\'s own four '
-                    'layers via DsButton.withFocusRing — never replacing '
+                    'layers via DsButton.withFocusRing: never replacing '
                     'them.',
               ),
               DocsInstallFact(
@@ -748,7 +773,7 @@ class _SliderArticle extends StatelessWidget {
                 label: 'Radius',
                 value: 'DsRadii.pill (track ends) / full circle (thumb)',
                 description:
-                    'The range itself paints no radius of its own — the '
+                    'The range itself paints no radius of its own: the '
                     'track\'s ClipRRect gives it its corners.',
               ),
               DocsInstallFact(
@@ -782,7 +807,7 @@ class _SliderArticle extends StatelessWidget {
                 label: 'Shared machinery',
                 value: 'lib/src/components/selection_control.dart',
                 description:
-                    'DsHitArea — shared with the checkbox, switch and radio '
+                    'DsHitArea: shared with the checkbox, switch and radio '
                     'families and documented on their own component pages.',
               ),
               const DocsInstallFact(
@@ -791,7 +816,7 @@ class _SliderArticle extends StatelessWidget {
                 description:
                     'Geometry (both coordinate spaces), rasterised colour/'
                     'shadow assertions, pointer/drag/keyboard behaviour, '
-                    'disabled dimming and reduced-motion coverage — driven '
+                    'disabled dimming and reduced-motion coverage: driven '
                     'and measured against the live reference per the '
                     'file\'s own header.',
               ),
@@ -832,6 +857,22 @@ DsSlider(
   onChanged: (List<double> next) => setState(() => priceRange = next),
 )''';
 
+const String _multipleThumbsCode = '''List<double> tiers = <double>[20, 50, 80];
+
+DsSlider(
+  values: tiers,
+  min: 0,
+  max: 100,
+  label: 'Budget tiers',
+  onChanged: (List<double> next) => setState(() => tiers = next),
+)''';
+
+const String _disabledUsageCode = '''const DsSlider(
+  values: <double>[40],
+  enabled: false,
+  label: 'Disabled',
+)''';
+
 const String _priceFilterCode =
     '// priceRange holds the two thumb values, ascending.\n'
     'DsSlider(\n'
@@ -842,7 +883,7 @@ const String _priceFilterCode =
     "  label: 'Price range',\n"
     '  onChanged: (List<double> next) => setState(() => priceRange = next),\n'
     ')\n\n'
-    '// DsSlider draws no numeric readout of its own — the caller states it.\n'
+    '// DsSlider draws no numeric readout of its own: the caller states it.\n'
     'DsText(\n'
     "  '\${priceRange.first.round()} - \${priceRange.last.round()}',\n"
     '  DsType.small,\n'
@@ -934,7 +975,7 @@ class _SliderPreviewState extends State<_SliderPreview> {
   }
 }
 
-/// A live, functioning slider-plus-readout for the "Usage" section — proof
+/// A live, functioning slider-plus-readout for the "Usage" section: proof
 /// the composition it documents actually renders and moves, not just a code
 /// excerpt.
 class _VolumeExample extends StatefulWidget {

@@ -1,14 +1,16 @@
-/// Public component documentation for the alert-dialog component.
-///
-/// The eighteen IA §9.1 sections map onto this page as: breadcrumb/family
-/// comes from the eyebrow and [DocsLayout.breadcrumbs]; title and short
-/// description come from [DocsLayout] itself; the expanded "when to use
-/// this instead of a neighbour" guidance is [alertDialogExpandedDescription],
-/// carried both in the page intro and as a dedicated decision-guide panel;
-/// status, preview, installation, usage, API, variants, states,
-/// accessibility, responsive behaviour, the install-facts disclosure, a
-/// composition example, theming notes, and source/tests each get their own
-/// [DsSection]; previous/next comes from [DocsLayout] again.
+/// Public component documentation for the alert-dialog component, shaped to
+/// mirror `https://ui.shadcn.com/docs/components/base/alert-dialog` section
+/// for section: a live [DsSection] Preview before any other heading, then
+/// Installation, Usage, a plain-text Composition tree, this component's own
+/// Sizes and Destructive specimens, and API Reference, followed by this
+/// system's own six extra sections (States, Accessibility, Responsive,
+/// Dependencies, Theming, Source) that the reference has no equivalent of.
+/// The reference's Media, Small with Media, and RTL sections are skipped:
+/// see the worker report for why. The expanded "when to use this instead of
+/// a neighbour" guidance is [alertDialogExpandedDescription], carried in the
+/// page's own [DocsPageIntro] rather than a separate section; breadcrumb/
+/// family comes from the eyebrow and [DocsLayout.breadcrumbs]; previous/next
+/// comes from [DocsLayout] again.
 ///
 /// Two findings, resolved in favour of the real source
 /// (`lib/src/components/alert_dialog.dart`), which is the documented source
@@ -18,15 +20,15 @@
 ///    comment says the whole value is "RECORDED, NOT BUILT", but
 ///    `DsAlertDialogContent.build` does branch on `size` for the panel's
 ///    `maxWidth` (`DsDialogContent.maxWidth` for `normal`, `DsContainers.xs`
-///    for `sm`) — that part ships. What does not ship is the rest of the
+///    for `sm`): that part ships. What does not ship is the rest of the
 ///    reference's `sm` anatomy: `DsAlertDialogHeader` and
 ///    `DsAlertDialogFooter` take no `size` parameter at all, so the
 ///    centred header and the two-column footer grid the reference's own doc
-///    comment describes never happen, for any value of `size`. The Variants
+///    comment describes never happen, for any value of `size`. The Sizes
 ///    section below says both halves plainly instead of repeating the
 ///    "not built" label over a case that partially is.
 ///  * **Escape does not run Cancel's `onPressed`.** `DsModalPortalState._onKey`
-///    calls its own `close()` directly — the same bare portal-close every
+///    calls its own `close()` directly: the same bare portal-close every
 ///    other modal in the family uses. Tapping Cancel calls the `onPressed`
 ///    a caller passed to `DsAlertDialogCancel`; pressing Escape never does.
 ///    For a caller that puts real work in Cancel's callback (resetting a
@@ -34,13 +36,13 @@
 ///    in Accessibility below, not as an ideal-behaviour aspiration.
 ///
 /// The focus story asked for by the task brief was verified with a live
-/// `WidgetTester`, not assumed — see
+/// `WidgetTester`, not assumed: see
 /// `example/test/components_docs/alert_dialog_test.dart`'s `focus behavior`
 /// group. Findings, in order:
 ///
 ///  1. **Moves in, but not onto a control.** `FocusScope(autofocus: true,
 ///     ...)` in `DsModalPortal` does move primary focus off whatever was
-///     focused before the dialog opened — but the harness observed
+///     focused before the dialog opened: but the harness observed
 ///     `FocusManager.instance.primaryFocus` becoming the panel's own
 ///     `FocusScopeNode`, identity-equal to `FocusScope.of()` resolved from
 ///     inside the panel, not a leaf control. The dialog.dart library doc's
@@ -55,7 +57,7 @@
 ///     nearest enclosing `FocusScopeNode`, and the alert dialog's own
 ///     `FocusScope` is exactly that boundary.
 ///  3. **Does not return.** Closing via Cancel does **not** hand focus back
-///     to the trigger that opened it — nothing in `DsModalPortalState.close()`
+///     to the trigger that opened it: nothing in `DsModalPortalState.close()`
 ///     saves or restores a previous `FocusNode`. This is a real, checked gap:
 ///     a keyboard user who opens the dialog and cancels it lands back with
 ///     focus resolved by Flutter's own framework default rather than
@@ -100,24 +102,22 @@ class AlertDialogDocPage extends StatelessWidget {
         ),
       ],
       toc: const <DocsTocEntry>[
-        DocsTocEntry(title: 'Purpose', anchor: 'purpose'),
-        DocsTocEntry(title: 'Status', anchor: 'status'),
-        DocsTocEntry(title: 'Preview', anchor: 'preview'),
-        DocsTocEntry(title: 'Install', anchor: 'install'),
+        DocsTocEntry(title: 'Installation', anchor: 'install'),
         DocsTocEntry(title: 'Usage', anchor: 'usage'),
-        DocsTocEntry(title: 'API', anchor: 'api'),
-        DocsTocEntry(title: 'Variants', anchor: 'variants'),
+        DocsTocEntry(title: 'Composition', anchor: 'composition'),
+        DocsTocEntry(title: 'Sizes', anchor: 'sizes'),
+        DocsTocEntry(title: 'Destructive', anchor: 'destructive'),
+        DocsTocEntry(title: 'API Reference', anchor: 'api'),
         DocsTocEntry(title: 'States', anchor: 'states'),
         DocsTocEntry(title: 'Accessibility', anchor: 'accessibility'),
         DocsTocEntry(title: 'Responsive', anchor: 'responsive'),
         DocsTocEntry(title: 'Dependencies', anchor: 'dependencies'),
-        DocsTocEntry(title: 'Composition', anchor: 'composition'),
         DocsTocEntry(title: 'Theming', anchor: 'theming'),
         DocsTocEntry(title: 'Source', anchor: 'source'),
       ],
       // alert-dialog is Wave 3's first entry. Dialog (Phase F, already
       // landed) is its closest built neighbour; Command is the next name in
-      // Wave 3's own list — a forward reference to an unbuilt sibling, the
+      // Wave 3's own list: a forward reference to an unbuilt sibling, the
       // same shape `accordion/page.dart` used for its own `next`.
       previous: const DocsPageLink(
         title: 'Dialog',
@@ -140,56 +140,17 @@ class _AlertDialogArticle extends StatelessWidget {
     key: const ValueKey<String>('alert-dialog-doc-article'),
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
-      DsSection(
-        id: 'purpose',
-        title: 'When to reach for it',
-        description:
-            'Three overlay-adjacent patterns live in this system and they '
-            'are not interchangeable.',
-        child: const _DecisionGuide(),
-      ),
-      DsSection(
-        id: 'status',
-        title: 'Status',
-        child: const DocsInstallFacts(
-          title: 'Status',
-          facts: <DocsInstallFact>[
-            DocsInstallFact(
-              label: 'Status',
-              value: 'Stable — registered in the registry',
-              description:
-                  'The whole DsAlertDialog family is exported from the '
-                  'public barrel and installable through the CLI today.',
-            ),
-            DocsInstallFact(
-              label: 'Version',
-              value: '0.0.1',
-              description: "The registry manifest's own version field.",
-            ),
-            DocsInstallFact(
-              label: 'Dart / Flutter',
-              value: '>=3.12.2 <4.0.0 / >=3.44.8',
-              description: "The manifest's minDart and minFlutter constraints.",
-            ),
-            DocsInstallFact(
-              label: 'Platforms',
-              value: 'Android, iOS, Web, macOS, Windows, Linux',
-              description:
-                  'Pure widget composition on top of DsModalPortal — nothing '
-                  'here is platform-gated, beyond the back-button dismissal '
-                  'DsModalPortal already wires for every modal in the family.',
-            ),
-          ],
+      ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: DsWidths.prose),
+        child: DsText(
+          'A destructive confirmation. Open it, then try to dismiss it by '
+            'tapping outside the panel: the reference and this port both '
+            'refuse. Escape and the two footer buttons still work.',
+          DsType.body,
         ),
       ),
-      DsSection(
-        id: 'preview',
-        title: 'Preview',
-        description:
-            'A destructive confirmation. Open it, then try to dismiss it by '
-            'tapping outside the panel — the reference and this port both '
-            'refuse. Escape and the two footer buttons still work.',
-        child: DocsCodeExample(
+      SizedBox(height: ds(6)),
+      DocsCodeExample(
           title: 'Alert dialog specimen',
           description:
               'Tap outside the panel to see the dismissal refused, or use '
@@ -197,12 +158,11 @@ class _AlertDialogArticle extends StatelessWidget {
           preview: const _AlertDialogPreview(),
           command: DocsCodeCommand(command: entry.command),
         ),
-      ),
       DsSection(
         id: 'install',
         title: 'Installation',
         description:
-            'alert-dialog already has a registry manifest — this installs '
+            'alert-dialog already has a registry manifest: this installs '
             'lib/src/components/alert_dialog.dart and its three '
             'dependencies, source-foundation, button, dialog and tooltip, '
             'resolved automatically.',
@@ -230,7 +190,7 @@ class _AlertDialogArticle extends StatelessWidget {
         title: 'Usage',
         description:
             'The smallest correct composition, then the shape the source '
-            "itself is built around — a destructive Action beside a safe "
+            "itself is built around: a destructive Action beside a safe "
             'Cancel, both wired to the same close callback.',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -250,11 +210,83 @@ class _AlertDialogArticle extends StatelessWidget {
         ),
       ),
       DsSection(
+        id: 'composition',
+        title: 'Composition',
+        description:
+            'The widget tree a caller actually builds: a trigger and a '
+            'content builder, and inside the content, one header and one '
+            'footer.',
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            DsPanel(
+              label: 'DART',
+              note: 'TREE',
+              child: DocsSelectableCodeBlock(code: _compositionTree),
+            ),
+            SizedBox(height: ds(3)),
+            DsText(
+              'No media slot: the reference also composes an '
+              'AlertDialogMedia into the header, for an icon or image '
+              'above the title. Nothing in this source builds that widget, '
+              'so DsAlertDialogHeader has no place to put one.',
+              DsType.small,
+            ),
+          ],
+        ),
+      ),
+      DsSection(
+        id: 'sizes',
+        title: 'Sizes',
+        description:
+            'DsAlertDialogSize is the only variant knob on this component, '
+            "and it is only half-built: see the sm row below for the full "
+            'finding.',
+        child: const DocsApiTable(
+          title: 'DsAlertDialogSize',
+          facts: <DocsApiFact>[
+            DocsApiFact(
+              name: 'normal',
+              type: 'DsAlertDialogSize',
+              description:
+                  'The default. DsAlertDialogContent constrains the panel '
+                  'to DsDialogContent.maxWidth (384): the same width as a '
+                  'plain DsDialog.',
+            ),
+            DocsApiFact(
+              name: 'sm',
+              type: 'DsAlertDialogSize',
+              description:
+                  'Narrows the panel to DsContainers.xs. That is the whole '
+                  'of what is built: DsAlertDialogHeader and '
+                  'DsAlertDialogFooter both take no size parameter at all, '
+                  "so the reference's centred header and two-column footer "
+                  'grid never happen for either value of size.',
+            ),
+          ],
+        ),
+      ),
+      DsSection(
+        id: 'destructive',
+        title: 'Destructive',
+        description:
+            "A danger-zone row: the shape the source's own library doc "
+            'cites, a long consequence label beside a short safe one, '
+            'inside a footer narrow enough that only Flexible/shrink keeps '
+            'both readable. DsAlertDialogAction already defaults to '
+            'DsButtonVariant.destructive, so every specimen on this page '
+            'is a destructive confirmation by default.',
+        child: const DocsCodeExample(
+          title: 'Danger zone composition',
+          preview: _AlertDialogComposition(),
+        ),
+      ),
+      DsSection(
         id: 'api',
-        title: 'API',
+        title: 'API Reference',
         description:
             'Every public class and constructor parameter the source '
-            'declares — nine exported symbols across five widgets and one '
+            'declares: nine exported symbols across five widgets and one '
             'enum.',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -267,14 +299,14 @@ class _AlertDialogArticle extends StatelessWidget {
                   type: 'DsModalTriggerBuilder',
                   description:
                       'Required. Widget Function(BuildContext, VoidCallback '
-                      'open) — builds the control that opens the portal.',
+                      'open): builds the control that opens the portal.',
                 ),
                 DocsApiFact(
                   name: 'content',
                   type: 'DsModalContentBuilder',
                   description:
                       'Required. Widget Function(BuildContext, VoidCallback '
-                      'close) — builds the panel and receives its close '
+                      'close): builds the panel and receives its close '
                       'callback.',
                 ),
                 DocsApiFact(
@@ -307,7 +339,7 @@ class _AlertDialogArticle extends StatelessWidget {
                   type: 'DsAlertDialogSize',
                   description:
                       'Default DsAlertDialogSize.normal. Only changes the '
-                      "panel's maxWidth — see Variants below for what it "
+                      "panel's maxWidth: see Variants below for what it "
                       'does not change.',
                 ),
               ],
@@ -368,7 +400,7 @@ class _AlertDialogArticle extends StatelessWidget {
                   name: 'cancel',
                   type: 'Widget',
                   description:
-                      'Required. Rendered first — the safe choice on the '
+                      'Required. Rendered first: the safe choice on the '
                       'left. Almost always a DsAlertDialogCancel.',
                 ),
                 DocsApiFact(
@@ -387,7 +419,7 @@ class _AlertDialogArticle extends StatelessWidget {
                   type: 'String',
                   description:
                       'Required. Rendered through an internal Text widget, '
-                      'not forwarded to DsButton.label — see Accessibility.',
+                      'not forwarded to DsButton.label: see Accessibility.',
                 ),
                 DocsApiFact(
                   name: 'onPressed',
@@ -398,7 +430,7 @@ class _AlertDialogArticle extends StatelessWidget {
                   name: 'variant',
                   type: 'DsButtonVariant',
                   description:
-                      'Default DsButtonVariant.destructive — "that is what '
+                      'Default DsButtonVariant.destructive, "that is what '
                       'an alert dialog is for."',
                 ),
                 DocsApiFact(
@@ -419,7 +451,7 @@ class _AlertDialogArticle extends StatelessWidget {
                   name: 'tooltip',
                   type: 'String?',
                   description:
-                      'Default null, which falls back to label — passing '
+                      'Default null, which falls back to label: passing '
                       'null does NOT mean "no tooltip". See Accessibility.',
                 ),
               ],
@@ -452,42 +484,11 @@ class _AlertDialogArticle extends StatelessWidget {
                   name: 'tooltip',
                   type: 'String?',
                   description:
-                      'Default null, falls back to label — same rule as '
+                      'Default null, falls back to label: same rule as '
                       "Action's. DsAlertDialogCancel has no loading "
                       'parameter at all.',
                 ),
               ],
-            ),
-          ],
-        ),
-      ),
-      DsSection(
-        id: 'variants',
-        title: 'Variants',
-        description:
-            'DsAlertDialogSize is the only variant knob on this component, '
-            "and it is only half-built — see the page's own library doc "
-            'for the full finding.',
-        child: const DocsApiTable(
-          title: 'DsAlertDialogSize',
-          facts: <DocsApiFact>[
-            DocsApiFact(
-              name: 'normal',
-              type: 'DsAlertDialogSize',
-              description:
-                  'The default. DsAlertDialogContent constrains the panel '
-                  'to DsDialogContent.maxWidth (384) — the same width as a '
-                  'plain DsDialog.',
-            ),
-            DocsApiFact(
-              name: 'sm',
-              type: 'DsAlertDialogSize',
-              description:
-                  'Narrows the panel to DsContainers.xs. That is the whole '
-                  'of what is built: DsAlertDialogHeader and '
-                  'DsAlertDialogFooter both take no size parameter at all, '
-                  "so the reference's centred header and two-column footer "
-                  'grid never happen for either value of size.',
             ),
           ],
         ),
@@ -514,7 +515,7 @@ class _AlertDialogArticle extends StatelessWidget {
               state: 'Hover',
               treatment:
                   "Cancel and Action inherit their variant's own DsButton "
-                  "hover fill (outline's and destructive's respectively) — "
+                  "hover fill (outline's and destructive's respectively), "
                   'nothing alert-dialog-specific is added.',
               userSignal: 'Matches every other DsButton in the system.',
             ),
@@ -526,7 +527,7 @@ class _AlertDialogArticle extends StatelessWidget {
                   'does not paint it.',
               userSignal:
                   'Ring is visible only after keyboard traversal, never '
-                  'after a mouse click — verified live in this page\'s own '
+                  'after a mouse click: verified live in this page\'s own '
                   'focus tests.',
             ),
             DocsStateFact(
@@ -539,7 +540,7 @@ class _AlertDialogArticle extends StatelessWidget {
             DocsStateFact(
               state: 'Selected',
               treatment:
-                  'N/A — a decision dialog has no selection concept beyond '
+                  'N/A: a decision dialog has no selection concept beyond '
                   'open or closed.',
               userSignal: 'N/A',
             ),
@@ -556,7 +557,7 @@ class _AlertDialogArticle extends StatelessWidget {
             DocsStateFact(
               state: 'Empty',
               treatment:
-                  'N/A — label, title and description are all required '
+                  'N/A: label, title and description are all required '
                   'Strings; the API has no path to an empty one to design '
                   'for.',
               userSignal: 'N/A',
@@ -564,14 +565,14 @@ class _AlertDialogArticle extends StatelessWidget {
             DocsStateFact(
               state: 'Error',
               treatment:
-                  'N/A — no validation or error state exists on this '
+                  'N/A: no validation or error state exists on this '
                   'component.',
               userSignal: 'N/A',
             ),
             DocsStateFact(
               state: 'Success',
               treatment:
-                  'N/A — onPressed is a synchronous VoidCallback, not a '
+                  'N/A: onPressed is a synchronous VoidCallback, not a '
                   'Future; there is no async outcome to confirm.',
               userSignal: 'N/A',
             ),
@@ -579,7 +580,7 @@ class _AlertDialogArticle extends StatelessWidget {
               state: 'Disabled',
               treatment:
                   'Neither Cancel nor Action has an explicit enabled/'
-                  'disabled parameter — onPressed: null is the only path, '
+                  'disabled parameter: onPressed: null is the only path, '
                   'same as any DsButton.',
               userSignal:
                   "Matches DsButton's own disabled visual: lower opacity, "
@@ -589,7 +590,7 @@ class _AlertDialogArticle extends StatelessWidget {
               state: 'Reduced motion',
               treatment:
                   'The whole panel rides DsJellyTransition through '
-                  'dsAnimationDuration, exactly like the plain dialog — the '
+                  'dsAnimationDuration, exactly like the plain dialog: the '
                   '420ms/250ms jelly and the 320ms scrim fade collapse to '
                   'zero.',
               userSignal:
@@ -615,7 +616,7 @@ class _AlertDialogArticle extends StatelessWidget {
                     'Cancel and Action each publish Semantics(button: true, '
                         'enabled: <onPressed != null && !loading>) through '
                         'the DsButton they wrap. Neither passes its label '
-                        "to DsButton's own label parameter — the "
+                        "to DsButton's own label parameter: the "
                         'accessible name instead comes from Semantics '
                         "merging upward over the internal Text child, "
                         'which still resolves to the same string.',
@@ -623,7 +624,7 @@ class _AlertDialogArticle extends StatelessWidget {
                   const _A11yRow(
                     'Required labels',
                     'title, description, and both button labels are all '
-                        'required — there is no path to a nameless control '
+                        'required: there is no path to a nameless control '
                         'or a captionless question.',
                   ),
                   const _A11yRow(
@@ -634,16 +635,16 @@ class _AlertDialogArticle extends StatelessWidget {
                         'handler. Escape closes the whole dialog.',
                   ),
                   const _A11yRow(
-                    'Focus behavior — verified, not assumed',
+                    'Focus behavior: verified, not assumed',
                     'Opening moves focus off whatever held it before, but '
                         'not onto a control: FocusManager.primaryFocus '
                         "becomes the panel's own bare FocusScopeNode, "
-                        "identity-checked live — not the Cancel button, "
+                        "identity-checked live: not the Cancel button, "
                         'despite the dialog.dart library doc describing '
                         "that as what the reference (Radix) measures. One "
                         'Tab press moves focus from that scope onto a '
                         'real control (Cancel or Action), and from there '
-                        'Tab is trapped — six consecutive presses in this '
+                        'Tab is trapped: six consecutive presses in this '
                         "page's own test never reached a control planted "
                         'outside the overlay. Closing does NOT return '
                         'focus to the trigger: DsModalPortalState.close() '
@@ -656,12 +657,12 @@ class _AlertDialogArticle extends StatelessWidget {
                   const _A11yRow(
                     'Touch target',
                     "Cancel and Action are md DsButtons (40px tall) unless "
-                        'a caller overrides size — no touch-target '
+                        'a caller overrides size: no touch-target '
                         'reduction is applied inside the footer band.',
                   ),
                   const _A11yRow(
                     'Non-color signal',
-                    "Action's destructive tint is never the only signal — "
+                    "Action's destructive tint is never the only signal, "
                         'the label itself always states the consequence '
                         '("Delete account", not just a red button), and '
                         'the title/description pair states the question '
@@ -669,13 +670,13 @@ class _AlertDialogArticle extends StatelessWidget {
                   ),
                   const _A11yRow(
                     'Error wiring',
-                    'None — this family never participates in form '
+                    'None: this family never participates in form '
                         'validation.',
                   ),
                   const _A11yRow(
                     'Screen-reader announcements',
                     'None beyond whatever the platform announces for a '
-                        'newly focused control — opening the panel raises '
+                        'newly focused control: opening the panel raises '
                         'no live region of its own, so a screen-reader '
                         'user learns the question only by having focus '
                         'land on Cancel and reading from there.',
@@ -694,15 +695,15 @@ class _AlertDialogArticle extends StatelessWidget {
             SizedBox(height: ds(5)),
             DsNote(
               tone: DsNoteTone.error,
-              title: "Known gap — Escape skips Cancel's own onPressed",
+              title: "Known gap, Escape skips Cancel's own onPressed",
               child: DsText(
                 'DsModalPortalState._onKey calls close() directly on '
-                'Escape — the same bare portal-close every modal in the '
+                'Escape: the same bare portal-close every modal in the '
                 'family uses. Tapping the Cancel button calls whatever '
                 'onPressed a caller passed to DsAlertDialogCancel; '
                 'pressing Escape does not call it. If a caller relies on '
-                "Cancel's callback for real work — resetting a field, "
-                'logging an abandoned confirmation — Escape silently '
+                "Cancel's callback for real work: resetting a field, "
+                'logging an abandoned confirmation, Escape silently '
                 'skips it while still closing the dialog.',
                 DsType.small,
               ),
@@ -710,7 +711,7 @@ class _AlertDialogArticle extends StatelessWidget {
             SizedBox(height: ds(3)),
             DsNote(
               tone: DsNoteTone.error,
-              title: 'Known gap — closing does not return focus to the trigger',
+              title: 'Known gap: closing does not return focus to the trigger',
               child: DsText(
                 "Verified live: after opening the panel and dismissing it "
                 'via Cancel, focus does not return to the button that '
@@ -729,7 +730,7 @@ class _AlertDialogArticle extends StatelessWidget {
         title: 'Responsive and platform behavior',
         description:
             'Shares DsModalCompact with every other centred modal in the '
-            'family — a phone-sized viewport clamps the panel rather than '
+            'family: a phone-sized viewport clamps the panel rather than '
             'letting it run to the edges or off the screen.',
         child: DsPanel(
           label: 'The compact clamp, and what it does to the footer',
@@ -738,7 +739,7 @@ class _AlertDialogArticle extends StatelessWidget {
             children: <Widget>[
               DsText(
                 'At 600 logical pixels of viewport width or below, the '
-                'panel is held inside 90vw x 75vh — DsModalCompact, shared '
+                'panel is held inside 90vw x 75vh, DsModalCompact, shared '
                 'with the plain dialog. Above that width the desktop '
                 'geometry is untouched.',
                 DsType.small,
@@ -746,7 +747,7 @@ class _AlertDialogArticle extends StatelessWidget {
               SizedBox(height: ds(3)),
               DsText(
                 'The header and question scroll inside a loose Flexible; '
-                'the footer band does not — the decision stays reachable '
+                'the footer band does not: the decision stays reachable '
                 'even when the question runs long enough to need scrolling '
                 'on a 375px phone.',
                 DsType.small,
@@ -755,7 +756,7 @@ class _AlertDialogArticle extends StatelessWidget {
               DsText(
                 "Cancel and Action are both wrapped in Flexible with "
                 "min-width 0 inside the footer's Row, and DsButton's child "
-                'is a single-line Text with TextOverflow.ellipsis — so a '
+                'is a single-line Text with TextOverflow.ellipsis: so a '
                 'long consequence label truncates to fit a narrow footer '
                 'instead of pushing the panel wider or overflowing it.',
                 DsType.small,
@@ -776,7 +777,7 @@ class _AlertDialogArticle extends StatelessWidget {
         id: 'dependencies',
         title: 'Dependencies, files, and disclosure',
         description:
-            "Elattar's own technical-transparency panel — what this "
+            "Elattar's own technical-transparency panel: what this "
             'component needs to install and run.',
         child: DocsInstallFacts(
           facts: <DocsInstallFact>[
@@ -786,6 +787,16 @@ class _AlertDialogArticle extends StatelessWidget {
               description:
                   'registry/components/alert-dialog.json exists and is '
                   'installable through the CLI today.',
+            ),
+            const DocsInstallFact(
+              label: 'Version',
+              value: '0.0.1',
+              description: "The registry manifest's own version field.",
+            ),
+            const DocsInstallFact(
+              label: 'Dart / Flutter',
+              value: '>=3.12.2 <4.0.0 / >=3.44.8',
+              description: "The manifest's minDart and minFlutter constraints.",
             ),
             const DocsInstallFact(
               label: 'Destination',
@@ -799,7 +810,7 @@ class _AlertDialogArticle extends StatelessWidget {
               value: 'source or package compatible',
               description:
                   "The manifest names source-foundation plus three "
-                  'sibling components — nothing here is package-mode-only.',
+                  'sibling components: nothing here is package-mode-only.',
             ),
             DocsInstallFact(
               label: 'Dependencies',
@@ -841,19 +852,6 @@ class _AlertDialogArticle extends StatelessWidget {
         ),
       ),
       DsSection(
-        id: 'composition',
-        title: 'Composition example',
-        description:
-            "A danger-zone row — the exact shape the source's own library "
-            'doc cites: a long consequence label beside a short safe one, '
-            'inside a footer narrow enough that only Flexible/shrink keeps '
-            'both readable.',
-        child: const DocsCodeExample(
-          title: 'Danger zone composition',
-          preview: _AlertDialogComposition(),
-        ),
-      ),
-      DsSection(
         id: 'theming',
         title: 'Theming notes',
         child: Column(
@@ -866,8 +864,8 @@ class _AlertDialogArticle extends StatelessWidget {
                 children: <Widget>[
                   DsText(
                     'The panel itself is DsDialogContent\'s own '
-                    'DsMachineSurface — theme.popover fill, a single 1px '
-                    'theme.foreground-at-10% ring, no elevation — reused '
+                    'DsMachineSurface: theme.popover fill, a single 1px '
+                    'theme.foreground-at-10% ring, no elevation: reused '
                     'directly rather than restated, so the two panels '
                     'cannot drift apart.',
                     DsType.small,
@@ -875,7 +873,7 @@ class _AlertDialogArticle extends StatelessWidget {
                   SizedBox(height: ds(3)),
                   DsText(
                     'The footer band is theme.muted at 50% alpha with a '
-                    '1px theme.border rule on top — identical to the '
+                    '1px theme.border rule on top: identical to the '
                     "dialog's own footer, unlike the header, which carries "
                     'no band at all here (see the library doc\'s own "no '
                     'band" note).',
@@ -884,7 +882,7 @@ class _AlertDialogArticle extends StatelessWidget {
                   SizedBox(height: ds(3)),
                   DsText(
                     "The title paints theme.foreground and the description "
-                    'theme.mutedForeground — the same pairing as the plain '
+                    'theme.mutedForeground: the same pairing as the plain '
                     "dialog's title and description.",
                     DsType.small,
                   ),
@@ -935,7 +933,7 @@ class _AlertDialogArticle extends StatelessWidget {
             const DocsInstallFact(
               label: 'Tests',
               value:
-                  'test/dialogs_test.dart (DsModalPortal — the alert '
+                  'test/dialogs_test.dart (DsModalPortal: the alert '
                   'dialog scrim/Escape group)',
               description:
                   'Package-level behavioral coverage: the overlay-tap '
@@ -955,67 +953,6 @@ class _AlertDialogArticle extends StatelessWidget {
   );
 }
 
-class _DecisionGuide extends StatelessWidget {
-  const _DecisionGuide();
-
-  @override
-  Widget build(BuildContext context) => DsPanel(
-    label: 'DECISION GUIDE',
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: const <Widget>[
-        _ComparisonRow(
-          name: 'Alert Dialog (this component)',
-          body:
-              'A single yes-or-no decision the interface must not let '
-              'someone click past by accident — deleting an account, '
-              'discarding unsaved work, confirming an irreversible charge. '
-              'The panel refuses to close on a tap outside it; only '
-              'Cancel, Action, or Escape get you out.',
-        ),
-        _ComparisonRow(
-          name: 'Dialog',
-          body:
-              'A general modal container for a task — a form, a short '
-              'flow, a details view. It shares alert-dialog\'s panel, '
-              'motion and focus scope, but closes on an overlay tap, '
-              'which alert-dialog deliberately does not.',
-        ),
-        _ComparisonRow(
-          name: 'Alert',
-          body:
-              'Not a modal at all. A persistent inline message that lives '
-              "directly in the page's own layout — no trigger, no scrim, "
-              'no portal — for a status someone should see but does not '
-              'have to act on immediately.',
-        ),
-      ],
-    ),
-  );
-}
-
-class _ComparisonRow extends StatelessWidget {
-  const _ComparisonRow({required this.name, required this.body});
-
-  final String name;
-  final String body;
-
-  @override
-  Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
-    return Padding(
-      padding: EdgeInsets.only(bottom: ds(4)),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          DsText(name, DsType.label, color: theme.actionInk),
-          SizedBox(height: ds(1.5)),
-          DsText(body, DsType.small),
-        ],
-      ),
-    );
-  }
-}
 
 class _A11yRow extends StatelessWidget {
   const _A11yRow(this.label, this.body, {this.last = false});
@@ -1070,7 +1007,7 @@ DsAlertDialog(
 )''';
 
 const String _usageLoadingCode = '''// The confirming button owns its own
-// loading flag — the source declares it here rather than inheriting
+// loading flag: the source declares it here rather than inheriting
 // Button's, because a caller has real async work to await (an API call
 // that actually deletes the account) before the dialog should close.
 class _DeleteAccountAction extends StatefulWidget {
@@ -1098,8 +1035,21 @@ class _DeleteAccountActionState extends State<_DeleteAccountAction> {
   );
 }''';
 
+/// The plain-text widget tree shown in the Composition section, built
+/// directly from the constructor parameter names above: no AlertDialogMedia
+/// slot, because nothing in the source builds that widget.
+const String _compositionTree = '''DsAlertDialog
+├── trigger: (context, open) => ...
+└── content: (context, close) => DsAlertDialogContent
+    ├── header: DsAlertDialogHeader
+    │   ├── title: DsAlertDialogTitle
+    │   └── description: DsAlertDialogDescription
+    └── footer: DsAlertDialogFooter
+        ├── cancel: DsAlertDialogCancel
+        └── action: DsAlertDialogAction''';
+
 /// The live specimen: a real DsAlertDialog with an overlay-tap probe built
-/// in — the [DsPanel] frame around it is itself outside the dialog's own
+/// in: the [DsPanel] frame around it is itself outside the dialog's own
 /// tree, so a tap that lands on the frame (not the panel) exercises the
 /// same "does the scrim refuse it" path the reference measured.
 class _AlertDialogPreview extends StatelessWidget {
@@ -1155,7 +1105,7 @@ class _AlertDialogPreview extends StatelessWidget {
   }
 }
 
-/// A realistic danger-zone row — a long consequence beside a short safe
+/// A realistic danger-zone row: a long consequence beside a short safe
 /// choice, the exact shape `alert_dialog.dart`'s own library doc cites.
 class _AlertDialogComposition extends StatelessWidget {
   const _AlertDialogComposition();

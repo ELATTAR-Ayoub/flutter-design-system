@@ -10,6 +10,22 @@
 /// validation and submission; selection_control is the invisible socket
 /// DsCheckbox, DsRadioGroup, and DsSwitch wear; and native_select is the
 /// OS picker with a port-built list.
+///
+/// Section shape mirrors `https://ui.shadcn.com/docs/components/base/native-select`
+/// for native_select, section for section: a live demo ahead of any heading,
+/// then Installation, Usage, Composition, Groups, Disabled, Invalid, Native
+/// select vs select, RTL, and API Reference, in that order.
+/// `https://ui.shadcn.com/docs/components/form` has no counterpart content of
+/// its own to mirror: it is a "pick your framework" gateway page (React Hook
+/// Form, TanStack Form, Formisch) with no props, no API, and no component
+/// sections at all, so DsForm's content stays where it already grouped
+/// naturally, inside Installation, Usage, API Reference, and the six
+/// trailing sections. selection_control has no shadcn counterpart page of
+/// any kind: it is an invented internal primitive, so its content is "ours
+/// only" throughout, grouped under its own name the same way. States,
+/// Accessibility, Responsive, Dependencies, Theming, and Source are this
+/// package's own six sections, added after API Reference, named exactly
+/// that with no extra words.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
@@ -68,13 +84,18 @@ class NativeSelectDocPage extends StatelessWidget {
         DocsSidebarEntry(title: 'Textarea', route: '/components/textarea'),
       ],
       toc: const <DocsTocEntry>[
-        DocsTocEntry(title: 'Overview', anchor: 'overview'),
-        DocsTocEntry(title: 'Status', anchor: 'status'),
-        DocsTocEntry(title: 'Preview', anchor: 'preview'),
-        DocsTocEntry(title: 'Install', anchor: 'install'),
+        DocsTocEntry(title: 'Installation', anchor: 'install'),
         DocsTocEntry(title: 'Usage', anchor: 'usage'),
-        DocsTocEntry(title: 'API', anchor: 'api'),
-        DocsTocEntry(title: 'Variants', anchor: 'variants'),
+        DocsTocEntry(title: 'Composition', anchor: 'composition'),
+        DocsTocEntry(title: 'Groups', anchor: 'groups'),
+        DocsTocEntry(title: 'Disabled', anchor: 'disabled'),
+        DocsTocEntry(title: 'Invalid', anchor: 'invalid'),
+        DocsTocEntry(
+          title: 'Native select vs select',
+          anchor: 'native-select-vs-select',
+        ),
+        DocsTocEntry(title: 'RTL', anchor: 'rtl'),
+        DocsTocEntry(title: 'API Reference', anchor: 'api'),
         DocsTocEntry(title: 'States', anchor: 'states'),
         DocsTocEntry(title: 'Accessibility', anchor: 'accessibility'),
         DocsTocEntry(title: 'Responsive', anchor: 'responsive'),
@@ -105,116 +126,20 @@ class _NativeSelectArticle extends StatelessWidget {
       key: const ValueKey<String>('native-select-doc-article'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        DsSection(
-          id: 'overview',
-          title: 'Three form layers on one page',
-          description: 'What each component solves, and how they fit together.',
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: DsWidths.prose),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                DsText(
-                  '**DsNativeSelect** is the select you reach for when you '
-                  'need the platform\'s own picker. The closed control is '
-                  'measured identical to the reference — 32px tall, 12px radius, '
-                  'transparent, 1px input border, 16px muted-foreground chevron '
-                  'on the right. But Flutter has no OS `<select>` widget, so the '
-                  'open list is a port-built DsSelectMenu instead of the system '
-                  'picker. The closed control\'s keyboard is faithful: arrows '
-                  'step the value while closed (not the highlight), and '
-                  'Alt+Down, Enter, Space, F4 open the list. Contrast this with '
-                  'DsSelect, which is the Radix menu component — fully custom, '
-                  'arrows open it, no native platform behaviour at all.',
-                  DsType.body,
-                ),
-                SizedBox(height: ds(4)),
-                DsText(
-                  '**DsSelectionControl** is not something you reach for '
-                  'directly — it is the invisible shared primitive that '
-                  'DsCheckbox, DsRadioGroup, and DsSwitch all build on. It '
-                  'supplies the socket, focus ring, 42×34 hit area expander, '
-                  'and the jelly squash animation that plays on every state '
-                  'change. Documenting it here explains what those three '
-                  'controls have in common, and where to look if you need to '
-                  'understand how they handle disabled, focus, or disabled vs '
-                  'inert states.',
-                  DsType.body,
-                ),
-                SizedBox(height: ds(4)),
-                DsText(
-                  '**DsForm** is the form state container — not a widget, not '
-                  'a layout wrapper, not a `<form>` element. It is a '
-                  'ChangeNotifier that holds fields in registration order, '
-                  'validation rules, submission count and flag, and the logic to '
-                  'validate and focus the first error. Bind it with a '
-                  'ListenableBuilder and pass each field\'s state into its own '
-                  'DsField. The form itself paints nothing.',
-                  DsType.body,
-                ),
-                SizedBox(height: ds(4)),
-                DsText(
-                  'Status: native_select and selection_control are stable, '
-                  'exported from the public barrel, but not yet in the registry. '
-                  'form is stable, exported, not in the registry. Platforms: '
-                  'Android, iOS, Web, macOS, Windows, Linux.',
-                  DsType.small,
-                  color: theme.mutedForeground,
-                ),
-              ],
-            ),
-          ),
-        ),
-        DsSection(
-          id: 'status',
-          title: 'Status',
-          child: const DocsInstallFacts(
-            title: 'Status',
-            facts: <DocsInstallFact>[
-              DocsInstallFact(
-                label: 'Status',
-                value: 'Stable — not in the registry yet',
-                description:
-                    'All three components are exported from the public barrel '
-                    'and ready to use, but `elattar add native-select`, '
-                    '`elattar add selection-control`, and `elattar add form` '
-                    'do not work yet — no registry manifests exist.',
-              ),
-              DocsInstallFact(
-                label: 'Version',
-                value: '0.0.1',
-                description:
-                    'The design system version; registry version is N/A.',
-              ),
-              DocsInstallFact(
-                label: 'Dart / Flutter',
-                value: '>=3.12.2 <4.0.0 / >=3.44.8',
-                description:
-                    'The design system\'s own constraints; no '
-                    'component-specific drift.',
-              ),
-              DocsInstallFact(
-                label: 'Platforms',
-                value: 'Android, iOS, Web, macOS, Windows, Linux',
-                description:
-                    'Pure widget composition — nothing platform-gated.',
-              ),
-            ],
-          ),
-        ),
-        DsSection(
-          id: 'preview',
-          title: 'Preview',
+        // The live demo, ahead of any heading: the same shape the reference
+        // page itself opens with. No DsSection wraps it, so it carries no
+        // Overview/Status/Preview heading of its own before Installation.
+        DocsCodeExample(
+          title: 'Live specimens',
           description:
-              'A live DsNativeSelect with options, DsSelectionControl in rest '
-              'and focused states (focus-visible is painted in preview, not a '
-              'simulator), and DsForm managing a simple field.',
-          child: DocsCodeExample(
-            title: 'Live specimens',
-            preview: const _NativeSelectPreview(),
-            command: DocsCodeCommand(command: entry.command),
-          ),
+              'A live DsNativeSelect with options, and DsSelectionControl in '
+              'rest and focused states (focus-visible is painted here, not '
+              'simulated). DsForm has no paint of its own: see Usage below '
+              'for how it is bound.',
+          preview: const _NativeSelectPreview(),
+          command: DocsCodeCommand(command: entry.command),
         ),
+        SizedBox(height: ds(8)),
         DsSection(
           id: 'install',
           title: 'Installation',
@@ -225,7 +150,7 @@ class _NativeSelectArticle extends StatelessWidget {
               command: entry.command,
               description:
                   'Import DsNativeSelect, DsSelectionControl, and DsForm from '
-                  'the public barrel — no CLI command yet.',
+                  'the public barrel: no CLI command yet.',
             ),
             manualFiles: const <DocsCodeFile>[
               DocsCodeFile(
@@ -233,7 +158,7 @@ class _NativeSelectArticle extends StatelessWidget {
                 code:
                     "import 'package:elattar_design_system/"
                     "elattar_design_system.dart';\n\n"
-                    '// Use directly — no elattar add command yet.',
+                    '// Use directly: no elattar add command yet.',
               ),
             ],
           ),
@@ -255,7 +180,7 @@ class _NativeSelectArticle extends StatelessWidget {
               SizedBox(height: ds(5)),
               DsPanel(
                 label: 'DART',
-                note: 'DsSelectionControl — THE SHARED SOCKET',
+                note: 'DsSelectionControl, THE SHARED SOCKET',
                 child: DocsSelectableCodeBlock(
                   code: _usageSelectionControlCode,
                 ),
@@ -263,15 +188,142 @@ class _NativeSelectArticle extends StatelessWidget {
               SizedBox(height: ds(5)),
               DsPanel(
                 label: 'DART',
-                note: 'DsForm — NON-VISUAL STATE CONTAINER',
+                note: 'DsForm, NON-VISUAL STATE CONTAINER',
                 child: DocsSelectableCodeBlock(code: _usageFormCode),
               ),
             ],
           ),
         ),
         DsSection(
+          id: 'composition',
+          title: 'Composition',
+          description:
+              'DsNativeSelect flattens whatever list it is handed to find '
+              'the selected value and to build the open list: a flat list '
+              'of DsSelectOption, or DsSelectOption wrapped in DsSelectGroup '
+              'under a label. DsSelectSeparator is legal in the same list '
+              'but carries no specimen of its own. Selection control and '
+              'form have no options tree to assemble: a selection control '
+              'is one indicator widget in a socket, and a form is a flat '
+              'list of fields.',
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              DsPanel(
+                label: 'DART',
+                note: 'SIMPLE: A FLAT LIST OF OPTIONS',
+                child: DocsSelectableCodeBlock(code: _compositionSimpleCode),
+              ),
+              SizedBox(height: ds(5)),
+              DsPanel(
+                label: 'DART',
+                note: 'WITH GROUPS: OPTIONS WRAPPED IN DsSelectGroup',
+                child: DocsSelectableCodeBlock(code: _compositionGroupedCode),
+              ),
+            ],
+          ),
+        ),
+        DsSection(
+          id: 'groups',
+          title: 'Groups',
+          description:
+              'DsSelectGroup organises related options under a label: the '
+              'label paints inside the open list and is skipped by the '
+              'keyboard, the same SelectGroup + SelectLabel pair the '
+              'reference composes by hand.',
+          child: DocsCodeExample(
+            title: 'Grouped options',
+            preview: const _NativeSelectGroupsPreview(),
+            manualFiles: const <DocsCodeFile>[
+              DocsCodeFile(
+                path: 'grouped_native_select.dart',
+                code: _compositionGroupedCode,
+              ),
+            ],
+          ),
+        ),
+        DsSection(
+          id: 'disabled',
+          title: 'Disabled',
+          description:
+              'enabled: false dims the whole wrapper to opacity-50 and '
+              'stops it taking pointers, exactly where the reference dims '
+              'the wrapper rather than the control. A single '
+              'DsSelectOption.enabled: false keeps the rest of the control '
+              'live but skips that one row for both the keyboard and the '
+              'click.',
+          child: DocsCodeExample(
+            title: 'Disabled control and disabled option',
+            preview: const _NativeSelectDisabledPreview(),
+            manualFiles: const <DocsCodeFile>[
+              DocsCodeFile(
+                path: 'disabled_native_select.dart',
+                code: _disabledCode,
+              ),
+            ],
+          ),
+        ),
+        DsSection(
+          id: 'invalid',
+          title: 'Invalid',
+          description:
+              'invalid: true colours the border and ring destructive and '
+              'paints the ring even at rest: the same aria-invalid '
+              'treatment the reference\'s class list carries. The '
+              'enclosing DsFieldScope\'s own invalid ORs in, so either side '
+              'can turn it on.',
+          child: DocsCodeExample(
+            title: 'Invalid select',
+            preview: const _NativeSelectInvalidPreview(),
+            manualFiles: const <DocsCodeFile>[
+              DocsCodeFile(
+                path: 'invalid_native_select.dart',
+                code: _invalidCode,
+              ),
+            ],
+          ),
+        ),
+        DsSection(
+          id: 'native-select-vs-select',
+          title: 'Native select vs select',
+          description: 'When to reach for which.',
+          child: _bullets(theme, <String>[
+            'DsNativeSelect is the platform picker, as far as Flutter can '
+                'carry it: the closed control is measured 1:1 with the '
+                'reference, arrows step the value while closed, and '
+                'Alt+Down, Enter, Space, F4 open the list. The open list is '
+                'a port-built DsSelectMenu, not the OS picker: Flutter has '
+                'no OS <select> widget.',
+            'DsSelect is DsSelectMenu wearing the Radix menu component\'s '
+                'own closed control instead: fully custom, taller (40px '
+                'against 32), and the arrows open it directly rather than '
+                'stepping a value while it stays shut.',
+            'Reach for DsNativeSelect when the closed-control fidelity and '
+                'the value-stepping keyboard matter more than a fully '
+                'custom look. Reach for DsSelect everywhere else.',
+          ]),
+        ),
+        DsSection(
+          id: 'rtl',
+          title: 'RTL',
+          description:
+              'The closed control\'s text and chevron use '
+              'AlignmentDirectional, not a fixed left or right: under a '
+              'Directionality.rtl the label starts on the right and the '
+              'chevron gutter moves to the left, the same flip the '
+              'reference gets from its own logical CSS properties. Nothing '
+              'in native_select.dart hardcodes a left-to-right assumption. '
+              'DsSelectionControl is square with symmetric hit-area '
+              'insets and carries no direction-specific geometry of its '
+              'own; DsForm reads no direction at all.',
+          child: const DocsCodeExample(
+            title: 'Right-to-left select',
+            preview: _NativeSelectRtlPreview(),
+          ),
+        ),
+        DsSection(
           id: 'api',
-          title: 'API',
+          title: 'API Reference',
           description:
               'DsNativeSelect and its size enum, DsSelectionControl and its '
               'hit area, and DsForm with fields and validation.',
@@ -305,7 +357,8 @@ class _NativeSelectArticle extends StatelessWidget {
                     name: 'size',
                     type: 'DsNativeSelectSize',
                     description:
-                        'Defaults to md. sm is 28px; md is 32px. See Variants.',
+                        'Defaults to md. sm is 28px; md is 32px. See '
+                        'DsNativeSelectSize below.',
                   ),
                   DocsApiFact(
                     name: 'enabled',
@@ -356,7 +409,7 @@ class _NativeSelectArticle extends StatelessWidget {
                     name: 'DsNativeSelect.menuOffset',
                     type: 'static double (get)',
                     description:
-                        '4px — the sideOffset between the closed control and '
+                        '4px: the sideOffset between the closed control and '
                         'the open list.',
                   ),
                 ],
@@ -380,7 +433,7 @@ class _NativeSelectArticle extends StatelessWidget {
                     name: 'label',
                     type: 'String (get)',
                     description:
-                        'Returns "default" for md, "sm" for sm — the attribute '
+                        'Returns "default" for md, "sm" for sm: the attribute '
                         'the reference writes.',
                   ),
                   DocsApiFact(
@@ -440,14 +493,14 @@ class _NativeSelectArticle extends StatelessWidget {
                     name: 'shadow',
                     type: 'DsShadowSpec',
                     description:
-                        'Required. The token for the state — shadow-pressed at '
+                        'Required. The token for the state: shadow-pressed at '
                         'rest, shadow-btn-primary when checked/on.',
                   ),
                   DocsApiFact(
                     name: 'duration',
                     type: 'Duration',
                     description:
-                        'Required. The transition length — all three inherit '
+                        'Required. The transition length: all three inherit '
                         'DsDurations.transitionDefault.',
                   ),
                   DocsApiFact(
@@ -473,7 +526,7 @@ class _NativeSelectArticle extends StatelessWidget {
                     name: 'enabled',
                     type: 'bool',
                     description:
-                        'Defaults to true. Separate from inert — a control can '
+                        'Defaults to true. Separate from inert: a control can '
                         'be enabled but inert.',
                   ),
                   DocsApiFact(
@@ -506,7 +559,7 @@ class _NativeSelectArticle extends StatelessWidget {
                     name: 'skipTraversal',
                     type: 'bool',
                     description:
-                        'Defaults to false. Roving tabindex — used by radio '
+                        'Defaults to false. Roving tabindex: used by radio '
                         'groups.',
                   ),
                   DocsApiFact(
@@ -532,7 +585,7 @@ class _NativeSelectArticle extends StatelessWidget {
                     name: 'fields',
                     type: 'List<DsFormFieldBase>',
                     description:
-                        'Required. In registration order — the order '
+                        'Required. In registration order: the order '
                         'focusFirstError walks.',
                   ),
                   DocsApiFact(
@@ -573,7 +626,7 @@ class _NativeSelectArticle extends StatelessWidget {
                     name: 'setError',
                     type: 'void Function(String, String)',
                     description:
-                        'Sets a message on a field by name — server error path; '
+                        'Sets a message on a field by name: server error path; '
                         'does not focus.',
                   ),
                   DocsApiFact(
@@ -592,7 +645,7 @@ class _NativeSelectArticle extends StatelessWidget {
                     name: 'isValid',
                     type: 'bool (get)',
                     description:
-                        'true if every field.invalid is false — computed, not '
+                        'true if every field.invalid is false: computed, not '
                         're-asked.',
                   ),
                   DocsApiFact(
@@ -604,7 +657,7 @@ class _NativeSelectArticle extends StatelessWidget {
                     name: 'submitCount',
                     type: 'int (get)',
                     description:
-                        'How many times submit has run — mode before this is '
+                        'How many times submit has run: mode before this is '
                         '0, reValidateMode after.',
                   ),
                   DocsApiFact(
@@ -644,40 +697,13 @@ class _NativeSelectArticle extends StatelessWidget {
           ),
         ),
         DsSection(
-          id: 'variants',
-          title: 'Variants and sizes',
-          description:
-              'DsNativeSelect has size variants documented in the API section '
-              'above. DsSelectionControl and DsForm have none — they are '
-              'configured by their callers.',
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: DsWidths.prose),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                DsText(
-                  '**DsNativeSelectSize.sm**: 28px tall with radius-md, '
-                  'insetY 0.5x. Use for compact layouts.',
-                  DsType.small,
-                ),
-                SizedBox(height: ds(2)),
-                DsText(
-                  '**DsNativeSelectSize.md**: 32px tall with radius-lg '
-                  '(12px), insetY 1x. The default and the reference\'s main '
-                  'specimen.',
-                  DsType.small,
-                ),
-              ],
-            ),
-          ),
-        ),
-        DsSection(
           id: 'states',
-          title: 'States and feedback',
+          title: 'States',
           description:
               'DsNativeSelect owns rest, hover, focus, invalid, disabled, and '
-              'open. DsSelectionControl and DsForm own their own states, '
-              'documented here as N/A with the reason.',
+              'open, across both size rungs (see DsNativeSelectSize in API '
+              'Reference above). DsSelectionControl and DsForm own their own '
+              'states, documented here as N/A with the reason.',
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
@@ -698,7 +724,7 @@ class _NativeSelectArticle extends StatelessWidget {
                         'Border becomes ring, ring-3 ring-ring/50 animates in '
                         'over transitionDefault.',
                     userSignal:
-                        'The control is focussed — animated focus ring '
+                        'The control is focussed: animated focus ring '
                         'appears.',
                   ),
                   DocsStateFact(
@@ -739,10 +765,10 @@ class _NativeSelectArticle extends StatelessWidget {
                   ),
                   DocsStateFact(
                     state:
-                        'States (DsSelectionControl, DsForm) — rest, checked, '
+                        'States (DsSelectionControl, DsForm): rest, checked, '
                         'disabled, etc.',
                     treatment:
-                        'N/A — these components do not own their own painted '
+                        'N/A: these components do not own their own painted '
                         'states. DsSelectionControl is configured by its '
                         'caller (fill, border, shadow per state); DsForm has '
                         'no paint at all.',
@@ -769,7 +795,7 @@ class _NativeSelectArticle extends StatelessWidget {
         ),
         DsSection(
           id: 'accessibility',
-          title: 'Accessibility and keyboard behavior',
+          title: 'Accessibility',
           description: 'Each component\'s keyboard and semantic contract.',
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -810,7 +836,7 @@ class _NativeSelectArticle extends StatelessWidget {
                   children: <Widget>[
                     const _A11yRow(
                       'Activation',
-                      'Enter and Space activate the control — it is a button. '
+                      'Enter and Space activate the control: it is a button. '
                           'Custom onKey handler is consulted first (for radio group '
                           'arrows).',
                     ),
@@ -818,7 +844,7 @@ class _NativeSelectArticle extends StatelessWidget {
                       'Hit area',
                       'The visible control is 20×20 (checkbox/radio) or 44×24 '
                           '(switch), but the hit area expands to 42×34, 66×38, and '
-                          '34×34 respectively. Margin expansion, not padding — so '
+                          '34×34 respectively. Margin expansion, not padding: so '
                           'neighbours stay in place.',
                     ),
                     _A11yRow(
@@ -839,14 +865,14 @@ class _NativeSelectArticle extends StatelessWidget {
                   children: <Widget>[
                     const _A11yRow(
                       'Non-visual',
-                      'DsForm paints nothing — bind it with ListenableBuilder '
+                      'DsForm paints nothing: bind it with ListenableBuilder '
                           'and read field.invalid and field.errors to drive your '
                           'own UI.',
                     ),
                     const _A11yRow(
                       'Field focus',
                       'focusFirstError() focuses the first invalid field in '
-                          'registration order — any field type, not just text inputs.',
+                          'registration order: any field type, not just text inputs.',
                     ),
                     _A11yRow(
                       'Announcements',
@@ -862,7 +888,7 @@ class _NativeSelectArticle extends StatelessWidget {
         ),
         DsSection(
           id: 'responsive',
-          title: 'Responsive and platform behavior',
+          title: 'Responsive',
           child: _bullets(theme, <String>[
             'DsNativeSelect at expand: true uses double.infinity width; at '
                 'expand: false is w-fit. A DsField wrapper will stretch it to '
@@ -870,20 +896,20 @@ class _NativeSelectArticle extends StatelessWidget {
             'DsSelectionControl is sized by its caller (width, height); no '
                 'responsive breakpoints.',
             'DsForm reads no MediaQuery and responds identically at 390px and '
-                '1440px — the form state machine is viewport-agnostic.',
+                '1440px: the form state machine is viewport-agnostic.',
             'Keyboard activation (arrows, Enter, Space, Tab) and pointer '
                 'activation (tap) behave identically on every Flutter target.',
           ]),
         ),
         DsSection(
           id: 'dependencies',
-          title: 'Dependencies, files, and disclosure',
+          title: 'Dependencies',
           description: 'What these components need to install and run.',
           child: DocsInstallFacts(
             facts: <DocsInstallFact>[
               const DocsInstallFact(
                 label: 'Registry items',
-                value: 'None — all three are new',
+                value: 'None: all three are new',
                 description:
                     'No registry manifests exist yet. `elattar add '
                     'native-select`, `elattar add selection-control`, and '
@@ -921,7 +947,7 @@ class _NativeSelectArticle extends StatelessWidget {
         ),
         DsSection(
           id: 'theming',
-          title: 'Theming notes',
+          title: 'Theming',
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
@@ -940,7 +966,7 @@ class _NativeSelectArticle extends StatelessWidget {
                     SizedBox(height: ds(3)),
                     DsText(
                       '**DsSelectionControl** reads colours from its caller '
-                      '(fill, border, shadow, ring) — it applies no theme '
+                      '(fill, border, shadow, ring): it applies no theme '
                       'colours itself. DsCheckbox, DsRadioGroup, and DsSwitch '
                       'supply those per their own state.',
                       DsType.small,
@@ -958,7 +984,7 @@ class _NativeSelectArticle extends StatelessWidget {
         ),
         DsSection(
           id: 'source',
-          title: 'Source and tests',
+          title: 'Source',
           child: DocsInstallFacts(
             title: 'Source and tests',
             facts: <DocsInstallFact>[
@@ -1045,7 +1071,7 @@ DsField(
 )''';
 
 const String _usageSelectionControlCode =
-    '''// DsSelectionControl is the invisible socket — not used directly.
+    '''// DsSelectionControl is the invisible socket: not used directly.
 // DsCheckbox, DsRadioGroup, and DsSwitch build on it.
 // See those components for examples.
 
@@ -1103,6 +1129,72 @@ ListenableBuilder(
   ),
 )''';
 
+const String _compositionSimpleCode = '''DsNativeSelect<String>(
+  options: const <DsSelectOption<String>>[
+    DsSelectOption(value: 'apple', label: 'Apple'),
+    DsSelectOption(value: 'banana', label: 'Banana'),
+    DsSelectOption(value: 'blueberry', label: 'Blueberry'),
+  ],
+  value: fruit,
+  onChanged: (String next) => setState(() => fruit = next),
+)''';
+
+const String _compositionGroupedCode = '''DsNativeSelect<String>(
+  options: const <DsSelectChild<String>>[
+    DsSelectGroup<String>(
+      label: 'Engineering',
+      children: <DsSelectOption<String>>[
+        DsSelectOption(value: 'engineer', label: 'Engineer'),
+        DsSelectOption(value: 'designer', label: 'Designer'),
+      ],
+    ),
+    DsSelectGroup<String>(
+      label: 'Operations',
+      children: <DsSelectOption<String>>[
+        DsSelectOption(value: 'support', label: 'Support'),
+        DsSelectOption(value: 'sales', label: 'Sales'),
+      ],
+    ),
+  ],
+  value: role,
+  onChanged: (String next) => setState(() => role = next),
+)''';
+
+const String _disabledCode = '''DsField(
+  label: 'Fruit',
+  child: DsNativeSelect<String>(
+    options: options,
+    value: fruit,
+    onChanged: (String next) => setState(() => fruit = next),
+    enabled: false, // whole control dimmed and inert
+  ),
+)
+
+DsField(
+  label: 'Fruit',
+  child: DsNativeSelect<String>(
+    options: const <DsSelectOption<String>>[
+      DsSelectOption(value: 'apple', label: 'Apple'),
+      DsSelectOption(value: 'banana', label: 'Banana', enabled: false),
+      DsSelectOption(value: 'blueberry', label: 'Blueberry'),
+    ],
+    value: fruit,
+    onChanged: (String next) => setState(() => fruit = next),
+    // the control stays live; only Banana is skipped
+  ),
+)''';
+
+const String _invalidCode = '''DsField(
+  label: 'Country',
+  errors: const <String>['Select a valid country.'],
+  child: DsNativeSelect<String>(
+    options: options,
+    value: country,
+    onChanged: (String next) => setState(() => country = next),
+    invalid: true,
+  ),
+)''';
+
 class _NativeSelectPreview extends StatefulWidget {
   const _NativeSelectPreview();
 
@@ -1140,7 +1232,7 @@ class _NativeSelectPreviewState extends State<_NativeSelectPreview> {
         ),
         SizedBox(height: ds(7)),
         DsText(
-          'DsSelectionControl — the shared socket (static focus ring, not real focus)',
+          'DsSelectionControl: the shared socket (static focus ring, not real focus)',
           DsType.label,
         ),
         SizedBox(height: ds(3)),
@@ -1197,4 +1289,170 @@ class _NativeSelectPreviewState extends State<_NativeSelectPreview> {
       ],
     );
   }
+}
+
+class _NativeSelectGroupsPreview extends StatefulWidget {
+  const _NativeSelectGroupsPreview();
+
+  @override
+  State<_NativeSelectGroupsPreview> createState() =>
+      _NativeSelectGroupsPreviewState();
+}
+
+class _NativeSelectGroupsPreviewState
+    extends State<_NativeSelectGroupsPreview> {
+  String _role = 'engineer';
+
+  @override
+  Widget build(BuildContext context) => ConstrainedBox(
+    constraints: const BoxConstraints(maxWidth: DsContainers.sm),
+    child: DsField(
+      key: const ValueKey<String>('native-select-groups-preview'),
+      label: 'Role',
+      child: DsNativeSelect<String>(
+        options: const <DsSelectChild<String>>[
+          DsSelectGroup<String>(
+            label: 'Engineering',
+            children: <DsSelectOption<String>>[
+              DsSelectOption(value: 'engineer', label: 'Engineer'),
+              DsSelectOption(value: 'designer', label: 'Designer'),
+            ],
+          ),
+          DsSelectGroup<String>(
+            label: 'Operations',
+            children: <DsSelectOption<String>>[
+              DsSelectOption(value: 'support', label: 'Support'),
+              DsSelectOption(value: 'sales', label: 'Sales'),
+            ],
+          ),
+        ],
+        value: _role,
+        onChanged: (String next) => setState(() => _role = next),
+      ),
+    ),
+  );
+}
+
+class _NativeSelectDisabledPreview extends StatefulWidget {
+  const _NativeSelectDisabledPreview();
+
+  @override
+  State<_NativeSelectDisabledPreview> createState() =>
+      _NativeSelectDisabledPreviewState();
+}
+
+class _NativeSelectDisabledPreviewState
+    extends State<_NativeSelectDisabledPreview> {
+  String _wholeControl = 'apple';
+  String _oneOption = 'apple';
+
+  static const List<DsSelectOption<String>> _fruits = <DsSelectOption<String>>[
+    DsSelectOption(value: 'apple', label: 'Apple'),
+    DsSelectOption(value: 'banana', label: 'Banana'),
+    DsSelectOption(value: 'blueberry', label: 'Blueberry'),
+  ];
+
+  @override
+  Widget build(BuildContext context) => ConstrainedBox(
+    constraints: const BoxConstraints(maxWidth: DsContainers.sm),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        DsText('Whole control disabled', DsType.label),
+        SizedBox(height: ds(3)),
+        DsField(
+          key: const ValueKey<String>('native-select-disabled-preview'),
+          label: 'Fruit',
+          child: DsNativeSelect<String>(
+            options: _fruits,
+            value: _wholeControl,
+            onChanged: (String next) => setState(() => _wholeControl = next),
+            enabled: false,
+          ),
+        ),
+        SizedBox(height: ds(7)),
+        DsText('One option disabled', DsType.label),
+        SizedBox(height: ds(3)),
+        DsField(
+          key: const ValueKey<String>('native-select-disabled-option-preview'),
+          label: 'Fruit',
+          child: DsNativeSelect<String>(
+            options: const <DsSelectOption<String>>[
+              DsSelectOption(value: 'apple', label: 'Apple'),
+              DsSelectOption(value: 'banana', label: 'Banana', enabled: false),
+              DsSelectOption(value: 'blueberry', label: 'Blueberry'),
+            ],
+            value: _oneOption,
+            onChanged: (String next) => setState(() => _oneOption = next),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+class _NativeSelectInvalidPreview extends StatefulWidget {
+  const _NativeSelectInvalidPreview();
+
+  @override
+  State<_NativeSelectInvalidPreview> createState() =>
+      _NativeSelectInvalidPreviewState();
+}
+
+class _NativeSelectInvalidPreviewState
+    extends State<_NativeSelectInvalidPreview> {
+  String _country = 'us';
+
+  @override
+  Widget build(BuildContext context) => ConstrainedBox(
+    constraints: const BoxConstraints(maxWidth: DsContainers.sm),
+    child: DsField(
+      key: const ValueKey<String>('native-select-invalid-preview'),
+      label: 'Country',
+      errors: const <String>['Select a valid country.'],
+      child: DsNativeSelect<String>(
+        options: const <DsSelectChild<String>>[
+          DsSelectOption(value: 'us', label: 'United States'),
+          DsSelectOption(value: 'ca', label: 'Canada'),
+          DsSelectOption(value: 'mx', label: 'Mexico'),
+        ],
+        value: _country,
+        onChanged: (String next) => setState(() => _country = next),
+        invalid: true,
+      ),
+    ),
+  );
+}
+
+class _NativeSelectRtlPreview extends StatefulWidget {
+  const _NativeSelectRtlPreview();
+
+  @override
+  State<_NativeSelectRtlPreview> createState() =>
+      _NativeSelectRtlPreviewState();
+}
+
+class _NativeSelectRtlPreviewState extends State<_NativeSelectRtlPreview> {
+  String _country = 'sa';
+
+  @override
+  Widget build(BuildContext context) => Directionality(
+    textDirection: TextDirection.rtl,
+    child: ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: DsContainers.sm),
+      child: DsField(
+        key: const ValueKey<String>('native-select-rtl-preview'),
+        label: 'الدولة',
+        child: DsNativeSelect<String>(
+          options: const <DsSelectChild<String>>[
+            DsSelectOption(value: 'sa', label: 'السعودية'),
+            DsSelectOption(value: 'eg', label: 'مصر'),
+            DsSelectOption(value: 'ma', label: 'المغرب'),
+          ],
+          value: _country,
+          onChanged: (String next) => setState(() => _country = next),
+        ),
+      ),
+    ),
+  );
 }

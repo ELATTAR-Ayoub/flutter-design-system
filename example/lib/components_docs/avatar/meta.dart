@@ -1,6 +1,6 @@
 /// Public documentation metadata for the avatar component.
 ///
-/// `avatar` has no `registry/components/avatar.json` manifest yet — see
+/// `avatar` has no `registry/components/avatar.json` manifest yet: see
 /// `AvatarDocPage`'s installation section for what that means today. Because
 /// there is no manifest, [avatarDoc.dependencies] is deliberately empty
 /// rather than naming registry items nothing has verified; a worker that
@@ -10,7 +10,7 @@ library;
 
 import '../catalog.dart' show ComponentDocEntry;
 
-/// `avatar` — a round identity mark: [DsAvatar]'s own image if it loads,
+/// `avatar`: a round identity mark: [DsAvatar]'s own image if it loads,
 /// initials underneath if it does not.
 const ComponentDocEntry avatarDoc = ComponentDocEntry(
   name: 'avatar',

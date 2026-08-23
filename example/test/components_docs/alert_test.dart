@@ -10,6 +10,15 @@
 /// loops (see `test/effects_test.dart`'s own note) -- `pumpAndSettle` would
 /// hang waiting for an animation that never finishes. `tester.pump()` is
 /// enough to render one frame and assert against it.
+///
+/// The page was reshaped to mirror
+/// https://ui.shadcn.com/docs/components/base/alert section for section:
+/// Preview, Installation, Usage, Composition, then the reference's own
+/// Basic / Destructive / Action / RTL examples (Custom Colors has no
+/// counterpart -- DsAlert has no style-override hook, only variant), then
+/// our Success / Warning / Info / Stacked alerts additions, then API
+/// Reference, then States / Accessibility / Responsive / Dependencies /
+/// Theming / Source. The ordering test below asserts that literal sequence.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
@@ -18,6 +27,28 @@ import 'package:example/components_docs/alert/page.dart';
 import 'package:example/kit.dart' show DsSection;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+/// The full section list, in the order the reshaped page must render them.
+const List<String> _sectionOrder = <String>[
+  'install',
+  'usage',
+  'composition',
+  'basic',
+  'destructive',
+  'action',
+  'success',
+  'warning',
+  'info',
+  'stacked-alerts',
+  'rtl',
+  'api',
+  'states',
+  'a11y',
+  'responsive',
+  'dependencies',
+  'theming',
+  'source',
+];
 
 Widget _harness(Widget child, {required DsThemeController controller}) =>
     DsTheme(
@@ -37,13 +68,54 @@ void main() {
       alertDoc.exports,
       containsAll(<String>['DsAlert', 'DsAlertVariant']),
     );
-    // No registry manifest exists for alert yet — see registry/components/.
+    // No registry manifest exists for alert yet: see registry/components/.
     // A worker must not invent registry dependency names for it.
     expect(alertDoc.dependencies, isEmpty);
   });
 
+  testWidgets('alert docs page renders every shadcn-parity section, in order', (
+    WidgetTester tester,
+  ) async {
+    tester.view.physicalSize = const Size(1440, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    final DsThemeController controller = DsThemeController(
+      mode: DsThemeMode.dark,
+    );
+    addTearDown(controller.dispose);
+    String? destination;
+
+    await tester.pumpWidget(
+      _harness(
+        AlertDocPage(onNavigate: (String route) => destination = route),
+        controller: controller,
+      ),
+    );
+    await tester.pump();
+
+    // Every section anchor exists, and each one sits below the section
+    // before it -- the "in order" half of the shadcn-parity contract.
+    double previousTop = -1;
+    for (final String anchor in _sectionOrder) {
+      final Finder section = find.byKey(DsSection.anchorKey(anchor));
+      expect(section, findsOneWidget, reason: 'section "$anchor" missing');
+      final double top = tester.getTopLeft(section).dy;
+      expect(
+        top,
+        greaterThan(previousTop),
+        reason: 'section "$anchor" should render after the previous section',
+      );
+      previousTop = top;
+    }
+
+    // No prose link fires the router: onNavigate stays untouched.
+    expect(destination, isNull);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets(
-    'alert docs page renders the article and documents every constructor parameter',
+    'alert docs page mounts live specimens across the example sections',
     (WidgetTester tester) async {
       tester.view.physicalSize = const Size(1440, 900);
       tester.view.devicePixelRatio = 1;
@@ -53,27 +125,88 @@ void main() {
         mode: DsThemeMode.dark,
       );
       addTearDown(controller.dispose);
-      String? destination;
 
       await tester.pumpWidget(
-        _harness(
-          AlertDocPage(onNavigate: (String route) => destination = route),
-          controller: controller,
-        ),
+        _harness(const AlertDocPage(), controller: controller),
       );
       await tester.pump();
 
-      // The page renders and mounts a live specimen of the real widget — one
-      // per DsAlertVariant value.
+      // The Preview grid alone already mounts one DsAlert per variant; the
+      // per-variant sections below each mount at least one more, and RTL
+      // mounts two.
       expect(find.text('Alert'), findsWidgets);
-      expect(find.byType(DsAlert), findsAtLeastNWidgets(5));
+      expect(find.byType(DsAlert), findsAtLeastNWidgets(10));
+
+      // Basic carries DsAlertVariant.normal's own specimen.
+      final Finder basicSection = find.byKey(DsSection.anchorKey('basic'));
       expect(
-        find.byKey(const ValueKey<String>('docs-layout-sidebar')),
+        find.descendant(of: basicSection, matching: find.text('Heads up')),
+        findsWidgets,
+      );
+
+      // Destructive has no action slot; Action reuses the same variant with
+      // one, so the two sections must read differently. (Every
+      // DocsCodeExample carries its own "Copy" DsButton regardless, so the
+      // signal is the "Retry" action label, not DsButton presence.)
+      final Finder destructiveSection = find.byKey(
+        DsSection.anchorKey('destructive'),
+      );
+      expect(
+        find.descendant(of: destructiveSection, matching: find.text('Retry')),
+        findsNothing,
+      );
+      final Finder actionSection = find.byKey(DsSection.anchorKey('action'));
+      expect(
+        find.descendant(of: actionSection, matching: find.text('Retry')),
+        findsWidgets,
+      );
+
+      // Success, Warning, and Info each carry their own live specimen.
+      for (final (String anchor, String title) in <(String, String)>[
+        ('success', 'Changes saved'),
+        ('warning', 'Withdrawal under review'),
+        ('info', 'New feature available'),
+      ]) {
+        final Finder section = find.byKey(DsSection.anchorKey(anchor));
+        expect(
+          find.descendant(of: section, matching: find.text(title)),
+          findsWidgets,
+          reason: '"$anchor" section should carry its own live specimen',
+        );
+      }
+
+      // RTL mounts two alerts inside a right-to-left Directionality.
+      final Finder rtlSection = find.byKey(DsSection.anchorKey('rtl'));
+      expect(
+        find.descendant(of: rtlSection, matching: find.byType(DsAlert)),
+        findsNWidgets(2),
+      );
+      expect(
+        find.descendant(
+          of: rtlSection,
+          matching: find.byWidgetPredicate(
+            (Widget widget) =>
+                widget is Directionality &&
+                widget.textDirection == TextDirection.rtl,
+          ),
+        ),
         findsOneWidget,
       );
 
+      // Composition documents the anatomy as Dart, not a live render.
+      final Finder compositionSection = find.byKey(
+        DsSection.anchorKey('composition'),
+      );
+      expect(
+        find.descendant(
+          of: compositionSection,
+          matching: find.textContaining('AlertAction'),
+        ),
+        findsWidgets,
+      );
+
       // The API table lists every public constructor parameter found on
-      // DsAlert in lib/src/components/alert.dart.
+      // DsAlert, and every DsAlertVariant value, in the same section.
       final Finder apiSection = find.byKey(DsSection.anchorKey('api'));
       expect(apiSection, findsOneWidget);
       for (final String parameter in <String>[
@@ -89,12 +222,6 @@ void main() {
           reason: 'constructor parameter "$parameter" should be documented',
         );
       }
-
-      // Every DsAlertVariant value is documented.
-      final Finder variantsSection = find.byKey(
-        DsSection.anchorKey('variants'),
-      );
-      expect(variantsSection, findsOneWidget);
       for (final String variant in <String>[
         'normal',
         'destructive',
@@ -103,15 +230,23 @@ void main() {
         'info',
       ]) {
         expect(
-          find.descendant(of: variantsSection, matching: find.text(variant)),
+          find.descendant(of: apiSection, matching: find.text(variant)),
           findsOneWidget,
           reason: 'DsAlertVariant.$variant should be documented',
         );
       }
+      // Custom Colors has no DsAlert equivalent -- recorded as skipped
+      // rather than faked with another variant swatch.
+      expect(
+        find.descendant(
+          of: apiSection,
+          matching: find.textContaining('SKIPPED'),
+        ),
+        findsWidgets,
+      );
 
       // The install section states honestly that alert has no CLI item yet.
       final Finder installSection = find.byKey(DsSection.anchorKey('install'));
-      expect(installSection, findsOneWidget);
       expect(
         find.descendant(
           of: installSection,
@@ -120,20 +255,19 @@ void main() {
         findsWidgets,
       );
 
-      // The purpose section names its neighbours instead of restating the
-      // component's own name (IA 9.2's decision-guidance contract).
-      final Finder purposeSection = find.byKey(DsSection.anchorKey('purpose'));
-      expect(purposeSection, findsOneWidget);
+      // The decision-guidance prose names its neighbours instead of restating
+      // the component's own name (IA 9.2's decision-guidance contract). It
+      // used to live in a `purpose` section; the shadcn frame puts nothing
+      // above `Installation` but the live demo, so the prose now sits
+      // unheaded in the article and is asserted against the article itself.
       expect(
         find.descendant(
-          of: purposeSection,
+          of: find.byKey(const ValueKey<String>('alert-doc-article')),
           matching: find.textContaining('alert dialog'),
         ),
         findsWidgets,
       );
 
-      // No prose link fires the router — onNavigate stays untouched.
-      expect(destination, isNull);
       expect(tester.takeException(), isNull);
     },
   );
@@ -163,21 +297,43 @@ void main() {
         find.byKey(const ValueKey<String>('docs-layout-sidebar')),
         findsNothing,
       );
-      expect(find.byType(DsAlert), findsAtLeastNWidgets(5));
+      expect(find.byType(DsAlert), findsAtLeastNWidgets(10));
       expect(tester.takeException(), isNull);
 
       // The controller is flipped in place: no new app, no new element tree.
       controller.setMode(DsThemeMode.dark);
       await tester.pump();
       expect(tester.takeException(), isNull);
+    },
+  );
 
+  testWidgets(
+    'alert docs page shows the wide-viewport sidebar layout',
+    (WidgetTester tester) async {
+      // A fresh mount at the wide breakpoint, rather than resizing the
+      // narrow tree above in place: docs_layout.dart's full-bleed
+      // OverflowBox needs a full layout pass at its final constraints, and
+      // resizing a live SingleChildScrollView tree mid-test can catch it on
+      // a transient unbounded-height frame on a page this size.
       tester.view.physicalSize = const Size(1440, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+
+      final DsThemeController controller = DsThemeController(
+        mode: DsThemeMode.dark,
+      );
+      addTearDown(controller.dispose);
+
+      await tester.pumpWidget(
+        _harness(const AlertDocPage(), controller: controller),
+      );
       await tester.pump();
+
       expect(
         find.byKey(const ValueKey<String>('docs-layout-sidebar')),
         findsOneWidget,
       );
-      expect(find.byType(DsAlert), findsAtLeastNWidgets(5));
+      expect(find.byType(DsAlert), findsAtLeastNWidgets(10));
       expect(tester.takeException(), isNull);
     },
   );

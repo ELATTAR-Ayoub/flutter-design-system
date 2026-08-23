@@ -1,5 +1,5 @@
 /// Tests for `components_docs/sidebar/meta.dart` and
-/// `components_docs/sidebar/page.dart` — the public Sidebar component
+/// `components_docs/sidebar/page.dart`: the public Sidebar component
 /// documentation page.
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
@@ -15,7 +15,8 @@
 ///
 /// The page mounts three real [DsSidebarProvider]s (icon, parts, offcanvas).
 /// Each installs its own `HardwareKeyboard` handler, so ⌘B/Ctrl-B toggles all
-/// three at once — the reference's own behaviour, reproduced, and the reason
+/// three at once, which is the reference's own behaviour, reproduced, and
+/// the reason
 /// the keyboard case below asserts on one named panel rather than on a
 /// count.
 library;
@@ -23,6 +24,7 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/sidebar/meta.dart';
 import 'package:example/components_docs/sidebar/page.dart';
+import 'package:example/kit.dart' show DsSection;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter_test/flutter_test.dart';
@@ -143,7 +145,7 @@ void main() {
         ]),
       );
 
-      // Source-level imports, not a registry manifest — sidebar has none.
+      // Source-level imports, not a registry manifest: sidebar has none.
       expect(sidebarDoc.dependencies, contains('tooltip'));
       expect(sidebarDoc.dependencies, contains('sheet'));
       expect(sidebarDoc.dependencies, contains('button'));
@@ -172,6 +174,48 @@ void main() {
       expect(find.byKey(_offcanvasKey), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
+
+    testWidgets(
+      'sections render in the shadcn-mirrored order, section for section',
+      (WidgetTester tester) async {
+        await _pumpSidebarDoc(tester);
+
+        final List<String> titles = tester
+            .widgetList<DsSection>(find.byType(DsSection))
+            .map((DsSection section) => section.title)
+            .toList();
+
+        expect(titles, <String>[
+          'Installation',
+          'Usage',
+          'Composition',
+          'Structure',
+          'SidebarProvider',
+          'Sidebar',
+          'useSidebar',
+          'SidebarHeader',
+          'SidebarFooter',
+          'SidebarContent',
+          'SidebarGroup',
+          'SidebarMenu',
+          'SidebarMenuButton',
+          'SidebarMenuAction',
+          'SidebarMenuSub',
+          'SidebarMenuBadge',
+          'SidebarMenuSkeleton',
+          'SidebarTrigger',
+          'SidebarRail',
+          'Controlled Sidebar',
+          'API Reference',
+          'States',
+          'Accessibility',
+          'Responsive',
+          'Dependencies',
+          'Theming',
+          'Source',
+        ]);
+      },
+    );
 
     testWidgets('the API tables cover the whole family', (
       WidgetTester tester,
@@ -264,7 +308,7 @@ void main() {
       await _pumpSidebarDoc(tester);
 
       // The finding: a row's own accessible name comes from
-      // DsButton(label: label ?? tooltip) — not from the tooltip overlay —
+      // DsButton(label: label ?? tooltip), not from the tooltip overlay,
       // and a row given neither loses its name entirely once collapsed.
       expect(find.textContaining('accessible name'), findsWidgets);
       expect(find.textContaining('label ?? tooltip'), findsWidgets);
@@ -295,7 +339,7 @@ void main() {
     });
   });
 
-  group('live specimen — the collapse contract', () {
+  group('live specimen: the collapse contract', () {
     testWidgets('the icon shell narrows 256 -> 48 and back', (
       WidgetTester tester,
     ) async {
@@ -436,8 +480,8 @@ void main() {
       );
       expect(find.byKey(_articleKey), findsOneWidget);
 
-      // Under DsBreakpoints.md the desktop gap/container pair is not built at
-      // all — the panel is a sheet that is closed until openMobile says
+      // Under DsBreakpoints.md the desktop gap/container pair is not built
+      // at all: the panel is a sheet that is closed until openMobile says
       // otherwise.
       expect(DsSidebarProvider.isMobileWidth(_narrow.width), isTrue);
       expect(_within(_shellKey, DsSidebarContent), findsNothing);

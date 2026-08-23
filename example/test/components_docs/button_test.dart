@@ -1,6 +1,7 @@
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/button/meta.dart';
 import 'package:example/components_docs/button/page.dart';
+import 'package:example/kit.dart' show DsSection;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -13,7 +14,7 @@ Widget _harness({
 );
 
 /// Every named constructor parameter `DsButton`'s own class declares
-/// (`lib/src/components/button.dart`), excluding `key` — the same set the
+/// (`lib/src/components/button.dart`), excluding `key`: the same set the
 /// page's `DsButton` [DocsApiTable] claims to cover.
 const List<String> _buttonConstructorParams = <String>[
   'child',
@@ -37,7 +38,7 @@ void main() {
   group('button docs page', () {
     testWidgets(
       'renders the article, the full API table, and a live specimen of '
-      'every DsButtonVariant and DsButtonSize the Examples section claims',
+      'every DsButtonVariant and DsButtonSize this page claims to show',
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(1440, 900);
         tester.view.devicePixelRatio = 1;
@@ -52,7 +53,7 @@ void main() {
             ),
           ),
         );
-        // One frame is enough — nothing on this page loops except the
+        // One frame is enough: nothing on this page loops except the
         // premium button's foil shimmer, which must never be settled on.
         await tester.pump();
 
@@ -85,16 +86,16 @@ void main() {
         }
 
         // A live DsButton specimen of every variant mounts somewhere on
-        // the page — the Examples section's own promise, not just the API
-        // table's prose.
+        // the page, this page's own promise, not just the API table's
+        // prose.
         final Set<DsButtonVariant> mountedVariants = tester
             .widgetList<DsButton>(find.byType(DsButton))
             .map((DsButton button) => button.variant)
             .toSet();
         expect(mountedVariants, containsAll(DsButtonVariant.values));
 
-        // A live specimen of every DsButtonSize rung mounts too — the
-        // Icon example covers the four squares, the Sizes example covers
+        // A live specimen of every DsButtonSize rung mounts too. The
+        // Icon example covers the four squares, the Size example covers
         // the five text rungs.
         final Set<DsButtonSize> mountedSizes = tester
             .widgetList<DsButton>(find.byType(DsButton))
@@ -105,7 +106,13 @@ void main() {
         // Every example specimen this page's own source keys carries its
         // key on the page.
         for (final String key in <String>[
-          'button-preview:hero',
+          'button-preview:primary',
+          'button-preview:premium',
+          'button-preview:secondary',
+          'button-preview:outline',
+          'button-preview:ghost',
+          'button-preview:destructive',
+          'button-preview:link',
           'button-example:default',
           'button-example:premium',
           'button-example:secondary',
@@ -118,6 +125,9 @@ void main() {
           'button-example:icon-icon',
           'button-example:icon-iconLg',
           'button-example:with-icon',
+          'button-example:rounded-pill',
+          'button-example:rounded-lg',
+          'button-example:rounded-md',
           'button-example:loading',
           'button-example:disabled',
           'button-example:sizes-xs',
@@ -126,6 +136,8 @@ void main() {
           'button-example:sizes-lg',
           'button-example:sizes-xl',
           'button-example:emphasis',
+          'button-example:button-group-grid',
+          'button-example:button-group-list',
         ]) {
           expect(
             find.byKey(ValueKey<String>(key)),
@@ -135,7 +147,7 @@ void main() {
         }
 
         // The Loading example specimen actually carries loading: true, and
-        // the Disabled example actually carries a null onPressed — the two
+        // the Disabled example actually carries a null onPressed: the two
         // states are not just labelled, they are real.
         final DsButton loadingButton = tester.widget<DsButton>(
           find.descendant(
@@ -175,6 +187,59 @@ void main() {
         );
         expect(buttonDoc.command, 'elattar add button');
         expect(destination, isNull);
+      },
+    );
+
+    testWidgets(
+      'sections render in the shadcn-mirrored order, section for section',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(1440, 900);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+
+        final DsThemeController controller = DsThemeController(
+          mode: DsThemeMode.dark,
+        );
+        await tester.pumpWidget(
+          _harness(controller: controller, child: const ButtonDocPage()),
+        );
+        await tester.pump();
+
+        // Immune to the duplicate-string hazard `find.text` carries here: a
+        // section heading and its own TOC link render the same string, so
+        // `find.text('States')` finds two widgets, not one. Reading each
+        // mounted `DsSection`'s own `title` field sidesteps that entirely.
+        final List<String> titles = tester
+            .widgetList<DsSection>(find.byType(DsSection))
+            .map((DsSection section) => section.title)
+            .toList();
+
+        expect(titles, <String>[
+          'Installation',
+          'Usage',
+          'Size',
+          'Default',
+          'Premium',
+          'Outline',
+          'Secondary',
+          'Ghost',
+          'Destructive',
+          'Link',
+          'Icon',
+          'With Icon',
+          'Rounded',
+          'Spinner',
+          'Disabled',
+          'Emphasis',
+          'Button Group',
+          'API Reference',
+          'States',
+          'Accessibility and keyboard behavior',
+          'Responsive and platform behavior',
+          'Dependencies, files, and install facts',
+          'Theming notes',
+          'Source, tests, and docs',
+        ]);
       },
     );
 
@@ -230,7 +295,7 @@ void main() {
           ),
         );
 
-        // Flip the SAME controller in place — not a fresh widget tree —
+        // Flip the SAME controller in place, not a fresh widget tree:
         // the same object every real theme toggle mutates. A single
         // `pump()`, never `pumpAndSettle()`: the premium example's foil
         // shimmer is a genuinely looping animation and would hang it.
@@ -245,12 +310,12 @@ void main() {
 
         // The flip actually reached the page's own subtree. `primary` is
         // deliberately the same token in both themes (theme.dart: "Same in
-        // both") — `background` and `foreground` are the pair that
+        // both"). `background` and `foreground` are the pair that
         // actually inverts.
         expect(lightTheme.background, isNot(darkTheme.background));
         expect(lightTheme.foreground, isNot(darkTheme.foreground));
 
-        // Nothing was lost across the flip — every specimen key is still
+        // Nothing was lost across the flip: every specimen key is still
         // mounted exactly once.
         for (final String key in <String>[
           'button-example:default',

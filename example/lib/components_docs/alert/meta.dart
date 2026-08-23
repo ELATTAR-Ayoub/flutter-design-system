@@ -1,7 +1,7 @@
 /// Documentation metadata for the alert component.
 ///
 /// `alert` has no `registry/components/*.json` manifest yet (unlike its
-/// sibling `alert-dialog`, which does) — see
+/// sibling `alert-dialog`, which does): see
 /// `docs/superpowers/plans/2026-08-23-phase-j-full-component-documentation.md`.
 /// [alertDoc.dependencies] is therefore left empty rather than naming
 /// registry items that do not exist; the page's own install section states

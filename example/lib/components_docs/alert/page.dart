@@ -1,12 +1,20 @@
 /// Public component documentation for the alert component.
 ///
-/// Follows `docs/superpowers/plans/2026-08-21-public-website-ui-information-
-/// architecture.md` §9.1's eighteen-section template, composed from the
-/// Phase C docs primitives (`docs_layout.dart`, `docs_code.dart`,
-/// `docs_facts.dart`, `kit.dart`'s `DsSection`/`DsPanel`) the same way
-/// `dialog_page.dart` does. Every usage example below is real Dart against
-/// [DsAlert]'s actual constructor — nothing here manufactures a shadcn
-/// example the Dart API does not support.
+/// Reshaped to the shadcn parity frame (Phase J supervisor's shadcn-parity
+/// pass): the reader knows https://ui.shadcn.com/docs/components/base/alert
+/// and finds the same answers, in the same order, on this page. That page's
+/// own top-level examples are Basic, Destructive, Action, Custom Colors, and
+/// RTL, none of them grouped under one "Variants" heading, so this page
+/// mirrors that shape instead of the single API-table "Variants" section an
+/// earlier draft used. Custom Colors has no counterpart here: DsAlert has no
+/// style-override hook, only [DsAlertVariant] -- see the Custom colors note
+/// inside API reference below for why that section is skipped rather than
+/// faked.
+/// Composed from the Phase C docs primitives (`docs_layout.dart`,
+/// `docs_code.dart`, `docs_facts.dart`, `kit.dart`'s `DsSection`/`DsPanel`)
+/// the same way `dialog_page.dart` does. Every usage example below is real
+/// Dart against [DsAlert]'s actual constructor: nothing here manufactures a
+/// shadcn example the Dart API does not support.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
@@ -36,18 +44,22 @@ class AlertDocPage extends StatelessWidget {
       DsBreadcrumbEntry.page('Alert'),
     ],
     toc: const <DocsTocEntry>[
-      DocsTocEntry(title: 'Purpose', anchor: 'purpose'),
-      DocsTocEntry(title: 'Status', anchor: 'status'),
-      DocsTocEntry(title: 'Preview', anchor: 'preview'),
-      DocsTocEntry(title: 'Install', anchor: 'install'),
+      DocsTocEntry(title: 'Installation', anchor: 'install'),
       DocsTocEntry(title: 'Usage', anchor: 'usage'),
-      DocsTocEntry(title: 'API', anchor: 'api'),
-      DocsTocEntry(title: 'Variants', anchor: 'variants'),
+      DocsTocEntry(title: 'Composition', anchor: 'composition'),
+      DocsTocEntry(title: 'Basic', anchor: 'basic'),
+      DocsTocEntry(title: 'Destructive', anchor: 'destructive'),
+      DocsTocEntry(title: 'Action', anchor: 'action'),
+      DocsTocEntry(title: 'Success', anchor: 'success'),
+      DocsTocEntry(title: 'Warning', anchor: 'warning'),
+      DocsTocEntry(title: 'Info', anchor: 'info'),
+      DocsTocEntry(title: 'Stacked alerts', anchor: 'stacked-alerts'),
+      DocsTocEntry(title: 'RTL', anchor: 'rtl'),
+      DocsTocEntry(title: 'API Reference', anchor: 'api'),
       DocsTocEntry(title: 'States', anchor: 'states'),
       DocsTocEntry(title: 'Accessibility', anchor: 'a11y'),
       DocsTocEntry(title: 'Responsive', anchor: 'responsive'),
       DocsTocEntry(title: 'Dependencies', anchor: 'dependencies'),
-      DocsTocEntry(title: 'Composition', anchor: 'composition'),
       DocsTocEntry(title: 'Theming', anchor: 'theming'),
       DocsTocEntry(title: 'Source', anchor: 'source'),
     ],
@@ -69,14 +81,19 @@ class _AlertArticle extends StatelessWidget {
     key: const ValueKey<String>('alert-doc-article'),
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
-      // 4. Expanded purpose and decision guidance.
-      DsSection(
-        id: 'purpose',
-        title: 'Purpose and when to use it',
-        description:
-            'A condition worth explaining, not a question and not a '
+      // Ours only: expanded purpose and decision guidance. shadcn's own
+      // alert page carries no equivalent -- added in our own house style
+      // rather than dropped, per the parity brief's "ours only" allowance.
+      ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: DsWidths.prose),
+        child: DsText(
+          'A condition worth explaining, not a question and not a '
             'one-off confirmation.',
-        child: const _Prose(<String>[
+          DsType.body,
+        ),
+      ),
+      SizedBox(height: ds(6)),
+      const _Prose(<String>[
           'DsAlert renders an inline, persistent region on the page '
               'itself: role="alert" on the reference, Semantics(container: '
               'true, liveRegion: true) here. No scrim, no auto-dismiss, no '
@@ -94,13 +111,9 @@ class _AlertArticle extends StatelessWidget {
               'never floats; it lays out like any other block in the '
               'page\'s own flow.',
         ]),
-      ),
 
-      // 5. Status/version/platform metadata.
-      DsSection(
-        id: 'status',
-        title: 'Status',
-        child: const DocsInstallFacts(
+      // Ours only: status/version/platform metadata.
+      const DocsInstallFacts(
           title: 'Status facts',
           facts: <DocsInstallFact>[
             DocsInstallFact(
@@ -108,7 +121,7 @@ class _AlertArticle extends StatelessWidget {
               value: 'Source-available, not registry-listed',
               description:
                   'Ships in the package today; elattar add alert is not '
-                  'wired up yet -- see Install below.',
+                  'wired up yet -- see Installation below.',
             ),
             DocsInstallFact(
               label: 'Version',
@@ -125,16 +138,19 @@ class _AlertArticle extends StatelessWidget {
             ),
           ],
         ),
-      ),
 
-      // 6. Primary live specimen with Preview/Code tabs.
-      DsSection(
-        id: 'preview',
-        title: 'Preview',
-        description:
-            'One card surface, five variants -- the destructive specimen '
-            'also carries an action.',
-        child: DocsCodeExample(
+      // shadcn: the live demo that opens the page, before any heading.
+      ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: DsWidths.prose),
+        child: DsText(
+          'One card surface, five variants -- the destructive specimen '
+            'also carries an action. Each variant gets its own dedicated '
+            'specimen further down.',
+          DsType.body,
+        ),
+      ),
+      SizedBox(height: ds(6)),
+      DocsCodeExample(
           title: 'Live specimen',
           description:
               'Every DsAlertVariant value, in the reference\'s own '
@@ -149,9 +165,8 @@ class _AlertArticle extends StatelessWidget {
             ),
           ],
         ),
-      ),
 
-      // 7. Installation with Command/Manual tabs.
+      // shadcn: Installation, Command and Manual tabs.
       DsSection(
         id: 'install',
         title: 'Installation',
@@ -183,7 +198,7 @@ class _AlertArticle extends StatelessWidget {
         ),
       ),
 
-      // 8. Usage.
+      // shadcn: Usage -- imports plus basic construction.
       DsSection(
         id: 'usage',
         title: 'Usage',
@@ -205,126 +220,326 @@ class _AlertArticle extends StatelessWidget {
         ),
       ),
 
-      // 9. API reference.
+      // shadcn: Composition -- the widget-hierarchy tree. DsAlert is one
+      // widget with four optional-content slots, not a family of separate
+      // subcomponents the way Icon/AlertTitle/AlertDescription/AlertAction
+      // are on the reference; this is that same anatomy read off the one
+      // constructor instead of off four JSX tags.
+      DsSection(
+        id: 'composition',
+        title: 'Composition',
+        description:
+            'DsAlert folds Icon, AlertTitle, AlertDescription, and '
+            'AlertAction into four constructor slots on one widget, '
+            'rather than four composable subcomponents.',
+        child: DsPanel(
+          label: 'DART',
+          note: 'ANATOMY',
+          child: const DocsSelectableCodeBlock(code: _compositionAnatomyCode),
+        ),
+      ),
+
+      // shadcn: Basic -- the default variant, icon + title + description.
+      DsSection(
+        id: 'basic',
+        title: 'Basic',
+        description:
+            'DsAlertVariant.normal, the constructor\'s own default: an '
+            'icon, a title, and a description.',
+        child: DocsCodeExample(
+          title: 'Basic',
+          preview: const Center(child: _BasicPreview()),
+          manualFiles: const <DocsCodeFile>[
+            DocsCodeFile(
+              path: 'alert_basic.dart',
+              title: 'Basic',
+              code: _basicCode,
+            ),
+          ],
+        ),
+      ),
+
+      // shadcn: Destructive -- the error-styled variant, no action.
+      DsSection(
+        id: 'destructive',
+        title: 'Destructive',
+        description:
+            'DsAlertVariant.destructive on its own: compare with Action '
+            'below, which adds an action slot on top of the same variant.',
+        child: DocsCodeExample(
+          title: 'Destructive',
+          preview: const Center(child: _DestructivePreview()),
+          manualFiles: const <DocsCodeFile>[
+            DocsCodeFile(
+              path: 'alert_destructive.dart',
+              title: 'Destructive',
+              code: _destructiveCode,
+            ),
+          ],
+        ),
+      ),
+
+      // shadcn: Action -- an interactive element positioned in the alert.
+      DsSection(
+        id: 'action',
+        title: 'Action',
+        description:
+            'The action slot sits 8px from the top and right of the '
+            'border box, and it always reserves an 80px-wide right lane '
+            'once action is non-null -- unconditionally, whether or not a '
+            'button of that size would actually have collided with the '
+            'text (supervisor ruling F10).',
+        child: DocsCodeExample(
+          title: 'Action',
+          preview: const Center(child: _ActionPreview()),
+          manualFiles: const <DocsCodeFile>[
+            DocsCodeFile(
+              path: 'alert_action.dart',
+              title: 'Action',
+              code: _actionCode,
+            ),
+          ],
+        ),
+      ),
+
+      // Ours only: DsAlertVariant.success has no counterpart example on the
+      // reference page, which only demos default and destructive by name.
+      DsSection(
+        id: 'success',
+        title: 'Success',
+        description:
+            'DsAlertVariant.success, for a confirmation that already '
+            'happened.',
+        child: DocsCodeExample(
+          title: 'Success',
+          preview: const Center(child: _SuccessPreview()),
+          manualFiles: const <DocsCodeFile>[
+            DocsCodeFile(
+              path: 'alert_success.dart',
+              title: 'Success',
+              code: _successCode,
+            ),
+          ],
+        ),
+      ),
+
+      // Ours only: DsAlertVariant.warning.
+      DsSection(
+        id: 'warning',
+        title: 'Warning',
+        description:
+            'DsAlertVariant.warning, for a condition that needs attention '
+            'but has not failed outright.',
+        child: DocsCodeExample(
+          title: 'Warning',
+          preview: const Center(child: _WarningPreview()),
+          manualFiles: const <DocsCodeFile>[
+            DocsCodeFile(
+              path: 'alert_warning.dart',
+              title: 'Warning',
+              code: _warningCode,
+            ),
+          ],
+        ),
+      ),
+
+      // Ours only: DsAlertVariant.info.
+      DsSection(
+        id: 'info',
+        title: 'Info',
+        description: 'DsAlertVariant.info, for a low-stakes announcement.',
+        child: DocsCodeExample(
+          title: 'Info',
+          preview: const Center(child: _InfoPreview()),
+          manualFiles: const <DocsCodeFile>[
+            DocsCodeFile(
+              path: 'alert_info.dart',
+              title: 'Info',
+              code: _infoCode,
+            ),
+          ],
+        ),
+      ),
+
+      // Ours only: stacking more than one alert. No counterpart section on
+      // the reference page.
+      DsSection(
+        id: 'stacked-alerts',
+        title: 'Stacked alerts',
+        description:
+            'Stacking more than one alert reads as a list of conditions, '
+            'not a traffic light, because every variant shares the same '
+            'card fill -- only the icon and the bloom move.',
+        child: DsPanel(
+          label: 'DART',
+          note: 'STACKED IN A REVIEW FLOW',
+          child: const DocsSelectableCodeBlock(code: _stackedCode),
+        ),
+      ),
+
+      // shadcn: RTL.
+      DsSection(
+        id: 'rtl',
+        title: 'RTL',
+        description:
+            'DsAlert reads Directionality.of(context) the way any Row '
+            'does, so the icon and text column swap sides under RTL. '
+            'DOCUMENTED DRIFT: the padding (EdgeInsets.fromLTRB) and the '
+            'action slot\'s Positioned(top, right) are both physical, not '
+            'directional -- unlike the reference\'s logical pr-20 / '
+            'top-2 right-2 CSS, neither one mirrors to the left edge '
+            'under RTL.',
+        child: DocsCodeExample(
+          title: 'RTL',
+          preview: const Center(child: _RtlPreview()),
+          manualFiles: const <DocsCodeFile>[
+            DocsCodeFile(path: 'alert_rtl.dart', title: 'RTL', code: _rtlCode),
+          ],
+        ),
+      ),
+
+      // shadcn: API Reference -- one prop table per class in the family.
+      // DsAlert has no separate AlertTitle/AlertDescription/AlertAction
+      // classes to give their own tables to, so the two tables here are
+      // DsAlert's own constructor/statics and the DsAlertVariant enum.
       DsSection(
         id: 'api',
         title: 'API reference',
         description:
-            'Every DsAlert constructor parameter and static member, read '
-            'directly from lib/src/components/alert.dart.',
-        child: const DocsApiTable(
-          facts: <DocsApiFact>[
-            DocsApiFact(
-              name: 'title',
-              type: 'String',
-              description:
-                  'Required. The AlertTitle text, column 2, font-medium.',
+            'Every DsAlert constructor parameter and static member, and '
+            'every DsAlertVariant value, read directly from '
+            'lib/src/components/alert.dart.',
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            const DocsApiTable(
+              title: 'DsAlert',
+              facts: <DocsApiFact>[
+                DocsApiFact(
+                  name: 'title',
+                  type: 'String',
+                  description:
+                      'Required. The AlertTitle text, column 2, '
+                      'font-medium.',
+                ),
+                DocsApiFact(
+                  name: 'description',
+                  type: 'String?',
+                  description:
+                      'Optional, defaults to null. When null, the gap-1 '
+                      'row and the muted description block do not render '
+                      'at all.',
+                ),
+                DocsApiFact(
+                  name: 'icon',
+                  type: 'Widget?',
+                  description:
+                      'Optional, defaults to null. The leading size-4 '
+                      'glyph, recolored by variant through the '
+                      'surrounding DefaultTextStyle. DsAlert does not '
+                      'choose an icon for a variant -- the caller '
+                      'supplies one, or none.',
+                ),
+                DocsApiFact(
+                  name: 'action',
+                  type: 'Widget?',
+                  description:
+                      'Optional, defaults to null. Positioned 8px from '
+                      'the top and right of the border box. Its presence '
+                      'also switches the base\'s right padding from 16px '
+                      'to a fixed 80px lane, unconditionally.',
+                ),
+                DocsApiFact(
+                  name: 'variant',
+                  type: 'DsAlertVariant',
+                  description:
+                      'Optional, defaults to DsAlertVariant.normal. '
+                      'Selects the icon ink color and the '
+                      '--bloom-1/--bloom-2 pair; fill, border, radius, '
+                      'and padding never change.',
+                ),
+                DocsApiFact(
+                  name: 'DsAlert.actionInset (static)',
+                  type: 'double',
+                  description:
+                      'ds(2) -- the 8px offset the action slot sits from '
+                      'the border box on both axes.',
+                ),
+                DocsApiFact(
+                  name: 'DsAlert.actionLane (static)',
+                  type: 'double',
+                  description:
+                      'ds(20) -- the fixed 80px right-padding lane '
+                      'substituted for the base 16px whenever action is '
+                      'non-null.',
+                ),
+              ],
             ),
-            DocsApiFact(
-              name: 'description',
-              type: 'String?',
-              description:
-                  'Optional, defaults to null. When null, the gap-1 row '
-                  'and the muted description block do not render at all.',
+            SizedBox(height: ds(6)),
+            const DocsApiTable(
+              title: 'DsAlertVariant',
+              facts: <DocsApiFact>[
+                DocsApiFact(
+                  name: 'normal',
+                  type: 'DsAlertVariant',
+                  description:
+                      'cva key "default" (the label getter renames it -- '
+                      'default is a Dart keyword). Ink: '
+                      'theme.mutedForeground. Bloom: '
+                      '--color-action-bright / --color-action.',
+                ),
+                DocsApiFact(
+                  name: 'destructive',
+                  type: 'DsAlertVariant',
+                  description:
+                      'Ink: theme.destructiveInk. Bloom: '
+                      'theme.destructive / --color-action.',
+                ),
+                DocsApiFact(
+                  name: 'success',
+                  type: 'DsAlertVariant',
+                  description:
+                      'Ink: theme.successInk. Bloom: --color-success / '
+                      '--color-value.',
+                ),
+                DocsApiFact(
+                  name: 'warning',
+                  type: 'DsAlertVariant',
+                  description:
+                      'Ink: theme.warningInk. Bloom: --color-warning / '
+                      '--color-action.',
+                ),
+                DocsApiFact(
+                  name: 'info',
+                  type: 'DsAlertVariant',
+                  description:
+                      'Ink: theme.infoInk. Bloom: --color-info / '
+                      '--color-action.',
+                ),
+              ],
             ),
-            DocsApiFact(
-              name: 'icon',
-              type: 'Widget?',
-              description:
-                  'Optional, defaults to null. The leading size-4 glyph, '
-                  'recolored by variant through the surrounding '
-                  'DefaultTextStyle. DsAlert does not choose an icon for a '
-                  'variant -- the caller supplies one, or none.',
-            ),
-            DocsApiFact(
-              name: 'action',
-              type: 'Widget?',
-              description:
-                  'Optional, defaults to null. Positioned 8px from the '
-                  'top and right of the border box. Its presence also '
-                  'switches the base\'s right padding from 16px to a '
-                  'fixed 80px lane, unconditionally.',
-            ),
-            DocsApiFact(
-              name: 'variant',
-              type: 'DsAlertVariant',
-              description:
-                  'Optional, defaults to DsAlertVariant.normal. Selects '
-                  'the icon ink color and the --bloom-1/--bloom-2 pair; '
-                  'fill, border, radius, and padding never change.',
-            ),
-            DocsApiFact(
-              name: 'DsAlert.actionInset (static)',
-              type: 'double',
-              description:
-                  'ds(2) -- the 8px offset the action slot sits from the '
-                  'border box on both axes.',
-            ),
-            DocsApiFact(
-              name: 'DsAlert.actionLane (static)',
-              type: 'double',
-              description:
-                  'ds(20) -- the fixed 80px right-padding lane substituted '
-                  'for the base 16px whenever action is non-null.',
+            SizedBox(height: ds(4)),
+            DsPanel(
+              label: 'CUSTOM COLORS',
+              note: 'SKIPPED',
+              child: const _Prose(<String>[
+                'The reference\'s Custom Colors example overrides an '
+                    'alert\'s classes directly to swap in an ad hoc '
+                    'palette. DsAlert has no equivalent hook: its only '
+                    'color control point is variant, which selects one of '
+                    'five predetermined ink/bloom pairs from DsThemeData '
+                    'rather than accepting an arbitrary Color. Faking a '
+                    'freeform override here would document a capability '
+                    'this widget does not have, so this section is '
+                    'skipped rather than approximated with another '
+                    'variant swatch.',
+              ]),
             ),
           ],
         ),
       ),
 
-      // 10. Variants and sizes.
-      DsSection(
-        id: 'variants',
-        title: 'Variants',
-        description:
-            'Five cva variants, in the reference\'s own declaration order. '
-            'Each sets exactly three things -- the icon ink color and the '
-            'two bloom stops -- and nothing else in the surface moves. '
-            'DsAlert has no size axis of its own; it fills whatever width '
-            'its parent gives it.',
-        child: const DocsApiTable(
-          title: 'DsAlertVariant',
-          facts: <DocsApiFact>[
-            DocsApiFact(
-              name: 'normal',
-              type: 'DsAlertVariant',
-              description:
-                  'cva key "default" (the label getter renames it -- '
-                  'default is a Dart keyword). Ink: theme.mutedForeground. '
-                  'Bloom: --color-action-bright / --color-action.',
-            ),
-            DocsApiFact(
-              name: 'destructive',
-              type: 'DsAlertVariant',
-              description:
-                  'Ink: theme.destructiveInk. Bloom: theme.destructive / '
-                  '--color-action.',
-            ),
-            DocsApiFact(
-              name: 'success',
-              type: 'DsAlertVariant',
-              description:
-                  'Ink: theme.successInk. Bloom: --color-success / '
-                  '--color-value.',
-            ),
-            DocsApiFact(
-              name: 'warning',
-              type: 'DsAlertVariant',
-              description:
-                  'Ink: theme.warningInk. Bloom: --color-warning / '
-                  '--color-action.',
-            ),
-            DocsApiFact(
-              name: 'info',
-              type: 'DsAlertVariant',
-              description:
-                  'Ink: theme.infoInk. Bloom: --color-info / '
-                  '--color-action.',
-            ),
-          ],
-        ),
-      ),
-
-      // 11. States and feedback.
+      // Ours: States and feedback.
       DsSection(
         id: 'states',
         title: 'States and feedback',
@@ -371,7 +586,8 @@ class _AlertArticle extends StatelessWidget {
               state: 'Error / Success / Warning / Info',
               treatment:
                   'A compile-time variant choice (DsAlertVariant), not a '
-                  'runtime transition -- see Variants above.',
+                  'runtime transition -- see Basic, Destructive, Success, '
+                  'Warning, and Info above.',
               userSignal:
                   'The caller re-renders with a different variant value.',
             ),
@@ -396,7 +612,7 @@ class _AlertArticle extends StatelessWidget {
         ),
       ),
 
-      // 12. Accessibility and keyboard behavior.
+      // Ours: Accessibility and keyboard behavior.
       DsSection(
         id: 'a11y',
         title: 'Accessibility and keyboard behavior',
@@ -463,7 +679,7 @@ class _AlertArticle extends StatelessWidget {
         ]),
       ),
 
-      // 13. Responsive/platform behavior.
+      // Ours: Responsive/platform behavior.
       DsSection(
         id: 'responsive',
         title: 'Responsive and platform behavior',
@@ -480,7 +696,7 @@ class _AlertArticle extends StatelessWidget {
         ]),
       ),
 
-      // 14. Dependencies, files, assets, fonts, and shaders.
+      // Ours: Dependencies, files, assets, fonts, and shaders.
       DsSection(
         id: 'dependencies',
         title: 'Dependencies, files, assets, fonts, and shaders',
@@ -524,22 +740,7 @@ class _AlertArticle extends StatelessWidget {
         ),
       ),
 
-      // 15. Composition examples.
-      DsSection(
-        id: 'composition',
-        title: 'Composition examples',
-        description:
-            'Stacking more than one alert reads as a list of conditions, '
-            'not a traffic light, because every variant shares the same '
-            'card fill -- only the icon and the bloom move.',
-        child: DsPanel(
-          label: 'DART',
-          note: 'STACKED IN A REVIEW FLOW',
-          child: const DocsSelectableCodeBlock(code: _compositionCode),
-        ),
-      ),
-
-      // 16. Theming notes.
+      // Ours: Theming notes.
       DsSection(
         id: 'theming',
         title: 'Theming notes',
@@ -560,7 +761,7 @@ class _AlertArticle extends StatelessWidget {
         ]),
       ),
 
-      // 17. Source, tests, report issue, and edit docs.
+      // Ours: Source, tests, report issue, and edit docs.
       DsSection(
         id: 'source',
         title: 'Source, tests, and reporting an issue',
@@ -594,7 +795,7 @@ class _AlertArticle extends StatelessWidget {
           ],
         ),
       ),
-      // 18. Previous/Next component navigation is DocsLayout's own chrome
+      // Previous/Next component navigation is DocsLayout's own chrome
       // (see the `previous`/`next` arguments above).
     ],
   );
@@ -651,6 +852,131 @@ class _AlertPreview extends StatelessWidget {
         description: 'The command palette is now available via Cmd+K.',
       ),
     ],
+  );
+}
+
+/// The Basic section's own specimen: [DsAlertVariant.normal], carried
+/// verbatim from [_AlertPreview]'s first entry.
+class _BasicPreview extends StatelessWidget {
+  const _BasicPreview();
+
+  @override
+  Widget build(BuildContext context) => const DsAlert(
+    icon: DsIcon(DsIconGlyph.bell),
+    title: 'Heads up',
+    description: 'You can revert this later from Settings → Preferences.',
+  );
+}
+
+/// The Destructive section's own specimen: [DsAlertVariant.destructive]
+/// with no action slot, so it reads distinctly from Action below.
+class _DestructivePreview extends StatelessWidget {
+  const _DestructivePreview();
+
+  @override
+  Widget build(BuildContext context) => const DsAlert(
+    variant: DsAlertVariant.destructive,
+    icon: DsIcon(DsIconGlyph.circleX),
+    title: 'Payment failed',
+    description: 'We could not process your card ending in 4242.',
+  );
+}
+
+/// The Action section's own specimen: carried verbatim from
+/// [_AlertPreview]'s destructive-plus-action entry.
+class _ActionPreview extends StatelessWidget {
+  const _ActionPreview();
+
+  @override
+  Widget build(BuildContext context) => DsAlert(
+    variant: DsAlertVariant.destructive,
+    icon: const DsIcon(DsIconGlyph.circleX),
+    title: 'Payment failed',
+    description: 'We could not process your card ending in 4242.',
+    action: DsButton(
+      variant: DsButtonVariant.secondary,
+      size: DsButtonSize.sm,
+      onPressed: () {},
+      child: const Text('Retry'),
+    ),
+  );
+}
+
+/// The Success section's own specimen, carried verbatim from
+/// [_AlertPreview].
+class _SuccessPreview extends StatelessWidget {
+  const _SuccessPreview();
+
+  @override
+  Widget build(BuildContext context) => const DsAlert(
+    variant: DsAlertVariant.success,
+    icon: DsIcon(DsIconGlyph.circleCheck),
+    title: 'Changes saved',
+    description: 'Your profile was updated successfully.',
+  );
+}
+
+/// The Warning section's own specimen, carried verbatim from
+/// [_AlertPreview].
+class _WarningPreview extends StatelessWidget {
+  const _WarningPreview();
+
+  @override
+  Widget build(BuildContext context) => const DsAlert(
+    variant: DsAlertVariant.warning,
+    icon: DsIcon(DsIconGlyph.alertTriangle),
+    title: 'Withdrawal under review',
+    description:
+        'Large withdrawals are held for a security review before they '
+        'clear.',
+  );
+}
+
+/// The Info section's own specimen, carried verbatim from [_AlertPreview].
+class _InfoPreview extends StatelessWidget {
+  const _InfoPreview();
+
+  @override
+  Widget build(BuildContext context) => const DsAlert(
+    variant: DsAlertVariant.info,
+    icon: DsIcon(DsIconGlyph.info),
+    title: 'New feature available',
+    description: 'The command palette is now available via Cmd+K.',
+  );
+}
+
+/// The RTL section's own specimen: the same two alerts [_AlertPreview]
+/// already carries, wrapped in a right-to-left [Directionality] so the row
+/// flip is real and live, not merely described.
+class _RtlPreview extends StatelessWidget {
+  const _RtlPreview();
+
+  @override
+  Widget build(BuildContext context) => Directionality(
+    textDirection: TextDirection.rtl,
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        const DsAlert(
+          icon: DsIcon(DsIconGlyph.bell),
+          title: 'تنبيه',
+          description: 'يمكنك التراجع عن هذا لاحقًا من الإعدادات.',
+        ),
+        SizedBox(height: ds(4)),
+        DsAlert(
+          variant: DsAlertVariant.destructive,
+          icon: const DsIcon(DsIconGlyph.circleX),
+          title: 'فشل الدفع',
+          description: 'تعذر معالجة بطاقتك المنتهية بـ 4242.',
+          action: DsButton(
+            variant: DsButtonVariant.secondary,
+            size: DsButtonSize.sm,
+            onPressed: () {},
+            child: const Text('إعادة المحاولة'),
+          ),
+        ),
+      ],
+    ),
   );
 }
 
@@ -758,7 +1084,62 @@ const String _actionUsageCode = '''DsAlert(
   ),
 )''';
 
-const String _compositionCode = '''Column(
+const String _compositionAnatomyCode = '''DsAlert(
+  icon: ...,          // optional leading glyph, size-4, recolored by variant
+  title: '...',       // required -- the only field with no default
+  description: '...', // optional, the row omits itself entirely when null
+  action: ...,        // optional trailing slot, pinned top-right
+  variant: DsAlertVariant.normal, // selects icon ink + the two bloom stops only
+)''';
+
+const String _basicCode = '''DsAlert(
+  icon: const DsIcon(DsIconGlyph.bell),
+  title: 'Heads up',
+  description: 'You can revert this later from Settings → Preferences.',
+)''';
+
+const String _destructiveCode = '''DsAlert(
+  variant: DsAlertVariant.destructive,
+  icon: const DsIcon(DsIconGlyph.circleX),
+  title: 'Payment failed',
+  description: 'We could not process your card ending in 4242.',
+)''';
+
+const String _actionCode = '''DsAlert(
+  variant: DsAlertVariant.destructive,
+  icon: const DsIcon(DsIconGlyph.circleX),
+  title: 'Payment failed',
+  description: 'We could not process your card ending in 4242.',
+  action: DsButton(
+    variant: DsButtonVariant.secondary,
+    size: DsButtonSize.sm,
+    onPressed: () {},
+    child: const Text('Retry'),
+  ),
+)''';
+
+const String _successCode = '''DsAlert(
+  variant: DsAlertVariant.success,
+  icon: const DsIcon(DsIconGlyph.circleCheck),
+  title: 'Changes saved',
+  description: 'Your profile was updated successfully.',
+)''';
+
+const String _warningCode = '''DsAlert(
+  variant: DsAlertVariant.warning,
+  icon: const DsIcon(DsIconGlyph.alertTriangle),
+  title: 'Withdrawal under review',
+  description: 'Large withdrawals are held for a security review before they clear.',
+)''';
+
+const String _infoCode = '''DsAlert(
+  variant: DsAlertVariant.info,
+  icon: const DsIcon(DsIconGlyph.info),
+  title: 'New feature available',
+  description: 'The command palette is now available via Cmd+K.',
+)''';
+
+const String _stackedCode = '''Column(
   crossAxisAlignment: CrossAxisAlignment.stretch,
   children: <Widget>[
     DsAlert(
@@ -775,4 +1156,13 @@ const String _compositionCode = '''Column(
       description: 'The command palette is now available via Cmd+K.',
     ),
   ],
+)''';
+
+const String _rtlCode = '''Directionality(
+  textDirection: TextDirection.rtl,
+  child: DsAlert(
+    icon: const DsIcon(DsIconGlyph.bell),
+    title: 'تنبيه',
+    description: 'يمكنك التراجع عن هذا لاحقًا من الإعدادات.',
+  ),
 )''';

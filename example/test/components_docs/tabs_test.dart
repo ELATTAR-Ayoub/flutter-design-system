@@ -1,4 +1,4 @@
-/// Tests for `components_docs/tabs/page.dart`'s [TabsDocPage] — the tabs
+/// Tests for `components_docs/tabs/page.dart`'s [TabsDocPage]: the tabs
 /// component documentation page.
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
@@ -12,11 +12,41 @@ import 'package:example/components_docs/tabs/meta.dart';
 import 'package:example/components_docs/tabs/page.dart';
 import 'package:example/docs/docs_code.dart';
 import 'package:example/docs/docs_facts.dart';
+import 'package:example/docs/docs_layout.dart';
+import 'package:example/kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 const Size _wide = Size(1440, 900);
 const Size _narrow = Size(390, 844);
+
+/// The shadcn-parity section order (worker-brief.md): the shadcn tabs page's
+/// own sections, mirrored, skipped or added-to per the Step 3 mapping, then
+/// this package's six fixed extra sections in their required order.
+///
+/// No 'preview' entry: the live demo renders ahead of every heading, the
+/// same as `https://ui.shadcn.com/docs/components/base/tabs` itself, so it
+/// carries no DsSection and no TOC anchor of its own. 'Vertical', 'Disabled'
+/// and 'Icons' have no counterpart: DsTabs has an orientation axis that is
+/// recorded but never wired, no enabled/disabled parameter, and no icon
+/// slot on DsTabItem. 'Composition', 'Line' and 'RTL' mirror the reference.
+/// 'Empty tab' is ours only, covering the real DsTabItem.content: null
+/// state.
+const List<String> _expectedSectionIds = <String>[
+  'install',
+  'usage',
+  'composition',
+  'line',
+  'empty-tab',
+  'rtl',
+  'api',
+  'states',
+  'accessibility',
+  'responsive',
+  'dependencies',
+  'theming',
+  'source',
+];
 
 /// Every public constructor parameter of `DsTabs`, enumerated by reading
 /// `lib/src/components/tabs.dart` directly (Step 1 of the task cycle). The
@@ -108,6 +138,44 @@ void main() {
   );
 
   testWidgets(
+    'renders the shadcn-parity section list, in order, and the sidebar TOC '
+    'matches it heading for heading',
+    (WidgetTester tester) async {
+      await _pump(tester);
+
+      final List<String> renderedIds = tester
+          .widgetList<DsSection>(find.byType(DsSection))
+          .map((DsSection section) => section.id)
+          .toList();
+      expect(renderedIds, _expectedSectionIds);
+
+      final DocsLayout layout = tester.widget<DocsLayout>(
+        find.byType(DocsLayout),
+      );
+      final List<String> tocAnchors = layout.toc
+          .map((DocsTocEntry entry) => entry.anchor)
+          .toList();
+      expect(tocAnchors, _expectedSectionIds);
+
+      final Map<String, String> titleById = <String, String>{
+        for (final DsSection section in tester.widgetList<DsSection>(
+          find.byType(DsSection),
+        ))
+          section.id: section.title,
+      };
+      for (final DocsTocEntry entry in layout.toc) {
+        expect(
+          titleById[entry.anchor],
+          entry.title,
+          reason:
+              'TOC entry for "${entry.anchor}" must read the same title as '
+              'the DsSection it points to',
+        );
+      }
+    },
+  );
+
+  testWidgets(
     'the API table covers every DsTabs and DsTabItem constructor parameter '
     'and every DsTabsVariant/static member',
     (WidgetTester tester) async {
@@ -164,8 +232,8 @@ void main() {
         findsOneWidget,
       );
 
-      // A DsTabItem with content: null — a real state the source itself
-      // documents (see tabs.dart's DsTabItem.content doc comment) — renders
+      // A DsTabItem with content: null, a real state the source itself
+      // documents (see tabs.dart's DsTabItem.content doc comment), renders
       // no panel at all when selected, and toggling to it must not throw.
       await tester.tap(find.text('More'), warnIfMissed: false);
       await tester.pump();
@@ -178,7 +246,7 @@ void main() {
   );
 
   testWidgets(
-    'DsTabs and its trigger wire no Focus widget of their own — there is no '
+    'DsTabs and its trigger wire no Focus widget of their own: there is no '
     'keyboard tab stop and no arrow-key traversal',
     (WidgetTester tester) async {
       await _pump(tester);
@@ -235,13 +303,56 @@ void main() {
 
     // DsTabs' track is an un-clipped, unscrolled Row (DsSlidingPillGroup):
     // it neither scrolls nor wraps when its triggers do not fit, so a
-    // RenderFlex overflow is the real, current behaviour — recorded here
+    // RenderFlex overflow is the real, current behaviour, recorded here
     // rather than asserted away, so the docs page's Responsive section
     // stays honest if that ever changes.
     final dynamic exception = tester.takeException();
     expect(exception, isNotNull);
     expect(exception.toString(), contains('overflowed'));
   });
+
+  testWidgets(
+    'the RTL specimen mirrors trigger order under a right-to-left '
+    'Directionality and switching tabs still works',
+    (WidgetTester tester) async {
+      await _pump(tester);
+
+      const Key key = ValueKey<String>('tabs-rtl-specimen');
+      final Finder specimen = find.byKey(key);
+      expect(specimen, findsOneWidget);
+      await tester.ensureVisible(specimen);
+
+      // Directionality.rtl is real here (not a synthetic MediaQuery), so
+      // Flutter's own Row lays the first item (الحساب) out at the leading
+      // edge for RTL, which is the *right*: the opposite of what the same
+      // list order would render under LTR. This is the RTL section's own
+      // mirroring claim, checked directly rather than assumed.
+      final Offset firstTop = tester.getTopLeft(find.text('الحساب'));
+      final Offset secondTop = tester.getTopLeft(find.text('الفريق'));
+      expect(
+        firstTop.dx,
+        greaterThan(secondTop.dx),
+        reason:
+            'under RTL the first DsTabItem should paint to the right of '
+            'the second, the same mirroring Flutter\'s own Row gives every '
+            'other RTL layout: if this fails, the RTL section\'s claim '
+            'that DsTabs needs no direction-specific code is wrong',
+      );
+
+      expect(tester.widget<DsTabs>(specimen).selectedIndex, 0);
+      expect(find.text('تحديث بيانات حسابك هنا.'), findsOneWidget);
+
+      await tester.tap(find.text('الفريق'), warnIfMissed: false);
+      await tester.pump();
+
+      expect(tester.widget<DsTabs>(specimen).selectedIndex, 1);
+      expect(
+        find.text('من يملك صلاحية الوصول إلى مساحة العمل هذه.'),
+        findsOneWidget,
+      );
+      expect(tester.takeException(), isNull);
+    },
+  );
 
   testWidgets(
     'both themes render the article with no exceptions when flipped in '
@@ -265,9 +376,9 @@ void main() {
   ) async {
     await _pump(tester);
 
-    // The honest disclosure is intentionally repeated (Status and
-    // Installation each state it in their own words), so this asserts
-    // presence, not a specific count.
+    // Stated once, in Installation's own CLI fact: this asserts presence,
+    // not a specific count, so a future rewording does not make the test
+    // brittle.
     expect(find.textContaining('not yet a registry item'), findsWidgets);
   });
 

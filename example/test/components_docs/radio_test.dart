@@ -1,4 +1,4 @@
-/// Tests for `components_docs/radio/page.dart`'s [RadioDocPage] — the radio
+/// Tests for `components_docs/radio/page.dart`'s [RadioDocPage]: the radio
 /// group component documentation page.
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
@@ -12,6 +12,7 @@ import 'package:example/components_docs/radio/meta.dart';
 import 'package:example/components_docs/radio/page.dart';
 import 'package:example/docs/docs_code.dart';
 import 'package:example/docs/docs_facts.dart';
+import 'package:example/kit.dart' show DsSection;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -45,7 +46,7 @@ const List<String> _radioGroupItemParams = <String>[
 
 /// The rest of the public surface: the static helpers on `DsRadioGroup` and
 /// `DsRadioGroupItem`. Neither type exposes an enum the way `DsCheckboxState`
-/// does — a radio item's checked-ness is derived by comparing the group's
+/// does: a radio item's checked-ness is derived by comparing the group's
 /// `value` against the item's own, not read off a state field.
 const List<String> _radioStatics = <String>[
   'DsRadioGroup.defaultGap',
@@ -83,6 +84,36 @@ Future<DsThemeController> _pump(
 }
 
 void main() {
+  testWidgets(
+    'sections render in the shadcn-mirrored order, section for section',
+    (WidgetTester tester) async {
+      await _pump(tester);
+
+      final List<String> titles = tester
+          .widgetList<DsSection>(find.byType(DsSection))
+          .map((DsSection section) => section.title)
+          .toList();
+
+      expect(titles, <String>[
+        'Installation',
+        'Usage',
+        'Composition',
+        'Description',
+        'Choice Card',
+        'Fieldset',
+        'Disabled',
+        'Invalid',
+        'API Reference',
+        'States and feedback',
+        'Accessibility',
+        'Responsive and platform behavior',
+        'Dependencies, files, assets, fonts and shaders',
+        'Theming notes',
+        'Source and tests',
+      ]);
+    },
+  );
+
   testWidgets(
     'renders the article at wide and narrow widths with no exceptions',
     (WidgetTester tester) async {
@@ -176,7 +207,7 @@ void main() {
       expect(tester.widget<DsRadioGroup<String>>(group).value, 'weekly');
 
       // …and selecting a third option moves it again, off "weekly" this time
-      // — proof that at most one item is ever "the" value, since the group
+      // proof that at most one item is ever "the" value, since the group
       // holds exactly one T? and nothing else.
       await tester.tap(items.at(2), warnIfMissed: false);
       await tester.pump();

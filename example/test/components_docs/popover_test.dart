@@ -1,20 +1,20 @@
 /// Tests for `components_docs/popover/meta.dart` and
-/// `components_docs/popover/page.dart` — the public Popover component
+/// `components_docs/popover/page.dart`: the public Popover component
 /// documentation page.
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
-/// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery` — the
+/// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`: the
 /// discipline `tooltip_test.dart` already carries. Theme coverage uses a live
 /// `DsThemeController` flipped in place rather than two independent pumps.
 ///
 /// `DsPopover` mounts its content through an `OverlayPortal`, so the live
-/// specimen needs a real `Overlay` — the harness wraps the page in a
+/// specimen needs a real `Overlay`: the harness wraps the page in a
 /// `MaterialApp`, the same fix a sibling worker needed for `DsSelect` and
 /// this page's own neighbour, `DsTooltip`. A bare `Directionality`/`Material`
 /// host would let the page render but the popover would never actually open.
 ///
 /// `DsPopover`'s open/close transition is a single forward-then-reverse run
-/// with a fixed `DsDurations.overlay` duration — not a loop — so
+/// with a fixed `DsDurations.overlay` duration: not a loop, so
 /// `pumpAndSettle` is safe where used below; the open/close assertions still
 /// use explicit `pump(duration)` steps to keep the exact frame under test.
 library;
@@ -22,11 +22,37 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/popover/meta.dart';
 import 'package:example/components_docs/popover/page.dart';
+import 'package:example/kit.dart' show DsSection;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 const Size _wide = Size(1440, 900);
 const Size _narrow = Size(390, 844);
+
+/// The page was reshaped to mirror
+/// https://ui.shadcn.com/docs/components/base/popover section for section:
+/// an unheaded live demo above the first heading, then Installation, Usage,
+/// Composition, then Align (the reference's own live Start/Center/End
+/// example, ported as a data table since every variant section on this
+/// docs site already uses that format), then our Variants addition for the
+/// side/origin/barrier enums the reference does not surface, then API
+/// Reference, then States / Accessibility / Responsive / Dependencies /
+/// Theming / Source. The ordering test below asserts that literal
+/// sequence.
+const List<String> _sectionOrder = <String>[
+  'install',
+  'usage',
+  'composition',
+  'align',
+  'variants',
+  'api',
+  'states',
+  'accessibility',
+  'responsive',
+  'dependencies',
+  'theming',
+  'source',
+];
 
 Future<DsThemeController> _pumpPopoverDoc(
   WidgetTester tester, {
@@ -82,7 +108,7 @@ void main() {
         ]),
       );
       // Matches registry/components/popover.json's registryDependencies
-      // verbatim — popover already has a real manifest, so a worker that
+      // verbatim: popover already has a real manifest, so a worker that
       // invented a dependency name here would be the exact failure mode the
       // Phase J supervisor notes warn about.
       expect(popoverDoc.dependencies, <String>['source-foundation']);
@@ -101,6 +127,29 @@ void main() {
   });
 
   group('rendered page', () {
+    testWidgets('renders every shadcn-parity section, in order', (
+      WidgetTester tester,
+    ) async {
+      await _pumpPopoverDoc(tester);
+
+      // Every section anchor exists, and each one sits below the section
+      // before it -- the "in order" half of the shadcn-parity contract.
+      double previousTop = -1;
+      for (final String anchor in _sectionOrder) {
+        final Finder section = find.byKey(DsSection.anchorKey(anchor));
+        expect(section, findsOneWidget, reason: 'section "$anchor" missing');
+        final double top = tester.getTopLeft(section).dy;
+        expect(
+          top,
+          greaterThan(previousTop),
+          reason:
+              'section "$anchor" should render after the previous section',
+        );
+        previousTop = top;
+      }
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('renders the article and the live specimen trigger', (
       WidgetTester tester,
     ) async {
@@ -217,7 +266,7 @@ void main() {
     );
   });
 
-  group('live specimen — open and dismiss', () {
+  group('live specimen: open and dismiss', () {
     testWidgets('tapping the trigger opens the popover content', (
       WidgetTester tester,
     ) async {
@@ -266,7 +315,7 @@ void main() {
         findsOneWidget,
       );
 
-      // Far from both the trigger and the open popup — lands on the modal
+      // Far from both the trigger and the open popup: lands on the modal
       // barrier `DsPopover` lays under its content by default.
       await tester.tapAt(const Offset(4, 4));
       await tester.pump();

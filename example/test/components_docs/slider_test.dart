@@ -1,4 +1,4 @@
-/// Tests for `components_docs/slider/page.dart`'s [SliderDocPage] — the
+/// Tests for `components_docs/slider/page.dart`'s [SliderDocPage]: the
 /// slider component documentation page.
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
@@ -7,7 +7,7 @@
 /// coverage rather than re-pumped under a new controller.
 ///
 /// Keyboard behaviour is driven directly against the real `Focus` nodes
-/// `DsSlider` builds per thumb — the same technique `test/slider_test.dart`
+/// `DsSlider` builds per thumb: the same technique `test/slider_test.dart`
 /// (the package's own suite) uses, since there is no `WidgetsApp` traversal
 /// to Tab through and the control answers `Focus.onKeyEvent` itself.
 library;
@@ -17,12 +17,40 @@ import 'package:example/components_docs/slider/meta.dart';
 import 'package:example/components_docs/slider/page.dart';
 import 'package:example/docs/docs_code.dart';
 import 'package:example/docs/docs_facts.dart';
+import 'package:example/kit.dart' show DsSection;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 const Size _wide = Size(1440, 900);
 const Size _narrow = Size(390, 844);
+
+/// The full shadcn-parity section list, in the order the reshaped page must
+/// render them: mirrors https://ui.shadcn.com/docs/components/base/slider
+/// (Installation, Usage, Range, Multiple Thumbs, Controlled, Disabled, API
+/// Reference), with Vertical and RTL skipped (DsSlider exposes no
+/// orientation parameter and no directionality-aware layout), Overview,
+/// Status and Preview ahead of it per this docs system's own convention, our
+/// Composition examples folded in beside the mirrored examples, and our six
+/// required extra sections (States, Accessibility, Responsive, Dependencies,
+/// Theming, Source) directly after API Reference.
+const List<String> _sectionOrder = <String>[
+  'install',
+  'usage',
+  'variants',
+  'range',
+  'multiple-thumbs',
+  'controlled',
+  'disabled',
+  'composition',
+  'api',
+  'states',
+  'accessibility',
+  'responsive',
+  'dependencies',
+  'theming',
+  'source',
+];
 
 /// Every public constructor parameter of `DsSlider`, enumerated by reading
 /// `lib/src/components/slider.dart` directly (Step 1 of the task cycle). The
@@ -38,7 +66,7 @@ const List<String> _sliderParams = <String>[
 ];
 
 /// The rest of the public surface: the two static geometry getters. `DsSlider`
-/// exports no enum of its own — a range is just two entries in `values`, not a
+/// exports no enum of its own: a range is just two entries in `values`, not a
 /// second type.
 const List<String> _sliderStatics = <String>[
   'DsSlider.trackHeight',
@@ -75,7 +103,7 @@ Future<DsThemeController> _pump(
   return theme;
 }
 
-/// The `Focus` nodes `DsSlider` builds — one per thumb, in order. Found by key
+/// The `Focus` nodes `DsSlider` builds: one per thumb, in order. Found by key
 /// on the `DsSlider` itself so a page with several live specimens does not
 /// mix nodes from one slider into another.
 List<FocusNode> _thumbNodes(WidgetTester tester, Key sliderKey) => tester
@@ -116,6 +144,27 @@ void main() {
         find.byKey(const ValueKey<String>('docs-layout-sidebar')),
         findsNothing,
       );
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'slider docs page renders every shadcn-parity section, in order',
+    (WidgetTester tester) async {
+      await _pump(tester);
+
+      double previousTop = -1;
+      for (final String anchor in _sectionOrder) {
+        final Finder section = find.byKey(DsSection.anchorKey(anchor));
+        expect(section, findsOneWidget, reason: 'section "$anchor" missing');
+        final double top = tester.getTopLeft(section).dy;
+        expect(
+          top,
+          greaterThan(previousTop),
+          reason: 'section "$anchor" should render after the previous section',
+        );
+        previousTop = top;
+      }
       expect(tester.takeException(), isNull);
     },
   );

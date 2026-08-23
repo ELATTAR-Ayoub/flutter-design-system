@@ -1,9 +1,18 @@
 /// Public component documentation for the textarea component.
 ///
 /// `textareaDoc` (from `meta.dart`) is the data source, not
-/// `componentDoc('textarea')` — textarea is not yet registered in
+/// `componentDoc('textarea')`: textarea is not yet registered in
 /// `catalog.dart`'s `componentDocs` list, so calling that would throw. Adding
 /// it there is a supervisor-owned aggregation step (Phase J plan).
+///
+/// Section shape mirrors https://ui.shadcn.com/docs/components/base/textarea:
+/// Preview, Installation, Usage, then that page's own literal sections
+/// (Field, Disabled, Invalid, Button, RTL) in their order, one section this
+/// page has that theirs does not (Textarea vs. input), an API Reference this
+/// page adds because DsTextarea has documentable props even though the
+/// counterpart page carries none, and finally the six sections shadcn does
+/// not have at all (States, Accessibility, Responsive, Dependencies,
+/// Theming, Source).
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
@@ -34,24 +43,25 @@ class TextareaDocPage extends StatelessWidget {
         DsBreadcrumbEntry.page('Textarea'),
       ],
       toc: const <DocsTocEntry>[
-        DocsTocEntry(title: 'Overview', anchor: 'overview'),
-        DocsTocEntry(title: 'Status', anchor: 'status'),
-        DocsTocEntry(title: 'Preview', anchor: 'preview'),
         DocsTocEntry(title: 'Installation', anchor: 'install'),
         DocsTocEntry(title: 'Usage', anchor: 'usage'),
-        DocsTocEntry(title: 'API', anchor: 'api'),
-        DocsTocEntry(title: 'Variants and sizes', anchor: 'variants'),
+        DocsTocEntry(title: 'Textarea vs. input', anchor: 'textarea-vs-input'),
+        DocsTocEntry(title: 'Field', anchor: 'field'),
+        DocsTocEntry(title: 'Disabled', anchor: 'disabled'),
+        DocsTocEntry(title: 'Invalid', anchor: 'invalid'),
+        DocsTocEntry(title: 'Button', anchor: 'button'),
+        DocsTocEntry(title: 'RTL', anchor: 'rtl'),
+        DocsTocEntry(title: 'API Reference', anchor: 'api'),
         DocsTocEntry(title: 'States', anchor: 'states'),
         DocsTocEntry(title: 'Accessibility', anchor: 'accessibility'),
-        DocsTocEntry(title: 'Responsive behavior', anchor: 'responsive'),
-        DocsTocEntry(title: 'Dependencies and files', anchor: 'dependencies'),
-        DocsTocEntry(title: 'Composition', anchor: 'composition'),
+        DocsTocEntry(title: 'Responsive', anchor: 'responsive'),
+        DocsTocEntry(title: 'Dependencies', anchor: 'dependencies'),
         DocsTocEntry(title: 'Theming', anchor: 'theming'),
         DocsTocEntry(title: 'Source', anchor: 'source'),
       ],
       // Wave 2's alphabetical order (Phase J plan inventory): `button_group
       // combobox field form input_group input_otp native_select radio
-      // selection_control slider textarea` — textarea is last, so there is
+      // selection_control slider textarea`: textarea is last, so there is
       // no "next" within the wave. Neither route is registered yet either —
       // the whole chain is stitched together once the supervisor aggregates
       // every meta.dart, the same as this page's own route is not reachable
@@ -77,106 +87,19 @@ class _TextareaArticle extends StatelessWidget {
       key: const ValueKey<String>('textarea-doc-article'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        DsSection(
-          id: 'overview',
-          title: 'When to use a textarea instead of an input',
-          description:
-              'What holding more than one line actually changes, and when '
-              'a neighbouring control answers the same need better.',
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              DsText(
-                'DsTextarea is for a value a user may reasonably want to '
-                'spread across more than one line — a comment, a bio, a '
-                'shipping note, free-form feedback — and it genuinely grows '
-                'with what is typed: there is an 80px floor '
-                '(DsTextarea.minHeight) and no ceiling, so the box gets '
-                'taller as the value gets longer instead of scrolling or '
-                'clipping. Reach for DsInput instead when the value is '
-                'naturally one line — an email address, a name, a search '
-                'query — even a long one, because DsInput never grows '
-                'past its fixed 40px height no matter what is typed into '
-                'it; giving it more vertical space would only pad empty '
-                'space around a single line, not make it a text area. That '
-                'is the real difference between the two controls: it is '
-                'not "the same field, taller," it is a different sizing '
-                'model entirely — field-sizing: content behaviour with a '
-                'floor and no cap, against a fixed single-line height.',
-                DsType.body,
-              ),
-              SizedBox(height: ds(4)),
-              DsText(
-                'Everything DsTextarea shares with DsInput it shares '
-                'exactly — the same border, fill, focus ring and invalid '
-                'ring, the same 250ms transition, the same selection wash. '
-                'Four things differ, and all four are consequences of '
-                'holding more than one line rather than independent '
-                'styling choices: the radius drops from the family\'s '
-                'usual 999px pill to DsRadii.lg (12px) — a pill\'s radius '
-                'is half its height, and half of an 80px field is a 40px '
-                'sweep that would swallow the first and last lines of '
-                'text, so this is the one control in the family on the '
-                'radius ladder rather than the pill curve; the height '
-                'floor is 80px with no cap instead of a fixed 40px; the '
-                'padding is 14px / 10px instead of 16px / 4px; and the '
-                'line height is 1.625 (a 21.125px line box) rather than '
-                'inheriting the ambient default, because a multi-line '
-                'field needs breathing room between lines that a one-line '
-                'field never has to think about. One more difference is '
-                'behavioural, not visual: disabling a textarea drops it to '
-                '45% opacity but never blocks the pointer, while a '
-                'disabled input additionally refuses hit-testing — see '
-                'States below for what that means for a reader.',
-                DsType.small,
-                color: theme.mutedForeground,
-              ),
-            ],
-          ),
-        ),
-        SizedBox(height: ds(6)),
-        DsSection(
-          id: 'status',
-          title: 'Status',
-          child: DocsInstallFacts(
-            title: 'Status',
-            facts: <DocsInstallFact>[
-              const DocsInstallFact(
-                label: 'Status',
-                value: 'Stable, not yet a registry item',
-                description:
-                    'Ported and tested against lib/src/components/textarea.dart. '
-                    'It is not yet a registry item, so elattar add textarea '
-                    'will not resolve — see Installation below.',
-              ),
-              DocsInstallFact(
-                label: 'Version',
-                value: '0.0.1',
-                description:
-                    'Tracks the package version; there is no registry schema '
-                    'version yet because there is no manifest.',
-              ),
-              const DocsInstallFact(
-                label: 'Platforms',
-                value: 'Android, iOS, Web, macOS, Windows, Linux',
-                description:
-                    'A pure Flutter widget tree over EditableText — no '
-                    'platform channel and no platform-specific branch.',
-              ),
-            ],
-          ),
-        ),
-        SizedBox(height: ds(6)),
-        DsSection(
-          id: 'preview',
-          title: 'Preview',
-          description:
-              'Six live specimens, all built from the same DsTextarea '
+        ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: DsWidths.prose),
+        child: DsText(
+          'Six live specimens, all built from the same DsTextarea '
               'constructor. Rest and Focused are real EditableText '
-              'instances — type into Rest to try it. Read-only, Disabled '
+              'instances: type into Rest to try it. Read-only, Disabled '
               'and Auto-grow are seeded with initialValue so their '
               'behaviour is visible without typing.',
-          child: DocsCodeExample(
+          DsType.body,
+        ),
+      ),
+      SizedBox(height: ds(6)),
+      DocsCodeExample(
             title: 'Textarea specimens',
             description: 'Every cell below renders a real DsTextarea.',
             preview: const _TextareaPreview(),
@@ -190,41 +113,73 @@ class _TextareaArticle extends StatelessWidget {
               ),
             ],
           ),
-        ),
         SizedBox(height: ds(6)),
         DsSection(
           id: 'install',
           title: 'Installation',
           description:
-              'Command install is not available yet — read this before '
+              'Command install is not available yet: read this before '
               'reaching for elattar add textarea.',
-          child: DocsInstallFacts(
-            facts: <DocsInstallFact>[
-              const DocsInstallFact(
-                label: 'CLI',
-                value: 'Not available',
-                description:
-                    'textarea is not yet a registry item, so `elattar add '
-                    'textarea` will not resolve. It is one of the Wave 2 '
-                    'form and input components still awaiting a manifest — '
-                    'see the Phase J documentation plan.',
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              DocsInstallFacts(
+                facts: <DocsInstallFact>[
+                  const DocsInstallFact(
+                    label: 'CLI',
+                    value: 'Not available',
+                    description:
+                        'textarea is not yet a registry item, so `elattar add '
+                        'textarea` will not resolve. It is one of the Wave 2 '
+                        'form and input components still awaiting a manifest, '
+                        'see the Phase J documentation plan.',
+                  ),
+                  const DocsInstallFact(
+                    label: 'Manual: package mode (supported today)',
+                    value:
+                        "import 'package:elattar_design_system/elattar_design_system.dart';",
+                    description:
+                        'Depend on the package and use DsTextarea directly, '
+                        'exactly as this page does.',
+                  ),
+                  DocsInstallFact(
+                    label: 'Manual: source mode (not recommended yet)',
+                    value: textareaDoc.sourcePath,
+                    description:
+                        'Copying this one file will not compile on its own: it '
+                        'needs field.dart and input.dart with it (see '
+                        'Dependencies and files below), and no manifest exists '
+                        'yet to resolve them for you.',
+                  ),
+                ],
               ),
-              const DocsInstallFact(
-                label: 'Manual — package mode (supported today)',
-                value:
-                    "import 'package:elattar_design_system/elattar_design_system.dart';",
-                description:
-                    'Depend on the package and use DsTextarea directly, '
-                    'exactly as this page does.',
-              ),
-              DocsInstallFact(
-                label: 'Manual — source mode (not recommended yet)',
-                value: textareaDoc.sourcePath,
-                description:
-                    'Copying this one file will not compile on its own — it '
-                    'needs field.dart and input.dart with it (see '
-                    'Dependencies and files below), and no manifest exists '
-                    'yet to resolve them for you.',
+              SizedBox(height: ds(5)),
+              DocsInstallFacts(
+                title: 'Status',
+                facts: <DocsInstallFact>[
+                  const DocsInstallFact(
+                    label: 'Status',
+                    value: 'Stable, not yet a registry item',
+                    description:
+                        'Ported and tested against lib/src/components/textarea.dart. '
+                        'It is not yet a registry item, so elattar add textarea '
+                        'will not resolve.',
+                  ),
+                  DocsInstallFact(
+                    label: 'Version',
+                    value: '0.0.1',
+                    description:
+                        'Tracks the package version; there is no registry schema '
+                        'version yet because there is no manifest.',
+                  ),
+                  const DocsInstallFact(
+                    label: 'Platforms',
+                    value: 'Android, iOS, Web, macOS, Windows, Linux',
+                    description:
+                        'A pure Flutter widget tree over EditableText: no '
+                        'platform channel and no platform-specific branch.',
+                  ),
+                ],
               ),
             ],
           ),
@@ -233,7 +188,9 @@ class _TextareaArticle extends StatelessWidget {
         DsSection(
           id: 'usage',
           title: 'Usage',
-          description: 'The smallest correct example, then a labelled field.',
+          description:
+              'The smallest correct example, then how to control it from '
+              'outside.',
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
@@ -244,10 +201,97 @@ class _TextareaArticle extends StatelessWidget {
               ),
               SizedBox(height: ds(5)),
               DsText(
-                'DsTextarea renders no visible caption of its own — label '
-                'only supplies the accessible name. Pair it with DsField '
-                'for a visible label, description and error wiring, and '
-                'its DsFieldScope threads the label straight through:',
+                'That form is uncontrolled: DsTextarea builds and owns its '
+                'own TextEditingController. Reach for controller instead '
+                'when the value needs to be read or written from outside '
+                'the widget, autosave, a live character count, syncing two '
+                'fields, and DsTextarea will use it in place of building '
+                'its own:',
+                DsType.small,
+                color: theme.mutedForeground,
+              ),
+              SizedBox(height: ds(3)),
+              DsPanel(
+                label: 'DART',
+                note: 'CONTROLLED VALUE',
+                child: DocsSelectableCodeBlock(code: _controlledDraftCode),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(height: ds(6)),
+        DsSection(
+          id: 'textarea-vs-input',
+          title: 'Textarea vs. input',
+          description:
+              'What holding more than one line actually changes, and when '
+              'a neighbouring control answers the same need better.',
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              DsText(
+                'DsTextarea is for a value a user may reasonably want to '
+                'spread across more than one line: a comment, a bio, a '
+                'shipping note, free-form feedback: and it genuinely grows '
+                'with what is typed: there is an 80px floor '
+                '(DsTextarea.minHeight) and no ceiling, so the box gets '
+                'taller as the value gets longer instead of scrolling or '
+                'clipping. Reach for DsInput instead when the value is '
+                'naturally one line: an email address, a name, a search '
+                'query: even a long one, because DsInput never grows '
+                'past its fixed 40px height no matter what is typed into '
+                'it; giving it more vertical space would only pad empty '
+                'space around a single line, not make it a text area. That '
+                'is the real difference between the two controls: it is '
+                'not "the same field, taller," it is a different sizing '
+                'model entirely: field-sizing: content behaviour with a '
+                'floor and no cap, against a fixed single-line height.',
+                DsType.body,
+              ),
+              SizedBox(height: ds(4)),
+              DsText(
+                'Everything DsTextarea shares with DsInput it shares '
+                'exactly: the same border, fill, focus ring and invalid '
+                'ring, the same 250ms transition, the same selection wash. '
+                'Four things differ, and all four are consequences of '
+                'holding more than one line rather than independent '
+                'styling choices: the radius drops from the family\'s '
+                'usual 999px pill to DsRadii.lg (12px): a pill\'s radius '
+                'is half its height, and half of an 80px field is a 40px '
+                'sweep that would swallow the first and last lines of '
+                'text, so this is the one control in the family on the '
+                'radius ladder rather than the pill curve; the height '
+                'floor is 80px with no cap instead of a fixed 40px; the '
+                'padding is 14px / 10px instead of 16px / 4px; and the '
+                'line height is 1.625 (a 21.125px line box) rather than '
+                'inheriting the ambient default, because a multi-line '
+                'field needs breathing room between lines that a one-line '
+                'field never has to think about. One more difference is '
+                'behavioural, not visual: disabling a textarea drops it to '
+                '45% opacity but never blocks the pointer, while a '
+                'disabled input additionally refuses hit-testing: see '
+                'Disabled below for what that means for a reader.',
+                DsType.small,
+                color: theme.mutedForeground,
+              ),
+            ],
+          ),
+        ),
+        SizedBox(height: ds(6)),
+        DsSection(
+          id: 'field',
+          title: 'Field',
+          description:
+              'DsTextarea renders no visible caption of its own: pair it '
+              'with DsField for a visible label, description and error '
+              'wiring.',
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              DsText(
+                'label only supplies the accessible name. DsField\'s '
+                'DsFieldScope threads that label straight through, so the '
+                'field only needs to name itself once:',
                 DsType.small,
                 color: theme.mutedForeground,
               ),
@@ -264,8 +308,141 @@ class _TextareaArticle extends StatelessWidget {
         ),
         SizedBox(height: ds(6)),
         DsSection(
+          id: 'disabled',
+          title: 'Disabled',
+          description:
+              'enabled: false, and the one way it deliberately does not '
+              'match DsInput.',
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              DsText(
+                'enabled: false drops the field to 45% opacity and forces '
+                'readOnly, but unlike DsInput the class list adds no '
+                'pointer-events-none of its own: the cursor becomes '
+                '"forbidden" and a tap still lands on the GestureDetector '
+                'underneath. It is dimmed and non-editable, not removed '
+                'from hit-testing.',
+                DsType.small,
+                color: theme.mutedForeground,
+              ),
+              SizedBox(height: ds(4)),
+              const DsStateCell(
+                label: 'Disabled',
+                note: 'Dims, but the pointer still lands',
+                child: DsTextarea(
+                  initialValue: 'Cannot be edited right now.',
+                  enabled: false,
+                  label: 'Disabled',
+                ),
+              ),
+              SizedBox(height: ds(4)),
+              DsPanel(
+                label: 'DART',
+                note: 'DISABLED',
+                child: DocsSelectableCodeBlock(code: _disabledUsageCode),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(height: ds(6)),
+        DsSection(
+          id: 'invalid',
+          title: 'Invalid',
+          description:
+              'invalid, ORed with the enclosing DsFieldScope, paired with '
+              'an error message.',
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              DsText(
+                'invalid: true swaps the border and ring to '
+                'theme.destructive, and it beats focus-visible at equal '
+                'specificity: a focused, invalid textarea looks '
+                'pixel-identical to an unfocused invalid one, reproduced '
+                'from the reference exactly.',
+                DsType.small,
+                color: theme.mutedForeground,
+              ),
+              SizedBox(height: ds(4)),
+              const DsStateCell(
+                label: 'Error',
+                note: 'invalid: true',
+                child: DsTextarea(
+                  initialValue: 'Too short',
+                  invalid: true,
+                  label: 'Error',
+                ),
+              ),
+              SizedBox(height: ds(4)),
+              DsPanel(
+                label: 'DART',
+                note: 'FIELD WITH AN ERROR',
+                child: DocsSelectableCodeBlock(code: _fieldErrorCode),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(height: ds(6)),
+        DsSection(
+          id: 'button',
+          title: 'Button',
+          description:
+              'A textarea paired with a submit button, the shape a '
+              'feedback form actually takes.',
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              const _TextareaWithButtonExample(),
+              SizedBox(height: ds(4)),
+              DsPanel(
+                label: 'DART',
+                note: 'WITH A BUTTON',
+                child: DocsSelectableCodeBlock(code: _textareaWithButtonCode),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(height: ds(6)),
+        DsSection(
+          id: 'rtl',
+          title: 'RTL',
+          description:
+              'DsTextarea has no textDirection parameter of its own: it '
+              'reads the ambient Directionality, the same as EditableText '
+              'always does.',
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              DsText(
+                'The placeholder is positioned with AlignmentDirectional, '
+                'and the padding is symmetric rather than left/right, so '
+                'wrapping the field in a Directionality(textDirection: '
+                'TextDirection.rtl) ancestor is the whole story: nothing '
+                'inside DsTextarea itself needs to change.',
+                DsType.small,
+                color: theme.mutedForeground,
+              ),
+              SizedBox(height: ds(4)),
+              const _TextareaRtlExample(),
+              SizedBox(height: ds(4)),
+              DsPanel(
+                label: 'DART',
+                note: 'RTL',
+                child: DocsSelectableCodeBlock(code: _textareaRtlCode),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(height: ds(6)),
+        DsSection(
           id: 'api',
-          title: 'API',
+          title: 'API Reference',
+          description:
+              'DsTextarea has no variant or size parameter, and no rows: '
+              'field-sizing: content plus the 80px floor already decide '
+              'the height, so a row count would contribute nothing to the '
+              'rendered result even if it were exposed.',
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
@@ -277,7 +454,7 @@ class _TextareaArticle extends StatelessWidget {
                     type: 'TextEditingController?',
                     description:
                         'Controls the value externally. Mutually exclusive '
-                        'with initialValue — the constructor asserts '
+                        'with initialValue: the constructor asserts '
                         'against supplying both, since a controller already '
                         'carries the value.',
                   ),
@@ -312,7 +489,7 @@ class _TextareaArticle extends StatelessWidget {
                     type: 'bool',
                     description:
                         'Defaults to true. false drops the control to 45% '
-                        'opacity and makes it non-editable — but, unlike '
+                        'opacity and makes it non-editable: but, unlike '
                         'DsInput, does not add pointer-events-none, so it '
                         'still receives the pointer and shows a '
                         '"forbidden" cursor rather than being skipped '
@@ -323,7 +500,7 @@ class _TextareaArticle extends StatelessWidget {
                     type: 'bool',
                     description:
                         'Defaults to false. true blocks editing while '
-                        'keeping full opacity — the field stays focusable '
+                        'keeping full opacity: the field stays focusable '
                         'and its text stays selectable, unlike enabled: '
                         'false.',
                   ),
@@ -349,7 +526,7 @@ class _TextareaArticle extends StatelessWidget {
                     name: 'hint',
                     type: 'String?',
                     description:
-                        'Read after the label — the aria-describedby '
+                        'Read after the label: the aria-describedby '
                         'analogue, resolved through Semantics.hint. Falls '
                         'back to the enclosing DsFieldScope\'s describedBy '
                         'when omitted.',
@@ -365,7 +542,7 @@ class _TextareaArticle extends StatelessWidget {
                     type: 'static double',
                     description:
                         'The 80px floor (min-h-20) the border box never '
-                        'shrinks below. There is no matching maximum — '
+                        'shrinks below. There is no matching maximum, '
                         'field-sizing: content grows the box with the '
                         'value and the class list declares no max-h.',
                   ),
@@ -384,30 +561,11 @@ class _TextareaArticle extends StatelessWidget {
         ),
         SizedBox(height: ds(6)),
         DsSection(
-          id: 'variants',
-          title: 'Variants and sizes',
-          description:
-              'Not applicable — recorded rather than silently skipped.',
-          child: DsText(
-            'DsTextarea has no variant or size parameter — one geometry, '
-            'the 80px floor and 12px radius described above, with no '
-            'smaller or larger option to choose between. There is also no '
-            'rows parameter: the reference passes rows={3} on its own '
-            'composed form, but field-sizing: content sizes the box from '
-            'its value and min-h-20 is the floor under it, so a row count '
-            'would contribute nothing to the rendered height even if it '
-            'were exposed — it is dropped rather than ported unused.',
-            DsType.small,
-            color: theme.mutedForeground,
-          ),
-        ),
-        SizedBox(height: ds(6)),
-        DsSection(
           id: 'states',
-          title: 'States and feedback',
+          title: 'States',
           description:
               'Hover, Pressed, Selected, Loading, Empty, Success and a '
-              'character limit are omitted below — reasons follow the '
+              'character limit are omitted below: reasons follow the '
               'table.',
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -418,7 +576,7 @@ class _TextareaArticle extends StatelessWidget {
                     state: 'Rest',
                     treatment:
                         'theme.card fill, theme.input border, a permanent '
-                        'pressed-style shadow — the socket never rises. '
+                        'pressed-style shadow: the socket never rises. '
                         'The placeholder (if any) shows only while the '
                         'value is empty and never affects the box height.',
                     userSignal:
@@ -432,7 +590,7 @@ class _TextareaArticle extends StatelessWidget {
                         '3px ring appears at theme.ring 35% alpha, added '
                         'to (not replacing) the socket shadow.',
                     userSignal:
-                        'A visible ring around the field — beaten by Error '
+                        'A visible ring around the field: beaten by Error '
                         'below when both apply.',
                   ),
                   DocsStateFact(
@@ -444,7 +602,7 @@ class _TextareaArticle extends StatelessWidget {
                     userSignal:
                         'aria-invalid beats focus-visible: a focused, '
                         'invalid textarea looks pixel-identical to an '
-                        'unfocused invalid one — reproduced faithfully '
+                        'unfocused invalid one: reproduced faithfully '
                         'from the reference, matching DsInput exactly.',
                   ),
                   DocsStateFact(
@@ -454,9 +612,9 @@ class _TextareaArticle extends StatelessWidget {
                         'accepting edits. Opacity, border, fill and shadow '
                         'are all unchanged from Rest.',
                     userSignal:
-                        'Looks exactly like an editable field — still '
+                        'Looks exactly like an editable field: still '
                         'focusable, still lets a reader select and copy '
-                        'the text — only typing has no effect. Distinct '
+                        'the text: only typing has no effect. Distinct '
                         'from Disabled below, which does dim.',
                   ),
                   DocsStateFact(
@@ -464,7 +622,7 @@ class _TextareaArticle extends StatelessWidget {
                     treatment:
                         'enabled: false drops opacity to 45% and forces '
                         'readOnly, but the widget adds no pointer-events '
-                        'block of its own — the cursor becomes '
+                        'block of its own: the cursor becomes '
                         '"forbidden" and a tap still lands on the '
                         'GestureDetector underneath.',
                     userSignal:
@@ -488,18 +646,18 @@ class _TextareaArticle extends StatelessWidget {
               ),
               SizedBox(height: ds(4)),
               DsText(
-                'Omitted: Hover — the class list carries no hover skin of '
+                'Omitted: Hover: the class list carries no hover skin of '
                 'its own, shared with DsInput; only the pointer cursor '
                 'changes (text I-beam when enabled, forbidden when not). '
-                'Pressed — a text field has no pressed skin; a tap simply '
-                'requests the keyboard. Selected — that state belongs to '
+                'Pressed: a text field has no pressed skin; a tap simply '
+                'requests the keyboard. Selected: that state belongs to '
                 'choice controls (checkbox, radio); a text primitive has '
-                'nothing analogous. Loading and Empty — DsTextarea is a '
+                'nothing analogous. Loading and Empty, DsTextarea is a '
                 'synchronous primitive with no async operation, and an '
                 'empty value is not a distinct visual state, only whether '
                 'the placeholder is visible, which Rest above already '
-                'covers. Success — the component defines no success '
-                'semantics of its own. Character limit — there is no '
+                'covers. Success: the component defines no success '
+                'semantics of its own. Character limit: there is no '
                 'maxLength, inputFormatters or counter parameter on '
                 'DsTextarea; the box has no ceiling to cap against, so '
                 'nothing is invented here that the API does not support.',
@@ -520,7 +678,7 @@ class _TextareaArticle extends StatelessWidget {
                 label: 'Semantic role',
                 value: 'Semantics(textField: true, multiline: true)',
                 description:
-                    'Merged in only when label, hint or invalid is set — '
+                    'Merged in only when label, hint or invalid is set, '
                     'when none of the three apply, the widget wraps '
                     'nothing extra and relies purely on EditableText\'s '
                     'own built-in text-field semantics.',
@@ -530,7 +688,7 @@ class _TextareaArticle extends StatelessWidget {
                 value: 'label',
                 description:
                     'Feeds the control\'s accessible name directly. It is '
-                    'never rendered as visible text — compose with DsField '
+                    'never rendered as visible text: compose with DsField '
                     '(or a DsFieldLabel) for a caption a sighted user can '
                     'read.',
               ),
@@ -539,7 +697,7 @@ class _TextareaArticle extends StatelessWidget {
                 value: 'Native multi-line text editing',
                 description:
                     'Unlike the choice-control family, no key handling is '
-                    'wired by hand — EditableText\'s own platform text '
+                    'wired by hand, EditableText\'s own platform text '
                     'input connection drives everything, so Enter inserts '
                     'a newline rather than doing anything special, and Tab '
                     'moves focus through the ambient FocusTraversalGroup '
@@ -558,7 +716,7 @@ class _TextareaArticle extends StatelessWidget {
                 label: 'Touch target',
                 value: 'The full padded surface, minimum 80px tall',
                 description:
-                    'No separate hit-area widget — unlike DsCheckbox\'s '
+                    'No separate hit-area widget: unlike DsCheckbox\'s '
                     'DsHitArea, the GestureDetector wraps the entire '
                     'DsFieldSurface, so the tappable region already spans '
                     'the whole field and comfortably clears a touch '
@@ -566,13 +724,13 @@ class _TextareaArticle extends StatelessWidget {
               ),
               const DocsInstallFact(
                 label: 'Non-colour signal',
-                value: 'None — colour is the only invalid signal',
+                value: 'None: colour is the only invalid signal',
                 description:
                     'Unlike DsCheckbox, which draws a different glyph per '
                     'state, an invalid textarea changes only its border '
                     'and ring colour. A reader who cannot perceive that '
                     'change still gets SemanticsValidationResult.invalid '
-                    'through the merged semantics node — recorded as a '
+                    'through the merged semantics node: recorded as a '
                     'real limitation, not fixed silently.',
               ),
               const DocsInstallFact(
@@ -606,14 +764,14 @@ class _TextareaArticle extends StatelessWidget {
         SizedBox(height: ds(6)),
         DsSection(
           id: 'responsive',
-          title: 'Responsive and platform behavior',
+          title: 'Responsive',
           child: DsText(
             'DsTextarea has no responsive breakpoints of its own: its '
             'width comes from the ambient constraints (it fills whatever '
             'box it is given) and its height grows from an 80px floor with '
             'no cap, identical across mobile, tablet, desktop and web. The '
             'one platform-shaped behaviour it does carry is '
-            'DsFieldVisibility, shared with the rest of the field family — '
+            'DsFieldVisibility, shared with the rest of the field family, '
             'a focused textarea is kept clear of the software keyboard, '
             'gated purely on MediaQuery.viewInsets.bottom > 0, so a '
             'desktop or web build where no software keyboard ever opens '
@@ -625,7 +783,7 @@ class _TextareaArticle extends StatelessWidget {
         SizedBox(height: ds(6)),
         DsSection(
           id: 'dependencies',
-          title: 'Dependencies, files, assets, fonts and shaders',
+          title: 'Dependencies',
           child: DocsInstallFacts(
             title: 'Dependencies and files',
             facts: <DocsInstallFact>[
@@ -642,9 +800,9 @@ class _TextareaArticle extends StatelessWidget {
                     'DsFieldScope wiring, and input.dart for '
                     'DsFieldSurface (the shared socket surface) and '
                     'DsFieldVisibility (the shared mobile keyboard-'
-                    'avoidance wrapper) — deliberately reused rather than '
+                    'avoidance wrapper): deliberately reused rather than '
                     'duplicated, so the textarea cannot drift from the '
-                    'input. Neither file is copyable in isolation — see '
+                    'input. Neither file is copyable in isolation: see '
                     'Installation.',
               ),
               const DocsInstallFact(
@@ -675,7 +833,7 @@ class _TextareaArticle extends StatelessWidget {
                 value: 'none of its own',
                 description:
                     'Text renders through DsComponentType.textareaBody, the '
-                    'app\'s own type scale — no font file is bundled by '
+                    'app\'s own type scale: no font file is bundled by '
                     'this component.',
               ),
               const DocsInstallFact(
@@ -688,32 +846,8 @@ class _TextareaArticle extends StatelessWidget {
         ),
         SizedBox(height: ds(6)),
         DsSection(
-          id: 'composition',
-          title: 'Composition examples',
-          description:
-              'Two larger, real patterns built from the same constructor — '
-              'not manufactured examples the Dart API cannot support.',
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              DsPanel(
-                label: 'DART',
-                note: 'FIELD WITH AN ERROR',
-                child: DocsSelectableCodeBlock(code: _fieldErrorCode),
-              ),
-              SizedBox(height: ds(5)),
-              DsPanel(
-                label: 'DART',
-                note: 'CONTROLLED DRAFT',
-                child: DocsSelectableCodeBlock(code: _controlledDraftCode),
-              ),
-            ],
-          ),
-        ),
-        SizedBox(height: ds(6)),
-        DsSection(
           id: 'theming',
-          title: 'Theming notes',
+          title: 'Theming',
           child: DocsInstallFacts(
             title: 'Tokens this component reads',
             facts: const <DocsInstallFact>[
@@ -728,7 +862,7 @@ class _TextareaArticle extends StatelessWidget {
                     'theme.input (rest) / theme.primary at 50% alpha '
                     '(focus-visible) / theme.destructive (invalid)',
                 description:
-                    'Resolved in that precedence order — invalid always '
+                    'Resolved in that precedence order: invalid always '
                     'wins, exactly as on DsInput.',
               ),
               DocsInstallFact(
@@ -746,14 +880,14 @@ class _TextareaArticle extends StatelessWidget {
                     'background cursor)',
                 description:
                     'The typed text inherits whatever colour Field applies '
-                    '— including invalid ink — because the style carries '
+                    '— including invalid ink: because the style carries '
                     'no colour of its own.',
               ),
               DocsInstallFact(
                 label: 'Selection wash',
                 value: 'theme.primary at 35% alpha',
                 description:
-                    'DsFieldSurface.selectionAlpha — shared exactly with '
+                    'DsFieldSurface.selectionAlpha: shared exactly with '
                     'DsInput so the two fields cannot select differently '
                     'from one another.',
               ),
@@ -770,8 +904,8 @@ class _TextareaArticle extends StatelessWidget {
                 value: 'DsRadii.lg (12px)',
                 description:
                     'The one member of the field family on the radius '
-                    'ladder rather than the 999px pill curve — see '
-                    'Overview for why.',
+                    'ladder rather than the 999px pill curve: see '
+                    'Textarea vs. input for why.',
               ),
               DocsInstallFact(
                 label: 'Motion',
@@ -787,7 +921,7 @@ class _TextareaArticle extends StatelessWidget {
         SizedBox(height: ds(6)),
         DsSection(
           id: 'source',
-          title: 'Source and tests',
+          title: 'Source',
           child: DocsInstallFacts(
             facts: <DocsInstallFact>[
               DocsInstallFact(
@@ -799,7 +933,7 @@ class _TextareaArticle extends StatelessWidget {
                 label: 'Shared machinery',
                 value: 'lib/src/components/input.dart',
                 description:
-                    'DsFieldSurface and DsFieldVisibility — shared with '
+                    'DsFieldSurface and DsFieldVisibility: shared with '
                     'DsInput and documented on its own component page.',
               ),
               const DocsInstallFact(
@@ -860,6 +994,35 @@ DsField(
   child: DsTextarea(
     controller: draftController,
     onChanged: (String next) => autosave(next),
+  ),
+)''';
+
+const String _disabledUsageCode = '''const DsTextarea(
+  enabled: false,
+  initialValue: 'Cannot be edited right now.',
+  label: 'Disabled',
+)''';
+
+const String _textareaWithButtonCode = '''Column(
+  crossAxisAlignment: CrossAxisAlignment.stretch,
+  children: <Widget>[
+    DsTextarea(
+      label: 'Message',
+      placeholder: 'Write your message',
+    ),
+    SizedBox(height: ds(3)),
+    DsButton(
+      onPressed: submit,
+      child: const Text('Send message'),
+    ),
+  ],
+)''';
+
+const String _textareaRtlCode = '''Directionality(
+  textDirection: TextDirection.rtl,
+  child: DsTextarea(
+    label: 'ملاحظة',
+    placeholder: 'اكتب ملاحظتك هنا',
   ),
 )''';
 
@@ -941,7 +1104,7 @@ class _TextareaPreviewState extends State<_TextareaPreview> {
         ),
         const DsStateCell(
           label: 'Auto-grow',
-          note: 'No max height — the value decides',
+          note: 'No max height: the value decides',
           child: DsTextarea(
             initialValue:
                 'Line one\nLine two\nLine three\nLine four grows the box '
@@ -954,7 +1117,7 @@ class _TextareaPreviewState extends State<_TextareaPreview> {
   }
 }
 
-/// A live, functioning `DsField`-wrapped textarea for the "Usage" section —
+/// A live, functioning `DsField`-wrapped textarea for the "Field" section,
 /// proof the composition it documents actually renders and accepts typed
 /// text, not just a code excerpt.
 class _ShippingNoteExample extends StatelessWidget {
@@ -967,6 +1130,48 @@ class _ShippingNoteExample extends StatelessWidget {
       description: 'Grows as you type. Minimum height is 80px.',
       child: const DsTextarea(
         placeholder: 'Anything the packing team should know',
+      ),
+    );
+  }
+}
+
+/// A live textarea-plus-submit-button composition for the "Button" section:
+/// the shadcn counterpart page has no such prop of ours to demonstrate, so
+/// this specimen is new (per the reshape brief's rule 6 exception).
+class _TextareaWithButtonExample extends StatelessWidget {
+  const _TextareaWithButtonExample();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        const DsTextarea(
+          key: ValueKey<String>('textarea-with-button-specimen'),
+          label: 'Message',
+          placeholder: 'Write your message',
+        ),
+        SizedBox(height: ds(3)),
+        DsButton(onPressed: () {}, child: const Text('Send message')),
+      ],
+    );
+  }
+}
+
+/// A live right-to-left textarea for the "RTL" section: proof that ambient
+/// Directionality is the whole mechanism, nothing inside DsTextarea itself
+/// needs a direction-specific parameter.
+class _TextareaRtlExample extends StatelessWidget {
+  const _TextareaRtlExample();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Directionality(
+      textDirection: TextDirection.rtl,
+      child: DsTextarea(
+        key: ValueKey<String>('textarea-rtl-specimen'),
+        label: 'ملاحظة',
+        placeholder: 'اكتب ملاحظتك هنا',
       ),
     );
   }

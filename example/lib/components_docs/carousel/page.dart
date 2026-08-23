@@ -1,9 +1,14 @@
 /// Public documentation page for the `carousel`, `nav_user`, and `marker` components.
 ///
-/// Mirrors `badge/page.dart`'s use of the Phase C docs primitives and
-/// `DsSection` for titled, anchor-registered content blocks.
+/// Reshaped to the shadcn parity frame: the reader knows
+/// https://ui.shadcn.com/docs/components/base/carousel and finds the same
+/// answers, in the same order, on this page's carousel sections. `nav_user`
+/// and `marker` have no shadcn counterpart at all, so their sections (Nav
+/// user, Marker variants) are ours only, kept in the component-specific
+/// zone between Composition and API Reference rather than folded silently
+/// into a carousel section.
 ///
-/// None of the three has a registry manifest yet — every install-facing
+/// None of the three has a registry manifest yet: every install-facing
 /// panel below says so honestly rather than presenting a CLI command that
 /// would fail.
 library;
@@ -36,17 +41,18 @@ class CarouselDocPage extends StatelessWidget {
     ],
     sidebar: _sidebar,
     toc: const <DocsTocEntry>[
-      DocsTocEntry(title: 'Overview', anchor: 'overview'),
-      DocsTocEntry(title: 'Preview', anchor: 'preview'),
-      DocsTocEntry(title: 'Install', anchor: 'install'),
+      DocsTocEntry(title: 'Installation', anchor: 'install'),
       DocsTocEntry(title: 'Usage', anchor: 'usage'),
-      DocsTocEntry(title: 'API', anchor: 'api'),
-      DocsTocEntry(title: 'Variants', anchor: 'variants'),
+      DocsTocEntry(title: 'Composition', anchor: 'composition'),
+      DocsTocEntry(title: 'Sizes', anchor: 'sizes'),
+      DocsTocEntry(title: 'RTL', anchor: 'rtl'),
+      DocsTocEntry(title: 'Nav user', anchor: 'nav-user'),
+      DocsTocEntry(title: 'Marker variants', anchor: 'marker-variants'),
+      DocsTocEntry(title: 'API Reference', anchor: 'api'),
       DocsTocEntry(title: 'States', anchor: 'states'),
       DocsTocEntry(title: 'Accessibility', anchor: 'accessibility'),
       DocsTocEntry(title: 'Responsive', anchor: 'responsive'),
       DocsTocEntry(title: 'Dependencies', anchor: 'dependencies'),
-      DocsTocEntry(title: 'Composition', anchor: 'composition'),
       DocsTocEntry(title: 'Theming', anchor: 'theming'),
       DocsTocEntry(title: 'Source', anchor: 'source'),
     ],
@@ -73,94 +79,100 @@ class _ArticleContent extends StatelessWidget {
       key: const ValueKey<String>('carousel-doc-article'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        _overview(theme),
-        _preview(),
+        _liveDemo(),
+        SizedBox(height: ds(8)),
+        _about(theme),
         _install(),
         _usage(),
-        _api(),
-        _variants(),
+        _composition(),
+        _sizes(),
+        _rtl(theme),
+        _navUser(),
+        _markerVariants(),
+        _apiReference(theme),
         _states(),
         _accessibility(theme),
         _responsive(theme),
         _dependencies(theme),
-        _composition(),
         _theming(theme),
         _source(),
       ],
     );
   }
 
-  Widget _overview(DsThemeData theme) => DsSection(
-    id: 'overview',
-    title: 'Overview',
-    child: ConstrainedBox(
+  // shadcn: the live demo that opens the page, before any heading. No
+  // DsSection, no id, no TOC entry: matching the reference exactly.
+  Widget _liveDemo() => DocsCodeExample(
+    title: 'Component specimens',
+    manualFiles: const <DocsCodeFile>[
+      DocsCodeFile(
+        path: 'lib/components/ui/carousel.dart',
+        code:
+            "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
+            '// Carousel, nav_user, and marker have no registry manifest yet\n'
+            '//: copy from the package source directly.',
+      ),
+    ],
+    preview: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        DsText('Carousel with 5 slides', DsType.label),
+        SizedBox(height: ds(3)),
+        _CarouselPreview(),
+        SizedBox(height: ds(6)),
+        DsText('Nav User in sidebar context', DsType.label),
+        SizedBox(height: ds(3)),
+        _NavUserPreview(),
+        SizedBox(height: ds(6)),
+        DsText('Marker variants', DsType.label),
+        SizedBox(height: ds(3)),
+        _MarkerVariantsPreview(),
+      ],
+    ),
+  );
+
+  // shadcn: About. Explains what the carousel is built on, the way the
+  // reference explains it is built on Embla Carousel.
+  Widget _about(DsThemeData theme) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: <Widget>[
+      ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: DsWidths.prose),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           DsText(
-            'Three components for layout and navigation: DsCarousel renders a '
-            'horizontally scrollable container with Embla physics, previous/next '
-            'buttons, and keyboard arrow navigation. DsNavUser is the account '
-            'footer block a sidebar is incomplete without — avatar, name, email, '
-            'and a dropdown menu. DsMarker is a quiet row separator for lists, '
-            'labeling transitions like "Today", "Context cleared", or "3 messages '
-            'hidden".',
+            "DsCarousel is a from-scratch reimplementation of Embla "
+            "Carousel's own physics, not a wrapper around the JS library: "
+            'an integrator loop for the glide (velocity = (velocity + '
+            '(target minus location) divided by 25, times 0.68), a '
+            'rubber-banded ScrollBounds past either edge, and '
+            'containScroll: trimSnaps for the snap ladder. Previous/next '
+            'buttons and the ArrowLeft/ArrowRight keys both drive the '
+            'same DsCarouselController.',
             DsType.body,
           ),
           SizedBox(height: ds(4)),
           DsText(
-            'Status: stable primitives, not yet registered in the CLI (see '
-            'Install). Platforms: Android, iOS, Web, macOS, Windows, Linux — '
-            'the same six every widget in this package targets.',
-            DsType.small,
-            color: theme.mutedForeground,
+            'This page also documents DsNavUser and DsMarker, a sidebar '
+            'account footer and a quiet list separator. Neither has a '
+            'shadcn counterpart: their sections below (Nav user, Marker '
+            'variants) are ours only.',
+            DsType.body,
           ),
         ],
       ),
     ),
+    ],
   );
 
-  Widget _preview() => DsSection(
-    id: 'preview',
-    title: 'Preview',
-    description: 'Live specimens of each component in their default state.',
-    child: DocsCodeExample(
-      title: 'Component specimens',
-      manualFiles: const <DocsCodeFile>[
-        DocsCodeFile(
-          path: 'lib/components/ui/carousel.dart',
-          code:
-              "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
-              '// Carousel, nav_user, and marker have no registry manifest yet\n'
-              '// — copy from the package source directly.',
-        ),
-      ],
-      preview: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          DsText('Carousel with 5 slides', DsType.label),
-          SizedBox(height: ds(3)),
-          _CarouselPreview(),
-          SizedBox(height: ds(6)),
-          DsText('Nav User in sidebar context', DsType.label),
-          SizedBox(height: ds(3)),
-          _NavUserPreview(),
-          SizedBox(height: ds(6)),
-          DsText('Marker variants', DsType.label),
-          SizedBox(height: ds(3)),
-          _MarkerVariantsPreview(),
-        ],
-      ),
-    ),
-  );
-
+  // shadcn: Installation, Command and Manual tabs.
   Widget _install() => DsSection(
     id: 'install',
     title: 'Installation',
     description:
         'None of these components has a registry manifest yet, so '
-        '`elattar add carousel` is not available — install by copying source files manually.',
+        '`elattar add carousel` is not available: install by copying source files manually.',
     child: DocsInstallFacts(
       title: 'Installation facts',
       facts: <DocsInstallFact>[
@@ -185,7 +197,7 @@ class _ArticleContent extends StatelessWidget {
           label: 'Dependencies',
           value: 'source-foundation, button, icon, avatar, dropdown_menu',
           description:
-              'What a future manifest would need to resolve — colors, '
+              'What a future manifest would need to resolve: colors, '
               'shadows, spacing, theme, typography, button, icon, and '
               'other UI components. None of this is resolved automatically '
               'today; copy the imports by hand.',
@@ -217,6 +229,7 @@ class _ArticleContent extends StatelessWidget {
     ),
   );
 
+  // shadcn: Usage, imports plus basic construction.
   Widget _usage() => DsSection(
     id: 'usage',
     title: 'Usage',
@@ -228,9 +241,184 @@ class _ArticleContent extends StatelessWidget {
     ),
   );
 
-  Widget _api() => DsSection(
+  // shadcn: Composition, the widget-hierarchy tree. DsCarousel folds
+  // CarouselContent/CarouselItem/CarouselPrevious/CarouselNext into one
+  // widget rather than a family of composable subcomponents; NavUser and
+  // Marker are the same shape, one widget each.
+  Widget _composition() => DsSection(
+    id: 'composition',
+    title: 'Composition',
+    description:
+        'DsCarousel folds CarouselContent, CarouselItem, '
+        'CarouselPrevious, and CarouselNext into one widget: hand it '
+        'items and basis, get back a scrollable track with both buttons '
+        'already wired up. DsNavUser and DsMarker are likewise single '
+        'widgets, not subcomponent families.',
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        DsPanel(
+          label: 'DART',
+          note: 'ANATOMY',
+          child: DocsSelectableCodeBlock(code: _compositionAnatomyCode),
+        ),
+        SizedBox(height: ds(6)),
+        DsText('Composed inside a panel', DsType.label),
+        SizedBox(height: ds(2)),
+        DsText(
+          "Pass the panel's padding and set flush: true so the arrows "
+          'can hang outside it.',
+          DsType.small,
+        ),
+        SizedBox(height: ds(4)),
+        DsPanel(
+          label: 'CAROUSEL INSIDE PANEL',
+          flush: true,
+          child: DsCarousel(
+            basis: 0.4,
+            padding: EdgeInsets.all(ds(6)),
+            items: <Widget>[
+              for (int i = 0; i < 5; i++) _DummySlide(label: 'Slide ${i + 1}'),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
+
+  // shadcn: Sizes, utility classes controlling item width.
+  Widget _sizes() => DsSection(
+    id: 'sizes',
+    title: 'Sizes',
+    description:
+        "basis is the item's share of the track: 0.5 shows two at once, "
+        '0.333 shows three. There is no responsive basis: one value '
+        'applies at every width, so a caller that wants it to change at a '
+        'breakpoint has to swap it itself.',
+    child: DocsCodeExample(
+      title: 'Two sizes',
+      preview: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          DsText('basis: 0.5, two per view', DsType.label),
+          SizedBox(height: ds(3)),
+          DsCarousel(
+            basis: 0.5,
+            padding: EdgeInsets.all(ds(6)),
+            items: <Widget>[
+              for (int i = 0; i < 5; i++) _DummySlide(label: 'Slide ${i + 1}'),
+            ],
+          ),
+          SizedBox(height: ds(6)),
+          DsText('basis: 0.333, three per view', DsType.label),
+          SizedBox(height: ds(3)),
+          DsCarousel(
+            basis: 0.333,
+            padding: EdgeInsets.all(ds(6)),
+            items: <Widget>[
+              for (int i = 0; i < 5; i++) _DummySlide(label: 'Slide ${i + 1}'),
+            ],
+          ),
+        ],
+      ),
+      manualFiles: const <DocsCodeFile>[
+        DocsCodeFile(path: 'carousel_sizes.dart', code: _sizesCode),
+      ],
+    ),
+  );
+
+  // shadcn: RTL. DOCUMENTED DRIFT, see the section description.
+  Widget _rtl(DsThemeData theme) => DsSection(
+    id: 'rtl',
+    title: 'RTL',
+    description:
+        'DOCUMENTED DRIFT: the track is a plain Row, which reads '
+        "Directionality and reverses its children's paint order under "
+        'RTL, but the arrow buttons are Positioned(left:, right:) and the '
+        'drag math is physical pixels, so neither one flips. Wrapping in '
+        'Directionality.rtl below is inconsistent rather than mirrored: '
+        'slide order reverses, the controls do not.',
+    child: DocsCodeExample(
+      title: 'Wrapped in Directionality.rtl',
+      preview: Directionality(
+        textDirection: TextDirection.rtl,
+        child: DsCarousel(
+          basis: 0.4,
+          padding: EdgeInsets.all(ds(6)),
+          items: <Widget>[
+            for (int i = 0; i < 5; i++) _DummySlide(label: 'Slide ${i + 1}'),
+          ],
+        ),
+      ),
+      manualFiles: const <DocsCodeFile>[
+        DocsCodeFile(path: 'carousel_rtl.dart', code: _rtlCode),
+      ],
+    ),
+  );
+
+  // Ours only: DsNavUser has no shadcn counterpart. Grouped under its own
+  // name in the component-specific zone, the way the frame asks for it.
+  Widget _navUser() => DsSection(
+    id: 'nav-user',
+    title: 'Nav user',
+    description:
+        'Ours only: the account block a sidebar footer is incomplete '
+        'without. One widget, one required account and one required item '
+        'list; the dropdown, avatar fallback, and destructive-item '
+        'styling all come along automatically.',
+    child: DocsCodeExample(
+      title: 'Nav user',
+      preview: const _NavUserPreview(),
+      manualFiles: const <DocsCodeFile>[
+        DocsCodeFile(path: 'nav_user_example.dart', code: _navUserCode),
+      ],
+    ),
+  );
+
+  // Ours only: DsMarker has no shadcn counterpart. One section for all
+  // three variant values, per rule 5, not three separate sections.
+  Widget _markerVariants() => DsSection(
+    id: 'marker-variants',
+    title: 'Marker variants',
+    description:
+        'Ours only: DsMarker has three variants, documented together in '
+        'one section rather than one section per value.',
+    child: const DocsApiTable(
+      title: 'DsMarkerVariant',
+      facts: <DocsApiFact>[
+        DocsApiFact(
+          name: 'normal',
+          type: 'default',
+          description:
+              'Bare row: for a container that already frames it. No rules '
+              'or borders.',
+        ),
+        DocsApiFact(
+          name: 'separator',
+          type: 'divider',
+          description:
+              'Rule, label, rule. Divides before from after, the rules '
+              'flex to fill available width.',
+        ),
+        DocsApiFact(
+          name: 'border',
+          type: 'border',
+          description:
+              'Label with a 1px bottom border. Heads what follows, good for '
+              'section breaks.',
+        ),
+      ],
+    ),
+  );
+
+  // shadcn: API Reference, the last shadcn section, one prop table per
+  // class in the family.
+  Widget _apiReference(DsThemeData theme) => DsSection(
     id: 'api',
-    title: 'API',
+    title: 'API Reference',
+    description:
+        'Every constructor parameter, read directly from '
+        'lib/src/components/carousel.dart, nav_user.dart, and marker.dart.',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
@@ -242,7 +430,7 @@ class _ArticleContent extends StatelessWidget {
               type: 'double',
               description:
                   'Required. The item\'s share of the track as a '
-                  'fraction — 0.5 for 2 columns, 0.333 for 3.',
+                  'fraction, 0.5 for 2 columns, 0.333 for 3.',
             ),
             DocsApiFact(
               name: 'items',
@@ -319,6 +507,22 @@ class _ArticleContent extends StatelessWidget {
             ),
           ],
         ),
+        SizedBox(height: ds(4)),
+        DsPanel(
+          label: 'DSCAROUSELCONTROLLER',
+          note: 'CAVEAT',
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: DsWidths.prose),
+            child: DsText(
+              'DsCarousel builds this controller internally: the '
+              'constructor above has no controller parameter. Nothing '
+              'outside DsCarousel can read selectedIndex, canScrollPrev, '
+              'or canScrollNext, or add its own listener, today.',
+              DsType.small,
+              color: theme.mutedForeground,
+            ),
+          ),
+        ),
         SizedBox(height: ds(6)),
         const DocsApiTable(
           title: 'DsNavUser properties',
@@ -327,7 +531,7 @@ class _ArticleContent extends StatelessWidget {
               name: 'user',
               type: 'DsNavUserAccount',
               description:
-                  'Required. The account details — name, email, optional avatar image.',
+                  'Required. The account details: name, email, optional avatar image.',
             ),
             DocsApiFact(
               name: 'items',
@@ -380,7 +584,7 @@ class _ArticleContent extends StatelessWidget {
               name: 'variant',
               type: 'DsMarkerVariant',
               description:
-                  'Defaults to normal. Controls the visual treatment — bare, '
+                  'Defaults to normal. Controls the visual treatment: bare, '
                   'separator (with rules), or border.',
             ),
             DocsApiFact(
@@ -394,42 +598,9 @@ class _ArticleContent extends StatelessWidget {
     ),
   );
 
-  Widget _variants() => DsSection(
-    id: 'variants',
-    title: 'Variants and configuration',
-    description:
-        'DsCarousel has no size variants. DsMarker has three variants.',
-    child: const DocsApiTable(
-      title: 'DsMarkerVariant',
-      facts: <DocsApiFact>[
-        DocsApiFact(
-          name: 'normal',
-          type: 'default',
-          description:
-              'Bare row — for a container that already frames it. No rules '
-              'or borders.',
-        ),
-        DocsApiFact(
-          name: 'separator',
-          type: 'divider',
-          description:
-              'Rule — label — rule. Divides before from after, the rules '
-              'flex to fill available width.',
-        ),
-        DocsApiFact(
-          name: 'border',
-          type: 'border',
-          description:
-              'Label with a 1px bottom border. Heads what follows, good for '
-              'section breaks.',
-        ),
-      ],
-    ),
-  );
-
   Widget _states() => DsSection(
     id: 'states',
-    title: 'States and feedback',
+    title: 'States',
     description:
         'DsCarousel animates location changes via an Embla-like integrator. '
         'DsNavUser and DsMarker are static.',
@@ -469,7 +640,7 @@ class _ArticleContent extends StatelessWidget {
 
   Widget _accessibility(DsThemeData theme) => DsSection(
     id: 'accessibility',
-    title: 'Accessibility and keyboard behavior',
+    title: 'Accessibility',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -480,10 +651,10 @@ class _ArticleContent extends StatelessWidget {
               'via the real button focus paths.',
           'Previous and next controls: Real focusable DsButton widgets with '
               'semantic labels ("Previous slide", "Next slide" by default).',
-          'Slide count announcement: Not implemented — no live region or '
+          'Slide count announcement: Not implemented: no live region or '
               'ARIA attribute announces the current slide index or total count. '
               'The carousel has a generic label ("carousel") only.',
-          'Autoplay: No autoplay mechanism exists in the source — there is no '
+          'Autoplay: No autoplay mechanism exists in the source: there is no '
               'auto-scrolling Timer or animation loop. No pause control needed.',
           'Button state: Previous button disabled at index 0; next button '
               'disabled at the last snap.',
@@ -504,7 +675,7 @@ class _ArticleContent extends StatelessWidget {
         DsText('Marker:', DsType.label),
         SizedBox(height: ds(2)),
         ..._bulletWidgets(theme, <String>[
-          'Static presentational widget — no interaction, focus, or animation.',
+          'Static presentational widget: no interaction, focus, or animation.',
           'Rendered as ordinary text, not as a semantic boundary or landmark. '
               'Screenreader reads the label text as prose.',
           'Use in a list or timeline where the label semantically marks a '
@@ -516,7 +687,7 @@ class _ArticleContent extends StatelessWidget {
 
   Widget _responsive(DsThemeData theme) => DsSection(
     id: 'responsive',
-    title: 'Responsive and platform behavior',
+    title: 'Responsive',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -525,7 +696,7 @@ class _ArticleContent extends StatelessWidget {
         ..._bulletWidgets(theme, <String>[
           'Basis determines the item width as a fraction of the track. Change '
               'basis between breakpoints to adjust columns (0.5 = 2 col, 0.333 '
-              '= 3 col).',
+              '= 3 col). See Sizes above.',
           'Previous/next buttons hang outside the carousel by --reach (12px ds '
               'unit). Arrows clipped by the panel\'s overflow-hidden.',
           'Keyboard and drag work identically on all platforms.',
@@ -537,13 +708,13 @@ class _ArticleContent extends StatelessWidget {
           'On mobile (inside a DsSidebarScope with isMobile: true), the '
               'dropdown opens below (DsPopoverSide.bottom). On desktop, it opens '
               'to the right.',
-          'Responsive inside DsSidebar — works identically on all platforms.',
+          'Responsive inside DsSidebar: works identically on all platforms.',
         ]),
         SizedBox(height: ds(4)),
         DsText('Marker:', DsType.label),
         SizedBox(height: ds(2)),
         ..._bulletWidgets(theme, <String>[
-          'No responsive branching — rendered identically at all widths.',
+          'No responsive branching: rendered identically at all widths.',
           'In separator variant, the two rules flex to fill available space; '
               'the label stays flexible.',
         ]),
@@ -553,18 +724,18 @@ class _ArticleContent extends StatelessWidget {
 
   Widget _dependencies(DsThemeData theme) => DsSection(
     id: 'dependencies',
-    title: 'Dependencies, files, and assets',
+    title: 'Dependencies',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         DsText('Files:', DsType.label),
         SizedBox(height: ds(2)),
         ..._bulletWidgets(theme, <String>[
-          'lib/src/components/carousel.dart — Carousel, DsCarouselController, '
+          'lib/src/components/carousel.dart, Carousel, DsCarouselController, '
               '_Track, _Arrow.',
-          'lib/src/components/nav_user.dart — DsNavUser, DsNavUserAccount, '
+          'lib/src/components/nav_user.dart, DsNavUser, DsNavUserAccount, '
               'DsNavUserItem, _IdentityText.',
-          'lib/src/components/marker.dart — DsMarker, DsMarkerVariant.',
+          'lib/src/components/marker.dart, DsMarker, DsMarkerVariant.',
         ]),
         SizedBox(height: ds(4)),
         DsText('Foundation imports:', DsType.label),
@@ -595,60 +766,9 @@ class _ArticleContent extends StatelessWidget {
     ),
   );
 
-  Widget _composition() => DsSection(
-    id: 'composition',
-    title: 'Composition examples',
-    description:
-        'Real shapes these components are composed into elsewhere in this package.',
-    child: DocsCodeExample(
-      title: 'Composed with other primitives',
-      preview: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          DsText('Carousel in a layout panel', DsType.label),
-          SizedBox(height: ds(2)),
-          DsText(
-            'Pass the panel\'s padding and set flush: true so arrows can hang out.',
-            DsType.small,
-          ),
-          SizedBox(height: ds(4)),
-          DsPanel(
-            label: 'CAROUSEL INSIDE PANEL',
-            flush: true,
-            child: DsCarousel(
-              basis: 0.4,
-              padding: EdgeInsets.all(ds(6)),
-              items: <Widget>[
-                for (int i = 0; i < 5; i++)
-                  _DummySlide(label: 'Slide ${i + 1}'),
-              ],
-            ),
-          ),
-        ],
-      ),
-      manualFiles: const <DocsCodeFile>[
-        DocsCodeFile(
-          path: 'carousel_in_panel.dart',
-          code: '''// Carousel panel composition
-DsPanel(
-  label: 'Featured',
-  flush: true,
-  child: DsCarousel(
-    basis: 0.4,
-    padding: EdgeInsets.all(ds(6)),
-    items: <Widget>[
-      // slides here
-    ],
-  ),
-)''',
-        ),
-      ],
-    ),
-  );
-
   Widget _theming(DsThemeData theme) => DsSection(
     id: 'theming',
-    title: 'Theming notes',
+    title: 'Theming',
     child: _bullets(theme, <String>[
       'Carousel: Previous/next buttons resolve their colors from DsButton '
           '(outline variant). Flipping DsThemeController updates both.',
@@ -661,7 +781,7 @@ DsPanel(
 
   Widget _source() => DsSection(
     id: 'source',
-    title: 'Source, tests, and docs',
+    title: 'Source',
     child: DocsInstallFacts(
       title: 'Reference',
       facts: <DocsInstallFact>[
@@ -847,4 +967,46 @@ DsNavUser(
 DsMarker(
   variant: DsMarkerVariant.separator,
   label: 'Today',
+)''';
+
+const String _compositionAnatomyCode = '''DsCarousel(
+  basis: 0.4,          // the item's share of the track
+  padding: EdgeInsets.all(24), // frame padding, so arrows can hang outside it
+  items: <Widget>[...], // the slides, each wrapped and gutter-padded internally
+  previousLabel: 'Previous slide', // sr-only style label on the prev button
+  nextLabel: 'Next slide',
+)''';
+
+const String _sizesCode = '''DsCarousel(
+  basis: 0.5, // two visible at once
+  items: <Widget>[...],
+)
+
+DsCarousel(
+  basis: 0.333, // three visible at once
+  items: <Widget>[...],
+)''';
+
+const String _rtlCode = '''Directionality(
+  textDirection: TextDirection.rtl,
+  child: DsCarousel(
+    basis: 0.4,
+    items: <Widget>[...],
+  ),
+)''';
+
+const String _navUserCode = '''DsNavUser(
+  user: const DsNavUserAccount(
+    name: 'Alex Johnson',
+    email: 'alex@example.com',
+  ),
+  items: <DsNavUserItem>[
+    DsNavUserItem(label: 'Profile', icon: DsLucide.user),
+    DsNavUserItem(label: 'Settings', icon: DsLucide.settings),
+    DsNavUserItem(
+      label: 'Sign out',
+      icon: DsLucide.logOut,
+      destructive: true,
+    ),
+  ],
 )''';

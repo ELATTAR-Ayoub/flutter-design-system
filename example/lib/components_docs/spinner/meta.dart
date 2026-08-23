@@ -2,11 +2,11 @@
 ///
 /// `spinner` has a real `registry/components/spinner.json` manifest —
 /// [dependencies] is that manifest's own `registryDependencies` list,
-/// verbatim — so the icon page's installation section can render the real
+/// verbatim: so the icon page's installation section can render the real
 /// `elattar add spinner` command.
 ///
 /// Spinner is documented on the icon page rather than its own, because the
-/// three smallest registry-backed primitives — icon, spinner and ds-rule —
+/// three smallest registry-backed primitives: icon, spinner and ds-rule —
 /// read better together than as three near-empty pages.
 library;
 

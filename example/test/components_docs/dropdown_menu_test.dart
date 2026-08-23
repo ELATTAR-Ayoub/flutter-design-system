@@ -1,5 +1,5 @@
 /// Tests for `components_docs/dropdown_menu/meta.dart` and
-/// `components_docs/dropdown_menu/page.dart` — the public documentation page
+/// `components_docs/dropdown_menu/page.dart`: the public documentation page
 /// for **both** `DsDropdownMenu` (`lib/src/components/dropdown_menu.dart`)
 /// and the shared menu engine it is built from
 /// (`lib/src/components/menu.dart`).
@@ -9,7 +9,7 @@
 /// coverage uses a live `DsThemeController` flipped in place.
 ///
 /// `DsDropdownMenu` mounts its content through `DsPopover`'s `OverlayPortal`,
-/// so the live specimen needs a real `Overlay` — the harness wraps the page
+/// so the live specimen needs a real `Overlay`: the harness wraps the page
 /// in a `MaterialApp`, the same fix `tooltip_test.dart` and `menus_test.dart`
 /// (the package-level suite) both needed. A bare `Directionality`/`Material`
 /// host would let the page render but the menu would never actually open.
@@ -18,6 +18,7 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/dropdown_menu/meta.dart';
 import 'package:example/components_docs/dropdown_menu/page.dart';
+import 'package:example/kit.dart' show DsSection;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -56,7 +57,7 @@ Future<DsThemeController> _pumpDropdownMenuDoc(
 }
 
 /// Runs the popover's 320ms exit animation out and lets the portal unmount
-/// behind it — `DsPopover` starts its reverse from a post-frame callback, so
+/// behind it: `DsPopover` starts its reverse from a post-frame callback, so
 /// this needs one frame beyond the naive count. Mirrors `menus_test.dart`'s
 /// own `runOverlay`.
 Future<void> _runOverlay(WidgetTester tester) async {
@@ -114,7 +115,7 @@ void main() {
           'DsMenuMotion',
         ]),
       );
-      // No registry manifest exists for either file — real, non-invented
+      // No registry manifest exists for either file: real, non-invented
       // source-level dependencies only, not a claimed registry list.
       expect(dropdownMenuDoc.dependencies, <String>[
         'button',
@@ -161,6 +162,49 @@ void main() {
     });
 
     testWidgets(
+      'renders the shadcn-mirrored section list, top to bottom, in order',
+      (WidgetTester tester) async {
+        await _pumpDropdownMenuDoc(tester);
+
+        // The shadcn dropdown-menu frame (Preview, Installation, Usage,
+        // Composition, one Examples section per row shape/pattern, API
+        // Reference), then Elattar's own six sections, in that order.
+        const List<String> headingsInOrder = <String>[
+          'Installation',
+          'Usage',
+          'Composition',
+          'Basic',
+          'Submenu',
+          'Shortcuts',
+          'Icons',
+          'Checkboxes',
+          'Radio group',
+          'Destructive',
+          'Complex',
+          'API Reference',
+          'States and feedback',
+          'Accessibility and keyboard behavior',
+          'Responsive and platform behavior',
+          'Dependencies, files, and disclosure',
+          'Theming notes',
+          'Source and tests',
+        ];
+
+        // Read the mounted DsSection widgets in tree order rather than
+        // text-finding each heading: the section heading and a nested
+        // sub-heading (e.g. inside "Complex") can render the same string,
+        // which makes a find.text-based check ambiguous even when scoped to
+        // the article.
+        final List<String> titles = tester
+            .widgetList<DsSection>(find.byType(DsSection))
+            .map((DsSection section) => section.title)
+            .toList();
+
+        expect(titles, headingsInOrder);
+      },
+    );
+
+    testWidgets(
       'the API tables document every constructor parameter found in the '
       'source, for both DsDropdownMenu and the shared menu.dart engine',
       (WidgetTester tester) async {
@@ -180,7 +224,7 @@ void main() {
         expect(find.text('sideOffset'), findsOneWidget);
         expect(find.text('pressScaleSuppressed'), findsOneWidget);
 
-        // The row model — DsMenuItem.
+        // The row model: DsMenuItem.
         expect(find.text('label'), findsWidgets);
         expect(find.text('icon'), findsWidgets);
         expect(find.text('lucideIcon'), findsOneWidget);
@@ -273,7 +317,7 @@ void main() {
     );
   });
 
-  group('live specimen — open, activate, dismiss', () {
+  group('live specimen: open, activate, dismiss', () {
     testWidgets('a tap on the trigger opens the menu and marks it expanded', (
       WidgetTester tester,
     ) async {
@@ -301,7 +345,7 @@ void main() {
         isTrue,
         reason:
             'DsMenuTriggerScope.openOf should flip the trigger to expanded '
-            'while the menu it opens is open — GAP CLOSED 2 in '
+            'while the menu it opens is open: GAP CLOSED 2 in '
             'dropdown_menu.dart.',
       );
     });
@@ -343,7 +387,7 @@ void main() {
 
         // Reopen and confirm the boolean really flipped: the checked row now
         // carries a check glyph inside its own Stack, an unchecked row holds
-        // none at all — same probe menus_test.dart runs against the source.
+        // none at all: same probe menus_test.dart runs against the source.
         await _openSpecimenMenu(tester);
         final Finder rowStack = find
             .ancestor(
@@ -401,7 +445,7 @@ void main() {
     });
 
     testWidgets(
-      'GAP: Enter/Space on the focused trigger does not open the menu — '
+      'GAP: Enter/Space on the focused trigger does not open the menu, '
       'only a real pointer down does',
       (WidgetTester tester) async {
         await _pumpDropdownMenuDoc(tester);
@@ -452,7 +496,7 @@ void main() {
     );
 
     testWidgets('GAP: a submenu under DsDropdownMenu renders subBordered, not '
-        "subRinged — the file's own DRIFT-4 table names for a dropdown's "
+        "subRinged: the file's own DRIFT-4 table names for a dropdown's "
         'sub-content', (WidgetTester tester) async {
       await _pumpDropdownMenuDoc(tester);
       await _openSpecimenMenu(tester);

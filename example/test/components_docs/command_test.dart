@@ -1,15 +1,15 @@
 /// Tests for `components_docs/command/meta.dart` and
-/// `components_docs/command/page.dart` — the paired public documentation
+/// `components_docs/command/page.dart`: the paired public documentation
 /// page for [DsCommand] and [DsCombobox].
 ///
 /// Both are anchored/inline "filter as you type" surfaces documented on one
-/// page — the same one-entry-two-components shape `sheet/page.dart` already
+/// page: the same one-entry-two-components shape `sheet/page.dart` already
 /// uses for Sheet and Drawer. `DsCombobox` mounts its popup through
 /// [DsPopover] (an [OverlayPortal]), so the live specimen needs a real
-/// [Overlay] — the harness wraps the page in a [MaterialApp], the same fix
+/// [Overlay]: the harness wraps the page in a [MaterialApp], the same fix
 /// `popover_test.dart` and `sheet_test.dart` needed. `DsCommand` is
-/// deliberately **not** an overlay — it has nothing to anchor to and is
-/// always mounted inline — so its own specimen needs no such wrapping, but
+/// deliberately **not** an overlay: it has nothing to anchor to and is
+/// always mounted inline: so its own specimen needs no such wrapping, but
 /// the shared harness below still supplies one for the combobox specimen
 /// living beside it on the same page.
 ///
@@ -21,6 +21,7 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/command/meta.dart';
 import 'package:example/components_docs/command/page.dart';
+import 'package:example/kit.dart' show DsSection;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -77,6 +78,32 @@ Finder _comboboxInput() => find.descendant(
   matching: find.byType(DsInputGroupInput),
 );
 
+/// The shadcn-parity section order (worker brief, `command` component,
+/// which covers two shadcn counterparts: `command` and `combobox`). The live
+/// demo sits unheaded above Installation, so it carries no entry here.
+/// Composition and Filtering are shared, cross-cutting sections; Shortcuts,
+/// Groups, Scrollable and In a panel are Command's own; Invalid and Disabled
+/// are Combobox's own; the trailing six are this package's fixed extras.
+const List<String> _expectedSectionHeadings = <String>[
+  'Installation',
+  'Usage',
+  'Composition',
+  'Filtering',
+  'Shortcuts',
+  'Groups',
+  'Scrollable',
+  'In a panel',
+  'Invalid',
+  'Disabled',
+  'API Reference',
+  'States',
+  'Accessibility',
+  'Responsive',
+  'Dependencies',
+  'Theming',
+  'Source',
+];
+
 void main() {
   group('meta', () {
     test('commandDoc names the real public API surface of both components', () {
@@ -125,6 +152,35 @@ void main() {
       expect(find.byKey(_comboboxSpecimenKey), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
+
+    testWidgets(
+      'renders the shadcn-parity section headings in order, with no '
+      'heading before Installation and no Overview, Preview or Variants '
+      'heading left over from the old shape',
+      (WidgetTester tester) async {
+        await _pumpCommandDoc(tester);
+
+        final List<String> headings = tester
+            .widgetList<DsText>(find.byType(DsText))
+            .where((DsText text) => text.spec == DsType.h3)
+            .map((DsText text) => text.text)
+            .toList();
+
+        expect(headings, _expectedSectionHeadings);
+
+        // Section headings only: DocsCodeExample renders its own "Preview"
+        // tab label as free text, so a plain find.text('Preview') finds that
+        // affordance rather than a leftover heading. Read the mounted
+        // DsSection titles instead, which are immune to that collision.
+        final List<String> sectionTitles = tester
+            .widgetList<DsSection>(find.byType(DsSection))
+            .map((DsSection section) => section.title)
+            .toList();
+        expect(sectionTitles, isNot(contains('Overview')));
+        expect(sectionTitles, isNot(contains('Preview')));
+        expect(sectionTitles, isNot(contains('Variants')));
+      },
+    );
 
     testWidgets(
       'the API tables cover every constructor parameter of DsCommand, '
@@ -192,7 +248,7 @@ void main() {
       (WidgetTester tester) async {
         await _pumpCommandDoc(tester);
 
-        // Command's fuzzy scorer — the source's own measured worked example.
+        // Command's fuzzy scorer: the source's own measured worked example.
         expect(find.textContaining('Go to Stash'), findsWidgets);
         expect(find.textContaining('0.891'), findsWidgets);
         // Combobox's plain substring matcher.
@@ -228,7 +284,7 @@ void main() {
     );
   });
 
-  group('live specimen — command palette filters and re-sorts as you type', () {
+  group('live specimen: command palette filters and re-sorts as you type', () {
     testWidgets('typing narrows the list and the empty state appears', (
       WidgetTester tester,
     ) async {
@@ -286,7 +342,7 @@ void main() {
       await tester.tap(input);
       await tester.pump();
       // cmdk selects the first item once the items register, before anyone
-      // has touched anything — Eclipse Vault is the first row of the first
+      // has touched anything: Eclipse Vault is the first row of the first
       // group.
       await tester.sendKeyEvent(LogicalKeyboardKey.enter);
       await tester.pump();
@@ -297,7 +353,7 @@ void main() {
   });
 
   group(
-    'live specimen — combobox opens, filters, and selects a real value',
+    'live specimen: combobox opens, filters, and selects a real value',
     () {
       testWidgets('tapping the input opens the popup showing every card set', (
         WidgetTester tester,
@@ -369,7 +425,7 @@ void main() {
         await tester.pump();
 
         expect(find.textContaining('Selected: Golden Rift'), findsOneWidget);
-        // The popup is closed — a sibling row is no longer in the tree.
+        // The popup is closed: a sibling row is no longer in the tree.
         expect(find.text('Mystic Surge'), findsNothing);
         expect(tester.takeException(), isNull);
       });

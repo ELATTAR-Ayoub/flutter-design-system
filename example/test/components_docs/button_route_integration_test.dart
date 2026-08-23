@@ -3,16 +3,17 @@
 ///
 /// * `main.dart` now dispatches `/components/button` to the reference page in
 ///   `components_docs/button/page.dart`, not the retired `ButtonDocPage` in
-///   `button_card_pages.dart` — proven via keys unique to the reference
-///   page's thirteen Examples subsections, which the retired page has no
-///   equivalent of.
+///   `button_card_pages.dart`: proven via keys unique to the reference
+///   page's example sections like Size and Default, which the retired page
+///   has no equivalent of.
 /// * A component route's left rail is now `DocsLayout`'s new default —
 ///   "Sections" then "Components", the latter built from every
-///   `components_docs/catalog.dart` entry — rather than the page's own
+///   `components_docs/catalog.dart` entry: rather than the page's own
 ///   retired five-item list.
-/// * The button page's TOC nests its thirteen Examples anchors as
-///   [DocsTocEntry.children] under one `Examples` parent, and activating a
-///   nested child scrolls the article rather than navigating away.
+/// * The button page's TOC has fourteen example sections as top-level entries,
+///   siblings of Installation and Usage, with no "Examples" wrapper. API
+///   Reference is the only entry with nested [DocsTocEntry.children], and
+///   activating a nested child scrolls the article rather than navigating away.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
@@ -39,22 +40,23 @@ Widget _harness({required Widget child, ScrollController? scrollController}) =>
 
 const Size _desktop = Size(1440, 900);
 
-/// Every `example-*` anchor the reference page nests under `Examples` — see
+/// Every example anchor that is a top-level TOC entry in the button page: see
 /// `components_docs/button/page.dart`'s `toc:` list.
 const List<String> _exampleAnchors = <String>[
-  'example-default',
-  'example-premium',
-  'example-secondary',
-  'example-destructive',
-  'example-outline',
-  'example-ghost',
-  'example-link',
-  'example-icon',
-  'example-with-icon',
-  'example-loading',
-  'example-disabled',
-  'example-sizes',
-  'example-emphasis',
+  'size',
+  'default',
+  'premium',
+  'outline',
+  'secondary',
+  'ghost',
+  'destructive',
+  'link',
+  'icon',
+  'with-icon',
+  'rounded',
+  'spinner',
+  'disabled',
+  'emphasis',
 ];
 
 void main() {
@@ -68,7 +70,7 @@ void main() {
           child: publicPageFor('/components/button', onNavigate: (_) {}),
         ),
       );
-      // One frame only — the Premium example's foil shimmer loops forever
+      // One frame only: the Premium example's foil shimmer loops forever
       // and would hang a `pumpAndSettle()`.
       await tester.pump();
 
@@ -132,8 +134,7 @@ void main() {
   );
 
   testWidgets(
-    'the Examples TOC entry carries all thirteen example anchors as nested '
-    'children',
+    'the example sections are top-level TOC entries, with no Examples parent',
     (WidgetTester tester) async {
       _setViewSize(tester, _desktop);
       await tester.pumpWidget(
@@ -143,33 +144,25 @@ void main() {
       );
       await tester.pump();
 
-      final Finder parent = find.byKey(
+      // No "Examples" entry exists in the TOC.
+      final Finder noExamples = find.byKey(
         const ValueKey<String>('docs-layout-toc-entry:examples'),
       );
-      expect(parent, findsOneWidget);
+      expect(noExamples, findsNothing);
 
+      // All example anchors are top-level entries, not children.
       for (final String anchor in _exampleAnchors) {
         expect(
-          find.byKey(ValueKey<String>('docs-layout-toc-child:$anchor')),
+          find.byKey(ValueKey<String>('docs-layout-toc-entry:$anchor')),
           findsOneWidget,
-          reason: '$anchor is not nested under Examples',
+          reason: '$anchor is not a top-level TOC entry',
         );
       }
-
-      final double parentLeft = tester.getTopLeft(parent).dx;
-      final double childLeft = tester
-          .getTopLeft(
-            find.byKey(
-              const ValueKey<String>('docs-layout-toc-entry:example-default'),
-            ),
-          )
-          .dx;
-      expect(childLeft, greaterThan(parentLeft));
     },
   );
 
   testWidgets(
-    'activating a nested Examples child scrolls the article; it never '
+    'activating a nested API Reference child scrolls the article; it never '
     'navigates away',
     (WidgetTester tester) async {
       _setViewSize(tester, _desktop);
@@ -188,7 +181,7 @@ void main() {
 
       await tester.tap(
         find.byKey(
-          const ValueKey<String>('docs-layout-toc-entry:example-secondary'),
+          const ValueKey<String>('docs-layout-toc-child:api-dsbutton'),
         ),
       );
       // Advance past the 400ms scroll-to-anchor animation without settling —

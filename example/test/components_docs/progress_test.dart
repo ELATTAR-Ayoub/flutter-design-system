@@ -4,16 +4,18 @@ import 'dart:ui' as ui;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/progress/meta.dart';
 import 'package:example/components_docs/progress/page.dart';
+import 'package:example/kit.dart' show DsSection;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// The `progress` documentation page: renders the eighteen-section template
-/// for BOTH `DsProgress` and `DsSkeleton` on one page (one entry, one route —
-/// see `meta.dart`'s own note on why two components share this slot).
+/// The `progress` documentation page: renders the shadcn-mirrored section
+/// template for BOTH `DsProgress` and `DsSkeleton` on one page (one entry,
+/// one route: see `meta.dart`'s own note on why two components share this
+/// slot).
 ///
-/// Both components carry a real animation — `DsProgress`'s fill tweens on
-/// every value change, `DsSkeleton`'s shimmer loops forever — so this file
+/// Both components carry a real animation: `DsProgress`'s fill tweens on
+/// every value change, `DsSkeleton`'s shimmer loops forever, so this file
 /// never calls `tester.pumpAndSettle()`: a looping `AnimationController.repeat()`
 /// under `DsSkeleton` means settle would poll forever. Every wait below is a
 /// bounded `tester.pump()`/`tester.pump(Duration(...))` instead, exactly as
@@ -37,6 +39,54 @@ Widget _harness({
 void main() {
   group('progress & skeleton docs page', () {
     testWidgets(
+      'sections render in the shadcn-mirrored order, section for section, '
+      'progress then skeleton, each named for its own component',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(1440, 900);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+
+        await tester.pumpWidget(
+          _harness(
+            size: const Size(1440, 900),
+            controller: DsThemeController(mode: DsThemeMode.dark),
+            child: const ProgressDocPage(),
+          ),
+        );
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 300));
+
+        final List<String> titles = tester
+            .widgetList<DsSection>(find.byType(DsSection))
+            .map((DsSection section) => section.title)
+            .toList();
+
+        expect(titles, <String>[
+          'Installation',
+          'Usage',
+          'Progress: Label and value',
+          'Progress: Controlled',
+          'Progress: RTL',
+          'Progress: Download list',
+          'Skeleton: Avatar',
+          'Skeleton: Card',
+          'Skeleton: Text',
+          'Skeleton: Form',
+          'Skeleton: Table',
+          'Skeleton: RTL',
+          'Skeleton: Avoiding layout shift',
+          'API Reference',
+          'States',
+          'Accessibility',
+          'Responsive',
+          'Dependencies',
+          'Theming',
+          'Source',
+        ]);
+      },
+    );
+
+    testWidgets(
       'renders the article, both API tables, and live specimens of both '
       'components at several values',
       (WidgetTester tester) async {
@@ -54,7 +104,7 @@ void main() {
             ),
           ),
         );
-        // One bounded pump for the first frame's layout — never
+        // One bounded pump for the first frame's layout: never
         // pumpAndSettle, which would poll forever against DsSkeleton's
         // repeating shimmer controller.
         await tester.pump();
@@ -217,7 +267,7 @@ void main() {
     );
 
     testWidgets(
-      'renders at narrow width in light mode too — the 390×844/1440×900 × '
+      'renders at narrow width in light mode too: the 390×844/1440×900 × '
       'light/dark matrix the brief requires',
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(390, 844);
@@ -268,7 +318,7 @@ void main() {
         findsOneWidget,
       );
 
-      // Flip the SAME controller in place — not a fresh widget tree.
+      // Flip the SAME controller in place: not a fresh widget tree.
       controller.setMode(DsThemeMode.light);
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 300));
@@ -300,7 +350,7 @@ void main() {
         // Under MediaQueryData.disableAnimations, dsAnimationDuration
         // collapses every tween AND every DsKeyframePlayer repeat to
         // Duration.zero (theme_scope.dart), so a couple of bounded pumps are
-        // enough to reach the settled frame — never pumpAndSettle.
+        // enough to reach the settled frame: never pumpAndSettle.
         await tester.pump();
         await tester.pump();
 
@@ -326,7 +376,7 @@ void main() {
         await tester.ensureVisible(advanceButton);
         await tester.pump();
         await tester.tap(advanceButton);
-        // A SINGLE pump — no arbitrary settle duration — is enough because
+        // A SINGLE pump: no arbitrary settle duration, is enough because
         // the transition's own duration is now Duration.zero.
         await tester.pump();
 
@@ -345,7 +395,7 @@ void main() {
         // ── DsSkeleton: the shimmer paints a single still frame under
         // reduced motion. DsKeyframePlayer(repeat: true) wraps its own
         // painted output in a RepaintBoundary (keyframes.dart), which this
-        // rasterises directly — the same technique
+        // rasterises directly: the same technique
         // test/feedback_effects_test.dart's rasterise()/readRaster() use at
         // package level, applied here to this page's own avatar specimen so
         // the docs test does not merely take the package test's word for
@@ -368,7 +418,7 @@ void main() {
           orderedEquals(frameB),
           reason:
               'the skeleton shimmer kept moving under '
-              'MediaQuery.disableAnimations: true — reduced motion did not '
+              'MediaQuery.disableAnimations: true, reduced motion did not '
               'settle it',
         );
       },

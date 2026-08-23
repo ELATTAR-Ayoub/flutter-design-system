@@ -1,6 +1,6 @@
 /// Documentation metadata for the `carousel`, `nav_user`, and `marker` components.
 ///
-/// Not wired into `catalog.dart`'s `componentDocs` list — that file is
+/// Not wired into `catalog.dart`'s `componentDocs` list: that file is
 /// supervisor-owned. `page.dart` reads [carouselDoc], [navUserDoc], and
 /// [markerDoc] directly rather than going through `componentDoc()`, so
 /// these entries stand on their own until the supervisor aggregates them.

@@ -1,29 +1,63 @@
 /// Public documentation page for the `button` component.
 ///
-/// This is the **reference shape** the Phase J supervisor asked for
-/// (https://ui.shadcn.com/docs/components/base/button as the visual target):
-/// title + one-sentence hero, a primary Preview/Code specimen, Installation
-/// (CLI + Manual), Usage, an `Examples` section carrying one Preview/Code
-/// pair PER real variant/size/state composition, API Reference (one table
-/// per exported class/enum), and finally the Elattar-specific sections —
-/// States, Accessibility, Responsive, Dependencies, Theming, Source — below
-/// that. Every other component page is expected to be reshaped to match this
-/// one, not the other way around.
+/// **Reference shape, reshaped again.** Phase J asked this page to mirror
+/// https://ui.shadcn.com/docs/components/base/button's own literal section
+/// list, not shadcn's variant names read as if they were enum values.
+/// Fetched fresh, that page's `<h2>`s are, in order: Installation, Usage,
+/// Cursor, Size, Default, Outline, Secondary, Ghost, Destructive, Link,
+/// Icon, With Icon, Rounded, Spinner, Button Group, As Link, RTL, API
+/// Reference (one nested `<h3>`, Button, its own prop table). Every one of
+/// those but three is a TOP-LEVEL section on their page, a sibling of
+/// Installation, never a child of some "Examples" wrapper, so this page
+/// carries no Examples wrapper either: the thirteen former `example-*`
+/// subsections are promoted to the same level as Installation, matching
+/// shadcn's own flat shape. The live all-variants specimen mounts above
+/// Installation too, but as a bare `DocsCodeExample`, not a `DsSection`:
+/// it owns no heading and no TOC entry, so Installation is the first real
+/// entry, matching every other page in the corpus.
 ///
-/// **Nested TOC.** [DocsTocEntry] (in `../../docs/docs_layout.dart`) now
-/// carries one level of `children`, so `Examples` is a single parent entry
-/// and the thirteen `example-*` anchors are its `children` — rendered
-/// indented beneath it in the "ON THIS PAGE" rail and flattened back in next
-/// to it in the narrow anchor strip. Anchors and section ids are unchanged;
-/// only the shape of the list passed to `toc:` nests.
+/// **Skipped, honestly.** Three of shadcn's eighteen sections describe a
+/// capability this Flutter port does not have, and rather than fake one,
+/// each is left off the page and named here instead:
+/// * Cursor: shadcn's section is a Tailwind v4 CSS snippet (or a
+///   `shadcn init --pointer` flag) that opts a whole PROJECT back into
+///   `cursor: pointer`. There is no CSS layer and no per-project toggle in
+///   this port: `_DsButtonState.build`'s `MouseRegion` hardcodes
+///   `SystemMouseCursors.click` whenever the button is enabled, on every
+///   variant, unconditionally. Nothing here is a switch a caller can flip.
+/// * As Link: shadcn's section uses `buttonVariants()`, a pure style
+///   function, to paint a real `<a>` like a Button without the polymorphic
+///   Button-as-anchor render prop. `button.dart` exposes no such
+///   style-only function: `_skin`/`_ButtonSkin`/`_surface` are private to
+///   `_DsButtonState.build`, and this system has no anchor widget to paint
+///   them onto. The page's own hero paragraph already argues the point the
+///   other way: reach for a route push, `DsNavigationMenu`, or a sidebar
+///   entry instead of dressing a control up as a link.
+/// * RTL: no `Directionality`/`TextDirection` branch anywhere in
+///   `button.dart`, and the docs shell this page renders inside carries no
+///   locale or direction toggle to demonstrate one against.
+///
+/// **Added, in their style.** `DsButton` carries three things shadcn's
+/// Button does not: a `premium` variant, a third `emphasis` axis, and, via
+/// the sibling `DsButtonGroup` file, a segmented-control composition. Each
+/// gets a section named for what it does, not for its enum value, inserted
+/// next to the shadcn section it is closest kin to: Premium beside Default
+/// (both solid fills), Emphasis and Disabled beside Spinner (all three are
+/// modifiers layered on top of a variant), and Button Group where shadcn's
+/// own equivalent section sits, last before API Reference.
+///
+/// **TOC.** Flat, like shadcn's own page, with one exception: API
+/// Reference nests its six prop tables as `children`, each a real
+/// `docsAnchorKey` target rather than a decoration, since not every
+/// heading here owns a scrollable `DsSection` of its own.
 ///
 /// Two descriptions live in `meta.dart`, the same split `popover` and
 /// `tooltip` already use: [ComponentDocEntry.description] is the short,
 /// one-sentence form (nav/search, and this page's own hero paragraph);
 /// [buttonExpandedDescription] is the longer "button vs link" guidance,
-/// rendered as its own unlabelled paragraph directly under the hero —
+/// rendered as its own unlabelled paragraph directly under the hero,
 /// deliberately not wrapped in its own [DsSection]/anchor, so the required
-/// section order starts clean at Preview.
+/// section order starts clean at Installation.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
@@ -53,29 +87,47 @@ class ButtonDocPage extends StatelessWidget {
       DsBreadcrumbEntry.page('Button'),
     ],
     toc: const <DocsTocEntry>[
-      DocsTocEntry(title: 'Preview', anchor: 'preview'),
       DocsTocEntry(title: 'Installation', anchor: 'install'),
       DocsTocEntry(title: 'Usage', anchor: 'usage'),
+      DocsTocEntry(title: 'Size', anchor: 'size'),
+      DocsTocEntry(title: 'Default', anchor: 'default'),
+      DocsTocEntry(title: 'Premium', anchor: 'premium'),
+      DocsTocEntry(title: 'Outline', anchor: 'outline'),
+      DocsTocEntry(title: 'Secondary', anchor: 'secondary'),
+      DocsTocEntry(title: 'Ghost', anchor: 'ghost'),
+      DocsTocEntry(title: 'Destructive', anchor: 'destructive'),
+      DocsTocEntry(title: 'Link', anchor: 'link'),
+      DocsTocEntry(title: 'Icon', anchor: 'icon'),
+      DocsTocEntry(title: 'With Icon', anchor: 'with-icon'),
+      DocsTocEntry(title: 'Rounded', anchor: 'rounded'),
+      DocsTocEntry(title: 'Spinner', anchor: 'spinner'),
+      DocsTocEntry(title: 'Disabled', anchor: 'disabled'),
+      DocsTocEntry(title: 'Emphasis', anchor: 'emphasis'),
+      DocsTocEntry(title: 'Button Group', anchor: 'button-group'),
       DocsTocEntry(
-        title: 'Examples',
-        anchor: 'examples',
+        title: 'API Reference',
+        anchor: 'api',
         children: <DocsTocEntry>[
-          DocsTocEntry(title: 'Default', anchor: 'example-default'),
-          DocsTocEntry(title: 'Premium', anchor: 'example-premium'),
-          DocsTocEntry(title: 'Secondary', anchor: 'example-secondary'),
-          DocsTocEntry(title: 'Destructive', anchor: 'example-destructive'),
-          DocsTocEntry(title: 'Outline', anchor: 'example-outline'),
-          DocsTocEntry(title: 'Ghost', anchor: 'example-ghost'),
-          DocsTocEntry(title: 'Link', anchor: 'example-link'),
-          DocsTocEntry(title: 'Icon', anchor: 'example-icon'),
-          DocsTocEntry(title: 'With icon', anchor: 'example-with-icon'),
-          DocsTocEntry(title: 'Loading', anchor: 'example-loading'),
-          DocsTocEntry(title: 'Disabled', anchor: 'example-disabled'),
-          DocsTocEntry(title: 'Sizes', anchor: 'example-sizes'),
-          DocsTocEntry(title: 'Emphasis (caps)', anchor: 'example-emphasis'),
+          DocsTocEntry(title: 'DsButton', anchor: 'api-dsbutton'),
+          DocsTocEntry(
+            title: 'DsButton static helpers',
+            anchor: 'api-dsbutton-static',
+          ),
+          DocsTocEntry(
+            title: 'DsButtonVariant',
+            anchor: 'api-dsbutton-variant',
+          ),
+          DocsTocEntry(title: 'DsButtonSize', anchor: 'api-dsbutton-size'),
+          DocsTocEntry(
+            title: 'DsButtonEmphasis',
+            anchor: 'api-dsbutton-emphasis',
+          ),
+          DocsTocEntry(
+            title: 'DsButtonSurface',
+            anchor: 'api-dsbutton-surface',
+          ),
         ],
       ),
-      DocsTocEntry(title: 'API Reference', anchor: 'api'),
       DocsTocEntry(title: 'States', anchor: 'states'),
       DocsTocEntry(title: 'Accessibility', anchor: 'accessibility'),
       DocsTocEntry(title: 'Responsive', anchor: 'responsive'),
@@ -108,20 +160,21 @@ class _ButtonArticle extends StatelessWidget {
         SizedBox(height: ds(6)),
         _usage(),
         SizedBox(height: ds(6)),
-        _examplesIntro(),
-        _exampleDefault(),
-        _examplePremium(),
-        _exampleSecondary(),
-        _exampleDestructive(),
-        _exampleOutline(),
-        _exampleGhost(),
-        _exampleLink(),
-        _exampleIcon(),
-        _exampleWithIcon(),
-        _exampleLoading(),
-        _exampleDisabled(),
-        _exampleSizes(),
-        _exampleEmphasis(),
+        _size(),
+        _default(),
+        _premium(),
+        _outline(),
+        _secondary(),
+        _ghost(),
+        _destructive(),
+        _link(),
+        _icon(),
+        _withIcon(),
+        _rounded(),
+        _spinner(),
+        _disabled(),
+        _emphasis(),
+        _buttonGroup(),
         _api(),
         _states(),
         _accessibility(theme),
@@ -134,48 +187,141 @@ class _ButtonArticle extends StatelessWidget {
   }
 
   /// The CONTENT RULES' "expanded description... when to reach for a button
-  /// versus a link", rendered as plain hero prose — not a [DsSection], so it
+  /// versus a link", rendered as plain hero prose: not a [DsSection], so it
   /// carries no heading and no TOC anchor of its own. See the library doc.
   Widget _heroExpansion() => ConstrainedBox(
     constraints: const BoxConstraints(maxWidth: DsWidths.prose),
     child: DsText(buttonExpandedDescription, DsType.body),
   );
 
-  Widget _preview() => DsSection(
-    id: 'preview',
-    title: 'Preview',
+  Widget _preview() => DocsCodeExample(
+    title: 'Button',
     description:
-        'The default DsButton — primary variant, md size, no emphasis. '
-        'Every other variant, size, and state gets its own live specimen '
-        'further down, in Examples.',
-    child: DocsCodeExample(
-      title: 'Button',
-      preview: Center(
-        child: KeyedSubtree(
-          key: const ValueKey<String>('button-preview:hero'),
-          child: DsButton(onPressed: () {}, child: const Text('Button')),
+        'All seven DsButtonVariant values, side by side. '
+        'Every size and state gets its own live specimen '
+        'further down the page.',
+    preview: SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: ds(2)),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            KeyedSubtree(
+              key: const ValueKey<String>('button-preview:primary'),
+              child: DsButton(onPressed: () {}, child: const Text('Primary')),
+            ),
+            SizedBox(width: ds(2)),
+            KeyedSubtree(
+              key: const ValueKey<String>('button-preview:premium'),
+              child: DsButton(
+                variant: DsButtonVariant.premium,
+                onPressed: () {},
+                child: const Text('Premium'),
+              ),
+            ),
+            SizedBox(width: ds(2)),
+            KeyedSubtree(
+              key: const ValueKey<String>('button-preview:secondary'),
+              child: DsButton(
+                variant: DsButtonVariant.secondary,
+                onPressed: () {},
+                child: const Text('Secondary'),
+              ),
+            ),
+            SizedBox(width: ds(2)),
+            KeyedSubtree(
+              key: const ValueKey<String>('button-preview:outline'),
+              child: DsButton(
+                variant: DsButtonVariant.outline,
+                onPressed: () {},
+                child: const Text('Outline'),
+              ),
+            ),
+            SizedBox(width: ds(2)),
+            KeyedSubtree(
+              key: const ValueKey<String>('button-preview:ghost'),
+              child: DsButton(
+                variant: DsButtonVariant.ghost,
+                onPressed: () {},
+                child: const Text('Ghost'),
+              ),
+            ),
+            SizedBox(width: ds(2)),
+            KeyedSubtree(
+              key: const ValueKey<String>('button-preview:destructive'),
+              child: DsButton(
+                variant: DsButtonVariant.destructive,
+                onPressed: () {},
+                child: const Text('Destructive'),
+              ),
+            ),
+            SizedBox(width: ds(2)),
+            KeyedSubtree(
+              key: const ValueKey<String>('button-preview:link'),
+              child: DsButton(
+                variant: DsButtonVariant.link,
+                onPressed: () {},
+                child: const Text('Link'),
+              ),
+            ),
+          ],
         ),
       ),
-      manualFiles: const <DocsCodeFile>[
-        DocsCodeFile(
-          path: 'button_preview.dart',
-          title: 'Default button',
-          code:
-              "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
-              'DsButton(\n'
-              '  onPressed: () {},\n'
-              "  child: const Text('Button'),\n"
-              ')',
-        ),
-      ],
     ),
+    manualFiles: const <DocsCodeFile>[
+      DocsCodeFile(
+        path: 'button_preview.dart',
+        title: 'All variants',
+        code:
+            "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
+            'Row(\n'
+            '  children: [\n'
+            '    DsButton(\n'
+            '      onPressed: () {},\n'
+            "      child: const Text('Primary'),\n"
+            '    ),\n'
+            '    DsButton(\n'
+            '      variant: DsButtonVariant.premium,\n'
+            '      onPressed: () {},\n'
+            "      child: const Text('Premium'),\n"
+            '    ),\n'
+            '    DsButton(\n'
+            '      variant: DsButtonVariant.secondary,\n'
+            '      onPressed: () {},\n'
+            "      child: const Text('Secondary'),\n"
+            '    ),\n'
+            '    DsButton(\n'
+            '      variant: DsButtonVariant.outline,\n'
+            '      onPressed: () {},\n'
+            "      child: const Text('Outline'),\n"
+            '    ),\n'
+            '    DsButton(\n'
+            '      variant: DsButtonVariant.ghost,\n'
+            '      onPressed: () {},\n'
+            "      child: const Text('Ghost'),\n"
+            '    ),\n'
+            '    DsButton(\n'
+            '      variant: DsButtonVariant.destructive,\n'
+            '      onPressed: () {},\n'
+            "      child: const Text('Destructive'),\n"
+            '    ),\n'
+            '    DsButton(\n'
+            '      variant: DsButtonVariant.link,\n'
+            '      onPressed: () {},\n'
+            "      child: const Text('Link'),\n"
+            '    ),\n'
+            '  ],\n'
+            ')',
+      ),
+    ],
   );
 
   Widget _install() => DsSection(
     id: 'install',
     title: 'Installation',
     description:
-        'button has a real registry manifest — `elattar add button` '
+        'button has a real registry manifest, `elattar add button` '
         'installs lib/src/components/button.dart and resolves all seven '
         'registryDependencies automatically. The Manual tab is for a '
         'project not using the CLI.',
@@ -236,7 +382,7 @@ class _ButtonArticle extends StatelessWidget {
               label: 'Semantic dependencies',
               value: 'press-motion, icon',
               description:
-                  "The manifest's own narrower hint — what a button is "
+                  "The manifest's own narrower hint: what a button is "
                   'commonly composed WITH (an icon child; the motion tokens '
                   'an icon-button transition reads), not a second import '
                   'list. button.dart does not import icon.dart itself.',
@@ -260,25 +406,74 @@ class _ButtonArticle extends StatelessWidget {
     ),
   );
 
-  Widget _examplesIntro() => DsSection(
-    id: 'examples',
-    title: 'Examples',
+  Widget _size() => _example(
+    id: 'size',
+    title: 'Size',
     description:
-        'One live, runnable specimen per real DsButtonVariant, plus every '
-        'DsButtonSize and state composition that renders meaningfully '
-        'differently from the one before it — nothing here is shadcn\'s '
-        'own variant set; every specimen below is built against the real '
-        'DsButtonVariant / DsButtonSize / DsButtonEmphasis this package '
-        'ships. Each subsection is its own Preview/Code pair with its own '
-        'anchor.',
-    child: const SizedBox.shrink(),
+        "shadcn's own Size demo shows four rungs: Extra Small, Small, "
+        'Default, Large. DsButtonSize ships five text rungs instead, xs '
+        'through xl. Each changes height, horizontal padding, and the '
+        'icon-child gap, and three of the five steps also change the type '
+        'spec: xs is unique, sm and md share 13px, lg and xl share 15px. '
+        'The four icon-only squares get their own section, in Icon below.',
+    panelTitle: 'Text sizes',
+    preview: Wrap(
+      spacing: ds(3),
+      runSpacing: ds(3),
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: <Widget>[
+        KeyedSubtree(
+          key: const ValueKey<String>('button-example:sizes-xs'),
+          child: DsButton(
+            size: DsButtonSize.xs,
+            onPressed: () {},
+            child: const Text('Extra small'),
+          ),
+        ),
+        KeyedSubtree(
+          key: const ValueKey<String>('button-example:sizes-sm'),
+          child: DsButton(
+            size: DsButtonSize.sm,
+            onPressed: () {},
+            child: const Text('Small'),
+          ),
+        ),
+        KeyedSubtree(
+          key: const ValueKey<String>('button-example:sizes-md'),
+          child: DsButton(onPressed: () {}, child: const Text('Medium')),
+        ),
+        KeyedSubtree(
+          key: const ValueKey<String>('button-example:sizes-lg'),
+          child: DsButton(
+            size: DsButtonSize.lg,
+            onPressed: () {},
+            child: const Text('Large'),
+          ),
+        ),
+        KeyedSubtree(
+          key: const ValueKey<String>('button-example:sizes-xl'),
+          child: DsButton(
+            size: DsButtonSize.xl,
+            onPressed: () {},
+            child: const Text('Extra large'),
+          ),
+        ),
+      ],
+    ),
+    path: 'button_size.dart',
+    code:
+        'DsButton(size: DsButtonSize.xs, onPressed: () {}, child: const Text(\'Extra small\'))\n'
+        'DsButton(size: DsButtonSize.sm, onPressed: () {}, child: const Text(\'Small\'))\n'
+        'DsButton(onPressed: () {}, child: const Text(\'Medium\')) // size defaults to md\n'
+        'DsButton(size: DsButtonSize.lg, onPressed: () {}, child: const Text(\'Large\'))\n'
+        'DsButton(size: DsButtonSize.xl, onPressed: () {}, child: const Text(\'Extra large\'))',
   );
 
-  Widget _exampleDefault() => _example(
-    id: 'example-default',
+  Widget _default() => _example(
+    id: 'default',
     title: 'Default',
     description:
-        "DsButtonVariant.primary — the constructor's own default. Painted "
+        "DsButtonVariant.primary: the constructor's own default. Painted "
         'through DsSheenAction over theme.primary; shadow-btn-primary at '
         'rest, shadow-btn-down while pressed.',
     panelTitle: 'Default (primary)',
@@ -290,14 +485,15 @@ class _ButtonArticle extends StatelessWidget {
     code: "DsButton(\n  onPressed: () {},\n  child: const Text('Button'),\n)",
   );
 
-  Widget _examplePremium() => _example(
-    id: 'example-premium',
+  Widget _premium() => _example(
+    id: 'premium',
     title: 'Premium',
     description:
-        'DsButtonVariant.premium — the one glowing variant. Painted '
-        'through DsFoilValue (a metal-ramp gradient, not a flat fill), '
-        'with DsPalette.valueForeground text that deliberately does not '
-        'flip between themes. Reserve it for reward and money actions.',
+        'Not in shadcn\'s own set: DsButtonVariant.premium is one this '
+        'system adds, the one glowing variant. Painted through DsFoilValue '
+        '(a metal-ramp gradient, not a flat fill), with '
+        'DsPalette.valueForeground text that deliberately does not flip '
+        'between themes. Reserve it for reward and money actions.',
     panelTitle: 'Premium',
     preview: KeyedSubtree(
       key: const ValueKey<String>('button-example:premium'),
@@ -316,62 +512,11 @@ class _ButtonArticle extends StatelessWidget {
         ')',
   );
 
-  Widget _exampleSecondary() => _example(
-    id: 'example-secondary',
-    title: 'Secondary',
-    description:
-        'DsButtonVariant.secondary — a neutral action beside a primary '
-        'one. Carries no shadow class at all; hover and an open '
-        'aria-expanded trigger both resolve to the same accent fill.',
-    panelTitle: 'Secondary',
-    preview: KeyedSubtree(
-      key: const ValueKey<String>('button-example:secondary'),
-      child: DsButton(
-        variant: DsButtonVariant.secondary,
-        onPressed: () {},
-        child: const Text('Secondary'),
-      ),
-    ),
-    path: 'button_secondary.dart',
-    code:
-        'DsButton(\n'
-        '  variant: DsButtonVariant.secondary,\n'
-        '  onPressed: () {},\n'
-        "  child: const Text('Secondary'),\n"
-        ')',
-  );
-
-  Widget _exampleDestructive() => _example(
-    id: 'example-destructive',
-    title: 'Destructive',
-    description:
-        'DsButtonVariant.destructive — a 10% tint of theme.destructive '
-        'rather than a solid fill: a solid fill measures under AA against '
-        'white text, the tint clears it and still reads unmistakably as '
-        'danger. Reach for it for an irreversible or dangerous action.',
-    panelTitle: 'Destructive',
-    preview: KeyedSubtree(
-      key: const ValueKey<String>('button-example:destructive'),
-      child: DsButton(
-        variant: DsButtonVariant.destructive,
-        onPressed: () {},
-        child: const Text('Delete account'),
-      ),
-    ),
-    path: 'button_destructive.dart',
-    code:
-        'DsButton(\n'
-        '  variant: DsButtonVariant.destructive,\n'
-        '  onPressed: () {},\n'
-        "  child: const Text('Delete account'),\n"
-        ')',
-  );
-
-  Widget _exampleOutline() => _example(
-    id: 'example-outline',
+  Widget _outline() => _example(
+    id: 'outline',
     title: 'Outline',
     description:
-        'DsButtonVariant.outline — a bordered DsMachineSurface you can '
+        'DsButtonVariant.outline: a bordered DsMachineSurface you can '
         'press: theme.card fill, theme.input border, shadow-btn at rest '
         'and shadow-btn-down while pressed. For actions that must not '
         'compete with a primary button.',
@@ -393,11 +538,36 @@ class _ButtonArticle extends StatelessWidget {
         ')',
   );
 
-  Widget _exampleGhost() => _example(
-    id: 'example-ghost',
+  Widget _secondary() => _example(
+    id: 'secondary',
+    title: 'Secondary',
+    description:
+        'DsButtonVariant.secondary: a neutral action beside a primary '
+        'one. Carries no shadow class at all; hover and an open '
+        'aria-expanded trigger both resolve to the same accent fill.',
+    panelTitle: 'Secondary',
+    preview: KeyedSubtree(
+      key: const ValueKey<String>('button-example:secondary'),
+      child: DsButton(
+        variant: DsButtonVariant.secondary,
+        onPressed: () {},
+        child: const Text('Secondary'),
+      ),
+    ),
+    path: 'button_secondary.dart',
+    code:
+        'DsButton(\n'
+        '  variant: DsButtonVariant.secondary,\n'
+        '  onPressed: () {},\n'
+        "  child: const Text('Secondary'),\n"
+        ')',
+  );
+
+  Widget _ghost() => _example(
+    id: 'ghost',
     title: 'Ghost',
     description:
-        'DsButtonVariant.ghost — no fill, no border, and no elevation '
+        'DsButtonVariant.ghost: no fill, no border, and no elevation '
         'until touched. The one variant that answers hover, pressed, and '
         'an open aria-expanded trigger with three different fills of its '
         'own.',
@@ -419,13 +589,39 @@ class _ButtonArticle extends StatelessWidget {
         ')',
   );
 
-  Widget _exampleLink() => _example(
-    id: 'example-link',
+  Widget _destructive() => _example(
+    id: 'destructive',
+    title: 'Destructive',
+    description:
+        'DsButtonVariant.destructive: a 10% tint of theme.destructive '
+        'rather than a solid fill: a solid fill measures under AA against '
+        'white text, the tint clears it and still reads unmistakably as '
+        'danger. Reach for it for an irreversible or dangerous action.',
+    panelTitle: 'Destructive',
+    preview: KeyedSubtree(
+      key: const ValueKey<String>('button-example:destructive'),
+      child: DsButton(
+        variant: DsButtonVariant.destructive,
+        onPressed: () {},
+        child: const Text('Delete account'),
+      ),
+    ),
+    path: 'button_destructive.dart',
+    code:
+        'DsButton(\n'
+        '  variant: DsButtonVariant.destructive,\n'
+        '  onPressed: () {},\n'
+        "  child: const Text('Delete account'),\n"
+        ')',
+  );
+
+  Widget _link() => _example(
+    id: 'link',
     title: 'Link',
     description:
-        'DsButtonVariant.link — text-only, theme.actionInk, underlines on '
+        'DsButtonVariant.link: text-only, theme.actionInk, underlines on '
         'hover. Still a DsButton underneath: the rendered Semantics node '
-        'reports button: true, not link — see this page\'s hero paragraph '
+        'reports button: true, not link: see this page\'s hero paragraph '
         'above for what that means for navigation.',
     panelTitle: 'Link',
     preview: KeyedSubtree(
@@ -445,11 +641,11 @@ class _ButtonArticle extends StatelessWidget {
         ')',
   );
 
-  Widget _exampleIcon() => _example(
-    id: 'example-icon',
+  Widget _icon() => _example(
+    id: 'icon',
     title: 'Icon',
     description:
-        'The four square DsButtonSize rungs — iconXs, iconSm, icon, '
+        'The four square DsButtonSize rungs: iconXs, iconSm, icon, '
         'iconLg. DsButton.isSquare(size) is true, gapFor and paddingXFor '
         'both go to zero, and the button centres a single glyph. label is '
         'required here: with no visible text, it becomes the whole '
@@ -504,7 +700,7 @@ class _ButtonArticle extends StatelessWidget {
     ),
     path: 'button_icon.dart',
     code:
-        '// iconXs (24px), iconSm (32px), icon (40px), iconLg (48px) — each\n'
+        '// iconXs (24px), iconSm (32px), icon (40px), iconLg (48px): each\n'
         '// forces its own icon px (DsButton.iconPxFor) and requires a\n'
         '// label, since there is no visible text.\n'
         'DsButton(\n'
@@ -516,11 +712,11 @@ class _ButtonArticle extends StatelessWidget {
         ')',
   );
 
-  Widget _exampleWithIcon() => _example(
-    id: 'example-with-icon',
-    title: 'With icon',
+  Widget _withIcon() => _example(
+    id: 'with-icon',
+    title: 'With Icon',
     description:
-        'DsButton takes exactly one child — an icon-and-label composition '
+        'DsButton takes exactly one child: an icon-and-label composition '
         'is the caller\'s own Row, spaced by DsButton.gapFor(size), the '
         'same gap the loading spinner uses in front of its own label.',
     panelTitle: 'With icon',
@@ -553,17 +749,84 @@ class _ButtonArticle extends StatelessWidget {
         ')',
   );
 
-  Widget _exampleLoading() => _example(
-    id: 'example-loading',
-    title: 'Loading',
+  Widget _rounded() => _example(
+    id: 'rounded',
+    title: 'Rounded',
     description:
-        'loading: true prepends a DsSpinner and forces the button '
+        "shadcn's own Rounded demo adds rounded-full to round off its "
+        'default rounded-md button. DsButton starts there already: '
+        'BorderRadius.circular(DsRadii.pill) is the base list\'s own '
+        'shape, on every variant, so there is nothing left to round '
+        'further. The real override axis runs the other way: radius '
+        'lets a caller pull IN from the pill. The sidebar is the one '
+        'place in the corpus that does it, SidebarMenuButton and '
+        'SidebarMenuSubButton both dropping to DsRadii.lg, '
+        'SidebarMenuAction dropping further to DsRadii.md, both shown '
+        'below, "a 240px pill is a lozenge."',
+    panelTitle: 'Shape override',
+    preview: Wrap(
+      spacing: ds(3),
+      runSpacing: ds(3),
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: <Widget>[
+        KeyedSubtree(
+          key: const ValueKey<String>('button-example:rounded-pill'),
+          child: DsButton(
+            onPressed: () {},
+            child: const Text('Pill (default)'),
+          ),
+        ),
+        KeyedSubtree(
+          key: const ValueKey<String>('button-example:rounded-lg'),
+          child: DsButton(
+            radius: BorderRadius.circular(DsRadii.lg),
+            onPressed: () {},
+            child: const Text('Sidebar row'),
+          ),
+        ),
+        KeyedSubtree(
+          key: const ValueKey<String>('button-example:rounded-md'),
+          child: DsButton(
+            radius: BorderRadius.circular(DsRadii.md),
+            onPressed: () {},
+            child: const Text('Sidebar action'),
+          ),
+        ),
+      ],
+    ),
+    path: 'button_rounded.dart',
+    code:
+        "// Pill is the base list's own shape, on every variant.\n"
+        'DsButton(onPressed: () {}, child: const Text(\'Pill (default)\'))\n'
+        '\n'
+        '// SidebarMenuButton / SidebarMenuSubButton override to rounded-lg.\n'
+        'DsButton(\n'
+        '  radius: BorderRadius.circular(DsRadii.lg),\n'
+        '  onPressed: () {},\n'
+        '  child: const Text(\'Sidebar row\'),\n'
+        ')\n'
+        '\n'
+        '// SidebarMenuAction overrides further to rounded-md.\n'
+        'DsButton(\n'
+        '  radius: BorderRadius.circular(DsRadii.md),\n'
+        '  onPressed: () {},\n'
+        '  child: const Text(\'Sidebar action\'),\n'
+        ')',
+  );
+
+  Widget _spinner() => _example(
+    id: 'spinner',
+    title: 'Spinner',
+    description:
+        'shadcn composes a <Spinner /> child by hand and tags it '
+        'data-icon for spacing. DsButton takes a single loading: true '
+        'flag instead, which prepends a DsSpinner and forces the button '
         'disabled (enabled = onPressed != null && !loading). DOCUMENTED '
         'DRIFT the source itself flags: the spinner\'s width is not '
         'reserved in advance, so the button grows by DsSpinner.px + '
         'gapFor(size) the instant loading starts, rather than holding a '
         'fixed width from the beginning.',
-    panelTitle: 'Loading',
+    panelTitle: 'Spinner',
     preview: KeyedSubtree(
       key: const ValueKey<String>('button-example:loading'),
       child: DsButton(
@@ -572,7 +835,7 @@ class _ButtonArticle extends StatelessWidget {
         child: const Text('Please wait'),
       ),
     ),
-    path: 'button_loading.dart',
+    path: 'button_spinner.dart',
     code:
         'DsButton(\n'
         '  loading: true,\n'
@@ -581,11 +844,11 @@ class _ButtonArticle extends StatelessWidget {
         ')',
   );
 
-  Widget _exampleDisabled() => _example(
-    id: 'example-disabled',
+  Widget _disabled() => _example(
+    id: 'disabled',
     title: 'Disabled',
     description:
-        'onPressed: null is the only disabled switch DsButton has — there '
+        'onPressed: null is the only disabled switch DsButton has: there '
         'is no separate enabled flag. Opacity springs to 45% on the same '
         'clock the colour legs use; IgnorePointer kills input in the same '
         'frame, unanimated.',
@@ -598,76 +861,15 @@ class _ButtonArticle extends StatelessWidget {
     code: "DsButton(\n  onPressed: null,\n  child: const Text('Disabled'),\n)",
   );
 
-  Widget _exampleSizes() => _example(
-    id: 'example-sizes',
-    title: 'Sizes',
+  Widget _emphasis() => _example(
+    id: 'emphasis',
+    title: 'Emphasis',
     description:
-        'The five text rungs — xs (24px) through xl (56px). Each changes '
-        'height, horizontal padding, and the icon-child gap; three of the '
-        'five steps also change the type spec: xs is unique, sm and md '
-        'share 13px, lg and xl share 15px.',
-    panelTitle: 'Text sizes',
-    preview: Wrap(
-      spacing: ds(3),
-      runSpacing: ds(3),
-      crossAxisAlignment: WrapCrossAlignment.center,
-      children: <Widget>[
-        KeyedSubtree(
-          key: const ValueKey<String>('button-example:sizes-xs'),
-          child: DsButton(
-            size: DsButtonSize.xs,
-            onPressed: () {},
-            child: const Text('Extra small'),
-          ),
-        ),
-        KeyedSubtree(
-          key: const ValueKey<String>('button-example:sizes-sm'),
-          child: DsButton(
-            size: DsButtonSize.sm,
-            onPressed: () {},
-            child: const Text('Small'),
-          ),
-        ),
-        KeyedSubtree(
-          key: const ValueKey<String>('button-example:sizes-md'),
-          child: DsButton(onPressed: () {}, child: const Text('Medium')),
-        ),
-        KeyedSubtree(
-          key: const ValueKey<String>('button-example:sizes-lg'),
-          child: DsButton(
-            size: DsButtonSize.lg,
-            onPressed: () {},
-            child: const Text('Large'),
-          ),
-        ),
-        KeyedSubtree(
-          key: const ValueKey<String>('button-example:sizes-xl'),
-          child: DsButton(
-            size: DsButtonSize.xl,
-            onPressed: () {},
-            child: const Text('Extra large'),
-          ),
-        ),
-      ],
-    ),
-    path: 'button_sizes.dart',
-    code:
-        'DsButton(size: DsButtonSize.xs, onPressed: () {}, child: const Text(\'Extra small\'))\n'
-        'DsButton(size: DsButtonSize.sm, onPressed: () {}, child: const Text(\'Small\'))\n'
-        'DsButton(onPressed: () {}, child: const Text(\'Medium\')) // size defaults to md\n'
-        'DsButton(size: DsButtonSize.lg, onPressed: () {}, child: const Text(\'Large\'))\n'
-        'DsButton(size: DsButtonSize.xl, onPressed: () {}, child: const Text(\'Extra large\'))',
-  );
-
-  Widget _exampleEmphasis() => _example(
-    id: 'example-emphasis',
-    title: 'Emphasis (caps)',
-    description:
-        'DsButtonEmphasis.caps — the third cva axis, independent of '
-        'variant and size. Uppercases the visible label (a screen reader '
-        'still hears the original casing, via semanticsLabel) and '
-        'switches to font-weight 600, matching the reference\'s pack and '
-        'money CTA treatment.',
+        'DsButtonEmphasis.caps: the third cva axis, independent of '
+        'variant and size, and shadcn has no equivalent. Uppercases the '
+        'visible label (a screen reader still hears the original casing, '
+        'via semanticsLabel) and switches to font-weight 600, matching '
+        'the reference\'s pack and money CTA treatment.',
     panelTitle: 'Emphasis: caps',
     preview: KeyedSubtree(
       key: const ValueKey<String>('button-example:emphasis'),
@@ -688,32 +890,117 @@ class _ButtonArticle extends StatelessWidget {
         ')',
   );
 
+  Widget _buttonGroup() => _example(
+    id: 'button-group',
+    title: 'Button Group',
+    description:
+        "shadcn's Button Group section points at a separate ButtonGroup "
+        'component and shows Archive, Report, and Snooze composed inside '
+        'it. This system keeps the same split: DsButtonGroup '
+        '(lib/src/components/button_group.dart) is its own file, not '
+        'part of button.dart, and reshapes a row of DsButton members into '
+        'one segmented control, squaring interior corners and dropping '
+        'interior borders to one hairline per seam. It has no catalog '
+        'page of its own yet in this port, so the live specimen below '
+        'stands in for it: two outline icon buttons composed as a view '
+        'switcher, the exact use button_group.dart\'s own docstring names '
+        'first, "view switching, quantity steppers and split actions."',
+    panelTitle: 'View switcher',
+    preview: DsButtonGroup(
+      children: <Widget>[
+        DsButton(
+          key: const ValueKey<String>('button-example:button-group-grid'),
+          variant: DsButtonVariant.outline,
+          size: DsButtonSize.icon,
+          label: 'Grid view',
+          onPressed: () {},
+          child: const DsIcon(DsIconGlyph.layoutGrid, size: DsIconSize.md),
+        ),
+        DsButton(
+          key: const ValueKey<String>('button-example:button-group-list'),
+          variant: DsButtonVariant.outline,
+          size: DsButtonSize.icon,
+          label: 'List view',
+          onPressed: () {},
+          child: const DsIcon(DsIconGlyph.rows3, size: DsIconSize.md),
+        ),
+      ],
+    ),
+    path: 'button_group.dart',
+    code:
+        'DsButtonGroup(\n'
+        '  children: [\n'
+        '    DsButton(\n'
+        '      variant: DsButtonVariant.outline,\n'
+        '      size: DsButtonSize.icon,\n'
+        "      label: 'Grid view',\n"
+        '      onPressed: () {},\n'
+        '      child: const DsIcon(DsIconGlyph.layoutGrid, size: DsIconSize.md),\n'
+        '    ),\n'
+        '    DsButton(\n'
+        '      variant: DsButtonVariant.outline,\n'
+        '      size: DsButtonSize.icon,\n'
+        "      label: 'List view',\n"
+        '      onPressed: () {},\n'
+        '      child: const DsIcon(DsIconGlyph.rows3, size: DsIconSize.md),\n'
+        '    ),\n'
+        '  ],\n'
+        ')',
+  );
+
   Widget _api() => DsSection(
     id: 'api',
     title: 'API Reference',
     description:
         'Every constructor parameter DsButton declares, every DsButtonVariant '
         'and DsButtonSize and DsButtonEmphasis value, and DsButtonSurface\'s '
-        'own six override fields — one table per exported class or enum, '
+        'own six override fields: one table per exported class or enum, '
         'plus a bonus table for the static helpers callers actually reach '
         'for.',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        const DocsApiTable(title: 'DsButton', facts: _buttonApiFacts),
-        SizedBox(height: ds(6)),
-        const DocsApiTable(
-          title: 'DsButton static helpers',
-          facts: _buttonStaticFacts,
+        KeyedSubtree(
+          key: docsAnchorKey('api-dsbutton'),
+          child: const DocsApiTable(title: 'DsButton', facts: _buttonApiFacts),
         ),
         SizedBox(height: ds(6)),
-        const DocsApiTable(title: 'DsButtonVariant', facts: _variantFacts),
+        KeyedSubtree(
+          key: docsAnchorKey('api-dsbutton-static'),
+          child: const DocsApiTable(
+            title: 'DsButton static helpers',
+            facts: _buttonStaticFacts,
+          ),
+        ),
         SizedBox(height: ds(6)),
-        const DocsApiTable(title: 'DsButtonSize', facts: _sizeFacts),
+        KeyedSubtree(
+          key: docsAnchorKey('api-dsbutton-variant'),
+          child: const DocsApiTable(
+            title: 'DsButtonVariant',
+            facts: _variantFacts,
+          ),
+        ),
         SizedBox(height: ds(6)),
-        const DocsApiTable(title: 'DsButtonEmphasis', facts: _emphasisFacts),
+        KeyedSubtree(
+          key: docsAnchorKey('api-dsbutton-size'),
+          child: const DocsApiTable(title: 'DsButtonSize', facts: _sizeFacts),
+        ),
         SizedBox(height: ds(6)),
-        const DocsApiTable(title: 'DsButtonSurface', facts: _surfaceFacts),
+        KeyedSubtree(
+          key: docsAnchorKey('api-dsbutton-emphasis'),
+          child: const DocsApiTable(
+            title: 'DsButtonEmphasis',
+            facts: _emphasisFacts,
+          ),
+        ),
+        SizedBox(height: ds(6)),
+        KeyedSubtree(
+          key: docsAnchorKey('api-dsbutton-surface'),
+          child: const DocsApiTable(
+            title: 'DsButtonSurface',
+            facts: _surfaceFacts,
+          ),
+        ),
       ],
     ),
   );
@@ -723,7 +1010,7 @@ class _ButtonArticle extends StatelessWidget {
     title: 'States',
     description:
         'Read straight off _DsButtonState._skin and _DsButtonState.build, '
-        'not inferred — every duration cited is the real token the source '
+        'not inferred: every duration cited is the real token the source '
         'names.',
     child: const DocsStateMatrix(facts: _stateFacts),
   );
@@ -733,43 +1020,43 @@ class _ButtonArticle extends StatelessWidget {
     title: 'Accessibility and keyboard behavior',
     child: _bullets(theme, <String>[
       'Semantic role: Semantics(button: true) on the rendered node, on '
-          'every variant without exception — including link, which is '
+          'every variant without exception: including link, which is '
           'still a button underneath its anchor-like paint.',
       'Accessible name: label, when given, REPLACES the content\'s name '
-          '(excludeSemantics: true) rather than joining it — required for '
+          '(excludeSemantics: true) rather than joining it: required for '
           'an icon-only button. Omitted, the visible child (usually a '
           'Text) supplies the name instead.',
       'Keyboard interactions: Enter, NumpadEnter, and Space activate a '
           'focused, enabled button. Flutter gives a bare pointer widget '
-          'none of that for free — Focus.onKeyEvent wires it by hand.',
+          'none of that for free, Focus.onKeyEvent wires it by hand.',
       'Focus behavior: :focus-visible, not :focus. Flutter does not move '
           'focus on a bare pointer tap, only on keyboard traversal or an '
           'explicit request, so hasFocus here already is the '
           'keyboard-only signal CSS means.',
       'Focus ring: springs open 0 -> 3px spread on the same clock as '
-          'everything else, at theme.ring 50% alpha — theme.destructive '
+          'everything else, at theme.ring 50% alpha: theme.destructive '
           '25% alpha (and a different border colour) on the destructive '
           'variant only.',
       'Touch target: not uniformly 44px. heightFor ranges from 24px '
           '(xs / iconXs) to 56px (xl), and the four icon squares are that '
-          'size wide as well as tall — DsButtonSize.iconXs is a 24x24 '
+          'size wide as well as tall, DsButtonSize.iconXs is a 24x24 '
           'target. DsButton enforces no floor; a caller reaching for a '
           'dense icon button owns that trade-off.',
-      'Known gap — expanded is visual only: _DsButtonState.build\'s '
+      'Known gap: expanded is visual only: _DsButtonState.build\'s '
           'Semantics node sets button / enabled / label / excludeSemantics '
           'and nothing else. DsButton.expanded changes which fill paints '
-          'but is never surfaced as Semantics.expanded — an open trigger '
+          'but is never surfaced as Semantics.expanded: an open trigger '
           'looks lit but is not announced as expanded.',
       'Loading and aria-busy: loading forces enabled: false, the same '
-          'branch an ordinary disabled button takes — the one half of the '
+          'branch an ordinary disabled button takes: the one half of the '
           'reference\'s aria-busy behaviour Flutter can reproduce. '
           'SemanticsProperties in the pinned SDK (3.44.8) declares no busy '
           'flag at all, so assistive tech learns the control is not '
-          'actionable but not why. Documented drift, not an oversight — '
+          'actionable but not why. Documented drift, not an oversight, '
           'the source docstring says so directly.',
       'suppressPressScale is visual only too: it cancels the 0.95 press '
           'scale for a trigger button (aria-haspopup\'s equivalent) but '
-          'carries no semantic signal — nothing tells a screen reader this '
+          'carries no semantic signal: nothing tells a screen reader this '
           'control opens something.',
     ]),
   );
@@ -778,25 +1065,25 @@ class _ButtonArticle extends StatelessWidget {
     id: 'responsive',
     title: 'Responsive and platform behavior',
     child: _bullets(theme, <String>[
-      'No breakpoint branching anywhere in button.dart — BuildContext '
+      'No breakpoint branching anywhere in button.dart, BuildContext '
           'width is never read for a layout decision; the same widget '
           'tree renders at 390px and 1440px.',
       'Every measurement (heightFor, gapFor, paddingXFor, iconPxFor) is a '
           'fixed 4px-grid value (ds()) keyed only to DsButtonSize, never '
           'to viewport.',
       'The one place a button\'s own width follows its surroundings is '
-          'expanded: true (with contentAlignment) — w-full justify-start '
+          'expanded: true (with contentAlignment): w-full justify-start '
           'instead of the default hug-content pill. Nothing in this file '
           'reads a breakpoint to decide when to pass it; that decision '
           'lives entirely at the call site.',
       'autoHeight drops the rung\'s fixed height (h-auto) and lets content '
-          'set it instead — what the sidebar\'s own row sizes use in '
+          'set it instead: what the sidebar\'s own row sizes use in '
           'place of the 24/32/40/48/56 ladder above.',
-      'Long labels are not truncated or wrapped specially — a Text child '
+      'Long labels are not truncated or wrapped specially: a Text child '
           'overflows however Text normally would; DsButton adds no '
           'ellipsis or maxLines of its own.',
       'Platform parity: Android, iOS, Web, macOS, Windows, and Linux all '
-          'render the same widget tree — no dart:io Platform branch '
+          'render the same widget tree: no dart:io Platform branch '
           'anywhere in the file.',
     ]),
   );
@@ -805,7 +1092,7 @@ class _ButtonArticle extends StatelessWidget {
     id: 'dependencies',
     title: 'Dependencies, files, and install facts',
     child: _bullets(theme, <String>[
-      'File: lib/src/components/button.dart — one file, no companions; '
+      'File: lib/src/components/button.dart: one file, no companions; '
           'the registry manifest lists exactly one entry under "files".',
       'Flutter imports: package:flutter/foundation.dart (clampDouble), '
           'package:flutter/services.dart (LogicalKeyboardKey, KeyEvent), '
@@ -814,17 +1101,17 @@ class _ButtonArticle extends StatelessWidget {
           'foundation/shadows.dart, foundation/spacing.dart (ds()), '
           'foundation/theme.dart, foundation/typography.dart, '
           'theme_scope.dart (DsText, DsTheme, dsAnimationDuration).',
-      'Effect imports: effects/sheen_action.dart (DsSheenAction — '
-          'primary), effects/foil_value.dart (DsFoilValue — premium), '
-          'effects/machine_surface.dart (DsMachineSurface — secondary, '
+      'Effect imports: effects/sheen_action.dart (DsSheenAction, '
+          'primary), effects/foil_value.dart (DsFoilValue: premium), '
+          'effects/machine_surface.dart (DsMachineSurface: secondary, '
           'outline, ghost, destructive, link).',
-      'Component import: spinner.dart (DsSpinner — loading only).',
+      'Component import: spinner.dart (DsSpinner: loading only).',
       'registryDependencies, resolved automatically by `elattar add '
           'button`: source-foundation, press-motion, icon, spinner, '
-          'foil-value, machine-surface, sheen-action — copied verbatim '
+          'foil-value, machine-surface, sheen-action: copied verbatim '
           'from registry/components/button.json.',
       'semanticDependencies (the manifest\'s own, narrower field): '
-          'press-motion, icon — a hint at what a button is commonly '
+          'press-motion, icon: a hint at what a button is commonly '
           'composed WITH, not a second import list; button.dart does not '
           'import icon.dart itself.',
     ]),
@@ -834,7 +1121,7 @@ class _ButtonArticle extends StatelessWidget {
     id: 'theming',
     title: 'Theming notes',
     child: _bullets(theme, <String>[
-      'Every colour is read live off DsTheme.of(context) at build time — '
+      'Every colour is read live off DsTheme.of(context) at build time, '
           'theme.primary/primaryForeground (primary), theme.secondary/'
           'secondaryForeground/accent (secondary), theme.card/muted/'
           'input/foreground (outline), theme.mutedForeground/secondary/'
@@ -842,25 +1129,26 @@ class _ButtonArticle extends StatelessWidget {
           '(destructive), theme.actionInk (link), and theme.ring (the '
           'focus ring on every variant but destructive, which rings at '
           'theme.destructive instead). Flipping DsThemeController '
-          're-resolves every one on the next frame — nothing is cached.',
+          're-resolves every one on the next frame: nothing is cached.',
       'premium partially opts out: DsPalette.value and '
           'DsPalette.valueForeground are fixed tokens rather than theme.* '
-          'getters, and the source says why — "the one foreground in the '
-          'system that deliberately does NOT flip with the theme" — the '
+          'getters, and the source says why, "the one foreground in the '
+          'system that deliberately does NOT flip with the theme": the '
           'metal foil reads as the same lime-on-dark-text in both themes.',
       'Shape: the pill (BorderRadius.circular(DsRadii.pill)) is a default '
-          'a caller can override with radius — the sidebar\'s own row '
+          'a caller can override with radius: the sidebar\'s own row '
           'buttons are the one real caller that does, dropping to '
-          'rounded-lg / rounded-md because "a 240px pill is a lozenge."',
-      'Elevation is always a DsShadowSpec token per variant and state — '
+          'rounded-lg / rounded-md because "a 240px pill is a lozenge," '
+          'see Rounded above for a live specimen of that override.',
+      'Elevation is always a DsShadowSpec token per variant and state, '
           'DsShadows.btnPrimary / btnDown / btnValue / glowValue / btn / '
-          'none — never a bespoke shadow at a call site. secondary and '
+          'none: never a bespoke shadow at a call site. secondary and '
           'destructive both carry DsShadows.none, which the shadows '
           'page\'s own copy contradicts (documented drift in button.dart\'s '
           'own class doc).',
       'surface (DsButtonSurface) is the one escape hatch for a call site '
           'that must restyle fill / border / ink without forking a new '
-          'variant — six optional Color? fields layered on top of the '
+          'variant: six optional Color? fields layered on top of the '
           'variant\'s own resolved skin, hover-aware. Used by exactly one '
           'real call site in the corpus (MessageScrollerButton) as of '
           'this port.',
@@ -877,7 +1165,7 @@ class _ButtonArticle extends StatelessWidget {
           label: 'Source',
           value: buttonDoc.sourcePath,
           description:
-              'Authoritative implementation — the truth this page was '
+              'Authoritative implementation: the truth this page was '
               'written from.',
         ),
         const DocsInstallFact(
@@ -886,7 +1174,7 @@ class _ButtonArticle extends StatelessWidget {
           description:
               'DsButton is covered inside the shared base-components '
               'suite (294 DsButton references at the time this page was '
-              'written) — there is no dedicated button_test.dart in the '
+              'written): there is no dedicated button_test.dart in the '
               'package yet.',
         ),
         const DocsInstallFact(
@@ -894,8 +1182,8 @@ class _ButtonArticle extends StatelessWidget {
           value: 'example/test/components_docs/button_test.dart',
           description:
               'Covers this page: the article mounts, every DsButtonVariant '
-              'and DsButtonSize the Examples section claims to show, the '
-              'full API table, and both themes at two viewport widths.',
+              'and DsButtonSize this page claims to show, the full API '
+              'table, and both themes at two viewport widths.',
         ),
         const DocsInstallFact(
           label: 'Edit these docs',
@@ -907,9 +1195,9 @@ class _ButtonArticle extends StatelessWidget {
   );
 }
 
-/// One Examples subsection: its own [DsSection] (own anchor, own heading)
-/// wrapping its own [DocsCodeExample] (own Preview/Manual pair, own copy
-/// control).
+/// One section built from a real DsButton (or button-composed) specimen:
+/// its own [DsSection] (own anchor, own heading) wrapping its own
+/// [DocsCodeExample] (own Preview/Manual pair, own copy control).
 Widget _example({
   required String id,
   required String title,
@@ -957,7 +1245,7 @@ const List<DocsApiFact> _buttonApiFacts = <DocsApiFact>[
     name: 'child',
     type: 'Widget',
     description:
-        "Required. The button's content — an icon, a label, or a "
+        "Required. The button's content: an icon, a label, or a "
         'caller-built row of both spaced by DsButton.gapFor.',
   ),
   DocsApiFact(
@@ -965,14 +1253,14 @@ const List<DocsApiFact> _buttonApiFacts = <DocsApiFact>[
     type: 'DsButtonVariant',
     description:
         'Optional. Defaults to DsButtonVariant.primary. Selects fill, '
-        'border, ink, and shadow — see the DsButtonVariant table below.',
+        'border, ink, and shadow: see the DsButtonVariant table below.',
   ),
   DocsApiFact(
     name: 'size',
     type: 'DsButtonSize',
     description:
         'Optional. Defaults to DsButtonSize.md. Selects height, '
-        'horizontal padding, icon gap, and forced icon-child px — see the '
+        'horizontal padding, icon gap, and forced icon-child px: see the '
         'DsButtonSize table below.',
   ),
   DocsApiFact(
@@ -987,8 +1275,8 @@ const List<DocsApiFact> _buttonApiFacts = <DocsApiFact>[
     name: 'loading',
     type: 'bool',
     description:
-        'Optional. Defaults to false. Prepends a DsSpinner, and — ORed '
-        'with a null onPressed — disables the button: 45% opacity, no '
+        'Optional. Defaults to false. Prepends a DsSpinner, and, ORed '
+        'with a null onPressed: disables the button: 45% opacity, no '
         'pointer events, no focus.',
   ),
   DocsApiFact(
@@ -1004,7 +1292,7 @@ const List<DocsApiFact> _buttonApiFacts = <DocsApiFact>[
     description:
         "Optional. Defaults to null. The accessible name. When given, it "
         "REPLACES the content's name (Semantics.excludeSemantics: true) "
-        'rather than joining it — required for an icon-only button.',
+        'rather than joining it: required for an icon-only button.',
   ),
   DocsApiFact(
     name: 'focusNode',
@@ -1019,7 +1307,7 @@ const List<DocsApiFact> _buttonApiFacts = <DocsApiFact>[
     description:
         'Optional. Defaults to null, which leaves '
         "DsButton.paddingXFor(size) in charge. Replaces the rung's "
-        "horizontal padding — Pagination's Previous/Next buttons are the "
+        "horizontal padding, Pagination's Previous/Next buttons are the "
         'one real caller that overrides it.',
   ),
   DocsApiFact(
@@ -1027,7 +1315,7 @@ const List<DocsApiFact> _buttonApiFacts = <DocsApiFact>[
     type: 'DsButtonSurface?',
     description:
         'Optional. Defaults to null. Fill/border/ink overrides layered '
-        'on top of the resolved variant skin — see the DsButtonSurface '
+        'on top of the resolved variant skin: see the DsButtonSurface '
         'table below.',
   ),
   DocsApiFact(
@@ -1035,7 +1323,7 @@ const List<DocsApiFact> _buttonApiFacts = <DocsApiFact>[
     type: 'bool',
     description:
         "Optional. Defaults to false. Holds the variant's own hover fill "
-        'open — the aria-expanded equivalent for a trigger whose popup '
+        'open: the aria-expanded equivalent for a trigger whose popup '
         'is open. Paints on secondary, outline, and ghost only.',
   ),
   DocsApiFact(
@@ -1043,7 +1331,7 @@ const List<DocsApiFact> _buttonApiFacts = <DocsApiFact>[
     type: 'bool',
     description:
         'Optional. Defaults to false. Cancels the 0.95 press-scale for a '
-        'button that opens something (a menu, a popover) — the '
+        'button that opens something (a menu, a popover): the '
         'aria-haspopup equivalent. The shadow and colour legs still fire.',
   ),
   DocsApiFact(
@@ -1059,7 +1347,7 @@ const List<DocsApiFact> _buttonApiFacts = <DocsApiFact>[
     type: 'bool',
     description:
         "Optional. Defaults to false. Drops the rung's fixed height and "
-        'lets the content set it instead — h-auto. Every other '
+        'lets the content set it instead: h-auto. Every other '
         'measurement the rung declares still applies.',
   ),
   DocsApiFact(
@@ -1068,7 +1356,7 @@ const List<DocsApiFact> _buttonApiFacts = <DocsApiFact>[
     description:
         'Optional. Defaults to null, which centres content on a '
         'hug-content pill. Non-null fills the incoming width at that '
-        'alignment — w-full justify-start.',
+        'alignment: w-full justify-start.',
   ),
 ];
 
@@ -1077,14 +1365,14 @@ const List<DocsApiFact> _buttonStaticFacts = <DocsApiFact>[
     name: 'DsButton.heightFor(size)',
     type: 'static double',
     description:
-        "The rung's fixed height — 24 / 32 / 40 / 48 / 56 for the five "
+        "The rung's fixed height, 24 / 32 / 40 / 48 / 56 for the five "
         'text rungs, matching square for the four icon rungs.',
   ),
   DocsApiFact(
     name: 'DsButton.gapFor(size)',
     type: 'static double',
     description:
-        "The gap between an icon and its label at this rung — 0 on "
+        "The gap between an icon and its label at this rung, 0 on "
         'every icon-only square. Exposed, not applied: a two-child '
         'button composes its own Row and asks here for the spacing.',
   ),
@@ -1092,14 +1380,14 @@ const List<DocsApiFact> _buttonStaticFacts = <DocsApiFact>[
     name: 'DsButton.paddingXFor(size)',
     type: 'static double',
     description:
-        "The rung's horizontal padding — 0 on every icon-only square, "
+        "The rung's horizontal padding, 0 on every icon-only square, "
         'which centres the glyph instead.',
   ),
   DocsApiFact(
     name: 'DsButton.iconPxFor(size)',
     type: 'static double',
     description:
-        "The px an icon child should render at for this rung — the "
+        "The px an icon child should render at for this rung: the "
         'caller\'s job to pass to DsIcon(size:) or sizePx:, since a '
         'Flutter parent cannot resize its child the way a CSS descendant '
         'selector can.',
@@ -1121,7 +1409,7 @@ const List<DocsApiFact> _buttonStaticFacts = <DocsApiFact>[
     name: 'DsButton.withFocusRing(spec, ring, {progress})',
     type: 'static DsShadowSpec',
     description:
-        'Composites a focus-visible ring in front of a shadow spec — '
+        'Composites a focus-visible ring in front of a shadow spec, '
         'the shared helper this widget and DsInput both reach for.',
   ),
 ];
@@ -1140,7 +1428,7 @@ const List<DocsApiFact> _variantFacts = <DocsApiFact>[
     description:
         'DsFoilValue over DsPalette.value; DsPalette.valueForeground '
         'text, which does not flip with the theme. shadow-btn-value at '
-        'rest, a glow on hover — the only variant with a hover glow.',
+        'rest, a glow on hover: the only variant with a hover glow.',
   ),
   DocsApiFact(
     name: 'secondary',
@@ -1168,7 +1456,7 @@ const List<DocsApiFact> _variantFacts = <DocsApiFact>[
     type: 'enum value',
     description:
         'A 10% tint of theme.destructive (20% on hover) rather than a '
-        'solid fill — measured to clear AA where a solid fill would not. '
+        'solid fill: measured to clear AA where a solid fill would not. '
         'No shadow.',
   ),
   DocsApiFact(
@@ -1176,7 +1464,7 @@ const List<DocsApiFact> _variantFacts = <DocsApiFact>[
     type: 'enum value',
     description:
         'Transparent, theme.actionInk text, underlines on hover. Still '
-        'reports Semantics(button: true) — see this page\'s hero copy.',
+        'reports Semantics(button: true): see this page\'s hero copy.',
   ),
 ];
 
@@ -1185,7 +1473,7 @@ const List<DocsApiFact> _sizeFacts = <DocsApiFact>[
     name: 'xs',
     type: '24px · text',
     description:
-        'Dense internal use only — chips inside a combobox or an '
+        'Dense internal use only: chips inside a combobox or an '
         'attachment row.',
   ),
   DocsApiFact(
@@ -1206,7 +1494,7 @@ const List<DocsApiFact> _sizeFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'xl',
     type: '56px · text',
-    description: 'Hero CTA only — a landing page or a pack-opening moment.',
+    description: 'Hero CTA only: a landing page or a pack-opening moment.',
   ),
   DocsApiFact(
     name: 'iconXs',
@@ -1221,7 +1509,7 @@ const List<DocsApiFact> _sizeFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'icon',
     type: '40px · square',
-    description: 'Forces a 16px icon child — the default square.',
+    description: 'Forces a 16px icon child: the default square.',
   ),
   DocsApiFact(
     name: 'iconLg',
@@ -1242,7 +1530,7 @@ const List<DocsApiFact> _emphasisFacts = <DocsApiFact>[
     description:
         'Uppercases the visible label (semanticsLabel keeps the '
         "original casing for a screen reader) and sets font-weight 600, "
-        "beating every rung's own text style — including the four icon "
+        "beating every rung's own text style: including the four icon "
         'squares.',
   ),
 ];
@@ -1289,7 +1577,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Rest',
     treatment:
-        "Each variant's own resolved fill/border/ink/shadow — see the "
+        "Each variant's own resolved fill/border/ink/shadow: see the "
         'DsButtonVariant table above.',
     userSignal: "The button's baseline paint.",
   ),
@@ -1304,7 +1592,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Pressed',
     treatment:
-        'Transform.scale to 0.95 — NOT animated; the exact frame the '
+        'Transform.scale to 0.95, NOT animated; the exact frame the '
         'pointer goes down is the exact frame the scale changes, and the '
         'same going back up. Shadow hard-cuts to shadow-btn-down '
         '(mismatched layer counts block interpolation).',
@@ -1346,7 +1634,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     state: 'Expanded (aria-expanded)',
     treatment:
         'Holds the hover fill open on secondary, outline, and ghost '
-        'only — the other four variants declare no such class. Not '
+        'only: the other four variants declare no such class. Not '
         'surfaced through Semantics (see Accessibility).',
     userSignal: 'The trigger stays lit while what it opened is still open.',
   ),

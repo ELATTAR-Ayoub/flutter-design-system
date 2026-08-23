@@ -1,6 +1,7 @@
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/stat/meta.dart';
 import 'package:example/components_docs/stat/page.dart';
+import 'package:example/kit.dart' show DsSection;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -42,9 +43,16 @@ void main() {
         expect(find.byType(DsEmpty), findsWidgets);
         expect(find.byType(DsKbd), findsWidgets);
 
-        // The page has section headers.
-        expect(find.text('API'), findsWidgets);
-        expect(find.text('Accessibility'), findsWidgets);
+        // The page has section headers. Read the mounted DsSection titles
+        // rather than free text: the wide-viewport table of contents rail
+        // renders every section title a second time, so a bare find.text
+        // is not a reliable "this section exists" check.
+        final List<String> sectionTitles = tester
+            .widgetList<DsSection>(find.byType(DsSection))
+            .map((DsSection section) => section.title)
+            .toList();
+        expect(sectionTitles, contains('API Reference'));
+        expect(sectionTitles, contains('Accessibility'));
 
         expect(statDoc.name, 'stat');
         expect(
@@ -206,6 +214,108 @@ void main() {
             expect(find.byType(DsKbd), findsWidgets);
           }
         }
+      },
+    );
+
+    testWidgets(
+      'renders the shadcn-shaped section list, in order: the shared frame '
+      'sections, then each component\'s own promoted sections grouped under '
+      'its own name, then API Reference, then the six extra sections',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(1440, 900);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+
+        await tester.pumpWidget(
+          _harness(
+            controller: DsThemeController(mode: DsThemeMode.dark),
+            child: const StatDocPage(),
+          ),
+        );
+
+        // Read the mounted DsSection widgets in tree order rather than
+        // text-finding each heading: the wide-viewport table of contents
+        // rail renders every section title a second time, and this page
+        // (four components on one page) also carries nested sub-headings
+        // that can repeat a top-level title's own text, so a find.text
+        // based structural check is not reliable here.
+        final List<DsSection> sections = tester
+            .widgetList<DsSection>(find.byType(DsSection))
+            .toList();
+        final List<String> sectionIds = sections
+            .map((DsSection section) => section.id)
+            .toList();
+        final List<String> sectionTitles = sections
+            .map((DsSection section) => section.title)
+            .toList();
+
+        expect(sectionIds, <String>[
+          'install',
+          'usage',
+          'composition',
+          'stat-delta',
+          'stat-states',
+          'item-vs-field',
+          'item-variant',
+          'item-icon',
+          'item-avatar',
+          'item-group',
+          'empty-input-group',
+          'kbd-group',
+          'kbd-button',
+          'kbd-input-group',
+          'rtl',
+          'api',
+          'states',
+          'accessibility',
+          'responsive',
+          'dependencies',
+          'theming',
+          'source',
+        ]);
+
+        // No leftover "Overview", "Preview" as second heading, or "Variants"
+        // headings: Overview's prose moved into Preview (which stands in for
+        // shadcn's unheaded live demo), and the enum tables that used to sit
+        // under a standalone "Variants" heading moved into API Reference.
+        expect(sectionTitles, isNot(contains('Overview')));
+        expect(sectionTitles, isNot(contains('Variants and sizes')));
+        expect(sectionTitles, isNot(contains('Status')));
+
+        // Every promoted section names the component it belongs to.
+        expect(
+          sectionTitles,
+          containsAll(<String>[
+            'Stat: Delta and direction',
+            'Stat: Loading, error, and empty',
+            'Item: Item vs Field',
+            'Item: Variant',
+            'Item: Icon',
+            'Item: Avatar',
+            'Item: Group',
+            'Empty: Input group',
+            'Kbd: Group',
+            'Kbd: Button',
+            'Kbd: Input group',
+          ]),
+        );
+
+        // The six trailing sections carry exactly their required names.
+        expect(
+          sectionTitles,
+          containsAll(<String>[
+            'States',
+            'Accessibility',
+            'Responsive',
+            'Dependencies',
+            'Theming',
+            'Source',
+          ]),
+        );
+
+        expect(sectionTitles, contains('API Reference'));
+        expect(sectionTitles, contains('RTL'));
+        expect(sectionTitles, contains('Composition'));
       },
     );
   });

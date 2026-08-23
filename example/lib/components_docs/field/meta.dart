@@ -10,7 +10,7 @@
 ///
 /// [ComponentDocEntry.description] is the one-sentence form for nav and
 /// search. [fieldExpandedDescription] carries the IA §9.2 "when to use this
-/// instead of a neighbour" guidance as a second top-level constant — the same
+/// instead of a neighbour" guidance as a second top-level constant: the same
 /// shape `tooltipExpandedDescription` and `switchExpandedDescription` use —
 /// because [ComponentDocEntry] itself carries only one description field and
 /// is supervisor-owned.
@@ -22,13 +22,13 @@ import '../catalog.dart' show ComponentDocEntry;
 /// a restatement of what a field is.
 const String fieldExpandedDescription =
     'DsField is the labelling and validation wrapper every other input '
-    'lives inside — not an input itself. It supplies the visible label, an '
+    'lives inside: not an input itself. It supplies the visible label, an '
     'optional description, and validation messages, and threads all three '
     'through DsFieldScope so the control folds them into one merged '
     'accessibility node instead of three separate announcements. Reach for '
     'it around DsInput, DsSelect, DsCheckbox, DsSwitch, or DsRadioGroup '
     'whenever that control needs a visible caption, helper copy, or an '
-    'error message — none of those controls render their own visible label '
+    'error message: none of those controls render their own visible label '
     'text. Reach for DsFieldGroup to stack several fields with the '
     'reference\'s own 20px rhythm, and DsFieldSet (with a leading '
     'DsFieldLegend) when several fields or a selection group belong under '

@@ -1,5 +1,5 @@
 /// Tests for `components_docs/navigation_menu/meta.dart` and
-/// `components_docs/navigation_menu/page.dart` — the public documentation
+/// `components_docs/navigation_menu/page.dart`: the public documentation
 /// page for Navigation Menu, Menubar, Context Menu, and Hover Card.
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
@@ -8,7 +8,7 @@
 /// independent pumps.
 ///
 /// DsNavigationMenu, DsMenubar, DsContextMenu, and DsHoverCard all mount
-/// through [OverlayPortal], so the live specimens need a real [Overlay] — the
+/// through [OverlayPortal], so the live specimens need a real [Overlay]: the
 /// harness wraps the page in a `MaterialApp`, the same fix Popover and Select
 /// needed.
 library;
@@ -16,6 +16,7 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/navigation_menu/meta.dart';
 import 'package:example/components_docs/navigation_menu/page.dart';
+import 'package:example/kit.dart' show DsSection;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -61,7 +62,7 @@ void main() {
         'Navigation Menu, Menubar, Context Menu, Hover Card',
       );
       expect(navigationMenuDoc.route, '/components/navigation-menu');
-      // No registry manifest — dependencies empty, not available for install yet.
+      // No registry manifest: dependencies empty, not available for install yet.
       expect(navigationMenuDoc.dependencies, isEmpty);
       expect(navigationMenuDoc.sourcePath, 'lib/src/components/');
       expect(
@@ -101,6 +102,50 @@ void main() {
   });
 
   group('rendered page', () {
+    testWidgets(
+      'sections render in the shadcn-mirrored order, section for section, '
+      'each of the four components grouped under its own name',
+      (WidgetTester tester) async {
+        await _pumpPage(tester);
+
+        final List<String> titles = tester
+            .widgetList<DsSection>(find.byType(DsSection))
+            .map((DsSection section) => section.title)
+            .toList();
+
+        expect(titles, <String>[
+          'Installation',
+          'Usage',
+          'Composition',
+          'Navigation Menu: RTL',
+          'Menubar: Checkbox',
+          'Menubar: Radio',
+          'Menubar: Submenu',
+          'Menubar: With icons',
+          'Menubar: RTL',
+          'Context Menu: Basic',
+          'Context Menu: Submenu',
+          'Context Menu: Shortcuts',
+          'Context Menu: Groups',
+          'Context Menu: Icons',
+          'Context Menu: Checkboxes',
+          'Context Menu: Radio',
+          'Context Menu: Destructive',
+          'Context Menu: RTL',
+          'Hover Card: Trigger delays',
+          'Hover Card: Basic',
+          'Hover Card: RTL',
+          'API Reference',
+          'States',
+          'Accessibility',
+          'Responsive',
+          'Dependencies',
+          'Theming',
+          'Source',
+        ]);
+      },
+    );
+
     testWidgets('renders the article and all four live specimens', (
       WidgetTester tester,
     ) async {
@@ -201,7 +246,7 @@ void main() {
     );
   });
 
-  group('live specimens — open and close', () {
+  group('live specimens: open and close', () {
     testWidgets('Navigation Menu trigger renders the specimen', (
       WidgetTester tester,
     ) async {

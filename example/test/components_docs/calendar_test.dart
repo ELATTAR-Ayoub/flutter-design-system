@@ -1,10 +1,10 @@
 /// Tests for `components_docs/calendar/meta.dart` and
-/// `components_docs/calendar/page.dart` — the public Calendar component
+/// `components_docs/calendar/page.dart`: the public Calendar component
 /// documentation page.
 ///
 /// **The clock is frozen, and it has to be.** `DsCalendar` opens on
 /// `month ?? defaultMonth ?? today`, and the page's three specimens pass
-/// neither of the first two on purpose — that is the reference's own
+/// neither of the first two on purpose: that is the reference's own
 /// `getInitialMonth`, and reproducing it is the point. A test that let the
 /// wall clock through would pass in August 2026 and fail in September, so
 /// every widget test below mounts the page under a [DsClock] pinned to
@@ -13,18 +13,19 @@
 /// instant `test/calendar_test.dart` runs the package's own suite on.
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
-/// `addTearDown(tester.view.reset)`), never a synthetic `MediaQuery` — the
+/// `addTearDown(tester.view.reset)`), never a synthetic `MediaQuery`: the
 /// discipline `popover_test.dart` already carries. Theme coverage flips one
 /// live `DsThemeController` in place rather than pumping two trees.
 ///
 /// `DsDatePicker` mounts its calendar through a `DsPopover`, which needs a
-/// real `Overlay`, so the harness wraps the page in a `MaterialApp` —
-/// the same fix the `popover` and `select` pages needed.
+/// real `Overlay`, so the harness wraps the page in a `MaterialApp`: the
+/// same fix the `popover` and `select` pages needed.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/calendar/meta.dart';
 import 'package:example/components_docs/calendar/page.dart';
+import 'package:example/kit.dart' show DsSection;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -76,7 +77,7 @@ Future<DsThemeController> _pumpCalendarDoc(
   return theme;
 }
 
-/// One 28px day cell — the `SizedBox` `_DayCell` wraps itself in, which is the
+/// One 28px day cell: the `SizedBox` `_DayCell` wraps itself in, which is the
 /// only `DsCalendar.cellSize` square that ever contains a digit (the weekday
 /// header squares hold `Su`…`Sa` and the nav squares hold a glyph).
 Finder _dayCell(Finder within, String day) => find.descendant(
@@ -124,7 +125,7 @@ void main() {
       // registry item names that exist today: foundation (which carries
       // date_format.dart, and therefore DsDateFormat, DsClock and
       // DsCalendarType), button, icon (which ships icon_paths.dart too), and
-      // popover. Nothing invented — `calendar` has no manifest of its own and
+      // popover. Nothing invented: `calendar` has no manifest of its own and
       // this list is what one would have to name.
       expect(calendarDoc.dependencies, <String>[
         'source-foundation',
@@ -147,7 +148,37 @@ void main() {
   });
 
   group('rendered page', () {
-    testWidgets('renders the article and all three live specimens', (
+    testWidgets(
+      'sections render in the shadcn-mirrored order, section for section',
+      (WidgetTester tester) async {
+        await _pumpCalendarDoc(tester);
+
+        final List<String> titles = tester
+            .widgetList<DsSection>(find.byType(DsSection))
+            .map((DsSection section) => section.title)
+            .toList();
+
+        expect(titles, <String>[
+          'Installation',
+          'Usage',
+          'Composition',
+          'About',
+          'Date picker',
+          'Selected date (with timezone)',
+          'Range calendar',
+          'Presets',
+          'API Reference',
+          'States',
+          'Accessibility',
+          'Responsive',
+          'Dependencies',
+          'Theming',
+          'Source',
+        ]);
+      },
+    );
+
+    testWidgets('renders the article and all four live specimens', (
       WidgetTester tester,
     ) async {
       await _pumpCalendarDoc(tester);
@@ -155,8 +186,11 @@ void main() {
       expect(_specimen('calendar-doc-article'), findsOneWidget);
       expect(_specimen('calendar-doc-single-specimen'), findsOneWidget);
       expect(_specimen('calendar-doc-range-specimen'), findsOneWidget);
+      expect(_specimen('calendar-doc-presets-specimen'), findsOneWidget);
       expect(_specimen('calendar-doc-picker'), findsOneWidget);
-      expect(find.byType(DsCalendar), findsNWidgets(2));
+      // single, range and presets render a grid up front; the date picker's
+      // own calendar stays unmounted until its popover opens.
+      expect(find.byType(DsCalendar), findsNWidgets(3));
       expect(find.byType(DsDatePicker), findsNWidgets(2));
       expect(tester.takeException(), isNull);
     });
@@ -165,13 +199,15 @@ void main() {
         'selection', (WidgetTester tester) async {
       await _pumpCalendarDoc(tester);
 
-      // Neither specimen passes `month` or `defaultMonth`, so both open on
-      // the clock's month. Two captions, one per calendar.
-      expect(find.text('August 2026'), findsNWidgets(2));
+      // The single and range specimens pass neither `month` nor
+      // `defaultMonth`; the presets specimen seeds its controlled `month`
+      // from the same clock. All three open on the clock's month: three
+      // captions, one per calendar.
+      expect(find.text('August 2026'), findsNWidgets(3));
       expect(find.text('July 2026'), findsNothing);
-      // Su Mo Tu We Th Fr Sa — Sunday first, hardcoded.
+      // Su Mo Tu We Th Fr Sa: Sunday first, hardcoded.
       for (final String weekday in DsDateFormat.weekdaysNarrow) {
-        expect(find.text(weekday), findsNWidgets(2));
+        expect(find.text(weekday), findsNWidgets(3));
       }
     });
 
@@ -239,7 +275,7 @@ void main() {
         'focusNode',
         'label',
         'pressScaleSuppressed',
-        // DsDateFormat, DsClock and DsCalendarType — source-foundation, and
+        // DsDateFormat, DsClock and DsCalendarType: source-foundation, and
         // the half of it this component cannot be understood without.
         'monthsShort',
         'monthsLong',
@@ -293,7 +329,7 @@ void main() {
     });
   });
 
-  group('the timezone ruling — the thing this page exists to teach', () {
+  group('the timezone ruling: the thing this page exists to teach', () {
     testWidgets('the page explains why a day key is built from local fields '
         'and never sliced off an ISO instant', (WidgetTester tester) async {
       await _pumpCalendarDoc(tester);
@@ -392,7 +428,7 @@ void main() {
     });
   });
 
-  group('live specimen — single selection', () {
+  group('live specimen: single selection', () {
     testWidgets('tapping a day reports it, and the readout follows', (
       WidgetTester tester,
     ) async {
@@ -412,7 +448,7 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('re-picking the selected day clears it — mode="single" '
+    testWidgets('re-picking the selected day clears it: mode="single" '
         'without required', (WidgetTester tester) async {
       await _pumpCalendarDoc(tester);
 
@@ -455,7 +491,7 @@ void main() {
     });
   });
 
-  group('live specimen — range selection', () {
+  group('live specimen: range selection', () {
     testWidgets('the seeded range prints its own label, and a click moves the '
         'end', (WidgetTester tester) async {
       await _pumpCalendarDoc(tester);
@@ -479,7 +515,56 @@ void main() {
     });
   });
 
-  group('live specimen — the date picker', () {
+  group('live specimen: presets', () {
+    testWidgets('a preset button sets the selected day and follows it to a '
+        'new month when needed', (WidgetTester tester) async {
+      await _pumpCalendarDoc(tester);
+
+      final Finder specimen = _specimen('calendar-doc-presets-specimen');
+      // Seeded from the clock: 16 Aug 2026.
+      expect(
+        find.descendant(of: specimen, matching: find.text('16 Aug 2026')),
+        findsOneWidget,
+      );
+
+      final Finder inThreeDays = find.descendant(
+        of: specimen,
+        matching: find.text('In 3 days'),
+      );
+      await tester.ensureVisible(inThreeDays);
+      await tester.pump();
+      await tester.tap(inThreeDays);
+      await tester.pump();
+
+      // 16 Aug + 3 days = 19 Aug, still the displayed month, so the caption
+      // does not move.
+      expect(
+        find.descendant(of: specimen, matching: find.text('19 Aug 2026')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: specimen, matching: find.text('August 2026')),
+        findsOneWidget,
+      );
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('tapping a day in the grid updates the readout the same as a '
+        'preset does', (WidgetTester tester) async {
+      await _pumpCalendarDoc(tester);
+
+      final Finder specimen = _specimen('calendar-doc-presets-specimen');
+      await _tapDay(tester, _dayCell(specimen, '21'));
+
+      expect(
+        find.descendant(of: specimen, matching: find.text('21 Aug 2026')),
+        findsOneWidget,
+      );
+      expect(tester.takeException(), isNull);
+    });
+  });
+
+  group('live specimen: the date picker', () {
     testWidgets('the trigger opens a popover carrying a real calendar, and '
         'picking a day closes it', (WidgetTester tester) async {
       await _pumpCalendarDoc(tester);
@@ -592,7 +677,7 @@ void main() {
       );
       expect(_specimen('calendar-doc-article'), findsOneWidget);
       // 222px of calendar fits inside a 390px viewport without overflow.
-      expect(find.byType(DsCalendar), findsNWidgets(2));
+      expect(find.byType(DsCalendar), findsNWidgets(3));
       expect(tester.takeException(), isNull);
     });
   });
@@ -616,13 +701,13 @@ void main() {
         tester,
         mode: DsThemeMode.dark,
       );
-      expect(find.byType(DsCalendar), findsNWidgets(2));
+      expect(find.byType(DsCalendar), findsNWidgets(3));
 
       theme.setMode(DsThemeMode.light);
       await tester.pump();
 
-      expect(find.byType(DsCalendar), findsNWidgets(2));
-      expect(find.text('August 2026'), findsNWidgets(2));
+      expect(find.byType(DsCalendar), findsNWidgets(3));
+      expect(find.text('August 2026'), findsNWidgets(3));
       expect(tester.takeException(), isNull);
     });
 

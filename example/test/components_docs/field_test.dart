@@ -1,4 +1,4 @@
-/// Tests for `components_docs/field/page.dart`'s [FieldDocPage] — the field
+/// Tests for `components_docs/field/page.dart`'s [FieldDocPage]: the field
 /// component documentation page.
 ///
 /// `field` is a family of nine classes plus one enum
@@ -22,9 +22,41 @@ import 'package:example/components_docs/field/meta.dart';
 import 'package:example/components_docs/field/page.dart';
 import 'package:example/docs/docs_code.dart';
 import 'package:example/docs/docs_facts.dart';
+import 'package:example/kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+/// The shadcn parity section order (worker brief, 2026-08-23): every
+/// `DsSection.id` this page renders, top to bottom. `overview` and
+/// `variants` are gone (shadcn's own field page has neither heading; the
+/// enum table now lives inside `api`), and the shadcn per-control headings
+/// (`input`, `textarea`, `select`, `slider`, `fieldset`, `checkbox`,
+/// `switch`, `field-group`, `validation-errors`) are new, promoted out of
+/// the old single `composition` section rather than left nested under it.
+const List<String> _expectedSectionOrder = <String>[
+  'install',
+  'usage',
+  'composition',
+  'anatomy',
+  'form',
+  'input',
+  'textarea',
+  'select',
+  'slider',
+  'fieldset',
+  'checkbox',
+  'switch',
+  'field-group',
+  'validation-errors',
+  'api',
+  'states',
+  'accessibility',
+  'responsive',
+  'dependencies',
+  'theming',
+  'source',
+];
 
 const Size _wide = Size(1440, 900);
 const Size _narrow = Size(390, 844);
@@ -32,7 +64,7 @@ const Size _narrow = Size(390, 844);
 /// Every `DsApiTable` this page must render, by title, and every public
 /// constructor parameter or static member of that class found by reading
 /// `lib/src/components/field.dart` directly (Step 1). The completeness test
-/// asserts each list is a subset of that specific table's own facts — not of
+/// asserts each list is a subset of that specific table's own facts: not of
 /// a set merged across every table on the page.
 const Map<String, List<String>> _expectedApiTables = <String, List<String>>{
   'DsField': <String>[
@@ -150,6 +182,20 @@ void main() {
   );
 
   testWidgets(
+    'renders the shadcn field page section order, section for section',
+    (WidgetTester tester) async {
+      await _pump(tester);
+
+      final List<String> ids = tester
+          .widgetList<DsSection>(find.byType(DsSection))
+          .map((DsSection section) => section.id)
+          .toList();
+
+      expect(ids, _expectedSectionOrder);
+    },
+  );
+
+  testWidgets(
     'each DsApiTable covers every public constructor parameter and static '
     'of its own class',
     (WidgetTester tester) async {
@@ -235,7 +281,7 @@ void main() {
 
   testWidgets(
     'the live horizontal field specimen toggles its wrapped checkbox on tap, '
-    'and the visible DsFieldLabel activates it too — DsFieldLabel\'s own '
+    'and the visible DsFieldLabel activates it too: DsFieldLabel\'s own '
     'activator ladder, not just the checkbox\'s own hit area',
     (WidgetTester tester) async {
       await _pump(tester);
@@ -254,8 +300,8 @@ void main() {
         DsCheckboxState.checked,
       );
 
-      // The field's own visible label — a plain DsText, not the checkbox's
-      // hit area — activates the control through DsFieldScope.activator,
+      // The field's own visible label, a plain DsText, not the checkbox's
+      // hit area, activates the control through DsFieldScope.activator,
       // exactly as an HTML <label for> click would.
       await tester.tap(
         find.text('Email me about product updates'),

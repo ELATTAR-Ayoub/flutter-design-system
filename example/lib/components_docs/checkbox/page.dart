@@ -1,9 +1,22 @@
 /// Public component documentation for the checkbox component.
 ///
 /// `checkboxDoc` (from `meta.dart`) is the data source, not
-/// `componentDoc('checkbox')` — checkbox is not yet registered in
+/// `componentDoc('checkbox')`: checkbox is not yet registered in
 /// `catalog.dart`'s `componentDocs` list, so calling that would throw. Adding
 /// it there is a supervisor-owned aggregation step (Phase J plan).
+///
+/// Section order mirrors `https://ui.shadcn.com/docs/components/base/checkbox`:
+/// a live demo before any heading, exactly like shadcn's own page, then
+/// Installation, Usage, Checked state, Invalid state, Basic, Description,
+/// Disabled, Group, Table, RTL, API Reference, then the six Elattar-specific
+/// sections (States, Accessibility,
+/// Responsive, Dependencies, Theming, Source) `button`'s reference shape
+/// establishes. Their "Group" and "Table" sections are this component's own
+/// two composition examples (a filter row, a tri-state bulk-selection
+/// header), renamed and promoted to top level rather than nested under a
+/// dropped `Composition examples` wrapper. Their "API Reference" links out to
+/// Base UI's own docs; this page keeps the full prop tables that section
+/// title already carried.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
@@ -34,23 +47,26 @@ class CheckboxDocPage extends StatelessWidget {
         DsBreadcrumbEntry.page('Checkbox'),
       ],
       toc: const <DocsTocEntry>[
-        DocsTocEntry(title: 'Overview', anchor: 'overview'),
-        DocsTocEntry(title: 'Status', anchor: 'status'),
-        DocsTocEntry(title: 'Preview', anchor: 'preview'),
         DocsTocEntry(title: 'Installation', anchor: 'install'),
         DocsTocEntry(title: 'Usage', anchor: 'usage'),
-        DocsTocEntry(title: 'API', anchor: 'api'),
-        DocsTocEntry(title: 'Variants and sizes', anchor: 'variants'),
+        DocsTocEntry(title: 'Checked state', anchor: 'checked-state'),
+        DocsTocEntry(title: 'Invalid state', anchor: 'invalid-state'),
+        DocsTocEntry(title: 'Basic', anchor: 'basic'),
+        DocsTocEntry(title: 'Description', anchor: 'description'),
+        DocsTocEntry(title: 'Disabled', anchor: 'disabled'),
+        DocsTocEntry(title: 'Group', anchor: 'group'),
+        DocsTocEntry(title: 'Table', anchor: 'table'),
+        DocsTocEntry(title: 'RTL', anchor: 'rtl'),
+        DocsTocEntry(title: 'API Reference', anchor: 'api'),
         DocsTocEntry(title: 'States', anchor: 'states'),
         DocsTocEntry(title: 'Accessibility', anchor: 'accessibility'),
-        DocsTocEntry(title: 'Responsive behavior', anchor: 'responsive'),
-        DocsTocEntry(title: 'Dependencies and files', anchor: 'dependencies'),
-        DocsTocEntry(title: 'Composition', anchor: 'composition'),
+        DocsTocEntry(title: 'Responsive', anchor: 'responsive'),
+        DocsTocEntry(title: 'Dependencies', anchor: 'dependencies'),
         DocsTocEntry(title: 'Theming', anchor: 'theming'),
         DocsTocEntry(title: 'Source', anchor: 'source'),
       ],
       // Wave 1's alphabetical neighbours (Phase J plan inventory). Neither
-      // route is registered yet either — the whole wave's previous/next chain
+      // route is registered yet either: the whole wave's previous/next chain
       // is stitched together once the supervisor aggregates every meta.dart,
       // the same as this page's own route is not reachable until then.
       previous: const DocsPageLink(
@@ -78,46 +94,77 @@ class _CheckboxArticle extends StatelessWidget {
       key: const ValueKey<String>('checkbox-doc-article'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        DsSection(
-          id: 'overview',
-          title: 'When to use a checkbox',
-          description:
-              'What it solves, and when a neighbouring control answers the '
-              'same interaction better.',
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: DsWidths.prose),
+          child: DsText(checkboxExpandedDescription, DsType.body),
+        ),
+        SizedBox(height: ds(3)),
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: DsWidths.prose),
           child: DsText(
-            'A checkbox holds one value a user sets independently of every '
-            'other option on the screen — "notify me by email" is true or '
-            'false on its own, with no relationship to any sibling setting, '
-            'and nothing happens until whatever reads it does (a form '
-            'submit, a filter recompute, a bulk action). Reach for '
-            'DsSwitch instead when the toggle has an immediate, standalone '
-            'effect the instant it flips, with no separate submit step (a '
-            'settings page\'s "Dark mode" row). Reach for DsRadioGroup '
-            'instead when the user is choosing exactly one option out of a '
-            'mutually exclusive set (a shipping method) — a checkbox says '
-            '"these can all be true independently," a radio group says '
-            '"only one of these can be true." Checkbox is also the only one '
-            'of the three that can render a third value, '
-            'DsCheckboxState.indeterminate, for a parent control reflecting '
-            'a partial selection among its children — a state neither a '
-            'switch nor a radio button has any way to represent.',
-            DsType.body,
+            'Seven live specimens, all built from the same DsCheckbox '
+            'constructor. Unchecked, Checked, Focus-visible and Error are '
+            'operable: tap them. Indeterminate is deliberately held '
+            'still and Disabled is deliberately inert; both are explained '
+            'in States below.',
+            DsType.small,
           ),
         ),
-        SizedBox(height: ds(6)),
+        SizedBox(height: ds(3)),
+        DocsCodeExample(
+          title: 'Checkbox specimens',
+          description: 'Every cell below renders a real DsCheckbox.',
+          preview: const _CheckboxPreview(),
+          manualFiles: <DocsCodeFile>[
+            DocsCodeFile(
+              path: checkboxDoc.sourcePath,
+              code:
+                  '// checkbox has no registry manifest yet, so there is no\n'
+                  '// generated @ui/checkbox.dart payload to copy here.\n'
+                  '// See "Installation" below for what actually works today.',
+            ),
+          ],
+        ),
+        SizedBox(height: ds(8)),
         DsSection(
-          id: 'status',
-          title: 'Status',
+          id: 'install',
+          title: 'Installation',
+          description:
+              'Command install is not available yet: read this before '
+              'reaching for elattar add checkbox.',
           child: DocsInstallFacts(
-            title: 'Status',
             facts: <DocsInstallFact>[
+              const DocsInstallFact(
+                label: 'CLI',
+                value: 'Not available',
+                description:
+                    'checkbox is not yet a registry item, so `elattar add '
+                    'checkbox` will not resolve. It is one of the Wave 1 '
+                    'base components still awaiting a manifest: see the '
+                    'Phase J documentation plan.',
+              ),
+              const DocsInstallFact(
+                label: 'Manual: package mode (supported today)',
+                value:
+                    "import 'package:elattar_design_system/elattar_design_system.dart';",
+                description:
+                    'Depend on the package and use DsCheckbox directly, '
+                    'exactly as this page does.',
+              ),
+              DocsInstallFact(
+                label: 'Manual: source mode (not recommended yet)',
+                value: checkboxDoc.sourcePath,
+                description:
+                    'Copying this one file will not compile on its own: it '
+                    'needs five sibling files with it (see Dependencies and '
+                    'files below), and no manifest exists yet to resolve '
+                    'them for you.',
+              ),
               const DocsInstallFact(
                 label: 'Status',
                 value: 'Stable, not yet a registry item',
                 description:
-                    'Ported and tested against lib/src/components/checkbox.dart. '
-                    'It is not yet a registry item, so elattar add checkbox '
-                    'will not resolve — see Installation below.',
+                    'Ported and tested against lib/src/components/checkbox.dart.',
               ),
               DocsInstallFact(
                 label: 'Version',
@@ -130,71 +177,8 @@ class _CheckboxArticle extends StatelessWidget {
                 label: 'Platforms',
                 value: 'Android, iOS, Web, macOS, Windows, Linux',
                 description:
-                    'A pure Flutter widget tree and CustomPainter geometry — '
+                    'A pure Flutter widget tree and CustomPainter geometry, '
                     'no platform channel and no platform-specific branch.',
-              ),
-            ],
-          ),
-        ),
-        SizedBox(height: ds(6)),
-        DsSection(
-          id: 'preview',
-          title: 'Preview',
-          description:
-              'Seven live specimens, all built from the same DsCheckbox '
-              'constructor. Unchecked, Checked, Focus-visible and Error are '
-              'operable — tap them. Indeterminate is deliberately held '
-              'still and Disabled is deliberately inert; both are explained '
-              'in States below.',
-          child: DocsCodeExample(
-            title: 'Checkbox specimens',
-            description: 'Every cell below renders a real DsCheckbox.',
-            preview: const _CheckboxPreview(),
-            manualFiles: <DocsCodeFile>[
-              DocsCodeFile(
-                path: checkboxDoc.sourcePath,
-                code:
-                    '// checkbox has no registry manifest yet, so there is no\n'
-                    '// generated @ui/checkbox.dart payload to copy here.\n'
-                    '// See "Installation" below for what actually works today.',
-              ),
-            ],
-          ),
-        ),
-        SizedBox(height: ds(6)),
-        DsSection(
-          id: 'install',
-          title: 'Installation',
-          description:
-              'Command install is not available yet — read this before '
-              'reaching for elattar add checkbox.',
-          child: DocsInstallFacts(
-            facts: <DocsInstallFact>[
-              const DocsInstallFact(
-                label: 'CLI',
-                value: 'Not available',
-                description:
-                    'checkbox is not yet a registry item, so `elattar add '
-                    'checkbox` will not resolve. It is one of the Wave 1 '
-                    'base components still awaiting a manifest — see the '
-                    'Phase J documentation plan.',
-              ),
-              const DocsInstallFact(
-                label: 'Manual — package mode (supported today)',
-                value:
-                    "import 'package:elattar_design_system/elattar_design_system.dart';",
-                description:
-                    'Depend on the package and use DsCheckbox directly, '
-                    'exactly as this page does.',
-              ),
-              DocsInstallFact(
-                label: 'Manual — source mode (not recommended yet)',
-                value: checkboxDoc.sourcePath,
-                description:
-                    'Copying this one file will not compile on its own — it '
-                    'needs five sibling files with it (see Dependencies and '
-                    'files below), and no manifest exists yet to resolve '
-                    'them for you.',
               ),
             ],
           ),
@@ -203,25 +187,52 @@ class _CheckboxArticle extends StatelessWidget {
         DsSection(
           id: 'usage',
           title: 'Usage',
-          description: 'The smallest correct example, then a labelled field.',
+          description: 'Import the package, then construct a DsCheckbox.',
+          child: DsPanel(
+            label: 'DART',
+            note: 'BASIC CONSTRUCTION',
+            child: DocsSelectableCodeBlock(code: _basicUsageCode),
+          ),
+        ),
+        SizedBox(height: ds(6)),
+        DsSection(
+          id: 'checked-state',
+          title: 'Checked state',
+          description:
+              'DsCheckbox is always controlled: state carries the current '
+              'DsCheckboxState and onChanged reports the next one on tap.',
+          child: DsPanel(
+            label: 'DART',
+            note: 'CONTROLLED',
+            child: DocsSelectableCodeBlock(code: _smallestUsageCode),
+          ),
+        ),
+        SizedBox(height: ds(6)),
+        DsSection(
+          id: 'invalid-state',
+          title: 'Invalid state',
+          description:
+              'invalid: true swaps the border and ring to the destructive '
+              'colour; see States and Accessibility below for the full '
+              'focus/error precedence.',
+          child: DsPanel(
+            label: 'DART',
+            note: 'INVALID',
+            child: DocsSelectableCodeBlock(code: _invalidUsageCode),
+          ),
+        ),
+        SizedBox(height: ds(6)),
+        DsSection(
+          id: 'basic',
+          title: 'Basic',
+          description:
+              'DsCheckbox renders no visible text of its own: label only '
+              'supplies the accessible name. Pair it with DsField for a '
+              'visible caption, and its DsFieldScope threads the label '
+              'straight through:',
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              DsPanel(
-                label: 'DART',
-                note: 'SMALLEST CORRECT EXAMPLE',
-                child: DocsSelectableCodeBlock(code: _smallestUsageCode),
-              ),
-              SizedBox(height: ds(5)),
-              DsText(
-                'DsCheckbox renders no visible text of its own — label only '
-                'supplies the accessible name. Pair it with DsField for a '
-                'visible caption, description and error wiring, and its '
-                'DsFieldScope threads the label straight through:',
-                DsType.small,
-                color: theme.mutedForeground,
-              ),
-              SizedBox(height: ds(3)),
               const _AcceptTermsExample(),
               SizedBox(height: ds(3)),
               DsPanel(
@@ -234,8 +245,82 @@ class _CheckboxArticle extends StatelessWidget {
         ),
         SizedBox(height: ds(6)),
         DsSection(
+          id: 'description',
+          title: 'Description',
+          child: DsText(
+            'The Basic demo above already sets DsField\'s own description '
+            '("You can withdraw consent at any time in Settings."). '
+            'DsFieldScope threads it straight into DsCheckbox.hint, read '
+            'after the label through Semantics.hint: the same '
+            'aria-describedby wiring shadcn\'s FieldDescription authors by '
+            'hand. No separate prop on DsCheckbox itself is needed once it '
+            'is composed inside a DsField.',
+            DsType.small,
+            color: theme.mutedForeground,
+          ),
+        ),
+        SizedBox(height: ds(6)),
+        DsSection(
+          id: 'disabled',
+          title: 'Disabled',
+          description:
+              'enabled: false dims the control to 50% opacity and removes '
+              'it from the tab order.',
+          child: DsPanel(
+            label: 'DART',
+            note: 'DISABLED',
+            child: DocsSelectableCodeBlock(code: _disabledUsageCode),
+          ),
+        ),
+        SizedBox(height: ds(6)),
+        DsSection(
+          id: 'group',
+          title: 'Group',
+          description:
+              'A list of independent checkboxes sharing one row layout, '
+              'each one still a plain, uncoordinated DsCheckbox.',
+          child: DsPanel(
+            label: 'DART',
+            note: 'FILTER ROW',
+            child: DocsSelectableCodeBlock(code: _filterRowCode),
+          ),
+        ),
+        SizedBox(height: ds(6)),
+        DsSection(
+          id: 'table',
+          title: 'Table',
+          description:
+              'A header checkbox reflecting a partial selection across '
+              'table rows: the case DsCheckboxState.indeterminate exists '
+              'for.',
+          child: DsPanel(
+            label: 'DART',
+            note: 'TRI-STATE BULK SELECTION',
+            child: DocsSelectableCodeBlock(code: _bulkSelectionCode),
+          ),
+        ),
+        SizedBox(height: ds(6)),
+        DsSection(
+          id: 'rtl',
+          title: 'RTL',
+          child: DsText(
+            'DsCheckbox carries no left/right-specific geometry of its '
+            'own: the socket is square, DsHitArea\'s insets grow '
+            'symmetrically on every side, and the tick/bar paths are drawn '
+            'in a fixed local coordinate space rather than mirrored. What '
+            'flips under Directionality.rtl belongs entirely to whatever '
+            'composes it: DsField and DsFieldLabel reorder label, control '
+            'and description the same way any other Flutter row does under '
+            'RTL, because nothing in checkbox.dart hardcodes a '
+            'left-to-right assumption.',
+            DsType.small,
+            color: theme.mutedForeground,
+          ),
+        ),
+        SizedBox(height: ds(6)),
+        DsSection(
           id: 'api',
-          title: 'API',
+          title: 'API Reference',
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
@@ -254,7 +339,7 @@ class _CheckboxArticle extends StatelessWidget {
                     type: 'ValueChanged<DsCheckboxState>?',
                     description:
                         'Called with the next state on tap or Enter/Space. '
-                        'Null disables the control — the same "no handler, '
+                        'Null disables the control: the same "no handler, '
                         'no operation" rule DsButton follows.',
                   ),
                   DocsApiFact(
@@ -271,7 +356,7 @@ class _CheckboxArticle extends StatelessWidget {
                         'Defaults to false. true holds the control at its '
                         'current state forever: full opacity, still '
                         'focusable, but a tap or Enter/Space does nothing. '
-                        'Distinct from enabled: false — see States.',
+                        'Distinct from enabled: false: see States.',
                   ),
                   DocsApiFact(
                     name: 'invalid',
@@ -300,7 +385,7 @@ class _CheckboxArticle extends StatelessWidget {
                     name: 'label',
                     type: 'String?',
                     description:
-                        'The accessible name. Not rendered as visible text — '
+                        'The accessible name. Not rendered as visible text, '
                         'pair with DsField (or DsFieldLabel) for a visible '
                         'caption.',
                   ),
@@ -308,7 +393,7 @@ class _CheckboxArticle extends StatelessWidget {
                     name: 'hint',
                     type: 'String?',
                     description:
-                        'Read after the label — the aria-describedby '
+                        'Read after the label: the aria-describedby '
                         'analogue, resolved through Semantics.hint.',
                   ),
                 ],
@@ -338,7 +423,7 @@ class _CheckboxArticle extends StatelessWidget {
                     name: 'DsCheckbox.size',
                     type: 'static double',
                     description:
-                        'The 20px box size — bigger than the reference\'s '
+                        'The 20px box size: bigger than the reference\'s '
                         'own default because a 16px target and tick were '
                         'judged illegible.',
                   ),
@@ -357,27 +442,11 @@ class _CheckboxArticle extends StatelessWidget {
         ),
         SizedBox(height: ds(6)),
         DsSection(
-          id: 'variants',
-          title: 'Variants and sizes',
-          description:
-              'Not applicable — recorded rather than silently skipped.',
-          child: DsText(
-            'DsCheckbox has no variant or size parameter. The reference '
-            'component fixes one geometry on purpose — its own docstring '
-            'calls 16px "a fiddly target [with an] illegible tick" — so '
-            'this port ships exactly one size, DsCheckbox.size at 20px, '
-            'with nothing smaller or larger to choose between.',
-            DsType.small,
-            color: theme.mutedForeground,
-          ),
-        ),
-        SizedBox(height: ds(6)),
-        DsSection(
           id: 'states',
-          title: 'States and feedback',
+          title: 'States',
           description:
-              'Hover, Pressed, Loading, Empty and Success are omitted below '
-              '— reasons follow the table.',
+              'Hover, Pressed, Loading, Empty and Success are omitted below: '
+              'reasons follow the table.',
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
@@ -396,7 +465,7 @@ class _CheckboxArticle extends StatelessWidget {
                         'theme.primary fill and border; the tick draws '
                         'itself, stroke first, over its own reveal.',
                     userSignal:
-                        'A drawn checkmark rather than a faded-in one — '
+                        'A drawn checkmark rather than a faded-in one, '
                         'visible even to a reader who cannot rely on the '
                         'fill colour changing.',
                   ),
@@ -407,7 +476,7 @@ class _CheckboxArticle extends StatelessWidget {
                         'horizontal bar instead of a tick; re-draws from '
                         'zero on every reveal.',
                     userSignal:
-                        'A bar, not a tick — the shape itself signals '
+                        'A bar, not a tick: the shape itself signals '
                         '"partially selected," not just a third colour.',
                   ),
                   DocsStateFact(
@@ -417,7 +486,7 @@ class _CheckboxArticle extends StatelessWidget {
                         'state forever, regardless of onChanged.',
                     userSignal:
                         'Full opacity, still in the tab order, looks '
-                        'exactly like an operable checkbox — a tap or '
+                        'exactly like an operable checkbox: a tap or '
                         'Enter/Space does nothing. Reproduced from the '
                         'reference on purpose, not a bug.',
                   ),
@@ -425,7 +494,7 @@ class _CheckboxArticle extends StatelessWidget {
                     state: 'Focus-visible',
                     treatment: 'border-ring plus a 3px ring at 50% alpha.',
                     userSignal:
-                        'A visible ring around the box — beaten by Error '
+                        'A visible ring around the box: beaten by Error '
                         'below when both apply.',
                   ),
                   DocsStateFact(
@@ -436,7 +505,7 @@ class _CheckboxArticle extends StatelessWidget {
                     userSignal:
                         'aria-invalid beats focus-visible: a focused, '
                         'invalid checkbox looks pixel-identical to an '
-                        'unfocused invalid one — reproduced faithfully '
+                        'unfocused invalid one: reproduced faithfully '
                         'rather than "fixed".',
                   ),
                   DocsStateFact(
@@ -446,7 +515,7 @@ class _CheckboxArticle extends StatelessWidget {
                         'the control from the tab order and from pointer '
                         'and keyboard handling.',
                     userSignal:
-                        'Visibly and operably inert — the one state that '
+                        'Visibly and operably inert: the one state that '
                         'dims.',
                   ),
                   DocsStateFact(
@@ -465,14 +534,14 @@ class _CheckboxArticle extends StatelessWidget {
               ),
               SizedBox(height: ds(4)),
               DsText(
-                'Omitted: Hover — no control in this family authors a '
-                'hover skin; only the pointer cursor changes. Pressed — '
+                'Omitted: Hover: no control in this family authors a '
+                'hover skin; only the pointer cursor changes. Pressed, '
                 'there is no separate pointer-down look; the box squashes '
                 'once, after the state actually changes, via DsJellyReplay, '
                 'which is a post-toggle reveal rather than a held-down '
-                'state. Loading and Empty — DsCheckbox is a synchronous '
+                'state. Loading and Empty, DsCheckbox is a synchronous '
                 'primitive with no async operation and nothing to list, so '
-                'neither applies. Success — the component defines no '
+                'neither applies. Success: the component defines no '
                 'success semantics of its own.',
                 DsType.small,
                 color: theme.mutedForeground,
@@ -493,7 +562,7 @@ class _CheckboxArticle extends StatelessWidget {
                 description:
                     'unchecked -> checked: false, mixed: false. checked -> '
                     'checked: true. indeterminate -> checked: false, mixed: '
-                    'true — read by assistive technology as a tri-state '
+                    'true: read by assistive technology as a tri-state '
                     'checkbox.',
               ),
               const DocsInstallFact(
@@ -501,7 +570,7 @@ class _CheckboxArticle extends StatelessWidget {
                 value: 'label',
                 description:
                     'Feeds the control\'s accessible name directly. It is '
-                    'never rendered as visible text — compose with DsField '
+                    'never rendered as visible text: compose with DsField '
                     '(or a DsFieldLabel) for a caption a sighted user can '
                     'read; tapping that visible label activates the '
                     'control through the same activator wiring an HTML '
@@ -511,7 +580,7 @@ class _CheckboxArticle extends StatelessWidget {
                 label: 'Keyboard activation',
                 value: 'Enter, numpad Enter, Space',
                 description:
-                    'Wired by hand through Focus.onKeyEvent — the control '
+                    'Wired by hand through Focus.onKeyEvent: the control '
                     'is not a native button, so nothing arrives for free.',
               ),
               const DocsInstallFact(
@@ -529,14 +598,14 @@ class _CheckboxArticle extends StatelessWidget {
                 description:
                     'DsHitArea grows the hit test past the painted box. '
                     'Measured from the reference at 2px short of the '
-                    'system\'s own 44px floor on both axes — recorded, not '
+                    'system\'s own 44px floor on both axes: recorded, not '
                     'corrected, because it is what the reference renders.',
               ),
               const DocsInstallFact(
                 label: 'Non-colour signal',
                 value: 'A drawn glyph, not just a fill change',
                 description:
-                    'Checked draws a tick and indeterminate draws a bar — '
+                    'Checked draws a tick and indeterminate draws a bar, '
                     'two different shapes, so the state does not depend on '
                     'a reader distinguishing fill colours.',
               ),
@@ -560,8 +629,8 @@ class _CheckboxArticle extends StatelessWidget {
                 label: 'Known drift',
                 value: 'inert renders as fully operable',
                 description:
-                    'inert: true carries no disabled semantics at all — '
-                    'the control announces enabled: true — so a screen '
+                    'inert: true carries no disabled semantics at all, '
+                    'the control announces enabled: true: so a screen '
                     'reader gets no more signal than a sighted reader that '
                     'the control cannot be operated. Reproduced from the '
                     'reference on purpose.',
@@ -572,9 +641,9 @@ class _CheckboxArticle extends StatelessWidget {
         SizedBox(height: ds(6)),
         DsSection(
           id: 'responsive',
-          title: 'Responsive and platform behavior',
+          title: 'Responsive',
           child: DsText(
-            'DsCheckbox has no responsive breakpoints of its own — it is a '
+            'DsCheckbox has no responsive breakpoints of its own: it is a '
             'fixed 20 x 20 atomic control with a fixed 42 x 34 hit area, '
             'identical across mobile, tablet, desktop and web. What '
             'changes with layout belongs to whatever composes it: DsField '
@@ -591,7 +660,7 @@ class _CheckboxArticle extends StatelessWidget {
         SizedBox(height: ds(6)),
         DsSection(
           id: 'dependencies',
-          title: 'Dependencies, files, assets, fonts and shaders',
+          title: 'Dependencies',
           child: DocsInstallFacts(
             title: 'Dependencies and files',
             facts: <DocsInstallFact>[
@@ -612,7 +681,7 @@ class _CheckboxArticle extends StatelessWidget {
                     'for DsFieldScope wiring, icon_paths.dart for the '
                     '24-unit icon grid, and motion/keyframes.dart for the '
                     'self-drawing stroke player. None are copyable in '
-                    'isolation — see Installation.',
+                    'isolation: see Installation.',
               ),
               const DocsInstallFact(
                 label: 'Foundation dependencies',
@@ -652,32 +721,8 @@ class _CheckboxArticle extends StatelessWidget {
         ),
         SizedBox(height: ds(6)),
         DsSection(
-          id: 'composition',
-          title: 'Composition examples',
-          description:
-              'Two larger, real patterns built from the same constructor — '
-              'not manufactured examples the Dart API cannot support.',
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              DsPanel(
-                label: 'DART',
-                note: 'FILTER ROW',
-                child: DocsSelectableCodeBlock(code: _filterRowCode),
-              ),
-              SizedBox(height: ds(5)),
-              DsPanel(
-                label: 'DART',
-                note: 'TRI-STATE BULK SELECTION',
-                child: DocsSelectableCodeBlock(code: _bulkSelectionCode),
-              ),
-            ],
-          ),
-        ),
-        SizedBox(height: ds(6)),
-        DsSection(
           id: 'theming',
-          title: 'Theming notes',
+          title: 'Theming',
           child: DocsInstallFacts(
             title: 'Tokens this component reads',
             facts: const <DocsInstallFact>[
@@ -694,7 +739,7 @@ class _CheckboxArticle extends StatelessWidget {
                     'theme.input (rest) / theme.primary (lit) / theme.ring '
                     '(focus-visible) / theme.destructive (invalid)',
                 description:
-                    'Resolved in that precedence order — invalid always '
+                    'Resolved in that precedence order: invalid always '
                     'wins.',
               ),
               DocsInstallFact(
@@ -721,7 +766,7 @@ class _CheckboxArticle extends StatelessWidget {
                     'DsJellyReplay',
                 description:
                     'Socket colour/border/ring tween duration, the '
-                    'self-drawing stroke, and the post-toggle squash — all '
+                    'self-drawing stroke, and the post-toggle squash: all '
                     'resolved through dsAnimationDuration, so reduced '
                     'motion shortens or removes them automatically.',
               ),
@@ -731,7 +776,7 @@ class _CheckboxArticle extends StatelessWidget {
         SizedBox(height: ds(6)),
         DsSection(
           id: 'source',
-          title: 'Source and tests',
+          title: 'Source',
           child: DocsInstallFacts(
             facts: <DocsInstallFact>[
               DocsInstallFact(
@@ -743,7 +788,7 @@ class _CheckboxArticle extends StatelessWidget {
                 label: 'Shared machinery',
                 value: 'lib/src/components/selection_control.dart',
                 description:
-                    'DsSelectionControl, DsHitArea and DsJellyReplay — '
+                    'DsSelectionControl, DsHitArea and DsJellyReplay, '
                     'shared with the switch and radio families and '
                     'documented on their own component page.',
               ),
@@ -769,6 +814,11 @@ class _CheckboxArticle extends StatelessWidget {
   }
 }
 
+const String _basicUsageCode =
+    '''import 'package:elattar_design_system/elattar_design_system.dart';
+
+DsCheckbox(label: 'Accept the terms')''';
+
 const String _smallestUsageCode = '''bool accepted = false;
 
 DsCheckbox(
@@ -777,6 +827,16 @@ DsCheckbox(
   onChanged: (DsCheckboxState next) {
     setState(() => accepted = next == DsCheckboxState.checked);
   },
+)''';
+
+const String _invalidUsageCode = '''DsCheckbox(
+  invalid: true,
+  label: 'Accept the terms',
+)''';
+
+const String _disabledUsageCode = '''DsCheckbox(
+  enabled: false,
+  label: 'Disabled',
 )''';
 
 const String _fieldUsageCode = '''DsField(
@@ -874,7 +934,7 @@ class _CheckboxPreviewState extends State<_CheckboxPreview> {
         ),
         const DsStateCell(
           label: 'Indeterminate',
-          note: 'Held here on purpose — see States',
+          note: 'Held here on purpose: see States',
           child: DsCheckbox(
             state: DsCheckboxState.indeterminate,
             inert: true,
@@ -918,7 +978,7 @@ class _CheckboxPreviewState extends State<_CheckboxPreview> {
   }
 }
 
-/// A live, functioning `DsField`-wrapped checkbox for the "Usage" section —
+/// A live, functioning `DsField`-wrapped checkbox for the "Basic" section:
 /// proof the composition it documents actually renders and toggles, not just
 /// a code excerpt.
 class _AcceptTermsExample extends StatefulWidget {

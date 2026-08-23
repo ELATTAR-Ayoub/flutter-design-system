@@ -12,6 +12,7 @@ import 'package:example/components_docs/textarea/meta.dart';
 import 'package:example/components_docs/textarea/page.dart';
 import 'package:example/docs/docs_code.dart';
 import 'package:example/docs/docs_facts.dart';
+import 'package:example/kit.dart' show DsSection;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -96,6 +97,36 @@ void main() {
         findsNothing,
       );
       expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'sections render in the shadcn-mirrored order, section for section',
+    (WidgetTester tester) async {
+      await _pump(tester);
+
+      final List<String> titles = tester
+          .widgetList<DsSection>(find.byType(DsSection))
+          .map((DsSection section) => section.title)
+          .toList();
+
+      expect(titles, <String>[
+        'Installation',
+        'Usage',
+        'Textarea vs. input',
+        'Field',
+        'Disabled',
+        'Invalid',
+        'Button',
+        'RTL',
+        'API Reference',
+        'States',
+        'Accessibility',
+        'Responsive',
+        'Dependencies',
+        'Theming',
+        'Source',
+      ]);
     },
   );
 

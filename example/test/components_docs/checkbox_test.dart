@@ -1,4 +1,4 @@
-/// Tests for `components_docs/checkbox/page.dart`'s [CheckboxDocPage] —
+/// Tests for `components_docs/checkbox/page.dart`'s [CheckboxDocPage]:
 /// the checkbox component documentation page.
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
@@ -12,11 +12,37 @@ import 'package:example/components_docs/checkbox/meta.dart';
 import 'package:example/components_docs/checkbox/page.dart';
 import 'package:example/docs/docs_code.dart';
 import 'package:example/docs/docs_facts.dart';
+import 'package:example/kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 const Size _wide = Size(1440, 900);
 const Size _narrow = Size(390, 844);
+
+/// The shadcn-mirrored section order this page must render, top to bottom:
+/// `https://ui.shadcn.com/docs/components/base/checkbox`'s own Installation
+/// through API Reference (the live demo above them carries no heading, the
+/// same as shadcn's own page), then the six Elattar-specific sections below
+/// them.
+const List<String> _expectedSectionIds = <String>[
+  'install',
+  'usage',
+  'checked-state',
+  'invalid-state',
+  'basic',
+  'description',
+  'disabled',
+  'group',
+  'table',
+  'rtl',
+  'api',
+  'states',
+  'accessibility',
+  'responsive',
+  'dependencies',
+  'theming',
+  'source',
+];
 
 /// Every public constructor parameter of `DsCheckbox`, enumerated by reading
 /// `lib/src/components/checkbox.dart` directly (Step 1 of the task cycle).
@@ -74,6 +100,31 @@ Future<DsThemeController> _pump(
 }
 
 void main() {
+  testWidgets('sections render in the shadcn-mirrored order, top to bottom', (
+    WidgetTester tester,
+  ) async {
+    await _pump(tester);
+
+    double previousDy = double.negativeInfinity;
+    for (final String id in _expectedSectionIds) {
+      final Finder finder = find.byKey(DsSection.anchorKey(id));
+      expect(
+        finder,
+        findsOneWidget,
+        reason: 'no DsSection with id "$id" is in the tree',
+      );
+      final double dy = tester.getTopLeft(finder).dy;
+      expect(
+        dy,
+        greaterThan(previousDy),
+        reason:
+            'section "$id" does not come after the previous section in '
+            'the expected order',
+      );
+      previousDy = dy;
+    }
+  });
+
   testWidgets(
     'renders the article at wide and narrow widths with no exceptions',
     (WidgetTester tester) async {

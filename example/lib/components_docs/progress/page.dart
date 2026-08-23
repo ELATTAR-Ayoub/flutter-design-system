@@ -1,17 +1,47 @@
 /// Public documentation page for the paired `progress` / `skeleton`
 /// components.
 ///
-/// Mirrors `badge/page.dart`'s use of the Phase C docs primitives
-/// (`DocsLayout`, `DocsCodeExample`, `DocsApiTable`, `DocsStateMatrix`,
-/// `DocsInstallFacts`) and `kit.dart`'s `DsSection` for titled,
-/// anchor-registered content blocks. The one structural difference from
-/// `badge`: every `DsSection` below covers BOTH `DsProgress` and
-/// `DsSkeleton` — see `meta.dart`'s library note for why one page, one
-/// route, and one `ComponentDocEntry` carry two components.
+/// Section shape mirrors BOTH counterparts, section for section:
+/// `https://ui.shadcn.com/docs/components/base/progress` and
+/// `https://ui.shadcn.com/docs/components/base/skeleton`. A live demo of
+/// each renders ahead of any heading, the same as the references' own
+/// top-of-page previews: no Overview, Status, or Preview heading precedes
+/// Installation. Installation and Usage are each a single merged section
+/// (one shared story, two panels: see `meta.dart`'s library note for why
+/// one page, one route, and one `ComponentDocEntry` carry two components).
+/// Every body section that follows belongs to exactly one of the two
+/// components and is named for it (`Progress: Controlled`, `Skeleton:
+/// Table`, and so on) so the reader always knows which component a section
+/// is about; Progress's sections come first, mirroring the reference's own
+/// Composition/Label/Controlled/RTL order (Composition itself is skipped,
+/// see below), then Skeleton's, mirroring its own Avatar/Card/Text/Form/
+/// Table/RTL order. API Reference closes out the shadcn-mirrored part of
+/// the page, one set of tables per exported class across both components
+/// (DsProgressTone's table, which has no shadcn counterpart section of its
+/// own, is folded in here rather than kept under an invented `Variants`
+/// heading). States, Accessibility, Responsive, Dependencies, Theming, and
+/// Source are this package's own six sections, each covering both
+/// components once rather than twice.
+///
+/// **Skipped from the counterparts**, and why: Progress's `Composition`
+/// section documents a `Progress.Root`/`Track`/`Indicator`/`Label`/`Value`
+/// compound-widget tree; [DsProgress] is one `StatelessWidget` with a
+/// `value`/`tone`/`label` surface and exposes no such tree, so there is
+/// nothing to show. Its `With label and value` subsection and its sibling
+/// `Label` section both answer the same reader question, "how do I show
+/// text next to the bar", so this page answers it once, under `Progress:
+/// Label and value`.
+///
+/// **Ours only**, and why: `Progress: Download list` and `Skeleton:
+/// Avoiding layout shift` have no shadcn counterpart section; both were
+/// already-built compositions on the pre-reshape page that show the two
+/// primitives doing real work (several tones in one list, a layout that
+/// never jumps when real content lands) rather than one bar or one box in
+/// isolation.
 ///
 /// Neither component has a registry manifest yet
 /// (`registry/components/progress.json` and `.../skeleton.json` do not
-/// exist) — every install-facing panel below says so honestly rather than
+/// exist): every install-facing panel below says so honestly rather than
 /// presenting a CLI command that would fail.
 ///
 /// **Motion.** `DsProgress`'s fill is a finite `ImplicitlyAnimatedWidget`
@@ -19,7 +49,7 @@
 /// `DsSkeleton`'s shimmer is a genuinely infinite `AnimationController.repeat()`
 /// (`DsKeyframePlayer` with `repeat: true`). Both collapse to
 /// `Duration.zero` under `MediaQuery.disableAnimations` via
-/// `dsAnimationDuration` (`theme_scope.dart`) — confirmed for the skeleton by
+/// `dsAnimationDuration` (`theme_scope.dart`): confirmed for the skeleton by
 /// the package's own `test/feedback_effects_test.dart` rasterised reduced
 /// motion case, and for the progress fill by reading
 /// `_AnimatedFractionalTranslation`'s duration parameter directly. See the
@@ -55,17 +85,36 @@ class ProgressDocPage extends StatelessWidget {
     ],
     sidebar: _sidebar,
     toc: const <DocsTocEntry>[
-      DocsTocEntry(title: 'Overview', anchor: 'overview'),
-      DocsTocEntry(title: 'Preview', anchor: 'preview'),
-      DocsTocEntry(title: 'Install', anchor: 'install'),
+      DocsTocEntry(title: 'Installation', anchor: 'install'),
       DocsTocEntry(title: 'Usage', anchor: 'usage'),
-      DocsTocEntry(title: 'API', anchor: 'api'),
-      DocsTocEntry(title: 'Variants', anchor: 'variants'),
+      DocsTocEntry(
+        title: 'Progress: Label and value',
+        anchor: 'progress-label-value',
+      ),
+      DocsTocEntry(
+        title: 'Progress: Controlled',
+        anchor: 'progress-controlled',
+      ),
+      DocsTocEntry(title: 'Progress: RTL', anchor: 'progress-rtl'),
+      DocsTocEntry(
+        title: 'Progress: Download list',
+        anchor: 'progress-download-list',
+      ),
+      DocsTocEntry(title: 'Skeleton: Avatar', anchor: 'skeleton-avatar'),
+      DocsTocEntry(title: 'Skeleton: Card', anchor: 'skeleton-card'),
+      DocsTocEntry(title: 'Skeleton: Text', anchor: 'skeleton-text'),
+      DocsTocEntry(title: 'Skeleton: Form', anchor: 'skeleton-form'),
+      DocsTocEntry(title: 'Skeleton: Table', anchor: 'skeleton-table'),
+      DocsTocEntry(title: 'Skeleton: RTL', anchor: 'skeleton-rtl'),
+      DocsTocEntry(
+        title: 'Skeleton: Avoiding layout shift',
+        anchor: 'skeleton-layout-shift',
+      ),
+      DocsTocEntry(title: 'API Reference', anchor: 'api'),
       DocsTocEntry(title: 'States', anchor: 'states'),
       DocsTocEntry(title: 'Accessibility', anchor: 'accessibility'),
       DocsTocEntry(title: 'Responsive', anchor: 'responsive'),
       DocsTocEntry(title: 'Dependencies', anchor: 'dependencies'),
-      DocsTocEntry(title: 'Composition', anchor: 'composition'),
       DocsTocEntry(title: 'Theming', anchor: 'theming'),
       DocsTocEntry(title: 'Source', anchor: 'source'),
     ],
@@ -82,7 +131,7 @@ class ProgressDocPage extends StatelessWidget {
 /// The Wave 1 "base primitives" group this page belongs to (IA §7.3), in the
 /// plan's own order, with `Progress` and `Skeleton`'s two rows merged into
 /// the one this page actually serves. Routes other workers are producing
-/// this same wave, not routes this page can verify are wired yet — the
+/// this same wave, not routes this page can verify are wired yet: the
 /// supervisor aggregates the real sidebar in `catalog.dart` and
 /// `site_routes.dart`.
 const List<DocsSidebarEntry> _sidebar = <DocsSidebarEntry>[
@@ -109,7 +158,7 @@ const List<DocsSidebarEntry> _sidebar = <DocsSidebarEntry>[
 /// One static [DsProgress] specimen. Values and labels echo the reference's
 /// own examples where `progress.dart`'s class doc quotes them verbatim
 /// (`20.6`, `66.7`, and the drift-7 array's `{ tone: "default", label:
-/// "Steps today", value: 72 }`) — see drift 6 and drift 7 in
+/// "Steps today", value: 72 }`): see drift 6 and drift 7 in
 /// `lib/src/components/progress.dart` for why the first bar below is
 /// deliberately unlabelled.
 class _ProgressSpecimen {
@@ -120,7 +169,7 @@ class _ProgressSpecimen {
 }
 
 const List<_ProgressSpecimen> _progressSpecimens = <_ProgressSpecimen>[
-  // No label — reproduces the reference's own drift 6 (page.tsx:339 is a
+  // No label: reproduces the reference's own drift 6 (page.tsx:339 is a
   // bare <Progress value={20.6} /> with no aria-label).
   _ProgressSpecimen(20.6, DsProgressTone.normal, null),
   _ProgressSpecimen(66.7, DsProgressTone.normal, 'Profile complete'),
@@ -129,7 +178,7 @@ const List<_ProgressSpecimen> _progressSpecimens = <_ProgressSpecimen>[
   _ProgressSpecimen(88, DsProgressTone.success, 'Sync complete'),
   _ProgressSpecimen(34, DsProgressTone.warning, 'Battery'),
   // destructive is for a reading OUTSIDE its safe band, per the enum's own
-  // doc comment — not merely a low number.
+  // doc comment: not merely a low number.
   _ProgressSpecimen(92, DsProgressTone.destructive, 'CPU temperature'),
 ];
 
@@ -143,127 +192,48 @@ class _ProgressSkeletonArticle extends StatelessWidget {
       key: const ValueKey<String>('progress-doc-article'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        _overview(theme),
-        _preview(),
+        // The live demos, ahead of any heading: the same shape both
+        // references open with. No DsSection wraps them, so they carry no
+        // Overview/Status/Preview heading before Installation.
+        const DocsCodeExample(
+          title: 'Progress and skeleton',
+          description:
+              'A determinate DsProgress reading, and a DsSkeleton avatar '
+              'plus two text lines standing in for content that has not '
+              'arrived yet.',
+          preview: _TopDemo(),
+        ),
+        SizedBox(height: ds(6)),
         _install(),
-        _usage(),
-        _api(),
-        _variants(theme),
+        _usage(theme),
+        _progressLabelValue(),
+        _progressControlled(),
+        _progressRtl(),
+        _progressDownloadList(),
+        _skeletonAvatar(),
+        _skeletonCard(),
+        _skeletonText(),
+        _skeletonForm(),
+        _skeletonTable(),
+        _skeletonRtl(),
+        _skeletonLayoutShift(),
+        _apiReference(theme),
         _states(),
         _accessibility(theme),
         _responsive(theme),
         _dependencies(theme),
-        _composition(),
         _theming(theme),
         _source(),
       ],
     );
   }
 
-  Widget _overview(DsThemeData theme) => DsSection(
-    id: 'overview',
-    title: 'Overview',
-    child: ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: DsWidths.prose),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          DsText(
-            'DsProgress renders a 10px sunken channel with a filled '
-            'indicator that translates into view as a value climbs — never '
-            'a width change, a translation, so the tone shadow\'s inset '
-            'rim runs off the end rather than pinning to the fill\'s '
-            'leading edge. DsSkeleton renders a box the exact size of the '
-            'thing that has not arrived yet, with a shimmering highlight '
-            'sweeping across it forever, until the caller swaps it for '
-            'real content.',
-            DsType.body,
-          ),
-          SizedBox(height: ds(4)),
-          DsText(progressSkeletonDecisionGuide, DsType.body),
-          SizedBox(height: ds(4)),
-          DsText(
-            'Status: two stable primitives, neither registered in the CLI '
-            'yet (see Install). Platforms: Android, iOS, Web, macOS, '
-            'Windows, Linux — the same six every widget in this package '
-            'targets.',
-            DsType.small,
-            color: theme.mutedForeground,
-          ),
-        ],
-      ),
-    ),
-  );
-
-  Widget _preview() => DsSection(
-    id: 'preview',
-    title: 'Preview',
-    description:
-        'Seven DsProgress readings across all five tones (three default, '
-        'one value, one success, one warning, one destructive — the same '
-        'split the reference\'s own PROGRESS_TONES array uses), an '
-        'interactive one you can advance, and four DsSkeleton shapes.',
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        DocsCodeExample(
-          title: 'Progress specimens',
-          manualFiles: const <DocsCodeFile>[
-            DocsCodeFile(
-              path: 'lib/components/ui/progress.dart',
-              code:
-                  "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
-                  '// Progress has no registry manifest yet — copy\n'
-                  '// lib/src/components/progress.dart from the package\n'
-                  '// source directly. There is no generated CLI payload.',
-            ),
-          ],
-          preview: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              for (final _ProgressSpecimen spec
-                  in _progressSpecimens) ...<Widget>[
-                _LabelledProgress(spec: spec),
-                SizedBox(height: ds(4)),
-              ],
-            ],
-          ),
-        ),
-        SizedBox(height: ds(6)),
-        const DocsCodeExample(
-          title: 'Interactive: advance a value',
-          description:
-              'A real, stateful DsProgress. Press "Advance" to see the '
-              'fill tween into its new position under DsProgress.transition '
-              '(250ms, DsCurves.out) — this is the specimen the reduced '
-              'motion section below drives to a single-pump landing.',
-          preview: _ProgressLiveSpecimen(),
-        ),
-        SizedBox(height: ds(6)),
-        DocsCodeExample(
-          title: 'Skeleton specimens',
-          manualFiles: const <DocsCodeFile>[
-            DocsCodeFile(
-              path: 'lib/components/ui/skeleton.dart',
-              code:
-                  "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
-                  '// Skeleton has no registry manifest yet — copy\n'
-                  '// lib/src/components/skeleton.dart from the package\n'
-                  '// source directly. There is no generated CLI payload.',
-            ),
-          ],
-          preview: const _SkeletonShapes(),
-        ),
-      ],
-    ),
-  );
-
   Widget _install() => DsSection(
     id: 'install',
     title: 'Installation',
     description:
         'Neither component has a registry manifest yet, so `elattar add '
-        'progress` and `elattar add skeleton` are not available — install '
+        'progress` and `elattar add skeleton` are not available: install '
         'by copying the source files manually.',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -292,7 +262,7 @@ class _ProgressSkeletonArticle extends StatelessWidget {
               label: 'Dependencies',
               value: 'source-foundation, machine-surface',
               description:
-                  'What a future manifest would need to resolve — colors, '
+                  'What a future manifest would need to resolve: colors, '
                   'shadows, spacing, theme, motion, and the DsMachineSurface '
                   'effect the channel and the fill both paint through. None '
                   'of this is resolved automatically today.',
@@ -306,8 +276,8 @@ class _ProgressSkeletonArticle extends StatelessWidget {
               label: 'Shaders',
               value: 'none',
               description:
-                  'The fill and channel are DsMachineSurface layers — box '
-                  'shadows and solid fills — not a fragment shader.',
+                  'The fill and channel are DsMachineSurface layers: box '
+                  'shadows and solid fills: not a fragment shader.',
             ),
             DocsInstallFact(
               label: 'Platforms',
@@ -323,7 +293,7 @@ class _ProgressSkeletonArticle extends StatelessWidget {
                   'fill placement. This page\'s own '
                   'example/test/components_docs/progress_test.dart covers '
                   'the specimen and reduced motion. No registry fixture '
-                  'install exists — there is nothing to install.',
+                  'install exists: there is nothing to install.',
             ),
           ],
         ),
@@ -393,13 +363,35 @@ class _ProgressSkeletonArticle extends StatelessWidget {
     ),
   );
 
-  Widget _usage() => DsSection(
+  Widget _usage(DsThemeData theme) => DsSection(
     id: 'usage',
     title: 'Usage',
     description: 'The smallest correct call for each, then a realistic shape.',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: DsWidths.prose),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              DsText(
+                'DsProgress renders a 10px sunken channel with a filled '
+                'indicator that translates into view as a value climbs: '
+                'never a width change, a translation, so the tone shadow\'s '
+                'inset rim runs off the end rather than pinning to the '
+                'fill\'s leading edge. DsSkeleton renders a box the exact '
+                'size of the thing that has not arrived yet, with a '
+                'shimmering highlight sweeping across it forever, until the '
+                'caller swaps it for real content.',
+                DsType.body,
+              ),
+              SizedBox(height: ds(4)),
+              DsText(progressSkeletonDecisionGuide, DsType.body),
+            ],
+          ),
+        ),
+        SizedBox(height: ds(5)),
         DsPanel(
           label: 'DART',
           note: 'PROGRESS',
@@ -415,9 +407,212 @@ class _ProgressSkeletonArticle extends StatelessWidget {
     ),
   );
 
-  Widget _api() => DsSection(
+  Widget _progressLabelValue() => DsSection(
+    id: 'progress-label-value',
+    title: 'Progress: Label and value',
+    description:
+        'DsProgress has no separate ProgressLabel or ProgressValue widget: '
+        '`label` is a single Semantics accessible-name parameter, and a '
+        'visible percentage readout, like the reference\'s own "412 / '
+        '2,000" span, is presentation the caller composes beside the bar. '
+        'These seven specimens pair a caller-drawn label and percentage '
+        'with each bar, the shape the reference\'s own PROGRESS_TONES '
+        'panels use (three default, one value, one success, one warning, '
+        'one destructive).',
+    child: DocsCodeExample(
+      title: 'Progress specimens',
+      preview: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          for (final _ProgressSpecimen spec in _progressSpecimens) ...<Widget>[
+            _LabelledProgress(spec: spec),
+            SizedBox(height: ds(4)),
+          ],
+        ],
+      ),
+    ),
+  );
+
+  Widget _progressControlled() => const DsSection(
+    id: 'progress-controlled',
+    title: 'Progress: Controlled',
+    description:
+        'A real, stateful DsProgress. Press "Advance" to see the fill '
+        'tween into its new position under DsProgress.transition (250ms, '
+        'DsCurves.out): this is the specimen the reduced motion section '
+        'below drives to a single-pump landing.',
+    child: DocsCodeExample(
+      title: 'Interactive: advance a value',
+      preview: _ProgressLiveSpecimen(),
+    ),
+  );
+
+  Widget _progressRtl() => const DsSection(
+    id: 'progress-rtl',
+    title: 'Progress: RTL',
+    description:
+        'DsProgress renders under an ambient RTL Directionality without '
+        'error, and its Semantics label and value announce correctly in '
+        'either direction. One real gap: the fill\'s FractionalTranslation '
+        'offset carries a fixed sign rather than one derived from '
+        'Directionality.of(context), so the bar keeps filling from the '
+        'physical left even under RTL, unlike a reference built on logical '
+        'CSS properties. A reader building a fully mirrored RTL layout '
+        'should know the fill itself will not flip.',
+    child: DocsCodeExample(
+      title: 'Progress under RTL',
+      preview: _ProgressRtlDemo(),
+    ),
+  );
+
+  Widget _progressDownloadList() => const DsSection(
+    id: 'progress-download-list',
+    title: 'Progress: Download list',
+    description:
+        'Three DsProgress rows sharing a list, echoing the reference\'s '
+        'own second PROGRESS_TONES panel: the composed shape a download '
+        'manager or a sync status panel actually uses. Not part of the '
+        'shadcn counterpart\'s own section list; added because a single '
+        'bar in isolation understates how the tones read together.',
+    child: DocsCodeExample(
+      title: 'A download list',
+      preview: _DownloadListComposition(),
+    ),
+  );
+
+  Widget _skeletonAvatar() => const DsSection(
+    id: 'skeleton-avatar',
+    title: 'Skeleton: Avatar',
+    description:
+        'A circular placeholder sized like the avatar it stands in for: '
+        'radius: DsRadii.pill turns the box into a circle the moment width '
+        'and height are equal.',
+    child: DocsCodeExample(
+      title: 'Avatar skeleton',
+      preview: KeyedSubtree(
+        key: ValueKey<String>('skeleton-preview:avatar'),
+        child: DsSkeleton(width: 40, height: 40, radius: DsRadii.pill),
+      ),
+    ),
+  );
+
+  Widget _skeletonCard() => const DsSection(
+    id: 'skeleton-card',
+    title: 'Skeleton: Card',
+    description:
+        'A block placeholder sized like the card it precedes: the caller '
+        'picks the exact width and height, DsSkeleton has no card-shaped '
+        'default of its own.',
+    child: DocsCodeExample(
+      title: 'Card skeleton',
+      preview: KeyedSubtree(
+        key: ValueKey<String>('skeleton-preview:card'),
+        child: DsSkeleton(width: 320, height: 128),
+      ),
+    ),
+  );
+
+  Widget _skeletonText() => DsSection(
+    id: 'skeleton-text',
+    title: 'Skeleton: Text',
+    description:
+        'Two block lines for a paragraph placeholder, rounded-md (the '
+        'default radius), and one inline DsSkeleton.span standing in for a '
+        'run of text inside a sentence rather than a block: the only way '
+        'to exercise that factory.',
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        DocsCodeExample(
+          title: 'Text line skeletons',
+          preview: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              const KeyedSubtree(
+                key: ValueKey<String>('skeleton-preview:line-1'),
+                child: DsSkeleton(width: 220, height: 14),
+              ),
+              SizedBox(height: ds(2)),
+              const KeyedSubtree(
+                key: ValueKey<String>('skeleton-preview:line-2'),
+                child: DsSkeleton(width: 160, height: 14),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(height: ds(5)),
+        const DocsCodeExample(
+          title: 'Inline skeleton',
+          description:
+              'DsSkeleton.span, aligned to PlaceholderAlignment.middle, '
+              'standing in for a run of text.',
+          preview: _SkeletonInlineDemo(),
+        ),
+      ],
+    ),
+  );
+
+  Widget _skeletonForm() => const DsSection(
+    id: 'skeleton-form',
+    title: 'Skeleton: Form',
+    description:
+        'A label-then-field pair, twice, plus a pill-shaped submit-button '
+        'placeholder: the caller sizes each box to match the real form '
+        'control it precedes, the same discipline every other shape on '
+        'this page follows.',
+    child: DocsCodeExample(
+      title: 'Form skeleton',
+      preview: _SkeletonFormDemo(),
+    ),
+  );
+
+  Widget _skeletonTable() => const DsSection(
+    id: 'skeleton-table',
+    title: 'Skeleton: Table',
+    description:
+        'Three rows of three cell-shaped bars: a table\'s loading state '
+        'is the same "match the footprint" rule as everything else on '
+        'this page, applied once per cell instead of once per block.',
+    child: DocsCodeExample(
+      title: 'Table skeleton',
+      preview: _SkeletonTableDemo(),
+    ),
+  );
+
+  Widget _skeletonRtl() => const DsSection(
+    id: 'skeleton-rtl',
+    title: 'Skeleton: RTL',
+    description:
+        'DsSkeleton carries no text of its own, so nothing inside it '
+        'mirrors on its own account: the surrounding Row does, because Row '
+        'asks the ambient Directionality which edge is "start". The '
+        'avatar sits on the visual right and the two lines run right to '
+        'left here, purely from the parent Row, not from anything '
+        'DsSkeleton itself does.',
+    child: DocsCodeExample(
+      title: 'Skeleton row under RTL',
+      preview: _SkeletonRtlDemo(),
+    ),
+  );
+
+  Widget _skeletonLayoutShift() => const DsSection(
+    id: 'skeleton-layout-shift',
+    title: 'Skeleton: Avoiding layout shift',
+    description:
+        'Not part of the shadcn counterpart\'s own section list: added '
+        'because a shape gallery alone does not show the actual reason a '
+        'skeleton is sized like its content. Press the button to swap the '
+        'placeholders for real content in place: the row never resizes, '
+        'because the skeleton was already sized to match it.',
+    child: DocsCodeExample(
+      title: 'A card that avoids layout shift',
+      preview: _LoadingCardComposition(),
+    ),
+  );
+
+  Widget _apiReference(DsThemeData theme) => DsSection(
     id: 'api',
-    title: 'API',
+    title: 'API Reference',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
@@ -436,7 +631,7 @@ class _ProgressSkeletonArticle extends StatelessWidget {
               type: 'DsProgressTone',
               description:
                   'Defaults to DsProgressTone.normal. Selects the fill ink '
-                  'and shadow — see Variants.',
+                  'and shadow: see the tone table below.',
             ),
             DocsApiFact(
               name: 'label',
@@ -444,7 +639,7 @@ class _ProgressSkeletonArticle extends StatelessWidget {
               description:
                   'Optional Semantics accessible name. Null reproduces the '
                   'reference\'s own first bar, which ships with no '
-                  'aria-label — see Accessibility for why this matters.',
+                  'aria-label: see Accessibility for why this matters.',
             ),
           ],
         ),
@@ -455,14 +650,58 @@ class _ProgressSkeletonArticle extends StatelessWidget {
             DocsApiFact(
               name: 'DsProgress.height',
               type: 'static double',
-              description: 'The channel height — 10px (h-2.5).',
+              description:
+                  'The channel height, 10px (h-2.5). A fixed constant: '
+                  'progress has a tone axis, not a size axis.',
             ),
             DocsApiFact(
               name: 'DsProgress.transition',
               type: 'static Duration',
               description:
-                  'DsDurations.transitionDefault (250ms) — the fill\'s own '
+                  'DsDurations.transitionDefault (250ms): the fill\'s own '
                   'transform transition, gated through dsAnimationDuration.',
+            ),
+          ],
+        ),
+        SizedBox(height: ds(6)),
+        const DocsApiTable(
+          title: 'DsProgressTone',
+          facts: <DocsApiFact>[
+            DocsApiFact(
+              name: 'normal',
+              type: 'filled: the default',
+              description:
+                  'Fills with theme.actionInk under DsShadows.btnPrimary. '
+                  'Spelled "normal" rather than "default" because default '
+                  'is a Dart keyword; .label still reports "default".',
+            ),
+            DocsApiFact(
+              name: 'value',
+              type: 'filled',
+              description:
+                  'Fills with theme.valueInk under DsShadows.btnValue, '
+                  'the one tone that leaves the action ramp, because '
+                  'progression toward a reward is a value signal.',
+            ),
+            DocsApiFact(
+              name: 'success',
+              type: 'filled',
+              description: 'Fills with theme.successInk under DsShadows.btn.',
+            ),
+            DocsApiFact(
+              name: 'warning',
+              type: 'filled',
+              description: 'Fills with theme.warningInk under DsShadows.btn.',
+            ),
+            DocsApiFact(
+              name: 'destructive',
+              type: 'filled',
+              description:
+                  'Fills with theme.destructiveInk under DsShadows.btn. '
+                  'For a reading OUTSIDE its safe band: a temperature or '
+                  'error rate too high: never merely for a number that '
+                  'fell; a figure moving the wrong way is news, not a '
+                  'fault, and stays on normal.',
             ),
           ],
         ),
@@ -502,7 +741,7 @@ class _ProgressSkeletonArticle extends StatelessWidget {
             DocsApiFact(
               name: 'DsSkeleton.defaultRadius',
               type: 'static double',
-              description: 'DsRadii.md (10px) — the box\'s resting corner.',
+              description: 'DsRadii.md (10px): the box\'s resting corner.',
             ),
             DocsApiFact(
               name: 'DsSkeleton.span',
@@ -513,75 +752,18 @@ class _ProgressSkeletonArticle extends StatelessWidget {
                   'Returns a WidgetSpan wrapping a DsSkeleton, aligned to '
                   'PlaceholderAlignment.middle, for a placeholder standing '
                   'in for a run of text inside a paragraph rather than a '
-                  'block. See Preview\'s "inline" specimen.',
+                  'block. See Skeleton: Text\'s inline specimen.',
             ),
           ],
         ),
-      ],
-    ),
-  );
-
-  Widget _variants(DsThemeData theme) => DsSection(
-    id: 'variants',
-    title: 'Variants and sizes',
-    description:
-        'Progress has a tone axis, not a size axis — DsProgress.height is a '
-        'fixed 10px everywhere. Skeleton has no variant enum at all: its '
-        '"variant" is whatever width, height and radius the caller passes, '
-        'because it must match the exact footprint of the content it '
-        'stands in for.',
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        const DocsApiTable(
-          title: 'DsProgressTone',
-          facts: <DocsApiFact>[
-            DocsApiFact(
-              name: 'normal',
-              type: 'filled — the default',
-              description:
-                  'Fills with theme.actionInk under DsShadows.btnPrimary. '
-                  'Spelled "normal" rather than "default" because default '
-                  'is a Dart keyword; .label still reports "default".',
-            ),
-            DocsApiFact(
-              name: 'value',
-              type: 'filled',
-              description:
-                  'Fills with theme.valueInk under DsShadows.btnValue — '
-                  'the one tone that leaves the action ramp, because '
-                  'progression toward a reward is a value signal.',
-            ),
-            DocsApiFact(
-              name: 'success',
-              type: 'filled',
-              description: 'Fills with theme.successInk under DsShadows.btn.',
-            ),
-            DocsApiFact(
-              name: 'warning',
-              type: 'filled',
-              description: 'Fills with theme.warningInk under DsShadows.btn.',
-            ),
-            DocsApiFact(
-              name: 'destructive',
-              type: 'filled',
-              description:
-                  'Fills with theme.destructiveInk under DsShadows.btn. '
-                  'For a reading OUTSIDE its safe band — a temperature or '
-                  'error rate too high — never merely for a number that '
-                  'fell; a figure moving the wrong way is news, not a '
-                  'fault, and stays on normal.',
-            ),
-          ],
-        ),
-        SizedBox(height: ds(4)),
+        SizedBox(height: ds(3)),
         DsText(
-          'Skeleton\'s only "variant" decision is the corner: '
-          'DsSkeleton.defaultRadius (10px, rounded-md) fits a block or a '
-          'text-line placeholder; passing radius: DsRadii.pill turns the '
-          'same widget into a circle or a pill the moment width and '
-          'height are equal or the box is short and wide. See the four '
-          'shapes in Preview.',
+          'Skeleton has no variant enum at all: its "variant" is whatever '
+          'width, height and radius the caller passes, because it must '
+          'match the exact footprint of the content it stands in for. The '
+          'corner is its only real choice: DsSkeleton.defaultRadius (10px) '
+          'fits a block or a text-line placeholder; radius: DsRadii.pill '
+          'turns the same widget into a circle or a pill.',
           DsType.small,
           color: theme.mutedForeground,
         ),
@@ -591,30 +773,30 @@ class _ProgressSkeletonArticle extends StatelessWidget {
 
   Widget _states() => DsSection(
     id: 'states',
-    title: 'States and feedback',
+    title: 'States',
     description:
         'Both are presentational StatelessWidgets with no onPressed, no '
-        'GestureDetector, and no FocusNode — most of IA §9.7\'s rows do not '
+        'GestureDetector, and no FocusNode: most of IA §9.7\'s rows do not '
         'apply to either, so the ones that are genuinely N/A are grouped '
         'below with the reason instead of invented.',
     child: const DocsStateMatrix(
       facts: <DocsStateFact>[
         DocsStateFact(
-          state: 'Progress — value change',
+          state: 'Progress: value change',
           treatment:
               'The indicator translates from its old position to its new '
-              'one over DsProgress.transition (250ms, DsCurves.out) — a '
+              'one over DsProgress.transition (250ms, DsCurves.out): a '
               'transform, not a width change.',
           userSignal:
               'The fill visibly slides to its new position rather than '
               'jumping or resizing.',
         ),
         DocsStateFact(
-          state: 'Skeleton — loading (its only state)',
+          state: 'Skeleton: loading (its only state)',
           treatment:
               'The shimmer runs forever via DsKeyframePlayer(repeat: true) '
               'until the caller stops rendering the skeleton and renders '
-              'real content instead — DsSkeleton has no "done" flag of its '
+              'real content instead, DsSkeleton has no "done" flag of its '
               'own.',
           userSignal:
               'A continuously sweeping highlight signals "still working" '
@@ -624,9 +806,9 @@ class _ProgressSkeletonArticle extends StatelessWidget {
         DocsStateFact(
           state: 'Error / Success (progress)',
           treatment:
-              'Not a live transition on one bar — choose '
+              'Not a live transition on one bar: choose '
               'DsProgressTone.destructive or .success at construction time '
-              'instead. See Variants.',
+              'instead. See the tone table in API Reference.',
           userSignal: 'A different progress instance, not a state change.',
         ),
         DocsStateFact(
@@ -640,7 +822,7 @@ class _ProgressSkeletonArticle extends StatelessWidget {
               'animating fast.',
           userSignal:
               'The progress bar jumps straight to its value; the skeleton '
-              'holds one still frame instead of sweeping — confirmed by '
+              'holds one still frame instead of sweeping: confirmed by '
               'this page\'s docs test and by '
               'test/feedback_effects_test.dart\'s rasterised case.',
         ),
@@ -649,7 +831,7 @@ class _ProgressSkeletonArticle extends StatelessWidget {
               'Hover / Focus-visible / Pressed / Selected / Empty / '
               'Disabled',
           treatment:
-              'N/A — neither widget carries a gesture, focus, or async-flag '
+              'N/A: neither widget carries a gesture, focus, or async-flag '
               'parameter to hold any of these; both are pure paint from '
               'their constructor arguments.',
           userSignal:
@@ -662,7 +844,7 @@ class _ProgressSkeletonArticle extends StatelessWidget {
 
   Widget _accessibility(DsThemeData theme) => DsSection(
     id: 'accessibility',
-    title: 'Accessibility and keyboard behavior',
+    title: 'Accessibility',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -670,19 +852,19 @@ class _ProgressSkeletonArticle extends StatelessWidget {
         SizedBox(height: ds(2)),
         _bullets(theme, <String>[
           'Semantic role: a Semantics node wraps the whole widget with '
-              "value: '\${value.round()}%' — every progress bar announces "
+              "value: '\${value.round()}%': every progress bar announces "
               'its percentage regardless of whether label is set. This is '
               'the one part of the brief that is fully met: a determinate '
               'progress bar here does announce its value.',
           'Accessible name (label): OPTIONAL, and null by default. A real '
-              'gap, not a design choice — a bar built with no label reads '
+              'gap, not a design choice: a bar built with no label reads '
               'to a screen reader as an unnamed control reporting "62%", '
               'with no indication of what is 62% complete. The default '
               'value reproduces the reference\'s own drift 6 rather than '
               'silently fixing it. Pass label explicitly for anything the '
               'surrounding context does not already make obvious.',
           'Keyboard interactions: none. DsProgress is never in the tab '
-              'order — it is a read-only status indicator, matching the '
+              'order: it is a read-only status indicator, matching the '
               'native ARIA progressbar role\'s own behavior.',
           'Non-colour signal: the Semantics value string carries the '
               'number independent of the fill\'s hue, so a tone change '
@@ -700,7 +882,7 @@ class _ProgressSkeletonArticle extends StatelessWidget {
               '"busy" announcement at all.',
           'What a screen reader actually gets: because the widget\'s leaf '
               'is a childless CustomPaint inside a SizedBox, Flutter '
-              'contributes no semantic information for it by default — so '
+              'contributes no semantic information for it by default: so '
               'in practice it is silently skipped, which is closer to '
               '"hidden" than "announced as busy", but that is an accident '
               'of how empty render objects are treated, not something '
@@ -713,7 +895,7 @@ class _ProgressSkeletonArticle extends StatelessWidget {
               'DsEmpty/DsAlert busy announcement) around the whole '
               'skeleton group, the same way a caller already owns the '
               'swap between skeleton and real content.',
-          'Keyboard interactions: none — DsSkeleton is never in the tab '
+          'Keyboard interactions: none, DsSkeleton is never in the tab '
               'order, consistent with it not being interactive content.',
         ]),
       ],
@@ -722,15 +904,15 @@ class _ProgressSkeletonArticle extends StatelessWidget {
 
   Widget _responsive(DsThemeData theme) => DsSection(
     id: 'responsive',
-    title: 'Responsive and platform behavior',
+    title: 'Responsive',
     child: _bullets(theme, <String>[
       'Neither widget reads a breakpoint from BuildContext or branches on '
-          'platform — both render identically at 390px and 1440px and on '
+          'platform: both render identically at 390px and 1440px and on '
           'every target platform.',
       'DsProgress takes its width from its parent\'s constraints (there is '
           'no width parameter); only its 10px height is fixed. A caller '
           'that wants a narrower bar wraps it in a SizedBox or a '
-          'ConstrainedBox — the component itself never clamps width.',
+          'ConstrainedBox: the component itself never clamps width.',
       'DsSkeleton\'s geometry is entirely the caller\'s: width and height '
           'default to null, which takes the incoming constraint exactly '
           'the way an unconstrained Container would. Responsive behavior '
@@ -743,7 +925,7 @@ class _ProgressSkeletonArticle extends StatelessWidget {
 
   Widget _dependencies(DsThemeData theme) => DsSection(
     id: 'dependencies',
-    title: 'Dependencies, files, and assets',
+    title: 'Dependencies',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -757,8 +939,8 @@ class _ProgressSkeletonArticle extends StatelessWidget {
               '(DsShadows.pressed/.btnPrimary/.btnValue/.btn), '
               'foundation/spacing.dart (ds(), DsRadii), '
               'foundation/theme.dart (DsThemeData).',
-          'Effect import: effects/machine_surface.dart (DsMachineSurface) '
-              '— paints the channel and the fill.',
+          'Effect import: effects/machine_surface.dart (DsMachineSurface), '
+              'which paints the channel and the fill.',
           'Scope import: theme_scope.dart (DsTheme).',
           'Assets/fonts/shaders: none.',
         ]),
@@ -771,46 +953,19 @@ class _ProgressSkeletonArticle extends StatelessWidget {
           'Foundation imports: foundation/spacing.dart (ds(), DsRadii), '
               'foundation/theme.dart (DsThemeData).',
           'Motion import: motion/keyframes.dart (DsKeyframePlayer, '
-              'DsShimmer) — the same looping-animation engine every '
+              'DsShimmer): the same looping-animation engine every '
               '"pulls-*" infinite motion in this system shares.',
           'Scope import: theme_scope.dart (DsTheme).',
-          'Assets/fonts/shaders: none — the sweep is a LinearGradient '
+          'Assets/fonts/shaders: none: the sweep is a LinearGradient '
               'shader object drawn by CustomPainter, not a bundled asset.',
         ]),
       ],
     ),
   );
 
-  Widget _composition() => DsSection(
-    id: 'composition',
-    title: 'Composition examples',
-    description:
-        'A determinate download list (three tones at once, echoing the '
-        'reference\'s own PROGRESS_TONES panel) and a card that swaps '
-        'between a skeleton and its loaded content without moving.',
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        const DocsCodeExample(
-          title: 'A download list',
-          preview: _DownloadListComposition(),
-        ),
-        SizedBox(height: ds(6)),
-        const DocsCodeExample(
-          title: 'A card that avoids layout shift',
-          description:
-              'Press the button to swap the placeholders for real content '
-              'in place — the row never resizes, because the skeleton was '
-              'already sized to match it.',
-          preview: _LoadingCardComposition(),
-        ),
-      ],
-    ),
-  );
-
   Widget _theming(DsThemeData theme) => DsSection(
     id: 'theming',
-    title: 'Theming notes',
+    title: 'Theming',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -818,11 +973,11 @@ class _ProgressSkeletonArticle extends StatelessWidget {
         SizedBox(height: ds(2)),
         _bullets(theme, <String>[
           'Every colour comes from the live theme: theme.muted/.input for '
-              'the channel, and DsProgressTone.inkOf(theme) — one of '
-              'actionInk/valueInk/successInk/warningInk/destructiveInk — '
+              'the channel, and DsProgressTone.inkOf(theme): one of '
+              'actionInk/valueInk/successInk/warningInk/destructiveInk, '
               'for the fill. Flipping DsThemeController re-resolves both '
               'on every rebuild; nothing is cached.',
-          'DsProgress declares no colour-override parameter of its own — '
+          'DsProgress declares no colour-override parameter of its own, '
               'every fill is tone-derived, the same rule DsBadge follows '
               'for its variants.',
         ]),
@@ -831,11 +986,11 @@ class _ProgressSkeletonArticle extends StatelessWidget {
         SizedBox(height: ds(2)),
         _bullets(theme, <String>[
           'The shimmer gradient is theme.popover → theme.accent → '
-              'theme.popover (DsShimmer.gradient(theme)) — both stops '
+              'theme.popover (DsShimmer.gradient(theme)): both stops '
               'resolve from the live theme, so light and dark each get '
               'their own correctly contrasted sweep with no override '
               'needed.',
-          'DsSkeleton declares no colour parameter of its own either — the '
+          'DsSkeleton declares no colour parameter of its own either: the '
               'gradient is entirely theme-derived, consistent with every '
               'other primitive on this page.',
         ]),
@@ -845,7 +1000,7 @@ class _ProgressSkeletonArticle extends StatelessWidget {
 
   Widget _source() => DsSection(
     id: 'source',
-    title: 'Source, tests, and docs',
+    title: 'Source',
     child: DocsInstallFacts(
       title: 'Reference',
       facts: <DocsInstallFact>[
@@ -863,7 +1018,7 @@ class _ProgressSkeletonArticle extends StatelessWidget {
           label: 'Package tests',
           value: 'test/feedback_effects_test.dart',
           description:
-              'group(\'DsProgress\') and group(\'DsSkeleton\') — tones, '
+              'group(\'DsProgress\') and group(\'DsSkeleton\'): tones, '
               'the translation formula, rasterised fill placement, the '
               'drift-6 unlabelled bar, and the rasterised reduced-motion '
               'case for the shimmer.',
@@ -886,7 +1041,40 @@ class _ProgressSkeletonArticle extends StatelessWidget {
   );
 }
 
-/// One [DsProgress] specimen with its value printed beside it — the docs
+/// The unheaded top-of-page demo: one representative [DsProgress] reading
+/// and one representative [DsSkeleton] group (an avatar plus two text
+/// lines, the same shape both references' own default demos use).
+class _TopDemo extends StatelessWidget {
+  const _TopDemo();
+
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: <Widget>[
+      const DsProgress(value: 66.7, label: 'Profile complete'),
+      SizedBox(height: ds(6)),
+      Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          const DsSkeleton(width: 48, height: 48, radius: DsRadii.pill),
+          SizedBox(width: ds(3)),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                const DsSkeleton(height: 16),
+                SizedBox(height: ds(2)),
+                const DsSkeleton(height: 16, width: 200),
+              ],
+            ),
+          ),
+        ],
+      ),
+    ],
+  );
+}
+
+/// One [DsProgress] specimen with its value printed beside it: the docs
 /// page's own presentation, not part of DsProgress's API.
 class _LabelledProgress extends StatelessWidget {
   const _LabelledProgress({required this.spec});
@@ -903,7 +1091,7 @@ class _LabelledProgress extends StatelessWidget {
           children: <Widget>[
             Expanded(
               child: DsText(
-                spec.label ?? '(no label — reproduces reference drift 6)',
+                spec.label ?? '(no label: reproduces reference drift 6)',
                 DsType.small,
                 color: spec.label == null
                     ? theme.mutedForeground
@@ -972,7 +1160,7 @@ class _ProgressLiveSpecimenState extends State<_ProgressLiveSpecimen> {
           runSpacing: ds(2),
           children: <Widget>[
             DsText(
-              '${_value.round()}% — Uploading report.pdf',
+              '${_value.round()}%, Uploading report.pdf',
               DsType.small,
               color: theme.mutedForeground,
             ),
@@ -994,71 +1182,24 @@ class _ProgressLiveSpecimenState extends State<_ProgressLiveSpecimen> {
   }
 }
 
-/// Four [DsSkeleton] shapes: a text line, a shorter second line, a circular
-/// avatar placeholder, and a block card placeholder — plus one inline
-/// [DsSkeleton.span] example, since that factory cannot be exercised any
-/// other way.
-class _SkeletonShapes extends StatelessWidget {
-  const _SkeletonShapes();
+/// A single [DsProgress] rendered under an ambient RTL [Directionality]:
+/// see `Progress: RTL`'s own description for what does, and does not,
+/// mirror.
+class _ProgressRtlDemo extends StatelessWidget {
+  const _ProgressRtlDemo();
 
   @override
-  Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
-    final TextStyle bodyStyle = DsText.styleOf(
-      context,
-      DsType.body,
-      color: theme.foreground,
-    );
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        DsText('Text lines (rounded-md, the default radius)', DsType.label),
-        SizedBox(height: ds(2)),
-        const KeyedSubtree(
-          key: ValueKey<String>('skeleton-preview:line-1'),
-          child: DsSkeleton(width: 220, height: 14),
-        ),
-        SizedBox(height: ds(2)),
-        const KeyedSubtree(
-          key: ValueKey<String>('skeleton-preview:line-2'),
-          child: DsSkeleton(width: 160, height: 14),
-        ),
-        SizedBox(height: ds(5)),
-        DsText('Avatar (radius: DsRadii.pill)', DsType.label),
-        SizedBox(height: ds(2)),
-        const KeyedSubtree(
-          key: ValueKey<String>('skeleton-preview:avatar'),
-          child: DsSkeleton(width: 40, height: 40, radius: DsRadii.pill),
-        ),
-        SizedBox(height: ds(5)),
-        DsText(
-          'A card placeholder, sized like the content it precedes',
-          DsType.label,
-        ),
-        SizedBox(height: ds(2)),
-        const KeyedSubtree(
-          key: ValueKey<String>('skeleton-preview:card'),
-          child: DsSkeleton(width: 320, height: 128),
-        ),
-        SizedBox(height: ds(5)),
-        DsText('Inline, standing in for a run of text', DsType.label),
-        SizedBox(height: ds(2)),
-        Text.rich(
-          TextSpan(
-            style: bodyStyle,
-            children: <InlineSpan>[
-              const TextSpan(text: 'The next release ships in '),
-              DsSkeleton.span(width: 64, height: 14),
-              const TextSpan(text: ' weeks, after code freeze.'),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
+  Widget build(BuildContext context) => const Directionality(
+    textDirection: TextDirection.rtl,
+    child: DsProgress(
+      value: 66.7,
+      tone: DsProgressTone.value,
+      label: 'اكتمال التحميل',
+    ),
+  );
 }
 
-/// Three [DsProgress] rows sharing a list — the composed shape a download
+/// Three [DsProgress] rows sharing a list: the composed shape a download
 /// manager or a sync status panel actually uses, echoing the reference's own
 /// PROGRESS_TONES second panel.
 class _DownloadListComposition extends StatelessWidget {
@@ -1103,8 +1244,132 @@ class _DownloadListComposition extends StatelessWidget {
   }
 }
 
+/// The inline [DsSkeleton.span] specimen, standing in for a run of text
+/// inside a sentence rather than a block.
+class _SkeletonInlineDemo extends StatelessWidget {
+  const _SkeletonInlineDemo();
+
+  @override
+  Widget build(BuildContext context) {
+    final DsThemeData theme = DsTheme.of(context);
+    final TextStyle bodyStyle = DsText.styleOf(
+      context,
+      DsType.body,
+      color: theme.foreground,
+    );
+    return Text.rich(
+      TextSpan(
+        style: bodyStyle,
+        children: <InlineSpan>[
+          const TextSpan(text: 'The next release ships in '),
+          DsSkeleton.span(width: 64, height: 14),
+          const TextSpan(text: ' weeks, after code freeze.'),
+        ],
+      ),
+    );
+  }
+}
+
+/// Two label-then-field pairs and a submit-button placeholder: a form's
+/// loading state, sized like the controls it precedes.
+class _SkeletonFormDemo extends StatelessWidget {
+  const _SkeletonFormDemo();
+
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: <Widget>[
+      const KeyedSubtree(
+        key: ValueKey<String>('skeleton-preview:form-name-label'),
+        child: DsSkeleton(width: 90, height: 12),
+      ),
+      SizedBox(height: ds(2)),
+      const KeyedSubtree(
+        key: ValueKey<String>('skeleton-preview:form-name-input'),
+        child: DsSkeleton(width: 280, height: 36),
+      ),
+      SizedBox(height: ds(4)),
+      const KeyedSubtree(
+        key: ValueKey<String>('skeleton-preview:form-email-label'),
+        child: DsSkeleton(width: 90, height: 12),
+      ),
+      SizedBox(height: ds(2)),
+      const KeyedSubtree(
+        key: ValueKey<String>('skeleton-preview:form-email-input'),
+        child: DsSkeleton(width: 280, height: 36),
+      ),
+      SizedBox(height: ds(4)),
+      const KeyedSubtree(
+        key: ValueKey<String>('skeleton-preview:form-submit'),
+        child: DsSkeleton(width: 110, height: 36, radius: DsRadii.pill),
+      ),
+    ],
+  );
+}
+
+/// Three rows of three cell-shaped bars: a table's loading state. Each row
+/// is one conceptual table row, so it is wrapped in the page's established
+/// horizontal-scroll mitigation (see `pagination/page.dart`'s Responsive
+/// section and `separator/page.dart`'s own wide specimen) rather than
+/// wrapped onto a second line, which would misrepresent a single table row
+/// as two.
+class _SkeletonTableDemo extends StatelessWidget {
+  const _SkeletonTableDemo();
+
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: <Widget>[
+      for (int row = 0; row < 3; row++) ...<Widget>[
+        if (row > 0) SizedBox(height: ds(3)),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            key: ValueKey<String>('skeleton-preview:table-row-$row'),
+            children: <Widget>[
+              const DsSkeleton(width: 140, height: 14),
+              SizedBox(width: ds(4)),
+              const DsSkeleton(width: 90, height: 14),
+              SizedBox(width: ds(4)),
+              const DsSkeleton(width: 60, height: 14),
+            ],
+          ),
+        ),
+      ],
+    ],
+  );
+}
+
+/// An avatar-plus-two-lines row rendered under an ambient RTL
+/// [Directionality]: the surrounding [Row] mirrors, exactly as `Skeleton:
+/// RTL`'s own description explains.
+class _SkeletonRtlDemo extends StatelessWidget {
+  const _SkeletonRtlDemo();
+
+  @override
+  Widget build(BuildContext context) => Directionality(
+    textDirection: TextDirection.rtl,
+    child: Row(
+      children: <Widget>[
+        const DsSkeleton(width: 40, height: 40, radius: DsRadii.pill),
+        SizedBox(width: ds(3)),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              const DsSkeleton(height: 14),
+              SizedBox(height: ds(2)),
+              const DsSkeleton(height: 14, width: 160),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
 /// A settings-row shape that swaps a [DsSkeleton] avatar and two text-line
-/// skeletons for real content, without the row changing size — the reason
+/// skeletons for real content, without the row changing size: the reason
 /// `skeleton.dart`'s own class doc gives for why the geometry is always the
 /// caller's.
 class _LoadingCardComposition extends StatefulWidget {
@@ -1163,7 +1428,7 @@ class _LoadingCardCompositionState extends State<_LoadingCardComposition> {
                         ),
                         SizedBox(height: ds(1)),
                         DsText(
-                          'Design lead — active 2 minutes ago',
+                          'Design lead: active 2 minutes ago',
                           DsType.small,
                           color: theme.mutedForeground,
                         ),
@@ -1208,7 +1473,7 @@ Widget _bullets(DsThemeData theme, List<String> lines) => Column(
 );
 
 const String _progressUsageCode = '''
-// The smallest correct call — tone defaults to normal, label is optional.
+// The smallest correct call: tone defaults to normal, label is optional.
 DsProgress(value: 62)
 
 // A labelled, tone-selected bar for a real status.

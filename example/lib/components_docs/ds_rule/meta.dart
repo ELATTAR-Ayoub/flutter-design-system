@@ -2,7 +2,7 @@
 ///
 /// `ds-rule` has a real `registry/components/ds-rule.json` manifest —
 /// [dependencies] is that manifest's own `registryDependencies` list,
-/// verbatim — so the icon page's installation section can render the real
+/// verbatim: so the icon page's installation section can render the real
 /// `elattar add ds-rule` command.
 ///
 /// Despite the name this is the validation-rule primitive, not a horizontal

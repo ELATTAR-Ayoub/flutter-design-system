@@ -1,10 +1,17 @@
 /// Public documentation page for the `input_group` component family.
 ///
-/// Documents three closely-related components: `DsInputGroup` (the 40px pill
-/// container for controls with optional leading/trailing addons),
-/// `DsButtonGroup` (the segmented control for related actions), and
-/// `DsInputOtp` (the six-digit verification field with painted boxes over one
+/// Documents three closely-related components, one shadcn counterpart page
+/// each, merged onto one page and grouped under their own name: `DsInputGroup`
+/// (shadcn `input-group`: the 40px pill container for controls with optional
+/// leading/trailing addons), `DsButtonGroup` (shadcn `button-group`: the
+/// segmented control for related actions), and `DsInputOtp` (shadcn
+/// `input-otp`: the six-digit verification field with painted boxes over one
 /// hidden input).
+///
+/// Shape: shared frame first (Preview, Installation, Usage, Composition),
+/// then each family's own sections under its own heading, then one merged API
+/// Reference, then the six sections shadcn does not have (States,
+/// Accessibility, Responsive, Dependencies, Theming, Source).
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
@@ -35,17 +42,56 @@ class InputGroupDocPage extends StatelessWidget {
     ],
     sidebar: _sidebar,
     toc: const <DocsTocEntry>[
-      DocsTocEntry(title: 'Overview', anchor: 'overview'),
-      DocsTocEntry(title: 'Preview', anchor: 'preview'),
-      DocsTocEntry(title: 'Install', anchor: 'install'),
+      DocsTocEntry(title: 'Installation', anchor: 'install'),
       DocsTocEntry(title: 'Usage', anchor: 'usage'),
-      DocsTocEntry(title: 'API', anchor: 'api'),
-      DocsTocEntry(title: 'Variants', anchor: 'variants'),
+      DocsTocEntry(title: 'Composition', anchor: 'composition'),
+      DocsTocEntry(
+        title: 'Input group',
+        anchor: 'family-input-group',
+        children: <DocsTocEntry>[
+          DocsTocEntry(title: 'Addon position', anchor: 'input-group-position'),
+          DocsTocEntry(title: 'Addon content', anchor: 'input-group-content'),
+          DocsTocEntry(title: 'Custom input', anchor: 'input-group-custom'),
+          DocsTocEntry(title: 'RTL', anchor: 'input-group-rtl'),
+        ],
+      ),
+      DocsTocEntry(
+        title: 'Button group',
+        anchor: 'family-button-group',
+        children: <DocsTocEntry>[
+          DocsTocEntry(
+            title: 'Composing other members',
+            anchor: 'button-group-composing',
+          ),
+          DocsTocEntry(title: 'Separator', anchor: 'button-group-separator'),
+          DocsTocEntry(title: 'Split', anchor: 'button-group-split'),
+          DocsTocEntry(title: 'Nested', anchor: 'button-group-nested'),
+          DocsTocEntry(title: 'Sizes', anchor: 'button-group-sizes'),
+          DocsTocEntry(
+            title: 'Vs. selection control',
+            anchor: 'button-group-vs-selection',
+          ),
+          DocsTocEntry(title: 'RTL', anchor: 'button-group-rtl'),
+        ],
+      ),
+      DocsTocEntry(
+        title: 'Input OTP',
+        anchor: 'family-input-otp',
+        children: <DocsTocEntry>[
+          DocsTocEntry(title: 'Groups and separators', anchor: 'otp-groups'),
+          DocsTocEntry(title: 'Disabled', anchor: 'otp-disabled'),
+          DocsTocEntry(title: 'Controlled', anchor: 'otp-controlled'),
+          DocsTocEntry(title: 'Invalid', anchor: 'otp-invalid'),
+          DocsTocEntry(title: 'Four digits', anchor: 'otp-four-digits'),
+          DocsTocEntry(title: 'Verification form', anchor: 'otp-form'),
+          DocsTocEntry(title: 'RTL', anchor: 'otp-rtl'),
+        ],
+      ),
+      DocsTocEntry(title: 'API Reference', anchor: 'api'),
       DocsTocEntry(title: 'States', anchor: 'states'),
       DocsTocEntry(title: 'Accessibility', anchor: 'accessibility'),
       DocsTocEntry(title: 'Responsive', anchor: 'responsive'),
       DocsTocEntry(title: 'Dependencies', anchor: 'dependencies'),
-      DocsTocEntry(title: 'Composition', anchor: 'composition'),
       DocsTocEntry(title: 'Theming', anchor: 'theming'),
       DocsTocEntry(title: 'Source', anchor: 'source'),
     ],
@@ -98,172 +144,174 @@ class _ArticleContentState extends State<_ArticleContent> {
       key: const ValueKey<String>('input-group-doc-article'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        _overview(theme),
         _preview(theme),
         _install(),
         _usage(),
+        _composition(),
+        _familyInputGroup(theme),
+        _inputGroupPosition(),
+        _inputGroupContent(theme),
+        _inputGroupCustom(theme),
+        _inputGroupRtl(),
+        _familyButtonGroup(theme),
+        _buttonGroupComposing(theme),
+        _buttonGroupSeparator(),
+        _buttonGroupSplit(),
+        _buttonGroupNested(theme),
+        _buttonGroupSizes(theme),
+        _buttonGroupVsSelection(theme),
+        _buttonGroupRtl(),
+        _familyInputOtp(theme),
+        _otpGroups(theme),
+        _otpDisabled(),
+        _otpControlled(),
+        _otpInvalid(),
+        _otpFourDigits(),
+        _otpForm(theme),
+        _otpRtl(),
         _api(),
-        _variants(),
         _states(),
         _accessibility(theme),
         _responsive(theme),
         _dependencies(theme),
-        _composition(),
         _theming(theme),
         _source(),
       ],
     );
   }
 
-  Widget _overview(DsThemeData theme) => DsSection(
-    id: 'overview',
-    title: 'Overview',
-    child: ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: DsWidths.prose),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          DsText(
-            'DsInputGroup wraps form controls in a 40px pill-shaped container '
-            'with optional leading and trailing addons. The addons can display '
-            'text, icons, or buttons — used for search prefixes, password '
-            'visibility toggles, or unit indicators. DsButtonGroup renders a '
-            'segmented control: buttons joined at their edges with one hairline '
-            'between each pair and squared interior corners. DsInputOtp is a '
-            'six-digit verification field: six painted boxes over one hidden '
-            'input, advancing focus and retreating on backspace.',
-            DsType.body,
-          ),
-          SizedBox(height: ds(4)),
-          DsText(
-            'Status: stable primitives, not yet registered in the CLI (see '
-            'Install). Platforms: Android, iOS, Web, macOS, Windows, Linux.',
-            DsType.small,
-            color: theme.mutedForeground,
-          ),
-        ],
+  Widget _preview(DsThemeData theme) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: <Widget>[
+      ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: DsWidths.prose),
+        child: DsText(
+          'A password field with toggle, a quantity stepper, and a '
+          'complete OTP entry.',
+          DsType.body,
+        ),
       ),
-    ),
-  );
-
-  Widget _preview(DsThemeData theme) => DsSection(
-    id: 'preview',
-    title: 'Preview',
-    description:
-        'A password field with toggle, a quantity stepper, and a '
-        'complete OTP entry.',
-    child: DocsCodeExample(
-      title: 'Input group family specimens',
-      preview: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: ds(6),
-        children: <Widget>[
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              DsText(
-                'Input group with password visibility toggle',
-                DsType.label,
-              ),
-              SizedBox(height: ds(3)),
-              SizedBox(
-                width: ds(64),
-                key: const ValueKey<String>('input-group-doc-password-field'),
-                child: DsInputGroup(
-                  endAddon: DsInputGroupAddon(
-                    align: DsInputGroupAlign.end,
-                    holdsButton: true,
-                    child: DsInputGroupButton(
-                      key: const ValueKey<String>(
-                        'input-group-doc-password-toggle',
-                      ),
-                      label: _passwordVisible ? 'Hide' : 'Show',
-                      onPressed: () =>
-                          setState(() => _passwordVisible = !_passwordVisible),
-                      child: DsIcon(
-                        _passwordVisible ? DsIconGlyph.eyeOff : DsIconGlyph.eye,
-                        size: DsIconSize.sm,
-                        tone: DsIconTone.inherit,
+      SizedBox(height: ds(6)),
+      DocsCodeExample(
+        title: 'Input group family specimens',
+        preview: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: ds(6),
+          children: <Widget>[
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                DsText(
+                  'Input group with password visibility toggle',
+                  DsType.label,
+                ),
+                SizedBox(height: ds(3)),
+                SizedBox(
+                  width: ds(64),
+                  key: const ValueKey<String>('input-group-doc-password-field'),
+                  child: DsInputGroup(
+                    endAddon: DsInputGroupAddon(
+                      align: DsInputGroupAlign.end,
+                      holdsButton: true,
+                      child: DsInputGroupButton(
+                        key: const ValueKey<String>(
+                          'input-group-doc-password-toggle',
+                        ),
+                        label: _passwordVisible ? 'Hide' : 'Show',
+                        onPressed: () => setState(
+                          () => _passwordVisible = !_passwordVisible,
+                        ),
+                        child: DsIcon(
+                          _passwordVisible
+                              ? DsIconGlyph.eyeOff
+                              : DsIconGlyph.eye,
+                          size: DsIconSize.sm,
+                          tone: DsIconTone.inherit,
+                        ),
                       ),
                     ),
+                    child: DsInputGroupInput(
+                      placeholder: 'Enter password',
+                      obscureText: !_passwordVisible,
+                    ),
                   ),
-                  child: DsInputGroupInput(
-                    placeholder: 'Enter password',
-                    obscureText: !_passwordVisible,
+                ),
+              ],
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                DsText('Button group quantity stepper', DsType.label),
+                SizedBox(height: ds(3)),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: DsButtonGroup(
+                    children: <Widget>[
+                      DsButton(
+                        key: const ValueKey<String>(
+                          'button-group-doc-decrease',
+                        ),
+                        variant: DsButtonVariant.outline,
+                        size: DsButtonSize.sm,
+                        onPressed: () =>
+                            setState(() => _count = (_count - 1).clamp(0, 99)),
+                        child: DsText('−', DsComponentType.buttonLabel),
+                      ),
+                      DsButtonGroupText(
+                        _count.toString(),
+                        key: const ValueKey<String>('button-group-doc-count'),
+                        numeric: true,
+                      ),
+                      DsButton(
+                        key: const ValueKey<String>(
+                          'button-group-doc-increase',
+                        ),
+                        variant: DsButtonVariant.outline,
+                        size: DsButtonSize.sm,
+                        onPressed: () =>
+                            setState(() => _count = (_count + 1).clamp(0, 99)),
+                        child: DsText('+', DsComponentType.buttonLabel),
+                      ),
+                    ],
                   ),
                 ),
-              ),
-            ],
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              DsText('Button group quantity stepper', DsType.label),
-              SizedBox(height: ds(3)),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: DsButtonGroup(
-                  children: <Widget>[
-                    DsButton(
-                      key: const ValueKey<String>('button-group-doc-decrease'),
-                      variant: DsButtonVariant.outline,
-                      size: DsButtonSize.sm,
-                      onPressed: () =>
-                          setState(() => _count = (_count - 1).clamp(0, 99)),
-                      child: DsText('−', DsComponentType.buttonLabel),
-                    ),
-                    DsButtonGroupText(
-                      _count.toString(),
-                      key: const ValueKey<String>('button-group-doc-count'),
-                      numeric: true,
-                    ),
-                    DsButton(
-                      key: const ValueKey<String>('button-group-doc-increase'),
-                      variant: DsButtonVariant.outline,
-                      size: DsButtonSize.sm,
-                      onPressed: () =>
-                          setState(() => _count = (_count + 1).clamp(0, 99)),
-                      child: DsText('+', DsComponentType.buttonLabel),
-                    ),
-                  ],
+              ],
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                DsText('Input OTP live entry', DsType.label),
+                SizedBox(height: ds(3)),
+                Center(
+                  child: DsInputOtp(
+                    key: const ValueKey<String>('input-otp-doc-live'),
+                    onChanged: (String code) {
+                      setState(() => _otpCode = code);
+                    },
+                  ),
                 ),
-              ),
-            ],
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              DsText('Input OTP live entry', DsType.label),
-              SizedBox(height: ds(3)),
-              Center(
-                child: DsInputOtp(
-                  key: const ValueKey<String>('input-otp-doc-live'),
-                  onChanged: (String code) {
-                    setState(() => _otpCode = code);
-                  },
+                SizedBox(height: ds(3)),
+                DsText(
+                  _otpCode.length == 6
+                      ? 'Complete: $_otpCode'
+                      : 'Waiting for code...',
+                  key: const ValueKey<String>('input-otp-doc-status'),
+                  DsType.small,
+                  color: theme.mutedForeground,
                 ),
-              ),
-              SizedBox(height: ds(3)),
-              DsText(
-                _otpCode.length == 6
-                    ? 'Complete: $_otpCode'
-                    : 'Waiting for code...',
-                key: const ValueKey<String>('input-otp-doc-status'),
-                DsType.small,
-                color: theme.mutedForeground,
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
-    ),
+    ],
   );
 
   Widget _install() => DsSection(
     id: 'install',
     title: 'Installation',
     description:
-        'None of the three components have registry manifests yet — '
+        'None of the three components have registry manifests yet, '
         'install by copying the source files manually.',
     child: DocsInstallFacts(
       title: 'Installation facts',
@@ -286,8 +334,7 @@ class _ArticleContentState extends State<_ArticleContent> {
         const DocsInstallFact(
           label: 'Platforms',
           value: 'Android, iOS, Web, macOS, Windows, Linux',
-          description:
-              'Pure widget composition — no platform-conditional code.',
+          description: 'Pure widget composition: no platform-conditional code.',
         ),
         const DocsInstallFact(
           label: 'Verified',
@@ -330,9 +377,562 @@ class _ArticleContentState extends State<_ArticleContent> {
     ),
   );
 
+  Widget _composition() => DsSection(
+    id: 'composition',
+    title: 'Composition',
+    description: 'The widget hierarchy each family builds on.',
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        DsPanel(
+          label: 'INPUT GROUP',
+          child: DocsSelectableCodeBlock(code: _compositionInputGroupCode),
+        ),
+        SizedBox(height: ds(5)),
+        DsPanel(
+          label: 'BUTTON GROUP',
+          child: DocsSelectableCodeBlock(code: _compositionButtonGroupCode),
+        ),
+        SizedBox(height: ds(5)),
+        DsPanel(
+          label: 'INPUT OTP',
+          child: DocsSelectableCodeBlock(code: _compositionOtpCode),
+        ),
+      ],
+    ),
+  );
+
+  // ── Input group ────────────────────────────────────────────────────────
+
+  Widget _familyInputGroup(DsThemeData theme) => DsSection(
+    id: 'family-input-group',
+    title: 'Input group',
+    description:
+        'DsInputGroup wraps DsInputGroupInput in a 40px pill with '
+        'optional leading and trailing addons. Everything below is one '
+        'mechanism, start/end alignment and what widget the addon holds.',
+    child: ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: DsWidths.prose),
+      child: DsText(
+        'Used for search prefixes, password visibility toggles, unit '
+        'indicators, and any other control that belongs beside a field '
+        'rather than above or below it.',
+        DsType.small,
+        color: theme.mutedForeground,
+      ),
+    ),
+  );
+
+  Widget _inputGroupPosition() => DsSection(
+    id: 'input-group-position',
+    title: 'Addon position',
+    description:
+        'align selects which side the addon sits on: start (their '
+        'inline-start) or end (their inline-end). There is no block-start '
+        'or block-end: DsInputGroupInput is single-line, so an addon above '
+        'or below the control does not apply here.',
+    child: DocsCodeExample(
+      title: 'Start and end addons',
+      preview: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: ds(5),
+        children: <Widget>[
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              DsText('start', DsType.small),
+              SizedBox(height: ds(2)),
+              DsInputGroup(
+                startAddon: DsInputGroupAddon(
+                  align: DsInputGroupAlign.start,
+                  child: DsInputGroupText('https://'),
+                ),
+                child: DsInputGroupInput(placeholder: 'example.com'),
+              ),
+            ],
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              DsText('end', DsType.small),
+              SizedBox(height: ds(2)),
+              DsInputGroup(
+                endAddon: DsInputGroupAddon(
+                  align: DsInputGroupAlign.end,
+                  child: DsInputGroupText('.com'),
+                ),
+                child: DsInputGroupInput(placeholder: 'example'),
+              ),
+            ],
+          ),
+        ],
+      ),
+    ),
+  );
+
+  Widget _inputGroupContent(DsThemeData theme) => DsSection(
+    id: 'input-group-content',
+    title: 'Addon content',
+    description:
+        'An addon holds one widget: icon, text, button, kbd, or spinner '
+        'below are the same slot with different content, not different '
+        'props. Textarea addons do not apply: there is no DsInputGroupTextarea.',
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        DocsCodeExample(
+          title: 'Icon, text, button, kbd, and spinner addons',
+          preview: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: ds(4),
+            children: <Widget>[
+              DsText('Search with leading icon and button', DsType.label),
+              DsInputGroup(
+                startAddon: DsInputGroupAddon(
+                  align: DsInputGroupAlign.start,
+                  child: DsIcon(
+                    DsIconGlyph.search,
+                    size: DsIconSize.md,
+                    tone: DsIconTone.inherit,
+                  ),
+                ),
+                endAddon: DsInputGroupAddon(
+                  align: DsInputGroupAlign.end,
+                  holdsButton: true,
+                  child: DsInputGroupButton(
+                    label: 'Clear',
+                    onPressed: () {},
+                    child: const DsIcon(
+                      DsIconGlyph.x,
+                      size: DsIconSize.sm,
+                      tone: DsIconTone.inherit,
+                    ),
+                  ),
+                ),
+                child: DsInputGroupInput(placeholder: 'Search...'),
+              ),
+              DsText('Text addon: currency prefix', DsType.label),
+              DsInputGroup(
+                startAddon: DsInputGroupAddon(
+                  align: DsInputGroupAlign.start,
+                  child: DsInputGroupText('USD'),
+                ),
+                child: DsInputGroupInput(placeholder: '0.00'),
+              ),
+              DsText('Kbd addon: keyboard shortcut', DsType.label),
+              DsInputGroup(
+                endAddon: DsInputGroupAddon(
+                  align: DsInputGroupAlign.end,
+                  child: const DsKbd('⌘K'),
+                ),
+                child: DsInputGroupInput(placeholder: 'Quick search'),
+              ),
+              DsText('Spinner addon: loading state', DsType.label),
+              DsInputGroup(
+                endAddon: DsInputGroupAddon(
+                  align: DsInputGroupAlign.end,
+                  child: DsSpinner(size: DsIcon.pxFor(DsIconSize.sm)),
+                ),
+                enabled: false,
+                child: DsInputGroupInput(
+                  placeholder: 'Checking availability...',
+                ),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(height: ds(5)),
+        DsPanel(
+          label: 'DART',
+          note: 'DROPDOWN ADDON',
+          child: DocsSelectableCodeBlock(code: _dropdownAddonCode),
+        ),
+        SizedBox(height: ds(3)),
+        DsText(
+          'A DsDropdownMenu trigger fits the same addon slot, it is not '
+          'rendered live on this page because it needs a real Overlay '
+          'ancestor (see the dropdown_menu docs for the interactive version).',
+          DsType.small,
+          color: theme.mutedForeground,
+        ),
+      ],
+    ),
+  );
+
+  Widget _inputGroupCustom(DsThemeData theme) => DsSection(
+    id: 'input-group-custom',
+    title: 'Custom input',
+    child: ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: DsWidths.prose),
+      child: DsText(
+        'DsInputGroup.child accepts any widget, not only '
+        'DsInputGroupInput. There is no data-slot equivalent, though: a '
+        'custom control has to match the group\'s own 40px height and '
+        'padding tokens itself, DsInputGroup does not measure or resize an '
+        'unrecognised child for it.',
+        DsType.small,
+        color: theme.mutedForeground,
+      ),
+    ),
+  );
+
+  Widget _inputGroupRtl() => DsSection(
+    id: 'input-group-rtl',
+    title: 'RTL',
+    child: DocsCodeExample(
+      title: 'Right-to-left reading order',
+      preview: const Directionality(
+        textDirection: TextDirection.rtl,
+        child: SizedBox(
+          width: 260,
+          child: DsInputGroup(
+            startAddon: DsInputGroupAddon(
+              align: DsInputGroupAlign.start,
+              child: DsInputGroupText('بحث'),
+            ),
+            child: DsInputGroupInput(placeholder: 'ابحث هنا'),
+          ),
+        ),
+      ),
+    ),
+  );
+
+  // ── Button group ───────────────────────────────────────────────────────
+
+  Widget _familyButtonGroup(DsThemeData theme) => DsSection(
+    id: 'family-button-group',
+    title: 'Button group',
+    description:
+        'A row of related actions joined at their edges with one '
+        'hairline between each pair and squared interior corners.',
+    child: DocsCodeExample(
+      title: 'View-switching buttons',
+      preview: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: DsButtonGroup(
+          children: <Widget>[
+            DsButton(
+              variant: DsButtonVariant.outline,
+              size: DsButtonSize.sm,
+              onPressed: () {},
+              child: DsText('All', DsComponentType.buttonLabel),
+            ),
+            DsButton(
+              variant: DsButtonVariant.outline,
+              size: DsButtonSize.sm,
+              onPressed: () {},
+              child: DsText('Active', DsComponentType.buttonLabel),
+            ),
+            DsButton(
+              variant: DsButtonVariant.outline,
+              size: DsButtonSize.sm,
+              onPressed: () {},
+              child: DsText('Archived', DsComponentType.buttonLabel),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+
+  Widget _buttonGroupComposing(DsThemeData theme) => DsSection(
+    id: 'button-group-composing',
+    title: 'Composing other members',
+    description:
+        'DsButtonGroup.children accepts any widget, not only DsButton '
+        'and DsButtonGroupText. Their input-group-in-a-button-group, '
+        'dropdown-menu, select, and popover pages are the same idea: only '
+        'DsButton and DsButtonGroupText get corner reshaping and border '
+        'synthesis, an unrecognised member is placed flush with its own '
+        'corners untouched.',
+    child: DocsCodeExample(
+      title: 'A plain field alongside a button',
+      preview: SizedBox(
+        width: ds(72),
+        child: DsButtonGroup(
+          children: <Widget>[
+            Expanded(child: DsInput(placeholder: 'Email address')),
+            DsButton(
+              variant: DsButtonVariant.outline,
+              onPressed: () {},
+              child: DsText('Send', DsComponentType.buttonLabel),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+
+  Widget _buttonGroupSeparator() => DsSection(
+    id: 'button-group-separator',
+    title: 'Separator',
+    description:
+        'DsButtonGroupSeparator draws one hairline rule between two '
+        'members. Members with an outline border already carry a seam of '
+        'their own, a separator is for the five variants that do not.',
+    child: DocsCodeExample(
+      title: 'A rule between two members',
+      preview: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: DsButtonGroup(
+          children: <Widget>[
+            DsButton(
+              variant: DsButtonVariant.ghost,
+              onPressed: () {},
+              child: DsText('Bold', DsComponentType.buttonLabel),
+            ),
+            DsButton(
+              variant: DsButtonVariant.ghost,
+              onPressed: () {},
+              child: DsText('Italic', DsComponentType.buttonLabel),
+            ),
+            const DsButtonGroupSeparator(),
+            DsButton(
+              variant: DsButtonVariant.ghost,
+              onPressed: () {},
+              child: DsText('Underline', DsComponentType.buttonLabel),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+
+  Widget _buttonGroupSplit() => DsSection(
+    id: 'button-group-split',
+    title: 'Split',
+    description:
+        'A primary action and a narrower secondary action, divided by '
+        'the same separator.',
+    child: DocsCodeExample(
+      title: 'A primary action with a trailing option',
+      preview: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: DsButtonGroup(
+          children: <Widget>[
+            DsButton(
+              onPressed: () {},
+              child: DsText('Save', DsComponentType.buttonLabel),
+            ),
+            const DsButtonGroupSeparator(),
+            DsButton(
+              onPressed: () {},
+              child: const DsIcon(
+                DsIconGlyph.chevronDown,
+                size: DsIconSize.sm,
+                tone: DsIconTone.inherit,
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+
+  Widget _buttonGroupNested(DsThemeData theme) => DsSection(
+    id: 'button-group-nested',
+    title: 'Nested',
+    description:
+        'Two groups placed side by side. Their has-[>[data-slot='
+        'button-group]]:gap-2 rule, which spaces a group nested inside '
+        'another, is not ported (nothing in this port nests a group), so a '
+        'nested layout needs its own gap, an 8px SizedBox below.',
+    child: DocsCodeExample(
+      title: 'Two independent groups, one row',
+      preview: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          DsButtonGroup(
+            children: <Widget>[
+              DsButton(
+                variant: DsButtonVariant.outline,
+                size: DsButtonSize.sm,
+                onPressed: () {},
+                child: DsText('Cut', DsComponentType.buttonLabel),
+              ),
+              DsButton(
+                variant: DsButtonVariant.outline,
+                size: DsButtonSize.sm,
+                onPressed: () {},
+                child: DsText('Copy', DsComponentType.buttonLabel),
+              ),
+            ],
+          ),
+          SizedBox(width: ds(2)),
+          DsButtonGroup(
+            children: <Widget>[
+              DsButton(
+                variant: DsButtonVariant.outline,
+                size: DsButtonSize.sm,
+                onPressed: () {},
+                child: DsText('Paste', DsComponentType.buttonLabel),
+              ),
+            ],
+          ),
+        ],
+      ),
+    ),
+  );
+
+  Widget _buttonGroupSizes(DsThemeData theme) => DsSection(
+    id: 'button-group-sizes',
+    title: 'Sizes',
+    child: ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: DsWidths.prose),
+      child: DsText(
+        'DsButtonGroup has no size prop of its own: each member keeps its '
+        'own DsButtonSize. Give every DsButton in a group the same size for '
+        'a level row, the sm stepper in Preview and the sm view switcher '
+        'above are both already that pattern.',
+        DsType.small,
+        color: theme.mutedForeground,
+      ),
+    ),
+  );
+
+  Widget _buttonGroupVsSelection(DsThemeData theme) => DsSection(
+    id: 'button-group-vs-selection',
+    title: 'Vs. selection control',
+    child: _bullets(theme, <String>[
+      'DsButtonGroup: every member is its own action, pressing "Save" '
+          'does not change what "Share" does next to it. Use it for '
+          'independent commands, a toolbar, a split action, a stepper.',
+      'DsSelectionControl (this port\'s nearest neighbour to shadcn\'s '
+          'ToggleGroup) tracks which option is chosen and stays chosen. Use '
+          'it when pressing one option is meant to change the state of the '
+          'others, a view filter, a single-select set of chips.',
+      'The two are not interchangeable: reach for DsButtonGroup by default, '
+          'reach for DsSelectionControl only once a press needs to persist '
+          'as selected.',
+    ]),
+  );
+
+  Widget _buttonGroupRtl() => DsSection(
+    id: 'button-group-rtl',
+    title: 'RTL',
+    child: DocsCodeExample(
+      title: 'Right-to-left reading order',
+      preview: const Directionality(
+        textDirection: TextDirection.rtl,
+        child: _RtlButtonGroup(),
+      ),
+    ),
+  );
+
+  // ── Input OTP ──────────────────────────────────────────────────────────
+
+  Widget _familyInputOtp(DsThemeData theme) => DsSection(
+    id: 'family-input-otp',
+    title: 'Input OTP',
+    description:
+        'A six-digit verification field: six painted boxes over one '
+        'hidden input, advancing focus and retreating on backspace. This '
+        'is a native Flutter reimplementation of the mechanism, not a port '
+        'of the JavaScript input-otp package the shadcn component wraps, '
+        'see Dependencies below for the EditableText-over-IgnorePointer '
+        'architecture that replaces it.',
+    child: ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: DsWidths.prose),
+      child: DsText(
+        'The live specimen in Preview above already demonstrates the '
+        'default shape, six slots grouped three and three. The sections '
+        'below cover every other configuration the constructor exposes.',
+        DsType.small,
+        color: theme.mutedForeground,
+      ),
+    ),
+  );
+
+  Widget _otpGroups(DsThemeData theme) => DsSection(
+    id: 'otp-groups',
+    title: 'Groups and separators',
+    description:
+        'groups drives both the slot count per group and where a '
+        'DsInputOtpSeparator is inserted, one between every pair. It must '
+        'sum to maxLength.',
+    child: DocsCodeExample(
+      title: 'Three groups of two',
+      preview: Center(child: DsInputOtp(groups: const <int>[2, 2, 2])),
+    ),
+  );
+
+  Widget _otpDisabled() => DsSection(
+    id: 'otp-disabled',
+    title: 'Disabled',
+    description: 'enabled: false fades the strip and stops accepting input.',
+    child: DocsCodeExample(
+      title: 'A disabled field with a seeded value',
+      preview: Center(child: DsInputOtp(enabled: false, initialValue: '123')),
+    ),
+  );
+
+  Widget _otpControlled() => DsSection(
+    id: 'otp-controlled',
+    title: 'Controlled',
+    description:
+        'The live specimen in Preview is already this shape, the parent '
+        'owns the value through onChanged, not through a controller. Pass '
+        'controller instead to drive the value imperatively.',
+    child: DsPanel(
+      label: 'DART',
+      note: 'A TextEditingController-DRIVEN FIELD',
+      child: DocsSelectableCodeBlock(code: _otpControlledCode),
+    ),
+  );
+
+  Widget _otpInvalid() => DsSection(
+    id: 'otp-invalid',
+    title: 'Invalid',
+    description:
+        'invalid: true colors the slot borders and the group\'s ring '
+        'destructive. See States below for the full color values.',
+    child: DocsCodeExample(
+      title: 'A rejected code',
+      preview: Center(child: DsInputOtp(invalid: true, initialValue: '123')),
+    ),
+  );
+
+  Widget _otpFourDigits() => DsSection(
+    id: 'otp-four-digits',
+    title: 'Four digits',
+    description: 'A PIN-length field: maxLength: 4, groups: [4], no split.',
+    child: DocsCodeExample(
+      title: 'A four-digit PIN',
+      preview: Center(child: DsInputOtp(maxLength: 4, groups: const <int>[4])),
+    ),
+  );
+
+  Widget _otpForm(DsThemeData theme) => DsSection(
+    id: 'otp-form',
+    title: 'Verification form',
+    description:
+        'DsInputOtp sitting in its usual home: a label, the field, and a '
+        'submit action, rather than the isolated specimen above.',
+    child: DocsCodeExample(
+      title: 'Email verification',
+      preview: _OtpFormComposition(theme: theme),
+    ),
+  );
+
+  Widget _otpRtl() => DsSection(
+    id: 'otp-rtl',
+    title: 'RTL',
+    description:
+        'The label reads right-to-left, the digit strip itself stays '
+        'left-to-right, a verification code is read as a number, not as '
+        'directional text.',
+    child: DocsCodeExample(
+      title: 'A right-to-left label above the strip',
+      preview: const Directionality(
+        textDirection: TextDirection.rtl,
+        child: _RtlOtp(),
+      ),
+    ),
+  );
+
   Widget _api() => DsSection(
     id: 'api',
-    title: 'API',
+    title: 'API Reference',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
@@ -349,12 +949,12 @@ class _ArticleContentState extends State<_ArticleContent> {
             DocsApiFact(
               name: 'startAddon',
               type: 'Widget?',
-              description: 'Optional leading addon — text, icon, or button.',
+              description: 'Optional leading addon: text, icon, or button.',
             ),
             DocsApiFact(
               name: 'endAddon',
               type: 'Widget?',
-              description: 'Optional trailing addon — text, icon, or button.',
+              description: 'Optional trailing addon: text, icon, or button.',
             ),
             DocsApiFact(
               name: 'invalid',
@@ -377,22 +977,22 @@ class _ArticleContentState extends State<_ArticleContent> {
             DocsApiFact(
               name: 'DsInputGroup.height',
               type: 'static double',
-              description: '40px — the hard border-box height.',
+              description: '40px: the hard border-box height.',
             ),
             DocsApiFact(
               name: 'DsInputGroup.addonInset',
               type: 'static double',
-              description: '16px — the addon\'s horizontal padding.',
+              description: '16px: the addon\'s horizontal padding.',
             ),
             DocsApiFact(
               name: 'DsInputGroup.addonButtonPull',
               type: 'static double',
-              description: '4px — negative margin when addon holds a button.',
+              description: '4px: negative margin when addon holds a button.',
             ),
             DocsApiFact(
               name: 'DsInputGroup.clearance',
               type: 'static double',
-              description: '8px — the control\'s padding on an addon side.',
+              description: '8px: the control\'s padding on an addon side.',
             ),
           ],
         ),
@@ -423,7 +1023,7 @@ class _ArticleContentState extends State<_ArticleContent> {
             DocsApiFact(
               name: 'keyboardType',
               type: 'TextInputType',
-              description: 'The soft keyboard layout — number, email, etc.',
+              description: 'The soft keyboard layout: number, email, etc.',
             ),
             DocsApiFact(
               name: 'onChanged',
@@ -445,12 +1045,12 @@ class _ArticleContentState extends State<_ArticleContent> {
               name: 'autofillHints',
               type: 'Iterable<String>?',
               description:
-                  'iOS/Android autofill hints — pass username, password, etc.',
+                  'iOS/Android autofill hints: pass username, password, etc.',
             ),
             DocsApiFact(
               name: 'textSpec',
               type: 'DsTypeSpec?',
-              description: 'Overrides the type spec — defaults to body.',
+              description: 'Overrides the type spec: defaults to body.',
             ),
             DocsApiFact(
               name: 'label',
@@ -468,13 +1068,13 @@ class _ArticleContentState extends State<_ArticleContent> {
               name: 'child',
               type: 'Widget',
               description:
-                  'Required. The content — DsText, DsIcon, or '
+                  'Required. The content, DsText, DsIcon, or '
                   'DsInputGroupButton.',
             ),
             DocsApiFact(
               name: 'align',
               type: 'DsInputGroupAlign',
-              description: 'start or end — the addon\'s position.',
+              description: 'start or end: the addon\'s position.',
             ),
             DocsApiFact(
               name: 'holdsButton',
@@ -486,12 +1086,12 @@ class _ArticleContentState extends State<_ArticleContent> {
             DocsApiFact(
               name: 'DsInputGroupAddon.insetY',
               type: 'static double',
-              description: '8px — vertical inset from the group edge.',
+              description: '8px: vertical inset from the group edge.',
             ),
             DocsApiFact(
               name: 'DsInputGroupAddon.gap',
               type: 'static double',
-              description: '8px — gap between addon and control.',
+              description: '8px: gap between addon and control.',
             ),
           ],
         ),
@@ -507,7 +1107,7 @@ class _ArticleContentState extends State<_ArticleContent> {
             DocsApiFact(
               name: 'spec',
               type: 'DsTypeSpec?',
-              description: 'Overrides the type spec — defaults to body.',
+              description: 'Overrides the type spec: defaults to body.',
             ),
           ],
         ),
@@ -518,7 +1118,7 @@ class _ArticleContentState extends State<_ArticleContent> {
             DocsApiFact(
               name: 'child',
               type: 'Widget?',
-              description: 'Optional. An icon or text — size xs.',
+              description: 'Optional. An icon or text: size xs.',
             ),
             DocsApiFact(
               name: 'onPressed',
@@ -555,12 +1155,12 @@ class _ArticleContentState extends State<_ArticleContent> {
             DocsApiFact(
               name: 'DsInputGroupButton.height',
               type: 'static double',
-              description: '40px — the hard border-box height.',
+              description: '40px: the hard border-box height.',
             ),
             DocsApiFact(
               name: 'DsInputGroupButton.paddingX',
               type: 'static double',
-              description: '8px — horizontal padding.',
+              description: '8px: horizontal padding.',
             ),
             DocsApiFact(
               name: 'DsInputGroupButton.paddingXFor',
@@ -570,7 +1170,39 @@ class _ArticleContentState extends State<_ArticleContent> {
             DocsApiFact(
               name: 'DsInputGroupButton.gap',
               type: 'static double',
-              description: '6px — gap between icon and label.',
+              description: '6px: gap between icon and label.',
+            ),
+          ],
+        ),
+        SizedBox(height: ds(6)),
+        const DocsApiTable(
+          title: 'DsInputGroupAlign',
+          facts: <DocsApiFact>[
+            DocsApiFact(
+              name: 'start',
+              type: 'enum value',
+              description: 'The addon leads the control.',
+            ),
+            DocsApiFact(
+              name: 'end',
+              type: 'enum value',
+              description: 'The addon trails the control.',
+            ),
+          ],
+        ),
+        SizedBox(height: ds(6)),
+        const DocsApiTable(
+          title: 'DsInputGroupButtonSize',
+          facts: <DocsApiFact>[
+            DocsApiFact(
+              name: 'xs',
+              type: 'enum value',
+              description: 'Extra small, 32px × 32px.',
+            ),
+            DocsApiFact(
+              name: 'iconXs',
+              type: 'enum value',
+              description: 'Icon-only extra small, 32px × 32px.',
             ),
           ],
         ),
@@ -614,12 +1246,12 @@ class _ArticleContentState extends State<_ArticleContent> {
             DocsApiFact(
               name: 'DsButtonGroupText.paddingX',
               type: 'static double',
-              description: '8px — horizontal padding.',
+              description: '8px: horizontal padding.',
             ),
             DocsApiFact(
               name: 'DsButtonGroupText.gap',
               type: 'static double',
-              description: '6px — gap between elements.',
+              description: '6px: gap between elements.',
             ),
           ],
         ),
@@ -688,12 +1320,12 @@ class _ArticleContentState extends State<_ArticleContent> {
             DocsApiFact(
               name: 'DsInputOtp.slotSize',
               type: 'static double',
-              description: '32px — the height and width of each slot.',
+              description: '32px: the height and width of each slot.',
             ),
             DocsApiFact(
               name: 'DsInputOtp.separatorWidth',
               type: 'static double',
-              description: '16px — the width of each separator.',
+              description: '16px: the width of each separator.',
             ),
             DocsApiFact(
               name: 'DsInputOtp.widthFor',
@@ -742,50 +1374,6 @@ class _ArticleContentState extends State<_ArticleContent> {
     ),
   );
 
-  Widget _variants() => DsSection(
-    id: 'variants',
-    title: 'Variants and sizes',
-    description:
-        'No size axis on any component — all use fixed token '
-        'heights. DsInputGroupAlign selects addon position.',
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        const DocsApiTable(
-          title: 'DsInputGroupAlign',
-          facts: <DocsApiFact>[
-            DocsApiFact(
-              name: 'start',
-              type: 'enum value',
-              description: 'The addon leads the control.',
-            ),
-            DocsApiFact(
-              name: 'end',
-              type: 'enum value',
-              description: 'The addon trails the control.',
-            ),
-          ],
-        ),
-        SizedBox(height: ds(6)),
-        const DocsApiTable(
-          title: 'DsInputGroupButtonSize',
-          facts: <DocsApiFact>[
-            DocsApiFact(
-              name: 'xs',
-              type: 'enum value',
-              description: 'Extra small — 32px × 32px.',
-            ),
-            DocsApiFact(
-              name: 'iconXs',
-              type: 'enum value',
-              description: 'Icon-only extra small — 32px × 32px.',
-            ),
-          ],
-        ),
-      ],
-    ),
-  );
-
   Widget _states() => DsSection(
     id: 'states',
     title: 'States and feedback',
@@ -810,7 +1398,7 @@ class _ArticleContentState extends State<_ArticleContent> {
           state: 'Invalid',
           treatment:
               'Ring becomes theme.destructive at 20% (light) or 40% '
-              '(dark). Border and ring stay — never just the ring.',
+              '(dark). Border and ring stay: never just the ring.',
           userSignal: 'Red ring.',
         ),
         DocsStateFact(
@@ -821,7 +1409,7 @@ class _ArticleContentState extends State<_ArticleContent> {
         DocsStateFact(
           state: 'Hover / Pressed / Selected / Loading / Success',
           treatment:
-              'N/A for DsInputGroup and DsButtonGroup — those states '
+              'N/A for DsInputGroup and DsButtonGroup: those states '
               'belong to the wrapped control. For DsInputOtp: painted '
               'boxes have no state of their own beyond active and '
               'invalid.',
@@ -832,7 +1420,7 @@ class _ArticleContentState extends State<_ArticleContent> {
         DocsStateFact(
           state: 'Reduced motion',
           treatment:
-              'N/A — no AnimationController in any of the three. The '
+              'N/A: no AnimationController in any of the three. The '
               'OTP caret animation is a discrete lookup, not a tween.',
           userSignal: 'Nothing to still.',
         ),
@@ -846,37 +1434,38 @@ class _ArticleContentState extends State<_ArticleContent> {
     child: _bullets(theme, <String>[
       'DsInputGroup wraps the whole subtree in Semantics(container: true). '
           'The control inside reads its own label through DsFieldScope.',
-      'DsButtonGroup carries Semantics(container: true) with no role — '
-          'it is a container, not a group with a semantic role. The buttons '
-          'inside keep their own semantics.',
+      'DsButtonGroup carries Semantics(container: true, explicitChildNodes: '
+          'true), a plain container role rather than a group role with its '
+          'own name, matching the reference\'s role="group". The buttons '
+          'inside keep their own semantics and stay individually reachable.',
       'DsInputOtp publishes two textField semantics nodes: one from the '
           'outer Semantics(textField: true) wrapper and one from the hidden '
           'EditableText inside, which does not exclude its own semantics. '
-          'This is a real screen-reader defect — the field may be announced '
+          'This is a real screen-reader defect: the field may be announced '
           'twice. The painted boxes contribute no semantics of their own.',
       'Focus behavior: DsInputGroup.focusNode focuses the control on '
           'label tap. The OTP strip takes focus as one field. Keyboard: '
-          'DsButtonGroup is not in the tab order — it is a control family, '
+          'DsButtonGroup is not in the tab order: it is a control family, '
           'not a container. DsInputOtp: typing and backspace work as '
           'expected; Tab advances to the next field.',
       'Touch target: DsInputGroup is 40px tall and 16px horizontally '
-          'padded — the same as DsInput on the group wrapper. Buttons are '
+          'padded: the same as DsInput on the group wrapper. Buttons are '
           '40px tall and 16px wide (sm size) or 32px × 32px (xs). '
           'DsInputOtp slots are 32px × 32px.',
       'Non-colour signals: error is shown as destructive text, not just '
           'colour. The active OTP slot shows a focus ring, not just a visual '
           'highlight.',
-      'Screen-reader announcements: DsInputOtp has no live region — '
+      'Screen-reader announcements: DsInputOtp has no live region, '
           'completion does not announce; wire that at the call site if '
           'needed.',
       'Paste is not supported: DsInputOtp sets enableInteractiveSelection: '
           'false on its hidden EditableText, which disables paste operations. '
           'Users can type or autofill a code, but cannot paste it. This is a '
-          'real accessibility gap — consider whether your use case requires '
+          'real accessibility gap: consider whether your use case requires '
           'paste support and weigh the tradeoff against the simplified focus '
           'model.',
       'Known platform differences: DsButtonGroup.radiiOf uses symmetric '
-          'bleed to reshape children — the visual result is identical on all '
+          'bleed to reshape children: the visual result is identical on all '
           'platforms, but the mechanism is Flutter-specific.',
     ]),
   );
@@ -885,16 +1474,18 @@ class _ArticleContentState extends State<_ArticleContent> {
     id: 'responsive',
     title: 'Responsive and platform behavior',
     child: _bullets(theme, <String>[
-      'No responsive breakpoints — DsInputGroup renders the same pill at '
+      'No responsive breakpoints, DsInputGroup renders the same pill at '
           '390px and 1440px. Width is intrinsic to the content and the '
           'frame around it.',
       'DsButtonGroup: interior members are squared; left end keeps its '
-          'radius; right end is forced to 12px. The same on all viewports.',
+          'radius; right end is forced to 12px. The same on all viewports. '
+          'orientation stays horizontal: the vertical layout the reference '
+          'declares is never ported, only the default is.',
       'DsInputOtp: the strip is always the sum of (slotSize × slot count) '
           'plus (separatorWidth × separator count). On narrow screens, '
           'constrain the surrounding layout if the 208px default is too wide.',
       'Overflow: DsInputGroup clips addons to its own height. Long button '
-          'labels are not truncated — they may overflow. The container must '
+          'labels are not truncated: they may overflow. The container must '
           'constrain width.',
       'All three render the same widget tree on Android, iOS, Web, macOS, '
           'Windows, and Linux.',
@@ -915,78 +1506,10 @@ class _ArticleContentState extends State<_ArticleContent> {
       'Assets: none. Fonts: none beyond the system type scale. Shaders: '
           'none.',
       'DsInputOtp: EditableText over IgnorePointer, not six separate '
-          'TextFields — the semantic and event model is built on that '
-          'architecture.',
+          'TextFields and not a wrap of the JavaScript input-otp package: '
+          'the semantic and event model is a native Flutter reimplementation '
+          'built on that architecture.',
     ]),
-  );
-
-  Widget _composition() => DsSection(
-    id: 'composition',
-    title: 'Composition examples',
-    description:
-        'A search input, a segment control, and the three family '
-        'members as they live in the system.',
-    child: DocsCodeExample(
-      title: 'Real compositions from this design system',
-      preview: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: ds(4),
-        children: <Widget>[
-          DsText('Search with leading icon and button', DsType.label),
-          DsInputGroup(
-            startAddon: DsInputGroupAddon(
-              align: DsInputGroupAlign.start,
-              child: DsIcon(
-                DsIconGlyph.search,
-                size: DsIconSize.md,
-                tone: DsIconTone.inherit,
-              ),
-            ),
-            endAddon: DsInputGroupAddon(
-              align: DsInputGroupAlign.end,
-              holdsButton: true,
-              child: DsInputGroupButton(
-                label: 'Clear',
-                onPressed: () {},
-                child: const DsIcon(
-                  DsIconGlyph.x,
-                  size: DsIconSize.sm,
-                  tone: DsIconTone.inherit,
-                ),
-              ),
-            ),
-            child: DsInputGroupInput(placeholder: 'Search...'),
-          ),
-          SizedBox(height: ds(2)),
-          DsText('Filter toggle buttons', DsType.label),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: DsButtonGroup(
-              children: <Widget>[
-                DsButton(
-                  variant: DsButtonVariant.outline,
-                  size: DsButtonSize.sm,
-                  onPressed: () {},
-                  child: DsText('All', DsComponentType.buttonLabel),
-                ),
-                DsButton(
-                  variant: DsButtonVariant.outline,
-                  size: DsButtonSize.sm,
-                  onPressed: () {},
-                  child: DsText('Active', DsComponentType.buttonLabel),
-                ),
-                DsButton(
-                  variant: DsButtonVariant.outline,
-                  size: DsButtonSize.sm,
-                  onPressed: () {},
-                  child: DsText('Archived', DsComponentType.buttonLabel),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    ),
   );
 
   Widget _theming(DsThemeData theme) => DsSection(
@@ -1004,7 +1527,7 @@ class _ArticleContentState extends State<_ArticleContent> {
           'active slot gets a ring at theme.ring / 50%. Invalid state uses '
           'theme.destructive borders. In dark mode, empty slots have a 30% '
           'alpha fill; light mode is transparent.',
-      'No colour overrides — all values come from the theme. A call site '
+      'No colour overrides: all values come from the theme. A call site '
           'that needs a non-standard colour should use DsTheme.of(context) '
           'to derive its own.',
     ]),
@@ -1020,7 +1543,7 @@ class _ArticleContentState extends State<_ArticleContent> {
           label: 'Source',
           value: inputGroupDoc.sourcePath,
           description:
-              'Authoritative implementation — the truth this page was '
+              'Authoritative implementation: the truth this page was '
               'written from.',
         ),
         const DocsInstallFact(
@@ -1058,13 +1581,97 @@ Widget _bullets(DsThemeData theme, List<String> lines) => ConstrainedBox(
   ),
 );
 
+class _RtlButtonGroup extends StatelessWidget {
+  const _RtlButtonGroup();
+
+  @override
+  Widget build(BuildContext context) => DsButtonGroup(
+    children: <Widget>[
+      DsButton(
+        variant: DsButtonVariant.outline,
+        size: DsButtonSize.sm,
+        onPressed: () {},
+        child: DsText('الكل', DsComponentType.buttonLabel),
+      ),
+      DsButton(
+        variant: DsButtonVariant.outline,
+        size: DsButtonSize.sm,
+        onPressed: () {},
+        child: DsText('نشط', DsComponentType.buttonLabel),
+      ),
+      DsButton(
+        variant: DsButtonVariant.outline,
+        size: DsButtonSize.sm,
+        onPressed: () {},
+        child: DsText('مؤرشف', DsComponentType.buttonLabel),
+      ),
+    ],
+  );
+}
+
+class _RtlOtp extends StatelessWidget {
+  const _RtlOtp();
+
+  @override
+  Widget build(BuildContext context) {
+    final DsThemeData theme = DsTheme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        DsText('أدخل رمز التحقق', DsType.label, color: theme.foreground),
+        SizedBox(height: ds(3)),
+        Center(child: DsInputOtp()),
+      ],
+    );
+  }
+}
+
+class _OtpFormComposition extends StatelessWidget {
+  const _OtpFormComposition({required this.theme});
+
+  final DsThemeData theme;
+
+  @override
+  Widget build(BuildContext context) => ConstrainedBox(
+    constraints: const BoxConstraints(maxWidth: 320),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        DsText('Verify your email', DsType.h4, color: theme.foreground),
+        SizedBox(height: ds(2)),
+        DsText(
+          'Enter the 6-digit code sent to ayoub@example.com.',
+          DsType.small,
+          color: theme.mutedForeground,
+        ),
+        SizedBox(height: ds(5)),
+        Center(child: DsInputOtp()),
+        SizedBox(height: ds(5)),
+        DsButton(
+          expanded: true,
+          onPressed: () {},
+          child: DsText('Verify', DsComponentType.buttonLabel),
+        ),
+        SizedBox(height: ds(3)),
+        Center(
+          child: DsButton(
+            variant: DsButtonVariant.link,
+            onPressed: () {},
+            child: DsText('Resend code', DsComponentType.buttonLabel),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
 const String _usageGroupCode = '''DsInputGroup(
   child: DsInputGroupInput(
     placeholder: 'https://',
   ),
   startAddon: DsInputGroupAddon(
     align: DsInputGroupAlign.start,
-    child: DsInputGroupText(text: 'https://'),
+    child: DsInputGroupText('https://'),
   ),
 )''';
 
@@ -1095,5 +1702,44 @@ const String _usageOtpCode = '''DsInputOtp(
     if (code.length == 6) {
       // Code complete
     }
+  },
+)''';
+
+const String _compositionInputGroupCode = '''DsInputGroup
+├── startAddon: DsInputGroupAddon (align: start)
+│   └── DsIcon / DsInputGroupText / DsInputGroupButton
+├── child: DsInputGroupInput
+└── endAddon: DsInputGroupAddon (align: end)
+    └── DsIcon / DsInputGroupText / DsInputGroupButton''';
+
+const String _compositionButtonGroupCode = '''DsButtonGroup
+├── DsButton (or any widget)
+├── DsButtonGroupSeparator
+└── DsButtonGroupText''';
+
+const String _compositionOtpCode = '''DsInputOtp
+├── DsInputOtpSlot (× groups[0])
+├── DsInputOtpSeparator
+├── DsInputOtpSlot (× groups[1])
+└── ... one DsInputOtpSeparator between every pair of groups''';
+
+const String _dropdownAddonCode = '''DsInputGroup(
+  endAddon: DsInputGroupAddon(
+    align: DsInputGroupAlign.end,
+    holdsButton: true,
+    child: DsDropdownMenu(
+      // ...trigger and items
+    ),
+  ),
+  child: DsInputGroupInput(placeholder: 'Filter...'),
+)''';
+
+const String _otpControlledCode = '''final TextEditingController controller =
+    TextEditingController(text: '123');
+
+DsInputOtp(
+  controller: controller,
+  onChanged: (String code) {
+    // read controller.text at any time
   },
 )''';

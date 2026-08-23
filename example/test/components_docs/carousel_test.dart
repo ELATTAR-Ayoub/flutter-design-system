@@ -1,8 +1,32 @@
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/carousel/meta.dart';
 import 'package:example/components_docs/carousel/page.dart';
+import 'package:example/kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+/// The page's own section order, live demo excluded (it has no heading):
+/// the shadcn parity brief requires this exact order and this exact set.
+/// `nav-user` and `marker-variants` are ours only (no shadcn counterpart
+/// for either component), grouped under their own names in the
+/// component-specific zone between Composition and API Reference, per
+/// `example/lib/components_docs/carousel/page.dart`'s own library doc.
+const List<String> _carouselSectionOrder = <String>[
+  'install',
+  'usage',
+  'composition',
+  'sizes',
+  'rtl',
+  'nav-user',
+  'marker-variants',
+  'api',
+  'states',
+  'accessibility',
+  'responsive',
+  'dependencies',
+  'theming',
+  'source',
+];
 
 Widget _harness({
   required Widget child,
@@ -105,6 +129,23 @@ void main() {
           ]),
         );
         expect(destination, isNull);
+
+        // Every shadcn-mirrored section (plus the two ours-only sections)
+        // renders, in exactly the order the reshape brief requires.
+        double? previousTop;
+        for (final String id in _carouselSectionOrder) {
+          final Finder finder = find.byKey(DsSection.anchorKey(id));
+          expect(finder, findsOneWidget, reason: 'missing section "$id"');
+          final double top = tester.getTopLeft(finder).dy;
+          if (previousTop != null) {
+            expect(
+              top,
+              greaterThan(previousTop),
+              reason: '"$id" is out of order',
+            );
+          }
+          previousTop = top;
+        }
       },
     );
 
