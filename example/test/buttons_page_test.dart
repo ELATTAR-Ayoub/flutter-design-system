@@ -300,7 +300,7 @@ void main() {
       );
       expect(
         sections[2].description,
-        'Hover, focus and active are live below — interact with them '
+        'Hover, focus and active are live below: interact with them '
         'directly. Disabled and loading are shown as rendered.',
       );
       expect(
@@ -534,24 +534,24 @@ void main() {
         expect(find.text(rung), findsNothing, reason: rung);
       }
 
-      // The mono span, a literal space, then the em-dashed sentence.
+      // The mono span, a literal space, then the colon-separated description.
       expect(
         find.textContaining(
-          'xs · 24px — Chips inside a combobox. Internal use only.',
+          'xs · 24px: Chips inside a combobox. Internal use only.',
           findRichText: true,
         ),
         findsOneWidget,
       );
       expect(
         find.textContaining(
-          'default · 40px — The standard. Forms, dialogs, most actions.',
+          'default · 40px: The standard. Forms, dialogs, most actions.',
           findRichText: true,
         ),
         findsOneWidget,
       );
       expect(
         find.textContaining(
-          'xl · 56px — Landing hero and headline moments. Once per screen.',
+          'xl · 56px: Landing hero and headline moments. Once per screen.',
           findRichText: true,
         ),
         findsOneWidget,

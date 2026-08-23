@@ -1,28 +1,74 @@
 import 'package:example/nav.dart';
 import 'package:example/components_docs/catalog.dart';
-import 'package:example/shots_docs/catalog.dart';
+import 'package:example/docs_pages/catalog.dart';
 import 'package:example/skills_docs/catalog.dart';
 import 'package:example/site/site_routes.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('public routes', () {
-    test('exposes the five public destinations in navigation order', () {
-      expect(
-        siteRoutes.map((SiteRoute route) => route.path),
-        <String>['/', '/docs', '/components', '/shots', '/skills'],
-      );
+    test('exposes the public destinations in navigation order', () {
+      expect(siteRoutes.map((SiteRoute route) => route.path), <String>[
+        homeRoute,
+        docsRoute,
+        docsIntroductionRoute,
+        componentsRoute,
+        docsInstallationRoute,
+        docsThemingRoute,
+        docsCliRoute,
+        skillsRoute,
+      ]);
       expect(siteRoutes.map((SiteRoute route) => route.title), <String>[
         'Home',
         'Documentation',
+        'Introduction',
         'Components',
-        'Shots',
+        'Installation',
+        'Theming',
+        'CLI',
         'Skills',
       ]);
     });
 
+    test('the Sections group (every sidebar-visible destination, in order) '
+        'reproduces the reference reading order exactly: Introduction, '
+        'Components, Installation, Theming, CLI, Skills', () {
+      final List<String> sectionTitles = siteRoutes
+          .where(
+            (SiteRoute route) =>
+                route.section != SiteSection.home && route.showInSidebar,
+          )
+          .map((SiteRoute route) => route.title)
+          .toList();
+      // "Documentation" (`/docs`) stays a resolvable route: removing it
+      // would break `site_navigation.dart`'s eager `siteQuickSearchRoutes`
+      // lookup and `site_shell_test.dart`'s quick-open assertion. It is
+      // excluded here through `SiteRoute.showInSidebar`, not by filtering
+      // its title out after the fact, so this is the true sidebar order.
+      expect(sectionTitles, <String>[
+        'Introduction',
+        'Components',
+        'Installation',
+        'Theming',
+        'CLI',
+        'Skills',
+      ]);
+      expect(sectionTitles, isNot(contains('Documentation')));
+      // Typeset, Registry and Changelog have no page yet
+      // (`docs_pages/catalog.dart` declares the routes; nothing routes to
+      // them in `main.dart`), so they must not appear in the sidebar.
+      expect(sectionTitles, isNot(contains('Typeset')));
+      expect(sectionTitles, isNot(contains('Registry')));
+      expect(sectionTitles, isNot(contains('Changelog')));
+    });
+
     test('lookup is exact and unknown paths return null', () {
       expect(siteRouteFor('/docs')?.section, SiteSection.docs);
+      expect(siteRouteFor('/docs')?.showInSidebar, isFalse);
+      expect(siteRouteFor(docsIntroductionRoute)?.section, SiteSection.docs);
+      expect(siteRouteFor(docsInstallationRoute)?.section, SiteSection.docs);
+      expect(siteRouteFor(docsThemingRoute)?.section, SiteSection.docs);
+      expect(siteRouteFor(docsCliRoute)?.section, SiteSection.docs);
       expect(
         siteRouteFor('/components/button')?.section,
         SiteSection.components,
@@ -32,51 +78,25 @@ void main() {
       expect(() => requireSiteRoute('/missing'), throwsArgumentError);
     });
 
-    test('every shot guide is a deep link under the Shots section', () {
-      for (final ShotDocEntry shot in shotDocs) {
-        final SiteRoute? route = siteRouteFor(shot.route);
-        expect(route, isNotNull, reason: '${shot.route} does not resolve.');
-        expect(route!.section, SiteSection.shots);
-        expect(route.title, shot.title);
-        expect(route.keywords, contains(shot.name));
-      }
-      // The header contract is unchanged: guides are pages beneath a
-      // destination, never a sixth destination.
-      expect(siteRoutes, hasLength(5));
-    });
-
-    test('a shot preview is not a site destination', () {
-      // The data half of the `main.dart` route-order contract. A preview route
-      // that resolved here would be wrapped in header, footer and search by the
-      // `siteRouteFor` guard — the exact chrome it exists to omit. The widget
-      // half is asserted in `public_pages_test.dart`.
-      for (final ShotDocEntry shot in shotDocs) {
-        expect(
-          siteRouteFor(shot.previewRoute),
-          isNull,
-          reason: '${shot.previewRoute} must not resolve as a site route.',
-        );
-      }
-    });
-
     test('metadata is non-empty and route paths are unique', () {
-      expect(siteRoutes.every((SiteRoute route) {
-        return route.title.isNotEmpty &&
-            route.description.isNotEmpty &&
-            route.keywords.isNotEmpty;
-      }), isTrue);
-      final List<String> paths =
-          siteRoutes.map((SiteRoute route) => route.path).toList();
+      expect(
+        siteRoutes.every((SiteRoute route) {
+          return route.title.isNotEmpty &&
+              route.description.isNotEmpty &&
+              route.keywords.isNotEmpty;
+        }),
+        isTrue,
+      );
+      final List<String> paths = siteRoutes
+          .map((SiteRoute route) => route.path)
+          .toList();
       expect(paths.toSet(), hasLength(paths.length));
     });
   });
 
   group('GitHub Pages links', () {
     test('encodes route as a query component', () {
-      expect(
-        githubPagesHref('/docs'),
-        '?route=%2Fdocs',
-      );
+      expect(githubPagesHref('/docs'), '?route=%2Fdocs');
       expect(
         githubPagesHref('/design-system/components/base/buttons'),
         '?route=%2Fdesign-system%2Fcomponents%2Fbase%2Fbuttons',
@@ -84,12 +104,18 @@ void main() {
     });
 
     test('normalizes a project base path', () {
-      expect(githubPagesHref('/shots', basePath: '/elattar-ui'),
-          '/elattar-ui/?route=%2Fshots');
-      expect(githubPagesHref('/shots', basePath: 'elattar-ui/'),
-          '/elattar-ui/?route=%2Fshots');
-      expect(githubPagesHref('/shots', basePath: '/'),
-          '?route=%2Fshots');
+      expect(
+        githubPagesHref('/components', basePath: '/elattar-ui'),
+        '/elattar-ui/?route=%2Fcomponents',
+      );
+      expect(
+        githubPagesHref('/components', basePath: 'elattar-ui/'),
+        '/elattar-ui/?route=%2Fcomponents',
+      );
+      expect(
+        githubPagesHref('/components', basePath: '/'),
+        '?route=%2Fcomponents',
+      );
     });
 
     test('rejects empty and relative routes', () {
@@ -101,18 +127,27 @@ void main() {
   group('search index', () {
     test('includes public routes and existing design-system routes', () {
       expect(searchableRoutes.first.path, homeRoute);
-      expect(searchableRoutes.any((SearchRoute route) {
-        return route.path == '/components/dialog' &&
-            route.section == SiteSection.components;
-      }), isTrue);
-      expect(searchableRoutes.any((SearchRoute route) {
-        return route.path == '$dsRoot/colors' && route.isDesignSystemRoute;
-      }), isTrue);
-      expect(searchableRoutes.any((SearchRoute route) {
-        return route.path == '$dsRoot/components/base/buttons' &&
-            route.groupId == 'base' &&
-            route.slug == 'buttons';
-      }), isTrue);
+      expect(
+        searchableRoutes.any((SearchRoute route) {
+          return route.path == '/components/dialog' &&
+              route.section == SiteSection.components;
+        }),
+        isTrue,
+      );
+      expect(
+        searchableRoutes.any((SearchRoute route) {
+          return route.path == '$dsRoot/colors' && route.isDesignSystemRoute;
+        }),
+        isTrue,
+      );
+      expect(
+        searchableRoutes.any((SearchRoute route) {
+          return route.path == '$dsRoot/components/base/buttons' &&
+              route.groupId == 'base' &&
+              route.slug == 'buttons';
+        }),
+        isTrue,
+      );
     });
 
     test('contains every installable component documentation route', () {
@@ -121,24 +156,6 @@ void main() {
           .map((SearchRoute route) => route.path)
           .toSet();
       expect(indexed, containsAll(componentDocs.map((entry) => entry.route)));
-    });
-
-    test('contains every installable shot documentation route', () {
-      final Set<String> indexed = searchableRoutes
-          .where((SearchRoute route) => route.section == SiteSection.shots)
-          .map((SearchRoute route) => route.path)
-          .toSet();
-      expect(indexed, containsAll(shotDocs.map((ShotDocEntry e) => e.route)));
-      // Indexed by slug, family and platform, so the search box finds a shot
-      // the way a reader names one.
-      for (final ShotDocEntry shot in shotDocs) {
-        final List<SearchRoute> hits = searchSiteRoutes(shot.name)
-            .where((SearchRoute route) => route.path == shot.route)
-            .toList();
-        expect(hits, hasLength(1), reason: '${shot.name} is not searchable.');
-        expect(hits.single.keywords, contains(shot.family.name));
-        expect(hits.single.keywords, contains(shot.platform.name));
-      }
     });
 
     test('indexes the skill under the Skills destination, not beside it', () {
@@ -165,9 +182,9 @@ void main() {
       // a stale list fails at the catalog instead of passing quietly.
       for (final SkillDocEntry skill in skillDocs) {
         for (final SkillReferenceFile file in skill.referenceFiles) {
-          final List<SearchRoute> hits = searchSiteRoutes(file.title)
-              .where((SearchRoute route) => route.path == skill.route)
-              .toList();
+          final List<SearchRoute> hits = searchSiteRoutes(
+            file.title,
+          ).where((SearchRoute route) => route.path == skill.route).toList();
           expect(
             hits,
             hasLength(1),
@@ -190,15 +207,6 @@ void main() {
       }
     });
 
-    test('never indexes a chrome-free shot preview', () {
-      final Set<String> indexed = searchableRoutes
-          .map((SearchRoute route) => route.path)
-          .toSet();
-      for (final ShotDocEntry shot in shotDocs) {
-        expect(indexed, isNot(contains(shot.previewRoute)));
-      }
-    });
-
     test('contains every existing group and category without changing nav', () {
       final Set<String> expected = <String>{
         for (final DsGroup group in dsGroups) group.href,
@@ -214,15 +222,20 @@ void main() {
     });
 
     test('search is case-insensitive, trims input, and preserves order', () {
-      expect(searchSiteRoutes('  BUTTONS  ').map((SearchRoute r) => r.path),
-          contains('$dsRoot/components/base/buttons'));
+      expect(
+        searchSiteRoutes('  BUTTONS  ').map((SearchRoute r) => r.path),
+        contains('$dsRoot/components/base/buttons'),
+      );
       expect(searchSiteRoutes('FLUTTER').first.path, homeRoute);
       expect(searchSiteRoutes('not-a-real-route'), isEmpty);
       expect(searchSiteRoutes(''), same(searchableRoutes));
     });
 
     test('search index and keyword lists cannot be mutated', () {
-      expect(() => searchableRoutes.add(searchableRoutes.first), throwsA(anything));
+      expect(
+        () => searchableRoutes.add(searchableRoutes.first),
+        throwsA(anything),
+      );
       expect(() => searchableRoutes.first.keywords.add('x'), throwsA(anything));
     });
   });

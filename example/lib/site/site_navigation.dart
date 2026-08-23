@@ -78,7 +78,6 @@ final List<SearchRoute> siteQuickSearchRoutes = List<SearchRoute>.unmodifiable(
       homeRoute,
       docsRoute,
       componentsRoute,
-      shotsRoute,
       skillsRoute,
       dsRoot,
       '$dsRoot/colors',
@@ -112,7 +111,6 @@ String _sectionLabel(SiteSection section) => switch (section) {
   SiteSection.home => 'Home',
   SiteSection.docs => 'Documentation',
   SiteSection.components => 'Components',
-  SiteSection.shots => 'Shots',
   SiteSection.skills => 'Skills',
 };
 

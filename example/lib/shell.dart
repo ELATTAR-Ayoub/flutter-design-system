@@ -1,4 +1,4 @@
-/// The docs chrome — `app/design-system/layout.tsx` + `components/ds/ds-nav.tsx`.
+/// The docs chrome, `app/design-system/layout.tsx` + `components/ds/ds-nav.tsx`.
 ///
 /// Three things the web gets from the platform and this file has to build:
 ///
@@ -16,7 +16,7 @@
 ///
 /// ## The fourth thing: system bars (user-ordered mobile adaptation)
 ///
-/// Ordered 2026-08-16 against screenshots — the header was rendering behind the
+/// Ordered 2026-08-16 against screenshots: the header was rendering behind the
 /// phone's clock and the reading column behind the gesture bar. A browser on a
 /// desktop has neither obstruction, so there is no reference behaviour to port;
 /// [DsSafeArea]'s library note carries the ruling and this file consumes it at
@@ -28,14 +28,14 @@
 ///  * both scroll views scroll *under* both bars and pay the bottom one at the
 ///    end of their content ([DsSafeArea.scrollPaddingOf]), so the last section
 ///    can be dragged clear of the gesture bar instead of hiding behind it;
-///  * the horizontal insets — a landscape notch — are spent once on the shell
+///  * the horizontal insets: a landscape notch: are spent once on the shell
 ///    frame, which is also what stops the rail from paying for a bar it does
 ///    not touch: [DsSafeArea] removes what it spends from the [MediaQuery] it
 ///    hands down, so everything below reads zero for those two sides.
 ///
 /// The glow is outside all of it and still bleeds off every edge, which is the
 /// half of the ruling that says what *not* to inset. Every inset is zero on a
-/// desktop, and [DsSafeArea] adds no widget at all when it is — so the geometry
+/// desktop, and [DsSafeArea] adds no widget at all when it is: so the geometry
 /// pins taken at 1440×900 measure the tree they always measured.
 library;
 
@@ -53,17 +53,17 @@ import 'nav.dart';
 import 'scroll_bridge.dart';
 import 'theme_toggle.dart';
 
-/// `bg-background/85` — the header is translucent so the blur has something to
+/// `bg-background/85`: the header is translucent so the blur has something to
 /// do.
 const double _headerAlpha = 0.85;
 
-/// `bg-action/12` — the active nav row's wash.
+/// `bg-action/12`: the active nav row's wash.
 const double _activeRowAlpha = 0.12;
 
-/// `bg-muted/50` — the sheet header's band.
+/// `bg-muted/50`: the sheet header's band.
 const double _sheetHeaderAlpha = 0.5;
 
-/// sonner's module-level `toast` — one queue for the whole app.
+/// sonner's module-level `toast`: one queue for the whole app.
 ///
 /// `<Toaster position="bottom-right" />` is mounted **once**, in the root
 /// layout (`app/layout.tsx:39`), and every page just imports `toast` and calls
@@ -76,7 +76,7 @@ final DsToastController docsToasts = DsToastController();
 ///
 /// The docs app has one route dimension (a path string) and no history, so a
 /// [ValueNotifier] is the whole router. It lives above the app's
-/// [WidgetsApp] — like [DsTheme] — because a pushed route (the mobile nav
+/// [WidgetsApp]: like [DsTheme]: because a pushed route (the mobile nav
 /// sheet) has to be able to navigate too.
 class AppRouter extends ValueNotifier<String> {
   AppRouter({String route = dsRoot}) : super(route);
@@ -108,7 +108,7 @@ class AppRouterScope extends InheritedNotifier<AppRouter> {
   }
 }
 
-/// Header, rail, reading column, atmosphere — everything around a page.
+/// Header, rail, reading column, atmosphere: everything around a page.
 class DocsShell extends StatefulWidget {
   const DocsShell({super.key, required this.route, required this.child});
 
@@ -153,7 +153,7 @@ class _DocsShellState extends State<DocsShell> {
     final DsThemeData theme = DsTheme.of(context);
     final double viewport = MediaQuery.sizeOf(context).width;
     final bool desktop = viewport >= DsBreakpoints.lg;
-    // What the header occupies, status bar included — the box it paints, the
+    // What the header occupies, status bar included: the box it paints, the
     // gap the rail starts below, and the room the reading column scrolls under.
     // All three are the same number by construction, which is why it is read
     // once here rather than three times below.
@@ -164,19 +164,19 @@ class _DocsShellState extends State<DocsShell> {
 
     return DefaultTextStyle(
       // `<body class="… text-foreground">`. Only the colour is ever inherited
-      // — every string on every page goes through a `.type-*` class that
-      // states its own family, size and leading — but without this, anything
+      //: every string on every page goes through a `.type-*` class that
+      // states its own family, size and leading: but without this, anything
       // whose class declares no `color` would inherit the framework's default
       // instead of the token.
       style: DsText.styleOf(context, DsType.body, color: theme.foreground),
       child: Stack(
         children: <Widget>[
-          // `background-attachment: fixed` — outside every scroll view.
+          // `background-attachment: fixed`: outside every scroll view.
           const Positioned.fill(child: DsPageGlow()),
           Positioned.fill(
             // The landscape notch, spent once for the whole frame: both columns
             // are inside it, and the two sides it pays are removed from the
-            // [MediaQuery] below — so the rail does not then pay a right-hand
+            // [MediaQuery] below: so the rail does not then pay a right-hand
             // inset it is nowhere near. Vertical is *not* spent here; the header
             // and the two scroll views each owe a different thing.
             child: DsSafeArea(
@@ -223,7 +223,7 @@ class _DocsShellState extends State<DocsShell> {
           // A full-size slot in **this** Stack rather than an `Overlay` entry:
           // the reduced-motion `MediaQuery` override the capture rig installs
           // sits below `MaterialApp`, and an overlay entry does not inherit it
-          // — so a toast captured through the rig would still be animating.
+          //: so a toast captured through the rig would still be animating.
           // The host paints nothing and takes no pointer until a toast is
           // queued.
           Positioned.fill(child: DsToaster(controller: docsToasts)),
@@ -262,7 +262,7 @@ class _Header extends StatelessWidget {
           ),
           padding: EdgeInsets.symmetric(horizontal: ds(6)),
           // Inside the decoration, so the wash, the blur and the bottom rule
-          // still cover the status bar and only the controls clear it — and
+          // still cover the status bar and only the controls clear it: and
           // inside the `px-6`, so a control clears the design padding *and* the
           // notch rather than the larger of the two. `bottom` is false because
           // a bar pinned to the top of the window owes the gesture bar nothing;
@@ -273,7 +273,7 @@ class _Header extends StatelessWidget {
             bottom: false,
             child: Row(
               children: <Widget>[
-                // `lg:hidden` — the rail takes over above it.
+                // `lg:hidden`: the rail takes over above it.
                 if (!desktop) ...<Widget>[const _MobileNavTrigger(), gap],
                 DsPress(
                   onTap: () => AppRouter.of(context).navigate(dsRoot),
@@ -364,7 +364,7 @@ class _VersionPill extends StatelessWidget {
   }
 }
 
-/// `Button variant="outline" size="icon" class="lg:hidden"` — opens the nav
+/// `Button variant="outline" size="icon" class="lg:hidden"`: opens the nav
 /// sheet.
 class _MobileNavTrigger extends StatelessWidget {
   const _MobileNavTrigger();
@@ -394,12 +394,12 @@ class _MobileNavSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final DsThemeData theme = DsTheme.of(context);
     // Both scopes live above the [WidgetsApp], so a pushed route reads them
-    // exactly like the page under it — and reading the route *here* is what
+    // exactly like the page under it: and reading the route *here* is what
     // `usePathname()` does inside the reference's `NavTree`: the sheet stays
     // open across a navigation, so its own active row has to keep up.
     final AppRouter router = AppRouter.of(context);
 
-    // `<NavTree />` — the reference passes no `onNavigate`, so a link routes
+    // `<NavTree />`: the reference passes no `onNavigate`, so a link routes
     // the page *underneath* and leaves the sheet standing; only the close
     // button and the barrier dismiss it. (SiteHeader's mobile nav is the one
     // that wraps its links in `SheetClose`; this one does not.)
@@ -415,7 +415,7 @@ class _MobileNavSheet extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          // `SheetHeader className="px-0"` — `p-4 pr-12` minus its horizontal
+          // `SheetHeader className="px-0"`, `p-4 pr-12` minus its horizontal
           // padding, keeping the room the close button needs.
           Container(
             width: double.infinity,
@@ -472,7 +472,7 @@ class _Sidebar extends StatelessWidget {
   final ScrollController controller;
   final String route;
 
-  /// The header's occupied height — [DsWidths.siteHeader] plus the status bar.
+  /// The header's occupied height, [DsWidths.siteHeader] plus the status bar.
   final double header;
 
   @override
@@ -500,7 +500,7 @@ class _Sidebar extends StatelessWidget {
                   controller: controller,
                   // The rail runs to the bottom of the window, so its last row
                   // is what the gesture bar would sit on. `NavTree`'s own
-                  // `pb-16` is not that clearance — it is the reference's, and
+                  // `pb-16` is not that clearance: it is the reference's, and
                   // it is inside the scrolled content either way; this is
                   // added to the viewport so the list can still be dragged
                   // clear. Horizontal reads zero here: the frame spent it.
@@ -540,7 +540,7 @@ class _Main extends StatelessWidget {
   final ScrollController controller;
   final bool desktop;
 
-  /// The header's occupied height — [DsWidths.siteHeader] plus the status bar.
+  /// The header's occupied height, [DsWidths.siteHeader] plus the status bar.
   final double header;
 
   final Widget child;
@@ -552,7 +552,7 @@ class _Main extends StatelessWidget {
       child: SingleChildScrollView(
         controller: controller,
         // Top: what `position: sticky` reserves in the flow. Content scrolls
-        // under the header from here — and on a phone the header is taller by
+        // under the header from here: and on a phone the header is taller by
         // the status bar, so this is too.
         //
         // Bottom: the gesture bar, which the page scrolls under in the same way
@@ -608,7 +608,7 @@ class DsThinScrollbar extends StatelessWidget {
   }
 }
 
-/// `nav[aria-label="Design system"].pb-16` — the whole tree, shared by the
+/// `nav[aria-label="Design system"].pb-16`: the whole tree, shared by the
 /// rail and the sheet.
 class NavTree extends StatelessWidget {
   const NavTree({super.key, required this.route, this.onNavigate});
@@ -654,7 +654,7 @@ class NavTree extends StatelessWidget {
                       // The one bordered box on this page that must NOT inset
                       // its child. `border-box` does move the `ul`'s content
                       // edge in by a pixel, and the rows' `-ml-px` moves them
-                      // straight back out again — the two cancel, and the
+                      // straight back out again: the two cancel, and the
                       // rows span the list's full border box.
                       decoration: BoxDecoration(
                         border: Border(
@@ -771,7 +771,7 @@ class _NavRowState extends State<_NavRow> {
     final DsThemeData theme = DsTheme.of(context);
     final bool active = widget.route == widget.href;
 
-    // Active: `border-action bg-action/12 text-foreground` — a 1px blue rule
+    // Active: `border-action bg-action/12 text-foreground`: a 1px blue rule
     // replacing the hairline, no glow, no weight change (`.type-nav` already
     // carries 500). Otherwise: `border-transparent text-muted-foreground
     // hover:border-input hover:text-foreground`.
@@ -810,7 +810,7 @@ class _NavRowState extends State<_NavRow> {
                   ),
                 ),
                 child: Padding(
-                  // `py-2 pl-4`, measured from where the hairline sits — and
+                  // `py-2 pl-4`, measured from where the hairline sits: and
                   // `box-sizing: border-box` puts the row's own `border-l`
                   // inside its box, so the label starts one pixel further in
                   // than the padding alone would put it. Vertically there is

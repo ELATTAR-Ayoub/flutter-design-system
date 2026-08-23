@@ -29,22 +29,6 @@ flutter:
     # render `<Image src="/imgs/sample-card.png">`; the well is a 102px
     # `object-cover` crop and the preview is the whole 734x1024 frame.
     - assets/imgs/sample-card.png
-    # The Shot compositions, declared as assets so `/shots/<slug>` can show the
-    # REAL source instead of a copy of it.
-    #
-    # A widget cannot read the filesystem on web or mobile, and `dart:io` paths
-    # are cwd-relative besides — so the only way `ShotDetailPage.fileSource`
-    # can carry the shipped bytes is for those bytes to be in the bundle.
-    # Declaring the composition itself (rather than generating a Dart literal
-    # from it) means the page and the registry hash read the same file: there
-    # is nothing to drift.
-    #
-    # One directory entry per Shot, because a directory asset is non-recursive
-    # and `lib/shots/` holds only sub-directories. `test/shots_catalog_parity_test.dart`
-    # fails if a catalog entry has no entry here.
-    - lib/shots/settings_profile/
-    - lib/shots/sign_in_flow/
-    - lib/shots/dashboard_overview/
   # The voice orb's fragment stage, re-declared HERE and nowhere else by
   # choice — this is the one thing a package pubspec cannot hand down.
   #

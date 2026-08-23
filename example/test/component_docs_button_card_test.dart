@@ -42,7 +42,22 @@ void main() {
       findsOneWidget,
     );
 
-    await tester.tap(find.text('Card').first);
+    // `find.text('Card')` matches twice on this page: the "IN THIS GUIDE"
+    // sidebar entry near the top, and the "previous" footer link at the
+    // bottom of the article (the next link there reads "Input", so 'Card'
+    // is unambiguous within that region). The test means to exercise page
+    // navigation via the article's own prev/next pager, not the sidebar, so
+    // scope to `docs-layout-prev-next` rather than pick an ordinal `.first`.
+    // That footer sits well past the 1440x900 viewport this test runs at,
+    // so it must be scrolled into view before it can be tapped.
+    final Finder cardFooterLink = find.descendant(
+      of: find.byKey(const ValueKey<String>('docs-layout-prev-next')),
+      matching: find.text('Card'),
+    );
+    expect(cardFooterLink, findsOneWidget);
+    await tester.ensureVisible(cardFooterLink);
+    await tester.pumpAndSettle();
+    await tester.tap(cardFooterLink);
     expect(destination, '/components/card');
   });
 

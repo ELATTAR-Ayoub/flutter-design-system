@@ -3,24 +3,16 @@ import 'dart:io';
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/docs/docs_code.dart';
 import 'package:example/main.dart';
-import 'package:example/shots_docs/catalog.dart';
-import 'package:example/shots_docs/shot_detail_page.dart';
-import 'package:example/shots_docs/shot_preview_host.dart';
-import 'package:example/shots_docs/shots_index_page.dart';
 import 'package:example/skills_docs/catalog.dart';
 import 'package:example/skills_docs/skills_page.dart';
 import 'package:example/site/pages/public_pages.dart';
-import 'package:example/site/site_routes.dart' show shotsRoute, skillsRoute;
-import 'package:example/site/site_shell.dart';
+import 'package:example/site/site_routes.dart' show skillsRoute;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_test/flutter_test.dart';
 
-/// The Shot the routing assertions deep-link to. Read from the catalog rather
-/// than spelled out, so a renamed slug fails at the catalog and not here.
-final ShotDocEntry _shot = shotDocs.first;
-
-/// The Skill `/skills` serves. Same reasoning as [_shot].
+/// The Skill `/skills` serves. Read from the catalog rather than spelled out,
+/// so a renamed slug fails at the catalog and not here.
 final SkillDocEntry _skill = skillDocs.first;
 
 /// The repository root, from the `example/` package this suite runs in — the
@@ -42,18 +34,17 @@ void _sizeTo(WidgetTester tester, Size size) {
 }
 
 void main() {
-  testWidgets('home exposes the foundation-first quickstart', (
+  testWidgets('home exposes the pill, headline, subhead and live grid', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(_harness(const PublicHomePage()));
 
+    expect(find.text('Browse components'), findsOneWidget);
     expect(find.text('Build the interface\nyou mean.'), findsOneWidget);
-    expect(find.text('One command to begin.'), findsOneWidget);
-    expect(
-      find.text('dart run elattar_cli init --foundation source'),
-      findsOneWidget,
-    );
     expect(find.text('Start building'), findsOneWidget);
+    // The grid is the point: a live composition's own card title, not a
+    // screenshot or a description of one.
+    expect(find.text('Building blocks'), findsOneWidget);
   });
 
   testWidgets('public page actions report their route without owning routing', (
@@ -62,11 +53,17 @@ void main() {
     final List<String> routes = <String>[];
     await tester.pumpWidget(_harness(PublicHomePage(onNavigate: routes.add)));
 
-    final Finder docsAction = find.text('Read the docs');
-    await tester.ensureVisible(docsAction);
-    await tester.tap(docsAction);
+    final Finder startBuilding = find.text('Start building');
+    await tester.ensureVisible(startBuilding);
+    await tester.tap(startBuilding);
     await tester.pump();
     expect(routes, <String>[publicDocsRoute]);
+
+    final Finder browseGrid = find.text('Browse components');
+    await tester.ensureVisible(browseGrid);
+    await tester.tap(browseGrid);
+    await tester.pump();
+    expect(routes, <String>[publicDocsRoute, publicComponentsRoute]);
   });
 
   testWidgets('components page renders installable docs and legacy groups', (
@@ -83,12 +80,6 @@ void main() {
     expect(find.text('elattar add button'), findsOneWidget);
   });
 
-  // `/shots` is no longer served from this library — `PublicShotsPage` and its
-  // four hand-written cards were retired when `ShotsIndexPage` took the route.
-  // The narrow-viewport half of the old assertion is not lost: it lives in
-  // `shots_index_test.dart`, which renders the real index at 390x844 and 1440x900,
-  // on both themes, against every catalog entry rather than four literals.
-
   // `/skills` is no longer served from this library either — `PublicSkillsPage`
   // and its three hand-written cards were retired when `SkillsPage` took the
   // route. These tests are the old ones re-pointed at the real page, at the
@@ -98,8 +89,7 @@ void main() {
   group('the skills route', () {
     // `rootBundle` is a `CachingAssetBundle`: it caches the *Future*, not the
     // string, so a test that awaits a key an earlier test already loaded gets a
-    // future from a scope that has ended and hangs. Same reasoning, and the
-    // same fix, as `shots_catalog_parity_test.dart`.
+    // future from a scope that has ended and hangs.
     setUp(rootBundle.clear);
 
     testWidgets('resolves to the real Skills page, not the placeholder', (
@@ -252,72 +242,6 @@ void main() {
             'show the file, not a description of it.',
       );
       expect(find.textContaining('is not loaded in this build'), findsNothing);
-    });
-  });
-
-  group('public route wiring', () {
-    testWidgets('the shots index route resolves to the catalog index', (
-      WidgetTester tester,
-    ) async {
-      _sizeTo(tester, const Size(1440, 900));
-
-      // `shotsRoute`, not a literal: one spelling of `/shots` in the repository.
-      await tester.pumpWidget(_harness(publicPageFor(shotsRoute)));
-      await tester.pump();
-
-      expect(find.byType(ShotsIndexPage), findsOneWidget);
-    });
-
-    testWidgets('a shot deep link resolves to its detail page', (
-      WidgetTester tester,
-    ) async {
-      _sizeTo(tester, const Size(1440, 900));
-
-      await tester.pumpWidget(_harness(publicPageFor(_shot.route)));
-      await tester.pump();
-
-      final ShotDetailPage page = tester.widget<ShotDetailPage>(
-        find.byType(ShotDetailPage),
-      );
-      expect(page.entry.name, _shot.name);
-    });
-
-    // That the detail page is handed the REAL source — the bytes on disk, not
-    // a copy of them — is asserted in `shots_catalog_parity_test.dart`, which
-    // owns the asset-bundle contract for every Shot rather than one of them.
-    // It cannot also be asserted here: `rootBundle` caches the `Future`, not
-    // the string, so a second `await` of a key an earlier test in the same file
-    // already loaded receives a future from a scope that has ended and never
-    // completes.
-
-    testWidgets('the preview route mounts no site chrome', (
-      WidgetTester tester,
-    ) async {
-      _sizeTo(tester, const Size(1440, 900));
-
-      // The Wave 2 contract, at the layer that actually decides it: the route
-      // arm in `main.dart` sits ABOVE the `siteRouteFor` guard, so a route that
-      // begins with `/shots` still escapes header, footer and search.
-      await tester.pumpWidget(DocsApp(initialRoute: _shot.previewRoute));
-      await tester.pump();
-
-      expect(find.byType(ShotPreviewHost), findsOneWidget);
-      expect(find.byType(SiteShell), findsNothing);
-    });
-
-    testWidgets('the shot detail route keeps the site chrome', (
-      WidgetTester tester,
-    ) async {
-      _sizeTo(tester, const Size(1440, 900));
-
-      // The other half of the same contract: strip the `/preview` suffix and
-      // the very same prefix is a site destination again.
-      await tester.pumpWidget(DocsApp(initialRoute: _shot.route));
-      await tester.pump();
-
-      expect(find.byType(SiteShell), findsOneWidget);
-      expect(find.byType(ShotDetailPage), findsOneWidget);
-      expect(find.byType(ShotPreviewHost), findsNothing);
     });
   });
 }

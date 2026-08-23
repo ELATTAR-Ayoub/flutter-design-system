@@ -1,13 +1,13 @@
-/// The wordmark — `components/ds/logo.tsx`.
+/// The wordmark, `components/ds/logo.tsx`.
 ///
 /// The reference's own note explains the shape: *"The mark is typographic on
-/// purpose — no illustrated logo to license or re-draw. The chevron glyph
+/// purpose: no illustrated logo to license or re-draw. The chevron glyph
 /// doubles as the favicon-scale mark. The value colour is reserved for the
 /// `.DS` suffix, so the wordmark carries the brand's 10% value allowance on
 /// its own and demonstrates the ratio at the smallest scale it ever appears
 /// in."*
 ///
-/// Two paths, painted rather than shipped as an asset — the same treatment
+/// Two paths, painted rather than shipped as an asset: the same treatment
 /// [DsIcon] gives lucide, and for the same reason: an SVG that has to be
 /// tinted per theme is geometry, not an image.
 library;
@@ -15,18 +15,18 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:flutter/widgets.dart';
 
-/// `M6 15.5 12 6l6 9.5` — the chevron, `stroke-linecap="square"`.
+/// `M6 15.5 12 6l6 9.5`: the chevron, `stroke-linecap="square"`.
 const DsIconPathElement _chevron = DsIconPathElement('M6 15.5 12 6l6 9.5');
 
-/// `M6 19h12` — the rule under it. No `stroke-linecap`, so SVG's default
+/// `M6 19h12`: the rule under it. No `stroke-linecap`, so SVG's default
 /// `butt` applies; the chevron's square caps are what make the two read as
 /// one drawing rather than a tick over a line.
 const DsIconPathElement _underline = DsIconPathElement('M6 19h12');
 
-/// `size-7` — the tile.
+/// `size-7`: the tile.
 final double _tilePx = ds(7);
 
-/// `size-4` — the SVG inside it.
+/// `size-4`: the SVG inside it.
 final double _glyphPx = ds(4);
 
 /// The `stroke-width="2.4"` both paths carry.
@@ -35,7 +35,7 @@ final double _glyphPx = ds(4);
 /// drawn on lucide's 24-unit grid at 16px, which is exactly what this is.
 final double _glyphStroke = DsIcon.strokeFor(_glyphPx);
 
-/// The blue tile with the chevron in it — `LogoMark`.
+/// The blue tile with the chevron in it, `LogoMark`.
 class DsLogoMark extends StatelessWidget {
   const DsLogoMark({super.key});
 
@@ -47,7 +47,7 @@ class DsLogoMark extends StatelessWidget {
         width: _tilePx,
         height: _tilePx,
         decoration: BoxDecoration(
-          // `bg-action` — the raw ramp, not `--primary`: the tile is the same
+          // `bg-action`: the raw ramp, not `--primary`: the tile is the same
           // blue in both themes.
           color: DsPalette.action,
           borderRadius: BorderRadius.circular(DsRadii.md),
@@ -70,7 +70,7 @@ class DsLogoMark extends StatelessWidget {
   }
 }
 
-/// `Logo` — mark plus wordmark, `gap-2.5`.
+/// `Logo`: mark plus wordmark, `gap-2.5`.
 class Logo extends StatelessWidget {
   const Logo({super.key, this.showMark = true});
 
@@ -121,7 +121,7 @@ class _MarkPainter extends CustomPainter {
   final Color chevron;
   final Color underline;
 
-  /// In the 24-unit space of the `viewBox`, as the SVG attribute is — the
+  /// In the 24-unit space of the `viewBox`, as the SVG attribute is: the
   /// canvas scale converts it.
   final double strokeWidth;
 

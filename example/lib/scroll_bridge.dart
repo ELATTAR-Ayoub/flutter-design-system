@@ -1,15 +1,15 @@
-/// The capture rig's scroll seam — `window.__dsScrollTo`, `__dsScrollY` and
+/// The capture rig's scroll seam, `window.__dsScrollTo`, `__dsScrollY` and
 /// `__dsScrollMax`.
 ///
 /// **Why this exists.** The rig photographs a page taller than the viewport in
 /// passes and stitches them. On the web app it drives that with `window.scrollY`
-/// — ground truth, read back after every move, so a pass that clamps short at
+///: ground truth, read back after every move, so a pass that clamps short at
 /// the bottom is *known* to have clamped and by how much. Flutter web has no
 /// document scroll: the reading column is a [ScrollController] inside a canvas,
 /// and `window.scrollY` is 0 forever.
 ///
-/// The obvious substitute — infer the offset by matching the overlap between
-/// two shots — cannot work here, and the reason is a design decision three
+/// The obvious substitute: infer the offset by matching the overlap between
+/// two shots: cannot work here, and the reason is a design decision three
 /// files away. `--body-glow` is `background-attachment: fixed`, so [DsPageGlow]
 /// sits at the bottom of the shell's [Stack], **outside both scroll views**.
 /// Scrolled content is therefore never a pure translation: every pass repaints
@@ -20,13 +20,13 @@
 ///
 /// So the rig drives and verifies scrolling through this seam instead, exactly
 /// as it does through `window.scrollY` on the web side. Three functions, no
-/// query-param gate — always installed in the gallery app, because a capture
+/// query-param gate: always installed in the gallery app, because a capture
 /// tool that has to ask for the instrumentation is a capture tool that will one
 /// day forget.
 ///
 /// **Web builds only.** The implementation imports `dart:js_interop`, which
 /// does not exist on the VM, so a conditional export picks a no-op stub
-/// everywhere else — without it every widget test that mounts `DocsShell`
+/// everywhere else: without it every widget test that mounts `DocsShell`
 /// would fail to compile.
 library;
 

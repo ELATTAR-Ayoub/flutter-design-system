@@ -19,6 +19,8 @@
 /// [_DocsLayoutState._scrollToAnchor] for what activating one does.
 library;
 
+import 'dart:math' as math;
+
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:flutter/material.dart';
 
@@ -34,14 +36,18 @@ export 'docs_sidebar.dart' show DocsSidebar, DocsSidebarEntry, DocsSidebarGroup;
 /// [DocsLayout.sidebar] list.
 ///
 /// "Sections" lists the top-level public destinations from
-/// `../site/site_routes.dart`, deliberately **excluding** [SiteSection.home]:
-/// an earlier audit found stale `/docs/*` sub-routes that dead-ended on the
-/// homepage inside this very rail, and Home is the one top-level destination
-/// that is never useful to reach *from inside* the documentation shell. What
-/// is left — `/docs`, `/components`, `/shots`, `/skills` — is exactly what
-/// `main.dart`'s `publicPageFor` resolves today: `/docs`, `/components` and
-/// `/shots` on their own switch arms, `/skills` one guard above it via
-/// `skillDocForRoute`. Nothing listed here is a dead link.
+/// `../site/site_routes.dart`, deliberately excluding two kinds of entry.
+/// First, [SiteSection.home]: an earlier audit found stale `/docs/*`
+/// sub-routes that dead-ended on the homepage inside this very rail, and
+/// Home is the one top-level destination that is never useful to reach
+/// *from inside* the documentation shell. Second, any [SiteRoute] whose
+/// [SiteRoute.showInSidebar] is `false`, which today is only `docsRoute`
+/// (title "Documentation"): that route still resolves through
+/// `main.dart`'s `publicPageFor` and still appears in quick search, it is
+/// just not also listed here, above the six sub-pages it groups. What is
+/// left, Introduction, Components, Installation, Theming, CLI and Skills, is
+/// exactly what `main.dart`'s `publicPageFor` resolves today. Nothing listed
+/// here is a dead link.
 ///
 /// "Components" lists every `../components_docs/catalog.dart` entry —
 /// already alphabetical by title, per that file's own contract — with
@@ -52,7 +58,7 @@ List<DocsSidebarGroup> _defaultSidebarGroups(String route) {
       label: 'Sections',
       items: <DocsSidebarEntry>[
         for (final SiteRoute site in siteRoutes)
-          if (site.section != SiteSection.home)
+          if (site.section != SiteSection.home && site.showInSidebar)
             DocsSidebarEntry(
               title: site.title,
               route: site.path,
@@ -182,7 +188,7 @@ class _DocsLayoutState extends State<DocsLayout> {
   /// Two conventions are in use across the nine `DocsPageLayout` routes and
   /// both are honoured here rather than rewritten:
   /// * [docsAnchorKey] — a [ValueKey] on the section's subtree, which the
-  ///   component, Shot and Skill articles carry. Resolved by walking this
+  ///   component and Skill articles carry. Resolved by walking this
   ///   layout's own article, which is what makes a value key enough.
   /// * `kit.dart`'s [DsSection], whose `id` already registers a [GlobalKey] in
   ///   that file's own anchor registry. The dialog, input and select guides
@@ -245,6 +251,27 @@ class _DocsLayoutState extends State<DocsLayout> {
     final double viewport = MediaQuery.sizeOf(context).width;
     final bool wide = viewport >= DsBreakpoints.lg;
     final bool extraWide = viewport >= DsBreakpoints.xl;
+    // How tall either rail is allowed to grow before it scrolls on its own,
+    // matching the width story in the [LayoutBuilder] below. A rail that
+    // fits within this in the common case never notices the clamp: it is
+    // only the "Components" list on a short screen, or a long "ON THIS PAGE"
+    // outline, that hits [SingleChildScrollView] instead of stretching the
+    // whole page (sidebar, article and all) down to its own height.
+    final double railMaxHeight = MediaQuery.sizeOf(context).height;
+    // `_SiteBody` (site_shell.dart) hands this widget a column already capped
+    // at `DsWidths.page` and centred inside `DsWidths.shell`, the dead space
+    // at the outer edges an earlier audit flagged. That constraint belongs to
+    // the whole site (every public page reads inside a `max-w-page` column,
+    // this one included) so it is not this widget's place to remove it
+    // upstream. Instead the rails in the [LayoutBuilder] below reach past it
+    // on their own, out to the shell's own edge or the viewport's, whichever
+    // is narrower, re-centred on the same point `_SiteBody`'s own `Center` →
+    // `Align` chain already centres it on. The reading column stays capped
+    // at [DsWidths.content] regardless, so only the rails actually reach the
+    // wider edge.
+    final double fullBleedWidth = viewport < DsWidths.shell
+        ? viewport
+        : DsWidths.shell;
     final List<DocsTocEntry> toc = widget.toc;
     final List<DocsSidebarGroup> sidebarGroups = widget.sidebarGroups.isNotEmpty
         ? widget.sidebarGroups
@@ -275,31 +302,115 @@ class _DocsLayoutState extends State<DocsLayout> {
             _AnchorStrip(entries: toc, onAnchor: _scrollToAnchor),
           SizedBox(height: ds(6)),
           if (wide)
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                SizedBox(
-                  key: const ValueKey<String>('docs-layout-sidebar'),
-                  width: DsWidths.rail,
-                  child: DocsSidebar(
-                    groups: sidebarGroups,
-                    onNavigate: _navigate,
-                  ),
-                ),
-                SizedBox(width: ds(8)),
-                Expanded(child: article),
-                if (extraWide) ...<Widget>[
-                  SizedBox(width: ds(8)),
-                  SizedBox(
-                    key: const ValueKey<String>('docs-layout-toc'),
-                    width: DsWidths.rail,
-                    child: _TableOfContents(
-                      entries: toc,
-                      onAnchor: _scrollToAnchor,
+            LayoutBuilder(
+              builder: (BuildContext context, BoxConstraints constraints) {
+                // How far the rails must reach, past the box this widget was
+                // actually given, to land on [fullBleedWidth]. Zero once that
+                // box already reaches the full-bleed edge on its own: every
+                // harness this layout is built and tested against today
+                // (`docs_layout_test.dart`, every component doc test) hands
+                // it the raw viewport directly, nothing above it narrows the
+                // box first, so `inset` is 0 there. It is only positive
+                // inside the real `_SiteBody` column, whose own
+                // `ConstrainedBox(maxWidth: DsWidths.page)` this widget
+                // cannot reach, see the comment above [fullBleedWidth].
+                final double inset = math.max(
+                  0.0,
+                  (fullBleedWidth - constraints.maxWidth) / 2,
+                );
+                // The reading column's own margin: a rail plus the gap after
+                // it, less however much of that margin already sits in the
+                // escaped `inset` band outside this widget's own box.
+                final double contentInset = math.max(
+                  0.0,
+                  DsWidths.rail + ds(8) - inset,
+                );
+
+                // An earlier version of this widget wrapped a three-column
+                // [Row] in an [OverflowBox] to reach past the box above. That
+                // crashed here: [OverflowBox] always sizes itself to
+                // `constraints.biggest`, and the incoming height constraint
+                // is unbounded (this whole page sits in a vertical
+                // [SingleChildScrollView]), so its reported size carried an
+                // infinite height. A [Row] cannot replace it either: its
+                // `Expanded` content column needs a bounded main-axis
+                // constraint to size against, and the only bound this widget
+                // has to offer is `constraints.maxWidth`, exactly the width
+                // the rails need to escape.
+                //
+                // [Stack] sizes itself from its one non-positioned child
+                // instead, via `constraints.constrain(child.size)`. That
+                // child is the reading column below, and its height is the
+                // article's own, always finite, so this widget's reported
+                // height stays finite too even though the constraint it was
+                // handed was not. The rails escape sideways as [Positioned]
+                // children, each pinned `inset` past this box's own edge:
+                // `clipBehavior: Clip.none` is what lets them paint there
+                // instead of being cut at this box's own, narrower bounds.
+                return Stack(
+                  clipBehavior: Clip.none,
+                  alignment: Alignment.topLeft,
+                  children: <Widget>[
+                    // Not [Positioned]: this is the one child [Stack] sizes
+                    // itself from, matching the reference
+                    // (https://ui.shadcn.com/docs/components), where the
+                    // rails sit at the edges of whatever box this widget is
+                    // given and only the middle column is capped and centred
+                    // between them.
+                    Padding(
+                      padding: EdgeInsets.only(
+                        left: contentInset,
+                        right: extraWide ? contentInset : 0,
+                      ),
+                      child: Center(
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(
+                            maxWidth: DsWidths.content,
+                          ),
+                          child: article,
+                        ),
+                      ),
                     ),
-                  ),
-                ],
-              ],
+                    Positioned(
+                      left: -inset,
+                      top: 0,
+                      child: SizedBox(
+                        key: const ValueKey<String>('docs-layout-sidebar'),
+                        width: DsWidths.rail,
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(maxHeight: railMaxHeight),
+                          child: SingleChildScrollView(
+                            child: DocsSidebar(
+                              groups: sidebarGroups,
+                              onNavigate: _navigate,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    if (extraWide)
+                      Positioned(
+                        right: -inset,
+                        top: 0,
+                        child: SizedBox(
+                          key: const ValueKey<String>('docs-layout-toc'),
+                          width: DsWidths.rail,
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                              maxHeight: railMaxHeight,
+                            ),
+                            child: SingleChildScrollView(
+                              child: _TableOfContents(
+                                entries: toc,
+                                onAnchor: _scrollToAnchor,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                );
+              },
             )
           else
             article,
@@ -431,13 +542,16 @@ class _TocRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Widget row = GestureDetector(
-      key: ValueKey<String>('docs-layout-toc-entry:${entry.anchor}'),
-      onTap: () => onAnchor(entry.anchor),
-      behavior: HitTestBehavior.opaque,
-      child: Padding(
-        padding: EdgeInsets.symmetric(vertical: ds(1.5)),
-        child: DsText(entry.title, DsType.small),
+    final Widget row = MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        key: ValueKey<String>('docs-layout-toc-entry:${entry.anchor}'),
+        onTap: () => onAnchor(entry.anchor),
+        behavior: HitTestBehavior.opaque,
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: ds(1.5)),
+          child: DsText(entry.title, DsType.small),
+        ),
       ),
     );
     if (!indented) return row;

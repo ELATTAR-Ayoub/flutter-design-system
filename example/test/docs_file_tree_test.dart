@@ -17,19 +17,19 @@ const Size _wide = Size(1440, 900);
 const Size _narrow = Size(390, 844);
 
 const List<DocsCodeFile> _twoFiles = <DocsCodeFile>[
-  DocsCodeFile(path: 'lib/shots/demo/a.dart', code: 'class A {}'),
-  DocsCodeFile(path: 'lib/shots/demo/b.dart', code: 'class B {}'),
+  DocsCodeFile(path: 'lib/widgets/demo/a.dart', code: 'class A {}'),
+  DocsCodeFile(path: 'lib/widgets/demo/b.dart', code: 'class B {}'),
 ];
 
 const List<DocsCodeFile> _threeFiles = <DocsCodeFile>[
-  DocsCodeFile(path: 'lib/shots/demo/a.dart', code: 'class A {}'),
-  DocsCodeFile(path: 'lib/shots/demo/b.dart', code: 'class B {}'),
-  DocsCodeFile(path: 'lib/shots/demo/c.dart', code: 'class C {}'),
+  DocsCodeFile(path: 'lib/widgets/demo/a.dart', code: 'class A {}'),
+  DocsCodeFile(path: 'lib/widgets/demo/b.dart', code: 'class B {}'),
+  DocsCodeFile(path: 'lib/widgets/demo/c.dart', code: 'class C {}'),
 ];
 
 const List<DocsCodeFile> _duplicateBasenames = <DocsCodeFile>[
-  DocsCodeFile(path: 'lib/shots/one/config.dart', code: 'class ConfigOne {}'),
-  DocsCodeFile(path: 'lib/shots/two/config.dart', code: 'class ConfigTwo {}'),
+  DocsCodeFile(path: 'lib/widgets/one/config.dart', code: 'class ConfigOne {}'),
+  DocsCodeFile(path: 'lib/widgets/two/config.dart', code: 'class ConfigTwo {}'),
 ];
 
 Future<DsThemeController> _pumpTree(
@@ -98,7 +98,7 @@ void main() {
     WidgetTester tester,
   ) async {
     const List<DocsCodeFile> single = <DocsCodeFile>[
-      DocsCodeFile(path: 'lib/shots/demo/solo.dart', code: 'class Solo {}'),
+      DocsCodeFile(path: 'lib/widgets/demo/solo.dart', code: 'class Solo {}'),
     ];
     await _pumpTree(tester, files: single);
 
@@ -266,11 +266,11 @@ void main() {
       await _pumpTree(tester, files: _duplicateBasenames);
 
       expect(
-        find.bySemanticsLabel('Selected file lib/shots/one/config.dart'),
+        find.bySemanticsLabel('Selected file lib/widgets/one/config.dart'),
         findsOneWidget,
       );
       expect(
-        find.bySemanticsLabel('Select file lib/shots/two/config.dart'),
+        find.bySemanticsLabel('Select file lib/widgets/two/config.dart'),
         findsOneWidget,
       );
       // The bare, ambiguous basename must not be used for either row once
@@ -287,19 +287,19 @@ void main() {
       await _pumpTree(tester, files: _twoFiles);
 
       expect(
-        find.bySemanticsLabel('Copy lib/shots/demo/a.dart'),
+        find.bySemanticsLabel('Copy lib/widgets/demo/a.dart'),
         findsOneWidget,
       );
-      expect(find.bySemanticsLabel('Copy lib/shots/demo/b.dart'), findsNothing);
+      expect(find.bySemanticsLabel('Copy lib/widgets/demo/b.dart'), findsNothing);
 
       await tester.tap(find.bySemanticsLabel('Select file b.dart'));
       await tester.pump();
 
       expect(
-        find.bySemanticsLabel('Copy lib/shots/demo/b.dart'),
+        find.bySemanticsLabel('Copy lib/widgets/demo/b.dart'),
         findsOneWidget,
       );
-      expect(find.bySemanticsLabel('Copy lib/shots/demo/a.dart'), findsNothing);
+      expect(find.bySemanticsLabel('Copy lib/widgets/demo/a.dart'), findsNothing);
     });
 
     testWidgets(
@@ -333,7 +333,7 @@ void main() {
         );
         await tester.pump();
 
-        await tester.tap(find.bySemanticsLabel('Copy lib/shots/demo/a.dart'));
+        await tester.tap(find.bySemanticsLabel('Copy lib/widgets/demo/a.dart'));
         await tester.pump();
 
         expect(copied, <String>['class A {}']);
@@ -372,13 +372,13 @@ void main() {
       await tester.pump();
       expect(find.text('Copy'), findsOneWidget);
 
-      await tester.tap(find.bySemanticsLabel('Copy lib/shots/demo/a.dart'));
+      await tester.tap(find.bySemanticsLabel('Copy lib/widgets/demo/a.dart'));
       await tester.pump();
 
       expect(find.text('Copied'), findsOneWidget);
       expect(find.text('Copy'), findsNothing);
       expect(
-        find.bySemanticsLabel('Copied lib/shots/demo/a.dart'),
+        find.bySemanticsLabel('Copied lib/widgets/demo/a.dart'),
         findsOneWidget,
       );
 
@@ -392,18 +392,18 @@ void main() {
     /// Wide enough to overflow any column, and deep enough that an uncapped
     /// block would carry its scrollbar off the bottom of the screen.
     final String longSource = <String>[
-      'class DashboardOverviewShot extends StatefulWidget with AVeryLongMixinName implements SomethingElseEntirely {',
+      'class SomeVeryLongWidgetClassName extends StatefulWidget with AVeryLongMixinName implements SomethingElseEntirely {',
       for (int i = 0; i < 400; i++) '  // line $i',
       '}',
     ].join('\n');
 
     List<DocsCodeFile> filesWith(String code) => <DocsCodeFile>[
-      DocsCodeFile(path: 'lib/shots/demo/long.dart', code: code),
+      DocsCodeFile(path: 'lib/widgets/demo/long.dart', code: code),
     ];
 
     // Catches: removing the `maxHeight` the file tree passes, which is what
     // put the horizontal scrollbar hundreds of pixels below the fold and left
-    // the reader with `class DashboardOverviewShot extends Statefu` and no way
+    // the reader with `class SomeVeryLongWidgetClassName extends Statefu` and no way
     // to reach the rest of the line.
     testWidgets('the pane is capped and its long lines are reachable', (
       WidgetTester tester,

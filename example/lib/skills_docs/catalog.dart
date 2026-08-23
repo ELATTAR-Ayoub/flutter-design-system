@@ -1,10 +1,10 @@
 /// Public documentation metadata for installable agent Skills.
 ///
 /// A Skill is a Markdown-and-references bundle that directs a coding agent —
-/// today, only Claude Code — to build with this design system correctly. This
+/// today, only Claude Code: to build with this design system correctly. This
 /// catalog is the single source of truth for slug, route, version, supported
-/// agents, reference titles, and the file tree — the Skills analogue of
-/// `shots_docs/catalog.dart` and `components_docs/catalog.dart`.
+/// agents, reference titles, and the file tree: the Skills analogue of
+/// `components_docs/catalog.dart`.
 ///
 /// The skill's real payload lives at `skills/elattar-flutter-ui-director/` —
 /// one copy, read directly by the repository's own agents (via `AGENTS.md`),
@@ -14,14 +14,14 @@
 /// `docs/superpowers/reports/public-release/decisions/005-public-skill-location.md`
 /// for the full record.
 ///
-/// ## `verifiedCommands` — the anti-invention guard
+/// ## `verifiedCommands`: the anti-invention guard
 ///
 /// The site previously shipped `npx skills add ELATTAR-Ayoub/flutter-design-system`
-/// — a command nothing in the repository implemented or verified. [SkillsPage]
+///: a command nothing in the repository implemented or verified. [SkillsPage]
 /// (in `skills_page.dart`) renders commands **only** by reading them out of a
 /// [SkillDocEntry]'s [SkillInstallRoute]s, and every one of those commands must
 /// appear, verbatim, in [verifiedCommands] below. A command that is not in this
-/// list is not published — a human has to consciously add a line here before
+/// list is not published: a human has to consciously add a line here before
 /// the page can show it, and `example/test/skills_docs_test.dart` asserts the
 /// two never drift apart.
 library;
@@ -30,7 +30,7 @@ library;
 /// pending a recorded transcript plus the owner's licensing decision.
 ///
 /// Nothing in this catalog is allowed to assert [pendingVerification] as
-/// working — see the hard constraint recorded in
+/// working: see the hard constraint recorded in
 /// `docs/superpowers/plans/2026-08-23-phase-h-skills-scope.md`.
 enum SkillRouteStatus {
   /// Demonstrated by this checkout itself, no license question, no network
@@ -47,9 +47,9 @@ enum SkillRouteStatus {
 ///
 /// Mirrors `docs/docs_code.dart`'s `DocsCodeCommand` shape exactly (`command`,
 /// `label`, `description`) so `skills_page.dart` can map one onto the other at
-/// render time — this file stays free of the Flutter import that widget type
-/// would pull in, the same discipline `shots_docs/catalog.dart` and
-/// `components_docs/catalog.dart` already keep.
+/// render time: this file stays free of the Flutter import that widget type
+/// would pull in, the same discipline `components_docs/catalog.dart` already
+/// keeps.
 class SkillCommand {
   const SkillCommand({
     required this.command,
@@ -94,7 +94,7 @@ class SkillInstallRoute {
 
   final List<SkillCommand> install;
 
-  /// Empty when there is no distinct update command — see [updateNote].
+  /// Empty when there is no distinct update command: see [updateNote].
   final List<SkillCommand> update;
   final List<SkillCommand> inspect;
   final List<SkillCommand> remove;
@@ -120,7 +120,7 @@ class SkillReferenceFile {
     required this.description,
   });
 
-  /// Repository-relative to the skill's own directory — e.g. `SKILL.md` or
+  /// Repository-relative to the skill's own directory: e.g. `SKILL.md` or
   /// `references/system-map.md`. Never the repo-root-relative path; see
   /// [SkillDocEntry.sourcePaths] for that.
   final String path;
@@ -150,7 +150,7 @@ class SkillDocEntry {
   /// Directory name under `skills/`, and the skill's frontmatter `name:`.
   final String slug;
 
-  /// `SKILL.md`'s frontmatter `name:` — identical to [slug] today, kept as a
+  /// `SKILL.md`'s frontmatter `name:`: identical to [slug] today, kept as a
   /// separate field because the two are allowed to diverge in principle (a
   /// renamed directory need not rename the skill) even though nothing does
   /// that yet.
@@ -158,10 +158,10 @@ class SkillDocEntry {
 
   final String title;
 
-  /// One line — `.claude-plugin/plugin.json`'s `description`.
+  /// One line, `.claude-plugin/plugin.json`'s `description`.
   final String summary;
 
-  /// Longer — `SKILL.md`'s frontmatter `description:`, the text an agent
+  /// Longer, `SKILL.md`'s frontmatter `description:`, the text an agent
   /// harness actually uses to decide when to load the skill.
   final String description;
 
@@ -176,12 +176,12 @@ class SkillDocEntry {
   /// `.claude-plugin/marketplace.json`'s `name`.
   final String marketplaceName;
 
-  /// `https://github.com/...` — informational only. Never rendered as part of
+  /// `https://github.com/...`: informational only. Never rendered as part of
   /// a copy-pasteable install command; see the hard constraint on GitHub-based
   /// install commands in the Phase H scope.
   final String repository;
 
-  /// Plain statement of the licensing gate — see Decision 005 §"Publication
+  /// Plain statement of the licensing gate: see Decision 005 §"Publication
   /// gate".
   final String licenseStatus;
 
@@ -197,9 +197,9 @@ class SkillDocEntry {
   final List<SkillInstallRoute> installRoutes;
 
   /// The one route this page serves. Equal to `site/site_routes.dart`'s
-  /// `skillsRoute` by construction — kept as a literal here (not imported)
-  /// the same way `shots_docs/catalog.dart` and `components_docs/catalog.dart`
-  /// define their own `route` getters independently of the site layer.
+  /// `skillsRoute` by construction: kept as a literal here (not imported)
+  /// the same way `components_docs/catalog.dart` defines its own `route`
+  /// getter independently of the site layer.
   String get route => '/skills';
 
   /// Repository-relative directory the skill's real files live under.
@@ -227,17 +227,17 @@ class SkillDocEntry {
 /// A command belongs here only once a human has read it and decided it is
 /// either demonstrably real today (see `SkillRouteStatus.verifiedToday`) or
 /// worth documenting as a pending route (see `SkillRouteStatus.pendingVerification`,
-/// which the page always labels as such — never as working). Nothing on the
+/// which the page always labels as such: never as working). Nothing on the
 /// page may render text that looks like a command unless it is drawn from
 /// this list; `example/test/skills_docs_test.dart` checks every
 /// `DocsSelectableCodeBlock` the page renders against it.
 const List<String> verifiedCommands = <String>[
   // Verified today: this checkout's own `AGENTS.md` already names the skill.
-  // No install step, no network dependency, no licensing question — reading
+  // No install step, no network dependency, no licensing question: reading
   // the file is the whole route.
   'cat AGENTS.md',
 
-  // Pending verification (Claude Code plugin route) — see
+  // Pending verification (Claude Code plugin route): see
   // `SkillDocEntry.licenseStatus` and Decision 005 §"Publication gate". The
   // exact `/plugin` subcommand syntax below was confirmed against current
   // Claude Code plugin-marketplace documentation, not invented.
@@ -247,7 +247,7 @@ const List<String> verifiedCommands = <String>[
   '/plugin list',
   '/plugin uninstall elattar-design-system@elattar',
 
-  // Pending verification (manual copy route) — same gate as above. Plain
+  // Pending verification (manual copy route): same gate as above. Plain
   // POSIX `cp`/`ls`/`rm`; no GitHub dependency, since the source directory is
   // whatever local checkout the reader already has.
   'cp -r skills/elattar-flutter-ui-director ~/.claude/skills/elattar-flutter-ui-director',
@@ -260,7 +260,7 @@ const String _licenseStatus =
     'The root LICENSE is still a placeholder ("TODO: Add your license here."). '
     'A plugin marketplace entry and a "copy this into your agent config" '
     'instruction are both invitations to redistribute, with no grant attached '
-    'yet — so the routes below are documented, not published as working. See '
+    'yet: so the routes below are documented, not published as working. See '
     'Decision 005 (docs/superpowers/reports/public-release/decisions/'
     '005-public-skill-location.md).';
 
@@ -288,7 +288,7 @@ const SkillDocEntry _elattarFlutterUiDirector = SkillDocEntry(
   licenseStatus: _licenseStatus,
   supportedAgents: <String>['Claude Code'],
   workflow: <String>[
-    'Resolve the project mode — repository or consumer — before reading or '
+    'Resolve the project mode: repository or consumer: before reading or '
         'writing anything.',
     'Classify the work and name its primary action, critical states, and '
         'supported form factors.',
@@ -426,7 +426,7 @@ const SkillDocEntry _elattarFlutterUiDirector = SkillDocEntry(
       status: SkillRouteStatus.pendingVerification,
       summary:
           "Copies the skill directory straight into an agent's own skills "
-          'folder — user-scoped (every project) or project-scoped (one '
+          'folder: user-scoped (every project) or project-scoped (one '
           'repository).',
       blockedBy:
           'Same licensing gate as the plugin route above; the mechanism is '
@@ -437,7 +437,7 @@ const SkillDocEntry _elattarFlutterUiDirector = SkillDocEntry(
           command:
               'cp -r skills/elattar-flutter-ui-director '
               '~/.claude/skills/elattar-flutter-ui-director',
-          label: 'Copy — user scope',
+          label: 'Copy: user scope',
           description:
               'Makes the skill available to every project on this '
               'machine.',
@@ -446,14 +446,14 @@ const SkillDocEntry _elattarFlutterUiDirector = SkillDocEntry(
           command:
               'cp -r skills/elattar-flutter-ui-director '
               '.claude/skills/elattar-flutter-ui-director',
-          label: 'Copy — project scope',
+          label: 'Copy: project scope',
           description:
               'Makes the skill available only inside the current '
               'project.',
         ),
       ],
       updateNote:
-          'Re-run the copy command above — cp -r overwrites the files already '
+          'Re-run the copy command above: cp -r overwrites the files already '
           'there with the newer ones.',
       inspect: <SkillCommand>[
         SkillCommand(

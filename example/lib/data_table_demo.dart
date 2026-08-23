@@ -1,8 +1,8 @@
-/// `components/ds/data-table-demo.tsx` — the Data Table recipe, live.
+/// `components/ds/data-table-demo.tsx`: the Data Table recipe, live.
 ///
 /// The reference's own header says why it is not a component:
 ///
-/// > Not a component in `ui/` — deliberately. shadcn ships Data Table as a
+/// > Not a component in `ui/`: deliberately. shadcn ships Data Table as a
 /// > RECIPE over `table.tsx`, not as a file, because the interesting part is
 /// > always the column definitions and those belong to whatever is being
 /// > listed. Wrapping it would mean inventing an API for something whose whole
@@ -10,8 +10,8 @@
 ///
 /// So it lives beside `kit.dart` rather than in the package, exactly as it
 /// lives beside `kit.tsx` rather than in `components/ui/`. What the port
-/// replaces is `@tanstack/react-table`: four features — sort, filter, select,
-/// paginate — reproduced from the behaviour the library actually shows, probed
+/// replaces is `@tanstack/react-table`: four features: sort, filter, select,
+/// paginate: reproduced from the behaviour the library actually shows, probed
 /// on the live page rather than read out of its docs.
 ///
 /// ## The four behaviours, measured
@@ -30,17 +30,17 @@
 ///
 /// ## The geometry, measured
 ///
-///  * The filter is `max-w-xs flex-1` — 320px — with the glyph absolutely
+///  * The filter is `max-w-xs flex-1`, 320px: with the glyph absolutely
 ///    placed at `left-4`, and the input carries `pl-10` for it. *(Measured:
 ///    input 320×40 at x 325, glyph 14×14 at x 341.)*
 ///  * A sort header is `-mx-2 … px-2`, so its padding cancels the `th`'s and
 ///    the column measures **text + gap + glyph + the `th`'s own `px-2`**.
-///    *(Measured: the `Card` column's max-content is 65.734 — a 29.7px string
+///    *(Measured: the `Card` column's max-content is 65.734: a 29.7px string
 ///    plus 36.)*
 ///  * `[&:has([role=checkbox])]:pr-0` drops the right padding of any cell with
 ///    a checkbox in it, which is why the select column measures **28** and not
 ///    36.
-///  * The empty state's cell is `h-48` — a hard 192px — and the `Empty` inside
+///  * The empty state's cell is `h-48`: a hard 192px: and the `Empty` inside
 ///    it is 167.69 tall, centred. Its dashed border never paints: `Empty`
 ///    writes `border-dashed` and no width. *(Measured: `border-top-width: 0px`,
 ///    `border-top-style: dashed`.)*
@@ -52,7 +52,7 @@ import 'package:flutter/widgets.dart';
 /// One row of `SALES`.
 typedef _Sale = ({String id, String card, String set, String grade, int price});
 
-/// `SALES` — the eight rows, in the file's own order.
+/// `SALES`: the eight rows, in the file's own order.
 const List<_Sale> _sales = <_Sale>[
   (id: '1', card: 'Eclipse Vault', set: 'Origin', grade: 'PSA 10', price: 4820),
   (id: '2', card: 'Golden Rift', set: 'Origin', grade: 'PSA 9', price: 1240),
@@ -79,7 +79,7 @@ const List<_Sale> _sales = <_Sale>[
 /// `initialState: { pagination: { pageSize: 4 } }`.
 const int _pageSize = 4;
 
-/// `SKELETON_ROWS` — *"static keys: a skeleton row has no identity beyond its
+/// `SKELETON_ROWS`, *"static keys: a skeleton row has no identity beyond its
 /// position."*
 const int _skeletonRows = 4;
 
@@ -91,7 +91,7 @@ enum _Column {
   grade,
   price;
 
-  /// `header` — the string `flexRender` draws, or null for the checkbox
+  /// `header`: the string `flexRender` draws, or null for the checkbox
   /// column.
   String? get header => switch (this) {
         _Column.select => null,
@@ -105,12 +105,12 @@ enum _Column {
   bool get sortable => this != _Column.select;
 
   /// TanStack's `getAutoSortDir`: **descending first when the value is a
-  /// number**, ascending otherwise. Probed, not assumed — see the library doc.
+  /// number**, ascending otherwise. Probed, not assumed: see the library doc.
   bool get descFirst => this == _Column.price;
 }
 
 /// `new Intl.NumberFormat("en-US", { style: "currency", currency: "USD",
-/// maximumFractionDigits: 0 })` — *"money is mono, tabular and right-aligned."*
+/// maximumFractionDigits: 0 })`, *"money is mono, tabular and right-aligned."*
 String _money(int value) {
   final String digits = value.toString();
   final StringBuffer grouped = StringBuffer();
@@ -121,7 +121,7 @@ String _money(int value) {
   return '\$$grouped';
 }
 
-/// `sortingFns.text` — `compareBasic(a.toLowerCase(), b.toLowerCase())`.
+/// `sortingFns.text`, `compareBasic(a.toLowerCase(), b.toLowerCase())`.
 int _text(String a, String b) => a.toLowerCase().compareTo(b.toLowerCase());
 
 /// The demo.
@@ -131,17 +131,17 @@ class DataTableDemo extends StatefulWidget {
   /// The second panel: *"skeleton rows on the real footprint."*
   final bool loading;
 
-  /// `space-y-4` — between the filter row, the table and the pager.
+  /// `space-y-4`: between the filter row, the table and the pager.
   static double get stackGap => ds(4);
 
   /// `max-w-xs` on the filter.
   // allow-hardcoded: framework container scale with no token to read it from.
   static const double filterWidth = 320;
 
-  /// `pl-10` — the room the glyph needs.
+  /// `pl-10`: the room the glyph needs.
   static double get filterInset => ds(10);
 
-  /// `left-4` — where the glyph sits.
+  /// `left-4`: where the glyph sits.
   static double get glyphInset => ds(4);
 
   /// `rounded-lg border border-border overflow-hidden` around the table.
@@ -155,14 +155,14 @@ class DataTableDemo extends StatefulWidget {
 }
 
 class _DataTableDemoState extends State<DataTableDemo> {
-  /// `useState<SortingState>([])` — at most one column, TanStack's default.
+  /// `useState<SortingState>([])`: at most one column, TanStack's default.
   _Column? _sortBy;
   bool _sortDesc = false;
 
   /// `useState<ColumnFiltersState>([])`, on the `card` column only.
   final TextEditingController _filter = TextEditingController();
 
-  /// `useState<RowSelectionState>({})`, keyed by `getRowId` — the row's own id.
+  /// `useState<RowSelectionState>({})`, keyed by `getRowId`: the row's own id.
   final Set<String> _selected = <String>{};
 
   int _page = 0;
@@ -182,7 +182,7 @@ class _DataTableDemoState extends State<DataTableDemo> {
 
   void _onFilter() => setState(() => _page = 0);
 
-  /// `getToggleSortingHandler()` — first → opposite → none.
+  /// `getToggleSortingHandler()`: first → opposite → none.
   void _toggleSort(_Column column) {
     setState(() {
       if (_sortBy != column) {
@@ -198,7 +198,7 @@ class _DataTableDemoState extends State<DataTableDemo> {
     });
   }
 
-  /// `getFilteredRowModel()` — the built-in `includesString` filter fn.
+  /// `getFilteredRowModel()`: the built-in `includesString` filter fn.
   List<_Sale> get _filtered {
     final String query = _filter.text.toLowerCase();
     if (query.isEmpty) return _sales;
@@ -207,7 +207,7 @@ class _DataTableDemoState extends State<DataTableDemo> {
         .toList();
   }
 
-  /// `getSortedRowModel()` — a stable sort, so equal keys keep source order.
+  /// `getSortedRowModel()`: a stable sort, so equal keys keep source order.
   List<_Sale> get _sorted {
     final List<_Sale> rows = List<_Sale>.of(_filtered);
     final _Column? by = _sortBy;
@@ -410,7 +410,7 @@ class _DataTableDemoState extends State<DataTableDemo> {
   }
 }
 
-/// `flex flex-wrap items-center gap-3` — the filter and the selection count.
+/// `flex flex-wrap items-center gap-3`: the filter and the selection count.
 class _FilterRow extends StatelessWidget {
   const _FilterRow({
     required this.controller,
@@ -485,7 +485,7 @@ enum _Sorted { none, asc, desc }
 /// it has to be reachable by keyboard and announced as a control (§7)."*
 ///
 /// Its `-mx-2` cancels its own `px-2` exactly, so the painted box overhangs the
-/// `th`'s padding and contributes nothing to the column's width — which is why
+/// `th`'s padding and contributes nothing to the column's width: which is why
 /// this is the row of content and not a padded box. `hover:text-foreground` is
 /// a no-op here: a `th` is already `text-foreground`.
 class _SortHeader extends StatelessWidget {
@@ -544,7 +544,7 @@ class _EmptyState extends StatelessWidget {
             'Try a shorter search, or clear the filter to see all eight.',
           ),
           Padding(
-            // `className="mt-4"` — on top of the `Empty`'s own `gap-4`.
+            // `className="mt-4"`: on top of the `Empty`'s own `gap-4`.
             padding: EdgeInsets.only(top: ds(4)),
             child: DsButton(
               variant: DsButtonVariant.outline,

@@ -117,20 +117,27 @@ class _SidebarRow extends StatelessWidget {
     return Semantics(
       link: true,
       selected: entry.selected,
-      child: GestureDetector(
-        onTap: () => onNavigate(entry.route),
-        behavior: HitTestBehavior.opaque,
-        child: Container(
-          key: ValueKey<String>('docs-sidebar:${entry.route}'),
-          padding: EdgeInsets.symmetric(horizontal: ds(3), vertical: ds(2)),
-          decoration: BoxDecoration(
-            color: entry.selected ? theme.muted : null,
-            borderRadius: BorderRadius.circular(DsRadii.md),
-          ),
-          child: DsText(
-            entry.title,
-            DsType.small,
-            color: entry.selected ? theme.foreground : theme.mutedForeground,
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: GestureDetector(
+          onTap: () => onNavigate(entry.route),
+          behavior: HitTestBehavior.opaque,
+          child: SelectionContainer.disabled(
+            child: Container(
+              key: ValueKey<String>('docs-sidebar:${entry.route}'),
+              padding: EdgeInsets.symmetric(horizontal: ds(3), vertical: ds(2)),
+              decoration: BoxDecoration(
+                color: entry.selected ? theme.muted : null,
+                borderRadius: BorderRadius.circular(DsRadii.md),
+              ),
+              child: DsText(
+                entry.title,
+                DsType.small,
+                color: entry.selected
+                    ? theme.foreground
+                    : theme.mutedForeground,
+              ),
+            ),
           ),
         ),
       ),

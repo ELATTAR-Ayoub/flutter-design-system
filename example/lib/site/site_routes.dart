@@ -7,11 +7,16 @@ library;
 
 import '../nav.dart';
 import '../components_docs/catalog.dart';
-import '../shots_docs/catalog.dart';
+import '../docs_pages/catalog.dart'
+    show
+        docsCliRoute,
+        docsInstallationRoute,
+        docsIntroductionRoute,
+        docsThemingRoute;
 import '../skills_docs/catalog.dart';
 
 /// The top-level destinations exposed by the public website.
-enum SiteSection { home, docs, components, shots, skills }
+enum SiteSection { home, docs, components, skills }
 
 /// A public website destination.
 class SiteRoute {
@@ -21,6 +26,7 @@ class SiteRoute {
     required this.title,
     required this.description,
     this.keywords = const <String>[],
+    this.showInSidebar = true,
   });
 
   final String path;
@@ -28,6 +34,13 @@ class SiteRoute {
   final String title;
   final String description;
   final List<String> keywords;
+
+  /// Whether the documentation shell's "Sections" rail
+  /// (`docs/docs_layout.dart`'s `_defaultSidebarGroups`) lists this
+  /// destination. Defaults to `true`; only [docsRoute] sets it to `false`, so
+  /// `/docs` stays a resolvable route, including for quick search, without
+  /// also appearing as a sidebar entry above the six sub-pages it groups.
+  final bool showInSidebar;
 }
 
 /// A searchable destination, including the existing design-system routes.
@@ -60,10 +73,33 @@ class SearchRoute {
 const String homeRoute = '/';
 const String docsRoute = '/docs';
 const String componentsRoute = '/components';
-const String shotsRoute = '/shots';
 const String skillsRoute = '/skills';
 
 /// Public website destinations, in header/navigation order.
+///
+/// [docsIntroductionRoute], [docsInstallationRoute], [docsThemingRoute] and
+/// [docsCliRoute] are the four `docs_pages/` articles this list wires into
+/// both the header/footer navigation (`site_navigation.dart`'s
+/// `primarySiteNavigation`) and the documentation shell's "Sections" rail
+/// (`docs/docs_layout.dart`'s `_defaultSidebarGroups`, which reads this list
+/// directly and is not modified here). Their position below is deliberate:
+/// interleaved with the existing [docsRoute], [componentsRoute] and
+/// [skillsRoute] entries so that, read in order and skipping [docsRoute]
+/// (see [SiteRoute.showInSidebar]), they reproduce the reference "Sections"
+/// order exactly: Introduction, Components, Installation, Theming, CLI,
+/// Skills. [docsRoute] ("Documentation") is left in [siteRoutes] rather than
+/// removed or renamed: dropping it would silently break
+/// `site_navigation.dart`'s eagerly evaluated `siteQuickSearchRoutes`
+/// (`searchRouteByPath(docsRoute)` throws for an unresolvable path) and
+/// `site_shell_test.dart`'s quick-open assertion, neither of which this
+/// change is meant to touch. It is excluded from the sidebar's "Sections"
+/// group alone, via [SiteRoute.showInSidebar]: `false` for this one entry,
+/// `true` (the default) for every other entry below.
+///
+/// Typeset, Registry and Changelog are the other three routes
+/// `docs_pages/catalog.dart` declares (`docsTypesetRoute`, `docsRegistryRoute`,
+/// `docsChangelogRoute`). They have no page to route to yet, so they are
+/// deliberately absent here too, rather than linked to a blank screen.
 const List<SiteRoute> siteRoutes = <SiteRoute>[
   SiteRoute(
     path: homeRoute,
@@ -78,6 +114,16 @@ const List<SiteRoute> siteRoutes = <SiteRoute>[
     title: 'Documentation',
     description: 'Learn the foundations, components, and installation flow.',
     keywords: <String>['docs', 'documentation', 'guide', 'install'],
+    showInSidebar: false,
+  ),
+  SiteRoute(
+    path: docsIntroductionRoute,
+    section: SiteSection.docs,
+    title: 'Introduction',
+    description:
+        'What Elattar is, who it is for, and how owning generated source '
+        'differs from depending on a package.',
+    keywords: <String>['introduction', 'overview', 'getting started'],
   ),
   SiteRoute(
     path: componentsRoute,
@@ -87,11 +133,31 @@ const List<SiteRoute> siteRoutes = <SiteRoute>[
     keywords: <String>['widgets', 'ui', 'components', 'copy'],
   ),
   SiteRoute(
-    path: shotsRoute,
-    section: SiteSection.shots,
-    title: 'Shots',
-    description: 'Composed screens built from the design system.',
-    keywords: <String>['screens', 'examples', 'compositions'],
+    path: docsInstallationRoute,
+    section: SiteSection.docs,
+    title: 'Installation',
+    description:
+        'The real, working steps to get the foundation and components into '
+        'a Flutter project today.',
+    keywords: <String>['install', 'installation', 'setup', 'foundation'],
+  ),
+  SiteRoute(
+    path: docsThemingRoute,
+    section: SiteSection.docs,
+    title: 'Theming',
+    description:
+        'Semantic tokens, DsThemeController, light and dark resolution, and '
+        'how a consumer overrides them.',
+    keywords: <String>['theming', 'theme', 'tokens', 'dark mode', 'colors'],
+  ),
+  SiteRoute(
+    path: docsCliRoute,
+    section: SiteSection.docs,
+    title: 'CLI',
+    description:
+        'The elattar command surface: init, add, list, search, info, and '
+        'doctor, with exit codes and workflows.',
+    keywords: <String>['cli', 'command line', 'elattar', 'commands'],
   ),
   SiteRoute(
     path: skillsRoute,
@@ -105,13 +171,9 @@ const List<SiteRoute> siteRoutes = <SiteRoute>[
 /// Finds a public route by its exact path. Matching is deliberately
 /// case-sensitive so malformed deep links do not silently resolve elsewhere.
 ///
-/// Component and Shot guides are **synthesized** rather than listed in
-/// [siteRoutes]: the header contract is exactly five destinations, and a guide
-/// is a page beneath one of them, not a sixth tab.
-///
-/// A Shot's chrome-free preview route (`/shots/<slug>/preview`) deliberately
-/// resolves to null here. It is not a site destination — it carries no header,
-/// footer or search — and `main.dart` answers it above this guard.
+/// Component guides are **synthesized** rather than listed in [siteRoutes]:
+/// the header contract is exactly four destinations, and a guide is a page
+/// beneath one of them, not a fifth tab.
 SiteRoute? siteRouteFor(String path) {
   for (final SiteRoute route in siteRoutes) {
     if (route.path == path) return route;
@@ -124,16 +186,6 @@ SiteRoute? siteRouteFor(String path) {
       title: component.title,
       description: component.description,
       keywords: <String>[component.name, 'component', 'registry', 'cli'],
-    );
-  }
-  final ShotDocEntry? shot = shotDocForRoute(path);
-  if (shot != null) {
-    return SiteRoute(
-      path: shot.route,
-      section: SiteSection.shots,
-      title: shot.title,
-      description: shot.description,
-      keywords: <String>[shot.name, 'shot', 'screen', 'registry', 'cli'],
     );
   }
   return null;
@@ -167,9 +219,9 @@ String githubPagesHref(String route, {String basePath = ''}) {
 /// Search keywords for a top-level destination, including anything the catalog
 /// that owns the destination's content contributes.
 ///
-/// A component guide and a Shot guide each own a route of their own
-/// (`/components/<name>`, `/shots/<slug>`), so each is indexed below as its own
-/// [SearchRoute]. A Skill does not: [SkillDocEntry.route] is the literal
+/// A component guide owns a route of its own (`/components/<name>`), so it is
+/// indexed below as its own [SearchRoute]. A Skill does not: [SkillDocEntry.route]
+/// is the literal
 /// `/skills` — there is one skill, and no index/detail split to model — so
 /// indexing it separately would put two rows with the same path in the results
 /// and make the search box answer "skills" twice.
@@ -218,23 +270,6 @@ final List<SearchRoute> searchableRoutes = List<SearchRoute>.unmodifiable(
           'registry',
           'cli',
           ...component.exports,
-        ]),
-      ),
-    for (final ShotDocEntry shot in shotDocs)
-      SearchRoute(
-        path: shot.route,
-        title: shot.title,
-        description: shot.description,
-        section: SiteSection.shots,
-        keywords: List<String>.unmodifiable(<String>[
-          shot.name,
-          'shot',
-          'screen',
-          'registry',
-          'cli',
-          shot.family.name,
-          shot.platform.name,
-          ...shot.dependencies,
         ]),
       ),
     for (final DsGroup group in dsGroups)

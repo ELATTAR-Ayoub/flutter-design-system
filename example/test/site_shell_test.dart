@@ -69,7 +69,6 @@ void main() {
     expect(find.text('Home'), findsWidgets);
     expect(find.text('Documentation'), findsWidgets);
     expect(find.text('Components'), findsWidgets);
-    expect(find.text('Shots'), findsWidgets);
     expect(find.text('Skills'), findsWidgets);
   });
 

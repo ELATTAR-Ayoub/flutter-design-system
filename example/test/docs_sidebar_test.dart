@@ -142,6 +142,30 @@ void main() {
     expect(activeText.color, isNot(inactiveText.color));
   });
 
+  testWidgets('every entry wears a pointer cursor, selected or not', (
+    WidgetTester tester,
+  ) async {
+    _setViewSize(tester, const Size(1440, 900));
+    await tester.pumpWidget(
+      _harness(
+        controller: DsThemeController(mode: DsThemeMode.dark),
+        child: DocsSidebar(groups: _groups(), onNavigate: (_) {}),
+      ),
+    );
+
+    for (final String route in <String>[
+      '/docs',
+      '/components/button',
+      '/components/accordion',
+    ]) {
+      final Finder entry = find.byKey(ValueKey<String>('docs-sidebar:$route'));
+      final MouseRegion region = tester.widget<MouseRegion>(
+        find.ancestor(of: entry, matching: find.byType(MouseRegion)).first,
+      );
+      expect(region.cursor, SystemMouseCursors.click, reason: route);
+    }
+  });
+
   testWidgets('tapping an entry calls onNavigate with its route', (
     WidgetTester tester,
   ) async {

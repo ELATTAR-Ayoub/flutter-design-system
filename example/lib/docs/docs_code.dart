@@ -510,13 +510,13 @@ class DocsSelectableCodeBlock extends StatefulWidget {
   /// grow to its content, which for one or two lines is the right shape.
   ///
   /// A **source listing** is a different animal, and leaving it uncapped is
-  /// what made the Files viewer on `/shots/<slug>` and `/skills` unreadable at
-  /// desktop width. The block scrolls horizontally, and it always did — but the
-  /// only affordance that scroll has is the scrollbar, which a horizontal
-  /// viewport paints along the *bottom of its own box*. Uncapped, that box is
-  /// as tall as the whole file, so the thumb sat hundreds of pixels below the
-  /// fold while the reader looked at line 1 seeing `class DashboardOverviewShot
-  /// extends Statefu` and nothing to suggest the rest existed. A mouse wheel
+  /// what made the Files viewer on `/skills` unreadable at desktop width. The
+  /// block scrolls horizontally, and it always did — but the only affordance
+  /// that scroll has is the scrollbar, which a horizontal viewport paints
+  /// along the *bottom of its own box*. Uncapped, that box is as tall as the
+  /// whole file, so the thumb sat hundreds of pixels below the fold while the
+  /// reader looked at line 1 seeing the file's first, unfinished line and
+  /// nothing to suggest the rest existed. A mouse wheel
   /// could not reach it either: a wheel reports `dy`, which a horizontal
   /// [Scrollable] ignores, and Flutter's default [ScrollBehavior] does not let
   /// a mouse drag a viewport.

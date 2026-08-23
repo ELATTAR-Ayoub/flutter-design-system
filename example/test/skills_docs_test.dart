@@ -3,8 +3,7 @@
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery` — the same
-/// discipline `shot_detail_test.dart` carries forward from
-/// `buttons_page_test.dart`.
+/// discipline `buttons_page_test.dart` carries.
 ///
 /// This suite runs with cwd = `example/` (the package root `flutter test`
 /// uses), so repository-root files are read as `../skills/...` and

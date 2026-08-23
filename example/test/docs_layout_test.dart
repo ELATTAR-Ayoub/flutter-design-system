@@ -45,8 +45,8 @@ DocsLayout _layout({required Widget child}) => DocsLayout(
   child: child,
 );
 
-/// An article deep enough to scroll, with `usage` marked the way the component,
-/// Shot and Skill articles mark their sections.
+/// An article deep enough to scroll, with `usage` marked the way the component
+/// and Skill articles mark their sections.
 Widget _tallArticle({Key? usageKey}) => Column(
   crossAxisAlignment: CrossAxisAlignment.stretch,
   children: <Widget>[
@@ -60,6 +60,107 @@ Widget _tallArticle({Key? usageKey}) => Column(
 );
 
 void main() {
+  testWidgets(
+    'wide layout pins the sidebar left, the toc right, and centers the '
+    'reading column between them',
+    (WidgetTester tester) async {
+      // Reproduces the reference shape at https://ui.shadcn.com/docs/components:
+      // the rails sit at the edges of the box the layout is given, and only
+      // the reading column is held to a fixed measure and centered in what is
+      // left over. This harness gives DocsLayout the full 1920 as its own box
+      // (the same shape the existing tests above already use), the way it is
+      // handed a full box today once nothing above it narrows that box first.
+      //
+      // The `MediaQuery` override alone only changes what `MediaQuery.of()`
+      // reports: it does not resize the real test surface, so the actual
+      // incoming constraints stayed the harness default (800x600) while this
+      // test asked for absolute pixel positions against 1920. Setting the
+      // view itself, the way `button_test.dart`'s desktop cases already do,
+      // is what makes the two agree.
+      tester.view.physicalSize = const Size(1920, 1080);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      await tester.pumpWidget(
+        _harness(
+          size: const Size(1920, 1080),
+          child: _layout(child: _tallArticle()),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final Rect sidebar = tester.getRect(
+        find.byKey(const ValueKey<String>('docs-layout-sidebar')),
+      );
+      final Rect article = tester.getRect(
+        find.byKey(const ValueKey<String>('docs-layout-article')),
+      );
+      final Rect toc = tester.getRect(
+        find.byKey(const ValueKey<String>('docs-layout-toc')),
+      );
+
+      const double tolerance = 1;
+      expect(sidebar.left, closeTo(0, tolerance));
+      expect(toc.right, closeTo(1920, tolerance));
+
+      final double between = toc.left - sidebar.right;
+      expect(
+        article.width,
+        lessThan(between),
+        reason:
+            'the reading column must not fill every pixel left between '
+            'the rails',
+      );
+
+      final double leftGap = article.left - sidebar.right;
+      final double rightGap = toc.left - article.right;
+      expect(
+        leftGap,
+        closeTo(rightGap, tolerance),
+        reason:
+            'the reading column is centered in the space between the '
+            'rails, not pinned to one side of it',
+      );
+    },
+  );
+
+  testWidgets(
+    'a sidebar entry and a toc entry both wear a pointer cursor on hover',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(
+        _harness(
+          size: const Size(1920, 1080),
+          child: _layout(child: _tallArticle()),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      bool wearsClickCursor(Key key) {
+        final Iterable<MouseRegion> regions = tester.widgetList<MouseRegion>(
+          find.ancestor(
+            of: find.byKey(key),
+            matching: find.byType(MouseRegion),
+          ),
+        );
+        return regions.any(
+          (MouseRegion region) => region.cursor == SystemMouseCursors.click,
+        );
+      }
+
+      expect(
+        wearsClickCursor(const ValueKey<String>('docs-sidebar:/docs')),
+        isTrue,
+        reason: 'a sidebar row is a tap target and must read as one',
+      );
+      expect(
+        wearsClickCursor(
+          const ValueKey<String>('docs-layout-toc-entry:overview'),
+        ),
+        isTrue,
+        reason: 'a toc row is a tap target and must read as one',
+      );
+    },
+  );
+
   testWidgets('wide layout exposes sidebar, article, and table of contents', (
     WidgetTester tester,
   ) async {
@@ -152,6 +253,12 @@ void main() {
   testWidgets('navigation callbacks are wired for sidebar and pager', (
     WidgetTester tester,
   ) async {
+    // Matches the real test surface to the `MediaQuery` size below: without
+    // it the rails still position themselves against 1440, landing outside
+    // the harness default 800x600 surface, and `tester.tap` misses them.
+    tester.view.physicalSize = const Size(1440, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
     final List<String> routes = <String>[];
     await tester.pumpWidget(
       _harness(
@@ -194,6 +301,11 @@ void main() {
     testWidgets(
       'the desktop "ON THIS PAGE" rail scrolls, and calls no router',
       (WidgetTester tester) async {
+        // Matches the real test surface to the `MediaQuery` size below: see
+        // the note on 'navigation callbacks are wired for sidebar and pager'.
+        tester.view.physicalSize = const Size(1440, 900);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
         final List<String> routes = <String>[];
         final ScrollController page = ScrollController();
         addTearDown(page.dispose);
@@ -286,6 +398,11 @@ void main() {
     testWidgets('a kit DsSection id resolves without any extra marking', (
       WidgetTester tester,
     ) async {
+      // Matches the real test surface to the `MediaQuery` size below: see
+      // the note on 'navigation callbacks are wired for sidebar and pager'.
+      tester.view.physicalSize = const Size(1440, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
       final List<String> routes = <String>[];
       final ScrollController page = ScrollController();
       addTearDown(page.dispose);
@@ -337,6 +454,14 @@ void main() {
     testWidgets('an unmarked anchor scrolls nothing and still routes nothing', (
       WidgetTester tester,
     ) async {
+      // Matches the real test surface to the `MediaQuery` size below: see
+      // the note on 'navigation callbacks are wired for sidebar and pager'.
+      // Without it the tap below misses the rail entirely (a hit-test
+      // warning, not a failure) and this test would pass for the wrong
+      // reason: a miss also leaves `routes` empty and `page.offset` at 0.
+      tester.view.physicalSize = const Size(1440, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
       final List<String> routes = <String>[];
       final ScrollController page = ScrollController();
       addTearDown(page.dispose);

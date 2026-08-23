@@ -1,4 +1,4 @@
-/// The non-web half of [scroll_bridge.dart] — see that library for the why.
+/// The non-web half of [scroll_bridge.dart]: see that library for the why.
 ///
 /// There is no `window` to hang anything on, and every widget test in this
 /// package mounts `DocsShell` on the VM, so this has to exist and has to do

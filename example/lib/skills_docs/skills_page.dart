@@ -1,19 +1,18 @@
-/// The public Skills page — what the skill is, which agents it is actually
+/// The public Skills page: what the skill is, which agents it is actually
 /// verified for, how to install/update/inspect/remove it, its reference file
-/// tree, and its version — for one [SkillDocEntry].
+/// tree, and its version: for one [SkillDocEntry].
 ///
-/// Mirrors `shots_docs/shot_detail_page.dart`'s `ShotDetailPage`: an article
-/// built on `docs/docs_layout.dart`'s [DocsLayout], with the same breadcrumb /
-/// sidebar / TOC / prev-next chrome every other public documentation page
-/// carries. The file tree reuses `docs/docs_file_tree.dart`'s [DocsFileTree]
-/// exactly as `ShotDetailPage` does; commands reuse `docs/docs_code.dart`'s
-/// [DocsCodeCommand] and [DocsSelectableCodeBlock]; the version block reuses
-/// `docs/docs_facts.dart`'s [DocsInstallFacts]. None of those four files are
+/// An article built on `docs/docs_layout.dart`'s [DocsLayout], with the same
+/// breadcrumb / sidebar / TOC / prev-next chrome every other public
+/// documentation page carries. The file tree reuses `docs/docs_file_tree.dart`'s
+/// [DocsFileTree]; commands reuse `docs/docs_code.dart`'s [DocsCodeCommand]
+/// and [DocsSelectableCodeBlock]; the version block reuses
+/// `docs/docs_facts.dart`'s [DocsInstallFacts]. None of those three files are
 /// modified here.
 ///
 /// Every command this page renders comes from a [SkillDocEntry]'s
 /// [SkillInstallRoute]s, which are themselves drawn from `catalog.dart`'s
-/// [verifiedCommands] allowlist — see that file's library doc for why. This
+/// [verifiedCommands] allowlist: see that file's library doc for why. This
 /// page never constructs a command string of its own.
 library;
 
@@ -36,17 +35,17 @@ class SkillsPage extends StatelessWidget {
   });
 
   /// The catalog entry this page documents. Defaults to [skillDocs]' single
-  /// entry — a parameter rather than a hardcoded read so a future multi-skill
+  /// entry: a parameter rather than a hardcoded read so a future multi-skill
   /// catalog can route more than one slug through this same widget.
   final SkillDocEntry? entry;
 
   /// Source for each [SkillReferenceFile] in [SkillDocEntry.referenceFiles],
   /// keyed by that file's [SkillReferenceFile.path] (e.g. `SKILL.md` or
-  /// `references/system-map.md`) — **not** the repo-relative path
+  /// `references/system-map.md`), **not** the repo-relative path
   /// [SkillDocEntry.sourcePaths] returns.
   ///
   /// A widget has no business reading the filesystem at build time, and
-  /// `skills/` sits outside `example/`'s own project root besides — a Flutter
+  /// `skills/` sits outside `example/`'s own project root besides: a Flutter
   /// asset path cannot climb above it (see `example/pubspec.yaml`'s shader
   /// comment for the same constraint hitting a different file). So this page
   /// takes file contents as data, the same contract `ShotDetailPage.fileSource`
@@ -122,8 +121,9 @@ class _SkillArticle extends StatelessWidget {
 
   @override
   // Each section is marked with `docs_layout.dart`'s [docsAnchorKey] so the
-  // page's own table of contents can reach it — see the equivalent note in
-  // `shots_docs/shot_detail_page.dart` for what an unmarked anchor used to do.
+  // page's own table of contents can reach it: an unmarked section has no
+  // anchor for `DocsLayout` to scroll to, and its TOC row silently does
+  // nothing.
   Widget build(BuildContext context) => Column(
     key: const ValueKey<String>('skill-doc-article'),
     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -410,7 +410,7 @@ class _CommandBlock extends StatelessWidget {
   Widget build(BuildContext context) {
     final DsThemeData theme = DsTheme.of(context);
     // Mapped onto `docs_code.dart`'s own command type rather than a
-    // hand-rolled equivalent — see that file's `DocsCodeCommand` and this
+    // hand-rolled equivalent: see that file's `DocsCodeCommand` and this
     // page's library doc.
     final DocsCodeCommand docsCommand = DocsCodeCommand(
       command: command.command,
@@ -470,7 +470,7 @@ class _VersionPanel extends StatelessWidget {
           label: 'Marketplace',
           value: entry.marketplaceName,
           description:
-              "This repository's own marketplace name — see "
+              "This repository's own marketplace name: see "
               '.claude-plugin/marketplace.json.',
         ),
         DocsInstallFact(
@@ -478,7 +478,7 @@ class _VersionPanel extends StatelessWidget {
           value: entry.repository,
           description:
               "Source of truth for the skill's files. Not a "
-              'copy-pasteable install command — see Install & manage above.',
+              'copy-pasteable install command: see Install & manage above.',
         ),
       ],
     ),

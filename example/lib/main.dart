@@ -19,6 +19,11 @@ import 'package:flutter/services.dart'
     show SystemChrome, SystemUiMode, rootBundle;
 
 import 'nav.dart';
+import 'docs_pages/catalog.dart';
+import 'docs_pages/cli_page.dart';
+import 'docs_pages/installation_page.dart';
+import 'docs_pages/introduction_page.dart';
+import 'docs_pages/theming_page.dart';
 import 'components_docs/button/page.dart';
 import 'components_docs/button_card_pages.dart' as legacy_button_card;
 import 'components_docs/dialog_page.dart';
@@ -122,10 +127,6 @@ import 'pages/transcript.dart';
 import 'pages/typography.dart';
 import 'shell.dart';
 import 'showcase/showcase_app.dart';
-import 'shots_docs/catalog.dart';
-import 'shots_docs/shot_detail_page.dart';
-import 'shots_docs/shot_preview_host.dart';
-import 'shots_docs/shots_index_page.dart';
 import 'skills_docs/catalog.dart';
 import 'skills_docs/skills_page.dart';
 import 'site/pages/public_pages.dart';
@@ -180,14 +181,9 @@ void runDocsApp({String? initialRoute}) {
           defaultTargetPlatform == TargetPlatform.iOS)) {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   }
-  // Warms the Shot sources so `/shots/<slug>` has a filled file tree on its
-  // first frame instead of the "not loaded" placeholder for a beat. Three
-  // small text files; the strings land in the asset bundle's own cache, which
-  // is what the page reads a moment later.
-  for (final ShotDocEntry entry in shotDocs) {
-    shotSourceFor(entry);
-  }
-  // Same, for `/skills` — eight Markdown files under 20 KB in total.
+  // Warms the Skill sources so `/skills` has a filled file tree on its first
+  // frame instead of the "not loaded" placeholder for a beat — eight Markdown
+  // files under 20 KB in total.
   for (final SkillDocEntry entry in skillDocs) {
     skillSourceFor(entry);
   }
@@ -390,21 +386,10 @@ class _DocsHome extends StatelessWidget {
     // the docs route table, and `shell_test` spends it against the nav, where
     // this href by construction does not appear.
 
-    // Resolved before the switch because its arm has to win before the
-    // `siteRouteFor` guard is consulted — see the arm's own note below.
-    final Widget? shotPreview = shotPreviewHostForRoute(route);
-
     final Widget home = DefaultSelectionStyle(
       selectionColor: DsPalette.action.withValues(alpha: _selectionAlpha),
       cursorColor: theme.foreground,
       child: switch (route) {
-        // ABOVE the `siteRouteFor` guard, deliberately. `/shots/<slug>/preview`
-        // begins with the public shots prefix, so a guard that resolved it as a
-        // site destination first would wrap the composition in the header,
-        // footer and search chrome the preview exists to omit. It sits outside
-        // the guard for the same reason `showcaseRoute` and `sidebarDemoRoute`
-        // do: it is a full-bleed surface, not a page inside the site shell.
-        _ when shotPreview != null => shotPreview,
         _ when siteRouteFor(route) != null => SiteShell(
           route: route,
           child: publicPageFor(
@@ -512,12 +497,8 @@ final Map<String, _ComponentDocPageBuilder> _componentDocPageBuilders =
 /// Resolves public website destinations without changing the
 /// established design-system specimen route table in [pageFor].
 Widget publicPageFor(String route, {PublicNavigate? onNavigate}) {
-  final ShotDocEntry? shot = shotDocForRoute(route);
-  if (shot != null) {
-    return _ShotDetailRoute(entry: shot, onNavigate: onNavigate);
-  }
-  // Resolved from the catalog, exactly as the Shot above it is, and NOT as a
-  // `skillsRoute` arm in the switch below. [SkillDocEntry.route] is the literal
+  // Resolved from the catalog, and NOT as a `skillsRoute` arm in the switch
+  // below. [SkillDocEntry.route] is the literal
   // `/skills` — there is one skill, and no index/detail split to model — so the
   // catalog is already the authority on which entry answers this path, and a
   // switch arm would be a second statement of the same fact. `/skills` is still
@@ -537,8 +518,11 @@ Widget publicPageFor(String route, {PublicNavigate? onNavigate}) {
   return switch (route) {
     homeRoute => PublicHomePage(onNavigate: onNavigate),
     docsRoute => PublicDocsPage(onNavigate: onNavigate),
+    docsIntroductionRoute => IntroductionDocsPage(onNavigate: onNavigate),
+    docsInstallationRoute => InstallationDocsPage(onNavigate: onNavigate),
+    docsThemingRoute => ThemingDocsPage(onNavigate: onNavigate),
+    docsCliRoute => CliDocsPage(onNavigate: onNavigate),
     componentsRoute => PublicComponentsPage(onNavigate: onNavigate),
-    shotsRoute => ShotsIndexPage(onNavigate: onNavigate),
     '/components/button' => const ButtonDocPage(),
     '/components/input' => const InputDocPage(),
     '/components/card' => const legacy_button_card.CardDocPage(),
@@ -546,97 +530,6 @@ Widget publicPageFor(String route, {PublicNavigate? onNavigate}) {
     '/components/select' => const SelectDocPage(),
     _ => PublicHomePage(onNavigate: onNavigate),
   };
-}
-
-/// The asset key for a repository-relative Shot source path.
-///
-/// [ShotDocEntry.sourcePaths] is rooted at the **repository**, because that is
-/// what the registry manifests and the source guard need. An asset key is
-/// rooted at the package that declares the asset, which for these files is
-/// `example/`. Stripping that one segment is the whole translation, and doing
-/// it here keeps `shots_docs/catalog.dart` the single authority on layout.
-String shotSourceAssetKey(String sourcePath) {
-  const String packageRoot = 'example/';
-  if (!sourcePath.startsWith(packageRoot)) {
-    throw ArgumentError.value(
-      sourcePath,
-      'sourcePath',
-      'Expected a path inside the example package',
-    );
-  }
-  return sourcePath.substring(packageRoot.length);
-}
-
-/// The real source of every file in [entry], keyed by plain file name — the
-/// shape [ShotDetailPage.fileSource] takes.
-///
-/// The compositions are declared as assets in `example/pubspec.yaml`, so the
-/// bytes the page renders are the bytes the generator hashes and the CLI
-/// copies: there is no second copy of a Shot's source anywhere, and therefore
-/// nothing that can drift from it. Reading the files with `dart:io` instead is
-/// not an option — a widget cannot reach the filesystem on web or mobile, which
-/// is precisely where this page is read.
-///
-/// Deliberately *not* memoised here. [rootBundle] is a `CachingAssetBundle` and
-/// already holds the decoded string, so a second call costs one small map; a
-/// second cache would only add a way to hand out a `Future` created in a scope
-/// that has since ended — which in a widget test means a load that never
-/// completes.
-Future<Map<String, String>> shotSourceFor(ShotDocEntry entry) async {
-  final Map<String, String> files = <String, String>{};
-  final List<String> paths = entry.sourcePaths;
-  for (int index = 0; index < entry.files.length; index++) {
-    final String key = shotSourceAssetKey(paths[index]);
-    try {
-      files[entry.files[index]] = await rootBundle.loadString(key);
-    } catch (error) {
-      // A file the bundle does not carry falls through to ShotDetailPage's own
-      // placeholder rather than taking the page down. The undeclared-asset case
-      // is caught at test time by `shots_catalog_parity_test.dart`, which fails
-      // when a catalog entry has no asset entry in `example/pubspec.yaml`.
-      debugPrint('Shot source "$key" is not in the asset bundle: $error');
-    }
-  }
-  return files;
-}
-
-/// [ShotDetailPage] with its file tree filled from the asset bundle.
-///
-/// The page itself takes the source as data — deliberately, so it stays a pure
-/// widget — which leaves someone to do the loading. That is this, at the same
-/// layer that already owns routing the page in.
-class _ShotDetailRoute extends StatefulWidget {
-  const _ShotDetailRoute({required this.entry, this.onNavigate});
-
-  final ShotDocEntry entry;
-  final PublicNavigate? onNavigate;
-
-  @override
-  State<_ShotDetailRoute> createState() => _ShotDetailRouteState();
-}
-
-class _ShotDetailRouteState extends State<_ShotDetailRoute> {
-  late Future<Map<String, String>> _source = shotSourceFor(widget.entry);
-
-  @override
-  void didUpdateWidget(covariant _ShotDetailRoute oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.entry.name != widget.entry.name) {
-      _source = shotSourceFor(widget.entry);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) => FutureBuilder<Map<String, String>>(
-    future: _source,
-    builder:
-        (BuildContext context, AsyncSnapshot<Map<String, String>> snapshot) =>
-            ShotDetailPage(
-              entry: widget.entry,
-              fileSource: snapshot.data ?? const <String, String>{},
-              onNavigate: widget.onNavigate,
-            ),
-  );
 }
 
 /// The asset key for a repository-relative skill source path.
@@ -669,14 +562,17 @@ String skillSourceAssetKey(String sourcePath) {
 /// The real source of every file in [entry], keyed by the path relative to the
 /// skill's own directory — the shape [SkillsPage.fileSource] takes.
 ///
-/// Same contract, and same reasoning, as [shotSourceFor]: the page renders the
-/// bytes on disk rather than a transcription of them, so there is no second
-/// copy to drift and no generation step to forget.
+/// The page renders the bytes on disk rather than a transcription of them, so
+/// there is no second copy to drift and no generation step to forget.
 /// `example/test/public_pages_test.dart` asserts that equality against
 /// `dart:io`, which is the only thing standing between this loader and a page
 /// that quietly shows stale text.
 ///
-/// Deliberately *not* memoised, for the reason [shotSourceFor] records.
+/// Deliberately *not* memoised. [rootBundle] is a `CachingAssetBundle` and
+/// already holds the decoded string, so a second call costs one small map; a
+/// second cache would only add a way to hand out a `Future` created in a scope
+/// that has since ended — which in a widget test means a load that never
+/// completes.
 Future<Map<String, String>> skillSourceFor(SkillDocEntry entry) async {
   final Map<String, String> files = <String, String>{};
   final List<String> paths = entry.sourcePaths;
@@ -696,9 +592,9 @@ Future<Map<String, String>> skillSourceFor(SkillDocEntry entry) async {
 
 /// [SkillsPage] with its file tree filled from the asset bundle.
 ///
-/// The mirror of [_ShotDetailRoute], and for the same reason: the page takes
-/// its source as data so it stays a pure widget, which leaves the loading to
-/// the layer that already owns routing the page in.
+/// The page takes its source as data — deliberately, so it stays a pure
+/// widget — which leaves someone to do the loading. That is this, at the same
+/// layer that already owns routing the page in.
 class _SkillsRoute extends StatefulWidget {
   const _SkillsRoute({required this.entry, this.onNavigate});
 

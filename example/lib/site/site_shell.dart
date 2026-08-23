@@ -98,8 +98,8 @@ class _SiteShellState extends State<SiteShell> {
       // it for the documentation shell and `showcase/showcase_app.dart:151`
       // states it for Signal Studio. Without it this subtree has no
       // [DefaultTextStyle] of its own, so every [DsText] inherits
-      // [WidgetsApp]'s fallback — 0xD0FF0000 ink under a double yellow
-      // underline, the "you forgot a Material" style — because [DsText] builds
+      // [WidgetsApp]'s fallback, 0xD0FF0000 ink under a double yellow
+      // underline, the "you forgot a Material" style: because [DsText] builds
       // with `inherit: true` and never declares a `decoration`, and because its
       // [DsTypeColor.none] classes resolve their ink from
       // `DefaultTextStyle.of(context).style.color`. Both leaked onto every
@@ -256,9 +256,14 @@ class _SiteHeader extends StatelessWidget {
                 ),
                 SizedBox(width: compactGap),
               ],
-              DsPress(
-                onTap: () => onNavigate(homeRoute),
-                child: Logo(showMark: !compact),
+              MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: DsPress(
+                  onTap: () => onNavigate(homeRoute),
+                  child: SelectionContainer.disabled(
+                    child: Logo(showMark: !compact),
+                  ),
+                ),
               ),
               if (desktop) ...<Widget>[
                 SizedBox(width: ds(6)),
@@ -483,9 +488,12 @@ class _SiteMobileNavigation extends StatelessWidget {
         children: <Widget>[
           Padding(
             padding: EdgeInsets.only(top: ds(4), bottom: ds(4), right: ds(12)),
-            child: DsPress(
-              onTap: () => onNavigate(homeRoute),
-              child: const Logo(),
+            child: MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: DsPress(
+                onTap: () => onNavigate(homeRoute),
+                child: SelectionContainer.disabled(child: const Logo()),
+              ),
             ),
           ),
           for (final SiteNavGroup group in footerSiteNavigation) ...<Widget>[
@@ -590,11 +598,16 @@ class _FooterColumn extends StatelessWidget {
           DsText(group.title, DsType.label, color: theme.foreground),
           SizedBox(height: ds(3)),
           for (final SiteNavEntry entry in group.entries) ...<Widget>[
-            DsPress(
-              onTap: () => onNavigate(entry.path),
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: ds(1)),
-                child: DsText(entry.title, DsType.small),
+            MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: DsPress(
+                onTap: () => onNavigate(entry.path),
+                child: SelectionContainer.disabled(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: ds(1)),
+                    child: DsText(entry.title, DsType.small),
+                  ),
+                ),
               ),
             ),
             SizedBox(height: ds(1)),

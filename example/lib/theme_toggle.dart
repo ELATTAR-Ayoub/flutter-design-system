@@ -1,16 +1,16 @@
-/// The three-way theme control — `components/ds/theme-toggle.tsx`.
+/// The three-way theme control, `components/ds/theme-toggle.tsx`.
 ///
 /// The reference's own reasoning, kept because it is the design decision:
 /// *"A two-way switch would have been smaller, but it cannot express 'follow
-/// the OS' — and a system that ships two themes and no way to defer to the
+/// the OS': and a system that ships two themes and no way to defer to the
 /// platform is making a decision on the user's behalf that is not its to
 /// make."*
 ///
 /// **The selection travels, because RULES §4 says it must.** Each option
 /// paints no background of its own; one pill moves between them
 /// ([DsSlidingPillGroup]) and lands with a squash. The web arrived here after
-/// shipping the forbidden version — every option owning `bg-card shadow-e1`
-/// when checked, one blinking on as another blinked off — for a long time.
+/// shipping the forbidden version: every option owning `bg-card shadow-e1`
+/// when checked, one blinking on as another blinked off: for a long time.
 ///
 /// The control reads the chosen **mode**, not the resolved theme: `System` has
 /// to look selected while it is painting dark.
@@ -19,15 +19,15 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:flutter/widgets.dart';
 
-/// `size-7` — one option.
+/// `size-7`: one option.
 final double _optionPx = ds(7);
 
-/// `size-3.5` — the glyph inside it.
+/// `size-3.5`: the glyph inside it.
 final double _iconPx = ds(3.5);
 
 /// These three icons are rendered **directly** in the reference
 /// (`<SunIcon className="size-3.5"/>`), not through `Icon`, so they keep
-/// lucide's own authored `stroke-width` instead of the size ladder's — which
+/// lucide's own authored `stroke-width` instead of the size ladder's: which
 /// at 14px would have snapped to 2.4.
 final double _iconStroke = DsIcon.strokeFor(DsIconPaths.viewBox);
 
@@ -153,8 +153,8 @@ class _ThemeOptionState extends State<_ThemeOption> {
           //
           // The option's class list is `press … transition-colors
           // duration-fast ease-out`. The `press` utility declares the whole
-          // `transition` shorthand — `transition: transform
-          // var(--duration-base) var(--ease-spring)` — and `transition-colors`
+          // `transition` shorthand, `transition: transform
+          // var(--duration-base) var(--ease-spring)`: and `transition-colors`
           // is emitted later at equal specificity, so it REPLACES that
           // shorthand's `transition-property` with the colour list. `transform`
           // is not in that list, so `:active { transform: scale(0.94) }`
@@ -178,7 +178,7 @@ class _ThemeOptionState extends State<_ThemeOption> {
             child: Center(
               child: TweenAnimationBuilder<Color?>(
                 tween: ColorTween(end: ink),
-                // `transition-colors duration-fast ease-out` — and
+                // `transition-colors duration-fast ease-out`: and
                 // `duration-fast` emits no CSS, so this is the framework
                 // default, probed at 0.25s.
                 duration: dsAnimationDuration(

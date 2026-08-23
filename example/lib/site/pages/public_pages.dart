@@ -12,6 +12,7 @@ import '../../kit.dart';
 import '../../nav.dart';
 import '../../components_docs/catalog.dart';
 import '../site_routes.dart' show skillsRoute;
+import 'home_showcase.dart';
 
 typedef PublicNavigate = void Function(String route);
 
@@ -19,24 +20,15 @@ const String publicHomeRoute = '/';
 const String publicDocsRoute = '/docs';
 const String publicComponentsRoute = '/components';
 
-/// Neither `/shots` nor `/skills` has a constant here, on purpose. There is
-/// exactly one spelling of each — `shotsRoute` and `skillsRoute` in
-/// `site/site_routes.dart`, which the header nav, the search index and the
-/// router all read. `publicShotsRoute` was a second copy of the first and went
-/// with `PublicShotsPage` in Phase G; `publicSkillsRoute` was a second copy of
-/// the second and went with `PublicSkillsPage` in Phase H, when
+/// `/skills` has no constant here, on purpose. There is exactly one spelling
+/// of it, `skillsRoute` in `site/site_routes.dart`, which the header nav, the
+/// search index and the router all read. `publicSkillsRoute` was a second copy
+/// of it and went with `PublicSkillsPage` in Phase H, when
 /// `skills_docs/skills_page.dart` took the route. This library imports
-/// `skillsRoute` for its one remaining caller — the docs link card below.
+/// `skillsRoute` for its one remaining caller: the docs link card below.
 ///
 /// The remaining `public*Route` constants are pre-Phase-G aliases of the same
 /// paths and are left as they are: each still has a caller in this library.
-
-final List<DsCategory> _featuredCategories = <DsCategory>[
-  findCategory('foundations', 'colors').category,
-  findCategory('foundations', 'typography').category,
-  findCategory('base', 'buttons').category,
-  findCategory('base', 'dialogs').category,
-];
 
 class PublicHomePage extends StatelessWidget {
   const PublicHomePage({super.key, this.onNavigate});
@@ -50,114 +42,82 @@ class PublicHomePage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          _Hero(onNavigate: onNavigate),
-          SizedBox(height: ds(16)),
-          _SectionHeading(
-            eyebrow: 'FOUNDATION FIRST',
-            title: 'A system that arrives ready to use.',
-            description:
-                'Start with the visual foundation, then copy only the components your product needs. Every layer stays local, inspectable and yours.',
-          ),
+          SizedBox(height: ds(4)),
+          Center(child: _HeroPill(onNavigate: onNavigate)),
           SizedBox(height: ds(6)),
-          DsGrid(
-            sm: 3,
-            children: const <Widget>[
-              _FeatureCard(
-                index: '01',
-                title: 'Copy the foundation',
-                body:
-                    'Theme, typography, color and motion are the default starting point.',
+          Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: DsContainers.xl2),
+              child: DsText(
+                'Build the interface\nyou mean.',
+                DsType.display,
+                fontSize: DsFluid.display(context),
+                align: TextAlign.center,
+                color: theme.foreground,
               ),
-              _FeatureCard(
-                index: '02',
-                title: 'Add by intent',
-                body:
-                    'Install a component into components/ui when you actually need it.',
-              ),
-              _FeatureCard(
-                index: '03',
-                title: 'Own the result',
-                body:
-                    'Generated files are readable Flutter code, made for your repository.',
-              ),
-            ],
+            ),
           ),
-          SizedBox(height: ds(16)),
-          DsPanel(
-            label: 'QUICKSTART',
-            note: '0.0.1',
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                DsText(
-                  'One command to begin.',
-                  DsType.h3,
-                  color: theme.foreground,
-                ),
-                SizedBox(height: ds(2)),
-                DsText(
-                  'Initialize the system in a Flutter project, then add components as your interface grows.',
-                  DsType.body,
-                ),
-                SizedBox(height: ds(5)),
-                const _CodeSnippet(
-                  code: 'dart run elattar_cli init --foundation source',
-                ),
-                SizedBox(height: ds(5)),
-                Wrap(
-                  spacing: ds(3),
-                  runSpacing: ds(3),
-                  children: <Widget>[
-                    DsButton(
-                      onPressed: onNavigate == null
-                          ? null
-                          : () => onNavigate!(publicDocsRoute),
-                      child: const Text('Read the docs'),
-                    ),
-                    DsButton(
-                      variant: DsButtonVariant.outline,
-                      onPressed: onNavigate == null
-                          ? null
-                          : () => onNavigate!(publicComponentsRoute),
-                      child: const Text('Browse components'),
-                    ),
-                  ],
-                ),
-              ],
+          SizedBox(height: ds(5)),
+          Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: DsContainers.md),
+              child: DsText(
+                'A copy-first design system for Flutter. Start with the '
+                'foundation, add only the pieces you need, and keep every '
+                'decision visible in your own codebase.',
+                DsType.lead,
+                align: TextAlign.center,
+              ),
+            ),
+          ),
+          SizedBox(height: ds(7)),
+          Center(
+            child: DsButton(
+              size: DsButtonSize.lg,
+              onPressed: onNavigate == null
+                  ? null
+                  : () => onNavigate!(publicDocsRoute),
+              child: const Text('Start building'),
             ),
           ),
           SizedBox(height: ds(16)),
-          _SectionHeading(
-            eyebrow: 'SELECTED STARTING POINTS',
-            title: 'See the decisions before the details.',
-            description:
-                'A small set of live references to help you choose the right next step.',
-          ),
-          SizedBox(height: ds(6)),
-          DsGrid(
-            sm: 2,
-            children: <Widget>[
-              for (final DsCategory category in _featuredCategories)
-                _PublicLinkCard(
-                  title: category.title,
-                  body: category.blurb,
-                  label: category.contents.take(3).join(' · '),
-                  onPressed: onNavigate == null
-                      ? null
-                      : () => onNavigate!(
-                          category.slug == 'colors'
-                              ? '/design-system/colors'
-                              : category.slug == 'typography'
-                              ? '/design-system/typography'
-                              : '/design-system/components/base/${category.slug}',
-                        ),
-                ),
-            ],
-          ),
+          HomeMasonryGrid(sm: 2, lg: 3, children: homeShowcaseCards()),
         ],
       ),
     );
   }
+}
+
+/// The pill at the top of the hero: a small, tappable, pill-shaped link, the
+/// way https://ui.shadcn.com/ leads with "Introducing…" above its own
+/// headline. [DsButton] is already pill-radius by default (see
+/// `DsButton.build`'s `widget.radius ?? BorderRadius.circular(DsRadii.pill)`),
+/// so this is a plain outline button sized down, not a bespoke shape.
+class _HeroPill extends StatelessWidget {
+  const _HeroPill({this.onNavigate});
+
+  final PublicNavigate? onNavigate;
+
+  @override
+  Widget build(BuildContext context) => DsButton(
+    size: DsButtonSize.sm,
+    variant: DsButtonVariant.outline,
+    onPressed: onNavigate == null
+        ? null
+        : () => onNavigate!(publicComponentsRoute),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        const Text('Browse components'),
+        SizedBox(width: ds(1.5)),
+        const DsIcon(
+          DsIconGlyph.arrowRight,
+          size: DsIconSize.xs,
+          tone: DsIconTone.muted,
+        ),
+      ],
+    ),
+  );
 }
 
 class PublicDocsPage extends StatelessWidget {
@@ -255,7 +215,7 @@ class PublicComponentsPage extends StatelessWidget {
   }
 }
 
-/// `/skills` is no longer served from this library. `PublicSkillsPage` — a
+/// `/skills` is no longer served from this library. `PublicSkillsPage`: a
 /// hand-written summary of the skill, with three cards restating its workflow —
 /// was retired when `skills_docs/skills_page.dart`'s `SkillsPage` took the
 /// route in Phase H. The real page reads the skill's own catalog entry, so the
@@ -292,123 +252,6 @@ class _PublicPage extends StatelessWidget {
       ),
     ),
   );
-}
-
-class _Hero extends StatelessWidget {
-  const _Hero({this.onNavigate});
-
-  final PublicNavigate? onNavigate;
-
-  @override
-  Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
-    return DsPanel(
-      bodyPadding: EdgeInsets.all(ds(8)),
-      bodyFill: theme.card,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          DsBadge(
-            label: 'FLUTTER · OPEN SOURCE',
-            variant: DsBadgeVariant.action,
-          ),
-          SizedBox(height: ds(5)),
-          DsText(
-            'Build the interface\nyou mean.',
-            DsType.h1,
-            fontSize: DsFluid.h1(context),
-            color: theme.foreground,
-          ),
-          SizedBox(height: ds(4)),
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: DsContainers.md),
-            child: DsText(
-              'A copy-first design system for Flutter. Start with the foundation, add the pieces you need, and keep every decision visible in your own codebase.',
-              DsType.lead,
-            ),
-          ),
-          SizedBox(height: ds(6)),
-          Wrap(
-            spacing: ds(3),
-            runSpacing: ds(3),
-            children: <Widget>[
-              DsButton(
-                size: DsButtonSize.lg,
-                onPressed: onNavigate == null
-                    ? null
-                    : () => onNavigate!(publicDocsRoute),
-                child: const Text('Start building'),
-              ),
-              DsButton(
-                size: DsButtonSize.lg,
-                variant: DsButtonVariant.outline,
-                onPressed: onNavigate == null
-                    ? null
-                    : () => onNavigate!(publicComponentsRoute),
-                child: const Text('Explore the library'),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SectionHeading extends StatelessWidget {
-  const _SectionHeading({
-    required this.eyebrow,
-    required this.title,
-    required this.description,
-  });
-
-  final String eyebrow;
-  final String title;
-  final String description;
-
-  @override
-  Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        DsText(eyebrow, DsType.label, color: theme.actionInk),
-        SizedBox(height: ds(2)),
-        DsText(title, DsType.h2, color: theme.foreground),
-        SizedBox(height: ds(2)),
-        ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: DsContainers.md),
-          child: DsText(description, DsType.body),
-        ),
-      ],
-    );
-  }
-}
-
-class _FeatureCard extends StatelessWidget {
-  const _FeatureCard({
-    required this.index,
-    required this.title,
-    required this.body,
-  });
-
-  final String index;
-  final String title;
-  final String body;
-
-  @override
-  Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
-    return DsCard(
-      children: <Widget>[
-        DsCardHeader(
-          title: DsText(title, DsType.h4, color: theme.foreground),
-          description: DsText(index, DsType.numSm, color: theme.actionInk),
-        ),
-        DsCardContent(child: DsText(body, DsType.small)),
-      ],
-    );
-  }
 }
 
 class _PublicLinkCard extends StatelessWidget {
@@ -458,16 +301,6 @@ class _PublicLinkCard extends StatelessWidget {
   }
 }
 
-class _CodeSnippet extends StatelessWidget {
-  const _CodeSnippet({required this.code});
-
-  final String code;
-
-  @override
-  Widget build(BuildContext context) =>
-      DsAgentCodeBlock(code: code, language: 'bash');
-}
-
 class _DocsList extends StatelessWidget {
   const _DocsList({this.onNavigate});
 
@@ -505,7 +338,7 @@ class _DocsList extends StatelessWidget {
           title: 'Skills',
           // Not "install": the skill's routes are documented but not yet
           // verified end to end, and the Skills page says so itself, route by
-          // route. `skillsRoute`, not a literal — one spelling of `/skills`.
+          // route. `skillsRoute`, not a literal: one spelling of `/skills`.
           body: 'The workflow that keeps implementation consistent.',
           route: skillsRoute,
         ),

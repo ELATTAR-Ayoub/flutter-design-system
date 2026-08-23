@@ -1,8 +1,8 @@
-/// The colours page's engine — `components/ds/token-swatch.tsx`.
+/// The colours page's engine, `components/ds/token-swatch.tsx`.
 ///
 /// The premise of `/design-system/colors` is *measured, not asserted*: no hex
 /// on that page is typed by hand, and no contrast claim is written down. The
-/// web gets this from the platform — it paints a hidden probe `div`, asks the
+/// web gets this from the platform: it paints a hidden probe `div`, asks the
 /// browser to rasterise `var(--token)`, reads the computed `rgb()` back, and
 /// does the WCAG arithmetic on whatever came out. A `MutationObserver` on
 /// `<html>`'s `class` attribute drops the memo caches when next-themes flips
@@ -11,12 +11,12 @@
 /// Flutter has no cascade to interrogate, so the two halves separate:
 ///
 /// * **Resolution** ([DsTokenRegistry.resolve]) maps a CSS custom-property name
-///   onto the live [DsThemeData]. It reads the package tokens — the same
-///   objects every other widget paints with — so a swatch cannot disagree with
+///   onto the live [DsThemeData]. It reads the package tokens: the same
+///   objects every other widget paints with: so a swatch cannot disagree with
 ///   the thing it is documenting. It never re-parses [DsTokenRegistry
 ///   .printedValue]; the printed text is a *readout*, not a source.
 /// * **The printed value** ([DsTokenRegistry.printedValue]) is the text
-///   `getComputedStyle().getPropertyValue()` hands back — which is *not* the
+///   `getComputedStyle().getPropertyValue()` hands back: which is *not* the
 ///   text `app/globals.css` authors. The stylesheet writes `hsl(240 10% 3.9%)`;
 ///   the browser is served `#09090b`, because Tailwind v4 compiles the sheet
 ///   through Lightning CSS, whose colour minifier rewrites every colour to its
@@ -48,7 +48,7 @@ import 'package:flutter/widgets.dart';
 // under the colour system. They are named here instead, one per line, so the
 // arithmetic below reads as the specification it transcribes.
 
-/// WCAG 2.x relative luminance — the linearisation threshold on the `0..1`
+/// WCAG 2.x relative luminance: the linearisation threshold on the `0..1`
 /// channel. The reference writes it in `token-swatch.tsx`'s `luminance()`.
 const double _linearThreshold = 0.03928; // allow-hardcoded: WCAG 2.x constant
 
@@ -73,7 +73,7 @@ const double _luminanceGreen = 0.7152; // allow-hardcoded: WCAG 2.x constant
 /// Blue's share of relative luminance.
 const double _luminanceBlue = 0.0722; // allow-hardcoded: WCAG 2.x constant
 
-/// The flare term in `(hi + 0.05) / (lo + 0.05)` — the ambient light the
+/// The flare term in `(hi + 0.05) / (lo + 0.05)`: the ambient light the
 /// standard assumes falls on the screen, which is what keeps the ratio finite.
 const double _contrastFlare = 0.05; // allow-hardcoded: WCAG 2.x constant
 
@@ -110,7 +110,7 @@ double _relativeLuminance(double r, double g, double b) =>
 
 /// The WCAG 2.x contrast ratio between [fg] and [bg], `1.0 … 21.0`.
 ///
-/// [fg] is alpha-composited over [bg] before its luminance is taken — the
+/// [fg] is alpha-composited over [bg] before its luminance is taken: the
 /// reference does this so a wash measured against the page reports the ratio a
 /// reader actually sees, not the ratio of the colour it was mixed from. [bg] is
 /// used as given, exactly as `contrast()` in `token-swatch.tsx` does; a
@@ -120,7 +120,7 @@ double _relativeLuminance(double r, double g, double b) =>
 double dsContrastRatio(Color fg, Color bg) {
   final bool translucent = fg.a < 1;
 
-  /// `composite()` — straight source-over on un-premultiplied channels.
+  /// `composite()`: straight source-over on un-premultiplied channels.
   double over(double f, double b) =>
       translucent ? f * fg.a + b * (1 - fg.a) : f;
 
@@ -137,7 +137,7 @@ double dsContrastRatio(Color fg, Color bg) {
 
 /// The badge's verdict word for [ratio].
 ///
-/// Computed on the **raw** ratio, never on the printed one — that gap is
+/// Computed on the **raw** ratio, never on the printed one: that gap is
 /// deliberate and visible on the page. `--color-value-dark` on dark measures
 /// 3.98, which is below AA and is graded "AA large / UI only", yet the badge
 /// beside it prints `4.0:1`. Rounding for the reader must not round for the
@@ -162,14 +162,14 @@ Color dsContrastVerdictColor(double ratio, DsThemeData theme) =>
 String dsContrastRatioLabel(double ratio) => ratio.toStringAsFixed(1);
 
 /// Everything the badge says before the verdict, including the separator and
-/// its trailing space — the reference's `Contrast {ratio.toFixed(1)}:1 ·{" "}`.
+/// its trailing space: the reference's `Contrast {ratio.toFixed(1)}:1 ·{" "}`.
 String dsContrastBadgePrefix(double ratio) =>
     'Contrast ${dsContrastRatioLabel(ratio)}:1 · ';
 
 /// The whole badge as one string, **as authored**: `Contrast 13.5:1 · AAA`.
 ///
 /// What renders is this string uppercased, because the badge is `.type-micro`
-/// and that class carries `text-transform: uppercase` — so the pixels read
+/// and that class carries `text-transform: uppercase`: so the pixels read
 /// `CONTRAST 13.5:1 · AAA`. Both forms are worth having: this one is the copy
 /// the reference source contains, and `.toUpperCase()` of it is the copy a
 /// screenshot contains.
@@ -183,7 +183,7 @@ String dsContrastBadgeText(double ratio) =>
 /// A colour written the way the reference's compiled stylesheet writes it.
 ///
 /// `getComputedStyle().getPropertyValue('--background')` returns the declaration
-/// text as the browser parsed it — but the browser never sees `globals.css`.
+/// text as the browser parsed it: but the browser never sees `globals.css`.
 /// Tailwind v4 compiles it through Lightning CSS, whose colour minifier rewrites
 /// every colour to the shortest equivalent form, so `hsl(240 10% 3.9%)` arrives
 /// as `#09090b` and `hsl(0 0% 100%)` as `#fff`. Measured on the live dev server,
@@ -194,8 +194,8 @@ String dsContrastBadgeText(double ratio) =>
 /// CSS named colour when one is shorter (`red` beats `#f00`), and it would emit
 /// `rgb()` if that were ever shorter than hex (it is not, for an opaque colour).
 /// No token in this system lands on a named colour; if a rebrand ever moved one
-/// onto `red`, `contrast_test.dart`'s round-trip — which parses every printed
-/// value back to a [Color] — is what would catch it.
+/// onto `red`, `contrast_test.dart`'s round-trip: which parses every printed
+/// value back to a [Color]: is what would catch it.
 ///
 /// Alpha follows the same rule in eight digits (`#000000df` is how the
 /// reference's own captured-theme block arrives). No registered token is
@@ -228,7 +228,7 @@ String dsCssColorText(Color color) {
 ///
 /// Always a field read: the token IS the theme's field, and going through
 /// anything else would re-introduce the second source of truth this file exists
-/// to remove. The printed text is no longer a second half to keep in step — it
+/// to remove. The printed text is no longer a second half to keep in step: it
 /// is [dsCssColorText] of whatever this returns.
 typedef _DsToken = Color Function(DsThemeData theme);
 
@@ -268,7 +268,7 @@ class DsTokenRegistry {
 
     // ── The ramps, `@theme static` (L103–109) ──────────────────────────────
     // Declared once, outside both theme blocks, so these read identically in
-    // light and dark — only what they MEAN changes, and that is the ink
+    // light and dark: only what they MEAN changes, and that is the ink
     // tokens' job.
     '--color-action-bright': (DsThemeData t) => DsPalette.actionBright,
     '--color-action': (DsThemeData t) => DsPalette.action,
@@ -331,14 +331,14 @@ class DsTokenRegistry {
   /// Every registered custom-property name.
   static Iterable<String> get names => _tokens.keys;
 
-  /// Whether [cssName] is registered — the guard a widget checks before asking
+  /// Whether [cssName] is registered: the guard a widget checks before asking
   /// for a value, so a typo renders the web's own `—` placeholder instead of
   /// crashing a docs page.
   static bool has(String cssName) => _tokens.containsKey(cssName);
 
   /// The live [Color] for [cssName] in [theme].
   ///
-  /// Resolution goes through the package's own token objects — the same
+  /// Resolution goes through the package's own token objects: the same
   /// [DsThemeData] fields a button paints with. It deliberately does NOT parse
   /// [printedValue]: the printed text is documentation, and documentation that
   /// feeds back into rendering is how a docs page starts lying.
@@ -346,16 +346,16 @@ class DsTokenRegistry {
       _require(cssName)(theme);
 
   /// The text `getComputedStyle().getPropertyValue(cssName)` returns under
-  /// [kind] — the compiled stylesheet's shortest-hex form, not the `hsl()` the
+  /// [kind]: the compiled stylesheet's shortest-hex form, not the `hsl()` the
   /// stylesheet source authors. See [dsCssColorText].
   static String printedValue(String cssName, DsThemeKind kind) =>
       dsCssColorText(resolve(cssName, themeOf(kind)));
 
-  /// The theme block [kind] selects — `.dark` or `:root, .light`.
+  /// The theme block [kind] selects, `.dark` or `:root, .light`.
   static DsThemeData themeOf(DsThemeKind kind) =>
       kind == DsThemeKind.dark ? DsThemeData.dark : DsThemeData.light;
 
-  /// The measured ratio of [cssName] against [against] in [theme] — the port of
+  /// The measured ratio of [cssName] against [against] in [theme]: the port of
   /// `useContrast`.
   static double contrastRatio(
     String cssName,
@@ -381,7 +381,7 @@ class DsTokenRegistry {
 /// `ContrastBadge`'s default: everything is measured against the page.
 const String _defaultAgainst = '--background';
 
-/// What the web renders when `getPropertyValue` comes back empty — and, before
+/// What the web renders when `getPropertyValue` comes back empty: and, before
 /// hydration, for every token. Flutter has no hydration gap, so here it means
 /// only one thing: the token is not registered.
 const String _unresolved = '—';
@@ -390,7 +390,7 @@ const String _unresolved = '—';
 // Widgets
 // ─────────────────────────────────────────────────────────────────────────────
 
-/// The token's value as the stylesheet spells it — `TokenValue`.
+/// The token's value as the stylesheet spells it, `TokenValue`.
 ///
 /// `span.type-num-sm.text-muted-foreground`.
 class DsTokenValue extends StatelessWidget {
@@ -409,14 +409,14 @@ class DsTokenValue extends StatelessWidget {
   }
 }
 
-/// The measured ratio and its verdict — `ContrastBadge`.
+/// The measured ratio and its verdict, `ContrastBadge`.
 ///
 /// `span.type-micro.text-muted-foreground` with only the verdict word tinted,
 /// so it is one [Text.rich] rather than a [Row]: the verdict has to wrap with
 /// the sentence, not beside it.
 ///
 /// `.type-micro` uppercases, and `text-transform` is inherited, so the WHOLE
-/// badge renders in caps — `CONTRAST 13.5:1 · AAA`. [dsContrastBadgeText] is
+/// badge renders in caps, `CONTRAST 13.5:1 · AAA`. [dsContrastBadgeText] is
 /// the authored casing; this widget paints its uppercase.
 class DsContrastBadge extends StatelessWidget {
   const DsContrastBadge(this.token, {super.key, this.against = _defaultAgainst});
@@ -463,7 +463,7 @@ class DsContrastBadge extends StatelessWidget {
   }
 }
 
-/// One documented token: painted, named, valued and measured — `TokenSwatch`.
+/// One documented token: painted, named, valued and measured, `TokenSwatch`.
 ///
 /// `grid items-center gap-4 p-4 sm:grid-cols-[5.5rem_minmax(0,13rem)_1fr]
 /// sm:gap-6`. Below `sm` the three cells stack in one column at 16px gaps;
@@ -471,7 +471,7 @@ class DsContrastBadge extends StatelessWidget {
 ///
 /// The two fixed tracks are written through [ds] rather than as pixels:
 /// Tailwind's `--spacing` unit is 4px, so `5.5rem` is `ds(22)` and `13rem` is
-/// `ds(52)` — the same arithmetic the framework does, kept in the same
+/// `ds(52)`: the same arithmetic the framework does, kept in the same
 /// vocabulary as every other measure on the page.
 class DsTokenSwatch extends StatelessWidget {
   const DsTokenSwatch({
@@ -482,7 +482,7 @@ class DsTokenSwatch extends StatelessWidget {
     this.measure = true,
   });
 
-  /// The CSS custom-property name — painted, printed, and named in the row.
+  /// The CSS custom-property name: painted, printed, and named in the row.
   final String token;
 
   /// The human label, `p.type-h4.text-foreground`.
@@ -496,10 +496,10 @@ class DsTokenSwatch extends StatelessWidget {
   /// a number without a question.
   final bool measure;
 
-  /// `sm:grid-cols-[5.5rem_…]` — 5.5rem = 88px.
+  /// `sm:grid-cols-[5.5rem_…]`, 5.5rem = 88px.
   static final double _swatchTrack = ds(22);
 
-  /// `minmax(0, 13rem)` — 13rem = 208px, the middle track's cap.
+  /// `minmax(0, 13rem)`, 13rem = 208px, the middle track's cap.
   static final double _nameTrack = ds(52);
 
   @override
@@ -507,7 +507,7 @@ class DsTokenSwatch extends StatelessWidget {
     final DsThemeData theme = DsTheme.of(context);
     final bool wide = MediaQuery.sizeOf(context).width >= DsBreakpoints.sm;
 
-    // `h-16 sm:h-14` — 64px, tightening to 56px once the row goes horizontal.
+    // `h-16 sm:h-14`, 64px, tightening to 56px once the row goes horizontal.
     final Widget swatch = SizedBox(
       height: wide ? ds(14) : ds(16),
       child: DecoratedBox(
@@ -576,7 +576,7 @@ class DsTokenSwatch extends StatelessWidget {
   }
 }
 
-/// The card the swatches sit in — `TokenSwatchList`.
+/// The card the swatches sit in, `TokenSwatchList`.
 ///
 /// `divide-y divide-border overflow-hidden rounded-xl border border-border
 /// bg-card`: a 16px card with a 1px hairline BETWEEN rows and none before the
@@ -595,14 +595,14 @@ class DsTokenSwatchList extends StatelessWidget {
     final List<Widget> children = <Widget>[];
     for (int i = 0; i < rows.length; i++) {
       if (i > 0) {
-        // `divide-y divide-border` — one hairline per GAP, not per row.
+        // `divide-y divide-border`: one hairline per GAP, not per row.
         children.add(Container(height: DsWidths.hairline, color: theme.border));
       }
       children.add(rows[i]);
     }
 
     return Container(
-      // `overflow-hidden` — the corners clip the first and last row.
+      // `overflow-hidden`: the corners clip the first and last row.
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: theme.card,
