@@ -19,7 +19,8 @@ import 'package:flutter/services.dart'
     show SystemChrome, SystemUiMode, rootBundle;
 
 import 'nav.dart';
-import 'components_docs/button_card_pages.dart';
+import 'components_docs/button/page.dart';
+import 'components_docs/button_card_pages.dart' as legacy_button_card;
 import 'components_docs/dialog_page.dart';
 import 'components_docs/input_select_pages.dart';
 import 'components_docs/accordion/meta.dart' as accordion;
@@ -540,7 +541,7 @@ Widget publicPageFor(String route, {PublicNavigate? onNavigate}) {
     shotsRoute => ShotsIndexPage(onNavigate: onNavigate),
     '/components/button' => const ButtonDocPage(),
     '/components/input' => const InputDocPage(),
-    '/components/card' => const CardDocPage(),
+    '/components/card' => const legacy_button_card.CardDocPage(),
     '/components/dialog' => const DialogDocPage(),
     '/components/select' => const SelectDocPage(),
     _ => PublicHomePage(onNavigate: onNavigate),

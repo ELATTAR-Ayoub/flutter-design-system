@@ -10,15 +10,12 @@
 /// that. Every other component page is expected to be reshaped to match this
 /// one, not the other way around.
 ///
-/// **Flat TOC, by design, not by oversight.** [DocsTocEntry] (in
-/// `../../docs/docs_layout.dart`, which this file does not own and must not
-/// edit) is `{title, anchor}` — it has no child/parent relationship. The
-/// thirteen `example-*` anchors below are meant to read as children of
-/// `examples`; until a sibling worker lands nested-TOC support on
-/// `DocsLayout`, they are passed as flat, sequential entries, and the
-/// supervisor is expected to re-nest them once that support exists. Nothing
-/// about the anchors, section ids, or content needs to change for that —
-/// only the shape of the list passed to `toc:`.
+/// **Nested TOC.** [DocsTocEntry] (in `../../docs/docs_layout.dart`) now
+/// carries one level of `children`, so `Examples` is a single parent entry
+/// and the thirteen `example-*` anchors are its `children` — rendered
+/// indented beneath it in the "ON THIS PAGE" rail and flattened back in next
+/// to it in the narrow anchor strip. Anchors and section ids are unchanged;
+/// only the shape of the list passed to `toc:` nests.
 ///
 /// Two descriptions live in `meta.dart`, the same split `popover` and
 /// `tooltip` already use: [ComponentDocEntry.description] is the short,
@@ -55,27 +52,29 @@ class ButtonDocPage extends StatelessWidget {
       DsBreadcrumbEntry.link('Components'),
       DsBreadcrumbEntry.page('Button'),
     ],
-    sidebar: _sidebar,
     toc: const <DocsTocEntry>[
       DocsTocEntry(title: 'Preview', anchor: 'preview'),
       DocsTocEntry(title: 'Installation', anchor: 'install'),
       DocsTocEntry(title: 'Usage', anchor: 'usage'),
-      // "Examples" and the thirteen entries under it are flat siblings today
-      // — see the library doc above.
-      DocsTocEntry(title: 'Examples', anchor: 'examples'),
-      DocsTocEntry(title: 'Default', anchor: 'example-default'),
-      DocsTocEntry(title: 'Premium', anchor: 'example-premium'),
-      DocsTocEntry(title: 'Secondary', anchor: 'example-secondary'),
-      DocsTocEntry(title: 'Destructive', anchor: 'example-destructive'),
-      DocsTocEntry(title: 'Outline', anchor: 'example-outline'),
-      DocsTocEntry(title: 'Ghost', anchor: 'example-ghost'),
-      DocsTocEntry(title: 'Link', anchor: 'example-link'),
-      DocsTocEntry(title: 'Icon', anchor: 'example-icon'),
-      DocsTocEntry(title: 'With icon', anchor: 'example-with-icon'),
-      DocsTocEntry(title: 'Loading', anchor: 'example-loading'),
-      DocsTocEntry(title: 'Disabled', anchor: 'example-disabled'),
-      DocsTocEntry(title: 'Sizes', anchor: 'example-sizes'),
-      DocsTocEntry(title: 'Emphasis (caps)', anchor: 'example-emphasis'),
+      DocsTocEntry(
+        title: 'Examples',
+        anchor: 'examples',
+        children: <DocsTocEntry>[
+          DocsTocEntry(title: 'Default', anchor: 'example-default'),
+          DocsTocEntry(title: 'Premium', anchor: 'example-premium'),
+          DocsTocEntry(title: 'Secondary', anchor: 'example-secondary'),
+          DocsTocEntry(title: 'Destructive', anchor: 'example-destructive'),
+          DocsTocEntry(title: 'Outline', anchor: 'example-outline'),
+          DocsTocEntry(title: 'Ghost', anchor: 'example-ghost'),
+          DocsTocEntry(title: 'Link', anchor: 'example-link'),
+          DocsTocEntry(title: 'Icon', anchor: 'example-icon'),
+          DocsTocEntry(title: 'With icon', anchor: 'example-with-icon'),
+          DocsTocEntry(title: 'Loading', anchor: 'example-loading'),
+          DocsTocEntry(title: 'Disabled', anchor: 'example-disabled'),
+          DocsTocEntry(title: 'Sizes', anchor: 'example-sizes'),
+          DocsTocEntry(title: 'Emphasis (caps)', anchor: 'example-emphasis'),
+        ],
+      ),
       DocsTocEntry(title: 'API Reference', anchor: 'api'),
       DocsTocEntry(title: 'States', anchor: 'states'),
       DocsTocEntry(title: 'Accessibility', anchor: 'accessibility'),
@@ -90,21 +89,6 @@ class ButtonDocPage extends StatelessWidget {
     child: const _ButtonArticle(),
   );
 }
-
-/// The five already-registered `catalog.dart` components. Static rather than
-/// derived from that file: `catalog.dart` is supervisor-owned, and this list
-/// only needs to match its current five entries, not import them.
-const List<DocsSidebarEntry> _sidebar = <DocsSidebarEntry>[
-  DocsSidebarEntry(
-    title: 'Button',
-    route: '/components/button',
-    selected: true,
-  ),
-  DocsSidebarEntry(title: 'Card', route: '/components/card'),
-  DocsSidebarEntry(title: 'Input', route: '/components/input'),
-  DocsSidebarEntry(title: 'Dialog', route: '/components/dialog'),
-  DocsSidebarEntry(title: 'Select', route: '/components/select'),
-];
 
 class _ButtonArticle extends StatelessWidget {
   const _ButtonArticle();

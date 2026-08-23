@@ -170,10 +170,6 @@ class _ArticleContentState extends State<_ArticleContent> {
                 width: ds(64),
                 key: const ValueKey<String>('input-group-doc-password-field'),
                 child: DsInputGroup(
-                  child: DsInputGroupInput(
-                    placeholder: 'Enter password',
-                    obscureText: !_passwordVisible,
-                  ),
                   endAddon: DsInputGroupAddon(
                     align: DsInputGroupAlign.end,
                     holdsButton: true,
@@ -190,6 +186,10 @@ class _ArticleContentState extends State<_ArticleContent> {
                         tone: DsIconTone.inherit,
                       ),
                     ),
+                  ),
+                  child: DsInputGroupInput(
+                    placeholder: 'Enter password',
+                    obscureText: !_passwordVisible,
                   ),
                 ),
               ),

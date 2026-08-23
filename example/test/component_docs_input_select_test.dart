@@ -48,11 +48,15 @@ void main() {
     );
     expect(editable.readOnly, isTrue);
 
-    final Finder cardLink = find.widgetWithText(DsButton, 'Card').last;
-    await tester.ensureVisible(cardLink);
-    await tester.tap(cardLink);
+    // `_pageLinkAfter('input')` walks the real, now-34-entry `componentDocs`
+    // catalog rather than a hand-picked five-page list, so the pager's own
+    // "next" neighbour is whichever entry actually follows `input` there —
+    // `input_group`, not `card`. See `catalog.dart`'s declared order.
+    final Finder nextLink = find.widgetWithText(DsButton, 'Input group').last;
+    await tester.ensureVisible(nextLink);
+    await tester.tap(nextLink);
     await tester.pumpAndSettle();
-    expect(navigated, contains('/components/card'));
+    expect(navigated, contains('/components/input_group'));
   });
 
   testWidgets('Input docs render narrow anchor strip', (
@@ -110,11 +114,16 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Selected: popular'), findsOneWidget);
 
-    final Finder dialogLink = find.widgetWithText(DsButton, 'Dialog').last;
-    await tester.ensureVisible(dialogLink);
-    await tester.tap(dialogLink);
+    // Same reasoning as the Input page's pager assertion above: `select`'s
+    // real "next" neighbour in the 34-entry `componentDocs` catalog is
+    // `separator`, not `dialog`.
+    final Finder nextLink = find
+        .widgetWithText(DsButton, 'Separator, Empty & Kbd')
+        .last;
+    await tester.ensureVisible(nextLink);
+    await tester.tap(nextLink);
     await tester.pumpAndSettle();
-    expect(navigated, contains('/components/dialog'));
+    expect(navigated, contains('/components/separator'));
   });
 
   testWidgets('Select docs show narrow layout and width demo toggle', (
@@ -132,7 +141,9 @@ void main() {
       find.byKey(const ValueKey<String>('docs-layout-anchor-strip')),
       findsOneWidget,
     );
-    final Finder expandToggle = find.widgetWithText(DsButton, 'Expand off').first;
+    final Finder expandToggle = find
+        .widgetWithText(DsButton, 'Expand off')
+        .first;
     await tester.ensureVisible(expandToggle);
     await tester.tap(expandToggle);
     await tester.pumpAndSettle();

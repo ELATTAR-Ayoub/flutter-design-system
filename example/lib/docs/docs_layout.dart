@@ -22,7 +22,57 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:flutter/material.dart';
 
+import '../components_docs/catalog.dart' show ComponentDocEntry, componentDocs;
 import '../kit.dart' show DsSection;
+import '../site/site_routes.dart' show SiteRoute, SiteSection, siteRoutes;
+import 'docs_sidebar.dart';
+
+export 'docs_sidebar.dart' show DocsSidebar, DocsSidebarEntry, DocsSidebarGroup;
+
+/// The "Sections" then "Components" rail [_DocsLayoutState.build] falls back
+/// to when a page supplies neither [DocsLayout.sidebarGroups] nor the legacy
+/// [DocsLayout.sidebar] list.
+///
+/// "Sections" lists the top-level public destinations from
+/// `../site/site_routes.dart`, deliberately **excluding** [SiteSection.home]:
+/// an earlier audit found stale `/docs/*` sub-routes that dead-ended on the
+/// homepage inside this very rail, and Home is the one top-level destination
+/// that is never useful to reach *from inside* the documentation shell. What
+/// is left — `/docs`, `/components`, `/shots`, `/skills` — is exactly what
+/// `main.dart`'s `publicPageFor` resolves today: `/docs`, `/components` and
+/// `/shots` on their own switch arms, `/skills` one guard above it via
+/// `skillDocForRoute`. Nothing listed here is a dead link.
+///
+/// "Components" lists every `../components_docs/catalog.dart` entry —
+/// already alphabetical by title, per that file's own contract — with
+/// whichever one matches [route] marked [DocsSidebarEntry.selected].
+List<DocsSidebarGroup> _defaultSidebarGroups(String route) {
+  return <DocsSidebarGroup>[
+    DocsSidebarGroup(
+      label: 'Sections',
+      items: <DocsSidebarEntry>[
+        for (final SiteRoute site in siteRoutes)
+          if (site.section != SiteSection.home)
+            DocsSidebarEntry(
+              title: site.title,
+              route: site.path,
+              selected: site.path == route,
+            ),
+      ],
+    ),
+    DocsSidebarGroup(
+      label: 'Components',
+      items: <DocsSidebarEntry>[
+        for (final ComponentDocEntry component in componentDocs)
+          DocsSidebarEntry(
+            title: component.title,
+            route: component.route,
+            selected: component.route == route,
+          ),
+      ],
+    ),
+  ];
+}
 
 /// The key a documentation article marks an in-page anchor target with.
 ///
@@ -37,23 +87,23 @@ import '../kit.dart' show DsSection;
 /// it. Resolution walks the mounted article instead ([_DocsLayoutState._anchorContext]).
 Key docsAnchorKey(String anchor) => ValueKey<String>('docs-anchor:$anchor');
 
-class DocsSidebarEntry {
-  const DocsSidebarEntry({
+/// An entry in the "ON THIS PAGE" rail (or the narrow anchor strip it
+/// collapses to). [children] is one level of nested sub-entries — a
+/// component page's "Examples" section lists each variant demo beneath it,
+/// for instance — rendered indented under [title] and scrolled to the same
+/// way a top-level entry is. A deeper level than that is not rendered: the
+/// reference layout never needs one, so [_TableOfContents] does not recurse
+/// into a child's own `children`.
+class DocsTocEntry {
+  const DocsTocEntry({
     required this.title,
-    required this.route,
-    this.selected = false,
+    required this.anchor,
+    this.children = const <DocsTocEntry>[],
   });
 
   final String title;
-  final String route;
-  final bool selected;
-}
-
-class DocsTocEntry {
-  const DocsTocEntry({required this.title, required this.anchor});
-
-  final String title;
   final String anchor;
+  final List<DocsTocEntry> children;
 }
 
 class DocsPageIntro {
@@ -84,6 +134,7 @@ class DocsLayout extends StatefulWidget {
     required this.child,
     this.breadcrumbs = const <DsBreadcrumbEntry>[],
     this.sidebar = const <DocsSidebarEntry>[],
+    this.sidebarGroups = const <DocsSidebarGroup>[],
     this.toc = const <DocsTocEntry>[],
     this.previous,
     this.next,
@@ -94,7 +145,18 @@ class DocsLayout extends StatefulWidget {
   final DocsPageIntro intro;
   final Widget child;
   final List<DsBreadcrumbEntry> breadcrumbs;
+
+  /// Legacy ungrouped rail data — one flat list, no group label. Ignored
+  /// once [sidebarGroups] is non-empty; kept only so pages that predate the
+  /// grouped rail keep compiling and rendering unchanged. New callers should
+  /// prefer [sidebarGroups].
   final List<DocsSidebarEntry> sidebar;
+
+  /// The grouped left rail — "Sections" then "Components" in the reference
+  /// layout. Takes priority over [sidebar] whenever it is non-empty. A page
+  /// that supplies neither this nor [sidebar] gets [_defaultSidebarGroups]
+  /// instead of an empty rail — see that function.
+  final List<DocsSidebarGroup> sidebarGroups;
   final List<DocsTocEntry> toc;
   final DocsPageLink? previous;
   final DocsPageLink? next;
@@ -184,6 +246,13 @@ class _DocsLayoutState extends State<DocsLayout> {
     final bool wide = viewport >= DsBreakpoints.lg;
     final bool extraWide = viewport >= DsBreakpoints.xl;
     final List<DocsTocEntry> toc = widget.toc;
+    final List<DocsSidebarGroup> sidebarGroups = widget.sidebarGroups.isNotEmpty
+        ? widget.sidebarGroups
+        : widget.sidebar.isEmpty
+        ? _defaultSidebarGroups(widget.route)
+        : <DocsSidebarGroup>[
+            DocsSidebarGroup(label: 'IN THIS GUIDE', items: widget.sidebar),
+          ];
 
     final Widget article = _Article(
       key: _article,
@@ -212,8 +281,8 @@ class _DocsLayoutState extends State<DocsLayout> {
                 SizedBox(
                   key: const ValueKey<String>('docs-layout-sidebar'),
                   width: DsWidths.rail,
-                  child: _Sidebar(
-                    entries: widget.sidebar,
+                  child: DocsSidebar(
+                    groups: sidebarGroups,
                     onNavigate: _navigate,
                   ),
                 ),
@@ -306,64 +375,9 @@ class _Article extends StatelessWidget {
   }
 }
 
-class _Sidebar extends StatelessWidget {
-  const _Sidebar({required this.entries, required this.onNavigate});
-
-  final List<DocsSidebarEntry> entries;
-  final ValueChanged<String> onNavigate;
-
-  @override
-  Widget build(BuildContext context) {
-    if (entries.isEmpty) return const SizedBox.shrink();
-    return Semantics(
-      container: true,
-      label: 'Documentation navigation',
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          DsText('IN THIS GUIDE', DsType.label),
-          SizedBox(height: ds(3)),
-          for (final DocsSidebarEntry entry in entries)
-            _RouteRow(entry: entry, onNavigate: onNavigate),
-        ],
-      ),
-    );
-  }
-}
-
-class _RouteRow extends StatelessWidget {
-  const _RouteRow({required this.entry, required this.onNavigate});
-
-  final DocsSidebarEntry entry;
-  final ValueChanged<String> onNavigate;
-
-  @override
-  Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
-    return Semantics(
-      link: true,
-      selected: entry.selected,
-      child: GestureDetector(
-        onTap: () => onNavigate(entry.route),
-        behavior: HitTestBehavior.opaque,
-        child: Container(
-          key: ValueKey<String>('docs-sidebar:${entry.route}'),
-          padding: EdgeInsets.symmetric(horizontal: ds(3), vertical: ds(2)),
-          decoration: BoxDecoration(
-            color: entry.selected ? theme.muted : null,
-            borderRadius: BorderRadius.circular(DsRadii.md),
-          ),
-          child: DsText(
-            entry.title,
-            DsType.small,
-            color: entry.selected ? theme.foreground : theme.mutedForeground,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
+/// The "ON THIS PAGE" rail. [entries] renders as given; any entry's
+/// [DocsTocEntry.children] render indented immediately beneath it, one level
+/// only — see the type's own doc comment.
 class _TableOfContents extends StatelessWidget {
   const _TableOfContents({required this.entries, required this.onAnchor});
 
@@ -391,18 +405,46 @@ class _TableOfContents extends StatelessWidget {
         children: <Widget>[
           DsText('ON THIS PAGE', DsType.label),
           SizedBox(height: ds(3)),
-          for (final DocsTocEntry entry in entries)
-            GestureDetector(
-              key: ValueKey<String>('docs-layout-toc-entry:${entry.anchor}'),
-              onTap: () => onAnchor(entry.anchor),
-              behavior: HitTestBehavior.opaque,
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: ds(1.5)),
-                child: DsText(entry.title, DsType.small),
-              ),
-            ),
+          for (final DocsTocEntry entry in entries) ...<Widget>[
+            _TocRow(entry: entry, onAnchor: onAnchor),
+            for (final DocsTocEntry child in entry.children)
+              _TocRow(entry: child, onAnchor: onAnchor, indented: true),
+          ],
         ],
       ),
+    );
+  }
+}
+
+class _TocRow extends StatelessWidget {
+  const _TocRow({
+    required this.entry,
+    required this.onAnchor,
+    this.indented = false,
+  });
+
+  final DocsTocEntry entry;
+
+  /// Scrolls the article to a section. **Not** a router — see the library note.
+  final ValueChanged<String> onAnchor;
+  final bool indented;
+
+  @override
+  Widget build(BuildContext context) {
+    final Widget row = GestureDetector(
+      key: ValueKey<String>('docs-layout-toc-entry:${entry.anchor}'),
+      onTap: () => onAnchor(entry.anchor),
+      behavior: HitTestBehavior.opaque,
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: ds(1.5)),
+        child: DsText(entry.title, DsType.small),
+      ),
+    );
+    if (!indented) return row;
+    return Padding(
+      key: ValueKey<String>('docs-layout-toc-child:${entry.anchor}'),
+      padding: EdgeInsets.only(left: ds(4)),
+      child: row,
     );
   }
 }
@@ -417,15 +459,23 @@ class _AnchorStrip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Flattened one level deep, so a nested "Examples" child stays reachable
+    // even where there is no room for the indented rail — see DocsTocEntry.
+    final List<DocsTocEntry> flat = <DocsTocEntry>[
+      for (final DocsTocEntry entry in entries) ...<DocsTocEntry>[
+        entry,
+        ...entry.children,
+      ],
+    ];
     return SizedBox(
       key: const ValueKey<String>('docs-layout-anchor-strip'),
       height: ds(10),
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        itemCount: entries.length,
+        itemCount: flat.length,
         separatorBuilder: (_, _) => SizedBox(width: ds(2)),
         itemBuilder: (BuildContext context, int index) {
-          final DocsTocEntry entry = entries[index];
+          final DocsTocEntry entry = flat[index];
           return DsButton(
             key: ValueKey<String>('docs-layout-anchor-chip:${entry.anchor}'),
             variant: DsButtonVariant.outline,
