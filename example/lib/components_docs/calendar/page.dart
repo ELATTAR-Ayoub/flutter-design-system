@@ -1501,11 +1501,7 @@ class _DatePickerDisabledSpecimen extends StatelessWidget {
     key: const ValueKey<String>('calendar-doc-picker-disabled'),
     child: const Align(
       alignment: Alignment.centerLeft,
-      child: DsDatePicker(
-        value: null,
-        onChanged: null,
-        placeholder: 'Locked',
-      ),
+      child: DsDatePicker(value: null, onChanged: null, placeholder: 'Locked'),
     ),
   );
 }

@@ -629,11 +629,7 @@ void main() {
     testWidgets('a narrow light viewport is covered too', (
       WidgetTester tester,
     ) async {
-      await _pumpCalendarDoc(
-        tester,
-        size: _narrow,
-        mode: DsThemeMode.light,
-      );
+      await _pumpCalendarDoc(tester, size: _narrow, mode: DsThemeMode.light);
       expect(_specimen('calendar-doc-article'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });

@@ -216,14 +216,8 @@ class _TableArticle extends StatelessWidget {
             header: const <DsTableCellSpec>[
               DsTableCellSpec(child: Text('Type')),
               DsTableCellSpec(child: Text('Detail')),
-              DsTableCellSpec(
-                child: Text('Amount'),
-                align: DsTableAlign.end,
-              ),
-              DsTableCellSpec(
-                child: Text('Status'),
-                align: DsTableAlign.end,
-              ),
+              DsTableCellSpec(child: Text('Amount'), align: DsTableAlign.end),
+              DsTableCellSpec(child: Text('Status'), align: DsTableAlign.end),
             ],
             rows: <DsTableRowSpec>[
               for (final _TxRow row in _previewRows)
@@ -392,7 +386,8 @@ class _TableArticle extends StatelessWidget {
             DocsApiFact(
               name: 'DsTable.headerHeight',
               type: 'static double',
-              description: 'The header row’s whole box — 40px, rule '
+              description:
+                  'The header row’s whole box — 40px, rule '
                   'included.',
             ),
             DocsApiFact(
@@ -645,7 +640,8 @@ class _TableArticle extends StatelessWidget {
               'dsTableHoverDuration), which collapses to Duration.zero when '
               'MediaQuery.disableAnimationsOf(context) is true — verified '
               'in table_test.dart.',
-          userSignal: 'The hover fill still appears, instantly instead of '
+          userSignal:
+              'The hover fill still appears, instantly instead of '
               'fading.',
         ),
         DocsStateFact(
@@ -845,7 +841,8 @@ class _TableArticle extends StatelessWidget {
         ),
         DocsCodeFile(
           path: 'data_table_demo_recipe.dart',
-          title: 'example/lib/data_table_demo.dart’s sort/filter/select/page recipe',
+          title:
+              'example/lib/data_table_demo.dart’s sort/filter/select/page recipe',
           description:
               'Where the behaviour DsTable does not have actually lives — '
               'a StatefulWidget rebuilding header/rows from its own state '
