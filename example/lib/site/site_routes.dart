@@ -243,7 +243,10 @@ final List<SearchRoute> searchableRoutes = List<SearchRoute>.unmodifiable(
         title: group.title,
         description: group.blurb,
         section: SiteSection.docs,
-        keywords: List<String>.unmodifiable(<String>[group.id, 'design system']),
+        keywords: List<String>.unmodifiable(<String>[
+          group.id,
+          'design system',
+        ]),
         groupId: group.id,
       ),
     for (final DsGroup group in dsGroups)
@@ -253,7 +256,10 @@ final List<SearchRoute> searchableRoutes = List<SearchRoute>.unmodifiable(
           title: category.title,
           description: category.blurb,
           section: SiteSection.docs,
-          keywords: List<String>.unmodifiable(<String>[group.id, ...category.contents]),
+          keywords: List<String>.unmodifiable(<String>[
+            group.id,
+            ...category.contents,
+          ]),
           groupId: group.id,
           slug: category.slug,
         ),

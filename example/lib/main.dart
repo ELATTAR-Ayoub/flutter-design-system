@@ -22,6 +22,74 @@ import 'nav.dart';
 import 'components_docs/button_card_pages.dart';
 import 'components_docs/dialog_page.dart';
 import 'components_docs/input_select_pages.dart';
+import 'components_docs/accordion/meta.dart' as accordion;
+import 'components_docs/accordion/page.dart';
+import 'components_docs/alert/meta.dart' as alert;
+import 'components_docs/alert/page.dart';
+import 'components_docs/alert_dialog/meta.dart' as alert_dialog;
+import 'components_docs/alert_dialog/page.dart';
+import 'components_docs/avatar/meta.dart' as avatar;
+import 'components_docs/avatar/page.dart';
+import 'components_docs/badge/meta.dart' as badge;
+import 'components_docs/badge/page.dart';
+import 'components_docs/breadcrumb/meta.dart' as breadcrumb;
+import 'components_docs/breadcrumb/page.dart';
+import 'components_docs/calendar/meta.dart' as calendar;
+import 'components_docs/calendar/page.dart';
+import 'components_docs/carousel/meta.dart' as carousel;
+import 'components_docs/carousel/page.dart';
+import 'components_docs/checkbox/meta.dart' as checkbox;
+import 'components_docs/checkbox/page.dart';
+import 'components_docs/collapsible/meta.dart' as collapsible;
+import 'components_docs/collapsible/page.dart';
+import 'components_docs/command/meta.dart' as command;
+import 'components_docs/command/page.dart';
+import 'components_docs/dropdown_menu/meta.dart' as dropdown_menu;
+import 'components_docs/dropdown_menu/page.dart';
+import 'components_docs/field/meta.dart' as field;
+import 'components_docs/field/page.dart';
+import 'components_docs/icon/meta.dart' as icon;
+import 'components_docs/icon/page.dart';
+import 'components_docs/input_group/meta.dart' as input_group;
+import 'components_docs/input_group/page.dart';
+import 'components_docs/native_select/meta.dart' as native_select;
+import 'components_docs/native_select/page.dart';
+import 'components_docs/navigation_menu/meta.dart' as navigation_menu;
+import 'components_docs/navigation_menu/page.dart';
+import 'components_docs/pagination/meta.dart' as pagination;
+import 'components_docs/pagination/page.dart';
+import 'components_docs/popover/meta.dart' as popover;
+import 'components_docs/popover/page.dart';
+import 'components_docs/progress/meta.dart' as progress;
+import 'components_docs/progress/page.dart';
+import 'components_docs/radio/meta.dart' as radio;
+import 'components_docs/radio/page.dart';
+import 'components_docs/scroll_area/meta.dart' as scroll_area;
+import 'components_docs/scroll_area/page.dart';
+import 'components_docs/separator/meta.dart' as separator;
+import 'components_docs/separator/page.dart';
+import 'components_docs/sheet/meta.dart' as sheet;
+import 'components_docs/sheet/page.dart';
+import 'components_docs/sidebar/meta.dart' as sidebar;
+import 'components_docs/sidebar/page.dart';
+import 'components_docs/slider/meta.dart' as slider;
+import 'components_docs/slider/page.dart';
+import 'components_docs/stat/meta.dart' as stat;
+import 'components_docs/stat/page.dart';
+import 'components_docs/switch/meta.dart' as switch_;
+import 'components_docs/switch/page.dart';
+import 'components_docs/table/meta.dart' as table;
+import 'components_docs/table/page.dart';
+import 'components_docs/tabs/meta.dart' as tabs;
+import 'components_docs/tabs/page.dart';
+import 'components_docs/textarea/meta.dart' as textarea;
+import 'components_docs/textarea/page.dart';
+import 'components_docs/toaster/meta.dart' as toaster;
+import 'components_docs/toaster/page.dart';
+import 'components_docs/toggle/meta.dart' as toggle;
+import 'components_docs/toggle/page.dart';
+import 'components_docs/tooltip/meta.dart' as tooltip;
+import 'components_docs/tooltip/page.dart';
 import 'pages/agent_avatar.dart';
 import 'pages/agent_voice.dart';
 import 'pages/buttons.dart';
@@ -359,6 +427,87 @@ class _DocsHome extends StatelessWidget {
   }
 }
 
+/// One page constructor per per-component `meta.dart`/`page.dart` pair.
+typedef _ComponentDocPageBuilder =
+    Widget Function({ValueChanged<String>? onNavigate});
+
+/// Maps every non-Phase-F component's route to its page constructor.
+///
+/// Keyed off each imported `<name>Doc.route` — never a hand-typed
+/// `/components/<name>` literal — so a route can only drift from
+/// `catalog.dart` if the `meta.dart` const it reads from does. `button`,
+/// `input`, `card`, `dialog`, and `select` are deliberately absent: they stay
+/// on their own switch arms below, unmigrated, exactly as they were before
+/// this map existed.
+final Map<String, _ComponentDocPageBuilder> _componentDocPageBuilders =
+    <String, _ComponentDocPageBuilder>{
+      accordion.accordionDoc.route: ({onNavigate}) =>
+          AccordionDocPage(onNavigate: onNavigate),
+      alert.alertDoc.route: ({onNavigate}) =>
+          AlertDocPage(onNavigate: onNavigate),
+      alert_dialog.alertDialogDoc.route: ({onNavigate}) =>
+          AlertDialogDocPage(onNavigate: onNavigate),
+      avatar.avatarDoc.route: ({onNavigate}) =>
+          AvatarDocPage(onNavigate: onNavigate),
+      badge.badgeDoc.route: ({onNavigate}) =>
+          BadgeDocPage(onNavigate: onNavigate),
+      breadcrumb.breadcrumbDoc.route: ({onNavigate}) =>
+          BreadcrumbDocPage(onNavigate: onNavigate),
+      calendar.calendarDoc.route: ({onNavigate}) =>
+          CalendarDocPage(onNavigate: onNavigate),
+      carousel.carouselDoc.route: ({onNavigate}) =>
+          CarouselDocPage(onNavigate: onNavigate),
+      checkbox.checkboxDoc.route: ({onNavigate}) =>
+          CheckboxDocPage(onNavigate: onNavigate),
+      collapsible.collapsibleDoc.route: ({onNavigate}) =>
+          CollapsibleDocPage(onNavigate: onNavigate),
+      command.commandDoc.route: ({onNavigate}) =>
+          CommandDocPage(onNavigate: onNavigate),
+      dropdown_menu.dropdownMenuDoc.route: ({onNavigate}) =>
+          DropdownMenuDocPage(onNavigate: onNavigate),
+      field.fieldDoc.route: ({onNavigate}) =>
+          FieldDocPage(onNavigate: onNavigate),
+      icon.iconDoc.route: ({onNavigate}) => IconDocPage(onNavigate: onNavigate),
+      input_group.inputGroupDoc.route: ({onNavigate}) =>
+          InputGroupDocPage(onNavigate: onNavigate),
+      native_select.nativeSelectDoc.route: ({onNavigate}) =>
+          NativeSelectDocPage(onNavigate: onNavigate),
+      navigation_menu.navigationMenuDoc.route: ({onNavigate}) =>
+          NavigationMenuDocPage(onNavigate: onNavigate),
+      pagination.paginationDoc.route: ({onNavigate}) =>
+          PaginationDocPage(onNavigate: onNavigate),
+      popover.popoverDoc.route: ({onNavigate}) =>
+          PopoverDocPage(onNavigate: onNavigate),
+      progress.progressDoc.route: ({onNavigate}) =>
+          ProgressDocPage(onNavigate: onNavigate),
+      radio.radioDoc.route: ({onNavigate}) =>
+          RadioDocPage(onNavigate: onNavigate),
+      scroll_area.scrollAreaDoc.route: ({onNavigate}) =>
+          ScrollAreaDocPage(onNavigate: onNavigate),
+      separator.separatorDoc.route: ({onNavigate}) =>
+          SeparatorDocPage(onNavigate: onNavigate),
+      sheet.sheetDoc.route: ({onNavigate}) =>
+          SheetDocPage(onNavigate: onNavigate),
+      sidebar.sidebarDoc.route: ({onNavigate}) =>
+          SidebarDocPage(onNavigate: onNavigate),
+      slider.sliderDoc.route: ({onNavigate}) =>
+          SliderDocPage(onNavigate: onNavigate),
+      stat.statDoc.route: ({onNavigate}) => StatDocPage(onNavigate: onNavigate),
+      switch_.switchDoc.route: ({onNavigate}) =>
+          SwitchDocPage(onNavigate: onNavigate),
+      table.tableDoc.route: ({onNavigate}) =>
+          TableDocPage(onNavigate: onNavigate),
+      tabs.tabsDoc.route: ({onNavigate}) => TabsDocPage(onNavigate: onNavigate),
+      textarea.textareaDoc.route: ({onNavigate}) =>
+          TextareaDocPage(onNavigate: onNavigate),
+      toaster.toasterDoc.route: ({onNavigate}) =>
+          ToasterDocPage(onNavigate: onNavigate),
+      toggle.toggleDoc.route: ({onNavigate}) =>
+          ToggleDocPage(onNavigate: onNavigate),
+      tooltip.tooltipDoc.route: ({onNavigate}) =>
+          TooltipDocPage(onNavigate: onNavigate),
+    };
+
 /// Resolves public website destinations without changing the
 /// established design-system specimen route table in [pageFor].
 Widget publicPageFor(String route, {PublicNavigate? onNavigate}) {
@@ -376,6 +525,13 @@ Widget publicPageFor(String route, {PublicNavigate? onNavigate}) {
   final SkillDocEntry? skill = skillDocForRoute(route);
   if (skill != null) {
     return _SkillsRoute(entry: skill, onNavigate: onNavigate);
+  }
+  // The ~35 non-Phase-F component docs resolve through the map above,
+  // built once from the catalog, instead of 35 more switch arms below.
+  final _ComponentDocPageBuilder? componentPage =
+      _componentDocPageBuilders[route];
+  if (componentPage != null) {
+    return componentPage(onNavigate: onNavigate);
   }
   return switch (route) {
     homeRoute => PublicHomePage(onNavigate: onNavigate),
