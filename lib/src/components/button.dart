@@ -1053,10 +1053,35 @@ class _DsButtonState extends State<DsButton> {
         onPointerUp: (_) => _setPressed(false),
         onPointerCancel: (_) => _setPressed(false),
         child: MouseRegion(
-          cursor: _enabled ? SystemMouseCursors.click : MouseCursor.defer,
+          // `<button>` — a native button's cursor is `pointer` (or the UA
+          // default arrow when disabled) over its ENTIRE box, label included;
+          // a button's text is never independently text-selectable the way a
+          // paragraph is. Both halves of that are stated explicitly rather
+          // than deferred: [MouseCursor.defer] would let whatever sits behind
+          // this region decide, and on a page wrapped in `SelectionArea`
+          // (every docs page — `example/lib/shell.dart`,
+          // `example/lib/site/site_shell.dart`) something always does.
+          //
+          // `Text.build` (`flutter/lib/src/widgets/text.dart`) wraps ITSELF in
+          // `MouseRegion(cursor: SystemMouseCursors.text, ...)` whenever
+          // `SelectionContainer.maybeOf(context)` is non-null, which is exactly
+          // what an ambient `SelectionArea` supplies. That inner region sits
+          // deeper in the render tree than this one, and
+          // `MouseTracker`/`_DeferringMouseCursor.firstNonDeferred` resolves
+          // the pointer's cursor by walking the hit-test path front-to-back
+          // and taking the first NON-deferred cursor it finds — so the
+          // label's own text-cursor region wins over this one regardless of
+          // what this one requests, undoing [SystemMouseCursors.click] the
+          // instant the pointer is over the glyphs rather than the padding
+          // around them. [SelectionContainer.disabled] below removes the
+          // registrar for this subtree, so `Text.build` never wraps the label
+          // in that competing region in the first place — this MouseRegion is
+          // then the only cursor annotation left anywhere inside the button,
+          // and it is what wins, everywhere, both states.
+          cursor: _enabled ? SystemMouseCursors.click : SystemMouseCursors.basic,
           onEnter: (_) => _setHovered(true),
           onExit: (_) => _setHovered(false),
-          child: button,
+          child: SelectionContainer.disabled(child: button),
         ),
       ),
     );

@@ -6,7 +6,7 @@
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
   "files": [
-    {"source": "lib/src/components/button.dart", "target": "@ui/button.dart", "sha256": "85313f89f3c68f98a94e3a72e2edce2a5c5474b2f48dc0b800bc5209ef898a2b"}
+    {"source": "lib/src/components/button.dart", "target": "@ui/button.dart", "sha256": "43715b4c41a4d73f92b008fa87bdbfe4fe7e1315814305af1ebb59daf6c74263"}
   ],
   "registryDependencies": ["source-foundation", "press-motion", "icon", "spinner", "foil-value", "machine-surface", "sheen-action"],
   "pubDependencies": {},

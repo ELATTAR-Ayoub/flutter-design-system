@@ -21,12 +21,6 @@
       "documentationRoute": "/components/card"
     },
     {
-      "name": "dashboard-overview",
-      "type": "shot",
-      "version": "0.0.1",
-      "documentationRoute": "/shots/dashboard-overview"
-    },
-    {
       "name": "dialog",
       "type": "component",
       "version": "0.0.1",
@@ -87,22 +81,10 @@
       "documentationRoute": "/components/select"
     },
     {
-      "name": "settings-profile",
-      "type": "shot",
-      "version": "0.0.1",
-      "documentationRoute": "/shots/settings-profile"
-    },
-    {
       "name": "sheen-action",
       "type": "effect",
       "version": "0.0.1",
       "documentationRoute": "/docs/effects/sheen-action"
-    },
-    {
-      "name": "sign-in-flow",
-      "type": "shot",
-      "version": "0.0.1",
-      "documentationRoute": "/shots/sign-in-flow"
     },
     {
       "name": "source-foundation",

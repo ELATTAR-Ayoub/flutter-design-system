@@ -1708,6 +1708,9 @@ class DsToast extends StatelessWidget {
   /// port's own, shipped and pinned before the choreography landed, and kept:
   /// a pointer-only affordance on a surface that lives for four seconds is not
   /// something to take away for symmetry.
+  ///
+  /// Null in a static preview: the card renders with no dismiss handler at
+  /// all, and the pointer cursor is withheld to match.
   final VoidCallback? onDismiss;
 
   /// `height: var(--front-toast-height)` — the outer box height to pin to, or
@@ -1885,10 +1888,17 @@ class DsToast extends StatelessWidget {
       container: true,
       liveRegion: true,
       label: message.title,
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: onDismiss,
-        child: toast,
+      // The tap is the port's own affordance (see [onDismiss]), so the cursor
+      // that marks it is too: a pointer on the whole card only while a tap
+      // would actually do something.
+      child: MouseRegion(
+        cursor:
+            onDismiss != null ? SystemMouseCursors.click : SystemMouseCursors.basic,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: onDismiss,
+          child: toast,
+        ),
       ),
     );
   }
