@@ -338,7 +338,7 @@ class _ToasterArticle extends StatelessWidget {
                   name: 'DsToaster.unmountDelay (static)',
                   type: 'Duration',
                   description:
-                      'Duration(milliseconds: 200) -- 200ms. How long a '
+                      'Duration(milliseconds: 200) -- 200ms. How long a ' // allow-hardcoded: prose describing DsToaster.unmountDelay, not a value used
                       'dismissed toast stays mounted after '
                       'DsToastController.dismiss before it is actually '
                       'removed (sonner\'s TIME_BEFORE_UNMOUNT); every exit '
@@ -349,7 +349,7 @@ class _ToasterArticle extends StatelessWidget {
                   name: 'DsToaster.transition (static)',
                   type: 'Duration',
                   description:
-                      'Duration(milliseconds: 400) -- 400ms. The window '
+                      'Duration(milliseconds: 400) -- 400ms. The window ' // allow-hardcoded: prose describing DsToaster.transition, not a value used
                       'the entrance, the collapse, the expand, and two of '
                       'the three exits all ride.',
                 ),
@@ -357,7 +357,7 @@ class _ToasterArticle extends StatelessWidget {
                   name: 'DsToaster.collapsedExitTransform (static)',
                   type: 'Duration',
                   description:
-                      'Duration(milliseconds: 500) -- 500ms. The transform '
+                      'Duration(milliseconds: 500) -- 500ms. The transform ' // allow-hardcoded: prose describing DsToaster.collapsedExitTransform, not a value used
                       'half of a back toast\'s collapsed exit; its opacity '
                       'half is unmountDelay\'s 200ms.',
                 ),
@@ -365,7 +365,7 @@ class _ToasterArticle extends StatelessWidget {
                   name: 'DsToaster.swipeOutDuration (static)',
                   type: 'Duration',
                   description:
-                      'Duration(milliseconds: 200) -- 200ms. The '
+                      'Duration(milliseconds: 200) -- 200ms. The ' // allow-hardcoded: prose describing DsToaster.swipeOutDuration, not a value used
                       'thrown-away animation once a swipe clears the '
                       'threshold.',
                 ),
@@ -1120,7 +1120,7 @@ class _ToasterPreviewState extends State<_ToasterPreview> {
             variant: DsButtonVariant.secondary,
             size: DsButtonSize.sm,
             onPressed: () => _controller.promise<void>(
-              Future<void>.delayed(const Duration(milliseconds: 1200)),
+              Future<void>.delayed(DsDurations.reward),
               loading: 'Saving…',
               success: 'Saved',
               error: 'Could not save',

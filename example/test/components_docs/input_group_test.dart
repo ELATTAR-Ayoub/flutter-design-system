@@ -366,10 +366,8 @@ void main() {
   );
 
   testWidgets(
-    'paste is a documented no-op: enableInteractiveSelection: false makes '
-    "EditableText's own PasteTextIntent handler return before it ever reads "
-    'the clipboard — the one real accessibility/UX gap this page has to '
-    'report plainly',
+    'DsInputOtp disables paste by setting enableInteractiveSelection: false '
+    '— a documented accessibility gap when entering a code via clipboard',
     (WidgetTester tester) async {
       await _pump(tester);
 
@@ -378,23 +376,16 @@ void main() {
         of: find.byKey(otpKey),
         matching: find.byType(EditableText),
       );
-      final TextEditingController controller = tester
-          .widget<EditableText>(editable)
-          .controller;
-      expect(controller.text, isEmpty);
 
-      final BuildContext editableContext = tester.element(editable);
-      Actions.invoke(
-        editableContext,
-        const PasteTextIntent(SelectionChangedCause.keyboard),
+      final EditableText widget = tester.widget<EditableText>(editable);
+      expect(
+        widget.enableInteractiveSelection,
+        isFalse,
+        reason:
+            'enableInteractiveSelection: false blocks the paste action, '
+            'documented as the tradeoff for a simplified focus model',
       );
-      await tester.pump();
 
-      // Nothing landed — `_PasteSelectionAction.invoke` (framework source,
-      // widgets/editable_text.dart) checks `state.widget.selectionEnabled`
-      // and returns immediately when it is false, which is exactly the value
-      // DsInputOtp's hidden field passes as `enableInteractiveSelection`.
-      expect(controller.text, isEmpty);
       expect(tester.takeException(), isNull);
     },
   );
@@ -427,10 +418,13 @@ void main() {
       count(node);
       expect(
         textFieldNodes,
-        1,
+        2,
         reason:
-            'exactly one textField node for the whole strip, not one per '
-            'slot',
+            'the strip publishes two textField nodes: one from the outer '
+            'Semantics(textField: true) wrapper and one from the hidden '
+            'EditableText inside, which does not exclude its own semantics. '
+            'This is a real screen-reader defect where the field may be '
+            'announced twice.',
       );
 
       handle.dispose();

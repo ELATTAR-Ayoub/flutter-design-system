@@ -849,10 +849,11 @@ class _ArticleContentState extends State<_ArticleContent> {
       'DsButtonGroup carries Semantics(container: true) with no role — '
           'it is a container, not a group with a semantic role. The buttons '
           'inside keep their own semantics.',
-      'DsInputOtp publishes one textField semantics node over the whole '
-          'strip — not six unlabelled boxes. All input goes to one hidden '
-          'EditableText; the painted boxes contribute no semantics of their '
-          'own.',
+      'DsInputOtp publishes two textField semantics nodes: one from the '
+          'outer Semantics(textField: true) wrapper and one from the hidden '
+          'EditableText inside, which does not exclude its own semantics. '
+          'This is a real screen-reader defect — the field may be announced '
+          'twice. The painted boxes contribute no semantics of their own.',
       'Focus behavior: DsInputGroup.focusNode focuses the control on '
           'label tap. The OTP strip takes focus as one field. Keyboard: '
           'DsButtonGroup is not in the tab order — it is a control family, '
@@ -868,6 +869,12 @@ class _ArticleContentState extends State<_ArticleContent> {
       'Screen-reader announcements: DsInputOtp has no live region — '
           'completion does not announce; wire that at the call site if '
           'needed.',
+      'Paste is not supported: DsInputOtp sets enableInteractiveSelection: '
+          'false on its hidden EditableText, which disables paste operations. '
+          'Users can type or autofill a code, but cannot paste it. This is a '
+          'real accessibility gap — consider whether your use case requires '
+          'paste support and weigh the tradeoff against the simplified focus '
+          'model.',
       'Known platform differences: DsButtonGroup.radiiOf uses symmetric '
           'bleed to reshape children — the visual result is identical on all '
           'platforms, but the mechanism is Flutter-specific.',
