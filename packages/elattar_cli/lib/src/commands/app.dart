@@ -729,6 +729,12 @@ class ElattarCli {
         }
       }
     }
+    if (!dryRun && conflicts.isEmpty) {
+      // The install succeeded, so the network is known to be reachable. Warm
+      // the other catalog file too, so `list`/`search --offline` work
+      // afterwards rather than missing on a file no install ever fetched.
+      await registry.client.warmCatalog();
+    }
     return _MutationResult(writes: writes, conflicts: conflicts);
   }
 

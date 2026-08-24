@@ -1,11 +1,27 @@
 name: elattar_cli
-description: Source-first installer CLI for the Elattar Flutter design system.
+description: >-
+  Installs Elattar's Flutter design system into your project as source you own:
+  components, foundation tokens, effects and motion, copied in and yours to edit.
 version: 0.0.1
-publish_to: none
+
+homepage: https://elattar-ayoub.github.io/flutter-design-system/
+repository: https://github.com/ELATTAR-Ayoub/flutter-design-system
+issue_tracker: https://github.com/ELATTAR-Ayoub/flutter-design-system/issues
+
+topics:
+  - flutter
+  - design-system
+  - cli
+  - ui
+  - scaffolding
 
 environment:
   sdk: ^3.12.2
 
+# One dependency, and a default-hosted one. Everything else this CLI needs -
+# HTTP, hashing, file handling - is `dart:io` and `dart:convert`, which is what
+# keeps `dart install elattar_cli` a single small resolve rather than a
+# transitive tree a user has to trust.
 dependencies:
   yaml: ^3.1.2
 

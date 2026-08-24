@@ -87,6 +87,27 @@ class RegistryClient {
     return document;
   }
 
+  /// Reads both catalog files so an offline run afterwards can serve either.
+  ///
+  /// `index.json` and `registry.json` are two views of the same catalog, and
+  /// the commands split across them: `resolve` walks the index, `list` and
+  /// `search` read the full catalog. An install therefore warms only the
+  /// index, and `elattar list --offline` immediately afterwards failed with a
+  /// cache miss on a project that had just installed the entire registry —
+  /// technically a correct answer, and a useless one.
+  ///
+  /// Called after a successful online mutation. Failures are swallowed on
+  /// purpose: warming a cache is a courtesy, and it must never turn a
+  /// completed install into a non-zero exit.
+  Future<void> warmCatalog() async {
+    try {
+      await loadIndex();
+      await loadCatalog();
+    } on Object {
+      // Deliberately ignored. See above.
+    }
+  }
+
   Future<List<RegistryItem>> list({
     RegistryItemType? type,
     bool includeDeprecated = false,

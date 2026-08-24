@@ -64,7 +64,8 @@ class RemoteRegistrySource extends RegistrySource {
       final List<int>? cached = await cache.readBytes(cacheKey);
       if (cached == null) {
         throw RegistrySourceException(
-          'Registry cache miss for "$relativePath" in offline mode.',
+          'Nothing cached for "$relativePath" from $baseUri. '
+          'Run the same command once without --offline to populate the cache.',
         );
       }
       return cached;

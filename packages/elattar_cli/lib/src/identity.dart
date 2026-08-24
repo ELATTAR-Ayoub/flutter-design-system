@@ -27,6 +27,15 @@ const String defaultRegistryUrl =
 /// [defaultRegistryUrl] parsed, for callers that want the `Uri`.
 final Uri defaultRegistryUri = Uri.parse(defaultRegistryUrl);
 
+/// The git tag a given CLI version is released under.
+///
+/// Stated in code rather than only in a runbook so
+/// `test/version_identity_test.dart` can check it: the tag, the pubspec
+/// version, the string `--version` prints, and the versioned registry path
+/// are four spellings of one number, and the release breaks quietly if any
+/// of them drifts.
+String releaseTagFor(String version) => 'v$version';
+
 enum FoundationMode { source, package }
 
 class CliIdentity {

@@ -1,0 +1,30 @@
+# What the published archive leaves behind.
+#
+# `.pubignore` replaces `.gitignore` for packaging, so anything not listed here
+# is uploaded. The rule applied below: ship what the command needs at runtime,
+# plus the three files a person reads before installing it — README, CHANGELOG
+# and LICENSE — and nothing else.
+
+# The test suite. It is 3,000 lines and it needs a checkout to run against:
+# `remote_registry_test.dart` serves `../../registry/generated/latest`, and
+# `license_install_test.dart` compares against the repository's own LICENSE.
+# Neither path exists inside the archive, so shipping them would only give a
+# consumer tests that cannot pass.
+test/
+
+# Resolution output. `pubspec.lock` is not a lock for a published package —
+# pub resolves against the consumer's constraints — and `.dart_tool/` is this
+# machine's build state.
+pubspec.lock
+.dart_tool/
+
+# Analyzer configuration is a contributor concern, not a consumer one.
+analysis_options.yaml
+
+# Never, under any circumstances.
+.env
+*.pem
+*.key
+*.p12
+*.keystore
+credentials.json

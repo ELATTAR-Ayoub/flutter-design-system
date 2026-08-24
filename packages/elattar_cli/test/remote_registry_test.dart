@@ -407,6 +407,20 @@ void main() {
       expect(second.exitCode, 0, reason: second.all);
     });
 
+    test('an install warms the cache for later read commands too', () async {
+      // `init`/`add` walk `index.json` and per-item manifests; `list` reads
+      // `registry.json`. Without warming, a project that had just installed
+      // the whole registry could not `list --offline` — a correct answer to
+      // the wrong question, and the exact thing found by running the isolated
+      // package by hand rather than only its unit tests.
+      await run(<String>['init', '--foundation', 'source']);
+      await server.close();
+
+      final _Run offline = await run(<String>['list', '--offline']);
+      expect(offline.exitCode, 0, reason: offline.all);
+      expect(offline.stdout, contains('button'));
+    });
+
     test('a cold cache reports a miss, not a network error', () async {
       final _Run result = await run(<String>[
         'list',
