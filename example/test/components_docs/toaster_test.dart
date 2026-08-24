@@ -214,13 +214,14 @@ void main() {
         reason: 'the real 200ms unmount delay should be documented',
       );
 
-      // The install section states honestly that toaster has no CLI item yet.
+      // The install section names the command that installs it. It asserted
+      // the opposite until the registry covered the whole component surface.
       final Finder installSection = find.byKey(ElSection.anchorKey('install'));
       expect(installSection, findsOneWidget);
       expect(
         find.descendant(
           of: installSection,
-          matching: find.textContaining('not yet'),
+          matching: find.textContaining('elattar add toaster'),
         ),
         findsWidgets,
       );

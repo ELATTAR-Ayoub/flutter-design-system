@@ -29,7 +29,7 @@ int main(List<String> arguments) {
 
   stdout
     ..writeln('Wrote ${target.path}')
-    ..writeln('  size    ${textureSize}x$textureSize, 8-bit RGBA')
+    ..writeln('  size    $textureSize x $textureSize, 8-bit RGBA')
     ..writeln('  seed    0x${textureSeed.toRadixString(16).toUpperCase()}')
     ..writeln('  octaves $octaves from ${baseFrequency} cells, persistence $persistence')
     ..writeln('  pixels  ${pixels.length} bytes, sha256 ${sha256Hex(pixels)}')

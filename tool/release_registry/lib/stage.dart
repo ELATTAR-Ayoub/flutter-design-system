@@ -196,7 +196,7 @@ void _writeReleaseManifest({
     'itemCount': (index['items']! as List<Object?>).length,
     'fileCount': files.length,
     'treeHash': treeHash,
-    if (generationCommit != null) 'generationCommit': generationCommit,
+    if (generationCommit case final String commit) 'generationCommit': commit,
   };
   File(_join(<String>[destination.path, 'release.json'])).writeAsStringSync(
     '${const JsonEncoder.withIndent('  ').convert(record)}\n',

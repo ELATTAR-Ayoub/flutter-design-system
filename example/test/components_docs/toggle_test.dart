@@ -528,18 +528,16 @@ void main() {
       },
     );
 
-    testWidgets(
-      'installation is honestly disclosed as not yet CLI-installable, for '
-      'toggle alone',
-      (WidgetTester tester) async {
-        await _pump(tester);
+    testWidgets('installation states that the component is installable, for '
+        'toggle alone', (WidgetTester tester) async {
+      await _pump(tester);
 
-        expect(
-          find.textContaining('toggle is not yet a registry item'),
-          findsWidgets,
-        );
-      },
-    );
+      expect(
+        find.textContaining('toggle is not yet a registry item'),
+        findsNothing,
+      );
+      expect(find.textContaining('elattar add toggle'), findsWidgets);
+    });
 
     testWidgets('the meta entry describes ElToggle alone', (
       WidgetTester tester,

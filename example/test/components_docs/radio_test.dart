@@ -265,14 +265,17 @@ void main() {
     },
   );
 
-  testWidgets('installation is honestly disclosed as not yet CLI-installable', (
+  testWidgets('installation states that the component is installable', (
     WidgetTester tester,
   ) async {
     await _pump(tester);
 
-    // The honest disclosure is intentionally repeated (Status and
-    // Installation each state it in their own words), so this asserts
-    // presence, not a specific count.
-    expect(find.textContaining('not yet a registry item'), findsWidgets);
+    // This test used to assert the opposite, correctly: radio was not a
+    // registry item, and holding the page to saying so was the right guard
+    // against overclaiming. The registry now ships it, so the same guard
+    // points the other way — the page must not tell a reader that a command
+    // which works will not.
+    expect(find.textContaining('not yet a registry item'), findsNothing);
+    expect(find.textContaining('elattar add radio'), findsWidgets);
   });
 }

@@ -588,19 +588,19 @@ void main() {
       },
     );
 
-    testWidgets(
-      'installation is honestly disclosed as not yet CLI-installable, and '
-      'names the two sibling files a manual copy also needs',
-      (WidgetTester tester) async {
-        await _pump(tester);
+    testWidgets('installation states that the component is installable, and '
+        'names the two sibling files a manual copy also needs', (
+      WidgetTester tester,
+    ) async {
+      await _pump(tester);
 
-        expect(
-          find.textContaining('toggle-group is not yet a registry item'),
-          findsWidgets,
-        );
-        expect(find.textContaining('sliding_pill.dart'), findsWidgets);
-      },
-    );
+      expect(
+        find.textContaining('toggle-group is not yet a registry item'),
+        findsNothing,
+      );
+      expect(find.textContaining('elattar add toggle-group'), findsWidgets);
+      expect(find.textContaining('sliding_pill.dart'), findsWidgets);
+    });
 
     testWidgets('the meta entry describes the group alone', (
       WidgetTester tester,
