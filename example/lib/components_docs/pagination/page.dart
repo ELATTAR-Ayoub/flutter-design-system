@@ -227,9 +227,9 @@ class _PaginationArticle extends StatelessWidget {
     id: 'install',
     title: 'Installation',
     description:
-        'pagination ships in the registry, so `elattar add '
-        'pagination` is not available: install by copying the source '
-        'file manually.',
+        'pagination ships in the registry, so `elattar add pagination` '
+        'installs it and everything it depends on. Copying the source by '
+        'hand is the alternative, not the fallback.',
     child: DocsInstallFacts(
       title: 'Installation',
       facts: <DocsInstallFact>[

@@ -649,7 +649,7 @@ class _BreadcrumbArticle extends StatelessWidget {
             const DocsInstallFact(
               label: 'GitHub',
               value:
-                  'github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/'
+                  'github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/'
                   'lib/src/components/breadcrumb.dart',
               description:
                   "The same blob path every published registry item's "

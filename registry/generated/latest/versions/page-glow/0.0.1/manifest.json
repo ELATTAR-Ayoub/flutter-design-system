@@ -22,6 +22,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/docs/effects/page-glow",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/effects/page_glow.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/effects/page_glow.dart",
   "deprecated": false
 }

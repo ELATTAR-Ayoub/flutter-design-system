@@ -149,14 +149,15 @@ class _ArticleContent extends StatelessWidget {
     id: 'install',
     title: 'Installation',
     description:
-        'nav_user ships in the registry, so `elattar add nav_user` '
-        'is not available: install by copying the source file manually.',
+        'nav-user ships in the registry, so `elattar add nav-user` installs '
+        'it and everything it depends on. Note the hyphen: registry item '
+        'names are kebab-case even where the Dart file is not.',
     child: DocsInstallFacts(
       title: 'Installation facts',
       facts: <DocsInstallFact>[
         const DocsInstallFact(
           label: 'Registry item',
-          value: 'registry/components/nav_user.json',
+          value: 'registry/components/nav-user.json',
           description:
               'No registry/components/nav_user.json exists. This is a '
               'source-only component today, and the command a manifest '

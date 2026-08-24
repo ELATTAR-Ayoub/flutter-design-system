@@ -125,10 +125,9 @@ class _TabsArticle extends StatelessWidget {
                 label: 'CLI',
                 value: 'registry/components/tabs.json',
                 description:
-                    'tabs is not yet a registry item, so `elattar add '
-                    'tabs` will not resolve. It is one of the Wave 3 '
-                    'overlay-and-navigation components still awaiting a '
-                    'manifest, see the Phase J documentation plan.',
+                    'tabs is a registry item, so `elattar add tabs` resolves '
+                    'it and its dependencies and copies the source into your '
+                    'project.',
               ),
               const DocsInstallFact(
                 label: 'Manual: package mode (supported today)',

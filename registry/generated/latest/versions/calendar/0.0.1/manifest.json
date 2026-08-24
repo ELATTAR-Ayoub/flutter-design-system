@@ -29,6 +29,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/calendar",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/calendar.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/calendar.dart",
   "deprecated": false
 }

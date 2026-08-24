@@ -126,10 +126,9 @@ class _TextareaArticle extends StatelessWidget {
                     label: 'CLI',
                     value: 'registry/components/textarea.json',
                     description:
-                        'textarea is not yet a registry item, so `elattar add '
-                        'textarea` will not resolve. It is one of the Wave 2 '
-                        'form and input components still awaiting a manifest, '
-                        'see the Phase J documentation plan.',
+                        'textarea is a registry item, so `elattar add '
+                        'textarea` resolves it and its dependencies and '
+                        'copies the source into your project.',
                   ),
                   const DocsInstallFact(
                     label: 'Manual: package mode (supported today)',
@@ -156,11 +155,11 @@ class _TextareaArticle extends StatelessWidget {
                 facts: <DocsInstallFact>[
                   const DocsInstallFact(
                     label: 'Status',
-                    value: 'Stable, installable through lattar add textarea',
+                    value: 'Stable, installable through elattar add textarea',
                     description:
-                        'Ported and tested against lib/src/components/textarea.dart. '
-                        'It is not yet a registry item, so elattar add textarea '
-                        'will not resolve.',
+                        'Ported and tested against lib/src/components/textarea.dart, '
+                        'and shipped as a registry item, so elattar add '
+                        'textarea resolves it.',
                   ),
                   DocsInstallFact(
                     label: 'Version',

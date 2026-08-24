@@ -2,7 +2,7 @@
 
 Thanks for helping improve this repository.
 
-This project is currently in its public-foundation stage and the package version is `0.0.1`. The Flutter package in this repository is the authoritative implementation. Future website, registry, and CLI work should stay aligned with that source of truth rather than creating parallel behavior.
+The package version is `0.0.1`, the first public release. The Flutter package in this repository is the authoritative implementation: the registry, the CLI and the website all derive from it, and should stay aligned with it rather than growing parallel behaviour.
 
 ## Before you start
 
@@ -20,7 +20,7 @@ The skill lives at [`skills/elattar-flutter-ui-director/`](skills/elattar-flutte
 
 **If your agent loads Claude Code plugins** — the repository root is also a plugin marketplace. `.claude-plugin/marketplace.json` declares one plugin sourced from `"./"`, and `.claude-plugin/plugin.json` points at `./skills/elattar-flutter-ui-director`. Adding your local clone as a marketplace therefore loads the skill straight from your working tree, with no copy step and no path to keep in sync.
 
-That plugin route is wired but not yet signed off: a recorded run per harness is tracked as release verification work, and until those exist, treat it as untested and fall back to the `AGENTS.md` path. If you do exercise it, note the harness and version in your pull request — that is exactly the evidence the sign-off needs.
+That plugin route is wired but not yet signed off: no recorded run per harness exists, so treat it as untested and fall back to the `AGENTS.md` path. If you do exercise it, note the harness and version in your pull request — that is exactly the evidence the sign-off needs.
 
 Do not copy the skill into a personal agent configuration directory and edit it there. Edit it in the tree and send a pull request, otherwise your changes cannot be reviewed and will drift from the repository the skill describes.
 
@@ -29,7 +29,7 @@ Do not copy the skill into a personal agent configuration directory and edit it 
 - Fix a bug in a public `El*` API or its tests.
 - Improve documentation or examples for the package.
 - Add verification coverage for an existing component or effect.
-- Improve the CLI (`packages/elattar_cli/`) or the registry (`registry/`, `tool/registry_builder/`) — both are implemented and tested in this repository already, just not published (`publish_to: none`, private repository). Extending their test coverage or closing gaps in what they scaffold is welcome.
+- Improve the CLI (`packages/elattar_cli/`) or the registry (`registry/`, `tool/registry_builder/`). Both are published as of `0.0.1`, which raises the bar rather than lowering it: a change to either reaches installed projects, so extending their test coverage is as welcome as extending their behaviour.
 - Improve accessibility, keyboard handling, semantics, focus order, or reduced-motion behavior.
 
 ## Workflow
@@ -47,8 +47,27 @@ Run the smallest relevant set, and run the full package checks before asking for
 ```powershell
 flutter analyze
 flutter test
-flutter test test/token_guard_test.dart
+flutter test test/token_guard_test.dart test/license_distribution_test.dart
 ```
+
+If you touch the CLI, the registry builder, or anything a registry item
+distributes:
+
+```powershell
+Push-Location packages/elattar_cli
+dart format --output=none --set-exit-if-changed .
+dart analyze
+dart test
+Pop-Location
+
+dart run tool/registry_builder/bin/build.dart .
+dart run tool/registry_builder/bin/validate.dart registry/generated/latest/registry.json
+git diff --exit-code -- registry/generated/latest
+```
+
+That last line is the one that matters: the generated registry is checked in,
+and a source change without a rebuild leaves published hashes that no longer
+match the files they describe.
 
 If you change the example app, also verify it directly:
 
@@ -89,10 +108,20 @@ Please include:
 
 Only submit code, fonts, textures, images, or other assets when you have the right to contribute them. If redistribution or licensing status is unclear, open an issue first instead of sending the asset in a pull request.
 
+Anything this repository redistributes needs three things, and
+`test/license_distribution_test.dart` fails without them: the upstream license
+text reproduced verbatim under `third_party/`, a row in
+`THIRD_PARTY_NOTICES.md` recording the source URL, version, retrieval date and
+content hash, and — if a registry item distributes it — a `licenses` entry on
+that item so the notice installs into the consumer's `LICENSES/` directory
+alongside the file it covers.
+
+Contributions to this repository are accepted under its MIT license.
+
 ## Planning and roadmap work
 
-The repository contains active planning documents for future public release, registry, CLI, and website work. Those plans are useful context, but implemented package behavior and tests win when there is a conflict.
+The repository contains planning and audit documents under `docs/superpowers/`. Those are useful context, and the phase reports in particular are dated snapshots rather than current statements — implemented behaviour and passing tests win whenever they disagree.
 
 ## Need a different issue type?
 
-Use the issue forms for bugs, component requests, docs, accessibility, and future CLI or registry work. If none fits well, start with the closest one and explain the mismatch in the first field.
+Use the issue forms for bugs, component requests, docs, accessibility, and CLI or registry work. If none fits well, start with the closest one and explain the mismatch in the first field.

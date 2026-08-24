@@ -116,14 +116,14 @@ class _ToasterArticle extends StatelessWidget {
       ),
 
       // Installation with Command/Manual tabs, plus the status facts a
-      // caller needs before copying the source (no CLI item yet).
+      // caller needs either way.
       ElSection(
         id: 'install',
         title: 'Installation',
         description:
-            'toaster has no registry/components/toaster.json manifest yet, '
-            'so elattar add toaster is not yet available -- copy the '
-            'component source file directly until that manifest lands.',
+            'toaster ships in the registry, so `elattar add toaster` installs '
+            'it and everything it depends on. Copying the source by hand '
+            'still works if you would rather not add the CLI.',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[

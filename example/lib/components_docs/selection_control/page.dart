@@ -98,7 +98,7 @@ class _SelectionControlArticle extends StatelessWidget {
           id: 'install',
           title: 'Installation',
           description:
-              'Install with lattar add selection-control, or import from the package barrel when you depend on the package directly.',
+              'Install with elattar add selection-control, or import from the package barrel when you depend on the package directly.',
           child: DocsCodeExample(
             title: 'Package import',
             command: DocsCodeCommand(

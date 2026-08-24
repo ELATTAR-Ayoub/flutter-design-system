@@ -1,5 +1,13 @@
 # Public release program status
 
+> **Historical snapshot.** This report records what was true on the date and
+> at the commit named in it. It is kept for the reasoning, not as a statement
+> of the current release — several findings below were closed afterwards. For
+> what is true now, read
+> [`v0.0.1-public-release-baseline.md`](v0.0.1-public-release-baseline.md),
+> which classifies every finding here against the commit that fixed it, and
+> the root [`CHANGELOG.md`](../../../../CHANGELOG.md).
+
 ## How to keep this file true
 
 This file drifted three times in one program — twice by claiming committed

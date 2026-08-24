@@ -128,19 +128,17 @@ class _RadioArticle extends StatelessWidget {
           id: 'install',
           title: 'Installation',
           description:
-              'Stable, but not yet a registry item: command install is not '
-              'available yet, read this before reaching for elattar add '
-              'radio.',
+              'Stable and installable: read this before reaching for '
+              'elattar add radio.',
           child: DocsInstallFacts(
             facts: <DocsInstallFact>[
               const DocsInstallFact(
                 label: 'Status',
-                value: 'Stable, installable through lattar add radio',
+                value: 'Stable, installable through elattar add radio',
                 description:
-                    'Ported and tested against lib/src/components/radio.dart. '
-                    'It is not yet a registry item, so elattar add radio '
-                    'will not resolve: see the facts below for what actually '
-                    'works today.',
+                    'Ported and tested against lib/src/components/radio.dart, '
+                    'and shipped as a registry item, so elattar add radio '
+                    'resolves it together with its dependencies.',
               ),
               const DocsInstallFact(
                 label: 'Platforms',
@@ -153,10 +151,9 @@ class _RadioArticle extends StatelessWidget {
                 label: 'CLI',
                 value: 'registry/components/radio.json',
                 description:
-                    'radio is not yet a registry item, so `elattar add '
-                    'radio` will not resolve. It is one of the Wave 2 form '
-                    'components still awaiting a manifest: see the Phase J '
-                    'documentation plan.',
+                    'radio is a registry item, so `elattar add radio` '
+                    'resolves it and its dependencies and copies the source '
+                    'into your project.',
               ),
               const DocsInstallFact(
                 label: 'Manual: package mode (supported today)',

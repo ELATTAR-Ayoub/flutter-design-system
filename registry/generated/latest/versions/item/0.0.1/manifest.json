@@ -22,6 +22,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/item",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/item.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/item.dart",
   "deprecated": false
 }

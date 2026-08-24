@@ -27,6 +27,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/carousel",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/carousel.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/carousel.dart",
   "deprecated": false
 }

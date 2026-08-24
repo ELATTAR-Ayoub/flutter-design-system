@@ -55,6 +55,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/agent-history",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/agent_history.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/agent_history.dart",
   "deprecated": false
 }

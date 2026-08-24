@@ -107,7 +107,7 @@ class _FormArticle extends StatelessWidget {
           id: 'install',
           title: 'Installation',
           description:
-              'Install with lattar add form, or import from the package barrel when you depend on the package directly.',
+              'Install with elattar add form, or import from the package barrel when you depend on the package directly.',
           child: DocsCodeExample(
             title: 'Package import',
             command: DocsCodeCommand(

@@ -25,6 +25,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/badge",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/badge.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/badge.dart",
   "deprecated": false
 }

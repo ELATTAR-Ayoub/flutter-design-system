@@ -106,6 +106,6 @@
     }
   ],
   "documentationRoute": "/docs/foundations",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/elattar_design_system.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/elattar_design_system.dart",
   "deprecated": false
 }

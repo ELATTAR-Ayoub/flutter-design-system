@@ -2,7 +2,9 @@
 
 ## Supported state
 
-This repository is in an early public-release phase and is currently version `0.0.1`. Security fixes may land before broader roadmap work, but the project should not be treated as formally hardened or compliance-certified by default.
+This repository is at version `0.0.1`, its first public release. Security fixes may land before broader roadmap work, but the project should not be treated as formally hardened or compliance-certified by default.
+
+`elattar_cli` is published on pub.dev and writes source into other people's projects, which is the surface most worth reporting against. Fixes to it ship as a new CLI version. A published registry version is never rewritten, so a corrected payload also ships as a new version rather than as a silent replacement of what people already installed.
 
 ## Reporting a vulnerability
 
@@ -20,7 +22,7 @@ If private reporting is not available in the repository UI, open a minimal publi
 
 Helpful reports usually include:
 
-- the affected package area, component, example surface, or planned CLI or registry path,
+- the affected package area, component, example surface, or CLI or registry path,
 - the exact commit, branch, or file set tested,
 - reproduction steps,
 - expected versus actual behavior,
@@ -44,7 +46,8 @@ Areas likely to matter most here include:
 
 - package API misuse that can break app safety expectations,
 - accessibility regressions that suppress critical feedback,
-- unsafe future CLI or registry behaviors such as overwriting files unexpectedly,
+- CLI or registry behaviour that writes outside where it says it writes, overwrites a consumer's files unexpectedly, or installs a payload whose hash was not verified,
+- anything that would let a registry, a mirror, or a redirect cause the CLI to write a file no manifest declared,
 - dependency or asset provenance issues,
 - and example or documentation guidance that could lead users into insecure integration patterns.
 

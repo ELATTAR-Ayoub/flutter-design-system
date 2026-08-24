@@ -33,7 +33,7 @@ body:
     id: design_constraints
     attributes:
       label: Design and token constraints
-      description: Mention any required `Ds*` APIs, token rules, or placement constraints.
+      description: Mention any required `El*` APIs, token rules, or placement constraints.
   - type: textarea
     id: accessibility
     attributes:

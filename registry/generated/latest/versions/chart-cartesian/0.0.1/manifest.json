@@ -27,6 +27,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/chart-cartesian",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/chart_cartesian.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/chart_cartesian.dart",
   "deprecated": false
 }

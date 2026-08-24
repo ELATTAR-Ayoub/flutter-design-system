@@ -29,6 +29,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/chart-polar",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/chart_polar.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/chart_polar.dart",
   "deprecated": false
 }

@@ -170,7 +170,7 @@ class _DropdownMenuArticle extends StatelessWidget {
           facts: <DocsInstallFact>[
             const DocsInstallFact(
               label: 'Status',
-              value: 'Stable and installable through lattar add dropdown-menu',
+              value: 'Stable and installable through elattar add dropdown-menu',
               description:
                   'Ported and tested against lib/src/components/'
                   'dropdown_menu.dart and lib/src/components/menu.dart, the '
@@ -189,11 +189,9 @@ class _DropdownMenuArticle extends StatelessWidget {
               label: 'CLI',
               value: 'Not available',
               description:
-                  'dropdown-menu and its shared menu.dart engine are not '
-                  'yet registry items, so `elattar add dropdown-menu` does '
-                  'not open the door on its own: they are among the Wave '
-                  '3 base components still awaiting a manifest. See the '
-                  'Phase J documentation plan.',
+                  'dropdown-menu and its shared menu.dart engine are both '
+                  'registry items, so `elattar add dropdown-menu` resolves '
+                  'menu with it and copies both into your project.',
             ),
             const DocsInstallFact(
               label: 'Manual: package mode (supported today)',

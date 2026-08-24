@@ -96,7 +96,7 @@ const List<DocsPageEntry> docsPageEntries = <DocsPageEntry>[
     title: 'Registry',
     description:
         'Schema v1, what a registry item is, how dependencies resolve, and '
-        'the 99 items generated today.',
+        'what the published registry contains.',
     route: docsRegistryRoute,
   ),
   DocsPageEntry(

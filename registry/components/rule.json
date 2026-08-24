@@ -19,5 +19,5 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/docs/foundations/rules",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/rule.dart"
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/rule.dart"
 }

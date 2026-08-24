@@ -22,6 +22,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/marker",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/marker.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/marker.dart",
   "deprecated": false
 }

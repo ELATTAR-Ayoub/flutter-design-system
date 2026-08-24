@@ -130,10 +130,9 @@ class _CheckboxArticle extends StatelessWidget {
                 label: 'CLI',
                 value: 'registry/components/checkbox.json',
                 description:
-                    'checkbox is not yet a registry item, so `elattar add '
-                    'checkbox` will not resolve. It is one of the Wave 1 '
-                    'base components still awaiting a manifest: see the '
-                    'Phase J documentation plan.',
+                    'checkbox is a registry item, so `elattar add checkbox` '
+                    'resolves it and its dependencies and copies the source '
+                    'into your project.',
               ),
               const DocsInstallFact(
                 label: 'Manual: package mode (supported today)',
@@ -154,7 +153,7 @@ class _CheckboxArticle extends StatelessWidget {
               ),
               const DocsInstallFact(
                 label: 'Status',
-                value: 'Stable, installable through lattar add checkbox',
+                value: 'Stable, installable through elattar add checkbox',
                 description:
                     'Ported and tested against lib/src/components/checkbox.dart.',
               ),

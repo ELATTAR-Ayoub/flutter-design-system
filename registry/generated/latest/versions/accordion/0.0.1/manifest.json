@@ -31,6 +31,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/accordion",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/accordion.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/accordion.dart",
   "deprecated": false
 }

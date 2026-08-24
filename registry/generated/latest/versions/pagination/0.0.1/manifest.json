@@ -27,6 +27,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/pagination",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/pagination.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/pagination.dart",
   "deprecated": false
 }

@@ -28,7 +28,7 @@ Pop-Location
 ## Checklist
 
 - [ ] The change is scoped and intentional.
-- [ ] Public `Ds*` APIs and token rules are respected.
+- [ ] Public `El*` APIs and token rules are respected.
 - [ ] Tests or docs were added or updated where needed.
 - [ ] UI changes include screenshots or recordings when useful.
 - [ ] Accessibility impact was considered.

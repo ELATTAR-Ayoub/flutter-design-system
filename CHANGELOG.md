@@ -2,15 +2,106 @@
 
 ## 0.0.1
 
-Initial public repository release for the maintained Flutter package.
+The first public release. Elattar becomes something a stranger can install.
 
-* Pre-publication API and distribution migration (2026-08-24): all maintained
-  package, example, registry, CLI, test, documentation, and skill surfaces now
-  use the `El*` public API and `el(...)` spacing helper. This is an intentional
-  hard rename with no compatibility aliases because `0.0.1` has not been
-  published. The source-first registry now covers the full component surface,
-  and the CLI supports installing every public component with
-  `elattar add --all`.
+### Distribution
+
+* **`elattar_cli` `0.0.1` is published on pub.dev.** `dart install
+  elattar_cli` puts an `elattar` command on your PATH; `elattar init
+  --foundation source` and `elattar add button` set up a Flutter project
+  without cloning anything. The CLI has one dependency.
+* **A hosted, version-pinned registry.** The CLI reads
+  `https://elattar-ayoub.github.io/flutter-design-system/registry/0.0.1/` by
+  default. That path is immutable: a change ships as a new version rather than
+  as a rewrite of a released one, so an installed `0.0.1` keeps installing the
+  same sources. `--registry` accepts any other directory or `http(s)` URL.
+* **Integrity before mutation.** Every manifest and payload is verified
+  against its declared sha256, and the entire install is downloaded and
+  checked before the first file is written. A dropped connection or a
+  substituted payload aborts with the project untouched.
+* **Offline works.** Downloads are cached per user under the platform's own
+  cache directory (`ELATTAR_CACHE_DIR` overrides). `--offline` reads only that
+  cache and distinguishes a cache miss from a network failure.
+* **`elattar add --all`** installs the complete registry in one command.
+* **The documentation site is live** at
+  <https://elattar-ayoub.github.io/flutter-design-system/>.
+
+### Licensing and provenance
+
+* **Elattar's own work is MIT** (`Copyright (c) 2026 ELATTAR Ayoub`). The
+  standard text, unmodified — no added attribution clause.
+* **Every redistributed third-party file has a provenance record.**
+  `THIRD_PARTY_NOTICES.md` names the upstream source, version, retrieval date
+  and content hash for each, and `third_party/` reproduces each license text
+  verbatim. Two findings worth naming: lucide's `LICENSE` is not ISC alone —
+  roughly 110 glyphs descend from Feather and carry a second MIT notice in the
+  same file, so the icon generator now embeds the whole file rather than a
+  transcription — and Redaction is dual OFL 1.1 / LGPL 2.1 per its publisher
+  although the binary declares only the OFL.
+* **Notices travel with what they cover.** A new `@license/` registry target
+  installs them into the consumer's `LICENSES/` directory: Elattar's MIT
+  always, the three font OFL notices with the foundation, lucide's with
+  `icon`, ElevenLabs UI's with `voice-orb`.
+* **`assets/textures/perlin-noise.png` was replaced.** It was a byte copy of a
+  file whose original this repository could not name. It is now generated from
+  a checked-in seed by `tool/generate_perlin_texture/`, matching the file it
+  replaces on the properties the shader depends on — same mean, same value
+  span, seamless wrap, smoother.
+
+### Package
+
+* **The public API is `El*` throughout.** All maintained package, example,
+  registry, CLI, test, documentation and skill surfaces use the `El*` prefix
+  and the `el(...)` spacing helper. A hard rename with no compatibility
+  aliases, because `0.0.1` had not been published.
+* **The registry covers the full component surface**: 99 items — 84
+  components, 9 effects, 5 motion, 1 foundation — at schema v1.
+* Foundation, components, effects, motion and the three font faces are
+  described in the sections below; nothing about them changed at release.
+
+### Repository
+
+* **Line endings are normalised to LF.** The generated registry records a
+  sha256 per distributed file computed from the working tree, and with
+  automatic line-ending translation enabled 51 of the 112 files hashed
+  differently per operating system — making every published hash correct on
+  exactly one platform. `.gitattributes` now pins them.
+* **Release staging is a checked tool, not workflow shell.**
+  `tool/release_registry/` copies the generated registry into the site
+  artifact under `/registry/<version>/`, validates the staged copy rather than
+  the source, and refuses to republish different bytes under a published
+  version.
+* **Guards against the mistakes this release actually made.**
+  `test/license_distribution_test.dart` recomputes every provenance hash and
+  fails if a consumer could receive third-party source without its notice;
+  `example/test/public_claims_test.dart` fails if the site claims a shipped
+  component cannot be installed, or prints a command with a character missing;
+  `packages/elattar_cli/test/version_identity_test.dart` compares the six
+  places the version is stated against each other.
+
+### Known limitations
+
+* **`--foundation package` is refused.** It wrote a dependency on a package
+  named `elattar_core` that does not exist, producing a project that could not
+  resolve. It stays refused until such a package is really published;
+  `--foundation source` is the supported path.
+* **The root `elattar_design_system` package is not on pub.dev.** Source
+  installation through the CLI is the distribution route. The package is
+  consumable from Git when the dependency model is what you want.
+* **Conflicts are all-or-nothing.** If any target file differs from the
+  registry's copy, `add` exits 73 and writes nothing. Re-run with
+  `--overwrite` once you have saved what you meant to keep.
+* **Accessibility has not been audited against assistive technology.** The
+  sources disambiguate semantic labels, and widget tests cover focus order and
+  keyboard reachability, but no screen-reader pass has been recorded.
+
+---
+
+## How this was built
+
+The port history below is kept because it records why the package is the way
+it is. It is a build log, not a statement of the current release; where the
+two disagree, the release record above wins.
 
 1:1 Flutter port of Elattar's Design System (web reference:
 `Design-System-2026-8/design-system`), verified side-by-side against the
@@ -79,10 +170,9 @@ running reference at 1440×900 in both themes.
   `elattar init` and `elattar add <slug>`) landed alongside the public website
   shell, the documentation system, per-component guide pages, and
   public-repository governance (README, CONTRIBUTING, CODE_OF_CONDUCT,
-  SECURITY, issue templates, the CI and GitHub Pages workflows). Neither the
-  CLI nor the registry is published: `packages/elattar_cli/pubspec.yaml` sets
-  `publish_to: none` and the repository itself is private - both exist and are
-  tested in this repository, with no external route to obtain them yet.
+  SECURITY, issue templates, the CI and GitHub Pages workflows). At the time
+  this landed neither the CLI nor the registry had a public route; both were
+  published as part of this same `0.0.1` release, described above.
 
 * Shots (2026-08-23): a `shot` registry item kind installs multi-file,
   product-neutral application compositions into a consumer's `@app/`, with an
@@ -94,8 +184,10 @@ running reference at 1440×900 in both themes.
   import rewriter was later hardened (`48c390b`) after an independent review
   found it rewrote text inside comments and string literals instead of
   stopping at Dart's directive prologue; the same commit added CI coverage for
-  the `packages/elattar_cli` test suite (26 tests) and the registry
-  build/validate steps. Registry regenerated to 20 schema-v1 items.
+  the `packages/elattar_cli` test suite and the registry build/validate
+  steps. The registry covered 20 items at this point; it reached 99 before
+  release. Shots were removed in `9c48294` when the site's information
+  architecture was reworked, and no `shot` item ships in `0.0.1`.
 
 * Skills (2026-08-23): the `elattar-flutter-ui-director` coding-agent skill
   moved from `.agents/skills/` - a path no agent harness scans - to `skills/`,
@@ -108,5 +200,5 @@ running reference at 1440×900 in both themes.
   manual copy, `AGENTS.md`), gated by a `verifiedCommands` allowlist so a
   command cannot reach the page without a human adding it explicitly - the
   same discipline that retired an earlier, invented `npx skills add …` line.
-  No skill install route is published as working today: `LICENSE` is a
-  placeholder and the repository is private.
+  The licensing blocker named here closed with this release; each route's
+  page states its own verification status.

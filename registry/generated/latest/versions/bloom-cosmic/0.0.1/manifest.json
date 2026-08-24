@@ -27,6 +27,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/docs/effects/bloom-cosmic",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/effects/bloom_cosmic.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/effects/bloom_cosmic.dart",
   "deprecated": false
 }

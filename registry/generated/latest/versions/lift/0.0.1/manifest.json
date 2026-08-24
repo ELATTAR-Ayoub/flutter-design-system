@@ -22,6 +22,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/docs/motion/lift",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/motion/lift.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/motion/lift.dart",
   "deprecated": false
 }

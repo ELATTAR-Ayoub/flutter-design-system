@@ -6,9 +6,10 @@
 /// (`ElattarCli.run`, `_printUsage`, and the `try`/`catch` exit-code ladder in
 /// `run`) and confirmed by executing every command listed against this
 /// checkout: `--version`, `help`, `init`, `add`, `list`, `search`, `info`,
-/// and `doctor` all ran; `list` and `info` were checked against the real 20
-/// item registry at `registry/generated/latest/`. `--foundation package` is
-/// documented as refused because it was run and refused with exit 64.
+/// and `doctor` all ran; `list` and `info` were checked against the real
+/// registry, both from `registry/generated/latest/` and over HTTP.
+/// `--foundation package` is documented as refused because it was run and
+/// refused with exit 64.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
@@ -95,12 +96,14 @@ class _CliArticle extends StatelessWidget {
       child: DocsSelectableCodeBlock(
         code:
             'elattar --version\n'
-            'elattar init [--foundation source] [--yes] [--dry-run] [--registry PATH]\n'
-            'elattar add <items...> [--overwrite] [--dry-run] [--registry PATH]\n'
-            'elattar list [--registry PATH]\n'
-            'elattar search <query> [--registry PATH]\n'
-            'elattar info <name> [--registry PATH]\n'
-            'elattar doctor [--registry PATH]\n'
+            'elattar init [--foundation source] [--yes] [--dry-run]\n'
+            '     [--registry PATH_OR_URL] [--offline]\n'
+            'elattar add <items...> [--all] [--overwrite] [--dry-run]\n'
+            '     [--registry PATH_OR_URL] [--offline]\n'
+            'elattar list [--registry PATH_OR_URL] [--offline]\n'
+            'elattar search <query> [--registry PATH_OR_URL] [--offline]\n'
+            'elattar info <name> [--registry PATH_OR_URL] [--offline]\n'
+            'elattar doctor [--registry PATH_OR_URL] [--offline] [--verbose]\n'
             'elattar help',
       ),
     ),
@@ -112,13 +115,13 @@ class _CliArticle extends StatelessWidget {
     child: ElAlert(
       variant: ElAlertVariant.info,
       icon: const ElIcon(ElIconGlyph.info),
-      title: 'Not published',
+      title: 'Getting the command',
       description:
-          'Every command on this page is written as `elattar <command>` '
-          'for readability. From a checkout it is actually invoked as '
-          '`dart run packages/elattar_cli/bin/elattar.dart <command>`, or '
-          'as the bare `elattar` form once activated locally. See '
-          'Installation for the full context.',
+          '`dart install elattar_cli` puts `elattar` on your PATH, and every '
+          'command on this page is then exactly what you type. Contributors '
+          'working inside a checkout can run the same commands as '
+          '`dart run packages/elattar_cli/bin/elattar.dart <command>` '
+          'without installing anything. See Installation.',
     ),
   );
 
@@ -164,7 +167,8 @@ class _CliArticle extends StatelessWidget {
             DocsApiFact(
               name: 'init',
               type:
-                  '[--foundation source] [--yes] [--dry-run] [--registry PATH]',
+                  '[--foundation source] [--yes] [--dry-run] '
+                  '[--registry PATH_OR_URL] [--offline]',
               description:
                   'Writes elattar.yaml, the source-foundation files, fonts, '
                   'and an empty lib/components/ui/ui.dart barrel. '
@@ -174,7 +178,9 @@ class _CliArticle extends StatelessWidget {
             ),
             DocsApiFact(
               name: 'add <items...>',
-              type: '[--overwrite] [--dry-run] [--registry PATH]',
+              type:
+                  '[--all] [--overwrite] [--dry-run] '
+                  '[--registry PATH_OR_URL] [--offline]',
               description:
                   'Resolves each item\'s transitive registryDependencies and '
                   'writes the resulting files, assets, and font '
@@ -183,28 +189,28 @@ class _CliArticle extends StatelessWidget {
             ),
             DocsApiFact(
               name: 'list',
-              type: '[--registry PATH]',
+              type: '[--registry PATH_OR_URL] [--offline]',
               description:
                   'Prints one tab-separated line per registry item: '
                   'name, type, version.',
             ),
             DocsApiFact(
               name: 'search <query>',
-              type: '[--registry PATH]',
+              type: '[--registry PATH_OR_URL] [--offline]',
               description:
                   'Prints one tab-separated line per match: name, type, '
                   'description.',
             ),
             DocsApiFact(
               name: 'info <name>',
-              type: '[--registry PATH]',
+              type: '[--registry PATH_OR_URL] [--offline]',
               description:
                   'Prints one item\'s full manifest as indented JSON: the '
                   'only command that emits JSON. See Output format.',
             ),
             DocsApiFact(
               name: 'doctor',
-              type: '[--registry PATH]',
+              type: '[--registry PATH_OR_URL] [--offline]',
               description:
                   'Checks the Flutter project, elattar.yaml, declared '
                   'dependency resolution, the manifest, and the registry. '

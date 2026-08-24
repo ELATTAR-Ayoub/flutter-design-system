@@ -274,11 +274,10 @@ class _InstallSection extends StatelessWidget {
       facts: <DocsInstallFact>[
         DocsInstallFact(
           label: 'CLI',
-          value: 'Not available',
+          value: 'elattar add toggle-group',
           description:
-              'toggle-group is not yet a registry item, so `elattar add '
-              'toggle-group` will not resolve. It is among the Wave 1 base '
-              'components still awaiting a manifest.',
+              'toggle-group is a registry item, so this resolves it and its '
+              'dependencies and copies the source into your project.',
         ),
         DocsInstallFact(
           label: 'Manual: package mode (supported today)',
@@ -303,7 +302,7 @@ class _InstallSection extends StatelessWidget {
         ),
         DocsInstallFact(
           label: 'Status',
-          value: 'Stable, installable through lattar add toggle-group',
+          value: 'Stable, installable through elattar add toggle-group',
           description:
               'Ported and tested against '
               'lib/src/components/toggle_group.dart.',

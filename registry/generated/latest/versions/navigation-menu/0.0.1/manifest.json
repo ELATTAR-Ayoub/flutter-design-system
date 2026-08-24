@@ -29,6 +29,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/navigation-menu",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/navigation_menu.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/navigation_menu.dart",
   "deprecated": false
 }

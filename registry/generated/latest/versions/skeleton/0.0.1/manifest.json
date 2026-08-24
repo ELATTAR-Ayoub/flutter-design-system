@@ -25,6 +25,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/skeleton",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/skeleton.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/skeleton.dart",
   "deprecated": false
 }

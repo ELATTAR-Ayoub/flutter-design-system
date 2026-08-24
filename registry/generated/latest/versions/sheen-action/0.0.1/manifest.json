@@ -25,6 +25,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/docs/effects/sheen-action",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/effects/sheen_action.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/effects/sheen_action.dart",
   "deprecated": false
 }

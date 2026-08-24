@@ -1,4 +1,5 @@
 import 'package:elattar_design_system/elattar_design_system.dart';
+import 'package:example/components_docs/catalog.dart';
 import 'package:example/components_docs/input_select_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -115,11 +116,18 @@ void main() {
     expect(find.text('Selected: popular'), findsOneWidget);
 
     // Same reasoning as the Input page's pager assertion above: `select`'s
-    // real "next" neighbour in the 34-entry `componentDocs` catalog is
-    // `separator`, not `dialog`.
-    final Finder nextLink = find
-        .widgetWithText(ElButton, 'Separator, Empty & Kbd')
-        .last;
+    // real "next" neighbour in `componentDocs` is `separator`.
+    //
+    // The label is read from the catalog rather than written out again. It
+    // was written out, as 'Separator, Empty & Kbd', and when 1e1fa1d
+    // reshaped every page onto its own counterpart the entry became plain
+    // 'Separator' — leaving this finder matching nothing and the suite red
+    // at HEAD. A pager assertion should fail when the pager breaks, not when
+    // a page is renamed.
+    final String nextTitle = componentDocs
+        .firstWhere((ComponentDocEntry entry) => entry.name == 'separator')
+        .title;
+    final Finder nextLink = find.widgetWithText(ElButton, nextTitle).last;
     await tester.ensureVisible(nextLink);
     await tester.tap(nextLink);
     await tester.pumpAndSettle();

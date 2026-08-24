@@ -171,9 +171,9 @@ class _AlertArticle extends StatelessWidget {
         id: 'install',
         title: 'Installation',
         description:
-            'alert has no registry/components/alert.json manifest yet, so '
-            'elattar add alert is not yet available -- copy the source '
-            'file directly until that manifest lands.',
+            'alert ships in the registry, so `elattar add alert` installs it '
+            'and everything it depends on. Copying the source by hand still '
+            'works if you would rather not add the CLI.',
         child: DocsCodeExample(
           title: 'Manual installation',
           description:

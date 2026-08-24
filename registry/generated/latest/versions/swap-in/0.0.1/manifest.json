@@ -25,6 +25,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/docs/motion/swap-in",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/motion/swap_in.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/motion/swap_in.dart",
   "deprecated": false
 }

@@ -109,7 +109,7 @@ class _NativeSelectArticle extends StatelessWidget {
           id: 'install',
           title: 'Installation',
           description:
-              'Install with lattar add native-select, or import from the package barrel when you depend on the package directly.',
+              'Install with elattar add native-select, or import from the package barrel when you depend on the package directly.',
           child: DocsCodeExample(
             title: 'Package import',
             command: DocsCodeCommand(

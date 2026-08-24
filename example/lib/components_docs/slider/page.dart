@@ -94,11 +94,10 @@ class _SliderArticle extends StatelessWidget {
           facts: <DocsInstallFact>[
             const DocsInstallFact(
               label: 'Status',
-              value: 'Stable, installable through lattar add slider',
+              value: 'Stable, installable through elattar add slider',
               description:
-                  'Ported and tested against lib/src/components/slider.dart. '
-                  'It is not yet a registry item, so elattar add slider '
-                  'will not resolve: see Installation below.',
+                  'Ported and tested against lib/src/components/slider.dart, '
+                  'and shipped as a registry item: see Installation below.',
             ),
             DocsInstallFact(
               label: 'Version',
@@ -157,10 +156,9 @@ class _SliderArticle extends StatelessWidget {
                 label: 'CLI',
                 value: 'registry/components/slider.json',
                 description:
-                    'slider is not yet a registry item, so `elattar add '
-                    'slider` will not resolve. It is one of the Wave 2 form '
-                    'components still awaiting a manifest: see the Phase J '
-                    'documentation plan.',
+                    'slider is a registry item, so `elattar add slider` '
+                    'resolves it and its dependencies and copies the source '
+                    'into your project.',
               ),
               const DocsInstallFact(
                 label: 'Manual: package mode (supported today)',

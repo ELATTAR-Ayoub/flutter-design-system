@@ -181,8 +181,9 @@ class _ArticleContent extends StatelessWidget {
     id: 'install',
     title: 'Installation',
     description:
-        'carousel ships in the registry, so `elattar add carousel` '
-        'is not available: install by copying the source file manually.',
+        'carousel ships in the registry, so `elattar add carousel` installs '
+        'it and everything it depends on. Copying the source by hand is the '
+        'alternative, not the fallback.',
     child: DocsInstallFacts(
       title: 'Installation facts',
       facts: <DocsInstallFact>[

@@ -30,7 +30,7 @@ body:
     id: location
     attributes:
       label: Affected component or page
-      description: Include the `Ds*` API, example route, test, or document section if known.
+      description: Include the `El*` API, example route, test, or document section if known.
     validations:
       required: true
   - type: textarea

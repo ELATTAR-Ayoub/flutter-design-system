@@ -888,7 +888,7 @@ class _DependenciesSection extends StatelessWidget {
             'track/focus-ring/hit-area primitive Checkbox and '
             'RadioGroupItem also build on).',
         'Internal dependencies (this page\'s own honest list, since no '
-            'registry dependencies resolved by lattar add switch: ${switchDoc.dependencies.join(', ')}.',
+            'registry dependencies resolved by elattar add switch: ${switchDoc.dependencies.join(', ')}.',
       ]),
     );
   }

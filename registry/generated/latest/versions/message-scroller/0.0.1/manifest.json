@@ -27,6 +27,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/message-scroller",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/message_scroller.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/message_scroller.dart",
   "deprecated": false
 }
