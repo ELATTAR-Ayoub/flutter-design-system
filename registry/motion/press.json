@@ -9,7 +9,7 @@
     {
       "source": "lib/src/motion/press.dart",
       "target": "@motion/press.dart",
-      "sha256": "d16c6e1fdb9de0b82039a835f2e164be6d973256d535850202648ad2ffd52bd3"
+      "sha256": "f7c4f8793598813648cb50ef8d8cab8eddec57157e61aa7aecb2cfd9883370cf"
     }
   ],
   "registryDependencies": [

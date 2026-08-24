@@ -9,7 +9,7 @@
     {
       "source": "lib/src/effects/glass.dart",
       "target": "@effects/glass.dart",
-      "sha256": "0f4b7ee33533e4db8f4e84a8d75ed06c1adcf5dab2f9cf6e9d3f97ed7ba8120a"
+      "sha256": "004590a21f45286e5fe19a71d546af239f8b84bf0c9557dfe1dde7f0d22b3994"
     }
   ],
   "registryDependencies": [

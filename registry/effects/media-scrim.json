@@ -9,7 +9,7 @@
     {
       "source": "lib/src/effects/media_scrim.dart",
       "target": "@effects/media_scrim.dart",
-      "sha256": "90b6f7f70f9e434f60bfd6d85124b0141d92bf9f8892eeef36e9d2af512b988d"
+      "sha256": "2176130797be665ba0be94618f5c8fa38697b352e587131301d76f25aaaa0ceb"
     }
   ],
   "registryDependencies": [

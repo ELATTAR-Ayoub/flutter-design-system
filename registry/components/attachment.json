@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/attachment.dart",
       "target": "@ui/attachment.dart",
-      "sha256": "f0b8df598d68c590c5ed28ee7af12babc81c131e3406e960a60fbba871f38da0"
+      "sha256": "52adb0e2089bf1d1a549dfadc50af6ae9c81f439a17969a0fbe6718972d174d9"
     }
   ],
   "registryDependencies": [

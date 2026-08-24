@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/badge.dart",
       "target": "@ui/badge.dart",
-      "sha256": "aab7dfe401807ed17d18b738a88def8b7572ab2248ea67efd71a7cbe16635910"
+      "sha256": "52f939f0366901d11de13387e78993a623a0aac67c013042dd3860ed02e019ac"
     }
   ],
   "registryDependencies": [

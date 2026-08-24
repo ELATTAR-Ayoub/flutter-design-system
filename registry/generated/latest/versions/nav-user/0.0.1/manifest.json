@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/nav_user.dart",
       "target": "@ui/nav_user.dart",
-      "sha256": "5b893254e0b2c5e337ed0607980b38b1659f35284ff6cb22c20b2e8686c3d2dc"
+      "sha256": "ebc79da2ff91d5919e074e18ed5c9825acfae3dfbf468f433952bef0da7a6b58"
     }
   ],
   "registryDependencies": [

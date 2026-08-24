@@ -14,7 +14,7 @@
     {
       "source": "lib/src/components/icon_paths.dart",
       "target": "@ui/icon_paths.dart",
-      "sha256": "a435776555a1e8fc5f68ff440e8ba01be40c1b82d05b6b7acb6774f335a2cca0"
+      "sha256": "efb17140bdc3ad2148ba4676a755298d8154e285a6f94bbb8f849bcd6b8827c8"
     },
     {
       "source": "lib/src/components/icon_paths.g.dart",

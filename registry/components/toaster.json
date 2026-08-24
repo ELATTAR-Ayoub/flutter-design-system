@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/toaster.dart",
       "target": "@ui/toaster.dart",
-      "sha256": "ae471a653d6646ce0f1f914261cf261ce94440ffbca1cc99fbc015f024a7c3b5"
+      "sha256": "82cd824cfd9d49f49e042725a447fb262afa656760742604a0f6da1e46794512"
     }
   ],
   "registryDependencies": [

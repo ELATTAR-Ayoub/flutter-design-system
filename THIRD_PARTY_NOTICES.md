@@ -138,7 +138,7 @@ second reason the generator embeds the whole file.
 | | |
 | --- | --- |
 | Redistributed file | [`shaders/orb.frag`](shaders/orb.frag), and its byte copy [`example/shaders/orb.frag`](example/shaders/orb.frag) |
-| sha256 | `95a0050d596eda3b0cd9fe8f61bd4a7b152a5eed66bc7532b997518ef04a92fe` |
+| sha256 | `4ece99223fec1d84a38186aca76b35b2be62652dc1b65e47f3a63420a360fb8f` |
 | Upstream | `elevenlabs/ui` — the Orb, `https://ui.elevenlabs.io/r/orb.json` |
 | License | MIT, `Copyright (c) 2025 Eleven Labs Inc.` |
 | Notice file | [`third_party/elevenlabs-ui/LICENSE`](third_party/elevenlabs-ui/LICENSE) |

@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/table.dart",
       "target": "@ui/table.dart",
-      "sha256": "a362e2e90d9c0126d357f6cddd026b74c70ee9ba6fa979a47cf50507d2c3bbd2"
+      "sha256": "8a37476d34433f1e9f4d39d977670a004a64ab94d85b4228b83bf42bdd534ae8"
     }
   ],
   "registryDependencies": [

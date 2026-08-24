@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/input_otp.dart",
       "target": "@ui/input_otp.dart",
-      "sha256": "8649b608e076fb22d842f42ec1703310b90245319893d7129a103dfd39d8b684"
+      "sha256": "6a38632d9d747d3da37540c81dbdbe0ac235fd9e33dbc630feef3d56789d4608"
     }
   ],
   "registryDependencies": [

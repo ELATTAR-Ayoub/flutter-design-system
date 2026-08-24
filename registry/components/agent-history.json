@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/agent_history.dart",
       "target": "@ui/agent_history.dart",
-      "sha256": "5f979061ed666c457acac7546dc6cc8340b1804460fabe3e008db7ab6c15bbf3"
+      "sha256": "bfec24f48db67d76456d3571c29e1298edeebc31042dbe4c06240557293a7a9d"
     }
   ],
   "registryDependencies": [

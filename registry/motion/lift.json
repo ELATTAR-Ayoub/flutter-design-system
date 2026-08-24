@@ -9,7 +9,7 @@
     {
       "source": "lib/src/motion/lift.dart",
       "target": "@motion/lift.dart",
-      "sha256": "e0288db96ee3ef9b59f6449e6724e96d59fe3b0126bf4e6d398a5e7cd338c130"
+      "sha256": "04d29c51c343228df0e4cd77d36043f7330a89f5fb6dec41125ef984466bdcd0"
     }
   ],
   "registryDependencies": [

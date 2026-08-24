@@ -9,7 +9,7 @@
     {
       "source": "lib/src/effects/page_glow.dart",
       "target": "@effects/page_glow.dart",
-      "sha256": "b2da307d4f9d369d00544a24d1ad58fe8feb7bc34a0ed05c01af27a78ec037a0"
+      "sha256": "c85b0c387cd46b69a5d88c36a546a625d32d1ebbfd05f944b0bbd2fd3eb95382"
     }
   ],
   "registryDependencies": [

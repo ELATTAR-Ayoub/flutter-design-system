@@ -9,7 +9,7 @@
     {
       "source": "lib/src/effects/machine_surface.dart",
       "target": "@effects/machine_surface.dart",
-      "sha256": "2cd5fcbef7dd7cca3977175bac3cbbc3fad7b1ee940eddd940d1d533a9fa2df1"
+      "sha256": "a386bc6b58b82a10af53935691cbc3310f00392cdd017481efaaee1e1514d239"
     }
   ],
   "registryDependencies": [

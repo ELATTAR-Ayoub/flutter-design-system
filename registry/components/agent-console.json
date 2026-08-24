@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/agent_console.dart",
       "target": "@ui/agent_console.dart",
-      "sha256": "5e8c43ebddbefdd7edf0e901060591d38829d76227fd60af47e34ff4bb22a513"
+      "sha256": "8eb348aaca1c3123439ecfd01e145ccf62ad3fefa936e0c35250340fac556f23"
     }
   ],
   "registryDependencies": [

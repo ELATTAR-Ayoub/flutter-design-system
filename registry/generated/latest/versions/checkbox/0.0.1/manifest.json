@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/checkbox.dart",
       "target": "@ui/checkbox.dart",
-      "sha256": "af8654cd28f5780376d0b5a93686dd4045f0f0a068db9dba6c88ebfb197ade5d"
+      "sha256": "06ed10982dd67e7f38f121dd32c695cc5f6813c508457f9b26c62edc2320eb28"
     }
   ],
   "registryDependencies": [

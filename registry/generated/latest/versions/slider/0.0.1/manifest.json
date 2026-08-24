@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/slider.dart",
       "target": "@ui/slider.dart",
-      "sha256": "32f8b64f199da63386b478c9a25bfe9f967f041a17229e6d5caa3254771070f0"
+      "sha256": "cb4040409020e626755fb0a16216b10eca80358f92ebee344a3600b16b269435"
     }
   ],
   "registryDependencies": [

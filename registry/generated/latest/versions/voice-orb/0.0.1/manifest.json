@@ -9,7 +9,7 @@
     {
       "source": "lib/src/effects/voice_orb.dart",
       "target": "@effects/voice_orb.dart",
-      "sha256": "1bb36a44d3b812401ed677beef720372af9df805bb6d8537dff8985999c4771b"
+      "sha256": "de8bd6cb0e0dcc1ee19f9a4514d8d58af530cdac67ceec7845981ad078ba5888"
     }
   ],
   "registryDependencies": [
@@ -29,7 +29,7 @@
     {
       "source": "shaders/orb.frag",
       "target": "@shaders/orb.frag",
-      "sha256": "95a0050d596eda3b0cd9fe8f61bd4a7b152a5eed66bc7532b997518ef04a92fe"
+      "sha256": "4ece99223fec1d84a38186aca76b35b2be62652dc1b65e47f3a63420a360fb8f"
     }
   ],
   "licenses": [

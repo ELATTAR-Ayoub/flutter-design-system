@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/chart.dart",
       "target": "@ui/chart.dart",
-      "sha256": "c19f07ba4cf2feae639088efc492a7f3c2fd1e8e5f8838ad8fa2dd6c17b7d41e"
+      "sha256": "7fd4d95b6be8dcfd576f188cb664340fe22a84d8124c0dd2ea47e3546676dc77"
     }
   ],
   "registryDependencies": [

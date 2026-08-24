@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/chart_polar.dart",
       "target": "@ui/chart_polar.dart",
-      "sha256": "205725bbcb1e7300317dbd6579829d15c1f5644a25ed6070475731b1b5759f9f"
+      "sha256": "482707fc3065b5d78b421a316588bcfe2f517d31e5771fca00ca3dec322b4e98"
     }
   ],
   "registryDependencies": [

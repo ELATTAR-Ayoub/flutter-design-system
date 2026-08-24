@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/agent_markdown.dart",
       "target": "@ui/agent_markdown.dart",
-      "sha256": "17ca7f28c932e2759ea733c8b1634be96a04b0934ad09bd998634fca2da39f86"
+      "sha256": "2584998206d2184e1937f7509a0e8559d24dbd97901d7a9cbe5e4ebae9c74c68"
     }
   ],
   "registryDependencies": [
