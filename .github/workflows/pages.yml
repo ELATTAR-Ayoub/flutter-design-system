@@ -1,32 +1,48 @@
-# GATED (Phase I, F27 — see docs/superpowers/reports/public-release/phase-i-audit-findings.md).
+# GATED. Deployment is manual until the release gates below are closed.
 #
-# The automatic `push: branches: [main]` trigger was removed because a single
-# merge to main would publish, simultaneously and publicly, every blocker that
-# audit records: a NOTICES file whose license notice is the literal string
-# "TODO: Add your license here." (F1); three SIL OFL fonts (Inter, Geist Mono,
-# Redaction 35) redistributed with no license text (F2); unattributed Lucide
-# icon geometry (F3), an unattributed MIT shader (F4), and a texture of
-# unknown provenance (F5); a homepage "OPEN SOURCE" badge that is false while
-# LICENSE is a placeholder (F11); a quickstart command that cannot work for
-# any reader (F8); and a developer-only toast string aimed at public readers
-# (F13).
+# The original `push: branches: [main]` trigger was removed during the Phase I
+# audit because one merge would have published, publicly and simultaneously,
+# every blocker that audit found. Most of them are now closed — see
+# `docs/superpowers/reports/public-release/v0.0.1-public-release-baseline.md`,
+# which classifies each one against the commit it was fixed in rather than
+# repeating the original list.
 #
-# Do not restore the `push` trigger until ALL of the following are closed:
-#   - F1/F2/F3/F4/F5 (licensing owner decisions — a real LICENSE is chosen,
-#     the OFL notices are bundled, and the Lucide/orb/texture provenance is
-#     resolved or the assets are replaced)
-#   - F8 (the broken `dart run elattar_cli init` quickstart command)
-#   - F11 (the false "OPEN SOURCE" badge)
-#   - F13 (the developer toast string reachable by public readers)
-# F9/F10/F14/F15 are the same audit's site-copy findings and should be closed
-# before re-gating too, even though they are not independently blocking.
+# Closed since the gate was written: the placeholder LICENSE (a real MIT
+# license with the confirmed copyright line), the three unlicensed font
+# binaries, the unattributed Lucide geometry, the unattributed shader, the
+# texture of unknown provenance (regenerated deterministically), the broken
+# quickstart command, the false "OPEN SOURCE" badge, and the developer toast
+# shipped to public readers.
 #
-# Until then, deploy manually and deliberately: Actions tab -> "Deploy Docs"
-# -> "Run workflow".
+# STILL OPEN, and each one blocks restoring an automatic trigger:
+#
+#   1. The repository is not public. Every registry `sourceLink`, every plugin
+#      install command on /skills, and every clone URL in the docs is a 404 to
+#      an anonymous reader, so deploying now publishes a site whose links do
+#      not work.
+#   2. `main` does not contain this branch. All 99 `sourceLink` values target
+#      `blob/main/...`; publishing before that merge ships 99 dead links even
+#      once the repository is public.
+#   3. The /skills page still publishes GitHub-form plugin install commands
+#      against that unreachable repository.
+#   4. Docs routing is incomplete: five of the seven /docs guide cards still
+#      navigate to the homepage, and three declared routes have no page.
+#
+# Until then: Actions -> "Deploy Docs" -> "Run workflow", deliberately.
 name: Deploy Docs
 
 on:
   workflow_dispatch:
+    inputs:
+      stage_registry:
+        description: >-
+          Stage the generated registry at /registry/<version>/ in the artifact.
+        type: boolean
+        default: true
+      registry_version:
+        description: The immutable registry version to publish.
+        type: string
+        default: 0.0.1
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -76,6 +92,27 @@ jobs:
       - name: Build example web release
         working-directory: example
         run: flutter build web --release --base-href /flutter-design-system/
+
+      # The registry is staged INTO the built site, so the CLI's default
+      # registry URL and the documentation share one origin and one
+      # deployment. Staging after the build is deliberate: `flutter build web`
+      # clears its output directory, so anything staged first would be erased.
+      #
+      # `stage.dart` refuses to overwrite an already-published version with
+      # different bytes. That refusal is the whole guarantee behind the CLI
+      # pinning `/registry/0.0.1/` — a released CLI must not start installing
+      # different sources because a later deploy reused the path.
+      - name: Stage the versioned registry
+        if: ${{ inputs.stage_registry }}
+        run: >-
+          dart run tool/release_registry/bin/stage.dart
+          --version ${{ inputs.registry_version }}
+          --web-root example/build/web
+          --commit ${{ github.sha }}
+
+      - name: Show what will be published
+        if: ${{ inputs.stage_registry }}
+        run: cat example/build/web/registry/${{ inputs.registry_version }}/release.json
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

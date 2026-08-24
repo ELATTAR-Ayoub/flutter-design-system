@@ -3,7 +3,70 @@
 | tool | job |
 |---|---|
 | `generate_icons.mjs` | emits the full lucide glyph registry from the reference's own installed package |
+| `generate_perlin_texture/` | regenerates the voice orb's tiling noise field from a checked-in seed |
+| `registry_builder/` | builds and validates `registry/generated/latest` from the source manifests |
+| `release_registry/` | stages a generated registry into the published site artifact |
 | `verify/` | the side-by-side pixel-parity rig — see `verify/README.md` |
+
+---
+
+# `release_registry/` — publishing a registry version
+
+The CLI pins `https://elattar-ayoub.github.io/flutter-design-system/registry/<version>/`
+and refuses to follow a moving target. This tool is what makes that pin mean
+something.
+
+## Staging a release
+
+Run it **after** `flutter build web`, because that build clears its own output
+directory:
+
+```sh
+cd example && flutter build web --release --base-href /flutter-design-system/ && cd ..
+dart run tool/release_registry/bin/stage.dart --version 0.0.1 --web-root example/build/web
+```
+
+That copies `registry/generated/latest` to
+`example/build/web/registry/0.0.1/`, validates the copy, and writes a
+`release.json` beside it recording the version, schema version, item count,
+file count, tree hash and the commit it was generated from.
+
+`--alias` also writes a mutable `/registry/latest/` for browsing. **A released
+CLI must never default to it** — that is the whole distinction this tool
+exists to keep.
+
+## Immutability
+
+Staging over an existing version with different bytes is refused, and the
+refusal happens before a single file is written, so a rejected re-stage cannot
+leave the published version half-replaced.
+
+```
+Refusing to overwrite the published registry 0.0.1 with different bytes.
+A released version is immutable: a CLI pinned to /registry/0.0.1/ would
+silently start installing different sources.
+Publish a new version instead.
+
+  - versions/button/0.0.1/logical/ui/button.dart would change
+```
+
+Re-staging *identical* bytes is a no-op and exits 0, so re-running a deploy is
+safe. If you meant to change what a version installs, that is a new version.
+
+## What the validator checks
+
+Not the generated registry — the generator already did that — but the copy
+that will actually be served: `index.json` and `registry.json` agree on
+version and item count, every item's manifest is present and matches its
+catalog entry, every dependency edge lands on an item that shipped, and every
+declared sha256 matches the staged payload's bytes.
+
+## Why Dart and not shell steps in the workflow
+
+So the behaviour a maintainer runs locally and the behaviour CI runs are the
+same code. Path handling is the first thing a shell copy step gets wrong on
+Windows, and a release tool that only works on the runner is a tool nobody can
+debug.
 
 ---
 
