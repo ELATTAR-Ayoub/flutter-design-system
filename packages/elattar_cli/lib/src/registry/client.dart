@@ -18,6 +18,12 @@ const List<String> _logicalTargetPrefixes = <String>[
   '@assets/',
   '@shaders/',
   '@app/',
+  // Third-party notices. Missing from this list, a notice's payload resolves
+  // to `logical/@license/...` instead of `logical/license/...`, so integrity
+  // verification looks for a file the generator never wrote and a consumer
+  // installing `icon` fails on the lucide notice rather than on anything
+  // real.
+  '@license/',
 ];
 
 class RegistryClient {
@@ -198,6 +204,39 @@ class RegistryClient {
       if (item.name == name) return item.version;
     }
     throw RegistryItemNotFoundException(name);
+  }
+
+  /// The verified bytes of one of [item]'s files, as the registry holds them.
+  ///
+  /// This is what an install copies. Reading the payload rather than the
+  /// repository source is what makes a remote registry work at all — a
+  /// globally activated CLI has no checkout to read `lib/src/...` out of —
+  /// and it is also stricter for a local registry, because the bytes that
+  /// land in the consumer are the same bytes whose sha256 was just checked.
+  ///
+  /// [verify] defaults to on and should stay on. It is the only thing
+  /// standing between a corrupted or substituted download and a file written
+  /// into somebody's `lib/`.
+  Future<List<int>> payloadBytes(
+    RegistryItem item,
+    RegistryResource resource, {
+    bool verify = true,
+  }) async {
+    final List<int> bytes = await _source.readBytes(
+      _versionPayloadPath(item.name, item.version, resource.target),
+    );
+    if (verify) {
+      final String actual = sha256Hex(bytes);
+      if (actual != resource.sha256) {
+        throw RegistryIntegrityException(
+          itemName: item.name,
+          target: resource.target,
+          expectedSha256: resource.sha256,
+          actualSha256: actual,
+        );
+      }
+    }
+    return bytes;
   }
 
   Future<void> _verifyItemIntegrity(RegistryItem item) async {

@@ -75,10 +75,18 @@ class RemoteRegistrySource extends RegistrySource {
       await cache.writeBytes(cacheKey, response.bodyBytes);
       return List<int>.from(response.bodyBytes);
     }
+    // A stale cache entry beats a failed request: the registry is immutable
+    // at a versioned URL, so anything cached for this key is still correct.
     final List<int>? cached = await cache.readBytes(cacheKey);
     if (cached != null) return cached;
+    if (response.statusCode == 404) {
+      throw RegistrySourceException(
+        'No registry at $uri (HTTP 404). '
+        'Check the --registry URL, or the `registry:` key in elattar.yaml.',
+      );
+    }
     throw RegistrySourceException(
-      'Registry request failed for $uri with status ${response.statusCode}.',
+      'Registry request failed for $uri with HTTP ${response.statusCode}.',
     );
   }
 

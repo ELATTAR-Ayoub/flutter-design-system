@@ -126,3 +126,34 @@ class InstallPlan {
   bool get canApply => conflicts.isEmpty;
   bool get isEmpty => operations.isEmpty && pubspec.isEmpty;
 }
+
+/// Registry payload bytes, fetched and verified before any file is written.
+///
+/// The installer is synchronous, and fetching a remote payload is not, so the
+/// bytes are gathered first and handed over as a lookup. That ordering is
+/// deliberate beyond convenience: **nothing is written until everything has
+/// been downloaded and every sha256 has matched.** A network failure halfway
+/// through an `add --all` leaves the consumer's tree exactly as it was,
+/// rather than half-installed with a broken barrel.
+///
+/// Keyed by item, version and logical target, so two versions of the same
+/// item cannot collide and a target moving between items is not silently
+/// reused.
+class InstallPayloads {
+  const InstallPayloads(this._bytes);
+
+  /// No payloads staged: every read falls back to the repository tree.
+  const InstallPayloads.empty() : _bytes = const <String, List<int>>{};
+
+  final Map<String, List<int>> _bytes;
+
+  bool get isEmpty => _bytes.isEmpty;
+
+  int get length => _bytes.length;
+
+  static String keyFor(String name, String version, String target) =>
+      '$name@$version:$target';
+
+  List<int>? bytesFor(InstallItem item, String target) =>
+      _bytes[keyFor(item.name, item.version, target)];
+}

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'import_transformer.dart';
@@ -30,6 +31,7 @@ class Installer {
     required List<InstallItem> items,
     bool overwrite = false,
     Map<String, String> textNotices = const <String, String>{},
+    InstallPayloads payloads = const InstallPayloads.empty(),
   }) {
     final List<InstallOperation> operations = <InstallOperation>[];
     final List<InstallConflict> conflicts = <InstallConflict>[];
@@ -46,16 +48,23 @@ class Installer {
           projectRoot.path,
           file.target,
         );
-        final File source = File(_join(repositoryRoot.path, file.source));
-        if (!source.existsSync())
-          throw StateError('Missing registry source: ${file.source}');
         final String content = sourceRewriter.rewrite(
           target: file.target,
           content: transformer.transform(
-            sourcePath: source.path,
+            // The *source* path, not the payload's location on disk. It is
+            // read only to work out relative imports, and a payload staged
+            // under `versions/<item>/<version>/logical/...` would compute the
+            // wrong ones.
+            sourcePath: _join(repositoryRoot.path, file.source),
             targetPath: destination,
             projectRoot: projectRoot.path,
-            content: source.readAsStringSync(),
+            content: _readText(
+              payloads,
+              item,
+              file.source,
+              file.target,
+              repositoryRoot,
+            ),
           ),
         );
         _queue(
@@ -82,6 +91,9 @@ class Installer {
           resource.source,
           repositoryRoot,
           overwrite,
+          payloads: payloads,
+          item: item,
+          target: resource.target,
         );
         assets.add(_relative(projectRoot.path, destination));
       }
@@ -97,6 +109,9 @@ class Installer {
           resource.source,
           repositoryRoot,
           overwrite,
+          payloads: payloads,
+          item: item,
+          target: resource.target,
         );
         // The family comes from the registry entry, never from the file name:
         // `InterVariable.ttf` registers as `InterLocal`, and the installed
@@ -121,6 +136,9 @@ class Installer {
           resource.source,
           repositoryRoot,
           overwrite,
+          payloads: payloads,
+          item: item,
+          target: resource.target,
         );
         shaders.add(_relative(projectRoot.path, destination));
       }
@@ -144,6 +162,9 @@ class Installer {
           resource.source,
           repositoryRoot,
           overwrite,
+          payloads: payloads,
+          item: item,
+          target: resource.target,
         );
       }
     }
@@ -267,19 +288,58 @@ class Installer {
     String destination,
     String source,
     Directory root,
-    bool overwrite,
-  ) {
-    final File file = File(_join(root.path, source));
-    if (!file.existsSync())
-      throw StateError('Missing registry resource: $source');
+    bool overwrite, {
+    InstallPayloads payloads = const InstallPayloads.empty(),
+    InstallItem? item,
+    String? target,
+  }) {
     _queue(
       operations,
       conflicts,
       destination,
       source,
-      file.readAsBytesSync(),
+      _readBytes(payloads, item, source, target, root),
       overwrite,
     );
+  }
+
+  /// The bytes to install: the registry's staged payload when one was
+  /// fetched, otherwise the repository file.
+  ///
+  /// The payload is preferred because it is the artifact whose sha256 was
+  /// verified, and because a CLI installed from pub.dev has no repository to
+  /// fall back to. The fallback exists for the repository's own tests, which
+  /// build items by hand against a source tree and never stage payloads.
+  static List<int> _readBytes(
+    InstallPayloads payloads,
+    InstallItem? item,
+    String source,
+    String? target,
+    Directory root,
+  ) {
+    if (item != null && target != null) {
+      final List<int>? staged = payloads.bytesFor(item, target);
+      if (staged != null) return staged;
+    }
+    final File file = File(_join(root.path, source));
+    if (!file.existsSync())
+      throw StateError('Missing registry resource: $source');
+    return file.readAsBytesSync();
+  }
+
+  static String _readText(
+    InstallPayloads payloads,
+    InstallItem item,
+    String source,
+    String target,
+    Directory root,
+  ) {
+    final List<int>? staged = payloads.bytesFor(item, target);
+    if (staged != null) return utf8.decode(staged);
+    final File file = File(_join(root.path, source));
+    if (!file.existsSync())
+      throw StateError('Missing registry source: $source');
+    return file.readAsStringSync();
   }
 
   void _queueBarrel(

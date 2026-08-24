@@ -14,7 +14,11 @@ import '../install/target_mapper.dart';
 import '../manifest.dart';
 import '../project.dart';
 import '../registry/client.dart';
+import '../registry/file_cache.dart';
+import '../registry/http_fetcher.dart';
+import '../registry/location.dart';
 import '../registry/models.dart';
+import '../registry/source.dart';
 
 const LogicalTargetMapper _targetMapper = LogicalTargetMapper();
 
@@ -33,19 +37,72 @@ const String packageModeUnavailable =
     'it produces. Use `--foundation source`, which copies the foundation into '
     'your project.';
 
-/// A URI scheme, requiring at least two characters before the colon so a
-/// Windows drive letter (`C:\src\registry`) is a path, not a scheme.
-final RegExp _uriScheme = RegExp(r'^[A-Za-z][A-Za-z0-9+.-]+:');
-
 class ElattarCli {
   ElattarCli({
     void Function(String line)? stdoutSink,
     void Function(String line)? stderrSink,
+    RegistryFetcher? fetcher,
+    Directory? cacheDirectory,
+    Directory? workingDirectory,
   }) : _stdout = stdoutSink ?? _defaultStdout,
-       _stderr = stderrSink ?? _defaultStderr;
+       _stderr = stderrSink ?? _defaultStderr,
+       _fetcher = fetcher,
+       _cacheDirectory = cacheDirectory,
+       _workingDirectory = workingDirectory;
 
   final void Function(String line) _stdout;
   final void Function(String line) _stderr;
+
+  /// Substituted by tests for a local `HttpServer`, so the remote code path
+  /// is exercised without the suite depending on the live internet.
+  final RegistryFetcher? _fetcher;
+
+  /// Substituted by tests for a temporary directory, so a test run never
+  /// reads or writes the developer's real cache.
+  final Directory? _cacheDirectory;
+
+  /// The directory commands act from. Defaults to the process's.
+  ///
+  /// A seam rather than `Directory.current`, because `Directory.current` is
+  /// **process**-wide while `dart test` runs test files in separate isolates
+  /// of one process: a suite that set it to a temporary project silently
+  /// changed the working directory of every other suite running at the same
+  /// time. Passing it in keeps each run's notion of "here" to itself.
+  final Directory? _workingDirectory;
+
+  Directory get _here => _workingDirectory ?? Directory.current;
+
+  /// Resolves the registry for one command.
+  ///
+  /// The resolution order lives in [resolveRegistryLocation]; this adds the
+  /// one thing the CLI owes a user on top of it — saying so out loud when a
+  /// local registry was *discovered* rather than named. Silently preferring a
+  /// directory found by walking up from the working directory is how a
+  /// released CLI would install something other than what it advertises.
+  _RegistryContext _registryFor({
+    String? explicit,
+    String? configured,
+    bool offline = false,
+    bool quiet = false,
+  }) {
+    final RegistryLocation location = resolveRegistryLocation(
+      explicit: explicit,
+      configured: configured,
+      workingDirectory: _here,
+    );
+    if (!quiet && location is LocalRegistryLocation && location.discovered) {
+      _stdout(
+        'note: using the local registry found at ${location.display}. '
+        'Pass --registry $defaultRegistryUrl to use the published one.',
+      );
+    }
+    return _RegistryContext.forLocation(
+      location,
+      offline: offline,
+      fetcher: _fetcher,
+      cacheDirectory: _cacheDirectory,
+    );
+  }
 
   Future<int> run(List<String> arguments) async {
     final _ArgCursor cursor = _ArgCursor(arguments);
@@ -72,6 +129,16 @@ class ElattarCli {
     } on FormatException catch (error) {
       _stderr(error.message);
       return 64;
+    } on RegistryLocationException catch (error) {
+      // A registry the CLI cannot use is a usage error, not a crash: same
+      // exit code as an unknown flag, and one sentence rather than a stack.
+      _stderr(error.message);
+      return 64;
+    } on RegistrySourceException catch (error) {
+      // Network and cache failures. 70 (EX_SOFTWARE) rather than 64: the
+      // command was well formed, the world did not cooperate.
+      _stderr(error.message);
+      return 70;
     } on ElattarConfigException catch (error) {
       _stderr(error.message);
       return 78;
@@ -99,6 +166,7 @@ class ElattarCli {
   Future<int> _runInit(_ArgCursor cursor) async {
     String foundation = 'source';
     bool dryRun = false;
+    bool offline = false;
     String? registryPath;
     while (cursor.hasNext) {
       final String value = cursor.take()!;
@@ -106,6 +174,8 @@ class ElattarCli {
         foundation = cursor.requireValue('--foundation');
       } else if (value == '--dry-run') {
         dryRun = true;
+      } else if (value == '--offline') {
+        offline = true;
       } else if (value == '--yes') {
         continue;
       } else if (value == '--registry') {
@@ -122,22 +192,20 @@ class ElattarCli {
     if (foundation != 'source') {
       throw const FormatException('init --foundation must be source.');
     }
-    final FlutterProject project = discoverFlutterProject();
-    final Directory registryDirectory = _discoverRegistryDirectory(
-      registryPath,
-    );
-    final _RegistryContext registry = _RegistryContext.fromLatestDirectory(
-      registryDirectory,
+    final FlutterProject project = discoverFlutterProject(start: _here);
+    final _RegistryContext registry = _registryFor(
+      explicit: registryPath,
+      offline: offline,
     );
     final ElattarConfig config = _configFor(
       project: project,
-      registryDirectory: registryDirectory,
+      location: registry.location,
     );
     final List<RegistryItem> resolved = await registry.client.resolve(<String>[
       'source-foundation',
     ]);
 
-    final _MutationResult mutation = _planMutation(
+    final _MutationResult mutation = await _planMutation(
       project: project,
       registry: registry,
       config: config,
@@ -149,7 +217,7 @@ class ElattarCli {
     if (config.registry == null && mutation.conflicts.isEmpty) {
       _stdout(
         'note: the registry is outside this project, so elattar.yaml pins no '
-        '`registry:` value. Pass --registry ${registryDirectory.path} to '
+        '`registry:` value. Pass --registry ${registry.location.display} to '
         '`elattar add`.',
       );
     }
@@ -160,6 +228,7 @@ class ElattarCli {
     bool overwrite = false;
     bool dryRun = false;
     bool addAll = false;
+    bool offline = false;
     String? registryPath;
     final List<String> names = <String>[];
     while (cursor.hasNext) {
@@ -168,6 +237,8 @@ class ElattarCli {
         overwrite = true;
       } else if (value == '--dry-run') {
         dryRun = true;
+      } else if (value == '--offline') {
+        offline = true;
       } else if (value == '--all') {
         addAll = true;
       } else if (value == '--registry') {
@@ -179,7 +250,7 @@ class ElattarCli {
         names.add(value);
       }
     }
-    final FlutterProject project = discoverFlutterProject();
+    final FlutterProject project = discoverFlutterProject(start: _here);
     final File configFile = File(_join(project.root.path, 'elattar.yaml'));
     if (!configFile.existsSync()) {
       throw const ElattarConfigException(
@@ -196,11 +267,10 @@ class ElattarCli {
         'again.',
       );
     }
-    final Directory registryDirectory = registryPath == null
-        ? _discoverRegistryDirectory(config.registry)
-        : _discoverRegistryDirectory(registryPath);
-    final _RegistryContext registry = _RegistryContext.fromLatestDirectory(
-      registryDirectory,
+    final _RegistryContext registry = _registryFor(
+      explicit: registryPath,
+      configured: config.registry,
+      offline: offline,
     );
     final List<String> requestedNames = await _resolvedAddNames(
       registry: registry,
@@ -219,7 +289,7 @@ class ElattarCli {
     final List<RegistryItem> resolved = await registry.client.resolve(
       requestedNames,
     );
-    final _MutationResult mutation = _planMutation(
+    final _MutationResult mutation = await _planMutation(
       project: project,
       registry: registry,
       config: config,
@@ -233,16 +303,20 @@ class ElattarCli {
 
   Future<int> _runList(_ArgCursor cursor) async {
     String? registryPath;
+    bool offline = false;
     while (cursor.hasNext) {
       final String value = cursor.take()!;
       if (value == '--registry') {
         registryPath = cursor.requireValue('--registry');
+      } else if (value == '--offline') {
+        offline = true;
       } else {
         throw FormatException('Unknown list option: $value');
       }
     }
-    final RegistryClient client = _RegistryContext.fromLatestDirectory(
-      _discoverRegistryDirectory(registryPath),
+    final RegistryClient client = _registryFor(
+      explicit: registryPath,
+      offline: offline,
     ).client;
     final List<RegistryItem> items = await client.list();
     for (final RegistryItem item in items) {
@@ -253,11 +327,14 @@ class ElattarCli {
 
   Future<int> _runSearch(_ArgCursor cursor) async {
     String? registryPath;
+    bool offline = false;
     final List<String> query = <String>[];
     while (cursor.hasNext) {
       final String value = cursor.take()!;
       if (value == '--registry') {
         registryPath = cursor.requireValue('--registry');
+      } else if (value == '--offline') {
+        offline = true;
       } else {
         if (value.startsWith('--')) {
           throw FormatException('Unknown search option: $value');
@@ -268,8 +345,9 @@ class ElattarCli {
     if (query.isEmpty) {
       throw const FormatException('search requires a query.');
     }
-    final RegistryClient client = _RegistryContext.fromLatestDirectory(
-      _discoverRegistryDirectory(registryPath),
+    final RegistryClient client = _registryFor(
+      explicit: registryPath,
+      offline: offline,
     ).client;
     final List<RegistrySearchResult> results = await client.search(
       query.join(' '),
@@ -284,11 +362,14 @@ class ElattarCli {
 
   Future<int> _runInfo(_ArgCursor cursor) async {
     String? registryPath;
+    bool offline = false;
     String? name;
     while (cursor.hasNext) {
       final String value = cursor.take()!;
       if (value == '--registry') {
         registryPath = cursor.requireValue('--registry');
+      } else if (value == '--offline') {
+        offline = true;
       } else {
         if (value.startsWith('--')) {
           throw FormatException('Unknown info option: $value');
@@ -299,8 +380,9 @@ class ElattarCli {
     if (name == null) {
       throw const FormatException('info requires an item name.');
     }
-    final RegistryClient client = _RegistryContext.fromLatestDirectory(
-      _discoverRegistryDirectory(registryPath),
+    final RegistryClient client = _registryFor(
+      explicit: registryPath,
+      offline: offline,
     ).client;
     final RegistryItem item = await client.info(name);
     _stdout(
@@ -329,18 +411,25 @@ class ElattarCli {
 
   Future<int> _runDoctor(_ArgCursor cursor) async {
     String? registryPath;
+    bool offline = false;
+    bool verbose = false;
     while (cursor.hasNext) {
       final String value = cursor.take()!;
       if (value == '--registry') {
         registryPath = cursor.requireValue('--registry');
+      } else if (value == '--offline') {
+        offline = true;
+      } else if (value == '--verbose' || value == '-v') {
+        verbose = true;
       } else {
         throw FormatException('Unknown doctor option: $value');
       }
     }
+    String? configured;
     int issues = 0;
     FlutterProject? project;
     try {
-      project = discoverFlutterProject();
+      project = discoverFlutterProject(start: _here);
       _stdout('ok  flutter project: ${project.root.path}');
     } on FlutterProjectNotFound catch (error) {
       _stderr('err flutter project: ${error.message}');
@@ -354,6 +443,7 @@ class ElattarCli {
           final ElattarConfig config = ElattarConfig.fromYaml(
             configFile.readAsStringSync(),
           );
+          configured = config.registry;
           if (config.foundation == FoundationMode.package) {
             _stderr('err config: foundation=package. $packageModeUnavailable');
             issues++;
@@ -388,22 +478,104 @@ class ElattarCli {
       }
     }
 
+    issues += await _checkRegistry(
+      explicit: registryPath,
+      configured: configured,
+      offline: offline,
+      verbose: verbose,
+    );
+    return issues == 0 ? 0 : 1;
+  }
+
+  /// Reports what registry a command would use, and whether it answers.
+  ///
+  /// `doctor` used to print a directory and an item count, which said nothing
+  /// about the case that now matters most: a released CLI reading a hosted
+  /// registry it may not be able to reach. So this reports the kind, the
+  /// version, the item count, the cache state, and reachability — the five
+  /// things that distinguish "your registry is fine" from each way it is not.
+  ///
+  /// It deliberately does not print the cache path unless [verbose]. That path
+  /// contains a username on every platform, and `doctor` output is the first
+  /// thing anyone pastes into a bug report.
+  Future<int> _checkRegistry({
+    String? explicit,
+    String? configured,
+    required bool offline,
+    required bool verbose,
+  }) async {
+    final _RegistryContext registry;
     try {
-      final Directory registryDirectory = _discoverRegistryDirectory(
-        registryPath,
+      registry = _registryFor(
+        explicit: explicit,
+        configured: configured,
+        offline: offline,
+        // The discovery note belongs to commands that act. `doctor` reports
+        // the same fact in its own line below, with more detail.
+        quiet: true,
       );
-      final RegistryClient client = _RegistryContext.fromLatestDirectory(
-        registryDirectory,
-      ).client;
-      final RegistryIndexDocument index = await client.loadIndex();
+    } on RegistryLocationException catch (error) {
+      _stderr('err registry: ${error.message}');
+      return 1;
+    }
+
+    final RegistryLocation location = registry.location;
+    final String discovered =
+        location is LocalRegistryLocation && location.discovered
+        ? ', discovered'
+        : '';
+    _stdout(
+      'ok  registry source: ${location.kind}$discovered — ${location.display}',
+    );
+
+    final FileRegistryCache? cache = registry.cache;
+    if (cache == null) {
+      _stdout('ok  registry cache: not used (local registry)');
+    } else if (!cache.isPersistent) {
+      // Worth an `err`, not a note: `--offline` cannot work at all in this
+      // state, and the user would otherwise only find out mid-flight.
+      _stderr(
+        'err registry cache: not persistent — this run cannot populate an '
+        'offline cache. Set ELATTAR_CACHE_DIR to a writable directory.',
+      );
+      return 1;
+    } else {
+      final String where = verbose ? ' at ${cache.directory?.path}' : '';
       _stdout(
-        'ok  registry: ${registryDirectory.path} (${index.items.length} items, v${index.registryVersion})',
+        'ok  registry cache: ${cache.entryCount} entries$where'
+        '${offline ? ' (offline: reading cache only)' : ''}',
       );
+    }
+
+    try {
+      final RegistryIndexDocument index = await registry.client.loadIndex();
+      _stdout(
+        'ok  registry: v${index.registryVersion}, ${index.items.length} items, '
+        'schema v${index.schemaVersion}',
+      );
+      if (index.schemaVersion != CliIdentity.registrySchemaVersion) {
+        _stderr(
+          'err registry: schema v${index.schemaVersion} but this CLI speaks '
+          'v${CliIdentity.registrySchemaVersion}.',
+        );
+        return 1;
+      }
+      return 0;
+    } on RegistrySourceException catch (error) {
+      // The distinction the plan asks for, and the one a user actually needs:
+      // an empty cache and an unreachable network are different problems with
+      // different fixes, and `--offline` is what tells them apart.
+      _stderr(
+        offline
+            ? 'err registry: nothing cached for ${location.display}. Run once '
+                  'without --offline to populate the cache.'
+            : 'err registry: ${error.message}',
+      );
+      return 1;
     } on Object catch (error) {
       _stderr('err registry: $error');
-      issues++;
+      return 1;
     }
-    return issues == 0 ? 0 : 1;
   }
 
   /// Reports whether the project's declared dependencies have actually
@@ -477,22 +649,31 @@ class ElattarCli {
     return 0;
   }
 
-  _MutationResult _planMutation({
+  Future<_MutationResult> _planMutation({
     required FlutterProject project,
     required _RegistryContext registry,
     required ElattarConfig config,
     required List<RegistryItem> resolvedItems,
     required bool overwrite,
     required bool dryRun,
-  }) {
+  }) async {
     final Installer installer = Installer();
     final List<InstallItem> installItems = <InstallItem>[
       for (final RegistryItem item in resolvedItems) _toInstallItem(item),
     ];
+    // Everything is downloaded and hash-checked before anything is written.
+    // A network failure or a corrupted payload therefore aborts with the
+    // consumer's tree untouched, rather than half-installed behind a barrel
+    // that references files that never arrived.
+    final InstallPayloads payloads = await _fetchPayloads(
+      registry,
+      resolvedItems,
+    );
     final InstallPlan installPlan = installer.plan(
       projectRoot: project.root,
       repositoryRoot: registry.repositoryRoot,
       items: installItems,
+      payloads: payloads,
       overwrite: overwrite,
       // Passed on every mutation, not only on `init`. `init` is where it
       // first lands, but a project whose `LICENSES/ELATTAR-MIT.txt` was
@@ -549,6 +730,33 @@ class ElattarCli {
       }
     }
     return _MutationResult(writes: writes, conflicts: conflicts);
+  }
+
+  /// Downloads and verifies every byte an install will write.
+  ///
+  /// Runs for a local registry too. The generated payloads are byte-identical
+  /// to the repository sources, so nothing changes for a contributor — but it
+  /// means one code path installs from one kind of artifact, and the bytes
+  /// that land in a consumer are always the ones whose sha256 was just
+  /// checked, rather than whatever the working tree happens to hold.
+  Future<InstallPayloads> _fetchPayloads(
+    _RegistryContext registry,
+    List<RegistryItem> items,
+  ) async {
+    final Map<String, List<int>> bytes = <String, List<int>>{};
+    for (final RegistryItem item in items) {
+      for (final RegistryResource resource in item.resources) {
+        bytes[InstallPayloads.keyFor(
+          item.name,
+          item.version,
+          resource.target,
+        )] = await registry.client.payloadBytes(
+          item,
+          resource,
+        );
+      }
+    }
+    return InstallPayloads(bytes);
   }
 
   List<InstalledItem> _mergedManifestItems(
@@ -656,13 +864,13 @@ class ElattarCli {
 
   ElattarConfig _configFor({
     required FlutterProject project,
-    required Directory registryDirectory,
+    required RegistryLocation location,
   }) {
+    // The location decides what is portable enough to commit: a URL always,
+    // a directory only when it sits inside the project. An absolute local
+    // path in a committed `elattar.yaml` works on exactly one machine.
     return ElattarConfig(
-      registry: projectRelativeRegistry(
-        project.root.absolute.path,
-        registryDirectory.absolute.path,
-      ),
+      registry: location.configValueFor(project.root.absolute.path),
     );
   }
 
@@ -671,15 +879,22 @@ class ElattarCli {
     _stdout('usage:');
     _stdout('  elattar --version');
     _stdout(
-      '  elattar init [--foundation source] [--yes] [--dry-run] [--registry PATH]',
+      '  elattar init [--foundation source] [--yes] [--dry-run] '
+      '[--registry PATH_OR_URL] [--offline]',
     );
     _stdout(
-      '  elattar add <items...> [--all] [--overwrite] [--dry-run] [--registry PATH]',
+      '  elattar add <items...> [--all] [--overwrite] [--dry-run] '
+      '[--registry PATH_OR_URL] [--offline]',
     );
-    _stdout('  elattar list [--registry PATH]');
-    _stdout('  elattar search <query> [--registry PATH]');
-    _stdout('  elattar info <name> [--registry PATH]');
-    _stdout('  elattar doctor [--registry PATH]');
+    _stdout('  elattar list [--registry PATH_OR_URL] [--offline]');
+    _stdout('  elattar search <query> [--registry PATH_OR_URL] [--offline]');
+    _stdout('  elattar info <name> [--registry PATH_OR_URL] [--offline]');
+    _stdout(
+      '  elattar doctor [--registry PATH_OR_URL] [--offline] [--verbose]',
+    );
+    _stdout('');
+    _stdout('  --registry takes a local directory or an http(s) URL.');
+    _stdout('  Default: $defaultRegistryUrl');
     return 0;
   }
 
@@ -790,22 +1005,63 @@ List<String> _dedupeNames(List<String> names) {
 
 class _RegistryContext {
   const _RegistryContext({
-    required this.directory,
+    required this.location,
     required this.repositoryRoot,
     required this.client,
+    this.cache,
   });
 
-  final Directory directory;
+  /// Where the registry lives, local or remote.
+  final RegistryLocation location;
+
+  /// The repository the local flow reads sources from.
+  ///
+  /// Meaningless for a remote registry — there is no checkout — so it points
+  /// at the working directory there and nothing reads it: a remote install
+  /// runs entirely on staged payloads.
   final Directory repositoryRoot;
   final RegistryClient client;
 
-  factory _RegistryContext.fromLatestDirectory(Directory latestDirectory) {
-    final Directory repoRoot = latestDirectory.parent.parent.parent;
-    return _RegistryContext(
-      directory: latestDirectory,
-      repositoryRoot: repoRoot,
-      client: RegistryClient.localGenerated(latestDirectory),
-    );
+  /// The persistent cache, when this registry has one. Local registries do
+  /// not: the files are already on disk.
+  final FileRegistryCache? cache;
+
+  /// Builds the context for a resolved [location].
+  ///
+  /// [fetcher] and [cacheDirectory] exist so tests can point the remote path
+  /// at a local `HttpServer` and a temporary directory. Nothing in the suite
+  /// touches the internet.
+  factory _RegistryContext.forLocation(
+    RegistryLocation location, {
+    bool offline = false,
+    RegistryFetcher? fetcher,
+    Directory? cacheDirectory,
+  }) {
+    switch (location) {
+      case LocalRegistryLocation(:final Directory directory):
+        return _RegistryContext(
+          location: location,
+          repositoryRoot: directory.parent.parent.parent,
+          client: RegistryClient.localGenerated(directory),
+        );
+      case RemoteRegistryLocation(:final Uri baseUri):
+        final FileRegistryCache cache = FileRegistryCache.open(
+          directory: cacheDirectory,
+        );
+        return _RegistryContext(
+          location: location,
+          // Nothing reads this for a remote registry; a remote install runs
+          // entirely on payloads that were fetched and hash-verified first.
+          repositoryRoot: Directory.current,
+          cache: cache,
+          client: RegistryClient.remote(
+            baseUri: baseUri,
+            fetcher: fetcher ?? httpRegistryFetcher(),
+            cache: cache,
+            offline: offline,
+          ),
+        );
+    }
   }
 }
 
@@ -892,41 +1148,6 @@ InstallItem _toInstallItem(RegistryItem item) {
     ],
     dependencies: item.registryDependencies,
     pubDependencies: item.pubDependencies,
-  );
-}
-
-Directory _discoverRegistryDirectory(String? explicitPath) {
-  if (explicitPath != null && explicitPath.trim().isNotEmpty) {
-    final String value = explicitPath.trim();
-    // A URL here used to reach `Directory(...)` and surface as an unhandled
-    // FileSystemException with a raw Dart stack trace. There is no HTTP
-    // fetcher, so a remote value can only fail; it fails with a sentence.
-    if (_uriScheme.hasMatch(value)) {
-      throw FormatException(
-        'Remote registries are not supported yet: $value\n'
-        'elattar ${CliIdentity.version} reads a local registry only. '
-        'Point --registry (or the `registry:` key in elattar.yaml) at a '
-        '`registry/generated/latest` directory.',
-      );
-    }
-    final Directory directory = Directory(value).absolute;
-    if (!directory.existsSync()) {
-      throw FormatException('Registry path does not exist: ${directory.path}');
-    }
-    return directory;
-  }
-  Directory current = Directory.current.absolute;
-  while (true) {
-    final Directory candidate = Directory(
-      _join(current.path, 'registry/generated/latest'),
-    );
-    if (candidate.existsSync()) return candidate;
-    final Directory parent = current.parent;
-    if (parent.path == current.path) break;
-    current = parent;
-  }
-  throw const FormatException(
-    'Could not find registry/generated/latest. Pass --registry PATH.',
   );
 }
 

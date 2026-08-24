@@ -41,14 +41,22 @@ class ElattarConfig {
 
   final String schema;
 
-  /// Where to read the registry from, or null when the project does not pin
-  /// one and every command must be given `--registry` (or run somewhere a
-  /// `registry/generated/latest` directory is discoverable above the working
-  /// directory).
+  /// Where to read the registry from, or null when the project pins nothing.
   ///
-  /// Only ever a project-relative directory path. A URI is rejected: there is
-  /// no HTTP fetcher, so a remote value can only fail, and it must fail with a
-  /// sentence rather than a stack trace.
+  /// Two shapes are portable enough to commit, and those are the only two
+  /// written here:
+  ///
+  ///  * an `http`/`https` URL — the published registry, or a mirror;
+  ///  * a **project-relative** directory path, for a project that vendors a
+  ///    registry inside itself.
+  ///
+  /// An absolute local path is deliberately never written. It was, once, and
+  /// the result was an `elattar.yaml` that worked on the machine that ran
+  /// `init` and exited 64 everywhere else — a file teams commit must not
+  /// encode one developer's filesystem.
+  ///
+  /// Null means every command supplies `--registry`, or falls back to the
+  /// registry this CLI version pins.
   final String? registry;
 
   final FoundationMode foundation;

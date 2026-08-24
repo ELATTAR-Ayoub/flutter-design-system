@@ -287,19 +287,41 @@ flutter:
       expect('${add.stdout}', contains('lib/components/ui/safe_area.dart'));
     });
 
-    test('a URL registry fails with a sentence, not a stack trace', () async {
+    test('a registry scheme that is not http(s) is refused by name', () async {
+      // The rule changed in 0.0.1: http and https are now real registry
+      // sources. Everything else still has to fail as one sentence naming the
+      // scheme, rather than reaching `Directory(...)` and surfacing as a raw
+      // FileSystemException with a Dart stack attached.
       final _Capture capture = _Capture();
       final int code = await capture.cli.run(<String>[
         'list',
         '--registry',
-        'https://elattar.dev/registry',
+        'ftp://example.invalid/registry',
       ]);
 
       expect(code, 64);
-      expect(capture.stderr, contains('Remote registries are not supported'));
-      expect(capture.stderr, contains('https://elattar.dev/registry'));
+      expect(capture.stderr, contains('Unsupported registry scheme "ftp"'));
+      expect(capture.stderr, contains('http/https'));
       expect(capture.stderr, isNot(contains('#0')));
       expect(capture.stderr, isNot(contains('FileSystemException')));
+    });
+
+    test('an unreachable https registry fails with a sentence too', () async {
+      // The remote path is exercised properly against a local HttpServer in
+      // `remote_registry_test.dart`. What matters here is the shape of the
+      // failure a user sees when the host simply is not there.
+      final _Capture capture = _Capture();
+      final int code = await capture.cli.run(<String>[
+        'list',
+        '--registry',
+        'https://registry.invalid/elattar/',
+      ]);
+
+      expect(code, 70, reason: capture.stderr);
+      expect(capture.stderr, contains('registry.invalid'));
+      expect(capture.stderr, contains('--offline'));
+      expect(capture.stderr, isNot(contains('#0')));
+      expect(capture.stderr, isNot(contains('SocketException')));
     });
 
     test('a Windows drive path is a path, not a URI scheme', () async {
@@ -312,10 +334,7 @@ flutter:
 
       expect(code, 64);
       expect(capture.stderr, contains('Registry path does not exist'));
-      expect(
-        capture.stderr,
-        isNot(contains('Remote registries are not supported')),
-      );
+      expect(capture.stderr, isNot(contains('Unsupported registry scheme')));
     });
 
     test(
