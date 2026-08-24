@@ -1,0 +1,24 @@
+{
+  "name": "safe-area",
+  "type": "component",
+  "version": "0.0.1",
+  "description": "The system-bar contract — **a user-ordered mobile adaptation, not a port.**",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/safe_area.dart",
+      "target": "@ui/safe_area.dart",
+      "sha256": "7288d4180792761d303fb4ef8cedd2908f1fd1affbead928571f8e2816b6a64f"
+    }
+  ],
+  "registryDependencies": [],
+  "semanticDependencies": [],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "documentationRoute": "/components/safe-area",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/safe_area.dart",
+  "deprecated": false
+}

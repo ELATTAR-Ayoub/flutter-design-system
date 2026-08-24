@@ -9,17 +9,17 @@
 ///
 /// The error is at most half a pixel per line and it **accumulates**: a
 /// foundation page is a few hundred lines deep, and by its foot the port sat
-/// 65px below the reference. [DsLineBox] gives a paragraph back the height CSS
+/// 65px below the reference. [ElLineBox] gives a paragraph back the height CSS
 /// gives it, so every box under it lands where the browser puts it. Where the
 /// engine already agrees — a line whose rounded metrics happen to be exact, or
 /// a future engine that stops rounding — the correction is the identity.
 ///
-/// [DsInlineBox] is the other half of the same story: a CSS **inline** element
+/// [ElInlineBox] is the other half of the same story: a CSS **inline** element
 /// (the `<code>` chip in a sentence) contributes only its own `line-height` to
 /// the line box it sits in, while its border box is the font's content area
 /// plus its padding and border, which is free to overflow that line. A Flutter
 /// `WidgetSpan` makes no such distinction — whatever the widget measures is
-/// what the line grows to. [DsInlineBox] hides the frame from the line.
+/// what the line grows to. [ElInlineBox] hides the frame from the line.
 library;
 
 import 'dart:ui' as ui;
@@ -42,7 +42,7 @@ final Map<TextStyle, double> _engineLineCache = <TextStyle, double>{};
 ///
 /// Measured rather than derived: the rounding turns on the font's own ascent
 /// and descent, which only the engine knows.
-double dsEngineLineHeight(TextStyle style) {
+double elEngineLineHeight(TextStyle style) {
   return _engineLineCache.putIfAbsent(style, () {
     final TextPainter painter = TextPainter(
       // allow-hardcoded: a probe glyph, not copy.
@@ -61,7 +61,7 @@ final Map<TextStyle, double> _contentAreaCache = <TextStyle, double>{};
 /// The CSS **content area** for [style]: the font's ascent plus its descent,
 /// each rounded to a whole pixel first, which is what Blink does before it
 /// draws an inline element's border box.
-double dsContentAreaHeight(TextStyle style) {
+double elContentAreaHeight(TextStyle style) {
   return _contentAreaCache.putIfAbsent(style, () {
     final TextPainter painter = TextPainter(
       // allow-hardcoded: a probe glyph, not copy.
@@ -85,8 +85,8 @@ double _cssLineHeight(TextStyle style) {
 }
 
 /// Wraps a paragraph so that its box is the height CSS would give it.
-class DsLineBox extends SingleChildRenderObjectWidget {
-  const DsLineBox({
+class ElLineBox extends SingleChildRenderObjectWidget {
+  const ElLineBox({
     super.key,
     required this.style,
     this.lineHeight,
@@ -99,14 +99,14 @@ class DsLineBox extends SingleChildRenderObjectWidget {
 
   /// The target for one line, when it is not `font-size × line-height` — an
   /// inline box, whose height is the font's content area (see
-  /// [dsContentAreaHeight]).
+  /// [elContentAreaHeight]).
   final double? lineHeight;
 
   double get _target => lineHeight ?? _cssLineHeight(style);
 
   @override
   RenderObject createRenderObject(BuildContext context) =>
-      _RenderLineBox(_target, dsEngineLineHeight(style));
+      _RenderLineBox(_target, elEngineLineHeight(style));
 
   @override
   void updateRenderObject(
@@ -115,7 +115,7 @@ class DsLineBox extends SingleChildRenderObjectWidget {
   ) {
     (renderObject as _RenderLineBox)
       ..cssLine = _target
-      ..engineLine = dsEngineLineHeight(style);
+      ..engineLine = elEngineLineHeight(style);
   }
 }
 
@@ -232,8 +232,8 @@ class _RenderLineBox extends RenderProxyBox {
 /// part a browser paints outside the line box without letting the line grow
 /// for it. Baseline-aligned inside a paragraph, the chip then sits on the
 /// sentence's baseline and bleeds over the leading, exactly as `<code>` does.
-class DsInlineBox extends SingleChildRenderObjectWidget {
-  const DsInlineBox({
+class ElInlineBox extends SingleChildRenderObjectWidget {
+  const ElInlineBox({
     super.key,
     required this.trim,
     required Widget super.child,
@@ -371,7 +371,7 @@ const String _noBreakAfter = '([{\u00ab\u201c\u2018';
 /// the same greedy walk produces the same lines. Nothing here can move a line
 /// that already breaks where the browser breaks it, because a line that did
 /// not use a deleted opportunity cannot notice that it is gone.
-InlineSpan dsGlueInlineBoxes(InlineSpan root, TextStyle base) {
+InlineSpan elGlueInlineBoxes(InlineSpan root, TextStyle base) {
   final _Glue glue = _Glue(base);
   glue._collect(root, base);
   glue._plan();
@@ -407,8 +407,9 @@ class _Glue {
   int _at = 0;
 
   void _collect(InlineSpan span, TextStyle inherited) {
-    final TextStyle style =
-        span.style == null ? inherited : inherited.merge(span.style);
+    final TextStyle style = span.style == null
+        ? inherited
+        : inherited.merge(span.style);
     if (span is TextSpan) {
       final String? text = span.text;
       if (text != null && text.isNotEmpty) {
@@ -446,7 +447,8 @@ class _Glue {
       if (i > 0 && !_isBox[i - 1]) {
         final String prev = _texts[i - 1];
         int n = 0;
-        while (n < prev.length && _noBreakAfter.contains(prev[prev.length - 1 - n])) {
+        while (n < prev.length &&
+            _noBreakAfter.contains(prev[prev.length - 1 - n])) {
           n++;
         }
         if (n > 0) {
@@ -459,8 +461,12 @@ class _Glue {
     }
     // A leaf short enough to be claimed from both ends would be double-counted;
     // leave such a seam alone rather than drop characters.
-    _fromStart.removeWhere((int i, int n) => n + (_fromEnd[i] ?? 0) > _texts[i].length);
-    _fromEnd.removeWhere((int i, int n) => n + (_fromStart[i] ?? 0) > _texts[i].length);
+    _fromStart.removeWhere(
+      (int i, int n) => n + (_fromEnd[i] ?? 0) > _texts[i].length,
+    );
+    _fromEnd.removeWhere(
+      (int i, int n) => n + (_fromStart[i] ?? 0) > _texts[i].length,
+    );
   }
 
   InlineSpan _rebuild(InlineSpan span) {
@@ -515,7 +521,7 @@ class _Glue {
 /// An inline box and the punctuation a line may not break away from it.
 ///
 /// The punctuation renders in the style it came from and contributes only its
-/// content area, exactly as [DsInlineBox] leaves the chip contributing only
+/// content area, exactly as [ElInlineBox] leaves the chip contributing only
 /// its own — the line box's height stays the paragraph's business, so gluing
 /// changes where lines break and never how tall they are.
 class _GluedBox extends StatelessWidget {
@@ -533,21 +539,21 @@ class _GluedBox extends StatelessWidget {
   final TextStyle tailStyle;
   final Widget child;
 
-  static Widget _punctuation(String text, TextStyle style) => DsLineBox(
-        style: style,
-        lineHeight: dsContentAreaHeight(style),
-        child: Text(text, style: style, softWrap: false),
-      );
+  static Widget _punctuation(String text, TextStyle style) => ElLineBox(
+    style: style,
+    lineHeight: elContentAreaHeight(style),
+    child: Text(text, style: style, softWrap: false),
+  );
 
   @override
   Widget build(BuildContext context) => Row(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.baseline,
-        textBaseline: TextBaseline.alphabetic,
-        children: <Widget>[
-          if (head.isNotEmpty) _punctuation(head, headStyle),
-          child,
-          if (tail.isNotEmpty) _punctuation(tail, tailStyle),
-        ],
-      );
+    mainAxisSize: MainAxisSize.min,
+    crossAxisAlignment: CrossAxisAlignment.baseline,
+    textBaseline: TextBaseline.alphabetic,
+    children: <Widget>[
+      if (head.isNotEmpty) _punctuation(head, headStyle),
+      child,
+      if (tail.isNotEmpty) _punctuation(tail, tailStyle),
+    ],
+  );
 }

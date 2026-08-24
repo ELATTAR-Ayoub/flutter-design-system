@@ -63,18 +63,18 @@
 ///     calls.** `AgentConsole` has no history control and reads no `restore`;
 ///     the mock transport implements it anyway and the `Meta` list documents it
 ///     as optional. Ported into the list as written: the port's
-///     [DsAgentTransport] does not declare it, so the row documents a member of
+///     [ElAgentTransport] does not declare it, so the row documents a member of
 ///     the reference's interface that this one does not have, which is itself
 ///     the honest reading of *"a transport with no history behind it omits it"*.
 ///  7. **The approval gate never reaches `awaiting_approval`.** Probed live: the
 ///     status line reads `Processing` while the card is up. See
-///     [DsAgentConsole]'s own register: one of the twenty states is unreachable
+///     [ElAgentConsole]'s own register: one of the twenty states is unreachable
 ///     through this transport.
 ///  8. **The launcher's label does not slide.** `translate-x-2` compiles to the
 ///     standalone `translate` property, which is not in the element's
 ///     `transition-property`; the 8px offset snaps on the first hover frame and
 ///     only the opacity fades. Traced with a real pointer: see
-///     [DsAgentLauncher].
+///     [ElAgentLauncher].
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
@@ -85,8 +85,8 @@ import 'package:flutter/widgets.dart';
 
 /* ── Shared fixtures ─────────────────────────────────────────────────────── */
 
-/// `PERSONA`, `components/ds/agent-demo.tsx`.
-const DsAgentPersona kVaultPersona = DsAgentPersona(
+/// `PERSONA`, `components/el/agent-demo.tsx`.
+const ElAgentPersona kVaultPersona = ElAgentPersona(
   name: 'Vault',
   blurb: 'Ask about packs, pulls, prices and your wallet.',
   suggestions: <String>[
@@ -102,50 +102,50 @@ const DsAgentPersona kVaultPersona = DsAgentPersona(
 /// Supplied by the caller rather than guessed, because only the caller knows
 /// whether `export_activity` is reading, writing or running: and a status line
 /// that guesses is a status line that lies."*
-const DsToolStateMap kVaultToolStates = <String, DsAgentState>{
-  'search_inventory': DsAgentState.searching,
-  'read_wallet': DsAgentState.retrieving,
-  'export_activity': DsAgentState.writing,
-  'fetch_market_price': DsAgentState.retrieving,
+const ElToolStateMap kVaultToolStates = <String, ElAgentState>{
+  'search_inventory': ElAgentState.searching,
+  'read_wallet': ElAgentState.retrieving,
+  'export_activity': ElAgentState.writing,
+  'fetch_market_price': ElAgentState.retrieving,
 };
 
 /// `COMMANDS`: three skills and one command, which is why the welcome card
 /// shows three chips (drift 5).
-const List<DsAgentCommand> kVaultCommands = <DsAgentCommand>[
-  DsAgentCommand(
+const List<ElAgentCommand> kVaultCommands = <ElAgentCommand>[
+  ElAgentCommand(
     id: 'inventory',
     label: 'inventory',
     hint: 'What is in stock',
-    group: DsAgentCommandGroup.skill,
-    icon: DsLucide.search,
+    group: ElAgentCommandGroup.skill,
+    icon: ElLucide.search,
   ),
-  DsAgentCommand(
+  ElAgentCommand(
     id: 'wallet',
     label: 'wallet',
     hint: 'Balance and recent movement',
-    group: DsAgentCommandGroup.skill,
-    icon: DsLucide.wallet,
+    group: ElAgentCommandGroup.skill,
+    icon: ElLucide.wallet,
   ),
-  DsAgentCommand(
+  ElAgentCommand(
     id: 'export',
     label: 'export',
     hint: 'Download activity as CSV',
-    group: DsAgentCommandGroup.skill,
-    icon: DsLucide.download,
+    group: ElAgentCommandGroup.skill,
+    icon: ElLucide.download,
   ),
-  DsAgentCommand(
+  ElAgentCommand(
     id: 'guide',
     label: 'guide',
     hint: 'How pack odds work',
-    group: DsAgentCommandGroup.command,
-    icon: DsLucide.bookOpen,
+    group: ElAgentCommandGroup.command,
+    icon: ElLucide.bookOpen,
   ),
 ];
 
 /// `MODELS`.
-const List<DsAgentModel> kVaultModels = <DsAgentModel>[
-  DsAgentModel(id: 'fast', label: 'Fast', hint: 'Answers in a second'),
-  DsAgentModel(id: 'deep', label: 'Deep', hint: 'Slower, checks its work'),
+const List<ElAgentModel> kVaultModels = <ElAgentModel>[
+  ElAgentModel(id: 'fast', label: 'Fast', hint: 'Answers in a second'),
+  ElAgentModel(id: 'deep', label: 'Deep', hint: 'Slower, checks its work'),
 ];
 
 /// `describeApproval`, *"turns a held action into a sentence a human can decide
@@ -166,12 +166,12 @@ class ConsolePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsCategoryHit here = findCategory('agent', 'console');
+    final ElCategoryHit here = findCategory('agent', 'console');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        DsPageHeader(
+        ElPageHeader(
           // DRIFT 1.
           eyebrow: '${here.group.title} · Components',
           title: here.category.title,
@@ -182,14 +182,14 @@ class ConsolePage extends StatelessWidget {
         // `className="mb-12"`, 48px, above the first section rather than
         // inside it.
         Padding(
-          padding: EdgeInsets.only(bottom: ds(12)),
-          child: const DsNote(title: 'This is running', child: _OpeningNote()),
+          padding: EdgeInsets.only(bottom: el(12)),
+          child: const ElNote(title: 'This is running', child: _OpeningNote()),
         ),
         const _LiveSection(),
         const _TransportSection(),
         const _FeaturesSection(),
         const _LauncherSection(),
-        const DsPageFootNav(groupId: 'agent', slug: 'console'),
+        const ElPageFootNav(groupId: 'agent', slug: 'console'),
       ],
     );
   }
@@ -199,7 +199,7 @@ class _OpeningNote extends StatelessWidget {
   const _OpeningNote();
 
   @override
-  Widget build(BuildContext context) => DsRichText(
+  Widget build(BuildContext context) => ElRichText(
     TextSpan(
       children: <InlineSpan>[
         const TextSpan(
@@ -220,7 +220,7 @@ class _OpeningNote extends StatelessWidget {
         const TextSpan(text: ' and it fails, on purpose.'),
       ],
     ),
-    DsType.small,
+    ElType.small,
   );
 }
 
@@ -236,14 +236,14 @@ class _LiveSection extends StatelessWidget {
   const _LiveSection();
 
   @override
-  Widget build(BuildContext context) => const DsSection(
+  Widget build(BuildContext context) => const ElSection(
     id: 'live',
     title: 'The console',
     description:
         'Transcript, composer, face and voice in one component. It '
         'owns the conversation and nothing else — the persona, the tools, '
         'the models and the agent itself all arrive as props.',
-    child: DsPanel(flush: true, child: LiveConsole()),
+    child: ElPanel(flush: true, child: LiveConsole()),
   );
 }
 
@@ -252,14 +252,14 @@ class LiveConsole extends StatefulWidget {
   const LiveConsole({super.key});
 
   /// `h-152`, 608px.
-  static double get height => ds(152);
+  static double get height => el(152);
 
   @override
   State<LiveConsole> createState() => _LiveConsoleState();
 }
 
 class _LiveConsoleState extends State<LiveConsole> {
-  final DsMockTransport _transport = DsMockTransport();
+  final ElMockTransport _transport = ElMockTransport();
 
   @override
   void dispose() {
@@ -268,7 +268,7 @@ class _LiveConsoleState extends State<LiveConsole> {
   }
 
   @override
-  Widget build(BuildContext context) => DsAgentConsole(
+  Widget build(BuildContext context) => ElAgentConsole(
     transport: _transport,
     persona: kVaultPersona,
     toolStates: kVaultToolStates,
@@ -285,7 +285,7 @@ class _TransportSection extends StatelessWidget {
   const _TransportSection();
 
   @override
-  Widget build(BuildContext context) => DsSection(
+  Widget build(BuildContext context) => ElSection(
     id: 'transport',
     title: 'The transport contract',
     description:
@@ -295,8 +295,8 @@ class _TransportSection extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        DsMeta(
-          items: <DsMetaItem>[
+        ElMeta(
+          items: <ElMetaItem>[
             (
               k: 'turns',
               v: const TextSpan(
@@ -358,11 +358,11 @@ class _TransportSection extends StatelessWidget {
           ],
         ),
         // `<p className="type-small mt-6">`.
-        SizedBox(height: ds(6)),
-        DsRichText(
+        SizedBox(height: el(6)),
+        ElRichText(
           TextSpan(
             children: <InlineSpan>[
-              DsCode.span('lib/agent/mock-transport.ts'),
+              ElCode.span('lib/agent/mock-transport.ts'),
               const TextSpan(
                 text:
                     ' is a complete implementation of all of it, in about '
@@ -372,7 +372,7 @@ class _TransportSection extends StatelessWidget {
               ),
             ],
           ),
-          DsType.small,
+          ElType.small,
         ),
       ],
     ),
@@ -385,14 +385,14 @@ class _FeaturesSection extends StatelessWidget {
   const _FeaturesSection();
 
   @override
-  Widget build(BuildContext context) => const DsSection(
+  Widget build(BuildContext context) => const ElSection(
     id: 'features',
     title: 'Feature flags',
     description:
         'Nine switches, all on by default. A console with '
         'everything turned off is still a console — which is the test that '
         'the parts are genuinely separable rather than merely arranged.',
-    child: DsPanel(
+    child: ElPanel(
       label: 'features',
       // DRIFT 4: nine names listed, eight of them switched off below.
       note:
@@ -410,10 +410,10 @@ class MinimalConsole extends StatefulWidget {
   const MinimalConsole({super.key});
 
   /// `h-80`, 320px.
-  static double get height => ds(80);
+  static double get height => el(80);
 
   /// The eight flags the demo turns off. `reset` is the ninth and stays on.
-  static const DsAgentFeatures features = DsAgentFeatures(
+  static const ElAgentFeatures features = ElAgentFeatures(
     avatar: false,
     suggestions: false,
     microphone: false,
@@ -429,7 +429,7 @@ class MinimalConsole extends StatefulWidget {
 }
 
 class _MinimalConsoleState extends State<MinimalConsole> {
-  final DsMockTransport _transport = DsMockTransport();
+  final ElMockTransport _transport = ElMockTransport();
 
   @override
   void dispose() {
@@ -438,9 +438,9 @@ class _MinimalConsoleState extends State<MinimalConsole> {
   }
 
   @override
-  Widget build(BuildContext context) => DsAgentConsole(
+  Widget build(BuildContext context) => ElAgentConsole(
     transport: _transport,
-    persona: const DsAgentPersona(
+    persona: const ElAgentPersona(
       name: 'Vault',
       placeholder: 'Ask a question…',
     ),
@@ -456,7 +456,7 @@ class _LauncherSection extends StatelessWidget {
   const _LauncherSection();
 
   @override
-  Widget build(BuildContext context) => DsSection(
+  Widget build(BuildContext context) => ElSection(
     id: 'launcher',
     title: 'Launcher',
     description:
@@ -469,12 +469,12 @@ class _LauncherSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         const LauncherDemo(),
-        SizedBox(height: ds(6)),
-        DsRichText(
+        SizedBox(height: el(6)),
+        ElRichText(
           TextSpan(
             children: <InlineSpan>[
               const TextSpan(text: 'The launcher takes the console as '),
-              DsCode.span('children'),
+              ElCode.span('children'),
               const TextSpan(
                 text:
                     ' rather than building one. A launcher that '
@@ -486,7 +486,7 @@ class _LauncherSection extends StatelessWidget {
               ),
             ],
           ),
-          DsType.small,
+          ElType.small,
         ),
       ],
     ),
@@ -504,17 +504,17 @@ class LauncherDemo extends StatefulWidget {
   const LauncherDemo({super.key});
 
   /// `h-56`, 224px.
-  static double get height => ds(56);
+  static double get height => el(56);
 
   /// `p-5` on the absolutely-positioned paragraph.
-  static double get padding => ds(5);
+  static double get padding => el(5);
 
   @override
   State<LauncherDemo> createState() => _LauncherDemoState();
 }
 
 class _LauncherDemoState extends State<LauncherDemo> {
-  final DsMockTransport _transport = DsMockTransport();
+  final ElMockTransport _transport = ElMockTransport();
 
   @override
   void dispose() {
@@ -524,15 +524,15 @@ class _LauncherDemoState extends State<LauncherDemo> {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return SizedBox(
       height: LauncherDemo.height,
       child: Container(
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
           color: theme.background,
-          borderRadius: BorderRadius.circular(DsRadii.lg),
-          border: Border.all(color: theme.border, width: DsWidths.hairline),
+          borderRadius: BorderRadius.circular(ElRadii.lg),
+          border: Border.all(color: theme.border, width: ElWidths.hairline),
         ),
         child: Stack(
           children: <Widget>[
@@ -543,19 +543,19 @@ class _LauncherDemoState extends State<LauncherDemo> {
               top: 0,
               child: Padding(
                 padding: EdgeInsets.all(LauncherDemo.padding),
-                child: DsText(
+                child: ElText(
                   'The launcher is fixed to the viewport, not to this panel — '
                   'it is sitting in the bottom-right corner of the page you are '
                   'reading. Click it.',
-                  DsType.small,
+                  ElType.small,
                 ),
               ),
             ),
-            DsAgentLauncher(
+            ElAgentLauncher(
               label: 'Ask the assistant',
               title: 'Vault',
               description: 'Ask about packs, pulls, prices and your wallet.',
-              child: DsAgentConsole(
+              child: ElAgentConsole(
                 transport: _transport,
                 persona: kVaultPersona,
                 toolStates: kVaultToolStates,

@@ -3,7 +3,7 @@
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`, per the
-/// Phase J brief. The live `DsThemeController` is flipped in place for theme
+/// Phase J brief. The live `ElThemeController` is flipped in place for theme
 /// coverage rather than re-pumped under a new controller.
 library;
 
@@ -26,11 +26,11 @@ const Size _narrow = Size(390, 844);
 ///
 /// No 'preview' entry: the live demo renders ahead of every heading, the
 /// same as `https://ui.shadcn.com/docs/components/base/tabs` itself, so it
-/// carries no DsSection and no TOC anchor of its own. 'Vertical', 'Disabled'
-/// and 'Icons' have no counterpart: DsTabs has an orientation axis that is
+/// carries no ElSection and no TOC anchor of its own. 'Vertical', 'Disabled'
+/// and 'Icons' have no counterpart: ElTabs has an orientation axis that is
 /// recorded but never wired, no enabled/disabled parameter, and no icon
-/// slot on DsTabItem. 'Composition', 'Line' and 'RTL' mirror the reference.
-/// 'Empty tab' is ours only, covering the real DsTabItem.content: null
+/// slot on ElTabItem. 'Composition', 'Line' and 'RTL' mirror the reference.
+/// 'Empty tab' is ours only, covering the real ElTabItem.content: null
 /// state.
 const List<String> _expectedSectionIds = <String>[
   'install',
@@ -48,7 +48,7 @@ const List<String> _expectedSectionIds = <String>[
   'source',
 ];
 
-/// Every public constructor parameter of `DsTabs`, enumerated by reading
+/// Every public constructor parameter of `ElTabs`, enumerated by reading
 /// `lib/src/components/tabs.dart` directly (Step 1 of the task cycle). The
 /// API table must cover all of these by name.
 const List<String> _tabsParams = <String>[
@@ -58,41 +58,41 @@ const List<String> _tabsParams = <String>[
   'variant',
 ];
 
-/// Every public constructor parameter of the `DsTabItem` model.
+/// Every public constructor parameter of the `ElTabItem` model.
 const List<String> _tabItemParams = <String>[
-  'DsTabItem.label',
-  'DsTabItem.content',
+  'ElTabItem.label',
+  'ElTabItem.content',
 ];
 
-/// The rest of the public surface: the `DsTabsVariant` enum and the static
-/// geometry getters on `DsTabs`.
+/// The rest of the public surface: the `ElTabsVariant` enum and the static
+/// geometry getters on `ElTabs`.
 const List<String> _tabsStatics = <String>[
-  'DsTabsVariant.standard',
-  'DsTabsVariant.line',
-  'DsTabs.trackHeight',
-  'DsTabs.triggerHeight',
-  'DsTabs.triggerPaddingX',
-  'DsTabs.ruleHeight',
-  'DsTabs.rootGap',
-  'DsTabs.trackPadding',
-  'DsTabs.gapFor',
+  'ElTabsVariant.standard',
+  'ElTabsVariant.line',
+  'ElTabs.trackHeight',
+  'ElTabs.triggerHeight',
+  'ElTabs.triggerPaddingX',
+  'ElTabs.ruleHeight',
+  'ElTabs.rootGap',
+  'ElTabs.trackPadding',
+  'ElTabs.gapFor',
 ];
 
-Future<DsThemeController> _pump(
+Future<ElThemeController> _pump(
   WidgetTester tester, {
   Size size = _wide,
-  DsThemeMode mode = DsThemeMode.dark,
+  ElThemeMode mode = ElThemeMode.dark,
   ValueChanged<String>? onNavigate,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final DsThemeController theme = DsThemeController(mode: mode);
+  final ElThemeController theme = ElThemeController(mode: mode);
   addTearDown(theme.dispose);
 
   await tester.pumpWidget(
-    DsTheme(
+    ElTheme(
       controller: theme,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -144,8 +144,8 @@ void main() {
       await _pump(tester);
 
       final List<String> renderedIds = tester
-          .widgetList<DsSection>(find.byType(DsSection))
-          .map((DsSection section) => section.id)
+          .widgetList<ElSection>(find.byType(ElSection))
+          .map((ElSection section) => section.id)
           .toList();
       expect(renderedIds, _expectedSectionIds);
 
@@ -158,8 +158,8 @@ void main() {
       expect(tocAnchors, _expectedSectionIds);
 
       final Map<String, String> titleById = <String, String>{
-        for (final DsSection section in tester.widgetList<DsSection>(
-          find.byType(DsSection),
+        for (final ElSection section in tester.widgetList<ElSection>(
+          find.byType(ElSection),
         ))
           section.id: section.title,
       };
@@ -169,15 +169,15 @@ void main() {
           entry.title,
           reason:
               'TOC entry for "${entry.anchor}" must read the same title as '
-              'the DsSection it points to',
+              'the ElSection it points to',
         );
       }
     },
   );
 
   testWidgets(
-    'the API table covers every DsTabs and DsTabItem constructor parameter '
-    'and every DsTabsVariant/static member',
+    'the API table covers every ElTabs and ElTabItem constructor parameter '
+    'and every ElTabsVariant/static member',
     (WidgetTester tester) async {
       await _pump(tester);
 
@@ -215,7 +215,7 @@ void main() {
       expect(find.byKey(key), findsOneWidget);
       await tester.ensureVisible(find.byKey(key));
 
-      expect(tester.widget<DsTabs>(find.byKey(key)).selectedIndex, 0);
+      expect(tester.widget<ElTabs>(find.byKey(key)).selectedIndex, 0);
       expect(find.text('Update your account details here.'), findsOneWidget);
       expect(
         find.text('See who else has access to this workspace.'),
@@ -225,15 +225,15 @@ void main() {
       await tester.tap(find.text('Team'), warnIfMissed: false);
       await tester.pump();
 
-      expect(tester.widget<DsTabs>(find.byKey(key)).selectedIndex, 1);
+      expect(tester.widget<ElTabs>(find.byKey(key)).selectedIndex, 1);
       expect(find.text('Update your account details here.'), findsNothing);
       expect(
         find.text('See who else has access to this workspace.'),
         findsOneWidget,
       );
 
-      // A DsTabItem with content: null, a real state the source itself
-      // documents (see tabs.dart's DsTabItem.content doc comment), renders
+      // A ElTabItem with content: null, a real state the source itself
+      // documents (see tabs.dart's ElTabItem.content doc comment), renders
       // no panel at all when selected, and toggling to it must not throw.
       await tester.tap(find.text('More'), warnIfMissed: false);
       await tester.pump();
@@ -246,7 +246,7 @@ void main() {
   );
 
   testWidgets(
-    'DsTabs and its trigger wire no Focus widget of their own: there is no '
+    'ElTabs and its trigger wire no Focus widget of their own: there is no '
     'keyboard tab stop and no arrow-key traversal',
     (WidgetTester tester) async {
       await _pump(tester);
@@ -258,7 +258,7 @@ void main() {
         ),
         findsNothing,
         reason:
-            'if this starts failing, DsTabs has grown real keyboard focus '
+            'if this starts failing, ElTabs has grown real keyboard focus '
             'and the Accessibility section of the docs page must be updated '
             'to stop saying otherwise',
       );
@@ -273,23 +273,23 @@ void main() {
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
 
-    final DsThemeController theme = DsThemeController(mode: DsThemeMode.dark);
+    final ElThemeController theme = ElThemeController(mode: ElThemeMode.dark);
     addTearDown(theme.dispose);
 
     await tester.pumpWidget(
-      DsTheme(
+      ElTheme(
         controller: theme,
         child: MaterialApp(
           home: Scaffold(
             body: Padding(
               padding: const EdgeInsets.all(16),
-              child: DsTabs(
-                items: const <DsTabItem>[
-                  DsTabItem(label: 'Overview'),
-                  DsTabItem(label: 'Analytics dashboard'),
-                  DsTabItem(label: 'Notification preferences'),
-                  DsTabItem(label: 'Billing and subscriptions'),
-                  DsTabItem(label: 'Security settings'),
+              child: ElTabs(
+                items: const <ElTabItem>[
+                  ElTabItem(label: 'Overview'),
+                  ElTabItem(label: 'Analytics dashboard'),
+                  ElTabItem(label: 'Notification preferences'),
+                  ElTabItem(label: 'Billing and subscriptions'),
+                  ElTabItem(label: 'Security settings'),
                 ],
                 selectedIndex: 0,
                 onChanged: (int _) {},
@@ -301,7 +301,7 @@ void main() {
     );
     await tester.pump();
 
-    // DsTabs' track is an un-clipped, unscrolled Row (DsSlidingPillGroup):
+    // ElTabs' track is an un-clipped, unscrolled Row (ElSlidingPillGroup):
     // it neither scrolls nor wraps when its triggers do not fit, so a
     // RenderFlex overflow is the real, current behaviour, recorded here
     // rather than asserted away, so the docs page's Responsive section
@@ -311,60 +311,59 @@ void main() {
     expect(exception.toString(), contains('overflowed'));
   });
 
-  testWidgets(
-    'the RTL specimen mirrors trigger order under a right-to-left '
-    'Directionality and switching tabs still works',
-    (WidgetTester tester) async {
-      await _pump(tester);
+  testWidgets('the RTL specimen mirrors trigger order under a right-to-left '
+      'Directionality and switching tabs still works', (
+    WidgetTester tester,
+  ) async {
+    await _pump(tester);
 
-      const Key key = ValueKey<String>('tabs-rtl-specimen');
-      final Finder specimen = find.byKey(key);
-      expect(specimen, findsOneWidget);
-      await tester.ensureVisible(specimen);
+    const Key key = ValueKey<String>('tabs-rtl-specimen');
+    final Finder specimen = find.byKey(key);
+    expect(specimen, findsOneWidget);
+    await tester.ensureVisible(specimen);
 
-      // Directionality.rtl is real here (not a synthetic MediaQuery), so
-      // Flutter's own Row lays the first item (الحساب) out at the leading
-      // edge for RTL, which is the *right*: the opposite of what the same
-      // list order would render under LTR. This is the RTL section's own
-      // mirroring claim, checked directly rather than assumed.
-      final Offset firstTop = tester.getTopLeft(find.text('الحساب'));
-      final Offset secondTop = tester.getTopLeft(find.text('الفريق'));
-      expect(
-        firstTop.dx,
-        greaterThan(secondTop.dx),
-        reason:
-            'under RTL the first DsTabItem should paint to the right of '
-            'the second, the same mirroring Flutter\'s own Row gives every '
-            'other RTL layout: if this fails, the RTL section\'s claim '
-            'that DsTabs needs no direction-specific code is wrong',
-      );
+    // Directionality.rtl is real here (not a synthetic MediaQuery), so
+    // Flutter's own Row lays the first item (الحساب) out at the leading
+    // edge for RTL, which is the *right*: the opposite of what the same
+    // list order would render under LTR. This is the RTL section's own
+    // mirroring claim, checked directly rather than assumed.
+    final Offset firstTop = tester.getTopLeft(find.text('الحساب'));
+    final Offset secondTop = tester.getTopLeft(find.text('الفريق'));
+    expect(
+      firstTop.dx,
+      greaterThan(secondTop.dx),
+      reason:
+          'under RTL the first ElTabItem should paint to the right of '
+          'the second, the same mirroring Flutter\'s own Row gives every '
+          'other RTL layout: if this fails, the RTL section\'s claim '
+          'that ElTabs needs no direction-specific code is wrong',
+    );
 
-      expect(tester.widget<DsTabs>(specimen).selectedIndex, 0);
-      expect(find.text('تحديث بيانات حسابك هنا.'), findsOneWidget);
+    expect(tester.widget<ElTabs>(specimen).selectedIndex, 0);
+    expect(find.text('تحديث بيانات حسابك هنا.'), findsOneWidget);
 
-      await tester.tap(find.text('الفريق'), warnIfMissed: false);
-      await tester.pump();
+    await tester.tap(find.text('الفريق'), warnIfMissed: false);
+    await tester.pump();
 
-      expect(tester.widget<DsTabs>(specimen).selectedIndex, 1);
-      expect(
-        find.text('من يملك صلاحية الوصول إلى مساحة العمل هذه.'),
-        findsOneWidget,
-      );
-      expect(tester.takeException(), isNull);
-    },
-  );
+    expect(tester.widget<ElTabs>(specimen).selectedIndex, 1);
+    expect(
+      find.text('من يملك صلاحية الوصول إلى مساحة العمل هذه.'),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
 
   testWidgets(
     'both themes render the article with no exceptions when flipped in '
     'place',
     (WidgetTester tester) async {
-      final DsThemeController theme = await _pump(
+      final ElThemeController theme = await _pump(
         tester,
-        mode: DsThemeMode.light,
+        mode: ElThemeMode.light,
       );
       expect(find.text(tabsDoc.title), findsWidgets);
 
-      theme.setMode(DsThemeMode.dark);
+      theme.setMode(ElThemeMode.dark);
       await tester.pump();
       expect(find.text(tabsDoc.title), findsWidgets);
       expect(tester.takeException(), isNull);

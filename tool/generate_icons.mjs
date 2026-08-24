@@ -31,7 +31,7 @@ const OUT_DIR = path.join(REPO, 'lib/src/components');
 /** Emitted Dart type names.
  *
  *  `SEALED` is the default and the merged state: the node types are
- *  `icon_paths.dart`'s own `DsIconElement` hierarchy, which this file imports
+ *  `icon_paths.dart`'s own `ElIconElement` hierarchy, which this file imports
  *  rather than declares. `SHIM` is the pre-merge shape kept for one reason —
  *  the two differ **only** in these names, and re-running under it reproduces
  *  the old file's node lines byte for byte, which is how the merge was checked.
@@ -39,29 +39,29 @@ const OUT_DIR = path.join(REPO, 'lib/src/components');
  *  merge a flag flip plus a rerun. */
 const MODEL = {
   SHIM: {
-    base: 'DsLucideNode',
-    path: 'DsLucidePath',
-    circle: 'DsLucideCircle',
-    rect: 'DsLucideRect',
-    line: 'DsLucideLine',
-    ellipse: 'DsLucideEllipse',
-    polyline: 'DsLucidePolyline',
-    polygon: 'DsLucidePolygon',
+    base: 'ElLucideNode',
+    path: 'ElLucidePath',
+    circle: 'ElLucideCircle',
+    rect: 'ElLucideRect',
+    line: 'ElLucideLine',
+    ellipse: 'ElLucideEllipse',
+    polyline: 'ElLucidePolyline',
+    polygon: 'ElLucidePolygon',
     emitModel: true,
   },
   SEALED: {
-    base: 'DsIconElement',
-    path: 'DsIconPathElement',
-    circle: 'DsIconCircleElement',
-    rect: 'DsIconRectElement',
-    line: 'DsIconLineElement',
-    ellipse: 'DsIconEllipseElement',
-    polyline: 'DsIconPolylineElement',
-    polygon: 'DsIconPolygonElement',
+    base: 'ElIconElement',
+    path: 'ElIconPathElement',
+    circle: 'ElIconCircleElement',
+    rect: 'ElIconRectElement',
+    line: 'ElIconLineElement',
+    ellipse: 'ElIconEllipseElement',
+    polyline: 'ElIconPolylineElement',
+    polygon: 'ElIconPolygonElement',
     emitModel: false,
   },
 };
-const T = MODEL[process.env.DS_ICON_MODEL ?? 'SEALED'];
+const T = MODEL[process.env.EL_ICON_MODEL ?? 'SEALED'];
 
 // ── read the package ────────────────────────────────────────────────────────
 
@@ -242,12 +242,12 @@ function emitNodeModel() {
 /// One SVG element from a lucide \`__iconNode\` list.
 ///
 /// **This model is a staging shim, and it is deliberately shallow.** The port's
-/// real element model is the \`sealed class DsIconElement\` hierarchy in
+/// real element model is the \`sealed class ElIconElement\` hierarchy in
 /// \`icon_paths.dart\`; a sealed class cannot be extended from another library,
 /// and the full lucide set needs two node types that hierarchy does not have
-/// yet ([DsLucideEllipse], [DsLucidePolygon]) plus a \`rect\` whose \`rx\` may be
+/// yet ([ElLucideEllipse], [ElLucidePolygon]) plus a \`rect\` whose \`rx\` may be
 /// absent. Rather than fork the parser, this shim **delegates every \`d\` string
-/// straight to [DsIconPathElement]** — the port's own reader, unchanged and
+/// straight to [ElIconPathElement]** — the port's own reader, unchanged and
 /// unduplicated — and holds the structured nodes as the same fields under
 /// different names. \`tool/README.md\` records the merge that retires it.
 sealed class ${T.base} {
@@ -270,7 +270,7 @@ class ${T.path} extends ${T.base} {
   /// Parsed by the port's own reader — this is the whole reason the shim
   /// delegates instead of carrying a second parser.
   @override
-  void addTo(Path path) => DsIconPathElement(d).addTo(path);
+  void addTo(Path path) => ElIconPathElement(d).addTo(path);
 }
 
 /// \`["circle", { cx, cy, r, fill? }]\`.
@@ -408,8 +408,8 @@ function emitGlyphClass() {
 /// A plain class with a const constructor rather than an enum member, and that
 /// is the load-bearing choice in this file — see the library docstring.
 @immutable
-class DsLucideGlyph {
-  const DsLucideGlyph(this.name, this.nodes);
+class ElLucideGlyph {
+  const ElLucideGlyph(this.name, this.nodes);
 
   /// The lucide module name, kebab-case: \`'circle-dollar-sign'\`.
   final String name;
@@ -441,7 +441,7 @@ class DsLucideGlyph {
   }
 
   @override
-  String toString() => 'DsLucideGlyph($name)';
+  String toString() => 'ElLucideGlyph($name)';
 }
 `;
 }
@@ -461,8 +461,8 @@ for (const [name, nodes] of icons) {
   const lines = nodes.map((n) => emitNode(name, n)).join('\n');
   bodies.push(
     `  /// \`${name}.mjs\`\n` +
-      `  static const DsLucideGlyph ${identifier(name)} =\n` +
-      `      DsLucideGlyph('${name}', <${T.base}>[\n${lines}\n  ]);`,
+      `  static const ElLucideGlyph ${identifier(name)} =\n` +
+      `      ElLucideGlyph('${name}', <${T.base}>[\n${lines}\n  ]);`,
   );
 }
 
@@ -482,8 +482,8 @@ const registry = `${header(`//
 /// **Why a class of constants and not an enum with a lookup map.** This file is
 /// the whole package, and the whole package must not reach the bundle of an app
 /// that draws six icons. Dart's tree shaker works per top-level symbol: a
-/// \`static const\` field is dropped when nothing names it, so \`DsLucide.zap\`
-/// pulls in \`zap\` and nothing else. A \`const Map<DsIconGlyph, …>\` is one
+/// \`static const\` field is dropped when nothing names it, so \`ElLucide.zap\`
+/// pulls in \`zap\` and nothing else. A \`const Map<ElIconGlyph, …>\` is one
 /// symbol holding every value, so touching it at all pulls in all ${icons.length} —
 /// which is precisely what \`lucide-react\` avoids on the web by shipping one
 /// module per icon and letting the bundler drop the rest. This is the Dart
@@ -503,10 +503,10 @@ import 'icon_paths.dart';${
 }
 ${T.emitModel ? emitNodeModel() : ''}${emitGlyphClass()}
 /// Every glyph lucide ${pkg.version} ships.
-class DsLucide {
-  const DsLucide._();
+class ElLucide {
+  const ElLucide._();
 
-  /// The viewBox lucide authors on — the same 24×24 grid as [DsIconPaths].
+  /// The viewBox lucide authors on — the same 24×24 grid as [ElIconPaths].
   static const double viewBox = 24;
 
 ${bodies.join('\n\n')}
@@ -516,7 +516,7 @@ ${bodies.join('\n\n')}
 // ---- the index --------------------------------------------------------------
 
 const byName = icons
-  .map(([name]) => `  '${name}': DsLucide.${identifier(name)},`)
+  .map(([name]) => `  '${name}': ElLucide.${identifier(name)},`)
   .join('\n');
 const aliasMap = aliases
   .map(([from, to]) => `  '${from}': '${to}',`)
@@ -527,12 +527,12 @@ const index = `${header(`//
 
 /// String → glyph for the whole lucide set.
 ///
-/// **Importing this library costs the entire set.** [dsLucideByName] is a
+/// **Importing this library costs the entire set.** [elLucideByName] is a
 /// single const map that names all ${icons.length} glyphs, so the tree shaker
 /// must keep all ${icons.length}. That is the honest price of a dynamic lookup
 /// and it is charged here, in its own library, rather than silently in
-/// \`icon_paths.g.dart\`: an app that writes \`DsLucide.zap\` pays for \`zap\`, and
-/// an app that writes \`dsLucideByName[userSuppliedString]\` pays for lucide.
+/// \`icon_paths.g.dart\`: an app that writes \`ElLucide.zap\` pays for \`zap\`, and
+/// an app that writes \`elLucideByName[userSuppliedString]\` pays for lucide.
 ///
 /// Measured on this package's example app — see \`tool/README.md\`.
 library;
@@ -540,7 +540,7 @@ library;
 import 'icon_paths.g.dart';
 
 /// Every glyph, keyed by its lucide module name.
-const Map<String, DsLucideGlyph> dsLucideByName = <String, DsLucideGlyph>{
+const Map<String, ElLucideGlyph> elLucideByName = <String, ElLucideGlyph>{
 ${byName}
 };
 
@@ -550,16 +550,16 @@ ${byName}
 /// These are the \`export { default } from './target.mjs'\` one-liners in the
 /// package — \`filter\` → \`funnel\`, \`help-circle\` → \`circle-question-mark\`,
 /// \`alert-triangle\` → \`triangle-alert\`, and ${aliases.length - 3} more. Strings
-/// only, so this map is cheap on its own; it is [dsLucideByName] that is not.
-const Map<String, String> dsLucideAliases = <String, String>{
+/// only, so this map is cheap on its own; it is [elLucideByName] that is not.
+const Map<String, String> elLucideAliases = <String, String>{
 ${aliasMap}
 };
 
 /// The glyph called [name], resolving deprecated aliases.
 ///
 /// Returns \`null\` for a name lucide ${pkg.version} does not ship.
-DsLucideGlyph? dsLucideLookup(String name) =>
-    dsLucideByName[name] ?? dsLucideByName[dsLucideAliases[name] ?? ''];
+ElLucideGlyph? elLucideLookup(String name) =>
+    elLucideByName[name] ?? elLucideByName[elLucideAliases[name] ?? ''];
 `)}`;
 
 mkdirSync(OUT_DIR, { recursive: true });

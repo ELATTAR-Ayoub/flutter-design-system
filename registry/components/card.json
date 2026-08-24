@@ -5,14 +5,29 @@
   "description": "A neutral content surface with structured header, title, description, content, and footer regions.",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
-  "files": [{"source": "lib/src/components/card.dart", "target": "@ui/card.dart", "sha256": "5df6ca1036ac6d3d446a40b35db943509259d4b5a0b4e8f37647a8b7c4d2eca0"}],
-  "registryDependencies": ["source-foundation"],
+  "files": [
+    {
+      "source": "lib/src/components/card.dart",
+      "target": "@ui/card.dart",
+      "sha256": "8b22d8d0fddb6bbf8cbb21c3f27010cd59578121a3422f6c332f12dcfcf51a80"
+    }
+  ],
+  "registryDependencies": [
+    "source-foundation"
+  ],
   "pubDependencies": {},
   "semanticDependencies": [],
   "assets": [],
   "fonts": [],
   "shaders": [],
-  "exports": ["DsCard", "DsCardHeader", "DsCardTitle", "DsCardDescription", "DsCardContent", "DsCardFooter"],
+  "exports": [
+    "ElCard",
+    "ElCardHeader",
+    "ElCardTitle",
+    "ElCardDescription",
+    "ElCardContent",
+    "ElCardFooter"
+  ],
   "documentationRoute": "/components/card",
   "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/card.dart"
 }

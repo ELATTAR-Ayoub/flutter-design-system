@@ -1,4 +1,4 @@
-/// `components/ds/data-table-demo.tsx`: the Data Table recipe, live.
+/// `components/el/data-table-demo.tsx`: the Data Table recipe, live.
 ///
 /// The reference's own header says why it is not a component:
 ///
@@ -62,7 +62,7 @@ const List<_Sale> _sales = <_Sale>[
     card: 'Shadow Core',
     set: 'Celestial',
     grade: 'PSA 10',
-    price: 7600
+    price: 7600,
   ),
   (id: '5', card: 'Origin Pulse', set: 'Origin', grade: 'PSA 9', price: 180),
   (
@@ -70,7 +70,7 @@ const List<_Sale> _sales = <_Sale>[
     card: 'Celestial Strike',
     set: 'Celestial',
     grade: 'PSA 10',
-    price: 21000
+    price: 21000,
   ),
   (id: '7', card: 'Ember Wake', set: 'Ember', grade: 'Raw', price: 95),
   (id: '8', card: 'Frost Herald', set: 'Ember', grade: 'PSA 9', price: 640),
@@ -94,12 +94,12 @@ enum _Column {
   /// `header`: the string `flexRender` draws, or null for the checkbox
   /// column.
   String? get header => switch (this) {
-        _Column.select => null,
-        _Column.card => 'Card',
-        _Column.set => 'Set',
-        _Column.grade => 'Grade',
-        _Column.price => 'Price',
-      };
+    _Column.select => null,
+    _Column.card => 'Card',
+    _Column.set => 'Set',
+    _Column.grade => 'Grade',
+    _Column.price => 'Price',
+  };
 
   /// `enableSorting: false` on the select column; every other column sorts.
   bool get sortable => this != _Column.select;
@@ -132,23 +132,23 @@ class DataTableDemo extends StatefulWidget {
   final bool loading;
 
   /// `space-y-4`: between the filter row, the table and the pager.
-  static double get stackGap => ds(4);
+  static double get stackGap => el(4);
 
   /// `max-w-xs` on the filter.
   // allow-hardcoded: framework container scale with no token to read it from.
   static const double filterWidth = 320;
 
   /// `pl-10`: the room the glyph needs.
-  static double get filterInset => ds(10);
+  static double get filterInset => el(10);
 
   /// `left-4`: where the glyph sits.
-  static double get glyphInset => ds(4);
+  static double get glyphInset => el(4);
 
   /// `rounded-lg border border-border overflow-hidden` around the table.
-  static double get frameRadius => DsRadii.lg;
+  static double get frameRadius => ElRadii.lg;
 
   /// `className="h-48"` on the empty state's cell.
-  static double get emptyCellHeight => ds(48);
+  static double get emptyCellHeight => el(48);
 
   @override
   State<DataTableDemo> createState() => _DataTableDemoState();
@@ -214,21 +214,22 @@ class _DataTableDemoState extends State<DataTableDemo> {
     if (by == null) return rows;
 
     int compare(_Sale a, _Sale b) => switch (by) {
-          _Column.card => _text(a.card, b.card),
-          _Column.set => _text(a.set, b.set),
-          _Column.grade => _text(a.grade, b.grade),
-          _Column.price => a.price.compareTo(b.price),
-          _Column.select => 0,
-        };
+      _Column.card => _text(a.card, b.card),
+      _Column.set => _text(a.set, b.set),
+      _Column.grade => _text(a.grade, b.grade),
+      _Column.price => a.price.compareTo(b.price),
+      _Column.select => 0,
+    };
 
     // Dart's `sort` is not stable; decorating with the source index makes it
     // so, which is what TanStack's own sort guarantees.
-    final List<({int i, _Sale row})> decorated = <({int i, _Sale row})>[
-      for (int i = 0; i < rows.length; i++) (i: i, row: rows[i]),
-    ]..sort((({int i, _Sale row}) a, ({int i, _Sale row}) b) {
-        final int result = compare(a.row, b.row) * (_sortDesc ? -1 : 1);
-        return result != 0 ? result : a.i.compareTo(b.i);
-      });
+    final List<({int i, _Sale row})> decorated =
+        <({int i, _Sale row})>[
+          for (int i = 0; i < rows.length; i++) (i: i, row: rows[i]),
+        ]..sort((({int i, _Sale row}) a, ({int i, _Sale row}) b) {
+          final int result = compare(a.row, b.row) * (_sortDesc ? -1 : 1);
+          return result != 0 ? result : a.i.compareTo(b.i);
+        });
     return <_Sale>[for (final ({int i, _Sale row}) e in decorated) e.row];
   }
 
@@ -238,8 +239,9 @@ class _DataTableDemoState extends State<DataTableDemo> {
     final List<_Sale> rows = _sorted;
     final int start = _page * _pageSize;
     if (start >= rows.length) return const <_Sale>[];
-    final int end =
-        start + _pageSize > rows.length ? rows.length : start + _pageSize;
+    final int end = start + _pageSize > rows.length
+        ? rows.length
+        : start + _pageSize;
     return rows.sublist(start, end);
   }
 
@@ -247,20 +249,21 @@ class _DataTableDemoState extends State<DataTableDemo> {
   bool get _canNext => _page + 1 < _pageCount;
 
   /// `table.getIsAllPageRowsSelected()` / `getIsSomePageRowsSelected()`.
-  DsCheckboxState get _headerState {
+  ElCheckboxState get _headerState {
     final List<_Sale> page = _rows;
-    if (page.isEmpty) return DsCheckboxState.unchecked;
-    final int ticked =
-        page.where((_Sale row) => _selected.contains(row.id)).length;
-    if (ticked == page.length) return DsCheckboxState.checked;
+    if (page.isEmpty) return ElCheckboxState.unchecked;
+    final int ticked = page
+        .where((_Sale row) => _selected.contains(row.id))
+        .length;
+    if (ticked == page.length) return ElCheckboxState.checked;
     return ticked == 0
-        ? DsCheckboxState.unchecked
-        : DsCheckboxState.indeterminate;
+        ? ElCheckboxState.unchecked
+        : ElCheckboxState.indeterminate;
   }
 
-  void _toggleAll(DsCheckboxState next) {
+  void _toggleAll(ElCheckboxState next) {
     setState(() {
-      final bool on = next == DsCheckboxState.checked;
+      final bool on = next == ElCheckboxState.checked;
       for (final _Sale row in _rows) {
         if (on) {
           _selected.add(row.id);
@@ -271,9 +274,9 @@ class _DataTableDemoState extends State<DataTableDemo> {
     });
   }
 
-  void _toggleRow(_Sale row, DsCheckboxState next) {
+  void _toggleRow(_Sale row, ElCheckboxState next) {
     setState(() {
-      if (next == DsCheckboxState.checked) {
+      if (next == ElCheckboxState.checked) {
         _selected.add(row.id);
       } else {
         _selected.remove(row.id);
@@ -283,7 +286,7 @@ class _DataTableDemoState extends State<DataTableDemo> {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     final bool loading = widget.loading;
     final List<_Sale> rows = _rows;
 
@@ -300,21 +303,21 @@ class _DataTableDemoState extends State<DataTableDemo> {
         DecoratedBox(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(DataTableDemo.frameRadius),
-            border: Border.all(color: theme.border, width: DsWidths.hairline),
+            border: Border.all(color: theme.border, width: ElWidths.hairline),
           ),
           child: Padding(
-            padding: const EdgeInsets.all(DsWidths.hairline),
+            padding: const EdgeInsets.all(ElWidths.hairline),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(
-                DataTableDemo.frameRadius - DsWidths.hairline,
+                DataTableDemo.frameRadius - ElWidths.hairline,
               ),
-              child: DsTable(
-                header: <DsTableCellSpec>[
+              child: ElTable(
+                header: <ElTableCellSpec>[
                   for (final _Column column in _Column.values)
-                    DsTableCellSpec(
+                    ElTableCellSpec(
                       checkbox: column == _Column.select,
                       child: column == _Column.select
-                          ? DsCheckbox(
+                          ? ElCheckbox(
                               state: _headerState,
                               label: 'Select all rows on this page',
                               onChanged: loading ? null : _toggleAll,
@@ -324,26 +327,27 @@ class _DataTableDemoState extends State<DataTableDemo> {
                               sorted: _sortBy == column
                                   ? (_sortDesc ? _Sorted.desc : _Sorted.asc)
                                   : _Sorted.none,
-                              onPressed:
-                                  loading ? null : () => _toggleSort(column),
+                              onPressed: loading
+                                  ? null
+                                  : () => _toggleSort(column),
                             ),
                     ),
                 ],
-                rows: <DsTableRowSpec>[
+                rows: <ElTableRowSpec>[
                   if (loading)
                     for (int i = 0; i < _skeletonRows; i++)
-                      DsTableRowSpec(
-                        cells: <DsTableCellSpec>[
+                      ElTableRowSpec(
+                        cells: <ElTableCellSpec>[
                           for (final _Column column in _Column.values)
-                            DsTableCellSpec(
+                            ElTableCellSpec(
                               checkbox: column == _Column.select,
                               // `<Skeleton className="h-4 w-full"/>`.
-                              child: DsSkeleton(height: ds(4)),
+                              child: ElSkeleton(height: el(4)),
                             ),
                         ],
                       )
                   else if (rows.isEmpty)
-                    DsTableRowSpec.span(
+                    ElTableRowSpec.span(
                       _EmptyState(
                         query: _filter.text,
                         onClear: () => _filter.clear(),
@@ -352,37 +356,37 @@ class _DataTableDemoState extends State<DataTableDemo> {
                     )
                   else
                     for (final _Sale row in rows)
-                      DsTableRowSpec(
+                      ElTableRowSpec(
                         selected: _selected.contains(row.id),
-                        cells: <DsTableCellSpec>[
-                          DsTableCellSpec(
+                        cells: <ElTableCellSpec>[
+                          ElTableCellSpec(
                             checkbox: true,
-                            child: DsCheckbox(
+                            child: ElCheckbox(
                               state: _selected.contains(row.id)
-                                  ? DsCheckboxState.checked
-                                  : DsCheckboxState.unchecked,
+                                  ? ElCheckboxState.checked
+                                  : ElCheckboxState.unchecked,
                               label: 'Select ${row.card}',
-                              onChanged: (DsCheckboxState next) =>
+                              onChanged: (ElCheckboxState next) =>
                                   _toggleRow(row, next),
                             ),
                           ),
-                          DsTableCellSpec(child: Text(row.card)),
-                          DsTableCellSpec(child: Text(row.set)),
-                          DsTableCellSpec(
-                            child: DsBadge(
+                          ElTableCellSpec(child: Text(row.card)),
+                          ElTableCellSpec(child: Text(row.set)),
+                          ElTableCellSpec(
+                            child: ElBadge(
                               label: row.grade,
                               variant: row.grade == 'PSA 10'
-                                  ? DsBadgeVariant.premium
-                                  : DsBadgeVariant.outline,
+                                  ? ElBadgeVariant.premium
+                                  : ElBadgeVariant.outline,
                             ),
                           ),
-                          DsTableCellSpec(
+                          ElTableCellSpec(
                             // `block text-right` inside a cell that is not
                             // itself right-aligned.
-                            align: DsTableAlign.end,
-                            child: DsText(
+                            align: ElTableAlign.end,
+                            child: ElText(
                               _money(row.price),
-                              DsType.numSm,
+                              ElType.numSm,
                               color: theme.foreground,
                             ),
                           ),
@@ -398,12 +402,13 @@ class _DataTableDemoState extends State<DataTableDemo> {
           caption: loading
               ? 'Loading…'
               : 'Page ${_page + 1} of ${_pageCount < 1 ? 1 : _pageCount} · '
-                  '${_filtered.length} of ${_sales.length} cards',
+                    '${_filtered.length} of ${_sales.length} cards',
           onPrevious: loading || !_canPrevious
               ? null
               : () => setState(() => _page -= 1),
-          onNext:
-              loading || !_canNext ? null : () => setState(() => _page += 1),
+          onNext: loading || !_canNext
+              ? null
+              : () => setState(() => _page += 1),
         ),
       ],
     );
@@ -424,7 +429,7 @@ class _FilterRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -434,7 +439,7 @@ class _FilterRow extends StatelessWidget {
           child: Stack(
             alignment: AlignmentDirectional.centerStart,
             children: <Widget>[
-              DsInput(
+              ElInput(
                 controller: controller,
                 placeholder: 'Filter by card',
                 label: 'Filter by card',
@@ -442,19 +447,19 @@ class _FilterRow extends StatelessWidget {
                 // `className="pl-10"` over the component's own `px-4`.
                 padding: EdgeInsetsDirectional.fromSTEB(
                   DataTableDemo.filterInset,
-                  ds(1),
-                  ds(4),
-                  ds(1),
+                  el(1),
+                  el(4),
+                  el(1),
                 ),
               ),
               // `pointer-events-none absolute top-1/2 left-4 -translate-y-1/2`.
               PositionedDirectional(
                 start: DataTableDemo.glyphInset,
                 child: const IgnorePointer(
-                  child: DsIcon.lucide(
-                    DsLucide.search,
-                    size: DsIconSize.sm,
-                    tone: DsIconTone.muted,
+                  child: ElIcon.lucide(
+                    ElLucide.search,
+                    size: ElIconSize.sm,
+                    tone: ElIconTone.muted,
                   ),
                 ),
               ),
@@ -463,10 +468,10 @@ class _FilterRow extends StatelessWidget {
         ),
         if (selected > 0) ...<Widget>[
           // `gap-3`.
-          SizedBox(width: ds(3)),
-          DsText(
+          SizedBox(width: el(3)),
+          ElText(
             '$selected selected',
-            DsType.caption,
+            ElType.caption,
             color: theme.mutedForeground,
           ),
         ],
@@ -500,33 +505,31 @@ class _SortHeader extends StatelessWidget {
   final VoidCallback? onPressed;
 
   /// `gap-1.5`.
-  static double get gap => ds(1.5);
+  static double get gap => el(1.5);
 
   @override
-  Widget build(BuildContext context) => DsPress(
-        scale: DsTransforms.clickSpringScale,
-        onTap: onPressed,
-        behavior: HitTestBehavior.opaque,
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            Text(label),
-            SizedBox(width: gap),
-            DsIcon.lucide(
-              switch (sorted) {
-                _Sorted.asc => DsLucide.arrowUp,
-                _Sorted.desc => DsLucide.arrowDown,
-                _Sorted.none => DsLucide.arrowUpDown,
-              },
-              size: DsIconSize.sm,
-              tone: sorted == _Sorted.none
-                  ? DsIconTone.muted
-                  : DsIconTone.action,
-            ),
-          ],
+  Widget build(BuildContext context) => ElPress(
+    scale: ElTransforms.clickSpringScale,
+    onTap: onPressed,
+    behavior: HitTestBehavior.opaque,
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: <Widget>[
+        Text(label),
+        SizedBox(width: gap),
+        ElIcon.lucide(
+          switch (sorted) {
+            _Sorted.asc => ElLucide.arrowUp,
+            _Sorted.desc => ElLucide.arrowDown,
+            _Sorted.none => ElLucide.arrowUpDown,
+          },
+          size: ElIconSize.sm,
+          tone: sorted == _Sorted.none ? ElIconTone.muted : ElIconTone.action,
         ),
-      );
+      ],
+    ),
+  );
 }
 
 /// The filtered-to-nothing state.
@@ -537,24 +540,24 @@ class _EmptyState extends StatelessWidget {
   final VoidCallback onClear;
 
   @override
-  Widget build(BuildContext context) => DsEmpty(
-        children: <Widget>[
-          DsEmptyTitle('No cards match “$query”'),
-          const DsEmptyDescription(
-            'Try a shorter search, or clear the filter to see all eight.',
-          ),
-          Padding(
-            // `className="mt-4"`: on top of the `Empty`'s own `gap-4`.
-            padding: EdgeInsets.only(top: ds(4)),
-            child: DsButton(
-              variant: DsButtonVariant.outline,
-              size: DsButtonSize.sm,
-              onPressed: onClear,
-              child: const Text('Clear filter'),
-            ),
-          ),
-        ],
-      );
+  Widget build(BuildContext context) => ElEmpty(
+    children: <Widget>[
+      ElEmptyTitle('No cards match “$query”'),
+      const ElEmptyDescription(
+        'Try a shorter search, or clear the filter to see all eight.',
+      ),
+      Padding(
+        // `className="mt-4"`: on top of the `Empty`'s own `gap-4`.
+        padding: EdgeInsets.only(top: el(4)),
+        child: ElButton(
+          variant: ElButtonVariant.outline,
+          size: ElButtonSize.sm,
+          onPressed: onClear,
+          child: const Text('Clear filter'),
+        ),
+      ),
+    ],
+  );
 }
 
 /// `flex flex-wrap items-center justify-between gap-3`.
@@ -571,29 +574,29 @@ class _PagerRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
         Flexible(
-          child: DsText(caption, DsType.caption, color: theme.mutedForeground),
+          child: ElText(caption, ElType.caption, color: theme.mutedForeground),
         ),
         Row(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            DsButton(
-              variant: DsButtonVariant.outline,
-              size: DsButtonSize.sm,
+            ElButton(
+              variant: ElButtonVariant.outline,
+              size: ElButtonSize.sm,
               onPressed: onPrevious,
               child: const Text('Previous'),
             ),
             // `gap-2`.
-            SizedBox(width: ds(2)),
-            DsButton(
-              variant: DsButtonVariant.outline,
-              size: DsButtonSize.sm,
+            SizedBox(width: el(2)),
+            ElButton(
+              variant: ElButtonVariant.outline,
+              size: ElButtonSize.sm,
               onPressed: onNext,
               child: const Text('Next'),
             ),

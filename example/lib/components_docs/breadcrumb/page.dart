@@ -12,12 +12,12 @@
 /// Preview heading precedes Installation. Then Installation, Usage,
 /// Composition, Basic, Link component, RTL, and API Reference, in that
 /// order. Custom separator, Dropdown, and Collapsed have no counterpart
-/// here: DsBreadcrumb has no separator override, no widget slot for a
+/// here: ElBreadcrumb has no separator override, no widget slot for a
 /// crumb-embedded trigger, and no widget that collapses a trail (see the
 /// Composition, Link component, and Responsive sections respectively).
 /// States, Accessibility, Responsive, Dependencies, Theming, and Source are
 /// this package's own six sections, added after API Reference, named
-/// exactly that with no extra words. Each gets its own [DsSection];
+/// exactly that with no extra words. Each gets its own [ElSection];
 /// title/description and previous/next come from [DocsLayout].
 library;
 
@@ -53,9 +53,9 @@ class BreadcrumbDocPage extends StatelessWidget {
             'The trail derives its own separators and wraps onto a new line '
             'instead of collapsing when it runs out of room.',
       ),
-      breadcrumbs: const <DsBreadcrumbEntry>[
-        DsBreadcrumbEntry.link('Components'),
-        DsBreadcrumbEntry.page('Breadcrumb'),
+      breadcrumbs: const <ElBreadcrumbEntry>[
+        ElBreadcrumbEntry.link('Components'),
+        ElBreadcrumbEntry.page('Breadcrumb'),
       ],
       sidebar: const <DocsSidebarEntry>[
         DocsSidebarEntry(title: 'Badge', route: '/components/badge'),
@@ -103,7 +103,7 @@ class _BreadcrumbArticle extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
       // The live demo, ahead of any heading: the same shape the reference
-      // page itself opens with. No DsSection wraps it, so it carries no
+      // page itself opens with. No ElSection wraps it, so it carries no
       // Overview/Status/Preview heading of its own before Installation.
       DocsCodeExample(
         title: 'Breadcrumb specimens',
@@ -118,15 +118,12 @@ class _BreadcrumbArticle extends StatelessWidget {
             path: 'lib/components/ui/breadcrumb.dart',
             code:
                 "import 'package:flutter/widgets.dart';\n\n"
-                '// No registry manifest exists for breadcrumb yet: copy\n'
-                '// lib/src/components/breadcrumb.dart directly and update its\n'
-                '// relative imports (foundation/*, theme_scope.dart, icon.dart)\n'
-                '// to wherever you land them. See the Installation section below.',
+                '// Install with: elattar add breadcrumb',
           ),
         ],
       ),
-      SizedBox(height: ds(8)),
-      DsSection(
+      SizedBox(height: el(8)),
+      ElSection(
         id: 'install',
         title: 'Installation',
         description:
@@ -137,11 +134,10 @@ class _BreadcrumbArticle extends StatelessWidget {
           facts: <DocsInstallFact>[
             const DocsInstallFact(
               label: 'CLI',
-              value: 'Not available yet',
+              value: 'elattar add breadcrumb',
               description:
-                  'registry/components/breadcrumb.json does not exist in '
-                  'this checkout, so `elattar add breadcrumb` has nothing to '
-                  'resolve and will fail against the real registry client.',
+                  'Installs registry/components/breadcrumb.json and its '
+                  'declared dependency closure.',
             ),
             DocsInstallFact(
               label: 'Manual',
@@ -161,23 +157,23 @@ class _BreadcrumbArticle extends StatelessWidget {
           ],
         ),
       ),
-      DsSection(
+      ElSection(
         id: 'usage',
         title: 'Usage',
         description:
             'The smallest correct composition: three steps, the last one '
             'the current page.',
-        child: DsPanel(
+        child: ElPanel(
           label: 'DART',
           note: 'COMPOSE',
           child: DocsSelectableCodeBlock(code: _usageCode),
         ),
       ),
-      DsSection(
+      ElSection(
         id: 'composition',
         title: 'Composition',
         description:
-            'DsBreadcrumb has no BreadcrumbList, BreadcrumbItem, or '
+            'ElBreadcrumb has no BreadcrumbList, BreadcrumbItem, or '
             'BreadcrumbSeparator to assemble by hand: items builds the '
             'whole trail, and a chevron separator is derived between every '
             'adjacent pair. What follows is what that single call builds '
@@ -185,11 +181,11 @@ class _BreadcrumbArticle extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            DsPanel(
-              label: 'What DsBreadcrumb(items: …) assembles',
+            ElPanel(
+              label: 'What ElBreadcrumb(items: …) assembles',
               child: DocsSelectableCodeBlock(code: _compositionCode),
             ),
-            SizedBox(height: ds(6)),
+            SizedBox(height: el(6)),
             const DocsCodeExample(
               title: 'Page header composition',
               description:
@@ -200,7 +196,7 @@ class _BreadcrumbArticle extends StatelessWidget {
           ],
         ),
       ),
-      DsSection(
+      ElSection(
         id: 'basic',
         title: 'Basic',
         description:
@@ -214,22 +210,22 @@ class _BreadcrumbArticle extends StatelessWidget {
           ],
         ),
       ),
-      DsSection(
+      ElSection(
         id: 'link-component',
         title: 'Link component',
         description:
             'Flutter has no anchor tag to swap in: onTap is the '
-            'equivalent seam. DsBreadcrumbEntry.link(label, {onTap}) hands '
+            'equivalent seam. ElBreadcrumbEntry.link(label, {onTap}) hands '
             'you a bare VoidCallback, so plugging in a router (go_router, '
             'Navigator, or anything else) is the caller\'s own onTap body, '
-            'not a render prop DsBreadcrumb has to know about.',
-        child: DsPanel(
+            'not a render prop ElBreadcrumb has to know about.',
+        child: ElPanel(
           label: 'DART',
           note: 'ROUTE',
           child: DocsSelectableCodeBlock(code: _linkComponentCode),
         ),
       ),
-      DsSection(
+      ElSection(
         id: 'rtl',
         title: 'RTL',
         description:
@@ -246,20 +242,20 @@ class _BreadcrumbArticle extends StatelessWidget {
           ],
         ),
       ),
-      DsSection(
+      ElSection(
         id: 'api',
         title: 'API Reference',
         description:
             'Every public class, constructor, field, and static layout '
-            'constant the source declares. There is no DsBreadcrumbVariant '
-            'or DsBreadcrumbSize to choose from: the only per-crumb '
+            'constant the source declares. There is no ElBreadcrumbVariant '
+            'or ElBreadcrumbSize to choose from: the only per-crumb '
             'decision is which constructor built the entry, .link or '
             '.page, both named below.',
         child: const DocsApiTable(
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'items',
-              type: 'List<DsBreadcrumbEntry>',
+              type: 'List<ElBreadcrumbEntry>',
               description:
                   'Required. The ordered trail. A chevron separator is '
                   'derived between every adjacent pair: there is no way to '
@@ -278,7 +274,7 @@ class _BreadcrumbArticle extends StatelessWidget {
               description: "14px: the derived chevron separator's own box.",
             ),
             DocsApiFact(
-              name: 'DsBreadcrumbEntry.link(label, {onTap})',
+              name: 'ElBreadcrumbEntry.link(label, {onTap})',
               type: 'const factory',
               description:
                   'A step back in the trail. label is required and '
@@ -287,7 +283,7 @@ class _BreadcrumbArticle extends StatelessWidget {
                   'a link.',
             ),
             DocsApiFact(
-              name: 'DsBreadcrumbEntry.page(label)',
+              name: 'ElBreadcrumbEntry.page(label)',
               type: 'const factory',
               description:
                   'The current page. label is required and positional. '
@@ -305,7 +301,7 @@ class _BreadcrumbArticle extends StatelessWidget {
               name: 'onTap',
               type: 'VoidCallback?',
               description:
-                  'Only ever set by DsBreadcrumbEntry.link; always null on '
+                  'Only ever set by ElBreadcrumbEntry.link; always null on '
                   'a page entry.',
             ),
             DocsApiFact(
@@ -318,7 +314,7 @@ class _BreadcrumbArticle extends StatelessWidget {
           ],
         ),
       ),
-      DsSection(
+      ElSection(
         id: 'states',
         title: 'States',
         description:
@@ -328,7 +324,7 @@ class _BreadcrumbArticle extends StatelessWidget {
           facts: <DocsStateFact>[
             DocsStateFact(
               state: 'Rest (link crumb)',
-              treatment: 'DsComponentType.textSm at theme.mutedForeground.',
+              treatment: 'ElComponentType.textSm at theme.mutedForeground.',
               userSignal:
                   'Reads as secondary, quiet text until interacted with.',
             ),
@@ -336,14 +332,14 @@ class _BreadcrumbArticle extends StatelessWidget {
               state: 'Hover (link crumb)',
               treatment:
                   'Animates to theme.foreground over '
-                  'dsAnimationDuration(context, DsDurations.transitionDefault) '
-                  'on DsCurves.out.',
+                  'elAnimationDuration(context, ElDurations.transitionDefault) '
+                  'on ElCurves.out.',
               userSignal:
                   'The crumb brightens toward full-strength text and the '
                   'cursor becomes a pointer.',
             ),
             DocsStateFact(
-              state: 'Current page (DsBreadcrumbEntry.page)',
+              state: 'Current page (ElBreadcrumbEntry.page)',
               treatment:
                   'theme.foreground at all times; Semantics(link: true, '
                   'enabled: false); no GestureDetector is attached.',
@@ -365,21 +361,21 @@ class _BreadcrumbArticle extends StatelessWidget {
               state: 'Pressed',
               treatment:
                   'N/A, GestureDetector.onTap fires with no intermediate '
-                  'pressed-state paint; there is no DsPress scale or '
+                  'pressed-state paint; there is no ElPress scale or '
                   'opacity step here.',
               userSignal: 'A tap or click resolves in a single frame.',
             ),
             DocsStateFact(
               state: 'Loading / Error / Success',
               treatment:
-                  'N/A, DsBreadcrumb is a synchronous rendering primitive '
+                  'N/A, ElBreadcrumb is a synchronous rendering primitive '
                   'with no future, stream, or error boundary of its own.',
               userSignal: 'Not applicable.',
             ),
             DocsStateFact(
               state: 'Empty items',
               treatment:
-                  'N/A as a dedicated state, DsBreadcrumb(items: const '
+                  'N/A as a dedicated state, ElBreadcrumb(items: const '
                   '[]) renders a zero-size Wrap: no crumbs, no separators, '
                   'no placeholder text.',
               userSignal:
@@ -390,7 +386,7 @@ class _BreadcrumbArticle extends StatelessWidget {
               state: 'Disabled',
               treatment:
                   'N/A as a whole-widget state: the nearest equivalent is '
-                  'per-entry: DsBreadcrumbEntry.page is permanently '
+                  'per-entry: ElBreadcrumbEntry.page is permanently '
                   'non-interactive.',
               userSignal: 'See Current page above.',
             ),
@@ -398,7 +394,7 @@ class _BreadcrumbArticle extends StatelessWidget {
               state: 'Reduced motion',
               treatment:
                   'The hover transition is read through '
-                  'dsAnimationDuration, which collapses to Duration.zero '
+                  'elAnimationDuration, which collapses to Duration.zero '
                   'under MediaQuery.disableAnimations.',
               userSignal:
                   'The ink still changes on hover; it snaps instead of '
@@ -407,10 +403,10 @@ class _BreadcrumbArticle extends StatelessWidget {
           ],
         ),
       ),
-      DsSection(
+      ElSection(
         id: 'accessibility',
         title: 'Accessibility',
-        child: DsPanel(
+        child: ElPanel(
           label: 'What the semantics tree actually carries',
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -457,7 +453,7 @@ class _BreadcrumbArticle extends StatelessWidget {
               ),
               _A11yRow(
                 'Error wiring',
-                'None, DsBreadcrumb never participates in form validation '
+                'None, ElBreadcrumb never participates in form validation '
                     'or an error state.',
               ),
               _A11yRow(
@@ -475,53 +471,53 @@ class _BreadcrumbArticle extends StatelessWidget {
           ),
         ),
       ),
-      DsSection(
+      ElSection(
         id: 'responsive',
         title: 'Responsive',
         description:
             "Breadcrumb's real overflow story: it wraps, it does not "
             'truncate or collapse.',
-        child: DsPanel(
+        child: ElPanel(
           label: 'What happens on a narrow viewport',
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              DsText(
+              ElText(
                 'The list lays out as a Wrap (spacing and runSpacing both '
-                'set to DsBreadcrumb.gap, crossAxisAlignment centered), '
+                'set to ElBreadcrumb.gap, crossAxisAlignment centered), '
                 "the same shape Tailwind's flex flex-wrap gives the "
                 'reference, not a fixed single-line Row.',
-                DsType.small,
+                ElType.small,
               ),
-              SizedBox(height: ds(3)),
-              DsText(
+              SizedBox(height: el(3)),
+              ElText(
                 'Once a row of crumbs and separators would overflow the '
                 'available width, the trail wraps onto a second line. '
                 'Nothing is clipped, scrolled, or replaced with an ellipsis.',
-                DsType.small,
+                ElType.small,
               ),
-              SizedBox(height: ds(3)),
-              DsText(
+              SizedBox(height: el(3)),
+              ElText(
                 'BreadcrumbEllipsis is recorded in the source\'s own doc '
                 'comment as an export the underlying reference carries, but '
                 'no Flutter widget builds a collapsed trail: the port '
                 'renders none because the page it was measured against '
                 'never mounts one either. Do not reach for a collapsing '
                 'behavior this component does not have.',
-                DsType.small,
+                ElType.small,
               ),
-              SizedBox(height: ds(3)),
-              DsText(
+              SizedBox(height: el(3)),
+              ElText(
                 'The pointer hover transition needs a mouse; on touch-only '
                 'platforms the tap still fires immediately, it just never '
                 'shows the intermediate brightening color.',
-                DsType.small,
+                ElType.small,
               ),
             ],
           ),
         ),
       ),
-      DsSection(
+      ElSection(
         id: 'dependencies',
         title: 'Dependencies',
         description:
@@ -535,7 +531,7 @@ class _BreadcrumbArticle extends StatelessWidget {
               label: 'Status',
               value: 'Stable primitive: no variants, sizes, or async states',
               description:
-                  'DsBreadcrumb and DsBreadcrumbEntry are both exported from '
+                  'ElBreadcrumb and ElBreadcrumbEntry are both exported from '
                   'the public barrel today.',
             ),
             const DocsInstallFact(
@@ -545,7 +541,7 @@ class _BreadcrumbArticle extends StatelessWidget {
             ),
             const DocsInstallFact(
               label: 'Registry item',
-              value: 'Not yet published',
+              value: 'registry/components/breadcrumb.json',
               description:
                   'No registry/components/breadcrumb.json exists in this '
                   'checkout: breadcrumb has not been wired into the CLI '
@@ -593,53 +589,53 @@ class _BreadcrumbArticle extends StatelessWidget {
               label: 'Verified',
               value: 'package tests + this docs specimen',
               description:
-                  "test/navigation_test.dart's DsBreadcrumb group "
+                  "test/navigation_test.dart's ElBreadcrumb group "
                   '(spacing, derived separators, current-page semantics and '
                   'taps, RTL reading order) plus this page\'s live specimen. '
-                  'No fixture install exists, because no registry manifest '
+                  'Fixture install coverage is still missing, even though a registry manifest '
                   'does.',
             ),
           ],
         ),
       ),
-      DsSection(
+      ElSection(
         id: 'theming',
         title: 'Theming',
-        child: DsPanel(
+        child: ElPanel(
           label: 'What actually varies with the theme',
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              DsText(
-                'DsBreadcrumb carries no fill, border, or surface of its '
+              ElText(
+                'ElBreadcrumb carries no fill, border, or surface of its '
                 'own: it only sets type and ink. Every crumb, link and '
-                'page alike, renders at DsComponentType.textSm; the weight '
+                'page alike, renders at ElComponentType.textSm; the weight '
                 'never changes.',
-                DsType.small,
+                ElType.small,
               ),
-              SizedBox(height: ds(3)),
-              DsText(
+              SizedBox(height: el(3)),
+              ElText(
                 'Ink is the whole story: theme.mutedForeground at rest, '
                 'theme.foreground on hover or for the current page. Both '
                 'come from the DefaultTextStyle that wraps the entire Wrap, '
-                'and the separator\'s DsIconTone.inherit reads that same '
+                'and the separator\'s ElIconTone.inherit reads that same '
                 'ambient style: the Flutter equivalent of a currentColor '
                 'stroke.',
-                DsType.small,
+                ElType.small,
               ),
-              SizedBox(height: ds(3)),
-              DsText(
+              SizedBox(height: el(3)),
+              ElText(
                 'Because color is the only token in play, a custom theme '
                 'only has to keep mutedForeground and foreground legibly '
                 'distinct in both light and dark: there is no dedicated '
                 'breadcrumb-*, background, or border role to override.',
-                DsType.small,
+                ElType.small,
               ),
             ],
           ),
         ),
       ),
-      DsSection(
+      ElSection(
         id: 'source',
         title: 'Source',
         child: DocsInstallFacts(
@@ -661,7 +657,7 @@ class _BreadcrumbArticle extends StatelessWidget {
             ),
             const DocsInstallFact(
               label: 'Tests',
-              value: 'test/navigation_test.dart (DsBreadcrumb group)',
+              value: 'test/navigation_test.dart (ElBreadcrumb group)',
               description:
                   'Package-level behavioral coverage: spacing constants, '
                   'derived separators, current-page semantics and taps, RTL '
@@ -684,11 +680,11 @@ class _BreadcrumbArticle extends StatelessWidget {
 const String _usageCode =
     '''import 'package:elattar_design_system/elattar_design_system.dart';
 
-DsBreadcrumb(
-  items: <DsBreadcrumbEntry>[
-    DsBreadcrumbEntry.link('Dashboard', onTap: () {}),
-    DsBreadcrumbEntry.link('Projects', onTap: () {}),
-    DsBreadcrumbEntry.page('Nova Redesign'),
+ElBreadcrumb(
+  items: <ElBreadcrumbEntry>[
+    ElBreadcrumbEntry.link('Dashboard', onTap: () {}),
+    ElBreadcrumbEntry.link('Projects', onTap: () {}),
+    ElBreadcrumbEntry.page('Nova Redesign'),
   ],
 )''';
 
@@ -696,27 +692,25 @@ const String _compositionCode =
     '''// nav: Semantics(container: true, label: 'breadcrumb')
 //  ol: DefaultTextStyle(text-sm, muted-foreground) around a Wrap
 //   li: one _DsCrumb per entry, gap 6px
-//    a / span: DsBreadcrumbEntry.link renders a tappable crumb,
-//              DsBreadcrumbEntry.page renders the inert current page
+//    a / span: ElBreadcrumbEntry.link renders a tappable crumb,
+//              ElBreadcrumbEntry.page renders the inert current page
 //   li (separator): a derived 14px chevron between every adjacent pair,
 //                   excluded from the semantics tree''';
 
-const String _linkComponentCode =
-    '''DsBreadcrumbEntry.link(
+const String _linkComponentCode = '''ElBreadcrumbEntry.link(
   'Projects',
   // Swap in whatever routing this app already uses: go_router,
-  // Navigator, or anything else. DsBreadcrumb never imports a router
+  // Navigator, or anything else. ElBreadcrumb never imports a router
   // itself, onTap is the whole seam.
   onTap: () => Navigator.of(context).pushNamed('/projects'),
 )''';
 
-const String _rtlCode =
-    '''Directionality(
+const String _rtlCode = '''Directionality(
   textDirection: TextDirection.rtl,
-  child: DsBreadcrumb(
-    items: <DsBreadcrumbEntry>[
-      DsBreadcrumbEntry.link('الرئيسية'),
-      DsBreadcrumbEntry.page('الإعدادات'),
+  child: ElBreadcrumb(
+    items: <ElBreadcrumbEntry>[
+      ElBreadcrumbEntry.link('الرئيسية'),
+      ElBreadcrumbEntry.page('الإعدادات'),
     ],
   ),
 )''';
@@ -730,15 +724,15 @@ class _A11yRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return Padding(
-      padding: EdgeInsets.only(bottom: last ? 0 : ds(3)),
+      padding: EdgeInsets.only(bottom: last ? 0 : el(3)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          DsText(label, DsType.label, color: theme.actionInk),
-          SizedBox(height: ds(1)),
-          DsText(body, DsType.small),
+          ElText(label, ElType.label, color: theme.actionInk),
+          SizedBox(height: el(1)),
+          ElText(body, ElType.small),
         ],
       ),
     );
@@ -752,20 +746,20 @@ class _BreadcrumbPreview extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      DsText('Typical trail', DsType.label),
-      SizedBox(height: ds(2)),
-      const DsBreadcrumb(
-        items: <DsBreadcrumbEntry>[
-          DsBreadcrumbEntry.link('Dashboard'),
-          DsBreadcrumbEntry.link('Projects'),
-          DsBreadcrumbEntry.page('Nova Redesign'),
+      ElText('Typical trail', ElType.label),
+      SizedBox(height: el(2)),
+      const ElBreadcrumb(
+        items: <ElBreadcrumbEntry>[
+          ElBreadcrumbEntry.link('Dashboard'),
+          ElBreadcrumbEntry.link('Projects'),
+          ElBreadcrumbEntry.page('Nova Redesign'),
         ],
       ),
-      SizedBox(height: ds(6)),
-      DsText('Single crumb: no separator to derive', DsType.label),
-      SizedBox(height: ds(2)),
-      const DsBreadcrumb(
-        items: <DsBreadcrumbEntry>[DsBreadcrumbEntry.page('Only crumb')],
+      SizedBox(height: el(6)),
+      ElText('Single crumb: no separator to derive', ElType.label),
+      SizedBox(height: el(2)),
+      const ElBreadcrumb(
+        items: <ElBreadcrumbEntry>[ElBreadcrumbEntry.page('Only crumb')],
       ),
     ],
   );
@@ -775,11 +769,11 @@ class _BreadcrumbBasic extends StatelessWidget {
   const _BreadcrumbBasic();
 
   @override
-  Widget build(BuildContext context) => const DsBreadcrumb(
-    items: <DsBreadcrumbEntry>[
-      DsBreadcrumbEntry.link('Dashboard'),
-      DsBreadcrumbEntry.link('Projects'),
-      DsBreadcrumbEntry.page('Nova Redesign'),
+  Widget build(BuildContext context) => const ElBreadcrumb(
+    items: <ElBreadcrumbEntry>[
+      ElBreadcrumbEntry.link('Dashboard'),
+      ElBreadcrumbEntry.link('Projects'),
+      ElBreadcrumbEntry.page('Nova Redesign'),
     ],
   );
 }
@@ -790,10 +784,10 @@ class _BreadcrumbRtl extends StatelessWidget {
   @override
   Widget build(BuildContext context) => const Directionality(
     textDirection: TextDirection.rtl,
-    child: DsBreadcrumb(
-      items: <DsBreadcrumbEntry>[
-        DsBreadcrumbEntry.link('الرئيسية'),
-        DsBreadcrumbEntry.page('الإعدادات'),
+    child: ElBreadcrumb(
+      items: <ElBreadcrumbEntry>[
+        ElBreadcrumbEntry.link('الرئيسية'),
+        ElBreadcrumbEntry.page('الإعدادات'),
       ],
     ),
   );
@@ -806,27 +800,27 @@ class _BreadcrumbComposition extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      const DsBreadcrumb(
-        items: <DsBreadcrumbEntry>[
-          DsBreadcrumbEntry.link('Dashboard'),
-          DsBreadcrumbEntry.link('Projects'),
-          DsBreadcrumbEntry.page('Nova Redesign'),
+      const ElBreadcrumb(
+        items: <ElBreadcrumbEntry>[
+          ElBreadcrumbEntry.link('Dashboard'),
+          ElBreadcrumbEntry.link('Projects'),
+          ElBreadcrumbEntry.page('Nova Redesign'),
         ],
       ),
-      SizedBox(height: ds(3)),
+      SizedBox(height: el(3)),
       Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           Expanded(
-            child: DsText(
+            child: ElText(
               'Nova Redesign',
-              DsType.h3,
-              color: DsTheme.of(context).foreground,
+              ElType.h3,
+              color: ElTheme.of(context).foreground,
             ),
           ),
-          SizedBox(width: ds(3)),
-          DsButton(
-            variant: DsButtonVariant.outline,
+          SizedBox(width: el(3)),
+          ElButton(
+            variant: ElButtonVariant.outline,
             onPressed: () {},
             child: const Text('Share'),
           ),

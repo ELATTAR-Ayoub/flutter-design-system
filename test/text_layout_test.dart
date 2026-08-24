@@ -38,11 +38,11 @@ Future<Size> _measure(
   double width = 400,
 }) async {
   final GlobalKey key = GlobalKey();
-  final DsThemeController controller = DsThemeController();
+  final ElThemeController controller = ElThemeController();
   addTearDown(controller.dispose);
 
   await tester.pumpWidget(
-    DsTheme(
+    ElTheme(
       controller: controller,
       child: Directionality(
         textDirection: TextDirection.ltr,
@@ -68,29 +68,30 @@ void main() {
   });
 
   group('one line is font-size × line-height', () {
-    testWidgets('for every class the four foundation pages set',
-        (WidgetTester tester) async {
-      final Map<String, (DsTypeSpec, double)> classes =
-          <String, (DsTypeSpec, double)>{
-        '.type-small': (DsType.small, 13),
-        '.type-h3': (DsType.h3, 21),
-        '.type-h4': (DsType.h4, 17),
-        '.type-lead': (DsType.lead, 17),
-        '.type-body': (DsType.body, 15),
-        '.type-micro': (DsType.micro, 10.5),
-        '.type-label': (DsType.label, 11),
-        '.type-num-sm': (DsType.numSm, 12),
-        '.type-chip': (DsType.chip, 11.5),
-        '.type-caption': (DsType.caption, 10.5),
-      };
+    testWidgets('for every class the four foundation pages set', (
+      WidgetTester tester,
+    ) async {
+      final Map<String, (ElTypeSpec, double)> classes =
+          <String, (ElTypeSpec, double)>{
+            '.type-small': (ElType.small, 13),
+            '.type-h3': (ElType.h3, 21),
+            '.type-h4': (ElType.h4, 17),
+            '.type-lead': (ElType.lead, 17),
+            '.type-body': (ElType.body, 15),
+            '.type-micro': (ElType.micro, 10.5),
+            '.type-label': (ElType.label, 11),
+            '.type-num-sm': (ElType.numSm, 12),
+            '.type-chip': (ElType.chip, 11.5),
+            '.type-caption': (ElType.caption, 10.5),
+          };
 
-      for (final MapEntry<String, (DsTypeSpec, double)> entry
+      for (final MapEntry<String, (ElTypeSpec, double)> entry
           in classes.entries) {
-        final (DsTypeSpec spec, double size) = entry.value;
+        final (ElTypeSpec spec, double size) = entry.value;
         final Size box = await _measure(
           tester,
           // allow-hardcoded: a specimen word, not copy.
-          DsText('Hxg', spec, color: _ink, fontSize: size),
+          ElText('Hxg', spec, color: _ink, fontSize: size),
           width: 600,
         );
         expect(
@@ -105,56 +106,58 @@ void main() {
       // Narrow enough that this wraps to four lines of `.type-small`.
       final Size box = await _measure(
         tester,
-        DsText(
+        ElText(
           'A state colour has one job: to be unmistakable for anything else '
           'on the screen, in either theme, at any size.',
-          DsType.small,
+          ElType.small,
           color: _ink,
         ),
         width: 260,
       );
-      final double line = DsType.small.size! * DsType.small.height!;
+      final double line = ElType.small.size! * ElType.small.height!;
       expect(box.height % line, closeTo(0, 0.001));
       expect(box.height / line, greaterThan(1));
     });
   });
 
   group('an inline box', () {
-    testWidgets('is the font content area, not the line box',
-        (WidgetTester tester) async {
+    testWidgets('is the font content area, not the line box', (
+      WidgetTester tester,
+    ) async {
       // `.type-code` is 12.5px/1.4 — a 17.5px line box, but a `<code>` chip in
       // a sentence is only as tall as Geist Mono's own ascent + descent.
       final Size block = await _measure(
         tester,
-        DsText('globals.css', DsType.code, color: _ink),
+        ElText('globals.css', ElType.code, color: _ink),
       );
       final Size inline = await _measure(
         tester,
-        DsText('globals.css', DsType.code, color: _ink, inline: true),
+        ElText('globals.css', ElType.code, color: _ink, inline: true),
       );
-      expect(block.height, closeTo(12.5 * DsType.code.height!, 0.001));
+      expect(block.height, closeTo(12.5 * ElType.code.height!, 0.001));
       expect(inline.height, lessThan(block.height));
     });
 
-    testWidgets('hides its frame from the line it sits in',
-        (WidgetTester tester) async {
+    testWidgets('hides its frame from the line it sits in', (
+      WidgetTester tester,
+    ) async {
       const double frame = 6; // allow-hardcoded: the trim under test.
       final Size chip = await _measure(
         tester,
         Container(
           padding: const EdgeInsets.symmetric(vertical: 2), // allow-hardcoded
           color: _ink,
-          child: DsText('x', DsType.code, color: _ink, inline: true),
+          child: ElText('x', ElType.code, color: _ink, inline: true),
         ),
       );
       final Size hidden = await _measure(
         tester,
-        DsInlineBox(
+        ElInlineBox(
           trim: frame,
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 2), // allow-hardcoded
             color: _ink,
-            child: DsText('x', DsType.code, color: _ink, inline: true),
+            child: ElText('x', ElType.code, color: _ink, inline: true),
           ),
         ),
       );

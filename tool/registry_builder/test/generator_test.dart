@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter_test/flutter_test.dart';
+import 'package:test/test.dart';
 
 import '../lib/generator.dart';
 
@@ -93,6 +93,60 @@ void main() {
       ).existsSync(),
       isTrue,
     );
+  });
+
+  test('rebuild removes stale generated payloads before writing', () {
+    final Directory root = Directory.systemTemp.createTempSync(
+      'elattar-registry-stale-',
+    );
+    addTearDown(() => root.deleteSync(recursive: true));
+    final File source = File('${root.path}/lib/src/components/button.dart')
+      ..createSync(recursive: true)
+      ..writeAsStringSync('const button = true;\n');
+    final String hash = sha256Hex(source.readAsBytesSync());
+    final Directory manifestDirectory = Directory(
+      '${root.path}/registry/components',
+    )..createSync(recursive: true);
+    File('${manifestDirectory.path}/button.json').writeAsStringSync(
+      const JsonEncoder.withIndent('  ')
+          .convert(<String, Object?>{
+            'name': 'button',
+            'type': 'component',
+            'version': '0.0.1',
+            'description': 'Button fixture.',
+            'minDart': '3.12.2',
+            'minFlutter': '3.44.8',
+            'files': <Object?>[
+              <String, Object?>{
+                'source': 'lib/src/components/button.dart',
+                'target': '@ui/button.dart',
+                'sha256': '__HASH__',
+              },
+            ],
+            'registryDependencies': <String>[],
+            'pubDependencies': <String, String>{},
+            'assets': <Object?>[],
+            'fonts': <Object?>[],
+            'shaders': <Object?>[],
+            'documentationRoute': '/components/button',
+            'sourceLink':
+                'https://github.com/ELATTAR-Ayoub/flutter-design-system',
+          })
+          .replaceAll('__HASH__', hash),
+    );
+
+    final RegistryGenerator generator = RegistryGenerator(repositoryRoot: root);
+    generator.build();
+
+    final File stale = File(
+      '${root.path}/registry/generated/latest/versions/stale/0.0.1/logical/ui/stale.dart',
+    )..createSync(recursive: true);
+    stale.writeAsStringSync('stale');
+    expect(stale.existsSync(), isTrue);
+
+    generator.build();
+
+    expect(stale.existsSync(), isFalse);
   });
 
   test('fails before writing when a source hash drifts', () {

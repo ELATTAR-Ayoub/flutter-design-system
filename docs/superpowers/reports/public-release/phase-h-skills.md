@@ -253,7 +253,7 @@ phase intact, and it does, in three places:
 3. **`example/lib/skills_docs/catalog.dart`** (H2) — the structural guard. The
    allowlist is the thing that makes 1 and 2 more than whack-a-mole.
 
-The old assertion `find.byType(DsAgentCodeBlock), findsNothing` was **not**
+The old assertion `find.byType(ElAgentCodeBlock), findsNothing` was **not**
 carried forward literally, and this is a strengthening rather than a weakening.
 That assertion was a proxy, available only because the placeholder had no
 install section at all: "renders no code block" stood in for "prints no
@@ -273,7 +273,7 @@ and 6 KB of `SKILL.md` is not a published command.
 | `public_pages_test.dart` — "skills stays legible at a narrow viewport and publishes no install command" | Split into four tests in a new `the skills route` group, all pumping `publicPageFor(skillsRoute)` instead of `const PublicSkillsPage()` | The subject moved from a deleted widget to the mounted route, which is the thing that actually ships. Everything the old test asserted is still asserted, on the real page. |
 | …"resolves to the real Skills page, not the placeholder" (new) | Asserts `SkillsPage` with the catalog's slug, and that `find.text('A shared way of working.')` finds **nothing** | The retired page's own copy is now a negative assertion, so a rewrite that quietly restores the hand-written summary fails instead of passing by resemblance. |
 | …"stays legible at a narrow viewport" | Same 390x844 sizing, real view metrics, `_skill.title` read from the catalog rather than a literal | Identical coverage; a renamed skill now fails at the catalog instead of here. |
-| …"publishes no npx text and no command outside the allowlist" | `find.textContaining('npx')` retained verbatim; `DsAgentCodeBlock findsNothing` replaced by the `verifiedCommands` allowlist check over every rendered command block | See the section above. The `npx` assertion is unchanged and now runs against a page carrying the skill's real Markdown, so it covers strictly more text than before. |
+| …"publishes no npx text and no command outside the allowlist" | `find.textContaining('npx')` retained verbatim; `ElAgentCodeBlock findsNothing` replaced by the `verifiedCommands` allowlist check over every rendered command block | See the section above. The `npx` assertion is unchanged and now runs against a page carrying the skill's real Markdown, so it covers strictly more text than before. |
 | …"renders the real bytes of the skill on disk" (new) | Compares the production loader's output to `File.readAsStringSync` for all eight files, asserts the route hands that exact map to `SkillsPage`, and asserts the tree renders the first file verbatim | New coverage. This is the anti-drift test the source-loading approach requires. |
 | `site_routes_test.dart` — "indexes the skill under the Skills destination, not beside it" (new) | Exactly one `/skills` search row; keywords contain the slug; `SkillDocEntry.route == skillsRoute` | New coverage. Guards against the duplicate-row failure the fold-in decision avoids. |
 | `site_routes_test.dart` — "skill topics are searchable" (new) | Every reference title finds `/skills`; every supported agent finds it; "codex" does not | New coverage, and the machine-checkable form of the deleted Codex claim. |

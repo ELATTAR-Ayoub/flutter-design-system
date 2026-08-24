@@ -5,8 +5,16 @@
   "description": "Reusable press interaction wrapper for token-backed scale and feedback behavior.",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
-  "files": [{"source": "lib/src/motion/press.dart", "target": "@motion/press.dart", "sha256": "46085aa88fcaae36f0bfaf4c04515a5e8e3431671179896a104d5350da599784"}],
-  "registryDependencies": ["source-foundation"],
+  "files": [
+    {
+      "source": "lib/src/motion/press.dart",
+      "target": "@motion/press.dart",
+      "sha256": "d16c6e1fdb9de0b82039a835f2e164be6d973256d535850202648ad2ffd52bd3"
+    }
+  ],
+  "registryDependencies": [
+    "source-foundation"
+  ],
   "semanticDependencies": [],
   "pubDependencies": {},
   "assets": [],

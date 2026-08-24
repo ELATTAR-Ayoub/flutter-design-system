@@ -37,7 +37,7 @@
 ///  5. **The Props table documents `value / onChange` and `inputRef`**, which
 ///     this port collapses into one `TextEditingController`. The rows are
 ///     reproduced verbatim anyway: they describe the reference's API, and the
-///     port note that reconciles them lives on `DsAgentComposer` itself.
+///     port note that reconciles them lives on `ElAgentComposer` itself.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
@@ -54,45 +54,45 @@ const String _placeholder = 'Ask about a pack, a pull or your balance…';
 
 /// `COMMANDS` from `agent-demo.tsx`, verbatim: three skills and one command,
 /// each carrying the glyph its capability carries everywhere else.
-const List<DsAgentCommand> _commands = <DsAgentCommand>[
-  DsAgentCommand(
+const List<ElAgentCommand> _commands = <ElAgentCommand>[
+  ElAgentCommand(
     id: 'inventory',
     label: 'inventory',
     hint: 'What is in stock',
-    group: DsAgentCommandGroup.skill,
-    icon: DsLucide.search,
+    group: ElAgentCommandGroup.skill,
+    icon: ElLucide.search,
   ),
-  DsAgentCommand(
+  ElAgentCommand(
     id: 'wallet',
     label: 'wallet',
     hint: 'Balance and recent movement',
-    group: DsAgentCommandGroup.skill,
-    icon: DsLucide.wallet,
+    group: ElAgentCommandGroup.skill,
+    icon: ElLucide.wallet,
   ),
-  DsAgentCommand(
+  ElAgentCommand(
     id: 'export',
     label: 'export',
     hint: 'Download activity as CSV',
-    group: DsAgentCommandGroup.skill,
-    icon: DsLucide.download,
+    group: ElAgentCommandGroup.skill,
+    icon: ElLucide.download,
   ),
-  DsAgentCommand(
+  ElAgentCommand(
     id: 'guide',
     label: 'guide',
     hint: 'How pack odds work',
-    group: DsAgentCommandGroup.command,
-    icon: DsLucide.bookOpen,
+    group: ElAgentCommandGroup.command,
+    icon: ElLucide.bookOpen,
   ),
 ];
 
 /// The one attachment `ComposerSpecimen` seeds when `withAttachment` is set.
-const DsAgentAttachment _seeded = DsAgentAttachment(
+const ElAgentAttachment _seeded = ElAgentAttachment(
   id: 'spec-upload',
   name: 'collection-export.csv',
   mime: 'text/csv',
-  kind: DsAgentAttachmentKind.data,
+  kind: ElAgentAttachmentKind.data,
   size: 18422,
-  delivery: DsAgentDelivery.content(),
+  delivery: ElAgentDelivery.content(),
 );
 
 /* ── The specimen ────────────────────────────────────────────────────────── */
@@ -120,9 +120,9 @@ class ComposerSpecimen extends StatefulWidget {
 
 class _ComposerSpecimenState extends State<ComposerSpecimen> {
   final TextEditingController _controller = TextEditingController();
-  late List<DsAgentAttachment> _attachments = widget.withAttachment
-      ? <DsAgentAttachment>[_seeded]
-      : <DsAgentAttachment>[];
+  late List<ElAgentAttachment> _attachments = widget.withAttachment
+      ? <ElAgentAttachment>[_seeded]
+      : <ElAgentAttachment>[];
 
   @override
   void dispose() {
@@ -132,7 +132,7 @@ class _ComposerSpecimenState extends State<ComposerSpecimen> {
 
   @override
   Widget build(BuildContext context) {
-    return DsAgentComposer(
+    return ElAgentComposer(
       controller: _controller,
       // `onSubmit={() => setValue("")}`: the specimen has nowhere to send it,
       // so sending is emptying.
@@ -143,12 +143,12 @@ class _ComposerSpecimenState extends State<ComposerSpecimen> {
       placeholder: _placeholder,
       commands: _commands,
       attachments: _attachments,
-      onAttach: (List<DsAgentAttachment> files) => setState(
-        () => _attachments = <DsAgentAttachment>[..._attachments, ...files],
+      onAttach: (List<ElAgentAttachment> files) => setState(
+        () => _attachments = <ElAgentAttachment>[..._attachments, ...files],
       ),
       onRemoveAttachment: (String id) => setState(
         () => _attachments = _attachments
-            .where((DsAgentAttachment a) => a.id != id)
+            .where((ElAgentAttachment a) => a.id != id)
             .toList(),
       ),
     );
@@ -162,12 +162,12 @@ class ComposerPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsCategoryHit here = findCategory('agent', 'composer');
+    final ElCategoryHit here = findCategory('agent', 'composer');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        DsPageHeader(
+        ElPageHeader(
           // DRIFT 1, "Components", not "Base".
           eyebrow: '${here.group.title} · Components',
           title: here.category.title,
@@ -180,7 +180,7 @@ class ComposerPage extends StatelessWidget {
         const _AttachmentsSection(),
         const _SlashSection(),
         const _PropsSection(),
-        const DsPageFootNav(groupId: 'agent', slug: 'composer'),
+        const ElPageFootNav(groupId: 'agent', slug: 'composer'),
       ],
     );
   }
@@ -193,7 +193,7 @@ class _RestSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const DsSection(
+    return const ElSection(
       id: 'rest',
       title: 'At rest',
       description:
@@ -201,7 +201,7 @@ class _RestSection extends StatelessWidget {
           'sends and Shift-Enter breaks the line — the convention every chat '
           'surface has agreed on, and breaking it is a novelty nobody asked '
           'for.',
-      child: DsPanel(
+      child: ElPanel(
         label: 'Composer',
         // DRIFT 4.
         note: 'idle',
@@ -218,7 +218,7 @@ class _StatesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsSection(
+    return ElSection(
       id: 'states',
       title: 'Busy and disabled',
       description:
@@ -231,13 +231,13 @@ class _StatesSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          const DsPanel(
+          const ElPanel(
             label: 'Composer',
             note: 'busy — send becomes stop',
             child: ComposerSpecimen(busy: true),
           ),
-          SizedBox(height: ds(6)),
-          const DsPanel(
+          SizedBox(height: el(6)),
+          const ElPanel(
             label: 'Composer',
             note: 'disabled — transport not ready',
             child: ComposerSpecimen(disabled: true),
@@ -255,7 +255,7 @@ class _AttachmentsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsSection(
+    return ElSection(
       id: 'attachments',
       title: 'File tray',
       description:
@@ -265,16 +265,16 @@ class _AttachmentsSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          const DsPanel(
+          const ElPanel(
             label: 'Composer',
             note: 'one attachment, content delivered',
             child: ComposerSpecimen(withAttachment: true),
           ),
           // `className="mt-6"` on the Note.
           Padding(
-            padding: EdgeInsets.only(top: ds(6)),
-            child: const DsNote(
-              tone: DsNoteTone.value,
+            padding: EdgeInsets.only(top: el(6)),
+            child: const ElNote(
+              tone: ElNoteTone.value,
               title: 'The border is the drop target',
               child: _DropTargetBody(),
             ),
@@ -290,11 +290,11 @@ class _DropTargetBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsRichText(
+    return ElRichText(
       TextSpan(
         children: <InlineSpan>[
           const TextSpan(text: 'Dragging a file over the console lights '),
-          DsCode.span('border-agent bg-agent/8'),
+          ElCode.span('border-agent bg-agent/8'),
           const TextSpan(
             text:
                 ' on the composer rather than overlaying a dashed rectangle '
@@ -305,7 +305,7 @@ class _DropTargetBody extends StatelessWidget {
           ),
         ],
       ),
-      DsType.small,
+      ElType.small,
     );
   }
 }
@@ -317,7 +317,7 @@ class _SlashSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const DsSection(
+    return const ElSection(
       id: 'slash',
       title: 'Slash palette',
       description:
@@ -326,7 +326,7 @@ class _SlashSection extends StatelessWidget {
           'Both carry the same glyph they carry in the tool chip, so one '
           'capability has one mark everywhere.',
       // DRIFT 3: the section about the palette holds a paragraph about it.
-      child: DsPanel(
+      child: ElPanel(
         label: 'SlashPalette',
         note: 'type / in any composer above',
         child: _SlashBody(),
@@ -340,7 +340,7 @@ class _SlashBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsRichText(
+    return ElRichText(
       TextSpan(
         children: <InlineSpan>[
           const TextSpan(
@@ -349,9 +349,9 @@ class _SlashBody extends StatelessWidget {
                 'anchored to the composer rather than portalled, so it moves '
                 'with the input as it grows. ',
           ),
-          DsCode.span('filterCommands'),
+          ElCode.span('filterCommands'),
           const TextSpan(text: ' and '),
-          DsCode.span('slashQuery'),
+          ElCode.span('slashQuery'),
           const TextSpan(
             text:
                 ' are exported separately — the matching is a pure function '
@@ -359,7 +359,7 @@ class _SlashBody extends StatelessWidget {
           ),
         ],
       ),
-      DsType.small,
+      ElType.small,
     );
   }
 }
@@ -371,7 +371,7 @@ class _PropsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const DsSection(
+    return const ElSection(
       id: 'props',
       title: 'Props',
       description:
@@ -379,8 +379,8 @@ class _PropsSection extends StatelessWidget {
           'own measurement. The console owns the draft, the attachments and '
           'the dictation session, which is what lets a caller compose a '
           'different shell around the same input.',
-      child: DsMeta(
-        items: <DsMetaItem>[
+      child: ElMeta(
+        items: <ElMetaItem>[
           // DRIFT 5: the reference's own API, reproduced as written.
           (k: 'value / onChange', v: TextSpan(text: 'string — controlled')),
           (k: 'onSubmit / onStop', v: TextSpan(text: '() => void')),

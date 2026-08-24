@@ -1,0 +1,25 @@
+{
+  "name": "chart",
+  "type": "component",
+  "version": "0.0.1",
+  "description": "`components/ui/chart.tsx` — the official shadcn wrapper, ported.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/chart.dart",
+      "target": "@ui/chart.dart",
+      "sha256": "c19f07ba4cf2feae639088efc492a7f3c2fd1e8e5f8838ad8fa2dd6c17b7d41e"
+    }
+  ],
+  "registryDependencies": [
+    "source-foundation"
+  ],
+  "semanticDependencies": [],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "documentationRoute": "/components/chart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/chart.dart"
+}

@@ -24,12 +24,12 @@ class AccordionDocPage extends StatelessWidget {
         title: accordionDoc.title,
         description: accordionDoc.description,
       ),
-      breadcrumbs: const <DsBreadcrumbEntry>[
-        DsBreadcrumbEntry.link('Components'),
-        DsBreadcrumbEntry.page('Accordion'),
+      breadcrumbs: const <ElBreadcrumbEntry>[
+        ElBreadcrumbEntry.link('Components'),
+        ElBreadcrumbEntry.page('Accordion'),
       ],
       toc: const <DocsTocEntry>[
-          DocsTocEntry(title: 'Installation', anchor: 'install'),
+        DocsTocEntry(title: 'Installation', anchor: 'install'),
         DocsTocEntry(title: 'Usage', anchor: 'usage'),
         DocsTocEntry(title: 'Composition', anchor: 'composition'),
         DocsTocEntry(title: 'Basic', anchor: 'basic'),
@@ -65,20 +65,15 @@ class _AccordionArticle extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: DsWidths.prose),
-        child: DsText(accordionExpandedDescription, DsType.body),
-      ),
-      SizedBox(height: ds(4)),
-      ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: DsWidths.prose),
-        child: DsText(
+        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+        child: ElText(
           'type="single" collapsible: one open panel, or none. Opening a '
           'second panel closes whichever was open; tapping the open '
           'panel\'s own trigger closes it too.',
-          DsType.body,
+          ElType.body,
         ),
       ),
-      SizedBox(height: ds(6)),
+      SizedBox(height: el(6)),
       DocsCodeExample(
         title: 'Accordion specimen',
         description:
@@ -88,8 +83,8 @@ class _AccordionArticle extends StatelessWidget {
           DocsCodeFile(path: 'accordion_preview.dart', code: _previewCode),
         ],
       ),
-      SizedBox(height: ds(2)),
-      DsSection(
+      SizedBox(height: el(2)),
+      ElSection(
         id: 'install',
         title: 'Installation',
         description:
@@ -99,7 +94,7 @@ class _AccordionArticle extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            DsPanel(
+            ElPanel(
               label: 'PACKAGE IMPORT',
               note: 'DART',
               child: const DocsSelectableCodeBlock(
@@ -108,18 +103,16 @@ class _AccordionArticle extends StatelessWidget {
                     "elattar_design_system.dart';\n",
               ),
             ),
-            SizedBox(height: ds(4)),
+            SizedBox(height: el(4)),
             DocsInstallFacts(
               title: 'Manual and CLI facts',
               facts: <DocsInstallFact>[
                 const DocsInstallFact(
                   label: 'CLI',
-                  value: 'Not available yet',
+                  value: 'elattar add accordion',
                   description:
-                      'accordion has no registry/components manifest, so '
-                      '"elattar add accordion" will fail until a later '
-                      'pass adds one. Use the package import above, or '
-                      'copy the source file manually, in the meantime.',
+                      'Installs registry/components/accordion.json and its '
+                      'declared dependency closure.',
                 ),
                 DocsInstallFact(
                   label: 'Manual copy target',
@@ -134,34 +127,34 @@ class _AccordionArticle extends StatelessWidget {
                   value: accordionDoc.dependencies.join(', '),
                   description:
                       'What a future registry manifest would need to list '
-                      'as registryDependencies, resolved by hand today.',
+                      'as registryDependencies, read directly from the shipped manifest.',
                 ),
               ],
             ),
           ],
         ),
       ),
-      SizedBox(height: ds(2)),
-      DsSection(
+      SizedBox(height: el(2)),
+      ElSection(
         id: 'usage',
         title: 'Usage',
         description:
-            'DsAccordion is always controlled: the caller owns openIndex '
+            'ElAccordion is always controlled: the caller owns openIndex '
             'and threads it back through onChanged. There is no '
             'uncontrolled or auto-managed variant.',
-        child: DsPanel(
+        child: ElPanel(
           label: 'DART',
           note: 'MINIMAL USAGE',
           child: const DocsSelectableCodeBlock(code: _usageCode),
         ),
       ),
-      SizedBox(height: ds(2)),
-      DsSection(
+      SizedBox(height: el(2)),
+      ElSection(
         id: 'composition',
         title: 'Composition',
         description:
-            'DsAccordion takes data, not children: items is a '
-            'List<DsAccordionItem>, each one a title and a content widget, '
+            'ElAccordion takes data, not children: items is a '
+            'List<ElAccordionItem>, each one a title and a content widget, '
             'rather than a tree of separate Accordion/AccordionItem/'
             'AccordionTrigger sub-widgets to assemble by hand. content still '
             'accepts any Widget, not just a string: this specimen nests more '
@@ -177,8 +170,8 @@ class _AccordionArticle extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: ds(2)),
-      DsSection(
+      SizedBox(height: el(2)),
+      ElSection(
         id: 'basic',
         title: 'Basic',
         description:
@@ -193,12 +186,12 @@ class _AccordionArticle extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: ds(2)),
-      DsSection(
+      SizedBox(height: el(2)),
+      ElSection(
         id: 'card',
         title: 'Card',
         description:
-            'DsAccordion has no surface of its own: wrap it in DsCard when '
+            'ElAccordion has no surface of its own: wrap it in ElCard when '
             'the FAQ needs a header and an edge, same as any other content.',
         child: DocsCodeExample(
           title: 'Accordion inside a card',
@@ -208,23 +201,23 @@ class _AccordionArticle extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: ds(2)),
-      DsSection(
+      SizedBox(height: el(2)),
+      ElSection(
         id: 'api',
         title: 'API Reference',
         description:
-            'Every public constructor parameter on DsAccordion and '
-            'DsAccordionItem, plus the fixed layout constants that stand in '
-            'for a variant or size enum, since DsAccordion has neither.',
+            'Every public constructor parameter on ElAccordion and '
+            'ElAccordionItem, plus the fixed layout constants that stand in '
+            'for a variant or size enum, since ElAccordion has neither.',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             const DocsApiTable(
-              title: 'DsAccordion',
+              title: 'ElAccordion',
               facts: <DocsApiFact>[
                 DocsApiFact(
                   name: 'items',
-                  type: 'List<DsAccordionItem>',
+                  type: 'List<ElAccordionItem>',
                   description: 'The ordered set of trigger/content pairs.',
                 ),
                 DocsApiFact(
@@ -245,9 +238,9 @@ class _AccordionArticle extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: ds(4)),
+            SizedBox(height: el(4)),
             const DocsApiTable(
-              title: 'DsAccordionItem',
+              title: 'ElAccordionItem',
               facts: <DocsApiFact>[
                 DocsApiFact(
                   name: 'title',
@@ -265,29 +258,28 @@ class _AccordionArticle extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: ds(4)),
+            SizedBox(height: el(4)),
             const DocsApiTable(
-              title: 'DsAccordion static layout tokens',
+              title: 'ElAccordion static layout tokens',
               facts: <DocsApiFact>[
                 DocsApiFact(
-                  name: 'DsAccordion.triggerPaddingY',
+                  name: 'ElAccordion.triggerPaddingY',
                   type: 'static double',
                   description:
                       '10px of vertical padding on the trigger (py-2.5), '
                       'reusable if you need to match the rhythm elsewhere.',
                 ),
                 DocsApiFact(
-                  name: 'DsAccordion.contentPaddingBottom',
+                  name: 'ElAccordion.contentPaddingBottom',
                   type: 'static double',
-                  description:
-                      '10px under the open panel\'s content (pb-2.5).',
+                  description: '10px under the open panel\'s content (pb-2.5).',
                 ),
                 DocsApiFact(
-                  name: 'DsAccordion.chevronPx',
+                  name: 'ElAccordion.chevronPx',
                   type: 'static double',
                   description:
                       '16px chevron size: the icon widget\'s own default, '
-                      'not an accordion-specific variant. DsAccordion '
+                      'not an accordion-specific variant. ElAccordion '
                       'exposes no variant or size enum: every accordion '
                       'renders through this same trigger and padding '
                       'ladder.',
@@ -297,8 +289,8 @@ class _AccordionArticle extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: ds(2)),
-      DsSection(
+      SizedBox(height: el(2)),
+      ElSection(
         id: 'states',
         title: 'States',
         child: const DocsStateMatrix(
@@ -353,7 +345,7 @@ class _AccordionArticle extends StatelessWidget {
             DocsStateFact(
               state: 'Disabled, N/A',
               treatment:
-                  'DsAccordion and DsAccordionItem expose no enabled or '
+                  'ElAccordion and ElAccordionItem expose no enabled or '
                   'disabled parameter.',
               userSignal:
                   'A caller wanting a disabled row has to gate it outside '
@@ -374,7 +366,7 @@ class _AccordionArticle extends StatelessWidget {
               state: 'Reduced motion',
               treatment:
                   'Both the focus-ring transition and the panel\'s open/'
-                  'close animation route through dsAnimationDuration.',
+                  'close animation route through elAnimationDuration.',
               userSignal:
                   'That duration collapses to zero when the platform\'s '
                   'disable-animations flag is on: transitions still '
@@ -383,8 +375,8 @@ class _AccordionArticle extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: ds(2)),
-      DsSection(
+      SizedBox(height: el(2)),
+      ElSection(
         id: 'accessibility',
         title: 'Accessibility',
         child: const _Bullets(
@@ -407,13 +399,13 @@ class _AccordionArticle extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: ds(2)),
-      DsSection(
+      SizedBox(height: el(2)),
+      ElSection(
         id: 'responsive',
         title: 'Responsive',
         child: const _Bullets(
           items: <String>[
-            'DsAccordion is a stretched Column with no breakpoints of its '
+            'ElAccordion is a stretched Column with no breakpoints of its '
                 'own: it always fills the width its parent gives it.',
             'A trigger title has no maxLines or overflow set, so a long '
                 'question wraps onto more than one line instead of '
@@ -423,8 +415,8 @@ class _AccordionArticle extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: ds(2)),
-      DsSection(
+      SizedBox(height: el(2)),
+      ElSection(
         id: 'dependencies',
         title: 'Dependencies',
         child: DocsInstallFacts(
@@ -438,7 +430,7 @@ class _AccordionArticle extends StatelessWidget {
             DocsInstallFact(
               label: 'Component dependencies',
               value:
-                  'button (focus-ring statics), collapsible (DsUnfold), '
+                  'button (focus-ring statics), collapsible (ElUnfold), '
                   'icon (chevron glyphs)',
               description: 'Sibling components imported directly.',
             ),
@@ -447,7 +439,7 @@ class _AccordionArticle extends StatelessWidget {
               value: 'source-foundation, machine-surface',
               description:
                   'Colors, motion, shadows, spacing, theme, typography, '
-                  'and the DsMachineSurface effect used for the focus ring.',
+                  'and the ElMachineSurface effect used for the focus ring.',
             ),
             const DocsInstallFact(
               label: 'Assets, fonts, shaders',
@@ -459,8 +451,8 @@ class _AccordionArticle extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: ds(2)),
-      DsSection(
+      SizedBox(height: el(2)),
+      ElSection(
         id: 'theming',
         title: 'Theming',
         child: const _Bullets(
@@ -474,13 +466,13 @@ class _AccordionArticle extends StatelessWidget {
             'theme.ring, at the system\'s standard 0.50 alpha, is the only '
                 'color the focus state adds; there is no separate hover '
                 'or pressed fill.',
-            'DsShadows.none is the trigger\'s resting elevation: the '
+            'ElShadows.none is the trigger\'s resting elevation: the '
                 'focus ring is the only shadow layer it ever gains.',
           ],
         ),
       ),
-      SizedBox(height: ds(2)),
-      DsSection(
+      SizedBox(height: el(2)),
+      ElSection(
         id: 'source',
         title: 'Source',
         child: DocsInstallFacts(
@@ -522,30 +514,30 @@ class _Bullets extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
-    return DsPanel(
+    final ElThemeData theme = ElTheme.of(context);
+    return ElPanel(
       label: 'GUIDANCE',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           for (int index = 0; index < items.length; index++) ...<Widget>[
-            if (index > 0) SizedBox(height: ds(3)),
+            if (index > 0) SizedBox(height: el(3)),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Padding(
-                  padding: EdgeInsets.only(top: ds(1.5)),
+                  padding: EdgeInsets.only(top: el(1.5)),
                   child: Container(
-                    width: ds(1.5),
-                    height: ds(1.5),
+                    width: el(1.5),
+                    height: el(1.5),
                     decoration: BoxDecoration(
                       color: theme.actionInk,
                       shape: BoxShape.circle,
                     ),
                   ),
                 ),
-                SizedBox(width: ds(3)),
-                Expanded(child: DsText(items[index], DsType.small)),
+                SizedBox(width: el(3)),
+                Expanded(child: ElText(items[index], ElType.small)),
               ],
             ),
           ],
@@ -567,39 +559,39 @@ class _AccordionPreview extends StatefulWidget {
 class _AccordionPreviewState extends State<_AccordionPreview> {
   int? _openIndex = 0;
 
-  static final List<DsAccordionItem> _items = <DsAccordionItem>[
-    DsAccordionItem(
+  static final List<ElAccordionItem> _items = <ElAccordionItem>[
+    ElAccordionItem(
       title: 'What does single and collapsible mean here?',
-      content: DsText(
+      content: ElText(
         'Only one panel can stay open. Opening a second panel closes the '
         'first, and tapping an already-open trigger closes it, so the '
         'set can end with nothing expanded.',
-        DsType.body,
+        ElType.body,
       ),
     ),
-    DsAccordionItem(
+    ElAccordionItem(
       title: 'Does the chevron rotate?',
-      content: DsText(
+      content: ElText(
         'No. The port renders two separate glyphs, chevron-down and '
         'chevron-up, and swaps which one is visible. Nothing on the '
         'icon animates a rotation.',
-        DsType.body,
+        ElType.body,
       ),
     ),
-    DsAccordionItem(
+    ElAccordionItem(
       title: 'What happens with a long question?',
-      content: DsText(
+      content: ElText(
         'The label wraps onto more than one line if it needs to. The '
         'chevron stays aligned with the first line instead of '
         're-centering on the full block.',
-        DsType.body,
+        ElType.body,
       ),
     ),
   ];
 
   @override
   Widget build(BuildContext context) {
-    return DsAccordion(
+    return ElAccordion(
       items: _items,
       openIndex: _openIndex,
       onChanged: (int? next) => setState(() => _openIndex = next),
@@ -620,13 +612,13 @@ class _FaqAccordionState extends State<FaqAccordion> {
 
   @override
   Widget build(BuildContext context) {
-    return DsAccordion(
-      items: const <DsAccordionItem>[
-        DsAccordionItem(
+    return ElAccordion(
+      items: const <ElAccordionItem>[
+        ElAccordionItem(
           title: 'What does single and collapsible mean here?',
           content: Text('Only one panel can stay open at a time.'),
         ),
-        DsAccordionItem(
+        ElAccordionItem(
           title: 'Does the chevron rotate?',
           content: Text('No: it swaps between two glyphs.'),
         ),
@@ -638,9 +630,9 @@ class _FaqAccordionState extends State<FaqAccordion> {
 }''';
 
 const String _usageCode = '''
-DsAccordion(
-  items: const <DsAccordionItem>[
-    DsAccordionItem(
+ElAccordion(
+  items: const <ElAccordionItem>[
+    ElAccordionItem(
       title: 'Shipping',
       content: Text('Orders ship within two business days.'),
     ),
@@ -663,23 +655,23 @@ class _AccordionCompositionPreviewState
     extends State<_AccordionCompositionPreview> {
   int? _openIndex = 0;
 
-  late final List<DsAccordionItem> _items = <DsAccordionItem>[
-    DsAccordionItem(
+  late final List<ElAccordionItem> _items = <ElAccordionItem>[
+    ElAccordionItem(
       title: 'Refund policy, in full',
       content: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          DsText(
+          ElText(
             'Refunds are issued to the original payment method within '
             'five business days of approval.',
-            DsType.body,
+            ElType.body,
           ),
           const SizedBox(height: 8),
-          DsText(
+          ElText(
             'Store credit is available immediately as an alternative, and '
             'never expires.',
-            DsType.body,
+            ElType.body,
           ),
         ],
       ),
@@ -688,7 +680,7 @@ class _AccordionCompositionPreviewState
 
   @override
   Widget build(BuildContext context) {
-    return DsAccordion(
+    return ElAccordion(
       items: _items,
       openIndex: _openIndex,
       onChanged: (int? next) => setState(() => _openIndex = next),
@@ -697,9 +689,9 @@ class _AccordionCompositionPreviewState
 }
 
 const String _compositionCode = '''
-DsAccordion(
-  items: <DsAccordionItem>[
-    DsAccordionItem(
+ElAccordion(
+  items: <ElAccordionItem>[
+    ElAccordionItem(
       title: 'Refund policy, in full',
       content: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -725,34 +717,33 @@ class _AccordionBasicPreview extends StatefulWidget {
   const _AccordionBasicPreview();
 
   @override
-  State<_AccordionBasicPreview> createState() =>
-      _AccordionBasicPreviewState();
+  State<_AccordionBasicPreview> createState() => _AccordionBasicPreviewState();
 }
 
 class _AccordionBasicPreviewState extends State<_AccordionBasicPreview> {
   int? _openIndex = 0;
 
-  static final List<DsAccordionItem> _items = <DsAccordionItem>[
-    DsAccordionItem(
+  static final List<ElAccordionItem> _items = <ElAccordionItem>[
+    ElAccordionItem(
       title: 'How long does shipping take?',
-      content: DsText(
+      content: ElText(
         'Orders ship within two business days and arrive in five to seven.',
-        DsType.body,
+        ElType.body,
       ),
     ),
-    DsAccordionItem(
+    ElAccordionItem(
       title: 'Can I return an item?',
-      content: DsText(
+      content: ElText(
         'Yes, within thirty days of delivery, unworn and in its original '
         'packaging.',
-        DsType.body,
+        ElType.body,
       ),
     ),
   ];
 
   @override
   Widget build(BuildContext context) {
-    return DsAccordion(
+    return ElAccordion(
       items: _items,
       openIndex: _openIndex,
       onChanged: (int? next) => setState(() => _openIndex = next),
@@ -761,13 +752,13 @@ class _AccordionBasicPreviewState extends State<_AccordionBasicPreview> {
 }
 
 const String _basicCode = '''
-DsAccordion(
-  items: const <DsAccordionItem>[
-    DsAccordionItem(
+ElAccordion(
+  items: const <ElAccordionItem>[
+    ElAccordionItem(
       title: 'How long does shipping take?',
       content: Text('Orders ship within two business days.'),
     ),
-    DsAccordionItem(
+    ElAccordionItem(
       title: 'Can I return an item?',
       content: Text('Yes, within thirty days of delivery.'),
     ),
@@ -776,8 +767,8 @@ DsAccordion(
   onChanged: (int? next) => setState(() => openIndex = next),
 )''';
 
-/// `DsAccordion` has no surface of its own: this specimen wraps it in
-/// [DsCard] to show the FAQ with a header and an edge.
+/// `ElAccordion` has no surface of its own: this specimen wraps it in
+/// [ElCard] to show the FAQ with a header and an edge.
 class _AccordionCardPreview extends StatefulWidget {
   const _AccordionCardPreview();
 
@@ -788,37 +779,37 @@ class _AccordionCardPreview extends StatefulWidget {
 class _AccordionCardPreviewState extends State<_AccordionCardPreview> {
   int? _openIndex = 0;
 
-  static final List<DsAccordionItem> _items = <DsAccordionItem>[
-    DsAccordionItem(
+  static final List<ElAccordionItem> _items = <ElAccordionItem>[
+    ElAccordionItem(
       title: 'What plans are available?',
-      content: DsText(
+      content: ElText(
         'Starter, Pro, and Enterprise. Every plan bills monthly and can be '
         'changed at any time.',
-        DsType.body,
+        ElType.body,
       ),
     ),
-    DsAccordionItem(
+    ElAccordionItem(
       title: 'Can I cancel anytime?',
-      content: DsText(
+      content: ElText(
         'Yes. Cancelling stops the next renewal; the current period stays '
         'active until it ends.',
-        DsType.body,
+        ElType.body,
       ),
     ),
   ];
 
   @override
   Widget build(BuildContext context) {
-    return DsCard(
+    return ElCard(
       children: <Widget>[
-        DsCardHeader(
-          title: const DsCardTitle('Subscription & Billing'),
-          description: const DsCardDescription(
+        ElCardHeader(
+          title: const ElCardTitle('Subscription & Billing'),
+          description: const ElCardDescription(
             'Common questions about plans and billing.',
           ),
         ),
-        DsCardContent(
-          child: DsAccordion(
+        ElCardContent(
+          child: ElAccordion(
             items: _items,
             openIndex: _openIndex,
             onChanged: (int? next) => setState(() => _openIndex = next),
@@ -830,18 +821,18 @@ class _AccordionCardPreviewState extends State<_AccordionCardPreview> {
 }
 
 const String _cardCode = '''
-DsCard(
+ElCard(
   children: [
-    DsCardHeader(
-      title: const DsCardTitle('Subscription & Billing'),
-      description: const DsCardDescription(
+    ElCardHeader(
+      title: const ElCardTitle('Subscription & Billing'),
+      description: const ElCardDescription(
         'Common questions about plans and billing.',
       ),
     ),
-    DsCardContent(
-      child: DsAccordion(
-        items: const <DsAccordionItem>[
-          DsAccordionItem(
+    ElCardContent(
+      child: ElAccordion(
+        items: const <ElAccordionItem>[
+          ElAccordionItem(
             title: 'What plans are available?',
             content: Text('Starter, Pro, and Enterprise.'),
           ),

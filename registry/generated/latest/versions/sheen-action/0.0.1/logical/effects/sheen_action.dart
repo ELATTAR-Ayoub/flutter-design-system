@@ -18,19 +18,19 @@
 ///    double thump on hover, fired once on press.
 ///
 /// **Every stop is derived, none is frozen.** The stylesheet writes each one as
-/// `color-mix(in oklab, …)`, so each is computed here from [DsPalette] through
-/// [DsOklab.mix] rather than pasted in as the hex it happens to resolve to
+/// `color-mix(in oklab, …)`, so each is computed here from [ElPalette] through
+/// [ElOklab.mix] rather than pasted in as the hex it happens to resolve to
 /// today. The values shadows-map §5.3 resolves for the three mixed stops are
 /// verification targets, not source — a rebrand of the action ramp has to carry
 /// through this file untouched, and no hex from that table appears in `lib/`.
 /// `color-mix(…, X N%, transparent)` is the same colour at `N%` alpha
-/// (colors.dart L110–115), so the texture's inks are [DsPalette.actionBright]
+/// (colors.dart L110–115), so the texture's inks are [ElPalette.actionBright]
 /// at an alpha, never an `rgba()` literal.
 ///
 /// **Painting order.** CSS paints a box in one fixed order: outer
 /// `box-shadow`, `background-color`, `background-image`, inset `box-shadow`,
 /// border, inline content, then positioned `::before`/`::after`.
-/// [DsMachineSurface.fill] is a flat [Color] and cannot carry a gradient, so
+/// [ElMachineSurface.fill] is a flat [Color] and cannot carry a gradient, so
 /// the ramp is spliced in from outside by a [Stack] whose children are that
 /// list in that order: the outer shadows, the ramp, the surface (inset shadows,
 /// border, label), then the two blended pseudo-layers. Only the surface is a
@@ -60,14 +60,14 @@
 /// page.
 ///
 /// **The beat is driven by ELAPSED TIME, not by phase — measured** (see
-/// [_DsSheenActionState._drive]). `:hover::before` and `:active::before` name
+/// [_ElSheenActionState._drive]). `:hover::before` and `:active::before` name
 /// the same `animation-name`, so a press does not create a new animation; it
 /// changes the duration of the one that is already running, and CSS keeps that
 /// animation's elapsed `currentTime` and re-divides it by the new duration.
 /// The port used to preserve *phase* instead, which is a different animation
 /// and produces a thump the reference usually does not play at all.
 ///
-/// **Reduced motion.** Every duration is re-read through [dsAnimationDuration]
+/// **Reduced motion.** Every duration is re-read through [elAnimationDuration]
 /// on each build, so under `MediaQuery.disableAnimations` the beat's period is
 /// [Duration.zero], the clock stops and it freezes at frame 0 — `opacity: 0;
 /// scale(0.55)`, which is invisible. That is the port of the reference's
@@ -163,14 +163,14 @@ enum _Beat { hover, press }
 
 /// The `sheen-action` surface: ramp, texture, beat, wrapped around [child].
 ///
-/// Takes the same [DsShadowSpec], [BorderRadius] and [BoxBorder] a
-/// [DsMachineSurface] would, and splices the ramp in where CSS puts it. The
+/// Takes the same [ElShadowSpec], [BorderRadius] and [BoxBorder] a
+/// [ElMachineSurface] would, and splices the ramp in where CSS puts it. The
 /// caller stays in charge of which spec is live — `--shadow-btn-primary` at
 /// rest, `--shadow-btn-down` while pressed, either of them already carrying a
 /// prepended focus-ring layer — because that state table belongs to the Button,
 /// not to its surface.
-class DsSheenAction extends StatefulWidget {
-  const DsSheenAction({
+class ElSheenAction extends StatefulWidget {
+  const ElSheenAction({
     super.key,
     required this.spec,
     required this.radius,
@@ -182,7 +182,7 @@ class DsSheenAction extends StatefulWidget {
 
   /// The `--shadow-*` token to paint: outer layers under the ramp, inset layers
   /// over it.
-  final DsShadowSpec spec;
+  final ElShadowSpec spec;
 
   /// The shape. The ramp, both pseudo-layers and the inset shadows are all
   /// clipped to it — `border-radius: inherit` on the pseudo-elements, and
@@ -201,7 +201,7 @@ class DsSheenAction extends StatefulWidget {
 
   final Widget child;
 
-  /// The ramp's five stops, oklab-mixed from [DsPalette] exactly as
+  /// The ramp's five stops, oklab-mixed from [ElPalette] exactly as
   /// `linear-gradient(176deg, …)` does (globals.css L2093–2100).
   ///
   /// `176deg` is 4° off straight down — CSS measures gradient angles clockwise
@@ -209,11 +209,11 @@ class DsSheenAction extends StatefulWidget {
   /// counter-clockwise.
   @visibleForTesting
   static final List<Color> rampColors = <Color>[
-    DsOklab.mix(DsPalette.actionBright, DsPalette.action, 0.20),
-    DsPalette.action,
-    DsOklab.mix(DsPalette.actionDark, DsPalette.action, 0.50),
-    DsPalette.action,
-    DsOklab.mix(DsPalette.actionBright, DsPalette.action, 0.10),
+    ElOklab.mix(ElPalette.actionBright, ElPalette.action, 0.20),
+    ElPalette.action,
+    ElOklab.mix(ElPalette.actionDark, ElPalette.action, 0.50),
+    ElPalette.action,
+    ElOklab.mix(ElPalette.actionBright, ElPalette.action, 0.10),
   ];
 
   /// Where [rampColors] sit, as the `0..1` fractions Skia wants rather than the
@@ -227,10 +227,10 @@ class DsSheenAction extends StatefulWidget {
   /// The utility declares `screen`; `:root` and `.light` then override it to
   /// `multiply`, and `.dark` restates `screen`. The stylesheet gives no reason
   /// for the split, so none is invented here.
-  static BlendMode beatBlendFor(DsThemeKind kind) => switch (kind) {
-        DsThemeKind.light => BlendMode.multiply,
-        DsThemeKind.dark => BlendMode.screen,
-      };
+  static BlendMode beatBlendFor(ElThemeKind kind) => switch (kind) {
+    ElThemeKind.light => BlendMode.multiply,
+    ElThemeKind.dark => BlendMode.screen,
+  };
 
   /// `@keyframes action-beat`'s `transform` track (globals.css L2059–2088).
   ///
@@ -324,7 +324,7 @@ class DsSheenAction extends StatefulWidget {
   }
 
   @override
-  State<DsSheenAction> createState() => _DsSheenActionState();
+  State<ElSheenAction> createState() => _ElSheenActionState();
 }
 
 /// One keyframe gap: from one declared value to the next, over its share of the
@@ -332,12 +332,14 @@ class DsSheenAction extends StatefulWidget {
 /// (L257–262).
 TweenSequenceItem<double> _beatStep(double from, double to, double weight) =>
     TweenSequenceItem<double>(
-      tween: Tween<double>(begin: from, end: to)
-          .chain(CurveTween(curve: DsCurves.out)),
+      tween: Tween<double>(
+        begin: from,
+        end: to,
+      ).chain(CurveTween(curve: ElCurves.out)),
       weight: weight,
     );
 
-class _DsSheenActionState extends State<DsSheenAction>
+class _ElSheenActionState extends State<ElSheenAction>
     with SingleTickerProviderStateMixin {
   /// The animation's own clock, and the reason this is a bare [Ticker] rather
   /// than an [AnimationController]: what a browser preserves across a duration
@@ -383,7 +385,7 @@ class _DsSheenActionState extends State<DsSheenAction>
 
   void _onTick(Duration elapsed) {
     _elapsed = elapsed;
-    _beat.value = DsSheenAction.phaseAt(
+    _beat.value = ElSheenAction.phaseAt(
       elapsed,
       _period,
       repeats: _playing == _Beat.hover,
@@ -438,7 +440,7 @@ class _DsSheenActionState extends State<DsSheenAction>
       _clock.start();
       return;
     }
-    _beat.value = DsSheenAction.phaseAt(
+    _beat.value = ElSheenAction.phaseAt(
       _elapsed,
       period,
       repeats: rule == _Beat.hover,
@@ -447,22 +449,19 @@ class _DsSheenActionState extends State<DsSheenAction>
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
-    final BlendMode blend = DsSheenAction.beatBlendFor(DsTheme.kindOf(context));
+    final ElThemeData theme = ElTheme.of(context);
+    final BlendMode blend = ElSheenAction.beatBlendFor(ElTheme.kindOf(context));
 
     final _Beat? rule = widget.pressed
         ? _Beat.press
         : widget.hovered
-            ? _Beat.hover
-            : null;
-    _drive(
-      rule,
-      switch (rule) {
-        _Beat.press => dsAnimationDuration(context, DsDurations.beatPress),
-        _Beat.hover => dsAnimationDuration(context, DsDurations.beatHover),
-        null => Duration.zero,
-      },
-    );
+        ? _Beat.hover
+        : null;
+    _drive(rule, switch (rule) {
+      _Beat.press => elAnimationDuration(context, ElDurations.beatPress),
+      _Beat.hover => elAnimationDuration(context, ElDurations.beatHover),
+      null => Duration.zero,
+    });
 
     return RepaintBoundary(
       // A paint-order device, not a layout one. [StackFit.passthrough] hands
@@ -494,8 +493,8 @@ class _DsSheenActionState extends State<DsSheenAction>
           ),
           // 3 — inset `box-shadow`, border, then inline content. The one
           // non-positioned child, so the Stack takes its size from here.
-          DsMachineSurface(
-            spec: DsShadowSpec(widget.spec.insetLayers),
+          ElMachineSurface(
+            spec: ElShadowSpec(widget.spec.insetLayers),
             radius: widget.radius,
             border: widget.border,
             child: widget.child,
@@ -535,13 +534,13 @@ class _RampPainter extends CustomPainter {
         ..shader = ui.Gradient.linear(
           from,
           to,
-          DsSheenAction.rampColors,
-          DsSheenAction.rampStops,
+          ElSheenAction.rampColors,
+          ElSheenAction.rampStops,
         ),
     );
   }
 
-  /// Nothing here depends on state: the stops come from [DsPalette], which does
+  /// Nothing here depends on state: the stops come from [ElPalette], which does
   /// not flip with the theme.
   @override
   bool shouldRepaint(_RampPainter old) => false;
@@ -559,7 +558,7 @@ class _PseudoPainter extends CustomPainter {
   /// which is also frame 0 — the resting `opacity: 0; scale(0.55)`.
   final double beat;
 
-  /// [DsSheenAction.beatBlendFor] for the live theme.
+  /// [ElSheenAction.beatBlendFor] for the live theme.
   final BlendMode blend;
 
   @override
@@ -573,9 +572,9 @@ class _PseudoPainter extends CustomPainter {
   /// `::before` — one radial gradient, scaled about its own centre, at the
   /// theme's blend mode and the keyframe's opacity.
   void _paintBeat(Canvas canvas, Rect box) {
-    final double opacity = DsSheenAction.beatOpacity.transform(beat);
+    final double opacity = ElSheenAction.beatOpacity.transform(beat);
     if (opacity <= 0) return;
-    final double scale = DsSheenAction.beatScale.transform(beat);
+    final double scale = ElSheenAction.beatScale.transform(beat);
 
     // `opacity` and `mix-blend-mode` are the pseudo-element's, so they apply to
     // the finished layer rather than to the gradient inside it.
@@ -596,9 +595,9 @@ class _PseudoPainter extends CustomPainter {
           centreX: _beatCentre,
           centreY: _beatCentre,
           colors: <Color>[
-            DsPalette.actionBright.withValues(alpha: _beatCoreAlpha),
-            DsPalette.actionBright.withValues(alpha: _beatMidAlpha),
-            DsPalette.actionBright.withValues(alpha: 0),
+            ElPalette.actionBright.withValues(alpha: _beatCoreAlpha),
+            ElPalette.actionBright.withValues(alpha: _beatMidAlpha),
+            ElPalette.actionBright.withValues(alpha: 0),
           ],
           stops: const <double>[0, _beatMid, _beatFade],
         ),
@@ -612,7 +611,7 @@ class _PseudoPainter extends CustomPainter {
   void _paintTexture(Canvas canvas, Rect box) {
     canvas.saveLayer(box, _groupPaint(_textureOpacity, BlendMode.softLight));
     // CSS paints the FIRST-listed background layer on top, so the three are
-    // walked backwards — the same reversal `DsShadowSpec.outerShadows` makes.
+    // walked backwards — the same reversal `ElShadowSpec.outerShadows` makes.
     _paintCorner(canvas, box);
     _paintDiagonal(canvas, box);
     _paintStriations(canvas, box);
@@ -633,8 +632,8 @@ class _PseudoPainter extends CustomPainter {
           centreX: _cornerCentreX,
           centreY: _cornerCentreY,
           colors: <Color>[
-            DsPalette.actionBright.withValues(alpha: _cornerAlpha),
-            DsPalette.actionBright.withValues(alpha: 0),
+            ElPalette.actionBright.withValues(alpha: _cornerAlpha),
+            ElPalette.actionBright.withValues(alpha: 0),
           ],
           stops: const <double>[0, _cornerFade],
         ),
@@ -657,9 +656,9 @@ class _PseudoPainter extends CustomPainter {
             // `transparent` next to a colour keeps that colour's hue: browsers
             // interpolate gradient stops premultiplied, where a zero-alpha stop
             // contributes no colour at all (`page_glow.dart` L109–117).
-            DsPalette.actionBright.withValues(alpha: 0),
-            DsPalette.actionBright.withValues(alpha: _diagonalAlpha),
-            DsPalette.actionBright.withValues(alpha: 0),
+            ElPalette.actionBright.withValues(alpha: 0),
+            ElPalette.actionBright.withValues(alpha: _diagonalAlpha),
+            ElPalette.actionBright.withValues(alpha: 0),
           ],
           const <double>[_diagonalIn, _diagonalPeak, _diagonalOut],
         ),
@@ -683,10 +682,10 @@ class _PseudoPainter extends CustomPainter {
           from,
           from + tile,
           <Color>[
-            DsPalette.actionBright.withValues(alpha: _striationAlpha),
-            DsPalette.actionBright.withValues(alpha: _striationAlpha),
-            DsPalette.actionBright.withValues(alpha: 0),
-            DsPalette.actionBright.withValues(alpha: 0),
+            ElPalette.actionBright.withValues(alpha: _striationAlpha),
+            ElPalette.actionBright.withValues(alpha: _striationAlpha),
+            ElPalette.actionBright.withValues(alpha: 0),
+            ElPalette.actionBright.withValues(alpha: 0),
           ],
           <double>[0, duty, duty, 1],
           TileMode.repeated,
@@ -762,7 +761,7 @@ Rect _imageRect(
 /// that plainly.
 Paint _groupPaint(double opacity, BlendMode blend) => Paint()
   ..blendMode = blend
-  ..color = dsTransparent.withValues(alpha: opacity);
+  ..color = elTransparent.withValues(alpha: opacity);
 
 /// CSS `radial-gradient(<rx> <ry> at <cx> <cy>, …)`, every value a fraction of
 /// [box]'s own width or height.

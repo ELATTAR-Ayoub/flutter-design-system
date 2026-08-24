@@ -11,7 +11,7 @@
 /// copy/clipboard seam already carries its own failure-recovery tests. The
 /// copy affordance below reuses the same public [DocsClipboardWriter] seam —
 /// `docs_code.dart`'s own copy header (`_DocsCodeHeader`) is private to that
-/// library, so an equivalent is composed here from public `Ds*` parts instead
+/// library, so an equivalent is composed here from public `El*` parts instead
 /// of duplicating its file.
 library;
 
@@ -87,14 +87,14 @@ class _DocsFileTreeState extends State<DocsFileTree> {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         if (files.isEmpty) {
-          return DsPanel(
+          return ElPanel(
             key: const ValueKey<String>('docs-file-tree-empty'),
             label: widget.label,
             note: '0 files',
-            child: DsText(
+            child: ElText(
               'No files to show.',
-              DsType.small,
-              color: DsTheme.of(context).mutedForeground,
+              ElType.small,
+              color: ElTheme.of(context).mutedForeground,
             ),
           );
         }
@@ -108,7 +108,7 @@ class _DocsFileTreeState extends State<DocsFileTree> {
         // The primitive's own available width, not the window's — so it
         // reflows correctly nested inside a narrower column on an otherwise
         // wide viewport instead of forcing the wide row's fixed rail width.
-        final bool wide = constraints.maxWidth >= DsBreakpoints.sm;
+        final bool wide = constraints.maxWidth >= ElBreakpoints.sm;
 
         final Widget list = _FileList(
           files: files,
@@ -126,8 +126,8 @@ class _DocsFileTreeState extends State<DocsFileTree> {
             ? Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  SizedBox(width: DsWidths.rail, child: list),
-                  SizedBox(width: ds(5)),
+                  SizedBox(width: ElWidths.rail, child: list),
+                  SizedBox(width: el(5)),
                   Expanded(child: pane),
                 ],
               )
@@ -135,7 +135,7 @@ class _DocsFileTreeState extends State<DocsFileTree> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
                   list,
-                  SizedBox(height: ds(4)),
+                  SizedBox(height: el(4)),
                   pane,
                 ],
               );
@@ -143,9 +143,9 @@ class _DocsFileTreeState extends State<DocsFileTree> {
         // No umbrella `Semantics(label: …)` here: with a single file it
         // would merge with the lone file entry's own label into one
         // concatenated string ("File list\nSelected file x.dart"), breaking
-        // exact-label lookups. `DsPanel`'s own strip already renders the
+        // exact-label lookups. `ElPanel`'s own strip already renders the
         // file count as plain text, which is discoverable on its own.
-        return DsPanel(
+        return ElPanel(
           label: widget.label,
           note: '${files.length} ${files.length == 1 ? 'file' : 'files'}',
           child: body,
@@ -165,7 +165,7 @@ class _SelectedFilePane extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     // `liveRegion` with no label of its own: the header and code below are
     // the content that changes on selection, and they already carry their
     // own text. Giving this node a label too would concatenate with them.
@@ -177,8 +177,8 @@ class _SelectedFilePane extends StatelessWidget {
           Wrap(
             alignment: WrapAlignment.spaceBetween,
             crossAxisAlignment: WrapCrossAlignment.center,
-            runSpacing: ds(3),
-            spacing: ds(3),
+            runSpacing: el(3),
+            spacing: el(3),
             children: <Widget>[
               // `container: true`: this plain text has no boundary of its
               // own, and its only sibling here — the copy button — does.
@@ -189,21 +189,21 @@ class _SelectedFilePane extends StatelessWidget {
               Semantics(
                 container: true,
                 child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: DsWidths.prose),
+                  constraints: const BoxConstraints(maxWidth: ElWidths.prose),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      DsText(
+                      ElText(
                         file.title ?? file.path,
-                        DsType.label,
+                        ElType.label,
                         color: theme.foreground,
                       ),
                       if (file.description != null) ...<Widget>[
-                        SizedBox(height: ds(1)),
-                        DsText(
+                        SizedBox(height: el(1)),
+                        ElText(
                           file.description!,
-                          DsType.small,
+                          ElType.small,
                           color: theme.mutedForeground,
                         ),
                       ],
@@ -228,7 +228,7 @@ class _SelectedFilePane extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: ds(3)),
+          SizedBox(height: el(3)),
           DocsSelectableCodeBlock(
             key: ValueKey<String>('docs-file-tree-code:${file.path}'),
             code: file.code,
@@ -276,7 +276,7 @@ class _CopyFileButtonState extends State<_CopyFileButton>
   /// ever touched would first run inside [dispose], where creating a [Ticker]
   /// means an inherited-widget lookup on a deactivated element.
   ///
-  /// [DsDurations.attachmentSaving] is the token, not a number of its own:
+  /// [ElDurations.attachmentSaving] is the token, not a number of its own:
   /// it is already this system's answer to "how long does a control's glyph
   /// stay on the check after the action it confirms".
   late final AnimationController _confirmation;
@@ -287,7 +287,7 @@ class _CopyFileButtonState extends State<_CopyFileButton>
   void initState() {
     super.initState();
     _confirmation =
-        AnimationController(vsync: this, duration: DsDurations.attachmentSaving)
+        AnimationController(vsync: this, duration: ElDurations.attachmentSaving)
           ..addStatusListener((AnimationStatus status) {
             if (status == AnimationStatus.completed && mounted) setState(() {});
           });
@@ -316,15 +316,15 @@ class _CopyFileButtonState extends State<_CopyFileButton>
     // the reader had no way to tell a copy from a mis-tap. The label and the
     // glyph both change, so the confirmation survives a colour-blind reader
     // and a screen reader alike — `label` is what the latter announces.
-    final (String text, DsLucideGlyph glyph) = switch ((_pending, _copied)) {
-      (true, _) => ('Copying', DsLucide.loaderCircle),
-      (_, true) => ('Copied', DsLucide.check),
-      _ => ('Copy', DsLucide.copy),
+    final (String text, ElLucideGlyph glyph) = switch ((_pending, _copied)) {
+      (true, _) => ('Copying', ElLucide.loaderCircle),
+      (_, true) => ('Copied', ElLucide.check),
+      _ => ('Copy', ElLucide.copy),
     };
 
-    return DsButton(
-      variant: DsButtonVariant.secondary,
-      size: DsButtonSize.sm,
+    return ElButton(
+      variant: ElButtonVariant.secondary,
+      size: ElButtonSize.sm,
       label: _copied
           ? 'Copied ${widget.file.path}'
           : 'Copy ${widget.file.path}',
@@ -332,9 +332,9 @@ class _CopyFileButtonState extends State<_CopyFileButton>
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          DsIcon.lucide(glyph, size: DsIconSize.sm),
-          SizedBox(width: DsButton.gapFor(DsButtonSize.sm)),
-          DsText(text, DsComponentType.buttonLabelSm),
+          ElIcon.lucide(glyph, size: ElIconSize.sm),
+          SizedBox(width: ElButton.gapFor(ElButtonSize.sm)),
+          ElText(text, ElComponentType.buttonLabelSm),
         ],
       ),
     );
@@ -394,12 +394,12 @@ class _FileList extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               for (int i = 0; i < entries.length; i++) ...<Widget>[
-                if (i > 0) SizedBox(height: ds(1.5)),
+                if (i > 0) SizedBox(height: el(1.5)),
                 entries[i],
               ],
             ],
           )
-        : Wrap(spacing: ds(2), runSpacing: ds(2), children: entries);
+        : Wrap(spacing: el(2), runSpacing: el(2), children: entries);
 
     // No umbrella label here either — same merge hazard as `DocsFileTree`'s
     // own container: a lone entry would have its accessible name swallowed
@@ -425,10 +425,10 @@ class _FileEntry extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Widget button = DsButton(
+    final Widget button = ElButton(
       key: ValueKey<String>('docs-file-tree-entry:$path'),
-      variant: selected ? DsButtonVariant.secondary : DsButtonVariant.outline,
-      size: DsButtonSize.sm,
+      variant: selected ? ElButtonVariant.secondary : ElButtonVariant.outline,
+      size: ElButtonSize.sm,
       label: selected ? 'Selected file $name' : 'Select file $name',
       expanded: expanded,
       contentAlignment: expanded ? Alignment.centerLeft : null,
@@ -436,19 +436,19 @@ class _FileEntry extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          DsIcon.lucide(DsLucide.fileCode, size: DsIconSize.sm),
-          SizedBox(width: DsButton.gapFor(DsButtonSize.sm)),
+          ElIcon.lucide(ElLucide.fileCode, size: ElIconSize.sm),
+          SizedBox(width: ElButton.gapFor(ElButtonSize.sm)),
           // Flexible, not a bare child: the rail's row width is fixed
-          // (DsWidths.rail less the button's own padding) and a long Shot
+          // (ElWidths.rail less the button's own padding) and a long Shot
           // file name must ellipsize rather than overflow the button.
           Flexible(
-            child: DsText(
+            child: ElText(
               name,
               // `sm` is this button's own rung — `buttonLabel` is the `md`
               // rung and, substituted into an auto-height left-aligned row
               // like this one, comes out short (typography.dart documents
               // the measured gap).
-              DsComponentType.buttonLabelSm,
+              ElComponentType.buttonLabelSm,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),

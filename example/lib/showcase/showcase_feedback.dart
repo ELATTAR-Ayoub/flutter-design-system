@@ -15,9 +15,9 @@ class ShowcaseFeedback extends InheritedWidget {
     required super.child,
   });
 
-  final DsToastController controller;
+  final ElToastController controller;
 
-  static DsToastController of(BuildContext context) {
+  static ElToastController of(BuildContext context) {
     final ShowcaseFeedback? scope = context
         .dependOnInheritedWidgetOfExactType<ShowcaseFeedback>();
     assert(scope != null, 'No ShowcaseFeedback found above this destination.');

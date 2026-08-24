@@ -14,27 +14,27 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/pagination/meta.dart';
 import 'package:example/components_docs/pagination/page.dart';
-import 'package:example/kit.dart' show DsSection;
+import 'package:example/kit.dart' show ElSection;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 Widget _harness({
   required Widget child,
-  required DsThemeController controller,
-}) => DsTheme(
+  required ElThemeController controller,
+}) => ElTheme(
   controller: controller,
   child: MaterialApp(home: SingleChildScrollView(child: child)),
 );
 
 /// Every constructor parameter [pagination.dart](../../../lib/src/components/pagination.dart)
-/// declares across its four public classes: [DsPagination], [DsPaginationLink],
-/// [DsPaginationStep] (both named constructors share the same field set) and
-/// [DsPaginationEllipsis] (key only). The API table must render each of
+/// declares across its four public classes: [ElPagination], [ElPaginationLink],
+/// [ElPaginationStep] (both named constructors share the same field set) and
+/// [ElPaginationEllipsis] (key only). The API table must render each of
 /// these names somewhere.
 const List<String> _apiParamNames = <String>[
-  'children', // DsPagination
-  'label', 'isActive', 'onTap', // DsPaginationLink
-  'text', // DsPaginationStep (onTap repeats, already listed)
+  'children', // ElPagination
+  'label', 'isActive', 'onTap', // ElPaginationLink
+  'text', // ElPaginationStep (onTap repeats, already listed)
 ];
 
 void main() {
@@ -48,15 +48,15 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: DsThemeController(mode: DsThemeMode.dark),
+            controller: ElThemeController(mode: ElThemeMode.dark),
             child: const PaginationDocPage(),
           ),
         );
         await tester.pumpAndSettle();
 
         final List<String> titles = tester
-            .widgetList<DsSection>(find.byType(DsSection))
-            .map((DsSection section) => section.title)
+            .widgetList<ElSection>(find.byType(ElSection))
+            .map((ElSection section) => section.title)
             .toList();
 
         expect(titles, <String>[
@@ -89,7 +89,7 @@ void main() {
         String? destination;
         await tester.pumpWidget(
           _harness(
-            controller: DsThemeController(mode: DsThemeMode.dark),
+            controller: ElThemeController(mode: ElThemeMode.dark),
             child: PaginationDocPage(
               onNavigate: (String route) => destination = route,
             ),
@@ -108,10 +108,10 @@ void main() {
           expect(find.text(param), findsWidgets, reason: 'missing $param');
         }
         // The two named constructors are the real public surface of
-        // DsPaginationStep: both must be documented as their own rows.
+        // ElPaginationStep: both must be documented as their own rows.
         for (final String ctor in <String>[
-          'DsPaginationStep.previous',
-          'DsPaginationStep.next',
+          'ElPaginationStep.previous',
+          'ElPaginationStep.next',
         ]) {
           expect(
             find.textContaining(ctor),
@@ -121,11 +121,11 @@ void main() {
         }
         // Static tokens every class exposes.
         for (final String token in <String>[
-          'DsPagination.gap',
-          'DsPaginationStep.tightPadding',
-          'DsPaginationStep.loosePadding',
-          'DsPaginationEllipsis.boxSize',
-          'DsPaginationEllipsis.glyphSize',
+          'ElPagination.gap',
+          'ElPaginationStep.tightPadding',
+          'ElPaginationStep.loosePadding',
+          'ElPaginationEllipsis.boxSize',
+          'ElPaginationEllipsis.glyphSize',
         ]) {
           expect(
             find.textContaining(token),
@@ -151,7 +151,7 @@ void main() {
         expect(
           find.descendant(
             of: worked,
-            matching: find.byType(DsPaginationEllipsis),
+            matching: find.byType(ElPaginationEllipsis),
           ),
           findsNWidgets(2),
         );
@@ -208,16 +208,16 @@ void main() {
         expect(
           find.descendant(
             of: single,
-            matching: find.byType(DsPaginationEllipsis),
+            matching: find.byType(ElPaginationEllipsis),
           ),
           findsNothing,
         );
         expect(
-          find.descendant(of: single, matching: find.byType(DsPaginationStep)),
+          find.descendant(of: single, matching: find.byType(ElPaginationStep)),
           findsNothing,
         );
 
-        // DsPagination declares an accessible container name: the page's
+        // ElPagination declares an accessible container name: the page's
         // own Accessibility section claims this and the test proves it.
         expect(find.bySemanticsLabel('pagination'), findsWidgets);
 
@@ -225,10 +225,10 @@ void main() {
         expect(
           paginationDoc.exports,
           containsAll(<String>[
-            'DsPagination',
-            'DsPaginationLink',
-            'DsPaginationStep',
-            'DsPaginationEllipsis',
+            'ElPagination',
+            'ElPaginationLink',
+            'ElPaginationStep',
+            'ElPaginationEllipsis',
           ]),
         );
         expect(destination, isNull);
@@ -244,7 +244,7 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: DsThemeController(mode: DsThemeMode.dark),
+            controller: ElThemeController(mode: ElThemeMode.dark),
             child: const PaginationDocPage(),
           ),
         );
@@ -256,21 +256,18 @@ void main() {
         );
         expect(simple, findsOneWidget);
         expect(
-          find.descendant(of: simple, matching: find.byType(DsPaginationStep)),
+          find.descendant(of: simple, matching: find.byType(ElPaginationStep)),
           findsNothing,
         );
         expect(
           find.descendant(
             of: simple,
-            matching: find.byType(DsPaginationEllipsis),
+            matching: find.byType(ElPaginationEllipsis),
           ),
           findsNothing,
         );
         expect(
-          find.descendant(
-            of: simple,
-            matching: find.byType(DsPaginationLink),
-          ),
+          find.descendant(of: simple, matching: find.byType(ElPaginationLink)),
           findsNWidgets(5),
         );
 
@@ -282,14 +279,14 @@ void main() {
         expect(
           find.descendant(
             of: iconsOnly,
-            matching: find.byType(DsPaginationLink),
+            matching: find.byType(ElPaginationLink),
           ),
           findsNothing,
         );
         expect(
           find.descendant(
             of: iconsOnly,
-            matching: find.byType(DsPaginationStep),
+            matching: find.byType(ElPaginationStep),
           ),
           findsNWidgets(2),
         );
@@ -329,7 +326,7 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: DsThemeController(mode: DsThemeMode.dark),
+            controller: ElThemeController(mode: ElThemeMode.dark),
             child: const PaginationDocPage(),
           ),
         );
@@ -383,8 +380,8 @@ void main() {
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
 
-        final DsThemeController controller = DsThemeController(
-          mode: DsThemeMode.dark,
+        final ElThemeController controller = ElThemeController(
+          mode: ElThemeMode.dark,
         );
         await tester.pumpWidget(
           _harness(controller: controller, child: const PaginationDocPage()),
@@ -394,27 +391,27 @@ void main() {
         final Finder worked = find.byKey(
           const ValueKey<String>('pagination-preview:worked-example'),
         );
-        DsButtonVariant activeVariant() {
-          final DsPaginationLink active = tester
-              .widgetList<DsPaginationLink>(
+        ElButtonVariant activeVariant() {
+          final ElPaginationLink active = tester
+              .widgetList<ElPaginationLink>(
                 find.descendant(
                   of: worked,
-                  matching: find.byType(DsPaginationLink),
+                  matching: find.byType(ElPaginationLink),
                 ),
               )
-              .singleWhere((DsPaginationLink link) => link.isActive);
+              .singleWhere((ElPaginationLink link) => link.isActive);
           final Finder activeFinder = find.descendant(
             of: find.byWidget(active),
-            matching: find.byType(DsButton),
+            matching: find.byType(ElButton),
           );
-          return tester.widget<DsButton>(activeFinder).variant;
+          return tester.widget<ElButton>(activeFinder).variant;
         }
 
-        expect(activeVariant(), DsButtonVariant.outline);
+        expect(activeVariant(), ElButtonVariant.outline);
 
         // Flip the SAME controller in place, not a fresh widget tree: the
         // same object every real theme toggle mutates.
-        controller.setMode(DsThemeMode.light);
+        controller.setMode(ElThemeMode.light);
         await tester.pumpAndSettle();
 
         expect(

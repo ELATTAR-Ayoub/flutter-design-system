@@ -11,28 +11,28 @@ Audited pages: `app/design-system/page.tsx` (home), `app/design-system/colors/pa
 - Wraps everything in `ThemeProvider` → `TooltipProvider delayDuration={200}` → children → `Toaster position="bottom-right"`.
 - Metadata title: `Elattar's Design System`.
 
-### `ThemeProvider` — `components/ds/theme-provider.tsx`
+### `ThemeProvider` — `components/el/theme-provider.tsx`
 - next-themes: `attribute="class"`, `defaultTheme="dark"`, `enableSystem`, `disableTransitionOnChange` (kills all transitions for one frame on toggle — without it ~200 surfaces smear over 250ms). Used by every page.
 
 ### Docs shell — `app/design-system/layout.tsx` (all 4 pages)
 - **Header**: `sticky top-0 z-40 flex h-(--height-site-header) shrink-0 items-center gap-4 border-b border-border bg-background/85 px-6 backdrop-blur-xl`. `--height-site-header: 4rem` (64px).
-  - Children in order: `DsMobileNav` → `Link href="/design-system" class="press"` wrapping `Logo` → version pill `<span class="type-micro hidden rounded-pill border border-border px-2.5 py-1 sm:block">Design System v0.1</span>` → `<span class="ml-auto type-micro hidden md:block">Desktop-first · 1440 frame · Light & dark</span>` → `ThemeToggle class="ml-auto md:ml-4"`.
-- **Body row**: `mx-auto flex w-full max-w-(--width-shell) flex-1 items-start` (`--width-shell: 1680px`) → `DsSidebar` + `<main class="min-w-0 flex-1 px-6 py-12 lg:px-12">` → inner `<div class="mx-auto max-w-(--width-content)">` (`--width-content: 1080px`).
+  - Children in order: `ElMobileNav` → `Link href="/design-system" class="press"` wrapping `Logo` → version pill `<span class="type-micro hidden rounded-pill border border-border px-2.5 py-1 sm:block">Design System v0.1</span>` → `<span class="ml-auto type-micro hidden md:block">Desktop-first · 1440 frame · Light & dark</span>` → `ThemeToggle class="ml-auto md:ml-4"`.
+- **Body row**: `mx-auto flex w-full max-w-(--width-shell) flex-1 items-start` (`--width-shell: 1680px`) → `ElSidebar` + `<main class="min-w-0 flex-1 px-6 py-12 lg:px-12">` → inner `<div class="mx-auto max-w-(--width-content)">` (`--width-content: 1080px`).
 - Anchor offset: no `scroll-mt-*` anywhere; `html` carries `scroll-padding-block-start: var(--scroll-offset)` where `--scroll-offset: calc(var(--height-site-header) + var(--spacing) * 8)` = 64 + 32 = **96px**.
 
-### `DsSidebar` / `DsMobileNav` / `NavTree` — `components/ds/ds-nav.tsx` (all 4 pages; client component)
-- **DsSidebar** (no props): `<aside class="sticky top-(--height-site-header) hidden h-[calc(100dvh-var(--height-site-header))] w-60 shrink-0 overflow-y-auto border-r border-border px-6 pt-10 scrollbar-thin lg:block">` — 240px wide, desktop-only (`lg:`), thin scrollbar.
+### `ElSidebar` / `ElMobileNav` / `NavTree` — `components/el/el-nav.tsx` (all 4 pages; client component)
+- **ElSidebar** (no props): `<aside class="sticky top-(--height-site-header) hidden h-[calc(100dvh-var(--height-site-header))] w-60 shrink-0 overflow-y-auto border-r border-border px-6 pt-10 scrollbar-thin lg:block">` — 240px wide, desktop-only (`lg:`), thin scrollbar.
 - **NavTree** (`onNavigate?: () => void`): `<nav aria-label="Design system" class="pb-16">`. Per group (`div.mb-8`):
   - Group link: `type-label mb-3 block transition-colors duration-fast hover:text-muted-foreground`; active (pathname === group.href) → `text-action-ink`, else `text-muted-foreground`.
   - Category list: `<ul class="space-y-px border-l border-border">`; each link: `type-nav -ml-px block border-l py-2 pl-4 transition-colors duration-fast` + `aria-current="page"` when active. Active: `border-action bg-action/12 text-foreground` (1px blue rule replacing the hairline — deliberately no glow, no extra `font-medium`; `.type-nav` already carries 500). Inactive: `border-transparent text-muted-foreground hover:border-input hover:text-foreground`.
-- **DsMobileNav** (no props): `Sheet` (Radix Dialog) with trigger `Button variant="outline" size="icon" class="lg:hidden"` containing `Icon icon={Menu}` + `sr-only` "Open design system navigation". `SheetContent side="left" class="w-72 overflow-y-auto px-6"` (288px, overrides default `w-3/4 sm:max-w-sm`); `SheetHeader class="px-0"` with `SheetTitle asChild` → `Link` → `Logo`; then `NavTree`.
+- **ElMobileNav** (no props): `Sheet` (Radix Dialog) with trigger `Button variant="outline" size="icon" class="lg:hidden"` containing `Icon icon={Menu}` + `sr-only` "Open design system navigation". `SheetContent side="left" class="w-72 overflow-y-auto px-6"` (288px, overrides default `w-3/4 sm:max-w-sm`); `SheetHeader class="px-0"` with `SheetTitle asChild` → `Link` → `Logo`; then `NavTree`.
 
-### `Logo` / `LogoMark` — `components/ds/logo.tsx`
+### `Logo` / `LogoMark` — `components/el/logo.tsx`
 - `LogoMark({className})`: `<span aria-hidden class="relative grid size-7 shrink-0 place-items-center rounded-md bg-action">` containing a `size-4` SVG (viewBox 0 0 24 24, fill none): chevron `d="M6 15.5 12 6l6 9.5"` stroke `var(--primary-foreground)` width 2.4 `strokeLinecap="square"`, plus underline `d="M6 19h12"` stroke `var(--color-value-bright)` width 2.4.
-- `Logo({className, showMark=true})`: `<span class="flex items-center gap-2.5">` → mark + `<span class="type-wordmark text-foreground">ELATTAR<span class="text-value-ink">.DS</span></span>`. The `.DS` suffix is the wordmark's entire 10% value allowance.
+- `Logo({className, showMark=true})`: `<span class="flex items-center gap-2.5">` → mark + `<span class="type-wordmark text-foreground">ELATTAR</span>`. The `ELATTAR` suffix is the wordmark's entire 10% value allowance.
 - `.type-wordmark`: 0.9375rem / line-height 1 / weight 700 / tracking `--tracking-num` (−0.01em).
 
-### `ThemeToggle` — `components/ds/theme-toggle.tsx` (all 4 pages; client)
+### `ThemeToggle` — `components/el/theme-toggle.tsx` (all 4 pages; client)
 - Props: `{className?}`. Three-way segmented control Light · System · Dark (`SunIcon`/`MonitorIcon`/`MoonIcon`), `role="radiogroup" aria-label="Colour theme"`.
 - Container: `relative inline-flex items-center gap-px rounded-pill border border-border bg-muted p-0.5`.
 - One travelling `SlidingIndicator` pill: `block size-full rounded-pill bg-card shadow-e1` — options paint **no** background of their own (RULES §4: selection travels, never blinks).
@@ -47,14 +47,14 @@ Audited pages: `app/design-system/page.tsx` (home), `app/design-system/colors/pa
 
 ---
 
-## 2. Kit — `components/ds/kit.tsx` (the docs component library)
+## 2. Kit — `components/el/kit.tsx` (the docs component library)
 
-### `DsPageHeader({eyebrow, title, blurb, contents?})` — all 4 pages
+### `ElPageHeader({eyebrow, title, blurb, contents?})` — all 4 pages
 - `<header class="mb-14 border-b border-border pb-10">`
 - Eyebrow: `type-label text-action-ink`. Title: `<h1 class="type-h1 mt-4 text-foreground">`. Blurb: `type-lead mt-4 max-w-2xl`.
 - Contents chips (optional): `<ul class="mt-7 flex flex-wrap gap-2">`; each `<li class="type-chip rounded-pill border border-border bg-card px-3 py-1.5 text-muted-foreground">`.
 
-### `DsSection({id, title, description?, children, className?})` — all 4 pages
+### `ElSection({id, title, description?, children, className?})` — all 4 pages
 - `<section id class="mb-20">`; heading block `mb-6`; **`<h2 class="type-h3 text-foreground">`** (h2 element, h3 class — intentional); description `type-small mt-2 max-w-2xl`. No scroll-margin (see `--scroll-offset` above).
 
 ### `Panel({label?, note?, children, className?, bodyClassName?, flush=false})` — colors, typography, spacing
@@ -91,13 +91,13 @@ Audited pages: `app/design-system/page.tsx` (home), `app/design-system/colors/pa
   - Blurb `type-small mt-2 grow`; chips `<ul class="mt-4 flex flex-wrap gap-1.5 border-t border-border pt-4">`; `<li class="type-caption rounded-sm bg-muted px-2 py-1 text-muted-foreground">`.
 
 ### `PageFootNav({groupId, slug})` — colors, typography, spacing (not home)
-- Uses `siblings()` from `lib/ds/nav.ts`; returns null if neither neighbour.
+- Uses `siblings()` from `lib/el/nav.ts`; returns null if neither neighbour.
 - `<nav class="mt-8 flex items-stretch gap-4 border-t border-border pt-8">`.
 - Prev link: `press flex min-w-0 flex-1 items-center gap-3 rounded-lg border border-border bg-card px-5 py-4 hover:border-input`; `Icon icon={ArrowLeft} size="md" tone="muted"`; caption `type-micro block text-muted-foreground` "Previous"; title `type-small mt-1 block truncate text-foreground`. Next mirrors (`justify-end`, `text-right`, arrow after). Missing side → `<span class="flex-1"/>` placeholder.
 
 ---
 
-## 3. `TokenSwatch` family — `components/ds/token-swatch.tsx` (colors page only; client)
+## 3. `TokenSwatch` family — `components/el/token-swatch.tsx` (colors page only; client)
 
 Reads tokens from the **live stylesheet** — nothing hand-typed. `useSyncExternalStore` + one shared `MutationObserver` on `document.documentElement` watching `attributes: ["class", "style"]`; on any change both caches (`valueCache`, `ratioCache`) clear and all subscribers re-read. (Flutter equivalent: recompute printed values + ratios on theme change.)
 
@@ -113,9 +113,9 @@ Reads tokens from the **live stylesheet** — nothing hand-typed. `useSyncExtern
 
 ---
 
-## 4. Nav data source — `lib/ds/nav.ts`
+## 4. Nav data source — `lib/el/nav.ts`
 
-- Types: `DsCategory {slug, title, blurb, contents[]}`, `DsGroup {id: "foundations"|"base"|"agent"|"site", title, href, blurb, categories}`. `DS_ROOT = "/design-system"`.
+- Types: `ElCategory {slug, title, blurb, contents[]}`, `ElGroup {id: "foundations"|"base"|"agent"|"site", title, href, blurb, categories}`. `EL_ROOT = "/design-system"`.
 - Foundations categories in order: **colors, typography, spacing, shadows, motion, icons** (drives sidebar order, home index cards, and PageFootNav prev/next: colors → typography → spacing → shadows…).
 - Group hrefs: foundations → `/design-system`; base → `/design-system/components/base`; agent → `…/agent`; site → `…/site`. `categoryHref`: foundations pages live at `/design-system/{slug}`, others at `{group.href}/{slug}`.
 - Helpers: `findCategory(groupId, slug)` (throws on unknown), `siblings(groupId, slug)` → `{prev, next}` as `{title, href}`.
@@ -200,8 +200,8 @@ Reads tokens from the **live stylesheet** — nothing hand-typed. `useSyncExtern
 
 | Component | home | colors | typography | spacing |
 |---|---|---|---|---|
-| DsPageHeader | ✓ (no contents) | ✓ (inline contents) | ✓ (nav contents) | ✓ (nav contents) |
-| DsSection | ✓ ×3 | ✓ ×5 | ✓ ×6 | ✓ ×6 |
+| ElPageHeader | ✓ (no contents) | ✓ (inline contents) | ✓ (nav contents) | ✓ (nav contents) |
+| ElSection | ✓ ×3 | ✓ ×5 | ✓ ×6 | ✓ ×6 |
 | Panel | — | ✓ ×2 | ✓ ×5 | ✓ ×4 |
 | Note | ✓ (value) | ✓ ×4 (action×2, value×2) | ✓ ×2 (action, error) | ✓ ×3 (error×1, default action ×2) |
 | Meta | — | — | ✓ ×1 (6 items) | ✓ ×2 (8+5 items) |
@@ -227,4 +227,4 @@ Section order + verbatim ids/titles: **home** `#foundations` "Foundations" → `
 5. **type-display weight**: typography DoDont says "heavy Space Grotesk at tight tracking already carries the hero" while `.type-display` is weight **500** (medium) at −0.03em.
 6. **Spacing Meta "Page margin px-6 md:px-8 lg:px-12"** describes customer pages; the docs shell itself uses `px-6 … lg:px-12` with no `md:px-8` step.
 
-Key files: `D:\DESIGN\Design-System-2026-8\design-system\components\ds\kit.tsx`, `…\components\ds\token-swatch.tsx`, `…\components\ds\ds-nav.tsx`, `…\components\ds\theme-toggle.tsx`, `…\components\ds\logo.tsx`, `…\components\ds\theme-provider.tsx`, `…\components\ui\icon.tsx`, `…\components\ui\button.tsx`, `…\components\ui\sheet.tsx`, `…\components\ui\sliding-indicator.tsx`, `…\components\ui\spinner.tsx`, `…\lib\ds\nav.ts`, `…\app\design-system\layout.tsx`, `…\app\layout.tsx`, `…\app\globals.css`.
+Key files: `D:\DESIGN\Design-System-2026-8\design-system\components\el\kit.tsx`, `…\components\el\token-swatch.tsx`, `…\components\el\el-nav.tsx`, `…\components\el\theme-toggle.tsx`, `…\components\el\logo.tsx`, `…\components\el\theme-provider.tsx`, `…\components\ui\icon.tsx`, `…\components\ui\button.tsx`, `…\components\ui\sheet.tsx`, `…\components\ui\sliding-indicator.tsx`, `…\components\ui\spinner.tsx`, `…\lib\el\nav.ts`, `…\app\design-system\layout.tsx`, `…\app\layout.tsx`, `…\app\globals.css`.

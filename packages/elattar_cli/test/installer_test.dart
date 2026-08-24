@@ -29,6 +29,14 @@ void main() {
       contains('lib/design_system/motion'),
     );
     expect(
+      mapper.destination(root, '@assets/textures/perlin-noise.png'),
+      contains('assets'),
+    );
+    expect(
+      mapper.destination(root, '@shaders/orb.frag').replaceAll('\\', '/'),
+      endsWith('shaders/orb.frag'),
+    );
+    expect(
       mapper
           .destination(root, '@app/shots/console/console_shot.dart')
           .replaceAll('\\', '/'),
@@ -109,15 +117,15 @@ void main() {
   });
 
   // A combinator or prefix on the umbrella import lands on whichever directive
-  // the fan-out emits LAST, so `show DsButton` would attach to the foundation
-  // barrel and DsButton would not resolve. All three forms must be refused,
+  // the fan-out emits LAST, so `show ElButton` would attach to the foundation
+  // barrel and ElButton would not resolve. All three forms must be refused,
   // not just `as`.
   for (final ({String label, String trailing}) form
       in <({String label, String trailing})>[
-        (label: 'a prefix', trailing: ' as ds'),
-        (label: 'a show combinator', trailing: ' show DsButton'),
-        (label: 'a hide combinator', trailing: ' hide DsButton'),
-        (label: 'a prefix and a combinator', trailing: ' as ds show DsButton'),
+        (label: 'a prefix', trailing: ' as el'),
+        (label: 'a show combinator', trailing: ' show ElButton'),
+        (label: 'a hide combinator', trailing: ' hide ElButton'),
+        (label: 'a prefix and a combinator', trailing: ' as el show ElButton'),
       ]) {
     test('an umbrella import with ${form.label} is refused, not mangled', () {
       final DartImportTransformer transformer = DartImportTransformer();
@@ -165,7 +173,7 @@ void main() {
   // usage, and string literals that quote snippets. A rewrite that matched the
   // word `import` anywhere would fan the umbrella barrel out into the middle of
   // a class body ("Directives must appear before any declarations") or into the
-  // middle of a string literal, and a commented-out `as ds` import would abort
+  // middle of a string literal, and a commented-out `as el` import would abort
   // the whole install.
 
   test('an import inside a doc comment is not a directive', () {
@@ -263,9 +271,9 @@ void main() {
   test('a commented-out umbrella import with a prefix does not throw', () {
     final DartImportTransformer transformer = DartImportTransformer();
     const String source =
-        "// import 'package:elattar_design_system/elattar_design_system.dart' as ds;\n"
+        "// import 'package:elattar_design_system/elattar_design_system.dart' as el;\n"
         '/*\n'
-        "import 'package:elattar_design_system/elattar_design_system.dart' show DsButton;\n"
+        "import 'package:elattar_design_system/elattar_design_system.dart' show ElButton;\n"
         '*/\n'
         "import 'package:flutter/widgets.dart';\n";
     late String result;
@@ -475,6 +483,55 @@ flutter:
       ],
     );
     expect(plan.canApply, isTrue);
+    expect(() => loadYaml(plan.pubspec), returnsNormally);
+    Installer().apply(plan);
+    expect(() => loadYaml(pubspec.readAsStringSync()), returnsNormally);
+  });
+
+  test('pubspec merge adds shaders and assets at root-relative paths', () {
+    final Directory root = Directory.systemTemp.createTempSync(
+      'elattar-pubspec-shaders-',
+    );
+    addTearDown(() => root.deleteSync(recursive: true));
+    final Directory repository = Directory.current.parent.parent;
+    final File pubspec =
+        File('${root.path}${Platform.pathSeparator}pubspec.yaml')
+          ..parent.createSync(recursive: true)
+          ..writeAsStringSync('''name: fixture
+description: Shader merge.
+environment:
+  sdk: ^3.12.2
+dependencies:
+  flutter:
+    sdk: flutter
+flutter:
+''');
+    final InstallPlan plan = Installer().plan(
+      projectRoot: root,
+      repositoryRoot: repository,
+      items: const <InstallItem>[
+        InstallItem(
+          name: 'voice-orb',
+          version: '0.0.1',
+          files: <InstallFile>[],
+          assets: <InstallResource>[
+            InstallResource(
+              source: 'assets/textures/perlin-noise.png',
+              target: '@assets/textures/perlin-noise.png',
+            ),
+          ],
+          shaders: <InstallResource>[
+            InstallResource(
+              source: 'shaders/orb.frag',
+              target: '@shaders/orb.frag',
+            ),
+          ],
+        ),
+      ],
+    );
+    expect(plan.canApply, isTrue);
+    expect(plan.pubspec, contains('assets/textures/perlin-noise.png'));
+    expect(plan.pubspec, contains('shaders/orb.frag'));
     expect(() => loadYaml(plan.pubspec), returnsNormally);
     Installer().apply(plan);
     expect(() => loadYaml(pubspec.readAsStringSync()), returnsNormally);

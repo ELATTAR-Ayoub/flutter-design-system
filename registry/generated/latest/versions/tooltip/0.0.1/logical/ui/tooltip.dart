@@ -14,8 +14,8 @@
 /// | enter | `animate-in fade-in-0 zoom-in-95` plus `data-[side=top]:slide-in-from-bottom-2` — 8px of upward travel — over `--duration-overlay` 320ms on `--ease-out` |
 /// | exit | `fade-out-0 zoom-out-95`. **No slide**: `slide-in-from-*` is an entrance utility and the class list writes no exit twin |
 ///
-/// **Why this does not compose `DsPopover`.** Three of the four things it would
-/// borrow are wrong here: `DsPopover` slides on the bottom side only (ruling
+/// **Why this does not compose `ElPopover`.** Three of the four things it would
+/// borrow are wrong here: `ElPopover` slides on the bottom side only (ruling
 /// L11 scoped it to the selects page's two consumers), it draws no arrow by the
 /// same ruling, and it dismisses on an outside pointer — a tooltip closes when
 /// the pointer *leaves the trigger*, which is a different gesture entirely. The
@@ -45,7 +45,7 @@
 ///  * **A tap anywhere else closes it**, through a translucent barrier that
 ///    observes the pointer without taking it: the tap it dismisses on still
 ///    reaches whatever it landed on.
-///  * **It dismisses itself after [DsTooltip.touchDwell]** if nothing else
+///  * **It dismisses itself after [ElTooltip.touchDwell]** if nothing else
 ///    closes it first, so a label can never be stranded on screen.
 ///
 /// **Routed on the event's own [PointerDeviceKind], never on the platform.** A
@@ -57,7 +57,7 @@
 ///
 /// Not ported: `TooltipProvider` as an object. Its one job is
 /// `delayDuration={200}`, which is set once for the whole application and is
-/// therefore a constant — [DsDurations.tooltipDelay] — rather than a scope. The
+/// therefore a constant — [ElDurations.tooltipDelay] — rather than a scope. The
 /// prose beside the specimens makes the same point: *"set once on the provider
 /// in the root layout so timing cannot vary between screens."*
 library;
@@ -86,7 +86,7 @@ const double _zoom = 0.95;
 /// `top` is the component's own default and what the dialogs page measures.
 /// `right` arrives with `SidebarMenuButton`, whose tooltip is the *only* label
 /// a collapsed rail has: `<TooltipContent side="right" align="center" …>`.
-enum DsTooltipSide {
+enum ElTooltipSide {
   /// The default. Content above the trigger, arrow lane below it.
   top,
 
@@ -96,13 +96,13 @@ enum DsTooltipSide {
 
 /// One `MouseRegion` around a trigger, a [Listener] watching it for taps, and a
 /// labelled diamond beside it.
-class DsTooltip extends StatefulWidget {
-  const DsTooltip({
+class ElTooltip extends StatefulWidget {
+  const ElTooltip({
     super.key,
     required this.label,
     required this.child,
-    this.delay = DsDurations.tooltipDelay,
-    this.side = DsTooltipSide.top,
+    this.delay = ElDurations.tooltipDelay,
+    this.side = ElTooltipSide.top,
     this.hidden = false,
   });
 
@@ -115,7 +115,7 @@ class DsTooltip extends StatefulWidget {
   final Duration delay;
 
   /// Which edge of the trigger the content sits on.
-  final DsTooltipSide side;
+  final ElTooltipSide side;
 
   /// `hidden` on the content — the trigger keeps its hover behaviour and
   /// nothing is rendered.
@@ -128,22 +128,22 @@ class DsTooltip extends StatefulWidget {
   final bool hidden;
 
   /// `size-2.5` — the arrow's box, before the 45° turn.
-  static double get arrowSize => ds(2.5);
+  static double get arrowSize => el(2.5);
 
   /// `rounded-xs` on the arrow.
-  static double get arrowRadius => DsRadii.xs;
+  static double get arrowRadius => ElRadii.xs;
 
   /// `translate-y-[calc(-50% - 2px)]` — half the arrow, plus two.
-  static double get arrowLift => arrowSize / 2 + DsRadii.xs;
+  static double get arrowLift => arrowSize / 2 + ElRadii.xs;
 
   /// `px-3`.
-  static double get horizontalPadding => ds(3);
+  static double get horizontalPadding => el(3);
 
   /// `py-1.5`.
-  static double get verticalPadding => ds(1.5);
+  static double get verticalPadding => el(1.5);
 
   /// `slide-in-from-bottom-2` — two spacing units of travel.
-  static double get slide => ds(2);
+  static double get slide => el(2);
 
   /// How long a **tap**-opened label stays up on its own — 1.5s.
   ///
@@ -152,23 +152,23 @@ class DsTooltip extends StatefulWidget {
   /// `Tooltip._defaultShowDuration` is `1500ms` and is passed as `touchDelay`,
   /// which is exactly this quantity: how long a label lingers after a touch
   /// opened it. Taking the host platform's answer for a question the reference
-  /// never asked is [DsCurves.cssEase]'s argument one layer up — a foreign
+  /// never asked is [ElCurves.cssEase]'s argument one layer up — a foreign
   /// default, adopted rather than invented.
   ///
-  /// Spelled as ten beats of [DsDurations.fast] rather than typed, because the
+  /// Spelled as ten beats of [ElDurations.fast] rather than typed, because the
   /// literal belongs in `foundation/` and this file is not it. The two agree to
   /// the microsecond.
   ///
-  /// Like [delay], it is **not** routed through [dsAnimationDuration]: a dwell
+  /// Like [delay], it is **not** routed through [elAnimationDuration]: a dwell
   /// is not motion, and `prefers-reduced-motion` has nothing to say about how
   /// long a label a finger asked for stays legible.
-  static Duration get touchDwell => DsDurations.fast * 10;
+  static Duration get touchDwell => ElDurations.fast * 10;
 
   @override
-  State<DsTooltip> createState() => _DsTooltipState();
+  State<ElTooltip> createState() => _ElTooltipState();
 }
 
-class _DsTooltipState extends State<DsTooltip>
+class _ElTooltipState extends State<ElTooltip>
     with SingleTickerProviderStateMixin {
   final OverlayPortalController _portal = OverlayPortalController();
   final GlobalKey _anchorKey = GlobalKey();
@@ -180,7 +180,7 @@ class _DsTooltipState extends State<DsTooltip>
   /// The `delayDuration` timer, cancelled if the pointer leaves first.
   Object? _pending;
 
-  /// [DsTooltip.touchDwell]'s timer, cancelled the moment anything else closes
+  /// [ElTooltip.touchDwell]'s timer, cancelled the moment anything else closes
   /// the label.
   ///
   /// A real [Timer] rather than [_pending]'s token-and-[Future.delayed] idiom,
@@ -194,7 +194,7 @@ class _DsTooltipState extends State<DsTooltip>
   ///
   /// The two dismissals must not cross: a hover-opened label is the pointer's
   /// to close and a finger must not steal it, and a tap-opened one has no
-  /// pointer to leave, so nothing but another tap (or [DsTooltip.touchDwell])
+  /// pointer to leave, so nothing but another tap (or [ElTooltip.touchDwell])
   /// may take it down.
   bool _byTouch = false;
 
@@ -208,8 +208,10 @@ class _DsTooltipState extends State<DsTooltip>
   @override
   void initState() {
     super.initState();
-    _animation =
-        AnimationController(vsync: this, duration: DsDurations.overlay);
+    _animation = AnimationController(
+      vsync: this,
+      duration: ElDurations.overlay,
+    );
   }
 
   @override
@@ -220,7 +222,7 @@ class _DsTooltipState extends State<DsTooltip>
     super.dispose();
   }
 
-  /// The hover delay is **not** routed through [dsAnimationDuration]: it is a
+  /// The hover delay is **not** routed through [elAnimationDuration]: it is a
   /// dwell time, not motion, and `prefers-reduced-motion` has nothing to say
   /// about how long a pointer must rest before a label appears.
   void _enter(PointerEnterEvent event) {
@@ -241,7 +243,7 @@ class _DsTooltipState extends State<DsTooltip>
   void _exit(PointerExitEvent event) {
     // Same rule read backwards, and the one that keeps a hybrid device honest:
     // a mouse leaving the trigger closes what the mouse opened, and leaves what
-    // the finger did to [DsTooltip.touchDwell] and to the next tap.
+    // the finger did to [ElTooltip.touchDwell] and to the next tap.
     if (event.kind == PointerDeviceKind.touch || _byTouch) return;
     _hide();
   }
@@ -261,7 +263,7 @@ class _DsTooltipState extends State<DsTooltip>
     _byTouch = true;
     _show();
     _dwell?.cancel();
-    _dwell = Timer(DsTooltip.touchDwell, () {
+    _dwell = Timer(ElTooltip.touchDwell, () {
       if (mounted) _hide();
     });
   }
@@ -274,7 +276,7 @@ class _DsTooltipState extends State<DsTooltip>
     _open = true;
     _portal.show();
     _animation
-      ..duration = dsAnimationDuration(context, DsDurations.overlay)
+      ..duration = elAnimationDuration(context, ElDurations.overlay)
       ..forward(from: 0);
   }
 
@@ -285,7 +287,7 @@ class _DsTooltipState extends State<DsTooltip>
     _open = false;
     _byTouch = false;
     if (!_portal.isShowing) return;
-    _animation.duration = dsAnimationDuration(context, DsDurations.overlay);
+    _animation.duration = elAnimationDuration(context, ElDurations.overlay);
     _animation.reverse().whenComplete(() {
       if (_animation.value != 0 || !mounted) return;
       _portal.hide();
@@ -294,8 +296,9 @@ class _DsTooltipState extends State<DsTooltip>
 
   Widget _buildOverlay(BuildContext overlayContext) {
     final RenderObject? object = _anchorKey.currentContext?.findRenderObject();
-    final RenderObject? theatre =
-        Overlay.maybeOf(overlayContext)?.context.findRenderObject();
+    final RenderObject? theatre = Overlay.maybeOf(
+      overlayContext,
+    )?.context.findRenderObject();
     if (object is! RenderBox ||
         theatre is! RenderBox ||
         !object.hasSize ||
@@ -331,7 +334,7 @@ class _DsTooltipState extends State<DsTooltip>
             child: _TooltipTransition(
               animation: _animation,
               side: widget.side,
-              child: DsTooltipContent(label: widget.label, side: widget.side),
+              child: ElTooltipContent(label: widget.label, side: widget.side),
             ),
           ),
         ),
@@ -341,17 +344,17 @@ class _DsTooltipState extends State<DsTooltip>
 
   @override
   Widget build(BuildContext context) => OverlayPortal(
-        controller: _portal,
-        overlayChildBuilder: _buildOverlay,
-        child: Listener(
-          onPointerDown: _down,
-          child: MouseRegion(
-            onEnter: _enter,
-            onExit: _exit,
-            child: KeyedSubtree(key: _anchorKey, child: widget.child),
-          ),
-        ),
-      );
+    controller: _portal,
+    overlayChildBuilder: _buildOverlay,
+    child: Listener(
+      onPointerDown: _down,
+      child: MouseRegion(
+        onEnter: _enter,
+        onExit: _exit,
+        child: KeyedSubtree(key: _anchorKey, child: widget.child),
+      ),
+    ),
+  );
 }
 
 /// Puts the tooltip on its trigger's chosen edge, centred, and keeps it on
@@ -360,7 +363,7 @@ class _TooltipLayout extends SingleChildLayoutDelegate {
   const _TooltipLayout({required this.anchor, required this.side});
 
   final Rect anchor;
-  final DsTooltipSide side;
+  final ElTooltipSide side;
 
   @override
   BoxConstraints getConstraintsForChild(BoxConstraints constraints) =>
@@ -372,7 +375,7 @@ class _TooltipLayout extends SingleChildLayoutDelegate {
         v.clamp(0.0, extent.clamp(0.0, double.infinity));
 
     switch (side) {
-      case DsTooltipSide.top:
+      case ElTooltipSide.top:
         final double x = clamp(
           anchor.center.dx - childSize.width / 2,
           size.width - childSize.width,
@@ -384,7 +387,7 @@ class _TooltipLayout extends SingleChildLayoutDelegate {
           size.height - childSize.height,
         );
         return Offset(x, y);
-      case DsTooltipSide.right:
+      case ElTooltipSide.right:
         // Same construction one quarter turn round: the lane is the child's
         // leading column, so its own left edge is the trigger's right.
         // *(Measured on a collapsed rail row: anchor right 340, content left
@@ -410,38 +413,38 @@ class _TooltipLayout extends SingleChildLayoutDelegate {
 /// edge and the trigger fall out of layout rather than out of an offset — Radix
 /// reserves the arrow's height in exactly the same way, which is why
 /// `sideOffset={0}` still leaves a gap.
-class DsTooltipContent extends StatelessWidget {
-  const DsTooltipContent({
+class ElTooltipContent extends StatelessWidget {
+  const ElTooltipContent({
     super.key,
     required this.label,
-    this.side = DsTooltipSide.top,
+    this.side = ElTooltipSide.top,
   });
 
   final String label;
 
-  /// Which edge the lane sits on — below the pill on [DsTooltipSide.top], left
-  /// of it on [DsTooltipSide.right].
-  final DsTooltipSide side;
+  /// Which edge the lane sits on — below the pill on [ElTooltipSide.top], left
+  /// of it on [ElTooltipSide.right].
+  final ElTooltipSide side;
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     final Widget pill = ConstrainedBox(
       // `max-w-xs`.
-      constraints: BoxConstraints(maxWidth: DsContainers.xs),
+      constraints: BoxConstraints(maxWidth: ElContainers.xs),
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: theme.foreground,
-          borderRadius: BorderRadius.circular(DsRadii.md),
+          borderRadius: BorderRadius.circular(ElRadii.md),
         ),
         child: Padding(
           padding: EdgeInsets.symmetric(
-            horizontal: DsTooltip.horizontalPadding,
-            vertical: DsTooltip.verticalPadding,
+            horizontal: ElTooltip.horizontalPadding,
+            vertical: ElTooltip.verticalPadding,
           ),
-          child: DsText(
+          child: ElText(
             label,
-            DsComponentType.tooltipLabel,
+            ElComponentType.tooltipLabel,
             color: theme.background,
           ),
         ),
@@ -464,11 +467,11 @@ class DsTooltipContent extends StatelessWidget {
     // Nothing about the drawn geometry changes: the box's own centre is the
     // pill's centre either way, so the diamond still lands on the trigger's
     // centre line, still 2px inside the facing edge, and the lane still spends
-    // exactly [DsTooltip.arrowSize] of layout — which is where the measured
+    // exactly [ElTooltip.arrowSize] of layout — which is where the measured
     // 10px gap comes from. The 45° turn takes the diamond past its box on the
     // diagonal (10 → ~14.1) and always did; a [CustomPaint] does not clip.
     final Widget lane = SizedBox.square(
-      dimension: DsTooltip.arrowSize,
+      dimension: ElTooltip.arrowSize,
       child: CustomPaint(
         painter: _ArrowPainter(color: theme.foreground, side: side),
       ),
@@ -477,14 +480,14 @@ class DsTooltipContent extends StatelessWidget {
     // Default cross-axis alignment — `center` — on both, so the box wraps its
     // pill on the cross axis instead of the constraints it was offered.
     return switch (side) {
-      DsTooltipSide.top => Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[pill, lane],
-        ),
-      DsTooltipSide.right => Row(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[lane, pill],
-        ),
+      ElTooltipSide.top => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[pill, lane],
+      ),
+      ElTooltipSide.right => Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[lane, pill],
+      ),
     };
   }
 }
@@ -496,17 +499,17 @@ class DsTooltipContent extends StatelessWidget {
 /// the painter rule's reason: a rotated, rounded square is one rendered path,
 /// and rendering it as one is what lets a pixel pin hold it.
 class _ArrowPainter extends CustomPainter {
-  const _ArrowPainter({required this.color, this.side = DsTooltipSide.top});
+  const _ArrowPainter({required this.color, this.side = ElTooltipSide.top});
 
   final Color color;
 
   /// Which lane this is painting in, and therefore which way the diamond's
   /// centre is pushed out of it.
-  final DsTooltipSide side;
+  final ElTooltipSide side;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final double square = DsTooltip.arrowSize;
+    final double square = ElTooltip.arrowSize;
     // On `top` the pill is `align="center"` on its trigger and the arrow is
     // centred on the trigger too, so the two centres coincide — measured 344.5
     // against 344.63, an eighth of a pixel apart. On `right` the same holds one
@@ -515,14 +518,13 @@ class _ArrowPainter extends CustomPainter {
     // (352, 379) against a content box at x 350 and a centre line at 379)*.
     final Offset centre = switch (side) {
       // `translate-y-[calc(-50% - 2px)]`, measured from the lane's own top.
-      DsTooltipSide.top => Offset(size.width / 2, -DsRadii.xs),
-      DsTooltipSide.right =>
-        Offset(size.width + DsRadii.xs, size.height / 2),
+      ElTooltipSide.top => Offset(size.width / 2, -ElRadii.xs),
+      ElTooltipSide.right => Offset(size.width + ElRadii.xs, size.height / 2),
     };
 
     final RRect diamond = RRect.fromRectAndRadius(
       Rect.fromCenter(center: centre, width: square, height: square),
-      Radius.circular(DsTooltip.arrowRadius),
+      Radius.circular(ElTooltip.arrowRadius),
     );
     canvas
       ..save()
@@ -547,7 +549,7 @@ class _TooltipTransition extends StatelessWidget {
   const _TooltipTransition({
     required this.animation,
     required this.child,
-    this.side = DsTooltipSide.top,
+    this.side = ElTooltipSide.top,
   });
 
   final Animation<double> animation;
@@ -555,36 +557,36 @@ class _TooltipTransition extends StatelessWidget {
   /// `data-[side=top]:slide-in-from-bottom-2` against
   /// `data-[side=right]:slide-in-from-left-2` — the travel is always **toward**
   /// the trigger, so the axis follows the side.
-  final DsTooltipSide side;
+  final ElTooltipSide side;
 
   final Widget child;
 
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
-        animation: animation,
-        child: child,
-        builder: (BuildContext context, Widget? child) {
-          final double t = DsCurves.out.transform(animation.value.clamp(0, 1));
-          final bool entering = animation.status != AnimationStatus.reverse;
-          final double travel = entering ? DsTooltip.slide * (1 - t) : 0;
-          return Opacity(
-            opacity: t,
-            child: Transform.translate(
-              offset: switch (side) {
-                DsTooltipSide.top => Offset(0, travel),
-                DsTooltipSide.right => Offset(-travel, 0),
-              },
-              child: Transform.scale(
-                scale: _zoom + (1 - _zoom) * t,
-                // The edge of the box the trigger is on.
-                alignment: switch (side) {
-                  DsTooltipSide.top => Alignment.bottomCenter,
-                  DsTooltipSide.right => Alignment.centerLeft,
-                },
-                child: child,
-              ),
-            ),
-          );
-        },
+    animation: animation,
+    child: child,
+    builder: (BuildContext context, Widget? child) {
+      final double t = ElCurves.out.transform(animation.value.clamp(0, 1));
+      final bool entering = animation.status != AnimationStatus.reverse;
+      final double travel = entering ? ElTooltip.slide * (1 - t) : 0;
+      return Opacity(
+        opacity: t,
+        child: Transform.translate(
+          offset: switch (side) {
+            ElTooltipSide.top => Offset(0, travel),
+            ElTooltipSide.right => Offset(-travel, 0),
+          },
+          child: Transform.scale(
+            scale: _zoom + (1 - _zoom) * t,
+            // The edge of the box the trigger is on.
+            alignment: switch (side) {
+              ElTooltipSide.top => Alignment.bottomCenter,
+              ElTooltipSide.right => Alignment.centerLeft,
+            },
+            child: child,
+          ),
+        ),
       );
+    },
+  );
 }

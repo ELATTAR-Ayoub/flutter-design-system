@@ -9,21 +9,21 @@
     {
       "source": "lib/src/components/button.dart",
       "target": "@ui/button.dart",
-      "sha256": "43715b4c41a4d73f92b008fa87bdbfe4fe7e1315814305af1ebb59daf6c74263"
+      "sha256": "4fc23ce56b48be88d2b354d11d9525956856750abe83543558cd6c354671d47d"
     }
   ],
   "registryDependencies": [
-    "source-foundation",
-    "press-motion",
-    "icon",
-    "spinner",
     "foil-value",
     "machine-surface",
-    "sheen-action"
+    "sheen-action",
+    "source-foundation",
+    "spinner"
   ],
   "semanticDependencies": [
-    "press-motion",
-    "icon"
+    "foil-value",
+    "machine-surface",
+    "sheen-action",
+    "spinner"
   ],
   "pubDependencies": {},
   "assets": [],

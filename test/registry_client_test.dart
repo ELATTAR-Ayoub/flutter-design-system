@@ -361,6 +361,8 @@ String _payloadPath(String target) {
     '@foundation/',
     '@effects/',
     '@motion/',
+    '@assets/',
+    '@shaders/',
   ]) {
     if (target.startsWith(prefix)) return 'logical/${target.substring(1)}';
   }

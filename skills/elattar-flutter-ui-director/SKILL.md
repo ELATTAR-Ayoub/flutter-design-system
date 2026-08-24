@@ -1,20 +1,20 @@
 ---
 name: elattar-flutter-ui-director
-description: Direct production Flutter UI with Elattar's design system, in the design-system repository itself or in a consumer app that installed it with the elattar CLI. Use when designing, implementing, reviewing, or documenting Flutter screens, flows, dashboards, mobile navigation, component specimens, loading/empty/error/success feedback, responsive behavior, visual verification, or agent-console experiences that must use the local Ds* APIs and token source of truth.
+description: Direct production Flutter UI with Elattar's design system, in the design-system repository itself or in a consumer app that installed it with the elattar CLI. Use when designing, implementing, reviewing, or documenting Flutter screens, flows, dashboards, mobile navigation, component specimens, loading/empty/error/success feedback, responsive behavior, visual verification, or agent-console experiences that must use the local El* APIs and token source of truth.
 ---
 
 # Elattar Flutter Ui Director
 
 ## Workflow
 
-Build a coherent, useful interface from the existing Flutter design system. Treat it as implementation material, not inspiration: inspect public `Ds*` APIs, foundations, themes, effects, motion, and specimens before proposing a primitive.
+Build a coherent, useful interface from the existing Flutter design system. Treat it as implementation material, not inspiration: inspect public `El*` APIs, foundations, themes, effects, motion, and specimens before proposing a primitive.
 
 1. Resolve the project mode with Step 0 of [system-map.md](references/system-map.md) before reading or writing anything. **Consumer mode** (`elattar.yaml` / `.elattar/manifest.json`) and **repository mode** (`lib/elattar_design_system.dart`) put the system in different directories, and every path named below is the repository-mode name. Translate through that reference. If neither probe matches, say so and stop.
 2. Classify the work: product screen, package component, web-parity port, agent console, or review/fix. Name its primary action, critical states, and supported form factors.
 3. Inventory the relevant public APIs with the discovery commands for your mode in [system-map.md](references/system-map.md) — barrel, source, tests, and specimens. Do not guess a widget exists.
 4. Read [visual-direction.md](references/visual-direction.md), then state the dominant visual idea, hierarchy, and restrained supporting effect. Inspect any reference first; extract principles, never a branded copy.
 5. Read [state-accessibility.md](references/state-accessibility.md) and define normal, loading, empty, error, success, disabled, focus, and recovery states before writing widgets.
-6. Build product UI outside the system-owned component directory; reserve system components for reusable system behavior. Compose `Ds*` widgets and use Flutter layout only as a token-fed composition layer.
+6. Build product UI outside the system-owned component directory; reserve system components for reusable system behavior. Compose `El*` widgets and use Flutter layout only as a token-fed composition layer.
 7. Use [platform-contracts.md](references/platform-contracts.md) for adaptive layout, safe areas, themes, input, and motion. Use [agent-console.md](references/agent-console.md) for agent-facing work.
 8. Add or update a specimen/documentation route where the mode has one, plus focused widget tests. Run [verify.md](references/verify.md); render both themes and relevant widths. Report the mode, commands, captures, and limitations.
 
@@ -26,7 +26,7 @@ Paths in this section are repository-mode names. In consumer mode substitute
 barrels instead of the package — see [system-map.md](references/system-map.md).
 
 - Import the design system through the entry point your mode provides: `package:elattar_design_system/elattar_design_system.dart` in repository mode, the generated `lib/components/ui/ui.dart` and `lib/design_system/foundation.dart` barrels in consumer mode. Do not reach past either into private internals.
-- Make geometry from `ds(...)`, `DsWidths`, `DsContainers`, `DsBreakpoints`, component APIs, or derived constraints. Make color from `DsTheme.of(context)` / semantic variants; type from `DsText` and `DsType`; timing/curves from `DsDurations`, `DsCurves`, and motion widgets.
+- Make geometry from `el(...)`, `ElWidths`, `ElContainers`, `ElBreakpoints`, component APIs, or derived constraints. Make color from `ElTheme.of(context)` / semantic variants; type from `ElText` and `ElType`; timing/curves from `ElDurations`, `ElCurves`, and motion widgets.
 - Never add raw colors, font sizes/weights/tracking/leading, radii, shadows, stock Flutter curves, or `Duration` literals outside the foundation directory. Do not hide a visual literal behind a local constant; a guard escape hatch needs a proven external-integration reason. Repository mode enforces this with `test/token_guard_test.dart`; consumer mode has no guard, so apply the rule by review.
 - Prefer a semantic, stateful component over a styled `Container`, `Text`, `ElevatedButton`, or ad-hoc snackbar. Keep domain-specific composition outside the system component tree.
 - Use status variants only for their meaning. Keep one clear primary action. Do not change foundation tokens to solve a single screen or use `Theme.of(context)` as a parallel visual system.

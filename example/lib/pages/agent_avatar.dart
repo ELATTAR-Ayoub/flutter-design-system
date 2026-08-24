@@ -7,7 +7,7 @@
 /// **Two hundred and thirty-one cubes are in motion before the reader touches
 /// anything**, on nineteen different periods. Supervisor ruling F2 applies as
 /// it does on the feedback page: all of them build and all of them run, and the
-/// only gate is `dsAnimationDuration`.
+/// only gate is `elAnimationDuration`.
 ///
 /// ## What is page-local, and why
 ///
@@ -15,18 +15,18 @@
 /// the console family. It has exactly one consumer here, so it stays on this
 /// page on the B10 precedent: promotion to the package needs a second one.
 /// Its shimmer is `@utility anim-shimmer-text`, which is `pulls-shimmer` (the
-/// keyframes `DsSkeleton` already runs) at [DsDurations.shimmerText] over a
+/// keyframes `ElSkeleton` already runs) at [ElDurations.shimmerText] over a
 /// **three-stop, 100deg, 220%-wide** gradient clipped to the glyphs: a
 /// different utility from both `anim-shimmer` and the `shimmer` one
-/// `DsShimmerText` carries, and the reason it is spelled out rather than
+/// `ElShimmerText` carries, and the reason it is spelled out rather than
 /// reused.
 ///
-/// [_Matrix] is `components/ds/agent-demo.tsx`'s `AvatarMatrix` and
+/// [_Matrix] is `components/el/agent-demo.tsx`'s `AvatarMatrix` and
 /// [_Playground] its `AvatarPlayground`. Both are docs-side components in the
 /// reference too, and both are page-local grids rather than kit ones: the
 /// matrix is `grid-cols-2 sm:grid-cols-4 lg:grid-cols-5`, which is **none** of
 /// the kit's five column maps (`cols={5}` is `2 / 3 / 5`), so only the lattice
-/// frame is shared. That is what [DsStateGrid.columns] is for.
+/// frame is shared. That is what [ElStateGrid.columns] is for.
 ///
 /// ## Probes
 ///
@@ -41,7 +41,7 @@
 ///
 ///  1. **`--agent-cube-error-right` is one 8-bit step apart.**
 ///     `hsl(0 60% 75%)` puts the red channel on 0.9 × 255 = **229.5 exactly**;
-///     Chrome rounds it up to 230 and `dsHsl` down to 229. One channel of one
+///     Chrome rounds it up to 230 and `elHsl` down to 229. One channel of one
 ///     token, in the foundation's hsl conversion rather than in this family.
 ///     Nothing else in the twelve-token block differs at all.
 ///  2. **`scenes.ts`'s durations are rounded before the browser ever sees
@@ -118,12 +118,12 @@ class AgentAvatarPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsCategoryHit here = findCategory('agent', 'avatar');
+    final ElCategoryHit here = findCategory('agent', 'avatar');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        DsPageHeader(
+        ElPageHeader(
           // DRIFT 1: the group is already called "Agent".
           eyebrow: '${here.group.title} · Components',
           title: here.category.title,
@@ -134,8 +134,8 @@ class AgentAvatarPage extends StatelessWidget {
         // `className="mb-12"`, 48px, and the only Note on this page outside a
         // section, so the only one at the full 1080.
         Padding(
-          padding: EdgeInsets.only(bottom: ds(12)),
-          child: const DsNote(
+          padding: EdgeInsets.only(bottom: el(12)),
+          child: const ElNote(
             title: 'The agent acts, so the agent is blue',
             child: _BlueBody(),
           ),
@@ -147,7 +147,7 @@ class AgentAvatarPage extends StatelessWidget {
         const _OrbSection(),
         const _RendererSection(),
         const _ReducedMotionSection(),
-        const DsPageFootNav(groupId: 'agent', slug: 'avatar'),
+        const ElPageFootNav(groupId: 'agent', slug: 'avatar'),
       ],
     );
   }
@@ -158,30 +158,33 @@ class _BlueBody extends StatelessWidget {
   const _BlueBody();
 
   @override
-  Widget build(BuildContext context) => DsRichText(
-        TextSpan(
-          children: <InlineSpan>[
-            const TextSpan(
-              text: 'Rule 2 of the seven: blue acts, lime values. An agent '
-                  'doing work is an action, so every scene below is lit from ',
-            ),
-            DsCode.span('--agent-cube-accent'),
-            const TextSpan(
-              text: ', which points at the blue ramp. The accent’s top and '
-                  'right faces are mixed from that one value in ',
-            ),
-            DsCode.span('oklab'),
-            const TextSpan(text: ', so re-pointing a single line in '),
-            DsCode.span('globals.css'),
-            // DRIFT 5: nineteen scenes and one 3D cube.
-            const TextSpan(
-              text: ' recolours all twenty scenes correctly — three lit faces, '
-                  'not three unrelated colours.',
-            ),
-          ],
+  Widget build(BuildContext context) => ElRichText(
+    TextSpan(
+      children: <InlineSpan>[
+        const TextSpan(
+          text:
+              'Rule 2 of the seven: blue acts, lime values. An agent '
+              'doing work is an action, so every scene below is lit from ',
         ),
-        DsType.small,
-      );
+        ElCode.span('--agent-cube-accent'),
+        const TextSpan(
+          text:
+              ', which points at the blue ramp. The accent’s top and '
+              'right faces are mixed from that one value in ',
+        ),
+        ElCode.span('oklab'),
+        const TextSpan(text: ', so re-pointing a single line in '),
+        ElCode.span('globals.css'),
+        // DRIFT 5: nineteen scenes and one 3D cube.
+        const TextSpan(
+          text:
+              ' recolours all twenty scenes correctly — three lit faces, '
+              'not three unrelated colours.',
+        ),
+      ],
+    ),
+    ElType.small,
+  );
 }
 
 /* ── §1 · states ─────────────────────────────────────────────────────────── */
@@ -190,17 +193,17 @@ class _StatesSection extends StatelessWidget {
   const _StatesSection();
 
   @override
-  Widget build(BuildContext context) => const DsSection(
-        id: 'states',
-        title: 'Twenty states',
-        description:
-            "Taken from the avatar handoff's enum, so the vocabulary and the "
-            'artwork can never drift apart. The list is deliberately closed: a '
-            'caller who needs a state that is not here is describing something '
-            "the avatar cannot draw, and silently falling back to a generic "
-            "'working' is how a status indicator starts lying.",
-        child: _Matrix(),
-      );
+  Widget build(BuildContext context) => const ElSection(
+    id: 'states',
+    title: 'Twenty states',
+    description:
+        "Taken from the avatar handoff's enum, so the vocabulary and the "
+        'artwork can never drift apart. The list is deliberately closed: a '
+        'caller who needs a state that is not here is describing something '
+        "the avatar cannot draw, and silently falling back to a generic "
+        "'working' is how a status indicator starts lying.",
+    child: _Matrix(),
+  );
 }
 
 /// `AvatarMatrix`, *"Every state in the machine, drawn at once."*
@@ -219,30 +222,30 @@ class _Matrix extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
-    return DsStateGrid.columns(
+    final ElThemeData theme = ElTheme.of(context);
+    return ElStateGrid.columns(
       base: 2,
       sm: 4,
       lg: 5,
       children: <Widget>[
-        for (final DsAgentState state in DsAgentState.values)
-          DsStateCell.bare(
+        for (final ElAgentState state in ElAgentState.values)
+          ElStateCell.bare(
             // `p-5`, not the bare cell's own `p-4`.
-            padding: EdgeInsets.all(ds(5)),
+            padding: EdgeInsets.all(el(5)),
             child: Column(
               // `flex flex-col items-center gap-3`.
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                DsCubeAvatar(
+                ElCubeAvatar(
                   state: state,
-                  size: DsAgentAvatarSize.lg,
+                  size: ElAgentAvatarSize.lg,
                   accent: accent,
                 ),
-                SizedBox(height: ds(3)),
-                DsText(
+                SizedBox(height: el(3)),
+                ElText(
                   state.label,
-                  DsType.micro,
+                  ElType.micro,
                   color: theme.mutedForeground,
                   align: TextAlign.center,
                 ),
@@ -260,16 +263,16 @@ class _PlaygroundSection extends StatelessWidget {
   const _PlaygroundSection();
 
   @override
-  Widget build(BuildContext context) => const DsSection(
-        id: 'playground',
-        title: 'Face and status line',
-        description:
-            'The face never appears alone. Present participles with an '
-            'ellipsis for anything ongoing, bare words for the three resting '
-            'states — the punctuation is doing work, so a glance at the text '
-            'alone tells you whether to wait.',
-        child: _Playground(),
-      );
+  Widget build(BuildContext context) => const ElSection(
+    id: 'playground',
+    title: 'Face and status line',
+    description:
+        'The face never appears alone. Present participles with an '
+        'ellipsis for anything ongoing, bare words for the three resting '
+        'states — the punctuation is doing work, so a glance at the text '
+        'alone tells you whether to wait.',
+    child: _Playground(),
+  );
 }
 
 /// `AvatarPlayground`, *"The face plus its status line, cycling under the
@@ -282,11 +285,11 @@ class _Playground extends StatefulWidget {
 }
 
 class _PlaygroundState extends State<_Playground> {
-  DsAgentState _state = DsAgentState.thinking;
+  ElAgentState _state = ElAgentState.thinking;
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
 
     return Column(
       // `flex flex-col gap-6`.
@@ -295,35 +298,35 @@ class _PlaygroundState extends State<_Playground> {
         // `flex items-center gap-5 rounded-lg border border-border
         //  bg-background p-6`.
         Container(
-          padding: EdgeInsets.all(ds(6)),
+          padding: EdgeInsets.all(el(6)),
           decoration: BoxDecoration(
             color: theme.background,
-            borderRadius: BorderRadius.circular(DsRadii.lg),
-            border: Border.all(color: theme.border, width: DsWidths.hairline),
+            borderRadius: BorderRadius.circular(ElRadii.lg),
+            border: Border.all(color: theme.border, width: ElWidths.hairline),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              DsCubeAvatar(state: _state, size: DsAgentAvatarSize.xl),
-              SizedBox(width: ds(5)),
+              ElCubeAvatar(state: _state, size: ElAgentAvatarSize.xl),
+              SizedBox(width: el(5)),
               // `min-w-0` on the status line, so the label truncates rather
               // than pushing the row wider than the panel.
               Expanded(child: _StatusLine(state: _state)),
             ],
           ),
         ),
-        SizedBox(height: ds(6)),
+        SizedBox(height: el(6)),
         // `flex flex-wrap gap-2`.
         Wrap(
-          spacing: ds(2),
-          runSpacing: ds(2),
+          spacing: el(2),
+          runSpacing: el(2),
           children: <Widget>[
-            for (final DsAgentState s in DsAgentState.values)
-              DsButton(
-                size: DsButtonSize.sm,
+            for (final ElAgentState s in ElAgentState.values)
+              ElButton(
+                size: ElButtonSize.sm,
                 variant: s == _state
-                    ? DsButtonVariant.primary
-                    : DsButtonVariant.outline,
+                    ? ElButtonVariant.primary
+                    : ElButtonVariant.outline,
                 onPressed: () => setState(() => _state = s),
                 // DRIFT 3: the wire id, not the label.
                 child: Text(s.wire),
@@ -356,13 +359,13 @@ class _PlaygroundState extends State<_Playground> {
 /// * `background-clip: text` with `color: transparent` is a [ShaderMask] in
 ///   [BlendMode.srcIn] over the painted glyphs: the gradient shows *through*
 ///   the letters and nowhere else.
-/// * `pulls-shimmer` is [DsShimmer]'s own table, `200% 0 → −200% 0`, and a
+/// * `pulls-shimmer` is [ElShimmer]'s own table, `200% 0 → −200% 0`, and a
 ///   `background-position` percentage resolves against `container − image`. At
 ///   **220%** that is `−1.2W` per unit rather than `−W`, so the band travels
-///   `±2.4W` and not `±2W`; [DsShimmer.offsetAt] assumes the 200% tile, so the
+///   `±2.4W` and not `±2W`; [ElShimmer.offsetAt] assumes the 200% tile, so the
 ///   offset is computed here from the same two stops.
 /// * `background-repeat` defaults to `repeat`, so the box is never empty at the
-///   extremes: the same fact [DsSkeleton]'s own note records.
+///   extremes: the same fact [ElSkeleton]'s own note records.
 ///
 /// The gradient's `100deg` leans the band ten degrees off vertical. Over a
 /// 13.8px line box that is 2.4px of vertical run against ~130px of horizontal,
@@ -371,7 +374,7 @@ class _PlaygroundState extends State<_Playground> {
 class _StatusLine extends StatefulWidget {
   const _StatusLine({required this.state});
 
-  final DsAgentState state;
+  final ElAgentState state;
 
   /// `background-size: 220% 100%`.
   static const double tileFactor = 2.2;
@@ -390,7 +393,7 @@ class _StatusLineState extends State<_StatusLine>
     with SingleTickerProviderStateMixin {
   late final AnimationController _c = AnimationController(
     vsync: this,
-    duration: DsDurations.shimmerText,
+    duration: ElDurations.shimmerText,
   );
 
   @override
@@ -398,7 +401,7 @@ class _StatusLineState extends State<_StatusLine>
     super.didChangeDependencies();
     // `animation: none` under reduced motion, with no fill mode: so the band
     // reverts to stop 0 rather than holding wherever it was.
-    if (dsAnimationDuration(context, DsDurations.shimmerText) ==
+    if (elAnimationDuration(context, ElDurations.shimmerText) ==
         Duration.zero) {
       _c.stop();
       _c.value = 0;
@@ -415,10 +418,10 @@ class _StatusLineState extends State<_StatusLine>
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
-    final Widget label = DsText(
+    final ElThemeData theme = ElTheme.of(context);
+    final Widget label = ElText(
       widget.state.label,
-      DsType.chip,
+      ElType.chip,
       color: theme.mutedForeground,
       // `truncate`, `overflow:hidden white-space:nowrap text-overflow:ellipsis`.
       maxLines: 1,
@@ -437,18 +440,18 @@ class _StatusLineState extends State<_StatusLine>
         shaderCallback: (Rect bounds) {
           final double tile = bounds.width * _StatusLine.tileFactor;
           // `background-position: X%` puts the image's X% point on the box's
-          // X% point: `offset = (W − tileW) · X`. DsShimmer states the two
+          // X% point: `offset = (W − tileW) · X`. ElShimmer states the two
           // ends; only the tile factor differs.
-          final double eased = DsShimmer.curve.transform(_c.value);
-          final double percent = DsShimmer.fromPercent +
-              (DsShimmer.toPercent - DsShimmer.fromPercent) * eased;
+          final double eased = ElShimmer.curve.transform(_c.value);
+          final double percent =
+              ElShimmer.fromPercent +
+              (ElShimmer.toPercent - ElShimmer.fromPercent) * eased;
           final double offset = (bounds.width - tile) * percent;
           final double radians = _StatusLine.angleDegrees * math.pi / 180;
           // CSS gradient angles run clockwise from "to top", so the axis is
           // (sin θ, −cos θ) in a y-down space.
           final Offset axis = Offset(math.sin(radians), -math.cos(radians));
-          final Offset centre =
-              Offset(offset + tile / 2, bounds.height / 2);
+          final Offset centre = Offset(offset + tile / 2, bounds.height / 2);
           return ui.Gradient.linear(
             centre - axis * (tile / 2),
             centre + axis * (tile / 2),
@@ -470,49 +473,49 @@ class _SizesSection extends StatelessWidget {
   const _SizesSection();
 
   @override
-  Widget build(BuildContext context) => const DsSection(
-        id: 'sizes',
-        title: 'Sizes',
-        description:
-            'Four scales. The scene sizes itself within the box rather than '
-            'being transform-scaled, so strokes stay one pixel at every size.',
-        child: DsStateGrid(
-          children: <Widget>[
-            DsStateCell(
-              label: 'sm',
-              note: '32px · inline, beside a chip',
-              child: DsCubeAvatar(
-                state: DsAgentState.thinking,
-                size: DsAgentAvatarSize.sm,
-              ),
-            ),
-            DsStateCell(
-              label: 'md',
-              note: '48px · launcher, console header',
-              child: DsCubeAvatar(
-                state: DsAgentState.thinking,
-                size: DsAgentAvatarSize.md,
-              ),
-            ),
-            DsStateCell(
-              label: 'lg',
-              note: '80px · welcome card',
-              child: DsCubeAvatar(
-                state: DsAgentState.thinking,
-                size: DsAgentAvatarSize.lg,
-              ),
-            ),
-            DsStateCell(
-              label: 'xl',
-              note: '128px · empty state, hero',
-              child: DsCubeAvatar(
-                state: DsAgentState.thinking,
-                size: DsAgentAvatarSize.xl,
-              ),
-            ),
-          ],
+  Widget build(BuildContext context) => const ElSection(
+    id: 'sizes',
+    title: 'Sizes',
+    description:
+        'Four scales. The scene sizes itself within the box rather than '
+        'being transform-scaled, so strokes stay one pixel at every size.',
+    child: ElStateGrid(
+      children: <Widget>[
+        ElStateCell(
+          label: 'sm',
+          note: '32px · inline, beside a chip',
+          child: ElCubeAvatar(
+            state: ElAgentState.thinking,
+            size: ElAgentAvatarSize.sm,
+          ),
         ),
-      );
+        ElStateCell(
+          label: 'md',
+          note: '48px · launcher, console header',
+          child: ElCubeAvatar(
+            state: ElAgentState.thinking,
+            size: ElAgentAvatarSize.md,
+          ),
+        ),
+        ElStateCell(
+          label: 'lg',
+          note: '80px · welcome card',
+          child: ElCubeAvatar(
+            state: ElAgentState.thinking,
+            size: ElAgentAvatarSize.lg,
+          ),
+        ),
+        ElStateCell(
+          label: 'xl',
+          note: '128px · empty state, hero',
+          child: ElCubeAvatar(
+            state: ElAgentState.thinking,
+            size: ElAgentAvatarSize.xl,
+          ),
+        ),
+      ],
+    ),
+  );
 }
 
 /* ── §4 · accent ─────────────────────────────────────────────────────────── */
@@ -522,48 +525,48 @@ class _AccentSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsSection(
+    return ElSection(
       id: 'accent',
       title: 'One knob',
       description:
           'The accent is a prop, so one avatar set serves several products. '
           'Any CSS colour works — a token, a hex, a color-mix. This is the '
           'seam that makes the face rebrandable without touching a scene.',
-      child: DsStateGrid(
+      child: ElStateGrid(
         children: <Widget>[
-          const DsStateCell(
+          const ElStateCell(
             label: 'var(--agent)',
             note: 'the default',
-            child: DsCubeAvatar(
-              state: DsAgentState.callingTools,
-              size: DsAgentAvatarSize.lg,
+            child: ElCubeAvatar(
+              state: ElAgentState.callingTools,
+              size: ElAgentAvatarSize.lg,
             ),
           ),
-          DsStateCell(
+          ElStateCell(
             label: 'var(--color-value)',
             note: 'values, not actions',
-            child: DsCubeAvatar(
-              state: DsAgentState.callingTools,
-              size: DsAgentAvatarSize.lg,
-              accent: DsPalette.value,
+            child: ElCubeAvatar(
+              state: ElAgentState.callingTools,
+              size: ElAgentAvatarSize.lg,
+              accent: ElPalette.value,
             ),
           ),
-          DsStateCell(
+          ElStateCell(
             label: 'var(--color-success)',
             note: 'a different product',
-            child: DsCubeAvatar(
-              state: DsAgentState.callingTools,
-              size: DsAgentAvatarSize.lg,
-              accent: DsPalette.success,
+            child: ElCubeAvatar(
+              state: ElAgentState.callingTools,
+              size: ElAgentAvatarSize.lg,
+              accent: ElPalette.success,
             ),
           ),
-          DsStateCell(
+          ElStateCell(
             label: 'var(--color-info)',
             note: 'a different product',
-            child: DsCubeAvatar(
-              state: DsAgentState.callingTools,
-              size: DsAgentAvatarSize.lg,
-              accent: DsPalette.info,
+            child: ElCubeAvatar(
+              state: ElAgentState.callingTools,
+              size: ElAgentAvatarSize.lg,
+              accent: ElPalette.info,
             ),
           ),
         ],
@@ -579,7 +582,7 @@ class _OrbSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsSection(
+    return ElSection(
       id: 'orb',
       title: 'Voice orb',
       description:
@@ -589,14 +592,14 @@ class _OrbSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          const DsPanel(
+          const ElPanel(
             label: 'Orb',
             // DRIFT 8: the one caption in the system naming a renderer.
             note: 'three.js · reads --orb-from and --orb-to',
             child: _OrbWell(),
           ),
           // `className="type-small mt-6"`.
-          SizedBox(height: ds(6)),
+          SizedBox(height: el(6)),
           const _OrbNote(),
         ],
       ),
@@ -611,42 +614,43 @@ class _OrbWell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-        padding: EdgeInsets.symmetric(vertical: ds(8)),
-        child: const Center(
-          child: DsVoiceOrb(state: DsOrbState.idle, size: 160),
-        ),
-      );
+    padding: EdgeInsets.symmetric(vertical: el(8)),
+    child: const Center(child: ElVoiceOrb(state: ElOrbState.idle, size: 160)),
+  );
 }
 
 class _OrbNote extends StatelessWidget {
   const _OrbNote();
 
   @override
-  Widget build(BuildContext context) => DsRichText(
-        TextSpan(
-          children: <InlineSpan>[
-            const TextSpan(
-              text: 'A shader cannot resolve a CSS variable, so the wrapper '
-                  'reads ',
-            ),
-            DsCode.span('--orb-from'),
-            const TextSpan(text: ' and '),
-            DsCode.span('--orb-to'),
-            const TextSpan(text: ' through '),
-            DsCode.span('getComputedStyle'),
-            const TextSpan(
-              text: ' — which returns a real colour — and hands that to THREE. '
-                  'They are separate tokens from ',
-            ),
-            DsCode.span('--agent'),
-            const TextSpan(
-              text: ' so the orb can be tuned without moving the accent every '
-                  'icon uses.',
-            ),
-          ],
+  Widget build(BuildContext context) => ElRichText(
+    TextSpan(
+      children: <InlineSpan>[
+        const TextSpan(
+          text:
+              'A shader cannot resolve a CSS variable, so the wrapper '
+              'reads ',
         ),
-        DsType.small,
-      );
+        ElCode.span('--orb-from'),
+        const TextSpan(text: ' and '),
+        ElCode.span('--orb-to'),
+        const TextSpan(text: ' through '),
+        ElCode.span('getComputedStyle'),
+        const TextSpan(
+          text:
+              ' — which returns a real colour — and hands that to THREE. '
+              'They are separate tokens from ',
+        ),
+        ElCode.span('--agent'),
+        const TextSpan(
+          text:
+              ' so the orb can be tuned without moving the accent every '
+              'icon uses.',
+        ),
+      ],
+    ),
+    ElType.small,
+  );
 }
 
 /* ── §6 · renderer ───────────────────────────────────────────────────────── */
@@ -655,48 +659,51 @@ class _RendererSection extends StatelessWidget {
   const _RendererSection();
 
   @override
-  Widget build(BuildContext context) => const DsSection(
-        id: 'renderer',
-        title: 'The renderer contract',
-        description:
-            'The console never imports a specific avatar. It takes an '
-            'AvatarRenderer and calls it — which is what makes the face '
-            'genuinely swappable. A mascot, a video, a Lottie or a photograph '
-            'is one module satisfying this type, and nothing in the state '
-            'machine, the transcript or the transport moves.',
-        // DRIFT 4: four rows for a five-member type.
-        child: DsMeta(
-          items: <DsMetaItem>[
-            (
-              k: 'state',
-              v: TextSpan(
-                text: 'AgentState — the only required prop. Which of the '
-                    'twenty to draw.',
-              ),
-            ),
-            (
-              k: 'size?',
-              v: TextSpan(
-                text: '"sm" | "md" | "lg" | "xl" — a renderer may ignore this',
-              ),
-            ),
-            (
-              k: 'accent?',
-              v: TextSpan(
-                text: 'string — any CSS colour, passed through to '
-                    '--agent-cube-accent',
-              ),
-            ),
-            (
-              k: 'speed?',
-              v: TextSpan(
-                text: 'number — multiplier; every duration in the set divides '
-                    'by it',
-              ),
-            ),
-          ],
+  Widget build(BuildContext context) => const ElSection(
+    id: 'renderer',
+    title: 'The renderer contract',
+    description:
+        'The console never imports a specific avatar. It takes an '
+        'AvatarRenderer and calls it — which is what makes the face '
+        'genuinely swappable. A mascot, a video, a Lottie or a photograph '
+        'is one module satisfying this type, and nothing in the state '
+        'machine, the transcript or the transport moves.',
+    // DRIFT 4: four rows for a five-member type.
+    child: ElMeta(
+      items: <ElMetaItem>[
+        (
+          k: 'state',
+          v: TextSpan(
+            text:
+                'AgentState — the only required prop. Which of the '
+                'twenty to draw.',
+          ),
         ),
-      );
+        (
+          k: 'size?',
+          v: TextSpan(
+            text: '"sm" | "md" | "lg" | "xl" — a renderer may ignore this',
+          ),
+        ),
+        (
+          k: 'accent?',
+          v: TextSpan(
+            text:
+                'string — any CSS colour, passed through to '
+                '--agent-cube-accent',
+          ),
+        ),
+        (
+          k: 'speed?',
+          v: TextSpan(
+            text:
+                'number — multiplier; every duration in the set divides '
+                'by it',
+          ),
+        ),
+      ],
+    ),
+  );
 }
 
 /* ── §7 · reduced motion ─────────────────────────────────────────────────── */
@@ -705,16 +712,16 @@ class _ReducedMotionSection extends StatelessWidget {
   const _ReducedMotionSection();
 
   @override
-  Widget build(BuildContext context) => const DsSection(
-        id: 'reduced-motion',
-        title: 'Reduced motion is handled explicitly',
-        description: 'Not inherited, and this is the trap worth knowing about.',
-        child: DsNote(
-          tone: DsNoteTone.value,
-          title: 'Why the blanket rule is not enough',
-          child: _ReducedMotionBody(),
-        ),
-      );
+  Widget build(BuildContext context) => const ElSection(
+    id: 'reduced-motion',
+    title: 'Reduced motion is handled explicitly',
+    description: 'Not inherited, and this is the trap worth knowing about.',
+    child: ElNote(
+      tone: ElNoteTone.value,
+      title: 'Why the blanket rule is not enough',
+      child: _ReducedMotionBody(),
+    ),
+  );
 }
 
 /// `<em>end</em>` is the page's one italic run.
@@ -724,33 +731,36 @@ class _ReducedMotionBody extends StatelessWidget {
   const _ReducedMotionBody();
 
   @override
-  Widget build(BuildContext context) => DsRichText(
-        TextSpan(
-          children: <InlineSpan>[
-            const TextSpan(
-              text: 'The global reduced-motion rule collapses every animation '
-                  'to 0.01ms and one iteration, which for most things is a '
-                  'freeze at the final keyframe. But ',
-            ),
-            DsCode.span('appear'),
-            const TextSpan(text: ' and '),
-            DsCode.span('drop'),
-            const TextSpan(text: ' deliberately '),
-            const TextSpan(text: 'end', style: _em),
-            const TextSpan(
-              text: ' at opacity 0 — cubes arrive one by one and then hard-cut '
-                  'back, Game Boy logo style — so the blanket rule would '
-                  'freeze half these scenes to nothing at all. The handoff’s '
-                  'instruction is to fall back to the static cube layout, so '
-                  'that is stated in ',
-            ),
-            DsCode.span('globals.css'),
-            const TextSpan(
-              text: ' rather than inherited: no animation, everything visible, '
-                  'no transforms.',
-            ),
-          ],
+  Widget build(BuildContext context) => ElRichText(
+    TextSpan(
+      children: <InlineSpan>[
+        const TextSpan(
+          text:
+              'The global reduced-motion rule collapses every animation '
+              'to 0.01ms and one iteration, which for most things is a '
+              'freeze at the final keyframe. But ',
         ),
-        DsType.small,
-      );
+        ElCode.span('appear'),
+        const TextSpan(text: ' and '),
+        ElCode.span('drop'),
+        const TextSpan(text: ' deliberately '),
+        const TextSpan(text: 'end', style: _em),
+        const TextSpan(
+          text:
+              ' at opacity 0 — cubes arrive one by one and then hard-cut '
+              'back, Game Boy logo style — so the blanket rule would '
+              'freeze half these scenes to nothing at all. The handoff’s '
+              'instruction is to fall back to the static cube layout, so '
+              'that is stated in ',
+        ),
+        ElCode.span('globals.css'),
+        const TextSpan(
+          text:
+              ' rather than inherited: no animation, everything visible, '
+              'no transforms.',
+        ),
+      ],
+    ),
+    ElType.small,
+  );
 }

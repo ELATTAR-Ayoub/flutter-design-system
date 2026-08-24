@@ -1,54 +1,32 @@
-/// Documentation metadata for three small presentational primitives —
-/// `separator`, `empty`, and `kbd`: sharing one entry and one page.
+/// Documentation metadata for `separator` alone.
 ///
-/// Each is too small for a page of its own (a hairline rule, a six-part
-/// empty-state composition, and a key-cap label) and all three share one
-/// theme: static, almost stateless presentation, not control. Rather than
-/// three near-empty pages this entry documents all three together, the way
-/// `badge/meta.dart` documents one, [route] resolves to `/components/separator`
-/// because [name] is `separator`; `empty` and `kbd` are not separately
-/// routed.
+/// Previously this entry covered three components (`separator`, `empty`,
+/// `kbd`) on one merged page. That merge is undone: `empty` and `kbd` now
+/// have their own directories (`lib/components_docs/empty/`,
+/// `lib/components_docs/kbd/`) and their own [ComponentDocEntry]s. This file
+/// keeps the name `separatorDoc` and the route `/components/separator`
+/// unchanged, since `catalog.dart` and `main.dart` already reference both by
+/// name — only the content narrows to the one component the directory name
+/// promises.
 ///
-/// Not wired into `catalog.dart`'s `componentDocs` list: that file is
-/// supervisor-owned. `page.dart` reads [separatorDoc] directly rather than
-/// going through `componentDoc('separator')`, so this entry stands on its own
-/// until the supervisor aggregates it.
+/// Not wired into `catalog.dart`'s `componentDocs` list beyond the reference
+/// that already exists there: that file is supervisor-owned. `page.dart`
+/// reads [separatorDoc] directly rather than going through
+/// `componentDoc('separator')`.
 library;
 
 import '../catalog.dart' show ComponentDocEntry;
 
-/// None of the three has a `registry/components/*.json` manifest yet: see
-/// `page.dart`'s installation section for the honest disclosure.
-/// [dependencies] is left empty rather than naming items a manifest does not
-/// yet resolve; the page states in prose what each would need once
-/// registered (`source-foundation` for all three, `icon` for `empty`,
-/// `machine-surface` for `kbd`).
-///
-/// [sourcePath] names all three source files: one per line: since
-/// [ComponentDocEntry] has a single source-path field and this entry covers
-/// three components.
+/// `separator` has no `registry/components/separator.json` yet: see
+/// `page.dart`'s installation section for the shipped command and registry dependencies.
 const ComponentDocEntry separatorDoc = ComponentDocEntry(
   name: 'separator',
-  title: 'Separator, Empty & Kbd',
+  title: 'Separator',
   description:
-      'Three static, presentational primitives with almost no state of '
-      'their own: a hairline rule, a structured empty-state composition, '
-      'and a keyboard-key label.',
-  dependencies: <String>[],
-  exports: <String>[
-    'DsSeparator',
-    'DsSeparatorOrientation',
-    'DsEmpty',
-    'DsEmptyHeader',
-    'DsEmptyMedia',
-    'DsEmptyTitle',
-    'DsEmptyDescription',
-    'DsEmptyContent',
-    'DsKbd',
-    'DsKbdGroup',
-  ],
-  sourcePath:
-      'lib/src/components/separator.dart, '
-      'lib/src/components/empty.dart, '
-      'lib/src/components/kbd.dart',
+      'A 1px hairline rule with no length of its own on its long axis: '
+      'horizontal fills the parent width, vertical stretches to the '
+      'parent height.',
+  dependencies: <String>['source-foundation'],
+  exports: <String>['ElSeparator', 'ElSeparatorOrientation'],
+  sourcePath: 'lib/src/components/separator.dart',
 );

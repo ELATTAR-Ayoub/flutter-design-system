@@ -35,6 +35,27 @@ import 'textarea/meta.dart' as textarea;
 import 'toaster/meta.dart' as toaster;
 import 'toggle/meta.dart' as toggle;
 import 'tooltip/meta.dart' as tooltip;
+import 'aspect_ratio/meta.dart' as aspect_ratio;
+import 'button/meta.dart' as button;
+import 'button_group/meta.dart' as button_group;
+import 'combobox/meta.dart' as combobox;
+import 'context_menu/meta.dart' as context_menu;
+import 'drawer/meta.dart' as drawer;
+import 'rule/meta.dart' as rule;
+import 'empty/meta.dart' as empty;
+import 'form/meta.dart' as form;
+import 'hover_card/meta.dart' as hover_card;
+import 'input_otp/meta.dart' as input_otp;
+import 'item/meta.dart' as item;
+import 'kbd/meta.dart' as kbd;
+import 'marker/meta.dart' as marker;
+import 'menubar/meta.dart' as menubar;
+import 'nav_user/meta.dart' as nav_user;
+import 'resizable/meta.dart' as resizable;
+import 'selection_control/meta.dart' as selection_control;
+import 'skeleton/meta.dart' as skeleton;
+import 'spinner/meta.dart' as spinner;
+import 'toggle_group/meta.dart' as toggle_group;
 
 class ComponentDocEntry {
   const ComponentDocEntry({
@@ -54,18 +75,16 @@ class ComponentDocEntry {
   final String sourcePath;
 
   String get route => '/components/$name';
-  String get command => 'elattar add $name';
+  String get command => 'elattar add ${name.replaceAll('_', '-')}';
 }
 
 /// Every publicly documented component, alphabetical by [ComponentDocEntry.title].
 ///
-/// `button`, `input`, `card`, `dialog`, and `select` are declared inline here
-/// (Phase F) rather than as a per-component `meta.dart`, and stay that way —
-/// they are not migrated. Every other entry is a worker-owned `<name>Doc`
-/// const, imported with a prefix so none of the ~35 `meta.dart` files can
-/// collide by name; this file only ever reads those consts, never edits them.
+/// `input`, `card`, `dialog`, and `select` are declared inline here. Every
+/// other entry is a per-component `<name>Doc` const imported with a prefix so
+/// the metadata files cannot collide by name.
 ///
-/// `ds_rule` and `spinner` are meta-only (no `page.dart`) and are
+/// `rule` and `spinner` are meta-only (no `page.dart`) and are
 /// deliberately absent from this list: including them would synthesize a
 /// route and a search entry with nothing to render at the other end.
 const List<ComponentDocEntry> componentDocs = <ComponentDocEntry>[
@@ -75,29 +94,7 @@ const List<ComponentDocEntry> componentDocs = <ComponentDocEntry>[
   avatar.avatarDoc,
   badge.badgeDoc,
   breadcrumb.breadcrumbDoc,
-  ComponentDocEntry(
-    name: 'button',
-    title: 'Button',
-    description:
-        'Semantic actions with variants, sizes, loading, focus, and disabled behavior.',
-    dependencies: <String>[
-      'source-foundation',
-      'press-motion',
-      'icon',
-      'spinner',
-      'foil-value',
-      'machine-surface',
-      'sheen-action',
-    ],
-    exports: <String>[
-      'DsButton',
-      'DsButtonVariant',
-      'DsButtonSize',
-      'DsButtonEmphasis',
-      'DsButtonSurface',
-    ],
-    sourcePath: 'lib/src/components/button.dart',
-  ),
+  button.buttonDoc,
   calendar.calendarDoc,
   ComponentDocEntry(
     name: 'card',
@@ -106,12 +103,12 @@ const List<ComponentDocEntry> componentDocs = <ComponentDocEntry>[
         'A structured surface with header, action, content, and footer regions.',
     dependencies: <String>['source-foundation'],
     exports: <String>[
-      'DsCard',
-      'DsCardHeader',
-      'DsCardTitle',
-      'DsCardDescription',
-      'DsCardContent',
-      'DsCardFooter',
+      'ElCard',
+      'ElCardHeader',
+      'ElCardTitle',
+      'ElCardDescription',
+      'ElCardContent',
+      'ElCardFooter',
     ],
     sourcePath: 'lib/src/components/card.dart',
   ),
@@ -131,14 +128,14 @@ const List<ComponentDocEntry> componentDocs = <ComponentDocEntry>[
       'machine-surface',
     ],
     exports: <String>[
-      'DsDialog',
-      'DsDialogVariant',
-      'DsDialogContent',
-      'DsDialogHeader',
-      'DsDialogFooter',
-      'DsDialogTitle',
-      'DsDialogDescription',
-      'DsDialogMedia',
+      'ElDialog',
+      'ElDialogVariant',
+      'ElDialogContent',
+      'ElDialogHeader',
+      'ElDialogFooter',
+      'ElDialogTitle',
+      'ElDialogDescription',
+      'ElDialogMedia',
     ],
     sourcePath: 'lib/src/components/dialog.dart',
   ),
@@ -154,10 +151,10 @@ const List<ComponentDocEntry> componentDocs = <ComponentDocEntry>[
       'source-foundation',
       'button',
       'field',
-      'ds-rule',
+      'rule',
       'machine-surface',
     ],
-    exports: <String>['DsInput'],
+    exports: <String>['ElInput'],
     sourcePath: 'lib/src/components/input.dart',
   ),
   input_group.inputGroupDoc,
@@ -182,11 +179,11 @@ const List<ComponentDocEntry> componentDocs = <ComponentDocEntry>[
       'machine-surface',
     ],
     exports: <String>[
-      'DsSelect',
-      'DsSelectSize',
-      'DsSelectOption',
-      'DsSelectGroup',
-      'DsSelectSeparator',
+      'ElSelect',
+      'ElSelectSize',
+      'ElSelectOption',
+      'ElSelectGroup',
+      'ElSelectSeparator',
     ],
     sourcePath: 'lib/src/components/select.dart',
   ),
@@ -202,6 +199,26 @@ const List<ComponentDocEntry> componentDocs = <ComponentDocEntry>[
   toaster.toasterDoc,
   toggle.toggleDoc,
   tooltip.tooltipDoc,
+  aspect_ratio.aspectRatioDoc,
+  button_group.buttonGroupDoc,
+  combobox.comboboxDoc,
+  context_menu.contextMenuDoc,
+  drawer.drawerDoc,
+  rule.elRuleDoc,
+  empty.emptyDoc,
+  form.formDoc,
+  hover_card.hoverCardDoc,
+  input_otp.inputOtpDoc,
+  item.itemDoc,
+  kbd.kbdDoc,
+  marker.markerDoc,
+  menubar.menubarDoc,
+  nav_user.navUserDoc,
+  resizable.resizableDoc,
+  selection_control.selectionControlDoc,
+  skeleton.skeletonDoc,
+  spinner.spinnerDoc,
+  toggle_group.toggleGroupDoc,
 ];
 
 ComponentDocEntry? componentDocForRoute(String route) {

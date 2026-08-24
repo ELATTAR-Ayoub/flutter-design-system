@@ -1,29 +1,30 @@
-/// Documentation metadata for the `carousel`, `nav_user`, and `marker` components.
+/// Documentation metadata for the `carousel` component.
 ///
-/// Not wired into `catalog.dart`'s `componentDocs` list: that file is
-/// supervisor-owned. `page.dart` reads [carouselDoc], [navUserDoc], and
-/// [markerDoc] directly rather than going through `componentDoc()`, so
-/// these entries stand on their own until the supervisor aggregates them.
+/// **Split, 2026-08-24.** This directory used to carry three separately
+/// barrel-exported components on one page: `ElCarousel`, `ElNavUser`, and
+/// `ElMarker`. `nav_user` and `marker` now own
+/// `example/lib/components_docs/nav_user/` and
+/// `example/lib/components_docs/marker/`, each with its own `meta.dart` and
+/// `page.dart`. [carouselDoc] below is `ElCarousel` only; the two others are
+/// `navUserDoc` and `markerDoc`, in their own directories.
+///
+/// [carouselDoc] stays in `catalog.dart`'s `componentDocs` list, which is
+/// supervisor-owned: wiring the two new entries in is not this file's job.
 library;
 
 import '../catalog.dart' show ComponentDocEntry;
 
 /// `carousel` has no `registry/components/carousel.json` yet.
-/// [dependencies] is left empty rather than naming items a manifest does not yet resolve.
+/// [ComponentDocEntry.dependencies] is left empty rather than naming items a
+/// manifest does not yet resolve.
 const ComponentDocEntry carouselDoc = ComponentDocEntry(
   name: 'carousel',
-  title: 'Carousel, Nav User, Marker',
+  title: 'Carousel',
   description:
-      'A horizontal scrolling carousel with Embla physics, a sidebar account block, and a quiet separator row for lists.',
-  dependencies: <String>[],
-  exports: <String>[
-    'DsCarousel',
-    'DsCarouselController',
-    'DsNavUser',
-    'DsNavUserAccount',
-    'DsNavUserItem',
-    'DsMarker',
-    'DsMarkerVariant',
-  ],
+      'A horizontal snapping track driven by a reimplementation of Embla '
+      "Carousel's own integrator physics: drag it, click either arrow, or "
+      'press ArrowLeft/ArrowRight.',
+  dependencies: <String>['button', 'icon', 'source-foundation'],
+  exports: <String>['ElCarousel', 'ElCarouselController'],
   sourcePath: 'lib/src/components/carousel.dart',
 );

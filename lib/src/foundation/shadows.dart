@@ -7,7 +7,7 @@
 ///
 /// **The geometry is fixed; the ink is not.** Every colour below is an
 /// `--ink-*` / `--rim` / `--wall` variable that the theme blocks set, so each
-/// layer stores a `Color Function(DsThemeData)` rather than a colour. Light
+/// layer stores a `Color Function(ElThemeData)` rather than a colour. Light
 /// mode gets weaker, cooler, tighter ink and an inverted rim — same shapes,
 /// same names, same components.
 library;
@@ -25,8 +25,8 @@ import 'theme.dart';
 /// transcript of globals.css. The CSS→Skia blur conversion happens in
 /// [blurRadius], not here.
 @immutable
-class DsShadowLayer {
-  const DsShadowLayer(
+class ElShadowLayer {
+  const ElShadowLayer(
     this.dx,
     this.dy,
     this.blur,
@@ -48,10 +48,10 @@ class DsShadowLayer {
   final double spread;
 
   /// Resolved against the live theme — the whole point of the ink family.
-  final Color Function(DsThemeData) color;
+  final Color Function(ElThemeData) color;
 
   /// CSS `inset` keyword. Flutter has no inset-shadow primitive; these layers
-  /// are painted by `DsMachineSurface` (effects layer) instead of [BoxShadow].
+  /// are painted by `ElMachineSurface` (effects layer) instead of [BoxShadow].
   final bool inset;
 
   Offset get offset => Offset(dx, dy);
@@ -76,72 +76,74 @@ class DsShadowLayer {
     return radius > 0 ? radius : 0;
   }
 
-  BoxShadow toBoxShadow(DsThemeData theme) => BoxShadow(
-        color: color(theme),
-        offset: offset,
-        blurRadius: blurRadius,
-        spreadRadius: spread,
-      );
+  BoxShadow toBoxShadow(ElThemeData theme) => BoxShadow(
+    color: color(theme),
+    offset: offset,
+    blurRadius: blurRadius,
+    spreadRadius: spread,
+  );
 }
 
 /// A complete `--shadow-*` token: an ordered list of layers, painted
 /// bottom-most last exactly as CSS paints a comma-separated `box-shadow`.
 @immutable
-class DsShadowSpec {
-  const DsShadowSpec(this.layers);
+class ElShadowSpec {
+  const ElShadowSpec(this.layers);
 
-  final List<DsShadowLayer> layers;
+  final List<ElShadowLayer> layers;
 
   /// The non-`inset` layers, ready for `BoxDecoration.boxShadow`.
   ///
   /// CSS paints the first-listed shadow on top; Flutter paints
   /// `BoxDecoration.boxShadow` in list order, first-painted therefore
   /// bottom-most. The list is reversed so the stacking order matches.
-  List<BoxShadow> outerShadows(DsThemeData theme) => <BoxShadow>[
-        for (final DsShadowLayer layer in layers.reversed)
-          if (!layer.inset) layer.toBoxShadow(theme),
-      ];
+  List<BoxShadow> outerShadows(ElThemeData theme) => <BoxShadow>[
+    for (final ElShadowLayer layer in layers.reversed)
+      if (!layer.inset) layer.toBoxShadow(theme),
+  ];
 
-  /// The `inset` layers, for `DsMachineSurface` to paint inside the shape.
-  List<DsShadowLayer> get insetLayers =>
-      <DsShadowLayer>[for (final DsShadowLayer l in layers) if (l.inset) l];
+  /// The `inset` layers, for `ElMachineSurface` to paint inside the shape.
+  List<ElShadowLayer> get insetLayers => <ElShadowLayer>[
+    for (final ElShadowLayer l in layers)
+      if (l.inset) l,
+  ];
 
-  bool get hasInset => layers.any((DsShadowLayer l) => l.inset);
+  bool get hasInset => layers.any((ElShadowLayer l) => l.inset);
 }
 
 // ── Ink resolvers ───────────────────────────────────────────────────────────
 // Named functions rather than closures so every spec below reads like the CSS.
 
-Color _ink1(DsThemeData t) => t.ink1;
-Color _ink2(DsThemeData t) => t.ink2;
-Color _ink3(DsThemeData t) => t.ink3;
-Color _ink4(DsThemeData t) => t.ink4;
-Color _rim(DsThemeData t) => t.rim;
-Color _rimStrong(DsThemeData t) => t.rimStrong;
-Color _wall(DsThemeData t) => t.wall;
+Color _ink1(ElThemeData t) => t.ink1;
+Color _ink2(ElThemeData t) => t.ink2;
+Color _ink3(ElThemeData t) => t.ink3;
+Color _ink4(ElThemeData t) => t.ink4;
+Color _rim(ElThemeData t) => t.rim;
+Color _rimStrong(ElThemeData t) => t.rimStrong;
+Color _wall(ElThemeData t) => t.wall;
 
 /// `color-mix(in oklab, <ramp> N%, transparent)` — mixing toward `transparent`
 /// in premultiplied oklab preserves the hue and scales alpha, so it resolves to
 /// the ramp colour at N% alpha (design spec §3).
-Color _actionAt(double alpha) => DsPalette.action.withValues(alpha: alpha);
+Color _actionAt(double alpha) => ElPalette.action.withValues(alpha: alpha);
 Color _actionBrightAt(double alpha) =>
-    DsPalette.actionBright.withValues(alpha: alpha);
-Color _valueAt(double alpha) => DsPalette.value.withValues(alpha: alpha);
+    ElPalette.actionBright.withValues(alpha: alpha);
+Color _valueAt(double alpha) => ElPalette.value.withValues(alpha: alpha);
 
 /// Tailwind's own `shadow-lg` ink: `rgb(0 0 0 / 0.1)`, the same in both
 /// themes because it is not part of the `--ink-*` family.
-Color _tailwindShadowInk(DsThemeData t) => const Color(0x1A000000);
+Color _tailwindShadowInk(ElThemeData t) => const Color(0x1A000000);
 
 /// Every `--shadow-*` token in `app/globals.css` L354–387.
-class DsShadows {
-  const DsShadows._();
+class ElShadows {
+  const ElShadows._();
 
   /// `box-shadow: none` — an empty layer list.
   ///
   /// Not a token in globals.css; it is the absence of one, named so that a
   /// component with no elevation can still say which spec it paints instead
   /// of special-casing null.
-  static const DsShadowSpec none = DsShadowSpec(<DsShadowLayer>[]);
+  static const ElShadowSpec none = ElShadowSpec(<ElShadowLayer>[]);
 
   /// Tailwind's stock `shadow-lg`, carried because `SheetContent` asks for it
   /// by that name (`components/ui/sheet.tsx`) and `globals.css` never
@@ -150,9 +152,9 @@ class DsShadows {
   /// Deliberately outside the `e1`–`e4` ladder: it is not part of this
   /// system's elevation vocabulary, and calling it `e3` would launder a
   /// foreign value into the token set.
-  static const DsShadowSpec tailwindLg = DsShadowSpec(<DsShadowLayer>[
-    DsShadowLayer(0, 10, 15, -3, _tailwindShadowInk),
-    DsShadowLayer(0, 4, 6, -4, _tailwindShadowInk),
+  static const ElShadowSpec tailwindLg = ElShadowSpec(<ElShadowLayer>[
+    ElShadowLayer(0, 10, 15, -3, _tailwindShadowInk),
+    ElShadowLayer(0, 4, 6, -4, _tailwindShadowInk),
   ]);
 
   /// Tailwind's stock `shadow-md`, carried for the same reason as
@@ -165,9 +167,9 @@ class DsShadows {
   /// DOCUMENTED DRIFT (forms-map drift 16): it is the only elevation on the
   /// forms page not drawn from the `--shadow-*` token set — fixed black at
   /// 10%, with no theme response at all, under a popover whose fill flips.
-  static const DsShadowSpec tailwindMd = DsShadowSpec(<DsShadowLayer>[
-    DsShadowLayer(0, 4, 6, -1, _tailwindShadowInk),
-    DsShadowLayer(0, 2, 4, -2, _tailwindShadowInk),
+  static const ElShadowSpec tailwindMd = ElShadowSpec(<ElShadowLayer>[
+    ElShadowLayer(0, 4, 6, -1, _tailwindShadowInk),
+    ElShadowLayer(0, 2, 4, -2, _tailwindShadowInk),
   ]);
 
   /// Tailwind's stock `shadow-xl`, carried for the same reason as [tailwindLg]
@@ -182,9 +184,9 @@ class DsShadows {
   /// through a vendored shadcn component rather than through a design
   /// decision — which is why it stays outside the `e1`–`e4` ladder like the
   /// other two.
-  static const DsShadowSpec tailwindXl = DsShadowSpec(<DsShadowLayer>[
-    DsShadowLayer(0, 20, 25, -5, _tailwindShadowInk),
-    DsShadowLayer(0, 8, 10, -6, _tailwindShadowInk),
+  static const ElShadowSpec tailwindXl = ElShadowSpec(<ElShadowLayer>[
+    ElShadowLayer(0, 20, 25, -5, _tailwindShadowInk),
+    ElShadowLayer(0, 8, 10, -6, _tailwindShadowInk),
   ]);
 
   /// Tailwind's stock `shadow-sm`, the fourth foreign elevation and the
@@ -195,113 +197,113 @@ class DsShadows {
   /// what renders.
   ///
   /// `0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)`.
-  static const DsShadowSpec tailwindSm = DsShadowSpec(<DsShadowLayer>[
-    DsShadowLayer(0, 1, 3, 0, _tailwindShadowInk),
-    DsShadowLayer(0, 1, 2, -1, _tailwindShadowInk),
+  static const ElShadowSpec tailwindSm = ElShadowSpec(<ElShadowLayer>[
+    ElShadowLayer(0, 1, 3, 0, _tailwindShadowInk),
+    ElShadowLayer(0, 1, 2, -1, _tailwindShadowInk),
   ]);
 
   /// `--shadow-e1: 0 1px 1px var(--ink-2), 0 1px 3px var(--ink-1)`
-  static const DsShadowSpec e1 = DsShadowSpec(<DsShadowLayer>[
-    DsShadowLayer(0, 1, 1, 0, _ink2),
-    DsShadowLayer(0, 1, 3, 0, _ink1),
+  static const ElShadowSpec e1 = ElShadowSpec(<ElShadowLayer>[
+    ElShadowLayer(0, 1, 1, 0, _ink2),
+    ElShadowLayer(0, 1, 3, 0, _ink1),
   ]);
 
   /// `--shadow-e2: 0 1px 2px var(--ink-2), 0 4px 10px -2px var(--ink-2)`
-  static const DsShadowSpec e2 = DsShadowSpec(<DsShadowLayer>[
-    DsShadowLayer(0, 1, 2, 0, _ink2),
-    DsShadowLayer(0, 4, 10, -2, _ink2),
+  static const ElShadowSpec e2 = ElShadowSpec(<ElShadowLayer>[
+    ElShadowLayer(0, 1, 2, 0, _ink2),
+    ElShadowLayer(0, 4, 10, -2, _ink2),
   ]);
 
   /// `--shadow-e3: 0 2px 4px var(--ink-2), 0 14px 28px -8px var(--ink-3)`
-  static const DsShadowSpec e3 = DsShadowSpec(<DsShadowLayer>[
-    DsShadowLayer(0, 2, 4, 0, _ink2),
-    DsShadowLayer(0, 14, 28, -8, _ink3),
+  static const ElShadowSpec e3 = ElShadowSpec(<ElShadowLayer>[
+    ElShadowLayer(0, 2, 4, 0, _ink2),
+    ElShadowLayer(0, 14, 28, -8, _ink3),
   ]);
 
   /// `--shadow-e4: 0 4px 8px var(--ink-3), 0 28px 56px -14px var(--ink-4)`
-  static const DsShadowSpec e4 = DsShadowSpec(<DsShadowLayer>[
-    DsShadowLayer(0, 4, 8, 0, _ink3),
-    DsShadowLayer(0, 28, 56, -14, _ink4),
+  static const ElShadowSpec e4 = ElShadowSpec(<ElShadowLayer>[
+    ElShadowLayer(0, 4, 8, 0, _ink3),
+    ElShadowLayer(0, 28, 56, -14, _ink4),
   ]);
 
   /// `--shadow-key: 0 4px 0 var(--wall), 0 7px 12px var(--ink-3)`
   /// Raised key with a side wall — travels down into its socket when pressed.
-  static const DsShadowSpec key = DsShadowSpec(<DsShadowLayer>[
-    DsShadowLayer(0, 4, 0, 0, _wall),
-    DsShadowLayer(0, 7, 12, 0, _ink3),
+  static const ElShadowSpec key = ElShadowSpec(<ElShadowLayer>[
+    ElShadowLayer(0, 4, 0, 0, _wall),
+    ElShadowLayer(0, 7, 12, 0, _ink3),
   ]);
 
   /// `--shadow-key-down: 0 1px 0 var(--wall), inset 0 2px 5px var(--ink-3)`
-  static const DsShadowSpec keyDown = DsShadowSpec(<DsShadowLayer>[
-    DsShadowLayer(0, 1, 0, 0, _wall),
-    DsShadowLayer(0, 2, 5, 0, _ink3, inset: true),
+  static const ElShadowSpec keyDown = ElShadowSpec(<ElShadowLayer>[
+    ElShadowLayer(0, 1, 0, 0, _wall),
+    ElShadowLayer(0, 2, 5, 0, _ink3, inset: true),
   ]);
 
   /// `--shadow-pressed: inset 0 2px 5px var(--ink-3), inset 0 1px 2px var(--ink-4)`
   /// Sunken socket. Inputs sit in one of these.
-  static const DsShadowSpec pressed = DsShadowSpec(<DsShadowLayer>[
-    DsShadowLayer(0, 2, 5, 0, _ink3, inset: true),
-    DsShadowLayer(0, 1, 2, 0, _ink4, inset: true),
+  static const ElShadowSpec pressed = ElShadowSpec(<ElShadowLayer>[
+    ElShadowLayer(0, 2, 5, 0, _ink3, inset: true),
+    ElShadowLayer(0, 1, 2, 0, _ink4, inset: true),
   ]);
 
   /// `--shadow-btn: inset 0 1px 0 var(--rim), inset 0 -2px 4px var(--ink-2),`
   /// `0 1px 2px var(--ink-2), 0 3px 8px -2px var(--ink-2)`
-  static const DsShadowSpec btn = DsShadowSpec(<DsShadowLayer>[
-    DsShadowLayer(0, 1, 0, 0, _rim, inset: true),
-    DsShadowLayer(0, -2, 4, 0, _ink2, inset: true),
-    DsShadowLayer(0, 1, 2, 0, _ink2),
-    DsShadowLayer(0, 3, 8, -2, _ink2),
+  static const ElShadowSpec btn = ElShadowSpec(<ElShadowLayer>[
+    ElShadowLayer(0, 1, 0, 0, _rim, inset: true),
+    ElShadowLayer(0, -2, 4, 0, _ink2, inset: true),
+    ElShadowLayer(0, 1, 2, 0, _ink2),
+    ElShadowLayer(0, 3, 8, -2, _ink2),
   ]);
 
   /// `--shadow-btn-primary: inset 0 1px 0 var(--rim-strong),`
   /// `inset 0 -2px 5px var(--ink-2), 0 1px 2px var(--ink-2),`
   /// `0 4px 10px -2px color-mix(in oklab, var(--color-action) 55%, transparent)`
-  static final DsShadowSpec btnPrimary = DsShadowSpec(<DsShadowLayer>[
-    const DsShadowLayer(0, 1, 0, 0, _rimStrong, inset: true),
-    const DsShadowLayer(0, -2, 5, 0, _ink2, inset: true),
-    const DsShadowLayer(0, 1, 2, 0, _ink2),
-    DsShadowLayer(0, 4, 10, -2, (_) => _actionAt(0.55)),
+  static final ElShadowSpec btnPrimary = ElShadowSpec(<ElShadowLayer>[
+    const ElShadowLayer(0, 1, 0, 0, _rimStrong, inset: true),
+    const ElShadowLayer(0, -2, 5, 0, _ink2, inset: true),
+    const ElShadowLayer(0, 1, 2, 0, _ink2),
+    ElShadowLayer(0, 4, 10, -2, (_) => _actionAt(0.55)),
   ]);
 
   /// `--shadow-btn-value: inset 0 1px 0 var(--rim-strong),`
   /// `inset 0 -2px 5px var(--ink-1), 0 1px 2px var(--ink-2),`
   /// `0 4px 10px -2px color-mix(in oklab, var(--color-value) 45%, transparent)`
-  static final DsShadowSpec btnValue = DsShadowSpec(<DsShadowLayer>[
-    const DsShadowLayer(0, 1, 0, 0, _rimStrong, inset: true),
-    const DsShadowLayer(0, -2, 5, 0, _ink1, inset: true),
-    const DsShadowLayer(0, 1, 2, 0, _ink2),
-    DsShadowLayer(0, 4, 10, -2, (_) => _valueAt(0.45)),
+  static final ElShadowSpec btnValue = ElShadowSpec(<ElShadowLayer>[
+    const ElShadowLayer(0, 1, 0, 0, _rimStrong, inset: true),
+    const ElShadowLayer(0, -2, 5, 0, _ink1, inset: true),
+    const ElShadowLayer(0, 1, 2, 0, _ink2),
+    ElShadowLayer(0, 4, 10, -2, (_) => _valueAt(0.45)),
   ]);
 
   /// `--shadow-btn-down: inset 0 2px 4px var(--ink-3), 0 1px 1px var(--ink-1)`
-  static const DsShadowSpec btnDown = DsShadowSpec(<DsShadowLayer>[
-    DsShadowLayer(0, 2, 4, 0, _ink3, inset: true),
-    DsShadowLayer(0, 1, 1, 0, _ink1),
+  static const ElShadowSpec btnDown = ElShadowSpec(<ElShadowLayer>[
+    ElShadowLayer(0, 2, 4, 0, _ink3, inset: true),
+    ElShadowLayer(0, 1, 1, 0, _ink1),
   ]);
 
   /// `--shadow-chip: inset 0 1px 0 var(--rim), inset 0 -1px 2px var(--ink-2),`
   /// `0 1px 2px var(--ink-2)`
-  static const DsShadowSpec chip = DsShadowSpec(<DsShadowLayer>[
-    DsShadowLayer(0, 1, 0, 0, _rim, inset: true),
-    DsShadowLayer(0, -1, 2, 0, _ink2, inset: true),
-    DsShadowLayer(0, 1, 2, 0, _ink2),
+  static const ElShadowSpec chip = ElShadowSpec(<ElShadowLayer>[
+    ElShadowLayer(0, 1, 0, 0, _rim, inset: true),
+    ElShadowLayer(0, -1, 2, 0, _ink2, inset: true),
+    ElShadowLayer(0, 1, 2, 0, _ink2),
   ]);
 
   /// `--shadow-glow-action:`
   /// `0 0 0 1px color-mix(in oklab, var(--color-action-bright) 45%, transparent),`
   /// `0 10px 34px -8px color-mix(in oklab, var(--color-action) 60%, transparent)`
   /// Rationed glow — selection and reward only.
-  static final DsShadowSpec glowAction = DsShadowSpec(<DsShadowLayer>[
-    DsShadowLayer(0, 0, 0, 1, (_) => _actionBrightAt(0.45)),
-    DsShadowLayer(0, 10, 34, -8, (_) => _actionAt(0.60)),
+  static final ElShadowSpec glowAction = ElShadowSpec(<ElShadowLayer>[
+    ElShadowLayer(0, 0, 0, 1, (_) => _actionBrightAt(0.45)),
+    ElShadowLayer(0, 10, 34, -8, (_) => _actionAt(0.60)),
   ]);
 
   /// `--shadow-glow-value:`
   /// `0 0 0 1px color-mix(in oklab, var(--color-value) 45%, transparent),`
   /// `0 10px 34px -8px color-mix(in oklab, var(--color-value) 42%, transparent)`
-  static final DsShadowSpec glowValue = DsShadowSpec(<DsShadowLayer>[
-    DsShadowLayer(0, 0, 0, 1, (_) => _valueAt(0.45)),
-    DsShadowLayer(0, 10, 34, -8, (_) => _valueAt(0.42)),
+  static final ElShadowSpec glowValue = ElShadowSpec(<ElShadowLayer>[
+    ElShadowLayer(0, 0, 0, 1, (_) => _valueAt(0.45)),
+    ElShadowLayer(0, 10, 34, -8, (_) => _valueAt(0.42)),
   ]);
 
   /// `@keyframes pulls-pulse-live` (globals.css L2521–2530) — the expanding
@@ -322,15 +324,15 @@ class DsShadows {
   /// (`#10b981`) or any other member of the palette — so it is transcribed
   /// here, in the one layer allowed to hold a literal, rather than laundered
   /// into a token the stylesheet does not have.
-  static DsShadowSpec pulseLiveRing(double t) => DsShadowSpec(<DsShadowLayer>[
-        DsShadowLayer(
-          0,
-          0,
-          0,
-          _pulseLiveSpread * t,
-          (_) => _pulseLiveInk.withValues(alpha: _pulseLiveAlpha * (1 - t)),
-        ),
-      ]);
+  static ElShadowSpec pulseLiveRing(double t) => ElShadowSpec(<ElShadowLayer>[
+    ElShadowLayer(
+      0,
+      0,
+      0,
+      _pulseLiveSpread * t,
+      (_) => _pulseLiveInk.withValues(alpha: _pulseLiveAlpha * (1 - t)),
+    ),
+  ]);
 
   /// `rgba(61, 220, 151, …)`.
   static const Color _pulseLiveInk = Color(0xFF3DDC97);

@@ -2,7 +2,7 @@
 ///
 /// Content contract: `docs/superpowers/plans/2026-08-21-public-website-ui-
 /// information-architecture.md` section 7.4. Covers what Elattar is,
-/// source-first ownership, composition through public `Ds*` APIs, registry
+/// source-first ownership, composition through public `El*` APIs, registry
 /// and CLI distribution, defaults, platform support, the agent skill, and a
 /// comparison of the three install modes: package, source foundation, and
 /// package foundation.
@@ -38,15 +38,15 @@ class IntroductionDocsPage extends StatelessWidget {
           'visible, every component is executable, and every useful '
           'artifact can be installed or owned as source.',
     ),
-    breadcrumbs: const <DsBreadcrumbEntry>[
-      DsBreadcrumbEntry.link('Docs'),
-      DsBreadcrumbEntry.page('Introduction'),
+    breadcrumbs: const <ElBreadcrumbEntry>[
+      ElBreadcrumbEntry.link('Docs'),
+      ElBreadcrumbEntry.page('Introduction'),
     ],
     toc: const <DocsTocEntry>[
       DocsTocEntry(title: 'What this is', anchor: 'overview'),
       DocsTocEntry(title: 'Source-first ownership', anchor: 'ownership'),
       DocsTocEntry(
-        title: 'Composition through Ds* APIs',
+        title: 'Composition through El* APIs',
         anchor: 'composition',
       ),
       DocsTocEntry(
@@ -69,7 +69,7 @@ class _IntroductionArticle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return Column(
       key: const ValueKey<String>('introduction-doc-article'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -86,13 +86,13 @@ class _IntroductionArticle extends StatelessWidget {
     );
   }
 
-  Widget _prose(String text, DsThemeData theme, {DsTypeSpec? spec}) =>
+  Widget _prose(String text, ElThemeData theme, {ElTypeSpec? spec}) =>
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: DsWidths.prose),
-        child: DsText(text, spec ?? DsType.body),
+        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+        child: ElText(text, spec ?? ElType.body),
       );
 
-  Widget _overview(DsThemeData theme) => DsSection(
+  Widget _overview(ElThemeData theme) => ElSection(
     id: 'overview',
     title: 'What this is',
     child: Column(
@@ -101,12 +101,12 @@ class _IntroductionArticle extends StatelessWidget {
         _prose(
           'Elattar is a Flutter design system: a package of semantic '
           'foundation tokens (color, type, spacing, radii, shadows, motion) '
-          'and public Ds* components built on top of them, plus a '
+          'and public El* components built on top of them, plus a '
           'source-first registry and CLI that let a Flutter project take a '
           'copy of that code instead of only depending on it.',
           theme,
         ),
-        SizedBox(height: ds(3)),
+        SizedBox(height: el(3)),
         _prose(
           'It targets Flutter developers evaluating the system, product '
           'teams installing components into an existing application, '
@@ -118,7 +118,7 @@ class _IntroductionArticle extends StatelessWidget {
     ),
   );
 
-  Widget _ownership(DsThemeData theme) => DsSection(
+  Widget _ownership(ElThemeData theme) => ElSection(
     id: 'ownership',
     title: 'Source-first ownership',
     description:
@@ -137,7 +137,7 @@ class _IntroductionArticle extends StatelessWidget {
           'need. There is no framework watching for drift back to upstream.',
           theme,
         ),
-        SizedBox(height: ds(3)),
+        SizedBox(height: el(3)),
         _prose(
           'This is the opposite trade from a typical UI package. A package '
           'dependency stays a black box you configure through the '
@@ -151,12 +151,12 @@ class _IntroductionArticle extends StatelessWidget {
     ),
   );
 
-  Widget _composition(DsThemeData theme) => DsSection(
+  Widget _composition(ElThemeData theme) => ElSection(
     id: 'composition',
-    title: 'Composition through public Ds* APIs',
+    title: 'Composition through public El* APIs',
     child: _prose(
       'Every component, effect, and motion primitive is reached through a '
-      'public Ds-prefixed class: DsButton, DsCard, DsSidebar, DsToaster, '
+      'public El-prefixed class: ElButton, ElCard, ElSidebar, ElToaster, '
       'and so on, exported from the package barrel '
       '(package:elattar_design_system/elattar_design_system.dart) or, once '
       'copied, from a project-local lib/components/ui/ui.dart barrel the '
@@ -167,7 +167,7 @@ class _IntroductionArticle extends StatelessWidget {
     ),
   );
 
-  Widget _distribution(DsThemeData theme) => DsSection(
+  Widget _distribution(ElThemeData theme) => ElSection(
     id: 'distribution',
     title: 'Registry and CLI distribution',
     child: Column(
@@ -175,27 +175,28 @@ class _IntroductionArticle extends StatelessWidget {
       children: <Widget>[
         _prose(
           'registry/generated/latest/ is a generated, sha256-verified '
-          'manifest of every installable item, 17 today: 12 components, 3 '
-          'effects, 1 motion primitive, and 1 foundation bundle. '
+          'manifest of every registry item, 99 today: 84 components, 9 '
+          'effects, 5 motion primitives, and 1 foundation bundle. '
           'packages/elattar_cli reads that manifest, resolves an item\'s '
           'transitive registryDependencies, and writes the resulting files, '
           'assets, and font registrations into a consumer project. See CLI '
           'and Registry for the full command surface and item schema.',
           theme,
         ),
-        SizedBox(height: ds(3)),
-        _prose(
-          'Neither the CLI nor the registry is published to an external '
-          'index yet. See Installation for exactly what that means and '
-          'what running them today actually requires.',
-          theme,
-          spec: DsType.small,
+        SizedBox(height: el(4)),
+        ElAlert(
+          variant: ElAlertVariant.info,
+          icon: const ElIcon(ElIconGlyph.info),
+          title: 'Not published to an external index yet',
+          description:
+              'See Installation for exactly what that means and what '
+              'running them today actually requires.',
         ),
       ],
     ),
   );
 
-  Widget _defaults(DsThemeData theme) => DsSection(
+  Widget _defaults(ElThemeData theme) => ElSection(
     id: 'defaults',
     title: 'Beautiful, coherent defaults',
     child: _prose(
@@ -210,7 +211,7 @@ class _IntroductionArticle extends StatelessWidget {
     ),
   );
 
-  Widget _platforms(DsThemeData theme) => DsSection(
+  Widget _platforms(ElThemeData theme) => ElSection(
     id: 'platforms',
     title: 'Flutter platform support',
     child: _prose(
@@ -224,12 +225,12 @@ class _IntroductionArticle extends StatelessWidget {
     ),
   );
 
-  Widget _skill(DsThemeData theme) => DsSection(
+  Widget _skill(ElThemeData theme) => ElSection(
     id: 'skill',
     title: 'AI-ready skill and open code',
     child: _prose(
       'This repository carries a coding-agent skill that teaches an agent '
-      'to discover the public Ds* surface, resolve values from tokens '
+      'to discover the public El* surface, resolve values from tokens '
       'instead of inventing them, and cover states and accessibility before '
       'calling a change done. It ships in the repository itself, no '
       'separate install step is needed to use it against a checkout, and '
@@ -241,7 +242,7 @@ class _IntroductionArticle extends StatelessWidget {
     ),
   );
 
-  Widget _modes(DsThemeData theme) => DsSection(
+  Widget _modes(ElThemeData theme) => ElSection(
     id: 'modes',
     title: 'Package versus CLI ownership',
     description:
@@ -258,7 +259,7 @@ class _IntroductionArticle extends StatelessWidget {
               type: 'dependency',
               description:
                   'Add elattar_design_system as a git or path dependency '
-                  'and import Ds* widgets directly. You own no local files; '
+                  'and import El* widgets directly. You own no local files; '
                   'every token and widget lives in the dependency. '
                   'Available today, see Installation.',
             ),

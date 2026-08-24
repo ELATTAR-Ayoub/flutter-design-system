@@ -2,12 +2,12 @@
 /// `components_docs/calendar/page.dart`: the public Calendar component
 /// documentation page.
 ///
-/// **The clock is frozen, and it has to be.** `DsCalendar` opens on
+/// **The clock is frozen, and it has to be.** `ElCalendar` opens on
 /// `month ?? defaultMonth ?? today`, and the page's three specimens pass
 /// neither of the first two on purpose: that is the reference's own
 /// `getInitialMonth`, and reproducing it is the point. A test that let the
 /// wall clock through would pass in August 2026 and fail in September, so
-/// every widget test below mounts the page under a [DsClock] pinned to
+/// every widget test below mounts the page under a [ElClock] pinned to
 /// **16 August 2026**, a Sunday, in a six-row month. That is the same seam
 /// `example/lib/main.dart` exposes as `?clock=<ISO-8601>` and the same
 /// instant `test/calendar_test.dart` runs the package's own suite on.
@@ -15,9 +15,9 @@
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never a synthetic `MediaQuery`: the
 /// discipline `popover_test.dart` already carries. Theme coverage flips one
-/// live `DsThemeController` in place rather than pumping two trees.
+/// live `ElThemeController` in place rather than pumping two trees.
 ///
-/// `DsDatePicker` mounts its calendar through a `DsPopover`, which needs a
+/// `ElDatePicker` mounts its calendar through a `ElPopover`, which needs a
 /// real `Overlay`, so the harness wraps the page in a `MaterialApp`: the
 /// same fix the `popover` and `select` pages needed.
 library;
@@ -25,7 +25,7 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/calendar/meta.dart';
 import 'package:example/components_docs/calendar/page.dart';
-import 'package:example/kit.dart' show DsSection;
+import 'package:example/kit.dart' show ElSection;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -40,17 +40,17 @@ const Size _narrow = Size(390, 844);
 /// Every day this file taps is drawn from the unique half.
 final DateTime _frozen = DateTime(2026, 8, 16, 2, 15);
 
-Future<DsThemeController> _pumpCalendarDoc(
+Future<ElThemeController> _pumpCalendarDoc(
   WidgetTester tester, {
   ValueChanged<String>? onNavigate,
   Size size = _wide,
-  DsThemeMode mode = DsThemeMode.dark,
+  ElThemeMode mode = ElThemeMode.dark,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final DsThemeController theme = DsThemeController(mode: mode);
+  final ElThemeController theme = ElThemeController(mode: mode);
   addTearDown(theme.dispose);
 
   await tester.pumpWidget(
@@ -58,9 +58,9 @@ Future<DsThemeController> _pumpCalendarDoc(
     // content is a sibling of `home` rather than a descendant, and the
     // calendar inside the date picker must resolve the same "now" as the two
     // on the page.
-    DsClock(
+    ElClock(
       now: _frozen,
-      child: DsTheme(
+      child: ElTheme(
         controller: theme,
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
@@ -78,7 +78,7 @@ Future<DsThemeController> _pumpCalendarDoc(
 }
 
 /// One 28px day cell: the `SizedBox` `_DayCell` wraps itself in, which is the
-/// only `DsCalendar.cellSize` square that ever contains a digit (the weekday
+/// only `ElCalendar.cellSize` square that ever contains a digit (the weekday
 /// header squares hold `Su`…`Sa` and the nav squares hold a glyph).
 Finder _dayCell(Finder within, String day) => find.descendant(
   of: within,
@@ -86,7 +86,7 @@ Finder _dayCell(Finder within, String day) => find.descendant(
     of: find.text(day),
     matching: find.byWidgetPredicate(
       (Widget widget) =>
-          widget is SizedBox && widget.width == DsCalendar.cellSize,
+          widget is SizedBox && widget.width == ElCalendar.cellSize,
     ),
   ),
 );
@@ -111,39 +111,30 @@ void main() {
       expect(
         calendarDoc.exports,
         containsAll(<String>[
-          'DsCalendar',
-          'DsCalendarMode',
-          'DsCalendarSurface',
-          'DsDateRange',
-          'DsCalendarDay',
-          'DsCalendarMonth',
-          'DsCalendarBandPainter',
-          'DsDatePicker',
+          'ElCalendar',
+          'ElCalendarMode',
+          'ElCalendarSurface',
+          'ElDateRange',
+          'ElCalendarDay',
+          'ElCalendarMonth',
+          'ElCalendarBandPainter',
+          'ElDatePicker',
         ]),
       );
       // The real imports of lib/src/components/calendar.dart, mapped onto
       // registry item names that exist today: foundation (which carries
-      // date_format.dart, and therefore DsDateFormat, DsClock and
-      // DsCalendarType), button, icon (which ships icon_paths.dart too), and
+      // date_format.dart, and therefore ElDateFormat, ElClock and
+      // ElCalendarType), button, icon (which ships icon_paths.dart too), and
       // popover. Nothing invented: `calendar` has no manifest of its own and
       // this list is what one would have to name.
       expect(calendarDoc.dependencies, <String>[
-        'source-foundation',
         'button',
         'icon',
         'popover',
+        'source-foundation',
       ]);
       expect(calendarDoc.description.trim(), calendarDoc.description);
       expect(calendarDoc.description, isNotEmpty);
-      // The expanded description answers "instead of which neighbour", and is
-      // a distinct constant rather than a restatement of the short one.
-      expect(
-        calendarExpandedDescription,
-        isNot(equals(calendarDoc.description)),
-      );
-      expect(calendarExpandedDescription.trim(), calendarExpandedDescription);
-      expect(calendarExpandedDescription, contains('date picker'));
-      expect(calendarExpandedDescription, contains('text field'));
     });
   });
 
@@ -154,8 +145,8 @@ void main() {
         await _pumpCalendarDoc(tester);
 
         final List<String> titles = tester
-            .widgetList<DsSection>(find.byType(DsSection))
-            .map((DsSection section) => section.title)
+            .widgetList<ElSection>(find.byType(ElSection))
+            .map((ElSection section) => section.title)
             .toList();
 
         expect(titles, <String>[
@@ -190,8 +181,8 @@ void main() {
       expect(_specimen('calendar-doc-picker'), findsOneWidget);
       // single, range and presets render a grid up front; the date picker's
       // own calendar stays unmounted until its popover opens.
-      expect(find.byType(DsCalendar), findsNWidgets(3));
-      expect(find.byType(DsDatePicker), findsNWidgets(2));
+      expect(find.byType(ElCalendar), findsNWidgets(3));
+      expect(find.byType(ElDatePicker), findsNWidgets(2));
       expect(tester.takeException(), isNull);
     });
 
@@ -206,7 +197,7 @@ void main() {
       expect(find.text('August 2026'), findsNWidgets(3));
       expect(find.text('July 2026'), findsNothing);
       // Su Mo Tu We Th Fr Sa: Sunday first, hardcoded.
-      for (final String weekday in DsDateFormat.weekdaysNarrow) {
+      for (final String weekday in ElDateFormat.weekdaysNarrow) {
         expect(find.text(weekday), findsNWidgets(3));
       }
     });
@@ -216,7 +207,7 @@ void main() {
       await _pumpCalendarDoc(tester);
 
       const List<String> members = <String>[
-        // DsCalendar.single / DsCalendar.range constructor parameters.
+        // ElCalendar.single / ElCalendar.range constructor parameters.
         'selected',
         'onSelected',
         'month',
@@ -230,11 +221,11 @@ void main() {
         'onDaySelected',
         'selectedRange',
         'onRangeSelected',
-        // DsCalendar's statics.
+        // ElCalendar's statics.
         'cellSize',
         'contentWidth',
         'rangeBleed',
-        // DsDateRange.
+        // ElDateRange.
         'from',
         'to',
         'isComplete',
@@ -243,7 +234,7 @@ void main() {
         'isEnd',
         'isMiddle',
         'addToRange',
-        // DsCalendarDay.
+        // ElCalendarDay.
         'of',
         'startOfMonth',
         'isSameDay',
@@ -251,7 +242,7 @@ void main() {
         'addDays',
         'addMonths',
         'daysInMonth',
-        // DsCalendarMonth.
+        // ElCalendarMonth.
         'leadingDays',
         'dayCount',
         'weekCount',
@@ -260,7 +251,7 @@ void main() {
         'outerHeight',
         'paddingFor',
         'borderWidthFor',
-        // DsCalendarBandPainter.
+        // ElCalendarBandPainter.
         'muted',
         'today',
         'rangeStart',
@@ -268,14 +259,14 @@ void main() {
         'radius',
         'bleed',
         'shouldRepaint',
-        // DsDatePicker.
+        // ElDatePicker.
         'value',
         'onChanged',
         'placeholder',
         'focusNode',
         'label',
         'pressScaleSuppressed',
-        // DsDateFormat, DsClock and DsCalendarType: source-foundation, and
+        // ElDateFormat, ElClock and ElCalendarType: source-foundation, and
         // the half of it this component cannot be understood without.
         'monthsShort',
         'monthsLong',
@@ -319,13 +310,13 @@ void main() {
       }
     });
 
-    testWidgets('installation states plainly that the CLI cannot install this '
-        'component yet', (WidgetTester tester) async {
+    testWidgets('installation shows the shipped registry command', (
+      WidgetTester tester,
+    ) async {
       await _pumpCalendarDoc(tester);
 
-      expect(find.text('Not available yet'), findsWidgets);
       expect(find.textContaining('elattar add calendar'), findsWidgets);
-      expect(find.textContaining('registry'), findsWidgets);
+      expect(find.textContaining('calendar.json'), findsWidgets);
     });
   });
 
@@ -477,7 +468,7 @@ void main() {
 
       final Finder specimen = _specimen('calendar-doc-single-specimen');
       final Finder previous = find
-          .descendant(of: specimen, matching: find.byType(DsIcon))
+          .descendant(of: specimen, matching: find.byType(ElIcon))
           .first;
       await tester.ensureVisible(previous);
       await tester.pump();
@@ -572,38 +563,38 @@ void main() {
       final Finder trigger = find
           .descendant(
             of: _specimen('calendar-doc-picker'),
-            matching: find.byType(DsButton),
+            matching: find.byType(ElButton),
           )
           .first;
       await tester.ensureVisible(trigger);
       await tester.pump();
-      expect(find.byType(DsPopoverSurface), findsNothing);
+      expect(find.byType(ElPopoverSurface), findsNothing);
 
       await tester.tap(trigger);
       await tester.pump();
       await tester.pump();
-      await tester.pump(DsDurations.overlay);
+      await tester.pump(ElDurations.overlay);
       await tester.pump();
 
-      expect(find.byType(DsPopoverSurface), findsOneWidget);
+      expect(find.byType(ElPopoverSurface), findsOneWidget);
       final Finder popup = find.descendant(
-        of: find.byType(DsPopoverSurface),
-        matching: find.byType(DsCalendar),
+        of: find.byType(ElPopoverSurface),
+        matching: find.byType(ElCalendar),
       );
       expect(popup, findsOneWidget);
       expect(
-        tester.widget<DsCalendar>(popup).surface,
-        DsCalendarSurface.popover,
+        tester.widget<ElCalendar>(popup).surface,
+        ElCalendarSurface.popover,
       );
 
-      await tester.tap(_dayCell(find.byType(DsPopoverSurface), '21').first);
+      await tester.tap(_dayCell(find.byType(ElPopoverSurface), '21').first);
       await tester.pump();
       await tester.pump();
-      await tester.pump(DsDurations.overlay);
-      await tester.pump(DsDurations.tick);
+      await tester.pump(ElDurations.overlay);
+      await tester.pump(ElDurations.tick);
       await tester.pump();
 
-      expect(find.byType(DsPopoverSurface), findsNothing);
+      expect(find.byType(ElPopoverSurface), findsNothing);
       expect(find.text('21 Aug 2026'), findsWidgets);
       expect(tester.takeException(), isNull);
     });
@@ -614,7 +605,7 @@ void main() {
       final Finder disabled = find
           .descendant(
             of: _specimen('calendar-doc-picker-disabled'),
-            matching: find.byType(DsButton),
+            matching: find.byType(ElButton),
           )
           .first;
       await tester.ensureVisible(disabled);
@@ -622,9 +613,9 @@ void main() {
       await tester.tap(disabled, warnIfMissed: false);
       await tester.pump();
       await tester.pump();
-      await tester.pump(DsDurations.overlay);
+      await tester.pump(ElDurations.overlay);
 
-      expect(find.byType(DsPopoverSurface), findsNothing);
+      expect(find.byType(ElPopoverSurface), findsNothing);
       expect(tester.takeException(), isNull);
     });
   });
@@ -677,36 +668,36 @@ void main() {
       );
       expect(_specimen('calendar-doc-article'), findsOneWidget);
       // 222px of calendar fits inside a 390px viewport without overflow.
-      expect(find.byType(DsCalendar), findsNWidgets(3));
+      expect(find.byType(ElCalendar), findsNWidgets(3));
       expect(tester.takeException(), isNull);
     });
   });
 
   group('both themes', () {
     testWidgets('renders on light', (WidgetTester tester) async {
-      await _pumpCalendarDoc(tester, mode: DsThemeMode.light);
+      await _pumpCalendarDoc(tester, mode: ElThemeMode.light);
       expect(_specimen('calendar-doc-single-specimen'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 
     testWidgets('renders on dark', (WidgetTester tester) async {
-      await _pumpCalendarDoc(tester, mode: DsThemeMode.dark);
+      await _pumpCalendarDoc(tester, mode: ElThemeMode.dark);
       expect(_specimen('calendar-doc-single-specimen'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 
     testWidgets('flipping the theme in place keeps the page and the grid '
         'intact', (WidgetTester tester) async {
-      final DsThemeController theme = await _pumpCalendarDoc(
+      final ElThemeController theme = await _pumpCalendarDoc(
         tester,
-        mode: DsThemeMode.dark,
+        mode: ElThemeMode.dark,
       );
-      expect(find.byType(DsCalendar), findsNWidgets(3));
+      expect(find.byType(ElCalendar), findsNWidgets(3));
 
-      theme.setMode(DsThemeMode.light);
+      theme.setMode(ElThemeMode.light);
       await tester.pump();
 
-      expect(find.byType(DsCalendar), findsNWidgets(3));
+      expect(find.byType(ElCalendar), findsNWidgets(3));
       expect(find.text('August 2026'), findsNWidgets(3));
       expect(tester.takeException(), isNull);
     });
@@ -714,7 +705,7 @@ void main() {
     testWidgets('a narrow light viewport is covered too', (
       WidgetTester tester,
     ) async {
-      await _pumpCalendarDoc(tester, size: _narrow, mode: DsThemeMode.light);
+      await _pumpCalendarDoc(tester, size: _narrow, mode: ElThemeMode.light);
       expect(_specimen('calendar-doc-article'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });

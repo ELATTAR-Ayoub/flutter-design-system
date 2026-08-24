@@ -1,35 +1,20 @@
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/icon/meta.dart';
 import 'package:example/components_docs/icon/page.dart';
-import 'package:example/kit.dart';
+import 'package:example/kit.dart' show ElSection;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// The page's own section order, live demo and Installation excluded from
-/// the "live demo has no heading" note (Installation is the first heading):
-/// shadcn parity brief requires this exact order and this exact set, see
-/// `example/lib/components_docs/icon/page.dart`'s own library doc. Only
-/// Customization is skipped from spinner's own reference sections: [DsSpinner]
-/// exposes no `icon`/`glyph` constructor parameter, so there is nothing to
-/// swap. Button, Badge, Input Group, Empty and RTL are all real compositions
-/// with [DsButton], [DsBadge], [DsInputGroup], [DsEmpty] and a
-/// [Directionality] wrapper, and are mirrored below. API Reference is the
-/// single, LAST shadcn-mirrored section the frame requires: one section
-/// holding a DocsApiTable per family (DsIcon, DsSpinner, DsRule), the way
-/// `example/lib/components_docs/separator/page.dart`'s own `_api` does for
-/// its three components.
+/// This page's own section order, split off `spinner` and `rule`:
+/// see `example/lib/components_docs/icon/page.dart`'s own library doc.
+/// The unheaded live demo carries no [ElSection] and no heading, so
+/// Installation is the first entry here.
 const List<String> _iconSectionOrder = <String>[
   'install',
-  'icon-usage',
-  'icon-glyphs',
-  'spinner-usage',
-  'spinner-size',
-  'spinner-button',
-  'spinner-badge',
-  'spinner-input-group',
-  'spinner-empty',
-  'spinner-rtl',
-  'dsrule-usage',
+  'usage',
+  'sizes',
+  'tones',
+  'lucide',
   'api',
   'states',
   'accessibility',
@@ -41,14 +26,14 @@ const List<String> _iconSectionOrder = <String>[
 
 Widget _harness({
   required Widget child,
-  required DsThemeController controller,
-}) => DsTheme(
+  required ElThemeController controller,
+}) => ElTheme(
   controller: controller,
   child: MaterialApp(home: SingleChildScrollView(child: child)),
 );
 
 void main() {
-  group('icon, spinner, ds-rule docs page', () {
+  group('icon docs page', () {
     testWidgets('renders the article with icon specimens at multiple sizes', (
       WidgetTester tester,
     ) async {
@@ -59,7 +44,7 @@ void main() {
       String? destination;
       await tester.pumpWidget(
         _harness(
-          controller: DsThemeController(mode: DsThemeMode.dark),
+          controller: ElThemeController(mode: ElThemeMode.dark),
           child: IconDocPage(onNavigate: (String route) => destination = route),
         ),
       );
@@ -70,32 +55,51 @@ void main() {
         findsOneWidget,
       );
 
-      // Icon specimens mount at multiple sizes.
-      final List<DsIcon> icons = tester
-          .widgetList<DsIcon>(find.byType(DsIcon))
+      // Icon specimens mount at every ElIconSize rung.
+      final List<ElIcon> icons = tester
+          .widgetList<ElIcon>(find.byType(ElIcon))
           .toList();
-      expect(icons.length, greaterThan(0), reason: 'no icon specimens');
+      expect(icons.length, greaterThanOrEqualTo(ElIconSize.values.length));
+      final Set<ElIconSize> mountedSizes = icons
+          .map((ElIcon i) => i.size)
+          .toSet();
+      expect(mountedSizes, containsAll(ElIconSize.values));
 
-      // Spinner mounts and is still (not settled yet).
-      expect(find.byType(DsSpinner), findsWidgets);
+      // Every fixed tone (all but inherit) mounts a live specimen.
+      final Set<ElIconTone> mountedTones = icons
+          .map((ElIcon i) => i.tone)
+          .toSet();
+      for (final ElIconTone tone in ElIconTone.values) {
+        if (tone == ElIconTone.inherit) continue;
+        expect(
+          mountedTones,
+          contains(tone),
+          reason: 'ElIconTone.${tone.name} has no live specimen',
+        );
+      }
+
+      // The lucide-registry constructor is demonstrated live.
+      final List<ElIcon> lucideIcons = icons
+          .where((ElIcon i) => i.lucide != null)
+          .toList();
+      expect(lucideIcons, isNotEmpty, reason: 'no ElIcon.lucide specimen');
 
       // Metadata reads correctly.
       expect(iconDoc.name, 'icon');
       expect(iconDoc.dependencies, <String>['source-foundation']);
       expect(
         iconDoc.exports,
-        containsAll(<String>['DsIcon', 'DsIconGlyph', 'DsIconSize']),
+        containsAll(<String>['ElIcon', 'ElIconGlyph', 'ElIconSize']),
       );
+      expect(iconDoc.command, 'elattar add icon');
 
       // No navigate callback triggered during build.
       expect(destination, isNull);
 
-      // Every shadcn-mirrored (or shadcn-styled, for icon and ds-rule)
-      // section renders, in exactly the order the reshape brief requires.
-      // Installation is first, not near the end as it was before.
+      // Every section renders, in exactly the order the page declares.
       double? previousTop;
       for (final String id in _iconSectionOrder) {
-        final Finder finder = find.byKey(DsSection.anchorKey(id));
+        final Finder finder = find.byKey(ElSection.anchorKey(id));
         expect(finder, findsOneWidget, reason: 'missing section "$id"');
         final double top = tester.getTopLeft(finder).dy;
         if (previousTop != null) {
@@ -108,12 +112,29 @@ void main() {
         previousTop = top;
       }
 
-      // The old Overview/Preview headings are gone: no heading sits above
-      // Installation, and no section is titled "Status".
-      expect(find.text('Icon overview'), findsNothing);
-      expect(find.text('Spinner overview'), findsNothing);
-      expect(find.text('DsRule overview'), findsNothing);
-      expect(find.text('Status'), findsNothing);
+      // Section titles match the shape brief exactly, in order.
+      final List<String> titles = tester
+          .widgetList<ElSection>(find.byType(ElSection))
+          .map((ElSection section) => section.title)
+          .toList();
+      expect(titles, <String>[
+        'Installation',
+        'Usage',
+        'Sizes',
+        'Tones',
+        'Lucide catalog',
+        'API Reference',
+        'States',
+        'Accessibility',
+        'Responsive',
+        'Dependencies',
+        'Theming',
+        'Source',
+      ]);
+
+      // spinner and rule content no longer renders on this page.
+      expect(find.byType(ElSpinner), findsNothing);
+      expect(find.textContaining('ElRule'), findsNothing);
     });
 
     testWidgets(
@@ -125,7 +146,7 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: DsThemeController(mode: DsThemeMode.dark),
+            controller: ElThemeController(mode: ElThemeMode.dark),
             child: const IconDocPage(),
           ),
         );
@@ -145,54 +166,6 @@ void main() {
       },
     );
 
-    testWidgets('spinner rotates under normal motion', (
-      WidgetTester tester,
-    ) async {
-      tester.view.physicalSize = const Size(1440, 900);
-      tester.view.devicePixelRatio = 1;
-      addTearDown(tester.view.reset);
-
-      final DsThemeController controller = DsThemeController(
-        mode: DsThemeMode.dark,
-      );
-
-      // Build with normal motion.
-      await tester.pumpWidget(
-        _harness(controller: controller, child: const IconDocPage()),
-      );
-
-      // Spinner mounts and is animating: the rotationValue progresses.
-      expect(find.byType(DsSpinner), findsWidgets);
-
-      // Pump once to let the animation start.
-      await tester.pump();
-
-      // Find the rotation transition widget.
-      final Finder rotationFinder = find.byType(RotationTransition);
-      expect(rotationFinder, findsWidgets);
-
-      // Read the first spinner's rotation value.
-      final RotationTransition rotation1 = tester.widget<RotationTransition>(
-        rotationFinder.first,
-      );
-      final double value1 = rotation1.turns.value;
-
-      // Pump again at 100ms.
-      await tester.pump(const Duration(milliseconds: 100));
-
-      final RotationTransition rotation2 = tester.widget<RotationTransition>(
-        rotationFinder.first,
-      );
-      final double value2 = rotation2.turns.value;
-
-      // Under normal motion, the spinner's rotation should progress.
-      expect(
-        value2,
-        greaterThan(value1),
-        reason: 'spinner did not rotate under normal motion',
-      );
-    });
-
     testWidgets('icon sizes and tones resolve correctly in both themes', (
       WidgetTester tester,
     ) async {
@@ -200,114 +173,45 @@ void main() {
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
 
-      final DsThemeController controller = DsThemeController(
-        mode: DsThemeMode.dark,
+      final ElThemeController controller = ElThemeController(
+        mode: ElThemeMode.dark,
       );
 
       await tester.pumpWidget(
         _harness(controller: controller, child: const IconDocPage()),
       );
 
-      // In dark mode, find icons and verify tone resolution.
-      final List<DsIcon> darkIcons = tester
-          .widgetList<DsIcon>(find.byType(DsIcon))
+      final List<ElIcon> darkIcons = tester
+          .widgetList<ElIcon>(find.byType(ElIcon))
           .toList();
       expect(darkIcons.length, greaterThan(0));
 
-      // Flip to light mode and verify icons re-resolve.
-      controller.setMode(DsThemeMode.light);
+      controller.setMode(ElThemeMode.light);
       await tester.pump();
 
-      final List<DsIcon> lightIcons = tester
-          .widgetList<DsIcon>(find.byType(DsIcon))
+      final List<ElIcon> lightIcons = tester
+          .widgetList<ElIcon>(find.byType(ElIcon))
           .toList();
       expect(lightIcons.length, equals(darkIcons.length));
     });
 
-    testWidgets('ds-rule validation runs without error', (
+    testWidgets('ElIcon.pxFor, strokeFor and colorFor resolve as documented', (
       WidgetTester tester,
     ) async {
-      tester.view.physicalSize = const Size(1440, 900);
-      tester.view.devicePixelRatio = 1;
-      addTearDown(tester.view.reset);
+      // Verifies the API table's own claims against the real static
+      // methods, not just against rendered prose.
+      expect(ElIcon.pxFor(ElIconSize.xs), 12);
+      expect(ElIcon.pxFor(ElIconSize.sm), 14);
+      expect(ElIcon.pxFor(ElIconSize.md), 16);
+      expect(ElIcon.pxFor(ElIconSize.lg), 20);
+      expect(ElIcon.pxFor(ElIconSize.xl), 24);
+      expect(ElIcon.pxFor(ElIconSize.xl2), 32);
+      expect(ElIcon.pxFor(ElIconSize.xl3), 40);
 
-      // Test DsRule validation directly, not via the page.
-      // This verifies the API shapes are correct and importable.
-
-      // minLength rule.
-      final DsRule<String> minRule = DsRule.minLength(
-        3,
-        'At least 3 characters.',
-      );
-      expect(minRule.issue('ab'), isNotNull);
-      expect(minRule.issue('abc'), isNull);
-
-      // maxLength rule.
-      final DsRule<String> maxRule = DsRule.maxLength(
-        5,
-        'At most 5 characters.',
-      );
-      expect(maxRule.issue('abcdef'), isNotNull);
-      expect(maxRule.issue('abc'), isNull);
-
-      // email rule.
-      final DsRule<String> emailRule = DsRule.email(
-        'That is not an email address.',
-      );
-      expect(emailRule.issue('a@b'), isNotNull, reason: 'a@b should fail');
-      expect(emailRule.issue('test@example.com'), isNull);
-
-      // pattern rule.
-      final DsRule<String> patternRule = DsRule.pattern(
-        RegExp(r'^[a-z0-9_]+$'),
-        'Must be lowercase letters, digits, or underscore.',
-      );
-      expect(patternRule.issue('Test'), isNotNull);
-      expect(patternRule.issue('test_123'), isNull);
-
-      // accepted rule (checkbox).
-      final DsRule<bool> acceptRule = DsRule.accepted(
-        'You must accept the terms.',
-      );
-      expect(acceptRule.issue(false), isNotNull);
-      expect(acceptRule.issue(true), isNull);
-
-      // oneOf rule.
-      final DsRule<String?> oneOfRule = DsRule.oneOf(<String>[
-        'option1',
-        'option2',
-      ], 'Choose one.');
-      expect(oneOfRule.issue(null), isNotNull);
-      expect(oneOfRule.issue('option3'), isNotNull);
-      expect(oneOfRule.issue('option1'), isNull);
-
-      // DsRules.check with first mode.
-      final List<DsRule<String>> rules = <DsRule<String>>[
-        DsRule.minLength(3, 'Too short.'),
-        DsRule.pattern(RegExp(r'^[a-z]'), 'Must start lowercase.'),
-      ];
-      final List<String> firstIssues = DsRules.check(
-        'A',
-        rules,
-        mode: DsIssueMode.first,
-      );
-      expect(firstIssues.length, 1, reason: 'first mode should stop at first');
-
-      // DsRules.check with all mode.
-      final List<String> allIssues = DsRules.check(
-        'A',
-        rules,
-        mode: DsIssueMode.all,
-      );
-      expect(allIssues.length, 2, reason: 'all mode should collect all');
-
-      // Dedupe.
-      final List<String> deduped = DsRules.dedupe(<String>[
-        'msg1',
-        'msg2',
-        'msg1',
-      ]);
-      expect(deduped, <String>['msg1', 'msg2']);
+      // scaled = 48 / px: above 2.6 -> 2.4, below 1.5 -> 1.6, else 2.
+      expect(ElIcon.strokeFor(16), 2.4); // 48/16 = 3.0 > 2.6
+      expect(ElIcon.strokeFor(32), 2.0); // 48/32 = 1.5, not < 1.5
+      expect(ElIcon.strokeFor(40), 1.6); // 48/40 = 1.2 < 1.5
     });
   });
 }

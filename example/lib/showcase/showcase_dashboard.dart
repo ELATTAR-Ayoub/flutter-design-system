@@ -42,7 +42,7 @@ class _ShowcaseDashboardState extends State<ShowcaseDashboard> {
       _loading = true;
       _failed = false;
     });
-    _timer = Timer(DsDurations.fast, () {
+    _timer = Timer(ElDurations.fast, () {
       if (!mounted) return;
       setState(() {
         _loading = false;
@@ -67,20 +67,20 @@ class _ShowcaseDashboardState extends State<ShowcaseDashboard> {
     ShowcaseFeedback.of(context).error(
       'Signal refresh paused',
       description: 'Retry when the connection is ready.',
-      action: DsToastAction(label: 'Retry', onPressed: _load),
+      action: ElToastAction(label: 'Retry', onPressed: _load),
     );
   }
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: EdgeInsets.fromLTRB(ds(5), ds(2), ds(5), 0),
+    padding: EdgeInsets.fromLTRB(el(5), el(2), el(5), 0),
     child: Semantics(
       label: 'Signal Studio dashboard',
       child: _loading
           ? const _DashboardSkeleton()
           : _failed
           ? _DashboardFailure(onRetry: _load)
-          : DsSwapIn(
+          : ElSwapIn(
               replayKey: _reloads,
               child: _DashboardContent(
                 onRefresh: _load,
@@ -105,10 +105,10 @@ class _DashboardContent extends StatefulWidget {
 }
 
 class _DashboardContentState extends State<_DashboardContent> {
-  static const List<DsSelectOption<String>> _ranges = <DsSelectOption<String>>[
-    DsSelectOption<String>(value: '7d', label: 'Last 7 days'),
-    DsSelectOption<String>(value: '30d', label: 'Last 30 days'),
-    DsSelectOption<String>(value: '90d', label: 'Last 3 months'),
+  static const List<ElSelectOption<String>> _ranges = <ElSelectOption<String>>[
+    ElSelectOption<String>(value: '7d', label: 'Last 7 days'),
+    ElSelectOption<String>(value: '30d', label: 'Last 30 days'),
+    ElSelectOption<String>(value: '90d', label: 'Last 3 months'),
   ];
 
   String _range = '7d';
@@ -129,10 +129,10 @@ class _DashboardContentState extends State<_DashboardContent> {
   @override
   Widget build(BuildContext context) => SingleChildScrollView(
     key: const Key('dashboard-scroll'),
-    padding: DsSafeArea.scrollPaddingOf(
+    padding: ElSafeArea.scrollPaddingOf(
       context,
       base: EdgeInsets.only(
-        bottom: ds(5) + ShowcaseShellScope.bottomOverlayClearanceOf(context),
+        bottom: el(5) + ShowcaseShellScope.bottomOverlayClearanceOf(context),
       ),
     ),
     child: Column(
@@ -140,28 +140,28 @@ class _DashboardContentState extends State<_DashboardContent> {
       children: <Widget>[
         Align(
           alignment: Alignment.centerRight,
-          child: DsSelect<String>(
-            width: ds(40),
+          child: ElSelect<String>(
+            width: el(40),
             label: 'Dashboard range',
             value: _range,
             onChanged: (String value) => setState(() => _range = value),
             options: _ranges,
           ),
         ),
-        SizedBox(height: ds(4)),
+        SizedBox(height: el(4)),
         _DashboardHero(
           onRefresh: widget.onRefresh,
           rangeLabel: _rangeLabel,
           qualifiedPlays: _qualifiedPlays,
         ),
-        SizedBox(height: ds(5)),
+        SizedBox(height: el(5)),
         _MetricsStrip(range: _range),
-        SizedBox(height: ds(5)),
+        SizedBox(height: el(5)),
         _MomentumFocus(rangeLabel: _rangeLabel),
-        SizedBox(height: ds(5)),
-        DsGrid(
+        SizedBox(height: el(5)),
+        ElGrid(
           lg: 2,
-          gap: ds(5),
+          gap: el(5),
           children: <Widget>[
             _ContentQueue(
               scheduled: _scheduled,
@@ -172,18 +172,18 @@ class _DashboardContentState extends State<_DashboardContent> {
             _StudioPulse(onShowUnavailable: widget.onShowUnavailable),
           ],
         ),
-        SizedBox(height: ds(5)),
+        SizedBox(height: el(5)),
         const _AudienceInsight(),
-        SizedBox(height: ds(5)),
+        SizedBox(height: el(5)),
         const _RecentActivity(),
-        SizedBox(height: ds(5)),
-        const DsAlert(
+        SizedBox(height: el(5)),
+        const ElAlert(
           key: Key('dashboard-scroll-end'),
           title: 'Plan the next cut around the strongest signal.',
           description:
               'Behind-the-scenes retention is rising before the final reveal.',
-          variant: DsAlertVariant.info,
-          icon: DsIcon.lucide(DsLucide.sparkles, tone: DsIconTone.inherit),
+          variant: ElAlertVariant.info,
+          icon: ElIcon.lucide(ElLucide.sparkles, tone: ElIconTone.inherit),
         ),
       ],
     ),
@@ -202,10 +202,10 @@ class _DashboardHero extends StatelessWidget {
   final String qualifiedPlays;
 
   @override
-  Widget build(BuildContext context) => DsGlassPanelDeep(
+  Widget build(BuildContext context) => ElGlassPanelDeep(
     key: const Key('dashboard-hero-surface'),
-    radius: BorderRadius.circular(DsRadii.xl3),
-    padding: EdgeInsets.all(ds(5)),
+    radius: BorderRadius.circular(ElRadii.xl3),
+    padding: EdgeInsets.all(el(5)),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -216,43 +216,43 @@ class _DashboardHero extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  DsText('This week in motion', DsType.section),
-                  SizedBox(height: ds(1)),
-                  DsText(
+                  ElText('This week in motion', ElType.section),
+                  SizedBox(height: el(1)),
+                  ElText(
                     'One clear read on what your audience carried forward.',
-                    DsType.small,
+                    ElType.small,
                   ),
                 ],
               ),
             ),
-            DsButton(
-              variant: DsButtonVariant.primary,
-              size: DsButtonSize.sm,
+            ElButton(
+              variant: ElButtonVariant.primary,
+              size: ElButtonSize.sm,
               label: 'Refresh dashboard',
               onPressed: onRefresh,
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  const DsIcon.lucide(DsLucide.refreshCw, size: DsIconSize.sm),
-                  SizedBox(width: DsButton.gapFor(DsButtonSize.sm)),
-                  DsText('Refresh', DsComponentType.buttonLabel),
+                  const ElIcon.lucide(ElLucide.refreshCw, size: ElIconSize.sm),
+                  SizedBox(width: ElButton.gapFor(ElButtonSize.sm)),
+                  ElText('Refresh', ElComponentType.buttonLabel),
                 ],
               ),
             ),
           ],
         ),
-        SizedBox(height: ds(6)),
-        DsText(qualifiedPlays, DsType.numXl),
-        SizedBox(height: ds(2)),
-        DsText(
+        SizedBox(height: el(6)),
+        ElText(qualifiedPlays, ElType.numXl),
+        SizedBox(height: el(2)),
+        ElText(
           'TOTAL QUALIFIED PLAYS · ${rangeLabel.toUpperCase()}',
-          DsType.label,
+          ElType.label,
         ),
-        SizedBox(height: ds(3)),
-        const DsBadge(
+        SizedBox(height: el(3)),
+        const ElBadge(
           label: '+18.6% week over week',
-          variant: DsBadgeVariant.success,
-          glyph: DsIcon.lucide(DsLucide.trendingUp),
+          variant: ElBadgeVariant.success,
+          glyph: ElIcon.lucide(ElLucide.trendingUp),
         ),
       ],
     ),
@@ -267,33 +267,33 @@ class _MetricsStrip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool extended = range != '7d';
-    return DsGrid(
+    return ElGrid(
       sm: 2,
       xl: 4,
-      gap: ds(4),
+      gap: el(4),
       children: <Widget>[
-        DsStat(
+        ElStat(
           label: 'Saves',
           value: extended ? '24,610' : '6,820',
-          delta: const (value: '14.2%', direction: DsStatDirection.up),
+          delta: const (value: '14.2%', direction: ElStatDirection.up),
           hint: 'vs last week',
         ),
-        DsStat(
+        ElStat(
           label: 'Shares',
           value: extended ? '8,972' : '2,146',
-          delta: const (value: '8.1%', direction: DsStatDirection.up),
+          delta: const (value: '8.1%', direction: ElStatDirection.up),
           hint: 'vs last week',
         ),
-        const DsStat(
+        const ElStat(
           label: 'Completion',
           value: '71.8%',
-          delta: (value: '4.4%', direction: DsStatDirection.up),
+          delta: (value: '4.4%', direction: ElStatDirection.up),
           hint: 'vs last week',
         ),
-        DsStat(
+        ElStat(
           label: 'New followers',
           value: extended ? '5,408' : '1,284',
-          delta: const (value: '2.6%', direction: DsStatDirection.up),
+          delta: const (value: '2.6%', direction: ElStatDirection.up),
           hint: 'vs last week',
         ),
       ],
@@ -318,43 +318,43 @@ class _MomentumFocus extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
-    return DsGlassPanel(
+    final ElThemeData theme = ElTheme.of(context);
+    return ElGlassPanel(
       key: const Key('dashboard-chart-focus'),
-      radius: BorderRadius.circular(DsRadii.xl),
-      padding: EdgeInsets.all(ds(5)),
+      radius: BorderRadius.circular(ElRadii.xl),
+      padding: EdgeInsets.all(el(5)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          DsText('Momentum', DsType.section),
-          SizedBox(height: ds(1)),
-          DsText('Qualified plays · $rangeLabel.', DsType.small),
-          SizedBox(height: ds(4)),
-          DsChartContainer(
-            height: ds(52),
-            config: DsChartConfig(<String, DsChartSeries>{
-              'plays': DsChartSeries(
+          ElText('Momentum', ElType.section),
+          SizedBox(height: el(1)),
+          ElText('Qualified plays · $rangeLabel.', ElType.small),
+          SizedBox(height: el(4)),
+          ElChartContainer(
+            height: el(52),
+            config: ElChartConfig(<String, ElChartSeries>{
+              'plays': ElChartSeries(
                 label: 'Qualified plays',
                 color: theme.chart1,
               ),
             }),
-            child: DsCartesianChart(
+            child: ElCartesianChart(
               data: _data,
-              grid: const DsChartGrid(vertical: false),
-              xAxis: const DsChartAxis(
+              grid: const ElChartGrid(vertical: false),
+              xAxis: const ElChartAxis(
                 dataKey: 'day',
                 tickLine: false,
                 axisLine: false,
               ),
-              tooltip: const DsChartTooltipSpec(
+              tooltip: const ElChartTooltipSpec(
                 cursor: false,
-                indicator: DsChartIndicator.line,
+                indicator: ElChartIndicator.line,
               ),
-              series: <DsChartSeriesSpec>[
-                DsChartSeriesSpec(
-                  kind: DsChartSeriesKind.line,
+              series: <ElChartSeriesSpec>[
+                ElChartSeriesSpec(
+                  kind: ElChartSeriesKind.line,
                   dataKey: 'plays',
-                  curve: DsCurveType.natural,
+                  curve: ElCurveType.natural,
                   stroke: theme.chart1,
                 ),
               ],
@@ -376,8 +376,8 @@ class _ContentQueue extends StatelessWidget {
   Widget build(BuildContext context) => _OutlinedSection(
     title: 'Content queue',
     description: 'Cuts ready for a publish decision.',
-    child: DsItemGroup(
-      gapOverride: ds(2),
+    child: ElItemGroup(
+      gapOverride: el(2),
       children: <Widget>[
         _QueueItem(
           id: 'night-desk',
@@ -421,39 +421,39 @@ class _QueueItem extends StatelessWidget {
   final ValueChanged<String> onSchedule;
 
   @override
-  Widget build(BuildContext context) => DsItem(
-    variant: DsItemVariant.outline,
+  Widget build(BuildContext context) => ElItem(
+    variant: ElItemVariant.outline,
     alignStart: true,
-    media: DsItemMedia(
-      child: DsIcon.lucide(
-        scheduled ? DsLucide.calendarCheck : DsLucide.clapperboard,
-        size: DsIconSize.sm,
-        tone: scheduled ? DsIconTone.success : DsIconTone.muted,
+    media: ElItemMedia(
+      child: ElIcon.lucide(
+        scheduled ? ElLucide.calendarCheck : ElLucide.clapperboard,
+        size: ElIconSize.sm,
+        tone: scheduled ? ElIconTone.success : ElIconTone.muted,
       ),
     ),
-    content: DsItemContent(
+    content: ElItemContent(
       children: <Widget>[
-        DsItemTitle(title),
-        DsItemDescription(detail),
-        DsBadge(
+        ElItemTitle(title),
+        ElItemDescription(detail),
+        ElBadge(
           label: scheduled ? 'SCHEDULED' : 'READY',
           variant: scheduled
-              ? DsBadgeVariant.success
-              : DsBadgeVariant.secondary,
+              ? ElBadgeVariant.success
+              : ElBadgeVariant.secondary,
         ),
       ],
     ),
-    actions: DsItemActions(
+    actions: ElItemActions(
       children: <Widget>[
-        DsButton(
-          size: DsButtonSize.sm,
+        ElButton(
+          size: ElButtonSize.sm,
           variant: scheduled
-              ? DsButtonVariant.ghost
-              : DsButtonVariant.secondary,
+              ? ElButtonVariant.ghost
+              : ElButtonVariant.secondary,
           onPressed: () => onSchedule(id),
-          child: DsText(
+          child: ElText(
             scheduled ? 'Undo' : 'Schedule',
-            DsComponentType.buttonLabel,
+            ElComponentType.buttonLabel,
           ),
         ),
       ],
@@ -474,24 +474,24 @@ class _StudioPulse extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         const _PulseItem(
-          glyph: DsLucide.circleCheck,
-          tone: DsIconTone.success,
+          glyph: ElLucide.circleCheck,
+          tone: ElIconTone.success,
           title: 'Edit approved',
           detail: 'Quiet architecture is ready to publish.',
         ),
-        SizedBox(height: ds(3)),
+        SizedBox(height: el(3)),
         const _PulseItem(
-          glyph: DsLucide.bell,
-          tone: DsIconTone.action,
+          glyph: ElLucide.bell,
+          tone: ElIconTone.action,
           title: 'Audience peak ahead',
           detail: 'Your next publish window opens in 42 minutes.',
         ),
-        SizedBox(height: ds(4)),
-        DsButton(
-          variant: DsButtonVariant.outline,
-          size: DsButtonSize.sm,
+        SizedBox(height: el(4)),
+        ElButton(
+          variant: ElButtonVariant.outline,
+          size: ElButtonSize.sm,
           onPressed: onShowUnavailable,
-          child: DsText('Test recovery feedback', DsComponentType.buttonLabel),
+          child: ElText('Test recovery feedback', ElComponentType.buttonLabel),
         ),
       ],
     ),
@@ -506,18 +506,18 @@ class _PulseItem extends StatelessWidget {
     required this.detail,
   });
 
-  final DsLucideGlyph glyph;
-  final DsIconTone tone;
+  final ElLucideGlyph glyph;
+  final ElIconTone tone;
   final String title;
   final String detail;
 
   @override
-  Widget build(BuildContext context) => DsItem(
-    media: DsItemMedia(
-      child: DsIcon.lucide(glyph, size: DsIconSize.sm, tone: tone),
+  Widget build(BuildContext context) => ElItem(
+    media: ElItemMedia(
+      child: ElIcon.lucide(glyph, size: ElIconSize.sm, tone: tone),
     ),
-    content: DsItemContent(
-      children: <Widget>[DsItemTitle(title), DsItemDescription(detail)],
+    content: ElItemContent(
+      children: <Widget>[ElItemTitle(title), ElItemDescription(detail)],
     ),
   );
 }
@@ -526,20 +526,20 @@ class _AudienceInsight extends StatelessWidget {
   const _AudienceInsight();
 
   @override
-  Widget build(BuildContext context) => DsAlert(
+  Widget build(BuildContext context) => ElAlert(
     title: 'Audience insight',
     description:
         'Returning viewers are at 38.6%, the strongest result in 12 weeks.',
-    variant: DsAlertVariant.info,
-    icon: const DsIcon.lucide(DsLucide.usersRound, tone: DsIconTone.inherit),
-    action: DsButton(
-      variant: DsButtonVariant.secondary,
-      size: DsButtonSize.sm,
+    variant: ElAlertVariant.info,
+    icon: const ElIcon.lucide(ElLucide.usersRound, tone: ElIconTone.inherit),
+    action: ElButton(
+      variant: ElButtonVariant.secondary,
+      size: ElButtonSize.sm,
       onPressed: () => ShowcaseFeedback.of(context).info(
         'Insight saved',
         description: 'A reminder is waiting in your next planning session.',
       ),
-      child: DsText('Save insight', DsComponentType.buttonLabel),
+      child: ElText('Save insight', ElComponentType.buttonLabel),
     ),
   );
 }
@@ -551,22 +551,22 @@ class _RecentActivity extends StatelessWidget {
   Widget build(BuildContext context) => _OutlinedSection(
     title: 'Recent activity',
     description: 'Small events worth carrying into the next cut.',
-    child: const DsItemGroup(
+    child: const ElItemGroup(
       children: <Widget>[
         _ActivityItem(
           title: 'Work in progress passed 10K saves',
           detail: 'Community signal · 18 minutes ago',
-          glyph: DsLucide.bookmarkCheck,
+          glyph: ElLucide.bookmarkCheck,
         ),
         _ActivityItem(
           title: 'Three collaborators joined your review queue',
           detail: 'Workflow signal · 46 minutes ago',
-          glyph: DsLucide.usersRound,
+          glyph: ElLucide.usersRound,
         ),
         _ActivityItem(
           title: 'A returning viewer finished your new sequence',
           detail: 'Retention signal · 1 hour ago',
-          glyph: DsLucide.arrowUpRight,
+          glyph: ElLucide.arrowUpRight,
         ),
       ],
     ),
@@ -582,15 +582,15 @@ class _ActivityItem extends StatelessWidget {
 
   final String title;
   final String detail;
-  final DsLucideGlyph glyph;
+  final ElLucideGlyph glyph;
 
   @override
-  Widget build(BuildContext context) => DsItem(
-    media: DsItemMedia(
-      child: DsIcon.lucide(glyph, size: DsIconSize.sm, tone: DsIconTone.muted),
+  Widget build(BuildContext context) => ElItem(
+    media: ElItemMedia(
+      child: ElIcon.lucide(glyph, size: ElIconSize.sm, tone: ElIconTone.muted),
     ),
-    content: DsItemContent(
-      children: <Widget>[DsItemTitle(title), DsItemDescription(detail)],
+    content: ElItemContent(
+      children: <Widget>[ElItemTitle(title), ElItemDescription(detail)],
     ),
   );
 }
@@ -610,10 +610,10 @@ class _OutlinedSection extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      DsText(title, DsType.section),
-      SizedBox(height: ds(1)),
-      DsText(description, DsType.small),
-      SizedBox(height: ds(3)),
+      ElText(title, ElType.section),
+      SizedBox(height: el(1)),
+      ElText(description, ElType.small),
+      SizedBox(height: el(3)),
       child,
     ],
   );
@@ -626,17 +626,17 @@ class _DashboardFailure extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Center(
-    child: DsAlert(
+    child: ElAlert(
       title: 'The studio signals are temporarily unavailable.',
       description:
           'No dashboard data was changed. Retry when you are ready to reconnect.',
-      variant: DsAlertVariant.destructive,
-      icon: const DsIcon.lucide(DsLucide.circleAlert, tone: DsIconTone.inherit),
-      action: DsButton(
-        variant: DsButtonVariant.secondary,
-        size: DsButtonSize.sm,
+      variant: ElAlertVariant.destructive,
+      icon: const ElIcon.lucide(ElLucide.circleAlert, tone: ElIconTone.inherit),
+      action: ElButton(
+        variant: ElButtonVariant.secondary,
+        size: ElButtonSize.sm,
         onPressed: onRetry,
-        child: DsText('Retry', DsComponentType.buttonLabel),
+        child: ElText('Retry', ElComponentType.buttonLabel),
       ),
     ),
   );
@@ -653,21 +653,21 @@ class _DashboardSkeleton extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        DsSkeleton(height: DsChartContainer.plotHeight),
-        SizedBox(height: ds(5)),
-        DsGrid(
+        ElSkeleton(height: ElChartContainer.plotHeight),
+        SizedBox(height: el(5)),
+        ElGrid(
           sm: 2,
           xl: 4,
-          gap: ds(4),
+          gap: el(4),
           children: <Widget>[
-            DsSkeleton(height: ds(20)),
-            DsSkeleton(height: ds(20)),
-            DsSkeleton(height: ds(20)),
-            DsSkeleton(height: ds(20)),
+            ElSkeleton(height: el(20)),
+            ElSkeleton(height: el(20)),
+            ElSkeleton(height: el(20)),
+            ElSkeleton(height: el(20)),
           ],
         ),
-        SizedBox(height: ds(5)),
-        DsSkeleton(height: DsChartContainer.plotHeight),
+        SizedBox(height: el(5)),
+        ElSkeleton(height: ElChartContainer.plotHeight),
       ],
     ),
   );

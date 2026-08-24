@@ -1,0 +1,30 @@
+{
+  "name": "menu",
+  "type": "component",
+  "version": "0.0.1",
+  "description": "The shared body of `dropdown-menu.tsx`, `context-menu.tsx` and",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/menu.dart",
+      "target": "@ui/menu.dart",
+      "sha256": "e878cb95255ee4a7729005ca2e0978434488ccc4a1755adf997684348347a9af"
+    }
+  ],
+  "registryDependencies": [
+    "icon",
+    "popover",
+    "source-foundation"
+  ],
+  "semanticDependencies": [
+    "icon",
+    "popover"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "documentationRoute": "/components/menu",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/menu.dart"
+}

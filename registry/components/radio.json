@@ -1,0 +1,34 @@
+{
+  "name": "radio",
+  "type": "component",
+  "version": "0.0.1",
+  "description": "`components/ui/radio-group.tsx` — the same 20px socket, and the dot pops.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/radio.dart",
+      "target": "@ui/radio.dart",
+      "sha256": "95b2524b1fce3e8ea0a9727aa8f17768c9c126c841344aa451c700c0a133e8c8"
+    }
+  ],
+  "registryDependencies": [
+    "field",
+    "keyframes",
+    "machine-surface",
+    "selection-control",
+    "source-foundation"
+  ],
+  "semanticDependencies": [
+    "field",
+    "keyframes",
+    "machine-surface",
+    "selection-control"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "documentationRoute": "/components/radio",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/radio.dart"
+}

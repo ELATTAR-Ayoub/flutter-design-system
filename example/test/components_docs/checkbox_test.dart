@@ -3,7 +3,7 @@
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`, per the
-/// Phase J brief. The live `DsThemeController` is flipped in place for theme
+/// Phase J brief. The live `ElThemeController` is flipped in place for theme
 /// coverage rather than re-pumped under a new controller.
 library;
 
@@ -44,7 +44,7 @@ const List<String> _expectedSectionIds = <String>[
   'source',
 ];
 
-/// Every public constructor parameter of `DsCheckbox`, enumerated by reading
+/// Every public constructor parameter of `ElCheckbox`, enumerated by reading
 /// `lib/src/components/checkbox.dart` directly (Step 1 of the task cycle).
 /// The API table must cover all of these by name.
 const List<String> _checkboxParams = <String>[
@@ -59,31 +59,31 @@ const List<String> _checkboxParams = <String>[
   'hint',
 ];
 
-/// The rest of the public surface: the static helpers on `DsCheckbox` and
-/// every member of the tri-state `DsCheckboxState` enum.
+/// The rest of the public surface: the static helpers on `ElCheckbox` and
+/// every member of the tri-state `ElCheckboxState` enum.
 const List<String> _checkboxStatics = <String>[
-  'DsCheckbox.size',
-  'DsCheckbox.nextAfter',
-  'DsCheckboxState.unchecked',
-  'DsCheckboxState.checked',
-  'DsCheckboxState.indeterminate',
+  'ElCheckbox.size',
+  'ElCheckbox.nextAfter',
+  'ElCheckboxState.unchecked',
+  'ElCheckboxState.checked',
+  'ElCheckboxState.indeterminate',
 ];
 
-Future<DsThemeController> _pump(
+Future<ElThemeController> _pump(
   WidgetTester tester, {
   Size size = _wide,
-  DsThemeMode mode = DsThemeMode.dark,
+  ElThemeMode mode = ElThemeMode.dark,
   ValueChanged<String>? onNavigate,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final DsThemeController theme = DsThemeController(mode: mode);
+  final ElThemeController theme = ElThemeController(mode: mode);
   addTearDown(theme.dispose);
 
   await tester.pumpWidget(
-    DsTheme(
+    ElTheme(
       controller: theme,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -107,11 +107,11 @@ void main() {
 
     double previousDy = double.negativeInfinity;
     for (final String id in _expectedSectionIds) {
-      final Finder finder = find.byKey(DsSection.anchorKey(id));
+      final Finder finder = find.byKey(ElSection.anchorKey(id));
       expect(
         finder,
         findsOneWidget,
-        reason: 'no DsSection with id "$id" is in the tree',
+        reason: 'no ElSection with id "$id" is in the tree',
       );
       final double dy = tester.getTopLeft(finder).dy;
       expect(
@@ -154,8 +154,8 @@ void main() {
   );
 
   testWidgets(
-    'the API table covers every DsCheckbox constructor parameter and every '
-    'DsCheckboxState member',
+    'the API table covers every ElCheckbox constructor parameter and every '
+    'ElCheckboxState member',
     (WidgetTester tester) async {
       await _pump(tester);
 
@@ -173,14 +173,14 @@ void main() {
         expect(
           documented,
           contains(param),
-          reason: 'DsCheckbox constructor parameter "$param" is undocumented',
+          reason: 'ElCheckbox constructor parameter "$param" is undocumented',
         );
       }
       for (final String member in _checkboxStatics) {
         expect(
           documented,
           contains(member),
-          reason: 'DsCheckbox/DsCheckboxState member "$member" is undocumented',
+          reason: 'ElCheckbox/ElCheckboxState member "$member" is undocumented',
         );
       }
     },
@@ -196,22 +196,22 @@ void main() {
       expect(find.byKey(key), findsOneWidget);
       await tester.ensureVisible(find.byKey(key));
       expect(
-        tester.widget<DsCheckbox>(find.byKey(key)).state,
-        DsCheckboxState.unchecked,
+        tester.widget<ElCheckbox>(find.byKey(key)).state,
+        ElCheckboxState.unchecked,
       );
 
       await tester.tap(find.byKey(key), warnIfMissed: false);
       await tester.pump();
       expect(
-        tester.widget<DsCheckbox>(find.byKey(key)).state,
-        DsCheckboxState.checked,
+        tester.widget<ElCheckbox>(find.byKey(key)).state,
+        ElCheckboxState.checked,
       );
 
       await tester.tap(find.byKey(key), warnIfMissed: false);
       await tester.pump();
       expect(
-        tester.widget<DsCheckbox>(find.byKey(key)).state,
-        DsCheckboxState.unchecked,
+        tester.widget<ElCheckbox>(find.byKey(key)).state,
+        ElCheckboxState.unchecked,
       );
 
       expect(tester.takeException(), isNull);
@@ -249,13 +249,13 @@ void main() {
   testWidgets(
     'both themes render the article with no exceptions when flipped in place',
     (WidgetTester tester) async {
-      final DsThemeController theme = await _pump(
+      final ElThemeController theme = await _pump(
         tester,
-        mode: DsThemeMode.light,
+        mode: ElThemeMode.light,
       );
       expect(find.text(checkboxDoc.title), findsWidgets);
 
-      theme.setMode(DsThemeMode.dark);
+      theme.setMode(ElThemeMode.dark);
       await tester.pump();
       expect(find.text(checkboxDoc.title), findsWidgets);
       expect(tester.takeException(), isNull);

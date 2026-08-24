@@ -230,14 +230,14 @@ function findAdvance(prevSig, newSig) {
     });
     try {
       await page.evaluate(
-        () => window.__dsScrollTo && window.__dsScrollTo(0),
+        () => window.__elScrollTo && window.__elScrollTo(0),
       );
     } catch (_) {}
     await new Promise((r) => setTimeout(r, 400));
 
     // The DOM app scrolls deterministically — no matching, no ambiguity. The
     // Flutter app exposes the same ground truth through a js_interop seam
-    // (__dsScrollTo/__dsScrollY/__dsScrollMax): pixel matching cannot recover
+    // (__elScrollTo/__elScrollY/__elScrollMax): pixel matching cannot recover
     // even the final clamped advance, because the viewport-fixed page glow
     // makes no two scroll positions pure translations of each other. The
     // wheel path below survives only as a fallback for bundles without the
@@ -249,8 +249,8 @@ function findAdvance(prevSig, newSig) {
       (await page
         .evaluate(
           () =>
-            typeof window.__dsScrollTo === 'function' &&
-            typeof window.__dsScrollY === 'function',
+            typeof window.__elScrollTo === 'function' &&
+            typeof window.__elScrollY === 'function',
         )
         .catch(() => false));
 
@@ -268,7 +268,7 @@ function findAdvance(prevSig, newSig) {
         const read = () =>
           domScroll
             ? page.evaluate(() => window.scrollY)
-            : page.evaluate(() => window.__dsScrollY());
+            : page.evaluate(() => window.__elScrollY());
         const before = await read();
         if (domScroll) {
           await page.evaluate(
@@ -276,7 +276,7 @@ function findAdvance(prevSig, newSig) {
             before + STEP,
           );
         } else {
-          await page.evaluate((y) => window.__dsScrollTo(y), before + STEP);
+          await page.evaluate((y) => window.__elScrollTo(y), before + STEP);
         }
         await new Promise((r) => setTimeout(r, 350));
         const after = await read();

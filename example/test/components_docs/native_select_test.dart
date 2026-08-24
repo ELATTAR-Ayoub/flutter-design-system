@@ -1,15 +1,14 @@
-/// Tests for `components_docs/native_select/page.dart`'s [NativeSelectDocPage] —
-/// the native_select, selection_control, and form documentation page.
+/// Tests for `components_docs/native_select/page.dart`'s [NativeSelectDocPage].
 ///
-/// Three components, documented together:
-/// - **native_select**: [DsNativeSelect] and [DsNativeSelectSize]
-/// - **selection_control**: [DsSelectionControl], [DsHitArea], [DsJellyReplay]
-/// - **form**: [DsForm], [DsFormField], [DsTextFormField], [DsValidateMode]
+/// This page documents exactly one component: [ElNativeSelect] and
+/// [ElNativeSelectSize]. `selection_control` and `form` — previously
+/// documented on this same page — now have their own pages, and their own
+/// tests: `selection_control_test.dart` and `form_test.dart`.
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
-/// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`, per the
-/// Phase J brief. The live `DsThemeController` is flipped in place for theme
-/// coverage rather than re-pumped under a new controller.
+/// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`. The live
+/// `ElThemeController` is flipped in place for theme coverage rather than
+/// re-pumped under a new controller.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
@@ -17,19 +16,18 @@ import 'package:example/components_docs/native_select/meta.dart';
 import 'package:example/components_docs/native_select/page.dart';
 import 'package:example/docs/docs_code.dart';
 import 'package:example/docs/docs_facts.dart';
-import 'package:example/kit.dart' show DsSection;
+import 'package:example/kit.dart' show ElSection;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 const Size _wide = Size(1440, 900);
 const Size _narrow = Size(390, 844);
 
-/// Every `DsApiTable` this page must render, by title, and every public
+/// Every `ElApiTable` this page must render, by title, and every public
 /// constructor parameter or static member of each documented class found by
-/// reading the source files directly. The completeness test asserts each list
-/// is a subset of that specific table's own facts.
+/// reading `lib/src/components/native_select.dart` directly.
 const Map<String, List<String>> _expectedApiTables = <String, List<String>>{
-  'DsNativeSelect': <String>[
+  'ElNativeSelect': <String>[
     'options',
     'value',
     'onChanged',
@@ -41,9 +39,9 @@ const Map<String, List<String>> _expectedApiTables = <String, List<String>>{
     'focusNode',
     'label',
     'hint',
-    'DsNativeSelect.menuOffset',
+    'ElNativeSelect.menuOffset',
   ],
-  'DsNativeSelectSize': <String>[
+  'ElNativeSelectSize': <String>[
     'sm',
     'md',
     'label',
@@ -51,60 +49,23 @@ const Map<String, List<String>> _expectedApiTables = <String, List<String>>{
     'radius',
     'insetY',
   ],
-  'DsSelectionControl': <String>[
-    'width',
-    'height',
-    'radius',
-    'fill',
-    'border',
-    'shadow',
-    'duration',
-    'jellyState',
-    'child',
-    'onTap',
-    'enabled',
-    'inert',
-    'invalid',
-    'forceFocusRing',
-    'focusNode',
-    'skipTraversal',
-    'onKey',
-    'semantics',
-  ],
-  'DsForm': <String>[
-    'fields',
-    'mode',
-    'reValidateMode',
-    'validate',
-    'focusFirstError',
-    'submit',
-    'setError',
-    'clearErrors',
-    'reset',
-    'isValid',
-    'isSubmitting',
-    'submitCount',
-    'DsFormField<T>',
-    'DsTextFormField',
-  ],
-  'DsValidateMode': <String>['onSubmit', 'onChange'],
 };
 
-Future<DsThemeController> _pump(
+Future<ElThemeController> _pump(
   WidgetTester tester, {
   Size size = _wide,
-  DsThemeMode mode = DsThemeMode.dark,
+  ElThemeMode mode = ElThemeMode.dark,
   ValueChanged<String>? onNavigate,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final DsThemeController theme = DsThemeController(mode: mode);
+  final ElThemeController theme = ElThemeController(mode: mode);
   addTearDown(theme.dispose);
 
   await tester.pumpWidget(
-    DsTheme(
+    ElTheme(
       controller: theme,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -127,8 +88,8 @@ void main() {
       await _pump(tester);
 
       final List<String> titles = tester
-          .widgetList<DsSection>(find.byType(DsSection))
-          .map((DsSection section) => section.title)
+          .widgetList<ElSection>(find.byType(ElSection))
+          .map((ElSection section) => section.title)
           .toList();
 
       expect(titles, <String>[
@@ -198,7 +159,7 @@ void main() {
   );
 
   testWidgets(
-    'each DsApiTable covers every public constructor parameter and static '
+    'each ElApiTable covers every public constructor parameter and static '
     'of its own class',
     (WidgetTester tester) async {
       await _pump(tester);
@@ -221,7 +182,7 @@ void main() {
         expect(
           documented,
           isNotNull,
-          reason: 'no DsApiTable titled "${expected.key}" was rendered',
+          reason: 'no ElApiTable titled "${expected.key}" was rendered',
         );
         for (final String param in expected.value) {
           expect(
@@ -235,22 +196,20 @@ void main() {
   );
 
   testWidgets(
-    'the live DsNativeSelect specimen is accessible and can be opened',
+    'the live ElNativeSelect specimen is accessible and can be opened',
     (WidgetTester tester) async {
       await _pump(tester);
 
       const Key selectKey = ValueKey<String>('native-select-preview');
       await tester.ensureVisible(find.byKey(selectKey));
       expect(tester.takeException(), isNull);
-
-      // The select should be renderable and tappable without error
       expect(find.byKey(selectKey), findsOneWidget);
     },
   );
 
   testWidgets(
     'the state matrix documents rest, focus, invalid, disabled, and open '
-    'states for native_select, with N/A for selection_control and form',
+    'states',
     (WidgetTester tester) async {
       await _pump(tester);
 
@@ -262,12 +221,12 @@ void main() {
           .toSet();
 
       for (final String expected in <String>[
-        'Rest (DsNativeSelect)',
-        'Focus-visible (DsNativeSelect)',
-        'Invalid (DsNativeSelect)',
-        'Disabled (DsNativeSelect)',
-        'Hover (DsNativeSelect)',
-        'Open (DsNativeSelect)',
+        'Rest',
+        'Focus-visible',
+        'Invalid',
+        'Disabled',
+        'Hover',
+        'Open',
         'Reduced motion',
       ]) {
         expect(
@@ -282,32 +241,24 @@ void main() {
   testWidgets(
     'both themes render the article with no exceptions when flipped in place',
     (WidgetTester tester) async {
-      final DsThemeController theme = await _pump(
+      final ElThemeController theme = await _pump(
         tester,
-        mode: DsThemeMode.light,
+        mode: ElThemeMode.light,
       );
       expect(find.text(nativeSelectDoc.title), findsWidgets);
 
-      theme.setMode(DsThemeMode.dark);
+      theme.setMode(ElThemeMode.dark);
       await tester.pump();
       expect(find.text(nativeSelectDoc.title), findsWidgets);
       expect(tester.takeException(), isNull);
     },
   );
 
-  testWidgets(
-    'installation correctly states that none of the three have registry '
-    'manifests yet',
-    (WidgetTester tester) async {
-      await _pump(tester);
+  testWidgets('installation presents the working native-select CLI command', (
+    WidgetTester tester,
+  ) async {
+    await _pump(tester);
 
-      expect(find.textContaining('not yet in the registry'), findsWidgets);
-      // Dependencies section's own disclosure, sentence-initial capital:
-      // `find.textContaining` is case-sensitive, so this must match verbatim.
-      expect(
-        find.textContaining('No registry manifests exist yet'),
-        findsWidgets,
-      );
-    },
-  );
+    expect(find.textContaining('elattar add native-select'), findsWidgets);
+  });
 }

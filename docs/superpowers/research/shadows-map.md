@@ -2,11 +2,11 @@
 
 **Files that produce the render** (all under `D:\DESIGN\Design-System-2026-8\design-system\`):
 - `app\design-system\shadows\page.tsx` — the page (server component, no client code, no page-local components; two module-level arrays: `ambient` (4) and `machine` (8))
-- `components\ds\kit.tsx` — `DsPageHeader`, `DsSection`, `Panel`, `Code`, `DoDont`, `Note`, `PageFootNav` (all used). **`Meta` is NOT used on this page** (unlike spacing/typography).
+- `components\el\kit.tsx` — `ElPageHeader`, `ElSection`, `Panel`, `Code`, `DoDont`, `Note`, `PageFootNav` (all used). **`Meta` is NOT used on this page** (unlike spacing/typography).
 - `components\ui\button.tsx` — five real Button variants render live
 - `components\ui\input.tsx` — one real Input renders live
 - `components\ui\icon.tsx` — `Icon` inside `DoDont` and `PageFootNav`
-- `lib\ds\nav.ts` L86–98 — `findCategory("foundations","shadows")` supplies eyebrow/title/blurb/contents; `siblings()` supplies foot-nav
+- `lib\el\nav.ts` L86–98 — `findCategory("foundations","shadows")` supplies eyebrow/title/blurb/contents; `siblings()` supplies foot-nav
 - `app\design-system\layout.tsx` — shell around the page
 - `app\globals.css` — every token/class/utility referenced below
 - `app\layout.tsx` — loads `GeistMono` (`--font-geist-mono`) on `<html>`
@@ -30,7 +30,7 @@ Identical to every foundations page — see `shared-map.md` §1 and `spacing-map
 
 ---
 
-## 1 · Page header (`DsPageHeader`)
+## 1 · Page header (`ElPageHeader`)
 
 `<header class="mb-14 border-b border-border pb-10">` — 56px below, 40px inner bottom, 1px hairline.
 
@@ -45,7 +45,7 @@ Identical to every foundations page — see `shared-map.md` §1 and `spacing-map
 
 ## 2 · Opening `Note` — before any section
 
-`<Note tone="action" title="Two families, one idea" className="mb-12">` — this sits between the header and the first `DsSection`, at page level. **No other foundations page opens with a page-level Note carrying `mb-12`** (colors opens with one but at the kit default).
+`<Note tone="action" title="Two families, one idea" className="mb-12">` — this sits between the header and the first `ElSection`, at page level. **No other foundations page opens with a page-level Note carrying `mb-12`** (colors opens with one but at the kit default).
 
 Anatomy: `rounded-lg (12px) border p-5 (20px)` + action tone `border-action/30 bg-action/[0.08] text-action-ink`, plus `mb-12` (48px).
 - Border: `--color-action` @ 30% = `rgba(26, 110, 244, 0.30)`
@@ -68,7 +68,7 @@ Inline runs, in order (for wrap-parity):
 
 ## 3 · Section `#ambient` — "Ambient depth"
 
-`DsSection` shell (every section): `<section id class="mb-20">` (80px); heading block `mb-6`; `<h2 class="type-h3 text-foreground">` — 21px (1.3125rem)/1.3/600/−0.01em; description `type-small mt-2 max-w-2xl` — 13px/1.5/400/muted.
+`ElSection` shell (every section): `<section id class="mb-20">` (80px); heading block `mb-6`; `<h2 class="type-h3 text-foreground">` — 21px (1.3125rem)/1.3/600/−0.01em; description `type-small mt-2 max-w-2xl` — 13px/1.5/400/muted.
 
 Heading: **"Ambient depth"**
 Description (verbatim): **"Four steps. On a near-black page a shadow reads as a soft darkening, so depth mostly comes from the surface ladder — these only confirm it."**
@@ -465,7 +465,7 @@ Both glass boxes sit on the Panel body, which is opaque `bg-background`. **The b
 - It exists because **`glass-panel shadow-e4` does not work**: both own `box-shadow`, both are Tailwind utilities, and whichever Tailwind emits later wins outright — so the glass rim and the top highlight vanish and you are left with a translucent rectangle and a drop shadow. Measured, not reasoned: `getComputedStyle(panel).boxShadow` came back with no `inset` layer at all. Stacking any `shadow-*` on either glass utility fails the same way, which is why the elevation is chosen inside the utility rather than at the call site.
 - `e4` rather than `e2` because elevation reads as a ratio of object to shadow: the ambient depth that floats a 400px dialog leaves a 1440px panel looking welded down.
 
-**Port implication:** if the Flutter glass helper takes a `DsShadowSpec` parameter, the CSS failure mode does not reproduce — but the *two named variants* should still exist so `glass-panel-deep` has a home, and the section copy should still say "Two utilities" verbatim.
+**Port implication:** if the Flutter glass helper takes a `ElShadowSpec` parameter, the CSS failure mode does not reproduce — but the *two named variants* should still exist so `glass-panel-deep` has a home, and the section copy should still say "Two utilities" verbatim.
 
 ---
 
@@ -603,8 +603,8 @@ Reduced motion: nothing on this page has a `prefers-reduced-motion` guard of its
 
 ### 13.1 · Blur is 2×sigma for `box-shadow`, 1×sigma for `filter`
 
-- **`box-shadow`**: CSS spec — the shadow approximates a Gaussian with `sigma = blur-radius / 2`. `DsShadowLayer` stores the **raw CSS blur** and inverts Flutter's `Shadow.convertRadiusToSigma(r) = r * 0.57735 + 0.5` in `blurRadius` (`lib\src\foundation\shadows.dart:72–77`). Nothing on this page should recompute it.
-- **`backdrop-filter: blur(24px)`**: CSS Filter Effects — the parameter **is** the standard deviation. So `ImageFilter.blur(sigmaX: 24, sigmaY: 24)` — **no halving**. `DsBlurs.xl = 24` (`spacing.dart:124`) is already correct and already used this way in `shell.dart:174`.
+- **`box-shadow`**: CSS spec — the shadow approximates a Gaussian with `sigma = blur-radius / 2`. `ElShadowLayer` stores the **raw CSS blur** and inverts Flutter's `Shadow.convertRadiusToSigma(r) = r * 0.57735 + 0.5` in `blurRadius` (`lib\src\foundation\shadows.dart:72–77`). Nothing on this page should recompute it.
+- **`backdrop-filter: blur(24px)`**: CSS Filter Effects — the parameter **is** the standard deviation. So `ImageFilter.blur(sigmaX: 24, sigmaY: 24)` — **no halving**. `ElBlurs.xl = 24` (`spacing.dart:124`) is already correct and already used this way in `shell.dart:174`.
 - **Known limit that bites on this page:** Flutter's `+0.5` makes sigmas below 0.5 unreachable, so `blurRadius` floors to 0. Two layers on this page are affected — `--shadow-e1`'s `0 1px 1px --ink-2` (σ 0.5) and `--shadow-btn-down`'s `0 1px 1px --ink-1` (σ 0.5). Both render as hard 1px edges rather than a half-pixel smear. Documented at `shadows.dart:69–71`; accept it, don't work around it.
 
 Sigma table for every layer on this page:
@@ -615,11 +615,11 @@ Sigma table for every layer on this page:
 
 ### 13.2 · Paint order
 
-CSS paints the **first-listed** shadow on top. `DsShadowSpec.outerShadows` reverses the list for `BoxDecoration.boxShadow` (`shadows.dart:100–103`). `DsMachineSurface` paints fill → inset shadows → border → content, which is CSS's order and is what keeps `inset 0 1px 0 var(--rim)` **under** the border rather than over it (`machine_surface.dart:22–25`).
+CSS paints the **first-listed** shadow on top. `ElShadowSpec.outerShadows` reverses the list for `BoxDecoration.boxShadow` (`shadows.dart:100–103`). `ElMachineSurface` paints fill → inset shadows → border → content, which is CSS's order and is what keeps `inset 0 1px 0 var(--rim)` **under** the border rather than over it (`machine_surface.dart:22–25`).
 
 ### 13.3 · Border-box
 
-`border border-transparent` + `bg-clip-padding` on the Button means the visible fill is inset 1px on every side while the shadow is drawn from the border box. `DsMachineSurface` already applies `border!.dimensions` as padding (`machine_surface.dart:64–74`), matching the `border-box` fix already landed in the port.
+`border border-transparent` + `bg-clip-padding` on the Button means the visible fill is inset 1px on every side while the shadow is drawn from the border box. `ElMachineSurface` already applies `border!.dimensions` as padding (`machine_surface.dart:64–74`), matching the `border-box` fix already landed in the port.
 
 ### 13.4 · Blend modes and stacking
 
@@ -648,35 +648,35 @@ Package root `D:\DESIGN\Design-System-2026-8\flutter-design-system\`.
 
 | need | where |
 |---|---|
-| All 14 `--shadow-*` tokens, layer-for-layer | `lib\src\foundation\shadows.dart` — `DsShadows.e1..e4` (:159–177), `key` (:184), `keyDown` (:190), `pressed` (:197), `btn` (:204), `btnPrimary` (:214), `btnValue` (:224), `btnDown` (:232), `chip` (:239), `glowAction` (:249), `glowValue` (:257) |
-| CSS→Skia blur inversion + CSS paint order | `DsShadowLayer.blurRadius` (:72), `DsShadowSpec.outerShadows` (:100) |
-| Inset-shadow painting | `lib\src\effects\machine_surface.dart` — `DsMachineSurface` (:26), `debugInsetRing` (:56) |
-| Ink / rim / wall per theme | `DsThemeData.ink1..ink4` (:243–255), `rim` (:260), `rimStrong` (:264), `wall` (:268) in `lib\src\foundation\theme.dart` |
-| oklab mixing | `DsOklab.mix` (`lib\src\foundation\colors.dart:116`) |
-| Ramp colours incl. `valueForeground` | `DsPalette` (`colors.dart:304–357`) |
-| Radii incl. `xl4` = 32 and `pill` = 999 | `DsRadii` (`lib\src\foundation\spacing.dart:78–106`) |
-| `DsBlurs.xl = 24` | `spacing.dart:124` |
-| Durations / curves / transforms | `DsDurations`, `DsCurves`, `DsTransforms` (`lib\src\foundation\motion.dart`) — incl. `keyDownY = 3` (:106), `buttonScale = 0.95` (:99) |
-| Every type class used here | `DsType.h1/h3/lead/small/chip/code/label/micro/numSm` (`lib\src\foundation\typography.dart`) |
-| Docs kit | `example\lib\kit.dart` — `DsPageHeader` (:48), `DsSection` (:142), `DsPanel` (:236), `DsCode` (:442, with hyphen-aware `span` at :508), `DsDoDont` (:641), `DsNote` (:740), `DsGrid` (:814), `DsPageFootNav` (:1062) |
+| All 14 `--shadow-*` tokens, layer-for-layer | `lib\src\foundation\shadows.dart` — `ElShadows.e1..e4` (:159–177), `key` (:184), `keyDown` (:190), `pressed` (:197), `btn` (:204), `btnPrimary` (:214), `btnValue` (:224), `btnDown` (:232), `chip` (:239), `glowAction` (:249), `glowValue` (:257) |
+| CSS→Skia blur inversion + CSS paint order | `ElShadowLayer.blurRadius` (:72), `ElShadowSpec.outerShadows` (:100) |
+| Inset-shadow painting | `lib\src\effects\machine_surface.dart` — `ElMachineSurface` (:26), `debugInsetRing` (:56) |
+| Ink / rim / wall per theme | `ElThemeData.ink1..ink4` (:243–255), `rim` (:260), `rimStrong` (:264), `wall` (:268) in `lib\src\foundation\theme.dart` |
+| oklab mixing | `ElOklab.mix` (`lib\src\foundation\colors.dart:116`) |
+| Ramp colours incl. `valueForeground` | `ElPalette` (`colors.dart:304–357`) |
+| Radii incl. `xl4` = 32 and `pill` = 999 | `ElRadii` (`lib\src\foundation\spacing.dart:78–106`) |
+| `ElBlurs.xl = 24` | `spacing.dart:124` |
+| Durations / curves / transforms | `ElDurations`, `ElCurves`, `ElTransforms` (`lib\src\foundation\motion.dart`) — incl. `keyDownY = 3` (:106), `buttonScale = 0.95` (:99) |
+| Every type class used here | `ElType.h1/h3/lead/small/chip/code/label/micro/numSm` (`lib\src\foundation\typography.dart`) |
+| Docs kit | `example\lib\kit.dart` — `ElPageHeader` (:48), `ElSection` (:142), `ElPanel` (:236), `ElCode` (:442, with hyphen-aware `span` at :508), `ElDoDont` (:641), `ElNote` (:740), `ElGrid` (:814), `ElPageFootNav` (:1062) |
 | Nav entry for `shadows` — slug, title, blurb, all six chips | `example\lib\nav.dart:146–159`, already guarded by `example\test\nav_test.dart:169` |
 | Siblings (prev Spacing & Layout, next Motion) | `siblings()` at `nav.dart:731` — already resolves |
 | Shell, routing, page glow, thin scrollbar | `example\lib\shell.dart`, `lib\src\effects\page_glow.dart` |
-| Closest structural template | `example\lib\pages\spacing.dart` `_ElevationSection` (:377), `_ElevationCell` (:420), `_GlowCell` (:493) — but these paint **outer-only** via `BoxDecoration`; every machine specimen must go through `DsMachineSurface` instead |
+| Closest structural template | `example\lib\pages\spacing.dart` `_ElevationSection` (:377), `_ElevationCell` (:420), `_GlowCell` (:493) — but these paint **outer-only** via `BoxDecoration`; every machine specimen must go through `ElMachineSurface` instead |
 
 ### 14.2 · Missing — must be built
 
 | # | missing | notes |
 |---|---|---|
 | 1 | `example\lib\pages\shadows.dart` + a `switch` arm at `example\lib\main.dart:104` | route currently falls through to `PlaceholderPage` ("Not ported yet") |
-| 2 | **`glass-panel` / `glass-panel-deep` / `glass-control`** | nothing in `lib\` implements them; only `DsBlurs.xl`'s doc comment names the utility |
+| 2 | **`glass-panel` / `glass-panel-deep` / `glass-control`** | nothing in `lib\` implements them; only `ElBlurs.xl`'s doc comment names the utility |
 | 3 | **`backdrop-saturate`** | port has `BackdropFilter` blur only (`shell.dart:174`, `sheet.dart:248`); needs the §13.5 matrix |
 | 4 | **`sheen-action`** | ramp + static texture + `action-beat`; theme-split blend mode |
 | 5 | **`foil-value`** | metal ramp + drifting foil + sweeping glint; two infinite animations |
 | 6 | **Button variants `default`, `premium`, `secondary`** | `lib\src\components\button.dart:28` ships **only** `outline` and `ghost`. `destructive` and `link` are not needed by this page. Enum is already shaped to take them without a rename (`button.dart:5–8`). |
-| 7 | **An Input / text-field widget** | nothing in the package. `DsShadows.pressed` exists with **no consumer**. Needs: 40px pill, `--input` border, `--card` fill, `shadow-pressed` inset socket, placeholder, focus ring `0 0 0 3px --ring @35%` + border `--primary @50%`, 250ms `--ease-out`. |
+| 7 | **An Input / text-field widget** | nothing in the package. `ElShadows.pressed` exists with **no consumer**. Needs: 40px pill, `--input` border, `--card` fill, `shadow-pressed` inset socket, placeholder, focus ring `0 0 0 3px --ring @35%` + border `--primary @50%`, 250ms `--ease-out`. |
 | 8 | **A focus-ring helper** | `focus-visible:ring-3` composited in front of the element's own shadow — needed by both Button and Input |
-| 9 | **`press-key` widget** | `DsShadows.key`/`keyDown` and `DsTransforms.keyDownY` exist, nothing wires them. Only needed if §4's stills are ever made interactive — the reference does **not** animate them. |
+| 9 | **`press-key` widget** | `ElShadows.key`/`keyDown` and `ElTransforms.keyDownY` exist, nothing wires them. Only needed if §4's stills are ever made interactive — the reference does **not** animate them. |
 | 10 | **`_referenceHeight` entry for `/design-system/shadows`** | `example\test\vertical_parity_probe_test.dart:45` — must be measured off the live web dev server at the 1440 frame before the page can pass parity |
 | 11 | **Wrap-parity expectations** | `example\test\wrap_parity_probe_test.dart` — this page has long `leading-snug` use strings in a 3-column and a 4-column grid; expect a dense break table |
 | 12 | Page test | model on `example\test\spacing_page_test.dart` |
@@ -686,9 +686,9 @@ Package root `D:\DESIGN\Design-System-2026-8\flutter-design-system\`.
 `test\token_guard_test.dart` (rules at :40–53) forbids, outside `lib\src\foundation\`: `Color(0x`, `Color.from`, `fontSize:<digit>`, `letterSpacing:<digit>`, `FontWeight.w<digit>`, `Curves.`, `Duration(milliseconds:<digit>`, `BorderRadius.circular(<digit>`, and **`BoxShadow(`**. Escape hatch is `// allow-hardcoded: <reason>` on the line.
 
 Consequences for this page:
-- Every specimen must reach its shadow through a `DsShadows.*` spec — no literal `BoxShadow(`.
-- `rounded-4xl` must be `DsRadii.xl4`, `rounded-pill` must be `DsRadii.pill`.
-- The foil/sheen gradient stops are literal colours → they belong in `lib\src\foundation\` (a `DsPalette`-adjacent effects-colour block) or in `lib\src\effects\` with an explicit escape-hatch comment. **Prefer: derive them at runtime with `DsOklab.mix` from `DsPalette` so a rebrand carries** — that is what the CSS does, and `colors.dart:116` already provides it. The resolved hexes in §5.3/§5.4 are then verification targets, not source.
+- Every specimen must reach its shadow through a `ElShadows.*` spec — no literal `BoxShadow(`.
+- `rounded-4xl` must be `ElRadii.xl4`, `rounded-pill` must be `ElRadii.pill`.
+- The foil/sheen gradient stops are literal colours → they belong in `lib\src\foundation\` (a `ElPalette`-adjacent effects-colour block) or in `lib\src\effects\` with an explicit escape-hatch comment. **Prefer: derive them at runtime with `ElOklab.mix` from `ElPalette` so a rebrand carries** — that is what the CSS does, and `colors.dart:116` already provides it. The resolved hexes in §5.3/§5.4 are then verification targets, not source.
 - `action-beat` / `value-glint` / `value-foil-drift` timings must come from named constants; `--duration-*` covers 80/250 but **2.6s, 620ms, 11s, 5.5s and 2.4s have no token** — see open question 3.
 
 ---
@@ -697,9 +697,9 @@ Consequences for this page:
 
 1. **`--referenceHeight` for the shadows route.** The vertical parity probe needs a measured number from the live web page at 1440×900 with the real fonts. Should I take that measurement (dev server + `scratchpad/measure-vertical.js`) as part of this build, or is it supplied?
 2. **Infinite animations vs the parity probe.** `foil-value` runs two forever-loops. The probe pumps widgets and measures geometry, so it should be unaffected, but a widget test with an unbounded `AnimationController` will hang `pumpAndSettle`. Confirm the page tests should use `pump(Duration)` rather than `pumpAndSettle`, and whether the foil should be frozen under a test flag.
-3. **Where do the effect timings live?** 2.6s, 620ms, 11s, 5.5s, 2.4s are written inline in globals.css and are not on the `--duration-*` scale. Add them as `DsDurations.beatHover` / `beatPress` / `foilDrift` / `glint` / `glintHover` in `lib\src\foundation\motion.dart` (a token the CSS does not have), or hold them in the effects file with escape-hatch comments? The former is cleaner but invents tokens the reference lacks.
-4. **Reduced motion.** The reference has no `prefers-reduced-motion` guard on the foil or the beat. `dsAnimationDuration` (`theme_scope.dart:332`) exists in the port. Do we mirror the reference exactly (foil keeps drifting under reduced motion), or apply the port's gate and accept the divergence?
-5. **Button variant scope.** This page needs `default`, `premium` and `secondary` added to `DsButtonVariant`. Build all three plus `destructive` and `link` now (completing the enum for the future buttons page), or exactly the three this page renders?
-6. **The Input.** No text-entry widget exists. Build a real focusable `DsInput` (editable, keyboard focus, caret) so "focus the field" in the section description is literally true, and so `--shadow-pressed` finally has a consumer? Or a non-editable specimen that only demonstrates the two shadow states?
+3. **Where do the effect timings live?** 2.6s, 620ms, 11s, 5.5s, 2.4s are written inline in globals.css and are not on the `--duration-*` scale. Add them as `ElDurations.beatHover` / `beatPress` / `foilDrift` / `glint` / `glintHover` in `lib\src\foundation\motion.dart` (a token the CSS does not have), or hold them in the effects file with escape-hatch comments? The former is cleaner but invents tokens the reference lacks.
+4. **Reduced motion.** The reference has no `prefers-reduced-motion` guard on the foil or the beat. `elAnimationDuration` (`theme_scope.dart:332`) exists in the port. Do we mirror the reference exactly (foil keeps drifting under reduced motion), or apply the port's gate and accept the divergence?
+5. **Button variant scope.** This page needs `default`, `premium` and `secondary` added to `ElButtonVariant`. Build all three plus `destructive` and `link` now (completing the enum for the future buttons page), or exactly the three this page renders?
+6. **The Input.** No text-entry widget exists. Build a real focusable `ElInput` (editable, keyboard focus, caret) so "focus the field" in the section description is literally true, and so `--shadow-pressed` finally has a consumer? Or a non-editable specimen that only demonstrates the two shadow states?
 7. **`glass-panel-deep`.** Not rendered on this page. Build it now alongside its sibling (the CSS pairs them and §7.5 explains why), or defer until a page shows it?
 8. **Drift 3 (44px vs `h-12` 48px).** Confirmed: render the specimen at 48px and print the copy saying 44px, per the fidelity bar. Flagging because it is the one drift where copy and pixels contradict on the same line.

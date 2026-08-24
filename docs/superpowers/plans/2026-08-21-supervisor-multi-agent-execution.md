@@ -257,7 +257,7 @@ Decisions:
 Implementation judgments and why they were made.
 
 Public APIs used:
-Verified Ds* APIs, foundations, or external contracts.
+Verified El* APIs, foundations, or external contracts.
 
 States covered:
 Loading, empty, error, success, disabled, focus, reduced motion, or N/A reasons.
@@ -294,7 +294,7 @@ A worker is not accepted as complete without this handoff.
 
 ### 8.2 Architecture review
 
-- Public `Ds*` APIs are used correctly.
+- Public `El*` APIs are used correctly.
 - No competing token or theme system was introduced.
 - Product composition stays outside package components.
 - Registry output derives from the authoritative package.

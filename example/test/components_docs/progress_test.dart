@@ -1,35 +1,29 @@
-import 'dart:typed_data';
-import 'dart:ui' as ui;
-
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/progress/meta.dart';
 import 'package:example/components_docs/progress/page.dart';
-import 'package:example/kit.dart' show DsSection;
+import 'package:example/kit.dart' show ElSection;
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// The `progress` documentation page: renders the shadcn-mirrored section
-/// template for BOTH `DsProgress` and `DsSkeleton` on one page (one entry,
-/// one route: see `meta.dart`'s own note on why two components share this
-/// slot).
+/// template for [ElProgress] only. `ElSkeleton` was split off into its own
+/// route (`example/lib/components_docs/skeleton/`) and its own test
+/// (`skeleton_test.dart`); see `progress/meta.dart`'s library note for the
+/// split.
 ///
-/// Both components carry a real animation: `DsProgress`'s fill tweens on
-/// every value change, `DsSkeleton`'s shimmer loops forever, so this file
-/// never calls `tester.pumpAndSettle()`: a looping `AnimationController.repeat()`
-/// under `DsSkeleton` means settle would poll forever. Every wait below is a
-/// bounded `tester.pump()`/`tester.pump(Duration(...))` instead, exactly as
-/// the task brief requires.
+/// `ElProgress`'s fill carries a real, finite tween, so this file still
+/// never calls `tester.pumpAndSettle()` against it out of caution: every
+/// wait below is a bounded `tester.pump()`/`tester.pump(Duration(...))`.
 Widget _harness({
   required Widget child,
   required Size size,
-  required DsThemeController controller,
+  required ElThemeController controller,
   bool disableAnimations = false,
 }) => MediaQuery(
   data: MediaQueryData(size: size, disableAnimations: disableAnimations),
   child: Directionality(
     textDirection: TextDirection.ltr,
-    child: DsTheme(
+    child: ElTheme(
       controller: controller,
       child: MaterialApp(home: SingleChildScrollView(child: child)),
     ),
@@ -37,10 +31,10 @@ Widget _harness({
 );
 
 void main() {
-  group('progress & skeleton docs page', () {
+  group('progress docs page', () {
     testWidgets(
       'sections render in the shadcn-mirrored order, section for section, '
-      'progress then skeleton, each named for its own component',
+      'with no leftover Skeleton section from the merged page',
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(1440, 900);
         tester.view.devicePixelRatio = 1;
@@ -49,7 +43,7 @@ void main() {
         await tester.pumpWidget(
           _harness(
             size: const Size(1440, 900),
-            controller: DsThemeController(mode: DsThemeMode.dark),
+            controller: ElThemeController(mode: ElThemeMode.dark),
             child: const ProgressDocPage(),
           ),
         );
@@ -57,29 +51,22 @@ void main() {
         await tester.pump(const Duration(milliseconds: 300));
 
         final List<String> titles = tester
-            .widgetList<DsSection>(find.byType(DsSection))
-            .map((DsSection section) => section.title)
+            .widgetList<ElSection>(find.byType(ElSection))
+            .map((ElSection section) => section.title)
             .toList();
 
         expect(titles, <String>[
           'Installation',
           'Usage',
-          'Progress: Label and value',
-          'Progress: Controlled',
-          'Progress: RTL',
-          'Progress: Download list',
-          'Skeleton: Avatar',
-          'Skeleton: Card',
-          'Skeleton: Text',
-          'Skeleton: Form',
-          'Skeleton: Table',
-          'Skeleton: RTL',
-          'Skeleton: Avoiding layout shift',
+          'Label and value',
+          'Controlled',
+          'RTL',
+          'Download list',
           'API Reference',
           'States',
-          'Accessibility',
+          'Accessibility and keyboard behavior',
           'Responsive',
-          'Dependencies',
+          'Dependencies, files, and install facts',
           'Theming',
           'Source',
         ]);
@@ -87,8 +74,8 @@ void main() {
     );
 
     testWidgets(
-      'renders the article, both API tables, and live specimens of both '
-      'components at several values',
+      'renders the article, the API table, and live specimens at several '
+      'values',
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(1440, 900);
         tester.view.devicePixelRatio = 1;
@@ -98,15 +85,12 @@ void main() {
         await tester.pumpWidget(
           _harness(
             size: const Size(1440, 900),
-            controller: DsThemeController(mode: DsThemeMode.dark),
+            controller: ElThemeController(mode: ElThemeMode.dark),
             child: ProgressDocPage(
               onNavigate: (String route) => destination = route,
             ),
           ),
         );
-        // One bounded pump for the first frame's layout: never
-        // pumpAndSettle, which would poll forever against DsSkeleton's
-        // repeating shimmer controller.
         await tester.pump();
         await tester.pump(const Duration(milliseconds: 300));
 
@@ -119,26 +103,17 @@ void main() {
           findsOneWidget,
         );
 
-        // The API table lists every DsProgress constructor parameter found
+        // The API table lists every ElProgress constructor parameter found
         // in lib/src/components/progress.dart.
         for (final String param in <String>['value', 'tone', 'label']) {
           expect(
             find.text(param),
             findsWidgets,
-            reason: 'missing DsProgress API row: $param',
-          );
-        }
-        // ...and every DsSkeleton constructor parameter found in
-        // lib/src/components/skeleton.dart.
-        for (final String param in <String>['width', 'height', 'radius']) {
-          expect(
-            find.text(param),
-            findsWidgets,
-            reason: 'missing DsSkeleton API row: $param',
+            reason: 'missing ElProgress API row: $param',
           );
         }
 
-        // Every DsProgressTone rung is documented.
+        // Every ElProgressTone rung is documented.
         for (final String tone in <String>[
           'normal',
           'value',
@@ -149,33 +124,33 @@ void main() {
           expect(
             find.text(tone),
             findsWidgets,
-            reason: 'missing DsProgressTone row: $tone',
+            reason: 'missing ElProgressTone row: $tone',
           );
         }
 
-        // Live DsProgress specimens mount at several distinct values.
-        final List<DsProgress> progresses = tester
-            .widgetList<DsProgress>(find.byType(DsProgress))
+        // Live ElProgress specimens mount at several distinct values.
+        final List<ElProgress> progresses = tester
+            .widgetList<ElProgress>(find.byType(ElProgress))
             .toList();
         expect(progresses.length, greaterThanOrEqualTo(6));
         expect(
-          progresses.map((DsProgress p) => p.value).toSet().length,
+          progresses.map((ElProgress p) => p.value).toSet().length,
           greaterThanOrEqualTo(6),
           reason: 'progress specimens should cover several distinct values',
         );
         // All five tones appear on at least one specimen.
         expect(
-          progresses.map((DsProgress p) => p.tone).toSet(),
-          containsAll(DsProgressTone.values),
+          progresses.map((ElProgress p) => p.tone).toSet(),
+          containsAll(ElProgressTone.values),
         );
 
-        // Live DsSkeleton specimens mount in several shapes.
-        expect(find.byType(DsSkeleton), findsAtLeastNWidgets(4));
+        // No leftover ElSkeleton widget from the pre-split page.
+        expect(find.byType(ElSkeleton), findsNothing);
 
         expect(progressDoc.name, 'progress');
         expect(
           progressDoc.exports,
-          containsAll(<String>['DsProgress', 'DsProgressTone', 'DsSkeleton']),
+          containsAll(<String>['ElProgress', 'ElProgressTone']),
         );
         expect(destination, isNull);
       },
@@ -193,7 +168,7 @@ void main() {
         await tester.pumpWidget(
           _harness(
             size: const Size(1440, 900),
-            controller: DsThemeController(mode: DsThemeMode.dark),
+            controller: ElThemeController(mode: ElThemeMode.dark),
             child: ProgressDocPage(
               onNavigate: (String route) => destination = route,
             ),
@@ -209,7 +184,7 @@ void main() {
         await tester.ensureVisible(specimen);
         await tester.pump();
 
-        final double before = tester.widget<DsProgress>(specimen).value;
+        final double before = tester.widget<ElProgress>(specimen).value;
 
         final Finder advanceButton = find.byKey(
           const ValueKey<String>('progress-doc-simulate-button'),
@@ -221,16 +196,17 @@ void main() {
         await tester.pump();
         await tester.pump(const Duration(milliseconds: 300));
 
-        final double after = tester.widget<DsProgress>(specimen).value;
+        final double after = tester.widget<ElProgress>(specimen).value;
         expect(after, greaterThan(before));
 
         // The Previous/Next pager (DocsLayout) navigates through the same
-        // route callback as every other docs page.
-        final Finder separatorLink = find.text('Separator').first;
-        await tester.ensureVisible(separatorLink);
+        // route callback as every other docs page. Progress's own next
+        // link now points at the new Skeleton route.
+        final Finder skeletonLink = find.text('Skeleton').first;
+        await tester.ensureVisible(skeletonLink);
         await tester.pump();
-        await tester.tap(separatorLink);
-        expect(destination, '/components/separator');
+        await tester.tap(skeletonLink);
+        expect(destination, '/components/skeleton');
       },
     );
 
@@ -244,7 +220,7 @@ void main() {
         await tester.pumpWidget(
           _harness(
             size: const Size(390, 844),
-            controller: DsThemeController(mode: DsThemeMode.dark),
+            controller: ElThemeController(mode: ElThemeMode.dark),
             child: const ProgressDocPage(),
           ),
         );
@@ -277,7 +253,7 @@ void main() {
         await tester.pumpWidget(
           _harness(
             size: const Size(390, 844),
-            controller: DsThemeController(mode: DsThemeMode.light),
+            controller: ElThemeController(mode: ElThemeMode.light),
             child: const ProgressDocPage(),
           ),
         );
@@ -288,20 +264,19 @@ void main() {
           find.byKey(const ValueKey<String>('progress-doc-article')),
           findsOneWidget,
         );
-        expect(find.byType(DsProgress), findsWidgets);
-        expect(find.byType(DsSkeleton), findsWidgets);
+        expect(find.byType(ElProgress), findsWidgets);
       },
     );
 
-    testWidgets('the live theme controller flips both specimens in place', (
+    testWidgets('the live theme controller flips the specimens in place', (
       WidgetTester tester,
     ) async {
       tester.view.physicalSize = const Size(1440, 900);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
 
-      final DsThemeController controller = DsThemeController(
-        mode: DsThemeMode.dark,
+      final ElThemeController controller = ElThemeController(
+        mode: ElThemeMode.dark,
       );
       await tester.pumpWidget(
         _harness(
@@ -319,7 +294,7 @@ void main() {
       );
 
       // Flip the SAME controller in place: not a fresh widget tree.
-      controller.setMode(DsThemeMode.light);
+      controller.setMode(ElThemeMode.light);
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 300));
 
@@ -327,13 +302,12 @@ void main() {
         find.byKey(const ValueKey<String>('progress-doc-article')),
         findsOneWidget,
       );
-      expect(find.byType(DsProgress), findsWidgets);
-      expect(find.byType(DsSkeleton), findsWidgets);
+      expect(find.byType(ElProgress), findsWidgets);
     });
 
     testWidgets(
       'reduced motion lands the progress fill on its final translation in '
-      'one pump, and freezes the skeleton shimmer to a single still frame',
+      'one pump',
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(1440, 900);
         tester.view.devicePixelRatio = 1;
@@ -342,20 +316,17 @@ void main() {
         await tester.pumpWidget(
           _harness(
             size: const Size(1440, 900),
-            controller: DsThemeController(mode: DsThemeMode.dark),
+            controller: ElThemeController(mode: ElThemeMode.dark),
             disableAnimations: true,
             child: const ProgressDocPage(),
           ),
         );
-        // Under MediaQueryData.disableAnimations, dsAnimationDuration
-        // collapses every tween AND every DsKeyframePlayer repeat to
-        // Duration.zero (theme_scope.dart), so a couple of bounded pumps are
-        // enough to reach the settled frame: never pumpAndSettle.
+        // Under MediaQueryData.disableAnimations, elAnimationDuration
+        // collapses the tween to Duration.zero (theme_scope.dart), so a
+        // couple of bounded pumps are enough to reach the settled frame.
         await tester.pump();
         await tester.pump();
 
-        // ── DsProgress: the fill lands on its target translation in a
-        // single pump after a value change, no tween to wait out. ──
         final Finder specimen = find.byKey(
           const ValueKey<String>('progress-doc-live-specimen'),
         );
@@ -384,62 +355,14 @@ void main() {
             .widget<FractionalTranslation>(fill)
             .translation
             .dx;
-        final DsProgress progress = tester.widget<DsProgress>(specimen);
+        final ElProgress progress = tester.widget<ElProgress>(specimen);
         expect(after, closeTo(progress.translation, 1e-9));
         expect(
           after,
           isNot(closeTo(before, 1e-9)),
           reason: 'the tap should have changed the value',
         );
-
-        // ── DsSkeleton: the shimmer paints a single still frame under
-        // reduced motion. DsKeyframePlayer(repeat: true) wraps its own
-        // painted output in a RepaintBoundary (keyframes.dart), which this
-        // rasterises directly: the same technique
-        // test/feedback_effects_test.dart's rasterise()/readRaster() use at
-        // package level, applied here to this page's own avatar specimen so
-        // the docs test does not merely take the package test's word for
-        // it. Two captures 470ms apart (a third of the shimmer's 1.4s
-        // cycle) must be pixel-identical; a running shimmer would not be.
-        final Finder skeletonBoundary = find.descendant(
-          of: find.byKey(const ValueKey<String>('skeleton-preview:avatar')),
-          matching: find.byType(RepaintBoundary),
-        );
-        expect(skeletonBoundary, findsOneWidget);
-
-        final Uint8List frameA = await _captureBytes(tester, skeletonBoundary);
-        // Bounded, not pumpAndSettle: DsKeyframePlayer stops its controller
-        // outright under reduced motion, so this must not hang.
-        await tester.pump(const Duration(milliseconds: 470));
-        final Uint8List frameB = await _captureBytes(tester, skeletonBoundary);
-
-        expect(
-          frameA,
-          orderedEquals(frameB),
-          reason:
-              'the skeleton shimmer kept moving under '
-              'MediaQuery.disableAnimations: true, reduced motion did not '
-              'settle it',
-        );
       },
     );
   });
-}
-
-/// Rasterises the [RepaintBoundary] at [finder] to raw RGBA bytes.
-///
-/// Mirrors `test/feedback_effects_test.dart`'s own `readRaster` helper —
-/// `toImage`/`toByteData` both need `tester.runAsync` because they touch the
-/// raster thread, not merely the widget tree `pump()` already advanced.
-Future<Uint8List> _captureBytes(WidgetTester tester, Finder finder) async {
-  final RenderRepaintBoundary boundary = tester.renderObject(finder);
-  final ui.Image image = (await tester.runAsync(
-    () => boundary.toImage(pixelRatio: 1),
-  ))!;
-  final ByteData bytes = (await tester.runAsync(
-    () async => (await image.toByteData(format: ui.ImageByteFormat.rawRgba))!,
-  ))!;
-  final Uint8List out = bytes.buffer.asUint8List();
-  image.dispose();
-  return out;
 }

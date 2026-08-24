@@ -5,6 +5,7 @@ import 'package:example/docs/docs_code.dart';
 import 'package:example/main.dart';
 import 'package:example/skills_docs/catalog.dart';
 import 'package:example/skills_docs/skills_page.dart';
+import 'package:example/site/pages/home_showcase.dart' show homeShowcaseCards;
 import 'package:example/site/pages/public_pages.dart';
 import 'package:example/site/site_routes.dart' show skillsRoute;
 import 'package:flutter/material.dart';
@@ -19,8 +20,8 @@ final SkillDocEntry _skill = skillDocs.first;
 /// skill's real files live above it, at `skills/<slug>/…`.
 String _rooted(String relative) => '../$relative';
 
-Widget _harness(Widget child) => DsTheme(
-  controller: DsThemeController(mode: DsThemeMode.dark),
+Widget _harness(Widget child) => ElTheme(
+  controller: ElThemeController(mode: ElThemeMode.dark),
   child: MaterialApp(
     debugShowCheckedModeBanner: false,
     home: SingleChildScrollView(child: child),
@@ -47,6 +48,47 @@ void main() {
     expect(find.text('Building blocks'), findsOneWidget);
   });
 
+  testWidgets('the home grid renders every live card it declares', (
+    WidgetTester tester,
+  ) async {
+    // Wide and tall on purpose: the masonry reads the viewport for its column
+    // count, and every card is built eagerly, so a short view would only
+    // measure overflow.
+    _sizeTo(tester, const Size(1600, 6000));
+    await tester.pumpWidget(_harness(const PublicHomePage()));
+
+    expect(homeShowcaseCards(), hasLength(14));
+
+    // One string per card, each unique to it. Titles alone will not do: the
+    // navigation card's rows are spelled 'Analytics', 'Notifications' and
+    // 'Profile' too, which are three other cards' headings.
+    const List<String> fingerprints = <String>[
+      'Building blocks',
+      'Contribution history',
+      'Set a new milestone',
+      'Switch metric',
+      'Distribute your first track',
+      'Payout threshold',
+      'Choose which email and push alerts you want to receive.',
+      'Recent activity',
+      'Say something',
+      'Last 6 months, one real chart.',
+      'Claimable balance',
+      // The sign-in card's own title is also its submit button's label, so the
+      // description is the only string in it that appears exactly once.
+      'A real form: validated fields and a submit.',
+      'Workspace navigation',
+      'How this account is addressed, edited live.',
+    ];
+    for (final String fingerprint in fingerprints) {
+      expect(
+        find.text(fingerprint),
+        findsOneWidget,
+        reason: 'the home grid dropped the card holding "$fingerprint"',
+      );
+    }
+  });
+
   testWidgets('public page actions report their route without owning routing', (
     WidgetTester tester,
   ) async {
@@ -71,13 +113,45 @@ void main() {
   ) async {
     await tester.pumpWidget(_harness(const PublicComponentsPage()));
 
-    expect(find.text('Base Components'), findsOneWidget);
-    expect(find.text('Agent'), findsOneWidget);
-    expect(find.text('Buttons'), findsOneWidget);
-    expect(find.text('Console'), findsOneWidget);
-    expect(find.text('Ready to install'), findsOneWidget);
-    expect(find.text('Button'), findsOneWidget);
-    expect(find.text('elattar add button'), findsOneWidget);
+    // `/components` renders inside `DocsLayout` now, so each group title
+    // appears twice on a wide viewport: once as the section heading in the
+    // article, and once as its entry in the right-hand "ON THIS PAGE" rail.
+    // A bare `find.text` is therefore ambiguous and reports "is too many",
+    // which reads confusingly as a missing heading. Assert `findsWidgets` for
+    // the titles the rail echoes, and keep `findsOneWidget` for the ones it
+    // does not.
+    // The `elGroups` sections (Base Components, Agent, Site Pages) are gone
+    // from this index: every entry in them linked into the legacy `/el/...`
+    // tree, which no longer exists, and an index must not list pages a reader
+    // cannot open. What remains is the documented components, each of which
+    // has a real `/components/<name>` page.
+    expect(find.text('Base Components'), findsNothing);
+    expect(find.text('Agent'), findsNothing);
+    expect(find.text('Ready to install'), findsWidgets);
+    expect(find.text('Button'), findsWidgets);
+    // Reshaped to match https://ui.shadcn.com/docs/components: a dense list
+    // of plain-name links, not a card with a description and a command
+    // caption. `elattar add button` is no longer printed on this page (it
+    // still is on /components/button, the page the link opens) — asserted
+    // below by driving the tap instead of reading a caption that no longer
+    // exists.
+    expect(find.text('elattar add button'), findsNothing);
+  });
+
+  testWidgets('a component link in the dense grid opens its own reference', (
+    WidgetTester tester,
+  ) async {
+    final List<String> routes = <String>[];
+    await tester.pumpWidget(
+      _harness(PublicComponentsPage(onNavigate: routes.add)),
+    );
+
+    final Finder buttonLink = find.text('Button');
+    await tester.ensureVisible(buttonLink);
+    await tester.tap(buttonLink);
+    await tester.pump();
+
+    expect(routes, <String>['/components/button']);
   });
 
   // `/skills` is no longer served from this library either — `PublicSkillsPage`
@@ -146,7 +220,7 @@ void main() {
       // Deleting it once is not enough: this is what stops it coming back.
       expect(find.textContaining('npx'), findsNothing);
 
-      // The old page asserted `find.byType(DsAgentCodeBlock), findsNothing`.
+      // The old page asserted `find.byType(ElAgentCodeBlock), findsNothing`.
       // That was a proxy for "prints no unverified command", available only
       // because the placeholder had no install section at all. `SkillsPage`
       // legitimately prints commands, so the proxy is replaced by the thing it
@@ -233,9 +307,7 @@ void main() {
       // which is the first one, as a single Text — so this compares the pixels
       // a reader gets against `File.readAsStringSync`, with nothing in between.
       expect(
-        find.text(
-          File(_rooted(_skill.sourcePaths.first)).readAsStringSync(),
-        ),
+        find.text(File(_rooted(_skill.sourcePaths.first)).readAsStringSync()),
         findsOneWidget,
         reason:
             '${_skill.files.first} is not rendered verbatim. The page must '

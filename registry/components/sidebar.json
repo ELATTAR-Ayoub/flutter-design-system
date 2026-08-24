@@ -1,0 +1,48 @@
+{
+  "name": "sidebar",
+  "type": "component",
+  "version": "0.0.1",
+  "description": "`components/ui/sidebar.tsx` — the app shell, taken apart.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/sidebar.dart",
+      "target": "@ui/sidebar.dart",
+      "sha256": "488a066354700b3a0c9ed15888b23eeb56176137661e6c9b534585c89c3d3008"
+    }
+  ],
+  "registryDependencies": [
+    "badge",
+    "button",
+    "collapsible",
+    "icon",
+    "icon-swap",
+    "input",
+    "keyframes",
+    "machine-surface",
+    "sheet",
+    "skeleton",
+    "source-foundation",
+    "tooltip"
+  ],
+  "semanticDependencies": [
+    "badge",
+    "button",
+    "collapsible",
+    "icon",
+    "icon-swap",
+    "input",
+    "keyframes",
+    "machine-surface",
+    "sheet",
+    "skeleton",
+    "tooltip"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "documentationRoute": "/components/sidebar",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/sidebar.dart"
+}

@@ -220,7 +220,7 @@ purpose only.
 - The three Shots deliberately exclude `foil-value`; it runs two infinite
   animations that the deterministic-preview gate would have to freeze.
 - Responsive layout inside a Shot is hand-rolled from `MediaQuery.sizeOf`
-  against `DsBreakpoints`, because `DsGrid`, `DsPageHeader` and `DsSection` are
+  against `ElBreakpoints`, because `ElGrid`, `ElPageHeader` and `ElSection` are
   example-app kit rather than registry items.
 - Visual review of the new routes is by widget test and by reading, not by
   golden image. This repository has no golden infrastructure (Ruling 5).

@@ -1,21 +1,21 @@
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/button/meta.dart';
 import 'package:example/components_docs/button/page.dart';
-import 'package:example/kit.dart' show DsSection;
+import 'package:example/kit.dart' show ElSection;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 Widget _harness({
   required Widget child,
-  required DsThemeController controller,
-}) => DsTheme(
+  required ElThemeController controller,
+}) => ElTheme(
   controller: controller,
   child: MaterialApp(home: SingleChildScrollView(child: child)),
 );
 
-/// Every named constructor parameter `DsButton`'s own class declares
+/// Every named constructor parameter `ElButton`'s own class declares
 /// (`lib/src/components/button.dart`), excluding `key`: the same set the
-/// page's `DsButton` [DocsApiTable] claims to cover.
+/// page's `ElButton` [DocsApiTable] claims to cover.
 const List<String> _buttonConstructorParams = <String>[
   'child',
   'variant',
@@ -38,7 +38,7 @@ void main() {
   group('button docs page', () {
     testWidgets(
       'renders the article, the full API table, and a live specimen of '
-      'every DsButtonVariant and DsButtonSize this page claims to show',
+      'every ElButtonVariant and ElButtonSize this page claims to show',
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(1440, 900);
         tester.view.devicePixelRatio = 1;
@@ -47,7 +47,7 @@ void main() {
         String? destination;
         await tester.pumpWidget(
           _harness(
-            controller: DsThemeController(mode: DsThemeMode.dark),
+            controller: ElThemeController(mode: ElThemeMode.dark),
             child: ButtonDocPage(
               onNavigate: (String route) => destination = route,
             ),
@@ -62,46 +62,46 @@ void main() {
           findsOneWidget,
         );
 
-        // Every DsButton constructor parameter is named in the DsButton
+        // Every ElButton constructor parameter is named in the ElButton
         // API table.
         for (final String param in _buttonConstructorParams) {
           expect(find.text(param), findsWidgets, reason: 'missing $param');
         }
 
-        // Every DsButtonVariant enum value is named in the DsButtonVariant
-        // table, and every DsButtonSize value in the DsButtonSize table.
-        for (final DsButtonVariant variant in DsButtonVariant.values) {
+        // Every ElButtonVariant enum value is named in the ElButtonVariant
+        // table, and every ElButtonSize value in the ElButtonSize table.
+        for (final ElButtonVariant variant in ElButtonVariant.values) {
           expect(
             find.text(variant.name),
             findsWidgets,
-            reason: 'DsButtonVariant.${variant.name} missing from API table',
+            reason: 'ElButtonVariant.${variant.name} missing from API table',
           );
         }
-        for (final DsButtonSize size in DsButtonSize.values) {
+        for (final ElButtonSize size in ElButtonSize.values) {
           expect(
             find.text(size.name),
             findsWidgets,
-            reason: 'DsButtonSize.${size.name} missing from API table',
+            reason: 'ElButtonSize.${size.name} missing from API table',
           );
         }
 
-        // A live DsButton specimen of every variant mounts somewhere on
+        // A live ElButton specimen of every variant mounts somewhere on
         // the page, this page's own promise, not just the API table's
         // prose.
-        final Set<DsButtonVariant> mountedVariants = tester
-            .widgetList<DsButton>(find.byType(DsButton))
-            .map((DsButton button) => button.variant)
+        final Set<ElButtonVariant> mountedVariants = tester
+            .widgetList<ElButton>(find.byType(ElButton))
+            .map((ElButton button) => button.variant)
             .toSet();
-        expect(mountedVariants, containsAll(DsButtonVariant.values));
+        expect(mountedVariants, containsAll(ElButtonVariant.values));
 
-        // A live specimen of every DsButtonSize rung mounts too. The
+        // A live specimen of every ElButtonSize rung mounts too. The
         // Icon example covers the four squares, the Size example covers
         // the five text rungs.
-        final Set<DsButtonSize> mountedSizes = tester
-            .widgetList<DsButton>(find.byType(DsButton))
-            .map((DsButton button) => button.size)
+        final Set<ElButtonSize> mountedSizes = tester
+            .widgetList<ElButton>(find.byType(ElButton))
+            .map((ElButton button) => button.size)
             .toSet();
-        expect(mountedSizes, containsAll(DsButtonSize.values));
+        expect(mountedSizes, containsAll(ElButtonSize.values));
 
         // Every example specimen this page's own source keys carries its
         // key on the page.
@@ -149,40 +149,40 @@ void main() {
         // The Loading example specimen actually carries loading: true, and
         // the Disabled example actually carries a null onPressed: the two
         // states are not just labelled, they are real.
-        final DsButton loadingButton = tester.widget<DsButton>(
+        final ElButton loadingButton = tester.widget<ElButton>(
           find.descendant(
             of: find.byKey(const ValueKey<String>('button-example:loading')),
-            matching: find.byType(DsButton),
+            matching: find.byType(ElButton),
           ),
         );
         expect(loadingButton.loading, isTrue);
 
-        final DsButton disabledButton = tester.widget<DsButton>(
+        final ElButton disabledButton = tester.widget<ElButton>(
           find.descendant(
             of: find.byKey(const ValueKey<String>('button-example:disabled')),
-            matching: find.byType(DsButton),
+            matching: find.byType(ElButton),
           ),
         );
         expect(disabledButton.onPressed, isNull);
 
-        // The Emphasis example actually carries DsButtonEmphasis.caps.
-        final DsButton capsButton = tester.widget<DsButton>(
+        // The Emphasis example actually carries ElButtonEmphasis.caps.
+        final ElButton capsButton = tester.widget<ElButton>(
           find.descendant(
             of: find.byKey(const ValueKey<String>('button-example:emphasis')),
-            matching: find.byType(DsButton),
+            matching: find.byType(ElButton),
           ),
         );
-        expect(capsButton.emphasis, DsButtonEmphasis.caps);
+        expect(capsButton.emphasis, ElButtonEmphasis.caps);
 
         expect(buttonDoc.name, 'button');
         expect(
           buttonDoc.exports,
           containsAll(<String>[
-            'DsButton',
-            'DsButtonVariant',
-            'DsButtonSize',
-            'DsButtonEmphasis',
-            'DsButtonSurface',
+            'ElButton',
+            'ElButtonVariant',
+            'ElButtonSize',
+            'ElButtonEmphasis',
+            'ElButtonSurface',
           ]),
         );
         expect(buttonDoc.command, 'elattar add button');
@@ -197,8 +197,8 @@ void main() {
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
 
-        final DsThemeController controller = DsThemeController(
-          mode: DsThemeMode.dark,
+        final ElThemeController controller = ElThemeController(
+          mode: ElThemeMode.dark,
         );
         await tester.pumpWidget(
           _harness(controller: controller, child: const ButtonDocPage()),
@@ -208,10 +208,10 @@ void main() {
         // Immune to the duplicate-string hazard `find.text` carries here: a
         // section heading and its own TOC link render the same string, so
         // `find.text('States')` finds two widgets, not one. Reading each
-        // mounted `DsSection`'s own `title` field sidesteps that entirely.
+        // mounted `ElSection`'s own `title` field sidesteps that entirely.
         final List<String> titles = tester
-            .widgetList<DsSection>(find.byType(DsSection))
-            .map((DsSection section) => section.title)
+            .widgetList<ElSection>(find.byType(ElSection))
+            .map((ElSection section) => section.title)
             .toList();
 
         expect(titles, <String>[
@@ -252,7 +252,7 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: DsThemeController(mode: DsThemeMode.dark),
+            controller: ElThemeController(mode: ElThemeMode.dark),
             child: const ButtonDocPage(),
           ),
         );
@@ -281,15 +281,15 @@ void main() {
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
 
-        final DsThemeController controller = DsThemeController(
-          mode: DsThemeMode.dark,
+        final ElThemeController controller = ElThemeController(
+          mode: ElThemeMode.dark,
         );
         await tester.pumpWidget(
           _harness(controller: controller, child: const ButtonDocPage()),
         );
         await tester.pump();
 
-        final DsThemeData darkTheme = DsTheme.of(
+        final ElThemeData darkTheme = ElTheme.of(
           tester.element(
             find.byKey(const ValueKey<String>('button-doc-article')),
           ),
@@ -299,10 +299,10 @@ void main() {
         // the same object every real theme toggle mutates. A single
         // `pump()`, never `pumpAndSettle()`: the premium example's foil
         // shimmer is a genuinely looping animation and would hang it.
-        controller.setMode(DsThemeMode.light);
+        controller.setMode(ElThemeMode.light);
         await tester.pump();
 
-        final DsThemeData lightTheme = DsTheme.of(
+        final ElThemeData lightTheme = ElTheme.of(
           tester.element(
             find.byKey(const ValueKey<String>('button-doc-article')),
           ),
@@ -333,11 +333,11 @@ void main() {
           expect(find.byKey(ValueKey<String>(key)), findsOneWidget);
         }
 
-        final Set<DsButtonVariant> mountedVariants = tester
-            .widgetList<DsButton>(find.byType(DsButton))
-            .map((DsButton button) => button.variant)
+        final Set<ElButtonVariant> mountedVariants = tester
+            .widgetList<ElButton>(find.byType(ElButton))
+            .map((ElButton button) => button.variant)
             .toSet();
-        expect(mountedVariants, containsAll(DsButtonVariant.values));
+        expect(mountedVariants, containsAll(ElButtonVariant.values));
       },
     );
   });

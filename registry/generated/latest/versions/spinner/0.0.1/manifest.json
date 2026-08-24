@@ -9,13 +9,16 @@
     {
       "source": "lib/src/components/spinner.dart",
       "target": "@ui/spinner.dart",
-      "sha256": "930d5c15c4b69cd06df252f0040cebeb67613653457572223ca9ffe5120dfaae"
+      "sha256": "8d2098944a1a3b61d61b5eaa0d8ad8c0c88becfe86f05c9ca7d860d0fc7f717b"
     }
   ],
   "registryDependencies": [
+    "icon",
     "source-foundation"
   ],
-  "semanticDependencies": [],
+  "semanticDependencies": [
+    "icon"
+  ],
   "pubDependencies": {},
   "assets": [],
   "fonts": [],

@@ -5,8 +5,8 @@ import 'package:flutter_test/flutter_test.dart';
 
 Widget _harness({required Widget child, required Size size}) => MediaQuery(
   data: MediaQueryData(size: size),
-  child: DsTheme(
-    controller: DsThemeController(mode: DsThemeMode.dark),
+  child: ElTheme(
+    controller: ElThemeController(mode: ElThemeMode.dark),
     child: MaterialApp(home: SingleChildScrollView(child: child)),
   ),
 );
@@ -30,7 +30,7 @@ void main() {
       find.byKey(const ValueKey<String>('button-doc-article')),
       findsOneWidget,
     );
-    expect(find.byType(DsButton), findsAtLeastNWidgets(3));
+    expect(find.byType(ElButton), findsAtLeastNWidgets(3));
     expect(
       find.text(
         'primary, premium, secondary, outline, ghost, destructive, link.',
@@ -79,10 +79,10 @@ void main() {
       find.byKey(const ValueKey<String>('docs-layout-anchor-strip')),
       findsOneWidget,
     );
-    expect(find.byType(DsCard), findsOneWidget);
-    expect(find.byType(DsCardHeader), findsOneWidget);
-    expect(find.byType(DsCardContent), findsOneWidget);
-    expect(find.byType(DsCardFooter), findsOneWidget);
+    expect(find.byType(ElCard), findsOneWidget);
+    expect(find.byType(ElCardHeader), findsOneWidget);
+    expect(find.byType(ElCardContent), findsOneWidget);
+    expect(find.byType(ElCardFooter), findsOneWidget);
     expect(find.textContaining('foundation dependency'), findsOneWidget);
   });
 }

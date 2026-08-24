@@ -5,15 +5,15 @@
 /// ## What this page is
 ///
 /// The reference builds it out of eleven files: `components/ui/chart.tsx` (the
-/// shadcn wrapper), `components/ds/chart-motion.ts` (the timing hook) and nine
-/// modules under `components/ds/charts/`, `data.ts`, `area`, `bar`, `line`,
+/// shadcn wrapper), `components/el/chart-motion.ts` (the timing hook) and nine
+/// modules under `components/el/charts/`, `data.ts`, `area`, `bar`, `line`,
 /// `pie`, `radar`, `radial`, `tooltip`, `state`, `skeletons`, plus the two
 /// hand-built figures `unit-activity` and `conversion-funnel`. The wrapper and
 /// the drawing engine are ported into the package (`chart.dart`,
 /// `chart_geometry.dart`, `chart_cartesian.dart`, `chart_polar.dart`); every
 /// **specimen** lives here, because that is where the reference puts it: the
-/// `components/ds/` tree is this file's counterpart, exactly as `kit.dart` is
-/// `components/ds/kit.tsx`'s.
+/// `components/el/` tree is this file's counterpart, exactly as `kit.dart` is
+/// `components/el/kit.tsx`'s.
 ///
 /// ## The three sweeps every family file carries, and what they became
 ///
@@ -22,14 +22,14 @@
 ///  1. `hsl(var(--chart-N))` → `var(--color-chart-N)`. The registry's pre-v4
 ///     spelling; `--chart-N` holds a whole colour here, so `hsl()` around it is
 ///     invalid and the series paints nothing. In Dart the tokens are
-///     [DsThemeData.chart1] … `chart5`, read off the theme.
+///     [ElThemeData.chart1] … `chart5`, read off the theme.
 ///  2. `var(--color-<seriesKey>)` → the direct chart tokens. shadcn's
 ///     `ChartStyle` mints a per-container custom property at runtime, which
 ///     exists in the browser and nowhere in source; `check:refs` fails it.
 ///     There is no `ChartStyle` here for the same reason the page's own note
 ///     gives: the five tokens are already declared once per theme.
 ///  3. Every animated element takes `{...useChartMotion()}`. Here that is
-///     [DsChartMotion], and the caller never types a duration.
+///     [ElChartMotion], and the caller never types a duration.
 ///
 /// ## Drift register: recorded, shipped as written
 ///
@@ -89,7 +89,7 @@
 /// easing keywords and no `cubic-bezier`, so `--ease-out` could not be threaded
 /// through and the keyword `ease-out` was passed instead: a different curve,
 /// documented on the page rather than hidden. The port has the token in hand
-/// and uses CSS's `ease-out` anyway ([DsChartMotion.curve]); reproducing the
+/// and uses CSS's `ease-out` anyway ([ElChartMotion.curve]); reproducing the
 /// system's own `--ease-out` here would make these charts move differently from
 /// the reference's.
 library;
@@ -103,7 +103,6 @@ import '../kit.dart';
 import '../nav.dart';
 import '../token_swatch.dart';
 
-
 /// `max-w-3xl`, `--container-3xl`, 48rem. Every prose block in the Animation
 /// section.
 // allow-hardcoded: framework container scale with no token to read it from.
@@ -113,11 +112,11 @@ const double _measure3xl = 768;
 // allow-hardcoded: framework container scale with no token to read it from.
 const double _measureXl = 576;
 
-/// `DsMetaItem` is a record typedef, so a plain string value has to be wrapped
+/// `ElMetaItem` is a record typedef, so a plain string value has to be wrapped
 /// in the [InlineSpan] the row renders.
-DsMetaItem _meta(String k, String v) => (k: k, v: TextSpan(text: v));
+ElMetaItem _meta(String k, String v) => (k: k, v: TextSpan(text: v));
 
-/* ── Fixtures, `components/ds/charts/data.ts` ───────────────────────────── */
+/* ── Fixtures, `components/el/charts/data.ts` ───────────────────────────── */
 
 /// One footprint, shared by every chart specimen and by the skeleton that
 /// stands in for it.
@@ -125,8 +124,8 @@ DsMetaItem _meta(String k, String v) => (k: k, v: TextSpan(text: v));
 /// `data.ts`'s own reasoning: §5 asks a skeleton to match what replaces it —
 /// same height, same padding, same radius: and the only way to be sure of that
 /// across seventy charts is for all of them to name the same constant. It is
-/// [DsChartContainer.plotHeight], 256, and nothing here restates it.
-double get _plotHeight => DsChartContainer.plotHeight;
+/// [ElChartContainer.plotHeight], 256, and nothing here restates it.
+double get _plotHeight => ElChartContainer.plotHeight;
 
 /// 9 variants: area default/linear/step · bar default/horizontal/label · line
 /// default/linear/step.
@@ -223,35 +222,103 @@ final List<Map<String, Object?>> _dailyVisits = _buildDailyVisits();
 
 List<Map<String, Object?>> _buildDailyVisits() {
   const List<List<int>> pairs = <List<int>>[
-    <int>[222, 150], <int>[97, 180], <int>[167, 120], <int>[242, 260],
-    <int>[373, 290], <int>[301, 340], <int>[245, 180], <int>[409, 320],
-    <int>[59, 110], <int>[261, 190], <int>[327, 350], <int>[292, 210],
-    <int>[342, 380], <int>[137, 220], <int>[120, 170], <int>[138, 190],
-    <int>[446, 360], <int>[364, 410], <int>[243, 180], <int>[89, 150],
-    <int>[137, 200], <int>[224, 170], <int>[138, 230], <int>[387, 290],
-    <int>[215, 250], <int>[75, 130], <int>[383, 420], <int>[122, 180],
-    <int>[315, 240], <int>[454, 380], <int>[165, 220], <int>[293, 310],
-    <int>[247, 190], <int>[385, 420], <int>[481, 390], <int>[498, 520],
-    <int>[388, 300], <int>[149, 210], <int>[227, 180], <int>[293, 330],
-    <int>[335, 270], <int>[197, 240], <int>[197, 160], <int>[448, 490],
-    <int>[473, 380], <int>[338, 400], <int>[499, 420], <int>[315, 350],
-    <int>[235, 180], <int>[177, 230], <int>[82, 140], <int>[81, 120],
-    <int>[252, 290], <int>[294, 220], <int>[201, 250], <int>[213, 170],
-    <int>[420, 460], <int>[233, 190], <int>[78, 130], <int>[340, 280],
-    <int>[178, 230], <int>[178, 200], <int>[470, 410], <int>[103, 160],
-    <int>[439, 380], <int>[88, 140], <int>[294, 250], <int>[323, 370],
-    <int>[385, 320], <int>[438, 480], <int>[155, 200], <int>[92, 150],
-    <int>[492, 420], <int>[81, 130], <int>[426, 380], <int>[307, 350],
-    <int>[371, 310], <int>[475, 520], <int>[107, 170], <int>[341, 290],
-    <int>[408, 450], <int>[169, 210], <int>[317, 270], <int>[480, 530],
-    <int>[132, 180], <int>[141, 190], <int>[434, 380], <int>[448, 490],
-    <int>[149, 200], <int>[103, 160], <int>[446, 400],
+    <int>[222, 150],
+    <int>[97, 180],
+    <int>[167, 120],
+    <int>[242, 260],
+    <int>[373, 290],
+    <int>[301, 340],
+    <int>[245, 180],
+    <int>[409, 320],
+    <int>[59, 110],
+    <int>[261, 190],
+    <int>[327, 350],
+    <int>[292, 210],
+    <int>[342, 380],
+    <int>[137, 220],
+    <int>[120, 170],
+    <int>[138, 190],
+    <int>[446, 360],
+    <int>[364, 410],
+    <int>[243, 180],
+    <int>[89, 150],
+    <int>[137, 200],
+    <int>[224, 170],
+    <int>[138, 230],
+    <int>[387, 290],
+    <int>[215, 250],
+    <int>[75, 130],
+    <int>[383, 420],
+    <int>[122, 180],
+    <int>[315, 240],
+    <int>[454, 380],
+    <int>[165, 220],
+    <int>[293, 310],
+    <int>[247, 190],
+    <int>[385, 420],
+    <int>[481, 390],
+    <int>[498, 520],
+    <int>[388, 300],
+    <int>[149, 210],
+    <int>[227, 180],
+    <int>[293, 330],
+    <int>[335, 270],
+    <int>[197, 240],
+    <int>[197, 160],
+    <int>[448, 490],
+    <int>[473, 380],
+    <int>[338, 400],
+    <int>[499, 420],
+    <int>[315, 350],
+    <int>[235, 180],
+    <int>[177, 230],
+    <int>[82, 140],
+    <int>[81, 120],
+    <int>[252, 290],
+    <int>[294, 220],
+    <int>[201, 250],
+    <int>[213, 170],
+    <int>[420, 460],
+    <int>[233, 190],
+    <int>[78, 130],
+    <int>[340, 280],
+    <int>[178, 230],
+    <int>[178, 200],
+    <int>[470, 410],
+    <int>[103, 160],
+    <int>[439, 380],
+    <int>[88, 140],
+    <int>[294, 250],
+    <int>[323, 370],
+    <int>[385, 320],
+    <int>[438, 480],
+    <int>[155, 200],
+    <int>[92, 150],
+    <int>[492, 420],
+    <int>[81, 130],
+    <int>[426, 380],
+    <int>[307, 350],
+    <int>[371, 310],
+    <int>[475, 520],
+    <int>[107, 170],
+    <int>[341, 290],
+    <int>[408, 450],
+    <int>[169, 210],
+    <int>[317, 270],
+    <int>[480, 530],
+    <int>[132, 180],
+    <int>[141, 190],
+    <int>[434, 380],
+    <int>[448, 490],
+    <int>[149, 200],
+    <int>[103, 160],
+    <int>[446, 400],
   ];
   final DateTime first = DateTime(2024, 4);
   return <Map<String, Object?>>[
     for (int i = 0; i < pairs.length; i++)
       <String, Object?>{
-        'date': DsDateFormat.dayKey(first.add(Duration(days: i))),
+        'date': ElDateFormat.dayKey(first.add(Duration(days: i))),
         'desktop': pairs[i][0],
         'mobile': pairs[i][1],
       },
@@ -269,16 +336,16 @@ List<Map<String, Object?>> _buildDailyVisits() {
 class _ChartInk {
   const _ChartInk(this.theme);
 
-  final DsThemeData theme;
+  final ElThemeData theme;
 
   /// `var(--color-chart-N)` for N in 1…5.
   Color slot(int n) => switch (n) {
-        1 => theme.chart1,
-        2 => theme.chart2,
-        3 => theme.chart3,
-        4 => theme.chart4,
-        _ => theme.chart5,
-      };
+    1 => theme.chart1,
+    2 => theme.chart2,
+    3 => theme.chart3,
+    4 => theme.chart4,
+    _ => theme.chart5,
+  };
 
   /// A datum's own `fill`, read off its `slot` field.
   Color ofRow(Map<String, Object?> row) => slot((row['slot'] as int?) ?? 1);
@@ -292,42 +359,42 @@ class _ChartInk {
 
   /* ── The four configs the registry reuses ─────────────────────────────── */
 
-  DsChartConfig get desktop => DsChartConfig(<String, DsChartSeries>{
-        'desktop': DsChartSeries(label: 'Desktop', color: slot(1)),
-      });
+  ElChartConfig get desktop => ElChartConfig(<String, ElChartSeries>{
+    'desktop': ElChartSeries(label: 'Desktop', color: slot(1)),
+  });
 
-  DsChartConfig get desktopMobile => DsChartConfig(<String, DsChartSeries>{
-        'desktop': DsChartSeries(label: 'Desktop', color: slot(1)),
-        'mobile': DsChartSeries(label: 'Mobile', color: slot(2)),
-      });
+  ElChartConfig get desktopMobile => ElChartConfig(<String, ElChartSeries>{
+    'desktop': ElChartSeries(label: 'Desktop', color: slot(1)),
+    'mobile': ElChartSeries(label: 'Mobile', color: slot(2)),
+  });
 
   /// *"`visitors` carries the axis label and deliberately has no colour: it is
   /// the value key, not a series."*
-  DsChartConfig get browser => DsChartConfig(<String, DsChartSeries>{
-        'visitors': const DsChartSeries(label: 'Visitors'),
-        'chrome': DsChartSeries(label: 'Chrome', color: slot(1)),
-        'safari': DsChartSeries(label: 'Safari', color: slot(2)),
-        'firefox': DsChartSeries(label: 'Firefox', color: slot(3)),
-        'edge': DsChartSeries(label: 'Edge', color: slot(4)),
-        'other': DsChartSeries(label: 'Other', color: slot(5)),
-      });
+  ElChartConfig get browser => ElChartConfig(<String, ElChartSeries>{
+    'visitors': const ElChartSeries(label: 'Visitors'),
+    'chrome': ElChartSeries(label: 'Chrome', color: slot(1)),
+    'safari': ElChartSeries(label: 'Safari', color: slot(2)),
+    'firefox': ElChartSeries(label: 'Firefox', color: slot(3)),
+    'edge': ElChartSeries(label: 'Edge', color: slot(4)),
+    'other': ElChartSeries(label: 'Other', color: slot(5)),
+  });
 
-  DsChartConfig get sport => DsChartConfig(<String, DsChartSeries>{
-        'running': DsChartSeries(label: 'Running', color: slot(1)),
-        'swimming': DsChartSeries(label: 'Swimming', color: slot(2)),
-      });
+  ElChartConfig get sport => ElChartConfig(<String, ElChartSeries>{
+    'running': ElChartSeries(label: 'Running', color: slot(1)),
+    'swimming': ElChartSeries(label: 'Swimming', color: slot(2)),
+  });
 
   /// Month keys, because the slices are months rather than series.
-  DsChartConfig get pieMonths => DsChartConfig(<String, DsChartSeries>{
-        'visitors': const DsChartSeries(label: 'Visitors'),
-        'desktop': const DsChartSeries(label: 'Desktop'),
-        'mobile': const DsChartSeries(label: 'Mobile'),
-        'january': DsChartSeries(label: 'January', color: slot(1)),
-        'february': DsChartSeries(label: 'February', color: slot(2)),
-        'march': DsChartSeries(label: 'March', color: slot(3)),
-        'april': DsChartSeries(label: 'April', color: slot(4)),
-        'may': DsChartSeries(label: 'May', color: slot(5)),
-      });
+  ElChartConfig get pieMonths => ElChartConfig(<String, ElChartSeries>{
+    'visitors': const ElChartSeries(label: 'Visitors'),
+    'desktop': const ElChartSeries(label: 'Desktop'),
+    'mobile': const ElChartSeries(label: 'Mobile'),
+    'january': ElChartSeries(label: 'January', color: slot(1)),
+    'february': ElChartSeries(label: 'February', color: slot(2)),
+    'march': ElChartSeries(label: 'March', color: slot(3)),
+    'april': ElChartSeries(label: 'April', color: slot(4)),
+    'may': ElChartSeries(label: 'May', color: slot(5)),
+  });
 }
 
 /* ── Formatters ──────────────────────────────────────────────────────────── */
@@ -338,29 +405,29 @@ String _month3(Object? value) => '$value'.substring(0, 3);
 /// `new Date(v).toLocaleDateString("en-US", { month: "short", day: "numeric" })`.
 String _shortDate(Object? value) {
   final DateTime d = DateTime.parse('$value');
-  return '${DsDateFormat.monthsShort[d.month - 1]} ${d.day}';
+  return '${ElDateFormat.monthsShort[d.month - 1]} ${d.day}';
 }
 
 /// …with `year: "numeric"`: the two interactive tooltips.
 String _shortDateYear(Object? value) {
   final DateTime d = DateTime.parse('$value');
-  return '${DsDateFormat.monthsShort[d.month - 1]} ${d.day}, ${d.year}';
+  return '${ElDateFormat.monthsShort[d.month - 1]} ${d.day}, ${d.year}';
 }
 
 /// `{ weekday: "short" }`: the tooltip family's whole X axis.
 ///
-/// `DsDateFormat` carries the long names and the narrow ones; en-US's short
+/// `ElDateFormat` carries the long names and the narrow ones; en-US's short
 /// weekday is the long name's first three letters, so this derives rather than
 /// declaring a seventh list.
 String _weekdayShort(Object? value) {
   final DateTime d = DateTime.parse('$value');
-  return DsDateFormat.weekdaysLong[d.weekday % 7].substring(0, 3);
+  return ElDateFormat.weekdaysLong[d.weekday % 7].substring(0, 3);
 }
 
 /// `{ day: "numeric", month: "long", year: "numeric" }`, `TooltipLabelFormatter`.
 String _longDate(Object? value) {
   final DateTime d = DateTime.parse('$value');
-  return '${DsDateFormat.monthsLong[d.month - 1]} ${d.day}, ${d.year}';
+  return '${ElDateFormat.monthsLong[d.month - 1]} ${d.day}, ${d.year}';
 }
 
 /// The bar's corner radius, off the ladder.
@@ -372,7 +439,7 @@ String _longDate(Object? value) {
 /// bar drawn three ways across ten files: and 6px is where they average."*
 /// The port names the rung instead of reading it, which is the same single
 /// source of truth with one fewer indirection.
-const double _barRadius = DsRadii.sm;
+const double _barRadius = ElRadii.sm;
 
 /// `[0, 0, r, r]`: the bottom of a stack.
 const List<double> _radiiBottom = <double>[0, 0, _barRadius, _barRadius];
@@ -391,10 +458,10 @@ const List<double> _radiiAll = <double>[
 /// `radial.tsx`'s two rungs. *"`10` is exactly the `md` rung already, on a
 /// 30px-thick single ring… `5` is not a rung at all and moves to `sm` (6), the
 /// same rung every bar corner in this system already takes."*
-const double _ringRadius = DsRadii.md;
-const double _stackRadius = DsRadii.sm;
+const double _ringRadius = ElRadii.md;
+const double _stackRadius = ElRadii.sm;
 
-/* ── ChartStates, `components/ds/charts/state.tsx` ──────────────────────── */
+/* ── ChartStates, `components/el/charts/state.tsx` ──────────────────────── */
 
 /// Which family's shape the loading placeholder draws.
 enum _SkeletonKind { area, bar, line, pie, radar, radial, tooltip }
@@ -449,18 +516,18 @@ class _ChartStatesState extends State<_ChartStates> {
 
   @override
   Widget build(BuildContext context) {
-    final Widget slot = DsSwapIn(
+    final Widget slot = ElSwapIn(
       replayKey: ValueKey<_ChartState>(_state),
       child: switch (_state) {
         _ChartState.loading => _ChartSkeleton(kind: widget.skeleton),
         _ChartState.empty => _ChartEmpty(
-            onLoad: () => setState(() => _state = _ChartState.ready),
-          ),
+          onLoad: () => setState(() => _state = _ChartState.ready),
+        ),
         _ChartState.ready => widget.child,
       },
     );
 
-    return DsPanel(
+    return ElPanel(
       label: widget.title,
       note: widget.note,
       child: Column(
@@ -468,12 +535,12 @@ class _ChartStatesState extends State<_ChartStates> {
         children: <Widget>[
           Align(
             alignment: Alignment.centerLeft,
-            child: DsToggleGroup(
-              size: DsToggleSize.sm,
-              items: const <DsToggleGroupItem>[
-                DsToggleGroupItem(label: 'Empty'),
-                DsToggleGroupItem(label: 'Loading'),
-                DsToggleGroupItem(label: 'Ready'),
+            child: ElToggleGroup(
+              size: ElToggleSize.sm,
+              items: const <ElToggleGroupItem>[
+                ElToggleGroupItem(label: 'Empty'),
+                ElToggleGroupItem(label: 'Loading'),
+                ElToggleGroupItem(label: 'Ready'),
               ],
               selectedIndex: _state.index,
               // Radix clears the value when the active item is pressed again.
@@ -488,7 +555,7 @@ class _ChartStatesState extends State<_ChartStates> {
           // The 20px below the toggle group belongs to the panel, not to the
           // slot, so a control strip lands in it and the slot keeps its own
           // footprint clean.
-          SizedBox(height: ds(5)),
+          SizedBox(height: el(5)),
           if (widget.controls != null)
             widget.controls!(context, slot)
           else
@@ -511,31 +578,31 @@ class _ChartEmpty extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return SizedBox(
       height: _plotHeight,
       child: DecoratedBox(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(DsRadii.lg),
-          border: Border.all(color: theme.border, width: DsWidths.hairline),
+          borderRadius: BorderRadius.circular(ElRadii.lg),
+          border: Border.all(color: theme.border, width: ElWidths.hairline),
         ),
         child: Center(
-          child: DsEmpty(
+          child: ElEmpty(
             children: <Widget>[
-              DsEmptyHeader(
+              ElEmptyHeader(
                 children: <Widget>[
                   const _ChartEmptyMedia(),
-                  const DsEmptyTitle('No data in this range'),
-                  const DsEmptyDescription(
+                  const ElEmptyTitle('No data in this range'),
+                  const ElEmptyDescription(
                     'Nothing came back for the period selected. Load the '
                     'sample series to see the shape this chart draws.',
                   ),
                 ],
               ),
-              DsEmptyContent(
+              ElEmptyContent(
                 children: <Widget>[
-                  DsButton(
-                    size: DsButtonSize.sm,
+                  ElButton(
+                    size: ElButtonSize.sm,
                     onPressed: onLoad,
                     child: const Text('Load sample data'),
                   ),
@@ -551,40 +618,40 @@ class _ChartEmpty extends StatelessWidget {
 
 /// `EmptyMedia variant="icon"` carrying `ChartLineIcon`.
 ///
-/// **A page-local copy of `DsEmptyMedia`, and the reason is narrow.** That
-/// widget takes a [DsIconGlyph]: the curated set: and `chart-line` is not in
+/// **A page-local copy of `ElEmptyMedia`, and the reason is narrow.** That
+/// widget takes a [ElIconGlyph]: the curated set: and `chart-line` is not in
 /// it; it lives only in the generated lucide registry. Widening `empty.dart`
 /// would be a change to the feedback family's file, so the tile is rebuilt here
-/// out of `DsEmptyMedia`'s own public geometry: nothing below restates a
+/// out of `ElEmptyMedia`'s own public geometry: nothing below restates a
 /// number, and if that widget retunes, this follows.
 class _ChartEmptyMedia extends StatelessWidget {
   const _ChartEmptyMedia();
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return Padding(
-      padding: EdgeInsets.only(bottom: DsEmptyMedia.marginBottom),
+      padding: EdgeInsets.only(bottom: ElEmptyMedia.marginBottom),
       child: Container(
-        width: DsEmptyMedia.box,
-        height: DsEmptyMedia.box,
+        width: ElEmptyMedia.box,
+        height: ElEmptyMedia.box,
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: theme.muted,
-          borderRadius: BorderRadius.circular(DsEmptyMedia.radius),
+          borderRadius: BorderRadius.circular(ElEmptyMedia.radius),
         ),
-        child: DsIcon.lucide(
-          DsLucide.chartLine,
-          sizePx: DsEmptyMedia.glyphSize,
-          strokeOverride: DsEmptyMedia.glyphStroke,
-          tone: DsIconTone.inherit,
+        child: ElIcon.lucide(
+          ElLucide.chartLine,
+          sizePx: ElEmptyMedia.glyphSize,
+          strokeOverride: ElEmptyMedia.glyphStroke,
+          tone: ElIconTone.inherit,
         ),
       ),
     );
   }
 }
 
-/* ── Skeletons, `components/ds/charts/skeletons.tsx` ────────────────────── */
+/* ── Skeletons, `components/el/charts/skeletons.tsx` ────────────────────── */
 
 /// One skeleton per chart family, each shaped like the family it stands in for.
 ///
@@ -599,7 +666,7 @@ class _ChartEmptyMedia extends StatelessWidget {
 /// paint inside an SVG `<path>`, so a skeleton drawn as SVG geometry would be a
 /// still silhouette with the shimmer running behind it: the one thing on the
 /// page that looks loaded while it is loading."* Flutter has no such split: a
-/// [DsSkeleton] inside a [ClipPath] shimmers inside the curve, which is what
+/// [ElSkeleton] inside a [ClipPath] shimmers inside the curve, which is what
 /// the `clip-path` was for.
 class _ChartSkeleton extends StatelessWidget {
   const _ChartSkeleton({required this.kind});
@@ -612,17 +679,17 @@ class _ChartSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SizedBox(
-        height: _plotHeight,
-        child: switch (kind) {
-          _SkeletonKind.area => const _CartesianSkeleton(shape: _Shape.area),
-          _SkeletonKind.bar => const _CartesianSkeleton(shape: _Shape.bar),
-          _SkeletonKind.line => const _CartesianSkeleton(shape: _Shape.line),
-          _SkeletonKind.pie => const _PolarSkeleton(shape: _Shape.pie),
-          _SkeletonKind.radar => const _PolarSkeleton(shape: _Shape.radar),
-          _SkeletonKind.radial => const _PolarSkeleton(shape: _Shape.radial),
-          _SkeletonKind.tooltip => const _TooltipSkeleton(),
-        },
-      );
+    height: _plotHeight,
+    child: switch (kind) {
+      _SkeletonKind.area => const _CartesianSkeleton(shape: _Shape.area),
+      _SkeletonKind.bar => const _CartesianSkeleton(shape: _Shape.bar),
+      _SkeletonKind.line => const _CartesianSkeleton(shape: _Shape.line),
+      _SkeletonKind.pie => const _PolarSkeleton(shape: _Shape.pie),
+      _SkeletonKind.radar => const _PolarSkeleton(shape: _Shape.radar),
+      _SkeletonKind.radial => const _PolarSkeleton(shape: _Shape.radial),
+      _SkeletonKind.tooltip => const _TooltipSkeleton(),
+    },
+  );
 }
 
 enum _Shape { area, bar, line, pie, radar, radial }
@@ -635,30 +702,30 @@ class _CartesianSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     final int ticks = shape == _Shape.bar ? 5 : _ChartSkeleton._series.length;
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: ds(2)),
+      padding: EdgeInsets.symmetric(vertical: el(2)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           Expanded(child: _Plot(shape: shape)),
-          SizedBox(height: ds(2)),
+          SizedBox(height: el(2)),
           SizedBox(
-            height: DsWidths.hairline,
+            height: ElWidths.hairline,
             child: ColoredBox(color: theme.border),
           ),
-          SizedBox(height: ds(2)),
+          SizedBox(height: el(2)),
           Row(
             children: <Widget>[
               for (int i = 0; i < ticks; i++) ...<Widget>[
-                if (i > 0) SizedBox(width: ds(4)),
+                if (i > 0) SizedBox(width: el(4)),
                 Expanded(
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: ConstrainedBox(
-                      constraints: BoxConstraints(maxWidth: ds(8)),
-                      child: DsSkeleton(height: ds(2)),
+                      constraints: BoxConstraints(maxWidth: el(8)),
+                      child: ElSkeleton(height: el(2)),
                     ),
                   ),
                 ),
@@ -686,11 +753,11 @@ class _Plot extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: <Widget>[
             for (int i = 0; i < bars.length; i++) ...<Widget>[
-              if (i > 0) SizedBox(width: ds(4)),
+              if (i > 0) SizedBox(width: el(4)),
               Expanded(
-                child: DsSkeleton(
+                child: ElSkeleton(
                   height: c.maxHeight * (100 - bars[i]) / 100,
-                  radius: DsRadii.sm,
+                  radius: ElRadii.sm,
                 ),
               ),
             ],
@@ -707,19 +774,20 @@ class _Plot extends StatelessWidget {
                 series: _ChartSkeleton._series,
                 stroke: shape == _Shape.line,
               ),
-              child: const DsSkeleton(radius: 0),
+              child: const ElSkeleton(radius: 0),
             ),
           ),
           if (shape == _Shape.line)
             for (int i = 0; i < _ChartSkeleton._series.length; i++)
               Positioned(
-                left: c.maxWidth * i / (_ChartSkeleton._series.length - 1) -
-                    ds(1),
-                top: c.maxHeight * _ChartSkeleton._series[i] / 100 - ds(1),
-                child: DsSkeleton(
-                  width: ds(2),
-                  height: ds(2),
-                  radius: DsRadii.pill,
+                left:
+                    c.maxWidth * i / (_ChartSkeleton._series.length - 1) -
+                    el(1),
+                top: c.maxHeight * _ChartSkeleton._series[i] / 100 - el(1),
+                child: ElSkeleton(
+                  width: el(2),
+                  height: el(2),
+                  radius: ElRadii.pill,
                 ),
               ),
         ],
@@ -776,43 +844,43 @@ class _PolarSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-        padding: EdgeInsets.symmetric(vertical: ds(2)),
-        child: Center(
-          child: AspectRatio(
-            aspectRatio: 1,
-            child: Stack(
-              children: <Widget>[
-                for (final _Annulus a in _rings)
-                  Positioned.fill(
-                    child: Opacity(
-                      opacity: a.opacity,
-                      child: ClipPath(
-                        clipper: _AnnulusClipper(a),
-                        child: const DsSkeleton(radius: 0),
-                      ),
-                    ),
+    padding: EdgeInsets.symmetric(vertical: el(2)),
+    child: Center(
+      child: AspectRatio(
+        aspectRatio: 1,
+        child: Stack(
+          children: <Widget>[
+            for (final _Annulus a in _rings)
+              Positioned.fill(
+                child: Opacity(
+                  opacity: a.opacity,
+                  child: ClipPath(
+                    clipper: _AnnulusClipper(a),
+                    child: const ElSkeleton(radius: 0),
                   ),
-              ],
-            ),
-          ),
+                ),
+              ),
+          ],
         ),
-      );
+      ),
+    ),
+  );
 
   /// The three polar silhouettes, in `skeletons.tsx`'s own numbers.
   List<_Annulus> get _rings => switch (shape) {
-        _Shape.pie => const <_Annulus>[
-            _Annulus(sweep: 360, steps: 48, outer: 46, inner: 27),
-          ],
-        _Shape.radar => const <_Annulus>[
-            _Annulus(sweep: 360, steps: 6, outer: 46, inner: 44, opacity: 0.5),
-            _Annulus(sweep: 360, steps: 6, outer: 34, inner: 30),
-          ],
-        _ => const <_Annulus>[
-            _Annulus(sweep: 250, steps: 32, outer: 46, inner: 37),
-            _Annulus(sweep: 190, steps: 32, outer: 34, inner: 25),
-            _Annulus(sweep: 120, steps: 32, outer: 22, inner: 13),
-          ],
-      };
+    _Shape.pie => const <_Annulus>[
+      _Annulus(sweep: 360, steps: 48, outer: 46, inner: 27),
+    ],
+    _Shape.radar => const <_Annulus>[
+      _Annulus(sweep: 360, steps: 6, outer: 46, inner: 44, opacity: 0.5),
+      _Annulus(sweep: 360, steps: 6, outer: 34, inner: 30),
+    ],
+    _ => const <_Annulus>[
+      _Annulus(sweep: 250, steps: 32, outer: 46, inner: 37),
+      _Annulus(sweep: 190, steps: 32, outer: 34, inner: 25),
+      _Annulus(sweep: 120, steps: 32, outer: 22, inner: 13),
+    ],
+  };
 }
 
 /// A ring, or a slice of one, as a single closed polygon.
@@ -859,8 +927,10 @@ class _AnnulusClipper extends CustomClipper<Path> {
 
     final Path path = Path();
     for (int i = 0; i <= spec.steps; i++) {
-      final Offset p =
-          at(_Annulus.top + spec.sweep * i / spec.steps, spec.outer);
+      final Offset p = at(
+        _Annulus.top + spec.sweep * i / spec.steps,
+        spec.outer,
+      );
       if (i == 0) {
         path.moveTo(p.dx, p.dy);
       } else {
@@ -868,8 +938,10 @@ class _AnnulusClipper extends CustomClipper<Path> {
       }
     }
     for (int i = spec.steps; i >= 0; i--) {
-      final Offset p =
-          at(_Annulus.top + spec.sweep * i / spec.steps, spec.inner);
+      final Offset p = at(
+        _Annulus.top + spec.sweep * i / spec.steps,
+        spec.inner,
+      );
       path.lineTo(p.dx, p.dy);
     }
     path.close();
@@ -890,25 +962,25 @@ class _TooltipSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints c) => Stack(
         children: <Widget>[
           const Positioned.fill(child: _CartesianSkeleton(shape: _Shape.bar)),
           Positioned(
-            left: c.maxWidth / 2 - DsChartTooltipContent.minWidth / 2,
+            left: c.maxWidth / 2 - ElChartTooltipContent.minWidth / 2,
             top: c.maxHeight * 14 / 100,
             child: Container(
-              width: DsChartTooltipContent.minWidth,
-              padding: EdgeInsets.all(ds(2.5)),
+              width: ElChartTooltipContent.minWidth,
+              padding: EdgeInsets.all(el(2.5)),
               decoration: BoxDecoration(
                 color: theme.background,
-                borderRadius: BorderRadius.circular(DsRadii.lg),
+                borderRadius: BorderRadius.circular(ElRadii.lg),
                 border: Border.all(
                   color: theme.border.withValues(alpha: 0.5),
-                  width: DsWidths.hairline,
+                  width: ElWidths.hairline,
                 ),
-                boxShadow: DsShadows.e2.outerShadows(theme),
+                boxShadow: ElShadows.e2.outerShadows(theme),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -917,21 +989,21 @@ class _TooltipSkeleton extends StatelessWidget {
                   FractionallySizedBox(
                     alignment: Alignment.centerLeft,
                     widthFactor: 0.6,
-                    child: DsSkeleton(height: ds(2)),
+                    child: ElSkeleton(height: el(2)),
                   ),
                   for (int i = 0; i < 2; i++) ...<Widget>[
-                    SizedBox(height: ds(2)),
+                    SizedBox(height: el(2)),
                     Row(
                       children: <Widget>[
-                        DsSkeleton(
-                          width: ds(2),
-                          height: ds(2),
-                          radius: DsRadii.xs,
+                        ElSkeleton(
+                          width: el(2),
+                          height: el(2),
+                          radius: ElRadii.xs,
                         ),
-                        SizedBox(width: ds(1.5)),
-                        Expanded(child: DsSkeleton(height: ds(2))),
-                        SizedBox(width: ds(1.5)),
-                        DsSkeleton(width: ds(4), height: ds(2)),
+                        SizedBox(width: el(1.5)),
+                        Expanded(child: ElSkeleton(height: el(2))),
+                        SizedBox(width: el(1.5)),
+                        ElSkeleton(width: el(4), height: el(2)),
                       ],
                     ),
                   ],
@@ -945,221 +1017,251 @@ class _TooltipSkeleton extends StatelessWidget {
   }
 }
 
-/* ── Area, `components/ds/charts/area.tsx` ──────────────────────────────── */
+/* ── Area, `components/el/charts/area.tsx` ──────────────────────────────── */
 
 /// The plot, in the container every specimen shares.
-Widget _plot(DsChartConfig config, Widget chart) =>
-    DsChartContainer(config: config, child: chart);
+Widget _plot(ElChartConfig config, Widget chart) =>
+    ElChartContainer(config: config, child: chart);
 
 /// The X axis nine of the ten area variants share, byte for byte.
-DsChartAxis _monthAxis() => const DsChartAxis(
-      dataKey: 'month',
-      tickLine: false,
-      axisLine: false,
-      tickMargin: 8,
-      tickFormatter: _month3,
-    );
+ElChartAxis _monthAxis() => const ElChartAxis(
+  dataKey: 'month',
+  tickLine: false,
+  axisLine: false,
+  tickMargin: 8,
+  tickFormatter: _month3,
+);
 
 /// `chart-area-default`: one series, natural curve.
 Widget _areaDefault(_ChartInk ink) => _plot(
-      ink.desktop,
-      DsCartesianChart(
-        data: _monthsDesktop,
-        // Plot maths, not the 8-point scale: recharts' own margin box.
-        margin: const DsChartMargin(left: 12, right: 12),
-        grid: const DsChartGrid(vertical: false),
-        xAxis: _monthAxis(),
-        tooltip: const DsChartTooltipSpec(
-          cursor: false,
-          indicator: DsChartIndicator.line,
-        ),
-        series: <DsChartSeriesSpec>[
-          DsChartSeriesSpec(
-            kind: DsChartSeriesKind.area,
-            dataKey: 'desktop',
-            curve: DsCurveType.natural,
-            fill: ink.slot(1),
-            fillOpacity: 0.4,
-            stroke: ink.slot(1),
-          ),
-        ],
-      ),
-    );
-
-Widget _areaLinear(_ChartInk ink) => _plot(
-      ink.desktop,
-      DsCartesianChart(
-        data: _monthsDesktop,
-        margin: const DsChartMargin(left: 12, right: 12),
-        grid: const DsChartGrid(vertical: false),
-        xAxis: _monthAxis(),
-        tooltip: const DsChartTooltipSpec(cursor: false, hideLabel: true),
-        series: <DsChartSeriesSpec>[
-          DsChartSeriesSpec(
-            kind: DsChartSeriesKind.area,
-            dataKey: 'desktop',
-            fill: ink.slot(1),
-            fillOpacity: 0.4,
-            stroke: ink.slot(1),
-          ),
-        ],
-      ),
-    );
-
-/// The registry's `chartConfig.desktop.icon` is `Activity`, unused by this
-/// variant's own markup but read by the tooltip's indicator slot: the gap
-/// `area.tsx` documents, where the config's icon bypasses `Icon` entirely.
-/// Flutter's builder slot has no such constraint, so it goes through [DsIcon].
-Widget _areaStep(_ChartInk ink) => _plot(
-      DsChartConfig(<String, DsChartSeries>{
-        'desktop': DsChartSeries(
-          label: 'Desktop',
-          color: ink.slot(1),
-          icon: (BuildContext context) =>
-              const DsIcon.lucide(DsLucide.activity, size: DsIconSize.xs),
-        ),
-      }),
-      DsCartesianChart(
-        data: _monthsDesktop,
-        margin: const DsChartMargin(left: 12, right: 12),
-        grid: const DsChartGrid(vertical: false),
-        xAxis: _monthAxis(),
-        tooltip: const DsChartTooltipSpec(cursor: false, hideLabel: true),
-        series: <DsChartSeriesSpec>[
-          DsChartSeriesSpec(
-            kind: DsChartSeriesKind.area,
-            dataKey: 'desktop',
-            curve: DsCurveType.step,
-            fill: ink.slot(1),
-            fillOpacity: 0.4,
-            stroke: ink.slot(1),
-          ),
-        ],
-      ),
-    );
-
-/// The two stacked areas six variants build on. `mobile` is declared first, so
-/// it is drawn at the bottom of the stack.
-List<DsChartSeriesSpec> _stackedAreas(_ChartInk ink) => <DsChartSeriesSpec>[
-      DsChartSeriesSpec(
-        kind: DsChartSeriesKind.area,
-        dataKey: 'mobile',
-        curve: DsCurveType.natural,
-        stackId: 'a',
-        fill: ink.slot(2),
-        fillOpacity: 0.4,
-        stroke: ink.slot(2),
-      ),
-      DsChartSeriesSpec(
-        kind: DsChartSeriesKind.area,
+  ink.desktop,
+  ElCartesianChart(
+    data: _monthsDesktop,
+    // Plot maths, not the 8-point scale: recharts' own margin box.
+    margin: const ElChartMargin(left: 12, right: 12),
+    grid: const ElChartGrid(vertical: false),
+    xAxis: _monthAxis(),
+    tooltip: const ElChartTooltipSpec(
+      cursor: false,
+      indicator: ElChartIndicator.line,
+    ),
+    series: <ElChartSeriesSpec>[
+      ElChartSeriesSpec(
+        kind: ElChartSeriesKind.area,
         dataKey: 'desktop',
-        curve: DsCurveType.natural,
-        stackId: 'a',
+        curve: ElCurveType.natural,
         fill: ink.slot(1),
         fillOpacity: 0.4,
         stroke: ink.slot(1),
       ),
-    ];
+    ],
+  ),
+);
+
+Widget _areaLinear(_ChartInk ink) => _plot(
+  ink.desktop,
+  ElCartesianChart(
+    data: _monthsDesktop,
+    margin: const ElChartMargin(left: 12, right: 12),
+    grid: const ElChartGrid(vertical: false),
+    xAxis: _monthAxis(),
+    tooltip: const ElChartTooltipSpec(cursor: false, hideLabel: true),
+    series: <ElChartSeriesSpec>[
+      ElChartSeriesSpec(
+        kind: ElChartSeriesKind.area,
+        dataKey: 'desktop',
+        fill: ink.slot(1),
+        fillOpacity: 0.4,
+        stroke: ink.slot(1),
+      ),
+    ],
+  ),
+);
+
+/// The registry's `chartConfig.desktop.icon` is `Activity`, unused by this
+/// variant's own markup but read by the tooltip's indicator slot: the gap
+/// `area.tsx` documents, where the config's icon bypasses `Icon` entirely.
+/// Flutter's builder slot has no such constraint, so it goes through [ElIcon].
+Widget _areaStep(_ChartInk ink) => _plot(
+  ElChartConfig(<String, ElChartSeries>{
+    'desktop': ElChartSeries(
+      label: 'Desktop',
+      color: ink.slot(1),
+      icon: (BuildContext context) =>
+          const ElIcon.lucide(ElLucide.activity, size: ElIconSize.xs),
+    ),
+  }),
+  ElCartesianChart(
+    data: _monthsDesktop,
+    margin: const ElChartMargin(left: 12, right: 12),
+    grid: const ElChartGrid(vertical: false),
+    xAxis: _monthAxis(),
+    tooltip: const ElChartTooltipSpec(cursor: false, hideLabel: true),
+    series: <ElChartSeriesSpec>[
+      ElChartSeriesSpec(
+        kind: ElChartSeriesKind.area,
+        dataKey: 'desktop',
+        curve: ElCurveType.step,
+        fill: ink.slot(1),
+        fillOpacity: 0.4,
+        stroke: ink.slot(1),
+      ),
+    ],
+  ),
+);
+
+/// The two stacked areas six variants build on. `mobile` is declared first, so
+/// it is drawn at the bottom of the stack.
+List<ElChartSeriesSpec> _stackedAreas(_ChartInk ink) => <ElChartSeriesSpec>[
+  ElChartSeriesSpec(
+    kind: ElChartSeriesKind.area,
+    dataKey: 'mobile',
+    curve: ElCurveType.natural,
+    stackId: 'a',
+    fill: ink.slot(2),
+    fillOpacity: 0.4,
+    stroke: ink.slot(2),
+  ),
+  ElChartSeriesSpec(
+    kind: ElChartSeriesKind.area,
+    dataKey: 'desktop',
+    curve: ElCurveType.natural,
+    stackId: 'a',
+    fill: ink.slot(1),
+    fillOpacity: 0.4,
+    stroke: ink.slot(1),
+  ),
+];
 
 Widget _areaStacked(_ChartInk ink) => _plot(
-      ink.desktopMobile,
-      DsCartesianChart(
-        data: _monthsDesktopMobile,
-        margin: const DsChartMargin(left: 12, right: 12),
-        grid: const DsChartGrid(vertical: false),
-        xAxis: _monthAxis(),
-        tooltip: const DsChartTooltipSpec(cursor: false),
-        series: _stackedAreas(ink),
-      ),
-    );
+  ink.desktopMobile,
+  ElCartesianChart(
+    data: _monthsDesktopMobile,
+    margin: const ElChartMargin(left: 12, right: 12),
+    grid: const ElChartGrid(vertical: false),
+    xAxis: _monthAxis(),
+    tooltip: const ElChartTooltipSpec(cursor: false),
+    series: _stackedAreas(ink),
+  ),
+);
 
 /// `data.ts` deliberately does not carry this shape, `MONTHS_DESKTOP_MOBILE`
 /// plus an `other` series exists for exactly one variant, so it stays local
 /// rather than becoming a ninth shared export.
 const List<Map<String, Object?>> _areaExpandData = <Map<String, Object?>>[
-  <String, Object?>{'month': 'January', 'desktop': 186, 'mobile': 80, 'other': 45},
-  <String, Object?>{'month': 'February', 'desktop': 305, 'mobile': 200, 'other': 100},
-  <String, Object?>{'month': 'March', 'desktop': 237, 'mobile': 120, 'other': 150},
-  <String, Object?>{'month': 'April', 'desktop': 73, 'mobile': 190, 'other': 50},
-  <String, Object?>{'month': 'May', 'desktop': 209, 'mobile': 130, 'other': 100},
-  <String, Object?>{'month': 'June', 'desktop': 214, 'mobile': 140, 'other': 160},
+  <String, Object?>{
+    'month': 'January',
+    'desktop': 186,
+    'mobile': 80,
+    'other': 45,
+  },
+  <String, Object?>{
+    'month': 'February',
+    'desktop': 305,
+    'mobile': 200,
+    'other': 100,
+  },
+  <String, Object?>{
+    'month': 'March',
+    'desktop': 237,
+    'mobile': 120,
+    'other': 150,
+  },
+  <String, Object?>{
+    'month': 'April',
+    'desktop': 73,
+    'mobile': 190,
+    'other': 50,
+  },
+  <String, Object?>{
+    'month': 'May',
+    'desktop': 209,
+    'mobile': 130,
+    'other': 100,
+  },
+  <String, Object?>{
+    'month': 'June',
+    'desktop': 214,
+    'mobile': 140,
+    'other': 160,
+  },
 ];
 
 Widget _areaStackedExpand(_ChartInk ink) => _plot(
-      ink.desktopMobile.plus(<String, DsChartSeries>{
-        'other': DsChartSeries(label: 'Other', color: ink.slot(3)),
-      }),
-      DsCartesianChart(
-        data: _areaExpandData,
-        margin: const DsChartMargin(left: 12, right: 12, top: 12),
-        stackOffsetExpand: true,
-        grid: const DsChartGrid(vertical: false),
-        xAxis: _monthAxis(),
-        tooltip: const DsChartTooltipSpec(
-          cursor: false,
-          indicator: DsChartIndicator.line,
-        ),
-        series: <DsChartSeriesSpec>[
-          DsChartSeriesSpec(
-            kind: DsChartSeriesKind.area,
-            dataKey: 'other',
-            curve: DsCurveType.natural,
-            stackId: 'a',
-            fill: ink.slot(3),
-            fillOpacity: 0.1,
-            stroke: ink.slot(3),
-          ),
-          ..._stackedAreas(ink),
-        ],
+  ink.desktopMobile.plus(<String, ElChartSeries>{
+    'other': ElChartSeries(label: 'Other', color: ink.slot(3)),
+  }),
+  ElCartesianChart(
+    data: _areaExpandData,
+    margin: const ElChartMargin(left: 12, right: 12, top: 12),
+    stackOffsetExpand: true,
+    grid: const ElChartGrid(vertical: false),
+    xAxis: _monthAxis(),
+    tooltip: const ElChartTooltipSpec(
+      cursor: false,
+      indicator: ElChartIndicator.line,
+    ),
+    series: <ElChartSeriesSpec>[
+      ElChartSeriesSpec(
+        kind: ElChartSeriesKind.area,
+        dataKey: 'other',
+        curve: ElCurveType.natural,
+        stackId: 'a',
+        fill: ink.slot(3),
+        fillOpacity: 0.1,
+        stroke: ink.slot(3),
       ),
-    );
+      ..._stackedAreas(ink),
+    ],
+  ),
+);
 
 Widget _areaLegend(_ChartInk ink) => _plot(
-      ink.desktopMobile,
-      DsCartesianChart(
-        data: _monthsDesktopMobile,
-        margin: const DsChartMargin(left: 12, right: 12),
-        grid: const DsChartGrid(vertical: false),
-        xAxis: _monthAxis(),
-        tooltip: const DsChartTooltipSpec(
-          cursor: false,
-          indicator: DsChartIndicator.line,
-        ),
-        legend: const DsChartLegendSpec(),
-        series: _stackedAreas(ink),
-      ),
-    );
+  ink.desktopMobile,
+  ElCartesianChart(
+    data: _monthsDesktopMobile,
+    margin: const ElChartMargin(left: 12, right: 12),
+    grid: const ElChartGrid(vertical: false),
+    xAxis: _monthAxis(),
+    tooltip: const ElChartTooltipSpec(
+      cursor: false,
+      indicator: ElChartIndicator.line,
+    ),
+    legend: const ElChartLegendSpec(),
+    series: _stackedAreas(ink),
+  ),
+);
 
 /// `TrendingDown` on `desktop` and `TrendingUp` on `mobile` is the registry's
 /// own pairing, not a claim these charts render onto that shape.
 Widget _areaIcons(_ChartInk ink) => _plot(
-      DsChartConfig(<String, DsChartSeries>{
-        'desktop': DsChartSeries(
-          label: 'Desktop',
-          color: ink.slot(1),
-          icon: (BuildContext context) =>
-              const DsIcon.lucide(DsLucide.trendingDown, size: DsIconSize.sm),
-        ),
-        'mobile': DsChartSeries(
-          label: 'Mobile',
-          color: ink.slot(2),
-          icon: (BuildContext context) =>
-              const DsIcon.lucide(DsLucide.trendingUp, size: DsIconSize.sm),
-        ),
-      }),
-      DsCartesianChart(
-        data: _monthsDesktopMobile,
-        margin: const DsChartMargin(left: 12, right: 12),
-        grid: const DsChartGrid(vertical: false),
-        xAxis: _monthAxis(),
-        tooltip: const DsChartTooltipSpec(
-          cursor: false,
-          indicator: DsChartIndicator.line,
-        ),
-        legend: const DsChartLegendSpec(),
-        series: _stackedAreas(ink),
-      ),
-    );
+  ElChartConfig(<String, ElChartSeries>{
+    'desktop': ElChartSeries(
+      label: 'Desktop',
+      color: ink.slot(1),
+      icon: (BuildContext context) =>
+          const ElIcon.lucide(ElLucide.trendingDown, size: ElIconSize.sm),
+    ),
+    'mobile': ElChartSeries(
+      label: 'Mobile',
+      color: ink.slot(2),
+      icon: (BuildContext context) =>
+          const ElIcon.lucide(ElLucide.trendingUp, size: ElIconSize.sm),
+    ),
+  }),
+  ElCartesianChart(
+    data: _monthsDesktopMobile,
+    margin: const ElChartMargin(left: 12, right: 12),
+    grid: const ElChartGrid(vertical: false),
+    xAxis: _monthAxis(),
+    tooltip: const ElChartTooltipSpec(
+      cursor: false,
+      indicator: ElChartIndicator.line,
+    ),
+    legend: const ElChartLegendSpec(),
+    series: _stackedAreas(ink),
+  ),
+);
 
 /// A `<linearGradient>` in `<defs>`, both stops on the token.
 ///
@@ -1167,7 +1269,8 @@ Widget _areaIcons(_ChartInk ink) => _plot(
 /// 0.8 → 0.1 stops rather than replacing them, so what actually paints on
 /// `AreaGradient` is 0.32 → 0.04. `AreaInteractive`, the other gradient
 /// variant, sets no `fillOpacity` at all and gets the declared stops.
-LinearGradient _gradientFor(Color colour, {double opacity = 1}) => LinearGradient(
+LinearGradient _gradientFor(Color colour, {double opacity = 1}) =>
+    LinearGradient(
       begin: Alignment.topCenter,
       end: Alignment.bottomCenter,
       stops: const <double>[0.05, 0.95],
@@ -1178,54 +1281,54 @@ LinearGradient _gradientFor(Color colour, {double opacity = 1}) => LinearGradien
     );
 
 Widget _areaGradient(_ChartInk ink) => _plot(
-      ink.desktopMobile,
-      DsCartesianChart(
-        data: _monthsDesktopMobile,
-        margin: const DsChartMargin(left: 12, right: 12),
-        grid: const DsChartGrid(vertical: false),
-        xAxis: _monthAxis(),
-        tooltip: const DsChartTooltipSpec(cursor: false),
-        series: <DsChartSeriesSpec>[
-          DsChartSeriesSpec(
-            kind: DsChartSeriesKind.area,
-            dataKey: 'mobile',
-            curve: DsCurveType.natural,
-            stackId: 'a',
-            gradient: _gradientFor(ink.slot(2), opacity: 0.4),
-            stroke: ink.slot(2),
-          ),
-          DsChartSeriesSpec(
-            kind: DsChartSeriesKind.area,
-            dataKey: 'desktop',
-            curve: DsCurveType.natural,
-            stackId: 'a',
-            gradient: _gradientFor(ink.slot(1), opacity: 0.4),
-            stroke: ink.slot(1),
-          ),
-        ],
+  ink.desktopMobile,
+  ElCartesianChart(
+    data: _monthsDesktopMobile,
+    margin: const ElChartMargin(left: 12, right: 12),
+    grid: const ElChartGrid(vertical: false),
+    xAxis: _monthAxis(),
+    tooltip: const ElChartTooltipSpec(cursor: false),
+    series: <ElChartSeriesSpec>[
+      ElChartSeriesSpec(
+        kind: ElChartSeriesKind.area,
+        dataKey: 'mobile',
+        curve: ElCurveType.natural,
+        stackId: 'a',
+        gradient: _gradientFor(ink.slot(2), opacity: 0.4),
+        stroke: ink.slot(2),
       ),
-    );
+      ElChartSeriesSpec(
+        kind: ElChartSeriesKind.area,
+        dataKey: 'desktop',
+        curve: ElCurveType.natural,
+        stackId: 'a',
+        gradient: _gradientFor(ink.slot(1), opacity: 0.4),
+        stroke: ink.slot(1),
+      ),
+    ],
+  ),
+);
 
 /// Both axes labelled: and the one chart on the page with a negative margin,
 /// which claws 20 of the Y axis's 60px back out of the plot's left edge.
 Widget _areaAxes(_ChartInk ink) => _plot(
-      ink.desktopMobile,
-      DsCartesianChart(
-        data: _monthsDesktopMobile,
-        margin: const DsChartMargin(left: -20, right: 12),
-        grid: const DsChartGrid(vertical: false),
-        xAxis: _monthAxis(),
-        yAxis: const DsChartAxis(
-          type: DsChartAxisType.number,
-          tickLine: false,
-          axisLine: false,
-          tickMargin: 8,
-          tickCount: 3,
-        ),
-        tooltip: const DsChartTooltipSpec(cursor: false),
-        series: _stackedAreas(ink),
-      ),
-    );
+  ink.desktopMobile,
+  ElCartesianChart(
+    data: _monthsDesktopMobile,
+    margin: const ElChartMargin(left: -20, right: 12),
+    grid: const ElChartGrid(vertical: false),
+    xAxis: _monthAxis(),
+    yAxis: const ElChartAxis(
+      type: ElChartAxisType.number,
+      tickLine: false,
+      axisLine: false,
+      tickMargin: 8,
+      tickCount: 3,
+    ),
+    tooltip: const ElChartTooltipSpec(cursor: false),
+    series: _stackedAreas(ink),
+  ),
+);
 
 /// The range picker and the 91-day plot it filters.
 ///
@@ -1250,7 +1353,11 @@ class _AreaInteractive extends StatefulWidget {
   static const String defaultRange = '90d';
 
   static List<Map<String, Object?>> filtered(String range) {
-    final int days = switch (range) { '30d' => 30, '7d' => 7, _ => 90 };
+    final int days = switch (range) {
+      '30d' => 30,
+      '7d' => 7,
+      _ => 90,
+    };
     final DateTime start = reference.subtract(Duration(days: days));
     return <Map<String, Object?>>[
       for (final Map<String, Object?> row in _dailyVisits)
@@ -1267,13 +1374,10 @@ class _AreaInteractiveState extends State<_AreaInteractive> {
 
   @override
   Widget build(BuildContext context) => _RangeStrip(
-        value: _range,
-        onChanged: (String next) => setState(() => _range = next),
-        child: _AreaInteractiveRange(
-          range: _range,
-          child: widget.child,
-        ),
-      );
+    value: _range,
+    onChanged: (String next) => setState(() => _range = next),
+    child: _AreaInteractiveRange(range: _range, child: widget.child),
+  );
 }
 
 /// The context the strip hands down through the keyed slot.
@@ -1295,53 +1399,53 @@ class _AreaInteractiveRange extends InheritedWidget {
 /// The plot only: no wrapper, so its footprint is `PLOT` exactly like the
 /// other nine.
 Widget _areaInteractive(BuildContext context, _ChartInk ink) => _plot(
-      ink.desktopMobile.plus(<String, DsChartSeries>{
-        'visitors': const DsChartSeries(label: 'Visitors'),
-      }),
-      DsCartesianChart(
-        data: _AreaInteractive.filtered(_AreaInteractiveRange.of(context)),
-        grid: const DsChartGrid(vertical: false),
-        xAxis: const DsChartAxis(
-          dataKey: 'date',
-          tickLine: false,
-          axisLine: false,
-          tickMargin: 8,
-          minTickGap: 32,
-          tickFormatter: _shortDate,
-        ),
-        tooltip: const DsChartTooltipSpec(
-          cursor: false,
-          labelFormatter: _shortDateLabel,
-        ),
-        legend: const DsChartLegendSpec(),
-        series: <DsChartSeriesSpec>[
-          DsChartSeriesSpec(
-            kind: DsChartSeriesKind.area,
-            dataKey: 'mobile',
-            curve: DsCurveType.natural,
-            stackId: 'a',
-            gradient: _gradientFor(ink.slot(2)),
-            stroke: ink.slot(2),
-          ),
-          DsChartSeriesSpec(
-            kind: DsChartSeriesKind.area,
-            dataKey: 'desktop',
-            curve: DsCurveType.natural,
-            stackId: 'a',
-            gradient: _gradientFor(ink.slot(1)),
-            stroke: ink.slot(1),
-          ),
-        ],
+  ink.desktopMobile.plus(<String, ElChartSeries>{
+    'visitors': const ElChartSeries(label: 'Visitors'),
+  }),
+  ElCartesianChart(
+    data: _AreaInteractive.filtered(_AreaInteractiveRange.of(context)),
+    grid: const ElChartGrid(vertical: false),
+    xAxis: const ElChartAxis(
+      dataKey: 'date',
+      tickLine: false,
+      axisLine: false,
+      tickMargin: 8,
+      minTickGap: 32,
+      tickFormatter: _shortDate,
+    ),
+    tooltip: const ElChartTooltipSpec(
+      cursor: false,
+      labelFormatter: _shortDateLabel,
+    ),
+    legend: const ElChartLegendSpec(),
+    series: <ElChartSeriesSpec>[
+      ElChartSeriesSpec(
+        kind: ElChartSeriesKind.area,
+        dataKey: 'mobile',
+        curve: ElCurveType.natural,
+        stackId: 'a',
+        gradient: _gradientFor(ink.slot(2)),
+        stroke: ink.slot(2),
       ),
-    );
+      ElChartSeriesSpec(
+        kind: ElChartSeriesKind.area,
+        dataKey: 'desktop',
+        curve: ElCurveType.natural,
+        stackId: 'a',
+        gradient: _gradientFor(ink.slot(1)),
+        stroke: ink.slot(1),
+      ),
+    ],
+  ),
+);
 
-String _shortDateLabel(String label, List<DsChartTooltipItem> items) =>
+String _shortDateLabel(String label, List<ElChartTooltipItem> items) =>
     _shortDate(label);
 
-String _shortDateYearLabel(String label, List<DsChartTooltipItem> items) =>
+String _shortDateYearLabel(String label, List<ElChartTooltipItem> items) =>
     _shortDateYear(label);
 
-String _longDateLabel(String label, List<DsChartTooltipItem> items) =>
+String _longDateLabel(String label, List<ElChartTooltipItem> items) =>
     _longDate(label);
 
 /// The `Select` strip, rendering unconditionally with `children` exactly once —
@@ -1363,47 +1467,47 @@ class _RangeStrip extends StatelessWidget {
   final double? width;
   final String label;
   final String placeholder;
-  final List<DsSelectOption<String>> options;
+  final List<ElSelectOption<String>> options;
 
   /// `w-40` on the area strip.
-  static double get rangeWidth => ds(40);
+  static double get rangeWidth => el(40);
 
   /// `w-36` on the pie strip.
-  static double get monthWidth => ds(36);
+  static double get monthWidth => el(36);
 
-  static const List<DsSelectOption<String>> _rangeOptions =
-      <DsSelectOption<String>>[
-    DsSelectOption<String>(value: '90d', label: 'Last 3 months'),
-    DsSelectOption<String>(value: '30d', label: 'Last 30 days'),
-    DsSelectOption<String>(value: '7d', label: 'Last 7 days'),
-  ];
+  static const List<ElSelectOption<String>> _rangeOptions =
+      <ElSelectOption<String>>[
+        ElSelectOption<String>(value: '90d', label: 'Last 3 months'),
+        ElSelectOption<String>(value: '30d', label: 'Last 30 days'),
+        ElSelectOption<String>(value: '7d', label: 'Last 7 days'),
+      ];
 
   @override
   Widget build(BuildContext context) => Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          Align(
-            alignment: Alignment.centerRight,
-            child: DsSelect<String>(
-              width: width ?? rangeWidth,
-              label: label,
-              placeholder: placeholder,
-              value: value,
-              onChanged: onChanged,
-              options: options,
-            ),
-          ),
-          // `mb-5`.
-          SizedBox(height: ds(5)),
-          child,
-        ],
-      );
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: <Widget>[
+      Align(
+        alignment: Alignment.centerRight,
+        child: ElSelect<String>(
+          width: width ?? rangeWidth,
+          label: label,
+          placeholder: placeholder,
+          value: value,
+          onChanged: onChanged,
+          options: options,
+        ),
+      ),
+      // `mb-5`.
+      SizedBox(height: el(5)),
+      child,
+    ],
+  );
 }
 
-/* ── Bar, `components/ds/charts/bar.tsx` ────────────────────────────────── */
+/* ── Bar, `components/el/charts/bar.tsx` ────────────────────────────────── */
 
 /// The X axis six of the ten bar variants share (`tickMargin` 10, not 8).
-const DsChartAxis _barMonthAxis = DsChartAxis(
+const ElChartAxis _barMonthAxis = ElChartAxis(
   dataKey: 'month',
   tickLine: false,
   axisLine: false,
@@ -1412,230 +1516,230 @@ const DsChartAxis _barMonthAxis = DsChartAxis(
 );
 
 Widget _barDefault(_ChartInk ink) => _plot(
-      ink.desktop,
-      DsCartesianChart(
-        data: _monthsDesktop,
-        grid: const DsChartGrid(vertical: false),
-        xAxis: _barMonthAxis,
-        tooltip: const DsChartTooltipSpec(cursor: false, hideLabel: true),
-        series: <DsChartSeriesSpec>[
-          DsChartSeriesSpec(
-            kind: DsChartSeriesKind.bar,
-            dataKey: 'desktop',
-            fill: ink.slot(1),
-            radii: _radiiAll,
-          ),
-        ],
+  ink.desktop,
+  ElCartesianChart(
+    data: _monthsDesktop,
+    grid: const ElChartGrid(vertical: false),
+    xAxis: _barMonthAxis,
+    tooltip: const ElChartTooltipSpec(cursor: false, hideLabel: true),
+    series: <ElChartSeriesSpec>[
+      ElChartSeriesSpec(
+        kind: ElChartSeriesKind.bar,
+        dataKey: 'desktop',
+        fill: ink.slot(1),
+        radii: _radiiAll,
       ),
-    );
+    ],
+  ),
+);
 
 /// `layout="vertical"`, `YAxis type="category"`: the same chart rotated, and
 /// the one the page warns *"reads backwards until you have hit it once"*.
 Widget _barHorizontal(_ChartInk ink) => _plot(
-      ink.desktop,
-      DsCartesianChart(
-        data: _monthsDesktop,
-        layout: DsChartLayout.vertical,
-        margin: const DsChartMargin(left: -20),
-        xAxis: const DsChartAxis(
-          type: DsChartAxisType.number,
-          dataKey: 'desktop',
-          hide: true,
-        ),
-        yAxis: const DsChartAxis(
-          dataKey: 'month',
-          tickLine: false,
-          axisLine: false,
-          tickMargin: 10,
-          tickFormatter: _month3,
-        ),
-        tooltip: const DsChartTooltipSpec(cursor: false, hideLabel: true),
-        series: <DsChartSeriesSpec>[
-          DsChartSeriesSpec(
-            kind: DsChartSeriesKind.bar,
-            dataKey: 'desktop',
-            fill: ink.slot(1),
-            radii: _radiiAll,
-          ),
-        ],
+  ink.desktop,
+  ElCartesianChart(
+    data: _monthsDesktop,
+    layout: ElChartLayout.vertical,
+    margin: const ElChartMargin(left: -20),
+    xAxis: const ElChartAxis(
+      type: ElChartAxisType.number,
+      dataKey: 'desktop',
+      hide: true,
+    ),
+    yAxis: const ElChartAxis(
+      dataKey: 'month',
+      tickLine: false,
+      axisLine: false,
+      tickMargin: 10,
+      tickFormatter: _month3,
+    ),
+    tooltip: const ElChartTooltipSpec(cursor: false, hideLabel: true),
+    series: <ElChartSeriesSpec>[
+      ElChartSeriesSpec(
+        kind: ElChartSeriesKind.bar,
+        dataKey: 'desktop',
+        fill: ink.slot(1),
+        radii: _radiiAll,
       ),
-    );
+    ],
+  ),
+);
 
 Widget _barMultiple(_ChartInk ink) => _plot(
-      ink.desktopMobile,
-      DsCartesianChart(
-        data: _monthsDesktopMobile,
-        grid: const DsChartGrid(vertical: false),
-        xAxis: _barMonthAxis,
-        tooltip: const DsChartTooltipSpec(
-          cursor: false,
-          indicator: DsChartIndicator.dashed,
-        ),
-        series: <DsChartSeriesSpec>[
-          DsChartSeriesSpec(
-            kind: DsChartSeriesKind.bar,
-            dataKey: 'desktop',
-            fill: ink.slot(1),
-            radii: _radiiAll,
-          ),
-          DsChartSeriesSpec(
-            kind: DsChartSeriesKind.bar,
-            dataKey: 'mobile',
-            fill: ink.slot(2),
-            radii: _radiiAll,
-          ),
-        ],
+  ink.desktopMobile,
+  ElCartesianChart(
+    data: _monthsDesktopMobile,
+    grid: const ElChartGrid(vertical: false),
+    xAxis: _barMonthAxis,
+    tooltip: const ElChartTooltipSpec(
+      cursor: false,
+      indicator: ElChartIndicator.dashed,
+    ),
+    series: <ElChartSeriesSpec>[
+      ElChartSeriesSpec(
+        kind: ElChartSeriesKind.bar,
+        dataKey: 'desktop',
+        fill: ink.slot(1),
+        radii: _radiiAll,
       ),
-    );
+      ElChartSeriesSpec(
+        kind: ElChartSeriesKind.bar,
+        dataKey: 'mobile',
+        fill: ink.slot(2),
+        radii: _radiiAll,
+      ),
+    ],
+  ),
+);
 
 /// Two bars sharing a `stackId`. Only the zeros' position is geometry: the
 /// radius itself is `--radius-sm`, one rung for the whole family.
 Widget _barStacked(_ChartInk ink) => _plot(
-      ink.desktopMobile,
-      DsCartesianChart(
-        data: _monthsDesktopMobile,
-        grid: const DsChartGrid(vertical: false),
-        xAxis: _barMonthAxis,
-        tooltip: const DsChartTooltipSpec(hideLabel: true),
-        legend: const DsChartLegendSpec(),
-        series: <DsChartSeriesSpec>[
-          DsChartSeriesSpec(
-            kind: DsChartSeriesKind.bar,
-            dataKey: 'desktop',
-            stackId: 'a',
-            fill: ink.slot(1),
-            radii: _radiiBottom,
-          ),
-          DsChartSeriesSpec(
-            kind: DsChartSeriesKind.bar,
-            dataKey: 'mobile',
-            stackId: 'a',
-            fill: ink.slot(2),
-            radii: _radiiTop,
-          ),
-        ],
+  ink.desktopMobile,
+  ElCartesianChart(
+    data: _monthsDesktopMobile,
+    grid: const ElChartGrid(vertical: false),
+    xAxis: _barMonthAxis,
+    tooltip: const ElChartTooltipSpec(hideLabel: true),
+    legend: const ElChartLegendSpec(),
+    series: <ElChartSeriesSpec>[
+      ElChartSeriesSpec(
+        kind: ElChartSeriesKind.bar,
+        dataKey: 'desktop',
+        stackId: 'a',
+        fill: ink.slot(1),
+        radii: _radiiBottom,
       ),
-    );
+      ElChartSeriesSpec(
+        kind: ElChartSeriesKind.bar,
+        dataKey: 'mobile',
+        stackId: 'a',
+        fill: ink.slot(2),
+        radii: _radiiTop,
+      ),
+    ],
+  ),
+);
 
 /// The registry sets `fontSize={12}` on this `LabelList`: a raw SVG number
 /// for a value the type scale already owns. `text-xs` reaches the same size
-/// through CSS; here it is [DsChartText.xs], which is the same statement.
-Widget _barLabel(_ChartInk ink, DsThemeData theme) => _plot(
-      ink.desktop,
-      DsCartesianChart(
-        data: _monthsDesktop,
-        margin: const DsChartMargin(top: 20),
-        grid: const DsChartGrid(vertical: false),
-        xAxis: _barMonthAxis,
-        tooltip: const DsChartTooltipSpec(cursor: false, hideLabel: true),
-        series: <DsChartSeriesSpec>[
-          DsChartSeriesSpec(
-            kind: DsChartSeriesKind.bar,
-            dataKey: 'desktop',
-            fill: ink.slot(1),
-            radii: _radiiAll,
-            labels: <DsChartLabelList>[
-              DsChartLabelList(offset: 12, color: theme.foreground),
-            ],
-          ),
+/// through CSS; here it is [ElChartText.xs], which is the same statement.
+Widget _barLabel(_ChartInk ink, ElThemeData theme) => _plot(
+  ink.desktop,
+  ElCartesianChart(
+    data: _monthsDesktop,
+    margin: const ElChartMargin(top: 20),
+    grid: const ElChartGrid(vertical: false),
+    xAxis: _barMonthAxis,
+    tooltip: const ElChartTooltipSpec(cursor: false, hideLabel: true),
+    series: <ElChartSeriesSpec>[
+      ElChartSeriesSpec(
+        kind: ElChartSeriesKind.bar,
+        dataKey: 'desktop',
+        fill: ink.slot(1),
+        radii: _radiiAll,
+        labels: <ElChartLabelList>[
+          ElChartLabelList(offset: 12, color: theme.foreground),
         ],
       ),
-    );
+    ],
+  ),
+);
 
 /// The registry mints a per-container `--color-label` so the in-bar month text
 /// can contrast against the bar's own fill; `bar.tsx` replaces it with
 /// `fill-background`, which is a themed utility rather than a runtime mint.
-Widget _barLabelCustom(_ChartInk ink, DsThemeData theme) => _plot(
-      ink.desktop,
-      DsCartesianChart(
-        data: _monthsDesktop,
-        layout: DsChartLayout.vertical,
-        margin: const DsChartMargin(right: 16),
-        grid: const DsChartGrid(horizontal: false),
-        yAxis: const DsChartAxis(
-          dataKey: 'month',
-          tickLine: false,
-          axisLine: false,
-          hide: true,
-        ),
-        xAxis: const DsChartAxis(
-          dataKey: 'desktop',
-          type: DsChartAxisType.number,
-          hide: true,
-        ),
-        tooltip: const DsChartTooltipSpec(
-          cursor: false,
-          indicator: DsChartIndicator.line,
-        ),
-        series: <DsChartSeriesSpec>[
-          DsChartSeriesSpec(
-            kind: DsChartSeriesKind.bar,
+Widget _barLabelCustom(_ChartInk ink, ElThemeData theme) => _plot(
+  ink.desktop,
+  ElCartesianChart(
+    data: _monthsDesktop,
+    layout: ElChartLayout.vertical,
+    margin: const ElChartMargin(right: 16),
+    grid: const ElChartGrid(horizontal: false),
+    yAxis: const ElChartAxis(
+      dataKey: 'month',
+      tickLine: false,
+      axisLine: false,
+      hide: true,
+    ),
+    xAxis: const ElChartAxis(
+      dataKey: 'desktop',
+      type: ElChartAxisType.number,
+      hide: true,
+    ),
+    tooltip: const ElChartTooltipSpec(
+      cursor: false,
+      indicator: ElChartIndicator.line,
+    ),
+    series: <ElChartSeriesSpec>[
+      ElChartSeriesSpec(
+        kind: ElChartSeriesKind.bar,
+        dataKey: 'desktop',
+        fill: ink.slot(1),
+        radii: _radiiAll,
+        labels: <ElChartLabelList>[
+          ElChartLabelList(
+            dataKey: 'month',
+            position: ElChartLabelPosition.insideLeft,
+            offset: 8,
+            color: theme.background,
+          ),
+          ElChartLabelList(
             dataKey: 'desktop',
-            fill: ink.slot(1),
-            radii: _radiiAll,
-            labels: <DsChartLabelList>[
-              DsChartLabelList(
-                dataKey: 'month',
-                position: DsChartLabelPosition.insideLeft,
-                offset: 8,
-                color: theme.background,
-              ),
-              DsChartLabelList(
-                dataKey: 'desktop',
-                position: DsChartLabelPosition.right,
-                offset: 8,
-                color: theme.foreground,
-              ),
-            ],
+            position: ElChartLabelPosition.right,
+            offset: 8,
+            color: theme.foreground,
           ),
         ],
       ),
-    );
+    ],
+  ),
+);
 
 /// One `Bar`, a colour per datum. No `fill` on the series: each row in
 /// `BROWSERS` already carries its own.
 Widget _barMixed(_ChartInk ink) => _plot(
-      ink.browser,
-      DsCartesianChart(
-        data: _browsers,
-        layout: DsChartLayout.vertical,
-        margin: const DsChartMargin(left: 0),
-        yAxis: DsChartAxis(
-          dataKey: 'browser',
-          tickLine: false,
-          axisLine: false,
-          tickMargin: 10,
-          tickFormatter: (Object? v) => _browserLabel('$v'),
-        ),
-        xAxis: const DsChartAxis(
-          dataKey: 'visitors',
-          type: DsChartAxisType.number,
-          hide: true,
-        ),
-        tooltip: const DsChartTooltipSpec(cursor: false, hideLabel: true),
-        series: <DsChartSeriesSpec>[
-          DsChartSeriesSpec(
-            kind: DsChartSeriesKind.bar,
-            dataKey: 'visitors',
-            radii: _radiiAll,
-            cellFills: <Color>[
-              for (final Map<String, Object?> row in _browsers) ink.ofRow(row),
-            ],
-          ),
+  ink.browser,
+  ElCartesianChart(
+    data: _browsers,
+    layout: ElChartLayout.vertical,
+    margin: const ElChartMargin(left: 0),
+    yAxis: ElChartAxis(
+      dataKey: 'browser',
+      tickLine: false,
+      axisLine: false,
+      tickMargin: 10,
+      tickFormatter: (Object? v) => _browserLabel('$v'),
+    ),
+    xAxis: const ElChartAxis(
+      dataKey: 'visitors',
+      type: ElChartAxisType.number,
+      hide: true,
+    ),
+    tooltip: const ElChartTooltipSpec(cursor: false, hideLabel: true),
+    series: <ElChartSeriesSpec>[
+      ElChartSeriesSpec(
+        kind: ElChartSeriesKind.bar,
+        dataKey: 'visitors',
+        radii: _radiiAll,
+        cellFills: <Color>[
+          for (final Map<String, Object?> row in _browsers) ink.ofRow(row),
         ],
       ),
-    );
+    ],
+  ),
+);
 
 /// `BROWSER_CONFIG`'s labels, as a formatter: the registry writes the same
 /// lookup inline on three axes.
 String _browserLabel(String key) => switch (key) {
-      'chrome' => 'Chrome',
-      'safari' => 'Safari',
-      'firefox' => 'Firefox',
-      'edge' => 'Edge',
-      'other' => 'Other',
-      _ => key,
-    };
+  'chrome' => 'Chrome',
+  'safari' => 'Safari',
+  'firefox' => 'Firefox',
+  'edge' => 'Edge',
+  'other' => 'Other',
+  _ => key,
+};
 
 /// `data.ts` names this shape as one of the eight kept local: `BROWSERS`
 /// reordered, so the "active" third bar lands on firefox rather than chrome.
@@ -1651,35 +1755,34 @@ const List<Map<String, Object?>> _barActiveData = <Map<String, Object?>>[
 /// `Tooltip`'s `defaultIndex`, which is why this specimen shows a panel with no
 /// pointer anywhere near it.
 Widget _barActive(_ChartInk ink) => _plot(
-      ink.browser,
-      DsCartesianChart(
-        data: _barActiveData,
-        grid: const DsChartGrid(vertical: false),
-        xAxis: DsChartAxis(
-          dataKey: 'browser',
-          tickLine: false,
-          axisLine: false,
-          tickMargin: 10,
-          tickFormatter: (Object? v) => _browserLabel('$v'),
-        ),
-        tooltip: const DsChartTooltipSpec(
-          cursor: false,
-          defaultIndex: 2,
-          hideLabel: true,
-        ),
-        series: <DsChartSeriesSpec>[
-          DsChartSeriesSpec(
-            kind: DsChartSeriesKind.bar,
-            dataKey: 'visitors',
-            radii: _radiiAll,
-            cellFills: <Color>[
-              for (final Map<String, Object?> row in _barActiveData)
-                ink.ofRow(row),
-            ],
-          ),
+  ink.browser,
+  ElCartesianChart(
+    data: _barActiveData,
+    grid: const ElChartGrid(vertical: false),
+    xAxis: ElChartAxis(
+      dataKey: 'browser',
+      tickLine: false,
+      axisLine: false,
+      tickMargin: 10,
+      tickFormatter: (Object? v) => _browserLabel('$v'),
+    ),
+    tooltip: const ElChartTooltipSpec(
+      cursor: false,
+      defaultIndex: 2,
+      hideLabel: true,
+    ),
+    series: <ElChartSeriesSpec>[
+      ElChartSeriesSpec(
+        kind: ElChartSeriesKind.bar,
+        dataKey: 'visitors',
+        radii: _radiiAll,
+        cellFills: <Color>[
+          for (final Map<String, Object?> row in _barActiveData) ink.ofRow(row),
         ],
       ),
-    );
+    ],
+  ),
+);
 
 /// Kept local per `data.ts`, `{ month, visitors }` with two negative rows.
 const List<Map<String, Object?>> _barNegativeData = <Map<String, Object?>>[
@@ -1696,37 +1799,37 @@ const List<Map<String, Object?>> _barNegativeData = <Map<String, Object?>>[
 /// direction is already legible from each bar's own position above or below the
 /// zero baseline, and the registry's own choice separates the two with
 /// `--chart-1` / `--chart-2`, both neutral action-ramp hues.
-Widget _barNegative(_ChartInk ink, DsThemeData theme) => _plot(
-      DsChartConfig(<String, DsChartSeries>{
-        'visitors': const DsChartSeries(label: 'Visitors'),
-      }),
-      DsCartesianChart(
-        data: _barNegativeData,
-        grid: const DsChartGrid(vertical: false),
-        tooltip: const DsChartTooltipSpec(
-          cursor: false,
-          hideLabel: true,
-          hideIndicator: true,
-        ),
-        series: <DsChartSeriesSpec>[
-          DsChartSeriesSpec(
-            kind: DsChartSeriesKind.bar,
-            dataKey: 'visitors',
-            cellFills: <Color>[
-              for (final Map<String, Object?> row in _barNegativeData)
-                (row['visitors']! as num) > 0 ? ink.slot(1) : ink.slot(2),
-            ],
-            labels: <DsChartLabelList>[
-              // No explicit fill in the registry means recharts' own untokenised
-              // grey paints the month labels: the same class of failure
-              // `ui/chart.tsx` measured on the axis ticks. `fill-foreground`
-              // closes it.
-              DsChartLabelList(dataKey: 'month', color: theme.foreground),
-            ],
-          ),
+Widget _barNegative(_ChartInk ink, ElThemeData theme) => _plot(
+  ElChartConfig(<String, ElChartSeries>{
+    'visitors': const ElChartSeries(label: 'Visitors'),
+  }),
+  ElCartesianChart(
+    data: _barNegativeData,
+    grid: const ElChartGrid(vertical: false),
+    tooltip: const ElChartTooltipSpec(
+      cursor: false,
+      hideLabel: true,
+      hideIndicator: true,
+    ),
+    series: <ElChartSeriesSpec>[
+      ElChartSeriesSpec(
+        kind: ElChartSeriesKind.bar,
+        dataKey: 'visitors',
+        cellFills: <Color>[
+          for (final Map<String, Object?> row in _barNegativeData)
+            (row['visitors']! as num) > 0 ? ink.slot(1) : ink.slot(2),
+        ],
+        labels: <ElChartLabelList>[
+          // No explicit fill in the registry means recharts' own untokenised
+          // grey paints the month labels: the same class of failure
+          // `ui/chart.tsx` measured on the axis ticks. `fill-foreground`
+          // closes it.
+          ElChartLabelList(dataKey: 'month', color: theme.foreground),
         ],
       ),
-    );
+    ],
+  ),
+);
 
 /// The two clickable totals, and the series they switch between.
 ///
@@ -1739,7 +1842,7 @@ Widget _barNegative(_ChartInk ink, DsThemeData theme) => _plot(
 /// their own selected background… Applies to `ToggleGroup` and `Tabs`, and to
 /// anything like them you add later."* `ToggleGroup` itself does not drop in —
 /// its variants are built for label-sized items and these tiles carry a
-/// `Stat`-sized figure: but the travel is [DsSlidingPillGroup]'s, and that is
+/// `Stat`-sized figure: but the travel is [ElSlidingPillGroup]'s, and that is
 /// reusable on its own.
 ///
 /// **The pill carries the series' colour, and only below the text.** `bar.tsx`
@@ -1767,9 +1870,9 @@ class _SeriesStrip extends StatefulWidget {
 
   /// The running totals over all 91 days.
   static int total(String key) => _dailyVisits.fold<int>(
-        0,
-        (int acc, Map<String, Object?> row) => acc + (row[key]! as int),
-      );
+    0,
+    (int acc, Map<String, Object?> row) => acc + (row[key]! as int),
+  );
 
   @override
   State<_SeriesStrip> createState() => _SeriesStripState();
@@ -1790,7 +1893,7 @@ class _SeriesStripState extends State<_SeriesStrip> {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     final Color colour = widget.ink.slot(_active + 1);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1798,12 +1901,12 @@ class _SeriesStripState extends State<_SeriesStrip> {
         DecoratedBox(
           decoration: BoxDecoration(
             color: theme.card,
-            borderRadius: BorderRadius.circular(DsRadii.lg),
-            border: Border.all(color: theme.border, width: DsWidths.hairline),
+            borderRadius: BorderRadius.circular(ElRadii.lg),
+            border: Border.all(color: theme.border, width: ElWidths.hairline),
           ),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(DsRadii.lg),
-            child: DsSlidingPillGroup(
+            borderRadius: BorderRadius.circular(ElRadii.lg),
+            child: ElSlidingPillGroup(
               activeIndex: _active,
               pill: DecoratedBox(
                 decoration: BoxDecoration(
@@ -1826,8 +1929,9 @@ class _SeriesStripState extends State<_SeriesStrip> {
                 for (int i = 0; i < _SeriesStrip.series.length; i++)
                   _SeriesTile(
                     label: i == 0 ? 'Desktop' : 'Mobile',
-                    value: dsChartNumber(
-                        _SeriesStrip.total(_SeriesStrip.series[i])),
+                    value: elChartNumber(
+                      _SeriesStrip.total(_SeriesStrip.series[i]),
+                    ),
                     swatch: widget.ink.slot(i + 1),
                     leadingBorder: i > 0,
                     onTap: () => setState(() => _active = i),
@@ -1837,7 +1941,7 @@ class _SeriesStripState extends State<_SeriesStrip> {
           ),
         ),
         // `mb-5`.
-        SizedBox(height: ds(5)),
+        SizedBox(height: el(5)),
         _SeriesScope(series: _SeriesStrip.series[_active], child: widget.child),
       ],
     );
@@ -1863,11 +1967,11 @@ class _SeriesTile extends StatelessWidget {
   /// `size-3 rounded-xs`: the same swatch `PieInteractiveControls` uses, so
   /// the two interactive pickers share one idiom rather than inventing a
   /// second.
-  static double get swatchSize => ds(3);
+  static double get swatchSize => el(3);
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
@@ -1877,16 +1981,16 @@ class _SeriesTile extends StatelessWidget {
               ? Border(
                   left: BorderSide(
                     color: theme.border,
-                    width: DsWidths.hairline,
+                    width: ElWidths.hairline,
                   ),
                 )
               : null,
         ),
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: ds(4), vertical: ds(3)),
+          padding: EdgeInsets.symmetric(horizontal: el(4), vertical: el(3)),
           child: Stack(
             children: <Widget>[
-              DsStat(label: label, value: value),
+              ElStat(label: label, value: value),
               Positioned(
                 top: 0,
                 right: 0,
@@ -1895,7 +1999,7 @@ class _SeriesTile extends StatelessWidget {
                   height: swatchSize,
                   decoration: BoxDecoration(
                     color: swatch,
-                    borderRadius: BorderRadius.circular(DsRadii.xs),
+                    borderRadius: BorderRadius.circular(ElRadii.xs),
                   ),
                 ),
               ),
@@ -1930,14 +2034,14 @@ Color _seriesColour(_ChartInk ink, String key) =>
 Widget _barInteractive(BuildContext context, _ChartInk ink) {
   final String active = _SeriesScope.of(context);
   return _plot(
-    ink.desktopMobile.plus(<String, DsChartSeries>{
-      'views': const DsChartSeries(label: 'Page Views'),
+    ink.desktopMobile.plus(<String, ElChartSeries>{
+      'views': const ElChartSeries(label: 'Page Views'),
     }),
-    DsCartesianChart(
+    ElCartesianChart(
       data: _dailyVisits,
-      margin: const DsChartMargin(left: 12, right: 12),
-      grid: const DsChartGrid(vertical: false),
-      xAxis: const DsChartAxis(
+      margin: const ElChartMargin(left: 12, right: 12),
+      grid: const ElChartGrid(vertical: false),
+      xAxis: const ElChartAxis(
         dataKey: 'date',
         tickLine: false,
         axisLine: false,
@@ -1945,13 +2049,13 @@ Widget _barInteractive(BuildContext context, _ChartInk ink) {
         minTickGap: 32,
         tickFormatter: _shortDate,
       ),
-      tooltip: const DsChartTooltipSpec(
+      tooltip: const ElChartTooltipSpec(
         nameKey: 'views',
         labelFormatter: _shortDateYearLabel,
       ),
-      series: <DsChartSeriesSpec>[
-        DsChartSeriesSpec(
-          kind: DsChartSeriesKind.bar,
+      series: <ElChartSeriesSpec>[
+        ElChartSeriesSpec(
+          kind: ElChartSeriesKind.bar,
           dataKey: active,
           fill: _seriesColour(ink, active),
         ),
@@ -1960,212 +2064,198 @@ Widget _barInteractive(BuildContext context, _ChartInk ink) {
   );
 }
 
-/* ── Line, `components/ds/charts/line.tsx` ──────────────────────────────── */
+/* ── Line, `components/el/charts/line.tsx` ──────────────────────────────── */
 
 /// The one line every `dot={false}` variant draws.
-DsChartSeriesSpec _lineSeries(
+ElChartSeriesSpec _lineSeries(
   Color colour,
   String key,
-  DsCurveType curve, {
-  DsChartDot? dot,
-  List<DsChartLabelList> labels = const <DsChartLabelList>[],
-}) =>
-    DsChartSeriesSpec(
-      kind: DsChartSeriesKind.line,
-      dataKey: key,
-      curve: curve,
-      stroke: colour,
-      strokeWidth: 2,
-      dot: dot,
-      labels: labels,
-    );
+  ElCurveType curve, {
+  ElChartDot? dot,
+  List<ElChartLabelList> labels = const <ElChartLabelList>[],
+}) => ElChartSeriesSpec(
+  kind: ElChartSeriesKind.line,
+  dataKey: key,
+  curve: curve,
+  stroke: colour,
+  strokeWidth: 2,
+  dot: dot,
+  labels: labels,
+);
 
 Widget _lineChart(
-  DsChartConfig config,
+  ElChartConfig config,
   List<Map<String, Object?>> data,
-  List<DsChartSeriesSpec> series, {
-  DsChartAxis? xAxis,
-  DsChartMargin margin = const DsChartMargin(left: 12, right: 12),
-  DsChartTooltipSpec tooltip =
-      const DsChartTooltipSpec(cursor: false, hideLabel: true),
-}) =>
-    _plot(
-      config,
-      DsCartesianChart(
-        data: data,
-        margin: margin,
-        grid: const DsChartGrid(vertical: false),
-        xAxis: xAxis,
-        tooltip: tooltip,
-        series: series,
-      ),
-    );
+  List<ElChartSeriesSpec> series, {
+  ElChartAxis? xAxis,
+  ElChartMargin margin = const ElChartMargin(left: 12, right: 12),
+  ElChartTooltipSpec tooltip = const ElChartTooltipSpec(
+    cursor: false,
+    hideLabel: true,
+  ),
+}) => _plot(
+  config,
+  ElCartesianChart(
+    data: data,
+    margin: margin,
+    grid: const ElChartGrid(vertical: false),
+    xAxis: xAxis,
+    tooltip: tooltip,
+    series: series,
+  ),
+);
 
 Widget _lineDefault(_ChartInk ink) => _lineChart(
-      ink.desktop,
-      _monthsDesktop,
-      <DsChartSeriesSpec>[
-        _lineSeries(ink.slot(1), 'desktop', DsCurveType.natural),
-      ],
-      xAxis: _monthAxis(),
-    );
+  ink.desktop,
+  _monthsDesktop,
+  <ElChartSeriesSpec>[_lineSeries(ink.slot(1), 'desktop', ElCurveType.natural)],
+  xAxis: _monthAxis(),
+);
 
 Widget _lineLinear(_ChartInk ink) => _lineChart(
-      ink.desktop,
-      _monthsDesktop,
-      <DsChartSeriesSpec>[
-        _lineSeries(ink.slot(1), 'desktop', DsCurveType.linear),
-      ],
-      xAxis: _monthAxis(),
-    );
+  ink.desktop,
+  _monthsDesktop,
+  <ElChartSeriesSpec>[_lineSeries(ink.slot(1), 'desktop', ElCurveType.linear)],
+  xAxis: _monthAxis(),
+);
 
 Widget _lineStep(_ChartInk ink) => _lineChart(
-      ink.desktop,
-      _monthsDesktop,
-      <DsChartSeriesSpec>[
-        _lineSeries(ink.slot(1), 'desktop', DsCurveType.step),
-      ],
-      xAxis: _monthAxis(),
-    );
+  ink.desktop,
+  _monthsDesktop,
+  <ElChartSeriesSpec>[_lineSeries(ink.slot(1), 'desktop', ElCurveType.step)],
+  xAxis: _monthAxis(),
+);
 
 Widget _lineMultiple(_ChartInk ink) => _lineChart(
-      ink.desktopMobile,
-      _monthsDesktopMobile,
-      <DsChartSeriesSpec>[
-        _lineSeries(ink.slot(1), 'desktop', DsCurveType.monotone),
-        _lineSeries(ink.slot(2), 'mobile', DsCurveType.monotone),
-      ],
-      xAxis: _monthAxis(),
-      tooltip: const DsChartTooltipSpec(),
-    );
+  ink.desktopMobile,
+  _monthsDesktopMobile,
+  <ElChartSeriesSpec>[
+    _lineSeries(ink.slot(1), 'desktop', ElCurveType.monotone),
+    _lineSeries(ink.slot(2), 'mobile', ElCurveType.monotone),
+  ],
+  xAxis: _monthAxis(),
+  tooltip: const ElChartTooltipSpec(),
+);
 
-Widget _lineDots(_ChartInk ink) => _lineChart(
-      ink.desktopMobile,
-      _monthsDesktopMobile,
-      <DsChartSeriesSpec>[
-        _lineSeries(
-          ink.slot(1),
-          'desktop',
-          DsCurveType.natural,
-          dot: DsChartDot(fill: ink.slot(1)),
-        ),
-      ],
-      xAxis: _monthAxis(),
-    );
+Widget _lineDots(_ChartInk ink) =>
+    _lineChart(ink.desktopMobile, _monthsDesktopMobile, <ElChartSeriesSpec>[
+      _lineSeries(
+        ink.slot(1),
+        'desktop',
+        ElCurveType.natural,
+        dot: ElChartDot(fill: ink.slot(1)),
+      ),
+    ], xAxis: _monthAxis());
 
 /// The registry hardcodes 24 for the glyph's box; `line.tsx` reads it off the
 /// icon ladder instead, *"so `xl` is 24 in one place only"*.
-Widget _lineDotsCustom(_ChartInk ink, DsThemeData theme) => _lineChart(
-      ink.desktopMobile,
-      _monthsDesktopMobile,
-      <DsChartSeriesSpec>[
-        _lineSeries(
-          ink.slot(1),
-          'desktop',
-          DsCurveType.natural,
-          dot: DsChartDot(
-            radius: DsIcon.pxFor(DsIconSize.xl) / 2,
-            fill: theme.background,
-            stroke: ink.slot(1),
-          ),
+Widget _lineDotsCustom(_ChartInk ink, ElThemeData theme) =>
+    _lineChart(ink.desktopMobile, _monthsDesktopMobile, <ElChartSeriesSpec>[
+      _lineSeries(
+        ink.slot(1),
+        'desktop',
+        ElCurveType.natural,
+        dot: ElChartDot(
+          radius: ElIcon.pxFor(ElIconSize.xl) / 2,
+          fill: theme.background,
+          stroke: ink.slot(1),
         ),
-      ],
-      xAxis: _monthAxis(),
-    );
+      ),
+    ], xAxis: _monthAxis());
 
 /// One line through five categorical points, coloured from each row rather than
 /// from a series palette: five rows, five tokens, no cycling.
 Widget _lineDotsColors(_ChartInk ink) => _lineChart(
-      ink.browser,
-      _browsers,
-      <DsChartSeriesSpec>[
-        DsChartSeriesSpec(
-          kind: DsChartSeriesKind.line,
-          dataKey: 'visitors',
-          curve: DsCurveType.natural,
-          // `visitors` is the value key and carries no colour of its own, so
-          // the stroke is the plain `--color-chart-2` the registry's config
-          // resolves to, not a lookup through it.
-          stroke: ink.slot(2),
-          strokeWidth: 2,
-          dot: const DsChartDot(radius: 5),
-          cellFills: <Color>[
-            for (final Map<String, Object?> row in _browsers) ink.ofRow(row),
-          ],
-        ),
+  ink.browser,
+  _browsers,
+  <ElChartSeriesSpec>[
+    ElChartSeriesSpec(
+      kind: ElChartSeriesKind.line,
+      dataKey: 'visitors',
+      curve: ElCurveType.natural,
+      // `visitors` is the value key and carries no colour of its own, so
+      // the stroke is the plain `--color-chart-2` the registry's config
+      // resolves to, not a lookup through it.
+      stroke: ink.slot(2),
+      strokeWidth: 2,
+      dot: const ElChartDot(radius: 5),
+      cellFills: <Color>[
+        for (final Map<String, Object?> row in _browsers) ink.ofRow(row),
       ],
-      margin: const DsChartMargin(top: 24, left: 24, right: 24),
-      tooltip: const DsChartTooltipSpec(
-        cursor: false,
-        indicator: DsChartIndicator.line,
-        nameKey: 'visitors',
-        hideLabel: true,
-      ),
-    );
+    ),
+  ],
+  margin: const ElChartMargin(top: 24, left: 24, right: 24),
+  tooltip: const ElChartTooltipSpec(
+    cursor: false,
+    indicator: ElChartIndicator.line,
+    nameKey: 'visitors',
+    hideLabel: true,
+  ),
+);
 
-Widget _lineLabel(_ChartInk ink, DsThemeData theme) => _lineChart(
-      ink.desktopMobile,
-      _monthsDesktopMobile,
-      <DsChartSeriesSpec>[
-        _lineSeries(
-          ink.slot(1),
-          'desktop',
-          DsCurveType.natural,
-          dot: DsChartDot(fill: ink.slot(1)),
-          labels: <DsChartLabelList>[
-            DsChartLabelList(offset: 12, color: theme.foreground),
-          ],
-        ),
+Widget _lineLabel(_ChartInk ink, ElThemeData theme) => _lineChart(
+  ink.desktopMobile,
+  _monthsDesktopMobile,
+  <ElChartSeriesSpec>[
+    _lineSeries(
+      ink.slot(1),
+      'desktop',
+      ElCurveType.natural,
+      dot: ElChartDot(fill: ink.slot(1)),
+      labels: <ElChartLabelList>[
+        ElChartLabelList(offset: 12, color: theme.foreground),
       ],
-      xAxis: _monthAxis(),
-      margin: const DsChartMargin(top: 20, left: 12, right: 12),
-      tooltip: const DsChartTooltipSpec(
-        cursor: false,
-        indicator: DsChartIndicator.line,
-      ),
-    );
+    ),
+  ],
+  xAxis: _monthAxis(),
+  margin: const ElChartMargin(top: 20, left: 12, right: 12),
+  tooltip: const ElChartTooltipSpec(
+    cursor: false,
+    indicator: ElChartIndicator.line,
+  ),
+);
 
-Widget _lineLabelCustom(_ChartInk ink, DsThemeData theme) => _lineChart(
-      ink.browser,
-      _browsers,
-      <DsChartSeriesSpec>[
-        _lineSeries(
-          ink.slot(2),
-          'visitors',
-          DsCurveType.natural,
-          dot: DsChartDot(fill: ink.slot(2)),
-          labels: <DsChartLabelList>[
-            DsChartLabelList(
-              dataKey: 'browser',
-              offset: 12,
-              color: theme.foreground,
-              formatter: _browserLabelOf,
-            ),
-          ],
+Widget _lineLabelCustom(_ChartInk ink, ElThemeData theme) => _lineChart(
+  ink.browser,
+  _browsers,
+  <ElChartSeriesSpec>[
+    _lineSeries(
+      ink.slot(2),
+      'visitors',
+      ElCurveType.natural,
+      dot: ElChartDot(fill: ink.slot(2)),
+      labels: <ElChartLabelList>[
+        ElChartLabelList(
+          dataKey: 'browser',
+          offset: 12,
+          color: theme.foreground,
+          formatter: _browserLabelOf,
         ),
       ],
-      margin: const DsChartMargin(top: 24, left: 24, right: 24),
-      tooltip: const DsChartTooltipSpec(
-        cursor: false,
-        indicator: DsChartIndicator.line,
-        nameKey: 'visitors',
-        hideLabel: true,
-      ),
-    );
+    ),
+  ],
+  margin: const ElChartMargin(top: 24, left: 24, right: 24),
+  tooltip: const ElChartTooltipSpec(
+    cursor: false,
+    indicator: ElChartIndicator.line,
+    nameKey: 'visitors',
+    hideLabel: true,
+  ),
+);
 
 String _browserLabelOf(Object? value) => _browserLabel('$value');
 
 Widget _lineInteractive(BuildContext context, _ChartInk ink) {
   final String active = _SeriesScope.of(context);
   return _plot(
-    ink.desktopMobile.plus(<String, DsChartSeries>{
-      'views': const DsChartSeries(label: 'Page Views'),
+    ink.desktopMobile.plus(<String, ElChartSeries>{
+      'views': const ElChartSeries(label: 'Page Views'),
     }),
-    DsCartesianChart(
+    ElCartesianChart(
       data: _dailyVisits,
-      margin: const DsChartMargin(left: 12, right: 12),
-      grid: const DsChartGrid(vertical: false),
-      xAxis: const DsChartAxis(
+      margin: const ElChartMargin(left: 12, right: 12),
+      grid: const ElChartGrid(vertical: false),
+      xAxis: const ElChartAxis(
         dataKey: 'date',
         tickLine: false,
         axisLine: false,
@@ -2173,23 +2263,23 @@ Widget _lineInteractive(BuildContext context, _ChartInk ink) {
         minTickGap: 32,
         tickFormatter: _shortDate,
       ),
-      tooltip: DsChartTooltipSpec(
+      tooltip: ElChartTooltipSpec(
         nameKey: 'views',
         labelFormatter: _shortDateYearLabel,
         // `className="w-40"`.
-        width: ds(40),
+        width: el(40),
       ),
-      series: <DsChartSeriesSpec>[
-        _lineSeries(_seriesColour(ink, active), active, DsCurveType.monotone),
+      series: <ElChartSeriesSpec>[
+        _lineSeries(_seriesColour(ink, active), active, ElCurveType.monotone),
       ],
     ),
   );
 }
 
-/* ── Pie, `components/ds/charts/pie.tsx` ────────────────────────────────── */
+/* ── Pie, `components/el/charts/pie.tsx` ────────────────────────────────── */
 
 /// The bare `Pie` eight of the eleven variants start from.
-DsPieSpec _browserPie(
+ElPieSpec _browserPie(
   _ChartInk ink, {
   double? innerRadius,
   double strokeWidth = 1,
@@ -2201,132 +2291,125 @@ DsPieSpec _browserPie(
   String Function(Map<String, Object?>)? labelBuilder,
   String? chipLabelKey,
   List<Map<String, Object?>>? data,
-}) =>
-    DsPieSpec(
-      data: ink.rows(data ?? _browsers),
-      dataKey: 'visitors',
-      nameKey: 'browser',
-      innerRadius: innerRadius,
-      strokeWidth: strokeWidth,
-      activeIndex: activeIndex,
-      activeGrow: activeGrow,
-      activeRing: activeRing,
-      outsideLabel: outsideLabel,
-      labelLine: labelLine,
-      labelBuilder: labelBuilder,
-      chipLabelKey: chipLabelKey,
-    );
+}) => ElPieSpec(
+  data: ink.rows(data ?? _browsers),
+  dataKey: 'visitors',
+  nameKey: 'browser',
+  innerRadius: innerRadius,
+  strokeWidth: strokeWidth,
+  activeIndex: activeIndex,
+  activeGrow: activeGrow,
+  activeRing: activeRing,
+  outsideLabel: outsideLabel,
+  labelLine: labelLine,
+  labelBuilder: labelBuilder,
+  chipLabelKey: chipLabelKey,
+);
 
 Widget _pieSimple(_ChartInk ink) => _plot(
-      ink.browser,
-      DsPieChart(
-        pies: <DsPieSpec>[_browserPie(ink)],
-        tooltip: const DsChartTooltipSpec(cursor: false, hideLabel: true),
-      ),
-    );
+  ink.browser,
+  ElPieChart(
+    pies: <ElPieSpec>[_browserPie(ink)],
+    tooltip: const ElChartTooltipSpec(cursor: false, hideLabel: true),
+  ),
+);
 
 /// `stroke="0"` is the registry's own value, kept verbatim: the wedge
 /// separator is a stroke WIDTH here, not a hue, and there is nothing in it for
 /// a token to own.
 Widget _pieSeparatorNone(_ChartInk ink) => _plot(
-      ink.browser,
-      DsPieChart(
-        pies: <DsPieSpec>[_browserPie(ink, strokeWidth: 0)],
-        tooltip: const DsChartTooltipSpec(cursor: false, hideLabel: true),
-      ),
-    );
+  ink.browser,
+  ElPieChart(
+    pies: <ElPieSpec>[_browserPie(ink, strokeWidth: 0)],
+    tooltip: const ElChartTooltipSpec(cursor: false, hideLabel: true),
+  ),
+);
 
 /// The label sits OUTSIDE the wedge, on the panel background, so this is a
 /// background-contrast case rather than the on-fill one `PieLabelList` answers.
-Widget _pieLabel(_ChartInk ink, DsThemeData theme) => _plot(
-      ink.browser,
-      DsPieChart(
-        pies: <DsPieSpec>[_browserPie(ink, outsideLabel: true)],
-        labelColor: theme.foreground,
-        tooltip: const DsChartTooltipSpec(hideLabel: true),
-      ),
-    );
+Widget _pieLabel(_ChartInk ink, ElThemeData theme) => _plot(
+  ink.browser,
+  ElPieChart(
+    pies: <ElPieSpec>[_browserPie(ink, outsideLabel: true)],
+    labelColor: theme.foreground,
+    tooltip: const ElChartTooltipSpec(hideLabel: true),
+  ),
+);
 
 /// The registry's custom `label` render function, swept once:
 /// `fill="hsla(var(--foreground))"` → `--foreground`. It still lands outside
 /// the wedge, so this is background contrast again.
-Widget _pieLabelCustom(_ChartInk ink, DsThemeData theme) => _plot(
-      ink.browser,
-      DsPieChart(
-        pies: <DsPieSpec>[
-          _browserPie(
-            ink,
-            outsideLabel: true,
-            labelLine: false,
-            labelBuilder: (Map<String, Object?> row) =>
-                dsChartNumber(row['visitors']! as num),
-          ),
-        ],
-        labelColor: theme.foreground,
-        tooltip: const DsChartTooltipSpec(
-          nameKey: 'visitors',
-          hideLabel: true,
-        ),
+Widget _pieLabelCustom(_ChartInk ink, ElThemeData theme) => _plot(
+  ink.browser,
+  ElPieChart(
+    pies: <ElPieSpec>[
+      _browserPie(
+        ink,
+        outsideLabel: true,
+        labelLine: false,
+        labelBuilder: (Map<String, Object?> row) =>
+            elChartNumber(row['visitors']! as num),
       ),
-    );
+    ],
+    labelColor: theme.foreground,
+    tooltip: const ElChartTooltipSpec(nameKey: 'visitors', hideLabel: true),
+  ),
+);
 
 /// This family's real AA question, and the one the arithmetic decides —
 /// see the chip widget in `chart_polar.dart` for the full derivation.
 Widget _pieLabelList(_ChartInk ink) => _plot(
-      ink.browser,
-      DsPieChart(
-        pies: <DsPieSpec>[_browserPie(ink, chipLabelKey: 'browser')],
-        tooltip: const DsChartTooltipSpec(
-          nameKey: 'visitors',
-          hideLabel: true,
-        ),
-      ),
-    );
+  ink.browser,
+  ElPieChart(
+    pies: <ElPieSpec>[_browserPie(ink, chipLabelKey: 'browser')],
+    tooltip: const ElChartTooltipSpec(nameKey: 'visitors', hideLabel: true),
+  ),
+);
 
 /// No tooltip in this variant: the legend is the whole point.
 Widget _pieLegend(_ChartInk ink) => _plot(
-      ink.browser,
-      DsPieChart(
-        pies: <DsPieSpec>[_browserPie(ink)],
-        legend: const DsChartLegendSpec(
-          nameKey: 'browser',
-          wrap: true,
-          // `-translate-y-2`.
-          offset: 8,
-        ),
-      ),
-    );
+  ink.browser,
+  ElPieChart(
+    pies: <ElPieSpec>[_browserPie(ink)],
+    legend: const ElChartLegendSpec(
+      nameKey: 'browser',
+      wrap: true,
+      // `-translate-y-2`.
+      offset: 8,
+    ),
+  ),
+);
 
 /// `innerRadius={60}` is the registry's own pixel value, kept rather than
 /// reinstated as a percentage (drift 4: the panel's note still says
 /// "percentage").
 Widget _pieDonut(_ChartInk ink) => _plot(
-      ink.browser,
-      DsPieChart(
-        pies: <DsPieSpec>[_browserPie(ink, innerRadius: 60)],
-        tooltip: const DsChartTooltipSpec(cursor: false, hideLabel: true),
-      ),
-    );
+  ink.browser,
+  ElPieChart(
+    pies: <ElPieSpec>[_browserPie(ink, innerRadius: 60)],
+    tooltip: const ElChartTooltipSpec(cursor: false, hideLabel: true),
+  ),
+);
 
 Widget _pieDonutActive(_ChartInk ink) => _plot(
-      ink.browser,
-      DsPieChart(
-        pies: <DsPieSpec>[
-          _browserPie(
-            ink,
-            innerRadius: 60,
-            strokeWidth: 5,
-            activeIndex: 0,
-            activeGrow: 10,
-          ),
-        ],
-        tooltip: const DsChartTooltipSpec(
-          cursor: false,
-          defaultIndex: 0,
-          hideLabel: true,
-        ),
+  ink.browser,
+  ElPieChart(
+    pies: <ElPieSpec>[
+      _browserPie(
+        ink,
+        innerRadius: 60,
+        strokeWidth: 5,
+        activeIndex: 0,
+        activeGrow: 10,
       ),
-    );
+    ],
+    tooltip: const ElChartTooltipSpec(
+      cursor: false,
+      defaultIndex: 0,
+      hideLabel: true,
+    ),
+  ),
+);
 
 /// Drift 5: `data.ts` calls this "+12 firefox / +100 other" and both raised
 /// rows are +100. `pie.tsx` flags it and does not reconcile it.
@@ -2343,13 +2426,13 @@ const List<Map<String, Object?>> _pieDonutTextData = <Map<String, Object?>>[
 /// themes. `type-num-xl` replaces the registry's `text-3xl font-bold`, the
 /// weight already living in the class.
 Widget _donutCentre(BuildContext context, String figure, String caption) {
-  final DsThemeData theme = DsTheme.of(context);
+  final ElThemeData theme = ElTheme.of(context);
   return Column(
     mainAxisSize: MainAxisSize.min,
     children: <Widget>[
-      DsText(figure, DsType.numXl, color: theme.foreground),
-      SizedBox(height: ds(1)),
-      DsText(caption, DsChartText.xs, color: theme.mutedForeground),
+      ElText(figure, ElType.numXl, color: theme.foreground),
+      SizedBox(height: el(1)),
+      ElText(caption, ElChartText.xs, color: theme.mutedForeground),
     ],
   );
 }
@@ -2361,8 +2444,8 @@ Widget _pieDonutText(_ChartInk ink) {
   );
   return _plot(
     ink.browser,
-    DsPieChart(
-      pies: <DsPieSpec>[
+    ElPieChart(
+      pies: <ElPieSpec>[
         _browserPie(
           ink,
           innerRadius: 60,
@@ -2371,38 +2454,38 @@ Widget _pieDonutText(_ChartInk ink) {
         ),
       ],
       centerLabel: (BuildContext context) =>
-          _donutCentre(context, dsChartNumber(total), 'Visitors'),
-      tooltip: const DsChartTooltipSpec(cursor: false, hideLabel: true),
+          _donutCentre(context, elChartNumber(total), 'Visitors'),
+      tooltip: const ElChartTooltipSpec(cursor: false, hideLabel: true),
     ),
   );
 }
 
 /// Two rings, one dataset each.
 Widget _pieStacked(_ChartInk ink) => _plot(
-      ink.pieMonths,
-      DsPieChart(
-        pies: <DsPieSpec>[
-          DsPieSpec(
-            data: ink.rows(_pieMonthsDesktop),
-            dataKey: 'desktop',
-            nameKey: 'month',
-            outerRadius: 60,
-          ),
-          DsPieSpec(
-            data: ink.rows(_pieMonthsMobile),
-            dataKey: 'mobile',
-            nameKey: 'month',
-            innerRadius: 70,
-            outerRadius: 90,
-          ),
-        ],
-        tooltip: const DsChartTooltipSpec(
-          labelKey: 'visitors',
-          nameKey: 'month',
-          indicator: DsChartIndicator.line,
-        ),
+  ink.pieMonths,
+  ElPieChart(
+    pies: <ElPieSpec>[
+      ElPieSpec(
+        data: ink.rows(_pieMonthsDesktop),
+        dataKey: 'desktop',
+        nameKey: 'month',
+        outerRadius: 60,
       ),
-    );
+      ElPieSpec(
+        data: ink.rows(_pieMonthsMobile),
+        dataKey: 'mobile',
+        nameKey: 'month',
+        innerRadius: 70,
+        outerRadius: 90,
+      ),
+    ],
+    tooltip: const ElChartTooltipSpec(
+      labelKey: 'visitors',
+      nameKey: 'month',
+      indicator: ElChartIndicator.line,
+    ),
+  ),
+);
 
 /// The slice picker. `defaultIndex` is what makes the `Select`'s choice
 /// reactive, `Tooltip.js` re-dispatches whenever the prop's value changes,
@@ -2437,9 +2520,9 @@ class _PieInteractiveState extends State<_PieInteractive> {
       width: _RangeStrip.monthWidth,
       label: 'Select a month',
       placeholder: 'Select month',
-      options: <DsSelectOption<String>>[
+      options: <ElSelectOption<String>>[
         for (int i = 0; i < _PieInteractive.months.length; i++)
-          DsSelectOption<String>(
+          ElSelectOption<String>(
             value: _PieInteractive.months[i],
             label: _monthLabel(_PieInteractive.months[i]),
           ),
@@ -2449,15 +2532,14 @@ class _PieInteractiveState extends State<_PieInteractive> {
   }
 }
 
-String _monthLabel(String key) =>
-    '${key[0].toUpperCase()}${key.substring(1)}';
+String _monthLabel(String key) => '${key[0].toUpperCase()}${key.substring(1)}';
 
 Widget _pieInteractive(BuildContext context, _ChartInk ink, int activeIndex) =>
     _plot(
       ink.pieMonths,
-      DsPieChart(
-        pies: <DsPieSpec>[
-          DsPieSpec(
+      ElPieChart(
+        pies: <ElPieSpec>[
+          ElPieSpec(
             data: ink.rows(_pieMonthsDesktop),
             dataKey: 'desktop',
             nameKey: 'month',
@@ -2470,10 +2552,10 @@ Widget _pieInteractive(BuildContext context, _ChartInk ink, int activeIndex) =>
         ],
         centerLabel: (BuildContext context) => _donutCentre(
           context,
-          dsChartNumber(_pieMonthsDesktop[activeIndex]['desktop']! as num),
+          elChartNumber(_pieMonthsDesktop[activeIndex]['desktop']! as num),
           'Visitors',
         ),
-        tooltip: DsChartTooltipSpec(
+        tooltip: ElChartTooltipSpec(
           cursor: false,
           defaultIndex: activeIndex,
           hideLabel: true,
@@ -2481,68 +2563,62 @@ Widget _pieInteractive(BuildContext context, _ChartInk ink, int activeIndex) =>
       ),
     );
 
-/* ── Radar, `components/ds/charts/radar.tsx` ────────────────────────────── */
+/* ── Radar, `components/el/charts/radar.tsx` ────────────────────────────── */
 
 /// One `Radar`, at the registry's own `fillOpacity`.
-DsRadarSpec _radar(
+ElRadarSpec _radar(
   Color colour,
   String key, {
   double fillOpacity = 1,
   Color? stroke,
   double strokeWidth = 1,
-  DsChartDotSpec? dot,
-}) =>
-    DsRadarSpec(
-      dataKey: key,
-      fill: colour,
-      fillOpacity: fillOpacity,
-      stroke: stroke,
-      strokeWidth: strokeWidth,
-      dot: dot,
-    );
+  ElChartDotSpec? dot,
+}) => ElRadarSpec(
+  dataKey: key,
+  fill: colour,
+  fillOpacity: fillOpacity,
+  stroke: stroke,
+  strokeWidth: strokeWidth,
+  dot: dot,
+);
 
 Widget _radarChart(
-  DsChartConfig config,
+  ElChartConfig config,
   List<Map<String, Object?>> data,
-  List<DsRadarSpec> series, {
-  DsPolarGrid? grid = const DsPolarGrid(),
-  DsPolarAngleAxis? angleAxis =
-      const DsPolarAngleAxis(dataKey: 'month'),
-  DsPolarRadiusAxis? radiusAxis,
-  DsChartLegendSpec? legend,
-  DsChartMargin margin = DsChartMargin.standard,
-}) =>
-    _plot(
-      config,
-      DsRadarChart(
-        data: data,
-        series: series,
-        grid: grid,
-        angleAxis: angleAxis,
-        radiusAxis: radiusAxis,
-        legend: legend,
-        margin: margin,
-      ),
-    );
+  List<ElRadarSpec> series, {
+  ElPolarGrid? grid = const ElPolarGrid(),
+  ElPolarAngleAxis? angleAxis = const ElPolarAngleAxis(dataKey: 'month'),
+  ElPolarRadiusAxis? radiusAxis,
+  ElChartLegendSpec? legend,
+  ElChartMargin margin = ElChartMargin.standard,
+}) => _plot(
+  config,
+  ElRadarChart(
+    data: data,
+    series: series,
+    grid: grid,
+    angleAxis: angleAxis,
+    radiusAxis: radiusAxis,
+    legend: legend,
+    margin: margin,
+  ),
+);
 
 Widget _radarDefault(_ChartInk ink) => _radarChart(
-      ink.desktop,
-      _radarMonths,
-      <DsRadarSpec>[_radar(ink.slot(1), 'desktop', fillOpacity: 0.6)],
-    );
+  ink.desktop,
+  _radarMonths,
+  <ElRadarSpec>[_radar(ink.slot(1), 'desktop', fillOpacity: 0.6)],
+);
 
-Widget _radarDots(_ChartInk ink) => _radarChart(
-      ink.desktop,
-      _radarMonths,
-      <DsRadarSpec>[
-        _radar(
-          ink.slot(1),
-          'desktop',
-          fillOpacity: 0.6,
-          dot: const DsChartDotSpec(),
-        ),
-      ],
-    );
+Widget _radarDots(_ChartInk ink) =>
+    _radarChart(ink.desktop, _radarMonths, <ElRadarSpec>[
+      _radar(
+        ink.slot(1),
+        'desktop',
+        fillOpacity: 0.6,
+        dot: const ElChartDotSpec(),
+      ),
+    ]);
 
 /// `data.ts` keeps this shape local: a six-row `{ month, desktop, mobile }`
 /// set close to but not `MONTHS_DESKTOP_MOBILE` (every row differs).
@@ -2555,27 +2631,23 @@ const List<Map<String, Object?>> _radarLinesOnlyData = <Map<String, Object?>>[
   <String, Object?>{'month': 'June', 'desktop': 174, 'mobile': 204},
 ];
 
-Widget _radarLinesOnly(_ChartInk ink) => _radarChart(
-      ink.desktopMobile,
-      _radarLinesOnlyData,
-      <DsRadarSpec>[
-        _radar(
-          ink.slot(1),
-          'desktop',
-          fillOpacity: 0,
-          stroke: ink.slot(1),
-          strokeWidth: 2,
-        ),
-        _radar(
-          ink.slot(2),
-          'mobile',
-          fillOpacity: 0,
-          stroke: ink.slot(2),
-          strokeWidth: 2,
-        ),
-      ],
-      grid: const DsPolarGrid(radialLines: false),
-    );
+Widget _radarLinesOnly(_ChartInk ink) =>
+    _radarChart(ink.desktopMobile, _radarLinesOnlyData, <ElRadarSpec>[
+      _radar(
+        ink.slot(1),
+        'desktop',
+        fillOpacity: 0,
+        stroke: ink.slot(1),
+        strokeWidth: 2,
+      ),
+      _radar(
+        ink.slot(2),
+        'mobile',
+        fillOpacity: 0,
+        stroke: ink.slot(2),
+        strokeWidth: 2,
+      ),
+    ], grid: const ElPolarGrid(radialLines: false));
 
 /// The one custom tick on the page: two figures over the month name, with the
 /// separator and the caption in `--muted-foreground`.
@@ -2590,17 +2662,19 @@ Widget _radarCustomTick(
   Offset anchor,
   TextAlign align,
 ) {
-  final DsThemeData theme = DsTheme.of(context);
+  final ElThemeData theme = ElTheme.of(context);
   final Map<String, Object?> row = _monthsDesktopMobile[index];
-  final TextStyle base =
-      DsText.styleOf(context, DsChartText.xs, color: theme.foreground);
-  final TextStyle muted =
-      base.copyWith(color: theme.mutedForeground);
+  final TextStyle base = ElText.styleOf(
+    context,
+    ElChartText.xs,
+    color: theme.foreground,
+  );
+  final TextStyle muted = base.copyWith(color: theme.mutedForeground);
   return Column(
     mainAxisSize: MainAxisSize.min,
     crossAxisAlignment: CrossAxisAlignment.center,
     children: <Widget>[
-      DsRichText(
+      ElRichText(
         TextSpan(
           style: base,
           children: <InlineSpan>[
@@ -2609,93 +2683,86 @@ Widget _radarCustomTick(
             TextSpan(text: '${row['mobile']}'),
           ],
         ),
-        DsChartText.xs,
+        ElChartText.xs,
       ),
-      DsText('${row['month']}', DsChartText.xs, color: theme.mutedForeground),
+      ElText('${row['month']}', ElChartText.xs, color: theme.mutedForeground),
     ],
   );
 }
 
 Widget _radarLabelCustom(_ChartInk ink) => _radarChart(
-      ink.desktopMobile,
-      _monthsDesktopMobile,
-      <DsRadarSpec>[
-        _radar(ink.slot(1), 'desktop', fillOpacity: 0.6),
-        _radar(ink.slot(2), 'mobile'),
-      ],
-      angleAxis: const DsPolarAngleAxis(
-        dataKey: 'month',
-        tickBuilder: _radarCustomTick,
-      ),
-      margin: const DsChartMargin(top: 10, right: 10, bottom: 10, left: 10),
-    );
+  ink.desktopMobile,
+  _monthsDesktopMobile,
+  <ElRadarSpec>[
+    _radar(ink.slot(1), 'desktop', fillOpacity: 0.6),
+    _radar(ink.slot(2), 'mobile'),
+  ],
+  angleAxis: const ElPolarAngleAxis(
+    dataKey: 'month',
+    tickBuilder: _radarCustomTick,
+  ),
+  margin: const ElChartMargin(top: 10, right: 10, bottom: 10, left: 10),
+);
 
 /// `polarRadius`/`strokeWidth` are plot maths: the grid ring's own radius and
 /// line weight: not the 8-point scale.
 Widget _radarGridCustom(_ChartInk ink) => _radarChart(
-      ink.desktop,
-      _radarMonths,
-      <DsRadarSpec>[_radar(ink.slot(1), 'desktop', fillOpacity: 0.6)],
-      grid: const DsPolarGrid(radialLines: false, polarRadius: <double>[90]),
-    );
+  ink.desktop,
+  _radarMonths,
+  <ElRadarSpec>[_radar(ink.slot(1), 'desktop', fillOpacity: 0.6)],
+  grid: const ElPolarGrid(radialLines: false, polarRadius: <double>[90]),
+);
 
 /// No `PolarGrid` at all, not even a hidden one.
-Widget _radarGridNone(_ChartInk ink) => _radarChart(
-      ink.desktop,
-      _radarMonths,
-      <DsRadarSpec>[
-        _radar(
-          ink.slot(1),
-          'desktop',
-          fillOpacity: 0.6,
-          dot: const DsChartDotSpec(),
-        ),
-      ],
-      grid: null,
-    );
+Widget _radarGridNone(_ChartInk ink) =>
+    _radarChart(ink.desktop, _radarMonths, <ElRadarSpec>[
+      _radar(
+        ink.slot(1),
+        'desktop',
+        fillOpacity: 0.6,
+        dot: const ElChartDotSpec(),
+      ),
+    ], grid: null);
 
 Widget _radarGridCircle(_ChartInk ink) => _radarChart(
-      ink.desktop,
-      _radarMonths,
-      <DsRadarSpec>[
-        _radar(
-          ink.slot(1),
-          'desktop',
-          fillOpacity: 0.6,
-          dot: const DsChartDotSpec(),
-        ),
-      ],
-      grid: const DsPolarGrid(gridType: DsPolarGridType.circle),
-    );
+  ink.desktop,
+  _radarMonths,
+  <ElRadarSpec>[
+    _radar(
+      ink.slot(1),
+      'desktop',
+      fillOpacity: 0.6,
+      dot: const ElChartDotSpec(),
+    ),
+  ],
+  grid: const ElPolarGrid(gridType: ElPolarGridType.circle),
+);
 
 /// `data.ts` keeps this local too: only April moves (273 → 203), so it is a
 /// third variant of the six-month series rather than a re-export.
 const List<Map<String, Object?>> _radarCircleNoLinesData =
     <Map<String, Object?>>[
-  <String, Object?>{'month': 'January', 'desktop': 186},
-  <String, Object?>{'month': 'February', 'desktop': 305},
-  <String, Object?>{'month': 'March', 'desktop': 237},
-  <String, Object?>{'month': 'April', 'desktop': 203},
-  <String, Object?>{'month': 'May', 'desktop': 209},
-  <String, Object?>{'month': 'June', 'desktop': 214},
-];
+      <String, Object?>{'month': 'January', 'desktop': 186},
+      <String, Object?>{'month': 'February', 'desktop': 305},
+      <String, Object?>{'month': 'March', 'desktop': 237},
+      <String, Object?>{'month': 'April', 'desktop': 203},
+      <String, Object?>{'month': 'May', 'desktop': 209},
+      <String, Object?>{'month': 'June', 'desktop': 214},
+    ];
 
 Widget _radarGridCircleNoLines(_ChartInk ink) => _radarChart(
-      ink.desktop,
-      _radarCircleNoLinesData,
-      <DsRadarSpec>[
-        _radar(
-          ink.slot(1),
-          'desktop',
-          fillOpacity: 0.6,
-          dot: const DsChartDotSpec(),
-        ),
-      ],
-      grid: const DsPolarGrid(
-        gridType: DsPolarGridType.circle,
-        radialLines: false,
-      ),
-    );
+  ink.desktop,
+  _radarCircleNoLinesData,
+  <ElRadarSpec>[
+    _radar(
+      ink.slot(1),
+      'desktop',
+      fillOpacity: 0.6,
+      dot: const ElChartDotSpec(),
+    ),
+  ],
+  grid: const ElPolarGrid(gridType: ElPolarGridType.circle, radialLines: false),
+);
 
 /// `className="fill-[--color-desktop] opacity-20"` in the registry is the
 /// `--color-<seriesKey>` pattern wearing Tailwind's arbitrary-property
@@ -2703,156 +2770,149 @@ Widget _radarGridCircleNoLines(_ChartInk ink) => _radarChart(
 /// nothing at all, silently keeping recharts' `fill="none"`. `radar.tsx` found
 /// it by rasterising. Here the fill is simply a colour.
 Widget _radarGridCircleFill(_ChartInk ink) => _radarChart(
-      ink.desktop,
-      _radarMonthsFill,
-      <DsRadarSpec>[_radar(ink.slot(1), 'desktop', fillOpacity: 0.5)],
-      grid: DsPolarGrid(
-        gridType: DsPolarGridType.circle,
-        fills: <Color>[ink.slot(1)],
-        opacity: 0.2,
-      ),
-    );
+  ink.desktop,
+  _radarMonthsFill,
+  <ElRadarSpec>[_radar(ink.slot(1), 'desktop', fillOpacity: 0.5)],
+  grid: ElPolarGrid(
+    gridType: ElPolarGridType.circle,
+    fills: <Color>[ink.slot(1)],
+    opacity: 0.2,
+  ),
+);
 
 Widget _radarGridFill(_ChartInk ink) => _radarChart(
-      ink.desktop,
-      _radarMonthsFill,
-      <DsRadarSpec>[_radar(ink.slot(1), 'desktop', fillOpacity: 0.5)],
-      grid: DsPolarGrid(fills: <Color>[ink.slot(1)], opacity: 0.2),
-    );
+  ink.desktop,
+  _radarMonthsFill,
+  <ElRadarSpec>[_radar(ink.slot(1), 'desktop', fillOpacity: 0.5)],
+  grid: ElPolarGrid(fills: <Color>[ink.slot(1)], opacity: 0.2),
+);
 
 /// Drift 7: the registry gives `mobile` no `fillOpacity` at all, so the second
 /// polygon paints fully opaque over the first. Kept: it is the registry's own
 /// choice, repeated identically on five variants.
-List<DsRadarSpec> _radarPair(_ChartInk ink) => <DsRadarSpec>[
-      _radar(ink.slot(1), 'desktop', fillOpacity: 0.6),
-      _radar(ink.slot(2), 'mobile'),
-    ];
+List<ElRadarSpec> _radarPair(_ChartInk ink) => <ElRadarSpec>[
+  _radar(ink.slot(1), 'desktop', fillOpacity: 0.6),
+  _radar(ink.slot(2), 'mobile'),
+];
 
-Widget _radarMultiple(_ChartInk ink) => _radarChart(
-      ink.desktopMobile,
-      _monthsDesktopMobile,
-      _radarPair(ink),
-    );
+Widget _radarMultiple(_ChartInk ink) =>
+    _radarChart(ink.desktopMobile, _monthsDesktopMobile, _radarPair(ink));
 
 Widget _radarLegend(_ChartInk ink) => _radarChart(
-      ink.desktopMobile,
-      _monthsDesktopMobile,
-      _radarPair(ink),
-      legend: const DsChartLegendSpec(),
-      margin: const DsChartMargin(top: -40, bottom: -10),
-    );
+  ink.desktopMobile,
+  _monthsDesktopMobile,
+  _radarPair(ink),
+  legend: const ElChartLegendSpec(),
+  margin: const ElChartMargin(top: -40, bottom: -10),
+);
 
 /// Drift 9: structurally identical to `RadarLegend`: the registry's own
 /// `chart-radar-icons` differs only in `chartConfig`.
 Widget _radarIcons(_ChartInk ink) => _plot(
-      DsChartConfig(<String, DsChartSeries>{
-        'desktop': DsChartSeries(
-          label: 'Desktop',
-          color: ink.slot(1),
-          icon: (BuildContext context) => const DsIcon.lucide(
-            DsLucide.arrowDownFromLine,
-            size: DsIconSize.sm,
-          ),
-        ),
-        'mobile': DsChartSeries(
-          label: 'Mobile',
-          color: ink.slot(2),
-          icon: (BuildContext context) => const DsIcon.lucide(
-            DsLucide.arrowUpFromLine,
-            size: DsIconSize.sm,
-          ),
-        ),
-      }),
-      DsRadarChart(
-        data: _monthsDesktopMobile,
-        series: _radarPair(ink),
-        grid: const DsPolarGrid(),
-        angleAxis: const DsPolarAngleAxis(dataKey: 'month'),
-        legend: const DsChartLegendSpec(),
-        margin: const DsChartMargin(top: -40, bottom: -10),
-      ),
-    );
+  ElChartConfig(<String, ElChartSeries>{
+    'desktop': ElChartSeries(
+      label: 'Desktop',
+      color: ink.slot(1),
+      icon: (BuildContext context) =>
+          const ElIcon.lucide(ElLucide.arrowDownFromLine, size: ElIconSize.sm),
+    ),
+    'mobile': ElChartSeries(
+      label: 'Mobile',
+      color: ink.slot(2),
+      icon: (BuildContext context) =>
+          const ElIcon.lucide(ElLucide.arrowUpFromLine, size: ElIconSize.sm),
+    ),
+  }),
+  ElRadarChart(
+    data: _monthsDesktopMobile,
+    series: _radarPair(ink),
+    grid: const ElPolarGrid(),
+    angleAxis: const ElPolarAngleAxis(dataKey: 'month'),
+    legend: const ElChartLegendSpec(),
+    margin: const ElChartMargin(top: -40, bottom: -10),
+  ),
+);
 
 /// The first chart in the whole effort to render a `PolarRadiusAxis`'s own
 /// numeric ticks: five `<text>` nodes reading `0 80 160 240 320`, and the
 /// first real contact with `ui/chart.tsx`'s pre-emptive defence for that axis
 /// family. `stroke="hsla(var(--foreground))"` is the same invalid-colour trap
 /// as `hsl(var(--chart-N))` and becomes `--foreground`.
-Widget _radarRadius(_ChartInk ink, DsThemeData theme) => _plot(
-      ink.desktopMobile,
-      DsRadarChart(
-        data: _monthsDesktopMobile,
-        series: _radarPair(ink),
-        grid: const DsPolarGrid(),
-        angleAxis: null,
-        radiusAxis: DsPolarRadiusAxis(
-          angle: 60,
-          stroke: theme.foreground,
-          axisLine: false,
-        ),
-      ),
-    );
+Widget _radarRadius(_ChartInk ink, ElThemeData theme) => _plot(
+  ink.desktopMobile,
+  ElRadarChart(
+    data: _monthsDesktopMobile,
+    series: _radarPair(ink),
+    grid: const ElPolarGrid(),
+    angleAxis: null,
+    radiusAxis: ElPolarRadiusAxis(
+      angle: 60,
+      stroke: theme.foreground,
+      axisLine: false,
+    ),
+  ),
+);
 
-/* ── Radial, `components/ds/charts/radial.tsx` ──────────────────────────── */
+/* ── Radial, `components/el/charts/radial.tsx` ──────────────────────────── */
 
 Widget _radialSimple(_ChartInk ink) => _plot(
-      ink.browser,
-      DsRadialBarChart(
-        data: ink.rows(_browsers),
-        innerRadius: 30,
-        outerRadius: 110,
-        series: const <DsRadialBarSpec>[
-          DsRadialBarSpec(dataKey: 'visitors', background: true),
-        ],
-        tooltip: const DsChartTooltipSpec(
-          cursor: false,
-          hideLabel: true,
-          nameKey: 'browser',
-        ),
-      ),
-    );
+  ink.browser,
+  ElRadialBarChart(
+    data: ink.rows(_browsers),
+    innerRadius: 30,
+    outerRadius: 110,
+    series: const <ElRadialBarSpec>[
+      ElRadialBarSpec(dataKey: 'visitors', background: true),
+    ],
+    tooltip: const ElChartTooltipSpec(
+      cursor: false,
+      hideLabel: true,
+      nameKey: 'browser',
+    ),
+  ),
+);
 
 Widget _radialGrid(_ChartInk ink) => _plot(
-      ink.browser,
-      DsRadialBarChart(
-        data: ink.rows(_browsers),
-        innerRadius: 30,
-        outerRadius: 100,
-        grid: const DsPolarGrid(gridType: DsPolarGridType.circle),
-        series: const <DsRadialBarSpec>[DsRadialBarSpec(dataKey: 'visitors')],
-        tooltip: const DsChartTooltipSpec(
-          cursor: false,
-          hideLabel: true,
-          nameKey: 'browser',
-        ),
-      ),
-    );
+  ink.browser,
+  ElRadialBarChart(
+    data: ink.rows(_browsers),
+    innerRadius: 30,
+    outerRadius: 100,
+    grid: const ElPolarGrid(gridType: ElPolarGridType.circle),
+    series: const <ElRadialBarSpec>[ElRadialBarSpec(dataKey: 'visitors')],
+    tooltip: const ElChartTooltipSpec(
+      cursor: false,
+      hideLabel: true,
+      nameKey: 'browser',
+    ),
+  ),
+);
 
 /// The labels sit at each arc's START angle, which is both the registry's own
 /// position and the only placement where five of them cannot collide: at the
 /// mid-angle they came out 19.9px apart for labels 48px wide.
 Widget _radialLabel(_ChartInk ink) => _plot(
-      ink.browser,
-      DsRadialBarChart(
-        data: ink.rows(_browsers),
-        startAngle: -90,
-        endAngle: 380,
-        innerRadius: 30,
-        outerRadius: 110,
-        series: const <DsRadialBarSpec>[
-          DsRadialBarSpec(
-            dataKey: 'visitors',
-            background: true,
-            chipLabelKey: 'browser',
-          ),
-        ],
-        tooltip: const DsChartTooltipSpec(
-          cursor: false,
-          hideLabel: true,
-          nameKey: 'browser',
-        ),
+  ink.browser,
+  ElRadialBarChart(
+    data: ink.rows(_browsers),
+    startAngle: -90,
+    endAngle: 380,
+    innerRadius: 30,
+    outerRadius: 110,
+    series: const <ElRadialBarSpec>[
+      ElRadialBarSpec(
+        dataKey: 'visitors',
+        background: true,
+        chipLabelKey: 'browser',
       ),
-    );
+    ],
+    tooltip: const ElChartTooltipSpec(
+      cursor: false,
+      hideLabel: true,
+      nameKey: 'browser',
+    ),
+  ),
+);
 
 /// A single browser row, used by nothing else.
 const List<Map<String, Object?>> _radialTextData = <Map<String, Object?>>[
@@ -2866,64 +2926,64 @@ const List<Map<String, Object?>> _radialShapeData = <Map<String, Object?>>[
   <String, Object?>{'browser': 'safari', 'visitors': 1260, 'slot': 2},
 ];
 
-DsPolarGrid _radialPlate(DsThemeData theme) => DsPolarGrid(
-      gridType: DsPolarGridType.circle,
-      radialLines: false,
-      // `className="first:fill-muted last:fill-background"`.
-      fills: <Color>[theme.muted, theme.background],
-      polarRadius: const <double>[86, 74],
-    );
+ElPolarGrid _radialPlate(ElThemeData theme) => ElPolarGrid(
+  gridType: ElPolarGridType.circle,
+  radialLines: false,
+  // `className="first:fill-muted last:fill-background"`.
+  fills: <Color>[theme.muted, theme.background],
+  polarRadius: const <double>[86, 74],
+);
 
-Widget _radialText(_ChartInk ink, DsThemeData theme) => _plot(
-      DsChartConfig(<String, DsChartSeries>{
-        'visitors': const DsChartSeries(label: 'Visitors'),
-        'safari': DsChartSeries(label: 'Safari', color: ink.slot(2)),
-      }),
-      DsRadialBarChart(
-        data: ink.rows(_radialTextData),
-        startAngle: 0,
-        endAngle: 250,
-        innerRadius: 80,
-        outerRadius: 110,
-        grid: _radialPlate(theme),
-        series: const <DsRadialBarSpec>[
-          DsRadialBarSpec(
-            dataKey: 'visitors',
-            background: true,
-            cornerRadius: _ringRadius,
-          ),
-        ],
-        radiusAxis: DsPolarRadiusAxis(
-          tick: false,
-          axisLine: false,
-          centerLabel: (BuildContext context) =>
-              _donutCentre(context, dsChartNumber(200), 'Visitors'),
-        ),
+Widget _radialText(_ChartInk ink, ElThemeData theme) => _plot(
+  ElChartConfig(<String, ElChartSeries>{
+    'visitors': const ElChartSeries(label: 'Visitors'),
+    'safari': ElChartSeries(label: 'Safari', color: ink.slot(2)),
+  }),
+  ElRadialBarChart(
+    data: ink.rows(_radialTextData),
+    startAngle: 0,
+    endAngle: 250,
+    innerRadius: 80,
+    outerRadius: 110,
+    grid: _radialPlate(theme),
+    series: const <ElRadialBarSpec>[
+      ElRadialBarSpec(
+        dataKey: 'visitors',
+        background: true,
+        cornerRadius: _ringRadius,
       ),
-    );
+    ],
+    radiusAxis: ElPolarRadiusAxis(
+      tick: false,
+      axisLine: false,
+      centerLabel: (BuildContext context) =>
+          _donutCentre(context, elChartNumber(200), 'Visitors'),
+    ),
+  ),
+);
 
-Widget _radialShape(_ChartInk ink, DsThemeData theme) => _plot(
-      DsChartConfig(<String, DsChartSeries>{
-        'visitors': const DsChartSeries(label: 'Visitors'),
-        'safari': DsChartSeries(label: 'Safari', color: ink.slot(2)),
-      }),
-      DsRadialBarChart(
-        data: ink.rows(_radialShapeData),
-        endAngle: 100,
-        innerRadius: 80,
-        outerRadius: 140,
-        grid: _radialPlate(theme),
-        series: const <DsRadialBarSpec>[
-          DsRadialBarSpec(dataKey: 'visitors', background: true),
-        ],
-        radiusAxis: DsPolarRadiusAxis(
-          tick: false,
-          axisLine: false,
-          centerLabel: (BuildContext context) =>
-              _donutCentre(context, dsChartNumber(1260), 'Visitors'),
-        ),
-      ),
-    );
+Widget _radialShape(_ChartInk ink, ElThemeData theme) => _plot(
+  ElChartConfig(<String, ElChartSeries>{
+    'visitors': const ElChartSeries(label: 'Visitors'),
+    'safari': ElChartSeries(label: 'Safari', color: ink.slot(2)),
+  }),
+  ElRadialBarChart(
+    data: ink.rows(_radialShapeData),
+    endAngle: 100,
+    innerRadius: 80,
+    outerRadius: 140,
+    grid: _radialPlate(theme),
+    series: const <ElRadialBarSpec>[
+      ElRadialBarSpec(dataKey: 'visitors', background: true),
+    ],
+    radiusAxis: ElPolarRadiusAxis(
+      tick: false,
+      axisLine: false,
+      centerLabel: (BuildContext context) =>
+          _donutCentre(context, elChartNumber(1260), 'Visitors'),
+    ),
+  ),
+);
 
 /// A single `{ month, desktop, mobile }` row. The registry names it
 /// `"january"`; kept, though it plays no visual role: there is no category
@@ -2940,197 +3000,193 @@ Widget _radialStacked(_ChartInk ink) {
   const int total = 1260 + 570;
   return _plot(
     ink.desktopMobile,
-    DsRadialBarChart(
+    ElRadialBarChart(
       data: _radialStackedData,
       endAngle: 180,
       innerRadius: 80,
       outerRadius: 130,
-      angleAxis: DsPolarAngleAxis(
+      angleAxis: ElPolarAngleAxis(
         tick: false,
         axisLine: false,
         domain: (min: 0, max: total.toDouble()),
       ),
-      radiusAxis: DsPolarRadiusAxis(
+      radiusAxis: ElPolarRadiusAxis(
         tick: false,
         axisLine: false,
         centerLabel: (BuildContext context) {
-          final DsThemeData theme = DsTheme.of(context);
+          final ElThemeData theme = ElTheme.of(context);
           return Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              DsText(dsChartNumber(total), DsType.numLg,
-                  color: theme.foreground),
-              SizedBox(height: ds(1)),
-              DsText('Visitors', DsChartText.xs,
-                  color: theme.mutedForeground),
+              ElText(
+                elChartNumber(total),
+                ElType.numLg,
+                color: theme.foreground,
+              ),
+              SizedBox(height: el(1)),
+              ElText('Visitors', ElChartText.xs, color: theme.mutedForeground),
             ],
           );
         },
       ),
-      series: <DsRadialBarSpec>[
-        DsRadialBarSpec(
+      series: <ElRadialBarSpec>[
+        ElRadialBarSpec(
           dataKey: 'desktop',
           stackId: 'a',
           cornerRadius: _stackRadius,
           fill: ink.slot(1),
         ),
-        DsRadialBarSpec(
+        ElRadialBarSpec(
           dataKey: 'mobile',
           stackId: 'a',
           cornerRadius: _stackRadius,
           fill: ink.slot(2),
         ),
       ],
-      tooltip: const DsChartTooltipSpec(cursor: false, hideLabel: true),
+      tooltip: const ElChartTooltipSpec(cursor: false, hideLabel: true),
     ),
   );
 }
 
-/* ── Tooltips, `components/ds/charts/tooltip.tsx` ───────────────────────── */
+/* ── Tooltips, `components/el/charts/tooltip.tsx` ───────────────────────── */
 
 /// Every one of the nine is the SAME two-series stacked bar chart, because the
 /// family's whole point is that only the tooltip's configuration changes. No
 /// `CartesianGrid`, no `YAxis`: the registry source for all nine omits both.
 Widget _tooltipChart(
   _ChartInk ink,
-  DsChartConfig config,
-  DsChartTooltipSpec tooltip,
-) =>
-    _plot(
-      config,
-      DsCartesianChart(
-        data: _sportDays,
-        xAxis: const DsChartAxis(
-          dataKey: 'date',
-          tickLine: false,
-          tickMargin: 10,
-          axisLine: false,
-          tickFormatter: _weekdayShort,
-        ),
-        tooltip: tooltip,
-        series: <DsChartSeriesSpec>[
-          DsChartSeriesSpec(
-            kind: DsChartSeriesKind.bar,
-            dataKey: 'running',
-            stackId: 'a',
-            fill: ink.slot(1),
-            radii: _radiiBottom,
-          ),
-          DsChartSeriesSpec(
-            kind: DsChartSeriesKind.bar,
-            dataKey: 'swimming',
-            stackId: 'a',
-            fill: ink.slot(2),
-            radii: _radiiTop,
-          ),
-        ],
+  ElChartConfig config,
+  ElChartTooltipSpec tooltip,
+) => _plot(
+  config,
+  ElCartesianChart(
+    data: _sportDays,
+    xAxis: const ElChartAxis(
+      dataKey: 'date',
+      tickLine: false,
+      tickMargin: 10,
+      axisLine: false,
+      tickFormatter: _weekdayShort,
+    ),
+    tooltip: tooltip,
+    series: <ElChartSeriesSpec>[
+      ElChartSeriesSpec(
+        kind: ElChartSeriesKind.bar,
+        dataKey: 'running',
+        stackId: 'a',
+        fill: ink.slot(1),
+        radii: _radiiBottom,
       ),
-    );
+      ElChartSeriesSpec(
+        kind: ElChartSeriesKind.bar,
+        dataKey: 'swimming',
+        stackId: 'a',
+        fill: ink.slot(2),
+        radii: _radiiTop,
+      ),
+    ],
+  ),
+);
 
 Widget _tooltipDefault(_ChartInk ink) => _tooltipChart(
-      ink,
-      ink.sport,
-      const DsChartTooltipSpec(cursor: false, defaultIndex: 1),
-    );
+  ink,
+  ink.sport,
+  const ElChartTooltipSpec(cursor: false, defaultIndex: 1),
+);
 
 Widget _tooltipIndicatorLine(_ChartInk ink) => _tooltipChart(
-      ink,
-      ink.sport,
-      const DsChartTooltipSpec(
-        cursor: false,
-        defaultIndex: 1,
-        indicator: DsChartIndicator.line,
-      ),
-    );
+  ink,
+  ink.sport,
+  const ElChartTooltipSpec(
+    cursor: false,
+    defaultIndex: 1,
+    indicator: ElChartIndicator.line,
+  ),
+);
 
 Widget _tooltipIndicatorNone(_ChartInk ink) => _tooltipChart(
-      ink,
-      ink.sport,
-      const DsChartTooltipSpec(
-        cursor: false,
-        defaultIndex: 1,
-        hideIndicator: true,
-      ),
-    );
+  ink,
+  ink.sport,
+  const ElChartTooltipSpec(cursor: false, defaultIndex: 1, hideIndicator: true),
+);
 
 /// The registry's one extra config key: a label that never comes from the
 /// hovered row at all, so the header always reads "Activities" rather than the
 /// day. `labelKey` routes the lookup at it, and the fallback in
 /// `getPayloadConfigFromPayload` is what makes a key naming no field work.
 Widget _tooltipLabelCustom(_ChartInk ink) => _tooltipChart(
-      ink,
-      ink.sport.plus(<String, DsChartSeries>{
-        'activities': const DsChartSeries(label: 'Activities'),
-      }),
-      const DsChartTooltipSpec(
-        cursor: false,
-        defaultIndex: 1,
-        labelKey: 'activities',
-        indicator: DsChartIndicator.line,
-      ),
-    );
+  ink,
+  ink.sport.plus(<String, ElChartSeries>{
+    'activities': const ElChartSeries(label: 'Activities'),
+  }),
+  const ElChartTooltipSpec(
+    cursor: false,
+    defaultIndex: 1,
+    labelKey: 'activities',
+    indicator: ElChartIndicator.line,
+  ),
+);
 
 Widget _tooltipLabelFormatter(_ChartInk ink) => _tooltipChart(
-      ink,
-      ink.sport,
-      const DsChartTooltipSpec(
-        cursor: false,
-        defaultIndex: 1,
-        labelFormatter: _longDateLabel,
-      ),
-    );
+  ink,
+  ink.sport,
+  const ElChartTooltipSpec(
+    cursor: false,
+    defaultIndex: 1,
+    labelFormatter: _longDateLabel,
+  ),
+);
 
 Widget _tooltipLabelNone(_ChartInk ink) => _tooltipChart(
-      ink,
-      ink.sport,
-      const DsChartTooltipSpec(
-        cursor: false,
-        defaultIndex: 1,
-        hideIndicator: true,
-        hideLabel: true,
-      ),
-    );
+  ink,
+  ink.sport,
+  const ElChartTooltipSpec(
+    cursor: false,
+    defaultIndex: 1,
+    hideIndicator: true,
+    hideLabel: true,
+  ),
+);
 
 /// Supplying `formatter` opts a row out of the default renderer entirely, so
 /// this one rebuilds by hand what the default already does: which is why
 /// `min-w-[130px]` in the registry becomes `min-w-32`, the exact width the
 /// default box opens with.
 Widget _tooltipFormatter(_ChartInk ink) => _tooltipChart(
-      ink,
-      ink.sport,
-      DsChartTooltipSpec(
-        cursor: false,
-        defaultIndex: 1,
-        hideLabel: true,
-        formatter: (BuildContext context, DsChartTooltipItem item, int index) =>
-            _KcalRow(item: item),
-      ),
-    );
+  ink,
+  ink.sport,
+  ElChartTooltipSpec(
+    cursor: false,
+    defaultIndex: 1,
+    hideLabel: true,
+    formatter: (BuildContext context, ElChartTooltipItem item, int index) =>
+        _KcalRow(item: item),
+  ),
+);
 
 /// `flex min-w-32 items-center text-xs text-muted-foreground`, with the figure
 /// and its unit pushed to the end.
 class _KcalRow extends StatelessWidget {
   const _KcalRow({required this.item, this.showTotal = false, this.total = 0});
 
-  final DsChartTooltipItem item;
+  final ElChartTooltipItem item;
   final bool showTotal;
   final int total;
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         ConstrainedBox(
-          constraints:
-              BoxConstraints(minWidth: DsChartTooltipContent.minWidth),
+          constraints: BoxConstraints(minWidth: ElChartTooltipContent.minWidth),
           child: Row(
             children: <Widget>[
-              DsText(
+              ElText(
                 item.name == 'running' ? 'Running' : 'Swimming',
-                DsChartText.xs,
+                ElChartText.xs,
                 color: theme.mutedForeground,
               ),
               const Spacer(),
@@ -3139,22 +3195,22 @@ class _KcalRow extends StatelessWidget {
           ),
         ),
         if (showTotal) ...<Widget>[
-          SizedBox(height: ds(1.5)),
+          SizedBox(height: el(1.5)),
           DecoratedBox(
             decoration: BoxDecoration(
               border: Border(
-                top: BorderSide(
-                  color: theme.border,
-                  width: DsWidths.hairline,
-                ),
+                top: BorderSide(color: theme.border, width: ElWidths.hairline),
               ),
             ),
             child: Padding(
-              padding: EdgeInsets.only(top: ds(1.5)),
+              padding: EdgeInsets.only(top: el(1.5)),
               child: Row(
                 children: <Widget>[
-                  DsText('Total', DsChartText.xsMedium,
-                      color: theme.foreground),
+                  ElText(
+                    'Total',
+                    ElChartText.xsMedium,
+                    color: theme.foreground,
+                  ),
                   const Spacer(),
                   _Kcal(value: total),
                 ],
@@ -3174,17 +3230,17 @@ class _Kcal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return Row(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.baseline,
       textBaseline: TextBaseline.alphabetic,
       children: <Widget>[
-        DsText(dsChartNumber(value), DsType.numSm, color: theme.foreground),
-        SizedBox(width: ds(0.5)),
+        ElText(elChartNumber(value), ElType.numSm, color: theme.foreground),
+        SizedBox(width: el(0.5)),
         // `font-normal text-muted-foreground`: the unit steps down out of the
         // figure's own weight.
-        DsText('kcal', DsChartText.xs, color: theme.mutedForeground),
+        ElText('kcal', ElChartText.xs, color: theme.mutedForeground),
       ],
     );
   }
@@ -3194,51 +3250,47 @@ class _Kcal extends StatelessWidget {
 /// `Waves`/swimming. `tooltip.tsx` routes both through `Icon` by wrapping them
 /// in a zero-arg component; the builder slot here needs no such wrapper.
 Widget _tooltipIcons(_ChartInk ink) => _tooltipChart(
-      ink,
-      DsChartConfig(<String, DsChartSeries>{
-        'running': DsChartSeries(
-          label: 'Running',
-          color: ink.slot(1),
-          icon: (BuildContext context) => const DsIcon.lucide(
-            DsLucide.footprints,
-            size: DsIconSize.xs,
-            tone: DsIconTone.muted,
-          ),
-        ),
-        'swimming': DsChartSeries(
-          label: 'Swimming',
-          color: ink.slot(2),
-          icon: (BuildContext context) => const DsIcon.lucide(
-            DsLucide.wavesHorizontal,
-            size: DsIconSize.xs,
-            tone: DsIconTone.muted,
-          ),
-        ),
-      }),
-      const DsChartTooltipSpec(
-        cursor: false,
-        defaultIndex: 1,
-        hideLabel: true,
+  ink,
+  ElChartConfig(<String, ElChartSeries>{
+    'running': ElChartSeries(
+      label: 'Running',
+      color: ink.slot(1),
+      icon: (BuildContext context) => const ElIcon.lucide(
+        ElLucide.footprints,
+        size: ElIconSize.xs,
+        tone: ElIconTone.muted,
       ),
-    );
+    ),
+    'swimming': ElChartSeries(
+      label: 'Swimming',
+      color: ink.slot(2),
+      icon: (BuildContext context) => const ElIcon.lucide(
+        ElLucide.wavesHorizontal,
+        size: ElIconSize.xs,
+        tone: ElIconTone.muted,
+      ),
+    ),
+  }),
+  const ElChartTooltipSpec(cursor: false, defaultIndex: 1, hideLabel: true),
+);
 
 /// The most involved of the nine: a swatch, the series label, the value with
 /// its unit, and: after the last row: a totalled line.
 Widget _tooltipAdvanced(_ChartInk ink) => _tooltipChart(
-      ink,
-      ink.sport,
-      DsChartTooltipSpec(
-        cursor: false,
-        defaultIndex: 1,
-        hideLabel: true,
-        // `className="w-44"`, 176px, the nearest rung of the same scale
-        // `min-w-32` uses, close enough that the fixed-width Total row does not
-        // reflow between the two hovered series.
-        width: ds(44),
-        formatter: (BuildContext context, DsChartTooltipItem item, int index) =>
-            _AdvancedRow(item: item, index: index, ink: ink),
-      ),
-    );
+  ink,
+  ink.sport,
+  ElChartTooltipSpec(
+    cursor: false,
+    defaultIndex: 1,
+    hideLabel: true,
+    // `className="w-44"`, 176px, the nearest rung of the same scale
+    // `min-w-32` uses, close enough that the fixed-width Total row does not
+    // reflow between the two hovered series.
+    width: el(44),
+    formatter: (BuildContext context, ElChartTooltipItem item, int index) =>
+        _AdvancedRow(item: item, index: index, ink: ink),
+  ),
+);
 
 class _AdvancedRow extends StatelessWidget {
   const _AdvancedRow({
@@ -3247,41 +3299,40 @@ class _AdvancedRow extends StatelessWidget {
     required this.ink,
   });
 
-  final DsChartTooltipItem item;
+  final ElChartTooltipItem item;
   final int index;
   final _ChartInk ink;
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     final Map<String, Object?> row = item.payload ?? const <String, Object?>{};
     final int total =
         ((row['running'] as num?) ?? 0).toInt() +
-            ((row['swimming'] as num?) ?? 0).toInt();
+        ((row['swimming'] as num?) ?? 0).toInt();
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Padding(
-          padding: EdgeInsets.only(top: ds(0.5)),
+          padding: EdgeInsets.only(top: el(0.5)),
           child: Container(
-            width: ds(2.5),
-            height: ds(2.5),
+            width: el(2.5),
+            height: el(2.5),
             decoration: BoxDecoration(
               color: ink.slot(item.name == 'running' ? 1 : 2),
-              borderRadius: BorderRadius.circular(DsRadii.xs),
+              borderRadius: BorderRadius.circular(ElRadii.xs),
             ),
           ),
         ),
-        SizedBox(width: ds(2)),
+        SizedBox(width: el(2)),
         Expanded(
           child: DefaultTextStyle(
-            style: DsText.styleOf(context, DsChartText.xs,
-                color: theme.mutedForeground),
-            child: _KcalRow(
-              item: item,
-              showTotal: index == 1,
-              total: total,
+            style: ElText.styleOf(
+              context,
+              ElChartText.xs,
+              color: theme.mutedForeground,
             ),
+            child: _KcalRow(item: item, showTotal: index == 1, total: total),
           ),
         ),
       ],
@@ -3289,7 +3340,7 @@ class _AdvancedRow extends StatelessWidget {
   }
 }
 
-/* ── Unit activity, `components/ds/charts/unit-activity.tsx` ────────────── */
+/* ── Unit activity, `components/el/charts/unit-activity.tsx` ────────────── */
 
 /// One labelled point in a day's row.
 @immutable
@@ -3316,44 +3367,60 @@ class _UnitDay {
 /// bare `current` values exactly as the source does.
 final List<_UnitDay> _unitSample = <_UnitDay>[
   _unitDay('Sun', const <List<int>>[
-    <int>[1, 1], <int>[2, 2], <int>[5, 8], <int>[8, 11], <int>[7, 10],
+    <int>[1, 1],
+    <int>[2, 2],
+    <int>[5, 8],
+    <int>[8, 11],
+    <int>[7, 10],
     <int>[4, 9],
   ]),
   _unitDayFlat('Mon', const <int>[2, 6, 3, 7, 4, 6]),
   _unitDay('Tue', const <List<int>>[
-    <int>[4, 9], <int>[10, 12], <int>[8, 11], <int>[5, 8], <int>[3, 3],
+    <int>[4, 9],
+    <int>[10, 12],
+    <int>[8, 11],
+    <int>[5, 8],
+    <int>[3, 3],
     <int>[2, 2],
   ]),
   _unitDay('Wed', const <List<int>>[
-    <int>[4, 8], <int>[10, 12], <int>[7, 10], <int>[3, 3], <int>[2, 2],
+    <int>[4, 8],
+    <int>[10, 12],
+    <int>[7, 10],
+    <int>[3, 3],
+    <int>[2, 2],
     <int>[1, 1],
   ]),
   _unitDay('Thu', const <List<int>>[
-    <int>[2, 2], <int>[4, 4], <int>[5, 5], <int>[6, 10], <int>[4, 8],
+    <int>[2, 2],
+    <int>[4, 4],
+    <int>[5, 5],
+    <int>[6, 10],
+    <int>[4, 8],
     <int>[3, 3],
   ]),
   _unitDay('Fri', const <List<int>>[
-    <int>[4, 4], <int>[5, 5], <int>[6, 6], <int>[7, 7], <int>[9, 11],
+    <int>[4, 4],
+    <int>[5, 5],
+    <int>[6, 6],
+    <int>[7, 7],
+    <int>[9, 11],
     <int>[4, 4],
   ]),
   _unitDayFlat('Sat', const <int>[5, 3, 2, 1, 3, 2]),
 ];
 
-_UnitDay _unitDay(String label, List<List<int>> pairs) => _UnitDay(
-      label,
-      <_UnitPoint>[
-        for (int i = 0; i < pairs.length; i++)
-          _UnitPoint('${i * 4}:00', pairs[i][0], pairs[i][1]),
-      ],
-    );
+_UnitDay _unitDay(String label, List<List<int>> pairs) =>
+    _UnitDay(label, <_UnitPoint>[
+      for (int i = 0; i < pairs.length; i++)
+        _UnitPoint('${i * 4}:00', pairs[i][0], pairs[i][1]),
+    ]);
 
-_UnitDay _unitDayFlat(String label, List<int> values) => _UnitDay(
-      label,
-      <_UnitPoint>[
-        for (int i = 0; i < values.length; i++)
-          _UnitPoint('${i * 4}:00', values[i]),
-      ],
-    );
+_UnitDay _unitDayFlat(String label, List<int> values) =>
+    _UnitDay(label, <_UnitPoint>[
+      for (int i = 0; i < values.length; i++)
+        _UnitPoint('${i * 4}:00', values[i]),
+    ]);
 
 /// A discrete density chart for activity over repeating time buckets.
 ///
@@ -3377,7 +3444,7 @@ class _UnitActivityChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return SizedBox(
       height: _plotHeight,
       child: Column(
@@ -3390,20 +3457,23 @@ class _UnitActivityChart extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    DsText('Active users', DsType.label),
-                    SizedBox(height: ds(1)),
-                    DsText(dsChartNumber(24815), DsType.numLg,
-                        color: theme.foreground),
-                    SizedBox(height: ds(1)),
-                    DsText('5.6k fewer in the last 7 days', DsType.small),
+                    ElText('Active users', ElType.label),
+                    SizedBox(height: el(1)),
+                    ElText(
+                      elChartNumber(24815),
+                      ElType.numLg,
+                      color: theme.foreground,
+                    ),
+                    SizedBox(height: el(1)),
+                    ElText('5.6k fewer in the last 7 days', ElType.small),
                   ],
                 ),
               ),
-              SizedBox(width: ds(4)),
+              SizedBox(width: el(4)),
               Wrap(
                 alignment: WrapAlignment.end,
-                spacing: ds(3),
-                runSpacing: ds(3),
+                spacing: el(3),
+                runSpacing: el(3),
                 children: <Widget>[
                   _UnitKey(colour: theme.muted, label: 'Previous'),
                   _UnitKey(colour: theme.chart4, label: 'Current'),
@@ -3411,7 +3481,7 @@ class _UnitActivityChart extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: ds(4)),
+          SizedBox(height: el(4)),
           Expanded(
             child: ClipRect(
               child: ConstrainedBox(
@@ -3420,7 +3490,7 @@ class _UnitActivityChart extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[
                     for (int d = 0; d < _unitSample.length; d++) ...<Widget>[
-                      if (d > 0) SizedBox(width: ds(2)),
+                      if (d > 0) SizedBox(width: el(2)),
                       Expanded(child: _UnitColumn(day: _unitSample[d])),
                     ],
                   ],
@@ -3435,7 +3505,7 @@ class _UnitActivityChart extends StatelessWidget {
 
   /// One cell's colour: the current period, the comparison remainder, or the
   /// rest of the matrix.
-  static Color cell(DsThemeData theme, int level, _UnitPoint point) {
+  static Color cell(ElThemeData theme, int level, _UnitPoint point) {
     if (level <= point.current) return theme.chart4;
     if (level <= (point.previous ?? point.current)) return theme.muted;
     return theme.muted.withValues(alpha: _restAlpha);
@@ -3450,20 +3520,20 @@ class _UnitKey extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Row(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Container(
-            width: ds(2),
-            height: ds(2),
-            decoration: BoxDecoration(
-              color: colour,
-              borderRadius: BorderRadius.circular(DsRadii.sm),
-            ),
-          ),
-          SizedBox(width: ds(1.5)),
-          DsText(label, DsType.label),
-        ],
-      );
+    mainAxisSize: MainAxisSize.min,
+    children: <Widget>[
+      Container(
+        width: el(2),
+        height: el(2),
+        decoration: BoxDecoration(
+          color: colour,
+          borderRadius: BorderRadius.circular(ElRadii.sm),
+        ),
+      ),
+      SizedBox(width: el(1.5)),
+      ElText(label, ElType.label),
+    ],
+  );
 }
 
 class _UnitColumn extends StatelessWidget {
@@ -3473,7 +3543,7 @@ class _UnitColumn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
@@ -3482,12 +3552,16 @@ class _UnitColumn extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               for (int p = 0; p < day.points.length; p++) ...<Widget>[
-                if (p > 0) SizedBox(width: ds(0.5)),
+                if (p > 0) SizedBox(width: el(0.5)),
                 Expanded(
                   child: Column(
                     children: <Widget>[
-                      for (int i = 0; i < _UnitActivityChart.levels; i++) ...<Widget>[
-                        if (i > 0) SizedBox(height: ds(0.5)),
+                      for (
+                        int i = 0;
+                        i < _UnitActivityChart.levels;
+                        i++
+                      ) ...<Widget>[
+                        if (i > 0) SizedBox(height: el(0.5)),
                         Expanded(
                           child: DecoratedBox(
                             decoration: BoxDecoration(
@@ -3496,7 +3570,7 @@ class _UnitColumn extends StatelessWidget {
                                 _UnitActivityChart.levels - i,
                                 day.points[p],
                               ),
-                              borderRadius: BorderRadius.circular(DsRadii.sm),
+                              borderRadius: BorderRadius.circular(ElRadii.sm),
                             ),
                           ),
                         ),
@@ -3508,14 +3582,14 @@ class _UnitColumn extends StatelessWidget {
             ],
           ),
         ),
-        SizedBox(height: ds(2)),
-        DsText(day.label, DsType.numSm, align: TextAlign.center),
+        SizedBox(height: el(2)),
+        ElText(day.label, ElType.numSm, align: TextAlign.center),
       ],
     );
   }
 }
 
-/* ── Conversion funnel, `components/ds/charts/conversion-funnel.tsx` ────── */
+/* ── Conversion funnel, `components/el/charts/conversion-funnel.tsx` ────── */
 
 @immutable
 class _Stage {
@@ -3552,18 +3626,17 @@ class _ConversionFunnelChart extends StatelessWidget {
   static const int stripUnits = 96;
 
   /// `h-12`: the strip's own height.
-  static double get stripHeight => ds(12);
+  static double get stripHeight => el(12);
 
   static String percentage(int value, int of) =>
       of > 0 ? '${(value / of * 100).toStringAsFixed(1)}%' : '0.0%';
 
-  static int unitCount(int value, int of) => of > 0
-      ? math.max(1, (value / of * stripUnits).round())
-      : 1;
+  static int unitCount(int value, int of) =>
+      of > 0 ? math.max(1, (value / of * stripUnits).round()) : 1;
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     final _ChartInk ink = _ChartInk(theme);
     final int stageTotal = _funnelStages.fold<int>(
       0,
@@ -3574,37 +3647,37 @@ class _ConversionFunnelChart extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          DsText('Conversions', DsType.label),
-          SizedBox(height: ds(1)),
-          DsText(dsChartNumber(total), DsType.numLg, color: theme.foreground),
-          SizedBox(height: ds(1)),
-          DsText(
+          ElText('Conversions', ElType.label),
+          SizedBox(height: el(1)),
+          ElText(elChartNumber(total), ElType.numLg, color: theme.foreground),
+          SizedBox(height: el(1)),
+          ElText(
             '${percentage(_funnelStages.last.value, total)} overall conversion',
-            DsType.small,
+            ElType.small,
             color: theme.valueInk,
           ),
-          SizedBox(height: ds(3)),
+          SizedBox(height: el(3)),
           SizedBox(
             height: stripHeight,
             child: Row(
               children: <Widget>[
                 for (int i = 0; i < _funnelStages.length; i++) ...<Widget>[
-                  if (i > 0) SizedBox(width: ds(0.5)),
+                  if (i > 0) SizedBox(width: el(0.5)),
                   Expanded(
                     flex: _funnelStages[i].value,
                     child: Row(
                       children: <Widget>[
-                        for (int u = 0;
-                            u <
-                                unitCount(_funnelStages[i].value, stageTotal);
-                            u++) ...<Widget>[
-                          if (u > 0) SizedBox(width: ds(0.5)),
+                        for (
+                          int u = 0;
+                          u < unitCount(_funnelStages[i].value, stageTotal);
+                          u++
+                        ) ...<Widget>[
+                          if (u > 0) SizedBox(width: el(0.5)),
                           Expanded(
                             child: DecoratedBox(
                               decoration: BoxDecoration(
                                 color: ink.slot(_funnelStages[i].slot),
-                                borderRadius:
-                                    BorderRadius.circular(DsRadii.sm),
+                                borderRadius: BorderRadius.circular(ElRadii.sm),
                               ),
                             ),
                           ),
@@ -3616,28 +3689,30 @@ class _ConversionFunnelChart extends StatelessWidget {
               ],
             ),
           ),
-          SizedBox(height: ds(2)),
+          SizedBox(height: el(2)),
           Row(
             children: <Widget>[
               for (int i = 0; i < _funnelStages.length; i++) ...<Widget>[
-                if (i > 0) SizedBox(width: ds(0.5)),
+                if (i > 0) SizedBox(width: el(0.5)),
                 Expanded(
                   flex: _funnelStages[i].value,
-                  child: DsText(
+                  child: ElText(
                     percentage(_funnelStages[i].value, total),
-                    DsType.numSm,
+                    ElType.numSm,
                   ),
                 ),
               ],
             ],
           ),
-          SizedBox(height: ds(3)),
+          SizedBox(height: el(3)),
           Expanded(
             child: DecoratedBox(
               decoration: BoxDecoration(
                 border: Border.symmetric(
-                  horizontal:
-                      BorderSide(color: theme.border, width: DsWidths.hairline),
+                  horizontal: BorderSide(
+                    color: theme.border,
+                    width: ElWidths.hairline,
+                  ),
                 ),
               ),
               child: Column(
@@ -3646,7 +3721,7 @@ class _ConversionFunnelChart extends StatelessWidget {
                   for (int i = 0; i < _funnelStages.length; i++) ...<Widget>[
                     if (i > 0)
                       SizedBox(
-                        height: DsWidths.hairline,
+                        height: ElWidths.hairline,
                         child: ColoredBox(color: theme.border),
                       ),
                     Expanded(child: _FunnelRow(stage: _funnelStages[i])),
@@ -3668,25 +3743,32 @@ class _FunnelRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     final _ChartInk ink = _ChartInk(theme);
     return Row(
       children: <Widget>[
         Container(
-          width: ds(2.5),
-          height: ds(2.5),
+          width: el(2.5),
+          height: el(2.5),
           decoration: BoxDecoration(
             color: ink.slot(stage.slot),
-            borderRadius: BorderRadius.circular(DsRadii.sm),
+            borderRadius: BorderRadius.circular(ElRadii.sm),
           ),
         ),
-        SizedBox(width: ds(2)),
+        SizedBox(width: el(2)),
         Expanded(
-          child: DsText(stage.label, DsType.small,
-              maxLines: 1, overflow: TextOverflow.ellipsis),
+          child: ElText(
+            stage.label,
+            ElType.small,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
-        DsText(dsChartNumber(stage.value), DsType.numSm,
-            color: theme.foreground),
+        ElText(
+          elChartNumber(stage.value),
+          ElType.numSm,
+          color: theme.foreground,
+        ),
       ],
     );
   }
@@ -3700,14 +3782,14 @@ class ChartsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsCategoryHit here = findCategory('base', 'charts');
-    final DsThemeData theme = DsTheme.of(context);
+    final ElCategoryHit here = findCategory('base', 'charts');
+    final ElThemeData theme = ElTheme.of(context);
     final _ChartInk ink = _ChartInk(theme);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        DsPageHeader(
+        ElPageHeader(
           eyebrow: '${here.group.title} · Base',
           title: here.category.title,
           blurb: here.category.blurb,
@@ -3715,24 +3797,24 @@ class ChartsPage extends StatelessWidget {
         ),
         // `className="mb-6"`.
         Padding(
-          padding: EdgeInsets.only(bottom: ds(6)),
-          child: const DsNote(
+          padding: EdgeInsets.only(bottom: el(6)),
+          child: const ElNote(
             title: 'Built, not installed',
             child: _BuiltNotInstalled(),
           ),
         ),
         // `className="mb-12"`.
         Padding(
-          padding: EdgeInsets.only(bottom: ds(12)),
-          child: const DsNote(
-            tone: DsNoteTone.value,
+          padding: EdgeInsets.only(bottom: el(12)),
+          child: const ElNote(
+            tone: ElNoteTone.value,
             title: 'Read the Animation section before you copy any of this',
             child: _ReadAnimationFirst(),
           ),
         ),
         // `className="mb-14"`.
         Padding(
-          padding: EdgeInsets.only(bottom: ds(14)),
+          padding: EdgeInsets.only(bottom: el(14)),
           child: const _TokensBlock(),
         ),
         _AreaSection(ink: ink),
@@ -3746,7 +3828,7 @@ class ChartsPage extends StatelessWidget {
         const _UnitActivitySection(),
         const _ConversionFunnelSection(),
         const _StatesSection(),
-        const DsPageFootNav(groupId: 'base', slug: 'charts'),
+        const ElPageFootNav(groupId: 'base', slug: 'charts'),
       ],
     );
   }
@@ -3756,33 +3838,36 @@ class _BuiltNotInstalled extends StatelessWidget {
   const _BuiltNotInstalled();
 
   @override
-  Widget build(BuildContext context) => DsRichText(
-        TextSpan(
-          children: <InlineSpan>[
-            DsCode.span('components/ui/chart.tsx'),
-            const TextSpan(
-              text: ' is the official shadcn wrapper and it arrives with ',
-            ),
-            DsCode.span('npx shadcn add chart'),
-            const TextSpan(
-              text: '. The gallery variants on the shadcn site do not: '
-                  'querying the registry for “chart” returns three '
-                  'items — the ',
-            ),
-            DsCode.span('chart'),
-            const TextSpan(
-              text: ' component, one example and one dashboard block. '
-                  'Everything below was written here, against ',
-            ),
-            DsCode.span('recharts'),
-            const TextSpan(
-              text: ', and every colour on it comes from the five chart '
-                  'tokens.',
-            ),
-          ],
+  Widget build(BuildContext context) => ElRichText(
+    TextSpan(
+      children: <InlineSpan>[
+        ElCode.span('components/ui/chart.tsx'),
+        const TextSpan(
+          text: ' is the official shadcn wrapper and it arrives with ',
         ),
-        DsType.small,
-      );
+        ElCode.span('npx shadcn add chart'),
+        const TextSpan(
+          text:
+              '. The gallery variants on the shadcn site do not: '
+              'querying the registry for “chart” returns three '
+              'items — the ',
+        ),
+        ElCode.span('chart'),
+        const TextSpan(
+          text:
+              ' component, one example and one dashboard block. '
+              'Everything below was written here, against ',
+        ),
+        ElCode.span('recharts'),
+        const TextSpan(
+          text:
+              ', and every colour on it comes from the five chart '
+              'tokens.',
+        ),
+      ],
+    ),
+    ElType.small,
+  );
 }
 
 class _ReadAnimationFirst extends StatelessWidget {
@@ -3790,8 +3875,8 @@ class _ReadAnimationFirst extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextStyle base = DsText.styleOf(context, DsType.small);
-    return DsRichText(
+    final TextStyle base = ElText.styleOf(context, ElType.small);
+    return ElRichText(
       TextSpan(
         children: <InlineSpan>[
           const TextSpan(
@@ -3809,16 +3894,17 @@ class _ReadAnimationFirst extends StatelessWidget {
           const TextSpan(
             text: ', so neither is a class and neither is visible to ',
           ),
-          DsCode.span('check:tokens'),
+          ElCode.span('check:tokens'),
           const TextSpan(
-            text: '. That makes charts the one place in this system where §0 '
+            text:
+                '. That makes charts the one place in this system where §0 '
                 'is upheld by reading the stylesheet rather than by writing a '
                 'utility — and the one place a hardcoded value passes '
                 'every guard in the repository and is still wrong.',
           ),
         ],
       ),
-      DsType.small,
+      ElType.small,
     );
   }
 }
@@ -3829,75 +3915,82 @@ class _TokensBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        DsText('The five chart tokens', DsType.h3, color: theme.foreground),
-        SizedBox(height: ds(2)),
+        ElText('The five chart tokens', ElType.h3, color: theme.foreground),
+        SizedBox(height: el(2)),
         ConstrainedBox(
           // `max-w-2xl`.
-          constraints: BoxConstraints(maxWidth: DsContainers.xl2),
-          child: DsRichText(
+          constraints: BoxConstraints(maxWidth: ElContainers.xl2),
+          child: ElRichText(
             TextSpan(
               children: <InlineSpan>[
                 const TextSpan(text: 'Declared once per theme in '),
-                DsCode.span('app/globals.css'),
+                ElCode.span('app/globals.css'),
                 const TextSpan(
-                  text: ', and mirrored between them on purpose: 2 and 3 swap, '
+                  text:
+                      ', and mirrored between them on purpose: 2 and 3 swap, '
                       'and so do 4 and 5, so the reading order of a stack '
                       'survives the theme flip instead of inverting with it. '
                       'Series colours here name ',
                 ),
-                DsCode.span('var(--color-chart-1)'),
+                ElCode.span('var(--color-chart-1)'),
                 const TextSpan(text: ' … '),
-                DsCode.span('-5'),
+                ElCode.span('-5'),
                 const TextSpan(
-                  text: ' directly. There is no sixth, and adding one needs a '
+                  text:
+                      ' directly. There is no sixth, and adding one needs a '
                       'written reason.',
                 ),
               ],
             ),
-            DsType.small,
+            ElType.small,
           ),
         ),
-        SizedBox(height: ds(6)),
-        const DsTokenSwatchList(
+        SizedBox(height: el(6)),
+        const ElTokenSwatchList(
           rows: <Widget>[
-            DsTokenSwatch(
+            ElTokenSwatch(
               token: '--chart-1',
               name: 'Chart 1',
-              use: 'Action. The primary series in both themes — the one the '
+              use:
+                  'Action. The primary series in both themes — the one the '
                   'reader is meant to follow.',
               measure: false,
             ),
-            DsTokenSwatch(
+            ElTokenSwatch(
               token: '--chart-2',
               name: 'Chart 2',
-              use: 'Action, one step away. Dark in light mode, bright in dark '
+              use:
+                  'Action, one step away. Dark in light mode, bright in dark '
                   'mode — the pair is mirrored so the second series stays the '
                   'second-loudest on either surface.',
               measure: false,
             ),
-            DsTokenSwatch(
+            ElTokenSwatch(
               token: '--chart-3',
               name: 'Chart 3',
-              use: 'Action, the other step. Bright in light mode, dark in dark '
+              use:
+                  'Action, the other step. Bright in light mode, dark in dark '
                   'mode.',
               measure: false,
             ),
-            DsTokenSwatch(
+            ElTokenSwatch(
               token: '--chart-4',
               name: 'Chart 4',
-              use: 'Value. The lime ramp enters here, which is why a fourth '
+              use:
+                  'Value. The lime ramp enters here, which is why a fourth '
                   'series reads as a different kind of quantity rather than a '
                   'fourth shade of the same one.',
               measure: false,
             ),
-            DsTokenSwatch(
+            ElTokenSwatch(
               token: '--chart-5',
               name: 'Chart 5',
-              use: 'Value, one step away. Mirrored between the themes exactly '
+              use:
+                  'Value, one step away. Mirrored between the themes exactly '
                   'as 2 and 3 are.',
               measure: false,
             ),
@@ -3912,7 +4005,7 @@ class _TokensBlock extends StatelessWidget {
 
 /// `lg:grid-cols-2` with `gap-4`: every family section's own grid.
 Widget _specimenGrid(List<Widget> children) =>
-    DsGrid(lg: 2, children: children);
+    ElGrid(lg: 2, children: children);
 
 class _AreaSection extends StatelessWidget {
   const _AreaSection({required this.ink});
@@ -3920,246 +4013,245 @@ class _AreaSection extends StatelessWidget {
   final _ChartInk ink;
 
   @override
-  Widget build(BuildContext context) => DsSection(
-        id: 'area',
-        title: 'Area',
-        description:
-            'A line with the region under it filled. Reach for it when the '
-            'magnitude beneath the curve is part of the story — volume, '
-            'holdings, cumulative spend — and for a plain trend reach for Line '
-            'instead.',
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            _specimenGrid(<Widget>[
-              _ChartStates(
-                title: 'Default',
-                note: 'one series, natural curve',
-                skeleton: _SkeletonKind.area,
-                child: _areaDefault(ink),
-              ),
-              _ChartStates(
-                title: 'Linear',
-                note: 'type=linear',
-                skeleton: _SkeletonKind.area,
-                child: _areaLinear(ink),
-              ),
-              _ChartStates(
-                title: 'Step',
-                note: 'type=step',
-                skeleton: _SkeletonKind.area,
-                child: _areaStep(ink),
-              ),
-              _ChartStates(
-                title: 'Stacked',
-                note: 'shared stackId',
-                skeleton: _SkeletonKind.area,
-                child: _areaStacked(ink),
-              ),
-              _ChartStates(
-                title: 'Stacked, expanded',
-                note: 'stackOffset=expand — shares, not totals',
-                skeleton: _SkeletonKind.area,
-                child: _areaStackedExpand(ink),
-              ),
-              _ChartStates(
-                title: 'Legend',
-                note: 'ChartLegendContent',
-                skeleton: _SkeletonKind.area,
-                child: _areaLegend(ink),
-              ),
-              _ChartStates(
-                title: 'Icons',
-                note: 'config icons in the legend',
-                skeleton: _SkeletonKind.area,
-                child: _areaIcons(ink),
-              ),
-              _ChartStates(
-                title: 'Gradient fill',
-                note: 'a linearGradient in defs, both stops on the token',
-                skeleton: _SkeletonKind.area,
-                child: _areaGradient(ink),
-              ),
-              _ChartStates(
-                title: 'Axes',
-                note: 'both axes labelled',
-                skeleton: _SkeletonKind.area,
-                child: _areaAxes(ink),
-              ),
-              _ChartStates(
-                title: 'Interactive',
-                note: 'range picker, above the plot',
-                skeleton: _SkeletonKind.area,
-                controls: (BuildContext context, Widget child) =>
-                    _AreaInteractive(ink: ink, child: child),
-                child: Builder(
-                  builder: (BuildContext context) =>
-                      _areaInteractive(context, ink),
-                ),
-              ),
-            ]),
-            SizedBox(height: ds(4)),
-            DsMeta(items: <DsMetaItem>[
-              _meta(
-                'type',
-                'natural · monotone · linear · step. natural and monotone both '
-                    'refuse to overshoot a data point, which linear cannot '
-                    'promise once the curve is smoothed. Pick step for anything '
-                    'that genuinely changes in jumps.',
-              ),
-              _meta(
-                'stackId',
-                'Any shared string stacks the areas that carry it. Order '
-                    'matters: the first Area is drawn at the bottom of the '
-                    'stack.',
-              ),
-              _meta(
-                'fillOpacity',
-                'Opacity is not one of the five token families — §0 owns '
-                    'colour, typography, spacing, radius and motion — so a fade '
-                    'is written plainly. The colour underneath it is still the '
-                    'token.',
-              ),
-              _meta(
-                'Gradient',
-                'A <linearGradient> inside <defs>, referenced as '
-                    'fill="url(#id)". Give the id a page-unique prefix; two '
-                    'charts sharing one id share one gradient.',
-              ),
-            ]),
+  Widget build(BuildContext context) => ElSection(
+    id: 'area',
+    title: 'Area',
+    description:
+        'A line with the region under it filled. Reach for it when the '
+        'magnitude beneath the curve is part of the story — volume, '
+        'holdings, cumulative spend — and for a plain trend reach for Line '
+        'instead.',
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        _specimenGrid(<Widget>[
+          _ChartStates(
+            title: 'Default',
+            note: 'one series, natural curve',
+            skeleton: _SkeletonKind.area,
+            child: _areaDefault(ink),
+          ),
+          _ChartStates(
+            title: 'Linear',
+            note: 'type=linear',
+            skeleton: _SkeletonKind.area,
+            child: _areaLinear(ink),
+          ),
+          _ChartStates(
+            title: 'Step',
+            note: 'type=step',
+            skeleton: _SkeletonKind.area,
+            child: _areaStep(ink),
+          ),
+          _ChartStates(
+            title: 'Stacked',
+            note: 'shared stackId',
+            skeleton: _SkeletonKind.area,
+            child: _areaStacked(ink),
+          ),
+          _ChartStates(
+            title: 'Stacked, expanded',
+            note: 'stackOffset=expand — shares, not totals',
+            skeleton: _SkeletonKind.area,
+            child: _areaStackedExpand(ink),
+          ),
+          _ChartStates(
+            title: 'Legend',
+            note: 'ChartLegendContent',
+            skeleton: _SkeletonKind.area,
+            child: _areaLegend(ink),
+          ),
+          _ChartStates(
+            title: 'Icons',
+            note: 'config icons in the legend',
+            skeleton: _SkeletonKind.area,
+            child: _areaIcons(ink),
+          ),
+          _ChartStates(
+            title: 'Gradient fill',
+            note: 'a linearGradient in defs, both stops on the token',
+            skeleton: _SkeletonKind.area,
+            child: _areaGradient(ink),
+          ),
+          _ChartStates(
+            title: 'Axes',
+            note: 'both axes labelled',
+            skeleton: _SkeletonKind.area,
+            child: _areaAxes(ink),
+          ),
+          _ChartStates(
+            title: 'Interactive',
+            note: 'range picker, above the plot',
+            skeleton: _SkeletonKind.area,
+            controls: (BuildContext context, Widget child) =>
+                _AreaInteractive(ink: ink, child: child),
+            child: Builder(
+              builder: (BuildContext context) => _areaInteractive(context, ink),
+            ),
+          ),
+        ]),
+        SizedBox(height: el(4)),
+        ElMeta(
+          items: <ElMetaItem>[
+            _meta(
+              'type',
+              'natural · monotone · linear · step. natural and monotone both '
+                  'refuse to overshoot a data point, which linear cannot '
+                  'promise once the curve is smoothed. Pick step for anything '
+                  'that genuinely changes in jumps.',
+            ),
+            _meta(
+              'stackId',
+              'Any shared string stacks the areas that carry it. Order '
+                  'matters: the first Area is drawn at the bottom of the '
+                  'stack.',
+            ),
+            _meta(
+              'fillOpacity',
+              'Opacity is not one of the five token families — §0 owns '
+                  'colour, typography, spacing, radius and motion — so a fade '
+                  'is written plainly. The colour underneath it is still the '
+                  'token.',
+            ),
+            _meta(
+              'Gradient',
+              'A <linearGradient> inside <defs>, referenced as '
+                  'fill="url(#id)". Give the id a page-unique prefix; two '
+                  'charts sharing one id share one gradient.',
+            ),
           ],
         ),
-      );
+      ],
+    ),
+  );
 }
 
 class _BarSection extends StatelessWidget {
   const _BarSection({required this.ink, required this.theme});
 
   final _ChartInk ink;
-  final DsThemeData theme;
+  final ElThemeData theme;
 
   @override
-  Widget build(BuildContext context) => DsSection(
-        id: 'bar',
-        title: 'Bar',
-        description:
-            'Comparison across a small number of named things. Four '
-            'arrangements, one of which is the same chart rotated — a '
-            'horizontal bar chart is a BarChart with layout=vertical, which '
-            'reads backwards until you have hit it once.',
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            _specimenGrid(<Widget>[
-              _ChartStates(
-                title: 'Default',
-                note: 'one series',
-                skeleton: _SkeletonKind.bar,
-                child: _barDefault(ink),
-              ),
-              _ChartStates(
-                title: 'Horizontal',
-                note: 'layout=vertical, YAxis type=category',
-                skeleton: _SkeletonKind.bar,
-                child: _barHorizontal(ink),
-              ),
-              _ChartStates(
-                title: 'Multiple',
-                note: 'two Bars, no stackId',
-                skeleton: _SkeletonKind.bar,
-                child: _barMultiple(ink),
-              ),
-              _ChartStates(
-                title: 'Stacked',
-                note: 'three Bars sharing a stackId',
-                skeleton: _SkeletonKind.bar,
-                child: _barStacked(ink),
-              ),
-              _ChartStates(
-                title: 'Label',
-                note: 'LabelList on the bar',
-                skeleton: _SkeletonKind.bar,
-                child: _barLabel(ink, theme),
-              ),
-              _ChartStates(
-                title: 'Custom label',
-                note: 'LabelList with a render function',
-                skeleton: _SkeletonKind.bar,
-                child: _barLabelCustom(ink, theme),
-              ),
-              _ChartStates(
-                title: 'Mixed',
-                note: 'one Bar, a colour per datum',
-                skeleton: _SkeletonKind.bar,
-                child: _barMixed(ink),
-              ),
-              _ChartStates(
-                title: 'Active',
-                note: 'activeIndex highlights one',
-                skeleton: _SkeletonKind.bar,
-                child: _barActive(ink),
-              ),
-              _ChartStates(
-                title: 'Negative',
-                note: 'values below zero — direction by position, not by red',
-                skeleton: _SkeletonKind.bar,
-                child: _barNegative(ink, theme),
-              ),
-              _ChartStates(
-                title: 'Interactive',
-                note: 'series picker, travelling pill',
-                skeleton: _SkeletonKind.bar,
-                controls: (BuildContext context, Widget child) => _SeriesStrip(
-                  ink: ink,
-                  slot: 'bar-series-option',
-                  child: child,
-                ),
-                child: Builder(
-                  builder: (BuildContext context) =>
-                      _barInteractive(context, ink),
-                ),
-              ),
-            ]),
-            SizedBox(height: ds(4)),
-            const DsNote(
-              title: 'Why these bars have square corners',
-              child: _SquareCorners(),
+  Widget build(BuildContext context) => ElSection(
+    id: 'bar',
+    title: 'Bar',
+    description:
+        'Comparison across a small number of named things. Four '
+        'arrangements, one of which is the same chart rotated — a '
+        'horizontal bar chart is a BarChart with layout=vertical, which '
+        'reads backwards until you have hit it once.',
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        _specimenGrid(<Widget>[
+          _ChartStates(
+            title: 'Default',
+            note: 'one series',
+            skeleton: _SkeletonKind.bar,
+            child: _barDefault(ink),
+          ),
+          _ChartStates(
+            title: 'Horizontal',
+            note: 'layout=vertical, YAxis type=category',
+            skeleton: _SkeletonKind.bar,
+            child: _barHorizontal(ink),
+          ),
+          _ChartStates(
+            title: 'Multiple',
+            note: 'two Bars, no stackId',
+            skeleton: _SkeletonKind.bar,
+            child: _barMultiple(ink),
+          ),
+          _ChartStates(
+            title: 'Stacked',
+            note: 'three Bars sharing a stackId',
+            skeleton: _SkeletonKind.bar,
+            child: _barStacked(ink),
+          ),
+          _ChartStates(
+            title: 'Label',
+            note: 'LabelList on the bar',
+            skeleton: _SkeletonKind.bar,
+            child: _barLabel(ink, theme),
+          ),
+          _ChartStates(
+            title: 'Custom label',
+            note: 'LabelList with a render function',
+            skeleton: _SkeletonKind.bar,
+            child: _barLabelCustom(ink, theme),
+          ),
+          _ChartStates(
+            title: 'Mixed',
+            note: 'one Bar, a colour per datum',
+            skeleton: _SkeletonKind.bar,
+            child: _barMixed(ink),
+          ),
+          _ChartStates(
+            title: 'Active',
+            note: 'activeIndex highlights one',
+            skeleton: _SkeletonKind.bar,
+            child: _barActive(ink),
+          ),
+          _ChartStates(
+            title: 'Negative',
+            note: 'values below zero — direction by position, not by red',
+            skeleton: _SkeletonKind.bar,
+            child: _barNegative(ink, theme),
+          ),
+          _ChartStates(
+            title: 'Interactive',
+            note: 'series picker, travelling pill',
+            skeleton: _SkeletonKind.bar,
+            controls: (BuildContext context, Widget child) =>
+                _SeriesStrip(ink: ink, slot: 'bar-series-option', child: child),
+            child: Builder(
+              builder: (BuildContext context) => _barInteractive(context, ink),
             ),
-            SizedBox(height: ds(4)),
-            DsMeta(items: <DsMetaItem>[
-              _meta(
-                'layout',
-                'horizontal (default) or vertical. vertical is the one that '
-                    'draws horizontal bars: it names the axis the CATEGORIES '
-                    'run along, not the direction the bars point.',
-              ),
-              _meta(
-                'XAxis / YAxis type',
-                'number or category. Swapping the layout means swapping these '
-                    'too — the horizontal specimen above sets XAxis type=number '
-                    'and YAxis type=category.',
-              ),
-              _meta(
-                'stackId',
-                'Same rule as Area. Without one, bars sit side by side in a '
-                    'group.',
-              ),
-              _meta(
-                'CartesianGrid',
-                'vertical={false} for a vertical bar chart, horizontal={false} '
-                    'for a rotated one — the gridlines you want are the ones '
-                    'crossing the bars, not running along them.',
-              ),
-              _meta(
-                'hide',
-                'On an axis, keeps the scale and drops the labels. The '
-                    'horizontal specimen hides its value axis because the '
-                    'tooltip already carries the number.',
-              ),
-            ]),
+          ),
+        ]),
+        SizedBox(height: el(4)),
+        const ElNote(
+          title: 'Why these bars have square corners',
+          child: _SquareCorners(),
+        ),
+        SizedBox(height: el(4)),
+        ElMeta(
+          items: <ElMetaItem>[
+            _meta(
+              'layout',
+              'horizontal (default) or vertical. vertical is the one that '
+                  'draws horizontal bars: it names the axis the CATEGORIES '
+                  'run along, not the direction the bars point.',
+            ),
+            _meta(
+              'XAxis / YAxis type',
+              'number or category. Swapping the layout means swapping these '
+                  'too — the horizontal specimen above sets XAxis type=number '
+                  'and YAxis type=category.',
+            ),
+            _meta(
+              'stackId',
+              'Same rule as Area. Without one, bars sit side by side in a '
+                  'group.',
+            ),
+            _meta(
+              'CartesianGrid',
+              'vertical={false} for a vertical bar chart, horizontal={false} '
+                  'for a rotated one — the gridlines you want are the ones '
+                  'crossing the bars, not running along them.',
+            ),
+            _meta(
+              'hide',
+              'On an axis, keeps the scale and drops the labels. The '
+                  'horizontal specimen hides its value axis because the '
+                  'tooltip already carries the number.',
+            ),
           ],
         ),
-      );
+      ],
+    ),
+  );
 }
 
 /// The note the port has to contradict, and says so.
@@ -4174,283 +4266,284 @@ class _SquareCorners extends StatelessWidget {
   const _SquareCorners();
 
   @override
-  Widget build(BuildContext context) => DsRichText(
-        TextSpan(
-          children: <InlineSpan>[
-            const TextSpan(
-              text: 'Recharts takes a bar’s corner radius as a number of '
-                  'pixels — ',
-            ),
-            DsCode.span('radius'),
-            const TextSpan(text: ' is typed '),
-            DsCode.span('RectRadius'),
-            const TextSpan(
-              text: ', a number or four of them, with no string form. Writing ',
-            ),
-            DsCode.span('radius={6}'),
-            const TextSpan(text: ' there restates '),
-            DsCode.span('--radius-sm'),
-            const TextSpan(
-              text: ' as a literal, in a prop no guard reads — the same failure '
-                  'the whole Animation section is about. It could be read off '
-                  'the stylesheet exactly as the duration is; that is simply a '
-                  'hook this page does not have, because motion was the thing '
-                  'worth solving first. Until it exists the bars are square, '
-                  'and that is a decision rather than an omission.',
-            ),
-          ],
+  Widget build(BuildContext context) => ElRichText(
+    TextSpan(
+      children: <InlineSpan>[
+        const TextSpan(
+          text:
+              'Recharts takes a bar’s corner radius as a number of '
+              'pixels — ',
         ),
-        DsType.small,
-      );
+        ElCode.span('radius'),
+        const TextSpan(text: ' is typed '),
+        ElCode.span('RectRadius'),
+        const TextSpan(
+          text: ', a number or four of them, with no string form. Writing ',
+        ),
+        ElCode.span('radius={6}'),
+        const TextSpan(text: ' there restates '),
+        ElCode.span('--radius-sm'),
+        const TextSpan(
+          text:
+              ' as a literal, in a prop no guard reads — the same failure '
+              'the whole Animation section is about. It could be read off '
+              'the stylesheet exactly as the duration is; that is simply a '
+              'hook this page does not have, because motion was the thing '
+              'worth solving first. Until it exists the bars are square, '
+              'and that is a decision rather than an omission.',
+        ),
+      ],
+    ),
+    ElType.small,
+  );
 }
 
 class _LineSection extends StatelessWidget {
   const _LineSection({required this.ink, required this.theme});
 
   final _ChartInk ink;
-  final DsThemeData theme;
+  final ElThemeData theme;
 
   @override
-  Widget build(BuildContext context) => DsSection(
-        id: 'line',
-        title: 'Line',
-        description:
-            'Trend over an ordered axis, and the default choice for more than '
-            'two series — three stacked areas fight each other for the same '
-            'pixels, three lines do not.',
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            _specimenGrid(<Widget>[
-              _ChartStates(
-                title: 'Default',
-                note: 'dot={false}',
-                skeleton: _SkeletonKind.line,
-                child: _lineDefault(ink),
-              ),
-              _ChartStates(
-                title: 'Linear',
-                note: 'type=linear',
-                skeleton: _SkeletonKind.line,
-                child: _lineLinear(ink),
-              ),
-              _ChartStates(
-                title: 'Step',
-                note: 'type=step',
-                skeleton: _SkeletonKind.line,
-                child: _lineStep(ink),
-              ),
-              _ChartStates(
-                title: 'Multi-series',
-                note: 'three lines, three tokens',
-                skeleton: _SkeletonKind.line,
-                child: _lineMultiple(ink),
-              ),
-              _ChartStates(
-                title: 'Dots',
-                note: 'a dot on every point',
-                skeleton: _SkeletonKind.line,
-                child: _lineDots(ink),
-              ),
-              _ChartStates(
-                title: 'Custom dots',
-                note: 'dot as a render function',
-                skeleton: _SkeletonKind.line,
-                child: _lineDotsCustom(ink, theme),
-              ),
-              _ChartStates(
-                title: 'Dot colours',
-                note: 'a token per dot',
-                skeleton: _SkeletonKind.line,
-                child: _lineDotsColors(ink),
-              ),
-              _ChartStates(
-                title: 'Label',
-                note: 'LabelList above the line',
-                skeleton: _SkeletonKind.line,
-                child: _lineLabel(ink, theme),
-              ),
-              _ChartStates(
-                title: 'Custom label',
-                note: 'LabelList with a render function',
-                skeleton: _SkeletonKind.line,
-                child: _lineLabelCustom(ink, theme),
-              ),
-              _ChartStates(
-                title: 'Interactive',
-                note: 'series picker, travelling pill',
-                skeleton: _SkeletonKind.line,
-                controls: (BuildContext context, Widget child) => _SeriesStrip(
-                  ink: ink,
-                  slot: 'line-series-option',
-                  child: child,
-                ),
-                child: Builder(
-                  builder: (BuildContext context) =>
-                      _lineInteractive(context, ink),
-                ),
-              ),
-            ]),
-            SizedBox(height: ds(4)),
-            DsMeta(items: <DsMetaItem>[
-              _meta(
-                'dot',
-                'false, true, an object of SVG props, or a render function. '
-                    'Turn dots on when the reader is meant to read individual '
-                    'points; leave them off when the shape is the message and '
-                    'the points are noise.',
-              ),
-              _meta(
-                'activeDot',
-                "The dot the tooltip highlights. Left at recharts' default "
-                    'here — overriding it means typing a radius in pixels.',
-              ),
-              _meta(
-                'stroke',
-                'The series colour. Lines have no fill, so this is the only '
-                    'place the token appears — and it is what the legend swatch '
-                    'and the tooltip indicator both read back.',
-              ),
-              _meta(
-                'connectNulls',
-                'Off by default, and usually right: a gap in the data should '
-                    'look like a gap. Turn it on only when the missing point is '
-                    'known to be missing rather than unknown.',
-              ),
-            ]),
+  Widget build(BuildContext context) => ElSection(
+    id: 'line',
+    title: 'Line',
+    description:
+        'Trend over an ordered axis, and the default choice for more than '
+        'two series — three stacked areas fight each other for the same '
+        'pixels, three lines do not.',
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        _specimenGrid(<Widget>[
+          _ChartStates(
+            title: 'Default',
+            note: 'dot={false}',
+            skeleton: _SkeletonKind.line,
+            child: _lineDefault(ink),
+          ),
+          _ChartStates(
+            title: 'Linear',
+            note: 'type=linear',
+            skeleton: _SkeletonKind.line,
+            child: _lineLinear(ink),
+          ),
+          _ChartStates(
+            title: 'Step',
+            note: 'type=step',
+            skeleton: _SkeletonKind.line,
+            child: _lineStep(ink),
+          ),
+          _ChartStates(
+            title: 'Multi-series',
+            note: 'three lines, three tokens',
+            skeleton: _SkeletonKind.line,
+            child: _lineMultiple(ink),
+          ),
+          _ChartStates(
+            title: 'Dots',
+            note: 'a dot on every point',
+            skeleton: _SkeletonKind.line,
+            child: _lineDots(ink),
+          ),
+          _ChartStates(
+            title: 'Custom dots',
+            note: 'dot as a render function',
+            skeleton: _SkeletonKind.line,
+            child: _lineDotsCustom(ink, theme),
+          ),
+          _ChartStates(
+            title: 'Dot colours',
+            note: 'a token per dot',
+            skeleton: _SkeletonKind.line,
+            child: _lineDotsColors(ink),
+          ),
+          _ChartStates(
+            title: 'Label',
+            note: 'LabelList above the line',
+            skeleton: _SkeletonKind.line,
+            child: _lineLabel(ink, theme),
+          ),
+          _ChartStates(
+            title: 'Custom label',
+            note: 'LabelList with a render function',
+            skeleton: _SkeletonKind.line,
+            child: _lineLabelCustom(ink, theme),
+          ),
+          _ChartStates(
+            title: 'Interactive',
+            note: 'series picker, travelling pill',
+            skeleton: _SkeletonKind.line,
+            controls: (BuildContext context, Widget child) => _SeriesStrip(
+              ink: ink,
+              slot: 'line-series-option',
+              child: child,
+            ),
+            child: Builder(
+              builder: (BuildContext context) => _lineInteractive(context, ink),
+            ),
+          ),
+        ]),
+        SizedBox(height: el(4)),
+        ElMeta(
+          items: <ElMetaItem>[
+            _meta(
+              'dot',
+              'false, true, an object of SVG props, or a render function. '
+                  'Turn dots on when the reader is meant to read individual '
+                  'points; leave them off when the shape is the message and '
+                  'the points are noise.',
+            ),
+            _meta(
+              'activeDot',
+              "The dot the tooltip highlights. Left at recharts' default "
+                  'here — overriding it means typing a radius in pixels.',
+            ),
+            _meta(
+              'stroke',
+              'The series colour. Lines have no fill, so this is the only '
+                  'place the token appears — and it is what the legend swatch '
+                  'and the tooltip indicator both read back.',
+            ),
+            _meta(
+              'connectNulls',
+              'Off by default, and usually right: a gap in the data should '
+                  'look like a gap. Turn it on only when the missing point is '
+                  'known to be missing rather than unknown.',
+            ),
           ],
         ),
-      );
+      ],
+    ),
+  );
 }
 
 class _PieSection extends StatelessWidget {
   const _PieSection({required this.ink, required this.theme});
 
   final _ChartInk ink;
-  final DsThemeData theme;
+  final ElThemeData theme;
 
   @override
-  Widget build(BuildContext context) => DsSection(
-        id: 'pie',
-        title: 'Pie',
-        description:
-            'Parts of one whole, and only when the parts genuinely sum to that '
-            'whole. Five slices is already near the ceiling — past that a bar '
-            'chart is easier to read and easier to label.',
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            _specimenGrid(<Widget>[
-              _ChartStates(
-                title: 'Simple',
-                note: 'fill carried on each datum',
-                skeleton: _SkeletonKind.pie,
-                child: _pieSimple(ink),
-              ),
-              _ChartStates(
-                title: 'No separator',
-                note: 'paddingAngle={0}',
-                skeleton: _SkeletonKind.pie,
-                child: _pieSeparatorNone(ink),
-              ),
-              _ChartStates(
-                title: 'Label',
-                note: 'labels outside, with leader lines',
-                skeleton: _SkeletonKind.pie,
-                child: _pieLabel(ink, theme),
-              ),
-              _ChartStates(
-                title: 'Custom label',
-                note: 'label as a render function',
-                skeleton: _SkeletonKind.pie,
-                child: _pieLabelCustom(ink, theme),
-              ),
-              _ChartStates(
-                title: 'Label list',
-                note: 'on a card chip — the fill cannot clear AA',
-                skeleton: _SkeletonKind.pie,
-                child: _pieLabelList(ink),
-              ),
-              _ChartStates(
-                title: 'Legend',
-                note: 'ChartLegendContent, no tooltip',
-                skeleton: _SkeletonKind.pie,
-                child: _pieLegend(ink),
-              ),
-              _ChartStates(
-                title: 'Donut',
-                note: 'innerRadius as a percentage',
-                skeleton: _SkeletonKind.pie,
-                child: _pieDonut(ink),
-              ),
-              _ChartStates(
-                title: 'Donut, active',
-                note: 'activeIndex grows one slice',
-                skeleton: _SkeletonKind.pie,
-                child: _pieDonutActive(ink),
-              ),
-              _ChartStates(
-                title: 'Donut with text',
-                note: 'the total in the hole',
-                skeleton: _SkeletonKind.pie,
-                child: _pieDonutText(ink),
-              ),
-              _ChartStates(
-                title: 'Stacked',
-                note: 'two rings, one chart',
-                skeleton: _SkeletonKind.pie,
-                child: _pieStacked(ink),
-              ),
-              _ChartStates(
-                title: 'Interactive',
-                note: 'slice picker, travelling pill',
-                skeleton: _SkeletonKind.pie,
-                controls: (BuildContext context, Widget child) =>
-                    _PieInteractive(
-                  ink: ink,
-                  builder: (BuildContext context, int index) =>
-                      _PieActiveScope(index: index, child: child),
-                ),
-                child: Builder(
-                  builder: (BuildContext context) => _pieInteractive(
-                    context,
-                    ink,
-                    _PieActiveScope.of(context),
-                  ),
-                ),
-              ),
-            ]),
-            SizedBox(height: ds(4)),
-            DsMeta(items: <DsMetaItem>[
-              _meta(
-                'dataKey / nameKey',
-                'dataKey is the number that sizes the slice; nameKey is the '
-                    'string that names it. Pass nameKey to ChartTooltipContent '
-                    'and ChartLegendContent too, or both fall back to the value '
-                    'key and every row reads "Cards".',
-              ),
-              _meta(
-                'fill',
-                'Per slice, carried on the datum itself rather than on the Pie '
-                    '— a Pie has one dataKey and many colours, which is the one '
-                    'place the colour belongs to the data.',
-              ),
-              _meta(
-                'innerRadius / outerRadius',
-                'Percentages, never pixels. A fraction of the plot is derived '
-                    'from the container, so it holds at every breakpoint and '
-                    'never restates a spacing step.',
-              ),
-              _meta(
-                'label / labelLine',
-                'label renders the value outside the arc; labelLine draws the '
-                    'leader to it. Leave room by pulling outerRadius in, or the '
-                    'labels clip against the container.',
-              ),
-            ]),
+  Widget build(BuildContext context) => ElSection(
+    id: 'pie',
+    title: 'Pie',
+    description:
+        'Parts of one whole, and only when the parts genuinely sum to that '
+        'whole. Five slices is already near the ceiling — past that a bar '
+        'chart is easier to read and easier to label.',
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        _specimenGrid(<Widget>[
+          _ChartStates(
+            title: 'Simple',
+            note: 'fill carried on each datum',
+            skeleton: _SkeletonKind.pie,
+            child: _pieSimple(ink),
+          ),
+          _ChartStates(
+            title: 'No separator',
+            note: 'paddingAngle={0}',
+            skeleton: _SkeletonKind.pie,
+            child: _pieSeparatorNone(ink),
+          ),
+          _ChartStates(
+            title: 'Label',
+            note: 'labels outside, with leader lines',
+            skeleton: _SkeletonKind.pie,
+            child: _pieLabel(ink, theme),
+          ),
+          _ChartStates(
+            title: 'Custom label',
+            note: 'label as a render function',
+            skeleton: _SkeletonKind.pie,
+            child: _pieLabelCustom(ink, theme),
+          ),
+          _ChartStates(
+            title: 'Label list',
+            note: 'on a card chip — the fill cannot clear AA',
+            skeleton: _SkeletonKind.pie,
+            child: _pieLabelList(ink),
+          ),
+          _ChartStates(
+            title: 'Legend',
+            note: 'ChartLegendContent, no tooltip',
+            skeleton: _SkeletonKind.pie,
+            child: _pieLegend(ink),
+          ),
+          _ChartStates(
+            title: 'Donut',
+            note: 'innerRadius as a percentage',
+            skeleton: _SkeletonKind.pie,
+            child: _pieDonut(ink),
+          ),
+          _ChartStates(
+            title: 'Donut, active',
+            note: 'activeIndex grows one slice',
+            skeleton: _SkeletonKind.pie,
+            child: _pieDonutActive(ink),
+          ),
+          _ChartStates(
+            title: 'Donut with text',
+            note: 'the total in the hole',
+            skeleton: _SkeletonKind.pie,
+            child: _pieDonutText(ink),
+          ),
+          _ChartStates(
+            title: 'Stacked',
+            note: 'two rings, one chart',
+            skeleton: _SkeletonKind.pie,
+            child: _pieStacked(ink),
+          ),
+          _ChartStates(
+            title: 'Interactive',
+            note: 'slice picker, travelling pill',
+            skeleton: _SkeletonKind.pie,
+            controls: (BuildContext context, Widget child) => _PieInteractive(
+              ink: ink,
+              builder: (BuildContext context, int index) =>
+                  _PieActiveScope(index: index, child: child),
+            ),
+            child: Builder(
+              builder: (BuildContext context) =>
+                  _pieInteractive(context, ink, _PieActiveScope.of(context)),
+            ),
+          ),
+        ]),
+        SizedBox(height: el(4)),
+        ElMeta(
+          items: <ElMetaItem>[
+            _meta(
+              'dataKey / nameKey',
+              'dataKey is the number that sizes the slice; nameKey is the '
+                  'string that names it. Pass nameKey to ChartTooltipContent '
+                  'and ChartLegendContent too, or both fall back to the value '
+                  'key and every row reads "Cards".',
+            ),
+            _meta(
+              'fill',
+              'Per slice, carried on the datum itself rather than on the Pie '
+                  '— a Pie has one dataKey and many colours, which is the one '
+                  'place the colour belongs to the data.',
+            ),
+            _meta(
+              'innerRadius / outerRadius',
+              'Percentages, never pixels. A fraction of the plot is derived '
+                  'from the container, so it holds at every breakpoint and '
+                  'never restates a spacing step.',
+            ),
+            _meta(
+              'label / labelLine',
+              'label renders the value outside the arc; labelLine draws the '
+                  'leader to it. Leave room by pulling outerRadius in, or the '
+                  'labels clip against the container.',
+            ),
           ],
         ),
-      );
+      ],
+    ),
+  );
 }
 
 /// The active slice, handed down through the keyed slot.
@@ -4470,231 +4563,235 @@ class _RadarSection extends StatelessWidget {
   const _RadarSection({required this.ink, required this.theme});
 
   final _ChartInk ink;
-  final DsThemeData theme;
+  final ElThemeData theme;
 
   @override
-  Widget build(BuildContext context) => DsSection(
-        id: 'radar',
-        title: 'Radar',
-        description:
-            'One subject measured on several axes at once, and best when the '
-            'shape is the point — comparing two profiles rather than reading '
-            'any single number off the grid.',
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            _specimenGrid(<Widget>[
-              _ChartStates(
-                title: 'Default',
-                note: 'polygon grid, radial lines on',
-                skeleton: _SkeletonKind.radar,
-                child: _radarDefault(ink),
-              ),
-              _ChartStates(
-                title: 'Dots',
-                note: 'a dot at every vertex',
-                skeleton: _SkeletonKind.radar,
-                child: _radarDots(ink),
-              ),
-              _ChartStates(
-                title: 'Lines only',
-                note: 'stroke, no fill',
-                skeleton: _SkeletonKind.radar,
-                child: _radarLinesOnly(ink),
-              ),
-              _ChartStates(
-                title: 'Custom label',
-                note: 'PolarAngleAxis tick as a render function',
-                skeleton: _SkeletonKind.radar,
-                child: _radarLabelCustom(ink),
-              ),
-              _ChartStates(
-                title: 'Custom grid',
-                note: 'PolarGrid with its own stroke',
-                skeleton: _SkeletonKind.radar,
-                child: _radarGridCustom(ink),
-              ),
-              _ChartStates(
-                title: 'No grid',
-                note: 'PolarGrid omitted',
-                skeleton: _SkeletonKind.radar,
-                child: _radarGridNone(ink),
-              ),
-              _ChartStates(
-                title: 'Circle grid',
-                note: 'gridType=circle',
-                skeleton: _SkeletonKind.radar,
-                child: _radarGridCircle(ink),
-              ),
-              _ChartStates(
-                title: 'Circle, no lines',
-                note: 'circle grid, radialLines={false}',
-                skeleton: _SkeletonKind.radar,
-                child: _radarGridCircleNoLines(ink),
-              ),
-              _ChartStates(
-                title: 'Circle, filled',
-                note: 'circle grid with a fill',
-                skeleton: _SkeletonKind.radar,
-                child: _radarGridCircleFill(ink),
-              ),
-              _ChartStates(
-                title: 'Polygon, filled',
-                note: 'polygon grid with a fill',
-                skeleton: _SkeletonKind.radar,
-                child: _radarGridFill(ink),
-              ),
-              _ChartStates(
-                title: 'Multiple',
-                note: 'two profiles overlaid',
-                skeleton: _SkeletonKind.radar,
-                child: _radarMultiple(ink),
-              ),
-              _ChartStates(
-                title: 'Legend',
-                note: 'ChartLegendContent under the web',
-                skeleton: _SkeletonKind.radar,
-                child: _radarLegend(ink),
-              ),
-              _ChartStates(
-                title: 'Icons',
-                note: 'config icons in the legend',
-                skeleton: _SkeletonKind.radar,
-                child: _radarIcons(ink),
-              ),
-              _ChartStates(
-                title: 'Radius axis',
-                note: 'PolarRadiusAxis shown',
-                skeleton: _SkeletonKind.radar,
-                child: _radarRadius(ink, theme),
-              ),
-            ]),
-            SizedBox(height: ds(4)),
-            DsMeta(items: <DsMetaItem>[
-              _meta(
-                'PolarGrid gridType',
-                'polygon (default) or circle. Polygon makes the vertices — the '
-                    'actual axes — easy to find; circle is quieter and reads '
-                    'better with two overlapping series.',
-              ),
-              _meta(
-                'PolarGrid radialLines',
-                'The spokes. Turning them off with a circle grid leaves rings '
-                    'only, which is the calmest of the four combinations.',
-              ),
-              _meta(
-                'PolarAngleAxis dataKey',
-                'The field naming each axis. Without it the axes are numbered '
-                    'and the chart says nothing.',
-              ),
-              _meta(
-                'PolarRadiusAxis',
-                'The scale running out from the centre. Usually hidden — '
-                    'tick={false} axisLine={false} — because a radar is read as '
-                    'a shape, not as five separate readings.',
-              ),
-              _meta(
-                'fillOpacity',
-                'Two overlapping radars need both fills translucent or the '
-                    'second one erases the first.',
-              ),
-            ]),
+  Widget build(BuildContext context) => ElSection(
+    id: 'radar',
+    title: 'Radar',
+    description:
+        'One subject measured on several axes at once, and best when the '
+        'shape is the point — comparing two profiles rather than reading '
+        'any single number off the grid.',
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        _specimenGrid(<Widget>[
+          _ChartStates(
+            title: 'Default',
+            note: 'polygon grid, radial lines on',
+            skeleton: _SkeletonKind.radar,
+            child: _radarDefault(ink),
+          ),
+          _ChartStates(
+            title: 'Dots',
+            note: 'a dot at every vertex',
+            skeleton: _SkeletonKind.radar,
+            child: _radarDots(ink),
+          ),
+          _ChartStates(
+            title: 'Lines only',
+            note: 'stroke, no fill',
+            skeleton: _SkeletonKind.radar,
+            child: _radarLinesOnly(ink),
+          ),
+          _ChartStates(
+            title: 'Custom label',
+            note: 'PolarAngleAxis tick as a render function',
+            skeleton: _SkeletonKind.radar,
+            child: _radarLabelCustom(ink),
+          ),
+          _ChartStates(
+            title: 'Custom grid',
+            note: 'PolarGrid with its own stroke',
+            skeleton: _SkeletonKind.radar,
+            child: _radarGridCustom(ink),
+          ),
+          _ChartStates(
+            title: 'No grid',
+            note: 'PolarGrid omitted',
+            skeleton: _SkeletonKind.radar,
+            child: _radarGridNone(ink),
+          ),
+          _ChartStates(
+            title: 'Circle grid',
+            note: 'gridType=circle',
+            skeleton: _SkeletonKind.radar,
+            child: _radarGridCircle(ink),
+          ),
+          _ChartStates(
+            title: 'Circle, no lines',
+            note: 'circle grid, radialLines={false}',
+            skeleton: _SkeletonKind.radar,
+            child: _radarGridCircleNoLines(ink),
+          ),
+          _ChartStates(
+            title: 'Circle, filled',
+            note: 'circle grid with a fill',
+            skeleton: _SkeletonKind.radar,
+            child: _radarGridCircleFill(ink),
+          ),
+          _ChartStates(
+            title: 'Polygon, filled',
+            note: 'polygon grid with a fill',
+            skeleton: _SkeletonKind.radar,
+            child: _radarGridFill(ink),
+          ),
+          _ChartStates(
+            title: 'Multiple',
+            note: 'two profiles overlaid',
+            skeleton: _SkeletonKind.radar,
+            child: _radarMultiple(ink),
+          ),
+          _ChartStates(
+            title: 'Legend',
+            note: 'ChartLegendContent under the web',
+            skeleton: _SkeletonKind.radar,
+            child: _radarLegend(ink),
+          ),
+          _ChartStates(
+            title: 'Icons',
+            note: 'config icons in the legend',
+            skeleton: _SkeletonKind.radar,
+            child: _radarIcons(ink),
+          ),
+          _ChartStates(
+            title: 'Radius axis',
+            note: 'PolarRadiusAxis shown',
+            skeleton: _SkeletonKind.radar,
+            child: _radarRadius(ink, theme),
+          ),
+        ]),
+        SizedBox(height: el(4)),
+        ElMeta(
+          items: <ElMetaItem>[
+            _meta(
+              'PolarGrid gridType',
+              'polygon (default) or circle. Polygon makes the vertices — the '
+                  'actual axes — easy to find; circle is quieter and reads '
+                  'better with two overlapping series.',
+            ),
+            _meta(
+              'PolarGrid radialLines',
+              'The spokes. Turning them off with a circle grid leaves rings '
+                  'only, which is the calmest of the four combinations.',
+            ),
+            _meta(
+              'PolarAngleAxis dataKey',
+              'The field naming each axis. Without it the axes are numbered '
+                  'and the chart says nothing.',
+            ),
+            _meta(
+              'PolarRadiusAxis',
+              'The scale running out from the centre. Usually hidden — '
+                  'tick={false} axisLine={false} — because a radar is read as '
+                  'a shape, not as five separate readings.',
+            ),
+            _meta(
+              'fillOpacity',
+              'Two overlapping radars need both fills translucent or the '
+                  'second one erases the first.',
+            ),
           ],
         ),
-      );
+      ],
+    ),
+  );
 }
 
 class _RadialSection extends StatelessWidget {
   const _RadialSection({required this.ink, required this.theme});
 
   final _ChartInk ink;
-  final DsThemeData theme;
+  final ElThemeData theme;
 
   @override
-  Widget build(BuildContext context) => DsSection(
-        id: 'radial',
-        title: 'Radial',
-        description:
-            'A bar chart bent around a circle. It buys compactness and costs '
-            'accuracy — the outer ring is longer than the inner one at the '
-            'same value — so use it for a gauge or a rough share, never for a '
-            'comparison the reader has to trust.',
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            _specimenGrid(<Widget>[
-              _ChartStates(
-                title: 'Simple',
-                note: 'background rings, one bar per tier',
-                skeleton: _SkeletonKind.radial,
-                child: _radialSimple(ink),
-              ),
-              _ChartStates(
-                title: 'Grid',
-                note: 'PolarGrid inside the ring',
-                skeleton: _SkeletonKind.radial,
-                child: _radialGrid(ink),
-              ),
-              _ChartStates(
-                title: 'Label',
-                note: 'on a card chip — the arc cannot clear AA',
-                skeleton: _SkeletonKind.radial,
-                child: _radialLabel(ink),
-              ),
-              _ChartStates(
-                title: 'Text',
-                note: 'the total in the hole',
-                skeleton: _SkeletonKind.radial,
-                child: _radialText(ink, theme),
-              ),
-              _ChartStates(
-                title: 'Shape',
-                note: 'a custom activeShape',
-                skeleton: _SkeletonKind.radial,
-                child: _radialShape(ink, theme),
-              ),
-              _ChartStates(
-                title: 'Stacked half-gauge',
-                note: 'startAngle 180 → endAngle 0',
-                skeleton: _SkeletonKind.radial,
-                child: _radialStacked(ink),
-              ),
-            ]),
-            SizedBox(height: ds(4)),
-            const DsNote(
-              tone: DsNoteTone.error,
-              title: 'A stacked radial does not widen its own angle axis',
-              child: _StackedRadialNote(),
+  Widget build(BuildContext context) => ElSection(
+    id: 'radial',
+    title: 'Radial',
+    description:
+        'A bar chart bent around a circle. It buys compactness and costs '
+        'accuracy — the outer ring is longer than the inner one at the '
+        'same value — so use it for a gauge or a rough share, never for a '
+        'comparison the reader has to trust.',
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        _specimenGrid(<Widget>[
+          _ChartStates(
+            title: 'Simple',
+            note: 'background rings, one bar per tier',
+            skeleton: _SkeletonKind.radial,
+            child: _radialSimple(ink),
+          ),
+          _ChartStates(
+            title: 'Grid',
+            note: 'PolarGrid inside the ring',
+            skeleton: _SkeletonKind.radial,
+            child: _radialGrid(ink),
+          ),
+          _ChartStates(
+            title: 'Label',
+            note: 'on a card chip — the arc cannot clear AA',
+            skeleton: _SkeletonKind.radial,
+            child: _radialLabel(ink),
+          ),
+          _ChartStates(
+            title: 'Text',
+            note: 'the total in the hole',
+            skeleton: _SkeletonKind.radial,
+            child: _radialText(ink, theme),
+          ),
+          _ChartStates(
+            title: 'Shape',
+            note: 'a custom activeShape',
+            skeleton: _SkeletonKind.radial,
+            child: _radialShape(ink, theme),
+          ),
+          _ChartStates(
+            title: 'Stacked half-gauge',
+            note: 'startAngle 180 → endAngle 0',
+            skeleton: _SkeletonKind.radial,
+            child: _radialStacked(ink),
+          ),
+        ]),
+        SizedBox(height: el(4)),
+        const ElNote(
+          tone: ElNoteTone.error,
+          title: 'A stacked radial does not widen its own angle axis',
+          child: _StackedRadialNote(),
+        ),
+        SizedBox(height: el(4)),
+        ElMeta(
+          items: <ElMetaItem>[
+            _meta(
+              'innerRadius / outerRadius',
+              'On the RadialBarChart, not on the bar. Percentages again. A '
+                  'wide gap between them gives thick rings; a narrow one '
+                  'gives a dial.',
             ),
-            SizedBox(height: ds(4)),
-            DsMeta(items: <DsMetaItem>[
-              _meta(
-                'innerRadius / outerRadius',
-                'On the RadialBarChart, not on the bar. Percentages again. A '
-                    'wide gap between them gives thick rings; a narrow one '
-                    'gives a dial.',
-              ),
-              _meta(
-                'background',
-                'Draws the unfilled remainder of each ring. ChartContainer '
-                    'already paints it --muted, so it needs no colour of its '
-                    'own.',
-              ),
-              _meta(
-                'startAngle / endAngle',
-                "Degrees, counter-clockwise from three o'clock. 180 → 0 is the "
-                    'top half. Angles are not a token family, so these are '
-                    'written plainly.',
-              ),
-              _meta(
-                'stackId',
-                'Stacks around the arc rather than up a column. With one datum '
-                    'and three keys, that is a single segmented gauge.',
-              ),
-            ]),
+            _meta(
+              'background',
+              'Draws the unfilled remainder of each ring. ChartContainer '
+                  'already paints it --muted, so it needs no colour of its '
+                  'own.',
+            ),
+            _meta(
+              'startAngle / endAngle',
+              "Degrees, counter-clockwise from three o'clock. 180 → 0 is the "
+                  'top half. Angles are not a token family, so these are '
+                  'written plainly.',
+            ),
+            _meta(
+              'stackId',
+              'Stacks around the arc rather than up a column. With one datum '
+                  'and three keys, that is a single segmented gauge.',
+            ),
           ],
         ),
-      );
+      ],
+    ),
+  );
 }
 
 class _StackedRadialNote extends StatelessWidget {
@@ -4702,48 +4799,52 @@ class _StackedRadialNote extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          DsRichText(
-            TextSpan(
-              children: <InlineSpan>[
-                const TextSpan(
-                  text: 'Left alone it silently drew one third of its data. The '
-                      'angle axis domain runs to the largest single series '
-                      'rather than to the stack total, so the first ring filled '
-                      'the whole sweep and the two behind it were clipped to '
-                      'nothing — no error, no warning, and a legend that still '
-                      'listed all three. The fix is an explicit ',
-                ),
-                DsCode.span('<PolarAngleAxis type="number" domain={[0, total]} />'),
-                const TextSpan(
-                  text: ', with the total summed from the data rather than '
-                      'typed, so it cannot fall out of step with it.',
-                ),
-              ],
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: <Widget>[
+      ElRichText(
+        TextSpan(
+          children: <InlineSpan>[
+            const TextSpan(
+              text:
+                  'Left alone it silently drew one third of its data. The '
+                  'angle axis domain runs to the largest single series '
+                  'rather than to the stack total, so the first ring filled '
+                  'the whole sweep and the two behind it were clipped to '
+                  'nothing — no error, no warning, and a legend that still '
+                  'listed all three. The fix is an explicit ',
             ),
-            DsType.small,
-          ),
-          SizedBox(height: ds(3)),
-          DsRichText(
-            TextSpan(
-              children: <InlineSpan>[
-                const TextSpan(
-                  text: 'The legend came off for a second reason: with one '
-                      'datum and three series keys, ',
-                ),
-                DsCode.span('ChartLegendContent'),
-                const TextSpan(
-                  text: ' renders an empty row — a radial legend’s payload is '
-                      'built per datum, not per series. The tooltip carries the '
-                      'three names instead.',
-                ),
-              ],
+            ElCode.span('<PolarAngleAxis type="number" domain={[0, total]} />'),
+            const TextSpan(
+              text:
+                  ', with the total summed from the data rather than '
+                  'typed, so it cannot fall out of step with it.',
             ),
-            DsType.small,
-          ),
-        ],
-      );
+          ],
+        ),
+        ElType.small,
+      ),
+      SizedBox(height: el(3)),
+      ElRichText(
+        TextSpan(
+          children: <InlineSpan>[
+            const TextSpan(
+              text:
+                  'The legend came off for a second reason: with one '
+                  'datum and three series keys, ',
+            ),
+            ElCode.span('ChartLegendContent'),
+            const TextSpan(
+              text:
+                  ' renders an empty row — a radial legend’s payload is '
+                  'built per datum, not per series. The tooltip carries the '
+                  'three names instead.',
+            ),
+          ],
+        ),
+        ElType.small,
+      ),
+    ],
+  );
 }
 
 class _TooltipSection extends StatelessWidget {
@@ -4752,159 +4853,162 @@ class _TooltipSection extends StatelessWidget {
   final _ChartInk ink;
 
   @override
-  Widget build(BuildContext context) => DsSection(
-        id: 'tooltips-legends',
-        title: 'Tooltips & legends',
-        description:
-            'The two pieces of a chart that are made of text, and therefore '
-            'the two that have to answer to §7. Hover any of these — the '
-            'indicator shape is the only difference between them.',
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            _specimenGrid(<Widget>[
-              _ChartStates(
-                title: 'Default',
-                note: 'ChartTooltipContent, dot indicator',
-                skeleton: _SkeletonKind.tooltip,
-                child: _tooltipDefault(ink),
-              ),
-              _ChartStates(
-                title: 'Line indicator',
-                note: 'indicator=line',
-                skeleton: _SkeletonKind.tooltip,
-                child: _tooltipIndicatorLine(ink),
-              ),
-              _ChartStates(
-                title: 'No indicator',
-                note: 'hideIndicator',
-                skeleton: _SkeletonKind.tooltip,
-                child: _tooltipIndicatorNone(ink),
-              ),
-              _ChartStates(
-                title: 'Custom label',
-                note: 'labelKey plus a config label',
-                skeleton: _SkeletonKind.tooltip,
-                child: _tooltipLabelCustom(ink),
-              ),
-              _ChartStates(
-                title: 'Label formatter',
-                note: 'labelFormatter',
-                skeleton: _SkeletonKind.tooltip,
-                child: _tooltipLabelFormatter(ink),
-              ),
-              _ChartStates(
-                title: 'No label',
-                note: 'hideLabel',
-                skeleton: _SkeletonKind.tooltip,
-                child: _tooltipLabelNone(ink),
-              ),
-              _ChartStates(
-                title: 'Formatter',
-                note: 'formatter render function',
-                skeleton: _SkeletonKind.tooltip,
-                child: _tooltipFormatter(ink),
-              ),
-              _ChartStates(
-                title: 'Icons',
-                note: 'config icons in the rows',
-                skeleton: _SkeletonKind.tooltip,
-                child: _tooltipIcons(ink),
-              ),
-              _ChartStates(
-                title: 'Advanced',
-                note: 'formatter with a running total',
-                skeleton: _SkeletonKind.tooltip,
-                child: _tooltipAdvanced(ink),
-              ),
-            ]),
-            SizedBox(height: ds(4)),
-            const DsNote(
-              title: 'ChartConfig is what makes a tooltip readable',
-              child: _ConfigNote(),
+  Widget build(BuildContext context) => ElSection(
+    id: 'tooltips-legends',
+    title: 'Tooltips & legends',
+    description:
+        'The two pieces of a chart that are made of text, and therefore '
+        'the two that have to answer to §7. Hover any of these — the '
+        'indicator shape is the only difference between them.',
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        _specimenGrid(<Widget>[
+          _ChartStates(
+            title: 'Default',
+            note: 'ChartTooltipContent, dot indicator',
+            skeleton: _SkeletonKind.tooltip,
+            child: _tooltipDefault(ink),
+          ),
+          _ChartStates(
+            title: 'Line indicator',
+            note: 'indicator=line',
+            skeleton: _SkeletonKind.tooltip,
+            child: _tooltipIndicatorLine(ink),
+          ),
+          _ChartStates(
+            title: 'No indicator',
+            note: 'hideIndicator',
+            skeleton: _SkeletonKind.tooltip,
+            child: _tooltipIndicatorNone(ink),
+          ),
+          _ChartStates(
+            title: 'Custom label',
+            note: 'labelKey plus a config label',
+            skeleton: _SkeletonKind.tooltip,
+            child: _tooltipLabelCustom(ink),
+          ),
+          _ChartStates(
+            title: 'Label formatter',
+            note: 'labelFormatter',
+            skeleton: _SkeletonKind.tooltip,
+            child: _tooltipLabelFormatter(ink),
+          ),
+          _ChartStates(
+            title: 'No label',
+            note: 'hideLabel',
+            skeleton: _SkeletonKind.tooltip,
+            child: _tooltipLabelNone(ink),
+          ),
+          _ChartStates(
+            title: 'Formatter',
+            note: 'formatter render function',
+            skeleton: _SkeletonKind.tooltip,
+            child: _tooltipFormatter(ink),
+          ),
+          _ChartStates(
+            title: 'Icons',
+            note: 'config icons in the rows',
+            skeleton: _SkeletonKind.tooltip,
+            child: _tooltipIcons(ink),
+          ),
+          _ChartStates(
+            title: 'Advanced',
+            note: 'formatter with a running total',
+            skeleton: _SkeletonKind.tooltip,
+            child: _tooltipAdvanced(ink),
+          ),
+        ]),
+        SizedBox(height: el(4)),
+        const ElNote(
+          title: 'ChartConfig is what makes a tooltip readable',
+          child: _ConfigNote(),
+        ),
+        SizedBox(height: el(4)),
+        const ElNote(
+          tone: ElNoteTone.value,
+          title: 'Why the fills here do not go through ChartStyle',
+          child: _ChartStyleNote(),
+        ),
+        SizedBox(height: el(4)),
+        const ElNote(
+          tone: ElNoteTone.error,
+          title: 'Building this page found two live AA failures in chart text',
+          child: _AaNote(),
+        ),
+        SizedBox(height: el(4)),
+        ElMeta(
+          items: <ElMetaItem>[
+            _meta(
+              'ChartTooltip',
+              "Recharts' Tooltip, re-exported unchanged. Pass "
+                  'content={<ChartTooltipContent />} — on its own it renders '
+                  "recharts' stock panel, which is on none of these tokens.",
             ),
-            SizedBox(height: ds(4)),
-            const DsNote(
-              tone: DsNoteTone.value,
-              title: 'Why the fills here do not go through ChartStyle',
-              child: _ChartStyleNote(),
+            _meta(
+              'ChartTooltipContent indicator',
+              'dot (default) · line · dashed. Cosmetic, except that dashed '
+                  'conventionally marks a projection — do not spend it on a '
+                  'plain second series.',
             ),
-            SizedBox(height: ds(4)),
-            const DsNote(
-              tone: DsNoteTone.error,
-              title: 'Building this page found two live AA failures in chart text',
-              child: _AaNote(),
+            _meta(
+              'hideLabel / hideIndicator',
+              'hideLabel drops the header row, which is right when the '
+                  'category is already on the axis under the cursor. '
+                  'hideIndicator drops the colour chip.',
             ),
-            SizedBox(height: ds(4)),
-            DsMeta(items: <DsMetaItem>[
-              _meta(
-                'ChartTooltip',
-                "Recharts' Tooltip, re-exported unchanged. Pass "
-                    'content={<ChartTooltipContent />} — on its own it renders '
-                    "recharts' stock panel, which is on none of these tokens.",
-              ),
-              _meta(
-                'ChartTooltipContent indicator',
-                'dot (default) · line · dashed. Cosmetic, except that dashed '
-                    'conventionally marks a projection — do not spend it on a '
-                    'plain second series.',
-              ),
-              _meta(
-                'hideLabel / hideIndicator',
-                'hideLabel drops the header row, which is right when the '
-                    'category is already on the axis under the cursor. '
-                    'hideIndicator drops the colour chip.',
-              ),
-              _meta(
-                'nameKey / labelKey',
-                'Which field to look up in the config. Pies and radial bars '
-                    'almost always need nameKey, because their series key is '
-                    'the value and their name lives on the datum.',
-              ),
-              _meta(
-                'ChartLegend',
-                "Recharts' Legend, re-exported. Same rule: "
-                    'content={<ChartLegendContent />} or it renders unstyled.',
-              ),
-              _meta(
-                'formatter',
-                'Takes (value, name, item, index, payload). Use it for currency '
-                    'and units — a bare number in a tooltip is the most common '
-                    'way a chart is misread.',
-              ),
-            ]),
+            _meta(
+              'nameKey / labelKey',
+              'Which field to look up in the config. Pies and radial bars '
+                  'almost always need nameKey, because their series key is '
+                  'the value and their name lives on the datum.',
+            ),
+            _meta(
+              'ChartLegend',
+              "Recharts' Legend, re-exported. Same rule: "
+                  'content={<ChartLegendContent />} or it renders unstyled.',
+            ),
+            _meta(
+              'formatter',
+              'Takes (value, name, item, index, payload). Use it for currency '
+                  'and units — a bare number in a tooltip is the most common '
+                  'way a chart is misread.',
+            ),
           ],
         ),
-      );
+      ],
+    ),
+  );
 }
 
 class _ConfigNote extends StatelessWidget {
   const _ConfigNote();
 
   @override
-  Widget build(BuildContext context) => DsRichText(
-        TextSpan(
-          children: <InlineSpan>[
-            const TextSpan(text: 'Without it a tooltip row says '),
-            DsCode.span('sealed'),
-            const TextSpan(text: ', because that is the key in the data. '),
-            DsCode.span('ChartConfig'),
-            const TextSpan(text: ' maps every series key to a '),
-            DsCode.span('label'),
-            const TextSpan(text: ' and a '),
-            DsCode.span('color'),
-            const TextSpan(text: ', and both '),
-            DsCode.span('ChartTooltipContent'),
-            const TextSpan(text: ' and '),
-            DsCode.span('ChartLegendContent'),
-            const TextSpan(
-              text: ' read it out of context. It is the one piece of a chart '
-                  'that is worth writing before the chart itself.',
-            ),
-          ],
+  Widget build(BuildContext context) => ElRichText(
+    TextSpan(
+      children: <InlineSpan>[
+        const TextSpan(text: 'Without it a tooltip row says '),
+        ElCode.span('sealed'),
+        const TextSpan(text: ', because that is the key in the data. '),
+        ElCode.span('ChartConfig'),
+        const TextSpan(text: ' maps every series key to a '),
+        ElCode.span('label'),
+        const TextSpan(text: ' and a '),
+        ElCode.span('color'),
+        const TextSpan(text: ', and both '),
+        ElCode.span('ChartTooltipContent'),
+        const TextSpan(text: ' and '),
+        ElCode.span('ChartLegendContent'),
+        const TextSpan(
+          text:
+              ' read it out of context. It is the one piece of a chart '
+              'that is worth writing before the chart itself.',
         ),
-        DsType.small,
-      );
+      ],
+    ),
+    ElType.small,
+  );
 }
 
 class _ChartStyleNote extends StatelessWidget {
@@ -4912,80 +5016,87 @@ class _ChartStyleNote extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          DsRichText(
-            TextSpan(
-              children: <InlineSpan>[
-                const TextSpan(text: 'shadcn’s '),
-                DsCode.span('ChartStyle'),
-                const TextSpan(text: ' mints a '),
-                DsCode.span('--color-<seriesKey>'),
-                const TextSpan(
-                  text: ' per container so one config can carry a light value '
-                      'and a dark one. This system does not need that second '
-                      'layer: ',
-                ),
-                DsCode.span('--chart-1'),
-                const TextSpan(text: ' … '),
-                DsCode.span('-5'),
-                const TextSpan(
-                  text: ' are already declared once in each theme block, so a '
-                      'series that names ',
-                ),
-                DsCode.span('var(--color-chart-1)'),
-                const TextSpan(text: ' gets the per-theme value for free.'),
-              ],
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: <Widget>[
+      ElRichText(
+        TextSpan(
+          children: <InlineSpan>[
+            const TextSpan(text: 'shadcn’s '),
+            ElCode.span('ChartStyle'),
+            const TextSpan(text: ' mints a '),
+            ElCode.span('--color-<seriesKey>'),
+            const TextSpan(
+              text:
+                  ' per container so one config can carry a light value '
+                  'and a dark one. This system does not need that second '
+                  'layer: ',
             ),
-            DsType.small,
-          ),
-          SizedBox(height: ds(3)),
-          DsRichText(
-            TextSpan(
-              children: <InlineSpan>[
-                const TextSpan(
-                  text: 'It is also the difference between a reference the '
-                      'guards can see and one they cannot. A fill naming ',
-                ),
-                DsCode.span('--color-sealed'),
-                const TextSpan(
-                  text: ', copied out of a shadcn example, reaches a custom '
-                      'property that exists only inside a ',
-                ),
-                DsCode.span('<style>'),
-                const TextSpan(text: ' tag injected at runtime — '),
-                DsCode.span('check:refs'),
-                const TextSpan(
-                  text: ' reports it as undeclared, and it is right to. If you '
-                      'want the per-series indirection, the fix is to declare '
-                      'the names, not to widen the guard.',
-                ),
-              ],
+            ElCode.span('--chart-1'),
+            const TextSpan(text: ' … '),
+            ElCode.span('-5'),
+            const TextSpan(
+              text:
+                  ' are already declared once in each theme block, so a '
+                  'series that names ',
             ),
-            DsType.small,
-          ),
-          SizedBox(height: ds(3)),
-          DsRichText(
-            TextSpan(
-              children: <InlineSpan>[
-                const TextSpan(
-                  text: 'This paragraph proved it on the way in. It first '
-                      'spelled the example out as a full ',
-                ),
-                DsCode.span('var(…)'),
-                const TextSpan(text: ' call, and '),
-                DsCode.span('check:refs'),
-                const TextSpan(
-                  text: ' failed the build on this page’s own documentation — '
-                      'which is the guard reading source rather than intent, '
-                      'exactly as designed.',
-                ),
-              ],
+            ElCode.span('var(--color-chart-1)'),
+            const TextSpan(text: ' gets the per-theme value for free.'),
+          ],
+        ),
+        ElType.small,
+      ),
+      SizedBox(height: el(3)),
+      ElRichText(
+        TextSpan(
+          children: <InlineSpan>[
+            const TextSpan(
+              text:
+                  'It is also the difference between a reference the '
+                  'guards can see and one they cannot. A fill naming ',
             ),
-            DsType.small,
-          ),
-        ],
-      );
+            ElCode.span('--color-sealed'),
+            const TextSpan(
+              text:
+                  ', copied out of a shadcn example, reaches a custom '
+                  'property that exists only inside a ',
+            ),
+            ElCode.span('<style>'),
+            const TextSpan(text: ' tag injected at runtime — '),
+            ElCode.span('check:refs'),
+            const TextSpan(
+              text:
+                  ' reports it as undeclared, and it is right to. If you '
+                  'want the per-series indirection, the fix is to declare '
+                  'the names, not to widen the guard.',
+            ),
+          ],
+        ),
+        ElType.small,
+      ),
+      SizedBox(height: el(3)),
+      ElRichText(
+        TextSpan(
+          children: <InlineSpan>[
+            const TextSpan(
+              text:
+                  'This paragraph proved it on the way in. It first '
+                  'spelled the example out as a full ',
+            ),
+            ElCode.span('var(…)'),
+            const TextSpan(text: ' call, and '),
+            ElCode.span('check:refs'),
+            const TextSpan(
+              text:
+                  ' failed the build on this page’s own documentation — '
+                  'which is the guard reading source rather than intent, '
+                  'exactly as designed.',
+            ),
+          ],
+        ),
+        ElType.small,
+      ),
+    ],
+  );
 }
 
 class _AaNote extends StatelessWidget {
@@ -5002,8 +5113,8 @@ class _AaNote extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextStyle base = DsText.styleOf(context, DsType.small);
-    final DsThemeData theme = DsTheme.of(context);
+    final TextStyle base = ElText.styleOf(context, ElType.small);
+    final ElThemeData theme = ElTheme.of(context);
     final TextStyle strong = base.copyWith(
       color: theme.foreground,
       fontWeight: FontWeight.bold,
@@ -5011,29 +5122,31 @@ class _AaNote extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        DsRichText(
+        ElRichText(
           TextSpan(
             children: <InlineSpan>[
               const TextSpan(
-                text: 'Both were invisible to every guard in the repository, '
+                text:
+                    'Both were invisible to every guard in the repository, '
                     'because recharts writes the colour as an inline ',
               ),
-              DsCode.span('fill'),
+              ElCode.span('fill'),
               const TextSpan(
-                text: ' attribute on the SVG. They were found by rasterising '
+                text:
+                    ' attribute on the SVG. They were found by rasterising '
                     'the rendered pixels in both themes — the only method that '
                     'works here, since a ',
               ),
-              DsCode.span('color-mix()'),
+              ElCode.span('color-mix()'),
               const TextSpan(text: ' read as text parses as '),
-              DsCode.span('oklab()'),
+              ElCode.span('oklab()'),
               const TextSpan(text: ' and not as RGB.'),
             ],
           ),
-          DsType.small,
+          ElType.small,
         ),
-        SizedBox(height: ds(3)),
-        DsRichText(
+        SizedBox(height: el(3)),
+        ElRichText(
           TextSpan(
             children: <InlineSpan>[
               TextSpan(
@@ -5041,42 +5154,44 @@ class _AaNote extends StatelessWidget {
                 style: strong,
               ),
               const TextSpan(text: ' '),
-              DsCode.span('chart.tsx'),
+              ElCode.span('chart.tsx'),
               const TextSpan(text: ' carries '),
-              DsCode.span(
-                  '[&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground'),
+              ElCode.span(
+                '[&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground',
+              ),
               const TextSpan(
                 text: ', and recharts 3.8 renders the label inside ',
               ),
-              DsCode.span('.recharts-cartesian-axis-tick-label'),
+              ElCode.span('.recharts-cartesian-axis-tick-label'),
               const TextSpan(text: ' with the class '),
-              DsCode.span('.recharts-cartesian-axis-tick-value'),
+              ElCode.span('.recharts-cartesian-axis-tick-value'),
               const TextSpan(text: ' on the '),
-              DsCode.span('<text>'),
+              ElCode.span('<text>'),
               const TextSpan(
-                text: '. The selector matched nothing, so every one of the 78 '
+                text:
+                    '. The selector matched nothing, so every one of the 78 '
                     'axis labels on this page kept recharts’ own ',
               ),
-              DsCode.span(rechartsTickFill),
+              ElCode.span(rechartsTickFill),
               const TextSpan(
-                text: ' — 3.46:1 in dark, 5.74:1 in light — and the polar ticks '
+                text:
+                    ' — 3.46:1 in dark, 5.74:1 in light — and the polar ticks '
                     'kept ',
               ),
-              DsCode.span(rechartsPolarFill),
+              ElCode.span(rechartsPolarFill),
               const TextSpan(
-                text: ', 5.04:1 dark and 3.95:1 light. Each theme was failing '
+                text:
+                    ', 5.04:1 dark and 3.95:1 light. Each theme was failing '
                     'AA on one of the two. On ',
               ),
-              DsCode.span('--muted-foreground'),
-              const TextSpan(
-                text: ' they now measure 13.46:1 and 4.83:1.',
-              ),
+              ElCode.span('--muted-foreground'),
+              const TextSpan(text: ' they now measure 13.46:1 and 4.83:1.'),
             ],
           ),
-          DsType.small,
+          ElType.small,
         ),
-        SizedBox(height: ds(3)),
-        DsRichText(
+        SizedBox(height: el(3)),
+        ElRichText(
           TextSpan(
             children: <InlineSpan>[
               TextSpan(
@@ -5084,22 +5199,23 @@ class _AaNote extends StatelessWidget {
                 style: strong,
               ),
               const TextSpan(text: ' Against '),
-              DsCode.span('--background'),
+              ElCode.span('--background'),
               const TextSpan(
-                text: ' the five chart tokens measure 4.34 · 10.75 · 1.88 · '
+                text:
+                    ' the five chart tokens measure 4.34 · 10.75 · 1.88 · '
                     '13.19 · 3.98 in dark and 4.58 · 10.58 · 1.85 · 4.99 · 1.51 '
                     'in light. Three of five fail as text in dark, two in '
                     'light. A fill is not text and is not held to that '
                     'threshold — which is exactly why a chart token must not be '
                     'reused as a label colour. The labelled pie sets ',
               ),
-              DsCode.span('--foreground'),
+              ElCode.span('--foreground'),
               const TextSpan(
                 text: ' instead and keeps the slice colour on the leader line.',
               ),
             ],
           ),
-          DsType.small,
+          ElType.small,
         ),
       ],
     );
@@ -5117,117 +5233,120 @@ class _AnimationSection extends StatelessWidget {
   const _AnimationSection();
 
   @override
-  Widget build(BuildContext context) => DsSection(
-        id: 'animation',
-        title: 'Animation',
-        description:
-            'The reason this page exists. Every other component in this system '
-            'declares its motion as a class, which check:tokens can read. '
-            'Recharts cannot be told anything in classes, so its motion is read '
-            'out of the stylesheet at runtime instead — and one half of that '
-            'read failed, which is documented here rather than hidden.',
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            const DsNote(
-              title: 'The guard is the enforcement, not the rule',
-              child: _GuardNote(),
-            ),
-            SizedBox(height: ds(6)),
-            _AnimationHeading('What the hook resolved, live'),
-            SizedBox(height: ds(3)),
-            const _MotionReadout(),
-            SizedBox(height: ds(8)),
-            _AnimationHeading('Why slow, and not base or jelly'),
-            SizedBox(height: ds(3)),
-            const _WhySlow(),
-            SizedBox(height: ds(8)),
-            _AnimationHeading('Why ease-out, and not ease-spring'),
-            SizedBox(height: ds(3)),
-            const _Prose(
-                    '{--ease-spring} overshoots and settles, and that is exactly what '
-                    'makes it wrong here. A bar that overshoots its own value shows the '
-                    'reader a number the data does not contain — for about ninety '
-                    'milliseconds, the chart is lying. Springs are for controls, where '
-                    'the overshoot carries no meaning because a button has no value to '
-                    'exceed. Everything that draws data decelerates into its final '
-                    'position and stops.',
-                  ),
-            SizedBox(height: ds(8)),
-            _AnimationHeading(
-                'The curve did not make it through. Only the keyword did.'),
-            SizedBox(height: ds(3)),
-            const _CurveFailed(),
-            SizedBox(height: ds(8)),
-            _AnimationHeading(
-              'Reduced motion is resolved in the hook, and not for the reason '
-              'you would expect',
-            ),
-            SizedBox(height: ds(3)),
-            const _ReducedMotion(),
-            SizedBox(height: ds(8)),
-            _AnimationHeading('Why useSyncExternalStore'),
-            SizedBox(height: ds(3)),
-            const _Prose(
-                    '{Bar} alone is wider. Its {animationEasing} is {EasingInput}, '
-                    'which is {NamedBezier | "spring" | EasingFunction}, and '
-                    '{NamedBezier} is those same five keywords plus one template '
-                    'literal: '
-                    '{`cubic-bezier(\${number},\${number},\${number},\${number})`}. Two '
-                    'things rule it out anyway. The template admits no spaces, and the '
-                    'token’s value has three of them. And a value read back from '
-                    '{getComputedStyle} is typed {string}, which is not assignable to a '
-                    'template literal type however it is spelled.',
-                  ),
-            SizedBox(height: ds(8)),
-            _AnimationHeading('The tooltip too — and its default only looked right'),
-            SizedBox(height: ds(3)),
-            const _Prose(
-                    'So the duration is read from the system and the curve is not. What '
-                    'is passed is the keyword {ease-out}, which names the token rather '
-                    'than copying its value. The two are not the same curve — the row '
-                    'above prints both, and they visibly differ. The alternatives were '
-                    'worse: a cast puts a string recharts’ own parser may not read into '
-                    'a typed slot and calls it safe, and writing the four control '
-                    'points out by hand duplicates a token as a literal, which is the '
-                    'exact drift {check:tokens} exists to catch.',
-                  ),
-            SizedBox(height: ds(8)),
-            const DsNote(
-              tone: DsNoteTone.value,
-              title:
-                  'The two SSR fallbacks are duplicated token values, on purpose',
-              child: _SsrNote(),
-            ),
-            SizedBox(height: ds(6)),
-            const DsDoDont(
-              dos: <String>[
-                'Call useChartMotion() once per demo and spread the whole result '
-                    'onto every animated element in it.',
-                'Read a timing out of the stylesheet whenever a library takes it '
-                    'as a number rather than a class.',
-                'Say on the page when a token could not be threaded through a '
-                    "library's types, and what was passed instead.",
-                "Leave a numeric prop at the library's default rather than "
-                    'typing a value from one of the five token families into it.',
-              ],
-              donts: <String>[
-                "Don't type animationDuration={800}. It passes check:tokens, "
-                    'check:refs, typecheck, lint and build, and it is still a '
-                    'violation of §0.',
-                "Don't cast the token's cubic-bezier through `as` to satisfy the "
-                    'type. A cast makes a claim about a parser you have not '
-                    'tested.',
-                "Don't write the four control points out by hand. That is a "
-                    'token duplicated as a literal, which is the drift the guard '
-                    'exists to catch.',
-                "Don't assume the global reduced-motion rule covers a chart. It "
-                    'animates in JavaScript; CSS never sees it.',
-              ],
-            ),
+  Widget build(BuildContext context) => ElSection(
+    id: 'animation',
+    title: 'Animation',
+    description:
+        'The reason this page exists. Every other component in this system '
+        'declares its motion as a class, which check:tokens can read. '
+        'Recharts cannot be told anything in classes, so its motion is read '
+        'out of the stylesheet at runtime instead — and one half of that '
+        'read failed, which is documented here rather than hidden.',
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        const ElNote(
+          title: 'The guard is the enforcement, not the rule',
+          child: _GuardNote(),
+        ),
+        SizedBox(height: el(6)),
+        _AnimationHeading('What the hook resolved, live'),
+        SizedBox(height: el(3)),
+        const _MotionReadout(),
+        SizedBox(height: el(8)),
+        _AnimationHeading('Why slow, and not base or jelly'),
+        SizedBox(height: el(3)),
+        const _WhySlow(),
+        SizedBox(height: el(8)),
+        _AnimationHeading('Why ease-out, and not ease-spring'),
+        SizedBox(height: el(3)),
+        const _Prose(
+          '{--ease-spring} overshoots and settles, and that is exactly what '
+          'makes it wrong here. A bar that overshoots its own value shows the '
+          'reader a number the data does not contain — for about ninety '
+          'milliseconds, the chart is lying. Springs are for controls, where '
+          'the overshoot carries no meaning because a button has no value to '
+          'exceed. Everything that draws data decelerates into its final '
+          'position and stops.',
+        ),
+        SizedBox(height: el(8)),
+        _AnimationHeading(
+          'The curve did not make it through. Only the keyword did.',
+        ),
+        SizedBox(height: el(3)),
+        const _CurveFailed(),
+        SizedBox(height: el(8)),
+        _AnimationHeading(
+          'Reduced motion is resolved in the hook, and not for the reason '
+          'you would expect',
+        ),
+        SizedBox(height: el(3)),
+        const _ReducedMotion(),
+        SizedBox(height: el(8)),
+        _AnimationHeading('Why useSyncExternalStore'),
+        SizedBox(height: el(3)),
+        const _Prose(
+          '{Bar} alone is wider. Its {animationEasing} is {EasingInput}, '
+          'which is {NamedBezier | "spring" | EasingFunction}, and '
+          '{NamedBezier} is those same five keywords plus one template '
+          'literal: '
+          '{`cubic-bezier(\${number},\${number},\${number},\${number})`}. Two '
+          'things rule it out anyway. The template admits no spaces, and the '
+          'token’s value has three of them. And a value read back from '
+          '{getComputedStyle} is typed {string}, which is not assignable to a '
+          'template literal type however it is spelled.',
+        ),
+        SizedBox(height: el(8)),
+        _AnimationHeading(
+          'The tooltip too — and its default only looked right',
+        ),
+        SizedBox(height: el(3)),
+        const _Prose(
+          'So the duration is read from the system and the curve is not. What '
+          'is passed is the keyword {ease-out}, which names the token rather '
+          'than copying its value. The two are not the same curve — the row '
+          'above prints both, and they visibly differ. The alternatives were '
+          'worse: a cast puts a string recharts’ own parser may not read into '
+          'a typed slot and calls it safe, and writing the four control '
+          'points out by hand duplicates a token as a literal, which is the '
+          'exact drift {check:tokens} exists to catch.',
+        ),
+        SizedBox(height: el(8)),
+        const ElNote(
+          tone: ElNoteTone.value,
+          title:
+              'The two SSR fallbacks are duplicated token values, on purpose',
+          child: _SsrNote(),
+        ),
+        SizedBox(height: el(6)),
+        const ElDoDont(
+          dos: <String>[
+            'Call useChartMotion() once per demo and spread the whole result '
+                'onto every animated element in it.',
+            'Read a timing out of the stylesheet whenever a library takes it '
+                'as a number rather than a class.',
+            'Say on the page when a token could not be threaded through a '
+                "library's types, and what was passed instead.",
+            "Leave a numeric prop at the library's default rather than "
+                'typing a value from one of the five token families into it.',
+          ],
+          donts: <String>[
+            "Don't type animationDuration={800}. It passes check:tokens, "
+                'check:refs, typecheck, lint and build, and it is still a '
+                'violation of §0.',
+            "Don't cast the token's cubic-bezier through `as` to satisfy the "
+                'type. A cast makes a claim about a parser you have not '
+                'tested.',
+            "Don't write the four control points out by hand. That is a "
+                'token duplicated as a literal, which is the drift the guard '
+                'exists to catch.',
+            "Don't assume the global reduced-motion rule covers a chart. It "
+                'animates in JavaScript; CSS never sees it.',
           ],
         ),
-      );
+      ],
+    ),
+  );
 }
 
 /// `h3.type-h4.text-foreground`.
@@ -5237,13 +5356,9 @@ class _AnimationHeading extends StatelessWidget {
   final String text;
 
   @override
-  Widget build(BuildContext context) => DsText(
-        text,
-        DsType.h4,
-        color: DsTheme.of(context).foreground,
-      );
+  Widget build(BuildContext context) =>
+      ElText(text, ElType.h4, color: ElTheme.of(context).foreground);
 }
-
 
 /// `max-w-3xl` on a block box, and why it is an [Align] rather than a bare
 /// [ConstrainedBox].
@@ -5256,17 +5371,17 @@ class _AnimationHeading extends StatelessWidget {
 /// of 768 and wrapped five lines short, which is `selection.dart`'s `_measured`
 /// trap exactly. [Align] is what turns the incoming constraint loose again.
 Widget _capped(Widget child) => Align(
-      alignment: Alignment.centerLeft,
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: _measure3xl),
-        child: child,
-      ),
-    );
+  alignment: Alignment.centerLeft,
+  child: ConstrainedBox(
+    constraints: const BoxConstraints(maxWidth: _measure3xl),
+    child: child,
+  ),
+);
 
 /// `p.type-small.max-w-3xl`, with its `<Code>` chips marked in the copy.
 ///
 /// **The chips are not decoration and dropping them changes the layout.** A
-/// `DsCode` chip is `px-1.5` plus a hairline on each side, so every one of them
+/// `ElCode` chip is `px-1.5` plus a hairline on each side, so every one of them
 /// is ~13px wider than the same characters set as prose: and this section
 /// carries about forty of them across six blocks. Written as plain strings the
 /// Animation section measured **2439.9** against the reference's 2646.9, and
@@ -5282,18 +5397,18 @@ class _Prose extends StatelessWidget {
   final String text;
 
   @override
-  Widget build(BuildContext context) => _capped(
-        DsRichText(_markup(context, text), DsType.small),
-      );
+  Widget build(BuildContext context) =>
+      _capped(ElRichText(_markup(context, text), ElType.small));
 
   /// `{{…}}` is a chip whose own text contains braces: the one instance is
   /// the spread `{...motion}` the Animation section quotes.
-  static final RegExp _marker =
-      RegExp(r'\{\{(.*?)\}\}|\{([^{}]*)\}|\*\*([^*]*)\*\*|\*([^*]*)\*');
+  static final RegExp _marker = RegExp(
+    r'\{\{(.*?)\}\}|\{([^{}]*)\}|\*\*([^*]*)\*\*|\*([^*]*)\*',
+  );
 
   static InlineSpan _markup(BuildContext context, String source) {
-    final DsThemeData theme = DsTheme.of(context);
-    final TextStyle base = DsText.styleOf(context, DsType.small);
+    final ElThemeData theme = ElTheme.of(context);
+    final TextStyle base = ElText.styleOf(context, ElType.small);
     final List<InlineSpan> spans = <InlineSpan>[];
     int cursor = 0;
     for (final RegExpMatch match in _marker.allMatches(source)) {
@@ -5305,24 +5420,28 @@ class _Prose extends StatelessWidget {
       final String? strong = match.group(3);
       final String? emphasis = match.group(4);
       if (braced != null) {
-        spans.add(DsCode.span('{$braced}'));
+        spans.add(ElCode.span('{$braced}'));
       } else if (code != null) {
-        spans.add(DsCode.span(code));
+        spans.add(ElCode.span(code));
       } else if (strong != null) {
         // Nested, because the reference puts `<Code>` chips inside its `<em>`
         // and `<strong>` runs and a flat scan would swallow the braces.
-        spans.add(TextSpan(
-          children: <InlineSpan>[_markup(context, strong)],
-          style: base.copyWith(
-            color: theme.foreground,
-            fontWeight: FontWeight.bold,
+        spans.add(
+          TextSpan(
+            children: <InlineSpan>[_markup(context, strong)],
+            style: base.copyWith(
+              color: theme.foreground,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-        ));
+        );
       } else if (emphasis != null) {
-        spans.add(TextSpan(
-          children: <InlineSpan>[_markup(context, emphasis)],
-          style: base.copyWith(fontStyle: FontStyle.italic),
-        ));
+        spans.add(
+          TextSpan(
+            children: <InlineSpan>[_markup(context, emphasis)],
+            style: base.copyWith(fontStyle: FontStyle.italic),
+          ),
+        );
       }
       cursor = match.end;
     }
@@ -5337,29 +5456,32 @@ class _GuardNote extends StatelessWidget {
   const _GuardNote();
 
   @override
-  Widget build(BuildContext context) => DsRichText(
-        TextSpan(
-          children: <InlineSpan>[
-            DsCode.span('check:tokens'),
-            const TextSpan(
-              text: ' scans classNames and CSS. A bare JavaScript number in a '
-                  'JSX prop slips past it completely. That does not make it '
-                  'allowed — §0 is the rule, and ',
-            ),
-            DsCode.span('animationDuration={800}'),
-            const TextSpan(
-              text: ' typed into a chart passes every guard in this repository '
-                  'and is still a violation. The whole of ',
-            ),
-            DsCode.span('components/ds/chart-motion.ts'),
-            const TextSpan(
-              text: ' exists to make the right thing the easy thing: call the '
-                  'hook, spread the result, and there is no number left to type.',
-            ),
-          ],
+  Widget build(BuildContext context) => ElRichText(
+    TextSpan(
+      children: <InlineSpan>[
+        ElCode.span('check:tokens'),
+        const TextSpan(
+          text:
+              ' scans classNames and CSS. A bare JavaScript number in a '
+              'JSX prop slips past it completely. That does not make it '
+              'allowed — §0 is the rule, and ',
         ),
-        DsType.small,
-      );
+        ElCode.span('animationDuration={800}'),
+        const TextSpan(
+          text:
+              ' typed into a chart passes every guard in this repository '
+              'and is still a violation. The whole of ',
+        ),
+        ElCode.span('components/el/chart-motion.ts'),
+        const TextSpan(
+          text:
+              ' exists to make the right thing the easy thing: call the '
+              'hook, spread the result, and there is no number left to type.',
+        ),
+      ],
+    ),
+    ElType.small,
+  );
 }
 
 /// What the port actually resolved, printed rather than asserted.
@@ -5368,14 +5490,16 @@ class _MotionReadout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Duration resolved =
-        dsAnimationDuration(context, DsChartMotion.duration);
-    return DsMeta(
-      items: <DsMetaItem>[
+    final Duration resolved = elAnimationDuration(
+      context,
+      ElChartMotion.duration,
+    );
+    return ElMeta(
+      items: <ElMetaItem>[
         _meta(
           '--duration-slow',
-          '${DsChartMotion.duration.inMilliseconds}ms · '
-              'named by DsChartMotion, not read off a stylesheet',
+          '${ElChartMotion.duration.inMilliseconds}ms · '
+              'named by ElChartMotion, not read off a stylesheet',
         ),
         _meta(
           'animationDuration',
@@ -5390,7 +5514,7 @@ class _MotionReadout extends StatelessWidget {
           'animationEasing',
           '"ease-out" · the keyword recharts received instead, because its '
               'types take no cubic-bezier here — reproduced as '
-              'DsCurves.cssEaseOut',
+              'ElCurves.cssEaseOut',
         ),
         _meta(
           'isAnimationActive',
@@ -5407,35 +5531,38 @@ class _WhySlow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => _capped(
-        DsRichText(
-          TextSpan(
-            children: <InlineSpan>[
-              DsCode.span('--duration-base'),
-              const TextSpan(
-                text: ' is a control duration. It is the right length for a '
-                    'button settling under a thumb, and across a plot four '
-                    'hundred pixels wide it reads as a flicker rather than as a '
-                    'drawing-on. ',
-              ),
-              DsCode.span('--duration-jelly'),
-              const TextSpan(text: ' and '),
-              DsCode.span('--duration-reward'),
-              const TextSpan(
-                text: ' belong to celebration — a pack opening, a payout landing '
-                    '— and a sales chart is neither. ',
-              ),
-              DsCode.span('--duration-bloom'),
-              const TextSpan(text: ' belongs to light. That leaves '),
-              DsCode.span('--duration-slow'),
-              const TextSpan(
-                text: ', which is long enough for the eye to follow a bar up and '
-                    'short enough that nobody waits for it.',
-              ),
-            ],
+    ElRichText(
+      TextSpan(
+        children: <InlineSpan>[
+          ElCode.span('--duration-base'),
+          const TextSpan(
+            text:
+                ' is a control duration. It is the right length for a '
+                'button settling under a thumb, and across a plot four '
+                'hundred pixels wide it reads as a flicker rather than as a '
+                'drawing-on. ',
           ),
-          DsType.small,
-        ),
-      );
+          ElCode.span('--duration-jelly'),
+          const TextSpan(text: ' and '),
+          ElCode.span('--duration-reward'),
+          const TextSpan(
+            text:
+                ' belong to celebration — a pack opening, a payout landing '
+                '— and a sales chart is neither. ',
+          ),
+          ElCode.span('--duration-bloom'),
+          const TextSpan(text: ' belongs to light. That leaves '),
+          ElCode.span('--duration-slow'),
+          const TextSpan(
+            text:
+                ', which is long enough for the eye to follow a bar up and '
+                'short enough that nobody waits for it.',
+          ),
+        ],
+      ),
+      ElType.small,
+    ),
+  );
 }
 
 class _CurveFailed extends StatelessWidget {
@@ -5443,90 +5570,91 @@ class _CurveFailed extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          _capped(
-            DsRichText(
-              TextSpan(
-                children: <InlineSpan>[
-                  const TextSpan(
-                    text: 'This is the half that failed, and it is a limit in '
-                        'recharts’ types rather than a shortcut taken here. ',
-                  ),
-                  DsCode.span('node_modules/recharts/types/util/types.d.ts'),
-                  const TextSpan(text: ' declares '),
-                  DsCode.span('AnimationTiming'),
-                  const TextSpan(text: ' as five keywords — '),
-                  DsCode.span('ease'),
-                  const TextSpan(text: ', '),
-                  DsCode.span('ease-in'),
-                  const TextSpan(text: ', '),
-                  DsCode.span('ease-out'),
-                  const TextSpan(text: ', '),
-                  DsCode.span('ease-in-out'),
-                  const TextSpan(text: ', '),
-                  DsCode.span('linear'),
-                  const TextSpan(text: ' — and '),
-                  DsCode.span('Area'),
-                  const TextSpan(text: ', '),
-                  DsCode.span('Line'),
-                  const TextSpan(text: ', '),
-                  DsCode.span('Pie'),
-                  const TextSpan(text: ', '),
-                  DsCode.span('Radar'),
-                  const TextSpan(text: ', '),
-                  DsCode.span('RadialBar'),
-                  const TextSpan(text: ' and '),
-                  DsCode.span('Tooltip'),
-                  const TextSpan(text: ' all type '),
-                  DsCode.span('animationEasing'),
-                  const TextSpan(text: ' as that. A '),
-                  DsCode.span('cubic-bezier()'),
-                  const TextSpan(text: ' string cannot be assigned to it.'),
-                ],
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: <Widget>[
+      _capped(
+        ElRichText(
+          TextSpan(
+            children: <InlineSpan>[
+              const TextSpan(
+                text:
+                    'This is the half that failed, and it is a limit in '
+                    'recharts’ types rather than a shortcut taken here. ',
               ),
-              DsType.small,
-            ),
+              ElCode.span('node_modules/recharts/types/util/types.d.ts'),
+              const TextSpan(text: ' declares '),
+              ElCode.span('AnimationTiming'),
+              const TextSpan(text: ' as five keywords — '),
+              ElCode.span('ease'),
+              const TextSpan(text: ', '),
+              ElCode.span('ease-in'),
+              const TextSpan(text: ', '),
+              ElCode.span('ease-out'),
+              const TextSpan(text: ', '),
+              ElCode.span('ease-in-out'),
+              const TextSpan(text: ', '),
+              ElCode.span('linear'),
+              const TextSpan(text: ' — and '),
+              ElCode.span('Area'),
+              const TextSpan(text: ', '),
+              ElCode.span('Line'),
+              const TextSpan(text: ', '),
+              ElCode.span('Pie'),
+              const TextSpan(text: ', '),
+              ElCode.span('Radar'),
+              const TextSpan(text: ', '),
+              ElCode.span('RadialBar'),
+              const TextSpan(text: ' and '),
+              ElCode.span('Tooltip'),
+              const TextSpan(text: ' all type '),
+              ElCode.span('animationEasing'),
+              const TextSpan(text: ' as that. A '),
+              ElCode.span('cubic-bezier()'),
+              const TextSpan(text: ' string cannot be assigned to it.'),
+            ],
           ),
-          SizedBox(height: ds(3)),
-          const _Prose(
-                  'The obvious shape — {useState} plus a {useEffect} that sets a '
-                  'mount flag — does not compile here. This repository lints under '
-                  'the React Compiler rules and {react-hooks/set-state-in-effect} '
-                  'rejects it. {useSyncExternalStore} is the intended tool for '
-                  'reading a browser value: it subscribes, reads on the client, and '
-                  'returns a defined server snapshot. {hooks/use-mobile.ts} and '
-                  '{components/ds/token-swatch.tsx} are the two models, and the '
-                  'second is where the {MutationObserver} on {<html>} comes from — it '
-                  'watches {class} for the theme flip and {style} for a runtime '
-                  'override, so a duration that changes under a mounted chart is '
-                  'followed rather than missed.',
-                ),
-          SizedBox(height: ds(3)),
-          const _Prose(
-                  'Every {ChartTooltip} in {chart-demos.tsx} takes the same '
-                  '{{...motion}} as the series beside it. It was the last holdout, '
-                  'and it is the most instructive one. Recharts’ own default for '
-                  '{Tooltip} is {animationDuration: 400} — which is exactly what '
-                  '{--duration-slow} is worth. So the tooltip was animating at the '
-                  'right length while reading that length out of {node_modules} '
-                  'rather than out of the stylesheet. Nothing would have failed the '
-                  'day the token moved; the tooltip would simply have stopped '
-                  'agreeing with the chart it belongs to. That is the *passes every '
-                  'guard and is still a violation* case in its quietest form — a '
-                  'coincidence doing the work of a token — and the fix is one spread.',
-                ),
-            SizedBox(height: ds(3)),
-            const _Prose(
-              'Two things change with it. The easing was recharts’ {ease} and '
-              'is now {ease-out}, the keyword that names {--ease-out}. And '
-              '{prefers-reduced-motion} now stops the tooltip along with '
-              'everything else, through this hook, rather than through the '
-              '{"auto"} default the section above explains why this system does '
-              'not rely on.',
-            ),
-        ],
-      );
+          ElType.small,
+        ),
+      ),
+      SizedBox(height: el(3)),
+      const _Prose(
+        'The obvious shape — {useState} plus a {useEffect} that sets a '
+        'mount flag — does not compile here. This repository lints under '
+        'the React Compiler rules and {react-hooks/set-state-in-effect} '
+        'rejects it. {useSyncExternalStore} is the intended tool for '
+        'reading a browser value: it subscribes, reads on the client, and '
+        'returns a defined server snapshot. {hooks/use-mobile.ts} and '
+        '{components/el/token-swatch.tsx} are the two models, and the '
+        'second is where the {MutationObserver} on {<html>} comes from — it '
+        'watches {class} for the theme flip and {style} for a runtime '
+        'override, so a duration that changes under a mounted chart is '
+        'followed rather than missed.',
+      ),
+      SizedBox(height: el(3)),
+      const _Prose(
+        'Every {ChartTooltip} in {chart-demos.tsx} takes the same '
+        '{{...motion}} as the series beside it. It was the last holdout, '
+        'and it is the most instructive one. Recharts’ own default for '
+        '{Tooltip} is {animationDuration: 400} — which is exactly what '
+        '{--duration-slow} is worth. So the tooltip was animating at the '
+        'right length while reading that length out of {node_modules} '
+        'rather than out of the stylesheet. Nothing would have failed the '
+        'day the token moved; the tooltip would simply have stopped '
+        'agreeing with the chart it belongs to. That is the *passes every '
+        'guard and is still a violation* case in its quietest form — a '
+        'coincidence doing the work of a token — and the fix is one spread.',
+      ),
+      SizedBox(height: el(3)),
+      const _Prose(
+        'Two things change with it. The easing was recharts’ {ease} and '
+        'is now {ease-out}, the keyword that names {--ease-out}. And '
+        '{prefers-reduced-motion} now stops the tooltip along with '
+        'everything else, through this hook, rather than through the '
+        '{"auto"} default the section above explains why this system does '
+        'not rely on.',
+      ),
+    ],
+  );
 }
 
 class _ReducedMotion extends StatelessWidget {
@@ -5534,66 +5662,66 @@ class _ReducedMotion extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          _Prose(
-            'The obvious claim — *recharts ignores {prefers-reduced-motion}, so '
-            'we have to do it* — is not true of recharts 3.8, and was written '
-            'into this page’s own plan before anyone opened the package. Every '
-            'series defaults to {isAnimationActive: "auto"}, and '
-            '{animation/JavascriptAnimate.js} resolves {auto} through its own '
-            '{util/usePrefersReducedMotion.js}. Left entirely alone, recharts '
-            'honours the preference.',
-          ),
-          _ProseGap(),
-          _Prose(
-            'The real reasons are narrower and they hold. {auto} stops applying '
-            'the moment you pass a boolean, which every shadcn chart example '
-            'does. It is a 3.x default that did not exist before it, so it is a '
-            'vendored behaviour that has already moved once. And the hook has '
-            'to know the preference regardless, because it is also what decides '
-            'whether a duration is worth reading at all — one source of truth, '
-            'in code this repository can test, beats a default in '
-            '{node_modules}.',
-          ),
-          _ProseGap(),
-          _Prose(
-            'What is not negotiable is why it matters. §4.3: **no information '
-            'may exist only inside an animation**. Recharts animates by '
-            'interpolating the geometry it draws, so a bar starts at zero '
-            'height and arrives at its value — for the length of the animation '
-            'the chart shows a number the data does not contain. That was '
-            'measured here rather than assumed: in a tab where '
-            '{requestAnimationFrame} never fires, animation on left 0 of 84 bar '
-            'rectangles with a path and every pie empty, while '
-            '{isAnimationActive: false} drew all 84 at their exact data ratios '
-            'on the first frame.',
-          ),
-          _ProseGap(),
-          _Prose(
-            'The two halves of that measurement are not worth the same, and it '
-            'matters which one you carry away. The {isAnimationActive: false} '
-            'half is a real result: the geometry is complete on the first frame '
-            'with nothing running. The other half proves only that *that tab* '
-            'never animates — in a live browser the entrance completes in '
-            '{--duration-slow} and the bars arrive normally. It is not evidence '
-            'that recharts fails §4.3 on a working screen.',
-          ),
-          _ProseGap(),
-          _Prose(
-            'What it does expose is where the geometry lives. '
-            '{JavascriptAnimate} opens on {useState(isActive ? from : to)}, so '
-            'with animation on there is nothing painted at all until the first '
-            'frame advances. That is not a reduced-motion problem — '
-            '{prefers-reduced-motion} does not suspend {requestAnimationFrame}, '
-            'and a reader who has asked for less motion is the one reader '
-            'guaranteed to see the chart immediately. It is everyone else’s: '
-            'any tab that is backgrounded, hidden or throttled shows an empty '
-            'chart for exactly as long as its frames stay suspended. A chart '
-            'that has drawn its data does not care whether the tab is in front.',
-          ),
-        ],
-      );
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: <Widget>[
+      _Prose(
+        'The obvious claim — *recharts ignores {prefers-reduced-motion}, so '
+        'we have to do it* — is not true of recharts 3.8, and was written '
+        'into this page’s own plan before anyone opened the package. Every '
+        'series defaults to {isAnimationActive: "auto"}, and '
+        '{animation/JavascriptAnimate.js} resolves {auto} through its own '
+        '{util/usePrefersReducedMotion.js}. Left entirely alone, recharts '
+        'honours the preference.',
+      ),
+      _ProseGap(),
+      _Prose(
+        'The real reasons are narrower and they hold. {auto} stops applying '
+        'the moment you pass a boolean, which every shadcn chart example '
+        'does. It is a 3.x default that did not exist before it, so it is a '
+        'vendored behaviour that has already moved once. And the hook has '
+        'to know the preference regardless, because it is also what decides '
+        'whether a duration is worth reading at all — one source of truth, '
+        'in code this repository can test, beats a default in '
+        '{node_modules}.',
+      ),
+      _ProseGap(),
+      _Prose(
+        'What is not negotiable is why it matters. §4.3: **no information '
+        'may exist only inside an animation**. Recharts animates by '
+        'interpolating the geometry it draws, so a bar starts at zero '
+        'height and arrives at its value — for the length of the animation '
+        'the chart shows a number the data does not contain. That was '
+        'measured here rather than assumed: in a tab where '
+        '{requestAnimationFrame} never fires, animation on left 0 of 84 bar '
+        'rectangles with a path and every pie empty, while '
+        '{isAnimationActive: false} drew all 84 at their exact data ratios '
+        'on the first frame.',
+      ),
+      _ProseGap(),
+      _Prose(
+        'The two halves of that measurement are not worth the same, and it '
+        'matters which one you carry away. The {isAnimationActive: false} '
+        'half is a real result: the geometry is complete on the first frame '
+        'with nothing running. The other half proves only that *that tab* '
+        'never animates — in a live browser the entrance completes in '
+        '{--duration-slow} and the bars arrive normally. It is not evidence '
+        'that recharts fails §4.3 on a working screen.',
+      ),
+      _ProseGap(),
+      _Prose(
+        'What it does expose is where the geometry lives. '
+        '{JavascriptAnimate} opens on {useState(isActive ? from : to)}, so '
+        'with animation on there is nothing painted at all until the first '
+        'frame advances. That is not a reduced-motion problem — '
+        '{prefers-reduced-motion} does not suspend {requestAnimationFrame}, '
+        'and a reader who has asked for less motion is the one reader '
+        'guaranteed to see the chart immediately. It is everyone else’s: '
+        'any tab that is backgrounded, hidden or throttled shows an empty '
+        'chart for exactly as long as its frames stay suspended. A chart '
+        'that has drawn its data does not care whether the tab is in front.',
+      ),
+    ],
+  );
 }
 
 /// `className="mt-3"` between two paragraphs of a block.
@@ -5601,39 +5729,42 @@ class _ProseGap extends StatelessWidget {
   const _ProseGap();
 
   @override
-  Widget build(BuildContext context) => SizedBox(height: ds(3));
+  Widget build(BuildContext context) => SizedBox(height: el(3));
 }
 
 class _SsrNote extends StatelessWidget {
   const _SsrNote();
 
   @override
-  Widget build(BuildContext context) => DsRichText(
-        TextSpan(
-          children: <InlineSpan>[
-            DsCode.span('chart-motion.ts'),
-            const TextSpan(
-              text: ' carries a millisecond constant and an easing keyword that '
-                  'restate what the tokens say. §0 would normally forbid that. '
-                  'They are kept because ',
-            ),
-            DsCode.span('getComputedStyle'),
-            const TextSpan(
-              text: ' does not exist on the server, and without them a chart '
-                  'renders nothing at all until hydration — a worse failure than '
-                  'a duplicated constant. They are unreachable in a browser: the '
-                  'store getters win the moment there is a ',
-            ),
-            DsCode.span('document'),
-            const TextSpan(
-              text: '. If a token moves and one of these does not, the only '
-                  'visible consequence is one frame of server-rendered markup at '
-                  'the old timing.',
-            ),
-          ],
+  Widget build(BuildContext context) => ElRichText(
+    TextSpan(
+      children: <InlineSpan>[
+        ElCode.span('chart-motion.ts'),
+        const TextSpan(
+          text:
+              ' carries a millisecond constant and an easing keyword that '
+              'restate what the tokens say. §0 would normally forbid that. '
+              'They are kept because ',
         ),
-        DsType.small,
-      );
+        ElCode.span('getComputedStyle'),
+        const TextSpan(
+          text:
+              ' does not exist on the server, and without them a chart '
+              'renders nothing at all until hydration — a worse failure than '
+              'a duplicated constant. They are unreachable in a browser: the '
+              'store getters win the moment there is a ',
+        ),
+        ElCode.span('document'),
+        const TextSpan(
+          text:
+              '. If a token moves and one of these does not, the only '
+              'visible consequence is one frame of server-rendered markup at '
+              'the old timing.',
+        ),
+      ],
+    ),
+    ElType.small,
+  );
 }
 
 /* ── The two discrete families ───────────────────────────────────────────── */
@@ -5642,161 +5773,167 @@ class _UnitActivitySection extends StatelessWidget {
   const _UnitActivitySection();
 
   @override
-  Widget build(BuildContext context) => DsSection(
-        id: 'unit-activity',
-        title: 'Unit activity',
-        description:
-            'A discrete density chart for activity over repeating time buckets. '
-            'Current values occupy the foreground units; comparison values '
-            'remain visible behind them without inventing another colour family.',
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            const _ChartStates(
-              title: 'Weekly activity',
-              note: 'current and previous periods',
-              skeleton: _SkeletonKind.bar,
-              child: _UnitActivityChart(),
+  Widget build(BuildContext context) => ElSection(
+    id: 'unit-activity',
+    title: 'Unit activity',
+    description:
+        'A discrete density chart for activity over repeating time buckets. '
+        'Current values occupy the foreground units; comparison values '
+        'remain visible behind them without inventing another colour family.',
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        const _ChartStates(
+          title: 'Weekly activity',
+          note: 'current and previous periods',
+          skeleton: _SkeletonKind.bar,
+          child: _UnitActivityChart(),
+        ),
+        SizedBox(height: el(4)),
+        ElMeta(
+          items: <ElMetaItem>[
+            _meta(
+              'data',
+              'UnitActivityDay[] — each day owns labelled points with current '
+                  'and optional previous levels.',
             ),
-            SizedBox(height: ds(4)),
-            DsMeta(items: <DsMetaItem>[
-              _meta(
-                'data',
-                'UnitActivityDay[] — each day owns labelled points with current '
-                    'and optional previous levels.',
-              ),
-              _meta(
-                'Levels',
-                'Twelve discrete rows. Current uses chart-4, the comparison '
-                    'remainder uses muted, and softer muted cells preserve the '
-                    'complete matrix.',
-              ),
-              _meta(
-                'Typography',
-                'Labels use the text foundation; totals, days and measured '
-                    'values use type-num-* (Geist Mono).',
-              ),
-            ]),
+            _meta(
+              'Levels',
+              'Twelve discrete rows. Current uses chart-4, the comparison '
+                  'remainder uses muted, and softer muted cells preserve the '
+                  'complete matrix.',
+            ),
+            _meta(
+              'Typography',
+              'Labels use the text foundation; totals, days and measured '
+                  'values use type-num-* (Geist Mono).',
+            ),
           ],
         ),
-      );
+      ],
+    ),
+  );
 }
 
 class _ConversionFunnelSection extends StatelessWidget {
   const _ConversionFunnelSection();
 
   @override
-  Widget build(BuildContext context) => DsSection(
-        id: 'conversion-funnel',
-        title: 'Conversion funnel',
-        description:
-            'A compact stage funnel for showing how a cohort narrows. The '
-            'segmented strip gives the distribution at a glance; the rows '
-            'preserve exact values and labels.',
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            const _ChartStates(
-              title: 'Stage conversion',
-              note: 'distribution strip and exact totals',
-              skeleton: _SkeletonKind.bar,
-              child: _ConversionFunnelChart(),
+  Widget build(BuildContext context) => ElSection(
+    id: 'conversion-funnel',
+    title: 'Conversion funnel',
+    description:
+        'A compact stage funnel for showing how a cohort narrows. The '
+        'segmented strip gives the distribution at a glance; the rows '
+        'preserve exact values and labels.',
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        const _ChartStates(
+          title: 'Stage conversion',
+          note: 'distribution strip and exact totals',
+          skeleton: _SkeletonKind.bar,
+          child: _ConversionFunnelChart(),
+        ),
+        SizedBox(height: el(4)),
+        ElMeta(
+          items: <ElMetaItem>[
+            _meta(
+              'stages',
+              'ConversionStage[] — label, value and one of the five chart '
+                  'tone slots. Stage order is funnel order.',
             ),
-            SizedBox(height: ds(4)),
-            DsMeta(items: <DsMetaItem>[
-              _meta(
-                'stages',
-                'ConversionStage[] — label, value and one of the five chart '
-                    'tone slots. Stage order is funnel order.',
-              ),
-              _meta(
-                'total',
-                'The cohort denominator. Percentages and the overall conversion '
-                    'rate are derived, never entered twice.',
-              ),
-              _meta(
-                'Accessibility',
-                'The figure has a concise summary; exact stage labels and '
-                    'totals remain real text below the decorative strip.',
-              ),
-            ]),
+            _meta(
+              'total',
+              'The cohort denominator. Percentages and the overall conversion '
+                  'rate are derived, never entered twice.',
+            ),
+            _meta(
+              'Accessibility',
+              'The figure has a concise summary; exact stage labels and '
+                  'totals remain real text below the decorative strip.',
+            ),
           ],
         ),
-      );
+      ],
+    ),
+  );
 }
 
 class _StatesSection extends StatelessWidget {
   const _StatesSection();
 
   @override
-  Widget build(BuildContext context) => DsSection(
-        id: 'states',
-        title: 'States',
-        description:
-            'Every chart above carries its own Empty · Loading · Ready switch. '
-            'There is no separate states demo, because a shared one only ever '
-            'proves the state machinery — not that this chart’s skeleton matches '
-            'this chart’s footprint.',
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            const DsNote(
-              title: 'The skeleton is the chart, with the data taken out',
-              child: _SkeletonNote(),
-            ),
-            SizedBox(height: ds(4)),
-            const DsDoDont(
-              dos: <String>[
-                'Match the skeleton to the family — a ring where a pie will '
-                    'land, bars where bars will.',
-                'Swap once: anim-swap-in on the arriving content, nothing on the '
-                    'leaving content.',
-                'Give the empty state a way forward. Every one here loads the '
-                    'data.',
-                'Keep any control strip outside the swapped slot, or the box '
-                    'grows on Ready.',
-              ],
-              donts: <String>[
-                "Don't use a grey rectangle. It is the layout jump you were "
-                    'trying to avoid.',
-                "Don't fade the skeleton out and the content in — that animates "
-                    'one thing twice.',
-                "Don't leave an empty chart with no explanation; a blank plot "
-                    'reads as broken.',
-                "Don't measure only the Ready state. The jump is invisible until "
-                    'you cycle all three.',
-              ],
-            ),
-            SizedBox(height: ds(4)),
-            DsMeta(items: <DsMetaItem>[
-              _meta(
-                'ChartStates title / note',
-                "The variant's name and the registry prop it demonstrates. They "
-                    "render in the panel's label and meta slots.",
-              ),
-              _meta(
-                'ChartStates skeleton',
-                'area | bar | line | pie | radar | radial | tooltip. Pick the '
-                    'one whose shape matches what will land there.',
-              ),
-              _meta(
-                'ChartStates controls',
-                'A component type, not a node — it wraps the state slot so it '
-                    'survives the keyed swap and can own the strip’s state. Used '
-                    'by the four interactive variants.',
-              ),
-              _meta(
-                'Coverage',
-                '70 variants: Area 10 · Bar 10 · Line 10 · Pie 11 · Radar 14 · '
-                    'Radial 6 · Tooltip 9. That is every chart in shadcn’s '
-                    'registry, probed rather than remembered — the registry '
-                    'serves 14 radar and 11 pie where the gallery page renders '
-                    '12 of each.',
-              ),
-            ]),
+  Widget build(BuildContext context) => ElSection(
+    id: 'states',
+    title: 'States',
+    description:
+        'Every chart above carries its own Empty · Loading · Ready switch. '
+        'There is no separate states demo, because a shared one only ever '
+        'proves the state machinery — not that this chart’s skeleton matches '
+        'this chart’s footprint.',
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        const ElNote(
+          title: 'The skeleton is the chart, with the data taken out',
+          child: _SkeletonNote(),
+        ),
+        SizedBox(height: el(4)),
+        const ElDoDont(
+          dos: <String>[
+            'Match the skeleton to the family — a ring where a pie will '
+                'land, bars where bars will.',
+            'Swap once: anim-swap-in on the arriving content, nothing on the '
+                'leaving content.',
+            'Give the empty state a way forward. Every one here loads the '
+                'data.',
+            'Keep any control strip outside the swapped slot, or the box '
+                'grows on Ready.',
+          ],
+          donts: <String>[
+            "Don't use a grey rectangle. It is the layout jump you were "
+                'trying to avoid.',
+            "Don't fade the skeleton out and the content in — that animates "
+                'one thing twice.',
+            "Don't leave an empty chart with no explanation; a blank plot "
+                'reads as broken.',
+            "Don't measure only the Ready state. The jump is invisible until "
+                'you cycle all three.',
           ],
         ),
-      );
+        SizedBox(height: el(4)),
+        ElMeta(
+          items: <ElMetaItem>[
+            _meta(
+              'ChartStates title / note',
+              "The variant's name and the registry prop it demonstrates. They "
+                  "render in the panel's label and meta slots.",
+            ),
+            _meta(
+              'ChartStates skeleton',
+              'area | bar | line | pie | radar | radial | tooltip. Pick the '
+                  'one whose shape matches what will land there.',
+            ),
+            _meta(
+              'ChartStates controls',
+              'A component type, not a node — it wraps the state slot so it '
+                  'survives the keyed swap and can own the strip’s state. Used '
+                  'by the four interactive variants.',
+            ),
+            _meta(
+              'Coverage',
+              '70 variants: Area 10 · Bar 10 · Line 10 · Pie 11 · Radar 14 · '
+                  'Radial 6 · Tooltip 9. That is every chart in shadcn’s '
+                  'registry, probed rather than remembered — the registry '
+                  'serves 14 radar and 11 pie where the gallery page renders '
+                  '12 of each.',
+            ),
+          ],
+        ),
+      ],
+    ),
+  );
 }
 
 class _SkeletonNote extends StatelessWidget {
@@ -5804,43 +5941,43 @@ class _SkeletonNote extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          DsText(
-            'Seven skeletons, one per family — a sloped band for Area, five '
-            'bars for Bar, a polyline for Line, a ring for Pie, a polygon for '
-            'Radar, concentric arcs for Radial, a plot plus a floating frame for '
-            'Tooltip. Each is drawn at the plot’s real footprint, so the box '
-            'does not move when the state changes.',
-            DsType.small,
-          ),
-          SizedBox(height: ds(3)),
-          DsRichText(
-            TextSpan(
-              children: <InlineSpan>[
-                const TextSpan(
-                  text: 'That is measurable and it was measured: ',
-                ),
-                DsCode.span('256px'),
-                const TextSpan(
-                  text: ' in the plot slot for all seven skeletons in all three '
-                      'states, and the panels that carry a control strip hold '
-                      'their full height too — the interactive variants used to '
-                      'grow from ',
-                ),
-                DsCode.span('393px'),
-                const TextSpan(text: ' to '),
-                DsCode.span('453px'),
-                const TextSpan(
-                  text: ' when you switched to Ready, which is the layout jump '
-                      '§5 calls worse than the spinner it was avoiding. The '
-                      'strip now sits above the swapped slot rather than inside '
-                      'it.',
-                ),
-              ],
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: <Widget>[
+      ElText(
+        'Seven skeletons, one per family — a sloped band for Area, five '
+        'bars for Bar, a polyline for Line, a ring for Pie, a polygon for '
+        'Radar, concentric arcs for Radial, a plot plus a floating frame for '
+        'Tooltip. Each is drawn at the plot’s real footprint, so the box '
+        'does not move when the state changes.',
+        ElType.small,
+      ),
+      SizedBox(height: el(3)),
+      ElRichText(
+        TextSpan(
+          children: <InlineSpan>[
+            const TextSpan(text: 'That is measurable and it was measured: '),
+            ElCode.span('256px'),
+            const TextSpan(
+              text:
+                  ' in the plot slot for all seven skeletons in all three '
+                  'states, and the panels that carry a control strip hold '
+                  'their full height too — the interactive variants used to '
+                  'grow from ',
             ),
-            DsType.small,
-          ),
-        ],
-      );
+            ElCode.span('393px'),
+            const TextSpan(text: ' to '),
+            ElCode.span('453px'),
+            const TextSpan(
+              text:
+                  ' when you switched to Ready, which is the layout jump '
+                  '§5 calls worse than the spinner it was avoiding. The '
+                  'strip now sits above the swapped slot rather than inside '
+                  'it.',
+            ),
+          ],
+        ),
+        ElType.small,
+      ),
+    ],
+  );
 }

@@ -22,7 +22,7 @@ const ComponentDocEntry breadcrumbDoc = ComponentDocEntry(
   // separator. Neither name is invented: `icon` is a published registry
   // item (`registry/components/icon.json`). What does not exist is a
   // `breadcrumb.json` wiring the two together: see the library doc above.
-  dependencies: <String>['source-foundation', 'icon'],
-  exports: <String>['DsBreadcrumb', 'DsBreadcrumbEntry'],
+  dependencies: <String>['icon', 'source-foundation'],
+  exports: <String>['ElBreadcrumb', 'ElBreadcrumbEntry'],
   sourcePath: 'lib/src/components/breadcrumb.dart',
 );

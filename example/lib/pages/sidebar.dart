@@ -21,7 +21,7 @@
 /// traps a genuinely `position: fixed` panel inside a 384px frame, *"CSS doing
 /// its documented job rather than a hack, and it is the whole reason
 /// `SidebarRail` and `SidebarInset` can be documented in a panel instead of
-/// behind a link."* The port needs no trap: [DsSidebar] renders its container
+/// behind a link."* The port needs no trap: [ElSidebar] renders its container
 /// as an overflowing child of its own gap, and this frame clips it.
 ///
 /// ## Oracle (light, 1440 × 900, 2026-08-16)
@@ -43,7 +43,7 @@
 ///  3. **The badge is typed twice and loses both properties it shares.**
 ///     `.type-num-xs` (11/600) against `Badge`'s `text-xs font-medium`
 ///     (12/500): measured 12px at 500, mono, tabular. Carried by
-///     [DsComponentType.sidebarMenuBadge].
+///     [ElComponentType.sidebarMenuBadge].
 ///  4. **`NavUser`'s avatar fallback splits the difference**, 13px from
 ///     `text-sm`, 600 from `.type-num-sm`, mono from `.type-num-sm`.
 ///  5. **Every row on the page is a `<button>` with no `onClick`.** The active
@@ -88,66 +88,66 @@ import 'sidebar_demo.dart';
 
 /// *"One product across every specimen, so the page reads as a thing rather
 /// than a parts bin."*
-const List<({String label, DsIconGlyph glyph, String? count})> _nav =
-    <({String label, DsIconGlyph glyph, String? count})>[
-  (label: 'All cards', glyph: DsIconGlyph.layers, count: '1,284'),
-  (label: 'Favourites', glyph: DsIconGlyph.star, count: '37'),
-  (label: 'New this week', glyph: DsIconGlyph.sparkles, count: null),
-  (label: 'Wallet', glyph: DsIconGlyph.wallet, count: null),
-];
+const List<({String label, ElIconGlyph glyph, String? count})> _nav =
+    <({String label, ElIconGlyph glyph, String? count})>[
+      (label: 'All cards', glyph: ElIconGlyph.layers, count: '1,284'),
+      (label: 'Favourites', glyph: ElIconGlyph.star, count: '37'),
+      (label: 'New this week', glyph: ElIconGlyph.sparkles, count: null),
+      (label: 'Wallet', glyph: ElIconGlyph.wallet, count: null),
+    ];
 
 /// `FOOT_NAV`. `Receipt` is not on the icons page's curated whitelist, so it
-/// comes off the generated registry: the same split `DsIcon.lucide` carries.
-const List<({String label, DsIconGlyph? glyph, DsLucideGlyph? lucide})>
-    _footNav = <({String label, DsIconGlyph? glyph, DsLucideGlyph? lucide})>[
-  (label: 'Orders', glyph: null, lucide: DsLucide.receipt),
-  (label: 'Alerts', glyph: DsIconGlyph.bell, lucide: null),
-  (label: 'Settings', glyph: DsIconGlyph.settings, lucide: null),
+/// comes off the generated registry: the same split `ElIcon.lucide` carries.
+const List<({String label, ElIconGlyph? glyph, ElLucideGlyph? lucide})>
+_footNav = <({String label, ElIconGlyph? glyph, ElLucideGlyph? lucide})>[
+  (label: 'Orders', glyph: null, lucide: ElLucide.receipt),
+  (label: 'Alerts', glyph: ElIconGlyph.bell, lucide: null),
+  (label: 'Settings', glyph: ElIconGlyph.settings, lucide: null),
 ];
 
 /// `ACCOUNT`, *"the account the footer specimens show. Sample data, never a
 /// default."*
-const DsNavUserAccount _account = DsNavUserAccount(
+const ElNavUserAccount _account = ElNavUserAccount(
   name: 'Ayoub Elattar',
   email: 'ayoub@eclipsevault.example',
 );
 
 /// `ACCOUNT_ITEMS`.
-const List<DsNavUserItem> _accountItems = <DsNavUserItem>[
-  DsNavUserItem(label: 'Account', icon: DsLucide.badgeCheck),
-  DsNavUserItem(label: 'Billing', icon: DsLucide.creditCard),
-  DsNavUserItem(label: 'Notifications', icon: DsLucide.bell),
-  DsNavUserItem(label: 'Sign out', icon: DsLucide.logOut, destructive: true),
+const List<ElNavUserItem> _accountItems = <ElNavUserItem>[
+  ElNavUserItem(label: 'Account', icon: ElLucide.badgeCheck),
+  ElNavUserItem(label: 'Billing', icon: ElLucide.creditCard),
+  ElNavUserItem(label: 'Notifications', icon: ElLucide.bell),
+  ElNavUserItem(label: 'Sign out', icon: ElLucide.logOut, destructive: true),
 ];
 
 /// `BUTTON_VARIANTS`, in the page's own order, `ghost` first, `default`
 /// second.
-const List<({String label, DsButtonVariant variant})> _buttonVariants =
-    <({String label, DsButtonVariant variant})>[
-  (label: 'ghost', variant: DsButtonVariant.ghost),
-  (label: 'default', variant: DsButtonVariant.primary),
-  (label: 'premium', variant: DsButtonVariant.premium),
-  (label: 'secondary', variant: DsButtonVariant.secondary),
-  (label: 'outline', variant: DsButtonVariant.outline),
-  (label: 'destructive', variant: DsButtonVariant.destructive),
-  (label: 'link', variant: DsButtonVariant.link),
-];
+const List<({String label, ElButtonVariant variant})> _buttonVariants =
+    <({String label, ElButtonVariant variant})>[
+      (label: 'ghost', variant: ElButtonVariant.ghost),
+      (label: 'default', variant: ElButtonVariant.primary),
+      (label: 'premium', variant: ElButtonVariant.premium),
+      (label: 'secondary', variant: ElButtonVariant.secondary),
+      (label: 'outline', variant: ElButtonVariant.outline),
+      (label: 'destructive', variant: ElButtonVariant.destructive),
+      (label: 'link', variant: ElButtonVariant.link),
+    ];
 
 /// `BADGE_VARIANTS`.
-const List<({String label, DsBadgeVariant variant})> _badgeVariants =
-    <({String label, DsBadgeVariant variant})>[
-  (label: 'default', variant: DsBadgeVariant.primary),
-  (label: 'secondary', variant: DsBadgeVariant.secondary),
-  (label: 'destructive', variant: DsBadgeVariant.destructive),
-  (label: 'outline', variant: DsBadgeVariant.outline),
-  (label: 'ghost', variant: DsBadgeVariant.ghost),
-  (label: 'link', variant: DsBadgeVariant.link),
-  (label: 'action', variant: DsBadgeVariant.action),
-  (label: 'premium', variant: DsBadgeVariant.premium),
-  (label: 'success', variant: DsBadgeVariant.success),
-  (label: 'warning', variant: DsBadgeVariant.warning),
-  (label: 'info', variant: DsBadgeVariant.info),
-];
+const List<({String label, ElBadgeVariant variant})> _badgeVariants =
+    <({String label, ElBadgeVariant variant})>[
+      (label: 'default', variant: ElBadgeVariant.primary),
+      (label: 'secondary', variant: ElBadgeVariant.secondary),
+      (label: 'destructive', variant: ElBadgeVariant.destructive),
+      (label: 'outline', variant: ElBadgeVariant.outline),
+      (label: 'ghost', variant: ElBadgeVariant.ghost),
+      (label: 'link', variant: ElBadgeVariant.link),
+      (label: 'action', variant: ElBadgeVariant.action),
+      (label: 'premium', variant: ElBadgeVariant.premium),
+      (label: 'success', variant: ElBadgeVariant.success),
+      (label: 'warning', variant: ElBadgeVariant.warning),
+      (label: 'info', variant: ElBadgeVariant.info),
+    ];
 
 /// `h-160`: the anatomy stage. 640px.
 const double _stageTall = 640;
@@ -185,11 +185,11 @@ class _PartStage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Widget stage = DsSidebarProvider(
+    final Widget stage = ElSidebarProvider(
       children: <Widget>[
         Expanded(
-          child: DsSidebar(
-            collapsible: DsSidebarCollapsible.none,
+          child: ElSidebar(
+            collapsible: ElSidebarCollapsible.none,
             expand: true,
             children: children,
           ),
@@ -211,29 +211,28 @@ class _ShellStage extends StatelessWidget {
 
   final List<Widget> children;
 
-  /// See [DsSidebarProvider.variant]: the wrapper's `has-data-[variant=inset]`
+  /// See [ElSidebarProvider.variant]: the wrapper's `has-data-[variant=inset]`
   /// fill and the inset's `peer-data-[variant=inset]` margins are relational
   /// selectors, so the fact travels down rather than up.
-  final DsSidebarVariant variant;
+  final ElSidebarVariant variant;
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return SizedBox(
       height: _shellHeight,
       child: DecoratedBox(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(DsRadii.lg),
-          border: Border.all(color: theme.border, width: DsWidths.hairline),
+          borderRadius: BorderRadius.circular(ElRadii.lg),
+          border: Border.all(color: theme.border, width: ElWidths.hairline),
         ),
         // `box-sizing: border-box`: the frame is paid out of the 384.
         child: Padding(
-          padding: const EdgeInsets.all(DsWidths.hairline),
+          padding: const EdgeInsets.all(ElWidths.hairline),
           child: ClipRRect(
             // `overflow-hidden`, and what clips the collapsing panel.
-            borderRadius:
-                BorderRadius.circular(DsRadii.lg - DsWidths.hairline),
-            child: DsSidebarProvider(variant: variant, children: children),
+            borderRadius: BorderRadius.circular(ElRadii.lg - ElWidths.hairline),
+            child: ElSidebarProvider(variant: variant, children: children),
           ),
         ),
       ),
@@ -249,30 +248,33 @@ class _FixtureHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
-    return DsSidebarHeader(
+    final ElThemeData theme = ElTheme.of(context);
+    return ElSidebarHeader(
       children: <Widget>[
-        DsSidebarMenu(
+        ElSidebarMenu(
           children: <Widget>[
-            DsSidebarMenuItem(
-              button: DsSidebarMenuButton(
-                size: DsSidebarMenuButtonSize.lg,
+            ElSidebarMenuItem(
+              button: ElSidebarMenuButton(
+                size: ElSidebarMenuButtonSize.lg,
                 tooltip: 'Eclipse Vault workspace',
-                child: DsSidebarMenuRow(
-                  size: DsSidebarMenuButtonSize.lg,
+                child: ElSidebarMenuRow(
+                  size: ElSidebarMenuButtonSize.lg,
                   // `type-num-sm flex size-8 shrink-0 items-center
                   //  justify-center rounded-lg bg-secondary text-foreground
                   //  shadow-chip`.
                   leading: SizedBox(
-                    width: ds(8),
-                    height: ds(8),
-                    child: DsMachineSurface(
-                      spec: DsShadows.chip,
-                      radius: BorderRadius.circular(DsRadii.lg),
+                    width: el(8),
+                    height: el(8),
+                    child: ElMachineSurface(
+                      spec: ElShadows.chip,
+                      radius: BorderRadius.circular(ElRadii.lg),
                       fill: theme.secondary,
                       child: Center(
-                        child: DsText('EV', DsType.numSm,
-                            color: theme.foreground),
+                        child: ElText(
+                          'EV',
+                          ElType.numSm,
+                          color: theme.foreground,
+                        ),
                       ),
                     ),
                   ),
@@ -280,14 +282,13 @@ class _FixtureHeader extends StatelessWidget {
                     title: 'Eclipse Vault',
                     subtitle: '12 members',
                   ),
-                  trailing:
-                      const DsIcon.lucide(DsLucide.chevronsUpDown),
+                  trailing: const ElIcon.lucide(ElLucide.chevronsUpDown),
                 ),
               ),
             ),
           ],
         ),
-        const DsSidebarInput(
+        const ElSidebarInput(
           placeholder: 'Search cards',
           label: 'Search cards',
         ),
@@ -309,26 +310,26 @@ class _WorkspaceLabel extends StatelessWidget {
 
   /// `.type-caption` by default; the version switcher's line is
   /// `.type-num-xs`.
-  final DsTypeSpec? subtitleSpec;
+  final ElTypeSpec? subtitleSpec;
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        DsText(
+        ElText(
           title,
-          DsType.nav,
+          ElType.nav,
           color: theme.foreground,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           softWrap: false,
         ),
-        DsText(
+        ElText(
           subtitle,
-          subtitleSpec ?? DsType.caption,
+          subtitleSpec ?? ElType.caption,
           color: theme.mutedForeground,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
@@ -352,22 +353,22 @@ class _FixtureMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double glyph = DsButton.iconPxFor(DsSidebarMenuButtonSize.md.button);
-    return DsSidebarMenu(
+    final double glyph = ElButton.iconPxFor(ElSidebarMenuButtonSize.md.button);
+    return ElSidebarMenu(
       children: <Widget>[
-        for (final ({String label, DsIconGlyph glyph, String? count}) item
+        for (final ({String label, ElIconGlyph glyph, String? count}) item
             in _nav)
-          DsSidebarMenuItem(
-            button: DsSidebarMenuButton(
+          ElSidebarMenuItem(
+            button: ElSidebarMenuButton(
               isActive: item.label == activeLabel,
               tooltip: item.label,
-              child: DsSidebarMenuRow(
-                leading: DsIcon(item.glyph, sizePx: glyph),
-                label: DsSidebarMenuLabel(item.label),
+              child: ElSidebarMenuRow(
+                leading: ElIcon(item.glyph, sizePx: glyph),
+                label: ElSidebarMenuLabel(item.label),
               ),
             ),
             badge: badges && item.count != null
-                ? DsSidebarMenuBadge(item.count!)
+                ? ElSidebarMenuBadge(item.count!)
                 : null,
           ),
       ],
@@ -381,19 +382,20 @@ class _ActivityMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double glyph = DsButton.iconPxFor(DsSidebarMenuButtonSize.md.button);
-    return DsSidebarMenu(
+    final double glyph = ElButton.iconPxFor(ElSidebarMenuButtonSize.md.button);
+    return ElSidebarMenu(
       children: <Widget>[
-        for (final ({String label, DsIconGlyph? glyph, DsLucideGlyph? lucide})
-            item in _footNav)
-          DsSidebarMenuItem(
-            button: DsSidebarMenuButton(
+        for (final ({String label, ElIconGlyph? glyph, ElLucideGlyph? lucide})
+            item
+            in _footNav)
+          ElSidebarMenuItem(
+            button: ElSidebarMenuButton(
               tooltip: item.label,
-              child: DsSidebarMenuRow(
+              child: ElSidebarMenuRow(
                 leading: item.glyph != null
-                    ? DsIcon(item.glyph!, sizePx: glyph)
-                    : DsIcon.lucide(item.lucide!, sizePx: glyph),
-                label: DsSidebarMenuLabel(item.label),
+                    ? ElIcon(item.glyph!, sizePx: glyph)
+                    : ElIcon.lucide(item.lucide!, sizePx: glyph),
+                label: ElSidebarMenuLabel(item.label),
               ),
             ),
           ),
@@ -407,22 +409,22 @@ class _FixtureContent extends StatelessWidget {
   const _FixtureContent();
 
   @override
-  Widget build(BuildContext context) => DsSidebarContent(
-        children: <Widget>[
-          DsSidebarCollapsibleGroup(
-            label: 'Collection',
-            toggleLabel: 'Toggle Collection group',
-            action: const _AddCollection(),
-            child: const _FixtureMenu(),
-          ),
-          const DsSidebarSeparator(),
-          const DsSidebarCollapsibleGroup(
-            label: 'Activity',
-            toggleLabel: 'Toggle Activity group',
-            child: _ActivityMenu(),
-          ),
-        ],
-      );
+  Widget build(BuildContext context) => ElSidebarContent(
+    children: <Widget>[
+      ElSidebarCollapsibleGroup(
+        label: 'Collection',
+        toggleLabel: 'Toggle Collection group',
+        action: const _AddCollection(),
+        child: const _FixtureMenu(),
+      ),
+      const ElSidebarSeparator(),
+      const ElSidebarCollapsibleGroup(
+        label: 'Activity',
+        toggleLabel: 'Toggle Activity group',
+        child: _ActivityMenu(),
+      ),
+    ],
+  );
 }
 
 /// `<SidebarGroupAction aria-label="Add collection"><Icon icon={Plus} /></…>`.
@@ -430,13 +432,13 @@ class _AddCollection extends StatelessWidget {
   const _AddCollection();
 
   @override
-  Widget build(BuildContext context) => DsSidebarGroupAction(
-        label: 'Add collection',
-        child: DsIcon(
-          DsIconGlyph.plus,
-          sizePx: DsButton.iconPxFor(DsButtonSize.iconXs),
-        ),
-      );
+  Widget build(BuildContext context) => ElSidebarGroupAction(
+    label: 'Add collection',
+    child: ElIcon(
+      ElIconGlyph.plus,
+      sizePx: ElButton.iconPxFor(ElButtonSize.iconXs),
+    ),
+  );
 }
 
 /// `FixtureFooter`, *"one NavUser composition, pinned by SidebarFooter."*
@@ -444,11 +446,9 @@ class _FixtureFooter extends StatelessWidget {
   const _FixtureFooter();
 
   @override
-  Widget build(BuildContext context) => const DsSidebarFooter(
-        children: <Widget>[
-          DsNavUser(user: _account, items: _accountItems),
-        ],
-      );
+  Widget build(BuildContext context) => const ElSidebarFooter(
+    children: <Widget>[ElNavUser(user: _account, items: _accountItems)],
+  );
 }
 
 /* ── §1 Complete sidebar ─────────────────────────────────────────────────── */
@@ -457,86 +457,88 @@ class _AnatomySection extends StatelessWidget {
   const _AnatomySection();
 
   @override
-  Widget build(BuildContext context) => DsSection(
-        id: 'anatomy',
-        title: 'Complete sidebar',
-        description: 'The source of truth. Every ordinary specimen below '
-            'reuses FixtureHeader, FixtureMenu, FixtureContent or '
-            'FixtureFooter from this composition.',
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            IntrinsicHeight(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  const SizedBox(
-                    width: _railColumn,
-                    child: DsPanel(
-                      label: 'The shared composition',
-                      flush: true,
-                      child: _PartStage(
-                        height: _stageTall,
-                        children: <Widget>[
-                          _FixtureHeader(),
-                          _FixtureContent(),
-                          _FixtureFooter(),
-                        ],
+  Widget build(BuildContext context) => ElSection(
+    id: 'anatomy',
+    title: 'Complete sidebar',
+    description:
+        'The source of truth. Every ordinary specimen below '
+        'reuses FixtureHeader, FixtureMenu, FixtureContent or '
+        'FixtureFooter from this composition.',
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              const SizedBox(
+                width: _railColumn,
+                child: ElPanel(
+                  label: 'The shared composition',
+                  flush: true,
+                  child: _PartStage(
+                    height: _stageTall,
+                    children: <Widget>[
+                      _FixtureHeader(),
+                      _FixtureContent(),
+                      _FixtureFooter(),
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(width: el(4)),
+              Expanded(
+                child: ElMeta(
+                  items: <ElMetaItem>[
+                    (
+                      k: 'Header',
+                      v: const TextSpan(
+                        text: 'One workspace button and one SidebarInput.',
                       ),
                     ),
-                  ),
-                  SizedBox(width: ds(4)),
-                  Expanded(
-                    child: DsMeta(
-                      items: <DsMetaItem>[
-                        (
-                          k: 'Header',
-                          v: const TextSpan(
-                            text: 'One workspace button and one SidebarInput.',
-                          )
-                        ),
-                        (
-                          k: 'Content',
-                          v: const TextSpan(
-                            text: 'The only scrolling region; it owns the '
-                                'shared groups.',
-                          )
-                        ),
-                        (
-                          k: 'Menu',
-                          v: const TextSpan(
-                            text: 'One FixtureMenu supplies active state, '
-                                'counts and tooltips.',
-                          )
-                        ),
-                        (
-                          k: 'Footer',
-                          v: const TextSpan(
-                            text: 'One NavUser composition, pinned by '
-                                'SidebarFooter.',
-                          )
-                        ),
-                        (
-                          k: 'Spacing',
-                          v: const TextSpan(
-                            text: 'p-3 regions and groups, gap-1 menus, equal '
-                                'X/Y row padding.',
-                          )
-                        ),
-                      ],
+                    (
+                      k: 'Content',
+                      v: const TextSpan(
+                        text:
+                            'The only scrolling region; it owns the '
+                            'shared groups.',
+                      ),
                     ),
-                  ),
-                ],
+                    (
+                      k: 'Menu',
+                      v: const TextSpan(
+                        text:
+                            'One FixtureMenu supplies active state, '
+                            'counts and tooltips.',
+                      ),
+                    ),
+                    (
+                      k: 'Footer',
+                      v: const TextSpan(
+                        text:
+                            'One NavUser composition, pinned by '
+                            'SidebarFooter.',
+                      ),
+                    ),
+                    (
+                      k: 'Spacing',
+                      v: const TextSpan(
+                        text:
+                            'p-3 regions and groups, gap-1 menus, equal '
+                            'X/Y row padding.',
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            SizedBox(height: ds(4)),
-            const DsNote(
-              title: 'No second anatomy',
-              child: _NoSecondAnatomy(),
-            ),
-          ],
+            ],
+          ),
         ),
-      );
+        SizedBox(height: el(4)),
+        const ElNote(title: 'No second anatomy', child: _NoSecondAnatomy()),
+      ],
+    ),
+  );
 }
 
 class _NoSecondAnatomy extends StatelessWidget {
@@ -544,20 +546,22 @@ class _NoSecondAnatomy extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Text.rich(
-        TextSpan(
-          children: <InlineSpan>[
-            const TextSpan(
-              text: 'This page no longer redraws the assembled sidebar with '
-                  'private markup. Change ',
-            ),
-            DsCode.span('FixtureMenu'),
-            const TextSpan(
-              text: ' or a primitive and every ordinary specimen changes with '
-                  'it.',
-            ),
-          ],
+    TextSpan(
+      children: <InlineSpan>[
+        const TextSpan(
+          text:
+              'This page no longer redraws the assembled sidebar with '
+              'private markup. Change ',
         ),
-      );
+        ElCode.span('FixtureMenu'),
+        const TextSpan(
+          text:
+              ' or a primitive and every ordinary specimen changes with '
+              'it.',
+        ),
+      ],
+    ),
+  );
 }
 
 /* ── §2 Header ───────────────────────────────────────────────────────────── */
@@ -566,68 +570,69 @@ class _HeaderSection extends StatelessWidget {
   const _HeaderSection();
 
   @override
-  Widget build(BuildContext context) => DsSection(
-        id: 'header-input',
-        title: 'Header',
-        description: 'The same shared header first, followed by the three '
-            'supported product patterns.',
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+  Widget build(BuildContext context) => ElSection(
+    id: 'header-input',
+    title: 'Header',
+    description:
+        'The same shared header first, followed by the three '
+        'supported product patterns.',
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        ElGrid(
+          lg: 2,
           children: <Widget>[
-            DsGrid(
-              lg: 2,
-              children: <Widget>[
-                const DsPanel(
-                  label: 'Shared workspace header',
-                  flush: true,
-                  child: _PartStage(children: <Widget>[_FixtureHeader()]),
-                ),
-                const DsPanel(
-                  label: 'Shared header in context',
-                  flush: true,
-                  child: _PartStage(
-                    height: _stageShort,
-                    children: <Widget>[_FixtureHeader(), DsSidebarContent()],
-                  ),
-                ),
-              ],
+            const ElPanel(
+              label: 'Shared workspace header',
+              flush: true,
+              child: _PartStage(children: <Widget>[_FixtureHeader()]),
             ),
-            SizedBox(height: ds(4)),
-            const DsGrid(
-              lg: 3,
-              children: <Widget>[
-                DsPanel(
-                  label: 'Team switcher',
-                  note: 'sidebar-07',
-                  flush: true,
-                  child: _PartStage(children: <Widget>[_TeamSwitcherHeader()]),
-                ),
-                DsPanel(
-                  label: 'Version switcher',
-                  note: 'sidebar-01',
-                  flush: true,
-                  child:
-                      _PartStage(children: <Widget>[_VersionSwitcherHeader()]),
-                ),
-                DsPanel(
-                  label: 'Search form',
-                  note: 'sidebar-05',
-                  flush: true,
-                  child: _PartStage(children: <Widget>[_SearchFormHeader()]),
-                ),
-              ],
+            const ElPanel(
+              label: 'Shared header in context',
+              flush: true,
+              child: _PartStage(
+                height: _stageShort,
+                children: <Widget>[_FixtureHeader(), ElSidebarContent()],
+              ),
             ),
           ],
         ),
-      );
+        SizedBox(height: el(4)),
+        const ElGrid(
+          lg: 3,
+          children: <Widget>[
+            ElPanel(
+              label: 'Team switcher',
+              note: 'sidebar-07',
+              flush: true,
+              child: _PartStage(children: <Widget>[_TeamSwitcherHeader()]),
+            ),
+            ElPanel(
+              label: 'Version switcher',
+              note: 'sidebar-01',
+              flush: true,
+              child: _PartStage(children: <Widget>[_VersionSwitcherHeader()]),
+            ),
+            ElPanel(
+              label: 'Search form',
+              note: 'sidebar-05',
+              flush: true,
+              child: _PartStage(children: <Widget>[_SearchFormHeader()]),
+            ),
+          ],
+        ),
+      ],
+    ),
+  );
 }
 
 /// `TEAMS` and `VERSIONS`.
-const List<({String name, String plan})> _teams = <({String name, String plan})>[
-  (name: 'Eclipse Vault', plan: 'Enterprise'),
-  (name: 'Acme Corp.', plan: 'Startup'),
-  (name: 'Evil Corp.', plan: 'Free'),
-];
+const List<({String name, String plan})> _teams =
+    <({String name, String plan})>[
+      (name: 'Eclipse Vault', plan: 'Enterprise'),
+      (name: 'Acme Corp.', plan: 'Startup'),
+      (name: 'Evil Corp.', plan: 'Free'),
+    ];
 
 const List<String> _versions = <String>['1.4.0-beta', '1.3.2', '1.2.9'];
 
@@ -638,19 +643,19 @@ class _Tile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return SizedBox(
-      width: ds(8),
-      height: ds(8),
+      width: el(8),
+      height: el(8),
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: theme.sidebarPrimary,
-          borderRadius: BorderRadius.circular(DsRadii.md),
+          borderRadius: BorderRadius.circular(ElRadii.md),
         ),
         child: Center(
           child: DefaultTextStyle.merge(
             style: TextStyle(color: theme.sidebarPrimaryForeground),
-            child: const DsIcon.lucide(DsLucide.galleryVerticalEnd),
+            child: const ElIcon.lucide(ElLucide.galleryVerticalEnd),
           ),
         ),
       ),
@@ -670,54 +675,51 @@ class _TeamSwitcherHeaderState extends State<_TeamSwitcherHeader> {
   ({String name, String plan}) _team = _teams.first;
 
   @override
-  Widget build(BuildContext context) => DsSidebarHeader(
+  Widget build(BuildContext context) => ElSidebarHeader(
+    children: <Widget>[
+      ElSidebarMenu(
         children: <Widget>[
-          DsSidebarMenu(
-            children: <Widget>[
-              DsSidebarMenuItem(
-                button: DsDropdownMenu(
-                  side: DsPopoverSide.right,
-                  align: DsPopoverAlign.start,
-                  width: _switcherWidth,
-                  children: <DsMenuChild>[
-                    const DsMenuLabel('Teams'),
-                    for (final ({String name, String plan}) t in _teams)
-                      DsMenuItem(
-                        label: t.name,
-                        onSelect: () => setState(() => _team = t),
-                      ),
-                    const DsMenuSeparator(),
-                    const DsMenuItem(
-                      label: 'Add team',
-                      icon: DsIconGlyph.plus,
-                    ),
-                  ],
-                  trigger: DsSidebarMenuButton(
-                    size: DsSidebarMenuButtonSize.lg,
-                    tooltip: _team.name,
-                    suppressPressScale: DsDropdownMenu.pressScaleSuppressed,
-                    expanded: DsMenuTriggerScope.openOf(context),
-                    child: DsSidebarMenuRow(
-                      size: DsSidebarMenuButtonSize.lg,
-                      leading: const _Tile(),
-                      label: _WorkspaceLabel(
-                        title: _team.name,
-                        subtitle: _team.plan,
-                      ),
-                      trailing: const DsIcon.lucide(DsLucide.chevronsUpDown),
-                    ),
+          ElSidebarMenuItem(
+            button: ElDropdownMenu(
+              side: ElPopoverSide.right,
+              align: ElPopoverAlign.start,
+              width: _switcherWidth,
+              children: <ElMenuChild>[
+                const ElMenuLabel('Teams'),
+                for (final ({String name, String plan}) t in _teams)
+                  ElMenuItem(
+                    label: t.name,
+                    onSelect: () => setState(() => _team = t),
                   ),
+                const ElMenuSeparator(),
+                const ElMenuItem(label: 'Add team', icon: ElIconGlyph.plus),
+              ],
+              trigger: ElSidebarMenuButton(
+                size: ElSidebarMenuButtonSize.lg,
+                tooltip: _team.name,
+                suppressPressScale: ElDropdownMenu.pressScaleSuppressed,
+                expanded: ElMenuTriggerScope.openOf(context),
+                child: ElSidebarMenuRow(
+                  size: ElSidebarMenuButtonSize.lg,
+                  leading: const _Tile(),
+                  label: _WorkspaceLabel(
+                    title: _team.name,
+                    subtitle: _team.plan,
+                  ),
+                  trailing: const ElIcon.lucide(ElLucide.chevronsUpDown),
                 ),
               ),
-            ],
+            ),
           ),
         ],
-      );
+      ),
+    ],
+  );
 }
 
 /// `min-w-56` on the team menu, `min-w-48` on the version menu.
-double get _switcherWidth => ds(56);
-double get _versionWidth => ds(48);
+double get _switcherWidth => el(56);
+double get _versionWidth => el(48);
 
 /// *"The pattern from shadcn's sidebar-01 and sidebar-02."*
 class _VersionSwitcherHeader extends StatefulWidget {
@@ -731,44 +733,44 @@ class _VersionSwitcherHeaderState extends State<_VersionSwitcherHeader> {
   String _version = _versions.first;
 
   @override
-  Widget build(BuildContext context) => DsSidebarHeader(
+  Widget build(BuildContext context) => ElSidebarHeader(
+    children: <Widget>[
+      ElSidebarMenu(
         children: <Widget>[
-          DsSidebarMenu(
-            children: <Widget>[
-              DsSidebarMenuItem(
-                button: DsDropdownMenu(
-                  side: DsPopoverSide.right,
-                  align: DsPopoverAlign.start,
-                  width: _versionWidth,
-                  children: <DsMenuChild>[
-                    for (final String v in _versions)
-                      DsMenuItem(
-                        label: 'v$v',
-                        onSelect: () => setState(() => _version = v),
-                      ),
-                  ],
-                  trigger: DsSidebarMenuButton(
-                    size: DsSidebarMenuButtonSize.lg,
-                    tooltip: 'Version $_version',
-                    suppressPressScale: DsDropdownMenu.pressScaleSuppressed,
-                    expanded: DsMenuTriggerScope.openOf(context),
-                    child: DsSidebarMenuRow(
-                      size: DsSidebarMenuButtonSize.lg,
-                      leading: const _Tile(),
-                      label: _WorkspaceLabel(
-                        title: 'Documentation',
-                        subtitle: 'v$_version',
-                        subtitleSpec: DsType.numXs,
-                      ),
-                      trailing: const DsIcon.lucide(DsLucide.chevronsUpDown),
-                    ),
+          ElSidebarMenuItem(
+            button: ElDropdownMenu(
+              side: ElPopoverSide.right,
+              align: ElPopoverAlign.start,
+              width: _versionWidth,
+              children: <ElMenuChild>[
+                for (final String v in _versions)
+                  ElMenuItem(
+                    label: 'v$v',
+                    onSelect: () => setState(() => _version = v),
                   ),
+              ],
+              trigger: ElSidebarMenuButton(
+                size: ElSidebarMenuButtonSize.lg,
+                tooltip: 'Version $_version',
+                suppressPressScale: ElDropdownMenu.pressScaleSuppressed,
+                expanded: ElMenuTriggerScope.openOf(context),
+                child: ElSidebarMenuRow(
+                  size: ElSidebarMenuButtonSize.lg,
+                  leading: const _Tile(),
+                  label: _WorkspaceLabel(
+                    title: 'Documentation',
+                    subtitle: 'v$_version',
+                    subtitleSpec: ElType.numXs,
+                  ),
+                  trailing: const ElIcon.lucide(ElLucide.chevronsUpDown),
                 ),
               ),
-            ],
+            ),
           ),
         ],
-      );
+      ),
+    ],
+  );
 }
 
 /// *"What makes it a search form rather than a naked input is the label: the
@@ -777,37 +779,37 @@ class _SearchFormHeader extends StatelessWidget {
   const _SearchFormHeader();
 
   @override
-  Widget build(BuildContext context) => DsSidebarHeader(
+  Widget build(BuildContext context) => ElSidebarHeader(
+    children: <Widget>[
+      Stack(
+        alignment: AlignmentDirectional.centerStart,
         children: <Widget>[
-          Stack(
-            alignment: AlignmentDirectional.centerStart,
-            children: <Widget>[
-              DsSidebarInput(
-                placeholder: 'Search the docs…',
-                label: 'Search the docs',
-                // `pl-8` over the field's own `px-4 py-1`.
-                padding: EdgeInsets.only(
-                  left: ds(8),
-                  right: ds(4),
-                  top: ds(1),
-                  bottom: ds(1),
-                ),
+          ElSidebarInput(
+            placeholder: 'Search the docs…',
+            label: 'Search the docs',
+            // `pl-8` over the field's own `px-4 py-1`.
+            padding: EdgeInsets.only(
+              left: el(8),
+              right: el(4),
+              top: el(1),
+              bottom: el(1),
+            ),
+          ),
+          // `absolute top-1/2 left-2 -translate-y-1/2`, `size="sm"`.
+          Positioned(
+            left: el(2),
+            child: IgnorePointer(
+              child: ElIcon(
+                ElIconGlyph.search,
+                size: ElIconSize.sm,
+                tone: ElIconTone.muted,
               ),
-              // `absolute top-1/2 left-2 -translate-y-1/2`, `size="sm"`.
-              Positioned(
-                left: ds(2),
-                child: IgnorePointer(
-                  child: DsIcon(
-                    DsIconGlyph.search,
-                    size: DsIconSize.sm,
-                    tone: DsIconTone.muted,
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
         ],
-      );
+      ),
+    ],
+  );
 }
 
 /* ── §3 Menu ─────────────────────────────────────────────────────────────── */
@@ -816,57 +818,58 @@ class _MenuSection extends StatelessWidget {
   const _MenuSection();
 
   @override
-  Widget build(BuildContext context) => DsSection(
-        id: 'menu',
-        title: 'Menu',
-        description: 'The shared menu in a labelled group, an action group and '
-            'an unlabelled group. The rows do not change between panels.',
-        child: const DsGrid(
-          lg: 3,
-          children: <Widget>[
-            DsPanel(
-              label: 'Labelled',
-              flush: true,
-              child: _PartStage(
-                children: <Widget>[
-                  DsSidebarCollapsibleGroup(
-                    label: 'Collection',
-                    toggleLabel: 'Toggle Collection group',
-                    child: _FixtureMenu(),
-                  ),
-                ],
+  Widget build(BuildContext context) => ElSection(
+    id: 'menu',
+    title: 'Menu',
+    description:
+        'The shared menu in a labelled group, an action group and '
+        'an unlabelled group. The rows do not change between panels.',
+    child: const ElGrid(
+      lg: 3,
+      children: <Widget>[
+        ElPanel(
+          label: 'Labelled',
+          flush: true,
+          child: _PartStage(
+            children: <Widget>[
+              ElSidebarCollapsibleGroup(
+                label: 'Collection',
+                toggleLabel: 'Toggle Collection group',
+                child: _FixtureMenu(),
               ),
-            ),
-            DsPanel(
-              label: 'Label + action',
-              flush: true,
-              child: _PartStage(
-                children: <Widget>[
-                  DsSidebarCollapsibleGroup(
-                    label: 'Collection',
-                    toggleLabel: 'Toggle Collection group',
-                    action: _AddCollection(),
-                    child: _FixtureMenu(),
-                  ),
-                ],
-              ),
-            ),
-            DsPanel(
-              label: 'No label',
-              flush: true,
-              child: _PartStage(
-                children: <Widget>[
-                  DsSidebarGroup(
-                    children: <Widget>[
-                      DsSidebarGroupContent(child: _FixtureMenu()),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
-      );
+        ElPanel(
+          label: 'Label + action',
+          flush: true,
+          child: _PartStage(
+            children: <Widget>[
+              ElSidebarCollapsibleGroup(
+                label: 'Collection',
+                toggleLabel: 'Toggle Collection group',
+                action: _AddCollection(),
+                child: _FixtureMenu(),
+              ),
+            ],
+          ),
+        ),
+        ElPanel(
+          label: 'No label',
+          flush: true,
+          child: _PartStage(
+            children: <Widget>[
+              ElSidebarGroup(
+                children: <Widget>[
+                  ElSidebarGroupContent(child: _FixtureMenu()),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
 }
 
 /* ── §4 Menu button variants ─────────────────────────────────────────────── */
@@ -876,32 +879,35 @@ class _ButtonVariantsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double glyph = DsButton.iconPxFor(DsSidebarMenuButtonSize.md.button);
-    return DsSection(
+    final double glyph = ElButton.iconPxFor(ElSidebarMenuButtonSize.md.button);
+    return ElSection(
       id: 'button-variants',
       title: 'Menu button variants',
-      description: 'These are intentionally different: each row is the '
+      description:
+          'These are intentionally different: each row is the '
           'canonical Button variant placed into the same sidebar geometry.',
-      child: DsStateGrid(
+      child: ElStateGrid(
         children: <Widget>[
-          for (final ({String label, DsButtonVariant variant}) v
+          for (final ({String label, ElButtonVariant variant}) v
               in _buttonVariants)
-            DsStateCell(
+            ElStateCell(
               label: v.label,
               child: _PartStage(
                 children: <Widget>[
-                  DsSidebarGroup(
+                  ElSidebarGroup(
                     children: <Widget>[
-                      DsSidebarGroupContent(
-                        child: DsSidebarMenu(
+                      ElSidebarGroupContent(
+                        child: ElSidebarMenu(
                           children: <Widget>[
-                            DsSidebarMenuItem(
-                              button: DsSidebarMenuButton(
+                            ElSidebarMenuItem(
+                              button: ElSidebarMenuButton(
                                 variant: v.variant,
-                                child: DsSidebarMenuRow(
-                                  leading:
-                                      DsIcon(_nav.first.glyph, sizePx: glyph),
-                                  label: const DsSidebarMenuLabel('All cards'),
+                                child: ElSidebarMenuRow(
+                                  leading: ElIcon(
+                                    _nav.first.glyph,
+                                    sizePx: glyph,
+                                  ),
+                                  label: const ElSidebarMenuLabel('All cards'),
                                 ),
                               ),
                             ),
@@ -926,38 +932,43 @@ class _RowExtrasSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double glyph = DsButton.iconPxFor(DsSidebarMenuButtonSize.md.button);
-    return DsSection(
+    final double glyph = ElButton.iconPxFor(ElSidebarMenuButtonSize.md.button);
+    return ElSection(
       id: 'row-extras',
       title: 'Badges and actions',
-      description: 'Counts are canonical Badge variants; verbs are canonical '
+      description:
+          'Counts are canonical Badge variants; verbs are canonical '
           'Button variants. Sidebar owns only their placement.',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          DsStateGrid(
+          ElStateGrid(
             cols: 5,
             children: <Widget>[
-              for (final ({String label, DsBadgeVariant variant}) v
+              for (final ({String label, ElBadgeVariant variant}) v
                   in _badgeVariants)
-                DsStateCell(
+                ElStateCell(
                   label: v.label,
                   child: _PartStage(
                     children: <Widget>[
-                      DsSidebarGroup(
+                      ElSidebarGroup(
                         children: <Widget>[
-                          DsSidebarGroupContent(
-                            child: DsSidebarMenu(
+                          ElSidebarGroupContent(
+                            child: ElSidebarMenu(
                               children: <Widget>[
-                                DsSidebarMenuItem(
-                                  button: DsSidebarMenuButton(
-                                    child: DsSidebarMenuRow(
-                                      leading: DsIcon(_nav.first.glyph,
-                                          sizePx: glyph),
-                                      label: const DsSidebarMenuLabel('Reports'),
+                                ElSidebarMenuItem(
+                                  button: ElSidebarMenuButton(
+                                    child: ElSidebarMenuRow(
+                                      leading: ElIcon(
+                                        _nav.first.glyph,
+                                        sizePx: glyph,
+                                      ),
+                                      label: const ElSidebarMenuLabel(
+                                        'Reports',
+                                      ),
                                     ),
                                   ),
-                                  badge: DsSidebarMenuBadge(
+                                  badge: ElSidebarMenuBadge(
                                     '3',
                                     variant: v.variant,
                                   ),
@@ -972,34 +983,39 @@ class _RowExtrasSection extends StatelessWidget {
                 ),
             ],
           ),
-          SizedBox(height: ds(4)),
-          DsGrid(
+          SizedBox(height: el(4)),
+          ElGrid(
             lg: 2,
             children: <Widget>[
-              DsPanel(
+              ElPanel(
                 label: 'Menu action',
                 flush: true,
                 child: _PartStage(
                   children: <Widget>[
-                    DsSidebarGroup(
+                    ElSidebarGroup(
                       children: <Widget>[
-                        DsSidebarGroupContent(
-                          child: DsSidebarMenu(
+                        ElSidebarGroupContent(
+                          child: ElSidebarMenu(
                             children: <Widget>[
-                              DsSidebarMenuItem(
-                                button: DsSidebarMenuButton(
-                                  child: DsSidebarMenuRow(
-                                    leading:
-                                        DsIcon(_nav.first.glyph, sizePx: glyph),
-                                    label: const DsSidebarMenuLabel('All cards'),
+                              ElSidebarMenuItem(
+                                button: ElSidebarMenuButton(
+                                  child: ElSidebarMenuRow(
+                                    leading: ElIcon(
+                                      _nav.first.glyph,
+                                      sizePx: glyph,
+                                    ),
+                                    label: const ElSidebarMenuLabel(
+                                      'All cards',
+                                    ),
                                   ),
                                 ),
-                                action: DsSidebarMenuAction(
+                                action: ElSidebarMenuAction(
                                   label: 'Add card',
-                                  child: DsIcon(
-                                    DsIconGlyph.plus,
-                                    sizePx:
-                                        DsButton.iconPxFor(DsButtonSize.iconXs),
+                                  child: ElIcon(
+                                    ElIconGlyph.plus,
+                                    sizePx: ElButton.iconPxFor(
+                                      ElButtonSize.iconXs,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -1011,12 +1027,12 @@ class _RowExtrasSection extends StatelessWidget {
                   ],
                 ),
               ),
-              const DsPanel(
+              const ElPanel(
                 label: 'Group action',
                 flush: true,
                 child: _PartStage(
                   children: <Widget>[
-                    DsSidebarCollapsibleGroup(
+                    ElSidebarCollapsibleGroup(
                       label: 'Collection',
                       toggleLabel: 'Toggle Collection group',
                       action: _AddCollection(),
@@ -1040,43 +1056,44 @@ class _SubmenuSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double glyph = DsButton.iconPxFor(DsSidebarMenuButtonSize.md.button);
-    return DsSection(
+    final double glyph = ElButton.iconPxFor(ElSidebarMenuButtonSize.md.button);
+    return ElSection(
       id: 'submenu',
       title: 'Submenu',
-      description: 'The parent and nested links use the same Button system; '
+      description:
+          'The parent and nested links use the same Button system; '
           'depth comes from the spine and indentation.',
-      child: DsPanel(
+      child: ElPanel(
         label: 'Nested under the shared active row',
         flush: true,
         child: _PartStage(
           children: <Widget>[
-            DsSidebarGroup(
+            ElSidebarGroup(
               children: <Widget>[
-                DsSidebarGroupContent(
-                  child: DsSidebarMenu(
+                ElSidebarGroupContent(
+                  child: ElSidebarMenu(
                     children: <Widget>[
-                      DsSidebarMenuItem(
-                        button: DsSidebarMenuButton(
+                      ElSidebarMenuItem(
+                        button: ElSidebarMenuButton(
                           isActive: true,
-                          child: DsSidebarMenuRow(
-                            leading: DsIcon(_nav.first.glyph, sizePx: glyph),
-                            label: const DsSidebarMenuLabel('All cards'),
+                          child: ElSidebarMenuRow(
+                            leading: ElIcon(_nav.first.glyph, sizePx: glyph),
+                            label: const ElSidebarMenuLabel('All cards'),
                           ),
                         ),
-                        submenu: const DsSidebarMenuSub(
+                        submenu: const ElSidebarMenuSub(
                           children: <Widget>[
-                            DsSidebarMenuSubItem(
-                              child: DsSidebarMenuSubButton(
+                            ElSidebarMenuSubItem(
+                              child: ElSidebarMenuSubButton(
                                 label: 'Open',
                                 isActive: true,
                               ),
                             ),
-                            DsSidebarMenuSubItem(
-                              child: DsSidebarMenuSubButton(label: 'Settled'),
+                            ElSidebarMenuSubItem(
+                              child: ElSidebarMenuSubButton(label: 'Settled'),
                             ),
-                            DsSidebarMenuSubItem(
-                              child: DsSidebarMenuSubButton(label: 'Archived'),
+                            ElSidebarMenuSubItem(
+                              child: ElSidebarMenuSubButton(label: 'Archived'),
                             ),
                           ],
                         ),
@@ -1099,37 +1116,38 @@ class _FooterSection extends StatelessWidget {
   const _FooterSection();
 
   @override
-  Widget build(BuildContext context) => DsSection(
-        id: 'footer',
-        title: 'Footer',
-        description: 'SidebarFooter pins the shared NavUser composition to the '
-            'panel floor.',
-        child: const DsGrid(
-          lg: 2,
-          children: <Widget>[
-            DsPanel(
-              label: 'Pinned below empty content',
-              flush: true,
-              child: _PartStage(
-                height: _stageFooter,
-                children: <Widget>[
-                  _FixtureHeader(),
-                  DsSidebarContent(),
-                  _FixtureFooter(),
-                ],
-              ),
-            ),
-            DsPanel(
-              label: 'Pinned below real content',
-              flush: true,
-              child: _PartStage(
-                height: _stageFooter,
-                children: <Widget>[_FixtureContent(), _FixtureFooter()],
-              ),
-            ),
-          ],
+  Widget build(BuildContext context) => ElSection(
+    id: 'footer',
+    title: 'Footer',
+    description:
+        'SidebarFooter pins the shared NavUser composition to the '
+        'panel floor.',
+    child: const ElGrid(
+      lg: 2,
+      children: <Widget>[
+        ElPanel(
+          label: 'Pinned below empty content',
+          flush: true,
+          child: _PartStage(
+            height: _stageFooter,
+            children: <Widget>[
+              _FixtureHeader(),
+              ElSidebarContent(),
+              _FixtureFooter(),
+            ],
+          ),
         ),
-      );
+        ElPanel(
+          label: 'Pinned below real content',
+          flush: true,
+          child: _PartStage(
+            height: _stageFooter,
+            children: <Widget>[_FixtureContent(), _FixtureFooter()],
+          ),
+        ),
+      ],
+    ),
+  );
 }
 
 /* ── §8 Shell ────────────────────────────────────────────────────────────── */
@@ -1148,9 +1166,9 @@ class _ShellMatrixDemo extends StatefulWidget {
 }
 
 class _ShellMatrixDemoState extends State<_ShellMatrixDemo> {
-  DsSidebarSide _side = DsSidebarSide.left;
-  DsSidebarVariant _variant = DsSidebarVariant.sidebar;
-  DsSidebarCollapsible _collapsible = DsSidebarCollapsible.icon;
+  ElSidebarSide _side = ElSidebarSide.left;
+  ElSidebarVariant _variant = ElSidebarVariant.sidebar;
+  ElSidebarCollapsible _collapsible = ElSidebarCollapsible.icon;
 
   static const List<String> _sideLabels = <String>['left', 'right'];
   static const List<String> _variantLabels = <String>[
@@ -1175,50 +1193,50 @@ class _ShellMatrixDemoState extends State<_ShellMatrixDemo> {
       children: <Widget>[
         // `flex flex-wrap gap-x-8 gap-y-5`.
         Wrap(
-          spacing: ds(8),
-          runSpacing: ds(5),
+          spacing: el(8),
+          runSpacing: el(5),
           children: <Widget>[
             _Knob(
               label: 'side',
               options: _sideLabels,
               selected: _side.index,
               onChanged: (int i) =>
-                  setState(() => _side = DsSidebarSide.values[i]),
+                  setState(() => _side = ElSidebarSide.values[i]),
             ),
             _Knob(
               label: 'variant',
               options: _variantLabels,
               selected: _variant.index,
               onChanged: (int i) =>
-                  setState(() => _variant = DsSidebarVariant.values[i]),
+                  setState(() => _variant = ElSidebarVariant.values[i]),
             ),
             _Knob(
               label: 'collapsible',
               options: _collapsibleLabels,
               selected: _collapsible.index,
               onChanged: (int i) =>
-                  setState(() => _collapsible = DsSidebarCollapsible.values[i]),
+                  setState(() => _collapsible = ElSidebarCollapsible.values[i]),
             ),
           ],
         ),
         // `gap-5`.
-        SizedBox(height: ds(5)),
+        SizedBox(height: el(5)),
         KeyedSubtree(
           key: ValueKey<String>(label),
           child: _ShellStage(
             variant: _variant,
             children: <Widget>[
-              DsSidebar(
+              ElSidebar(
                 side: _side,
                 variant: _variant,
                 collapsible: _collapsible,
                 children: <Widget>[
                   const _DemoNav(),
-                  if (_collapsible != DsSidebarCollapsible.none)
-                    const DsSidebarRail(),
+                  if (_collapsible != ElSidebarCollapsible.none)
+                    const ElSidebarRail(),
                 ],
               ),
-              DsSidebarInset(child: _InsetHeader(label: label)),
+              ElSidebarInset(child: _InsetHeader(label: label)),
             ],
           ),
         ),
@@ -1243,28 +1261,28 @@ class _Knob extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
+    crossAxisAlignment: CrossAxisAlignment.start,
+    mainAxisSize: MainAxisSize.min,
+    children: <Widget>[
+      ElText(label, ElType.caption),
+      SizedBox(height: el(2)),
+      Wrap(
+        spacing: el(2),
+        runSpacing: el(2),
         children: <Widget>[
-          DsText(label, DsType.caption),
-          SizedBox(height: ds(2)),
-          Wrap(
-            spacing: ds(2),
-            runSpacing: ds(2),
-            children: <Widget>[
-              for (int i = 0; i < options.length; i++)
-                DsButton(
-                  size: DsButtonSize.sm,
-                  variant: i == selected
-                      ? DsButtonVariant.primary
-                      : DsButtonVariant.outline,
-                  onPressed: () => onChanged(i),
-                  child: Text(options[i]),
-                ),
-            ],
-          ),
+          for (int i = 0; i < options.length; i++)
+            ElButton(
+              size: ElButtonSize.sm,
+              variant: i == selected
+                  ? ElButtonVariant.primary
+                  : ElButtonVariant.outline,
+              onPressed: () => onChanged(i),
+              child: Text(options[i]),
+            ),
         ],
-      );
+      ),
+    ],
+  );
 }
 
 /// The shared body of every shell specimen.
@@ -1273,22 +1291,23 @@ class _DemoNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double glyph = DsButton.iconPxFor(DsSidebarMenuButtonSize.md.button);
-    return DsSidebarContent(
+    final double glyph = ElButton.iconPxFor(ElSidebarMenuButtonSize.md.button);
+    return ElSidebarContent(
       children: <Widget>[
-        DsSidebarGroup(
+        ElSidebarGroup(
           children: <Widget>[
-            DsSidebarGroupContent(
-              child: DsSidebarMenu(
+            ElSidebarGroupContent(
+              child: ElSidebarMenu(
                 children: <Widget>[
-                  for (final ({String label, DsIconGlyph glyph, String? count})
-                      item in _nav)
-                    DsSidebarMenuItem(
-                      button: DsSidebarMenuButton(
+                  for (final ({String label, ElIconGlyph glyph, String? count})
+                      item
+                      in _nav)
+                    ElSidebarMenuItem(
+                      button: ElSidebarMenuButton(
                         tooltip: item.label,
-                        child: DsSidebarMenuRow(
-                          leading: DsIcon(item.glyph, sizePx: glyph),
-                          label: DsSidebarMenuLabel(item.label),
+                        child: ElSidebarMenuRow(
+                          leading: ElIcon(item.glyph, sizePx: glyph),
+                          label: ElSidebarMenuLabel(item.label),
                         ),
                       ),
                     ),
@@ -1310,24 +1329,23 @@ class _InsetHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         Container(
-          height: DsWidths.siteHeader,
-          padding: EdgeInsets.symmetric(horizontal: ds(6)),
+          height: ElWidths.siteHeader,
+          padding: EdgeInsets.symmetric(horizontal: el(6)),
           decoration: BoxDecoration(
             border: Border(
-              bottom:
-                  BorderSide(color: theme.border, width: DsWidths.hairline),
+              bottom: BorderSide(color: theme.border, width: ElWidths.hairline),
             ),
           ),
           child: Row(
             children: <Widget>[
-              const DsSidebarTrigger(),
-              SizedBox(width: ds(3)),
-              DsText(label, DsType.label),
+              const ElSidebarTrigger(),
+              SizedBox(width: el(3)),
+              ElText(label, ElType.label),
             ],
           ),
         ),
@@ -1340,31 +1358,30 @@ class _ShellSection extends StatelessWidget {
   const _ShellSection();
 
   @override
-  Widget build(BuildContext context) => DsSection(
-        id: 'shell',
-        title: 'Shell',
-        description:
-            'One interactive shell matrix owns side, variant and collapse '
-            'behavior.',
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            const _ShellMatrixDemo(),
-            SizedBox(height: ds(4)),
-            Align(
-              alignment: AlignmentDirectional.centerStart,
-              child: DsButton(
-                variant: DsButtonVariant.outline,
-                // `asChild` + `<Link href="/sidebar-demo">`: the B4
-                // divergence, so the href is the button's own handler.
-                onPressed: () =>
-                    AppRouter.of(context).navigate(sidebarDemoRoute),
-                child: const Text('Open the full-viewport sidebar'),
-              ),
-            ),
-          ],
+  Widget build(BuildContext context) => ElSection(
+    id: 'shell',
+    title: 'Shell',
+    description:
+        'One interactive shell matrix owns side, variant and collapse '
+        'behavior.',
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        const _ShellMatrixDemo(),
+        SizedBox(height: el(4)),
+        Align(
+          alignment: AlignmentDirectional.centerStart,
+          child: ElButton(
+            variant: ElButtonVariant.outline,
+            // `asChild` + `<Link href="/sidebar-demo">`: the B4
+            // divergence, so the href is the button's own handler.
+            onPressed: () => AppRouter.of(context).navigate(sidebarDemoRoute),
+            child: const Text('Open the full-viewport sidebar'),
+          ),
         ),
-      );
+      ],
+    ),
+  );
 }
 
 /* ── §9 Contract ─────────────────────────────────────────────────────────── */
@@ -1373,27 +1390,27 @@ class _ContractSection extends StatelessWidget {
   const _ContractSection();
 
   @override
-  Widget build(BuildContext context) => const DsSection(
-        id: 'contract',
-        title: 'Contract',
-        child: DsDoDont(
-          dos: <String>[
-            'Change the primitives or the shared fixture, never a private '
-                'specimen copy.',
-            'Use Button variants for actions and Badge variants for counts.',
-            'Keep SidebarFooter as the final region; it pins itself with '
-                'mt-auto.',
-            'Give every collapsible menu row a tooltip.',
-          ],
-          donts: <String>[
-            'Do not recreate active, hover or focus visuals in page-only '
-                'markup.',
-            'Do not hand-paint a sidebar-only badge or action.',
-            'Do not maintain a second anatomy composition.',
-            'Do not compensate for primitive spacing in specimen wrappers.',
-          ],
-        ),
-      );
+  Widget build(BuildContext context) => const ElSection(
+    id: 'contract',
+    title: 'Contract',
+    child: ElDoDont(
+      dos: <String>[
+        'Change the primitives or the shared fixture, never a private '
+            'specimen copy.',
+        'Use Button variants for actions and Badge variants for counts.',
+        'Keep SidebarFooter as the final region; it pins itself with '
+            'mt-auto.',
+        'Give every collapsible menu row a tooltip.',
+      ],
+      donts: <String>[
+        'Do not recreate active, hover or focus visuals in page-only '
+            'markup.',
+        'Do not hand-paint a sidebar-only badge or action.',
+        'Do not maintain a second anatomy composition.',
+        'Do not compensate for primitive spacing in specimen wrappers.',
+      ],
+    ),
+  );
 }
 
 /* ── The page ────────────────────────────────────────────────────────────── */
@@ -1404,15 +1421,16 @@ class SidebarPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsCategoryHit here = findCategory('base', 'sidebar');
+    final ElCategoryHit here = findCategory('base', 'sidebar');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        DsPageHeader(
+        ElPageHeader(
           eyebrow: '${here.group.title} · Base',
           title: here.category.title,
-          blurb: 'One sidebar system, rendered repeatedly from one '
+          blurb:
+              'One sidebar system, rendered repeatedly from one '
               'composition. Variants differ only when the section is '
               'explicitly demonstrating a canonical Button or Badge variant.',
           // DRIFT 1: twenty-one component names over nine sections.
@@ -1427,7 +1445,7 @@ class SidebarPage extends StatelessWidget {
         const _FooterSection(),
         const _ShellSection(),
         const _ContractSection(),
-        const DsPageFootNav(groupId: 'base', slug: 'sidebar'),
+        const ElPageFootNav(groupId: 'base', slug: 'sidebar'),
       ],
     );
   }

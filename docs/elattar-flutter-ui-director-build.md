@@ -23,7 +23,7 @@ Workers did not overlap ownership. The root agent was the sole integrator and re
 
 - `skills/elattar-flutter-ui-director/SKILL.md` describes Flutter screen, page, component, migration, and review work.
 - `references/system-map.md` and `references/verify.md` route implementation and proof against the actual Flutter package.
-- Guidance requires `DsTheme`, `DsSafeArea`, `DsText`, `ds(...)`, design-system colors, breakpoints, motion/reduced-motion, toast lifecycle, and reuse-before-extension decisions.
+- Guidance requires `ElTheme`, `ElSafeArea`, `ElText`, `el(...)`, design-system colors, breakpoints, motion/reduced-motion, toast lifecycle, and reuse-before-extension decisions.
 - `AGENTS.md` requires the skill for repository Flutter UI work.
 - `quick_validate.py .agents\\skills\\elattar-flutter-ui-director` returned `Skill is valid!` at the time of this build. The skill has since moved; see the relocation note below.
 
@@ -32,17 +32,17 @@ Workers did not overlap ownership. The root agent was the sole integrator and re
 `example/lib/showcase_main.dart` boots Signal Studio through the documentation app's shared router. The normal documentation entry point still opens the design-system overview.
 
 - The docs header and mobile navigation sheet expose an `Example app` action. Signal Studio exposes a labelled `Back to design system` / `System` action.
-- `DocsApp` owns the shared `DsTheme`, `MaterialApp`, and `AppRouter`; `SignalStudioShowcase` owns and disposes its product-scoped `DsToastController`.
-- The product shell owns one `DsToaster` and an `IndexedStack` for state-preserving navigation.
-- Compact navigation is a fixed, icon-led `DsGlassPanelDeep` dock with semantic selected state, keyboard parity, one safe-area inset owner, and token-derived content clearance; wide navigation stays in the shared header.
+- `DocsApp` owns the shared `ElTheme`, `MaterialApp`, and `AppRouter`; `SignalStudioShowcase` owns and disposes its product-scoped `ElToastController`.
+- The product shell owns one `ElToaster` and an `IndexedStack` for state-preserving navigation.
+- Compact navigation is a fixed, icon-led `ElGlassPanelDeep` dock with semantic selected state, keyboard parity, one safe-area inset owner, and token-derived content clearance; wide navigation stays in the shared header.
 - Dashboard includes skeleton loading, refresh/busy behavior, recovery feedback, range-driven KPI/chart data, a schedule/undo content queue, audience guidance, insight, and activity content.
 - Profile includes avatar/cover choices, identity badges, metrics, responsive tabs, skeleton loading, empty/recovery paths, and a real validated editor for name, handle, location, bio, category, visibility, and status. Save commits changes and toasts once; validation is inline and cancel is silent.
-- Reels includes a vertical `PageView`, safe-area overlays, declared assets, loading and unavailable/retry states, per-reel like/save counts animated through `DsIconSwap`, follow state, a creator-name-only collapsed card, an animated details disclosure, comments, and a share dialog with copy plus two social-post actions. Inline state does not toast; completed share/refresh actions do.
-- Compact and wide compositions use `DsBreakpoints`; spacing, geometry, typography, color, motion, icons, and feedback primitives come from the design system.
+- Reels includes a vertical `PageView`, safe-area overlays, declared assets, loading and unavailable/retry states, per-reel like/save counts animated through `ElIconSwap`, follow state, a creator-name-only collapsed card, an animated details disclosure, comments, and a share dialog with copy plus two social-post actions. Inline state does not toast; completed share/refresh actions do.
+- Compact and wide compositions use `ElBreakpoints`; spacing, geometry, typography, color, motion, icons, and feedback primitives come from the design system.
 
 ## Fallback text-style resolution
 
-The client APK screenshot showed red inherited text with a yellow double underline. Flutter defines that exact combination as MaterialApp's fallback `DefaultTextStyle` (`_errorTextStyle`) for text rendered without a Material text scope. Signal Studio's standalone route had correctly scoped theme colors but no ambient DS text style, so any `DsText` role that intentionally inherited unset properties also inherited the fallback decoration. `_SignalStudioShell` now establishes `DsType.body` and `theme.foreground` as the default for the entire product tree. A widget regression test asserts that the inherited style is DS-colored and carries neither the fallback underline nor its double decoration style.
+The client APK screenshot showed red inherited text with a yellow double underline. Flutter defines that exact combination as MaterialApp's fallback `DefaultTextStyle` (`_errorTextStyle`) for text rendered without a Material text scope. Signal Studio's standalone route had correctly scoped theme colors but no ambient Elattar text style, so any `ElText` role that intentionally inherited unset properties also inherited the fallback decoration. `_SignalStudioShell` now establishes `ElType.body` and `theme.foreground` as the default for the entire product tree. A widget regression test asserts that the inherited style is Elattar-colored and carries neither the fallback underline nor its double decoration style.
 
 The debug-only `debugPaintBaselinesEnabled` reset remains a separate defensive measure for Inspector sessions; it was not the cause of the release screenshot.
 
@@ -73,8 +73,8 @@ Both the source guard and manual strict searches completed with no violations.
 
 - Compact navigation now opens on Profile and reads Profile, Dashboard, Reels. The `Ari Rocha` header control routes directly to Profile.
 - The compact deep-glass dock is fixed over the page instead of consuming a shell layout slot. Each scrollable page owns enough bottom clearance to keep its final actions reachable, and the collapsed Reels title/menu panel sits above the dock while its media continues behind it.
-- Collapsed Reels show only the title and a right-side disclosure control. The expanded DS disclosure orders description, views/time, creator/follow, then Like, Share, Comments, Bookmark.
-- Like and Bookmark use the package `DsIconSwap` contract; the package component suite verifies its vertical wheel and jelly motion.
+- Collapsed Reels show only the title and a right-side disclosure control. The expanded Elattar disclosure orders description, views/time, creator/follow, then Like, Share, Comments, Bookmark.
+- Like and Bookmark use the package `ElIconSwap` contract; the package component suite verifies its vertical wheel and jelly motion.
 - Profile and Reels share one product-layer `ShowcaseShareDialog` with a read-only public link, Copy, Threads, X, and Done actions.
 - Dashboard now separates a dominant deep-glass metric, compact stats, chart focus, semantic alerts, and item-based queues/activity instead of repeating the same card surface.
 - `flutter build web --release --target lib/showcase_main.dart` produced the current preview in `example/build/web`. No APK was rebuilt for this revision.
@@ -83,7 +83,7 @@ Both the source guard and manual strict searches completed with no violations.
 
 - Path: `example/build/app/outputs/flutter-apk/Elattar-Design-System.apk`
 - Android application label: `Elattar Design System`
-- Launcher: code-native Android vector of `DsLogoMark`, using the authoritative action, primary-foreground, and value-bright tokens. `aapt` confirms the packaged icon resource and token colors.
+- Launcher: code-native Android vector of `ElLogoMark`, using the authoritative action, primary-foreground, and value-bright tokens. `aapt` confirms the packaged icon resource and token colors.
 - Application ID: `com.elattar.designsystem`
 - Version: `1.0.0` (`versionCode` 1)
 - Size: 58,755,751 bytes (56.03 MiB)

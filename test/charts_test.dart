@@ -9,7 +9,7 @@
 ///
 /// The three families of assertion, and why each exists:
 ///
-///  * **maths** — `dsChartNiceTicks` and the scales, checked in isolation. The
+///  * **maths** — `elChartNiceTicks` and the scales, checked in isolation. The
 ///    niced domain is the one number nothing else can be placed without, and it
 ///    is invisible in the DOM: it has to be read back out of a path.
 ///  * **rendered pixels** — the standing painter rule. A painter ships with
@@ -46,12 +46,12 @@ Future<void> _loadFonts() async {
       File('assets/fonts/$file').readAsBytesSync(),
     );
     // The package pubspec registers its faces under the prefixed family name,
-    // and `DsTypeSpec` threads `package:` through every `TextStyle` — so a
+    // and `ElTypeSpec` threads `package:` through every `TextStyle` — so a
     // loader registered on the bare family name is never consulted and every
     // measurement below silently becomes an Ahem measurement.
-    final FontLoader loader =
-        FontLoader('packages/elattar_design_system/$family')
-          ..addFont(Future<ByteData>.value(bytes));
+    final FontLoader loader = FontLoader(
+      'packages/elattar_design_system/$family',
+    )..addFont(Future<ByteData>.value(bytes));
     await loader.load();
   }
 
@@ -59,16 +59,16 @@ Future<void> _loadFonts() async {
   await one('GeistMono', 'GeistMono-Variable.ttf');
 }
 
-Widget _scoped(Widget child, {DsThemeMode mode = DsThemeMode.light}) => DsTheme(
-      controller: DsThemeController(mode: mode),
-      child: MediaQuery(
-        data: const MediaQueryData(disableAnimations: true),
-        child: Directionality(
-          textDirection: TextDirection.ltr,
-          child: Align(alignment: Alignment.topLeft, child: child),
-        ),
-      ),
-    );
+Widget _scoped(Widget child, {ElThemeMode mode = ElThemeMode.light}) => ElTheme(
+  controller: ElThemeController(mode: mode),
+  child: MediaQuery(
+    data: const MediaQueryData(disableAnimations: true),
+    child: Directionality(
+      textDirection: TextDirection.ltr,
+      child: Align(alignment: Alignment.topLeft, child: child),
+    ),
+  ),
+);
 
 void main() {
   setUpAll(_loadFonts);
@@ -79,35 +79,35 @@ void main() {
     test('MONTHS_DESKTOP nices 305 up to 320', () {
       // Read back out of `AreaDefault`'s own path: February (305) lands at
       // y=10.594 of a 226-tall plot, which is 305/320 and not 305/305.
-      expect(dsChartNiceTicks(0, 305), <double>[0, 80, 160, 240, 320]);
-      final ({double min, double max}) domain = dsChartNiceDomain(0, 305);
+      expect(elChartNiceTicks(0, 305), <double>[0, 80, 160, 240, 320]);
+      final ({double min, double max}) domain = elChartNiceDomain(0, 305);
       expect(domain.min, 0);
       expect(domain.max, 320);
     });
 
     test('AreaAxes renders three ticks over 0..600', () {
       // Measured: the Y axis prints 0 · 300 · 600 at y = 226 · 113 · 9.
-      expect(dsChartNiceTicks(0, 505, tickCount: 3), <double>[0, 300, 600]);
+      expect(elChartNiceTicks(0, 505, tickCount: 3), <double>[0, 300, 600]);
     });
 
     test('a stacked pair nices to the stack total, not the tallest series', () {
       // AreaStacked's top series reaches 505 (305 + 200).
-      expect(dsChartNiceTicks(0, 505), <double>[0, 150, 300, 450, 600]);
+      expect(elChartNiceTicks(0, 505), <double>[0, 150, 300, 450, 600]);
     });
 
     test('BarNegative keeps zero as a tick on both sides', () {
-      final List<double> ticks = dsChartNiceTicks(-209, 214);
+      final List<double> ticks = elChartNiceTicks(-209, 214);
       expect(ticks.contains(0), isTrue);
       expect(ticks.first, lessThanOrEqualTo(-209));
       expect(ticks.last, greaterThanOrEqualTo(214));
     });
 
     test('SPORT_DAYS stacks to 950 and nices to 1000', () {
-      expect(dsChartNiceTicks(0, 950), <double>[0, 250, 500, 750, 1000]);
+      expect(elChartNiceTicks(0, 950), <double>[0, 250, 500, 750, 1000]);
     });
 
     test('a flat domain still returns tickCount stops', () {
-      expect(dsChartNiceTicks(5, 5).length, 5);
+      expect(elChartNiceTicks(5, 5).length, 5);
     });
   });
 
@@ -115,11 +115,8 @@ void main() {
 
   group('scales — measured stops', () {
     test('the point scale puts six months on the plot edges', () {
-      const DsPointScale scale =
-          DsPointScale(count: 6, start: 12, extent: 458);
-      final List<double> xs = <double>[
-        for (int i = 0; i < 6; i++) scale.at(i),
-      ];
+      const ElPointScale scale = ElPointScale(count: 6, start: 12, extent: 458);
+      final List<double> xs = <double>[for (int i = 0; i < 6; i++) scale.at(i)];
       // `AreaDefault`'s six vertices, exactly.
       expect(xs[0], closeTo(12, _mathTol));
       expect(xs[1], closeTo(103.6, 1e-9));
@@ -130,14 +127,14 @@ void main() {
     });
 
     test('the band scale centres six categories across BarDefault', () {
-      const DsBandScale scale = DsBandScale(count: 6, start: 5, extent: 472);
+      const ElBandScale scale = ElBandScale(count: 6, start: 5, extent: 472);
       expect(scale.bandwidth, closeTo(78.6667, 1e-3));
       expect(scale.bandStart(0), closeTo(5, _mathTol));
       expect(scale.center(0), closeTo(44.3333, 1e-3));
     });
 
     test('the value scale maps 186 to BarDefault\'s own bar top', () {
-      final DsLinearScale scale = DsLinearScale.nice(
+      final ElLinearScale scale = ElLinearScale.nice(
         dataMin: 73,
         dataMax: 305,
         rangeStart: 221,
@@ -155,8 +152,7 @@ void main() {
 
   group('bar slots — the JS int cast is load-bearing', () {
     test('one bar in a 78.667 band comes out 62 wide, not 62.93', () {
-      final List<DsBarSlot> slots =
-          dsBarSlots(bandSize: 472 / 6, barCount: 1);
+      final List<ElBarSlot> slots = elBarSlots(bandSize: 472 / 6, barCount: 1);
       expect(slots.single.offset, closeTo(7.8667, 1e-3));
       // recharts writes `originalSize >>= 0`. Rounding instead would give 63
       // and push the last bar past the grid.
@@ -164,8 +160,7 @@ void main() {
     });
 
     test('two bars share the band with a 4px gap', () {
-      final List<DsBarSlot> slots =
-          dsBarSlots(bandSize: 472 / 6, barCount: 2);
+      final List<ElBarSlot> slots = elBarSlots(bandSize: 472 / 6, barCount: 2);
       expect(slots[0].size, 29);
       expect(slots[0].offset, closeTo(7.8667, 1e-3));
       expect(slots[1].offset, closeTo(7.8667 + 29 + 4, 1e-3));
@@ -186,7 +181,7 @@ void main() {
     ];
 
     test('natural reaches the measured overshoot above February', () {
-      final Path path = dsCurvePath(areaDefault, DsCurveType.natural);
+      final Path path = elCurvePath(areaDefault, ElCurveType.natural);
       final Rect bounds = path.getBounds();
       // The rendered `d` runs C…103.6,10.594 C134.133,-0.072… — the spline
       // rises ABOVE the plot before it comes back down, which is exactly the
@@ -197,15 +192,15 @@ void main() {
     });
 
     test('linear stays inside its own points', () {
-      final Path path = dsCurvePath(areaDefault, DsCurveType.linear);
+      final Path path = elCurvePath(areaDefault, ElCurveType.linear);
       expect(path.getBounds().top, closeTo(10.594, _tol));
     });
 
     test('step breaks at the midpoint of each interval', () {
-      final Path path = dsCurvePath(
-        const <Offset>[Offset(0, 100), Offset(100, 0)],
-        DsCurveType.step,
-      );
+      final Path path = elCurvePath(const <Offset>[
+        Offset(0, 100),
+        Offset(100, 0),
+      ], ElCurveType.step);
       // A midpoint break is on the vertical at x=50, so both ends are touched
       // and nothing overshoots.
       final Rect b = path.getBounds();
@@ -216,7 +211,7 @@ void main() {
     });
 
     test('monotone never overshoots a data point', () {
-      final Path path = dsCurvePath(areaDefault, DsCurveType.monotone);
+      final Path path = elCurvePath(areaDefault, ElCurveType.monotone);
       final Rect b = path.getBounds();
       expect(b.top, greaterThanOrEqualTo(10.594 - _tol));
       expect(b.bottom, lessThanOrEqualTo(174.444 + _tol));
@@ -227,23 +222,25 @@ void main() {
 
   group('polar — the measured pie', () {
     test('the plot radius is 98.4 on a 482 x 256 box', () {
-      expect(dsPolarMaxRadius(_plot.width, _plot.height) * 0.8,
-          closeTo(98.4, 1e-9));
+      expect(
+        elPolarMaxRadius(_plot.width, _plot.height) * 0.8,
+        closeTo(98.4, 1e-9),
+      );
     });
 
     test('chrome ends where the rendered sector ends', () {
       // BROWSERS totals 925; chrome is 275, i.e. 107.027 degrees.
       const double total = 925;
       const double angle = 275 / total * 360;
-      final Offset end = dsPolarToCartesian(241, 128, 98.4, angle);
+      final Offset end = elPolarToCartesian(241, 128, 98.4, angle);
       expect(end.dx, closeTo(212.1863, _tol));
       expect(end.dy, closeTo(33.9132, _tol));
     });
 
     test('the radar web starts at twelve o\'clock and steps -60', () {
       // RadarDefault's grid ring at full radius.
-      final Offset v0 = dsPolarToCartesian(241, 128, 98.4, 90);
-      final Offset v1 = dsPolarToCartesian(241, 128, 98.4, 30);
+      final Offset v0 = elPolarToCartesian(241, 128, 98.4, 90);
+      final Offset v1 = elPolarToCartesian(241, 128, 98.4, 30);
       expect(v0.dx, closeTo(241, _tol));
       expect(v0.dy, closeTo(29.6, _tol));
       expect(v1.dx, closeTo(326.2169, _tol));
@@ -251,7 +248,7 @@ void main() {
     });
 
     test('a donut sector closes on its own inner arc', () {
-      final Path path = dsSectorPath(
+      final Path path = elSectorPath(
         cx: 241,
         cy: 128,
         innerRadius: 60,
@@ -270,37 +267,45 @@ void main() {
 
   /* ── Widgets ──────────────────────────────────────────────────────────── */
 
-  group('DsChartContainer', () {
-    testWidgets('renders at the measured 482 x 256 plot', (WidgetTester t) async {
-      await t.pumpWidget(_scoped(SizedBox(
-        width: _plot.width,
-        child: DsChartContainer(
-          config: const DsChartConfig(<String, DsChartSeries>{}),
-          child: const SizedBox.shrink(),
+  group('ElChartContainer', () {
+    testWidgets('renders at the measured 482 x 256 plot', (
+      WidgetTester t,
+    ) async {
+      await t.pumpWidget(
+        _scoped(
+          SizedBox(
+            width: _plot.width,
+            child: ElChartContainer(
+              config: const ElChartConfig(<String, ElChartSeries>{}),
+              child: const SizedBox.shrink(),
+            ),
+          ),
         ),
-      )));
-      expect(
-        t.getSize(find.byType(DsChartContainer)),
-        const Size(482, 256),
       );
+      expect(t.getSize(find.byType(ElChartContainer)), const Size(482, 256));
     });
   });
 
-  group('DsChartTooltipContent', () {
-    testWidgets('the default panel is 128 wide at its measured height',
-        (WidgetTester t) async {
-      await t.pumpWidget(_scoped(DsChartTooltipContent(
-        config: const DsChartConfig(<String, DsChartSeries>{
-          'running': DsChartSeries(label: 'Running'),
-          'swimming': DsChartSeries(label: 'Swimming'),
-        }),
-        label: '2024-07-16',
-        items: const <DsChartTooltipItem>[
-          DsChartTooltipItem(name: 'running', value: 380),
-          DsChartTooltipItem(name: 'swimming', value: 420),
-        ],
-      )));
-      final Size size = t.getSize(find.byType(DsChartTooltipContent));
+  group('ElChartTooltipContent', () {
+    testWidgets('the default panel is 128 wide at its measured height', (
+      WidgetTester t,
+    ) async {
+      await t.pumpWidget(
+        _scoped(
+          ElChartTooltipContent(
+            config: const ElChartConfig(<String, ElChartSeries>{
+              'running': ElChartSeries(label: 'Running'),
+              'swimming': ElChartSeries(label: 'Swimming'),
+            }),
+            label: '2024-07-16',
+            items: const <ElChartTooltipItem>[
+              ElChartTooltipItem(name: 'running', value: 380),
+              ElChartTooltipItem(name: 'swimming', value: 420),
+            ],
+          ),
+        ),
+      );
+      final Size size = t.getSize(find.byType(ElChartTooltipContent));
       // Measured on `TooltipDefault`, which shows its tooltip at rest through
       // `defaultIndex={1}`: 128 x 70.78.
       expect(size.width, closeTo(128, _tol));
@@ -308,36 +313,44 @@ void main() {
     });
 
     testWidgets('hideLabel drops the header row', (WidgetTester t) async {
-      await t.pumpWidget(_scoped(DsChartTooltipContent(
-        config: const DsChartConfig(<String, DsChartSeries>{
-          'running': DsChartSeries(label: 'Running'),
-        }),
-        label: '2024-07-16',
-        hideLabel: true,
-        items: const <DsChartTooltipItem>[
-          DsChartTooltipItem(name: 'running', value: 380),
-        ],
-      )));
+      await t.pumpWidget(
+        _scoped(
+          ElChartTooltipContent(
+            config: const ElChartConfig(<String, ElChartSeries>{
+              'running': ElChartSeries(label: 'Running'),
+            }),
+            label: '2024-07-16',
+            hideLabel: true,
+            items: const <ElChartTooltipItem>[
+              ElChartTooltipItem(name: 'running', value: 380),
+            ],
+          ),
+        ),
+      );
       expect(find.text('2024-07-16'), findsNothing);
       expect(find.text('Running'), findsOneWidget);
     });
   });
 
-  group('DsChartLegendContent', () {
+  group('ElChartLegendContent', () {
     testWidgets('one row of keys, centred', (WidgetTester t) async {
-      await t.pumpWidget(_scoped(SizedBox(
-        width: _plot.width,
-        child: DsChartLegendContent(
-          config: const DsChartConfig(<String, DsChartSeries>{
-            'desktop': DsChartSeries(label: 'Desktop'),
-            'mobile': DsChartSeries(label: 'Mobile'),
-          }),
-          items: const <DsChartLegendItem>[
-            DsChartLegendItem(name: 'desktop', color: Color(0xFF1A6EF4)),
-            DsChartLegendItem(name: 'mobile', color: Color(0xFF1A6EF4)),
-          ],
+      await t.pumpWidget(
+        _scoped(
+          SizedBox(
+            width: _plot.width,
+            child: ElChartLegendContent(
+              config: const ElChartConfig(<String, ElChartSeries>{
+                'desktop': ElChartSeries(label: 'Desktop'),
+                'mobile': ElChartSeries(label: 'Mobile'),
+              }),
+              items: const <ElChartLegendItem>[
+                ElChartLegendItem(name: 'desktop', color: Color(0xFF1A6EF4)),
+                ElChartLegendItem(name: 'mobile', color: Color(0xFF1A6EF4)),
+              ],
+            ),
+          ),
         ),
-      )));
+      );
       expect(find.text('Desktop'), findsOneWidget);
       expect(find.text('Mobile'), findsOneWidget);
     });
@@ -357,26 +370,28 @@ void main() {
       Size size,
       Offset at,
     ) async {
-      await t.pumpWidget(_scoped(
-        RepaintBoundary(
-          key: const Key('raster'),
-          child: SizedBox(
-            width: size.width,
-            height: size.height,
-            child: ColoredBox(
-              color: const Color(0xFF000000),
-              child: child,
+      await t.pumpWidget(
+        _scoped(
+          RepaintBoundary(
+            key: const Key('raster'),
+            child: SizedBox(
+              width: size.width,
+              height: size.height,
+              child: ColoredBox(color: const Color(0xFF000000), child: child),
             ),
           ),
         ),
-      ));
+      );
       await t.pump();
-      final RenderRepaintBoundary box =
-          t.renderObject(find.byKey(const Key('raster')));
-      final ui.Image image =
-          (await t.runAsync(() => box.toImage(pixelRatio: 1)))!;
+      final RenderRepaintBoundary box = t.renderObject(
+        find.byKey(const Key('raster')),
+      );
+      final ui.Image image = (await t.runAsync(
+        () => box.toImage(pixelRatio: 1),
+      ))!;
       final ByteData data = (await t.runAsync(
-        () async => (await image.toByteData(format: ui.ImageByteFormat.rawRgba))!,
+        () async =>
+            (await image.toByteData(format: ui.ImageByteFormat.rawRgba))!,
       ))!;
       final int i = ((at.dy.round() * size.width.round()) + at.dx.round()) * 4;
       final Color colour = Color.fromARGB(
@@ -392,51 +407,59 @@ void main() {
     /// `BarDefault`'s first bar, exactly as the browser draws it:
     /// `x=12.8667 y=95.45 width=62 height=125.55 radius=6`.
     Widget barSpecimen() => CustomPaint(
-          painter: const DsBarSeriesPainter(
-            bars: <DsBarRect>[
-              DsBarRect(
-                rect: Rect.fromLTWH(12.8667, 95.45, 62, 125.55),
-                radii: <double>[
-                  DsRadii.sm,
-                  DsRadii.sm,
-                  DsRadii.sm,
-                  DsRadii.sm,
-                ],
-                color: Color(0xFF1A6EF4),
-              ),
-            ],
+      painter: const ElBarSeriesPainter(
+        bars: <ElBarRect>[
+          ElBarRect(
+            rect: Rect.fromLTWH(12.8667, 95.45, 62, 125.55),
+            radii: <double>[ElRadii.sm, ElRadii.sm, ElRadii.sm, ElRadii.sm],
+            color: Color(0xFF1A6EF4),
           ),
-        );
+        ],
+      ),
+    );
 
     testWidgets('the bar fills its own rectangle', (WidgetTester t) async {
-      final Color inside =
-          await pixel(t, barSpecimen(), _plot, const Offset(43, 150));
+      final Color inside = await pixel(
+        t,
+        barSpecimen(),
+        _plot,
+        const Offset(43, 150),
+      );
       expect(inside, const Color(0xFF1A6EF4));
     });
 
     testWidgets('and stops at the measured top edge', (WidgetTester t) async {
       // y = 94 is one pixel above the bar; y = 97 is inside it.
-      expect(await pixel(t, barSpecimen(), _plot, const Offset(43, 94)),
-          const Color(0xFF000000));
-      expect(await pixel(t, barSpecimen(), _plot, const Offset(43, 97)),
-          const Color(0xFF1A6EF4));
+      expect(
+        await pixel(t, barSpecimen(), _plot, const Offset(43, 94)),
+        const Color(0xFF000000),
+      );
+      expect(
+        await pixel(t, barSpecimen(), _plot, const Offset(43, 97)),
+        const Color(0xFF1A6EF4),
+      );
     });
 
     testWidgets('the --radius-sm corner is really cut', (WidgetTester t) async {
       // The top-left corner box is 6 x 6 from (12.8667, 95.45). Its outermost
       // pixel is outside the rounded quadrant; the pixel one radius in is not.
       // A square `drawRect` would paint both.
-      expect(await pixel(t, barSpecimen(), _plot, const Offset(13, 96)),
-          const Color(0xFF000000));
-      expect(await pixel(t, barSpecimen(), _plot, const Offset(20, 102)),
-          const Color(0xFF1A6EF4));
+      expect(
+        await pixel(t, barSpecimen(), _plot, const Offset(13, 96)),
+        const Color(0xFF000000),
+      );
+      expect(
+        await pixel(t, barSpecimen(), _plot, const Offset(20, 102)),
+        const Color(0xFF1A6EF4),
+      );
     });
 
-    testWidgets('a full donut sector paints between its two radii',
-        (WidgetTester t) async {
+    testWidgets('a full donut sector paints between its two radii', (
+      WidgetTester t,
+    ) async {
       final Widget donut = CustomPaint(
         painter: _SectorProbe(
-          path: dsSectorPath(
+          path: elSectorPath(
             cx: 241,
             cy: 128,
             innerRadius: 60,
@@ -448,38 +471,44 @@ void main() {
       );
       // 241 + 80 is between the two radii; 241 + 40 is inside the hole and
       // 241 + 110 is outside the ring.
-      expect(await pixel(t, donut, _plot, const Offset(321, 128)),
-          const Color(0xFF1A6EF4));
-      expect(await pixel(t, donut, _plot, const Offset(281, 128)),
-          const Color(0xFF000000));
-      expect(await pixel(t, donut, _plot, const Offset(351, 128)),
-          const Color(0xFF000000));
+      expect(
+        await pixel(t, donut, _plot, const Offset(321, 128)),
+        const Color(0xFF1A6EF4),
+      );
+      expect(
+        await pixel(t, donut, _plot, const Offset(281, 128)),
+        const Color(0xFF000000),
+      );
+      expect(
+        await pixel(t, donut, _plot, const Offset(351, 128)),
+        const Color(0xFF000000),
+      );
     });
 
-    testWidgets('the natural spline overshoots where the web overshoots',
-        (WidgetTester t) async {
+    testWidgets('the natural spline overshoots where the web overshoots', (
+      WidgetTester t,
+    ) async {
       // `AreaDefault`'s curve passes ABOVE the plot between January and
       // February — the rendered `d` reads `C134.133,-0.072`. A linear or a
       // monotone interpolation cannot put ink at y=4 near x=120; the natural
       // spline does, and that single pixel is the difference.
       final Widget stroke = CustomPaint(
         painter: _SectorProbe(
-          path: dsCurvePath(
-            const <Offset>[
-              Offset(12, 94.637),
-              Offset(103.6, 10.594),
-              Offset(195.2, 58.619),
-              Offset(286.8, 174.444),
-              Offset(378.4, 78.394),
-              Offset(470, 74.863),
-            ],
-            DsCurveType.natural,
-          ),
+          path: elCurvePath(const <Offset>[
+            Offset(12, 94.637),
+            Offset(103.6, 10.594),
+            Offset(195.2, 58.619),
+            Offset(286.8, 174.444),
+            Offset(378.4, 78.394),
+            Offset(470, 74.863),
+          ], ElCurveType.natural),
           stroke: 4,
         ),
       );
-      expect(await pixel(t, stroke, _plot, const Offset(126, 6)),
-          const Color(0xFF1A6EF4));
+      expect(
+        await pixel(t, stroke, _plot, const Offset(126, 6)),
+        const Color(0xFF1A6EF4),
+      );
     });
   });
 }

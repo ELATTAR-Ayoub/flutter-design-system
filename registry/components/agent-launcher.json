@@ -1,0 +1,34 @@
+{
+  "name": "agent-launcher",
+  "type": "component",
+  "version": "0.0.1",
+  "description": "`components/agent/agent-launcher.tsx` — how the agent appears on a working",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/agent_launcher.dart",
+      "target": "@ui/agent_launcher.dart",
+      "sha256": "e5a8d32a8e6bc7a33b3d4073bd66102ba944620db8073741a1c8228577daee50"
+    }
+  ],
+  "registryDependencies": [
+    "agent-core",
+    "agent-face",
+    "button",
+    "dialog",
+    "source-foundation"
+  ],
+  "semanticDependencies": [
+    "agent-core",
+    "agent-face",
+    "button",
+    "dialog"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "documentationRoute": "/components/agent-launcher",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/agent_launcher.dart"
+}

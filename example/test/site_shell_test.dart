@@ -30,8 +30,8 @@ TextStyle _paintedStyle(WidgetTester tester, String text) => tester
     .style!;
 
 Widget _harness({required AppRouter router, required Widget child}) {
-  final DsThemeController theme = DsThemeController(mode: DsThemeMode.dark);
-  return DsTheme(
+  final ElThemeController theme = ElThemeController(mode: ElThemeMode.dark);
+  return ElTheme(
     controller: theme,
     child: AppRouterScope(
       router: router,
@@ -66,10 +66,14 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Home'), findsWidgets);
+    // The header carries exactly two destinations. Introduction, Installation,
+    // Theming, CLI and Skills are all documentation pages, so they live in the
+    // documentation shell's left rail, not beside `Documentation` as its
+    // peers. Home is reachable from the wordmark.
     expect(find.text('Documentation'), findsWidgets);
     expect(find.text('Components'), findsWidgets);
-    expect(find.text('Skills'), findsWidgets);
+    expect(find.text('Skills'), findsNothing);
+    expect(find.text('Installation'), findsNothing);
   });
 
   // Catches: deleting the `DefaultTextStyle` from `_SiteShellState.build`.
@@ -93,7 +97,7 @@ void main() {
           route: router.route,
           // `.type-body` declares no `color`, so its ink is whatever the
           // enclosing `DefaultTextStyle` supplies — which is the leak.
-          child: DsText('Inherited probe paragraph', DsType.body),
+          child: ElText('Inherited probe paragraph', ElType.body),
         ),
       ),
     );
@@ -101,7 +105,7 @@ void main() {
 
     final TextStyle probe = _paintedStyle(tester, 'Inherited probe paragraph');
     expect(probe.color, isNot(_fallbackInk));
-    expect(probe.color, DsThemeData.dark.foreground);
+    expect(probe.color, ElThemeData.dark.foreground);
     expect(probe.decoration ?? TextDecoration.none, TextDecoration.none);
     expect(probe.decorationColor, isNot(_fallbackUnderline));
     expect(probe.decorationStyle, isNot(TextDecorationStyle.double));
@@ -214,12 +218,15 @@ void main() {
     await tester.tap(find.bySemanticsLabel('Open site navigation'));
     await tester.pumpAndSettle();
 
-    expect(find.byType(DsSheetPanel), findsOneWidget);
+    expect(find.byType(ElSheetPanel), findsOneWidget);
     expect(find.text('DESIGN SYSTEM'), findsWidgets);
 
-    await tester.tap(find.text('Skills').last);
+    // Skills is a documentation page now, so it is reached from the
+    // documentation shell's left rail rather than from the site navigation
+    // sheet. The sheet carries the same two destinations the header does.
+    await tester.tap(find.text('Components').last);
     await tester.pumpAndSettle();
-    expect(router.route, skillsRoute);
-    expect(find.byType(DsSheetPanel), findsNothing);
+    expect(router.route, componentsRoute);
+    expect(find.byType(ElSheetPanel), findsNothing);
   });
 }

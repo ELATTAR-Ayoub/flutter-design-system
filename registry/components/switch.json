@@ -1,0 +1,32 @@
+{
+  "name": "switch",
+  "type": "component",
+  "version": "0.0.1",
+  "description": "`components/ui/switch.tsx` — a knob sitting in a socket.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/switch.dart",
+      "target": "@ui/switch.dart",
+      "sha256": "5a2c3f0b6df333b54a7b68a539e09bc62c1cd42b81b6f420a2113fb7b80c09f4"
+    }
+  ],
+  "registryDependencies": [
+    "field",
+    "machine-surface",
+    "selection-control",
+    "source-foundation"
+  ],
+  "semanticDependencies": [
+    "field",
+    "machine-surface",
+    "selection-control"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "documentationRoute": "/components/switch",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/switch.dart"
+}

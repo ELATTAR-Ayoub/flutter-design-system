@@ -1,0 +1,25 @@
+{
+  "name": "page-glow",
+  "type": "effect",
+  "version": "0.0.1",
+  "description": "The page atmosphere — `app/globals.css` L983–993.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/effects/page_glow.dart",
+      "target": "@effects/page_glow.dart",
+      "sha256": "b2da307d4f9d369d00544a24d1ad58fe8feb7bc34a0ed05c01af27a78ec037a0"
+    }
+  ],
+  "registryDependencies": [
+    "source-foundation"
+  ],
+  "semanticDependencies": [],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "documentationRoute": "/docs/effects/page-glow",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/effects/page_glow.dart"
+}

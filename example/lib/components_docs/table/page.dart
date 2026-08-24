@@ -2,10 +2,10 @@
 ///
 /// Mirrors `badge/page.dart`'s use of the Phase C docs primitives
 /// (`DocsLayout`, `DocsCodeExample`, `DocsApiTable`, `DocsStateMatrix`,
-/// `DocsInstallFacts`) and `kit.dart`'s `DsSection` for titled,
+/// `DocsInstallFacts`) and `kit.dart`'s `ElSection` for titled,
 /// anchor-registered content blocks.
 ///
-/// `table` has no registry manifest yet (`registry/components/table.json`
+/// `table` ships in the registry (`registry/components/table.json`
 /// does not exist): every install-facing panel below says so honestly
 /// rather than presenting a CLI command that would fail.
 ///
@@ -17,9 +17,9 @@
 /// that order, then API Reference. Footer has no counterpart here: the
 /// source's own library doc says so plainly ("Not ported: TableFooter …
 /// no table in the corpus has one"), so this page names it as skipped
-/// rather than inventing a footer row DsTable cannot render. Variants
+/// rather than inventing a footer row ElTable cannot render. Variants
 /// folds into API Reference's own intro sentence rather than standing as
-/// its own heading, because DsTable has none to enumerate. States,
+/// its own heading, because ElTable has none to enumerate. States,
 /// Accessibility, Responsive, Dependencies, Theming, and Source are this
 /// package's own six sections, added after API Reference, named exactly
 /// that with no extra words.
@@ -29,16 +29,16 @@
 /// `lib/src/components/table.dart`'s own library doc describes the
 /// reference's `<table>` as living in its own `relative w-full
 /// overflow-x-auto` container: that wrapper is never reproduced here.
-/// `DsTable.build` returns a bare `Column` around a `Table`, nothing more.
+/// `ElTable.build` returns a bare `Column` around a `Table`, nothing more.
 /// At a narrow width that leaves three different outcomes depending on what
 /// a cell holds, all three measured by
-/// `example/test/components_docs/table_test.dart`'s `DsTable overflow
+/// `example/test/components_docs/table_test.dart`'s `ElTable overflow
 /// behaviour at 390px` group and written up in this page's Responsive
 /// section: plain text reflows safely, a non-wrapping cell (an icon beside a
 /// label: the real shape `example/lib/pages/data.dart`'s own Transaction
 /// history table uses) throws a genuine `RenderFlex overflowed`, and the
 /// obvious one-line fix (a bare horizontal `SingleChildScrollView`) throws a
-/// *different* error, because `DsTable`'s root `Column` stretches its cross
+/// *different* error, because `ElTable`'s root `Column` stretches its cross
 /// axis and a scroll view hands it an unbounded one. The fix that actually
 /// works, `SingleChildScrollView` around an `IntrinsicWidth` around the
 /// table: is what this page's own live demo uses, which is why it survives
@@ -55,7 +55,7 @@ import '../../kit.dart';
 import 'meta.dart';
 
 /// The key `table_test.dart` uses to scope its container search to this
-/// page's own live-demo specimen rather than every `DsTable` on the page.
+/// page's own live-demo specimen rather than every `ElTable` on the page.
 const Key previewTableKey = ValueKey<String>('table-doc-preview-table');
 
 class TableDocPage extends StatelessWidget {
@@ -71,9 +71,9 @@ class TableDocPage extends StatelessWidget {
       title: tableDoc.title,
       description: tableDoc.description,
     ),
-    breadcrumbs: const <DsBreadcrumbEntry>[
-      DsBreadcrumbEntry.link('Components'),
-      DsBreadcrumbEntry.page('Table'),
+    breadcrumbs: const <ElBreadcrumbEntry>[
+      ElBreadcrumbEntry.link('Components'),
+      ElBreadcrumbEntry.page('Table'),
     ],
     sidebar: _sidebar,
     toc: const <DocsTocEntry>[
@@ -115,13 +115,13 @@ class _TableArticle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return Column(
       key: const ValueKey<String>('table-doc-article'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         _liveDemo(),
-        SizedBox(height: ds(8)),
+        SizedBox(height: el(8)),
         _install(),
         _usage(),
         _composition(),
@@ -140,7 +140,7 @@ class _TableArticle extends StatelessWidget {
   }
 
   // The live demo, ahead of any heading: the same shape the reference page
-  // itself opens with. No DsSection wraps it, so it carries no
+  // itself opens with. No ElSection wraps it, so it carries no
   // Overview/Status/Preview heading of its own before Installation.
   Widget _liveDemo() => DocsCodeExample(
     title: 'Table specimen',
@@ -156,58 +156,56 @@ class _TableArticle extends StatelessWidget {
         path: 'lib/components/ui/table.dart',
         code:
             "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
-            '// Table has no registry manifest yet: copy\n'
-            '// lib/src/components/table.dart from the package source\n'
-            '// directly. There is no generated CLI payload to fetch.',
+            '// Install with: elattar add table',
       ),
     ],
     preview: SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: IntrinsicWidth(
-        child: DsTable(
+        child: ElTable(
           key: previewTableKey,
           caption: 'Showing the 5 most recent transactions of 248.',
-          header: const <DsTableCellSpec>[
-            DsTableCellSpec(child: Text('Type')),
-            DsTableCellSpec(child: Text('Detail')),
-            DsTableCellSpec(child: Text('Amount'), align: DsTableAlign.end),
-            DsTableCellSpec(child: Text('Status'), align: DsTableAlign.end),
+          header: const <ElTableCellSpec>[
+            ElTableCellSpec(child: Text('Type')),
+            ElTableCellSpec(child: Text('Detail')),
+            ElTableCellSpec(child: Text('Amount'), align: ElTableAlign.end),
+            ElTableCellSpec(child: Text('Status'), align: ElTableAlign.end),
           ],
-          rows: <DsTableRowSpec>[
+          rows: <ElTableRowSpec>[
             for (final _TxRow row in _previewRows)
-              DsTableRowSpec(
+              ElTableRowSpec(
                 selected: row.selected,
-                cells: <DsTableCellSpec>[
-                  DsTableCellSpec(
+                cells: <ElTableCellSpec>[
+                  ElTableCellSpec(
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
-                        DsIcon.lucide(
+                        ElIcon.lucide(
                           row.incoming
-                              ? DsLucide.arrowDownLeft
-                              : DsLucide.arrowUpRight,
-                          size: DsIconSize.sm,
+                              ? ElLucide.arrowDownLeft
+                              : ElLucide.arrowUpRight,
+                          size: ElIconSize.sm,
                           tone: row.incoming
-                              ? DsIconTone.success
-                              : DsIconTone.subtle,
+                              ? ElIconTone.success
+                              : ElIconTone.subtle,
                         ),
-                        SizedBox(width: ds(2)),
+                        SizedBox(width: el(2)),
                         Text(row.type),
                       ],
                     ),
                   ),
-                  DsTableCellSpec(child: Text(row.detail)),
-                  DsTableCellSpec(
-                    align: DsTableAlign.end,
+                  ElTableCellSpec(child: Text(row.detail)),
+                  ElTableCellSpec(
+                    align: ElTableAlign.end,
                     child: Text(row.amount),
                   ),
-                  DsTableCellSpec(
-                    align: DsTableAlign.end,
-                    child: DsBadge(
+                  ElTableCellSpec(
+                    align: ElTableAlign.end,
+                    child: ElBadge(
                       label: row.status,
                       variant: row.status == 'Pending'
-                          ? DsBadgeVariant.warning
-                          : DsBadgeVariant.success,
+                          ? ElBadgeVariant.warning
+                          : ElBadgeVariant.success,
                     ),
                   ),
                 ],
@@ -218,18 +216,18 @@ class _TableArticle extends StatelessWidget {
     ),
   );
 
-  Widget _install() => DsSection(
+  Widget _install() => ElSection(
     id: 'install',
     title: 'Installation',
     description:
-        'table has no registry manifest yet, so `elattar add table` is not '
+        'table ships in the registry, so `elattar add table` is not '
         'available: install by copying the source file manually.',
     child: DocsInstallFacts(
       title: 'Installation facts',
       facts: <DocsInstallFact>[
         const DocsInstallFact(
           label: 'Registry item',
-          value: 'not yet registered',
+          value: 'registry/components/table.json',
           description:
               'No registry/components/table.json exists. This is a '
               'source-only component today.',
@@ -248,7 +246,7 @@ class _TableArticle extends StatelessWidget {
           label: 'Dependencies',
           value: 'source-foundation',
           description:
-              'What a future manifest would need to resolve: colors, '
+              'What the shipped manifest resolves: colors, '
               'spacing, theme, typography, and motion (the hover-fade '
               'duration and curve). table.dart imports no other component '
               'and no effect file: unlike badge or button, it does not '
@@ -282,37 +280,37 @@ class _TableArticle extends StatelessWidget {
     ),
   );
 
-  Widget _usage() => DsSection(
+  Widget _usage() => ElSection(
     id: 'usage',
     title: 'Usage',
     description:
         'The smallest correct call, then the shapes example/lib/pages/'
         'data.dart and example/lib/data_table_demo.dart actually use.',
-    child: DsPanel(
+    child: ElPanel(
       label: 'DART',
       note: 'COMPOSE',
       child: DocsSelectableCodeBlock(code: _usageCode),
     ),
   );
 
-  Widget _composition() => DsSection(
+  Widget _composition() => ElSection(
     id: 'composition',
     title: 'Composition',
     description:
-        'DsTable has no separate TableHeader, TableBody, TableFooter or '
+        'ElTable has no separate TableHeader, TableBody, TableFooter or '
         'TableCaption widget to assemble by hand: one call builds the whole '
         'table from three plain-data arguments. _HeaderCell and _BodyCell, '
-        'below, are private: what follows is what DsTable.build assembles '
+        'below, are private: what follows is what ElTable.build assembles '
         'internally on every rebuild, not something a caller composes '
         'piece by piece.',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        DsPanel(
-          label: 'What DsTable(header: …, rows: …, caption: …) assembles',
+        ElPanel(
+          label: 'What ElTable(header: …, rows: …, caption: …) assembles',
           child: DocsSelectableCodeBlock(code: _compositionCode),
         ),
-        SizedBox(height: ds(6)),
+        SizedBox(height: el(6)),
         DocsCodeExample(
           title: 'A read-only summary table',
           description:
@@ -320,20 +318,20 @@ class _TableArticle extends StatelessWidget {
               'caption, no selection, no span. Wrapped in the same '
               'SingleChildScrollView + IntrinsicWidth recipe the live demo '
               'above and the Responsive section below use, for the same '
-              'reason: DsTable has no scroll container of its own.',
+              'reason: ElTable has no scroll container of its own.',
           preview: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: IntrinsicWidth(
-              child: DsTable(
-                header: const <DsTableCellSpec>[
-                  DsTableCellSpec(child: Text('Campaign')),
-                  DsTableCellSpec(child: Text('Revenue')),
+              child: ElTable(
+                header: const <ElTableCellSpec>[
+                  ElTableCellSpec(child: Text('Campaign')),
+                  ElTableCellSpec(child: Text('Revenue')),
                 ],
-                rows: const <DsTableRowSpec>[
-                  DsTableRowSpec(
-                    cells: <DsTableCellSpec>[
-                      DsTableCellSpec(child: Text('Stir in strength')),
-                      DsTableCellSpec(child: Text('\$12,180')),
+                rows: const <ElTableRowSpec>[
+                  ElTableRowSpec(
+                    cells: <ElTableCellSpec>[
+                      ElTableCellSpec(child: Text('Stir in strength')),
+                      ElTableCellSpec(child: Text('\$12,180')),
                     ],
                   ),
                 ],
@@ -345,53 +343,53 @@ class _TableArticle extends StatelessWidget {
     ),
   );
 
-  Widget _actions() => DsSection(
+  Widget _actions() => ElSection(
     id: 'actions',
     title: 'Actions',
     description:
-        'DsTable places no constraint on a cell\'s child, so a trailing '
+        'ElTable places no constraint on a cell\'s child, so a trailing '
         'column can hold a real interactive control instead of plain text: '
-        'here, a per-row DsDropdownMenu trigger, the same shape a caller '
+        'here, a per-row ElDropdownMenu trigger, the same shape a caller '
         'would add to example/lib/pages/data.dart\'s own Transaction '
-        'history table if it needed a row menu. DsTable itself contributes '
+        'history table if it needed a row menu. ElTable itself contributes '
         'nothing to this beyond the cell it lays the trigger button out in.',
     child: DocsCodeExample(
       title: 'Row actions menu',
       preview: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: IntrinsicWidth(
-          child: DsTable(
-            header: const <DsTableCellSpec>[
-              DsTableCellSpec(child: Text('Campaign')),
-              DsTableCellSpec(child: Text('Revenue')),
-              DsTableCellSpec(child: Text(''), align: DsTableAlign.end),
+          child: ElTable(
+            header: const <ElTableCellSpec>[
+              ElTableCellSpec(child: Text('Campaign')),
+              ElTableCellSpec(child: Text('Revenue')),
+              ElTableCellSpec(child: Text(''), align: ElTableAlign.end),
             ],
-            rows: <DsTableRowSpec>[
+            rows: <ElTableRowSpec>[
               for (final _ActionRow row in _actionRows)
-                DsTableRowSpec(
-                  cells: <DsTableCellSpec>[
-                    DsTableCellSpec(child: Text(row.campaign)),
-                    DsTableCellSpec(child: Text(row.revenue)),
-                    DsTableCellSpec(
-                      align: DsTableAlign.end,
-                      child: DsDropdownMenu(
-                        trigger: DsButton(
-                          variant: DsButtonVariant.ghost,
-                          size: DsButtonSize.icon,
+                ElTableRowSpec(
+                  cells: <ElTableCellSpec>[
+                    ElTableCellSpec(child: Text(row.campaign)),
+                    ElTableCellSpec(child: Text(row.revenue)),
+                    ElTableCellSpec(
+                      align: ElTableAlign.end,
+                      child: ElDropdownMenu(
+                        trigger: ElButton(
+                          variant: ElButtonVariant.ghost,
+                          size: ElButtonSize.icon,
                           label: 'Row actions for ${row.campaign}',
                           onPressed: () {},
-                          child: const DsIcon.lucide(
-                            DsLucide.ellipsis,
-                            size: DsIconSize.sm,
+                          child: const ElIcon.lucide(
+                            ElLucide.ellipsis,
+                            size: ElIconSize.sm,
                           ),
                         ),
-                        children: <DsMenuChild>[
-                          DsMenuItem(label: 'View', onSelect: () {}),
-                          DsMenuItem(label: 'Edit', onSelect: () {}),
-                          const DsMenuSeparator(),
-                          DsMenuItem(
+                        children: <ElMenuChild>[
+                          ElMenuItem(label: 'View', onSelect: () {}),
+                          ElMenuItem(label: 'Edit', onSelect: () {}),
+                          const ElMenuSeparator(),
+                          ElMenuItem(
                             label: 'Delete',
-                            variant: DsMenuItemVariant.destructive,
+                            variant: ElMenuItemVariant.destructive,
                             onSelect: () {},
                           ),
                         ],
@@ -409,7 +407,7 @@ class _TableArticle extends StatelessWidget {
     ),
   );
 
-  Widget _dataTable() => DsSection(
+  Widget _dataTable() => ElSection(
     id: 'data-table',
     title: 'Data Table',
     description:
@@ -426,7 +424,7 @@ class _TableArticle extends StatelessWidget {
           'owns sort/filter/selection/page state and simply rebuilds a '
           'fresh header/rows list on every change. A caller that wants a '
           'sortable, filterable, paginated table copies that recipe\'s '
-          'shape against its own data; DsTable stays the presentational '
+          'shape against its own data; ElTable stays the presentational '
           'layer underneath it, exactly as it already is underneath the '
           'plain read-only tables elsewhere on the same page.',
       manualFiles: const <DocsCodeFile>[
@@ -443,17 +441,17 @@ class _TableArticle extends StatelessWidget {
 
   // getFilteredRowModel / getSortedRowModel equivalents, then:
   @override
-  Widget build(BuildContext context) => DsTable(
-    header: <DsTableCellSpec>[
+  Widget build(BuildContext context) => ElTable(
+    header: <ElTableCellSpec>[
       for (final column in _Column.values)
-        DsTableCellSpec(
+        ElTableCellSpec(
           checkbox: column == _Column.select,
-          child: /* a real DsCheckbox, or a sortable-header DsButton */,
+          child: /* a real ElCheckbox, or a sortable-header ElButton */,
         ),
     ],
-    rows: <DsTableRowSpec>[
+    rows: <ElTableRowSpec>[
       for (final row in _rows) // sorted, filtered, paginated by hand
-        DsTableRowSpec(selected: _selected.contains(row.id), cells: /* … */),
+        ElTableRowSpec(selected: _selected.contains(row.id), cells: /* … */),
     ],
   );
 }''',
@@ -462,11 +460,11 @@ class _TableArticle extends StatelessWidget {
     ),
   );
 
-  Widget _rtl() => DsSection(
+  Widget _rtl() => ElSection(
     id: 'rtl',
     title: 'RTL',
     description:
-        'DsTableAlign.start and .end resolve to literal Alignment.'
+        'ElTableAlign.start and .end resolve to literal Alignment.'
         'centerLeft and Alignment.centerRight, the plain, direction-blind '
         'Alignment class, not the directionality-aware '
         'AlignmentDirectional.centerStart/.centerEnd pair. Wrapping a '
@@ -483,20 +481,17 @@ class _TableArticle extends StatelessWidget {
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: IntrinsicWidth(
-            child: DsTable(
-              header: <DsTableCellSpec>[
-                DsTableCellSpec(child: Text('البند')),
-                DsTableCellSpec(
-                  child: Text('المبلغ'),
-                  align: DsTableAlign.end,
-                ),
+            child: ElTable(
+              header: <ElTableCellSpec>[
+                ElTableCellSpec(child: Text('البند')),
+                ElTableCellSpec(child: Text('المبلغ'), align: ElTableAlign.end),
               ],
-              rows: <DsTableRowSpec>[
-                DsTableRowSpec(
-                  cells: <DsTableCellSpec>[
-                    DsTableCellSpec(child: Text('اشتراك')),
-                    DsTableCellSpec(
-                      align: DsTableAlign.end,
+              rows: <ElTableRowSpec>[
+                ElTableRowSpec(
+                  cells: <ElTableCellSpec>[
+                    ElTableCellSpec(child: Text('اشتراك')),
+                    ElTableCellSpec(
+                      align: ElTableAlign.end,
                       child: Text('129.00 دولار'),
                     ),
                   ],
@@ -512,36 +507,36 @@ class _TableArticle extends StatelessWidget {
     ),
   );
 
-  Widget _api() => DsSection(
+  Widget _api() => ElSection(
     id: 'api',
     title: 'API Reference',
     description:
         'Every public class, enum and top-level member table.dart exports '
-        '— there is no separate DsTableHeader, DsTableBody, DsTableFooter '
-        'or DsTableCaption widget; a table is one DsTable plus the two '
-        'plain data classes below it. DsTable also has no variant or size '
+        '— there is no separate ElTableHeader, ElTableBody, ElTableFooter '
+        'or ElTableCaption widget; a table is one ElTable plus the two '
+        'plain data classes below it. ElTable also has no variant or size '
         'enum of its own: every table renders the same visual family, and '
-        'the only shape controls are per-cell (DsTableAlign, checkbox) and '
+        'the only shape controls are per-cell (ElTableAlign, checkbox) and '
         'per-row (selected, or replacing the body with '
-        'DsTableRowSpec.span), both documented below.',
+        'ElTableRowSpec.span), both documented below.',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         const DocsApiTable(
-          title: 'DsTable properties',
+          title: 'ElTable properties',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'header',
-              type: 'List<DsTableCellSpec>',
+              type: 'List<ElTableCellSpec>',
               description:
                   'Required. The single header row: every table in the '
                   'corpus has exactly one.',
             ),
             DocsApiFact(
               name: 'rows',
-              type: 'List<DsTableRowSpec>',
+              type: 'List<ElTableRowSpec>',
               description:
-                  'Required. The body rows, or a single DsTableRowSpec.span '
+                  'Required. The body rows, or a single ElTableRowSpec.span '
                   'row replacing the whole body: see States.',
             ),
             DocsApiFact(
@@ -553,34 +548,34 @@ class _TableArticle extends StatelessWidget {
             ),
           ],
         ),
-        SizedBox(height: ds(6)),
+        SizedBox(height: el(6)),
         const DocsApiTable(
-          title: 'DsTable static tokens',
+          title: 'ElTable static tokens',
           facts: <DocsApiFact>[
             DocsApiFact(
-              name: 'DsTable.headerHeight',
+              name: 'ElTable.headerHeight',
               type: 'static double',
               description:
                   'The header row’s whole box, 40px, rule '
                   'included.',
             ),
             DocsApiFact(
-              name: 'DsTable.cellPadding',
+              name: 'ElTable.cellPadding',
               type: 'static double',
               description: 'Every cell’s padding on each unclipped side.',
             ),
             DocsApiFact(
-              name: 'DsTable.captionGap',
+              name: 'ElTable.captionGap',
               type: 'static double',
               description: 'The gap between the body and the caption.',
             ),
             DocsApiFact(
-              name: 'DsTable.ruleWidth',
+              name: 'ElTable.ruleWidth',
               type: 'static double',
               description: 'The hairline rule between rows.',
             ),
             DocsApiFact(
-              name: 'DsTable.collapsedRemainder',
+              name: 'ElTable.collapsedRemainder',
               type: 'static double',
               description:
                   'Half that hairline, kept as unpainted padding under the '
@@ -590,9 +585,9 @@ class _TableArticle extends StatelessWidget {
             ),
           ],
         ),
-        SizedBox(height: ds(6)),
+        SizedBox(height: el(6)),
         const DocsApiTable(
-          title: 'DsTableCellSpec: one header or body cell',
+          title: 'ElTableCellSpec: one header or body cell',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'child',
@@ -601,7 +596,7 @@ class _TableArticle extends StatelessWidget {
             ),
             DocsApiFact(
               name: 'align',
-              type: 'DsTableAlign',
+              type: 'ElTableAlign',
               description:
                   'Defaults to start. end right-aligns: required on '
                   'numeric columns by this page’s own convention.',
@@ -617,13 +612,13 @@ class _TableArticle extends StatelessWidget {
             ),
           ],
         ),
-        SizedBox(height: ds(6)),
+        SizedBox(height: el(6)),
         const DocsApiTable(
-          title: 'DsTableRowSpec: one body row',
+          title: 'ElTableRowSpec: one body row',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'cells',
-              type: 'List<DsTableCellSpec>',
+              type: 'List<ElTableCellSpec>',
               description:
                   'The default constructor’s required field: this '
                   'row’s cells, one per header column.',
@@ -639,7 +634,7 @@ class _TableArticle extends StatelessWidget {
               name: 'span',
               type: 'Widget',
               description:
-                  'The DsTableRowSpec.span named constructor’s required '
+                  'The ElTableRowSpec.span named constructor’s required '
                   'positional field: a widget that replaces the whole '
                   'table body. cells is forced empty and selected forced '
                   'false on this constructor.',
@@ -648,14 +643,14 @@ class _TableArticle extends StatelessWidget {
               name: 'spanHeight',
               type: 'double?',
               description:
-                  'DsTableRowSpec.span only. The spanning box’s own '
+                  'ElTableRowSpec.span only. The spanning box’s own '
                   'height; null lets it size to content.',
             ),
             DocsApiFact(
               name: 'isSpan',
               type: 'bool (getter)',
               description:
-                  'True when span is non-null. DsTable asserts a spanning '
+                  'True when span is non-null. ElTable asserts a spanning '
                   'row is the only entry in rows, Flutter’s Table has '
                   'no column-spanning of its own, so a spanning row is laid '
                   'out as its own full-width box beside the table rather '
@@ -664,9 +659,9 @@ class _TableArticle extends StatelessWidget {
             ),
           ],
         ),
-        SizedBox(height: ds(6)),
+        SizedBox(height: el(6)),
         const DocsApiTable(
-          title: 'DsTableAlign',
+          title: 'ElTableAlign',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'start',
@@ -688,9 +683,9 @@ class _TableArticle extends StatelessWidget {
             ),
           ],
         ),
-        SizedBox(height: ds(6)),
+        SizedBox(height: el(6)),
         const DocsApiTable(
-          title: 'DsTableColumnWidth: the default column-width rule',
+          title: 'ElTableColumnWidth: the default column-width rule',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'minIntrinsicWidth',
@@ -718,21 +713,21 @@ class _TableArticle extends StatelessWidget {
             ),
           ],
         ),
-        SizedBox(height: ds(6)),
+        SizedBox(height: el(6)),
         const DocsApiTable(
           title: 'Top-level motion tokens',
           facts: <DocsApiFact>[
             DocsApiFact(
-              name: 'dsTableHoverDuration',
+              name: 'elTableHoverDuration',
               type: 'Duration (getter)',
               description:
-                  'DsDurations.transitionDefault, 250ms. What a row’s '
+                  'ElDurations.transitionDefault, 250ms. What a row’s '
                   'hover fill fades on.',
             ),
             DocsApiFact(
-              name: 'dsTableHoverCurve',
+              name: 'elTableHoverCurve',
               type: 'Curve (getter)',
-              description: 'DsCurves.out.',
+              description: 'ElCurves.out.',
             ),
           ],
         ),
@@ -740,11 +735,11 @@ class _TableArticle extends StatelessWidget {
     ),
   );
 
-  Widget _states() => DsSection(
+  Widget _states() => ElSection(
     id: 'states',
     title: 'States',
     description:
-        'DsTable is a StatefulWidget: unlike badge, it does carry real '
+        'ElTable is a StatefulWidget: unlike badge, it does carry real '
         'interaction state (row hover). Most of IA §9.7’s remaining rows '
         'still do not apply to the table itself, because they belong to '
         'whatever a caller puts inside a cell instead: grouped into one '
@@ -762,8 +757,8 @@ class _TableArticle extends StatelessWidget {
           state: 'Hover',
           treatment:
               'The row under the pointer fades to theme.muted at 50% alpha '
-              '(bg-muted/50) over dsTableHoverDuration (250ms) on '
-              'dsTableHoverCurve: a MouseRegion on every body cell reports '
+              '(bg-muted/50) over elTableHoverDuration (250ms) on '
+              'elTableHoverCurve: a MouseRegion on every body cell reports '
               'entry to the row, painted per cell via TweenAnimationBuilder '
               'since the fill has to travel, not just be a static colour.',
           userSignal:
@@ -773,7 +768,7 @@ class _TableArticle extends StatelessWidget {
         DocsStateFact(
           state: 'Selected',
           treatment:
-              'DsTableRowSpec.selected paints theme.muted at full '
+              'ElTableRowSpec.selected paints theme.muted at full '
               'strength, and: because selection is resolved after hover '
               'in the same comparison, at equal specificity: it beats a '
               'simultaneous hover on that row rather than the two blending.',
@@ -782,19 +777,19 @@ class _TableArticle extends StatelessWidget {
         DocsStateFact(
           state: 'Empty',
           treatment:
-              'DsTableRowSpec.span replaces the entire body with one '
-              'widget, vertically centred in a box of spanHeight. DsTable '
+              'ElTableRowSpec.span replaces the entire body with one '
+              'widget, vertically centred in a box of spanHeight. ElTable '
               'asserts if any other row is present alongside it.',
           userSignal:
               'Whatever the caller passes as the spanning widget, '
-              'data_table_demo.dart uses a DsEmpty with a "Clear filter" '
+              'data_table_demo.dart uses a ElEmpty with a "Clear filter" '
               'button.',
         ),
         DocsStateFact(
           state: 'Reduced motion',
           treatment:
-              'The hover fade’s duration is dsAnimationDuration(context, '
-              'dsTableHoverDuration), which collapses to Duration.zero when '
+              'The hover fade’s duration is elAnimationDuration(context, '
+              'elTableHoverDuration), which collapses to Duration.zero when '
               'MediaQuery.disableAnimationsOf(context) is true: verified '
               'in table_test.dart.',
           userSignal:
@@ -806,15 +801,15 @@ class _TableArticle extends StatelessWidget {
               'Focus-visible / Pressed / Loading / Error / Success / '
               'Disabled',
           treatment:
-              'N/A on DsTable itself: it has no FocusNode, no tap gesture '
+              'N/A on ElTable itself: it has no FocusNode, no tap gesture '
               'of its own beyond the hover MouseRegion, and no loading, '
               'error, success or enabled parameter. Whichever of these a '
               'real table needs lives on the widget a caller puts inside a '
               'cell instead: data_table_demo.dart’s sortable header is '
-              'a real DsButton (focusable, has a disabled state while '
-              'loading), its checkboxes are real DsCheckbox instances, and '
-              'its loading rows are DsSkeleton content: none of it is a '
-              'DsTable-level flag.',
+              'a real ElButton (focusable, has a disabled state while '
+              'loading), its checkboxes are real ElCheckbox instances, and '
+              'its loading rows are ElSkeleton content: none of it is a '
+              'ElTable-level flag.',
           userSignal:
               'Look at the cell’s own widget’s documentation for '
               'that state, not this page.',
@@ -823,34 +818,34 @@ class _TableArticle extends StatelessWidget {
     ),
   );
 
-  Widget _accessibility(DsThemeData theme) => DsSection(
+  Widget _accessibility(ElThemeData theme) => ElSection(
     id: 'accessibility',
     title: 'Accessibility',
     description:
         'Flutter 3.44 ships real semantics for exactly this shape, '
-        'SemanticsRole.table, .row, .cell and .columnHeader: and DsTable '
+        'SemanticsRole.table, .row, .cell and .columnHeader: and ElTable '
         'uses none of them. This is not "Flutter doesn’t support it"; '
         'the primitives exist and this component does not opt in.',
     child: _bullets(theme, <String>[
-      'Semantic role: none. DsTable, and its private _HeaderCell/_BodyCell '
+      'Semantic role: none. ElTable, and its private _HeaderCell/_BodyCell '
           'builders, construct zero Semantics widgets anywhere. Assistive '
           'tech receives whatever each cell’s own child happens to '
-          'expose (a bare Text reads as static text, a DsBadge exposes '
-          'nothing per its own docs, a DsCheckbox exposes its own control) '
+          'expose (a bare Text reads as static text, a ElBadge exposes '
+          'nothing per its own docs, a ElCheckbox exposes its own control) '
           'with no table, row, cell or columnHeader grouping around any of '
           'it, and no association between a header cell and the column '
           'beneath it.',
-      'Required labels: none of DsTable’s own: caption is rendered as '
+      'Required labels: none of ElTable’s own: caption is rendered as '
           'plain centred text under the body, not wired to any table-level '
           'accessible label or description.',
-      'Keyboard interactions: none, DsTable itself is never in the tab '
+      'Keyboard interactions: none, ElTable itself is never in the tab '
           'order. Only content a caller places inside a cell (a sortable '
           'header button, a checkbox) can receive focus, exactly as far as '
           'that widget’s own docs describe.',
-      'Focus behavior: DsTable never requests or reports focus itself.',
-      'Touch target: not evaluated by DsTable: a cell’s content owns '
+      'Focus behavior: ElTable never requests or reports focus itself.',
+      'Touch target: not evaluated by ElTable: a cell’s content owns '
           'its own target size. The table only fixes the header row’s '
-          'height (DsTable.headerHeight, 40px); body rows are exactly as '
+          'height (ElTable.headerHeight, 40px); body rows are exactly as '
           'tall as their content.',
       'Non-colour signals: none for hover or selected: both are fills '
           'only, with no icon, border, or text change alongside them, and '
@@ -869,12 +864,12 @@ class _TableArticle extends StatelessWidget {
     ]),
   );
 
-  Widget _responsive(DsThemeData theme) => DsSection(
+  Widget _responsive(ElThemeData theme) => ElSection(
     id: 'responsive',
     title: 'Responsive',
     description:
         'The reference’s own <table> lives inside relative w-full '
-        'overflow-x-auto, DsTable does not reproduce that container. Its '
+        'overflow-x-auto, ElTable does not reproduce that container. Its '
         'build method returns a bare Column around a Table; there is no '
         'ScrollView anywhere in table.dart. What happens next depends on '
         'what a cell holds, measured directly rather than assumed:',
@@ -883,8 +878,8 @@ class _TableArticle extends StatelessWidget {
           'padding on each side) against a realistic 4-column table, '
           'RenderTable compresses every column proportionally toward its '
           'own minimum-intrinsic width, Flutter’s own algorithm, not a '
-          'DsTable behaviour: rather than triggering a scrollbar the way '
-          'overflow-x-auto would. A Text or DsText cell absorbs that '
+          'ElTable behaviour: rather than triggering a scrollbar the way '
+          'overflow-x-auto would. A Text or ElText cell absorbs that '
           'safely: it wraps onto more lines and the row grows taller, with '
           'no error.',
       'No wrapper, a non-wrapping cell: the same table’s "Type" column '
@@ -897,15 +892,15 @@ class _TableArticle extends StatelessWidget {
           'yellow-and-black stripes, clipped paint outside debug mode. '
           'This is measured, not hypothetical: see table_test.dart’s '
           '"un-wrapped" case.',
-      'The obvious fix does not work: wrapping the bare DsTable in '
+      'The obvious fix does not work: wrapping the bare ElTable in '
           'SingleChildScrollView(scrollDirection: Axis.horizontal) throws '
           'a different error, "BoxConstraints forces an infinite width." '
-          'DsTable’s root Column stretches its cross axis '
+          'ElTable’s root Column stretches its cross axis '
           '(crossAxisAlignment: CrossAxisAlignment.stretch), and a '
           'stretched cross axis needs a bounded width; a horizontal scroll '
           'view hands its child an unbounded one along the scroll axis.',
       'The recipe that does work: SingleChildScrollView(scrollDirection: '
-          'Axis.horizontal, child: IntrinsicWidth(child: DsTable(…))). '
+          'Axis.horizontal, child: IntrinsicWidth(child: ElTable(…))). '
           'IntrinsicWidth measures the table’s own natural width first '
           'and hands the scroll view a bounded box, which is what lets the '
           'stretched Column resolve. This page’s own live demo uses '
@@ -918,7 +913,7 @@ class _TableArticle extends StatelessWidget {
     ]),
   );
 
-  Widget _dependencies(DsThemeData theme) => DsSection(
+  Widget _dependencies(ElThemeData theme) => ElSection(
     id: 'dependencies',
     title: 'Dependencies',
     child: _bullets(theme, <String>[
@@ -926,36 +921,36 @@ class _TableArticle extends StatelessWidget {
       'Engine imports: package:flutter/rendering.dart (TableColumnWidth, '
           'RenderBox) and package:flutter/widgets.dart (Table, TableRow, '
           'TableCellVerticalAlignment, MouseRegion, TweenAnimationBuilder).',
-      'Foundation imports: foundation/motion.dart (dsAnimationDuration, '
-          'DsDurations.transitionDefault, DsCurves.out), '
-          'foundation/spacing.dart (ds()), foundation/theme.dart '
-          '(DsThemeData), foundation/typography.dart '
-          '(DsComponentType.tableHead).',
-      'Scope import: theme_scope.dart (DsText, DsTheme).',
+      'Foundation imports: foundation/motion.dart (elAnimationDuration, '
+          'ElDurations.transitionDefault, ElCurves.out), '
+          'foundation/spacing.dart (el()), foundation/theme.dart '
+          '(ElThemeData), foundation/typography.dart '
+          '(ElComponentType.tableHead).',
+      'Scope import: theme_scope.dart (ElText, ElTheme).',
       'No effect import: unlike badge or button, table.dart does not '
           'reach for machine-surface, sheen-action, or any other visual '
           'effect. Every fill is a plain BoxDecoration colour.',
-      'Assets: none. Fonts: none beyond the system type scale every DsText '
+      'Assets: none. Fonts: none beyond the system type scale every ElText '
           'call already depends on. Shaders: none.',
     ]),
   );
 
-  Widget _theming(DsThemeData theme) => DsSection(
+  Widget _theming(ElThemeData theme) => ElSection(
     id: 'theming',
     title: 'Theming',
     child: _bullets(theme, <String>[
-      'Every colour DsTable paints is theme-derived: theme.border for the '
+      'Every colour ElTable paints is theme-derived: theme.border for the '
           'header and row rules, theme.muted for the hover and selected '
           'fills, theme.foreground and theme.mutedForeground for header, '
-          'body and caption text via DsComponentType.tableHead, '
-          'DsType.textSm and DsType.small. Flipping DsThemeController '
+          'body and caption text via ElComponentType.tableHead, '
+          'ElType.textSm and ElType.small. Flipping ElThemeController '
           're-resolves all of them live: nothing is cached.',
       'The half-pixel collapsedRemainder and the hover '
-          'dsTableHoverDuration/dsTableHoverCurve are not designer-facing '
+          'elTableHoverDuration/elTableHoverCurve are not designer-facing '
           'colour tokens; they are exposed as static and top-level getters '
           'specifically so a page like this one: or a test: can name the '
           'exact number instead of restating it.',
-      'DsTable declares no colour-override parameter of its own: no '
+      'ElTable declares no colour-override parameter of its own: no '
           'headerColor, no rowFill, no borderColor argument anywhere in '
           'its constructor. A caller that needs a different fill wraps a '
           'cell’s own content, or reaches for a new component, rather '
@@ -963,7 +958,7 @@ class _TableArticle extends StatelessWidget {
     ]),
   );
 
-  Widget _source() => DsSection(
+  Widget _source() => ElSection(
     id: 'source',
     title: 'Source',
     child: DocsInstallFacts(
@@ -989,7 +984,7 @@ class _TableArticle extends StatelessWidget {
           description:
               'Covers this page (the API table, a live specimen, narrow '
               'and wide layout, live theme flip) plus a set of isolated '
-              'DsTable widget tests that independently verify every claim '
+              'ElTable widget tests that independently verify every claim '
               'in States and Responsive above: the overflow measurements, '
               'the hover/selected fill, and reduced motion.',
         ),
@@ -1056,32 +1051,32 @@ const List<_ActionRow> _actionRows = <_ActionRow>[
   _ActionRow('Quiet mornings', '\$8,420'),
 ];
 
-Widget _bullets(DsThemeData theme, List<String> lines) => Column(
+Widget _bullets(ElThemeData theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: DsWidths.prose),
-        child: DsText('•  $line', DsType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
       ),
-      SizedBox(height: ds(2)),
+      SizedBox(height: el(2)),
     ],
   ],
 );
 
 const String _usageCode = '''
 // The smallest correct call: one header row, one body row.
-DsTable(
-  header: const <DsTableCellSpec>[
-    DsTableCellSpec(child: Text('Type')),
-    DsTableCellSpec(child: Text('Amount'), align: DsTableAlign.end),
+ElTable(
+  header: const <ElTableCellSpec>[
+    ElTableCellSpec(child: Text('Type')),
+    ElTableCellSpec(child: Text('Amount'), align: ElTableAlign.end),
   ],
-  rows: <DsTableRowSpec>[
-    DsTableRowSpec(
-      cells: <DsTableCellSpec>[
-        const DsTableCellSpec(child: Text('Payout')),
-        const DsTableCellSpec(
-          align: DsTableAlign.end,
+  rows: <ElTableRowSpec>[
+    ElTableRowSpec(
+      cells: <ElTableCellSpec>[
+        const ElTableCellSpec(child: Text('Payout')),
+        const ElTableCellSpec(
+          align: ElTableAlign.end,
           child: Text('\\\$412.50'),
         ),
       ],
@@ -1091,19 +1086,19 @@ DsTable(
 
 // A caption and a selected row: example/lib/pages/data.dart's own
 // Transaction history panel.
-DsTable(
+ElTable(
   caption: 'Showing the 5 most recent transactions of 248.',
-  header: const <DsTableCellSpec>[
-    DsTableCellSpec(child: Text('Type')),
-    DsTableCellSpec(child: Text('Amount'), align: DsTableAlign.end),
+  header: const <ElTableCellSpec>[
+    ElTableCellSpec(child: Text('Type')),
+    ElTableCellSpec(child: Text('Amount'), align: ElTableAlign.end),
   ],
-  rows: <DsTableRowSpec>[
-    DsTableRowSpec(
+  rows: <ElTableRowSpec>[
+    ElTableRowSpec(
       selected: true,
-      cells: <DsTableCellSpec>[
-        const DsTableCellSpec(child: Text('Payout')),
-        const DsTableCellSpec(
-          align: DsTableAlign.end,
+      cells: <ElTableCellSpec>[
+        const ElTableCellSpec(child: Text('Payout')),
+        const ElTableCellSpec(
+          align: ElTableAlign.end,
           child: Text('\\\$412.50'),
         ),
       ],
@@ -1113,50 +1108,48 @@ DsTable(
 
 // The empty state: a single spanning row replaces the body entirely: the
 // same shape example/lib/data_table_demo.dart uses when its filter matches
-// nothing. DsTable asserts if a spanning row is not the only row.
-DsTable(
-  header: const <DsTableCellSpec>[DsTableCellSpec(child: Text('Card'))],
-  rows: <DsTableRowSpec>[
-    DsTableRowSpec.span(const Text('No results.'), spanHeight: 192),
+// nothing. ElTable asserts if a spanning row is not the only row.
+ElTable(
+  header: const <ElTableCellSpec>[ElTableCellSpec(child: Text('Card'))],
+  rows: <ElTableRowSpec>[
+    ElTableRowSpec.span(const Text('No results.'), spanHeight: 192),
   ],
 )
 
-// Sorting, filtering, selection and pagination are NOT DsTable parameters —
+// Sorting, filtering, selection and pagination are NOT ElTable parameters —
 // see the Data Table section, and example/lib/data_table_demo.dart's
 // DataTableDemo, for the full recipe.
 ''';
 
-const String _compositionCode =
-    '''// DsTable(header, rows, caption)
-//  Table (RenderTable, DsTableColumnWidth per column)
-//   TableRow (header): one _HeaderCell per DsTableCellSpec in `header`
-//   TableRow (body), one per DsTableRowSpec in `rows`:
-//    _BodyCell per DsTableCellSpec in `cells`, filled from row hover or
+const String _compositionCode = '''// ElTable(header, rows, caption)
+//  Table (RenderTable, ElTableColumnWidth per column)
+//   TableRow (header): one _HeaderCell per ElTableCellSpec in `header`
+//   TableRow (body), one per ElTableRowSpec in `rows`:
+//    _BodyCell per ElTableCellSpec in `cells`, filled from row hover or
 //    `selected` via TweenAnimationBuilder
 //   or, when the single row's `isSpan` is true: a full-width SizedBox
 //   laid out beside the Table rather than inside it (Flutter's Table has
 //   no colSpan of its own)
-//  optional caption: centred DsText under the body, DsTable.captionGap
+//  optional caption: centred ElText under the body, ElTable.captionGap
 //  below it''';
 
-const String _actionsCode =
-    '''DsTableCellSpec(
-  align: DsTableAlign.end,
-  child: DsDropdownMenu(
-    trigger: DsButton(
-      variant: DsButtonVariant.ghost,
-      size: DsButtonSize.icon,
+const String _actionsCode = '''ElTableCellSpec(
+  align: ElTableAlign.end,
+  child: ElDropdownMenu(
+    trigger: ElButton(
+      variant: ElButtonVariant.ghost,
+      size: ElButtonSize.icon,
       label: 'Row actions for \$campaign',
       onPressed: () {},
-      child: const DsIcon.lucide(DsLucide.ellipsis, size: DsIconSize.sm),
+      child: const ElIcon.lucide(ElLucide.ellipsis, size: ElIconSize.sm),
     ),
-    children: <DsMenuChild>[
-      DsMenuItem(label: 'View', onSelect: () {}),
-      DsMenuItem(label: 'Edit', onSelect: () {}),
-      const DsMenuSeparator(),
-      DsMenuItem(
+    children: <ElMenuChild>[
+      ElMenuItem(label: 'View', onSelect: () {}),
+      ElMenuItem(label: 'Edit', onSelect: () {}),
+      const ElMenuSeparator(),
+      ElMenuItem(
         label: 'Delete',
-        variant: DsMenuItemVariant.destructive,
+        variant: ElMenuItemVariant.destructive,
         onSelect: () {},
       ),
     ],
@@ -1165,17 +1158,17 @@ const String _actionsCode =
 
 const String _rtlCode = '''Directionality(
   textDirection: TextDirection.rtl,
-  child: DsTable(
-    header: <DsTableCellSpec>[
-      DsTableCellSpec(child: Text('البند')),
-      DsTableCellSpec(child: Text('المبلغ'), align: DsTableAlign.end),
+  child: ElTable(
+    header: <ElTableCellSpec>[
+      ElTableCellSpec(child: Text('البند')),
+      ElTableCellSpec(child: Text('المبلغ'), align: ElTableAlign.end),
     ],
-    rows: <DsTableRowSpec>[
-      DsTableRowSpec(
-        cells: <DsTableCellSpec>[
-          DsTableCellSpec(child: Text('اشتراك')),
-          DsTableCellSpec(
-            align: DsTableAlign.end,
+    rows: <ElTableRowSpec>[
+      ElTableRowSpec(
+        cells: <ElTableCellSpec>[
+          ElTableCellSpec(child: Text('اشتراك')),
+          ElTableCellSpec(
+            align: ElTableAlign.end,
             child: Text('129.00 دولار'),
           ),
         ],

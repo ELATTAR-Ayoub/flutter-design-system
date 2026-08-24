@@ -43,7 +43,7 @@
 // 2026-08-16, the four live orbs average rgb(45.9, 59.4, 144.5) inside the
 // disc against rgb(31.3, 45.4, 135.1) for linear uniforms and
 // rgb(48.7, 91.3, 184.4) for raw sRGB ones — the green channel settles it.
-// `DsVoiceOrb` linearises before it calls `setFloat`, so `uColor1`/`uColor2`
+// `ElVoiceOrb` linearises before it calls `setFloat`, so `uColor1`/`uColor2`
 // arrive here exactly as linear as they do upstream.
 
 #include <flutter/runtime_effect.glsl>

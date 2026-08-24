@@ -7,7 +7,7 @@ const Size _phone = Size(390, 844);
 const double _gestureBar = 34;
 
 Finder _navigationButton(String label) => find.byWidgetPredicate(
-  (Widget widget) => widget is DsButton && widget.label == label,
+  (Widget widget) => widget is ElButton && widget.label == label,
 );
 
 Semantics _selectionSemantics(WidgetTester tester, String label) => tester
@@ -53,7 +53,7 @@ void main() {
     await tester.pumpWidget(const SignalStudioApp());
     await tester.tap(_navigationButton('Dashboard'));
     await tester.pump();
-    await tester.pump(DsDurations.fast);
+    await tester.pump(ElDurations.fast);
 
     expect(
       _selectionSemantics(tester, 'Dashboard').properties.selected,
@@ -85,7 +85,7 @@ void main() {
     );
     final Finder back = find.byWidgetPredicate(
       (Widget widget) =>
-          widget is DsButton && widget.label == 'Back to design system',
+          widget is ElButton && widget.label == 'Back to design system',
     );
     final Finder theme = find.bySemanticsLabel('Colour theme');
 
@@ -93,7 +93,7 @@ void main() {
     expect(name, findsOneWidget);
     expect(
       tester.getRect(name).left - tester.getRect(avatar).right,
-      closeTo(ds(2), DsWidths.hairline),
+      closeTo(el(2), ElWidths.hairline),
     );
     expect(
       tester.getRect(back).left,
@@ -101,12 +101,12 @@ void main() {
     );
     expect(
       tester.getRect(theme).left - tester.getRect(back).right,
-      closeTo(ds(2), DsWidths.hairline),
+      closeTo(el(2), ElWidths.hairline),
     );
-    expect(tester.getRect(identity).left, greaterThanOrEqualTo(ds(4)));
+    expect(tester.getRect(identity).left, greaterThanOrEqualTo(el(4)));
     expect(
       tester.getRect(theme).right,
-      lessThanOrEqualTo(_phone.width - ds(4)),
+      lessThanOrEqualTo(_phone.width - el(4)),
     );
     expect(tester.takeException(), isNull);
   });
@@ -124,30 +124,30 @@ void main() {
       final Finder dock = find.byKey(const Key('showcase-compact-dock'));
       final Finder group = find.descendant(
         of: dock,
-        matching: find.byType(DsSlidingPillGroup),
+        matching: find.byType(ElSlidingPillGroup),
       );
       final Finder buttons = find.descendant(
         of: dock,
-        matching: find.byType(DsButton),
+        matching: find.byType(ElButton),
       );
 
       expect(group, findsOneWidget);
-      expect(tester.widget<DsSlidingPillGroup>(group).activeIndex, 0);
+      expect(tester.widget<ElSlidingPillGroup>(group).activeIndex, 0);
       expect(buttons, findsNWidgets(3));
       expect(
         tester
-            .widgetList<DsButton>(buttons)
-            .map((DsButton button) => button.variant),
-        everyElement(DsButtonVariant.ghost),
+            .widgetList<ElButton>(buttons)
+            .map((ElButton button) => button.variant),
+        everyElement(ElButtonVariant.ghost),
       );
       expect(_selectionSemantics(tester, 'Profile').properties.selected, true);
 
-      final DsMachineSurface pill = tester.widget<DsMachineSurface>(
+      final ElMachineSurface pill = tester.widget<ElMachineSurface>(
         find.byKey(const Key('showcase-destination-pill')),
       );
-      expect(pill.spec, same(DsShadows.chip));
-      expect(pill.radius, BorderRadius.circular(DsRadii.lg));
-      expect(pill.fill, DsTheme.of(tester.element(dock)).secondary);
+      expect(pill.spec, same(ElShadows.chip));
+      expect(pill.radius, BorderRadius.circular(ElRadii.lg));
+      expect(pill.fill, ElTheme.of(tester.element(dock)).secondary);
     },
   );
 
@@ -161,7 +161,7 @@ void main() {
     await tester.pumpWidget(const SignalStudioApp());
     await tester.pump();
     await tester.pump();
-    await tester.pump(DsDurations.animJelly);
+    await tester.pump(ElDurations.animJelly);
 
     final Finder pill = find.byKey(const Key('showcase-destination-pill'));
     final double oldCenter = tester.getCenter(pill).dx;
@@ -171,14 +171,14 @@ void main() {
 
     await tester.tap(_navigationButton('Dashboard'));
     await tester.pump();
-    await tester.pump(DsDurations.tick);
+    await tester.pump(ElDurations.tick);
 
     final double travellingCenter = tester.getCenter(pill).dx;
     expect(travellingCenter, greaterThan(oldCenter));
     expect(travellingCenter, lessThan(newCenter));
 
-    await tester.pump(DsDurations.base);
-    expect(tester.getCenter(pill).dx, closeTo(newCenter, DsWidths.hairline));
+    await tester.pump(ElDurations.base);
+    expect(tester.getCenter(pill).dx, closeTo(newCenter, ElWidths.hairline));
   });
 
   testWidgets('compact destination pill snaps under reduced motion', (
@@ -201,7 +201,7 @@ void main() {
       tester.getCenter(pill).dx,
       closeTo(
         tester.getCenter(_navigationButton('Reels')).dx,
-        DsWidths.hairline,
+        ElWidths.hairline,
       ),
     );
   });
@@ -213,7 +213,7 @@ void main() {
     addTearDown(tester.view.reset);
 
     for (final double width in <double>[390, 800]) {
-      tester.view.physicalSize = Size(width, DsWidths.page);
+      tester.view.physicalSize = Size(width, ElWidths.page);
       await tester.pumpWidget(const SignalStudioApp());
       await tester.pump();
       await tester.tap(_navigationButton('Reels'));
@@ -227,7 +227,7 @@ void main() {
           .left;
       expect(
         avatarLeft,
-        closeTo(reelContentLeft, DsWidths.hairline),
+        closeTo(reelContentLeft, ElWidths.hairline),
         reason: 'compact width $width should share the reel content measure',
       );
       expect(tester.takeException(), isNull);
@@ -253,7 +253,7 @@ void main() {
       findsOneWidget,
     );
     expect(_selectionSemantics(tester, 'Profile').properties.selected, isTrue);
-    expect(tester.getRect(dock).bottom, _phone.height - _gestureBar - ds(3));
+    expect(tester.getRect(dock).bottom, _phone.height - _gestureBar - el(3));
     expect(
       tester.getRect(find.byType(IndexedStack)).bottom,
       greaterThan(tester.getRect(dock).top),
@@ -316,14 +316,14 @@ void main() {
   ) async {
     await tester.pumpWidget(const SignalStudioApp());
     await tester.tap(_navigationButton('Dashboard'));
-    await tester.pump(DsDurations.fast);
+    await tester.pump(ElDurations.fast);
     await tester.pump();
 
-    await tester.tap(find.widgetWithText(DsButton, 'Refresh').first);
+    await tester.tap(find.widgetWithText(ElButton, 'Refresh').first);
     await tester.pump();
-    expect(find.byType(DsSkeleton), findsWidgets);
+    expect(find.byType(ElSkeleton), findsWidgets);
 
-    await tester.pump(DsDurations.fast);
+    await tester.pump(ElDurations.fast);
     await tester.pump();
     expect(find.text('Studio data is current'), findsOneWidget);
   });
@@ -344,12 +344,12 @@ class _ProfileStateProbeState extends State<_ProfileStateProbe> {
     child: Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        DsText('Profile draft $_draft', DsType.body),
-        SizedBox(height: ds(2)),
-        DsButton(
+        ElText('Profile draft $_draft', ElType.body),
+        SizedBox(height: el(2)),
+        ElButton(
           label: 'Increase profile draft',
           onPressed: () => setState(() => _draft += 1),
-          child: DsText('Increase', DsComponentType.buttonLabel),
+          child: ElText('Increase', ElComponentType.buttonLabel),
         ),
       ],
     ),

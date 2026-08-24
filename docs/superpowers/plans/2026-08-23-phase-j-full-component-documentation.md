@@ -15,8 +15,8 @@
 - Usage examples must be real Dart against the real API. IA §9.5: "Do not manufacture shadcn examples that the Dart API does not support."
 - State matrix rows (IA §9.7) are omitted or marked N/A **with a reason**. Never invent asynchronous behaviour for a synchronous primitive.
 - Every page carries the installation facts panel of IA §9.9.
-- Tokens only: no `Colors.`, no `Color(`, no `TextStyle(`, no bare `Text(` for prose, no hardcoded numeric layout. `ds()`, `DsText`/`DsType`, `DsTheme.of(context)`.
-- Real test-view sizing (`tester.view.physicalSize` + `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`. Live `DsThemeController` flipped in place for theme coverage.
+- Tokens only: no `Colors.`, no `Color(`, no `TextStyle(`, no bare `Text(` for prose, no hardcoded numeric layout. `el()`, `ElText`/`ElType`, `ElTheme.of(context)`.
+- Real test-view sizing (`tester.view.physicalSize` + `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`. Live `ElThemeController` flipped in place for theme coverage.
 - A registry manifest's `registryDependencies` may only name items that exist. Adding a component to the registry means adding its real transitive support items too.
 - `dart format` clean on every file touched.
 
@@ -68,8 +68,8 @@ Already documented (Phase F, do not redo): `button` `input` `card` `dialog` `sel
 **Wave 6 — agent family**
 `agent_attach_menu` `agent_attachments` `agent_avatar` `agent_composer` `agent_console` `agent_face` `agent_history` `agent_launcher` `agent_markdown` `agent_slash_palette` `agent_transcript` `attachment` `bubble` `message` `message_scroller` `questionnaire` `voice`
 
-**Excluded — not user-facing components:** `agent_core` `icon_paths` `icon_paths.g` `icon_paths.g.index` `ds_safe_area` `icon_swap` `marker`
-(`icon`, `spinner`, `ds_rule` already have registry items; they get pages in Wave 1 if time allows.)
+**Excluded — not user-facing components:** `agent_core` `icon_paths` `icon_paths.g` `icon_paths.g.index` `el_safe_area` `icon_swap` `marker`
+(`icon`, `spinner`, `rule` already have registry items; they get pages in Wave 1 if time allows.)
 
 ---
 

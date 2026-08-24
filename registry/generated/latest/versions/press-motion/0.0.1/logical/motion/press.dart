@@ -18,25 +18,25 @@ import '../theme_scope.dart';
 
 /// Squishes [child] while a pointer is down on it.
 ///
-/// Put this on anything clickable that is not a `DsButton` — the logo, a chip,
+/// Put this on anything clickable that is not a `ElButton` — the logo, a chip,
 /// a nav row, a theme-toggle option.
-class DsPress extends StatefulWidget {
-  const DsPress({
+class ElPress extends StatefulWidget {
+  const ElPress({
     super.key,
-    this.scale = DsTransforms.pressScale,
+    this.scale = ElTransforms.pressScale,
     required this.child,
     this.onTap,
     this.behavior = HitTestBehavior.opaque,
-    this.downDuration = DsDurations.pressDown,
-    this.upDuration = DsDurations.base,
+    this.downDuration = ElDurations.pressDown,
+    this.upDuration = ElDurations.base,
   });
 
-  /// The `:active` scale. Defaults to the `press` utility's 0.94; `DsButton`
-  /// passes [DsTransforms.buttonScale], `click-spring` surfaces 0.9.
+  /// The `:active` scale. Defaults to the `press` utility's 0.94; `ElButton`
+  /// passes [ElTransforms.buttonScale], `click-spring` surfaces 0.9.
   final double scale;
 
   /// How long the squish takes. `press` and its two siblings all use 40ms;
-  /// `btn-spring` — what a `DsButton` wears — uses `--duration-tick`, 80ms.
+  /// `btn-spring` — what a `ElButton` wears — uses `--duration-tick`, 80ms.
   final Duration downDuration;
 
   /// How long the spring back takes. `--duration-base` for every utility in
@@ -52,15 +52,15 @@ class DsPress extends StatefulWidget {
   final HitTestBehavior behavior;
 
   @override
-  State<DsPress> createState() => _DsPressState();
+  State<ElPress> createState() => _ElPressState();
 }
 
-class _DsPressState extends State<DsPress> with SingleTickerProviderStateMixin {
+class _ElPressState extends State<ElPress> with SingleTickerProviderStateMixin {
   /// 0 at rest, 1 fully pressed. The asymmetry lives in the two durations.
   late final AnimationController _controller = AnimationController(
     vsync: this,
-    duration: DsDurations.pressDown,
-    reverseDuration: DsDurations.base,
+    duration: ElDurations.pressDown,
+    reverseDuration: ElDurations.base,
   );
 
   /// `--ease-spring` in both directions.
@@ -71,8 +71,8 @@ class _DsPressState extends State<DsPress> with SingleTickerProviderStateMixin {
   /// backwards and turn the spring's overshoot into a lag.
   late final Animation<double> _progress = CurvedAnimation(
     parent: _controller,
-    curve: DsCurves.spring,
-    reverseCurve: DsCurves.spring.flipped,
+    curve: ElCurves.spring,
+    reverseCurve: ElCurves.spring.flipped,
   );
 
   @override
@@ -86,9 +86,11 @@ class _DsPressState extends State<DsPress> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    _controller.duration = dsAnimationDuration(context, widget.downDuration);
-    _controller.reverseDuration =
-        dsAnimationDuration(context, widget.upDuration);
+    _controller.duration = elAnimationDuration(context, widget.downDuration);
+    _controller.reverseDuration = elAnimationDuration(
+      context,
+      widget.upDuration,
+    );
 
     Widget result = Listener(
       onPointerDown: _down,

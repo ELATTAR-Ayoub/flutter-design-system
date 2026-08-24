@@ -9,18 +9,20 @@
     {
       "source": "lib/src/components/alert_dialog.dart",
       "target": "@ui/alert_dialog.dart",
-      "sha256": "6487594ead885564f83f7abe5ad043b2d80de7b4ef4b542f53da2904dc9469b6"
+      "sha256": "27c1f9f8f78ff78f9545d6042a0c26ae9e4f9cc52f175f645c9b7585db6dad9b"
     }
   ],
   "registryDependencies": [
-    "source-foundation",
     "button",
     "dialog",
+    "machine-surface",
+    "source-foundation",
     "tooltip"
   ],
   "semanticDependencies": [
     "button",
     "dialog",
+    "machine-surface",
     "tooltip"
   ],
   "pubDependencies": {},

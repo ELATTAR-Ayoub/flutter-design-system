@@ -26,9 +26,9 @@ class DialogDocPage extends StatelessWidget {
         description:
             'A focused modal surface for tasks that need attention without leaving the current page. Compose a normal dialog or a full-bleed media variant from the same portal.',
       ),
-      breadcrumbs: const <DsBreadcrumbEntry>[
-        DsBreadcrumbEntry.link('Components'),
-        DsBreadcrumbEntry.page('Dialog'),
+      breadcrumbs: const <ElBreadcrumbEntry>[
+        ElBreadcrumbEntry.link('Components'),
+        ElBreadcrumbEntry.page('Dialog'),
       ],
       toc: const <DocsTocEntry>[
         DocsTocEntry(title: 'Preview', anchor: 'preview'),
@@ -43,7 +43,7 @@ class DialogDocPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          DsSection(
+          ElSection(
             id: 'preview',
             title: 'Preview',
             description:
@@ -62,7 +62,7 @@ class DialogDocPage extends StatelessWidget {
               ],
             ),
           ),
-          DsSection(
+          ElSection(
             id: 'install',
             title: 'Installation',
             child: DocsInstallFacts(
@@ -87,16 +87,16 @@ class DialogDocPage extends StatelessWidget {
               ],
             ),
           ),
-          DsSection(
+          ElSection(
             id: 'usage',
             title: 'Usage',
-            child: DsPanel(
+            child: ElPanel(
               label: 'DART',
               note: 'COMPOSE',
               child: DocsSelectableCodeBlock(code: _usageCode),
             ),
           ),
-          DsSection(
+          ElSection(
             id: 'api',
             title: 'API',
             child: DocsApiTable(
@@ -114,7 +114,7 @@ class DialogDocPage extends StatelessWidget {
                 ),
                 DocsApiFact(
                   name: 'variant',
-                  type: 'DsDialogVariant',
+                  type: 'ElDialogVariant',
                   description: 'normal or media anatomy.',
                 ),
                 DocsApiFact(
@@ -131,7 +131,7 @@ class DialogDocPage extends StatelessWidget {
               ],
             ),
           ),
-          DsSection(
+          ElSection(
             id: 'states',
             title: 'States and accessibility',
             child: DocsStateMatrix(
@@ -165,7 +165,7 @@ class DialogDocPage extends StatelessWidget {
               ],
             ),
           ),
-          DsSection(
+          ElSection(
             id: 'dependencies',
             title: 'Dependencies and source',
             child: DocsInstallFacts(
@@ -197,20 +197,20 @@ class DialogDocPage extends StatelessWidget {
   }
 }
 
-const String _usageCode = '''DsDialog(
-  trigger: (context, open) => DsButton(
+const String _usageCode = '''ElDialog(
+  trigger: (context, open) => ElButton(
     onPressed: open,
     child: const Text('Open dialog'),
   ),
-  content: (context, close) => DsDialogContent(
+  content: (context, close) => ElDialogContent(
     onClose: close,
     children: <Widget>[
-      DsDialogHeader(children: <Widget>[
-        DsDialogTitle('Confirm action'),
-        DsDialogDescription('Review the change before continuing.'),
+      ElDialogHeader(children: <Widget>[
+        ElDialogTitle('Confirm action'),
+        ElDialogDescription('Review the change before continuing.'),
       ]),
-      DsDialogFooter(children: <Widget>[
-        DsButton(onPressed: close, child: const Text('Cancel')),
+      ElDialogFooter(children: <Widget>[
+        ElButton(onPressed: close, child: const Text('Cancel')),
       ]),
     ],
   ),
@@ -226,54 +226,54 @@ class _DialogPreview extends StatefulWidget {
 class _DialogPreviewState extends State<_DialogPreview> {
   @override
   Widget build(BuildContext context) => Wrap(
-    spacing: ds(3),
-    runSpacing: ds(3),
+    spacing: el(3),
+    runSpacing: el(3),
     children: <Widget>[
-      DsDialog(
+      ElDialog(
         trigger: (BuildContext context, VoidCallback open) =>
-            DsButton(onPressed: open, child: const Text('Open normal')),
-        content: (BuildContext context, VoidCallback close) => DsDialogContent(
+            ElButton(onPressed: open, child: const Text('Open normal')),
+        content: (BuildContext context, VoidCallback close) => ElDialogContent(
           onClose: close,
           children: <Widget>[
-            const DsDialogHeader(
+            const ElDialogHeader(
               children: <Widget>[
-                DsDialogTitle('Confirm action'),
-                DsDialogDescription('This is a live modal preview.'),
+                ElDialogTitle('Confirm action'),
+                ElDialogDescription('This is a live modal preview.'),
               ],
             ),
-            DsDialogFooter(
+            ElDialogFooter(
               children: <Widget>[
-                DsButton(onPressed: close, child: Text('Cancel')),
+                ElButton(onPressed: close, child: Text('Cancel')),
               ],
             ),
           ],
         ),
       ),
-      DsDialog(
-        trigger: (BuildContext context, VoidCallback open) => DsButton(
-          variant: DsButtonVariant.outline,
+      ElDialog(
+        trigger: (BuildContext context, VoidCallback open) => ElButton(
+          variant: ElButtonVariant.outline,
           onPressed: open,
           child: const Text('Open media'),
         ),
-        content: (BuildContext context, VoidCallback close) => DsDialogContent(
-          variant: DsDialogVariant.media,
+        content: (BuildContext context, VoidCallback close) => ElDialogContent(
+          variant: ElDialogVariant.media,
           showCloseButton: false,
           children: <Widget>[
-            DsDialogMedia(
+            ElDialogMedia(
               child: ColoredBox(
-                color: DsPalette.action,
-                child: Center(child: DsIcon(DsIconGlyph.sparkles)),
+                color: ElPalette.action,
+                child: Center(child: ElIcon(ElIconGlyph.sparkles)),
               ),
             ),
-            const DsDialogHeader(
+            const ElDialogHeader(
               children: <Widget>[
-                DsDialogTitle('A visual lead'),
-                DsDialogDescription('Media dialogs use the same close flow.'),
+                ElDialogTitle('A visual lead'),
+                ElDialogDescription('Media dialogs use the same close flow.'),
               ],
             ),
-            DsDialogFooter(
+            ElDialogFooter(
               children: <Widget>[
-                DsButton(onPressed: close, child: Text('Continue')),
+                ElButton(onPressed: close, child: Text('Continue')),
               ],
             ),
           ],

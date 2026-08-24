@@ -1,14 +1,14 @@
 /// Tests for `components_docs/collapsible/page.dart`'s [CollapsibleDocPage]
-/// the public documentation page for `DsCollapsible` (and the [DsUnfold]
-/// animation it shares with `DsAccordion`).
+/// the public documentation page for `ElCollapsible` (and the [ElUnfold]
+/// animation it shares with `ElAccordion`).
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery` for
 /// layout: the discipline `buttons_page_test.dart` established and
 /// `docs_file_tree_test.dart` / `skills_docs_test.dart` carry forward. Motion
 /// is frozen through `MediaQuery(disableAnimations: true)`, mounted below
-/// `MaterialApp` so it reaches every descendant `DsUnfold`, rather than
-/// pumping `DsDurations.jelly` / `DsDurations.base` by hand.
+/// `MaterialApp` so it reaches every descendant `ElUnfold`, rather than
+/// pumping `ElDurations.jelly` / `ElDurations.base` by hand.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
@@ -40,21 +40,21 @@ const List<String> _expectedSectionOrder = <String>[
 const Size _wide = Size(1440, 900);
 const Size _narrow = Size(390, 844);
 
-Future<DsThemeController> _pumpCollapsible(
+Future<ElThemeController> _pumpCollapsible(
   WidgetTester tester, {
   Size size = _wide,
-  DsThemeMode mode = DsThemeMode.dark,
+  ElThemeMode mode = ElThemeMode.dark,
   ValueChanged<String>? onNavigate,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final DsThemeController theme = DsThemeController(mode: mode);
+  final ElThemeController theme = ElThemeController(mode: mode);
   addTearDown(theme.dispose);
 
   await tester.pumpWidget(
-    DsTheme(
+    ElTheme(
       controller: theme,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -83,30 +83,29 @@ void main() {
       expect(collapsibleDoc.sourcePath, 'lib/src/components/collapsible.dart');
       expect(
         collapsibleDoc.exports,
-        containsAll(<String>['DsCollapsible', 'DsUnfold']),
+        containsAll(<String>['ElCollapsible', 'ElUnfold']),
       );
     });
   });
 
   group('page', () {
-    testWidgets(
-      'renders the shadcn-parity section order top to bottom',
-      (WidgetTester tester) async {
-        await _pumpCollapsible(tester, size: const Size(1440, 3200));
+    testWidgets('renders the shadcn-parity section order top to bottom', (
+      WidgetTester tester,
+    ) async {
+      await _pumpCollapsible(tester, size: const Size(1440, 3200));
 
-        final List<String> rendered = tester
-            .widgetList<DsSection>(find.byType(DsSection))
-            .map((DsSection section) => section.title)
-            .toList();
+      final List<String> rendered = tester
+          .widgetList<ElSection>(find.byType(ElSection))
+          .map((ElSection section) => section.title)
+          .toList();
 
-        expect(rendered, _expectedSectionOrder);
-      },
-    );
+      expect(rendered, _expectedSectionOrder);
+    });
 
     testWidgets(
       'renders the article at 1440x900 and flips a live theme controller in place',
       (WidgetTester tester) async {
-        final DsThemeController theme = await _pumpCollapsible(
+        final ElThemeController theme = await _pumpCollapsible(
           tester,
           size: _wide,
         );
@@ -120,12 +119,12 @@ void main() {
           find.byKey(const ValueKey<String>('docs-layout-sidebar')),
           findsOneWidget,
         );
-        expect(find.byType(DsCollapsible), findsWidgets);
+        expect(find.byType(ElCollapsible), findsWidgets);
         expect(tester.takeException(), isNull);
 
         // Same controller, flipped in place rather than rebuilt: dark then
         // light must both render the same tree without throwing.
-        theme.setMode(DsThemeMode.light);
+        theme.setMode(ElThemeMode.light);
         await tester.pump();
         expect(
           find.byKey(const ValueKey<String>('collapsible-doc-article')),
@@ -155,36 +154,25 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('the API tables document every DsCollapsible and DsUnfold '
+    testWidgets('the API tables document every ElCollapsible and ElUnfold '
         'constructor parameter', (WidgetTester tester) async {
       await _pumpCollapsible(tester);
 
-      // `open` is shared by both DsCollapsible and DsUnfold.
+      // `open` is shared by both ElCollapsible and ElUnfold.
       expect(find.text('open'), findsNWidgets(2));
-      // DsCollapsible-only.
+      // ElCollapsible-only.
       expect(find.text('trigger'), findsOneWidget);
       expect(find.text('content'), findsOneWidget);
-      // DsUnfold-only.
+      // ElUnfold-only.
       expect(find.text('child'), findsOneWidget);
     });
 
     testWidgets(
-      'the honest install section presents no copyable CLI command for '
-      'collapsible',
+      'the install section presents the working collapsible CLI command',
       (WidgetTester tester) async {
         await _pumpCollapsible(tester);
 
-        // The phrase may appear in explanatory prose (it does: the install
-        // section explains why the command does not exist yet), but it must
-        // never be rendered as a standalone, copyable command block.
-        expect(
-          find.text('elattar add collapsible'),
-          findsNothing,
-          reason:
-              'a bare command-shaped text widget would read as copyable/'
-              'runnable, which the component cannot back yet',
-        );
-        expect(find.textContaining('Not available yet'), findsWidgets);
+        expect(find.text('elattar add collapsible'), findsOneWidget);
       },
     );
 
@@ -194,7 +182,7 @@ void main() {
       (WidgetTester tester) async {
         await _pumpCollapsible(tester, size: const Size(900, 1400));
 
-        // Closed by default: DsUnfold renders nothing for its content.
+        // Closed by default: ElUnfold renders nothing for its content.
         expect(find.text('Volatility'), findsNothing);
         expect(find.text('Advanced filters'), findsOneWidget);
 

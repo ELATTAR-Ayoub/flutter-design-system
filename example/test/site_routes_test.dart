@@ -136,13 +136,13 @@ void main() {
       );
       expect(
         searchableRoutes.any((SearchRoute route) {
-          return route.path == '$dsRoot/colors' && route.isDesignSystemRoute;
+          return route.path == '$elRoot/colors' && route.isDesignSystemRoute;
         }),
         isTrue,
       );
       expect(
         searchableRoutes.any((SearchRoute route) {
-          return route.path == '$dsRoot/components/base/buttons' &&
+          return route.path == '$elRoot/components/base/buttons' &&
               route.groupId == 'base' &&
               route.slug == 'buttons';
         }),
@@ -209,9 +209,9 @@ void main() {
 
     test('contains every existing group and category without changing nav', () {
       final Set<String> expected = <String>{
-        for (final DsGroup group in dsGroups) group.href,
-        for (final DsGroup group in dsGroups)
-          for (final DsCategory category in group.categories)
+        for (final ElGroup group in elGroups) group.href,
+        for (final ElGroup group in elGroups)
+          for (final ElCategory category in group.categories)
             categoryHref(group, category),
       };
       final Set<String> indexed = searchableRoutes
@@ -224,7 +224,7 @@ void main() {
     test('search is case-insensitive, trims input, and preserves order', () {
       expect(
         searchSiteRoutes('  BUTTONS  ').map((SearchRoute r) => r.path),
-        contains('$dsRoot/components/base/buttons'),
+        contains('$elRoot/components/base/buttons'),
       );
       expect(searchSiteRoutes('FLUTTER').first.path, homeRoute);
       expect(searchSiteRoutes('not-a-real-route'), isEmpty);

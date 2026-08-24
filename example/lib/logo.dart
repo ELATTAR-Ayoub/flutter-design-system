@@ -1,14 +1,13 @@
-/// The wordmark, `components/ds/logo.tsx`.
+/// The wordmark, `components/el/logo.tsx`.
 ///
 /// The reference's own note explains the shape: *"The mark is typographic on
 /// purpose: no illustrated logo to license or re-draw. The chevron glyph
-/// doubles as the favicon-scale mark. The value colour is reserved for the
-/// `.DS` suffix, so the wordmark carries the brand's 10% value allowance on
-/// its own and demonstrates the ratio at the smallest scale it ever appears
-/// in."*
+/// doubles as the favicon-scale mark. The value colour is reserved for rare,
+/// meaningful emphasis, so the wordmark stays clean at the smallest scale it
+/// ever appears in."*
 ///
 /// Two paths, painted rather than shipped as an asset: the same treatment
-/// [DsIcon] gives lucide, and for the same reason: an SVG that has to be
+/// [ElIcon] gives lucide, and for the same reason: an SVG that has to be
 /// tinted per theme is geometry, not an image.
 library;
 
@@ -16,32 +15,32 @@ import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:flutter/widgets.dart';
 
 /// `M6 15.5 12 6l6 9.5`: the chevron, `stroke-linecap="square"`.
-const DsIconPathElement _chevron = DsIconPathElement('M6 15.5 12 6l6 9.5');
+const ElIconPathElement _chevron = ElIconPathElement('M6 15.5 12 6l6 9.5');
 
 /// `M6 19h12`: the rule under it. No `stroke-linecap`, so SVG's default
 /// `butt` applies; the chevron's square caps are what make the two read as
 /// one drawing rather than a tick over a line.
-const DsIconPathElement _underline = DsIconPathElement('M6 19h12');
+const ElIconPathElement _underline = ElIconPathElement('M6 19h12');
 
 /// `size-7`: the tile.
-final double _tilePx = ds(7);
+final double _tilePx = el(7);
 
 /// `size-4`: the SVG inside it.
-final double _glyphPx = ds(4);
+final double _glyphPx = el(4);
 
 /// The `stroke-width="2.4"` both paths carry.
 ///
 /// Not typed as a literal: 2.4 is what the icon system computes for anything
 /// drawn on lucide's 24-unit grid at 16px, which is exactly what this is.
-final double _glyphStroke = DsIcon.strokeFor(_glyphPx);
+final double _glyphStroke = ElIcon.strokeFor(_glyphPx);
 
 /// The blue tile with the chevron in it, `LogoMark`.
-class DsLogoMark extends StatelessWidget {
-  const DsLogoMark({super.key});
+class ElLogoMark extends StatelessWidget {
+  const ElLogoMark({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return ExcludeSemantics(
       child: Container(
         width: _tilePx,
@@ -49,8 +48,8 @@ class DsLogoMark extends StatelessWidget {
         decoration: BoxDecoration(
           // `bg-action`: the raw ramp, not `--primary`: the tile is the same
           // blue in both themes.
-          color: DsPalette.action,
-          borderRadius: BorderRadius.circular(DsRadii.md),
+          color: ElPalette.action,
+          borderRadius: BorderRadius.circular(ElRadii.md),
         ),
         child: Center(
           child: SizedBox(
@@ -59,7 +58,7 @@ class DsLogoMark extends StatelessWidget {
             child: CustomPaint(
               painter: _MarkPainter(
                 chevron: theme.primaryForeground,
-                underline: DsPalette.valueBright,
+                underline: ElPalette.valueBright,
                 strokeWidth: _glyphStroke,
               ),
             ),
@@ -80,32 +79,12 @@ class Logo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        if (showMark) ...<Widget>[
-          const DsLogoMark(),
-          SizedBox(width: ds(2.5)),
-        ],
-        DsRichText(
-          TextSpan(
-            text: 'ELATTAR',
-            children: <InlineSpan>[
-              TextSpan(
-                // The wordmark's entire 10% value allowance.
-                text: '.DS',
-                style: DsText.styleOf(
-                  context,
-                  DsType.wordmark,
-                  color: theme.valueInk,
-                ),
-              ),
-            ],
-          ),
-          DsType.wordmark,
-          color: theme.foreground,
-        ),
+        if (showMark) ...<Widget>[const ElLogoMark(), SizedBox(width: el(2.5))],
+        ElText('ELATTAR', ElType.wordmark, color: theme.foreground),
       ],
     );
   }
@@ -130,8 +109,8 @@ class _MarkPainter extends CustomPainter {
     if (size.isEmpty) return;
     canvas.save();
     canvas.scale(
-      size.width / DsIconPaths.viewBox,
-      size.height / DsIconPaths.viewBox,
+      size.width / ElIconPaths.viewBox,
+      size.height / ElIconPaths.viewBox,
     );
     _stroke(canvas, _chevron, chevron, StrokeCap.square, StrokeJoin.miter);
     _stroke(canvas, _underline, underline, StrokeCap.butt, StrokeJoin.miter);
@@ -140,7 +119,7 @@ class _MarkPainter extends CustomPainter {
 
   void _stroke(
     Canvas canvas,
-    DsIconPathElement element,
+    ElIconPathElement element,
     Color color,
     StrokeCap cap,
     StrokeJoin join,

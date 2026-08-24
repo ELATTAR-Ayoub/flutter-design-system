@@ -3,8 +3,8 @@ import 'package:example/docs/docs_code.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-Widget _harness(Widget child) => DsTheme(
-  controller: DsThemeController(mode: DsThemeMode.dark),
+Widget _harness(Widget child) => ElTheme(
+  controller: ElThemeController(mode: ElThemeMode.dark),
   child: MaterialApp(
     debugShowCheckedModeBanner: false,
     home: Scaffold(body: SingleChildScrollView(child: child)),
@@ -48,7 +48,7 @@ void main() {
     WidgetTester tester,
   ) async {
     String? copied;
-    final List<DsToastMessage> feedback = <DsToastMessage>[];
+    final List<ElToastMessage> feedback = <ElToastMessage>[];
 
     await tester.pumpWidget(
       _harness(
@@ -70,14 +70,14 @@ void main() {
     expect(copied, 'dart run lfr add button');
     expect(feedback, hasLength(1));
     expect(feedback.single.title, 'Command copied');
-    expect(feedback.single.type, DsToastType.success);
+    expect(feedback.single.type, ElToastType.success);
     expect(feedback.single.description, 'Install button');
   });
 
   testWidgets(
     'copy failure emits error feedback and keeps manual source visible',
     (WidgetTester tester) async {
-      final List<DsToastMessage> feedback = <DsToastMessage>[];
+      final List<ElToastMessage> feedback = <ElToastMessage>[];
 
       await tester.pumpWidget(
         _harness(
@@ -104,7 +104,7 @@ void main() {
 
       expect(feedback, hasLength(1));
       expect(feedback.single.title, 'Copy failed');
-      expect(feedback.single.type, DsToastType.error);
+      expect(feedback.single.type, ElToastType.error);
       expect(find.text('class CardWidget {}'), findsOneWidget);
     },
   );

@@ -1,0 +1,38 @@
+{
+  "name": "voice-orb",
+  "type": "effect",
+  "version": "0.0.1",
+  "description": "`components/agent/voice/orb.tsx` — the voice face.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/effects/voice_orb.dart",
+      "target": "@effects/voice_orb.dart",
+      "sha256": "1bb36a44d3b812401ed677beef720372af9df805bb6d8537dff8985999c4771b"
+    }
+  ],
+  "registryDependencies": [
+    "source-foundation"
+  ],
+  "semanticDependencies": [],
+  "pubDependencies": {},
+  "assets": [
+    {
+      "source": "assets/textures/perlin-noise.png",
+      "target": "@assets/textures/perlin-noise.png",
+      "sha256": "6327c82c7700d6774794f7b06517e45bfedba50ef3b71abac280bd2595e98e6c"
+    }
+  ],
+  "fonts": [],
+  "shaders": [
+    {
+      "source": "shaders/orb.frag",
+      "target": "@shaders/orb.frag",
+      "sha256": "65a449c07b01dd14c0c3229f70c66cb4744fb7410c6d3b13c1c0419b282f8d28"
+    }
+  ],
+  "documentationRoute": "/docs/effects/voice-orb",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/effects/voice_orb.dart",
+  "deprecated": false
+}

@@ -1,14 +1,14 @@
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/stat/meta.dart';
 import 'package:example/components_docs/stat/page.dart';
-import 'package:example/kit.dart' show DsSection;
+import 'package:example/kit.dart' show ElSection;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 Widget _harness({
   required Widget child,
-  required DsThemeController controller,
-}) => DsTheme(
+  required ElThemeController controller,
+}) => ElTheme(
   controller: controller,
   child: MaterialApp(home: SingleChildScrollView(child: child)),
 );
@@ -16,7 +16,7 @@ Widget _harness({
 void main() {
   group('stat docs page', () {
     testWidgets(
-      'renders the article, the full API tables, and live specimens of all four components',
+      'renders the article, the full API tables, and live specimens of ElStat',
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(1440, 900);
         tester.view.devicePixelRatio = 1;
@@ -25,7 +25,7 @@ void main() {
         String? destination;
         await tester.pumpWidget(
           _harness(
-            controller: DsThemeController(mode: DsThemeMode.dark),
+            controller: ElThemeController(mode: ElThemeMode.dark),
             child: StatDocPage(
               onNavigate: (String route) => destination = route,
             ),
@@ -37,19 +37,15 @@ void main() {
           findsOneWidget,
         );
 
-        // All four components have live specimens.
-        expect(find.byType(DsStat), findsWidgets);
-        expect(find.byType(DsItem), findsWidgets);
-        expect(find.byType(DsEmpty), findsWidgets);
-        expect(find.byType(DsKbd), findsWidgets);
+        expect(find.byType(ElStat), findsWidgets);
+        // item/empty/kbd are their own pages now: no live specimens here.
+        expect(find.byType(ElItem), findsNothing);
+        expect(find.byType(ElEmpty), findsNothing);
+        expect(find.byType(ElKbd), findsNothing);
 
-        // The page has section headers. Read the mounted DsSection titles
-        // rather than free text: the wide-viewport table of contents rail
-        // renders every section title a second time, so a bare find.text
-        // is not a reliable "this section exists" check.
         final List<String> sectionTitles = tester
-            .widgetList<DsSection>(find.byType(DsSection))
-            .map((DsSection section) => section.title)
+            .widgetList<ElSection>(find.byType(ElSection))
+            .map((ElSection section) => section.title)
             .toList();
         expect(sectionTitles, contains('API Reference'));
         expect(sectionTitles, contains('Accessibility'));
@@ -58,13 +54,10 @@ void main() {
         expect(
           statDoc.exports,
           containsAll(<String>[
-            'DsStat',
-            'DsStatDirection',
-            'DsStatState',
-            'DsItem',
-            'DsItemVariant',
-            'DsEmpty',
-            'DsKbd',
+            'ElStat',
+            'ElStatDirection',
+            'ElStatState',
+            'ElStatDeltaMark',
           ]),
         );
         expect(destination, isNull);
@@ -80,7 +73,7 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: DsThemeController(mode: DsThemeMode.dark),
+            controller: ElThemeController(mode: ElThemeMode.dark),
             child: const StatDocPage(),
           ),
         );
@@ -107,26 +100,24 @@ void main() {
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
 
-      final DsThemeController controller = DsThemeController(
-        mode: DsThemeMode.light,
+      final ElThemeController controller = ElThemeController(
+        mode: ElThemeMode.light,
       );
       await tester.pumpWidget(
         _harness(controller: controller, child: const StatDocPage()),
       );
 
-      // Find a stat with a delta.
-      final DsStat stat = tester.widget<DsStat>(find.byType(DsStat).first);
+      final ElStat stat = tester.widget<ElStat>(find.byType(ElStat).first);
       expect(stat.delta, isNotNull, reason: 'expected a specimen with delta');
 
-      // The mark is rendered and carries the delta data.
       expect(
-        find.byType(DsStatDeltaMark),
+        find.byType(ElStatDeltaMark),
         findsWidgets,
         reason: 'delta mark is rendered',
       );
     });
 
-    testWidgets('empty and stat have different empty state treatments', (
+    testWidgets('stat renders correctly in every ElStatState', (
       WidgetTester tester,
     ) async {
       tester.view.physicalSize = const Size(1440, 900);
@@ -135,50 +126,18 @@ void main() {
 
       await tester.pumpWidget(
         _harness(
-          controller: DsThemeController(mode: DsThemeMode.dark),
-          child: Column(
-            children: <Widget>[
-              DsStat(
-                label: 'Metric',
-                value: 'N/A',
-                state: DsStatState.empty,
-                message: 'Data unavailable',
-              ),
-            ],
-          ),
+          controller: ElThemeController(mode: ElThemeMode.dark),
+          child: const StatDocPage(),
         ),
       );
 
-      // Stat renders in empty state without errors.
-      expect(
-        find.byType(DsStat),
-        findsOneWidget,
-        reason: 'stat renders in empty state',
-      );
-    });
-
-    testWidgets('kbd and kbdgroup render correctly', (
-      WidgetTester tester,
-    ) async {
-      tester.view.physicalSize = const Size(1440, 900);
-      tester.view.devicePixelRatio = 1;
-      addTearDown(tester.view.reset);
-
-      await tester.pumpWidget(
-        _harness(
-          controller: DsThemeController(mode: DsThemeMode.dark),
-          child: Column(
-            children: <Widget>[
-              const DsKbd('Esc'),
-              const DsKbdGroup(children: <Widget>[DsKbd('Ctrl'), DsKbd('K')]),
-            ],
-          ),
-        ),
-      );
-
-      // Both single kbd and kbdgroup render.
-      expect(find.byType(DsKbd), findsWidgets);
-      expect(find.byType(DsKbdGroup), findsOneWidget);
+      for (final ElStatState state in ElStatState.values) {
+        expect(
+          find.byWidgetPredicate((Widget w) => w is ElStat && w.state == state),
+          findsWidgets,
+          reason: 'missing a $state specimen',
+        );
+      }
     });
 
     testWidgets(
@@ -188,15 +147,15 @@ void main() {
           const Size(390, 844),
           const Size(1440, 900),
         ]) {
-          for (final DsThemeMode mode in <DsThemeMode>[
-            DsThemeMode.light,
-            DsThemeMode.dark,
+          for (final ElThemeMode mode in <ElThemeMode>[
+            ElThemeMode.light,
+            ElThemeMode.dark,
           ]) {
             tester.view.physicalSize = size;
             tester.view.devicePixelRatio = 1;
             addTearDown(tester.view.reset);
 
-            final DsThemeController controller = DsThemeController(mode: mode);
+            final ElThemeController controller = ElThemeController(mode: mode);
             await tester.pumpWidget(
               _harness(controller: controller, child: const StatDocPage()),
             );
@@ -207,20 +166,16 @@ void main() {
               reason: 'at $size in $mode',
             );
 
-            // All four components mount without error at this combination.
-            expect(find.byType(DsStat), findsWidgets);
-            expect(find.byType(DsItem), findsWidgets);
-            expect(find.byType(DsEmpty), findsWidgets);
-            expect(find.byType(DsKbd), findsWidgets);
+            expect(find.byType(ElStat), findsWidgets);
           }
         }
       },
     );
 
     testWidgets(
-      'renders the shadcn-shaped section list, in order: the shared frame '
-      'sections, then each component\'s own promoted sections grouped under '
-      'its own name, then API Reference, then the six extra sections',
+      'renders the ours-only section list, in order: Installation, Usage, '
+      'then stat\'s own sections, then API Reference, then the six extra '
+      'sections',
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(1440, 900);
         tester.view.devicePixelRatio = 1;
@@ -228,42 +183,27 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: DsThemeController(mode: DsThemeMode.dark),
+            controller: ElThemeController(mode: ElThemeMode.dark),
             child: const StatDocPage(),
           ),
         );
 
-        // Read the mounted DsSection widgets in tree order rather than
-        // text-finding each heading: the wide-viewport table of contents
-        // rail renders every section title a second time, and this page
-        // (four components on one page) also carries nested sub-headings
-        // that can repeat a top-level title's own text, so a find.text
-        // based structural check is not reliable here.
-        final List<DsSection> sections = tester
-            .widgetList<DsSection>(find.byType(DsSection))
+        final List<ElSection> sections = tester
+            .widgetList<ElSection>(find.byType(ElSection))
             .toList();
         final List<String> sectionIds = sections
-            .map((DsSection section) => section.id)
+            .map((ElSection section) => section.id)
             .toList();
         final List<String> sectionTitles = sections
-            .map((DsSection section) => section.title)
+            .map((ElSection section) => section.title)
             .toList();
 
         expect(sectionIds, <String>[
           'install',
           'usage',
           'composition',
-          'stat-delta',
-          'stat-states',
-          'item-vs-field',
-          'item-variant',
-          'item-icon',
-          'item-avatar',
-          'item-group',
-          'empty-input-group',
-          'kbd-group',
-          'kbd-button',
-          'kbd-input-group',
+          'delta',
+          'states-demo',
           'rtl',
           'api',
           'states',
@@ -274,36 +214,18 @@ void main() {
           'source',
         ]);
 
-        // No leftover "Overview", "Preview" as second heading, or "Variants"
-        // headings: Overview's prose moved into Preview (which stands in for
-        // shadcn's unheaded live demo), and the enum tables that used to sit
-        // under a standalone "Variants" heading moved into API Reference.
-        expect(sectionTitles, isNot(contains('Overview')));
-        expect(sectionTitles, isNot(contains('Variants and sizes')));
-        expect(sectionTitles, isNot(contains('Status')));
+        expect(sectionTitles, isNot(contains('Item: Variant')));
+        expect(sectionTitles, isNot(contains('Empty: Input group')));
+        expect(sectionTitles, isNot(contains('Kbd: Group')));
 
-        // Every promoted section names the component it belongs to.
         expect(
           sectionTitles,
           containsAll(<String>[
-            'Stat: Delta and direction',
-            'Stat: Loading, error, and empty',
-            'Item: Item vs Field',
-            'Item: Variant',
-            'Item: Icon',
-            'Item: Avatar',
-            'Item: Group',
-            'Empty: Input group',
-            'Kbd: Group',
-            'Kbd: Button',
-            'Kbd: Input group',
-          ]),
-        );
-
-        // The six trailing sections carry exactly their required names.
-        expect(
-          sectionTitles,
-          containsAll(<String>[
+            'Composition',
+            'Delta and direction',
+            'Loading, error, and empty',
+            'RTL',
+            'API Reference',
             'States',
             'Accessibility',
             'Responsive',
@@ -312,10 +234,6 @@ void main() {
             'Source',
           ]),
         );
-
-        expect(sectionTitles, contains('API Reference'));
-        expect(sectionTitles, contains('RTL'));
-        expect(sectionTitles, contains('Composition'));
       },
     );
   });

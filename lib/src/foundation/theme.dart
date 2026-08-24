@@ -5,10 +5,10 @@
 ///
 /// Dark is the mode the system was designed in and is still its default
 /// (L737–740). `.light` exists so a light island inside a dark page resolves
-/// correctly, which is what a side-by-side specimen is; [DsThemeData.light] is
+/// correctly, which is what a side-by-side specimen is; [ElThemeData.light] is
 /// its equivalent here and can be handed to any subtree.
 ///
-/// Every field of [DsThemeData] is one CSS custom property. Where the stylesheet
+/// Every field of [ElThemeData] is one CSS custom property. Where the stylesheet
 /// writes `var(--other)`, this file resolves it at construction — the resolved
 /// value is what a component reads either way.
 library;
@@ -17,8 +17,8 @@ import 'dart:ui' show Color;
 
 import 'colors.dart';
 
-/// Which theme block a [DsThemeData] transcribes.
-enum DsThemeKind {
+/// Which theme block a [ElThemeData] transcribes.
+enum ElThemeKind {
   /// `:root, .light` — globals.css L546.
   light,
 
@@ -27,8 +27,8 @@ enum DsThemeKind {
 }
 
 /// One resolved theme block.
-class DsThemeData {
-  const DsThemeData._({
+class ElThemeData {
+  const ElThemeData._({
     required this.kind,
     required this.background,
     required this.foreground,
@@ -93,7 +93,7 @@ class DsThemeData {
   });
 
   /// Which block this is.
-  final DsThemeKind kind;
+  final ElThemeKind kind;
 
   // ── Monochrome: zinc ──────────────────────────────────────────────────────
 
@@ -227,7 +227,7 @@ class DsThemeData {
   /// `--bubble-tinted` — light `oklch(from var(--primary) 0.93 calc(c * 0.4) h)`
   /// L602 / dark `oklch(from var(--primary) 0.3 calc(c * 0.4) h)` L811.
   ///
-  /// Computed by [DsOklab.fromOklchRelative], never hardcoded: it is derived
+  /// Computed by [ElOklab.fromOklchRelative], never hardcoded: it is derived
   /// from the action ramp so it follows a rebrand (L599–601).
   final Color bubbleTinted;
 
@@ -343,13 +343,13 @@ class DsThemeData {
   /// L903. The agent's own turn in the transcript, one step off `--card`.
   final Color agentMuted;
 
-  /// The twelve `--agent-cube-*` tokens — see [DsAgentCubeTokens].
+  /// The twelve `--agent-cube-*` tokens — see [ElAgentCubeTokens].
   ///
   /// Grouped into an object rather than spread across twelve fields here
   /// because they are read as a **set**: every consumer is a cube face resolver
   /// that needs the whole palette at once, and `bloom`'s five knobs above are
   /// the opposite case — five unrelated scalars each read on its own.
-  final DsAgentCubeTokens cube;
+  final ElAgentCubeTokens cube;
 
   /// `--scrim` — light `hsl(240 10% 3.9% / 0.28)` L663 /
   /// dark `hsl(240 10% 3.9% / 0.66)` L906.
@@ -415,40 +415,40 @@ class DsThemeData {
   /// declares `color-mix(in oklab, var(--bloom-2) 85%, transparent)` — the
   /// host's own hue at 85%. Only the **strength** can be flattened into a theme
   /// block; which colour it is applied to depends on `--bloom-2`, which exists
-  /// only on the host element. `DsStarfield.glowFor` is that second half.
+  /// only on the host element. `ElStarfield.glowFor` is that second half.
   final double starGlowMix;
 
   // ───────────────────────────────────────────────────────────────────────────
 
   /// `:root, .light` — globals.css L546–735.
-  static final DsThemeData light = _build(
-    kind: DsThemeKind.light,
-    background: dsHsl(0, 0, 100),
-    foreground: dsHsl(240, 10, 3.9),
-    card: dsHsl(0, 0, 100),
-    cardForeground: dsHsl(240, 10, 3.9),
-    popover: dsHsl(0, 0, 100),
-    popoverForeground: dsHsl(240, 10, 3.9),
-    secondary: dsHsl(240, 4.8, 95.9),
-    secondaryForeground: dsHsl(240, 5.9, 10),
-    muted: dsHsl(240, 4.8, 95.9),
-    mutedForeground: dsHsl(240, 4, 40),
-    accent: dsHsl(240, 4.8, 95.9),
-    accentForeground: dsHsl(240, 5.9, 10),
-    border: dsHsl(240, 5.9, 90),
-    input: dsHsl(240, 5.9, 90),
-    pageGlow: dsHsl(240, 30, 98),
-    primary: DsPalette.action,
-    primaryForeground: dsHsl(0, 0, 100),
-    ring: DsPalette.action,
-    actionInk: DsPalette.actionDark,
-    valueInk: DsPalette.valueDark,
-    successInk: DsPalette.successDeep,
-    warningInk: DsPalette.warningDeep,
-    infoInk: DsPalette.infoDeep,
-    destructiveInk: DsPalette.destructiveDeep,
-    destructive: dsHsl(0, 72.2, 50.6),
-    destructiveForeground: dsHsl(0, 0, 98),
+  static final ElThemeData light = _build(
+    kind: ElThemeKind.light,
+    background: elHsl(0, 0, 100),
+    foreground: elHsl(240, 10, 3.9),
+    card: elHsl(0, 0, 100),
+    cardForeground: elHsl(240, 10, 3.9),
+    popover: elHsl(0, 0, 100),
+    popoverForeground: elHsl(240, 10, 3.9),
+    secondary: elHsl(240, 4.8, 95.9),
+    secondaryForeground: elHsl(240, 5.9, 10),
+    muted: elHsl(240, 4.8, 95.9),
+    mutedForeground: elHsl(240, 4, 40),
+    accent: elHsl(240, 4.8, 95.9),
+    accentForeground: elHsl(240, 5.9, 10),
+    border: elHsl(240, 5.9, 90),
+    input: elHsl(240, 5.9, 90),
+    pageGlow: elHsl(240, 30, 98),
+    primary: ElPalette.action,
+    primaryForeground: elHsl(0, 0, 100),
+    ring: ElPalette.action,
+    actionInk: ElPalette.actionDark,
+    valueInk: ElPalette.valueDark,
+    successInk: ElPalette.successDeep,
+    warningInk: ElPalette.warningDeep,
+    infoInk: ElPalette.infoDeep,
+    destructiveInk: ElPalette.destructiveDeep,
+    destructive: elHsl(0, 72.2, 50.6),
+    destructiveForeground: elHsl(0, 0, 98),
     // oklch(from var(--primary) 0.93 calc(c * 0.4) h) — L602.
     bubbleLightness: 0.93,
     bubbleChromaScale: 0.4,
@@ -456,25 +456,25 @@ class DsThemeData {
     bubbleHoverLightness: 0.88,
     bubbleHoverChromaScale: 0.5,
     radius: 10,
-    ink1: dsHsl(240, 20, 20, 0.04),
-    ink2: dsHsl(240, 20, 20, 0.07),
-    ink3: dsHsl(240, 20, 20, 0.11),
-    ink4: dsHsl(240, 20, 20, 0.16),
-    rim: dsHsl(0, 0, 100, 0.85),
-    rimStrong: dsHsl(0, 0, 100, 0.4),
-    wall: dsHsl(240, 6, 82),
-    chart1: DsPalette.action,
-    chart2: DsPalette.valueDark,
-    chart3: DsPalette.infoDeep,
-    chart4: DsPalette.actionDark,
-    chart5: DsPalette.successDeep,
-    agent: DsPalette.action,
-    agentMuted: dsHsl(213, 100, 97),
-    scrim: dsHsl(240, 10, 3.9, 0.28),
+    ink1: elHsl(240, 20, 20, 0.04),
+    ink2: elHsl(240, 20, 20, 0.07),
+    ink3: elHsl(240, 20, 20, 0.11),
+    ink4: elHsl(240, 20, 20, 0.16),
+    rim: elHsl(0, 0, 100, 0.85),
+    rimStrong: elHsl(0, 0, 100, 0.4),
+    wall: elHsl(240, 6, 82),
+    chart1: ElPalette.action,
+    chart2: ElPalette.valueDark,
+    chart3: ElPalette.infoDeep,
+    chart4: ElPalette.actionDark,
+    chart5: ElPalette.successDeep,
+    agent: ElPalette.action,
+    agentMuted: elHsl(213, 100, 97),
+    scrim: elHsl(240, 10, 3.9, 0.28),
     // CSS `white` *is* `hsl(0 0% 100%)`; spelled as the top of the lightness
     // axis rather than as an ARGB literal, so this block states no colour the
     // rest of it would not.
-    bloomVoid: dsHsl(0, 0, 100),
+    bloomVoid: elHsl(0, 0, 100),
     bloomL: 0.6,
     bloomC: 1.55,
     bloomLift: 0,
@@ -484,34 +484,34 @@ class DsThemeData {
   );
 
   /// `.dark` — globals.css L741–942.
-  static final DsThemeData dark = _build(
-    kind: DsThemeKind.dark,
-    background: dsHsl(240, 10, 3.9),
-    foreground: dsHsl(0, 0, 98),
-    card: dsHsl(240, 5.9, 10),
-    cardForeground: dsHsl(0, 0, 98),
-    popover: dsHsl(240, 5.9, 10),
-    popoverForeground: dsHsl(0, 0, 98),
-    secondary: dsHsl(240, 3.7, 15.9),
-    secondaryForeground: dsHsl(0, 0, 98),
-    muted: dsHsl(240, 3.7, 15.9),
-    mutedForeground: dsHsl(240, 4.9, 83.9),
-    accent: dsHsl(240, 5.3, 26.1),
-    accentForeground: dsHsl(0, 0, 98),
-    border: dsHsl(240, 3.7, 15.9),
-    input: dsHsl(240, 5.3, 26.1),
-    pageGlow: dsHsl(240, 8, 10),
-    primary: DsPalette.action,
-    primaryForeground: dsHsl(0, 0, 100),
-    ring: DsPalette.actionBright,
-    actionInk: DsPalette.actionBright,
-    valueInk: DsPalette.valueBright,
-    successInk: DsPalette.success,
-    warningInk: DsPalette.warning,
-    infoInk: DsPalette.info,
-    destructiveInk: DsPalette.destructiveLifted,
-    destructive: dsHsl(0, 72.2, 50.6),
-    destructiveForeground: dsHsl(0, 0, 98),
+  static final ElThemeData dark = _build(
+    kind: ElThemeKind.dark,
+    background: elHsl(240, 10, 3.9),
+    foreground: elHsl(0, 0, 98),
+    card: elHsl(240, 5.9, 10),
+    cardForeground: elHsl(0, 0, 98),
+    popover: elHsl(240, 5.9, 10),
+    popoverForeground: elHsl(0, 0, 98),
+    secondary: elHsl(240, 3.7, 15.9),
+    secondaryForeground: elHsl(0, 0, 98),
+    muted: elHsl(240, 3.7, 15.9),
+    mutedForeground: elHsl(240, 4.9, 83.9),
+    accent: elHsl(240, 5.3, 26.1),
+    accentForeground: elHsl(0, 0, 98),
+    border: elHsl(240, 3.7, 15.9),
+    input: elHsl(240, 5.3, 26.1),
+    pageGlow: elHsl(240, 8, 10),
+    primary: ElPalette.action,
+    primaryForeground: elHsl(0, 0, 100),
+    ring: ElPalette.actionBright,
+    actionInk: ElPalette.actionBright,
+    valueInk: ElPalette.valueBright,
+    successInk: ElPalette.success,
+    warningInk: ElPalette.warning,
+    infoInk: ElPalette.info,
+    destructiveInk: ElPalette.destructiveLifted,
+    destructive: elHsl(0, 72.2, 50.6),
+    destructiveForeground: elHsl(0, 0, 98),
     // oklch(from var(--primary) 0.3 calc(c * 0.4) h) — L811.
     bubbleLightness: 0.3,
     bubbleChromaScale: 0.4,
@@ -521,23 +521,23 @@ class DsThemeData {
     radius: 10,
     // rgb(0 0 0 / a) and rgb(255 255 255 / a) — the same colours hsl() spells
     // as `hsl(0 0% 0%)` and `hsl(0 0% 100%)`.
-    ink1: dsHsl(0, 0, 0, 0.35),
-    ink2: dsHsl(0, 0, 0, 0.5),
-    ink3: dsHsl(0, 0, 0, 0.6),
-    ink4: dsHsl(0, 0, 0, 0.75),
-    rim: dsHsl(0, 0, 100, 0.14),
-    rimStrong: dsHsl(0, 0, 100, 0.28),
-    wall: dsHsl(240, 6, 8),
-    chart1: DsPalette.actionBright,
-    chart2: DsPalette.value,
-    chart3: DsPalette.info,
-    chart4: DsPalette.valueBright,
-    chart5: DsPalette.success,
-    agent: DsPalette.actionBright,
-    agentMuted: dsHsl(217, 40, 13),
-    scrim: dsHsl(240, 10, 3.9, 0.66),
+    ink1: elHsl(0, 0, 0, 0.35),
+    ink2: elHsl(0, 0, 0, 0.5),
+    ink3: elHsl(0, 0, 0, 0.6),
+    ink4: elHsl(0, 0, 0, 0.75),
+    rim: elHsl(0, 0, 100, 0.14),
+    rimStrong: elHsl(0, 0, 100, 0.28),
+    wall: elHsl(240, 6, 8),
+    chart1: ElPalette.actionBright,
+    chart2: ElPalette.value,
+    chart3: ElPalette.info,
+    chart4: ElPalette.valueBright,
+    chart5: ElPalette.success,
+    agent: ElPalette.actionBright,
+    agentMuted: elHsl(217, 40, 13),
+    scrim: elHsl(240, 10, 3.9, 0.66),
     // `black` — the bottom of the same axis, for the same reason.
-    bloomVoid: dsHsl(0, 0, 0),
+    bloomVoid: elHsl(0, 0, 0),
     bloomL: 1,
     bloomC: 1,
     bloomLift: 0.85,
@@ -554,8 +554,8 @@ class DsThemeData {
   ///   `--accent-foreground`, `--border` and `--ring` in both blocks;
   /// * `--bubble-tinted` / `--bubble-tinted-hover`, which are relative OKLCH
   ///   colours derived from `--primary`.
-  static DsThemeData _build({
-    required DsThemeKind kind,
+  static ElThemeData _build({
+    required ElThemeKind kind,
     required Color background,
     required Color foreground,
     required Color card,
@@ -610,7 +610,7 @@ class DsThemeData {
     required double starGlowSize,
     required double starGlowMix,
   }) {
-    return DsThemeData._(
+    return ElThemeData._(
       kind: kind,
       background: background,
       foreground: foreground,
@@ -638,12 +638,12 @@ class DsThemeData {
       destructiveInk: destructiveInk,
       destructive: destructive,
       destructiveForeground: destructiveForeground,
-      bubbleTinted: DsOklab.fromOklchRelative(
+      bubbleTinted: ElOklab.fromOklchRelative(
         primary,
         lightness: bubbleLightness,
         chromaScale: bubbleChromaScale,
       ),
-      bubbleTintedHover: DsOklab.fromOklchRelative(
+      bubbleTintedHover: ElOklab.fromOklchRelative(
         primary,
         lightness: bubbleHoverLightness,
         chromaScale: bubbleHoverChromaScale,
@@ -674,9 +674,9 @@ class DsThemeData {
       // Resolved off the block being built rather than passed in, exactly as
       // the eight sidebar tokens above are: the two sets are declared verbatim
       // per theme block, so which one this is *is* the whole of the lookup.
-      cube: kind == DsThemeKind.dark
-          ? DsAgentCubeTokens.dark
-          : DsAgentCubeTokens.light,
+      cube: kind == ElThemeKind.dark
+          ? ElAgentCubeTokens.dark
+          : ElAgentCubeTokens.light,
       scrim: scrim,
       bloomVoid: bloomVoid,
       bloomL: bloomL,
@@ -701,17 +701,17 @@ class DsThemeData {
 /// beside every other one, and that file was not the avatar lane's to open.
 /// This pass is the opening, and it is `bloom_cosmic.dart`'s move one family
 /// over: the flat per-block values come here, the derivations stay with the
-/// effect that performs them (`DsAgentCubeFaces` mixes the accent's own top and
+/// effect that performs them (`ElAgentCubeFaces` mixes the accent's own top and
 /// right faces out of [accent] and [accentShade], so it cannot be flattened
 /// into a block and does not move).
 ///
-/// The note also asked that `DsAgentCubeTokens.of(BuildContext)` come with
-/// them. It does not: it was a second resolver for what `DsTheme.of` already
-/// does, and the tokens now ride [DsThemeData.cube] like every other one. That
+/// The note also asked that `ElAgentCubeTokens.of(BuildContext)` come with
+/// them. It does not: it was a second resolver for what `ElTheme.of` already
+/// does, and the tokens now ride [ElThemeData.cube] like every other one. That
 /// is the whole of the API change — the two statics below are untouched, which
 /// is what the avatar tests spend.
-class DsAgentCubeTokens {
-  const DsAgentCubeTokens({
+class ElAgentCubeTokens {
+  const ElAgentCubeTokens({
     required this.top,
     required this.left,
     required this.right,
@@ -739,7 +739,7 @@ class DsAgentCubeTokens {
   final Color stroke;
 
   /// `--agent-cube-accent` — light `var(--color-action)` / dark
-  /// `var(--color-action-bright)`. The single knob; `DsCubeAvatar.accent`
+  /// `var(--color-action-bright)`. The single knob; `ElCubeAvatar.accent`
   /// overrides it.
   final Color accent;
 
@@ -773,34 +773,34 @@ class DsAgentCubeTokens {
   final Color errorStroke;
 
   /// globals.css L720–731.
-  static final DsAgentCubeTokens light = DsAgentCubeTokens(
-    top: dsHsl(240, 20, 99),
-    left: dsHsl(240, 15, 94),
-    right: dsHsl(240, 14, 90),
-    stroke: dsHsl(240, 10, 79),
-    accent: DsPalette.action,
-    accentShade: dsHsl(217, 45, 72),
-    back: dsHsl(240, 14, 86),
-    ghostInk: dsHsl(240, 5, 54),
-    errorTop: dsHsl(0, 70, 88),
-    errorLeft: dsHsl(0, 65, 82),
-    errorRight: dsHsl(0, 60, 75),
-    errorStroke: dsHsl(0, 55, 69),
+  static final ElAgentCubeTokens light = ElAgentCubeTokens(
+    top: elHsl(240, 20, 99),
+    left: elHsl(240, 15, 94),
+    right: elHsl(240, 14, 90),
+    stroke: elHsl(240, 10, 79),
+    accent: ElPalette.action,
+    accentShade: elHsl(217, 45, 72),
+    back: elHsl(240, 14, 86),
+    ghostInk: elHsl(240, 5, 54),
+    errorTop: elHsl(0, 70, 88),
+    errorLeft: elHsl(0, 65, 82),
+    errorRight: elHsl(0, 60, 75),
+    errorStroke: elHsl(0, 55, 69),
   );
 
   /// globals.css L914–932.
-  static final DsAgentCubeTokens dark = DsAgentCubeTokens(
-    top: dsHsl(240, 5, 21),
-    left: dsHsl(240, 5, 17),
-    right: dsHsl(240, 5, 14),
-    stroke: dsHsl(240, 5, 31),
-    accent: DsPalette.actionBright,
-    accentShade: dsHsl(217, 40, 32),
-    back: dsHsl(240, 6, 10),
-    ghostInk: dsHsl(240, 5, 45),
-    errorTop: dsHsl(0, 60, 46),
-    errorLeft: dsHsl(0, 62, 39),
-    errorRight: dsHsl(0, 63, 33),
-    errorStroke: dsHsl(0, 68, 58),
+  static final ElAgentCubeTokens dark = ElAgentCubeTokens(
+    top: elHsl(240, 5, 21),
+    left: elHsl(240, 5, 17),
+    right: elHsl(240, 5, 14),
+    stroke: elHsl(240, 5, 31),
+    accent: ElPalette.actionBright,
+    accentShade: elHsl(217, 40, 32),
+    back: elHsl(240, 6, 10),
+    ghostInk: elHsl(240, 5, 45),
+    errorTop: elHsl(0, 60, 46),
+    errorLeft: elHsl(0, 62, 39),
+    errorRight: elHsl(0, 63, 33),
+    errorStroke: elHsl(0, 68, 58),
   );
 }

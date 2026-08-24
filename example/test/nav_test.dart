@@ -1,7 +1,7 @@
 import 'package:example/nav.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// Locks `example/lib/nav.dart` to `design-system/lib/ds/nav.ts`.
+/// Locks `example/lib/nav.dart` to `design-system/lib/el/nav.ts`.
 ///
 /// The nav is the one file the whole docs app reads: sidebar order, index
 /// cards, page headers and the page-foot prev/next all come out of it, so a
@@ -11,27 +11,31 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   group('shape', () {
     test('four groups, in source order', () {
-      expect(dsGroups.length, 4);
-      expect(
-        dsGroups.map((DsGroup g) => g.id).toList(),
-        <String>['foundations', 'base', 'agent', 'site'],
-      );
-      expect(
-        dsGroups.map((DsGroup g) => g.title).toList(),
-        <String>['Foundations', 'Base Components', 'Agent', 'Site Pages'],
-      );
+      expect(elGroups.length, 4);
+      expect(elGroups.map((ElGroup g) => g.id).toList(), <String>[
+        'foundations',
+        'base',
+        'agent',
+        'site',
+      ]);
+      expect(elGroups.map((ElGroup g) => g.title).toList(), <String>[
+        'Foundations',
+        'Base Components',
+        'Agent',
+        'Site Pages',
+      ]);
     });
 
     test('category counts per group', () {
-      expect(dsGroupById('foundations').categories.length, 6);
-      expect(dsGroupById('base').categories.length, 14);
-      expect(dsGroupById('agent').categories.length, 6);
-      expect(dsGroupById('site').categories.length, 6);
+      expect(elGroupById('foundations').categories.length, 6);
+      expect(elGroupById('base').categories.length, 14);
+      expect(elGroupById('agent').categories.length, 6);
+      expect(elGroupById('site').categories.length, 6);
     });
 
     test('foundations order drives the sidebar and the foot nav', () {
       expect(
-        dsGroupById('foundations').categories.map((DsCategory c) => c.slug),
+        elGroupById('foundations').categories.map((ElCategory c) => c.slug),
         <String>[
           'colors',
           'typography',
@@ -42,7 +46,7 @@ void main() {
         ],
       );
       expect(
-        dsGroupById('foundations').categories.map((DsCategory c) => c.title),
+        elGroupById('foundations').categories.map((ElCategory c) => c.title),
         <String>[
           'Colors',
           'Typography',
@@ -57,20 +61,20 @@ void main() {
 
   group('routes', () {
     test('group index hrefs', () {
-      expect(dsRoot, '/design-system');
-      expect(dsGroupById('foundations').href, '/design-system');
-      expect(dsGroupById('base').href, '/design-system/components/base');
-      expect(dsGroupById('agent').href, '/design-system/components/agent');
-      expect(dsGroupById('site').href, '/design-system/components/site');
+      expect(elRoot, '/design-system');
+      expect(elGroupById('foundations').href, '/design-system');
+      expect(elGroupById('base').href, '/design-system/components/base');
+      expect(elGroupById('agent').href, '/design-system/components/agent');
+      expect(elGroupById('site').href, '/design-system/components/site');
     });
 
     test('foundations categories hang off the root, not a group segment', () {
-      final DsCategoryHit hit = findCategory('foundations', 'colors');
+      final ElCategoryHit hit = findCategory('foundations', 'colors');
       expect(categoryHref(hit.group, hit.category), '/design-system/colors');
     });
 
     test('every other group nests under its own index', () {
-      final DsCategoryHit hit = findCategory('base', 'buttons');
+      final ElCategoryHit hit = findCategory('base', 'buttons');
       expect(
         categoryHref(hit.group, hit.category),
         '/design-system/components/base/buttons',
@@ -79,8 +83,8 @@ void main() {
 
     test('every href in the tree is unique', () {
       final List<String> hrefs = <String>[
-        for (final DsGroup group in dsGroups)
-          for (final DsCategory category in group.categories)
+        for (final ElGroup group in elGroups)
+          for (final ElCategory category in group.categories)
             categoryHref(group, category),
       ];
       expect(hrefs.length, 32);
@@ -88,10 +92,10 @@ void main() {
     });
 
     test('every title and slug in the tree is non-empty', () {
-      for (final DsGroup group in dsGroups) {
+      for (final ElGroup group in elGroups) {
         expect(group.title, isNotEmpty, reason: group.id);
         expect(group.blurb, isNotEmpty, reason: group.id);
-        for (final DsCategory category in group.categories) {
+        for (final ElCategory category in group.categories) {
           final String where = '${group.id}/${category.slug}';
           expect(category.title, isNotEmpty, reason: where);
           expect(category.slug, isNotEmpty, reason: group.id);
@@ -104,14 +108,14 @@ void main() {
 
   group('siblings', () {
     test('first category has no previous', () {
-      final DsSiblings s = siblings('foundations', 'colors');
+      final ElSiblings s = siblings('foundations', 'colors');
       expect(s.prev, isNull);
       expect(s.next?.title, 'Typography');
       expect(s.next?.href, '/design-system/typography');
     });
 
     test('a middle category sees both neighbours', () {
-      final DsSiblings s = siblings('foundations', 'spacing');
+      final ElSiblings s = siblings('foundations', 'spacing');
       expect(s.prev?.title, 'Typography');
       expect(s.prev?.href, '/design-system/typography');
       expect(s.next?.title, 'Shadows');
@@ -119,7 +123,7 @@ void main() {
     });
 
     test('last category has no next', () {
-      final DsSiblings s = siblings('foundations', 'icons');
+      final ElSiblings s = siblings('foundations', 'icons');
       expect(s.prev?.title, 'Motion');
       expect(s.next, isNull);
     });
@@ -133,13 +137,13 @@ void main() {
 
     // Both of these are the reference's behaviour, ported deliberately.
     test('unknown group degrades to nothing rather than throwing', () {
-      final DsSiblings s = siblings('nope', 'colors');
+      final ElSiblings s = siblings('nope', 'colors');
       expect(s.prev, isNull);
       expect(s.next, isNull);
     });
 
     test('unknown slug points at the top of the group (findIndex −1)', () {
-      final DsSiblings s = siblings('foundations', 'nope');
+      final ElSiblings s = siblings('foundations', 'nope');
       expect(s.prev, isNull);
       expect(s.next?.title, 'Colors');
     });
@@ -160,9 +164,9 @@ void main() {
       );
     });
 
-    test('dsGroupById rejects an unknown id', () {
-      expect(() => dsGroupById('nope'), throwsA(isA<ArgumentError>()));
-      expect(dsGroupById('site').title, 'Site Pages');
+    test('elGroupById rejects an unknown id', () {
+      expect(() => elGroupById('nope'), throwsA(isA<ArgumentError>()));
+      expect(elGroupById('site').title, 'Site Pages');
     });
   });
 
@@ -194,8 +198,10 @@ void main() {
     test('the typography blurb keeps the reference drift', () {
       expect(
         findCategory('foundations', 'typography').category.blurb,
-        startsWith('Two faces only: Space Grotesk for every word, Geist Mono '
-            'for every number.'),
+        startsWith(
+          'Two faces only: Space Grotesk for every word, Geist Mono '
+          'for every number.',
+        ),
       );
     });
 
@@ -206,9 +212,11 @@ void main() {
         'Ambient e1–e4',
       );
       // …em dashes and an apostrophe in the group blurbs.
-      expect(dsGroupById('base').blurb, contains("this system's tokens"));
-      expect(dsGroupById('agent').blurb,
-          contains('— transcript, composer, avatar and voice —'));
+      expect(elGroupById('base').blurb, contains("this system's tokens"));
+      expect(
+        elGroupById('agent').blurb,
+        contains('— transcript, composer, avatar and voice —'),
+      );
     });
   });
 }

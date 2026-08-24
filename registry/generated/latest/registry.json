@@ -3,6 +3,529 @@
   "registryVersion": "0.0.1",
   "items": [
     {
+      "name": "accordion",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/ui/accordion.tsx` — a set of related disclosures where only one",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/accordion.dart",
+          "target": "@ui/accordion.dart",
+          "sha256": "40ff818aafcb31196ae1a89d1d6ee0fe8315077ead4453f3a47971e3fba970cb"
+        }
+      ],
+      "registryDependencies": [
+        "button",
+        "collapsible",
+        "icon",
+        "machine-surface",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "button",
+        "collapsible",
+        "icon",
+        "machine-surface"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/accordion",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/accordion.dart",
+      "deprecated": false
+    },
+    {
+      "name": "agent-attach-menu",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/agent/parts/attach-menu.tsx` — the plus.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/agent_attach_menu.dart",
+          "target": "@ui/agent_attach_menu.dart",
+          "sha256": "b040d7f25d3862eab5056e278acf52190ea84f302cf88b9547a633215fa5fe45"
+        }
+      ],
+      "registryDependencies": [
+        "agent-slash-palette",
+        "button",
+        "dropdown-menu",
+        "icon",
+        "menu",
+        "popover",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "agent-slash-palette",
+        "button",
+        "dropdown-menu",
+        "icon",
+        "menu",
+        "popover"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/agent-attach-menu",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/agent_attach_menu.dart",
+      "deprecated": false
+    },
+    {
+      "name": "agent-attachments",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/agent/parts/attachments.tsx` — files, going both ways.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/agent_attachments.dart",
+          "target": "@ui/agent_attachments.dart",
+          "sha256": "c874bf2e8f594d311afd4f4c01106cc118391d0b24afb169ae0d7c11158ecdd3"
+        }
+      ],
+      "registryDependencies": [
+        "agent-core",
+        "attachment",
+        "button",
+        "dialog",
+        "icon",
+        "source-foundation",
+        "tooltip"
+      ],
+      "semanticDependencies": [
+        "agent-core",
+        "attachment",
+        "button",
+        "dialog",
+        "icon",
+        "tooltip"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/agent-attachments",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/agent_attachments.dart",
+      "deprecated": false
+    },
+    {
+      "name": "agent-avatar",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/agent/avatar/` — the default face, whole.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/agent_avatar.dart",
+          "target": "@ui/agent_avatar.dart",
+          "sha256": "c823941d165e84db19073e53eb6b66bdd18db6344b76daf50362d5fb646c4531"
+        }
+      ],
+      "registryDependencies": [
+        "agent-core",
+        "keyframes",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "agent-core",
+        "keyframes"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/agent-avatar",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/agent_avatar.dart",
+      "deprecated": false
+    },
+    {
+      "name": "agent-composer",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/agent/parts/composer.tsx` — where the user says things.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/agent_composer.dart",
+          "target": "@ui/agent_composer.dart",
+          "sha256": "95b11637ccde1858d1a50572de51f042784563fa382ad6975bf7bf440f48f74c"
+        }
+      ],
+      "registryDependencies": [
+        "agent-attach-menu",
+        "agent-attachments",
+        "agent-core",
+        "agent-slash-palette",
+        "button",
+        "icon",
+        "input",
+        "machine-surface",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "agent-attach-menu",
+        "agent-attachments",
+        "agent-core",
+        "agent-slash-palette",
+        "button",
+        "icon",
+        "input",
+        "machine-surface"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/agent-composer",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/agent_composer.dart",
+      "deprecated": false
+    },
+    {
+      "name": "agent-console",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/agent/agent-console.tsx` — the whole component.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/agent_console.dart",
+          "target": "@ui/agent_console.dart",
+          "sha256": "5e8c43ebddbefdd7edf0e901060591d38829d76227fd60af47e34ff4bb22a513"
+        }
+      ],
+      "registryDependencies": [
+        "agent-avatar",
+        "agent-composer",
+        "agent-core",
+        "agent-face",
+        "agent-history",
+        "agent-slash-palette",
+        "agent-transcript",
+        "button",
+        "dropdown-menu",
+        "icon",
+        "marker",
+        "menu",
+        "popover",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "agent-avatar",
+        "agent-composer",
+        "agent-core",
+        "agent-face",
+        "agent-history",
+        "agent-slash-palette",
+        "agent-transcript",
+        "button",
+        "dropdown-menu",
+        "icon",
+        "marker",
+        "menu",
+        "popover"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/agent-console",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/agent_console.dart",
+      "deprecated": false
+    },
+    {
+      "name": "agent-core",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/agent/core/*` — the vocabulary every agent family renders.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/agent_core.dart",
+          "target": "@ui/agent_core.dart",
+          "sha256": "d5b2f90d974b530909758b84a3e223f391b6847e7bc3e878565aafda333e1b13"
+        }
+      ],
+      "registryDependencies": [
+        "icon",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "icon"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/agent-core",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/agent_core.dart",
+      "deprecated": false
+    },
+    {
+      "name": "agent-face",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/agent/parts/agent-face.tsx` — what the assistant looks like",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/agent_face.dart",
+          "target": "@ui/agent_face.dart",
+          "sha256": "e877f6bc5ea0ba32f19a7d653d1558bb1911b04671a4b5c73a9bb670766a156f"
+        }
+      ],
+      "registryDependencies": [
+        "agent-avatar",
+        "agent-core",
+        "keyframes",
+        "source-foundation",
+        "voice",
+        "voice-orb"
+      ],
+      "semanticDependencies": [
+        "agent-avatar",
+        "agent-core",
+        "keyframes",
+        "voice",
+        "voice-orb"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/agent-face",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/agent_face.dart",
+      "deprecated": false
+    },
+    {
+      "name": "agent-history",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/agent/parts/{history-card,chat-history,history-search}.tsx` —",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/agent_history.dart",
+          "target": "@ui/agent_history.dart",
+          "sha256": "5f979061ed666c457acac7546dc6cc8340b1804460fabe3e008db7ab6c15bbf3"
+        }
+      ],
+      "registryDependencies": [
+        "agent-core",
+        "alert",
+        "alert-dialog",
+        "button",
+        "command",
+        "dialog",
+        "dropdown-menu",
+        "empty",
+        "field",
+        "icon",
+        "input",
+        "item",
+        "machine-surface",
+        "menu",
+        "popover",
+        "source-foundation",
+        "spinner"
+      ],
+      "semanticDependencies": [
+        "agent-core",
+        "alert",
+        "alert-dialog",
+        "button",
+        "command",
+        "dialog",
+        "dropdown-menu",
+        "empty",
+        "field",
+        "icon",
+        "input",
+        "item",
+        "machine-surface",
+        "menu",
+        "popover",
+        "spinner"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/agent-history",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/agent_history.dart",
+      "deprecated": false
+    },
+    {
+      "name": "agent-launcher",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/agent/agent-launcher.tsx` — how the agent appears on a working",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/agent_launcher.dart",
+          "target": "@ui/agent_launcher.dart",
+          "sha256": "e5a8d32a8e6bc7a33b3d4073bd66102ba944620db8073741a1c8228577daee50"
+        }
+      ],
+      "registryDependencies": [
+        "agent-core",
+        "agent-face",
+        "button",
+        "dialog",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "agent-core",
+        "agent-face",
+        "button",
+        "dialog"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/agent-launcher",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/agent_launcher.dart",
+      "deprecated": false
+    },
+    {
+      "name": "agent-markdown",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/agent/parts/markdown.tsx` + `parts/code-block.tsx` — formatted",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/agent_markdown.dart",
+          "target": "@ui/agent_markdown.dart",
+          "sha256": "17ca7f28c932e2759ea733c8b1634be96a04b0934ad09bd998634fca2da39f86"
+        }
+      ],
+      "registryDependencies": [
+        "source-foundation"
+      ],
+      "semanticDependencies": [],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/agent-markdown",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/agent_markdown.dart",
+      "deprecated": false
+    },
+    {
+      "name": "agent-slash-palette",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/agent/parts/slash-palette.tsx` — the `/` menu.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/agent_slash_palette.dart",
+          "target": "@ui/agent_slash_palette.dart",
+          "sha256": "ae8d13ada34db5b321bb43ec96f95695717410d35e3c5ecf02191ab267ff5699"
+        }
+      ],
+      "registryDependencies": [
+        "icon",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "icon"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/agent-slash-palette",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/agent_slash_palette.dart",
+      "deprecated": false
+    },
+    {
+      "name": "agent-transcript",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/agent/parts/` — the transcript's own parts.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/agent_transcript.dart",
+          "target": "@ui/agent_transcript.dart",
+          "sha256": "6fac9555d660f3a29fcf8f93770bca37dbd30dc1e0c9d86add51fb6482787bff"
+        }
+      ],
+      "registryDependencies": [
+        "agent-attachments",
+        "agent-core",
+        "agent-markdown",
+        "button",
+        "icon",
+        "keyframes",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "agent-attachments",
+        "agent-core",
+        "agent-markdown",
+        "button",
+        "icon",
+        "keyframes"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/agent-transcript",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/agent_transcript.dart",
+      "deprecated": false
+    },
+    {
+      "name": "alert",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/ui/alert.tsx` — one surface, five meanings.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/alert.dart",
+          "target": "@ui/alert.dart",
+          "sha256": "be4893eb0f4f8775cd2a21f9cf37934f5b104457936aa412d05337890edda391"
+        }
+      ],
+      "registryDependencies": [
+        "bloom-cosmic",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "bloom-cosmic"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/alert",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/alert.dart",
+      "deprecated": false
+    },
+    {
       "name": "alert-dialog",
       "type": "component",
       "version": "0.0.1",
@@ -13,18 +536,20 @@
         {
           "source": "lib/src/components/alert_dialog.dart",
           "target": "@ui/alert_dialog.dart",
-          "sha256": "6487594ead885564f83f7abe5ad043b2d80de7b4ef4b542f53da2904dc9469b6"
+          "sha256": "27c1f9f8f78ff78f9545d6042a0c26ae9e4f9cc52f175f645c9b7585db6dad9b"
         }
       ],
       "registryDependencies": [
-        "source-foundation",
         "button",
         "dialog",
+        "machine-surface",
+        "source-foundation",
         "tooltip"
       ],
       "semanticDependencies": [
         "button",
         "dialog",
+        "machine-surface",
         "tooltip"
       ],
       "pubDependencies": {},
@@ -33,6 +558,209 @@
       "shaders": [],
       "documentationRoute": "/components/alert-dialog",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/alert_dialog.dart",
+      "deprecated": false
+    },
+    {
+      "name": "aspect-ratio",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/ui/aspect-ratio.tsx` — eleven lines, no styling of its own.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/aspect_ratio.dart",
+          "target": "@ui/aspect_ratio.dart",
+          "sha256": "b2955c6d3390b2aaa0651768503e7bcf5767e725b581e002e0d786d3c6ee14c6"
+        }
+      ],
+      "registryDependencies": [],
+      "semanticDependencies": [],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/aspect-ratio",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/aspect_ratio.dart",
+      "deprecated": false
+    },
+    {
+      "name": "attachment",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/ui/attachment.tsx` — a file, in a conversation.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/attachment.dart",
+          "target": "@ui/attachment.dart",
+          "sha256": "f0b8df598d68c590c5ed28ee7af12babc81c131e3406e960a60fbba871f38da0"
+        }
+      ],
+      "registryDependencies": [
+        "button",
+        "dialog",
+        "icon",
+        "icon-swap",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "button",
+        "dialog",
+        "icon",
+        "icon-swap"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/attachment",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/attachment.dart",
+      "deprecated": false
+    },
+    {
+      "name": "avatar",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/ui/avatar.tsx` — the circle, its rim, and the initials behind it.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/avatar.dart",
+          "target": "@ui/avatar.dart",
+          "sha256": "633d0216cea5e86bda8bc75ce939e2a8cb4297491af0cfc17da17cc933883aa6"
+        }
+      ],
+      "registryDependencies": [
+        "source-foundation"
+      ],
+      "semanticDependencies": [],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/avatar",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/avatar.dart",
+      "deprecated": false
+    },
+    {
+      "name": "badge",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/ui/badge.tsx` — *\\\"a chip with depth, not a coloured",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/badge.dart",
+          "target": "@ui/badge.dart",
+          "sha256": "aab7dfe401807ed17d18b738a88def8b7572ab2248ea67efd71a7cbe16635910"
+        }
+      ],
+      "registryDependencies": [
+        "machine-surface",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "machine-surface"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/badge",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/badge.dart",
+      "deprecated": false
+    },
+    {
+      "name": "bloom-cosmic",
+      "type": "effect",
+      "version": "0.0.1",
+      "description": "`bloom-cosmic` — the iridescence behind an Alert and a toast",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/effects/bloom_cosmic.dart",
+          "target": "@effects/bloom_cosmic.dart",
+          "sha256": "889887645ceaaeb9565dff1f9010e8941a9c440cdbddb7e94ad2d62df24976b2"
+        }
+      ],
+      "registryDependencies": [
+        "keyframes",
+        "source-foundation",
+        "starfield"
+      ],
+      "semanticDependencies": [
+        "keyframes",
+        "starfield"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/docs/effects/bloom-cosmic",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/effects/bloom_cosmic.dart",
+      "deprecated": false
+    },
+    {
+      "name": "breadcrumb",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/ui/breadcrumb.tsx` — the trail back out of a detail page.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/breadcrumb.dart",
+          "target": "@ui/breadcrumb.dart",
+          "sha256": "f5a4804dc080dcfd3aa04d9361f79bfe9d6a7387dedfebbdb17231dd64e231d3"
+        }
+      ],
+      "registryDependencies": [
+        "icon",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "icon"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/breadcrumb",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/breadcrumb.dart",
+      "deprecated": false
+    },
+    {
+      "name": "bubble",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/ui/bubble.tsx` — the surface a message sits on.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/bubble.dart",
+          "target": "@ui/bubble.dart",
+          "sha256": "d5af2f021327c0adfb668225cb1e7103c14774662ef6d0816a216d06544723dc"
+        }
+      ],
+      "registryDependencies": [
+        "press-motion",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "press-motion"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/bubble",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/bubble.dart",
       "deprecated": false
     },
     {
@@ -46,21 +774,21 @@
         {
           "source": "lib/src/components/button.dart",
           "target": "@ui/button.dart",
-          "sha256": "43715b4c41a4d73f92b008fa87bdbfe4fe7e1315814305af1ebb59daf6c74263"
+          "sha256": "4fc23ce56b48be88d2b354d11d9525956856750abe83543558cd6c354671d47d"
         }
       ],
       "registryDependencies": [
-        "source-foundation",
-        "press-motion",
-        "icon",
-        "spinner",
         "foil-value",
         "machine-surface",
-        "sheen-action"
+        "sheen-action",
+        "source-foundation",
+        "spinner"
       ],
       "semanticDependencies": [
-        "press-motion",
-        "icon"
+        "foil-value",
+        "machine-surface",
+        "sheen-action",
+        "spinner"
       ],
       "pubDependencies": {},
       "assets": [],
@@ -68,6 +796,68 @@
       "shaders": [],
       "documentationRoute": "/components/button",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/button.dart",
+      "deprecated": false
+    },
+    {
+      "name": "button-group",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/ui/button-group.tsx` — the segmented control.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/button_group.dart",
+          "target": "@ui/button_group.dart",
+          "sha256": "a304bae1e012a322c876c67ea325abe36eff4fad3ef017ce339074583cc0a93a"
+        }
+      ],
+      "registryDependencies": [
+        "button",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "button"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/button-group",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/button_group.dart",
+      "deprecated": false
+    },
+    {
+      "name": "calendar",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/ui/calendar.tsx` — the month grid, in three arrangements.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/calendar.dart",
+          "target": "@ui/calendar.dart",
+          "sha256": "a9d7d760b2a38bb48bd8930633a6a873b9ed5bc1ead00b5ec330f8bee6d0953a"
+        }
+      ],
+      "registryDependencies": [
+        "button",
+        "icon",
+        "popover",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "button",
+        "icon",
+        "popover"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/calendar",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/calendar.dart",
       "deprecated": false
     },
     {
@@ -81,7 +871,7 @@
         {
           "source": "lib/src/components/card.dart",
           "target": "@ui/card.dart",
-          "sha256": "5df6ca1036ac6d3d446a40b35db943509259d4b5a0b4e8f37647a8b7c4d2eca0"
+          "sha256": "8b22d8d0fddb6bbf8cbb21c3f27010cd59578121a3422f6c332f12dcfcf51a80"
         }
       ],
       "registryDependencies": [
@@ -97,48 +887,48 @@
       "deprecated": false
     },
     {
-      "name": "dialog",
+      "name": "carousel",
       "type": "component",
       "version": "0.0.1",
-      "description": "Accessible modal composition with portal, overlay, jelly transition, compact sizing, media content, header, description, and footer regions.",
+      "description": "`components/ui/carousel.tsx` — the shadcn wrapper around Embla, and the one",
       "minDart": ">=3.12.2 <4.0.0",
       "minFlutter": ">=3.44.8",
       "files": [
         {
-          "source": "lib/src/components/dialog.dart",
-          "target": "@ui/dialog.dart",
-          "sha256": "88fe5926b49d3b828f8e8346337db6f571094e05500dbafae41281bebcef0762"
+          "source": "lib/src/components/carousel.dart",
+          "target": "@ui/carousel.dart",
+          "sha256": "8884161aaad1297b5341d245d529d6687dfdfa74e70d419f3c8d11eb5ddb7407"
         }
       ],
       "registryDependencies": [
-        "source-foundation",
         "button",
         "icon",
-        "machine-surface"
+        "source-foundation"
       ],
       "semanticDependencies": [
+        "button",
         "icon"
       ],
       "pubDependencies": {},
       "assets": [],
       "fonts": [],
       "shaders": [],
-      "documentationRoute": "/components/dialog",
-      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/dialog.dart",
+      "documentationRoute": "/components/carousel",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/carousel.dart",
       "deprecated": false
     },
     {
-      "name": "ds-rule",
+      "name": "chart",
       "type": "component",
       "version": "0.0.1",
-      "description": "Small validation rule and issue-mode support used by composed fields and forms.",
+      "description": "`components/ui/chart.tsx` — the official shadcn wrapper, ported.",
       "minDart": ">=3.12.2 <4.0.0",
       "minFlutter": ">=3.44.8",
       "files": [
         {
-          "source": "lib/src/components/ds_rule.dart",
-          "target": "@ui/ds_rule.dart",
-          "sha256": "fd893a4e770d1a641c5af25ff8a135c92bc82086a01a2d5c0488f38319edb8d8"
+          "source": "lib/src/components/chart.dart",
+          "target": "@ui/chart.dart",
+          "sha256": "c19f07ba4cf2feae639088efc492a7f3c2fd1e8e5f8838ad8fa2dd6c17b7d41e"
         }
       ],
       "registryDependencies": [
@@ -149,8 +939,382 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
-      "documentationRoute": "/docs/foundations/rules",
-      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/ds_rule.dart",
+      "documentationRoute": "/components/chart",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/chart.dart",
+      "deprecated": false
+    },
+    {
+      "name": "chart-cartesian",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "The three cartesian families — `AreaChart`, `BarChart` and `LineChart`.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/chart_cartesian.dart",
+          "target": "@ui/chart_cartesian.dart",
+          "sha256": "8cd55ae27944dff6ffc31d4d5e17889d6f7f49088ba6150818ad81f8ffd269ac"
+        }
+      ],
+      "registryDependencies": [
+        "chart",
+        "chart-geometry",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "chart",
+        "chart-geometry"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/chart-cartesian",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/chart_cartesian.dart",
+      "deprecated": false
+    },
+    {
+      "name": "chart-geometry",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "The maths under every chart on `/design-system/components/base/charts`.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/chart_geometry.dart",
+          "target": "@ui/chart_geometry.dart",
+          "sha256": "c906b0a88886122bf1332686120346fa0f598ef8de31550c6e2efcbef057b2dc"
+        }
+      ],
+      "registryDependencies": [],
+      "semanticDependencies": [],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/chart-geometry",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/chart_geometry.dart",
+      "deprecated": false
+    },
+    {
+      "name": "chart-polar",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "The three polar families — `PieChart`, `RadarChart` and `RadialBarChart`.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/chart_polar.dart",
+          "target": "@ui/chart_polar.dart",
+          "sha256": "205725bbcb1e7300317dbd6579829d15c1f5644a25ed6070475731b1b5759f9f"
+        }
+      ],
+      "registryDependencies": [
+        "chart",
+        "chart-cartesian",
+        "chart-geometry",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "chart",
+        "chart-cartesian",
+        "chart-geometry"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/chart-polar",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/chart_polar.dart",
+      "deprecated": false
+    },
+    {
+      "name": "checkbox",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/ui/checkbox.tsx` — 20px, and the tick draws itself.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/checkbox.dart",
+          "target": "@ui/checkbox.dart",
+          "sha256": "af8654cd28f5780376d0b5a93686dd4045f0f0a068db9dba6c88ebfb197ade5d"
+        }
+      ],
+      "registryDependencies": [
+        "field",
+        "icon",
+        "keyframes",
+        "selection-control",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "field",
+        "icon",
+        "keyframes",
+        "selection-control"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/checkbox",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/checkbox.dart",
+      "deprecated": false
+    },
+    {
+      "name": "collapsible",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/ui/collapsible.tsx` — one independent disclosure, and the",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/collapsible.dart",
+          "target": "@ui/collapsible.dart",
+          "sha256": "bde02c6cb673ae1800df292ca9833cbe0e6c0b6d08d70d33b5929801ecf0eccf"
+        }
+      ],
+      "registryDependencies": [
+        "source-foundation"
+      ],
+      "semanticDependencies": [],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/collapsible",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/collapsible.dart",
+      "deprecated": false
+    },
+    {
+      "name": "combobox",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/ui/combobox.tsx` — a select the user can type into, and **the",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/combobox.dart",
+          "target": "@ui/combobox.dart",
+          "sha256": "5475be0bbfcac54382deeee2c42562d72aad97217d94e59b2ca3d68c6a0024ac"
+        }
+      ],
+      "registryDependencies": [
+        "field",
+        "icon",
+        "input-group",
+        "popover",
+        "select",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "field",
+        "icon",
+        "input-group",
+        "popover",
+        "select"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/combobox",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/combobox.dart",
+      "deprecated": false
+    },
+    {
+      "name": "command",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/ui/command.tsx` — the command palette, and the port's only",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/command.dart",
+          "target": "@ui/command.dart",
+          "sha256": "e68db22e5cf69fca1b6be6d4907329c892f9e5fc882260067cbfe17df2890035"
+        }
+      ],
+      "registryDependencies": [
+        "icon",
+        "input",
+        "input-group",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "icon",
+        "input",
+        "input-group"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/command",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/command.dart",
+      "deprecated": false
+    },
+    {
+      "name": "context-menu",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/ui/context-menu.tsx` — the same menu, opened by a right-click,",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/context_menu.dart",
+          "target": "@ui/context_menu.dart",
+          "sha256": "33abc11802eeb0d87cc6886ea03900a6a1ca4b795e7486aa52bb69c436ed2609"
+        }
+      ],
+      "registryDependencies": [
+        "menu",
+        "popover",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "menu",
+        "popover"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/context-menu",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/context_menu.dart",
+      "deprecated": false
+    },
+    {
+      "name": "dialog",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "Accessible modal composition with portal, overlay, jelly transition, compact sizing, media content, header, description, and footer regions.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/dialog.dart",
+          "target": "@ui/dialog.dart",
+          "sha256": "2c686727fb668336681f449d51049192e5d41e354a20a113d6162f8579ffe759"
+        }
+      ],
+      "registryDependencies": [
+        "button",
+        "icon",
+        "machine-surface",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "button",
+        "icon",
+        "machine-surface"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/dialog",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/dialog.dart",
+      "deprecated": false
+    },
+    {
+      "name": "drawer",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/ui/drawer.tsx` — *\\\"the mobile bottom sheet. Draggable, and the",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/drawer.dart",
+          "target": "@ui/drawer.dart",
+          "sha256": "c266991937267ec1254e525a17c4afc0b59b5f110b7bfbffdda83a33949af422"
+        }
+      ],
+      "registryDependencies": [
+        "dialog",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "dialog"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/drawer",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/drawer.dart",
+      "deprecated": false
+    },
+    {
+      "name": "dropdown-menu",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/ui/dropdown-menu.tsx` — a button that opens a menu under",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/dropdown_menu.dart",
+          "target": "@ui/dropdown_menu.dart",
+          "sha256": "715b26ee5469a33357188750ce2bd1444d53d0e31ce19b3420081e70c2647dc8"
+        }
+      ],
+      "registryDependencies": [
+        "button",
+        "menu",
+        "popover",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "button",
+        "menu",
+        "popover"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/dropdown-menu",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/dropdown_menu.dart",
+      "deprecated": false
+    },
+    {
+      "name": "empty",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/ui/empty.tsx` — six parts, and two of them are drifts.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/empty.dart",
+          "target": "@ui/empty.dart",
+          "sha256": "f4cd07b07a5b3a69bc616b29f65b9146d7a6e1182bc0b63b82d1359b165180b8"
+        }
+      ],
+      "registryDependencies": [
+        "icon",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "icon"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/empty",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/empty.dart",
       "deprecated": false
     },
     {
@@ -164,15 +1328,15 @@
         {
           "source": "lib/src/components/field.dart",
           "target": "@ui/field.dart",
-          "sha256": "8b64fe758d7dae09ff46253dd1acacd95d2cdc63d573ae857d265c3e47482ef3"
+          "sha256": "c1d4c4503e48e1e9c3643601751f265dc56041c3117ba7fadd6e627048a29705"
         }
       ],
       "registryDependencies": [
-        "source-foundation",
-        "ds-rule"
+        "rule",
+        "source-foundation"
       ],
       "semanticDependencies": [
-        "ds-rule"
+        "rule"
       ],
       "pubDependencies": {},
       "assets": [],
@@ -193,12 +1357,12 @@
         {
           "source": "lib/src/effects/foil_value.dart",
           "target": "@effects/foil_value.dart",
-          "sha256": "4ef9eba6d431e54d3d3320f046e16806528b4e95f0780dd0ee9e88945c185413"
+          "sha256": "57799d9e85d62c6bafcce021c26447c7e34c281d6b8973f1f4e0f5548a6807ed"
         }
       ],
       "registryDependencies": [
-        "source-foundation",
-        "machine-surface"
+        "machine-surface",
+        "source-foundation"
       ],
       "semanticDependencies": [
         "machine-surface"
@@ -212,6 +1376,92 @@
       "deprecated": false
     },
     {
+      "name": "form",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/ui/form.tsx` — the wiring, with no styling at all.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/form.dart",
+          "target": "@ui/form.dart",
+          "sha256": "53e03b41c81b4b90698e5bf30baa0d3cb7de92d2156e91c4ebc0ba78f6a25e13"
+        }
+      ],
+      "registryDependencies": [
+        "rule"
+      ],
+      "semanticDependencies": [
+        "rule"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/form",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/form.dart",
+      "deprecated": false
+    },
+    {
+      "name": "glass",
+      "type": "effect",
+      "version": "0.0.1",
+      "description": "Glass — `app/globals.css` L1560–1617.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/effects/glass.dart",
+          "target": "@effects/glass.dart",
+          "sha256": "0f4b7ee33533e4db8f4e84a8d75ed06c1adcf5dab2f9cf6e9d3f97ed7ba8120a"
+        }
+      ],
+      "registryDependencies": [
+        "machine-surface",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "machine-surface"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/docs/effects/glass",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/effects/glass.dart",
+      "deprecated": false
+    },
+    {
+      "name": "hover-card",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/ui/hover-card.tsx` — *\\\"a richer preview on hover, for pointer",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/hover_card.dart",
+          "target": "@ui/hover_card.dart",
+          "sha256": "1f4d596c77035c99dd38008af22e31be8757bfccddf1ff6928268d08e9874601"
+        }
+      ],
+      "registryDependencies": [
+        "popover",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "popover"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/hover-card",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/hover_card.dart",
+      "deprecated": false
+    },
+    {
       "name": "icon",
       "type": "component",
       "version": "0.0.1",
@@ -222,17 +1472,22 @@
         {
           "source": "lib/src/components/icon.dart",
           "target": "@ui/icon.dart",
-          "sha256": "619d0271af81d51b296a88bf8b1d20a86ab71ef298f15868a381f0d8aec86cb5"
+          "sha256": "c2d08c1e3dbdc299d21f2316db6c8e76543d5b68973178e41f493b11af59c541"
         },
         {
           "source": "lib/src/components/icon_paths.dart",
           "target": "@ui/icon_paths.dart",
-          "sha256": "43c3161a2f0a91ba9ddf461d1f94646b92a75d933fa10a878411936140bda0b9"
+          "sha256": "a435776555a1e8fc5f68ff440e8ba01be40c1b82d05b6b7acb6774f335a2cca0"
         },
         {
           "source": "lib/src/components/icon_paths.g.dart",
           "target": "@ui/icon_paths.g.dart",
-          "sha256": "bb3a13ad4e625add61333ef61c080346b44a9678074d6be7e965e5e04c48c012"
+          "sha256": "a57629dad023c46232ea08e27e21c3b4c90a06802d00a1180396bff169419209"
+        },
+        {
+          "source": "lib/src/components/icon_paths.g.index.dart",
+          "target": "@ui/icon_paths.g.index.dart",
+          "sha256": "295f3dbce8baac3eae373dbace980301da318ca3912de3f2836b9cb7056ef4e2"
         }
       ],
       "registryDependencies": [
@@ -248,6 +1503,35 @@
       "deprecated": false
     },
     {
+      "name": "icon-swap",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/ui/icon-swap.tsx` — the two-state control's vertical wheel.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/icon_swap.dart",
+          "target": "@ui/icon_swap.dart",
+          "sha256": "2099e7d4c096f7d825c063b5f8bab10892fdfe4dfed21ace6d8fe5915c16b217"
+        }
+      ],
+      "registryDependencies": [
+        "keyframes",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "keyframes"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/icon-swap",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/icon_swap.dart",
+      "deprecated": false
+    },
+    {
       "name": "input",
       "type": "component",
       "version": "0.0.1",
@@ -258,20 +1542,19 @@
         {
           "source": "lib/src/components/input.dart",
           "target": "@ui/input.dart",
-          "sha256": "997687ec2e4d1ccc526d77128dcbe4bd8613405c4c8f822f6e2689ddb5d62114"
+          "sha256": "cf265cf5434d927a680bed9a0edd0d45308e8da37641a99d670113ed71fae65d"
         }
       ],
       "registryDependencies": [
-        "source-foundation",
         "button",
         "field",
-        "ds-rule",
-        "machine-surface"
+        "machine-surface",
+        "source-foundation"
       ],
       "semanticDependencies": [
         "button",
         "field",
-        "ds-rule"
+        "machine-surface"
       ],
       "pubDependencies": {},
       "assets": [],
@@ -279,6 +1562,189 @@
       "shaders": [],
       "documentationRoute": "/components/input",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/input.dart",
+      "deprecated": false
+    },
+    {
+      "name": "input-group",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/ui/input-group.tsx` — the socket, and the control stripped bare",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/input_group.dart",
+          "target": "@ui/input_group.dart",
+          "sha256": "0c6334549581a43cafd273b183ce70029d5644b6678fc7bf2d1cc532c64c3b2d"
+        }
+      ],
+      "registryDependencies": [
+        "button",
+        "field",
+        "input",
+        "machine-surface",
+        "press-motion",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "button",
+        "field",
+        "input",
+        "machine-surface",
+        "press-motion"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/input-group",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/input_group.dart",
+      "deprecated": false
+    },
+    {
+      "name": "input-otp",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/ui/input-otp.tsx` + the `input-otp` package it is markup for.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/input_otp.dart",
+          "target": "@ui/input_otp.dart",
+          "sha256": "8649b608e076fb22d842f42ec1703310b90245319893d7129a103dfd39d8b684"
+        }
+      ],
+      "registryDependencies": [
+        "button",
+        "field",
+        "icon",
+        "input",
+        "keyframes",
+        "machine-surface",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "button",
+        "field",
+        "icon",
+        "input",
+        "keyframes",
+        "machine-surface"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/input-otp",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/input_otp.dart",
+      "deprecated": false
+    },
+    {
+      "name": "item",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/ui/item.tsx` — a structured list row: media, content, actions.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/item.dart",
+          "target": "@ui/item.dart",
+          "sha256": "f27a2d7cf7fc69aaa775c76430423a22e545be55ce8a7f8e6f04a65702b544c4"
+        }
+      ],
+      "registryDependencies": [
+        "source-foundation"
+      ],
+      "semanticDependencies": [],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/item",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/item.dart",
+      "deprecated": false
+    },
+    {
+      "name": "kbd",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/ui/kbd.tsx` — the keyboard hint, and the one object in the",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/kbd.dart",
+          "target": "@ui/kbd.dart",
+          "sha256": "aa282eb0fc0b7cec294e197276a6691bbbdfee6b33f9db54e8bee941b85151d1"
+        }
+      ],
+      "registryDependencies": [
+        "machine-surface",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "machine-surface"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/kbd",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/kbd.dart",
+      "deprecated": false
+    },
+    {
+      "name": "keyframes",
+      "type": "motion",
+      "version": "0.0.1",
+      "description": "`@keyframes` — the reference's fourteen, transcribed whole.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/motion/keyframes.dart",
+          "target": "@motion/keyframes.dart",
+          "sha256": "48884e39d3e647978b04fe97c7784a615c3b1dd92859c87b3bf9f26dd825cce9"
+        }
+      ],
+      "registryDependencies": [
+        "source-foundation"
+      ],
+      "semanticDependencies": [],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/docs/motion/keyframes",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/motion/keyframes.dart",
+      "deprecated": false
+    },
+    {
+      "name": "lift",
+      "type": "motion",
+      "version": "0.0.1",
+      "description": "The hover lift — the `lift` utility, `app/globals.css` L2318–2330.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/motion/lift.dart",
+          "target": "@motion/lift.dart",
+          "sha256": "e0288db96ee3ef9b59f6449e6724e96d59fe3b0126bf4e6d398a5e7cd338c130"
+        }
+      ],
+      "registryDependencies": [
+        "source-foundation"
+      ],
+      "semanticDependencies": [],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/docs/motion/lift",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/motion/lift.dart",
       "deprecated": false
     },
     {
@@ -292,7 +1758,7 @@
         {
           "source": "lib/src/effects/machine_surface.dart",
           "target": "@effects/machine_surface.dart",
-          "sha256": "3b93ce4fd3a885c3bc991624e25f98a1b7a9f7dfaf2a6200aa018a21a6e52623"
+          "sha256": "2cd5fcbef7dd7cca3977175bac3cbbc3fad7b1ee940eddd940d1d533a9fa2df1"
         }
       ],
       "registryDependencies": [
@@ -308,6 +1774,348 @@
       "deprecated": false
     },
     {
+      "name": "marker",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/ui/marker.tsx` — *\\\"a note **about** a list, sitting in the",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/marker.dart",
+          "target": "@ui/marker.dart",
+          "sha256": "ba139c17a0fbe337da3894acebe768a997d3b0e253a238ba70c9b5c6ea88536b"
+        }
+      ],
+      "registryDependencies": [
+        "source-foundation"
+      ],
+      "semanticDependencies": [],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/marker",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/marker.dart",
+      "deprecated": false
+    },
+    {
+      "name": "media-scrim",
+      "type": "effect",
+      "version": "0.0.1",
+      "description": "Bottom-up media contrast that keeps overlaid copy readable without adding",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/effects/media_scrim.dart",
+          "target": "@effects/media_scrim.dart",
+          "sha256": "90b6f7f70f9e434f60bfd6d85124b0141d92bf9f8892eeef36e9d2af512b988d"
+        }
+      ],
+      "registryDependencies": [
+        "source-foundation"
+      ],
+      "semanticDependencies": [],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/docs/effects/media-scrim",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/effects/media_scrim.dart",
+      "deprecated": false
+    },
+    {
+      "name": "menu",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "The shared body of `dropdown-menu.tsx`, `context-menu.tsx` and",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/menu.dart",
+          "target": "@ui/menu.dart",
+          "sha256": "e878cb95255ee4a7729005ca2e0978434488ccc4a1755adf997684348347a9af"
+        }
+      ],
+      "registryDependencies": [
+        "icon",
+        "popover",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "icon",
+        "popover"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/menu",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/menu.dart",
+      "deprecated": false
+    },
+    {
+      "name": "menubar",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/ui/menubar.tsx` — a strip of triggers that pass one open menu",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/menubar.dart",
+          "target": "@ui/menubar.dart",
+          "sha256": "b1764cecd80b00dae8f027b5efd60e62c9b9dfe2944474a73022998291d0729c"
+        }
+      ],
+      "registryDependencies": [
+        "menu",
+        "popover",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "menu",
+        "popover"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/menubar",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/menubar.dart",
+      "deprecated": false
+    },
+    {
+      "name": "message",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/ui/message.tsx` — one turn, laid out.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/message.dart",
+          "target": "@ui/message.dart",
+          "sha256": "e60dfc39426eb13887a56fe9170194419d735ef466b020721629784857679f1b"
+        }
+      ],
+      "registryDependencies": [
+        "bubble",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "bubble"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/message",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/message.dart",
+      "deprecated": false
+    },
+    {
+      "name": "message-scroller",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/ui/message-scroller.tsx` — a transcript viewport that manages",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/message_scroller.dart",
+          "target": "@ui/message_scroller.dart",
+          "sha256": "b25634f120f9e2e03400186801743ea2d9b25e40213f559e2058b87f0afbcfa4"
+        }
+      ],
+      "registryDependencies": [
+        "button",
+        "icon",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "button",
+        "icon"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/message-scroller",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/message_scroller.dart",
+      "deprecated": false
+    },
+    {
+      "name": "native-select",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/ui/native-select.tsx` — a real `<select>`, and **the one place",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/native_select.dart",
+          "target": "@ui/native_select.dart",
+          "sha256": "c438da8d4ffd843ac885909721eb73247b505a1f8b7711b9cb5c472e8a79f8e7"
+        }
+      ],
+      "registryDependencies": [
+        "button",
+        "field",
+        "icon",
+        "machine-surface",
+        "popover",
+        "select",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "button",
+        "field",
+        "icon",
+        "machine-surface",
+        "popover",
+        "select"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/native-select",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/native_select.dart",
+      "deprecated": false
+    },
+    {
+      "name": "nav-user",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/ui/nav-user.tsx` — *\\\"the account block a sidebar footer is",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/nav_user.dart",
+          "target": "@ui/nav_user.dart",
+          "sha256": "5b893254e0b2c5e337ed0607980b38b1659f35284ff6cb22c20b2e8686c3d2dc"
+        }
+      ],
+      "registryDependencies": [
+        "avatar",
+        "dropdown-menu",
+        "icon",
+        "menu",
+        "popover",
+        "sidebar",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "avatar",
+        "dropdown-menu",
+        "icon",
+        "menu",
+        "popover",
+        "sidebar"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/nav-user",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/nav_user.dart",
+      "deprecated": false
+    },
+    {
+      "name": "navigation-menu",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/ui/navigation-menu.tsx` — a top bar whose items can open a",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/navigation_menu.dart",
+          "target": "@ui/navigation_menu.dart",
+          "sha256": "3701dc887c39d0b7b11c39d12c5ea2c8d299803d56d747f87531a10eeeb47f1f"
+        }
+      ],
+      "registryDependencies": [
+        "icon",
+        "popover",
+        "press-motion",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "icon",
+        "popover",
+        "press-motion"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/navigation-menu",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/navigation_menu.dart",
+      "deprecated": false
+    },
+    {
+      "name": "page-glow",
+      "type": "effect",
+      "version": "0.0.1",
+      "description": "The page atmosphere — `app/globals.css` L983–993.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/effects/page_glow.dart",
+          "target": "@effects/page_glow.dart",
+          "sha256": "b2da307d4f9d369d00544a24d1ad58fe8feb7bc34a0ed05c01af27a78ec037a0"
+        }
+      ],
+      "registryDependencies": [
+        "source-foundation"
+      ],
+      "semanticDependencies": [],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/docs/effects/page-glow",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/effects/page_glow.dart",
+      "deprecated": false
+    },
+    {
+      "name": "pagination",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/ui/pagination.tsx` — page numbers, built entirely out of",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/pagination.dart",
+          "target": "@ui/pagination.dart",
+          "sha256": "fcf7ea4e3245641fcf5cde34ae807fbb612a72d73fd72d54d1b853419215d1c8"
+        }
+      ],
+      "registryDependencies": [
+        "button",
+        "icon",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "button",
+        "icon"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/pagination",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/pagination.dart",
+      "deprecated": false
+    },
+    {
       "name": "popover",
       "type": "component",
       "version": "0.0.1",
@@ -318,13 +2126,16 @@
         {
           "source": "lib/src/components/popover.dart",
           "target": "@ui/popover.dart",
-          "sha256": "4d944d325f8fe5b0283b58c47d2918c26f3aaf4909001e5659ab30c70b04cdfe"
+          "sha256": "5872f328851c1a77ed6b8f0fad76e0621b7eacfa3964a3fc3f1f100eced5de8f"
         }
       ],
       "registryDependencies": [
+        "machine-surface",
         "source-foundation"
       ],
-      "semanticDependencies": [],
+      "semanticDependencies": [
+        "machine-surface"
+      ],
       "pubDependencies": {},
       "assets": [],
       "fonts": [],
@@ -344,7 +2155,7 @@
         {
           "source": "lib/src/motion/press.dart",
           "target": "@motion/press.dart",
-          "sha256": "46085aa88fcaae36f0bfaf4c04515a5e8e3431671179896a104d5350da599784"
+          "sha256": "d16c6e1fdb9de0b82039a835f2e164be6d973256d535850202648ad2ffd52bd3"
         }
       ],
       "registryDependencies": [
@@ -360,6 +2171,205 @@
       "deprecated": false
     },
     {
+      "name": "progress",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/ui/progress.tsx` — a filled channel, not a hair.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/progress.dart",
+          "target": "@ui/progress.dart",
+          "sha256": "779108d9bbd3fe2426da98d8744a069cbab00b89eb8171cb6f67c58a9dac9588"
+        }
+      ],
+      "registryDependencies": [
+        "machine-surface",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "machine-surface"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/progress",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/progress.dart",
+      "deprecated": false
+    },
+    {
+      "name": "questionnaire",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/ui/questionnaire.tsx` over `@shadcn/react/questionnaire` — a",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/questionnaire.dart",
+          "target": "@ui/questionnaire.dart",
+          "sha256": "dffb1c23008d87f5a6ef6bc3576face78cd3a37c51af2b62c0c5833fd24ceb63"
+        }
+      ],
+      "registryDependencies": [
+        "button",
+        "input",
+        "kbd",
+        "keyframes",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "button",
+        "input",
+        "kbd",
+        "keyframes"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/questionnaire",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/questionnaire.dart",
+      "deprecated": false
+    },
+    {
+      "name": "radio",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/ui/radio-group.tsx` — the same 20px socket, and the dot pops.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/radio.dart",
+          "target": "@ui/radio.dart",
+          "sha256": "95b2524b1fce3e8ea0a9727aa8f17768c9c126c841344aa451c700c0a133e8c8"
+        }
+      ],
+      "registryDependencies": [
+        "field",
+        "keyframes",
+        "machine-surface",
+        "selection-control",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "field",
+        "keyframes",
+        "machine-surface",
+        "selection-control"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/radio",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/radio.dart",
+      "deprecated": false
+    },
+    {
+      "name": "resizable",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/ui/resizable.tsx` — three wrappers over",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/resizable.dart",
+          "target": "@ui/resizable.dart",
+          "sha256": "2b2d500be9886287b90604fa57a5174bf07fb8dcfc7a5a598ab0deeddadd2418"
+        }
+      ],
+      "registryDependencies": [
+        "source-foundation"
+      ],
+      "semanticDependencies": [],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/resizable",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/resizable.dart",
+      "deprecated": false
+    },
+    {
+      "name": "rule",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "Small validation rule and issue-mode support used by composed fields and forms.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/rule.dart",
+          "target": "@ui/rule.dart",
+          "sha256": "488e76e0dcb4478b87359e63d28a7f4ce7cffb109af2d7eedf1e5fe5ca9e6a74"
+        }
+      ],
+      "registryDependencies": [],
+      "semanticDependencies": [],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/docs/foundations/rules",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/rule.dart",
+      "deprecated": false
+    },
+    {
+      "name": "safe-area",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "The system-bar contract — **a user-ordered mobile adaptation, not a port.**",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/safe_area.dart",
+          "target": "@ui/safe_area.dart",
+          "sha256": "7288d4180792761d303fb4ef8cedd2908f1fd1affbead928571f8e2816b6a64f"
+        }
+      ],
+      "registryDependencies": [],
+      "semanticDependencies": [],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/safe-area",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/safe_area.dart",
+      "deprecated": false
+    },
+    {
+      "name": "scroll-area",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/ui/scroll-area.tsx` — the browser rail replaced by a composed",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/scroll_area.dart",
+          "target": "@ui/scroll_area.dart",
+          "sha256": "90ce66b9c08b86e5d566172ac64b27107aa72b97c9d4fe43ebcabc437dbaa6d5"
+        }
+      ],
+      "registryDependencies": [
+        "source-foundation"
+      ],
+      "semanticDependencies": [],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/scroll-area",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/scroll_area.dart",
+      "deprecated": false
+    },
+    {
       "name": "select",
       "type": "component",
       "version": "0.0.1",
@@ -370,20 +2380,22 @@
         {
           "source": "lib/src/components/select.dart",
           "target": "@ui/select.dart",
-          "sha256": "7c2bf1d0a8d3c6fd859297a489c7dce4a6654ac0edd4d43a300eb90fce747b59"
+          "sha256": "85e960c69d929988c6dbba075be41e276736b5671d946e2f32d43e0c6509c2d3"
         }
       ],
       "registryDependencies": [
-        "source-foundation",
         "button",
         "field",
         "icon",
+        "machine-surface",
         "popover",
-        "machine-surface"
+        "source-foundation"
       ],
       "semanticDependencies": [
+        "button",
         "field",
         "icon",
+        "machine-surface",
         "popover"
       ],
       "pubDependencies": {},
@@ -392,6 +2404,65 @@
       "shaders": [],
       "documentationRoute": "/components/select",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/select.dart",
+      "deprecated": false
+    },
+    {
+      "name": "selection-control",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "What `Checkbox`, `RadioGroupItem` and `Switch` share.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/selection_control.dart",
+          "target": "@ui/selection_control.dart",
+          "sha256": "06149dcede6da7d9c6cc56ee6e34b80ca2c849c831eaf920ddfbcf9dce0377f0"
+        }
+      ],
+      "registryDependencies": [
+        "button",
+        "keyframes",
+        "machine-surface",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "button",
+        "keyframes",
+        "machine-surface"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/selection-control",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/selection_control.dart",
+      "deprecated": false
+    },
+    {
+      "name": "separator",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/ui/separator.tsx` — a hairline, and nothing else.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/separator.dart",
+          "target": "@ui/separator.dart",
+          "sha256": "9ed933c6b9cb791fc5bc686d2eae2d839d077c37f81d251c984dcf4a9aca6996"
+        }
+      ],
+      "registryDependencies": [
+        "source-foundation"
+      ],
+      "semanticDependencies": [],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/separator",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/separator.dart",
       "deprecated": false
     },
     {
@@ -405,12 +2476,12 @@
         {
           "source": "lib/src/effects/sheen_action.dart",
           "target": "@effects/sheen_action.dart",
-          "sha256": "bde8fd6414a89866b893e397caa5dcebd902b012ac6b2a286430e1af7c944bb5"
+          "sha256": "b2371a385c517a5ed6126518076244c672c422b32a525b6c42eda01aeaf9b1a7"
         }
       ],
       "registryDependencies": [
-        "source-foundation",
-        "machine-surface"
+        "machine-surface",
+        "source-foundation"
       ],
       "semanticDependencies": [
         "machine-surface"
@@ -424,6 +2495,181 @@
       "deprecated": false
     },
     {
+      "name": "sheet",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/ui/sheet.tsx`, left side only — the mobile navigation drawer.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/sheet.dart",
+          "target": "@ui/sheet.dart",
+          "sha256": "6a20113686968fd7f10958564a71ec475dc497266e7e0be531f85900a2e173f8"
+        }
+      ],
+      "registryDependencies": [
+        "button",
+        "dialog",
+        "icon",
+        "safe-area",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "button",
+        "dialog",
+        "icon",
+        "safe-area"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/sheet",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/sheet.dart",
+      "deprecated": false
+    },
+    {
+      "name": "sidebar",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/ui/sidebar.tsx` — the app shell, taken apart.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/sidebar.dart",
+          "target": "@ui/sidebar.dart",
+          "sha256": "488a066354700b3a0c9ed15888b23eeb56176137661e6c9b534585c89c3d3008"
+        }
+      ],
+      "registryDependencies": [
+        "badge",
+        "button",
+        "collapsible",
+        "icon",
+        "icon-swap",
+        "input",
+        "keyframes",
+        "machine-surface",
+        "sheet",
+        "skeleton",
+        "source-foundation",
+        "tooltip"
+      ],
+      "semanticDependencies": [
+        "badge",
+        "button",
+        "collapsible",
+        "icon",
+        "icon-swap",
+        "input",
+        "keyframes",
+        "machine-surface",
+        "sheet",
+        "skeleton",
+        "tooltip"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/sidebar",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/sidebar.dart",
+      "deprecated": false
+    },
+    {
+      "name": "skeleton",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/ui/skeleton.tsx` — thirty-two lines, one utility, one prop.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/skeleton.dart",
+          "target": "@ui/skeleton.dart",
+          "sha256": "90f5a65ce24133fa03ec5d5043ec3e160a4edcb01085113e12b69c33a2096e27"
+        }
+      ],
+      "registryDependencies": [
+        "keyframes",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "keyframes"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/skeleton",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/skeleton.dart",
+      "deprecated": false
+    },
+    {
+      "name": "slider",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/ui/slider.tsx` — a knob sitting in a groove.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/slider.dart",
+          "target": "@ui/slider.dart",
+          "sha256": "32f8b64f199da63386b478c9a25bfe9f967f041a17229e6d5caa3254771070f0"
+        }
+      ],
+      "registryDependencies": [
+        "button",
+        "machine-surface",
+        "selection-control",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "button",
+        "machine-surface",
+        "selection-control"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/slider",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/slider.dart",
+      "deprecated": false
+    },
+    {
+      "name": "sliding-pill",
+      "type": "motion",
+      "version": "0.0.1",
+      "description": "The travelling selection pill — `components/ui/sliding-indicator.tsx` plus",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/motion/sliding_pill.dart",
+          "target": "@motion/sliding_pill.dart",
+          "sha256": "1d4abd31b06947d7bc940d86f087c5e78edc03fa6764926a9ce41f43d2eedb58"
+        }
+      ],
+      "registryDependencies": [
+        "keyframes",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "keyframes"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/docs/motion/sliding-pill",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/motion/sliding_pill.dart",
+      "deprecated": false
+    },
+    {
       "name": "source-foundation",
       "type": "foundation",
       "version": "0.0.1",
@@ -434,57 +2680,57 @@
         {
           "source": "lib/src/foundation/colors.dart",
           "target": "@foundation/colors.dart",
-          "sha256": "4b8f176fdff07d749b3f43c22b41c86683a6c9dae916df7e52d0d4f8a82f876c"
+          "sha256": "ca52446e2c72a81be0be6bc5ad2974daa76541c6f1db0e5e68705dc1c0113dd3"
         },
         {
           "source": "lib/src/foundation/date_format.dart",
           "target": "@foundation/date_format.dart",
-          "sha256": "33734b9b00b2ed5807b3b370658bb87e90d460d4ad03a94aa55748b721bbf50f"
+          "sha256": "9bda1199073f6b4d4fda3384df10846b88aa4636ca6b3d287feee9de921e7ddf"
         },
         {
           "source": "lib/src/foundation/media.dart",
           "target": "@foundation/media.dart",
-          "sha256": "52da61e72a5574b1cccd3c3dd62c19f9aa3840ca8bf486078a5cc71aadd1b9ae"
+          "sha256": "392442079d4e9e6bb1dadcff4b0a8a33507c99811bd5e2e4ea4a57d2fae2d312"
         },
         {
           "source": "lib/src/foundation/motion.dart",
           "target": "@foundation/motion.dart",
-          "sha256": "b329ca191e93f25ebdb3336cef66cb4cb1404f24e56f5c1be8a6250d49dc7481"
+          "sha256": "163e2a500185617cec945e6c3f3c17a963c2881617831fc7a3c642337ccaec9c"
         },
         {
           "source": "lib/src/foundation/shadows.dart",
           "target": "@foundation/shadows.dart",
-          "sha256": "31dae82254cd97febe5241c6354412733342ba38348b66f9cb4d4a8d7e272457"
+          "sha256": "94dfe317c822047594000155236eedd094b14147f87c6b4a9fbb8d13537c6948"
         },
         {
           "source": "lib/src/foundation/spacing.dart",
           "target": "@foundation/spacing.dart",
-          "sha256": "bf13f691d0adfe98c74fabcfd1f2eeddd063fbf2f0d4f3490e62f5f50fca0f27"
+          "sha256": "448689633efa7a1a4c8f3acef14a11421563261227f58d4895f36ec80f7b8b58"
         },
         {
           "source": "lib/src/foundation/surfaces.dart",
           "target": "@foundation/surfaces.dart",
-          "sha256": "0dcc18f0ab7bf56c58fa85c90bdfe85880681344c9694463de2461b6733ed5f8"
+          "sha256": "2f91a8d36c3a055521f064d4f39fee0c22ab1f75bacef633f22c4e6968df197c"
         },
         {
           "source": "lib/src/foundation/theme.dart",
           "target": "@foundation/theme.dart",
-          "sha256": "df8c81a6b2565d2408ccef54518b37bdc9687e4b25959cb1aeee4464dbcfda3b"
+          "sha256": "9628e3cbc767cd4cb8c794b5ddd1f39cf4e02ec2a8b06f2786c245be7eeed6d3"
         },
         {
           "source": "lib/src/foundation/typography.dart",
           "target": "@foundation/typography.dart",
-          "sha256": "eb2a93e1713a4ca4029c217486fb7f02387fc218abf45074484ba386d12e670c"
+          "sha256": "ca9a9e6bd3c2b936b044bd03d907a4b2b9b6aa9e58f8fd765079fccccf7c9af2"
         },
         {
           "source": "lib/src/text_layout.dart",
           "target": "@foundation/text_layout.dart",
-          "sha256": "e38b11b1639d416c96f6749fc8d08d8f7e2bcf6a84decfbf3dce8d44e0eb6de0"
+          "sha256": "31ac69ec85116c8b70876af76e9bd9a46ceecc76d9064bc3607b0630185787c6"
         },
         {
           "source": "lib/src/theme_scope.dart",
           "target": "@foundation/theme_scope.dart",
-          "sha256": "7524edf51bc2679a4b3dfbff8bca9777d2868813c532b72b52b0f9a29a27c2b9"
+          "sha256": "9651d66a8af7971af07c52d20f9fe1ba17bf7406f15fc1b269e1babfdabc0aa2"
         }
       ],
       "registryDependencies": [],
@@ -528,7 +2774,160 @@
         {
           "source": "lib/src/components/spinner.dart",
           "target": "@ui/spinner.dart",
-          "sha256": "930d5c15c4b69cd06df252f0040cebeb67613653457572223ca9ffe5120dfaae"
+          "sha256": "8d2098944a1a3b61d61b5eaa0d8ad8c0c88becfe86f05c9ca7d860d0fc7f717b"
+        }
+      ],
+      "registryDependencies": [
+        "icon",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "icon"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/spinner",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/spinner.dart",
+      "deprecated": false
+    },
+    {
+      "name": "starfield",
+      "type": "effect",
+      "version": "0.0.1",
+      "description": "`.starfield` — thirteen hand-placed sparkles and two slow sways",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/effects/starfield.dart",
+          "target": "@effects/starfield.dart",
+          "sha256": "61f7bb2b8bcc8ebecebd637321a4d5266033a37f12102c7e9948c6c9eb883ce3"
+        }
+      ],
+      "registryDependencies": [
+        "icon",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "icon"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/docs/effects/starfield",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/effects/starfield.dart",
+      "deprecated": false
+    },
+    {
+      "name": "stat",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/ui/stat.tsx` — a labelled figure, an optional delta, an",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/stat.dart",
+          "target": "@ui/stat.dart",
+          "sha256": "b8dad3e8750c43f6ce0d17cc869970b6aba7a44fb09fadf710e18359efcbb71b"
+        }
+      ],
+      "registryDependencies": [
+        "icon",
+        "skeleton",
+        "source-foundation",
+        "swap-in"
+      ],
+      "semanticDependencies": [
+        "icon",
+        "skeleton",
+        "swap-in"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/stat",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/stat.dart",
+      "deprecated": false
+    },
+    {
+      "name": "swap-in",
+      "type": "motion",
+      "version": "0.0.1",
+      "description": "`@utility anim-swap-in` — globals.css L2904–2906.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/motion/swap_in.dart",
+          "target": "@motion/swap_in.dart",
+          "sha256": "2e53aa49d8001f08dcc9a2f488c981a57e360a90b38e005d9e15ac80300b37ae"
+        }
+      ],
+      "registryDependencies": [
+        "keyframes",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "keyframes"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/docs/motion/swap-in",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/motion/swap_in.dart",
+      "deprecated": false
+    },
+    {
+      "name": "switch",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/ui/switch.tsx` — a knob sitting in a socket.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/switch.dart",
+          "target": "@ui/switch.dart",
+          "sha256": "5a2c3f0b6df333b54a7b68a539e09bc62c1cd42b81b6f420a2113fb7b80c09f4"
+        }
+      ],
+      "registryDependencies": [
+        "field",
+        "machine-surface",
+        "selection-control",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "field",
+        "machine-surface",
+        "selection-control"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/switch",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/switch.dart",
+      "deprecated": false
+    },
+    {
+      "name": "table",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/ui/table.tsx` — the eight slots, and the one thing about them",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/table.dart",
+          "target": "@ui/table.dart",
+          "sha256": "a362e2e90d9c0126d357f6cddd026b74c70ee9ba6fa979a47cf50507d2c3bbd2"
         }
       ],
       "registryDependencies": [
@@ -539,8 +2938,173 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
-      "documentationRoute": "/components/spinner",
-      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/spinner.dart",
+      "documentationRoute": "/components/table",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/table.dart",
+      "deprecated": false
+    },
+    {
+      "name": "tabs",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/ui/tabs.tsx` — one travelling mark and a set of views behind it.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/tabs.dart",
+          "target": "@ui/tabs.dart",
+          "sha256": "4954aac6d03ff98ca27a511c31d47ddd787f6d8a326183fdef530000c5d1526f"
+        }
+      ],
+      "registryDependencies": [
+        "button",
+        "machine-surface",
+        "sliding-pill",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "button",
+        "machine-surface",
+        "sliding-pill"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/tabs",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/tabs.dart",
+      "deprecated": false
+    },
+    {
+      "name": "textarea",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/ui/textarea.tsx` — the same socket, the wrong shape for a pill.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/textarea.dart",
+          "target": "@ui/textarea.dart",
+          "sha256": "98693354f74091478f7ca34c89647191432f0592656ab11802883564e33db4ab"
+        }
+      ],
+      "registryDependencies": [
+        "field",
+        "input",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "field",
+        "input"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/textarea",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/textarea.dart",
+      "deprecated": false
+    },
+    {
+      "name": "toaster",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/ui/sonner.tsx` + the `.cn-toast` block (`app/globals.css`",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/toaster.dart",
+          "target": "@ui/toaster.dart",
+          "sha256": "ae471a653d6646ce0f1f914261cf261ce94440ffbca1cc99fbc015f024a7c3b5"
+        }
+      ],
+      "registryDependencies": [
+        "bloom-cosmic",
+        "icon",
+        "machine-surface",
+        "safe-area",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "bloom-cosmic",
+        "icon",
+        "machine-surface",
+        "safe-area"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/toaster",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/toaster.dart",
+      "deprecated": false
+    },
+    {
+      "name": "toggle",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/ui/toggle.tsx` — the whole `cva`, including the three",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/toggle.dart",
+          "target": "@ui/toggle.dart",
+          "sha256": "0d9899ad33012e1990b0ec11a8d7a47f7443aa4676f37a91453e353352e0d0ac"
+        }
+      ],
+      "registryDependencies": [
+        "button",
+        "icon",
+        "machine-surface",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "button",
+        "icon",
+        "machine-surface"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/toggle",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/toggle.dart",
+      "deprecated": false
+    },
+    {
+      "name": "toggle-group",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/ui/toggle-group.tsx` — three mutually exclusive options and one",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/toggle_group.dart",
+          "target": "@ui/toggle_group.dart",
+          "sha256": "d0b3d62d1338f6c2ab3098141d6c13a2ecedb85a351681a5dcee442794aa1ee5"
+        }
+      ],
+      "registryDependencies": [
+        "machine-surface",
+        "sliding-pill",
+        "source-foundation",
+        "toggle"
+      ],
+      "semanticDependencies": [
+        "machine-surface",
+        "sliding-pill",
+        "toggle"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/toggle-group",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/toggle_group.dart",
       "deprecated": false
     },
     {
@@ -554,7 +3118,7 @@
         {
           "source": "lib/src/components/tooltip.dart",
           "target": "@ui/tooltip.dart",
-          "sha256": "02e0e9faf9d39be68ae1f3b369bce8eabcaf24e05649eba338c3d4903dae6631"
+          "sha256": "e5f23266cb2929623ad429bdb51338caac86ce18c6162c227bfce6c45473736b"
         }
       ],
       "registryDependencies": [
@@ -567,6 +3131,75 @@
       "shaders": [],
       "documentationRoute": "/components/tooltip",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/tooltip.dart",
+      "deprecated": false
+    },
+    {
+      "name": "voice",
+      "type": "component",
+      "version": "0.0.1",
+      "description": "`components/agent/voice/` — the listening surface.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/voice.dart",
+          "target": "@ui/voice.dart",
+          "sha256": "a361d7f98386b0f0df9e189f55c16281b80c08c730cd7d6ede2a9d1e1dc7e242"
+        }
+      ],
+      "registryDependencies": [
+        "button",
+        "icon",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "button",
+        "icon"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "documentationRoute": "/components/voice",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/voice.dart",
+      "deprecated": false
+    },
+    {
+      "name": "voice-orb",
+      "type": "effect",
+      "version": "0.0.1",
+      "description": "`components/agent/voice/orb.tsx` — the voice face.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/effects/voice_orb.dart",
+          "target": "@effects/voice_orb.dart",
+          "sha256": "1bb36a44d3b812401ed677beef720372af9df805bb6d8537dff8985999c4771b"
+        }
+      ],
+      "registryDependencies": [
+        "source-foundation"
+      ],
+      "semanticDependencies": [],
+      "pubDependencies": {},
+      "assets": [
+        {
+          "source": "assets/textures/perlin-noise.png",
+          "target": "@assets/textures/perlin-noise.png",
+          "sha256": "6327c82c7700d6774794f7b06517e45bfedba50ef3b71abac280bd2595e98e6c"
+        }
+      ],
+      "fonts": [],
+      "shaders": [
+        {
+          "source": "shaders/orb.frag",
+          "target": "@shaders/orb.frag",
+          "sha256": "65a449c07b01dd14c0c3229f70c66cb4744fb7410c6d3b13c1c0419b282f8d28"
+        }
+      ],
+      "documentationRoute": "/docs/effects/voice-orb",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/effects/voice_orb.dart",
       "deprecated": false
     }
   ]

@@ -22,32 +22,30 @@ ScrollPosition? _positionOf(ScrollController controller) =>
 /// Idempotent: it assigns three properties, so a hot restart simply rebinds
 /// them to the new controller. Nothing detaches them, and nothing needs to —
 /// the shell that owns the controller outlives every page in the gallery.
-void dsInstallScrollBridge(ScrollController controller) {
-  /// `window.__dsScrollTo(y)`: jump, clamped to the scrollable range.
+void elInstallScrollBridge(ScrollController controller) {
+  /// `window.__elScrollTo(y)`: jump, clamped to the scrollable range.
   ///
   /// A jump rather than an animation on purpose: the rig takes a photograph
   /// immediately afterwards, and it must not have to know how long a scroll
   /// takes. Clamping is what makes a short bottom pass *legible* rather than
-  /// silent: ask for more than the page has and `__dsScrollY()` reports the
+  /// silent: ask for more than the page has and `__elScrollY()` reports the
   /// clamp, which is precisely the partial advance pixel matching could not
   /// recover.
-  globalContext['__dsScrollTo'] = ((JSNumber y) {
+  globalContext['__elScrollTo'] = ((JSNumber y) {
     final ScrollPosition? position = _positionOf(controller);
     if (position == null) return;
-    position.jumpTo(
-      y.toDartDouble.clamp(0.0, position.maxScrollExtent),
-    );
+    position.jumpTo(y.toDartDouble.clamp(0.0, position.maxScrollExtent));
   }).toJS;
 
-  /// `window.__dsScrollY()`: the port of `window.scrollY`.
-  globalContext['__dsScrollY'] = (() {
+  /// `window.__elScrollY()`: the port of `window.scrollY`.
+  globalContext['__elScrollY'] = (() {
     final ScrollPosition? position = _positionOf(controller);
     return (position?.pixels ?? 0).toJS;
   }).toJS;
 
-  /// `window.__dsScrollMax()`: the port of
+  /// `window.__elScrollMax()`: the port of
   /// `document.body.scrollHeight − innerHeight`.
-  globalContext['__dsScrollMax'] = (() {
+  globalContext['__elScrollMax'] = (() {
     final ScrollPosition? position = _positionOf(controller);
     return (position?.maxScrollExtent ?? 0).toJS;
   }).toJS;

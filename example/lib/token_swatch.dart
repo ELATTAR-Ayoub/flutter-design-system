@@ -1,4 +1,4 @@
-/// The colours page's engine, `components/ds/token-swatch.tsx`.
+/// The colours page's engine, `components/el/token-swatch.tsx`.
 ///
 /// The premise of `/design-system/colors` is *measured, not asserted*: no hex
 /// on that page is typed by hand, and no contrast claim is written down. The
@@ -10,12 +10,12 @@
 ///
 /// Flutter has no cascade to interrogate, so the two halves separate:
 ///
-/// * **Resolution** ([DsTokenRegistry.resolve]) maps a CSS custom-property name
-///   onto the live [DsThemeData]. It reads the package tokens: the same
+/// * **Resolution** ([ElTokenRegistry.resolve]) maps a CSS custom-property name
+///   onto the live [ElThemeData]. It reads the package tokens: the same
 ///   objects every other widget paints with: so a swatch cannot disagree with
-///   the thing it is documenting. It never re-parses [DsTokenRegistry
+///   the thing it is documenting. It never re-parses [ElTokenRegistry
 ///   .printedValue]; the printed text is a *readout*, not a source.
-/// * **The printed value** ([DsTokenRegistry.printedValue]) is the text
+/// * **The printed value** ([ElTokenRegistry.printedValue]) is the text
 ///   `getComputedStyle().getPropertyValue()` hands back: which is *not* the
 ///   text `app/globals.css` authors. The stylesheet writes `hsl(240 10% 3.9%)`;
 ///   the browser is served `#09090b`, because Tailwind v4 compiles the sheet
@@ -23,12 +23,12 @@
 ///   shortest form before the CSS ever leaves the dev server. So the page reads
 ///   back lowercase hex for all eighteen swatches, with `#ffffff` collapsed to
 ///   `#fff`. That is a pure function of the resolved colour, so it is *derived*
-///   here ([dsCssColorText]) rather than transcribed: a rebrand moves the token
+///   here ([elCssColorText]) rather than transcribed: a rebrand moves the token
 ///   and the readout follows, which is the same guarantee the web gets for free.
 ///   It stays per-theme wherever the underlying var flips.
 ///
 /// The observer has no port and needs none: every widget here reads
-/// `DsTheme.of(context)`, so a mode change rebuilds them and both halves
+/// `ElTheme.of(context)`, so a mode change rebuilds them and both halves
 /// recompute. That is the same guarantee the observer buys the web, arrived at
 /// by the framework rather than by a subscription.
 library;
@@ -90,12 +90,12 @@ const double _thresholdLarge = 3; // allow-hardcoded: WCAG 2.x success criterion
 ///
 /// [channel] is `0..1`. The web divides an `0..255` byte by 255 to get here;
 /// Flutter's [Color.r] / [Color.g] / [Color.b] are already that quotient, and
-/// because `dsHsl` quantises through the 8-bit grid the two agree exactly.
+/// because `elHsl` quantises through the 8-bit grid the two agree exactly.
 double _linearise(double channel) => channel <= _linearThreshold
     ? channel / _linearSlope
     : math
-        .pow((channel + _gammaOffset) / _gammaScale, _gammaExponent)
-        .toDouble();
+          .pow((channel + _gammaOffset) / _gammaScale, _gammaExponent)
+          .toDouble();
 
 /// WCAG relative luminance of three **opaque** `0..1` channels.
 ///
@@ -117,7 +117,7 @@ double _relativeLuminance(double r, double g, double b) =>
 /// translucent backdrop is not a case the page has.
 ///
 /// Order does not matter: the brighter luminance always takes the numerator.
-double dsContrastRatio(Color fg, Color bg) {
+double elContrastRatio(Color fg, Color bg) {
   final bool translucent = fg.a < 1;
 
   /// `composite()`: straight source-over on un-premultiplied channels.
@@ -142,7 +142,7 @@ double dsContrastRatio(Color fg, Color bg) {
 /// 3.98, which is below AA and is graded "AA large / UI only", yet the badge
 /// beside it prints `4.0:1`. Rounding for the reader must not round for the
 /// grader.
-String dsContrastVerdict(double ratio) {
+String elContrastVerdict(double ratio) {
   if (ratio >= _thresholdAaa) return 'AAA';
   if (ratio >= _thresholdAa) return 'AA';
   if (ratio >= _thresholdLarge) return 'AA large / UI only';
@@ -152,19 +152,19 @@ String dsContrastVerdict(double ratio) {
 /// True when [ratio] passes at some level, which is the only thing the badge's
 /// colouring distinguishes: the three passing verdicts all render in
 /// `--value-ink`, and only `Fails` goes to `--destructive-ink`.
-bool dsContrastPasses(double ratio) => ratio >= _thresholdLarge;
+bool elContrastPasses(double ratio) => ratio >= _thresholdLarge;
 
 /// The colour the verdict word takes in [theme].
-Color dsContrastVerdictColor(double ratio, DsThemeData theme) =>
-    dsContrastPasses(ratio) ? theme.valueInk : theme.destructiveInk;
+Color elContrastVerdictColor(double ratio, ElThemeData theme) =>
+    elContrastPasses(ratio) ? theme.valueInk : theme.destructiveInk;
 
 /// The printed ratio, `toFixed(1)` in the reference.
-String dsContrastRatioLabel(double ratio) => ratio.toStringAsFixed(1);
+String elContrastRatioLabel(double ratio) => ratio.toStringAsFixed(1);
 
 /// Everything the badge says before the verdict, including the separator and
 /// its trailing space: the reference's `Contrast {ratio.toFixed(1)}:1 ·{" "}`.
-String dsContrastBadgePrefix(double ratio) =>
-    'Contrast ${dsContrastRatioLabel(ratio)}:1 · ';
+String elContrastBadgePrefix(double ratio) =>
+    'Contrast ${elContrastRatioLabel(ratio)}:1 · ';
 
 /// The whole badge as one string, **as authored**: `Contrast 13.5:1 · AAA`.
 ///
@@ -173,8 +173,8 @@ String dsContrastBadgePrefix(double ratio) =>
 /// `CONTRAST 13.5:1 · AAA`. Both forms are worth having: this one is the copy
 /// the reference source contains, and `.toUpperCase()` of it is the copy a
 /// screenshot contains.
-String dsContrastBadgeText(double ratio) =>
-    '${dsContrastBadgePrefix(ratio)}${dsContrastVerdict(ratio)}';
+String elContrastBadgeText(double ratio) =>
+    '${elContrastBadgePrefix(ratio)}${elContrastVerdict(ratio)}';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // The serialisation the page reads back
@@ -200,7 +200,7 @@ String dsContrastBadgeText(double ratio) =>
 /// Alpha follows the same rule in eight digits (`#000000df` is how the
 /// reference's own captured-theme block arrives). No registered token is
 /// translucent, so that arm documents the pipeline rather than the page.
-String dsCssColorText(Color color) {
+String elCssColorText(Color color) {
   String byte(double channel) =>
       (channel * 255).round().toRadixString(16).padLeft(2, '0');
 
@@ -215,9 +215,7 @@ String dsCssColorText(Color color) {
   ].every((int i) => digits[i] == digits[i + 1]);
 
   if (!collapsible) return '#$digits';
-  return '#${<String>[
-    for (int i = 0; i < digits.length; i += 2) digits[i],
-  ].join()}';
+  return '#${<String>[for (int i = 0; i < digits.length; i += 2) digits[i]].join()}';
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -229,8 +227,8 @@ String dsCssColorText(Color color) {
 /// Always a field read: the token IS the theme's field, and going through
 /// anything else would re-introduce the second source of truth this file exists
 /// to remove. The printed text is no longer a second half to keep in step: it
-/// is [dsCssColorText] of whatever this returns.
-typedef _DsToken = Color Function(DsThemeData theme);
+/// is [elCssColorText] of whatever this returns.
+typedef _DsToken = Color Function(ElThemeData theme);
 
 /// Every token the docs can swatch, keyed by its CSS custom-property name.
 ///
@@ -238,75 +236,75 @@ typedef _DsToken = Color Function(DsThemeData theme);
 /// else to keep in step: the printed readout is derived from the same [Color]
 /// the swatch paints, so the row cannot disagree with itself. The line
 /// references point at `app/globals.css` in the reference repo.
-class DsTokenRegistry {
-  const DsTokenRegistry._();
+class ElTokenRegistry {
+  const ElTokenRegistry._();
 
   static final Map<String, _DsToken> _tokens = <String, _DsToken>{
     // ── Monochrome: zinc (globals.css L549–574 light / L746–762 dark) ───────
-    '--background': (DsThemeData t) => t.background,
-    '--foreground': (DsThemeData t) => t.foreground,
-    '--card': (DsThemeData t) => t.card,
-    '--card-foreground': (DsThemeData t) => t.cardForeground,
-    '--popover': (DsThemeData t) => t.popover,
-    '--popover-foreground': (DsThemeData t) => t.popoverForeground,
-    '--secondary': (DsThemeData t) => t.secondary,
-    '--secondary-foreground': (DsThemeData t) => t.secondaryForeground,
-    '--muted': (DsThemeData t) => t.muted,
-    '--muted-foreground': (DsThemeData t) => t.mutedForeground,
-    '--accent': (DsThemeData t) => t.accent,
-    '--accent-foreground': (DsThemeData t) => t.accentForeground,
-    '--border': (DsThemeData t) => t.border,
-    '--input': (DsThemeData t) => t.input,
-    '--page-glow': (DsThemeData t) => t.pageGlow,
+    '--background': (ElThemeData t) => t.background,
+    '--foreground': (ElThemeData t) => t.foreground,
+    '--card': (ElThemeData t) => t.card,
+    '--card-foreground': (ElThemeData t) => t.cardForeground,
+    '--popover': (ElThemeData t) => t.popover,
+    '--popover-foreground': (ElThemeData t) => t.popoverForeground,
+    '--secondary': (ElThemeData t) => t.secondary,
+    '--secondary-foreground': (ElThemeData t) => t.secondaryForeground,
+    '--muted': (ElThemeData t) => t.muted,
+    '--muted-foreground': (ElThemeData t) => t.mutedForeground,
+    '--accent': (ElThemeData t) => t.accent,
+    '--accent-foreground': (ElThemeData t) => t.accentForeground,
+    '--border': (ElThemeData t) => t.border,
+    '--input': (ElThemeData t) => t.input,
+    '--page-glow': (ElThemeData t) => t.pageGlow,
 
     // ── Brand (L582–584 / L772–780) ────────────────────────────────────────
     // `--primary: var(--color-action)` in both blocks, so it reads the same in
     // either; `--ring` is the one that flips.
-    '--primary': (DsThemeData t) => t.primary,
-    '--primary-foreground': (DsThemeData t) => t.primaryForeground,
-    '--ring': (DsThemeData t) => t.ring,
+    '--primary': (ElThemeData t) => t.primary,
+    '--primary-foreground': (ElThemeData t) => t.primaryForeground,
+    '--ring': (ElThemeData t) => t.ring,
 
     // ── The ramps, `@theme static` (L103–109) ──────────────────────────────
     // Declared once, outside both theme blocks, so these read identically in
     // light and dark: only what they MEAN changes, and that is the ink
     // tokens' job.
-    '--color-action-bright': (DsThemeData t) => DsPalette.actionBright,
-    '--color-action': (DsThemeData t) => DsPalette.action,
-    '--color-action-dark': (DsThemeData t) => DsPalette.actionDark,
-    '--color-value-bright': (DsThemeData t) => DsPalette.valueBright,
-    '--color-value': (DsThemeData t) => DsPalette.value,
-    '--color-value-dark': (DsThemeData t) => DsPalette.valueDark,
-    '--color-value-foreground': (DsThemeData t) => DsPalette.valueForeground,
+    '--color-action-bright': (ElThemeData t) => ElPalette.actionBright,
+    '--color-action': (ElThemeData t) => ElPalette.action,
+    '--color-action-dark': (ElThemeData t) => ElPalette.actionDark,
+    '--color-value-bright': (ElThemeData t) => ElPalette.valueBright,
+    '--color-value': (ElThemeData t) => ElPalette.value,
+    '--color-value-dark': (ElThemeData t) => ElPalette.valueDark,
+    '--color-value-foreground': (ElThemeData t) => ElPalette.valueForeground,
 
     // ── State hues, `@theme static` (L148–165) ─────────────────────────────
-    '--color-success': (DsThemeData t) => DsPalette.success,
-    '--color-warning': (DsThemeData t) => DsPalette.warning,
-    '--color-info': (DsThemeData t) => DsPalette.info,
-    '--color-success-deep': (DsThemeData t) => DsPalette.successDeep,
-    '--color-warning-deep': (DsThemeData t) => DsPalette.warningDeep,
-    '--color-info-deep': (DsThemeData t) => DsPalette.infoDeep,
-    '--color-destructive-lifted': (DsThemeData t) =>
-        DsPalette.destructiveLifted,
-    '--color-destructive-deep': (DsThemeData t) => DsPalette.destructiveDeep,
-    '--destructive': (DsThemeData t) => t.destructive,
-    '--destructive-foreground': (DsThemeData t) => t.destructiveForeground,
+    '--color-success': (ElThemeData t) => ElPalette.success,
+    '--color-warning': (ElThemeData t) => ElPalette.warning,
+    '--color-info': (ElThemeData t) => ElPalette.info,
+    '--color-success-deep': (ElThemeData t) => ElPalette.successDeep,
+    '--color-warning-deep': (ElThemeData t) => ElPalette.warningDeep,
+    '--color-info-deep': (ElThemeData t) => ElPalette.infoDeep,
+    '--color-destructive-lifted': (ElThemeData t) =>
+        ElPalette.destructiveLifted,
+    '--color-destructive-deep': (ElThemeData t) => ElPalette.destructiveDeep,
+    '--destructive': (ElThemeData t) => t.destructive,
+    '--destructive-foreground': (ElThemeData t) => t.destructiveForeground,
 
     // ── The text-safe end of each ramp, per theme (L589–594 / L784–802) ────
     // `--color-action-ink: var(--action-ink)` (L490) and the theme block then
     // answers with a ramp end, so ONE substitution chain lands on two different
     // colours. This is the whole reason the printed value is per-theme.
-    '--action-ink': (DsThemeData t) => t.actionInk,
-    '--color-action-ink': (DsThemeData t) => t.actionInk,
-    '--value-ink': (DsThemeData t) => t.valueInk,
-    '--color-value-ink': (DsThemeData t) => t.valueInk,
-    '--success-ink': (DsThemeData t) => t.successInk,
-    '--color-success-ink': (DsThemeData t) => t.successInk,
-    '--warning-ink': (DsThemeData t) => t.warningInk,
-    '--color-warning-ink': (DsThemeData t) => t.warningInk,
-    '--info-ink': (DsThemeData t) => t.infoInk,
-    '--color-info-ink': (DsThemeData t) => t.infoInk,
-    '--destructive-ink': (DsThemeData t) => t.destructiveInk,
-    '--color-destructive-ink': (DsThemeData t) => t.destructiveInk,
+    '--action-ink': (ElThemeData t) => t.actionInk,
+    '--color-action-ink': (ElThemeData t) => t.actionInk,
+    '--value-ink': (ElThemeData t) => t.valueInk,
+    '--color-value-ink': (ElThemeData t) => t.valueInk,
+    '--success-ink': (ElThemeData t) => t.successInk,
+    '--color-success-ink': (ElThemeData t) => t.successInk,
+    '--warning-ink': (ElThemeData t) => t.warningInk,
+    '--color-warning-ink': (ElThemeData t) => t.warningInk,
+    '--info-ink': (ElThemeData t) => t.infoInk,
+    '--color-info-ink': (ElThemeData t) => t.infoInk,
+    '--destructive-ink': (ElThemeData t) => t.destructiveInk,
+    '--color-destructive-ink': (ElThemeData t) => t.destructiveInk,
 
     // ── The five chart tokens, per theme (L624–628 / L842–846) ─────────────
     // *"Declared once per theme in `app/globals.css`, and mirrored between them
@@ -316,16 +314,16 @@ class DsTokenRegistry {
     // all five through `TokenSwatchList`, with `measure: false` on every row —
     // a series fill is not text and is not held to the AA threshold, which is
     // exactly why a chart token must not be reused as a label colour.
-    '--chart-1': (DsThemeData t) => t.chart1,
-    '--chart-2': (DsThemeData t) => t.chart2,
-    '--chart-3': (DsThemeData t) => t.chart3,
-    '--chart-4': (DsThemeData t) => t.chart4,
-    '--chart-5': (DsThemeData t) => t.chart5,
-    '--color-chart-1': (DsThemeData t) => t.chart1,
-    '--color-chart-2': (DsThemeData t) => t.chart2,
-    '--color-chart-3': (DsThemeData t) => t.chart3,
-    '--color-chart-4': (DsThemeData t) => t.chart4,
-    '--color-chart-5': (DsThemeData t) => t.chart5,
+    '--chart-1': (ElThemeData t) => t.chart1,
+    '--chart-2': (ElThemeData t) => t.chart2,
+    '--chart-3': (ElThemeData t) => t.chart3,
+    '--chart-4': (ElThemeData t) => t.chart4,
+    '--chart-5': (ElThemeData t) => t.chart5,
+    '--color-chart-1': (ElThemeData t) => t.chart1,
+    '--color-chart-2': (ElThemeData t) => t.chart2,
+    '--color-chart-3': (ElThemeData t) => t.chart3,
+    '--color-chart-4': (ElThemeData t) => t.chart4,
+    '--color-chart-5': (ElThemeData t) => t.chart5,
   };
 
   /// Every registered custom-property name.
@@ -339,30 +337,29 @@ class DsTokenRegistry {
   /// The live [Color] for [cssName] in [theme].
   ///
   /// Resolution goes through the package's own token objects: the same
-  /// [DsThemeData] fields a button paints with. It deliberately does NOT parse
+  /// [ElThemeData] fields a button paints with. It deliberately does NOT parse
   /// [printedValue]: the printed text is documentation, and documentation that
   /// feeds back into rendering is how a docs page starts lying.
-  static Color resolve(String cssName, DsThemeData theme) =>
+  static Color resolve(String cssName, ElThemeData theme) =>
       _require(cssName)(theme);
 
   /// The text `getComputedStyle().getPropertyValue(cssName)` returns under
   /// [kind]: the compiled stylesheet's shortest-hex form, not the `hsl()` the
-  /// stylesheet source authors. See [dsCssColorText].
-  static String printedValue(String cssName, DsThemeKind kind) =>
-      dsCssColorText(resolve(cssName, themeOf(kind)));
+  /// stylesheet source authors. See [elCssColorText].
+  static String printedValue(String cssName, ElThemeKind kind) =>
+      elCssColorText(resolve(cssName, themeOf(kind)));
 
   /// The theme block [kind] selects, `.dark` or `:root, .light`.
-  static DsThemeData themeOf(DsThemeKind kind) =>
-      kind == DsThemeKind.dark ? DsThemeData.dark : DsThemeData.light;
+  static ElThemeData themeOf(ElThemeKind kind) =>
+      kind == ElThemeKind.dark ? ElThemeData.dark : ElThemeData.light;
 
   /// The measured ratio of [cssName] against [against] in [theme]: the port of
   /// `useContrast`.
   static double contrastRatio(
     String cssName,
-    DsThemeData theme, {
+    ElThemeData theme, {
     String against = _defaultAgainst,
-  }) =>
-      dsContrastRatio(resolve(cssName, theme), resolve(against, theme));
+  }) => elContrastRatio(resolve(cssName, theme), resolve(against, theme));
 
   static _DsToken _require(String cssName) {
     final _DsToken? token = _tokens[cssName];
@@ -370,8 +367,8 @@ class DsTokenRegistry {
       throw ArgumentError.value(
         cssName,
         'cssName',
-        'Not a registered design token. Add it to DsTokenRegistry with the '
-            'DsThemeData field the theme blocks resolve it to.',
+        'Not a registered design token. Add it to ElTokenRegistry with the '
+            'ElThemeData field the theme blocks resolve it to.',
       );
     }
     return token;
@@ -393,19 +390,19 @@ const String _unresolved = '—';
 /// The token's value as the stylesheet spells it, `TokenValue`.
 ///
 /// `span.type-num-sm.text-muted-foreground`.
-class DsTokenValue extends StatelessWidget {
-  const DsTokenValue(this.token, {super.key});
+class ElTokenValue extends StatelessWidget {
+  const ElTokenValue(this.token, {super.key});
 
   /// The CSS custom-property name, e.g. `--muted-foreground`.
   final String token;
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
-    final String value = DsTokenRegistry.has(token)
-        ? DsTokenRegistry.printedValue(token, theme.kind)
+    final ElThemeData theme = ElTheme.of(context);
+    final String value = ElTokenRegistry.has(token)
+        ? ElTokenRegistry.printedValue(token, theme.kind)
         : _unresolved;
-    return DsText(value, DsType.numSm, color: theme.mutedForeground);
+    return ElText(value, ElType.numSm, color: theme.mutedForeground);
   }
 }
 
@@ -416,10 +413,14 @@ class DsTokenValue extends StatelessWidget {
 /// the sentence, not beside it.
 ///
 /// `.type-micro` uppercases, and `text-transform` is inherited, so the WHOLE
-/// badge renders in caps, `CONTRAST 13.5:1 · AAA`. [dsContrastBadgeText] is
+/// badge renders in caps, `CONTRAST 13.5:1 · AAA`. [elContrastBadgeText] is
 /// the authored casing; this widget paints its uppercase.
-class DsContrastBadge extends StatelessWidget {
-  const DsContrastBadge(this.token, {super.key, this.against = _defaultAgainst});
+class ElContrastBadge extends StatelessWidget {
+  const ElContrastBadge(
+    this.token, {
+    super.key,
+    this.against = _defaultAgainst,
+  });
 
   /// The token being measured.
   final String token;
@@ -429,36 +430,39 @@ class DsContrastBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
 
-    if (!DsTokenRegistry.has(token) || !DsTokenRegistry.has(against)) {
-      return DsText(_unresolved, DsType.micro, color: theme.mutedForeground);
+    if (!ElTokenRegistry.has(token) || !ElTokenRegistry.has(against)) {
+      return ElText(_unresolved, ElType.micro, color: theme.mutedForeground);
     }
 
-    final double ratio =
-        DsTokenRegistry.contrastRatio(token, theme, against: against);
+    final double ratio = ElTokenRegistry.contrastRatio(
+      token,
+      theme,
+      against: against,
+    );
 
     // `.type-micro` sets its own colour, so the sentence needs no override; the
     // verdict span is the one place the markup writes a `text-*` utility.
-    final TextStyle sentence = DsText.styleOf(context, DsType.micro);
-    final TextStyle verdict = DsText.styleOf(
+    final TextStyle sentence = ElText.styleOf(context, ElType.micro);
+    final TextStyle verdict = ElText.styleOf(
       context,
-      DsType.micro,
-      color: dsContrastVerdictColor(ratio, theme),
+      ElType.micro,
+      color: elContrastVerdictColor(ratio, theme),
     );
 
     String cased(String text) =>
-        DsType.micro.uppercase ? text.toUpperCase() : text;
+        ElType.micro.uppercase ? text.toUpperCase() : text;
 
-    return DsRichText(
+    return ElRichText(
       TextSpan(
         style: sentence,
         children: <InlineSpan>[
-          TextSpan(text: cased(dsContrastBadgePrefix(ratio))),
-          TextSpan(text: cased(dsContrastVerdict(ratio)), style: verdict),
+          TextSpan(text: cased(elContrastBadgePrefix(ratio))),
+          TextSpan(text: cased(elContrastVerdict(ratio)), style: verdict),
         ],
       ),
-      DsType.micro,
+      ElType.micro,
     );
   }
 }
@@ -469,12 +473,12 @@ class DsContrastBadge extends StatelessWidget {
 /// sm:gap-6`. Below `sm` the three cells stack in one column at 16px gaps;
 /// from `sm` up they are a row of 88px / 208px / flex at 24px gaps.
 ///
-/// The two fixed tracks are written through [ds] rather than as pixels:
-/// Tailwind's `--spacing` unit is 4px, so `5.5rem` is `ds(22)` and `13rem` is
-/// `ds(52)`: the same arithmetic the framework does, kept in the same
+/// The two fixed tracks are written through [el] rather than as pixels:
+/// Tailwind's `--spacing` unit is 4px, so `5.5rem` is `el(22)` and `13rem` is
+/// `el(52)`: the same arithmetic the framework does, kept in the same
 /// vocabulary as every other measure on the page.
-class DsTokenSwatch extends StatelessWidget {
-  const DsTokenSwatch({
+class ElTokenSwatch extends StatelessWidget {
+  const ElTokenSwatch({
     super.key,
     required this.token,
     required this.name,
@@ -497,28 +501,28 @@ class DsTokenSwatch extends StatelessWidget {
   final bool measure;
 
   /// `sm:grid-cols-[5.5rem_…]`, 5.5rem = 88px.
-  static final double _swatchTrack = ds(22);
+  static final double _swatchTrack = el(22);
 
   /// `minmax(0, 13rem)`, 13rem = 208px, the middle track's cap.
-  static final double _nameTrack = ds(52);
+  static final double _nameTrack = el(52);
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
-    final bool wide = MediaQuery.sizeOf(context).width >= DsBreakpoints.sm;
+    final ElThemeData theme = ElTheme.of(context);
+    final bool wide = MediaQuery.sizeOf(context).width >= ElBreakpoints.sm;
 
     // `h-16 sm:h-14`, 64px, tightening to 56px once the row goes horizontal.
     final Widget swatch = SizedBox(
-      height: wide ? ds(14) : ds(16),
+      height: wide ? el(14) : el(16),
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: DsTokenRegistry.has(token)
-              ? DsTokenRegistry.resolve(token, theme)
-              : dsTransparent,
-          borderRadius: BorderRadius.circular(DsRadii.lg),
+          color: ElTokenRegistry.has(token)
+              ? ElTokenRegistry.resolve(token, theme)
+              : elTransparent,
+          borderRadius: BorderRadius.circular(ElRadii.lg),
           // No child to inset: the swatch *is* the colour, and the hairline
           // only has to keep a white card visible on a white background.
-          border: Border.all(color: theme.input, width: DsWidths.hairline),
+          border: Border.all(color: theme.input, width: ElWidths.hairline),
         ),
       ),
     );
@@ -527,11 +531,11 @@ class DsTokenSwatch extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        DsText(name, DsType.h4, color: theme.foreground),
-        SizedBox(height: ds(1)), // `mt-1`
-        DsTokenValue(token),
-        SizedBox(height: ds(1)), // `mt-1`
-        DsText(token, DsType.numSm, color: theme.actionInk),
+        ElText(name, ElType.h4, color: theme.foreground),
+        SizedBox(height: el(1)), // `mt-1`
+        ElTokenValue(token),
+        SizedBox(height: el(1)), // `mt-1`
+        ElText(token, ElType.numSm, color: theme.actionInk),
       ],
     );
 
@@ -539,25 +543,25 @@ class DsTokenSwatch extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        DsText(use, DsType.small, color: theme.mutedForeground),
+        ElText(use, ElType.small, color: theme.mutedForeground),
         if (measure) ...<Widget>[
-          SizedBox(height: ds(2)), // `mt-2`
-          DsContrastBadge(token),
+          SizedBox(height: el(2)), // `mt-2`
+          ElContrastBadge(token),
         ],
       ],
     );
 
     return Padding(
-      padding: EdgeInsets.all(ds(4)), // `p-4`
+      padding: EdgeInsets.all(el(4)), // `p-4`
       child: wide
           ? Row(
               // `items-center`.
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 SizedBox(width: _swatchTrack, child: swatch),
-                SizedBox(width: ds(6)), // `sm:gap-6`
+                SizedBox(width: el(6)), // `sm:gap-6`
                 SizedBox(width: _nameTrack, child: identity),
-                SizedBox(width: ds(6)),
+                SizedBox(width: el(6)),
                 Expanded(child: purpose), // `1fr`
               ],
             )
@@ -566,9 +570,9 @@ class DsTokenSwatch extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 swatch,
-                SizedBox(height: ds(4)), // `gap-4`
+                SizedBox(height: el(4)), // `gap-4`
                 identity,
-                SizedBox(height: ds(4)),
+                SizedBox(height: el(4)),
                 purpose,
               ],
             ),
@@ -582,21 +586,21 @@ class DsTokenSwatch extends StatelessWidget {
 /// bg-card`: a 16px card with a 1px hairline BETWEEN rows and none before the
 /// first or after the last, which is what `divide-y` means and what a naive
 /// bottom-border-per-row gets wrong.
-class DsTokenSwatchList extends StatelessWidget {
-  const DsTokenSwatchList({super.key, required this.rows});
+class ElTokenSwatchList extends StatelessWidget {
+  const ElTokenSwatchList({super.key, required this.rows});
 
-  /// The rows, normally [DsTokenSwatch]es.
+  /// The rows, normally [ElTokenSwatch]es.
   final List<Widget> rows;
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
 
     final List<Widget> children = <Widget>[];
     for (int i = 0; i < rows.length; i++) {
       if (i > 0) {
         // `divide-y divide-border`: one hairline per GAP, not per row.
-        children.add(Container(height: DsWidths.hairline, color: theme.border));
+        children.add(Container(height: ElWidths.hairline, color: theme.border));
       }
       children.add(rows[i]);
     }
@@ -606,8 +610,8 @@ class DsTokenSwatchList extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: theme.card,
-        borderRadius: BorderRadius.circular(DsRadii.xl),
-        border: Border.all(color: theme.border, width: DsWidths.hairline),
+        borderRadius: BorderRadius.circular(ElRadii.xl),
+        border: Border.all(color: theme.border, width: ElWidths.hairline),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,

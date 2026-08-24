@@ -7,8 +7,8 @@ import 'package:flutter_test/flutter_test.dart';
 
 Widget _harness({required Widget child, required Size size}) => MediaQuery(
   data: MediaQueryData(size: size),
-  child: DsTheme(
-    controller: DsThemeController(mode: DsThemeMode.dark),
+  child: ElTheme(
+    controller: ElThemeController(mode: ElThemeMode.dark),
     child: MaterialApp(home: SingleChildScrollView(child: child)),
   ),
 );
@@ -60,20 +60,20 @@ void main() {
     await tester.ensureVisible(find.text('Open normal'));
     await tester.tap(find.text('Open normal'));
     await tester.pumpAndSettle();
-    expect(find.byType(DsDialogContent), findsOneWidget);
+    expect(find.byType(ElDialogContent), findsOneWidget);
     expect(find.text('Confirm action'), findsOneWidget);
 
     await tester.sendKeyEvent(LogicalKeyboardKey.escape);
     await tester.pumpAndSettle();
-    expect(find.byType(DsDialogContent), findsNothing);
+    expect(find.byType(ElDialogContent), findsNothing);
 
     await tester.tap(find.text('Open media'));
     await tester.pumpAndSettle();
-    expect(find.byType(DsDialogMedia), findsOneWidget);
+    expect(find.byType(ElDialogMedia), findsOneWidget);
     expect(find.text('A visual lead'), findsOneWidget);
     await tester.tap(find.text('Continue'));
     await tester.pumpAndSettle();
-    expect(find.byType(DsDialogMedia), findsNothing);
+    expect(find.byType(ElDialogMedia), findsNothing);
     expect(tester.takeException(), isNull);
   });
 }

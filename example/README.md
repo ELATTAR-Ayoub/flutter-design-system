@@ -1,17 +1,16 @@
-# example
+# Example App
 
-A new Flutter project.
+This Flutter app is the local docs and specimen site for the design system.
 
-## Getting Started
+What it covers today:
 
-This project is a starting point for a Flutter application.
+- 84 documented component entries that mirror the shipped component manifests
+- The generated registry snapshot in `registry/generated/latest/`, which currently contains 99 total items across components, effects, motion, and foundations
+- Focused widget tests under `example/test/` for docs routes, catalog wiring, and component specimens
 
-A few resources to get you started if this is your first Flutter project:
+Run it from this directory with:
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```console
+flutter pub get
+flutter run
+```

@@ -78,14 +78,14 @@ class _Tool extends _Beat {
     required this.params,
     required this.ms,
     required this.result,
-    this.attachments = const <DsAgentAttachment>[],
+    this.attachments = const <ElAgentAttachment>[],
   });
 
   final String name;
   final Map<String, Object?> params;
   final int ms;
   final Map<String, Object?> result;
-  final List<DsAgentAttachment> attachments;
+  final List<ElAgentAttachment> attachments;
 }
 
 /// *"Ask to do something, and stop until a human answers."*
@@ -103,11 +103,11 @@ class _Fail extends _Beat {
 
 /// The CSV `export_activity` hands back, *"so the attachment renderer has
 /// something to draw in the direction that is easy to forget: agent to user."*
-final DsAgentAttachment _activityCsv = DsAgentAttachment(
+final ElAgentAttachment _activityCsv = ElAgentAttachment(
   id: 'mock-activity-csv',
   name: 'activity-30d.csv',
   mime: 'text/csv',
-  kind: DsAgentAttachmentKind.data,
+  kind: ElAgentAttachmentKind.data,
   size: 4821,
   text: <String>[
     'date,event,item,value',
@@ -116,7 +116,7 @@ final DsAgentAttachment _activityCsv = DsAgentAttachment(
     '2026-07-19,pull,Cobalt Run,72.00',
     '2026-08-02,sale,Eclipse Vault,240.00',
   ].join('\n'),
-  delivery: const DsAgentDelivery.produced(),
+  delivery: const ElAgentDelivery.produced(),
 );
 
 const List<_Beat> _defaultScript = <_Beat>[
@@ -180,7 +180,7 @@ List<_Beat> get _reportScript => <_Beat>[
     params: const <String, Object?>{'window': '30d', 'format': 'csv'},
     ms: 1200,
     result: const <String, Object?>{'rows': 148},
-    attachments: <DsAgentAttachment>[_activityCsv],
+    attachments: <ElAgentAttachment>[_activityCsv],
   ),
   const _Say(
     '148 rows, attached above. Net position over the window is '
@@ -232,10 +232,10 @@ class _Aborted implements Exception {
 /// The reference is a hook whose consumer re-renders because React re-runs it;
 /// the port's console listens, so this is the notifier. Every `setTurns` in the
 /// original is a mutation followed by [notifyListeners] here.
-class DsMockTransport extends ChangeNotifier implements DsAgentTransport {
-  DsMockTransport({
+class ElMockTransport extends ChangeNotifier implements ElAgentTransport {
+  ElMockTransport({
     this.latency = const Duration(milliseconds: _thinkMs),
-    this.capabilities = const DsAgentCapabilities(),
+    this.capabilities = const ElAgentCapabilities(),
   });
 
   /// *"Delay before the first event. The console shows `awaitingFirstEvent`
@@ -244,10 +244,10 @@ class DsMockTransport extends ChangeNotifier implements DsAgentTransport {
   final Duration latency;
 
   @override
-  final DsAgentCapabilities capabilities;
+  final ElAgentCapabilities capabilities;
 
-  final List<DsAgentTurn> _turns = <DsAgentTurn>[];
-  final List<DsPendingApproval> _pending = <DsPendingApproval>[];
+  final List<ElAgentTurn> _turns = <ElAgentTurn>[];
+  final List<ElPendingApproval> _pending = <ElPendingApproval>[];
 
   _Abort? _abort;
   bool _isLoading = false;
@@ -256,11 +256,11 @@ class DsMockTransport extends ChangeNotifier implements DsAgentTransport {
   int _askCount = 0;
 
   @override
-  List<DsAgentTurn> get turns => List<DsAgentTurn>.unmodifiable(_turns);
+  List<ElAgentTurn> get turns => List<ElAgentTurn>.unmodifiable(_turns);
 
   @override
-  List<DsPendingApproval> get pendingApprovals =>
-      List<DsPendingApproval>.unmodifiable(_pending);
+  List<ElPendingApproval> get pendingApprovals =>
+      List<ElPendingApproval>.unmodifiable(_pending);
 
   @override
   bool get isLoading => _isLoading;
@@ -288,8 +288,8 @@ class DsMockTransport extends ChangeNotifier implements DsAgentTransport {
   /// tool calls ago, and `resolveState` cannot tell 'writing' from 'wrote'."*
   void _closeStreaming() {
     if (_turns.isEmpty) return;
-    final DsAgentTurn last = _turns.last;
-    if (last is! DsTextTurn || !last.streaming) return;
+    final ElAgentTurn last = _turns.last;
+    if (last is! ElTextTurn || !last.streaming) return;
     _turns[_turns.length - 1] = last.notStreaming();
   }
 
@@ -299,10 +299,10 @@ class DsMockTransport extends ChangeNotifier implements DsAgentTransport {
   /// arguments is still a retry."*
   int _priorFailures(String name) {
     int count = 0;
-    for (final DsAgentTurn turn in _turns) {
-      if (turn is DsToolTurn &&
+    for (final ElAgentTurn turn in _turns) {
+      if (turn is ElToolTurn &&
           turn.name == name &&
-          turn.status == DsAgentTurnStatus.error) {
+          turn.status == ElAgentTurnStatus.error) {
         count += 1;
       }
     }
@@ -312,16 +312,16 @@ class DsMockTransport extends ChangeNotifier implements DsAgentTransport {
   /// `reduceEvent`'s `text` arm.
   void _emitText(String content) {
     if (content.isEmpty) return;
-    final DsAgentTurn? last = _turns.isEmpty ? null : _turns.last;
-    if (last is DsTextTurn) {
-      _turns[_turns.length - 1] = DsTextTurn(
+    final ElAgentTurn? last = _turns.isEmpty ? null : _turns.last;
+    if (last is ElTextTurn) {
+      _turns[_turns.length - 1] = ElTextTurn(
         id: last.id,
         text: last.text + content,
         attachments: last.attachments,
         streaming: true,
       );
     } else {
-      _turns.add(DsTextTurn(id: _nextId, text: content, streaming: true));
+      _turns.add(ElTextTurn(id: _nextId, text: content, streaming: true));
     }
     notifyListeners();
   }
@@ -330,11 +330,11 @@ class DsMockTransport extends ChangeNotifier implements DsAgentTransport {
   void _emitToolCall(String name, Map<String, Object?> params) {
     _closeStreaming();
     _turns.add(
-      DsToolTurn(
+      ElToolTurn(
         id: _nextId,
         name: name,
         params: params,
-        status: DsAgentTurnStatus.running,
+        status: ElAgentTurnStatus.running,
         startedAt: DateTime.now().millisecondsSinceEpoch,
         attempt: _priorFailures(name) + 1,
       ),
@@ -349,20 +349,20 @@ class DsMockTransport extends ChangeNotifier implements DsAgentTransport {
     required bool success,
     Object? result,
     String? error,
-    List<DsAgentAttachment> attachments = const <DsAgentAttachment>[],
+    List<ElAgentAttachment> attachments = const <ElAgentAttachment>[],
   }) {
     for (int i = _turns.length - 1; i >= 0; i -= 1) {
-      final DsAgentTurn turn = _turns[i];
-      if (turn is! DsToolTurn ||
+      final ElAgentTurn turn = _turns[i];
+      if (turn is! ElToolTurn ||
           turn.name != name ||
-          turn.status != DsAgentTurnStatus.running) {
+          turn.status != ElAgentTurnStatus.running) {
         continue;
       }
-      _turns[i] = DsToolTurn(
+      _turns[i] = ElToolTurn(
         id: turn.id,
         name: turn.name,
         params: turn.params,
-        status: success ? DsAgentTurnStatus.ok : DsAgentTurnStatus.error,
+        status: success ? ElAgentTurnStatus.ok : ElAgentTurnStatus.error,
         startedAt: turn.startedAt,
         result: result,
         error: error,
@@ -389,11 +389,11 @@ class DsMockTransport extends ChangeNotifier implements DsAgentTransport {
   ) {
     _closeStreaming();
     _turns.add(
-      DsActionTurn(
+      ElActionTurn(
         id: correlationId,
         action: action,
         params: params,
-        status: DsAgentTurnStatus.running,
+        status: ElAgentTurnStatus.running,
         startedAt: DateTime.now().millisecondsSinceEpoch,
       ),
     );
@@ -404,17 +404,17 @@ class DsMockTransport extends ChangeNotifier implements DsAgentTransport {
   /// action."*
   void _settleAction(String action, {required bool success, String? error}) {
     for (int i = _turns.length - 1; i >= 0; i -= 1) {
-      final DsAgentTurn turn = _turns[i];
-      if (turn is! DsActionTurn ||
+      final ElAgentTurn turn = _turns[i];
+      if (turn is! ElActionTurn ||
           turn.action != action ||
-          turn.status != DsAgentTurnStatus.running) {
+          turn.status != ElAgentTurnStatus.running) {
         continue;
       }
-      _turns[i] = DsActionTurn(
+      _turns[i] = ElActionTurn(
         id: turn.id,
         action: turn.action,
         params: turn.params,
-        status: success ? DsAgentTurnStatus.ok : DsAgentTurnStatus.error,
+        status: success ? ElAgentTurnStatus.ok : ElAgentTurnStatus.error,
         startedAt: turn.startedAt,
         error: error,
         ms: DateTime.now().millisecondsSinceEpoch - turn.startedAt,
@@ -426,11 +426,11 @@ class DsMockTransport extends ChangeNotifier implements DsAgentTransport {
   }
 
   /// `markApproval`, *"flag an action turn as held at an approval gate."*
-  void _markApproval(String turnId, DsApprovalOutcome outcome) {
+  void _markApproval(String turnId, ElApprovalOutcome outcome) {
     for (int i = _turns.length - 1; i >= 0; i -= 1) {
-      final DsAgentTurn turn = _turns[i];
-      if (turn is! DsActionTurn || turn.id != turnId) continue;
-      _turns[i] = DsActionTurn(
+      final ElAgentTurn turn = _turns[i];
+      if (turn is! ElActionTurn || turn.id != turnId) continue;
+      _turns[i] = ElActionTurn(
         id: turn.id,
         action: turn.action,
         params: turn.params,
@@ -448,7 +448,7 @@ class DsMockTransport extends ChangeNotifier implements DsAgentTransport {
   /// `reduceEvent`'s `error` arm.
   void _emitError(String message, {required bool fatal}) {
     _closeStreaming();
-    _turns.add(DsErrorTurn(id: _nextId, message: message, fatal: fatal));
+    _turns.add(ElErrorTurn(id: _nextId, message: message, fatal: fatal));
     notifyListeners();
   }
 
@@ -479,16 +479,16 @@ class DsMockTransport extends ChangeNotifier implements DsAgentTransport {
     final Completer<bool> completer = Completer<bool>();
     void settle(bool approved) {
       if (completer.isCompleted) return;
-      _pending.removeWhere((DsPendingApproval p) => p.turnId == turnId);
+      _pending.removeWhere((ElPendingApproval p) => p.turnId == turnId);
       _markApproval(
         turnId,
-        approved ? DsApprovalOutcome.approved : DsApprovalOutcome.rejected,
+        approved ? ElApprovalOutcome.approved : ElApprovalOutcome.rejected,
       );
       completer.complete(approved);
     }
 
     _pending.add(
-      DsPendingApproval(
+      ElPendingApproval(
         turnId: turnId,
         action: action,
         params: params,
@@ -503,7 +503,7 @@ class DsMockTransport extends ChangeNotifier implements DsAgentTransport {
   @override
   Future<void> send(
     String text, [
-    DsAgentSendOptions options = const DsAgentSendOptions(),
+    ElAgentSendOptions options = const ElAgentSendOptions(),
   ]) async {
     _abort?.cancelled = true;
     final _Abort signal = _Abort();
@@ -512,7 +512,7 @@ class DsMockTransport extends ChangeNotifier implements DsAgentTransport {
     _error = null;
     _isLoading = true;
     _turns.add(
-      DsUserTurn(id: _nextId, text: text, attachments: options.attachments),
+      ElUserTurn(id: _nextId, text: text, attachments: options.attachments),
     );
     notifyListeners();
 

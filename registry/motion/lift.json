@@ -1,0 +1,25 @@
+{
+  "name": "lift",
+  "type": "motion",
+  "version": "0.0.1",
+  "description": "The hover lift — the `lift` utility, `app/globals.css` L2318–2330.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/motion/lift.dart",
+      "target": "@motion/lift.dart",
+      "sha256": "e0288db96ee3ef9b59f6449e6724e96d59fe3b0126bf4e6d398a5e7cd338c130"
+    }
+  ],
+  "registryDependencies": [
+    "source-foundation"
+  ],
+  "semanticDependencies": [],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "documentationRoute": "/docs/motion/lift",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/motion/lift.dart"
+}

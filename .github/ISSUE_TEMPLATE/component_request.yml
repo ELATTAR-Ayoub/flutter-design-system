@@ -12,7 +12,7 @@ body:
     id: component_name
     attributes:
       label: Proposed component or API
-      placeholder: DsToast, DsTabs, command palette specimen, public token helper...
+      placeholder: ElToast, ElTabs, command palette specimen, public token helper...
     validations:
       required: true
   - type: textarea

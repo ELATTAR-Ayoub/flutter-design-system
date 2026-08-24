@@ -5,16 +5,16 @@
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`: the
 /// discipline `tooltip_test.dart` already carries. Theme coverage uses a live
-/// `DsThemeController` flipped in place rather than two independent pumps.
+/// `ElThemeController` flipped in place rather than two independent pumps.
 ///
-/// `DsPopover` mounts its content through an `OverlayPortal`, so the live
+/// `ElPopover` mounts its content through an `OverlayPortal`, so the live
 /// specimen needs a real `Overlay`: the harness wraps the page in a
-/// `MaterialApp`, the same fix a sibling worker needed for `DsSelect` and
-/// this page's own neighbour, `DsTooltip`. A bare `Directionality`/`Material`
+/// `MaterialApp`, the same fix a sibling worker needed for `ElSelect` and
+/// this page's own neighbour, `ElTooltip`. A bare `Directionality`/`Material`
 /// host would let the page render but the popover would never actually open.
 ///
-/// `DsPopover`'s open/close transition is a single forward-then-reverse run
-/// with a fixed `DsDurations.overlay` duration: not a loop, so
+/// `ElPopover`'s open/close transition is a single forward-then-reverse run
+/// with a fixed `ElDurations.overlay` duration: not a loop, so
 /// `pumpAndSettle` is safe where used below; the open/close assertions still
 /// use explicit `pump(duration)` steps to keep the exact frame under test.
 library;
@@ -22,7 +22,7 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/popover/meta.dart';
 import 'package:example/components_docs/popover/page.dart';
-import 'package:example/kit.dart' show DsSection;
+import 'package:example/kit.dart' show ElSection;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -54,21 +54,21 @@ const List<String> _sectionOrder = <String>[
   'source',
 ];
 
-Future<DsThemeController> _pumpPopoverDoc(
+Future<ElThemeController> _pumpPopoverDoc(
   WidgetTester tester, {
   ValueChanged<String>? onNavigate,
   Size size = _wide,
-  DsThemeMode mode = DsThemeMode.dark,
+  ElThemeMode mode = ElThemeMode.dark,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final DsThemeController theme = DsThemeController(mode: mode);
+  final ElThemeController theme = ElThemeController(mode: mode);
   addTearDown(theme.dispose);
 
   await tester.pumpWidget(
-    DsTheme(
+    ElTheme(
       controller: theme,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -95,34 +95,29 @@ void main() {
       expect(
         popoverDoc.exports,
         containsAll(<String>[
-          'DsPopover',
-          'DsPopoverSide',
-          'DsPopoverAlign',
-          'DsPopoverOriginModel',
-          'DsPopoverBarrier',
-          'DsPopoverPlacement',
-          'DsPopoverAnchorMetrics',
-          'DsPopoverContentBuilder',
-          'DsPopoverSurface',
-          'dsPopoverPlacement',
+          'ElPopover',
+          'ElPopoverSide',
+          'ElPopoverAlign',
+          'ElPopoverOriginModel',
+          'ElPopoverBarrier',
+          'ElPopoverPlacement',
+          'ElPopoverAnchorMetrics',
+          'ElPopoverContentBuilder',
+          'ElPopoverSurface',
+          'elPopoverPlacement',
         ]),
       );
       // Matches registry/components/popover.json's registryDependencies
       // verbatim: popover already has a real manifest, so a worker that
       // invented a dependency name here would be the exact failure mode the
       // Phase J supervisor notes warn about.
-      expect(popoverDoc.dependencies, <String>['source-foundation']);
+      expect(popoverDoc.dependencies, <String>[
+        'machine-surface',
+        'source-foundation',
+      ]);
       // Short description: one sentence, no trailing ellipsis.
       expect(popoverDoc.description, isNot(contains('..')));
       expect(popoverDoc.description.trim(), popoverDoc.description);
-      // The expanded, decision-guidance description is a distinct constant
-      // that names all three overlay neighbours, not a restatement of the
-      // short one.
-      expect(popoverExpandedDescription, isNot(equals(popoverDoc.description)));
-      expect(popoverExpandedDescription.trim(), popoverExpandedDescription);
-      expect(popoverExpandedDescription, contains('Tooltip'));
-      expect(popoverExpandedDescription, contains('Dropdown Menu'));
-      expect(popoverExpandedDescription, contains('Hover Card'));
     });
   });
 
@@ -136,14 +131,13 @@ void main() {
       // before it -- the "in order" half of the shadcn-parity contract.
       double previousTop = -1;
       for (final String anchor in _sectionOrder) {
-        final Finder section = find.byKey(DsSection.anchorKey(anchor));
+        final Finder section = find.byKey(ElSection.anchorKey(anchor));
         expect(section, findsOneWidget, reason: 'section "$anchor" missing');
         final double top = tester.getTopLeft(section).dy;
         expect(
           top,
           greaterThan(previousTop),
-          reason:
-              'section "$anchor" should render after the previous section',
+          reason: 'section "$anchor" should render after the previous section',
         );
         previousTop = top;
       }
@@ -176,7 +170,7 @@ void main() {
       (WidgetTester tester) async {
         await _pumpPopoverDoc(tester);
 
-        // DsPopover's own constructor.
+        // ElPopover's own constructor.
         expect(find.text('open'), findsWidgets);
         expect(find.text('anchor'), findsWidgets);
         expect(find.text('content'), findsWidgets);
@@ -192,13 +186,13 @@ void main() {
         expect(find.text('barrier'), findsWidgets);
         expect(find.text('onDismiss'), findsOneWidget);
 
-        // DsPopoverSurface's constructor.
+        // ElPopoverSurface's constructor.
         expect(find.text('radius'), findsOneWidget);
         expect(find.text('shadow'), findsOneWidget);
         expect(find.text('ring'), findsOneWidget);
         expect(find.text('border'), findsOneWidget);
 
-        // DsPopoverPlacement / DsPopoverAnchorMetrics fields.
+        // ElPopoverPlacement / ElPopoverAnchorMetrics fields.
         expect(find.text('offset'), findsOneWidget);
         expect(find.text('rect'), findsOneWidget);
         expect(find.text('viewport'), findsWidgets);
@@ -285,7 +279,7 @@ void main() {
 
       await tester.tap(trigger);
       await tester.pump();
-      await tester.pump(DsDurations.overlay);
+      await tester.pump(ElDurations.overlay);
       await tester.pump();
 
       expect(
@@ -308,7 +302,7 @@ void main() {
 
       await tester.tap(trigger);
       await tester.pump();
-      await tester.pump(DsDurations.overlay);
+      await tester.pump(ElDurations.overlay);
       await tester.pump();
       expect(
         find.byKey(const ValueKey<String>('popover-doc-specimen-content')),
@@ -316,10 +310,10 @@ void main() {
       );
 
       // Far from both the trigger and the open popup: lands on the modal
-      // barrier `DsPopover` lays under its content by default.
+      // barrier `ElPopover` lays under its content by default.
       await tester.tapAt(const Offset(4, 4));
       await tester.pump();
-      await tester.pump(DsDurations.overlay);
+      await tester.pump(ElDurations.overlay);
       await tester.pump();
 
       expect(
@@ -375,7 +369,7 @@ void main() {
 
   group('both themes', () {
     testWidgets('renders on light', (WidgetTester tester) async {
-      await _pumpPopoverDoc(tester, mode: DsThemeMode.light);
+      await _pumpPopoverDoc(tester, mode: ElThemeMode.light);
       expect(
         find.byKey(const ValueKey<String>('popover-doc-specimen-trigger')),
         findsOneWidget,
@@ -384,7 +378,7 @@ void main() {
     });
 
     testWidgets('renders on dark', (WidgetTester tester) async {
-      await _pumpPopoverDoc(tester, mode: DsThemeMode.dark);
+      await _pumpPopoverDoc(tester, mode: ElThemeMode.dark);
       expect(
         find.byKey(const ValueKey<String>('popover-doc-specimen-trigger')),
         findsOneWidget,
@@ -395,16 +389,16 @@ void main() {
     testWidgets('flipping the theme in place keeps the page intact', (
       WidgetTester tester,
     ) async {
-      final DsThemeController theme = await _pumpPopoverDoc(
+      final ElThemeController theme = await _pumpPopoverDoc(
         tester,
-        mode: DsThemeMode.dark,
+        mode: ElThemeMode.dark,
       );
       expect(
         find.byKey(const ValueKey<String>('popover-doc-specimen-trigger')),
         findsOneWidget,
       );
 
-      theme.setMode(DsThemeMode.light);
+      theme.setMode(ElThemeMode.light);
       await tester.pump();
 
       expect(

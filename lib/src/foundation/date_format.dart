@@ -11,12 +11,12 @@
 ///
 /// | reference call | here |
 /// |---|---|
-/// | `format(d, "d MMM")` (page:83–84, the Panel note) | [DsDateFormat.dayMonth] |
-/// | `format(d, "d MMM yyyy")` (page:352, the trigger label) | [DsDateFormat.dayMonthYear] |
-/// | `DateLib.formatMonthYear` → `LLLL yyyy` (`DateLib.js:521`) | [DsDateFormat.monthYear] |
-/// | `formatWeekdayName` → `format(d, "cccccc")` | [DsDateFormat.weekdayNarrow] |
-/// | `calendarDayKey` → `YYYY-MM-DD` (`calendar.tsx:15–20`) | [DsDateFormat.dayKey] |
-/// | `labelDayButton` → `EEEE, MMMM do, yyyy` | [DsDateFormat.dayLabel] |
+/// | `format(d, "d MMM")` (page:83–84, the Panel note) | [ElDateFormat.dayMonth] |
+/// | `format(d, "d MMM yyyy")` (page:352, the trigger label) | [ElDateFormat.dayMonthYear] |
+/// | `DateLib.formatMonthYear` → `LLLL yyyy` (`DateLib.js:521`) | [ElDateFormat.monthYear] |
+/// | `formatWeekdayName` → `format(d, "cccccc")` | [ElDateFormat.weekdayNarrow] |
+/// | `calendarDayKey` → `YYYY-MM-DD` (`calendar.tsx:15–20`) | [ElDateFormat.dayKey] |
+/// | `labelDayButton` → `EEEE, MMMM do, yyyy` | [ElDateFormat.dayLabel] |
 ///
 /// The page's own §7 `Note` is about exactly this file's reason to exist:
 /// *"`toISOString()` converts to UTC first … It is invisible in London, wrong
@@ -26,8 +26,8 @@
 /// Two more things live here, and both are here rather than in a file of their
 /// own because they are foundation facts the calendar cannot be built without:
 ///
-///  * [DsClock] — the app's "now", injectable. Ruling **L2**.
-///  * [DsCalendarType] — the one resolved type rung the calendar needs that
+///  * [ElClock] — the app's "now", injectable. Ruling **L2**.
+///  * [ElCalendarType] — the one resolved type rung the calendar needs that
 ///    `typography.dart` has no declaration for.
 library;
 
@@ -37,9 +37,9 @@ import 'typography.dart';
 
 /// `en-US` date strings, without `intl`.
 ///
-/// A holder, never instantiated — the same shape [DsRadii] and [DsFonts] take.
-class DsDateFormat {
-  const DsDateFormat._();
+/// A holder, never instantiated — the same shape [ElRadii] and [ElFonts] take.
+class ElDateFormat {
+  const ElDateFormat._();
 
   /// `MMM` — `date-fns` `enUS.localize.month(i, {width: 'abbreviated'})`.
   ///
@@ -115,7 +115,7 @@ class DsDateFormat {
   /// The whole grid is built on this one conversion: a `% 7` turns Dart's
   /// ISO-8601 week into the `en-US` week the reference renders, and the same
   /// expression counts the leading outside days of a month
-  /// (`DsCalendarMonth.leadingDays`).
+  /// (`ElCalendarMonth.leadingDays`).
   static int weekIndex(DateTime date) => date.weekday % 7;
 
   /// `format(d, "d MMM")` — **"12 Jul"**. No leading zero: `d`, not `dd`.
@@ -196,8 +196,8 @@ class DsDateFormat {
 /// Nothing above the calendar is required to supply it: [nowOf] falls back to
 /// [DateTime.now], so a widget mounted with no clock in scope behaves exactly
 /// as it did before this seam existed.
-class DsClock extends InheritedWidget {
-  const DsClock({super.key, required this.now, required super.child});
+class ElClock extends InheritedWidget {
+  const ElClock({super.key, required this.now, required super.child});
 
   /// The instant every consumer below reads as "now".
   ///
@@ -211,33 +211,33 @@ class DsClock extends InheritedWidget {
   /// Registers a dependency, so a rig that swaps the instant rebuilds every
   /// calendar under it.
   static DateTime nowOf(BuildContext context) =>
-      context.dependOnInheritedWidgetOfExactType<DsClock>()?.now ??
+      context.dependOnInheritedWidgetOfExactType<ElClock>()?.now ??
       DateTime.now();
 
   /// The injected clock itself, without the fallback — for a caller that needs
   /// to know whether one was supplied at all.
-  static DsClock? maybeOf(BuildContext context) =>
-      context.dependOnInheritedWidgetOfExactType<DsClock>();
+  static ElClock? maybeOf(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<ElClock>();
 
   @override
-  bool updateShouldNotify(DsClock old) => old.now != now;
+  bool updateShouldNotify(ElClock old) => old.now != now;
 }
 
 /// The type the calendar needs and `typography.dart` does not declare.
 ///
 /// **One rung.** The other two the calendar prints already exist and are used
 /// as-is: the caption label is `font-medium … text-sm` →
-/// [DsComponentType.buttonLabel] (13 / 18.5714 / 500) and the weekday header is
-/// `text-sm font-normal` → [DsComponentType.textSm] (13 / 18.5714 / 400). Both
+/// [ElComponentType.buttonLabel] (13 / 18.5714 / 500) and the weekday header is
+/// `text-sm font-normal` → [ElComponentType.textSm] (13 / 18.5714 / 400). Both
 /// were *(probe-confirmed)* on the live calendar to the digit.
 ///
 /// It is declared **here** rather than in `typography.dart` because that file
 /// has a single writer per wave and this wave is not it. It is a token, so it
 /// belongs under `lib/src/foundation/` — which is the rule the guard actually
-/// enforces — and it should move up to `DsComponentType` the next time
+/// enforces — and it should move up to `ElComponentType` the next time
 /// `typography.dart` is opened.
-class DsCalendarType {
-  const DsCalendarType._();
+class ElCalendarType {
+  const ElCalendarType._();
 
   /// `CalendarDayButton`'s number.
   ///
@@ -257,8 +257,8 @@ class DsCalendarType {
   /// **sans** face at a size the type scale does not name — the page's own
   /// Do 5 (*"render dates and prices with the named numerical typography
   /// foundation"*) is about the trigger label, not about the grid.
-  static final DsTypeSpec dayNumber = DsTypeSpec(
-    family: DsFonts.sans,
+  static final ElTypeSpec dayNumber = ElTypeSpec(
+    family: ElFonts.sans,
     size: 16,
     height: 1,
     wght: 400,

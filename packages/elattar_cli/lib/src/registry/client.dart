@@ -15,6 +15,8 @@ const List<String> _logicalTargetPrefixes = <String>[
   '@foundation/',
   '@effects/',
   '@motion/',
+  '@assets/',
+  '@shaders/',
   '@app/',
 ];
 

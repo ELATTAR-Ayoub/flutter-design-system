@@ -42,23 +42,23 @@ Directory get _skillDirectory =>
 
 final SkillDocEntry _entry = skillDoc('elattar-flutter-ui-director');
 
-Future<DsThemeController> _pumpSkills(
+Future<ElThemeController> _pumpSkills(
   WidgetTester tester, {
   SkillDocEntry? entry,
   Map<String, String> fileSource = const <String, String>{},
   ValueChanged<String>? onNavigate,
   Size size = _wide,
-  DsThemeMode mode = DsThemeMode.dark,
+  ElThemeMode mode = ElThemeMode.dark,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final DsThemeController theme = DsThemeController(mode: mode);
+  final ElThemeController theme = ElThemeController(mode: mode);
   addTearDown(theme.dispose);
 
   await tester.pumpWidget(
-    DsTheme(
+    ElTheme(
       controller: theme,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -298,8 +298,8 @@ void main() {
           );
           expect(card, findsOneWidget, reason: route.id);
 
-          final DsBadge rendered = tester.widget<DsBadge>(
-            find.descendant(of: card, matching: find.byType(DsBadge)),
+          final ElBadge rendered = tester.widget<ElBadge>(
+            find.descendant(of: card, matching: find.byType(ElBadge)),
           );
           expect(
             rendered.label,
@@ -412,7 +412,7 @@ void main() {
     testWidgets('renders the same structure on light', (
       WidgetTester tester,
     ) async {
-      await _pumpSkills(tester, mode: DsThemeMode.light);
+      await _pumpSkills(tester, mode: ElThemeMode.light);
 
       expect(find.text(_entry.title), findsWidgets);
       expect(find.byType(DocsFileTree), findsOneWidget);
@@ -422,7 +422,7 @@ void main() {
     testWidgets('renders the same structure on dark', (
       WidgetTester tester,
     ) async {
-      await _pumpSkills(tester, mode: DsThemeMode.dark);
+      await _pumpSkills(tester, mode: ElThemeMode.dark);
 
       expect(find.text(_entry.title), findsWidgets);
       expect(find.byType(DocsFileTree), findsOneWidget);
@@ -432,14 +432,14 @@ void main() {
     testWidgets('flipping the theme in place keeps the page intact', (
       WidgetTester tester,
     ) async {
-      final DsThemeController theme = await _pumpSkills(
+      final ElThemeController theme = await _pumpSkills(
         tester,
-        mode: DsThemeMode.dark,
+        mode: ElThemeMode.dark,
       );
 
       expect(find.text(_entry.title), findsWidgets);
 
-      theme.setMode(DsThemeMode.light);
+      theme.setMode(ElThemeMode.light);
       await tester.pump();
 
       expect(find.text(_entry.title), findsWidgets);

@@ -1,0 +1,59 @@
+{
+  "name": "agent-history",
+  "type": "component",
+  "version": "0.0.1",
+  "description": "`components/agent/parts/{history-card,chat-history,history-search}.tsx` —",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/agent_history.dart",
+      "target": "@ui/agent_history.dart",
+      "sha256": "5f979061ed666c457acac7546dc6cc8340b1804460fabe3e008db7ab6c15bbf3"
+    }
+  ],
+  "registryDependencies": [
+    "agent-core",
+    "alert",
+    "alert-dialog",
+    "button",
+    "command",
+    "dialog",
+    "dropdown-menu",
+    "empty",
+    "field",
+    "icon",
+    "input",
+    "item",
+    "machine-surface",
+    "menu",
+    "popover",
+    "source-foundation",
+    "spinner"
+  ],
+  "semanticDependencies": [
+    "agent-core",
+    "alert",
+    "alert-dialog",
+    "button",
+    "command",
+    "dialog",
+    "dropdown-menu",
+    "empty",
+    "field",
+    "icon",
+    "input",
+    "item",
+    "machine-surface",
+    "menu",
+    "popover",
+    "spinner"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "documentationRoute": "/components/agent-history",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/agent_history.dart",
+  "deprecated": false
+}

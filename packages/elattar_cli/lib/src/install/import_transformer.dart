@@ -108,7 +108,7 @@ class DartImportTransformer {
     if (path == '$designSystemPackage.dart') {
       // The umbrella barrel has no single counterpart: the installer emits one
       // barrel per family, so one directive fans out to several. That is only
-      // sound for a plain directive — a prefix (`as ds`) or a combinator
+      // sound for a plain directive — a prefix (`as el`) or a combinator
       // (`show`/`hide`) cannot be distributed across barrels without silently
       // changing what resolves, so refuse rather than emit broken code.
       if (trailing.isNotEmpty) {
@@ -217,7 +217,7 @@ class _Directive {
   /// The URI as written, without its quotes.
   final String uri;
 
-  /// Everything between the URI and the `;` — a prefix (`as ds`), a combinator
+  /// Everything between the URI and the `;` — a prefix (`as el`), a combinator
   /// (`show X`, `hide Y`), a configuration clause — trimmed. Empty for a plain
   /// directive.
   final String trailing;

@@ -16,29 +16,29 @@ class PlaceholderPage extends StatelessWidget {
   /// The page's own name: the nav category, or the group for an index route.
   final String title;
 
-  /// The group above it, rendered the way `DsPageHeader` renders one.
+  /// The group above it, rendered the way `ElPageHeader` renders one.
   final String? eyebrow;
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         if (eyebrow != null) ...<Widget>[
-          DsText(eyebrow!, DsType.label, color: theme.actionInk),
+          ElText(eyebrow!, ElType.label, color: theme.actionInk),
           // `mt-4`.
-          SizedBox(height: ds(4)),
+          SizedBox(height: el(4)),
         ],
-        DsText(
+        ElText(
           title,
-          DsType.h1,
-          fontSize: DsFluid.h1(context),
+          ElType.h1,
+          fontSize: ElFluid.h1(context),
           color: theme.foreground,
         ),
-        SizedBox(height: ds(4)),
-        DsText('Not ported yet', DsType.small),
+        SizedBox(height: el(4)),
+        ElText('Not ported yet', ElType.small),
       ],
     );
   }

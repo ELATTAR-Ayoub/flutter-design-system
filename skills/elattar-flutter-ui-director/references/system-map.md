@@ -44,9 +44,9 @@ file and the tree disagree, the tree wins.
 | Install ledger | `.elattar/manifest.json` | Authoritative: which items are installed, at which version, and every file path they wrote. |
 | Configuration | `elattar.yaml` | Foundation mode (`source`/`package`) and registry. Its path/barrel keys are inert — see above. |
 | Components barrel | `lib/components/ui/ui.dart` | Generated; the entry point for installed components. |
-| Components | `lib/components/ui/` | Installed `Ds*` component sources. Owned by the consumer, editable. |
+| Components | `lib/components/ui/` | Installed `El*` component sources. Owned by the consumer, editable. |
 | Foundation barrel | `lib/design_system/foundation.dart` | Generated; the entry point for tokens and theme. |
-| Tokens | `lib/design_system/foundation/` | `ds`, measures, breakpoints, radii, type, themes, shadows, colors, motion. |
+| Tokens | `lib/design_system/foundation/` | `el`, measures, breakpoints, radii, type, themes, shadows, colors, motion. |
 | Effects | `lib/design_system/effects/` | Installed effect sources. |
 | Motion | `lib/design_system/motion/` | Installed motion sources. |
 | Shots | `lib/shots/` | Installed application compositions. |
@@ -59,7 +59,7 @@ Get-Content .elattar/manifest.json
 Get-Content elattar.yaml
 Get-Content lib/components/ui/ui.dart
 Get-Content lib/design_system/foundation.dart
-rg -n "class Ds|enum Ds" lib/components/ui lib/design_system
+rg -n "class El|enum El|typedef El" lib/components/ui lib/design_system
 ```
 
 Import installed code through the generated barrels with relative imports, the
@@ -84,15 +84,15 @@ Use the public barrel first:
 
 ```powershell
 Get-Content lib/elattar_design_system.dart
-rg -n "class Ds|enum Ds" lib/src/components lib/src/effects lib/src/motion
-rg -n "Ds<ComponentName>" example/lib test
+rg -n "class El|enum El|typedef El" lib/src/components lib/src/effects lib/src/motion
+rg -n "El<ComponentName>" example/lib test
 ```
 
 | Concern | Source of truth | Use |
 | --- | --- | --- |
 | Public API | `lib/elattar_design_system.dart` | Verify a type is exported before consuming it. |
-| Tokens | `lib/src/foundation/` | `ds`, measures, breakpoints, radii, type, themes, shadows, colors, motion. |
-| Context | `lib/src/theme_scope.dart` | `DsTheme`, `DsText`, typography resolution. |
+| Tokens | `lib/src/foundation/` | `el`, measures, breakpoints, radii, type, themes, shadows, colors, motion. |
+| Context | `lib/src/theme_scope.dart` | `ElTheme`, `ElText`, typography resolution. |
 | Components | `lib/src/components/` | Controls, navigation, feedback, data display, overlays, agent family. |
 | Effects/motion | `lib/src/effects/`, `lib/src/motion/` | System-owned visuals and mechanics. |
 | Specimens | `example/lib/` | Composition, routing, responsive conventions. |

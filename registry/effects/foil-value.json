@@ -5,9 +5,20 @@
   "description": "Rationed value foil effect for premium and reward surfaces.",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
-  "files": [{"source": "lib/src/effects/foil_value.dart", "target": "@effects/foil_value.dart", "sha256": "4ef9eba6d431e54d3d3320f046e16806528b4e95f0780dd0ee9e88945c185413"}],
-  "registryDependencies": ["source-foundation", "machine-surface"],
-  "semanticDependencies": ["machine-surface"],
+  "files": [
+    {
+      "source": "lib/src/effects/foil_value.dart",
+      "target": "@effects/foil_value.dart",
+      "sha256": "57799d9e85d62c6bafcce021c26447c7e34c281d6b8973f1f4e0f5548a6807ed"
+    }
+  ],
+  "registryDependencies": [
+    "machine-surface",
+    "source-foundation"
+  ],
+  "semanticDependencies": [
+    "machine-surface"
+  ],
   "pubDependencies": {},
   "assets": [],
   "fonts": [],

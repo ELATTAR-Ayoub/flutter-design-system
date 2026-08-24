@@ -8,22 +8,6 @@ library;
 
 import '../catalog.dart';
 
-/// IA §9.2's *expanded* description: not what a switch is, but when to reach
-/// for one instead of a neighbour: specifically [DsCheckbox], the control it
-/// is most often confused with. Kept as a second top-level constant, beside
-/// [switchDoc], because [ComponentDocEntry] carries only one description
-/// field and the two-description contract still has to be met from a file
-/// this worker owns rather than by editing the supervisor-owned class.
-const String switchExpandedDescription =
-    'Reach for a switch when flipping it takes effect immediately: a '
-    'setting that is already true the moment the thumb moves, with no Save '
-    'button anywhere on the screen. Reach for a checkbox instead when the '
-    'value is captured and submitted with the rest of a form, including '
-    'inside a list where several boxes are gathered before one action '
-    'commits them. The same boolean, two different promises to the user: a '
-    'switch says "this is already on," a checkbox says "this is what I '
-    'intend, once I submit."';
-
 const ComponentDocEntry switchDoc = ComponentDocEntry(
   name: 'switch',
   title: 'Switch',
@@ -32,10 +16,15 @@ const ComponentDocEntry switchDoc = ComponentDocEntry(
       'separate save step.',
   // What lib/src/components/switch.dart itself imports from
   // lib/src/components/: real source-level dependencies, not a verified
-  // registry dependency list. Switch has no registry manifest yet (see
+  // registry dependency list. Switch installs through `elattar add switch` (see
   // DocsInstallFacts on the page), so these are documented as internal
   // dependencies rather than claimed as CLI-resolvable ones.
-  dependencies: <String>['field', 'selection_control'],
-  exports: <String>['DsSwitch', 'DsSwitchSize'],
+  dependencies: <String>[
+    'field',
+    'machine-surface',
+    'selection-control',
+    'source-foundation',
+  ],
+  exports: <String>['ElSwitch', 'ElSwitchSize'],
   sourcePath: 'lib/src/components/switch.dart',
 );

@@ -1,31 +1,25 @@
-/// Public documentation page for three small presentational primitives:
-/// `separator`, `empty`, and `kbd`.
+/// Public documentation page for the `separator` component alone.
 ///
-/// Each is too small for a page of its own: a hairline rule that is one
-/// class list, a six-part empty-state composition, and a 20px key cap: and
-/// all three share one theme: static presentation with almost no state of
-/// its own. This page documents all three together rather than three
-/// near-empty pages, the way `meta.dart` explains.
+/// **Split from a merged page.** `separator/page.dart` used to document
+/// `separator`, `empty`, and `kbd` together, because each was "too small for
+/// a page of its own." `empty` and `kbd` now have real pages of their own
+/// (`lib/components_docs/empty/`, `lib/components_docs/kbd/`); this file
+/// keeps only what belongs to `ElSeparator`.
 ///
-/// Shaped against shadcn's own three counterpart pages
-/// (`ui.shadcn.com/docs/components/base/separator`, `.../empty`,
-/// `.../kbd`), merged section by section: shared frame sections (Preview,
-/// Installation, Usage, Composition, API Reference, then this package's own
-/// States/Accessibility/Responsive/Dependencies/Theming/Source) stay
-/// internally split into three labelled groups, one per component, exactly
-/// as before; each counterpart's own named sections (Vertical, List, Menu
-/// for separator; Input group for empty; Group, Button, Input group for
-/// kbd) are promoted to top-level sections of their own, prefixed with the
-/// component's name so a reader always knows which of the three a section
-/// belongs to. It mirrors `badge/page.dart`'s use of the Phase C docs
-/// primitives (`DocsLayout`, `DocsCodeExample`, `DocsApiTable`,
-/// `DocsStateMatrix`, `DocsInstallFacts`) and `kit.dart`'s `DsSection` for
-/// titled, anchor-registered content blocks.
+/// **Reference shape**, mirrored from shadcn's own
+/// `ui.shadcn.com/docs/components/base/separator`, fetched fresh: Installation,
+/// Usage, Vertical, Menu, List, RTL, API Reference — every one a top-level
+/// section, the same flat shape `button/page.dart` established as this
+/// corpus's reference. shadcn's page has no Composition section (only
+/// `empty`, `kbd`, and `item` do, each with several part-widgets to
+/// assemble); `ElSeparator` is a single leaf, so this page carries none
+/// either. RTL was not on the old merged page, but `stat/page.dart` proved
+/// the honest way to build one for a component with no direction-specific
+/// layout of its own: wrap a real specimen in a bare [Directionality]. Done
+/// the same way here.
 ///
-/// None of the three has a registry manifest yet
-/// (`registry/components/separator.json`, `empty.json`, `kbd.json` do not
-/// exist): every install-facing panel below says so honestly rather than
-/// presenting a CLI command that would fail.
+/// [ComponentDocEntry.description] is the page's only rendered description;
+/// no second hero paragraph renders beneath it.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
@@ -50,22 +44,18 @@ class SeparatorDocPage extends StatelessWidget {
       title: separatorDoc.title,
       description: separatorDoc.description,
     ),
-    breadcrumbs: const <DsBreadcrumbEntry>[
-      DsBreadcrumbEntry.link('Components'),
-      DsBreadcrumbEntry.page('Separator, Empty & Kbd'),
+    breadcrumbs: const <ElBreadcrumbEntry>[
+      ElBreadcrumbEntry.link('Components'),
+      ElBreadcrumbEntry.page('Separator'),
     ],
     sidebar: _sidebar,
     toc: const <DocsTocEntry>[
       DocsTocEntry(title: 'Installation', anchor: 'install'),
       DocsTocEntry(title: 'Usage', anchor: 'usage'),
-      DocsTocEntry(title: 'Composition', anchor: 'composition'),
-      DocsTocEntry(title: 'Separator: Vertical', anchor: 'separator-vertical'),
-      DocsTocEntry(title: 'Separator: List', anchor: 'separator-list'),
-      DocsTocEntry(title: 'Separator: Menu', anchor: 'separator-menu'),
-      DocsTocEntry(title: 'Empty: Input group', anchor: 'empty-input-group'),
-      DocsTocEntry(title: 'Kbd: Group', anchor: 'kbd-group'),
-      DocsTocEntry(title: 'Kbd: Button', anchor: 'kbd-button'),
-      DocsTocEntry(title: 'Kbd: Input group', anchor: 'kbd-input-group'),
+      DocsTocEntry(title: 'Vertical', anchor: 'vertical'),
+      DocsTocEntry(title: 'Menu', anchor: 'menu'),
+      DocsTocEntry(title: 'List', anchor: 'list'),
+      DocsTocEntry(title: 'RTL', anchor: 'rtl'),
       DocsTocEntry(title: 'API Reference', anchor: 'api'),
       DocsTocEntry(title: 'States', anchor: 'states'),
       DocsTocEntry(title: 'Accessibility', anchor: 'accessibility'),
@@ -84,12 +74,8 @@ class SeparatorDocPage extends StatelessWidget {
   );
 }
 
-/// The Wave 1 "base primitives" group this page belongs to (IA §7.3), listed
-/// in the plan's own order: except `Empty` and `Kbd` do not get their own
-/// rows: both are documented on this page (route `/components/separator`)
-/// rather than at `/components/empty` and `/components/kbd`, so the merged
-/// row sits where `separator` alphabetises. These are not routes other
-/// workers are producing this same wave verified as wired: the supervisor
+/// The Wave 1 "base primitives" group this page belongs to (IA §7.3). Not
+/// routes another worker's page is verified as wired: the supervisor
 /// aggregates the real sidebar in `catalog.dart` and `site_routes.dart`.
 const List<DocsSidebarEntry> _sidebar = <DocsSidebarEntry>[
   DocsSidebarEntry(title: 'Accordion', route: '/components/accordion'),
@@ -101,7 +87,7 @@ const List<DocsSidebarEntry> _sidebar = <DocsSidebarEntry>[
   DocsSidebarEntry(title: 'Collapsible', route: '/components/collapsible'),
   DocsSidebarEntry(title: 'Progress', route: '/components/progress'),
   DocsSidebarEntry(
-    title: 'Separator, Empty & Kbd',
+    title: 'Separator',
     route: '/components/separator',
     selected: true,
   ),
@@ -116,24 +102,20 @@ class _SeparatorArticle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return Column(
       key: const ValueKey<String>('separator-doc-article'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        _heroExpansion(theme),
-        SizedBox(height: ds(8)),
-        _preview(),
+        _preview(theme),
+        SizedBox(height: el(6)),
         _install(),
+        SizedBox(height: el(6)),
         _usage(),
-        _composition(),
-        _separatorVertical(),
-        _separatorList(theme),
-        _separatorMenu(theme),
-        _emptyInputGroup(),
-        _kbdGroup(),
-        _kbdButton(),
-        _kbdInputGroup(),
+        _vertical(),
+        _menu(theme),
+        _list(theme),
+        _rtl(theme),
         _api(theme),
         _states(),
         _accessibility(theme),
@@ -145,250 +127,98 @@ class _SeparatorArticle extends StatelessWidget {
     );
   }
 
-  /// The three components' own descriptions and "reach for it when"
-  /// guidance, rendered as plain hero prose above Preview: not a
-  /// [DsSection], so it carries no heading and no TOC anchor of its own,
-  /// the way `button/page.dart`'s `_heroExpansion` carries the CONTENT
-  /// RULES' expanded description. shadcn's own pages put this same kind of
-  /// prose directly under the page title, before Installation, with no
-  /// heading of its own either.
-  Widget _heroExpansion(DsThemeData theme) => ConstrainedBox(
-    constraints: const BoxConstraints(maxWidth: DsWidths.prose),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        DsText(
-          'Three components that share one theme: almost no state, and a '
-          'single visual job each. None of the three owns a GestureDetector, '
-          'a FocusNode, or an async flag anywhere in its build method: every '
-          'row below that looks empty in the State matrix is empty for that '
-          'reason, not because the template was left unfilled.',
-          DsType.body,
-        ),
-        SizedBox(height: ds(5)),
-        DsText('Separator', DsType.h4, color: theme.foreground),
-        SizedBox(height: ds(2)),
-        DsText(
-          'DsSeparator renders one 1px hairline in theme.border, on '
-          'whichever axis orientation names: the long axis is left unset so '
-          'the parent constraint fills it, exactly like the reference\'s '
-          'w-full / self-stretch.',
-          DsType.body,
-        ),
-        SizedBox(height: ds(2)),
-        DsText(
-          'Reach for it, instead of plain whitespace, when the boundary '
-          'itself must stay visible even on a quick scan: a settings list '
-          'where each row has to read as a discrete unit, not merely spaced '
-          'apart. Reach for whitespace alone when adjacency already implies '
-          'grouping and a line would be one accent too many. Reach for a '
-          'bordered DsCard/Container instead of a lone separator when the '
-          '*region* needs a boundary on all four sides: a separator has no '
-          'length of its own and only ever draws one edge.',
-          DsType.body,
-        ),
-        SizedBox(height: ds(5)),
-        DsText('Empty', DsType.h4, color: theme.foreground),
-        SizedBox(height: ds(2)),
-        DsText(
-          'DsEmpty is a structured empty state: an optional media tile, a '
-          'title, a description, and one clear way out (DsEmptyContent), '
-          'centred in a column with 16px between its parts.',
-          DsType.body,
-        ),
-        SizedBox(height: ds(2)),
-        DsText(
-          'Reach for it whenever a collection, search, or workspace has '
-          'nothing to show and the user needs to know why and what to do '
-          'next. Reach for a spinner/skeleton instead when the empty '
-          'appearance is temporary and about to resolve on its own, DsEmpty '
-          'never resolves itself, it has no loading concept. Reach for '
-          'simply rendering nothing only when the state never changes and '
-          'there is genuinely no next step to suggest; the moment there is '
-          'one, a bare "No results" string is an unfinished screen and '
-          'DsEmpty is what finishes it.',
-          DsType.body,
-        ),
-        SizedBox(height: ds(5)),
-        DsText('Kbd', DsType.h4, color: theme.foreground),
-        SizedBox(height: ds(2)),
-        DsText(
-          'DsKbd renders a 20px-tall, 20px-minimum-wide key cap: muted fill, '
-          '6px corners, 12px/500 label, inert to touch and text selection.',
-          DsType.body,
-        ),
-        SizedBox(height: ds(2)),
-        DsText(
-          'Reach for it when the content is a literal key the reader would '
-          'press, Ctrl, K, Esc, ⌘: never a status word or a count (that is '
-          'DsBadge) and never a snippet of code (that is the mono '
-          'DsType.code role or a DsPanel code block, which read as *quoted '
-          'text*, not as *a key you press*). DsKbdGroup composes several '
-          'keys into one shortcut that should be read as a single '
-          'combination, not as unrelated letters.',
-          DsType.body,
-        ),
-        SizedBox(height: ds(4)),
-        DsText(
-          'Status: stable primitives, not yet registered in the CLI (see '
-          'Install). Platforms: Android, iOS, Web, macOS, Windows, Linux, '
-          'the same six every widget in this package targets.',
-          DsType.small,
-          color: theme.mutedForeground,
-        ),
-      ],
-    ),
-  );
-
-  Widget _preview() => DocsCodeExample(
-    title: 'Separator, Empty, and Kbd specimens',
+  /// The unheaded live demo shadcn renders above its first `<h2>`: no
+  /// [ElSection], no heading, no TOC entry — [ComponentDocEntry.description]
+  /// already carries the one-line summary in [DocsPageIntro].
+  Widget _preview(ElThemeData theme) => DocsCodeExample(
+    title: 'Separator',
     description:
-        'One representative specimen of each: the balance/three-figure strip '
-        'the separator source itself documents, a search "no results" empty '
-        'state, and the shortcut list from the buttons page.',
+        'ElSeparator renders one 1px hairline in theme.border, on whichever '
+        'axis orientation names: the long axis is left unset so the parent '
+        'constraint fills it, exactly like the reference\'s w-full / '
+        'self-stretch. Reach for it, instead of plain whitespace, when the '
+        'boundary itself must stay visible even on a quick scan.',
     manualFiles: const <DocsCodeFile>[
       DocsCodeFile(
         path: 'lib/components/ui/separator.dart',
         code:
             "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
-            '// None of the three has a registry manifest yet: copy\n'
-            '// lib/src/components/separator.dart, empty.dart, and kbd.dart\n'
-            '// from the package source directly. There is no generated\n'
-            '// CLI payload to fetch.',
+            '// Install with: elattar add separator',
       ),
     ],
     preview: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        DsText('Separator: horizontal and vertical', DsType.label),
-        SizedBox(height: ds(3)),
+        ElText('Horizontal', ElType.label),
+        SizedBox(height: el(3)),
         Align(
           alignment: AlignmentDirectional.centerStart,
           child: SizedBox(
-            width: DsContainers.md,
+            width: ElContainers.md,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                DsText('Available balance', DsType.small),
-                SizedBox(height: ds(4)),
+                ElText('Available balance', ElType.small),
+                SizedBox(height: el(4)),
                 KeyedSubtree(
                   key: const ValueKey<String>('separator-preview:horizontal'),
-                  child: const DsSeparator(),
+                  child: const ElSeparator(),
                 ),
-                SizedBox(height: ds(4)),
-                DsText('Bonus balance', DsType.small),
+                SizedBox(height: el(4)),
+                ElText('Bonus balance', ElType.small),
               ],
             ),
           ),
         ),
-        SizedBox(height: ds(5)),
+        SizedBox(height: el(8)),
+        ElText('Vertical', ElType.label),
+        SizedBox(height: el(3)),
         SizedBox(
-          height: ds(6),
+          height: el(6),
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                DsText('412 packs', DsType.numSm),
-                SizedBox(width: ds(4)),
+                ElText('412 packs', ElType.numSm),
+                SizedBox(width: el(4)),
                 KeyedSubtree(
                   key: const ValueKey<String>('separator-preview:vertical'),
-                  child: const DsSeparator.vertical(),
+                  child: const ElSeparator.vertical(),
                 ),
-                SizedBox(width: ds(4)),
-                DsText('1,284 cards', DsType.numSm),
-                SizedBox(width: ds(4)),
-                const DsSeparator.vertical(),
-                SizedBox(width: ds(4)),
-                DsText('8 sets', DsType.numSm),
+                SizedBox(width: el(4)),
+                ElText('1,284 cards', ElType.numSm),
+                SizedBox(width: el(4)),
+                const ElSeparator.vertical(),
+                SizedBox(width: el(4)),
+                ElText('8 sets', ElType.numSm),
               ],
             ),
-          ),
-        ),
-        SizedBox(height: ds(8)),
-        DsText('Empty: a no-results state, with a way out', DsType.label),
-        SizedBox(height: ds(3)),
-        KeyedSubtree(
-          key: const ValueKey<String>('empty-preview'),
-          child: DsEmpty(
-            children: <Widget>[
-              const DsEmptyHeader(
-                children: <Widget>[
-                  DsEmptyMedia(
-                    glyph: DsIconGlyph.search,
-                    tone: DsIconTone.subtle,
-                  ),
-                  DsEmptyTitle('No results found'),
-                  DsEmptyDescription(
-                    'Try a different search term or clear your filters.',
-                  ),
-                ],
-              ),
-              DsEmptyContent(
-                children: <Widget>[
-                  DsButton(
-                    variant: DsButtonVariant.secondary,
-                    size: DsButtonSize.sm,
-                    onPressed: () {},
-                    child: DsText('Clear filters', DsComponentType.buttonLabel),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-        SizedBox(height: ds(8)),
-        DsText('Kbd: shortcut hints', DsType.label),
-        SizedBox(height: ds(3)),
-        KeyedSubtree(
-          key: const ValueKey<String>('kbd-preview'),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              DsRow(
-                children: <Widget>[
-                  const DsKbdGroup(
-                    children: <Widget>[DsKbd('Ctrl'), DsKbd('K')],
-                  ),
-                  DsText('Open search', DsType.small),
-                ],
-              ),
-              SizedBox(height: ds(4)),
-              DsRow(
-                children: <Widget>[
-                  const DsKbd('Esc'),
-                  DsText('Close this dialog', DsType.small),
-                ],
-              ),
-            ],
           ),
         ),
       ],
     ),
   );
 
-  Widget _install() => DsSection(
+  Widget _install() => ElSection(
     id: 'install',
     title: 'Installation',
     description:
-        'None of the three has a registry manifest yet, so `elattar add '
-        'separator` / `empty` / `kbd` is not available: install by copying '
-        'the source files manually.',
+        '`elattar add separator` installs the component and its declared '
+        'dependency closure.',
     child: DocsInstallFacts(
       title: 'Installation facts',
       facts: <DocsInstallFact>[
         const DocsInstallFact(
           label: 'Registry item',
-          value: 'not yet registered (×3)',
-          description:
-              'No registry/components/separator.json, empty.json, or '
-              'kbd.json exists. All three are source-only today.',
+          value: 'registry/components/separator.json',
+          description: 'Shipped and resolved by `elattar add separator`.',
         ),
         const DocsInstallFact(
           label: 'Destination',
-          value: 'lib/components/ui/separator.dart, empty.dart, kbd.dart',
-          description: 'Where a manual copy of each source file belongs.',
+          value: 'lib/components/ui/separator.dart',
+          description: 'Where a manual copy of the source file belongs.',
         ),
         const DocsInstallFact(
           label: 'Foundation',
@@ -397,14 +227,10 @@ class _SeparatorArticle extends StatelessWidget {
         ),
         const DocsInstallFact(
           label: 'Dependencies',
-          value: 'source-foundation; empty → icon; kbd → machine-surface',
+          value: 'source-foundation only',
           description:
-              'Separator needs only spacing/theme tokens. Empty additionally '
-              'needs the icon component (DsEmptyMedia renders a DsIcon). Kbd '
-              'additionally needs the machine-surface effect, though it '
-              'paints through it with DsShadows.none: see Theming. None of '
-              'this is resolved automatically today; copy the imports by '
-              'hand.',
+              'ElSeparator needs only spacing/theme tokens: no component or '
+              'effect import.',
         ),
         const DocsInstallFact(
           label: 'Assets',
@@ -414,16 +240,12 @@ class _SeparatorArticle extends StatelessWidget {
         const DocsInstallFact(
           label: 'Shaders',
           value: 'none',
-          description:
-              'Kbd\'s machine surface renders DsShadows.none: a flat fill '
-              'and border, not a fragment shader.',
+          description: 'A ColoredBox fill, not a fragment-shader paint.',
         ),
-        DocsInstallFact(
+        const DocsInstallFact(
           label: 'Platforms',
           value: 'Android, iOS, Web, macOS, Windows, Linux',
-          description:
-              'No platform-conditional code in separator.dart, empty.dart, '
-              'or kbd.dart.',
+          description: 'No platform-conditional code in separator.dart.',
         ),
         const DocsInstallFact(
           label: 'Verified',
@@ -432,662 +254,106 @@ class _SeparatorArticle extends StatelessWidget {
               'This page\'s live preview and '
               'example/test/components_docs/separator_test.dart. No '
               'dedicated package-level unit test and no registry fixture '
-              'install exist yet for any of the three: there is nothing to '
-              'install.',
+              'install exist yet.',
         ),
       ],
     ),
   );
 
-  Widget _usage() => DsSection(
+  Widget _usage() => ElSection(
     id: 'usage',
     title: 'Usage',
-    description: 'The smallest correct call for each, then the shapes above.',
-    child: DsPanel(
+    description: 'The smallest correct call, then the named constructor.',
+    child: ElPanel(
       label: 'DART',
       note: 'COMPOSE',
       child: DocsSelectableCodeBlock(code: _usageCode),
     ),
   );
 
-  Widget _api(DsThemeData theme) => DsSection(
-    id: 'api',
-    title: 'API Reference',
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        const DocsApiTable(
-          title: 'DsSeparator properties',
-          facts: <DocsApiFact>[
-            DocsApiFact(
-              name: 'orientation',
-              type: 'DsSeparatorOrientation',
-              description:
-                  'Defaults to horizontal. Selects which axis draws the '
-                  'rule. DsSeparator.vertical() is equivalent to passing '
-                  'DsSeparatorOrientation.vertical here.',
-            ),
-          ],
-        ),
-        SizedBox(height: ds(6)),
-        const DocsApiTable(
-          title: 'DsSeparatorOrientation',
-          facts: <DocsApiFact>[
-            DocsApiFact(
-              name: 'horizontal',
-              type: 'the default',
-              description:
-                  '1px tall, full parent width. Used between stacked rows: '
-                  'see Separator: List.',
-            ),
-            DocsApiFact(
-              name: 'vertical',
-              type: 'DsSeparator.vertical()',
-              description:
-                  '1px wide, stretches to the parent\'s height (needs a '
-                  'bounded-height ancestor, e.g. a fixed-height Row): see '
-                  'Separator: Vertical and Separator: Menu.',
-            ),
-          ],
-        ),
-        SizedBox(height: ds(2)),
-        DsText(
-          'This is Separator\'s only enum, and the only size/variant axis '
-          'any of the three has: Empty has no DsEmptyVariant (its shape '
-          'comes from which of the six parts a caller includes, not an '
-          'enum), and Kbd has no DsKbdSize or DsKbdVariant either, '
-          'DsKbdGroup composes several keys rather than switching a '
-          'variant.',
-          DsType.small,
-          color: theme.mutedForeground,
-        ),
-        SizedBox(height: ds(6)),
-        const DocsApiTable(
-          title: 'DsSeparator static tokens',
-          facts: <DocsApiFact>[
-            DocsApiFact(
-              name: 'DsSeparator.thickness',
-              type: 'static double',
-              description:
-                  'The rule\'s thickness on its short axis, DsWidths.hairline '
-                  '(1px). The long axis is left null on purpose so the '
-                  'parent\'s own constraint fills it.',
-            ),
-          ],
-        ),
-        SizedBox(height: ds(8)),
-        const DocsApiTable(
-          title: 'Empty family properties',
-          facts: <DocsApiFact>[
-            DocsApiFact(
-              name: 'children',
-              type: 'List<Widget>',
-              description:
-                  'Required (DsEmpty, DsEmptyHeader, DsEmptyContent). '
-                  'DsEmpty: typically a DsEmptyHeader and a DsEmptyContent, '
-                  'in order, joined by a 16px gap. DsEmptyHeader: the media, '
-                  'the title, and the description, capped at a 384px measure '
-                  'and joined by an 8px gap. DsEmptyContent: one or more '
-                  'actions, capped at the same 384px measure, joined by a '
-                  '10px gap.',
-            ),
-            DocsApiFact(
-              name: 'glyph',
-              type: 'DsIconGlyph',
-              description:
-                  '(DsEmptyMedia) Required. The icon drawn inside the '
-                  '32px tile.',
-            ),
-            DocsApiFact(
-              name: 'tone',
-              type: 'DsIconTone',
-              description: '(DsEmptyMedia) Defaults to DsIconTone.normal.',
-            ),
-            DocsApiFact(
-              name: 'text',
-              type: 'String (positional)',
-              description:
-                  '(DsEmptyTitle, DsEmptyDescription) Required. DsEmptyTitle: '
-                  'the heading, 13px/500, −0.26px tracking. '
-                  'DsEmptyDescription: the supporting sentence, 13px/400, '
-                  '1.625 line height, theme.mutedForeground.',
-            ),
-          ],
-        ),
-        SizedBox(height: ds(6)),
-        const DocsApiTable(
-          title: 'Empty family static tokens',
-          facts: <DocsApiFact>[
-            DocsApiFact(
-              name: 'DsEmpty.padding / .gap / .radius',
-              type: 'static double',
-              description:
-                  '24px outer padding, 16px between children, 16px corner '
-                  'radius. radius shapes nothing today: see Theming.',
-            ),
-            DocsApiFact(
-              name: 'DsEmptyHeader.gap / .maxWidth',
-              type: 'static double',
-              description: '8px gap, 384px measure (DsContainers.sm).',
-            ),
-            DocsApiFact(
-              name:
-                  'DsEmptyMedia.box / .radius / .marginBottom / .glyphSize / '
-                  '.glyphStroke',
-              type: 'static double',
-              description:
-                  '32px tile, 12px corners, 8px gap to the title, a 16px '
-                  'glyph drawn with the stroke width computed for 24px: a '
-                  'deliberate drift, see Overview\'s source note and '
-                  'Theming.',
-            ),
-            DocsApiFact(
-              name: 'DsEmptyTitle.styleOf(context, {color})',
-              type: 'static TextStyle Function',
-              description:
-                  'Resolves the title\'s text style so a caller building its '
-                  'own title-shaped text can match it exactly.',
-            ),
-            DocsApiFact(
-              name: 'DsEmptyDescription.spec',
-              type: 'static DsTypeSpec',
-              description:
-                  'DsComponentType.textareaBody: the resolved rung the '
-                  'description renders with.',
-            ),
-            DocsApiFact(
-              name: 'DsEmptyContent.gap / .maxWidth',
-              type: 'static double',
-              description: '10px gap, 384px measure.',
-            ),
-          ],
-        ),
-        SizedBox(height: ds(8)),
-        const DocsApiTable(
-          title: 'Kbd family properties',
-          facts: <DocsApiFact>[
-            DocsApiFact(
-              name: 'text',
-              type: 'String (positional)',
-              description:
-                  '(DsKbd) Required. The legend, as authored, "Ctrl", "K".',
-            ),
-            DocsApiFact(
-              name: 'children',
-              type: 'List<Widget>',
-              description:
-                  '(DsKbdGroup) Required. The keys, in order: typically '
-                  'DsKbd widgets.',
-            ),
-          ],
-        ),
-        SizedBox(height: ds(6)),
-        const DocsApiTable(
-          title: 'Kbd family static tokens',
-          facts: <DocsApiFact>[
-            DocsApiFact(
-              name: 'DsKbd.height / .minWidth / .paddingX / .gap',
-              type: 'static double',
-              description:
-                  '20px tall, 20px minimum wide, 4px horizontal padding, and '
-                  'a 4px gap exposed for a caller composing an icon beside '
-                  'the text (nothing on this page uses it).',
-            ),
-            DocsApiFact(
-              name: 'DsKbdGroup.gap',
-              type: 'static double',
-              description: '4px between keys in a group.',
-            ),
-          ],
-        ),
-      ],
-    ),
-  );
-
-  Widget _states() => DsSection(
-    id: 'states',
-    title: 'States',
-    description:
-        'All three are static, presentational StatelessWidgets: none owns '
-        'onPressed/enabled, a GestureDetector, a FocusNode, or an async flag '
-        'anywhere in its build method. Most of IA §9.7\'s rows genuinely do '
-        'not apply, so they are grouped below with the reason, rather than '
-        'invented.',
-    child: const DocsStateMatrix(
-      facts: <DocsStateFact>[
-        DocsStateFact(
-          state: 'Rest',
-          treatment:
-              'Separator paints its 1px theme.border fill. Empty paints a '
-              'centred column: a muted 32px tile behind the glyph if '
-              'DsEmptyMedia is present, the title in theme.foreground, the '
-              'description in theme.mutedForeground. Kbd paints a flat '
-              'theme.muted fill with theme.mutedForeground text.',
-          userSignal: 'The resting paint is the only paint for all three.',
-        ),
-        DocsStateFact(
-          state: '"Empty" (as a matrix row)',
-          treatment:
-              'This row usually asks what a stateful component looks like '
-              'with no data. DsEmpty does not have that state, DsEmpty *is* '
-              'the widget another component renders when its own data is '
-              'empty. There is no "DsEmpty, but empty" to describe.',
-          userSignal:
-              'Named explicitly here so the row is not mistaken for an '
-              'unfilled gap.',
-        ),
-        DocsStateFact(
-          state: 'Loading / Error / Success',
-          treatment:
-              'N/A for all three: none owns an async flag. A caller renders '
-              'a different DsEmpty (a different glyph/title/description) for '
-              'an error versus an empty-by-design state, the same way '
-              'DsBadge swaps variant instead of transitioning in place; '
-              'DsSeparator and DsKbd carry no concept of either.',
-          userSignal: 'A different specimen, not a live state change.',
-        ),
-        DocsStateFact(
-          state: 'Hover / Focus-visible / Pressed / Selected / Disabled',
-          treatment:
-              'N/A: none of the three owns a GestureDetector, FocusNode, or '
-              'onPressed/enabled parameter. DsEmptyContent can *hold* an '
-              'interactive child (e.g. the DsButton in the Preview '
-              'specimen), whose own states apply to it, not to DsEmpty.',
-          userSignal:
-              'Compose with an interactive component at the call site, '
-              'DsKbd\'s own IgnorePointer makes the "not interactive" '
-              'contract explicit for kbd specifically.',
-        ),
-        DocsStateFact(
-          state: 'Reduced motion',
-          treatment:
-              'N/A: no AnimationController and no motion token appears in '
-              'any of the three build methods.',
-          userSignal: 'Nothing animates, so nothing needs to still.',
-        ),
-      ],
-    ),
-  );
-
-  Widget _accessibility(DsThemeData theme) => DsSection(
-    id: 'accessibility',
-    title: 'Accessibility',
-    description:
-        'This is the one section where the three genuinely differ, and '
-        'where the source has real gaps worth naming plainly rather than '
-        'papering over.',
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        DsText('Separator', DsType.label, color: theme.actionInk),
-        SizedBox(height: ds(2)),
-        _bullets(theme, <String>[
-          'Semantic role: none: build() returns a bare SizedBox wrapping a '
-              'ColoredBox; no Semantics widget appears anywhere in '
-              'separator.dart.',
-          'Hidden from assistive tech, but by omission rather than a guard: '
-              'the source\'s own doc comment says the port "hides both" '
-              '(decorative and orientation) because "a Semantics divider '
-              'node carries no information a Flutter reader can use": but '
-              'the implementation reaches that outcome by simply never '
-              'creating a semantics node, not via an explicit '
-              'Semantics(excludeSemantics: true) or ExcludeSemantics '
-              'wrapper. That hides it today (a bare SizedBox/ColoredBox '
-              'produces no semantics node on its own), but there is no '
-              'defensive marker keeping it hidden if an ancestor ever wraps '
-              'it in a Semantics(container: true): a real, currently '
-              'harmless gap, reported rather than silently fixed.',
-          'Keyboard: never focusable: no Focus widget or FocusNode exists.',
-          'Touch target: not applicable: a rule is not interactive and '
-              'makes no target-size guarantee.',
-          'Non-colour signal: none needed: it is decorative geometry, not '
-              'a status signal.',
-          'Known platform differences: none: no platform branch in '
-              'separator.dart.',
-        ]),
-        SizedBox(height: ds(5)),
-        DsText('Empty', DsType.label, color: theme.actionInk),
-        SizedBox(height: ds(2)),
-        _bullets(theme, <String>[
-          'Semantic role: none of its own. DsEmpty, DsEmptyHeader, '
-              'DsEmptyMedia, and DsEmptyContent are plain Column/Padding/'
-              'ConstrainedBox widgets with no Semantics wrapper.',
-          'Not silent: DsEmptyTitle and DsEmptyDescription render through '
-              'Text (via DsLineBox/DsText), which carries Flutter\'s default '
-              'static-text semantics: the title and the description are '
-              'individually reachable and readable by a screen reader.',
-          'The gap: nothing announces the *arrival* of an empty state. '
-              'There is no Semantics(liveRegion: true) anywhere in '
-              'empty.dart and no heading semantics on DsEmptyTitle. When an '
-              'app swaps a loading list, or an error DsEmpty, for a '
-              '"no results" DsEmpty, nothing in this component tells an '
-              'assistive-tech user that the content changed: they only '
-              'discover the new text if they navigate back to that part of '
-              'the tree. The text itself is not silent; its *appearance* '
-              'is. Wiring a live announcement at the call site (e.g. '
-              'Semantics(liveRegion: true) around the swap, or '
-              'SemanticsService.announce) is on the caller today.',
-          'DsEmptyMedia\'s icon carries no separate accessible label '
-              'parameter of its own: appropriate, since the adjacent '
-              'DsEmptyTitle already states the same information in text.',
-          'Keyboard: DsEmptyContent commonly holds an interactive child '
-              '(a DsButton in the Preview specimen above), which supplies '
-              'its own focus and keyboard behavior; DsEmpty adds none.',
-          'Known platform differences: none observed: no platform branch '
-              'in empty.dart.',
-        ]),
-        SizedBox(height: ds(5)),
-        DsText('Kbd', DsType.label, color: theme.actionInk),
-        SizedBox(height: ds(2)),
-        _bullets(theme, <String>[
-          'Semantic role: none of its own, DsKbd wraps its DsText in '
-              'IgnorePointer and SelectionContainer.disabled only; no '
-              'Semantics override. The legend reaches assistive tech as '
-              'ordinary static text.',
-          'The gap: nothing marks it as "a key you press." There is no '
-              'semanticLabel such as "key: Esc" and no custom Semantics '
-              'role: a screen reader reads "Esc" exactly as it would read '
-              'the word "Esc" anywhere else on the page, with no signal '
-              'that it names a keyboard key rather than being prose.',
-          'One deliberate exception: DsKbdGroup wraps its children in '
-              'MergeSemantics, so a grouped shortcut *does* fold into a '
-              'single announcement instead of two separate stops ("Ctrl K" '
-              'as one node, not "Ctrl" then "K"). The source\'s own comment '
-              'frames this directly: a nested kbd is "one keyboard object, '
-              'not a container of two."',
-          'pointer-events-none / select-none, matched exactly: IgnorePointer '
-              'keeps it out of hit-testing, and SelectionContainer.disabled '
-              'keeps it out of a SelectionArea\'s copy: the same pair of '
-              'behaviors the reference\'s two classes name.',
-          'Keyboard: never focusable, same as Separator and Empty.',
-          'Touch target: not applicable: inert to touch by design '
-              '(IgnorePointer).',
-          'Known platform differences: none: no platform branch in '
-              'kbd.dart.',
-        ]),
-      ],
-    ),
-  );
-
-  Widget _responsive(DsThemeData theme) => DsSection(
-    id: 'responsive',
-    title: 'Responsive',
-    child: _bullets(theme, <String>[
-      'No responsive branching: none of the three reads a breakpoint from '
-          'BuildContext; all render identically at 390px and 1440px.',
-      'Separator has no length of its own on the long axis by design, '
-          'width is null when horizontal, height is null when vertical, so '
-          'the rule always fills whatever the parent gives it; only the '
-          '1px short-axis thickness is fixed.',
-      'Empty\'s DsEmptyHeader and DsEmptyContent both cap at 384px '
-          '(DsContainers.sm) regardless of viewport. At 390px that cap '
-          'rarely binds: the phone\'s own content width is already close '
-          'to or narrower than it. At 1440px it is what keeps the title and '
-          'description from stretching edge to edge inside a much wider '
-          'DsEmpty panel.',
-      'Kbd is a fixed 20px-tall, content-wide box with a 20px floor: the '
-          'same footprint at 390px and 1440px; only the legend string '
-          'changes the width it occupies.',
-      'Platform parity: Android, iOS, Web, macOS, Windows, and Linux all '
-          'render the same widget tree: no platform-conditional code exists '
-          'in separator.dart, empty.dart, or kbd.dart.',
-    ]),
-  );
-
-  Widget _dependencies(DsThemeData theme) => DsSection(
-    id: 'dependencies',
-    title: 'Dependencies',
-    child: _bullets(theme, <String>[
-      'Files: three, one component each, no companion parts, '
-          'lib/src/components/separator.dart, empty.dart, kbd.dart.',
-      'DsSeparator imports: foundation/spacing.dart (ds(), DsWidths), '
-          'foundation/theme.dart (DsThemeData), theme_scope.dart (DsTheme). '
-          'No component dependency.',
-      'DsEmpty family imports: foundation/spacing.dart, foundation/'
-          'theme.dart, foundation/typography.dart (DsComponentType, '
-          'DsTypeSpec), text_layout.dart (DsLineBox), theme_scope.dart '
-          '(DsText, DsTheme), icon.dart (DsIcon, DsIconTone), '
-          'icon_paths.dart (DsIconGlyph). The one of the three with a real '
-          'component dependency: DsEmptyMedia renders a DsIcon.',
-      'DsKbd family imports: effects/machine_surface.dart (DsMachineSurface), '
-          'foundation/shadows.dart (DsShadows.none: named explicitly, see '
-          'Theming), foundation/spacing.dart, foundation/theme.dart, '
-          'foundation/typography.dart (DsComponentType.kbdKey), '
-          'theme_scope.dart. Depends on the machine-surface effect, though '
-          'it paints through it with no elevation.',
-      'Assets: none. Fonts: none beyond the system type scale every DsText '
-          'call already depends on. Shaders: none: kbd\'s machine surface '
-          'call is DsShadows.none, a flat fill and border, not a '
-          'fragment-shader-backed paint.',
-    ]),
-  );
-
-  Widget _composition() => DsSection(
-    id: 'composition',
-    title: 'Composition',
-    description:
-        'shadcn shows Composition as a tree diagram for Empty and Kbd; '
-        'Separator\'s own counterpart page has no such section, and none of '
-        'the three has a size or variant axis to switch: Separator\'s only '
-        'enum is orientation (see API Reference), and Empty and Kbd get '
-        'their shape entirely from which parts a caller includes, not from '
-        'a prop. Below is the same tree, shown as it actually renders '
-        'elsewhere in this package, cited from real call sites rather than '
-        'invented for this page.',
-    child: DocsCodeExample(
-      title: 'Composed elsewhere in this package',
-      manualFiles: const <DocsCodeFile>[
-        DocsCodeFile(
-          path: 'example/lib/pages/data.dart',
-          title: 'The Separator page\'s own specimen',
-          description:
-              'A balance/bonus divider, then a fixed-height row using '
-              'DsSeparator.vertical() between three figures: the exact '
-              'shape this page\'s Preview reproduces:',
-          code: '''SizedBox(
-  height: ds(6), // flex h-6 items-center gap-4
-  child: Row(
-    crossAxisAlignment: CrossAxisAlignment.stretch,
-    children: <Widget>[
-      figure('412 packs'),
-      SizedBox(width: gap),
-      const DsSeparator.vertical(),
-      SizedBox(width: gap),
-      figure('1,284 cards'),
-      SizedBox(width: gap),
-      const DsSeparator.vertical(),
-      SizedBox(width: gap),
-      figure('8 sets'),
-    ],
-  ),
-)''',
-        ),
-        DocsCodeFile(
-          path: 'example/lib/site/site_shell.dart',
-          title: 'The site search\'s empty state',
-          description:
-              'What the public site itself renders when a search finds '
-              'nothing: glyph, title, description, and a way out:',
-          code: '''DsEmpty(
-  children: <Widget>[
-    const DsEmptyHeader(
-      children: <Widget>[
-        DsEmptyMedia(glyph: DsIconGlyph.search),
-        DsEmptyTitle('Nothing matched that search'),
-        DsEmptyDescription(
-          'Try a broader term, or jump straight into the documentation index.',
-        ),
-      ],
-    ),
-    DsEmptyContent(
-      children: <Widget>[
-        DsButton(
-          variant: DsButtonVariant.secondary,
-          onPressed: () => onNavigate(docsRoute),
-          child: const Text('Open documentation'),
-        ),
-      ],
-    ),
-  ],
-)''',
-        ),
-        DocsCodeFile(
-          path: 'example/lib/pages/buttons.dart',
-          title: 'The buttons page\'s shortcut list',
-          description:
-              'A single key and a two-key chord, each paired with the '
-              'action it triggers: the exact shape this page\'s Preview '
-              'reproduces:',
-          code: '''DsRow(
-  children: <Widget>[
-    // DRIFT 19: a `<kbd>` nesting two `<kbd>`s: the group renders the same
-    // element its members do while typed as a `div`.
-    DsKbdGroup(children: <Widget>[DsKbd('Ctrl'), DsKbd('K')]),
-    DsText('Open search', DsType.small),
-  ],
-)''',
-        ),
-      ],
-    ),
-  );
-
-  Widget _separatorVertical() => DsSection(
-    id: 'separator-vertical',
-    title: 'Separator: Vertical',
+  Widget _vertical() => ElSection(
+    id: 'vertical',
+    title: 'Vertical',
     description:
         'The named constructor for the cross-axis rule: a row of short '
-        'labels, each divided from the next by DsSeparator.vertical() '
-        'inside a fixed-height ancestor.',
+        'labels, each divided from the next by ElSeparator.vertical() '
+        'inside a fixed-height ancestor. Vertical has no length of its own '
+        'either: it self-stretches to whatever height the row gives it.',
     child: DocsCodeExample(
       title: 'A row divided by vertical rules',
       manualFiles: const <DocsCodeFile>[
         DocsCodeFile(
           path: 'separator_vertical.dart',
           code: '''SizedBox(
-  height: ds(5),
+  height: el(5),
   child: Row(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
-      DsText('Blog', DsType.small),
-      SizedBox(width: ds(4)),
-      const DsSeparator.vertical(),
-      SizedBox(width: ds(4)),
-      DsText('Docs', DsType.small),
-      SizedBox(width: ds(4)),
-      const DsSeparator.vertical(),
-      SizedBox(width: ds(4)),
-      DsText('Source', DsType.small),
+      ElText('Blog', ElType.small),
+      SizedBox(width: el(4)),
+      const ElSeparator.vertical(),
+      SizedBox(width: el(4)),
+      ElText('Docs', ElType.small),
+      SizedBox(width: el(4)),
+      const ElSeparator.vertical(),
+      SizedBox(width: el(4)),
+      ElText('Source', ElType.small),
     ],
   ),
 )''',
         ),
       ],
       preview: SizedBox(
-        height: ds(5),
+        height: el(5),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            DsText('Blog', DsType.small),
-            SizedBox(width: ds(4)),
+            ElText('Blog', ElType.small),
+            SizedBox(width: el(4)),
             const KeyedSubtree(
               key: ValueKey<String>('separator-example:vertical-1'),
-              child: DsSeparator.vertical(),
+              child: ElSeparator.vertical(),
             ),
-            SizedBox(width: ds(4)),
-            DsText('Docs', DsType.small),
-            SizedBox(width: ds(4)),
+            SizedBox(width: el(4)),
+            ElText('Docs', ElType.small),
+            SizedBox(width: el(4)),
             const KeyedSubtree(
               key: ValueKey<String>('separator-example:vertical-2'),
-              child: DsSeparator.vertical(),
+              child: ElSeparator.vertical(),
             ),
-            SizedBox(width: ds(4)),
-            DsText('Source', DsType.small),
+            SizedBox(width: el(4)),
+            ElText('Source', ElType.small),
           ],
         ),
       ),
     ),
   );
 
-  Widget _separatorList(DsThemeData theme) => DsSection(
-    id: 'separator-list',
-    title: 'Separator: List',
-    description:
-        'Horizontal rules between stacked rows: an account menu\'s own '
-        'shape, the way DsSeparator\'s default orientation is meant to be '
-        'used.',
-    child: DocsCodeExample(
-      title: 'A stacked list divided by horizontal rules',
-      manualFiles: const <DocsCodeFile>[
-        DocsCodeFile(
-          path: 'separator_list.dart',
-          code: '''Column(
-  crossAxisAlignment: CrossAxisAlignment.start,
-  children: [
-    DsText('Profile', DsType.small),
-    SizedBox(height: ds(3)),
-    const DsSeparator(),
-    SizedBox(height: ds(3)),
-    DsText('Billing', DsType.small),
-    SizedBox(height: ds(3)),
-    const DsSeparator(),
-    SizedBox(height: ds(3)),
-    DsText('Notifications', DsType.small),
-  ],
-)''',
-        ),
-      ],
-      preview: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: DsContainers.sm),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            DsText('Profile', DsType.small, color: theme.foreground),
-            SizedBox(height: ds(3)),
-            const KeyedSubtree(
-              key: ValueKey<String>('separator-example:list-1'),
-              child: DsSeparator(),
-            ),
-            SizedBox(height: ds(3)),
-            DsText('Billing', DsType.small, color: theme.foreground),
-            SizedBox(height: ds(3)),
-            const KeyedSubtree(
-              key: ValueKey<String>('separator-example:list-2'),
-              child: DsSeparator(),
-            ),
-            SizedBox(height: ds(3)),
-            DsText('Notifications', DsType.small, color: theme.foreground),
-          ],
-        ),
-      ),
-    ),
-  );
-
-  Widget _separatorMenu(DsThemeData theme) => DsSection(
-    id: 'separator-menu',
-    title: 'Separator: Menu',
+  Widget _menu(ElThemeData theme) => ElSection(
+    id: 'menu',
+    title: 'Menu',
     description:
         'Vertical rules between menu items that each carry their own '
-        'one-line description, the shape a top nav or a mega menu uses.',
+        'one-line description: a top nav or a mega menu\'s own shape.',
     child: DocsCodeExample(
       title: 'Menu items divided by vertical rules',
       manualFiles: const <DocsCodeFile>[
         DocsCodeFile(
           path: 'separator_menu.dart',
           code: '''SizedBox(
-  height: ds(10),
+  height: el(10),
   child: Row(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
       menuItem('Docs', 'Guides and API'),
-      SizedBox(width: ds(4)),
-      const DsSeparator.vertical(),
-      SizedBox(width: ds(4)),
+      SizedBox(width: el(4)),
+      const ElSeparator.vertical(),
+      SizedBox(width: el(4)),
       menuItem('Blog', 'Release notes'),
-      SizedBox(width: ds(4)),
-      const DsSeparator.vertical(),
-      SizedBox(width: ds(4)),
+      SizedBox(width: el(4)),
+      const ElSeparator.vertical(),
+      SizedBox(width: el(4)),
       menuItem('Source', 'Open on GitHub'),
     ],
   ),
@@ -1095,7 +361,7 @@ class _SeparatorArticle extends StatelessWidget {
         ),
       ],
       preview: SizedBox(
-        height: ds(10),
+        height: el(10),
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
@@ -1103,19 +369,19 @@ class _SeparatorArticle extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               _menuItem(theme, 'Docs', 'Guides and API'),
-              SizedBox(width: ds(4)),
+              SizedBox(width: el(4)),
               const KeyedSubtree(
                 key: ValueKey<String>('separator-example:menu-1'),
-                child: DsSeparator.vertical(),
+                child: ElSeparator.vertical(),
               ),
-              SizedBox(width: ds(4)),
+              SizedBox(width: el(4)),
               _menuItem(theme, 'Blog', 'Release notes'),
-              SizedBox(width: ds(4)),
+              SizedBox(width: el(4)),
               const KeyedSubtree(
                 key: ValueKey<String>('separator-example:menu-2'),
-                child: DsSeparator.vertical(),
+                child: ElSeparator.vertical(),
               ),
-              SizedBox(width: ds(4)),
+              SizedBox(width: el(4)),
               _menuItem(theme, 'Source', 'Open on GitHub'),
             ],
           ),
@@ -1124,143 +390,88 @@ class _SeparatorArticle extends StatelessWidget {
     ),
   );
 
-  Widget _emptyInputGroup() => DsSection(
-    id: 'empty-input-group',
-    title: 'Empty: Input group',
+  Widget _list(ElThemeData theme) => ElSection(
+    id: 'list',
+    title: 'List',
     description:
-        'DsEmptyContent\'s "way out" does not have to be a button: any '
-        'widget is a valid child, including a DsInputGroup that lets the '
-        'reader search again in place.',
+        'Horizontal rules between stacked rows: the default orientation\'s '
+        'own shape, dividing a settings list where each row must read as a '
+        'discrete unit on a quick scan.',
     child: DocsCodeExample(
-      title: 'An empty state whose action is a search field',
+      title: 'A stacked list divided by horizontal rules',
       manualFiles: const <DocsCodeFile>[
         DocsCodeFile(
-          path: 'empty_input_group.dart',
-          code: '''DsEmpty(
+          path: 'separator_list.dart',
+          code: '''Column(
+  crossAxisAlignment: CrossAxisAlignment.start,
   children: [
-    const DsEmptyHeader(
-      children: [
-        DsEmptyMedia(glyph: DsIconGlyph.search, tone: DsIconTone.subtle),
-        DsEmptyTitle('No results found'),
-        DsEmptyDescription('Try a broader search term.'),
-      ],
-    ),
-    DsEmptyContent(
-      children: [
-        DsInputGroup(
-          startAddon: DsInputGroupAddon(
-            child: DsIcon(DsIconGlyph.search, size: DsIconSize.sm),
-          ),
-          child: DsInputGroupInput(placeholder: 'Search again...'),
-        ),
-      ],
-    ),
+    ElText('Profile', ElType.small),
+    SizedBox(height: el(3)),
+    const ElSeparator(),
+    SizedBox(height: el(3)),
+    ElText('Billing', ElType.small),
+    SizedBox(height: el(3)),
+    const ElSeparator(),
+    SizedBox(height: el(3)),
+    ElText('Notifications', ElType.small),
   ],
 )''',
         ),
       ],
-      preview: KeyedSubtree(
-        key: const ValueKey<String>('empty-example:input-group'),
-        child: DsEmpty(
+      preview: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: ElContainers.sm),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            const DsEmptyHeader(
-              children: <Widget>[
-                DsEmptyMedia(
-                  glyph: DsIconGlyph.search,
-                  tone: DsIconTone.subtle,
-                ),
-                DsEmptyTitle('No results found'),
-                DsEmptyDescription('Try a broader search term.'),
-              ],
+            ElText('Profile', ElType.small, color: theme.foreground),
+            SizedBox(height: el(3)),
+            const KeyedSubtree(
+              key: ValueKey<String>('separator-example:list-1'),
+              child: ElSeparator(),
             ),
-            DsEmptyContent(
-              children: <Widget>[
-                DsInputGroup(
-                  startAddon: DsInputGroupAddon(
-                    child: DsIcon(
-                      DsIconGlyph.search,
-                      size: DsIconSize.sm,
-                      tone: DsIconTone.inherit,
-                    ),
-                  ),
-                  child: const DsInputGroupInput(
-                    placeholder: 'Search again...',
-                  ),
-                ),
-              ],
+            SizedBox(height: el(3)),
+            ElText('Billing', ElType.small, color: theme.foreground),
+            SizedBox(height: el(3)),
+            const KeyedSubtree(
+              key: ValueKey<String>('separator-example:list-2'),
+              child: ElSeparator(),
             ),
+            SizedBox(height: el(3)),
+            ElText('Notifications', ElType.small, color: theme.foreground),
           ],
         ),
       ),
     ),
   );
 
-  Widget _kbdGroup() => DsSection(
-    id: 'kbd-group',
-    title: 'Kbd: Group',
+  Widget _rtl(ElThemeData theme) => ElSection(
+    id: 'rtl',
+    title: 'RTL',
     description:
-        'DsKbdGroup composes several keys into one shortcut, read by '
-        'assistive tech as a single combination rather than unrelated '
-        'letters (see Accessibility).',
-    child: DocsCodeExample(
-      title: 'A two-key shortcut',
-      manualFiles: const <DocsCodeFile>[
-        DocsCodeFile(
-          path: 'kbd_group.dart',
-          code: '''DsRow(
-  children: [
-    DsKbdGroup(children: [DsKbd('⌘'), DsKbd('K')]),
-    DsText('Open the command palette', DsType.small),
-  ],
-)''',
-        ),
-      ],
-      preview: KeyedSubtree(
-        key: const ValueKey<String>('kbd-example:group'),
-        child: DsRow(
-          children: <Widget>[
-            const DsKbdGroup(children: <Widget>[DsKbd('⌘'), DsKbd('K')]),
-            DsText('Open the command palette', DsType.small),
-          ],
-        ),
-      ),
-    ),
-  );
-
-  Widget _kbdButton() => DsSection(
-    id: 'kbd-button',
-    title: 'Kbd: Button',
-    description:
-        'A DsKbd composed inside a DsButton\'s own child, so the key cap '
-        'rides along with the label as one control.',
-    child: DocsCodeExample(
-      title: 'A button that names its own shortcut',
-      manualFiles: const <DocsCodeFile>[
-        DocsCodeFile(
-          path: 'kbd_button.dart',
-          code: '''DsButton(
-  onPressed: () {},
-  child: Row(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      DsText('Accept', DsComponentType.buttonLabel),
-      SizedBox(width: ds(2)),
-      const DsKbd('⏎'),
-    ],
-  ),
-)''',
-        ),
-      ],
-      preview: KeyedSubtree(
-        key: const ValueKey<String>('kbd-example:button'),
-        child: DsButton(
-          onPressed: () {},
-          child: Row(
+        'ElSeparator paints no direction-specific layout of its own: '
+        'horizontal is a plain width/height box with no start/end split, and '
+        'vertical self-stretches regardless of text direction. The List '
+        'shape above, rendered under a right-to-left Directionality, proves '
+        'it: the same three rows, the same rule between them.',
+    child: ElPanel(
+      label: 'PREVIEW',
+      child: Directionality(
+        textDirection: TextDirection.rtl,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: ElContainers.sm),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              DsText('Accept', DsComponentType.buttonLabel),
-              SizedBox(width: ds(2)),
-              const DsKbd('⏎'),
+              ElText('الملف الشخصي', ElType.small, color: theme.foreground),
+              SizedBox(height: el(3)),
+              const KeyedSubtree(
+                key: ValueKey<String>('rtl-example:separator'),
+                child: ElSeparator(),
+              ),
+              SizedBox(height: el(3)),
+              ElText('الفواتير', ElType.small, color: theme.foreground),
             ],
           ),
         ),
@@ -1268,74 +479,180 @@ class _SeparatorArticle extends StatelessWidget {
     ),
   );
 
-  Widget _kbdInputGroup() => DsSection(
-    id: 'kbd-input-group',
-    title: 'Kbd: Input group',
+  Widget _api(ElThemeData theme) => ElSection(
+    id: 'api',
+    title: 'API Reference',
     description:
-        'A DsKbd inside a DsInputGroupAddon, hinting at the shortcut that '
-        'focuses the field it sits in.',
-    child: DocsCodeExample(
-      title: 'A search field that names its own shortcut',
-      manualFiles: const <DocsCodeFile>[
-        DocsCodeFile(
-          path: 'kbd_input_group.dart',
-          code: '''DsInputGroup(
-  endAddon: DsInputGroupAddon(
-    align: DsInputGroupAlign.end,
-    child: const DsKbd('⌘K'),
-  ),
-  child: const DsInputGroupInput(placeholder: 'Search...'),
-)''',
+        'ElSeparator\'s only constructor parameter, its only enum, and its '
+        'one static token.',
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        KeyedSubtree(
+          key: docsAnchorKey('api-elseparator'),
+          child: const DocsApiTable(
+            title: 'ElSeparator',
+            facts: <DocsApiFact>[
+              DocsApiFact(
+                name: 'orientation',
+                type: 'ElSeparatorOrientation',
+                description:
+                    'Optional. Defaults to ElSeparatorOrientation.horizontal. '
+                    'ElSeparator.vertical() is a named constructor equivalent '
+                    'to passing ElSeparatorOrientation.vertical here.',
+              ),
+            ],
+          ),
+        ),
+        SizedBox(height: el(6)),
+        KeyedSubtree(
+          key: docsAnchorKey('api-elseparatororientation'),
+          child: const DocsApiTable(
+            title: 'ElSeparatorOrientation',
+            facts: <DocsApiFact>[
+              DocsApiFact(
+                name: 'horizontal',
+                type: 'the default',
+                description:
+                    '1px tall, full parent width. Used between stacked rows: '
+                    'see List.',
+              ),
+              DocsApiFact(
+                name: 'vertical',
+                type: 'ElSeparator.vertical()',
+                description:
+                    '1px wide, stretches to the parent\'s height (needs a '
+                    'bounded-height ancestor, e.g. a fixed-height Row): see '
+                    'Vertical and Menu.',
+              ),
+            ],
+          ),
+        ),
+        SizedBox(height: el(6)),
+        KeyedSubtree(
+          key: docsAnchorKey('api-elseparator-static'),
+          child: const DocsApiTable(
+            title: 'ElSeparator static tokens',
+            facts: <DocsApiFact>[
+              DocsApiFact(
+                name: 'ElSeparator.thickness',
+                type: 'static double',
+                description:
+                    'The rule\'s thickness on its short axis, '
+                    'ElWidths.hairline (1px). The long axis is left null on '
+                    'purpose so the parent\'s own constraint fills it.',
+              ),
+            ],
+          ),
         ),
       ],
-      preview: KeyedSubtree(
-        key: const ValueKey<String>('kbd-example:input-group'),
-        child: DsInputGroup(
-          endAddon: const DsInputGroupAddon(
-            align: DsInputGroupAlign.end,
-            child: DsKbd('⌘K'),
-          ),
-          child: const DsInputGroupInput(placeholder: 'Search...'),
-        ),
-      ),
     ),
   );
 
-  Widget _theming(DsThemeData theme) => DsSection(
-    id: 'theming',
-    title: 'Theming',
+  Widget _states() => ElSection(
+    id: 'states',
+    title: 'States',
+    description:
+        'ElSeparator is a static, presentational StatelessWidget: no '
+        'onPressed/enabled, no GestureDetector, no FocusNode, no async flag '
+        'anywhere in its build method.',
+    child: const DocsStateMatrix(
+      facts: <DocsStateFact>[
+        DocsStateFact(
+          state: 'Rest',
+          treatment: 'Paints its 1px theme.border fill. The only paint it has.',
+          userSignal: 'The resting paint is the only paint.',
+        ),
+        DocsStateFact(
+          state: 'Hover / Focus-visible / Pressed / Selected / Disabled',
+          treatment:
+              'N/A: no GestureDetector, FocusNode, or onPressed/enabled '
+              'parameter exists.',
+          userSignal: 'Nothing responds to a pointer or keyboard here.',
+        ),
+        DocsStateFact(
+          state: 'Reduced motion',
+          treatment:
+              'N/A: no AnimationController and no motion token appears in '
+              'the build method.',
+          userSignal: 'Nothing animates, so nothing needs to still.',
+        ),
+      ],
+    ),
+  );
+
+  Widget _accessibility(ElThemeData theme) => ElSection(
+    id: 'accessibility',
+    title: 'Accessibility',
     child: _bullets(theme, <String>[
-      'Separator paints exactly one colour: DsTheme.of(context).border. '
-          'Flipping DsThemeController between light and dark re-resolves it '
-          'live: nothing is cached (see the Preview specimen, which the '
-          'docs test flips in place).',
-      'Empty reads theme.muted for the DsEmptyMedia tile, theme.foreground '
-          'for the title, and theme.mutedForeground for the description; '
-          'the glyph\'s tone is theme-resolved through DsIconTone. All '
-          're-resolve on a live theme flip.',
-      'Empty\'s corner radius (DsRadii.xl, 16px) shapes nothing today: '
-          'there is no border to shape and no background fill on DsEmpty '
-          'itself to clip. It is kept because it is what a future border '
-          'width would follow, exactly as badge\'s own drift note for a '
-          'similar radius explains.',
-      'Kbd is the one object in this trio that owns an elevation token and '
-          'never wears it: DsShadows.key and DsShadows.keyDown exist for '
-          'exactly this object (documented one foundations page away, on '
-          'Shadows, as a raised key with a side wall that travels into its '
-          'socket) but DsKbd\'s DsMachineSurface call passes DsShadows.none '
-          'explicitly: no border, no shadow, no press. It ships flat. The '
-          'token set is aspirational; the component that renders is not '
-          'using it.',
-      'Kbd\'s fill (theme.muted) and ink (theme.mutedForeground) are the '
-          'only theme-resolved colours it carries: both re-resolve on a '
-          'live flip along with everything else on this page.',
-      'None of the three exposes a colour-override parameter of its own, '
-          'every colour is theme- or tone-derived, never a bare Color '
-          'argument.',
+      'Semantic role: none: build() returns a bare SizedBox wrapping a '
+          'ColoredBox; no Semantics widget appears anywhere in '
+          'separator.dart.',
+      'Hidden from assistive tech, but by omission rather than a guard: '
+          'the source\'s own doc comment says the port "hides both" '
+          '(decorative and orientation) because "a Semantics divider node '
+          'carries no information a Flutter reader can use": but the '
+          'implementation reaches that outcome by simply never creating a '
+          'semantics node, not via an explicit '
+          'Semantics(excludeSemantics: true) or ExcludeSemantics wrapper. '
+          'That hides it today (a bare SizedBox/ColoredBox produces no '
+          'semantics node on its own), but there is no defensive marker '
+          'keeping it hidden if an ancestor ever wraps it in a '
+          'Semantics(container: true): a real, currently harmless gap, '
+          'reported rather than silently fixed.',
+      'Keyboard: never focusable: no Focus widget or FocusNode exists.',
+      'Touch target: not applicable: a rule is not interactive and makes '
+          'no target-size guarantee.',
+      'Non-colour signal: none needed: it is decorative geometry, not a '
+          'status signal.',
+      'Known platform differences: none: no platform branch in '
+          'separator.dart.',
     ]),
   );
 
-  Widget _source() => DsSection(
+  Widget _responsive(ElThemeData theme) => ElSection(
+    id: 'responsive',
+    title: 'Responsive',
+    child: _bullets(theme, <String>[
+      'No responsive branching: BuildContext width is never read for a '
+          'layout decision; the same widget tree renders at 390px and '
+          '1440px.',
+      'No length of its own on the long axis by design: width is null '
+          'when horizontal, height is null when vertical, so the rule '
+          'always fills whatever the parent gives it; only the 1px '
+          'short-axis thickness is fixed.',
+      'Platform parity: Android, iOS, Web, macOS, Windows, and Linux all '
+          'render the same widget tree: no platform-conditional code '
+          'exists in separator.dart.',
+    ]),
+  );
+
+  Widget _dependencies(ElThemeData theme) => ElSection(
+    id: 'dependencies',
+    title: 'Dependencies',
+    child: _bullets(theme, <String>[
+      'Files: one, lib/src/components/separator.dart, no companions.',
+      'Imports: foundation/spacing.dart (el(), ElWidths), '
+          'foundation/theme.dart (ElThemeData), theme_scope.dart '
+          '(ElTheme). No component or effect dependency.',
+      'Assets: none. Fonts: none. Shaders: none: a flat ColoredBox fill.',
+    ]),
+  );
+
+  Widget _theming(ElThemeData theme) => ElSection(
+    id: 'theming',
+    title: 'Theming',
+    child: _bullets(theme, <String>[
+      'Paints exactly one colour: ElTheme.of(context).border. Flipping '
+          'ElThemeController between light and dark re-resolves it live: '
+          'nothing is cached (see the Preview specimen, which the docs '
+          'test flips in place).',
+      'No colour-override parameter of its own: every colour is '
+          'theme-derived, never a bare Color argument.',
+    ]),
+  );
+
+  Widget _source() => ElSection(
     id: 'source',
     title: 'Source',
     child: DocsInstallFacts(
@@ -1345,23 +662,23 @@ class _SeparatorArticle extends StatelessWidget {
           label: 'Source',
           value: separatorDoc.sourcePath,
           description:
-              'Authoritative implementations: the truth this page was '
+              'Authoritative implementation: the truth this page was '
               'written from.',
         ),
         const DocsInstallFact(
           label: 'Package tests',
           value: 'none yet',
           description:
-              'No dedicated unit test exists for separator.dart, empty.dart, '
-              'or kbd.dart in the package test suite as of this page.',
+              'No dedicated unit test exists for separator.dart in the '
+              'package test suite as of this page.',
         ),
         const DocsInstallFact(
           label: 'Docs test',
           value: 'example/test/components_docs/separator_test.dart',
           description:
               'Covers this page: the API tables, a live specimen of every '
-              'exported class, and the separator specimen\'s colour actually '
-              'changing across a live theme flip.',
+              'exported class, and the separator specimen\'s colour '
+              'actually changing across a live theme flip.',
         ),
         const DocsInstallFact(
           label: 'Edit these docs',
@@ -1373,63 +690,38 @@ class _SeparatorArticle extends StatelessWidget {
   );
 }
 
-Widget _bullets(DsThemeData theme, List<String> lines) => Column(
+Widget _bullets(ElThemeData theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: DsWidths.prose),
-        child: DsText('•  $line', DsType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
       ),
-      SizedBox(height: ds(2)),
+      SizedBox(height: el(2)),
     ],
   ],
 );
 
-/// One menu item for [_SeparatorArticle._separatorMenu]: a label over a
-/// one-line muted description, centred in the fixed-height row the vertical
-/// rules sit in.
-Widget _menuItem(DsThemeData theme, String label, String description) => Column(
+/// One menu item for [_SeparatorArticle._menu]: a label over a one-line
+/// muted description, centred in the fixed-height row the vertical rules
+/// sit in.
+Widget _menuItem(ElThemeData theme, String label, String description) => Column(
   mainAxisAlignment: MainAxisAlignment.center,
   crossAxisAlignment: CrossAxisAlignment.start,
   mainAxisSize: MainAxisSize.min,
   children: <Widget>[
-    DsText(label, DsType.small, color: theme.foreground),
-    SizedBox(height: ds(1)),
-    DsText(description, DsType.caption, color: theme.mutedForeground),
+    ElText(label, ElType.small, color: theme.foreground),
+    SizedBox(height: el(1)),
+    ElText(description, ElType.caption, color: theme.mutedForeground),
   ],
 );
 
 const String _usageCode = '''
-// Separator: the smallest correct call, horizontal by default.
-DsSeparator()
+import 'package:elattar_design_system/elattar_design_system.dart';
+
+// Horizontal, the default.
+ElSeparator()
 
 // The named constructor for the cross-axis rule.
-DsSeparator.vertical()
-
-// Empty: a title, a description, and one way out.
-DsEmpty(
-  children: [
-    DsEmptyHeader(
-      children: [
-        DsEmptyMedia(glyph: DsIconGlyph.search, tone: DsIconTone.subtle),
-        DsEmptyTitle('No results found'),
-        DsEmptyDescription('Try a different search term.'),
-      ],
-    ),
-    DsEmptyContent(
-      children: [
-        DsButton(
-          variant: DsButtonVariant.secondary,
-          size: DsButtonSize.sm,
-          onPressed: () {},
-          child: DsText('Clear filters', DsComponentType.buttonLabel),
-        ),
-      ],
-    ),
-  ],
-)
-
-// Kbd: a single key, and a chord.
-DsKbd('Esc')
-DsKbdGroup(children: [DsKbd('Ctrl'), DsKbd('K')])''';
+ElSeparator.vertical()''';

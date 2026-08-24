@@ -5,14 +5,33 @@
   "description": "Token-backed text input with semantic field surfaces, validation, focus, disabled, obscured, and visibility states.",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
-  "files": [{"source": "lib/src/components/input.dart", "target": "@ui/input.dart", "sha256": "997687ec2e4d1ccc526d77128dcbe4bd8613405c4c8f822f6e2689ddb5d62114"}],
-  "registryDependencies": ["source-foundation", "button", "field", "ds-rule", "machine-surface"],
+  "files": [
+    {
+      "source": "lib/src/components/input.dart",
+      "target": "@ui/input.dart",
+      "sha256": "cf265cf5434d927a680bed9a0edd0d45308e8da37641a99d670113ed71fae65d"
+    }
+  ],
+  "registryDependencies": [
+    "button",
+    "field",
+    "machine-surface",
+    "source-foundation"
+  ],
   "pubDependencies": {},
-  "semanticDependencies": ["button", "field", "ds-rule"],
+  "semanticDependencies": [
+    "button",
+    "field",
+    "machine-surface"
+  ],
   "assets": [],
   "fonts": [],
   "shaders": [],
-  "exports": ["DsInput", "DsFieldSurface", "DsFieldVisibility"],
+  "exports": [
+    "ElInput",
+    "ElFieldSurface",
+    "ElFieldVisibility"
+  ],
   "documentationRoute": "/components/input",
   "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/input.dart"
 }

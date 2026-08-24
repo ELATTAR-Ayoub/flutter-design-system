@@ -1,27 +1,30 @@
 /// Tests for `components_docs/command/meta.dart` and
-/// `components_docs/command/page.dart`: the paired public documentation
-/// page for [DsCommand] and [DsCombobox].
+/// `components_docs/command/page.dart`: the public documentation page for
+/// [ElCommand] alone.
 ///
-/// Both are anchored/inline "filter as you type" surfaces documented on one
-/// page: the same one-entry-two-components shape `sheet/page.dart` already
-/// uses for Sheet and Drawer. `DsCombobox` mounts its popup through
-/// [DsPopover] (an [OverlayPortal]), so the live specimen needs a real
-/// [Overlay]: the harness wraps the page in a [MaterialApp], the same fix
-/// `popover_test.dart` and `sheet_test.dart` needed. `DsCommand` is
-/// deliberately **not** an overlay: it has nothing to anchor to and is
-/// always mounted inline: so its own specimen needs no such wrapping, but
-/// the shared harness below still supplies one for the combobox specimen
-/// living beside it on the same page.
+/// **Trimmed for the split.** This file used to cover one page documenting
+/// both [ElCommand] and [ElCombobox]. `ElCombobox` now has its own page and
+/// its own `combobox_test.dart`; every combobox assertion moved there, and
+/// the ones left here assert it is *gone* from this page rather than
+/// re-testing it.
+///
+/// [ElCommand] is deliberately **not** an overlay: it has nothing to anchor
+/// to and is always mounted inline, so its specimen needs no [Overlay] to
+/// work. The harness below still supplies a [MaterialApp] for the ordinary
+/// reasons a docs page wants one (directionality, media query, text
+/// selection), not to make the palette open.
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`. Theme
-/// coverage uses one live [DsThemeController] flipped in place.
+/// coverage uses one live [ElThemeController] flipped in place. Never
+/// `pumpAndSettle`: nothing on this page loops, and a single `pump` is the
+/// habit that keeps it that way.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/command/meta.dart';
 import 'package:example/components_docs/command/page.dart';
-import 'package:example/kit.dart' show DsSection;
+import 'package:example/kit.dart' show ElSection;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -32,25 +35,22 @@ const Size _narrow = Size(390, 844);
 const Key _commandSpecimenKey = ValueKey<String>(
   'command-doc-command-specimen',
 );
-const Key _comboboxSpecimenKey = ValueKey<String>(
-  'command-doc-combobox-specimen',
-);
 
-Future<DsThemeController> _pumpCommandDoc(
+Future<ElThemeController> _pumpCommandDoc(
   WidgetTester tester, {
   ValueChanged<String>? onNavigate,
   Size size = _wide,
-  DsThemeMode mode = DsThemeMode.dark,
+  ElThemeMode mode = ElThemeMode.dark,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final DsThemeController theme = DsThemeController(mode: mode);
+  final ElThemeController theme = ElThemeController(mode: mode);
   addTearDown(theme.dispose);
 
   await tester.pumpWidget(
-    DsTheme(
+    ElTheme(
       controller: theme,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -72,19 +72,13 @@ Finder _commandInput() => find.descendant(
   matching: find.byType(EditableText),
 );
 
-/// The single text field inside the live combobox specimen.
-Finder _comboboxInput() => find.descendant(
-  of: find.byKey(_comboboxSpecimenKey),
-  matching: find.byType(DsInputGroupInput),
-);
-
-/// The shadcn-parity section order (worker brief, `command` component,
-/// which covers two shadcn counterparts: `command` and `combobox`). The live
-/// demo sits unheaded above Installation, so it carries no entry here.
-/// Composition and Filtering are shared, cross-cutting sections; Shortcuts,
-/// Groups, Scrollable and In a panel are Command's own; Invalid and Disabled
-/// are Combobox's own; the trailing six are this package's fixed extras.
-const List<String> _expectedSectionHeadings = <String>[
+/// The section order this page promises, after the split.
+///
+/// The live demo sits unheaded above Installation, so it carries no entry.
+/// Composition, Filtering, Shortcuts, Groups, Scrollable and In a panel are
+/// Command's own; API Reference is last of those; the trailing six are this
+/// package's fixed extras. Nothing combobox-shaped survives.
+const List<String> _expectedSectionTitles = <String>[
   'Installation',
   'Usage',
   'Composition',
@@ -93,8 +87,6 @@ const List<String> _expectedSectionHeadings = <String>[
   'Groups',
   'Scrollable',
   'In a panel',
-  'Invalid',
-  'Disabled',
   'API Reference',
   'States',
   'Accessibility',
@@ -104,42 +96,95 @@ const List<String> _expectedSectionHeadings = <String>[
   'Source',
 ];
 
+/// Every named constructor parameter `ElCommand` declares, excluding `key`.
+const List<String> _commandParams = <String>[
+  'groups',
+  'placeholder',
+  'emptyLabel',
+  'controller',
+  'focusNode',
+  'shouldFilter',
+  'filter',
+  'loop',
+  'vimBindings',
+  'label',
+  'onValueChanged',
+  'inDialog',
+];
+
+/// Every named constructor parameter `ElCommandItem` declares, plus the
+/// derived `searchValue` getter the matcher actually reads.
+const List<String> _commandItemMembers = <String>[
+  'label',
+  'icon',
+  'lucideIcon',
+  'iconTone',
+  'subtitle',
+  'meta',
+  'shortcut',
+  'value',
+  'keywords',
+  'enabled',
+  'onSelect',
+  'searchValue',
+];
+
+/// Every named constructor parameter `ElCommandGroup` declares.
+const List<String> _commandGroupParams = <String>[
+  'items',
+  'heading',
+  'separatorBefore',
+];
+
+/// Every public static `ElCommand` exposes.
+const List<String> _commandStatics = <String>[
+  'ElCommand.padding',
+  'ElCommand.listMaxHeight',
+  'ElCommand.inputHeight',
+  'ElCommand.inputFillAlpha',
+  'ElCommand.searchGlyphOpacity',
+  'ElCommand.disabledOpacity',
+  'ElCommand.itemHeight',
+  'ElCommand.headingHeight',
+  'ElCommand.emptyHeight',
+  'ElCommand.sortsGroups',
+];
+
 void main() {
   group('meta', () {
-    test('commandDoc names the real public API surface of both components', () {
+    test('commandDoc names the real public API surface of ElCommand', () {
       expect(commandDoc.name, 'command');
-      expect(commandDoc.title, isNotEmpty);
+      expect(commandDoc.title, 'Command');
       expect(commandDoc.route, '/components/command');
       expect(commandDoc.command, 'elattar add command');
       expect(commandDoc.sourcePath, 'lib/src/components/command.dart');
-      expect(comboboxSourcePath, 'lib/src/components/combobox.dart');
-      expect(
-        commandDoc.exports,
-        containsAll(<String>[
-          'DsCommand',
-          'DsCommandItem',
-          'DsCommandGroup',
-          'dsCommandScore',
-          'DsCombobox',
-          'DsComboboxItem',
-          'dsCollatorContains',
-        ]),
-      );
+      expect(commandDoc.exports, <String>[
+        'ElCommand',
+        'ElCommandItem',
+        'ElCommandGroup',
+        'elCommandScore',
+      ]);
+      // The split: nothing combobox-shaped is claimed by this entry any more.
+      expect(commandDoc.exports, isNot(contains('ElCombobox')));
+      expect(commandDoc.exports, isNot(contains('ElComboboxItem')));
+      expect(commandDoc.exports, isNot(contains('elCollatorContains')));
       // Short description: one sentence, no trailing ellipsis.
       expect(commandDoc.description, isNot(contains('..')));
       expect(commandDoc.description.trim(), commandDoc.description);
-      // The expanded, decision-guidance description is a distinct constant
-      // that names both jobs, not a restatement of the short one.
-      expect(commandExpandedDescription, isNot(equals(commandDoc.description)));
-      expect(commandExpandedDescription.trim(), commandExpandedDescription);
-      expect(commandExpandedDescription, contains('anchor'));
-      expect(commandExpandedDescription, contains('Combobox'));
-      expect(commandExpandedDescription, contains('Command'));
+    });
+
+    test('dependencies match the command registry manifest', () {
+      expect(commandDoc.dependencies, <String>[
+        'icon',
+        'input',
+        'input-group',
+        'source-foundation',
+      ]);
     });
   });
 
   group('rendered page', () {
-    testWidgets('renders the article and both live specimens', (
+    testWidgets('renders the article and the live palette', (
       WidgetTester tester,
     ) async {
       await _pumpCommandDoc(tester);
@@ -149,122 +194,165 @@ void main() {
         findsOneWidget,
       );
       expect(find.byKey(_commandSpecimenKey), findsOneWidget);
-      expect(find.byKey(_comboboxSpecimenKey), findsOneWidget);
+      expect(find.byType(ElCommand), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 
     testWidgets(
-      'renders the shadcn-parity section headings in order, with no '
-      'heading before Installation and no Overview, Preview or Variants '
-      'heading left over from the old shape',
+      'sections render in the reference-shape order, with no heading before '
+      'Installation',
       (WidgetTester tester) async {
         await _pumpCommandDoc(tester);
 
-        final List<String> headings = tester
-            .widgetList<DsText>(find.byType(DsText))
-            .where((DsText text) => text.spec == DsType.h3)
-            .map((DsText text) => text.text)
+        // Read the mounted ElSection titles rather than find.text: a section
+        // title also renders in the right-rail TOC at this width, so a bare
+        // find.text would match twice.
+        final List<String> titles = tester
+            .widgetList<ElSection>(find.byType(ElSection))
+            .map((ElSection section) => section.title)
             .toList();
 
-        expect(headings, _expectedSectionHeadings);
-
-        // Section headings only: DocsCodeExample renders its own "Preview"
-        // tab label as free text, so a plain find.text('Preview') finds that
-        // affordance rather than a leftover heading. Read the mounted
-        // DsSection titles instead, which are immune to that collision.
-        final List<String> sectionTitles = tester
-            .widgetList<DsSection>(find.byType(DsSection))
-            .map((DsSection section) => section.title)
-            .toList();
-        expect(sectionTitles, isNot(contains('Overview')));
-        expect(sectionTitles, isNot(contains('Preview')));
-        expect(sectionTitles, isNot(contains('Variants')));
+        expect(titles, _expectedSectionTitles);
+        expect(titles, isNot(contains('Overview')));
+        expect(titles, isNot(contains('Preview')));
+        expect(titles, isNot(contains('Variants')));
+        // No component-name prefix survives on any section title.
+        for (final String title in titles) {
+          expect(title.startsWith('Command'), isFalse, reason: title);
+        }
       },
     );
 
+    testWidgets('every combobox section and specimen is gone from this page', (
+      WidgetTester tester,
+    ) async {
+      await _pumpCommandDoc(tester);
+
+      final List<String> titles = tester
+          .widgetList<ElSection>(find.byType(ElSection))
+          .map((ElSection section) => section.title)
+          .toList();
+      // Combobox's own two sections moved out with it.
+      expect(titles, isNot(contains('Invalid')));
+      expect(titles, isNot(contains('Disabled')));
+
+      // The live combobox and its API table went too.
+      expect(find.byType(ElCombobox<String>), findsNothing);
+      expect(
+        find.byKey(const ValueKey<String>('command-doc-combobox-specimen')),
+        findsNothing,
+      );
+      expect(find.text('ElCombobox<T>'), findsNothing);
+      expect(
+        find.text('elCollatorContains(label, query) → bool'),
+        findsNothing,
+      );
+    });
+
     testWidgets(
-      'the API tables cover every constructor parameter of DsCommand, '
-      'DsCommandItem, DsCommandGroup and dsCommandScore',
+      'the API tables cover every parameter, static and top-level function '
+      'command.dart declares',
       (WidgetTester tester) async {
         await _pumpCommandDoc(tester);
 
         for (final String name in <String>[
-          // DsCommand
-          'groups', 'placeholder', 'emptyLabel', 'controller', 'focusNode',
-          'shouldFilter', 'filter', 'loop', 'vimBindings', 'label',
-          'onValueChanged', 'inDialog',
-          // DsCommandItem
-          'icon', 'lucideIcon', 'iconTone', 'subtitle', 'meta', 'shortcut',
-          'value', 'keywords', 'enabled', 'onSelect',
-          // DsCommandGroup
-          'items', 'heading', 'separatorBefore',
-          // dsCommandScore(string, abbreviation, [aliases])
-          'string', 'abbreviation', 'aliases',
+          ..._commandParams,
+          ..._commandItemMembers,
+          ..._commandGroupParams,
+          ..._commandStatics,
+          // elCommandScore(string, abbreviation, [aliases])
+          'string',
+          'abbreviation',
+          'aliases',
         ]) {
           expect(
             find.text(name),
             findsAtLeastNWidgets(1),
-            reason: 'Parameter "$name" missing from a Command API table',
+            reason: 'Member "$name" missing from an API table',
+          );
+        }
+
+        // One table per exported class, plus the statics and the function.
+        // findsAtLeastNWidgets, not findsOneWidget: each of these is also a
+        // nested TOC entry at this width, so a bare find.text matches twice.
+        for (final String title in <String>[
+          'ElCommand',
+          'ElCommand static helpers',
+          'ElCommandItem',
+          'ElCommandGroup',
+          'elCommandScore(string, abbreviation, [aliases]) → double',
+        ]) {
+          expect(
+            find.text(title),
+            findsAtLeastNWidgets(1),
+            reason: 'API table "$title" missing',
           );
         }
       },
     );
 
     testWidgets(
-      'the API tables cover every constructor parameter of DsCombobox, '
-      'DsComboboxItem and dsCollatorContains',
+      'the API tables carry the REAL declared types, not the ones the '
+      'combined page guessed',
       (WidgetTester tester) async {
         await _pumpCommandDoc(tester);
 
-        for (final String name in <String>[
-          // DsCombobox
-          'items', 'value', 'onChanged', 'placeholder', 'emptyLabel',
-          'enabled', 'invalid', 'focusNode', 'label', 'hint', 'filter',
-          // dsCollatorContains(label, query)
-          'query',
-        ]) {
-          expect(
-            find.text(name),
-            findsAtLeastNWidgets(1),
-            reason: 'Parameter "$name" missing from a Combobox API table',
-          );
-        }
+        // The old merged table typed lucideIcon String?. It is a curated
+        // generated-glyph enum.
+        expect(find.text('ElLucideGlyph?'), findsOneWidget);
+        expect(find.text('String?'), findsAtLeastNWidgets(1));
+        // filter's real signature names its three parameters.
+        expect(
+          find.text(
+            'double Function(String value, String search, '
+            'List<String> keywords)?',
+          ),
+          findsOneWidget,
+        );
+        // onValueChanged carries the highlighted row's searchValue, which the
+        // old table described as the query.
+        expect(find.textContaining('HIGHLIGHTED'), findsAtLeastNWidgets(1));
       },
     );
 
+    testWidgets('installation shows the shipped registry command', (
+      WidgetTester tester,
+    ) async {
+      await _pumpCommandDoc(tester);
+
+      expect(find.textContaining('elattar add command'), findsWidgets);
+      expect(find.textContaining('command.json'), findsWidgets);
+    });
+
     testWidgets(
-      'installation says plainly that neither CLI command works yet',
+      'the filtering section documents the real scorer with a worked example',
       (WidgetTester tester) async {
         await _pumpCommandDoc(tester);
 
-        expect(find.textContaining('Not available yet'), findsWidgets);
-        expect(find.textContaining('elattar add command'), findsNothing);
-        expect(find.textContaining('elattar add combobox'), findsNothing);
-      },
-    );
-
-    testWidgets(
-      'the filtering section documents both real algorithms with a worked example',
-      (WidgetTester tester) async {
-        await _pumpCommandDoc(tester);
-
-        // Command's fuzzy scorer: the source's own measured worked example.
+        expect(find.textContaining('elCommandScore'), findsWidgets);
         expect(find.textContaining('Go to Stash'), findsWidgets);
         expect(find.textContaining('0.891'), findsWidgets);
-        // Combobox's plain substring matcher.
-        expect(find.textContaining('contains'), findsWidgets);
-        expect(find.textContaining('Golden Rift'), findsWidgets);
       },
     );
 
     testWidgets(
       'accessibility plainly documents the missing live region and the '
-      'combobox highlight gap',
+      'focus-affordance gap',
       (WidgetTester tester) async {
         await _pumpCommandDoc(tester);
 
         expect(find.textContaining('live region'), findsWidgets);
         expect(find.textContaining('Known gap'), findsWidgets);
+      },
+    );
+
+    testWidgets(
+      'the skipped shadcn sections are named rather than silently dropped',
+      (WidgetTester tester) async {
+        await _pumpCommandDoc(tester);
+
+        expect(find.textContaining('RTL'), findsWidgets);
+        expect(find.textContaining('CommandDialog'), findsWidgets);
       },
     );
 
@@ -284,7 +372,7 @@ void main() {
     );
   });
 
-  group('live specimen: command palette filters and re-sorts as you type', () {
+  group('live specimen: the palette filters and re-sorts as you type', () {
     testWidgets('typing narrows the list and the empty state appears', (
       WidgetTester tester,
     ) async {
@@ -330,6 +418,24 @@ void main() {
       },
     );
 
+    testWidgets(
+      'the meta text is searchable, which is what searchValue means',
+      (WidgetTester tester) async {
+        await _pumpCommandDoc(tester);
+
+        final Finder input = _commandInput();
+        await tester.ensureVisible(input);
+
+        // Eclipse Vault's meta is a price; nothing in its label is a digit.
+        await tester.enterText(input, '48');
+        await tester.pump();
+
+        expect(find.text('Eclipse Vault'), findsOneWidget);
+        expect(find.text('Open Wallet'), findsNothing);
+        expect(find.text('Go to Stash'), findsNothing);
+      },
+    );
+
     testWidgets('Enter commits the highlighted row and fires its onSelect', (
       WidgetTester tester,
     ) async {
@@ -351,86 +457,6 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   });
-
-  group(
-    'live specimen: combobox opens, filters, and selects a real value',
-    () {
-      testWidgets('tapping the input opens the popup showing every card set', (
-        WidgetTester tester,
-      ) async {
-        await _pumpCommandDoc(tester);
-
-        final Finder input = _comboboxInput();
-        await tester.ensureVisible(input);
-        expect(find.text('Mystic Surge'), findsNothing);
-
-        await tester.tap(input);
-        await tester.pump();
-        await tester.pump(DsDurations.overlay);
-        await tester.pump();
-
-        expect(find.text('Mystic Surge'), findsOneWidget);
-        expect(find.text('Eclipse Vault'), findsOneWidget);
-        expect(tester.takeException(), isNull);
-      });
-
-      testWidgets('typing narrows by substring, not by prefix', (
-        WidgetTester tester,
-      ) async {
-        await _pumpCommandDoc(tester);
-
-        final Finder input = _comboboxInput();
-        await tester.ensureVisible(input);
-        await tester.tap(input);
-        await tester.pump();
-        await tester.pump(DsDurations.overlay);
-        await tester.pump();
-
-        // "rift" is a mid-word substring of "Golden Rift", not a prefix.
-        await tester.enterText(input, 'rift');
-        await tester.pump();
-
-        expect(find.text('Golden Rift'), findsOneWidget);
-        expect(
-          find.descendant(
-            of: find.byType(DsPopoverSurface),
-            matching: find.text('Eclipse Vault'),
-          ),
-          findsNothing,
-        );
-        expect(
-          find.descendant(
-            of: find.byType(DsPopoverSurface),
-            matching: find.text('Mystic Surge'),
-          ),
-          findsNothing,
-        );
-      });
-
-      testWidgets('tapping a row commits the value and closes the popup', (
-        WidgetTester tester,
-      ) async {
-        await _pumpCommandDoc(tester);
-
-        final Finder input = _comboboxInput();
-        await tester.ensureVisible(input);
-        await tester.tap(input);
-        await tester.pump();
-        await tester.pump(DsDurations.overlay);
-        await tester.pump();
-
-        await tester.tap(find.text('Golden Rift'));
-        await tester.pump();
-        await tester.pump(DsDurations.overlay);
-        await tester.pump();
-
-        expect(find.textContaining('Selected: Golden Rift'), findsOneWidget);
-        // The popup is closed: a sibling row is no longer in the tree.
-        expect(find.text('Mystic Surge'), findsNothing);
-        expect(tester.takeException(), isNull);
-      });
-    },
-  );
 
   group('viewport widths', () {
     testWidgets('a wide viewport exposes the table of contents', (
@@ -468,33 +494,42 @@ void main() {
 
   group('both themes', () {
     testWidgets('renders on light', (WidgetTester tester) async {
-      await _pumpCommandDoc(tester, mode: DsThemeMode.light);
+      await _pumpCommandDoc(tester, mode: ElThemeMode.light);
       expect(find.byKey(_commandSpecimenKey), findsOneWidget);
-      expect(find.byKey(_comboboxSpecimenKey), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 
     testWidgets('renders on dark', (WidgetTester tester) async {
-      await _pumpCommandDoc(tester, mode: DsThemeMode.dark);
+      await _pumpCommandDoc(tester, mode: ElThemeMode.dark);
       expect(find.byKey(_commandSpecimenKey), findsOneWidget);
-      expect(find.byKey(_comboboxSpecimenKey), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 
     testWidgets('flipping the theme in place keeps the page intact', (
       WidgetTester tester,
     ) async {
-      final DsThemeController theme = await _pumpCommandDoc(
+      final ElThemeController theme = await _pumpCommandDoc(
         tester,
-        mode: DsThemeMode.dark,
+        mode: ElThemeMode.dark,
       );
-      expect(find.byKey(_comboboxSpecimenKey), findsOneWidget);
+      final ElThemeData dark = ElTheme.of(
+        tester.element(
+          find.byKey(const ValueKey<String>('command-doc-article')),
+        ),
+      );
 
-      theme.setMode(DsThemeMode.light);
+      theme.setMode(ElThemeMode.light);
       await tester.pump();
 
+      final ElThemeData light = ElTheme.of(
+        tester.element(
+          find.byKey(const ValueKey<String>('command-doc-article')),
+        ),
+      );
+      expect(light.background, isNot(dark.background));
+      expect(light.foreground, isNot(dark.foreground));
+
       expect(find.byKey(_commandSpecimenKey), findsOneWidget);
-      expect(find.byKey(_comboboxSpecimenKey), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
   });

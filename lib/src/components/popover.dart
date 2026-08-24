@@ -6,7 +6,7 @@
 /// screen is a bug rather than a drift, so the flip is built. An arrow is paint
 /// nothing on the ported pages asks for, and a popover inside a popover is
 /// `menus`/`dialogs` territory — the same shape as the ruling that scoped
-/// `DsSelect` in phase 3.
+/// `ElSelect` in phase 3.
 ///
 /// `PopoverContent`'s class list, with the two twMerge casualties struck
 /// (selects-map §10.2):
@@ -61,11 +61,11 @@
 ///
 /// | knob | why | measured |
 /// |---|---|---|
-/// | [DsPopover.origin] | Radix and base-ui write **different** transform origins | an open dropdown computes `--radix-dropdown-menu-content-transform-origin: 0% 0px` — the content's own **corner** — where the combobox's base-ui popup computes `172px calc(100% + 6px)`, the **anchor's centre** |
-/// | [DsPopover.slideSides] | `popover.tsx` writes one `slide-in-from-*`; every menu writes four | a submenu at `side=right` enters with `translateX −8 → 0` (x 695 → 703 over 320ms) |
-/// | [DsPopover.anchorPoint] | a context menu has no trigger box — Radix anchors it to a **virtual element** at the pointer | the content lands at `pointer + (2, 0)`, `side=right align=start` |
-/// | [DsPopover.animateOut] | `MenubarContent`'s class list carries `data-open:animate-in` and **no `animate-out` twin** | its sibling `MenubarSubContent` carries both |
-/// | [DsPopover.barrier] | a submenu is one dismissable branch with its parent, not a second layer over it | with a barrier of its own, a pointer moving from the submenu back onto a parent row would never reach the row |
+/// | [ElPopover.origin] | Radix and base-ui write **different** transform origins | an open dropdown computes `--radix-dropdown-menu-content-transform-origin: 0% 0px` — the content's own **corner** — where the combobox's base-ui popup computes `172px calc(100% + 6px)`, the **anchor's centre** |
+/// | [ElPopover.slideSides] | `popover.tsx` writes one `slide-in-from-*`; every menu writes four | a submenu at `side=right` enters with `translateX −8 → 0` (x 695 → 703 over 320ms) |
+/// | [ElPopover.anchorPoint] | a context menu has no trigger box — Radix anchors it to a **virtual element** at the pointer | the content lands at `pointer + (2, 0)`, `side=right align=start` |
+/// | [ElPopover.animateOut] | `MenubarContent`'s class list carries `data-open:animate-in` and **no `animate-out` twin** | its sibling `MenubarSubContent` carries both |
+/// | [ElPopover.barrier] | a submenu is one dismissable branch with its parent, not a second layer over it | with a barrier of its own, a pointer moving from the submenu back onto a parent row would never reach the row |
 library;
 
 import 'package:flutter/scheduler.dart';
@@ -83,12 +83,12 @@ import '../theme_scope.dart';
 const double _ringAlpha = 0.10;
 
 /// `zoom-in-95` / `zoom-out-95` — tw-animate-css's own scale, the same 95% the
-/// stock `scale-95` utility means. Not [DsTransforms.buttonScale]: that records
+/// stock `scale-95` utility means. Not [ElTransforms.buttonScale]: that records
 /// a *press*, and an overlay that borrowed it would follow a retuned button.
 const double _zoom = 0.95;
 
 /// Which edge of the trigger the popup is placed against — Radix's `side`.
-enum DsPopoverSide {
+enum ElPopoverSide {
   /// Above the trigger.
   top,
 
@@ -102,20 +102,20 @@ enum DsPopoverSide {
   right;
 
   /// The side a collision flips this one onto.
-  DsPopoverSide get opposite => switch (this) {
-        DsPopoverSide.top => DsPopoverSide.bottom,
-        DsPopoverSide.bottom => DsPopoverSide.top,
-        DsPopoverSide.left => DsPopoverSide.right,
-        DsPopoverSide.right => DsPopoverSide.left,
-      };
+  ElPopoverSide get opposite => switch (this) {
+    ElPopoverSide.top => ElPopoverSide.bottom,
+    ElPopoverSide.bottom => ElPopoverSide.top,
+    ElPopoverSide.left => ElPopoverSide.right,
+    ElPopoverSide.right => ElPopoverSide.left,
+  };
 
   /// True for [top] and [bottom] — the sides whose main axis is vertical.
   bool get isVertical =>
-      this == DsPopoverSide.top || this == DsPopoverSide.bottom;
+      this == ElPopoverSide.top || this == ElPopoverSide.bottom;
 }
 
 /// How the popup lines up on the cross axis — Radix's `align`.
-enum DsPopoverAlign {
+enum ElPopoverAlign {
   /// Leading edges flush. What both consumers pass.
   start,
 
@@ -131,13 +131,13 @@ enum DsPopoverAlign {
 /// The two overlay libraries in the corpus disagree, and both answers are
 /// measured on the live reference — so this is a fact about the consumer, not a
 /// tuning knob.
-enum DsPopoverOriginModel {
+enum ElPopoverOriginModel {
   /// base-ui's `--transform-origin`: **it points at the trigger.**
   ///
   /// *(Measured 2026-08-15: an open combobox popup computes
   /// `172px calc(100% + 6px)` — 172 is half of its 344px anchor, and
   /// `100% + 6px` is its own far edge plus the 6px `sideOffset`.)* The default,
-  /// because `DsPopover`'s first two consumers are both base-ui's.
+  /// because `ElPopover`'s first two consumers are both base-ui's.
   anchor,
 
   /// Radix's `--radix-*-content-transform-origin`: **the popup's own corner.**
@@ -175,7 +175,7 @@ enum DsPopoverOriginModel {
 /// Radix's `modal` prop and its `DismissableLayer` nesting, on one axis —
 /// because the three answers are exactly the three configurations the corpus
 /// uses, and no consumer needs two independent switches.
-enum DsPopoverBarrier {
+enum ElPopoverBarrier {
   /// `modal={true}` — the layer is **opaque** to hit testing, so nothing
   /// outside the popup can be hovered or clicked while it is open; the pointer
   /// dismisses instead. `DropdownMenu`'s and `ContextMenu`'s own default, and
@@ -201,8 +201,8 @@ enum DsPopoverBarrier {
 
 /// Where the positioner put the popup, after the flip and the shift.
 @immutable
-class DsPopoverPlacement {
-  const DsPopoverPlacement({
+class ElPopoverPlacement {
+  const ElPopoverPlacement({
     required this.offset,
     required this.side,
     required this.origin,
@@ -211,11 +211,11 @@ class DsPopoverPlacement {
   /// The popup's top-left, in the overlay's coordinate space.
   final Offset offset;
 
-  /// The side it ended up on — [DsPopoverSide.opposite] of the requested one
+  /// The side it ended up on — [ElPopoverSide.opposite] of the requested one
   /// when the flip fired. Radix writes this back as `data-side`, which is why
   /// `data-[side=bottom]:slide-in-from-top-2` can only be resolved after
   /// placement.
-  final DsPopoverSide side;
+  final ElPopoverSide side;
 
   /// `--radix-popover-content-transform-origin`: the corner nearest the
   /// trigger, which is where the zoom grows from.
@@ -223,7 +223,7 @@ class DsPopoverPlacement {
 
   @override
   bool operator ==(Object other) =>
-      other is DsPopoverPlacement &&
+      other is ElPopoverPlacement &&
       other.offset == offset &&
       other.side == side &&
       other.origin == origin;
@@ -239,71 +239,77 @@ class DsPopoverPlacement {
 /// the align and is clamped into the viewport rather than flipped, because
 /// sliding a popup along its trigger keeps it attached and flipping it across
 /// would not. When **neither** side fits, the one with more room wins and the
-/// popup is capped by [DsPopoverAnchorMetrics.availableHeight] instead — a
+/// popup is capped by [ElPopoverAnchorMetrics.availableHeight] instead — a
 /// popup that hangs off the screen is the one outcome this must not produce.
-DsPopoverPlacement dsPopoverPlacement({
+ElPopoverPlacement elPopoverPlacement({
   required Rect anchor,
   required Size content,
   required Size viewport,
-  DsPopoverSide side = DsPopoverSide.bottom,
-  DsPopoverAlign align = DsPopoverAlign.center,
+  ElPopoverSide side = ElPopoverSide.bottom,
+  ElPopoverAlign align = ElPopoverAlign.center,
   double sideOffset = 0,
   double collisionPadding = 0,
-  DsPopoverOriginModel origin = DsPopoverOriginModel.anchor,
+  ElPopoverOriginModel origin = ElPopoverOriginModel.anchor,
 }) {
-  double roomOn(DsPopoverSide s) => switch (s) {
-        DsPopoverSide.top => anchor.top - sideOffset - collisionPadding,
-        DsPopoverSide.bottom =>
-          viewport.height - collisionPadding - anchor.bottom - sideOffset,
-        DsPopoverSide.left => anchor.left - sideOffset - collisionPadding,
-        DsPopoverSide.right =>
-          viewport.width - collisionPadding - anchor.right - sideOffset,
-      };
+  double roomOn(ElPopoverSide s) => switch (s) {
+    ElPopoverSide.top => anchor.top - sideOffset - collisionPadding,
+    ElPopoverSide.bottom =>
+      viewport.height - collisionPadding - anchor.bottom - sideOffset,
+    ElPopoverSide.left => anchor.left - sideOffset - collisionPadding,
+    ElPopoverSide.right =>
+      viewport.width - collisionPadding - anchor.right - sideOffset,
+  };
 
   final double needed = side.isVertical ? content.height : content.width;
   final double roomPreferred = roomOn(side);
   final double roomOpposite = roomOn(side.opposite);
 
-  final DsPopoverSide resolved = roomPreferred >= needed
+  final ElPopoverSide resolved = roomPreferred >= needed
       ? side
       : roomOpposite >= needed
-          ? side.opposite
-          : roomPreferred >= roomOpposite
-              ? side
-              : side.opposite;
+      ? side.opposite
+      : roomPreferred >= roomOpposite
+      ? side
+      : side.opposite;
 
   // The cross axis: align, then shift back inside the viewport.
-  double crossFor(double anchorStart, double anchorSize, double contentSize,
-      double viewportSize) {
+  double crossFor(
+    double anchorStart,
+    double anchorSize,
+    double contentSize,
+    double viewportSize,
+  ) {
     final double placed = switch (align) {
-      DsPopoverAlign.start => anchorStart,
-      DsPopoverAlign.center =>
-        anchorStart + anchorSize / 2 - contentSize / 2,
-      DsPopoverAlign.end => anchorStart + anchorSize - contentSize,
+      ElPopoverAlign.start => anchorStart,
+      ElPopoverAlign.center => anchorStart + anchorSize / 2 - contentSize / 2,
+      ElPopoverAlign.end => anchorStart + anchorSize - contentSize,
     };
     final double ceiling = viewportSize - collisionPadding - contentSize;
     return placed
-        .clamp(collisionPadding, ceiling < collisionPadding ? collisionPadding : ceiling)
+        .clamp(
+          collisionPadding,
+          ceiling < collisionPadding ? collisionPadding : ceiling,
+        )
         .toDouble();
   }
 
   final Offset offset = switch (resolved) {
-    DsPopoverSide.bottom => Offset(
-        crossFor(anchor.left, anchor.width, content.width, viewport.width),
-        anchor.bottom + sideOffset,
-      ),
-    DsPopoverSide.top => Offset(
-        crossFor(anchor.left, anchor.width, content.width, viewport.width),
-        anchor.top - sideOffset - content.height,
-      ),
-    DsPopoverSide.right => Offset(
-        anchor.right + sideOffset,
-        crossFor(anchor.top, anchor.height, content.height, viewport.height),
-      ),
-    DsPopoverSide.left => Offset(
-        anchor.left - sideOffset - content.width,
-        crossFor(anchor.top, anchor.height, content.height, viewport.height),
-      ),
+    ElPopoverSide.bottom => Offset(
+      crossFor(anchor.left, anchor.width, content.width, viewport.width),
+      anchor.bottom + sideOffset,
+    ),
+    ElPopoverSide.top => Offset(
+      crossFor(anchor.left, anchor.width, content.width, viewport.width),
+      anchor.top - sideOffset - content.height,
+    ),
+    ElPopoverSide.right => Offset(
+      anchor.right + sideOffset,
+      crossFor(anchor.top, anchor.height, content.height, viewport.height),
+    ),
+    ElPopoverSide.left => Offset(
+      anchor.left - sideOffset - content.width,
+      crossFor(anchor.top, anchor.height, content.height, viewport.height),
+    ),
   };
 
   // The transform origin — `--radix-popover-content-transform-origin`, and
@@ -324,48 +330,50 @@ DsPopoverPlacement dsPopoverPlacement({
   // nothing else — `{start: '0%', center: '50%', end: '100%'}` — and its main
   // axis is the flat edge, `0px` or `100%`, with no `sideOffset` term.
   final double crossKeyword = switch (align) {
-    DsPopoverAlign.start => -1,
-    DsPopoverAlign.center => 0,
-    DsPopoverAlign.end => 1,
+    ElPopoverAlign.start => -1,
+    ElPopoverAlign.center => 0,
+    ElPopoverAlign.end => 1,
   };
 
   final Alignment resolvedOrigin = switch (origin) {
     // `transform-origin: 50% 50%` — the initial value, and what an unmatched
     // `origin-*` class leaves behind.
-    DsPopoverOriginModel.selfCenter => Alignment.center,
-    DsPopoverOriginModel.corner => switch (resolved) {
-        DsPopoverSide.bottom => Alignment(crossKeyword, -1),
-        DsPopoverSide.top => Alignment(crossKeyword, 1),
-        DsPopoverSide.right => Alignment(-1, crossKeyword),
-        DsPopoverSide.left => Alignment(1, crossKeyword),
-      },
-    DsPopoverOriginModel.anchor => switch (resolved) {
-        DsPopoverSide.bottom || DsPopoverSide.top => Alignment(
-            alignmentOf(anchor.center.dx, offset.dx, content.width),
-            resolved == DsPopoverSide.bottom
-                ? -1 -
-                    2 * sideOffset / (content.height <= 0 ? 1 : content.height)
-                : 1 + 2 * sideOffset / (content.height <= 0 ? 1 : content.height),
-          ),
-        DsPopoverSide.right || DsPopoverSide.left => Alignment(
-            resolved == DsPopoverSide.right
-                ? -1 - 2 * sideOffset / (content.width <= 0 ? 1 : content.width)
-                : 1 + 2 * sideOffset / (content.width <= 0 ? 1 : content.width),
-            alignmentOf(anchor.center.dy, offset.dy, content.height),
-          ),
-      },
+    ElPopoverOriginModel.selfCenter => Alignment.center,
+    ElPopoverOriginModel.corner => switch (resolved) {
+      ElPopoverSide.bottom => Alignment(crossKeyword, -1),
+      ElPopoverSide.top => Alignment(crossKeyword, 1),
+      ElPopoverSide.right => Alignment(-1, crossKeyword),
+      ElPopoverSide.left => Alignment(1, crossKeyword),
+    },
+    ElPopoverOriginModel.anchor => switch (resolved) {
+      ElPopoverSide.bottom || ElPopoverSide.top => Alignment(
+        alignmentOf(anchor.center.dx, offset.dx, content.width),
+        resolved == ElPopoverSide.bottom
+            ? -1 - 2 * sideOffset / (content.height <= 0 ? 1 : content.height)
+            : 1 + 2 * sideOffset / (content.height <= 0 ? 1 : content.height),
+      ),
+      ElPopoverSide.right || ElPopoverSide.left => Alignment(
+        resolved == ElPopoverSide.right
+            ? -1 - 2 * sideOffset / (content.width <= 0 ? 1 : content.width)
+            : 1 + 2 * sideOffset / (content.width <= 0 ? 1 : content.width),
+        alignmentOf(anchor.center.dy, offset.dy, content.height),
+      ),
+    },
   };
 
-  return DsPopoverPlacement(
-      offset: offset, side: resolved, origin: resolvedOrigin);
+  return ElPopoverPlacement(
+    offset: offset,
+    side: resolved,
+    origin: resolvedOrigin,
+  );
 }
 
 /// What the positioner knows about the trigger before the popup has been
 /// measured — Radix's `--radix-popover-*` variables and base-ui's
 /// `--anchor-width` / `--available-*`, handed to the content builder.
 @immutable
-class DsPopoverAnchorMetrics {
-  const DsPopoverAnchorMetrics({
+class ElPopoverAnchorMetrics {
+  const ElPopoverAnchorMetrics({
     required this.rect,
     required this.viewport,
     required this.availableWidth,
@@ -392,10 +400,8 @@ class DsPopoverAnchorMetrics {
 }
 
 /// Builds the popup, given what the positioner knows about the trigger.
-typedef DsPopoverContentBuilder = Widget Function(
-  BuildContext context,
-  DsPopoverAnchorMetrics metrics,
-);
+typedef ElPopoverContentBuilder =
+    Widget Function(BuildContext context, ElPopoverAnchorMetrics metrics);
 
 /// The popup's own paint — `rounded-lg bg-popover text-popover-foreground
 /// shadow-md ring-1 ring-foreground/10`.
@@ -404,9 +410,9 @@ typedef DsPopoverContentBuilder = Widget Function(
 /// *"`shadow-md` is Tailwind's stock elevation and it is now on three
 /// overlays"*). Tailwind composites its ring slot in front of the shadow slot,
 /// which is what prepending the ring layer means here — the same order
-/// `DsButton.withFocusRing` documents.
-class DsPopoverSurface extends StatelessWidget {
-  const DsPopoverSurface({
+/// `ElButton.withFocusRing` documents.
+class ElPopoverSurface extends StatelessWidget {
+  const ElPopoverSurface({
     super.key,
     required this.child,
     this.radius,
@@ -422,7 +428,7 @@ class DsPopoverSurface extends StatelessWidget {
 
   /// The elevation under the ring — `shadow-md` unless a caller says
   /// otherwise. Every `*SubContent` in the menu family writes `shadow-lg`.
-  final DsShadowSpec? shadow;
+  final ElShadowSpec? shadow;
 
   /// `ring-1 ring-foreground/10`. **False for `ContextMenuSubContent`**, which
   /// is the one overlay in the corpus that writes a real `border` instead.
@@ -436,28 +442,28 @@ class DsPopoverSurface extends StatelessWidget {
 
   /// The spec every overlay in the family wears: a 1px `--foreground`/10 ring
   /// over Tailwind's stock `shadow-md`.
-  static DsShadowSpec spec(DsThemeData theme) => specOf();
+  static ElShadowSpec spec(ElThemeData theme) => specOf();
 
   /// The same recipe with either half swapped out.
-  static DsShadowSpec specOf({DsShadowSpec? shadow, bool ring = true}) =>
-      DsShadowSpec(<DsShadowLayer>[
+  static ElShadowSpec specOf({ElShadowSpec? shadow, bool ring = true}) =>
+      ElShadowSpec(<ElShadowLayer>[
         if (ring)
-          DsShadowLayer(
+          ElShadowLayer(
             0,
             0,
             0,
-            DsWidths.hairline,
-            (DsThemeData t) => t.foreground.withValues(alpha: _ringAlpha),
+            ElWidths.hairline,
+            (ElThemeData t) => t.foreground.withValues(alpha: _ringAlpha),
           ),
-        ...(shadow ?? DsShadows.tailwindMd).layers,
+        ...(shadow ?? ElShadows.tailwindMd).layers,
       ]);
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
-    return DsMachineSurface(
+    final ElThemeData theme = ElTheme.of(context);
+    return ElMachineSurface(
       spec: specOf(shadow: shadow, ring: ring),
-      radius: radius ?? BorderRadius.circular(DsRadii.lg),
+      radius: radius ?? BorderRadius.circular(ElRadii.lg),
       fill: theme.popover,
       border: border,
       // `text-popover-foreground` — an ambient style, the way the class is.
@@ -470,22 +476,22 @@ class DsPopoverSurface extends StatelessWidget {
 }
 
 /// An overlay anchored to [anchor], open when [open] says so.
-class DsPopover extends StatefulWidget {
-  const DsPopover({
+class ElPopover extends StatefulWidget {
+  const ElPopover({
     super.key,
     required this.open,
     required this.anchor,
     required this.content,
-    this.side = DsPopoverSide.bottom,
-    this.align = DsPopoverAlign.center,
+    this.side = ElPopoverSide.bottom,
+    this.align = ElPopoverAlign.center,
     this.sideOffset = 0,
     this.collisionPadding = 0,
     this.animate = true,
     this.animateOut = true,
-    this.origin = DsPopoverOriginModel.anchor,
-    this.slideSides = const <DsPopoverSide>{DsPopoverSide.bottom},
+    this.origin = ElPopoverOriginModel.anchor,
+    this.slideSides = const <ElPopoverSide>{ElPopoverSide.bottom},
     this.anchorPoint,
-    this.barrier = DsPopoverBarrier.modal,
+    this.barrier = ElPopoverBarrier.modal,
     this.onDismiss,
   });
 
@@ -497,10 +503,10 @@ class DsPopover extends StatefulWidget {
   /// keeps its own `onPressed`.
   final Widget anchor;
 
-  final DsPopoverContentBuilder content;
+  final ElPopoverContentBuilder content;
 
-  final DsPopoverSide side;
-  final DsPopoverAlign align;
+  final ElPopoverSide side;
+  final ElPopoverAlign align;
 
   /// `sideOffset` — 6px on the combobox positioner, 4px on the date picker's.
   final double sideOffset;
@@ -515,7 +521,7 @@ class DsPopover extends StatefulWidget {
   /// identical class list and cancels every line of it with
   /// `data-[align-trigger=true]:animate-none` (selects-map drift 9). False is
   /// that cancellation — the popup appears, whole, in one frame. It is what
-  /// `DsNativeSelect` mounts its menu under: an operating system's picker does
+  /// `ElNativeSelect` mounts its menu under: an operating system's picker does
   /// not zoom.
   final bool animate;
 
@@ -530,8 +536,8 @@ class DsPopover extends StatefulWidget {
   /// already means "no animation at either end".
   final bool animateOut;
 
-  /// Whose `transform-origin` the zoom grows from — see [DsPopoverOriginModel].
-  final DsPopoverOriginModel origin;
+  /// Whose `transform-origin` the zoom grows from — see [ElPopoverOriginModel].
+  final ElPopoverOriginModel origin;
 
   /// The sides whose **entrance** carries a `slide-in-from-*` utility.
   ///
@@ -539,10 +545,10 @@ class DsPopover extends StatefulWidget {
   /// three menu files write four. The travel is always 2 spacing units
   /// *towards* the trigger's side — measured on an open submenu at
   /// `side=right`, which enters from 8px to its left.
-  final Set<DsPopoverSide> slideSides;
+  final Set<ElPopoverSide> slideSides;
 
   /// A **virtual anchor**: a zero-size rect at this point, in global
-  /// coordinates, instead of [DsPopover.anchor]'s measured box.
+  /// coordinates, instead of [ElPopover.anchor]'s measured box.
   ///
   /// Radix's `ContextMenu` anchors its content to a virtual element built from
   /// the `contextmenu` event's client coordinates, which is why a right-click
@@ -553,16 +559,16 @@ class DsPopover extends StatefulWidget {
 
   /// What the popup lays under itself to catch an outside pointer — Radix's
   /// `modal`, and its `DismissableLayer` nesting.
-  final DsPopoverBarrier barrier;
+  final ElPopoverBarrier barrier;
 
   /// A pointer outside the popup, or Escape while focus is inside it.
   final VoidCallback? onDismiss;
 
   @override
-  State<DsPopover> createState() => _DsPopoverState();
+  State<ElPopover> createState() => _ElPopoverState();
 }
 
-class _DsPopoverState extends State<DsPopover>
+class _ElPopoverState extends State<ElPopover>
     with SingleTickerProviderStateMixin {
   final GlobalKey _anchorKey = GlobalKey();
 
@@ -593,7 +599,7 @@ class _DsPopoverState extends State<DsPopover>
   /// therefore zooms from the requested corner for one frame and from the
   /// resolved one for the rest of the 320ms; a popup that does not flip, which
   /// is every popup on the ported pages, is correct from the first.
-  DsPopoverPlacement? _placement;
+  ElPopoverPlacement? _placement;
 
   bool get _showing => _portal.isShowing;
 
@@ -606,13 +612,13 @@ class _DsPopoverState extends State<DsPopover>
     super.initState();
     _animation = AnimationController(
       vsync: this,
-      duration: DsDurations.overlay,
+      duration: ElDurations.overlay,
     );
     if (widget.open) _sync();
   }
 
   @override
-  void didUpdateWidget(DsPopover old) {
+  void didUpdateWidget(ElPopover old) {
     super.didUpdateWidget(old);
     if (widget.open != old.open) _sync();
   }
@@ -623,7 +629,7 @@ class _DsPopoverState extends State<DsPopover>
     super.dispose();
   }
 
-  /// Brings the portal into line with [DsPopover.open], at the frame boundary.
+  /// Brings the portal into line with [ElPopover.open], at the frame boundary.
   ///
   /// Showing and hiding both `setState`, and every caller flips `open` from
   /// inside its own build — a keystroke that filters a list, a button that
@@ -656,7 +662,7 @@ class _DsPopoverState extends State<DsPopover>
   /// `--duration-overlay`, unless the class list cancels the animation or the
   /// platform asks for reduced motion — both of which mean "no time at all".
   Duration get _duration => widget.animate
-      ? dsAnimationDuration(context, DsDurations.overlay)
+      ? elAnimationDuration(context, ElDurations.overlay)
       : Duration.zero;
 
   void _hide() {
@@ -688,7 +694,7 @@ class _DsPopoverState extends State<DsPopover>
 
   /// Called from the layout delegate, which is mid-layout — so the report is
   /// deferred to the frame boundary rather than setting state under way.
-  void _report(DsPopoverPlacement placement) {
+  void _report(ElPopoverPlacement placement) {
     if (_placement == placement) return;
     SchedulerBinding.instance.addPostFrameCallback((_) {
       if (!mounted || _placement == placement) return;
@@ -701,8 +707,9 @@ class _DsPopoverState extends State<DsPopover>
     // The overlay is an ancestor of this widget, so it is laid out before the
     // popup asks where it is — which is what makes the anchor's box
     // expressible in the coordinate space the placement returns.
-    final RenderObject? theatre =
-        Overlay.maybeOf(overlayContext)?.context.findRenderObject();
+    final RenderObject? theatre = Overlay.maybeOf(
+      overlayContext,
+    )?.context.findRenderObject();
     if (object is! RenderBox ||
         theatre is! RenderBox ||
         !object.hasSize ||
@@ -718,38 +725,39 @@ class _DsPopoverState extends State<DsPopover>
         ? object.localToGlobal(Offset.zero, ancestor: overlay) & object.size
         : (overlay.globalToLocal(point) & Size.zero);
     final Size viewport = overlay.size;
-    final DsPopoverAnchorMetrics metrics = DsPopoverAnchorMetrics(
+    final ElPopoverAnchorMetrics metrics = ElPopoverAnchorMetrics(
       rect: anchor,
       viewport: viewport,
       availableWidth: viewport.width - widget.collisionPadding * 2,
       availableHeight: switch (widget.side) {
-        DsPopoverSide.bottom => viewport.height -
-            widget.collisionPadding -
-            anchor.bottom -
-            widget.sideOffset,
-        DsPopoverSide.top =>
+        ElPopoverSide.bottom =>
+          viewport.height -
+              widget.collisionPadding -
+              anchor.bottom -
+              widget.sideOffset,
+        ElPopoverSide.top =>
           anchor.top - widget.sideOffset - widget.collisionPadding,
-        DsPopoverSide.left ||
-        DsPopoverSide.right =>
-          viewport.height - widget.collisionPadding * 2,
+        ElPopoverSide.left ||
+        ElPopoverSide.right => viewport.height - widget.collisionPadding * 2,
       },
     );
 
     // The transform origin is the previous layout's answer; the first frame
     // uses the requested side, which is also the resolved one whenever nothing
     // collides.
-    final Alignment origin = _placement?.origin ??
-        // [DsPopoverOriginModel.selfCenter] does not depend on the placement at
+    final Alignment origin =
+        _placement?.origin ??
+        // [ElPopoverOriginModel.selfCenter] does not depend on the placement at
         // all, so it is right from the first frame rather than from the second.
-        (widget.origin == DsPopoverOriginModel.selfCenter
+        (widget.origin == ElPopoverOriginModel.selfCenter
             ? Alignment.center
             : switch (widget.side) {
-                DsPopoverSide.bottom => Alignment(_alignAxis, -1),
-                DsPopoverSide.top => Alignment(_alignAxis, 1),
-                DsPopoverSide.right => Alignment(-1, _alignAxis),
-                DsPopoverSide.left => Alignment(1, _alignAxis),
+                ElPopoverSide.bottom => Alignment(_alignAxis, -1),
+                ElPopoverSide.top => Alignment(_alignAxis, 1),
+                ElPopoverSide.right => Alignment(-1, _alignAxis),
+                ElPopoverSide.left => Alignment(1, _alignAxis),
               });
-    final DsPopoverSide side = _placement?.side ?? widget.side;
+    final ElPopoverSide side = _placement?.side ?? widget.side;
 
     return Stack(
       // The theatre hands an overlay child loose constraints; without this the
@@ -757,13 +765,13 @@ class _DsPopoverState extends State<DsPopover>
       fit: StackFit.expand,
       children: <Widget>[
         // Radix renders no scrim; a pointer anywhere else dismisses. How much
-        // of that pointer the layer keeps is [DsPopoverBarrier]'s subject: a
+        // of that pointer the layer keeps is [ElPopoverBarrier]'s subject: a
         // modal layer swallows it, a non-modal one lets it through to whatever
         // it landed on, and a submenu lays no layer at all.
-        if (widget.barrier != DsPopoverBarrier.none)
+        if (widget.barrier != ElPopoverBarrier.none)
           Positioned.fill(
             child: GestureDetector(
-              behavior: widget.barrier == DsPopoverBarrier.modal
+              behavior: widget.barrier == ElPopoverBarrier.modal
                   ? HitTestBehavior.opaque
                   : HitTestBehavior.translucent,
               onTap: widget.onDismiss,
@@ -808,7 +816,7 @@ class _DsPopoverState extends State<DsPopover>
   /// that is simply the menu.
   Widget _animate({
     required Alignment origin,
-    required DsPopoverSide? slide,
+    required ElPopoverSide? slide,
     required Widget child,
   }) {
     if (!widget.animate) return child;
@@ -821,10 +829,10 @@ class _DsPopoverState extends State<DsPopover>
   }
 
   double get _alignAxis => switch (widget.align) {
-        DsPopoverAlign.start => -1,
-        DsPopoverAlign.center => 0,
-        DsPopoverAlign.end => 1,
-      };
+    ElPopoverAlign.start => -1,
+    ElPopoverAlign.center => 0,
+    ElPopoverAlign.end => 1,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -851,12 +859,12 @@ class _PopoverLayout extends SingleChildLayoutDelegate {
   });
 
   final Rect anchor;
-  final DsPopoverSide side;
-  final DsPopoverAlign align;
+  final ElPopoverSide side;
+  final ElPopoverAlign align;
   final double sideOffset;
   final double collisionPadding;
-  final DsPopoverOriginModel origin;
-  final ValueChanged<DsPopoverPlacement> onPlaced;
+  final ElPopoverOriginModel origin;
+  final ValueChanged<ElPopoverPlacement> onPlaced;
 
   /// `max-h-(--available-height) max-w-(--available-width)`, applied as
   /// constraints rather than as paint: the popup may be any size it likes up to
@@ -865,15 +873,15 @@ class _PopoverLayout extends SingleChildLayoutDelegate {
   BoxConstraints getConstraintsForChild(BoxConstraints constraints) {
     final double room = side.isVertical
         ? (anchor.top - sideOffset - collisionPadding) >
-                (constraints.maxHeight -
+                  (constraints.maxHeight -
+                      collisionPadding -
+                      anchor.bottom -
+                      sideOffset)
+              ? anchor.top - sideOffset - collisionPadding
+              : constraints.maxHeight -
                     collisionPadding -
                     anchor.bottom -
-                    sideOffset)
-            ? anchor.top - sideOffset - collisionPadding
-            : constraints.maxHeight -
-                collisionPadding -
-                anchor.bottom -
-                sideOffset
+                    sideOffset
         : constraints.maxHeight - collisionPadding * 2;
     return BoxConstraints(
       maxWidth: constraints.maxWidth - collisionPadding * 2,
@@ -883,7 +891,7 @@ class _PopoverLayout extends SingleChildLayoutDelegate {
 
   @override
   Offset getPositionForChild(Size size, Size childSize) {
-    final DsPopoverPlacement placement = dsPopoverPlacement(
+    final ElPopoverPlacement placement = elPopoverPlacement(
       anchor: anchor,
       content: childSize,
       viewport: size,
@@ -922,7 +930,7 @@ class _PopoverTransition extends StatelessWidget {
 
   /// The resolved side, when its entrance carries a `slide-in-from-*`; null
   /// when the class list writes none for that side.
-  final DsPopoverSide? slide;
+  final ElPopoverSide? slide;
 
   final Widget child;
 
@@ -930,22 +938,22 @@ class _PopoverTransition extends StatelessWidget {
   Widget build(BuildContext context) {
     // `slide-in-from-*-2` — 2 spacing units of travel, and the exit has no
     // twin, so the offset is pinned to the forward run.
-    final double travel = ds(2);
+    final double travel = el(2);
     // The popup starts displaced **away** from the trigger's side and closes
     // the gap: `side=bottom` writes `slide-in-from-top`, `side=right` writes
     // `slide-in-from-left`.
     final Offset unit = switch (slide) {
       null => Offset.zero,
-      DsPopoverSide.bottom => const Offset(0, -1),
-      DsPopoverSide.top => const Offset(0, 1),
-      DsPopoverSide.right => const Offset(-1, 0),
-      DsPopoverSide.left => const Offset(1, 0),
+      ElPopoverSide.bottom => const Offset(0, -1),
+      ElPopoverSide.top => const Offset(0, 1),
+      ElPopoverSide.right => const Offset(-1, 0),
+      ElPopoverSide.left => const Offset(1, 0),
     };
     return AnimatedBuilder(
       animation: animation,
       child: child,
       builder: (BuildContext context, Widget? child) {
-        final double t = DsCurves.out.transform(animation.value.clamp(0, 1));
+        final double t = ElCurves.out.transform(animation.value.clamp(0, 1));
         final bool entering = animation.status != AnimationStatus.reverse;
         return Opacity(
           opacity: t,

@@ -1,0 +1,31 @@
+{
+  "name": "bloom-cosmic",
+  "type": "effect",
+  "version": "0.0.1",
+  "description": "`bloom-cosmic` — the iridescence behind an Alert and a toast",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/effects/bloom_cosmic.dart",
+      "target": "@effects/bloom_cosmic.dart",
+      "sha256": "889887645ceaaeb9565dff1f9010e8941a9c440cdbddb7e94ad2d62df24976b2"
+    }
+  ],
+  "registryDependencies": [
+    "keyframes",
+    "source-foundation",
+    "starfield"
+  ],
+  "semanticDependencies": [
+    "keyframes",
+    "starfield"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "documentationRoute": "/docs/effects/bloom-cosmic",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/effects/bloom_cosmic.dart",
+  "deprecated": false
+}

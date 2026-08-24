@@ -5,29 +5,29 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 Finder _button(String label) => find.byWidgetPredicate(
-  (Widget widget) => widget is DsButton && widget.label == label,
+  (Widget widget) => widget is ElButton && widget.label == label,
 );
 
 Future<void> _pumpPage(WidgetTester tester, {required Widget child}) async {
   tester.view.devicePixelRatio = 1;
-  tester.view.physicalSize = const Size(DsBreakpoints.sm, DsWidths.page);
+  tester.view.physicalSize = const Size(ElBreakpoints.sm, ElWidths.page);
   addTearDown(tester.view.resetDevicePixelRatio);
   addTearDown(tester.view.resetPhysicalSize);
-  final DsThemeController theme = DsThemeController();
+  final ElThemeController theme = ElThemeController();
   addTearDown(theme.dispose);
   await tester.pumpWidget(
-    DsTheme(
+    ElTheme(
       controller: theme,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         home: MediaQuery(
           data: const MediaQueryData(
-            size: Size(DsBreakpoints.sm, DsWidths.page),
+            size: Size(ElBreakpoints.sm, ElWidths.page),
             disableAnimations: true,
           ),
           child: SizedBox(
-            width: DsBreakpoints.sm,
-            height: DsWidths.page,
+            width: ElBreakpoints.sm,
+            height: ElWidths.page,
             child: child,
           ),
         ),
@@ -41,7 +41,7 @@ void main() {
   testWidgets('profile provides identity, editor, empty, and recovery states', (
     WidgetTester tester,
   ) async {
-    final DsToastController toasts = DsToastController();
+    final ElToastController toasts = ElToastController();
     addTearDown(toasts.dispose);
     await _pumpPage(tester, child: SignalStudioProfilePage(toasts: toasts));
 
@@ -50,13 +50,13 @@ void main() {
 
     await tester.tap(find.text('Edit profile'));
     await tester.pump();
-    expect(find.byType(DsDialogContent), findsOneWidget);
+    expect(find.byType(ElDialogContent), findsOneWidget);
     expect(toasts.length, 0);
 
     await tester.ensureVisible(find.byKey(const Key('profile-cancel')));
     await tester.tap(find.byKey(const Key('profile-cancel')));
     await tester.pump();
-    expect(find.byType(DsDialogContent), findsNothing);
+    expect(find.byType(ElDialogContent), findsNothing);
 
     await tester.ensureVisible(find.text('Drafts'));
     await tester.tap(find.text('Drafts'));
@@ -73,18 +73,18 @@ void main() {
   testWidgets(
     'reels provide vertical content and stateful actions without refresh chrome',
     (WidgetTester tester) async {
-      final DsToastController toasts = DsToastController();
+      final ElToastController toasts = ElToastController();
       addTearDown(toasts.dispose);
       await _pumpPage(tester, child: SignalStudioReelsPage(toasts: toasts));
 
       expect(find.text('Ari Rocha'), findsNothing);
       expect(find.text('A quiet system for louder work.'), findsOneWidget);
       expect(_button('Refresh reels'), findsNothing);
-      expect(find.byType(DsSkeleton), findsNothing);
-      expect(find.byType(DsMediaScrim), findsOneWidget);
+      expect(find.byType(ElSkeleton), findsNothing);
+      expect(find.byType(ElMediaScrim), findsOneWidget);
       await tester.tap(_button('Show reel details'));
       await tester.pump();
-      expect(find.byType(DsMediaScrim), findsNWidgets(2));
+      expect(find.byType(ElMediaScrim), findsNWidgets(2));
       expect(find.text('Ari Rocha'), findsOneWidget);
       expect(
         find.text(

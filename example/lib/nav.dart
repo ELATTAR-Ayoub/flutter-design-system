@@ -1,5 +1,5 @@
 /// Single source of truth for the design-system tree: a verbatim port of the
-/// reference's `lib/ds/nav.ts` (615 lines).
+/// reference's `lib/el/nav.ts` (615 lines).
 ///
 /// That file's own header states the contract, which this port inherits
 /// unchanged:
@@ -18,8 +18,8 @@ library;
 ///
 /// `slug` plus the owning group decide the route (see [categoryHref]); `blurb`
 /// and `contents` are what the page header and the index cards render.
-class DsCategory {
-  const DsCategory({
+class ElCategory {
+  const ElCategory({
     required this.slug,
     required this.title,
     required this.blurb,
@@ -44,8 +44,8 @@ class DsCategory {
 
 /// One family of pages: a labelled block in the sidebar and one card on the
 /// overview page.
-class DsGroup {
-  const DsGroup({
+class ElGroup {
+  const ElGroup({
     required this.id,
     required this.title,
     required this.href,
@@ -67,11 +67,11 @@ class DsGroup {
 
   final String blurb;
 
-  final List<DsCategory> categories;
+  final List<ElCategory> categories;
 }
 
-/// `DS_ROOT`: every route in the tree hangs off this one segment.
-const String dsRoot = '/design-system';
+/// `EL_ROOT`: every route in the tree hangs off this one segment.
+const String elRoot = '/design-system';
 
 /// Product showcase route, deliberately outside the documentation tree.
 ///
@@ -80,19 +80,19 @@ const String dsRoot = '/design-system';
 const String showcaseRoute = '/signal-studio';
 
 /// A page-foot / sidebar link: what [siblings] hands back for prev and next.
-typedef DsNavLink = ({String title, String href});
+typedef ElNavLink = ({String title, String href});
 
 /// The pair [siblings] returns. Both sides are null-able because the ends of a
 /// group have nothing beyond them.
-typedef DsSiblings = ({DsNavLink? prev, DsNavLink? next});
+typedef ElSiblings = ({ElNavLink? prev, ElNavLink? next});
 
 /// The group + category pair [findCategory] resolves.
-typedef DsCategoryHit = ({DsGroup group, DsCategory category});
+typedef ElCategoryHit = ({ElGroup group, ElCategory category});
 
 /* ── Foundations ─────────────────────────────────────────────────────────── */
 
-const List<DsCategory> _foundations = <DsCategory>[
-  DsCategory(
+const List<ElCategory> _foundations = <ElCategory>[
+  ElCategory(
     slug: 'colors',
     title: 'Colors',
     blurb:
@@ -116,7 +116,7 @@ const List<DsCategory> _foundations = <DsCategory>[
   // from render Inter, not Space Grotesk. The blurb still says Space Grotesk,
   // so the blurb still says Space Grotesk here. Fonts follow tokens; copy
   // follows the reference.
-  DsCategory(
+  ElCategory(
     slug: 'typography',
     title: 'Typography',
     blurb:
@@ -135,7 +135,7 @@ const List<DsCategory> _foundations = <DsCategory>[
       'Rules',
     ],
   ),
-  DsCategory(
+  ElCategory(
     slug: 'spacing',
     title: 'Spacing & Layout',
     blurb:
@@ -149,7 +149,7 @@ const List<DsCategory> _foundations = <DsCategory>[
       'Content width',
     ],
   ),
-  DsCategory(
+  ElCategory(
     slug: 'shadows',
     title: 'Shadows',
     blurb:
@@ -163,7 +163,7 @@ const List<DsCategory> _foundations = <DsCategory>[
       'Glass',
     ],
   ),
-  DsCategory(
+  ElCategory(
     slug: 'motion',
     title: 'Motion',
     blurb:
@@ -177,7 +177,7 @@ const List<DsCategory> _foundations = <DsCategory>[
       'Reduced motion',
     ],
   ),
-  DsCategory(
+  ElCategory(
     slug: 'icons',
     title: 'Icons',
     blurb:
@@ -195,8 +195,8 @@ const List<DsCategory> _foundations = <DsCategory>[
 
 /* ── Base components: the shadcn chassis, restyled ──────────────────────── */
 
-const List<DsCategory> _base = <DsCategory>[
-  DsCategory(
+const List<ElCategory> _base = <ElCategory>[
+  ElCategory(
     slug: 'buttons',
     title: 'Buttons',
     blurb:
@@ -210,7 +210,7 @@ const List<DsCategory> _base = <DsCategory>[
       'Kbd',
     ],
   ),
-  DsCategory(
+  ElCategory(
     slug: 'inputs',
     title: 'Inputs',
     blurb:
@@ -228,7 +228,7 @@ const List<DsCategory> _base = <DsCategory>[
       'Field & Label',
     ],
   ),
-  DsCategory(
+  ElCategory(
     slug: 'forms',
     title: 'Forms',
     blurb:
@@ -242,7 +242,7 @@ const List<DsCategory> _base = <DsCategory>[
       'Composed fields',
     ],
   ),
-  DsCategory(
+  ElCategory(
     slug: 'selects',
     title: 'Selects & Pickers',
     blurb:
@@ -259,7 +259,7 @@ const List<DsCategory> _base = <DsCategory>[
       'Date Picker',
     ],
   ),
-  DsCategory(
+  ElCategory(
     slug: 'selection',
     title: 'Selection Controls',
     blurb: 'Binary and ranged controls: checkbox, radio, switch and slider.',
@@ -271,7 +271,7 @@ const List<DsCategory> _base = <DsCategory>[
       'Range Slider',
     ],
   ),
-  DsCategory(
+  ElCategory(
     slug: 'dialogs',
     title: 'Dialogs & Overlays',
     blurb:
@@ -288,13 +288,13 @@ const List<DsCategory> _base = <DsCategory>[
       'Tooltip',
     ],
   ),
-  DsCategory(
+  ElCategory(
     slug: 'menus',
     title: 'Menus',
     blurb: 'Account dropdown, right-click menus and the application menubar.',
     contents: <String>['Dropdown Menu', 'Context Menu', 'Menubar'],
   ),
-  DsCategory(
+  ElCategory(
     slug: 'navigation',
     title: 'Navigation',
     blurb:
@@ -308,7 +308,7 @@ const List<DsCategory> _base = <DsCategory>[
       'Collapsible',
     ],
   ),
-  DsCategory(
+  ElCategory(
     slug: 'feedback',
     title: 'Feedback',
     blurb:
@@ -323,7 +323,7 @@ const List<DsCategory> _base = <DsCategory>[
       'Empty',
     ],
   ),
-  DsCategory(
+  ElCategory(
     slug: 'chat',
     title: 'Chat',
     blurb:
@@ -346,7 +346,7 @@ const List<DsCategory> _base = <DsCategory>[
   // the other way round: by building the range calendar the entry had been
   // promising. Nothing checks this direction, so it is worth saying twice:
   // adding a string here is a commitment, not a label.
-  DsCategory(
+  ElCategory(
     slug: 'data',
     title: 'Data Display',
     blurb: 'Tables, data tables, badges, avatars, cards, stats and list items.',
@@ -362,7 +362,7 @@ const List<DsCategory> _base = <DsCategory>[
       'Separator',
     ],
   ),
-  DsCategory(
+  ElCategory(
     slug: 'charts',
     title: 'Charts',
     blurb:
@@ -386,7 +386,7 @@ const List<DsCategory> _base = <DsCategory>[
   // it has its own category below; leaving the entry here would have been a
   // second home for one component and a chip pointing at a section that had
   // moved.
-  DsCategory(
+  ElCategory(
     slug: 'layout',
     title: 'Layout Primitives',
     blurb:
@@ -403,7 +403,7 @@ const List<DsCategory> _base = <DsCategory>[
   // convention `buttons` uses, where `contents` is what is shown rather than
   // what the headings are called. On this page it doubles as the export
   // inventory: every name below has a specimen you can design against.
-  DsCategory(
+  ElCategory(
     slug: 'sidebar',
     title: 'Sidebar',
     blurb:
@@ -445,8 +445,8 @@ const List<DsCategory> _base = <DsCategory>[
  * it is a comment, so it renders nowhere — but it is left as found.)
  */
 
-const List<DsCategory> _agent = <DsCategory>[
-  DsCategory(
+const List<ElCategory> _agent = <ElCategory>[
+  ElCategory(
     slug: 'console',
     title: 'Console',
     blurb:
@@ -460,7 +460,7 @@ const List<DsCategory> _agent = <DsCategory>[
       'Transport contract',
     ],
   ),
-  DsCategory(
+  ElCategory(
     slug: 'avatar',
     title: 'Avatar',
     blurb:
@@ -473,7 +473,7 @@ const List<DsCategory> _agent = <DsCategory>[
       'Reduced motion',
     ],
   ),
-  DsCategory(
+  ElCategory(
     slug: 'composer',
     title: 'Composer',
     blurb:
@@ -493,7 +493,7 @@ const List<DsCategory> _agent = <DsCategory>[
   // and Questionnaire are deliberately adjacent (the same interaction shape:
   // the agent speaks, the user answers inline) and Attachments closes the page
   // as the one object that travels in both directions.
-  DsCategory(
+  ElCategory(
     slug: 'transcript',
     title: 'Transcript',
     blurb:
@@ -509,7 +509,7 @@ const List<DsCategory> _agent = <DsCategory>[
       'Attachments',
     ],
   ),
-  DsCategory(
+  ElCategory(
     slug: 'history',
     title: 'History',
     blurb:
@@ -523,7 +523,7 @@ const List<DsCategory> _agent = <DsCategory>[
       'Blur switch',
     ],
   ),
-  DsCategory(
+  ElCategory(
     slug: 'voice',
     title: 'Voice',
     blurb:
@@ -551,8 +551,8 @@ const List<DsCategory> _agent = <DsCategory>[
  * plan up front would ship five links to nothing.
  */
 
-const List<DsCategory> _site = <DsCategory>[
-  DsCategory(
+const List<ElCategory> _site = <ElCategory>[
+  ElCategory(
     slug: 'structure',
     title: 'Page Structure',
     blurb:
@@ -567,7 +567,7 @@ const List<DsCategory> _site = <DsCategory>[
       'Prose',
     ],
   ),
-  DsCategory(
+  ElCategory(
     slug: 'intro',
     title: 'Page Introductions',
     blurb:
@@ -581,7 +581,7 @@ const List<DsCategory> _site = <DsCategory>[
       'Dates without a locale',
     ],
   ),
-  DsCategory(
+  ElCategory(
     slug: 'landing',
     title: 'Landing Hero',
     blurb:
@@ -595,7 +595,7 @@ const List<DsCategory> _site = <DsCategory>[
       'The whole section',
     ],
   ),
-  DsCategory(
+  ElCategory(
     slug: 'navigation',
     title: 'Reading Navigation',
     blurb:
@@ -609,7 +609,7 @@ const List<DsCategory> _site = <DsCategory>[
       'Reduced motion',
     ],
   ),
-  DsCategory(
+  ElCategory(
     slug: 'sections',
     title: 'Content Sections',
     blurb:
@@ -626,7 +626,7 @@ const List<DsCategory> _site = <DsCategory>[
       'What is not a component',
     ],
   ),
-  DsCategory(
+  ElCategory(
     slug: 'chrome',
     title: 'Site Chrome',
     blurb:
@@ -642,35 +642,35 @@ const List<DsCategory> _site = <DsCategory>[
   ),
 ];
 
-/// `DS_GROUPS`: the whole tree, in the order the sidebar renders it.
-const List<DsGroup> dsGroups = <DsGroup>[
-  DsGroup(
+/// `EL_GROUPS`: the whole tree, in the order the sidebar renders it.
+const List<ElGroup> elGroups = <ElGroup>[
+  ElGroup(
     id: 'foundations',
     title: 'Foundations',
-    href: dsRoot,
+    href: elRoot,
     blurb: 'The decisions everything else inherits.',
     categories: _foundations,
   ),
-  DsGroup(
+  ElGroup(
     id: 'base',
     title: 'Base Components',
-    href: '$dsRoot/components/base',
+    href: '$elRoot/components/base',
     blurb:
         "The shadcn chassis, restyled onto this system's tokens. Generic, reusable, product-agnostic.",
     categories: _base,
   ),
-  DsGroup(
+  ElGroup(
     id: 'agent',
     title: 'Agent',
-    href: '$dsRoot/components/agent',
+    href: '$elRoot/components/agent',
     blurb:
         'A complete AI console — transcript, composer, avatar and voice — pointed at a transport you supply. Written from scratch, and product-agnostic by construction.',
     categories: _agent,
   ),
-  DsGroup(
+  ElGroup(
     id: 'site',
     title: 'Site Pages',
-    href: '$dsRoot/components/site',
+    href: '$elRoot/components/site',
     blurb:
         'Composition rather than controls: the containers, bands and reading columns that assemble an FAQ, a policy or a help article out of base components without inventing a single new visual value.',
     categories: _site,
@@ -682,15 +682,15 @@ const List<DsGroup> dsGroups = <DsGroup>[
 /// Foundations pages sit directly under the root, `/design-system/colors`, not
 /// `/design-system/foundations/colors`: because Foundations *is* the index of
 /// the design system. Every other group nests under its own index.
-String categoryHref(DsGroup group, DsCategory category) =>
+String categoryHref(ElGroup group, ElCategory category) =>
     group.id == 'foundations'
-    ? '$dsRoot/${category.slug}'
+    ? '$elRoot/${category.slug}'
     : '${group.href}/${category.slug}';
 
-/// The group with this id, or null. The reference inlines `DS_GROUPS.find`
+/// The group with this id, or null. The reference inlines `EL_GROUPS.find`
 /// three times; the port names it once.
-DsGroup? _groupOrNull(String id) {
-  for (final DsGroup group in dsGroups) {
+ElGroup? _groupOrNull(String id) {
+  for (final ElGroup group in elGroups) {
     if (group.id == id) return group;
   }
   return null;
@@ -701,8 +701,8 @@ DsGroup? _groupOrNull(String id) {
 /// Not in the reference (which has no caller that needs a group alone), but the
 /// shell keys its sidebar off group ids and a typo there should fail loudly for
 /// the same reason [findCategory] throws.
-DsGroup dsGroupById(String id) {
-  final DsGroup? group = _groupOrNull(id);
+ElGroup elGroupById(String id) {
+  final ElGroup? group = _groupOrNull(id);
   if (group == null) {
     throw ArgumentError.value(id, 'id', 'Unknown design-system group');
   }
@@ -714,9 +714,9 @@ DsGroup dsGroupById(String id) {
 /// Throws on either half being unknown, as the reference does: a page header
 /// that cannot find itself in the nav is the exact drift this file exists to
 /// prevent, so it fails rather than rendering an empty heading.
-DsCategoryHit findCategory(String groupId, String slug) {
-  final DsGroup group = dsGroupById(groupId);
-  for (final DsCategory category in group.categories) {
+ElCategoryHit findCategory(String groupId, String slug) {
+  final ElGroup group = elGroupById(groupId);
+  for (final ElCategory category in group.categories) {
     if (category.slug == slug) {
       return (group: group, category: category);
     }
@@ -734,16 +734,16 @@ DsCategoryHit findCategory(String groupId, String slug) {
 /// * an unknown *slug* leaves `findIndex` at −1, so `prev` is null and `next`
 ///   resolves to index 0: the group's first category. A foot nav on a page
 ///   that is not in the tree therefore points at the top of the group.
-DsSiblings siblings(String groupId, String slug) {
-  final DsGroup? found = _groupOrNull(groupId);
+ElSiblings siblings(String groupId, String slug) {
+  final ElGroup? found = _groupOrNull(groupId);
   if (found == null) return (prev: null, next: null);
-  final DsGroup group = found;
+  final ElGroup group = found;
 
-  final int i = group.categories.indexWhere((DsCategory c) => c.slug == slug);
+  final int i = group.categories.indexWhere((ElCategory c) => c.slug == slug);
 
-  DsNavLink? at(int n) {
+  ElNavLink? at(int n) {
     if (n < 0 || n >= group.categories.length) return null;
-    final DsCategory c = group.categories[n];
+    final ElCategory c = group.categories[n];
     return (title: c.title, href: categoryHref(group, c));
   }
 

@@ -1,0 +1,29 @@
+/// Documentation metadata for the `skeleton` component.
+///
+/// **New route, split out of `progress`.** `ElSkeleton` used to share
+/// `/components/progress` with `ElProgress` under one shared
+/// `ComponentDocEntry` (see `progress/meta.dart`'s own note for the split).
+/// It now has its own [name], its own route (`/components/skeleton`), and
+/// its own page class (`SkeletonDocPage`).
+///
+/// Not wired into `catalog.dart`'s `componentDocs` list: that file is
+/// supervisor-owned, and this entry is new. `page.dart` reads [skeletonDoc]
+/// directly rather than going through `componentDoc('skeleton')`.
+///
+/// `registry/components/skeleton.json` does not exist yet: see `page.dart`'s
+/// installation section for the shipped command and registry dependencies. [dependencies] is left
+/// empty rather than naming items a manifest does not yet resolve.
+library;
+
+import '../catalog.dart' show ComponentDocEntry;
+
+const ComponentDocEntry skeletonDoc = ComponentDocEntry(
+  name: 'skeleton',
+  title: 'Skeleton',
+  description:
+      'A shimmering placeholder box, sized like the content that has not '
+      'arrived yet, so the layout never jumps when it does.',
+  dependencies: <String>['keyframes', 'source-foundation'],
+  exports: <String>['ElSkeleton'],
+  sourcePath: 'lib/src/components/skeleton.dart',
+);

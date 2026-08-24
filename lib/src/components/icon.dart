@@ -23,7 +23,7 @@ import 'icon_paths.g.dart';
 ///
 /// Named for Tailwind's own size steps; `xl2`/`xl3` are the `2xl`/`3xl` keys
 /// spelled the way Dart allows.
-enum DsIconSize {
+enum ElIconSize {
   /// 12px.
   xs,
 
@@ -54,18 +54,18 @@ enum DsIconSize {
   /// and it must not leak into rendered copy — which is the whole reason this
   /// mapping exists rather than a `.name` call at the call site.
   String get label => switch (this) {
-        DsIconSize.xs => 'xs',
-        DsIconSize.sm => 'sm',
-        DsIconSize.md => 'md',
-        DsIconSize.lg => 'lg',
-        DsIconSize.xl => 'xl',
-        DsIconSize.xl2 => '2xl',
-        DsIconSize.xl3 => '3xl',
-      };
+    ElIconSize.xs => 'xs',
+    ElIconSize.sm => 'sm',
+    ElIconSize.md => 'md',
+    ElIconSize.lg => 'lg',
+    ElIconSize.xl => 'xl',
+    ElIconSize.xl2 => '2xl',
+    ElIconSize.xl3 => '3xl',
+  };
 }
 
 /// `ICON_TONES` — every tone maps to a token, never to a raw colour.
-enum DsIconTone {
+enum ElIconTone {
   /// `text-foreground`. Primary text.
   normal,
 
@@ -104,23 +104,23 @@ enum DsIconTone {
   ///
   /// Not `name`: `ICON_TONES`'s first key is **`default`**, which is a Dart
   /// reserved word, so this enum spells it [normal]. Same rule as
-  /// [DsIconSize.label] — the rename is a language constraint and must not
+  /// [ElIconSize.label] — the rename is a language constraint and must not
   /// reach rendered copy.
   ///
   /// [muted] and [subtle] return different strings for the same colour on
   /// purpose; see [subtle]'s own doc for why the two names exist.
   String get label => switch (this) {
-        DsIconTone.normal => 'default',
-        DsIconTone.muted => 'muted',
-        DsIconTone.subtle => 'subtle',
-        DsIconTone.action => 'action',
-        DsIconTone.value => 'value',
-        DsIconTone.success => 'success',
-        DsIconTone.warning => 'warning',
-        DsIconTone.info => 'info',
-        DsIconTone.error => 'error',
-        DsIconTone.inherit => 'inherit',
-      };
+    ElIconTone.normal => 'default',
+    ElIconTone.muted => 'muted',
+    ElIconTone.subtle => 'subtle',
+    ElIconTone.action => 'action',
+    ElIconTone.value => 'value',
+    ElIconTone.success => 'success',
+    ElIconTone.warning => 'warning',
+    ElIconTone.info => 'info',
+    ElIconTone.error => 'error',
+    ElIconTone.inherit => 'inherit',
+  };
 }
 
 /// The stroke lucide draws its 24-unit grid for.
@@ -133,12 +133,12 @@ const double _heavyAbove = 2.6;
 const double _lightBelow = 1.5;
 
 /// One lucide glyph, stroked at a size and tone from the ladder.
-class DsIcon extends StatelessWidget {
-  const DsIcon(
+class ElIcon extends StatelessWidget {
+  const ElIcon(
     this.glyph, {
     super.key,
-    this.size = DsIconSize.md,
-    this.tone = DsIconTone.inherit,
+    this.size = ElIconSize.md,
+    this.tone = ElIconTone.inherit,
     this.sizePx,
     this.strokeOverride,
     this.label,
@@ -147,7 +147,7 @@ class DsIcon extends StatelessWidget {
   /// The same widget, over the **generated** registry rather than the curated
   /// enum.
   ///
-  /// [DsIconGlyph] is the icons page's own whitelist — the glyphs that page
+  /// [ElIconGlyph] is the icons page's own whitelist — the glyphs that page
   /// prints and names. Every other page reaches for lucide directly, and until
   /// the chat family there was no call site that needed one outside the
   /// whitelist. `chat/page.tsx` imports seven (`BotIcon`, `CircleAlertIcon`,
@@ -156,30 +156,30 @@ class DsIcon extends StatelessWidget {
   /// not on the whitelist and never will be, because the whitelist is a
   /// transcript of one page's registry rather than a budget.
   ///
-  /// So this constructor takes a [DsLucideGlyph] from `icon_paths.g.dart` and
+  /// So this constructor takes a [ElLucideGlyph] from `icon_paths.g.dart` and
   /// paints it through exactly the same [paintGlyph] the enum path uses — same
   /// 24-unit space, same stroke formula, same clip. Nothing about the render is
   /// different; only where the geometry was looked up.
-  const DsIcon.lucide(
-    DsLucideGlyph this.lucide, {
+  const ElIcon.lucide(
+    ElLucideGlyph this.lucide, {
     super.key,
-    this.size = DsIconSize.md,
-    this.tone = DsIconTone.inherit,
+    this.size = ElIconSize.md,
+    this.tone = ElIconTone.inherit,
     this.sizePx,
     this.strokeOverride,
     this.label,
   }) : glyph = null;
 
   /// The curated glyph, or null when [lucide] carries the geometry.
-  final DsIconGlyph? glyph;
+  final ElIconGlyph? glyph;
 
   /// The generated-registry glyph, or null when [glyph] does.
-  final DsLucideGlyph? lucide;
+  final ElLucideGlyph? lucide;
 
   /// A rung of the ladder. Ignored when [sizePx] is given.
-  final DsIconSize size;
+  final ElIconSize size;
 
-  final DsIconTone tone;
+  final ElIconTone tone;
 
   /// An off-ladder px size.
   ///
@@ -201,15 +201,15 @@ class DsIcon extends StatelessWidget {
   final String? label;
 
   /// `ICON_SIZES[size]`.
-  static double pxFor(DsIconSize size) => switch (size) {
-        DsIconSize.xs => 12,
-        DsIconSize.sm => 14,
-        DsIconSize.md => 16,
-        DsIconSize.lg => 20,
-        DsIconSize.xl => 24,
-        DsIconSize.xl2 => 32,
-        DsIconSize.xl3 => 40,
-      };
+  static double pxFor(ElIconSize size) => switch (size) {
+    ElIconSize.xs => 12,
+    ElIconSize.sm => 14,
+    ElIconSize.md => 16,
+    ElIconSize.lg => 20,
+    ElIconSize.xl => 24,
+    ElIconSize.xl2 => 32,
+    ElIconSize.xl3 => 40,
+  };
 
   /// The `strokeWidth` the reference computes for a glyph rendered at [px].
   ///
@@ -227,7 +227,7 @@ class DsIcon extends StatelessWidget {
   /// Scaling the stroke with the box keeps optical weight even across the size
   /// ladder."*
   static double strokeFor(double px) {
-    final double scaled = (_authoredStroke * DsIconPaths.viewBox) / px;
+    final double scaled = (_authoredStroke * ElIconPaths.viewBox) / px;
     if (scaled > _heavyAbove) return _heavyStroke;
     if (scaled < _lightBelow) return _lightStroke;
     return _authoredStroke;
@@ -235,7 +235,7 @@ class DsIcon extends StatelessWidget {
 
   /// Paints one glyph into [size], the way lucide's `<svg>` wrapper does.
   ///
-  /// [path] and [fill] are in lucide's 24-unit space ([DsIconPaths.viewBox]);
+  /// [path] and [fill] are in lucide's 24-unit space ([ElIconPaths.viewBox]);
   /// so is [strokeWidth], exactly as the SVG `stroke-width` attribute is — the
   /// canvas scale converts it, which is what a browser does when it fits a
   /// `viewBox` into a smaller box.
@@ -258,7 +258,7 @@ class DsIcon extends StatelessWidget {
   ///
   /// Public and [visibleForTesting] because the clip is only provable in
   /// rendered pixels, and the glyph that proves it lives in the generated
-  /// registry rather than in [DsIconGlyph].
+  /// registry rather than in [ElIconGlyph].
   @visibleForTesting
   static void paintGlyph(
     Canvas canvas,
@@ -271,9 +271,11 @@ class DsIcon extends StatelessWidget {
     if (size.isEmpty) return;
     canvas.save();
     canvas.scale(
-        size.width / DsIconPaths.viewBox, size.height / DsIconPaths.viewBox);
+      size.width / ElIconPaths.viewBox,
+      size.height / ElIconPaths.viewBox,
+    );
     canvas.clipRect(
-      const Rect.fromLTWH(0, 0, DsIconPaths.viewBox, DsIconPaths.viewBox),
+      const Rect.fromLTWH(0, 0, ElIconPaths.viewBox, ElIconPaths.viewBox),
     );
     canvas.drawPath(
       path,
@@ -292,7 +294,7 @@ class DsIcon extends StatelessWidget {
     // it — the same two operations, in the same order, a browser performs for
     // `<circle … fill="currentColor">` inside lucide's `<svg>`. `tag`'s
     // 0.5-unit dot is the only one in the embedded set; every other glyph
-    // skips this entirely because [DsIconPaths.fillPathFor] returns null.
+    // skips this entirely because [ElIconPaths.fillPathFor] returns null.
     if (fill != null) {
       canvas.drawPath(fill, Paint()..color = color);
     }
@@ -301,22 +303,22 @@ class DsIcon extends StatelessWidget {
 
   /// The token [tone] resolves to in [context].
   ///
-  /// [DsIconTone.inherit] is `text-current`: it takes the colour of the
+  /// [ElIconTone.inherit] is `text-current`: it takes the colour of the
   /// surrounding text, which in Flutter is the nearest [DefaultTextStyle] —
-  /// how a `DsButton` colours the icon inside it — falling back to
+  /// how a `ElButton` colours the icon inside it — falling back to
   /// `--foreground`, the colour `<body>` sets.
-  static Color colorFor(BuildContext context, DsIconTone tone) {
-    final DsThemeData theme = DsTheme.of(context);
+  static Color colorFor(BuildContext context, ElIconTone tone) {
+    final ElThemeData theme = ElTheme.of(context);
     return switch (tone) {
-      DsIconTone.normal => theme.foreground,
-      DsIconTone.muted || DsIconTone.subtle => theme.mutedForeground,
-      DsIconTone.action => theme.actionInk,
-      DsIconTone.value => theme.valueInk,
-      DsIconTone.success => theme.successInk,
-      DsIconTone.warning => theme.warningInk,
-      DsIconTone.info => theme.infoInk,
-      DsIconTone.error => theme.destructiveInk,
-      DsIconTone.inherit =>
+      ElIconTone.normal => theme.foreground,
+      ElIconTone.muted || ElIconTone.subtle => theme.mutedForeground,
+      ElIconTone.action => theme.actionInk,
+      ElIconTone.value => theme.valueInk,
+      ElIconTone.success => theme.successInk,
+      ElIconTone.warning => theme.warningInk,
+      ElIconTone.info => theme.infoInk,
+      ElIconTone.error => theme.destructiveInk,
+      ElIconTone.inherit =>
         DefaultTextStyle.of(context).style.color ?? theme.foreground,
     };
   }
@@ -350,8 +352,8 @@ class _GlyphPainter extends CustomPainter {
     required this.strokeWidth,
   });
 
-  final DsIconGlyph? glyph;
-  final DsLucideGlyph? lucide;
+  final ElIconGlyph? glyph;
+  final ElLucideGlyph? lucide;
   final Color color;
 
   /// In lucide's 24-unit space, exactly as the SVG `stroke-width` attribute
@@ -360,18 +362,16 @@ class _GlyphPainter extends CustomPainter {
   final double strokeWidth;
 
   @override
-  void paint(Canvas canvas, Size size) => DsIcon.paintGlyph(
-        canvas,
-        size,
-        path: glyph != null
-            ? DsIconPaths.pathFor(glyph!)
-            : lucide!.toPath(),
-        fill: glyph != null
-            ? DsIconPaths.fillPathFor(glyph!)
-            : lucide!.toFillPath(),
-        color: color,
-        strokeWidth: strokeWidth,
-      );
+  void paint(Canvas canvas, Size size) => ElIcon.paintGlyph(
+    canvas,
+    size,
+    path: glyph != null ? ElIconPaths.pathFor(glyph!) : lucide!.toPath(),
+    fill: glyph != null
+        ? ElIconPaths.fillPathFor(glyph!)
+        : lucide!.toFillPath(),
+    color: color,
+    strokeWidth: strokeWidth,
+  );
 
   @override
   bool shouldRepaint(_GlyphPainter old) =>

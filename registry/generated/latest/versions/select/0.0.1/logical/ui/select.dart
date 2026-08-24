@@ -16,7 +16,7 @@
 /// | | `aria-invalid:border-destructive aria-invalid:ring-3 ring-destructive/20` | and it beats focus |
 /// | | `data-placeholder:text-muted-foreground` | — |
 /// | | chevron | `size-4 text-muted-foreground` |
-/// | | NEW `className="w-40"` | an explicit [DsSelect.width] — see the ruling below |
+/// | | NEW `className="w-40"` | an explicit [ElSelect.width] — see the ruling below |
 /// | content | `min-w-36 rounded-lg bg-popover shadow-md ring-1 ring-foreground/10` | 144, 12px, Tailwind's stock elevation |
 /// | viewport | `p-2` | 8 |
 /// | item | `py-2 pr-9 pl-3 rounded-md gap-2 text-sm` | 8 / 36 / 12, 10px |
@@ -33,28 +33,28 @@
 /// `position` defaults to `"item-aligned"` and the page passes none. The four
 /// `translate-*` nudges are `data-[position=popper]`-only and inert for the
 /// same reason. What renders is a menu that simply appears; that is what is
-/// ported. Its counterexample now sits in the same package: `DsPopover` and
-/// `DsCombobox` run the identical class set at 320ms (selects-map drift 9).
+/// ported. Its counterexample now sits in the same package: `ElPopover` and
+/// `ElCombobox` run the identical class set at 320ms (selects-map drift 9).
 ///
 /// **`item-aligned`** is what that default *does*: the content is placed so the
 /// chosen row sits over the trigger, the way a native `<select>` opens. With
 /// nothing chosen the first row takes that place.
 ///
-/// Phase 3 computed that placement as `ds(2) + (index + 0.5) × itemHeight`,
+/// Phase 3 computed that placement as `el(2) + (index + 0.5) × itemHeight`,
 /// which is only true of a menu whose rows are all items. The selects page's
 /// first menu is a label, three items, a separator, a second label and two more
 /// items, and its chosen row sits **40px** into the content rather than 17.3
 /// (selects-map §4.2). The arithmetic is therefore a running offset over the
-/// real flattened list — [DsSelectGroup] and [DsSelectSeparator] contribute
+/// real flattened list — [ElSelectGroup] and [ElSelectSeparator] contribute
 /// their own heights to it — and every row kind states its height as a static
-/// on [DsSelect] so a test can pin the sum rather than a magic number.
+/// on [ElSelect] so a test can pin the sum rather than a magic number.
 ///
 /// DOCUMENTED DRIFT (forms-map drift 11, selects-map drift 10): the trigger's
 /// own `w-fit` never applies on either page — on the forms page the vertical
 /// `Field`'s `*:w-full` is emitted later at equal specificity and wins; in the
 /// selects page's state cells `w-40` kills it through twMerge before CSS is
-/// consulted. All three widths are reachable here: [DsSelect.expand] false is
-/// the class, true is the cascade, and [DsSelect.width] is the utility that
+/// consulted. All three widths are reachable here: [ElSelect.expand] false is
+/// the class, true is the cascade, and [ElSelect.width] is the utility that
 /// beats both — ruling L4 keeps `expand` rather than replacing a documented
 /// switch with an enum.
 ///
@@ -62,12 +62,12 @@
 /// resting fill is `--input` at 30%, not `--card` like its siblings, and it
 /// authors the only hover state in the family (`dark:hover:bg-input/50`). Light
 /// mode has no hover feedback on any control. It is no longer *the only*
-/// control with `dark:` variants — `DsNativeSelect` carries the same four.
+/// control with `dark:` variants — `ElNativeSelect` carries the same four.
 ///
 /// DOCUMENTED DRIFT (forms-map drift 16, selects-map drift 11): `shadow-md` is
 /// Tailwind's stock elevation, fixed black at 10% under a popover whose fill
 /// flips with the theme. It now carries all three overlays on the selects page,
-/// which is why the recipe moved to [DsPopoverSurface].
+/// which is why the recipe moved to [ElPopoverSurface].
 ///
 /// DOCUMENTED PARITY (ruling L5, selects-map drift 18): the "Disabled" state
 /// cell ships an empty `<SelectContent />` behind a trigger that cannot open
@@ -112,35 +112,36 @@ const double _darkFillAlpha = 0.30;
 const double _darkHoverFillAlpha = 0.50;
 
 /// `min-w-36`.
-double get _contentMinWidth => ds(36);
+double get _contentMinWidth => el(36);
 
 /// How close the menu may come to the edge of the viewport before it is nudged
 /// back — `--radix-select-content-available-height` reserves the same margin
 /// that `collisionPadding` defaults to in Radix.
-double get _viewportMargin => ds(2);
+double get _viewportMargin => el(2);
 
 /// How often a hovered scroll button advances the viewport.
 ///
 /// `SelectScrollButtonImpl` starts a `window.setInterval(onAutoScroll, 50)` on
 /// `pointerMove` and clears it on `pointerLeave`; each tick scrolls by one
 /// item's height. A dependency's own timer, not a `--duration-*` token.
-const Duration _autoScrollTick =
-    Duration(milliseconds: 50); // allow-hardcoded: Radix's own scroll interval
+const Duration _autoScrollTick = Duration(
+  milliseconds: 50,
+); // allow-hardcoded: Radix's own scroll interval
 
 /// The two rungs of `data-size` on the trigger.
-enum DsSelectSize {
+enum ElSelectSize {
   /// `data-size="sm"` — `h-8`.
   sm,
 
-  /// `data-size="default"` — `h-10`, level with a `DsInput` and a default
-  /// `DsButton`. Named [md] because `default` is a Dart keyword.
+  /// `data-size="default"` — `h-10`, level with a `ElInput` and a default
+  /// `ElButton`. Named [md] because `default` is a Dart keyword.
   md;
 
   /// The attribute value the reference writes.
-  String get label => this == DsSelectSize.md ? 'default' : 'sm';
+  String get label => this == ElSelectSize.md ? 'default' : 'sm';
 
   /// `h-10` / `h-8`.
-  double get height => this == DsSelectSize.md ? ds(10) : ds(8);
+  double get height => this == ElSelectSize.md ? el(10) : el(8);
 }
 
 /// Anything that can sit directly inside a `SelectContent`.
@@ -148,16 +149,16 @@ enum DsSelectSize {
 /// The reference's content is a child list, not an array of options: the
 /// selects page writes `<SelectGroup>`, `<SelectSeparator />` and
 /// `<SelectItem>` as siblings, and the item-aligned placement has to count all
-/// three. Modelling it as one sealed family is what lets [DsSelect] walk the
+/// three. Modelling it as one sealed family is what lets [ElSelect] walk the
 /// list once and get both the geometry and the keyboard order out of it.
-sealed class DsSelectChild<T> {
-  const DsSelectChild();
+sealed class ElSelectChild<T> {
+  const ElSelectChild();
 }
 
 /// One `SelectItem`.
 @immutable
-class DsSelectOption<T> extends DsSelectChild<T> {
-  const DsSelectOption({
+class ElSelectOption<T> extends ElSelectChild<T> {
+  const ElSelectOption({
     required this.value,
     required this.label,
     this.enabled = true,
@@ -178,17 +179,17 @@ class DsSelectOption<T> extends DsSelectChild<T> {
 /// page: every `SelectGroup` opens with a `SelectLabel`, and a label outside a
 /// group would be a `<div>` in a listbox with nothing to name. The group itself
 /// paints nothing — its whole class list is `scroll-my-2`, an 8px scroll margin
-/// that only `scrollIntoView` reads, which is why [DsSelect] applies it when
+/// that only `scrollIntoView` reads, which is why [ElSelect] applies it when
 /// the keyboard walks into a grouped row and nowhere else.
 @immutable
-class DsSelectGroup<T> extends DsSelectChild<T> {
-  const DsSelectGroup({this.label, required this.children});
+class ElSelectGroup<T> extends ElSelectChild<T> {
+  const ElSelectGroup({this.label, required this.children});
 
   /// The `SelectLabel`'s text. Null renders a group with no label — legal in
   /// the primitive, unused on the page.
   final String? label;
 
-  final List<DsSelectOption<T>> children;
+  final List<ElSelectOption<T>> children;
 }
 
 /// `SelectSeparator` (`select.tsx:131`) — `pointer-events-none -mx-2 my-2 h-px
@@ -200,21 +201,21 @@ class DsSelectGroup<T> extends DsSelectChild<T> {
 /// never going to survive this page.
 ///
 /// It carries no value, so its element type is [Never] — which is what makes
-/// one `const DsSelectSeparator()` legal inside a list of options of any type.
+/// one `const ElSelectSeparator()` legal inside a list of options of any type.
 @immutable
-class DsSelectSeparator extends DsSelectChild<Never> {
-  const DsSelectSeparator();
+class ElSelectSeparator extends ElSelectChild<Never> {
+  const ElSelectSeparator();
 }
 
 /// A select with a real menu.
-class DsSelect<T> extends StatefulWidget {
-  const DsSelect({
+class ElSelect<T> extends StatefulWidget {
+  const ElSelect({
     super.key,
     required this.options,
     required this.value,
     required this.onChanged,
     this.placeholder,
-    this.size = DsSelectSize.md,
+    this.size = ElSelectSize.md,
     this.enabled = true,
     this.invalid = false,
     this.expand = false,
@@ -227,10 +228,10 @@ class DsSelect<T> extends StatefulWidget {
   /// `SelectContent`'s children — items, groups and separators.
   ///
   /// Kept under the name `options` through the widening from
-  /// `List<DsSelectOption<T>>`: a flat list of items is still the common call
-  /// and still compiles unchanged, because a `List<DsSelectOption<T>>` is a
-  /// `List<DsSelectChild<T>>`.
-  final List<DsSelectChild<T>> options;
+  /// `List<ElSelectOption<T>>`: a flat list of items is still the common call
+  /// and still compiles unchanged, because a `List<ElSelectOption<T>>` is a
+  /// `List<ElSelectChild<T>>`.
+  final List<ElSelectChild<T>> options;
 
   /// `value` — `null` renders [placeholder] under
   /// `data-placeholder:text-muted-foreground`.
@@ -242,12 +243,12 @@ class DsSelect<T> extends StatefulWidget {
   /// `SelectValue placeholder="…"`.
   final String? placeholder;
 
-  final DsSelectSize size;
+  final ElSelectSize size;
 
-  /// `disabled`. ANDed with the enclosing [DsFieldScope]'s.
+  /// `disabled`. ANDed with the enclosing [ElFieldScope]'s.
   final bool enabled;
 
-  /// `aria-invalid="true"`. ORed with the enclosing [DsFieldScope]'s.
+  /// `aria-invalid="true"`. ORed with the enclosing [ElFieldScope]'s.
   final bool invalid;
 
   /// The trigger's own class is `w-fit`; a vertical `Field` overrides it to
@@ -265,7 +266,7 @@ class DsSelect<T> extends StatefulWidget {
   /// an explicit width does to `*:w-full`.
   final double? width;
 
-  /// A [DsFieldScope]'s node wins over the owned one and loses to this.
+  /// A [ElFieldScope]'s node wins over the owned one and loses to this.
   ///
   /// `FormControl` wraps the **trigger**, not the `Select` — *"the trigger is
   /// the focusable thing, so it is the thing that needs the id"* — which is why
@@ -286,54 +287,54 @@ class DsSelect<T> extends StatefulWidget {
   ///
   /// Read off the type spec rather than measured, because the placement runs
   /// before the menu has ever been laid out: `text-sm` is 13px on Tailwind's
-  /// own `--text-sm--line-height`, which `DsLineBox` renders at exactly
+  /// own `--text-sm--line-height`, which `ElLineBox` renders at exactly
   /// `size × height`.
   static double get itemHeight {
-    final DsTypeSpec spec = DsComponentType.sheetBody;
-    return (spec.size ?? 0) * (spec.height ?? 1) + ds(2) * 2;
+    final ElTypeSpec spec = ElComponentType.sheetBody;
+    return (spec.size ?? 0) * (spec.height ?? 1) + el(2) * 2;
   }
 
   /// `SelectLabel`'s `px-3 py-2 text-xs` — 12px in a 16px line box, so **32**.
   ///
-  /// Derived from [DsComponentType.menuLabel] for the same reason [itemHeight]
+  /// Derived from [ElComponentType.menuLabel] for the same reason [itemHeight]
   /// is derived from `sheetBody`: the placement counts this height before the
   /// row exists.
   static double get labelHeight {
-    final DsTypeSpec spec = DsComponentType.menuLabel;
-    return (spec.size ?? 0) * (spec.height ?? 1) + ds(2) * 2;
+    final ElTypeSpec spec = ElComponentType.menuLabel;
+    return (spec.size ?? 0) * (spec.height ?? 1) + el(2) * 2;
   }
 
   /// `SelectSeparator`'s `my-2 h-px` — 8 + 1 + 8 = **17**.
-  static double get separatorHeight => DsWidths.hairline + ds(2) * 2;
+  static double get separatorHeight => ElWidths.hairline + el(2) * 2;
 
   /// `SelectScrollUpButton` / `SelectScrollDownButton` — `py-2` around a 16px
   /// chevron, so **32** each.
   static double get scrollButtonHeight =>
-      DsIcon.pxFor(DsIconSize.md) + ds(2) * 2;
+      ElIcon.pxFor(ElIconSize.md) + el(2) * 2;
 
   @override
-  State<DsSelect<T>> createState() => _DsSelectState<T>();
+  State<ElSelect<T>> createState() => _ElSelectState<T>();
 }
 
-class _DsSelectState<T> extends State<DsSelect<T>> {
+class _ElSelectState<T> extends State<ElSelect<T>> {
   final GlobalKey _triggerKey = GlobalKey();
 
   FocusNode? _ownedFocusNode;
 
-  /// The enclosing [DsFieldScope], cached on every dependency change so the
+  /// The enclosing [ElFieldScope], cached on every dependency change so the
   /// pointer and keyboard handlers can read it without depending on an
   /// inherited widget outside a build.
-  DsFieldScope? _scope;
+  ElFieldScope? _scope;
 
   FocusNode get _focusNode =>
       widget.focusNode ??
       _scope?.focusNode ??
-      (_ownedFocusNode ??= FocusNode(debugLabel: 'DsSelect'));
+      (_ownedFocusNode ??= FocusNode(debugLabel: 'ElSelect'));
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _scope = DsFieldScope.maybeOf(context);
+    _scope = ElFieldScope.maybeOf(context);
   }
 
   // The slot merge (`FormControl`): the scope supplies what the id graph would
@@ -360,10 +361,11 @@ class _DsSelectState<T> extends State<DsSelect<T>> {
   /// The flattened child list, kept until the caller passes a different one.
   _MenuGeometry<T>? _cachedMenu;
 
-  _MenuGeometry<T> get _menu => _cachedMenu ??= _MenuGeometry<T>(widget.options);
+  _MenuGeometry<T> get _menu =>
+      _cachedMenu ??= _MenuGeometry<T>(widget.options);
 
   @override
-  void didUpdateWidget(DsSelect<T> old) {
+  void didUpdateWidget(ElSelect<T> old) {
     super.didUpdateWidget(old);
     if (!identical(old.options, widget.options)) _cachedMenu = null;
   }
@@ -380,8 +382,9 @@ class _DsSelectState<T> extends State<DsSelect<T>> {
   }
 
   int get _selectedIndex {
-    final int i = _menu.options
-        .indexWhere((DsSelectOption<T> o) => o.value == widget.value);
+    final int i = _menu.options.indexWhere(
+      (ElSelectOption<T> o) => o.value == widget.value,
+    );
     return i < 0 ? 0 : i;
   }
 
@@ -409,7 +412,7 @@ class _DsSelectState<T> extends State<DsSelect<T>> {
   }
 
   void _commit(int index) {
-    final DsSelectOption<T> option = _menu.options[index];
+    final ElSelectOption<T> option = _menu.options[index];
     if (!option.enabled) return;
     _closeMenu();
     widget.onChanged?.call(option.value);
@@ -472,16 +475,16 @@ class _DsSelectState<T> extends State<DsSelect<T>> {
 
   /// `bg-card`, or `--input` at 30% / 50% on dark. The only hover state any
   /// control on this page authors, and it exists in one theme.
-  Color _triggerFill(DsThemeData theme) {
-    if (theme.kind == DsThemeKind.light) return theme.card;
+  Color _triggerFill(ElThemeData theme) {
+    if (theme.kind == ElThemeKind.light) return theme.card;
     return theme.input.withValues(
       alpha: _hovered ? _darkHoverFillAlpha : _darkFillAlpha,
     );
   }
 
-  Color _triggerBorder(DsThemeData theme) {
+  Color _triggerBorder(ElThemeData theme) {
     if (_invalid) {
-      return theme.kind == DsThemeKind.dark
+      return theme.kind == ElThemeKind.dark
           ? theme.destructive.withValues(alpha: _invalidBorderAlphaDark)
           : theme.destructive;
     }
@@ -489,32 +492,35 @@ class _DsSelectState<T> extends State<DsSelect<T>> {
     return theme.input;
   }
 
-  Color _triggerRing(DsThemeData theme) {
+  Color _triggerRing(ElThemeData theme) {
     if (_invalid) {
       return theme.destructive.withValues(
-        alpha: theme.kind == DsThemeKind.dark
+        alpha: theme.kind == ElThemeKind.dark
             ? _invalidRingAlphaDark
             : _invalidRingAlpha,
       );
     }
-    return theme.ring
-        .withValues(alpha: _focused || _open ? _focusRingAlpha : 0);
+    return theme.ring.withValues(
+      alpha: _focused || _open ? _focusRingAlpha : 0,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     // `transition-colors` with no duration class — the framework default.
-    final Duration duration =
-        dsAnimationDuration(context, DsDurations.transitionDefault);
+    final Duration duration = elAnimationDuration(
+      context,
+      ElDurations.transitionDefault,
+    );
 
     // `<label for>` on a select opens it — the trigger is the labelable thing,
     // and clicking its label is clicking the trigger. Null while disabled.
     _scope?.activator?.callback = _enabled ? _openMenu : null;
 
-    DsSelectOption<T>? chosen;
+    ElSelectOption<T>? chosen;
     if (widget.value != null) {
-      for (final DsSelectOption<T> option in _menu.options) {
+      for (final ElSelectOption<T> option in _menu.options) {
         if (option.value != widget.value) continue;
         chosen = option;
         break;
@@ -528,44 +534,47 @@ class _DsSelectState<T> extends State<DsSelect<T>> {
     Widget trigger = TweenAnimationBuilder<Color?>(
       tween: ColorTween(end: _triggerFill(theme)),
       duration: duration,
-      curve: DsCurves.out,
+      curve: ElCurves.out,
       builder: (BuildContext context, Color? fill, Widget? child) =>
           TweenAnimationBuilder<Color?>(
-        tween: ColorTween(end: _triggerBorder(theme)),
-        duration: duration,
-        curve: DsCurves.out,
-        builder: (BuildContext context, Color? border, Widget? child) =>
-            TweenAnimationBuilder<Color?>(
-          tween: ColorTween(end: _triggerRing(theme)),
-          duration: duration,
-          curve: DsCurves.out,
-          builder: (BuildContext context, Color? ring, Widget? child) =>
-              DsMachineSurface(
-            spec: DsButton.withFocusRing(DsShadows.pressed, ring ?? theme.ring),
-            radius: BorderRadius.circular(DsRadii.pill),
-            fill: fill ?? theme.card,
-            border: Border.all(
-              color: border ?? theme.input,
-              width: DsWidths.hairline,
-            ),
-            child: Padding(
-              // `pl-4 pr-3.5`. The surface has already paid for the border.
-              padding: EdgeInsets.only(left: ds(4), right: ds(3.5)),
-              child: child,
-            ),
+            tween: ColorTween(end: _triggerBorder(theme)),
+            duration: duration,
+            curve: ElCurves.out,
+            builder: (BuildContext context, Color? border, Widget? child) =>
+                TweenAnimationBuilder<Color?>(
+                  tween: ColorTween(end: _triggerRing(theme)),
+                  duration: duration,
+                  curve: ElCurves.out,
+                  builder: (BuildContext context, Color? ring, Widget? child) =>
+                      ElMachineSurface(
+                        spec: ElButton.withFocusRing(
+                          ElShadows.pressed,
+                          ring ?? theme.ring,
+                        ),
+                        radius: BorderRadius.circular(ElRadii.pill),
+                        fill: fill ?? theme.card,
+                        border: Border.all(
+                          color: border ?? theme.input,
+                          width: ElWidths.hairline,
+                        ),
+                        child: Padding(
+                          // `pl-4 pr-3.5`. The surface has already paid for the border.
+                          padding: EdgeInsets.only(left: el(4), right: el(3.5)),
+                          child: child,
+                        ),
+                      ),
+                  child: child,
+                ),
+            child: child,
           ),
-          child: child,
-        ),
-        child: child,
-      ),
       child: Row(
         // `justify-between` — the value takes the room, the chevron sits out.
         mainAxisSize: fills ? MainAxisSize.max : MainAxisSize.min,
         children: <Widget>[
           Flexible(
-            child: DsText(
+            child: ElText(
               chosen?.label ?? widget.placeholder ?? '',
-              DsComponentType.sheetBody,
+              ElComponentType.sheetBody,
               color: chosen == null ? theme.mutedForeground : theme.foreground,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -573,8 +582,8 @@ class _DsSelectState<T> extends State<DsSelect<T>> {
             ),
           ),
           // `gap-2`.
-          SizedBox(width: ds(2)),
-          const DsIcon(DsIconGlyph.chevronDown, tone: DsIconTone.muted),
+          SizedBox(width: el(2)),
+          const ElIcon(ElIconGlyph.chevronDown, tone: ElIconTone.muted),
         ],
       ),
     );
@@ -626,7 +635,7 @@ class _DsSelectState<T> extends State<DsSelect<T>> {
   /// Where `position="item-aligned"` puts the content: the chosen row over the
   /// trigger, clamped so the menu stays on screen.
   ///
-  /// The chosen row's centre is `ds(2) + Σ(heights of every row above it) +
+  /// The chosen row's centre is `el(2) + Σ(heights of every row above it) +
   /// itemHeight / 2` — labels and separators included, which is the whole of
   /// selects-map §3.2 delta 5. A menu of nothing but items reduces to the
   /// arithmetic phase 3 shipped, so the forms page does not move.
@@ -643,13 +652,16 @@ class _DsSelectState<T> extends State<DsSelect<T>> {
   /// button and no scroll-down button, at that offset. Both are reproduced.
   /// When nothing clamps, `wanted == top` and the offset is 0, which is why the
   /// forms page's flat menus do not move.
-  ({Offset origin, double width, double maxHeight, double scroll}) _placement() {
+  ({Offset origin, double width, double maxHeight, double scroll})
+  _placement() {
     final RenderBox trigger =
         _triggerKey.currentContext!.findRenderObject()! as RenderBox;
     final RenderBox overlay = _overlayBox!;
 
-    final Offset topLeft =
-        trigger.localToGlobal(Offset.zero, ancestor: overlay);
+    final Offset topLeft = trigger.localToGlobal(
+      Offset.zero,
+      ancestor: overlay,
+    );
     final Size screen = overlay.size;
 
     final double triggerCentre = topLeft.dy + trigger.size.height / 2;
@@ -660,8 +672,13 @@ class _DsSelectState<T> extends State<DsSelect<T>> {
     final double wanted = triggerCentre - chosenCentre;
 
     final double top = wanted
-        .clamp(_viewportMargin, (screen.height - _viewportMargin - height)
-            .clamp(_viewportMargin, double.infinity))
+        .clamp(
+          _viewportMargin,
+          (screen.height - _viewportMargin - height).clamp(
+            _viewportMargin,
+            double.infinity,
+          ),
+        )
         .toDouble();
 
     // `min-w-36`, and never narrower than the thing it is aligned over: an
@@ -707,7 +724,7 @@ class _DsSelectState<T> extends State<DsSelect<T>> {
             child: Focus(
               autofocus: true,
               onKeyEvent: _onMenuKey,
-              child: DsSelectMenu<T>(
+              child: ElSelectMenu<T>(
                 children: widget.options,
                 selected: widget.value,
                 highlighted: _highlighted,
@@ -734,31 +751,31 @@ class _DsSelectState<T> extends State<DsSelect<T>> {
 /// placement (before the menu exists), by the keyboard (which walks only the
 /// selectable rows) and by the scroll-into-view (which needs a row's box).
 class _MenuGeometry<T> {
-  _MenuGeometry(List<DsSelectChild<T>> children) {
+  _MenuGeometry(List<ElSelectChild<T>> children) {
     void add(_Row<T> row) {
       offsets.add(_height);
       rows.add(row);
       _height += row.height;
     }
 
-    for (final DsSelectChild<T> child in children) {
+    for (final ElSelectChild<T> child in children) {
       switch (child) {
-        case DsSelectOption<T>():
+        case ElSelectOption<T>():
           _rowOfOption.add(rows.length);
           add(_Row<T>.option(child, options.length, scrollMargin: 0));
           options.add(child);
-        case DsSelectGroup<T>():
+        case ElSelectGroup<T>():
           // `scroll-my-2` lives on the group, so every row inside it — the
           // label included — carries the margin when it is scrolled to.
           if (child.label != null) {
-            add(_Row<T>.label(child.label!, scrollMargin: ds(2)));
+            add(_Row<T>.label(child.label!, scrollMargin: el(2)));
           }
-          for (final DsSelectOption<T> option in child.children) {
+          for (final ElSelectOption<T> option in child.children) {
             _rowOfOption.add(rows.length);
-            add(_Row<T>.option(option, options.length, scrollMargin: ds(2)));
+            add(_Row<T>.option(option, options.length, scrollMargin: el(2)));
             options.add(option);
           }
-        case DsSelectSeparator():
+        case ElSelectSeparator():
           add(_Row<T>.separator());
       }
     }
@@ -773,7 +790,7 @@ class _MenuGeometry<T> {
 
   /// The selectable rows only: what the value, the keyboard and the tick index
   /// into.
-  final List<DsSelectOption<T>> options = <DsSelectOption<T>>[];
+  final List<ElSelectOption<T>> options = <ElSelectOption<T>>[];
 
   final List<int> _rowOfOption = <int>[];
 
@@ -783,11 +800,11 @@ class _MenuGeometry<T> {
   double get rowsHeight => _height;
 
   /// `p-2` + every row + `p-2` — the menu's height when nothing caps it.
-  double get contentHeight => ds(2) * 2 + _height;
+  double get contentHeight => el(2) * 2 + _height;
 
   /// The distance from the content's top edge to the middle of option [i].
   double centreOfOption(int i) =>
-      ds(2) + offsets[_rowOfOption[i]] + DsSelect.itemHeight / 2;
+      el(2) + offsets[_rowOfOption[i]] + ElSelect.itemHeight / 2;
 
   /// Option [i]'s box inside the scrolling viewport, `scroll-my-2` included —
   /// what `scrollIntoView` is asked to reveal.
@@ -795,8 +812,8 @@ class _MenuGeometry<T> {
     final int row = _rowOfOption[i];
     final double margin = rows[row].scrollMargin;
     return (
-      top: ds(2) + offsets[row] - margin,
-      bottom: ds(2) + offsets[row] + rows[row].height + margin,
+      top: el(2) + offsets[row] - margin,
+      bottom: el(2) + offsets[row] + rows[row].height + margin,
     );
   }
 }
@@ -806,21 +823,32 @@ enum _RowKind { option, label, separator }
 
 @immutable
 class _Row<T> {
-  const _Row._(this.kind, {this.option, this.text, this.index = -1,
-      this.scrollMargin = 0});
+  const _Row._(
+    this.kind, {
+    this.option,
+    this.text,
+    this.index = -1,
+    this.scrollMargin = 0,
+  });
 
-  const _Row.option(DsSelectOption<T> option, int index,
-      {required double scrollMargin})
-      : this._(_RowKind.option,
-            option: option, index: index, scrollMargin: scrollMargin);
+  const _Row.option(
+    ElSelectOption<T> option,
+    int index, {
+    required double scrollMargin,
+  }) : this._(
+         _RowKind.option,
+         option: option,
+         index: index,
+         scrollMargin: scrollMargin,
+       );
 
   const _Row.label(String text, {required double scrollMargin})
-      : this._(_RowKind.label, text: text, scrollMargin: scrollMargin);
+    : this._(_RowKind.label, text: text, scrollMargin: scrollMargin);
 
   const _Row.separator() : this._(_RowKind.separator);
 
   final _RowKind kind;
-  final DsSelectOption<T>? option;
+  final ElSelectOption<T>? option;
   final String? text;
 
   /// Into [_MenuGeometry.options], or −1 for a row that cannot be chosen.
@@ -830,21 +858,21 @@ class _Row<T> {
   final double scrollMargin;
 
   double get height => switch (kind) {
-        _RowKind.option => DsSelect.itemHeight,
-        _RowKind.label => DsSelect.labelHeight,
-        _RowKind.separator => DsSelect.separatorHeight,
-      };
+    _RowKind.option => ElSelect.itemHeight,
+    _RowKind.label => ElSelect.labelHeight,
+    _RowKind.separator => ElSelect.separatorHeight,
+  };
 }
 
 /// `SelectContent` — the popover surface, the two scroll buttons and the
 /// `Viewport` between them.
 ///
-/// Public because ruling L6 makes [DsNativeSelect] mount it: Flutter has no OS
+/// Public because ruling L6 makes [ElNativeSelect] mount it: Flutter has no OS
 /// `<select>` list, so the port's own menu is what the native control opens.
 /// Everything about it belongs to `select.tsx`; nothing about it belongs to
 /// whoever is showing it, which is why the placement stays with the caller.
-class DsSelectMenu<T> extends StatefulWidget {
-  const DsSelectMenu({
+class ElSelectMenu<T> extends StatefulWidget {
+  const ElSelectMenu({
     super.key,
     required this.children,
     required this.selected,
@@ -860,7 +888,7 @@ class DsSelectMenu<T> extends StatefulWidget {
   /// the flattening is a walk over a handful of records, and a widget that took
   /// a private type could not be mounted from another file — which is exactly
   /// what ruling L6 asks of it.
-  final List<DsSelectChild<T>> children;
+  final List<ElSelectChild<T>> children;
 
   /// The chosen value — the row that wears the tick.
   final T? selected;
@@ -878,16 +906,17 @@ class DsSelectMenu<T> extends StatefulWidget {
 
   /// The height the child list renders at, `p-2` included — what a caller
   /// needs before the menu exists in order to place it.
-  static double heightOf<T>(List<DsSelectChild<T>> children) =>
+  static double heightOf<T>(List<ElSelectChild<T>> children) =>
       _MenuGeometry<T>(children).contentHeight;
 
   @override
-  State<DsSelectMenu<T>> createState() => _DsSelectMenuState<T>();
+  State<ElSelectMenu<T>> createState() => _ElSelectMenuState<T>();
 }
 
-class _DsSelectMenuState<T> extends State<DsSelectMenu<T>> {
-  late final ScrollController _scroll =
-      ScrollController(initialScrollOffset: widget.initialScrollOffset);
+class _ElSelectMenuState<T> extends State<ElSelectMenu<T>> {
+  late final ScrollController _scroll = ScrollController(
+    initialScrollOffset: widget.initialScrollOffset,
+  );
 
   late _MenuGeometry<T> _menu = _MenuGeometry<T>(widget.children);
 
@@ -906,7 +935,7 @@ class _DsSelectMenuState<T> extends State<DsSelectMenu<T>> {
   }
 
   @override
-  void didUpdateWidget(DsSelectMenu<T> old) {
+  void didUpdateWidget(ElSelectMenu<T> old) {
     super.didUpdateWidget(old);
     if (!identical(old.children, widget.children)) {
       _menu = _MenuGeometry<T>(widget.children);
@@ -947,8 +976,9 @@ class _DsSelectMenuState<T> extends State<DsSelectMenu<T>> {
     if (box.top < at.pixels) {
       at.jumpTo(box.top.clamp(0, ceiling < 0 ? 0 : ceiling));
     } else if (box.bottom > at.pixels + at.viewportDimension) {
-      at.jumpTo((box.bottom - at.viewportDimension)
-          .clamp(0, ceiling < 0 ? 0 : ceiling));
+      at.jumpTo(
+        (box.bottom - at.viewportDimension).clamp(0, ceiling < 0 ? 0 : ceiling),
+      );
     }
   }
 
@@ -960,17 +990,17 @@ class _DsSelectMenuState<T> extends State<DsSelectMenu<T>> {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
 
-    return DsPopoverSurface(
+    return ElPopoverSurface(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           if (_canScrollUp)
             _ScrollButton(
-              glyph: DsIconGlyph.chevronUp,
-              onScroll: () => _scrollBy(-DsSelect.itemHeight),
+              glyph: ElIconGlyph.chevronUp,
+              onScroll: () => _scrollBy(-ElSelect.itemHeight),
             ),
           Flexible(
             child: SingleChildScrollView(
@@ -978,7 +1008,7 @@ class _DsSelectMenuState<T> extends State<DsSelectMenu<T>> {
               // The viewport's `p-2`, on the scrolling box itself so a
               // separator's `-mx-2` has something to cancel. The horizontal
               // half is applied per row instead — see [_SelectSeparator].
-              padding: EdgeInsets.symmetric(vertical: ds(2)),
+              padding: EdgeInsets.symmetric(vertical: el(2)),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -986,20 +1016,20 @@ class _DsSelectMenuState<T> extends State<DsSelectMenu<T>> {
                   for (final _Row<T> row in _menu.rows)
                     switch (row.kind) {
                       _RowKind.option => Padding(
-                          padding: EdgeInsets.symmetric(horizontal: ds(2)),
-                          child: _SelectItem<T>(
-                            theme: theme,
-                            option: row.option!,
-                            checked: row.option!.value == widget.selected,
-                            highlighted: row.index == widget.highlighted,
-                            onTap: () => widget.onPick(row.index),
-                            onHover: () => widget.onHover(row.index),
-                          ),
+                        padding: EdgeInsets.symmetric(horizontal: el(2)),
+                        child: _SelectItem<T>(
+                          theme: theme,
+                          option: row.option!,
+                          checked: row.option!.value == widget.selected,
+                          highlighted: row.index == widget.highlighted,
+                          onTap: () => widget.onPick(row.index),
+                          onHover: () => widget.onHover(row.index),
                         ),
+                      ),
                       _RowKind.label => Padding(
-                          padding: EdgeInsets.symmetric(horizontal: ds(2)),
-                          child: _SelectLabel(theme: theme, text: row.text!),
-                        ),
+                        padding: EdgeInsets.symmetric(horizontal: el(2)),
+                        child: _SelectLabel(theme: theme, text: row.text!),
+                      ),
                       // `-mx-2` cancels the padding the other rows keep, so the
                       // rule runs the full content width.
                       _RowKind.separator => _SelectSeparator(theme: theme),
@@ -1010,8 +1040,8 @@ class _DsSelectMenuState<T> extends State<DsSelectMenu<T>> {
           ),
           if (_canScrollDown)
             _ScrollButton(
-              glyph: DsIconGlyph.chevronDown,
-              onScroll: () => _scrollBy(DsSelect.itemHeight),
+              glyph: ElIconGlyph.chevronDown,
+              onScroll: () => _scrollBy(ElSelect.itemHeight),
             ),
         ],
       ),
@@ -1023,16 +1053,16 @@ class _DsSelectMenuState<T> extends State<DsSelectMenu<T>> {
 class _SelectLabel extends StatelessWidget {
   const _SelectLabel({required this.theme, required this.text});
 
-  final DsThemeData theme;
+  final ElThemeData theme;
   final String text;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: ds(3), vertical: ds(2)),
-      child: DsText(
+      padding: EdgeInsets.symmetric(horizontal: el(3), vertical: el(2)),
+      child: ElText(
         text,
-        DsComponentType.menuLabel,
+        ElComponentType.menuLabel,
         color: theme.mutedForeground,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
@@ -1047,15 +1077,15 @@ class _SelectLabel extends StatelessWidget {
 class _SelectSeparator extends StatelessWidget {
   const _SelectSeparator({required this.theme});
 
-  final DsThemeData theme;
+  final ElThemeData theme;
 
   @override
   Widget build(BuildContext context) {
     return IgnorePointer(
       child: Padding(
-        padding: EdgeInsets.symmetric(vertical: ds(2)),
+        padding: EdgeInsets.symmetric(vertical: el(2)),
         child: SizedBox(
-          height: DsWidths.hairline,
+          height: ElWidths.hairline,
           child: ColoredBox(color: theme.border),
         ),
       ),
@@ -1072,7 +1102,7 @@ class _SelectSeparator extends StatelessWidget {
 class _ScrollButton extends StatefulWidget {
   const _ScrollButton({required this.glyph, required this.onScroll});
 
-  final DsIconGlyph glyph;
+  final ElIconGlyph glyph;
   final VoidCallback onScroll;
 
   @override
@@ -1099,7 +1129,7 @@ class _ScrollButtonState extends State<_ScrollButton> {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return MouseRegion(
       cursor: SystemMouseCursors.basic,
       onEnter: (_) => _start(),
@@ -1107,10 +1137,10 @@ class _ScrollButtonState extends State<_ScrollButton> {
       child: ColoredBox(
         color: theme.popover,
         child: SizedBox(
-          height: DsSelect.scrollButtonHeight,
+          height: ElSelect.scrollButtonHeight,
           child: Center(
             // `tone="inherit"` under the content's `text-popover-foreground`.
-            child: DsIcon(widget.glyph, tone: DsIconTone.inherit),
+            child: ElIcon(widget.glyph, tone: ElIconTone.inherit),
           ),
         ),
       ),
@@ -1129,8 +1159,8 @@ class _SelectItem<T> extends StatelessWidget {
     required this.onHover,
   });
 
-  final DsThemeData theme;
-  final DsSelectOption<T> option;
+  final ElThemeData theme;
+  final ElSelectOption<T> option;
   final bool checked;
   final bool highlighted;
   final VoidCallback onTap;
@@ -1138,27 +1168,28 @@ class _SelectItem<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color ink =
-        highlighted ? theme.accentForeground : theme.popoverForeground;
+    final Color ink = highlighted
+        ? theme.accentForeground
+        : theme.popoverForeground;
 
     Widget row = DecoratedBox(
       decoration: BoxDecoration(
         // `focus:bg-accent` — Radix moves DOM focus onto the highlighted item,
         // so `:focus` is the highlight.
         color: highlighted ? theme.accent : null,
-        borderRadius: BorderRadius.circular(DsRadii.md),
+        borderRadius: BorderRadius.circular(ElRadii.md),
       ),
       child: Padding(
         // `py-2 pr-9 pl-3` — the 36px right gutter is the indicator's room.
         padding: EdgeInsets.only(
-          left: ds(3),
-          right: ds(9),
-          top: ds(2),
-          bottom: ds(2),
+          left: el(3),
+          right: el(9),
+          top: el(2),
+          bottom: el(2),
         ),
-        child: DsText(
+        child: ElText(
           option.label,
-          DsComponentType.sheetBody,
+          ElComponentType.sheetBody,
           color: ink,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
@@ -1180,8 +1211,8 @@ class _SelectItem<T> extends StatelessWidget {
               alignment: AlignmentDirectional.centerEnd,
               child: Padding(
                 // `absolute right-3` on a `size-4` box.
-                padding: EdgeInsets.only(right: ds(3)),
-                child: DsIcon(DsIconGlyph.check, sizePx: ds(4)),
+                padding: EdgeInsets.only(right: el(3)),
+                child: ElIcon(ElIconGlyph.check, sizePx: el(4)),
               ),
             ),
           ),
@@ -1190,7 +1221,10 @@ class _SelectItem<T> extends StatelessWidget {
 
     // The tick is `tone="inherit"` — `text-current` — so it takes whatever the
     // row's own colour resolves to, highlighted or not.
-    row = DefaultTextStyle.merge(style: TextStyle(color: ink), child: row);
+    row = DefaultTextStyle.merge(
+      style: TextStyle(color: ink),
+      child: row,
+    );
     row = Opacity(opacity: option.enabled ? 1 : _disabledOpacity, child: row);
 
     return Semantics(

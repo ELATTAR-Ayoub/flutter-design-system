@@ -16,15 +16,15 @@ import '../foundation/shadows.dart';
 import '../foundation/theme.dart';
 import '../theme_scope.dart';
 
-/// Paints a [DsShadowSpec] — outer layers *and* inset layers — around and
+/// Paints a [ElShadowSpec] — outer layers *and* inset layers — around and
 /// inside [child].
 ///
 /// Painting order reproduces CSS's: fill, then inset shadows, then the border,
 /// then content. Getting that order wrong is visible on every outline button:
 /// the `inset 0 1px 0 var(--rim)` highlight is a one-pixel line hugging the
 /// top inside edge, and it must sit *under* the border, not over it.
-class DsMachineSurface extends StatelessWidget {
-  const DsMachineSurface({
+class ElMachineSurface extends StatelessWidget {
+  const ElMachineSurface({
     super.key,
     required this.spec,
     required this.radius,
@@ -34,7 +34,7 @@ class DsMachineSurface extends StatelessWidget {
   });
 
   /// The `--shadow-*` token to paint.
-  final DsShadowSpec spec;
+  final ElShadowSpec spec;
 
   /// The shape. Both the outer shadows and the inset clip follow it.
   final BorderRadius radius;
@@ -53,12 +53,12 @@ class DsMachineSurface extends StatelessWidget {
   /// by the sign of its `dy`, and it is worth pinning that a positive `dy`
   /// lights the *top* edge rather than the bottom.
   @visibleForTesting
-  static Path debugInsetRing(RRect shape, DsShadowLayer layer) =>
+  static Path debugInsetRing(RRect shape, ElShadowLayer layer) =>
       _insetRing(shape, layer);
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
 
     Widget content = child;
     if (border != null) {
@@ -102,7 +102,7 @@ class DsMachineSurface extends StatelessWidget {
 /// so `1.5 × blur` would do; twice the blur is the same reasoning with room to
 /// spare. The floor keeps a zero-blur layer's ring from collapsing onto the
 /// shape's own edge.
-double _ringReach(DsShadowLayer layer) =>
+double _ringReach(ElShadowLayer layer) =>
     layer.blur * 2 + layer.spread.abs() + layer.offset.distance + 4;
 
 /// The area an inset [layer] covers inside [shape], as the **pair of rounded
@@ -116,7 +116,7 @@ double _ringReach(DsShadowLayer layer) =>
 /// Kept as two rectangles rather than one combined [Path] because that is what
 /// [Canvas.drawDRRect] takes, and because a rectangle pair is the shape's own
 /// vocabulary — see [_InsetShadowPainter.paint] for why the difference matters.
-({RRect outer, RRect? hole}) _insetRingRects(RRect shape, DsShadowLayer layer) {
+({RRect outer, RRect? hole}) _insetRingRects(RRect shape, ElShadowLayer layer) {
   final RRect outer = RRect.fromRectAndRadius(
     shape.outerRect.inflate(_ringReach(layer)),
     Radius.zero,
@@ -136,17 +136,13 @@ double _ringReach(DsShadowLayer layer) =>
 /// gets painted — see [_InsetShadowPainter.paint] — and survives because it is
 /// how the ring's *geometry* is asserted: which edge a signed `dy` lights, and
 /// how far past the shape the ring has to reach.
-Path _insetRing(RRect shape, DsShadowLayer layer) {
+Path _insetRing(RRect shape, ElShadowLayer layer) {
   final ({RRect outer, RRect? hole}) rects = _insetRingRects(shape, layer);
   final Path outer = Path()..addRRect(rects.outer);
   final RRect? hole = rects.hole;
   if (hole == null) return outer;
 
-  return Path.combine(
-    PathOperation.difference,
-    outer,
-    Path()..addRRect(hole),
-  );
+  return Path.combine(PathOperation.difference, outer, Path()..addRRect(hole));
 }
 
 class _InsetShadowPainter extends CustomPainter {
@@ -156,9 +152,9 @@ class _InsetShadowPainter extends CustomPainter {
     required this.theme,
   });
 
-  final List<DsShadowLayer> layers;
+  final List<ElShadowLayer> layers;
   final BorderRadius radius;
-  final DsThemeData theme;
+  final ElThemeData theme;
 
   /// **Why [Canvas.drawDRRect] and not `drawPath` over a combined path.**
   ///
@@ -186,8 +182,8 @@ class _InsetShadowPainter extends CustomPainter {
     canvas.save();
     canvas.clipRRect(shape, doAntiAlias: true);
     // CSS paints the first-listed shadow on top, so the list is walked
-    // backwards — the same reversal `DsShadowSpec.outerShadows` makes.
-    for (final DsShadowLayer layer in layers.reversed) {
+    // backwards — the same reversal `ElShadowSpec.outerShadows` makes.
+    for (final ElShadowLayer layer in layers.reversed) {
       final Paint paint = Paint()..color = layer.color(theme);
       // `layer.blurRadius` already un-does Flutter's radius→sigma formula, so
       // putting it back through that formula lands on the CSS sigma exactly:

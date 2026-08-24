@@ -32,16 +32,26 @@ class SiteNavGroup {
 }
 
 /// The top-level public destinations, in header order.
+///
+/// Exactly two: `Documentation` and `Components`. Everything else a reader can
+/// reach lives in the left rail of the documentation shell, never in the
+/// header. Introduction, Installation, Theming, CLI and Skills are all
+/// documentation pages, so putting them beside `Documentation` in the header
+/// listed a section and its own children as peers.
+///
+/// This filters [siteRoutes] rather than restating it, so a route added there
+/// cannot silently reappear in the header: only the two section landings do.
 final List<SiteNavEntry> primarySiteNavigation =
     List<SiteNavEntry>.unmodifiable(<SiteNavEntry>[
       for (final SiteRoute route in siteRoutes)
-        SiteNavEntry(
-          title: route.title,
-          path: route.path,
-          description: route.description,
-          keywords: route.keywords,
-          section: route.section,
-        ),
+        if (route.path == docsRoute || route.path == componentsRoute)
+          SiteNavEntry(
+            title: route.title,
+            path: route.path,
+            description: route.description,
+            keywords: route.keywords,
+            section: route.section,
+          ),
     ]);
 
 /// Footer groupings for the public shell.
@@ -53,12 +63,12 @@ final List<SiteNavGroup> footerSiteNavigation = List<SiteNavGroup>.unmodifiable(
       entries: <SiteNavEntry>[
         const SiteNavEntry(
           title: 'Overview',
-          path: dsRoot,
+          path: elRoot,
           description: 'The operating manual for the whole design system.',
           keywords: <String>['overview', 'foundations'],
           section: SiteSection.docs,
         ),
-        for (final DsGroup group in dsGroups.skip(1))
+        for (final ElGroup group in elGroups.skip(1))
           SiteNavEntry(
             title: group.title,
             path: group.href,
@@ -79,13 +89,13 @@ final List<SearchRoute> siteQuickSearchRoutes = List<SearchRoute>.unmodifiable(
       docsRoute,
       componentsRoute,
       skillsRoute,
-      dsRoot,
-      '$dsRoot/colors',
-      '$dsRoot/typography',
-      '$dsRoot/motion',
-      '$dsRoot/components/base/buttons',
-      '$dsRoot/components/base/sidebar',
-      '$dsRoot/components/agent/console',
+      elRoot,
+      '$elRoot/colors',
+      '$elRoot/typography',
+      '$elRoot/motion',
+      '$elRoot/components/base/buttons',
+      '$elRoot/components/base/sidebar',
+      '$elRoot/components/agent/console',
     ])
       searchRouteByPath(path),
   ],
@@ -114,7 +124,7 @@ String _sectionLabel(SiteSection section) => switch (section) {
   SiteSection.skills => 'Skills',
 };
 
-double _searchScore(SearchRoute route, String query) => dsCommandScore(
+double _searchScore(SearchRoute route, String query) => elCommandScore(
   route.title,
   query,
   <String>[route.path, route.description, ...route.keywords],

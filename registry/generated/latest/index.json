@@ -3,10 +3,136 @@
   "registryVersion": "0.0.1",
   "items": [
     {
+      "name": "accordion",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/accordion"
+    },
+    {
+      "name": "agent-attach-menu",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/agent-attach-menu"
+    },
+    {
+      "name": "agent-attachments",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/agent-attachments"
+    },
+    {
+      "name": "agent-avatar",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/agent-avatar"
+    },
+    {
+      "name": "agent-composer",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/agent-composer"
+    },
+    {
+      "name": "agent-console",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/agent-console"
+    },
+    {
+      "name": "agent-core",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/agent-core"
+    },
+    {
+      "name": "agent-face",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/agent-face"
+    },
+    {
+      "name": "agent-history",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/agent-history"
+    },
+    {
+      "name": "agent-launcher",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/agent-launcher"
+    },
+    {
+      "name": "agent-markdown",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/agent-markdown"
+    },
+    {
+      "name": "agent-slash-palette",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/agent-slash-palette"
+    },
+    {
+      "name": "agent-transcript",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/agent-transcript"
+    },
+    {
+      "name": "alert",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/alert"
+    },
+    {
       "name": "alert-dialog",
       "type": "component",
       "version": "0.0.1",
       "documentationRoute": "/components/alert-dialog"
+    },
+    {
+      "name": "aspect-ratio",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/aspect-ratio"
+    },
+    {
+      "name": "attachment",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/attachment"
+    },
+    {
+      "name": "avatar",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/avatar"
+    },
+    {
+      "name": "badge",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/badge"
+    },
+    {
+      "name": "bloom-cosmic",
+      "type": "effect",
+      "version": "0.0.1",
+      "documentationRoute": "/docs/effects/bloom-cosmic"
+    },
+    {
+      "name": "breadcrumb",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/breadcrumb"
+    },
+    {
+      "name": "bubble",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/bubble"
     },
     {
       "name": "button",
@@ -15,10 +141,82 @@
       "documentationRoute": "/components/button"
     },
     {
+      "name": "button-group",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/button-group"
+    },
+    {
+      "name": "calendar",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/calendar"
+    },
+    {
       "name": "card",
       "type": "component",
       "version": "0.0.1",
       "documentationRoute": "/components/card"
+    },
+    {
+      "name": "carousel",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/carousel"
+    },
+    {
+      "name": "chart",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/chart"
+    },
+    {
+      "name": "chart-cartesian",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/chart-cartesian"
+    },
+    {
+      "name": "chart-geometry",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/chart-geometry"
+    },
+    {
+      "name": "chart-polar",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/chart-polar"
+    },
+    {
+      "name": "checkbox",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/checkbox"
+    },
+    {
+      "name": "collapsible",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/collapsible"
+    },
+    {
+      "name": "combobox",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/combobox"
+    },
+    {
+      "name": "command",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/command"
+    },
+    {
+      "name": "context-menu",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/context-menu"
     },
     {
       "name": "dialog",
@@ -27,10 +225,22 @@
       "documentationRoute": "/components/dialog"
     },
     {
-      "name": "ds-rule",
+      "name": "drawer",
       "type": "component",
       "version": "0.0.1",
-      "documentationRoute": "/docs/foundations/rules"
+      "documentationRoute": "/components/drawer"
+    },
+    {
+      "name": "dropdown-menu",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/dropdown-menu"
+    },
+    {
+      "name": "empty",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/empty"
     },
     {
       "name": "field",
@@ -45,10 +255,34 @@
       "documentationRoute": "/docs/effects/foil-value"
     },
     {
+      "name": "form",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/form"
+    },
+    {
+      "name": "glass",
+      "type": "effect",
+      "version": "0.0.1",
+      "documentationRoute": "/docs/effects/glass"
+    },
+    {
+      "name": "hover-card",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/hover-card"
+    },
+    {
       "name": "icon",
       "type": "component",
       "version": "0.0.1",
       "documentationRoute": "/components/icon"
+    },
+    {
+      "name": "icon-swap",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/icon-swap"
     },
     {
       "name": "input",
@@ -57,10 +291,112 @@
       "documentationRoute": "/components/input"
     },
     {
+      "name": "input-group",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/input-group"
+    },
+    {
+      "name": "input-otp",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/input-otp"
+    },
+    {
+      "name": "item",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/item"
+    },
+    {
+      "name": "kbd",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/kbd"
+    },
+    {
+      "name": "keyframes",
+      "type": "motion",
+      "version": "0.0.1",
+      "documentationRoute": "/docs/motion/keyframes"
+    },
+    {
+      "name": "lift",
+      "type": "motion",
+      "version": "0.0.1",
+      "documentationRoute": "/docs/motion/lift"
+    },
+    {
       "name": "machine-surface",
       "type": "effect",
       "version": "0.0.1",
       "documentationRoute": "/docs/effects/machine-surface"
+    },
+    {
+      "name": "marker",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/marker"
+    },
+    {
+      "name": "media-scrim",
+      "type": "effect",
+      "version": "0.0.1",
+      "documentationRoute": "/docs/effects/media-scrim"
+    },
+    {
+      "name": "menu",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/menu"
+    },
+    {
+      "name": "menubar",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/menubar"
+    },
+    {
+      "name": "message",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/message"
+    },
+    {
+      "name": "message-scroller",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/message-scroller"
+    },
+    {
+      "name": "native-select",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/native-select"
+    },
+    {
+      "name": "nav-user",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/nav-user"
+    },
+    {
+      "name": "navigation-menu",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/navigation-menu"
+    },
+    {
+      "name": "page-glow",
+      "type": "effect",
+      "version": "0.0.1",
+      "documentationRoute": "/docs/effects/page-glow"
+    },
+    {
+      "name": "pagination",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/pagination"
     },
     {
       "name": "popover",
@@ -75,16 +411,100 @@
       "documentationRoute": "/docs/motion/press"
     },
     {
+      "name": "progress",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/progress"
+    },
+    {
+      "name": "questionnaire",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/questionnaire"
+    },
+    {
+      "name": "radio",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/radio"
+    },
+    {
+      "name": "resizable",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/resizable"
+    },
+    {
+      "name": "rule",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/docs/foundations/rules"
+    },
+    {
+      "name": "safe-area",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/safe-area"
+    },
+    {
+      "name": "scroll-area",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/scroll-area"
+    },
+    {
       "name": "select",
       "type": "component",
       "version": "0.0.1",
       "documentationRoute": "/components/select"
     },
     {
+      "name": "selection-control",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/selection-control"
+    },
+    {
+      "name": "separator",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/separator"
+    },
+    {
       "name": "sheen-action",
       "type": "effect",
       "version": "0.0.1",
       "documentationRoute": "/docs/effects/sheen-action"
+    },
+    {
+      "name": "sheet",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/sheet"
+    },
+    {
+      "name": "sidebar",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/sidebar"
+    },
+    {
+      "name": "skeleton",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/skeleton"
+    },
+    {
+      "name": "slider",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/slider"
+    },
+    {
+      "name": "sliding-pill",
+      "type": "motion",
+      "version": "0.0.1",
+      "documentationRoute": "/docs/motion/sliding-pill"
     },
     {
       "name": "source-foundation",
@@ -99,10 +519,82 @@
       "documentationRoute": "/components/spinner"
     },
     {
+      "name": "starfield",
+      "type": "effect",
+      "version": "0.0.1",
+      "documentationRoute": "/docs/effects/starfield"
+    },
+    {
+      "name": "stat",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/stat"
+    },
+    {
+      "name": "swap-in",
+      "type": "motion",
+      "version": "0.0.1",
+      "documentationRoute": "/docs/motion/swap-in"
+    },
+    {
+      "name": "switch",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/switch"
+    },
+    {
+      "name": "table",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/table"
+    },
+    {
+      "name": "tabs",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/tabs"
+    },
+    {
+      "name": "textarea",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/textarea"
+    },
+    {
+      "name": "toaster",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/toaster"
+    },
+    {
+      "name": "toggle",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/toggle"
+    },
+    {
+      "name": "toggle-group",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/toggle-group"
+    },
+    {
       "name": "tooltip",
       "type": "component",
       "version": "0.0.1",
       "documentationRoute": "/components/tooltip"
+    },
+    {
+      "name": "voice",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/voice"
+    },
+    {
+      "name": "voice-orb",
+      "type": "effect",
+      "version": "0.0.1",
+      "documentationRoute": "/docs/effects/voice-orb"
     }
   ]
 }

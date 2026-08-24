@@ -1,0 +1,33 @@
+{
+  "name": "dropdown-menu",
+  "type": "component",
+  "version": "0.0.1",
+  "description": "`components/ui/dropdown-menu.tsx` — a button that opens a menu under",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/dropdown_menu.dart",
+      "target": "@ui/dropdown_menu.dart",
+      "sha256": "715b26ee5469a33357188750ce2bd1444d53d0e31ce19b3420081e70c2647dc8"
+    }
+  ],
+  "registryDependencies": [
+    "button",
+    "menu",
+    "popover",
+    "source-foundation"
+  ],
+  "semanticDependencies": [
+    "button",
+    "menu",
+    "popover"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "documentationRoute": "/components/dropdown-menu",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/dropdown_menu.dart",
+  "deprecated": false
+}

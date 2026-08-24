@@ -1,0 +1,31 @@
+{
+  "name": "pagination",
+  "type": "component",
+  "version": "0.0.1",
+  "description": "`components/ui/pagination.tsx` — page numbers, built entirely out of",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/pagination.dart",
+      "target": "@ui/pagination.dart",
+      "sha256": "fcf7ea4e3245641fcf5cde34ae807fbb612a72d73fd72d54d1b853419215d1c8"
+    }
+  ],
+  "registryDependencies": [
+    "button",
+    "icon",
+    "source-foundation"
+  ],
+  "semanticDependencies": [
+    "button",
+    "icon"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "documentationRoute": "/components/pagination",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/pagination.dart",
+  "deprecated": false
+}

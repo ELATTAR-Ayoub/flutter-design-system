@@ -13,6 +13,8 @@ const String uiDirectory = 'lib/components/ui';
 const String foundationDirectory = 'lib/design_system/foundation';
 const String effectsDirectory = 'lib/design_system/effects';
 const String motionDirectory = 'lib/design_system/motion';
+const String assetsDirectory = 'assets';
+const String shadersDirectory = 'shaders';
 const String fontsDirectory = 'assets/elattar/fonts';
 
 /// Application compositions (shots) land in the consumer's own `lib/`, not
@@ -45,6 +47,12 @@ class LogicalTargetMapper {
     }
     if (relative.startsWith('@motion/')) {
       return _join(projectRoot, '$motionDirectory/${relative.substring(8)}');
+    }
+    if (relative.startsWith('@assets/')) {
+      return _join(projectRoot, '$assetsDirectory/${relative.substring(8)}');
+    }
+    if (relative.startsWith('@shaders/')) {
+      return _join(projectRoot, '$shadersDirectory/${relative.substring(9)}');
     }
     if (relative.startsWith('@app/')) {
       return _join(projectRoot, '$appDirectory/${relative.substring(5)}');

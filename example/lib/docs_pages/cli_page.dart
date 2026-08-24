@@ -35,9 +35,9 @@ class CliDocsPage extends StatelessWidget {
           'The real elattar command surface: six commands, their flags, '
           'and the exit code each failure path returns.',
     ),
-    breadcrumbs: const <DsBreadcrumbEntry>[
-      DsBreadcrumbEntry.link('Docs'),
-      DsBreadcrumbEntry.page('CLI'),
+    breadcrumbs: const <ElBreadcrumbEntry>[
+      ElBreadcrumbEntry.link('Docs'),
+      ElBreadcrumbEntry.page('CLI'),
     ],
     toc: const <DocsTocEntry>[
       DocsTocEntry(title: 'Synopsis', anchor: 'synopsis'),
@@ -62,13 +62,13 @@ class _CliArticle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return Column(
       key: const ValueKey<String>('cli-doc-article'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         _synopsis(),
-        _running(theme),
+        _running(),
         _globalOptions(theme),
         _commands(theme),
         _workflows(),
@@ -80,16 +80,16 @@ class _CliArticle extends StatelessWidget {
     );
   }
 
-  Widget _prose(String text, DsThemeData theme, {DsTypeSpec? spec}) =>
+  Widget _prose(String text, ElThemeData theme, {ElTypeSpec? spec}) =>
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: DsWidths.prose),
-        child: DsText(text, spec ?? DsType.body),
+        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+        child: ElText(text, spec ?? ElType.body),
       );
 
-  Widget _synopsis() => DsSection(
+  Widget _synopsis() => ElSection(
     id: 'synopsis',
     title: 'Synopsis',
-    child: DsPanel(
+    child: ElPanel(
       label: 'CONSOLE',
       note: 'USAGE',
       child: DocsSelectableCodeBlock(
@@ -106,20 +106,23 @@ class _CliArticle extends StatelessWidget {
     ),
   );
 
-  Widget _running(DsThemeData theme) => DsSection(
+  Widget _running() => ElSection(
     id: 'running',
     title: 'Running it',
-    child: _prose(
-      'The CLI is not published, see Installation for the full context. '
-      'Every command on this page is written as `elattar <command>` for '
-      'readability; from a checkout it is actually invoked as `dart run '
-      'packages/elattar_cli/bin/elattar.dart <command>`, or as the bare '
-      '`elattar` form once activated locally.',
-      theme,
+    child: ElAlert(
+      variant: ElAlertVariant.info,
+      icon: const ElIcon(ElIconGlyph.info),
+      title: 'Not published',
+      description:
+          'Every command on this page is written as `elattar <command>` '
+          'for readability. From a checkout it is actually invoked as '
+          '`dart run packages/elattar_cli/bin/elattar.dart <command>`, or '
+          'as the bare `elattar` form once activated locally. See '
+          'Installation for the full context.',
     ),
   );
 
-  Widget _globalOptions(DsThemeData theme) => DsSection(
+  Widget _globalOptions(ElThemeData theme) => ElSection(
     id: 'global-options',
     title: 'Global options',
     child: const DocsApiTable(
@@ -149,7 +152,7 @@ class _CliArticle extends StatelessWidget {
     ),
   );
 
-  Widget _commands(DsThemeData theme) => DsSection(
+  Widget _commands(ElThemeData theme) => ElSection(
     id: 'commands',
     title: 'Commands',
     child: Column(
@@ -213,13 +216,13 @@ class _CliArticle extends StatelessWidget {
     ),
   );
 
-  Widget _workflows() => DsSection(
+  Widget _workflows() => ElSection(
     id: 'workflows',
     title: 'Common workflows',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        DsPanel(
+        ElPanel(
           label: 'CONSOLE',
           note: 'NEW PROJECT',
           child: DocsSelectableCodeBlock(
@@ -228,8 +231,8 @@ class _CliArticle extends StatelessWidget {
                 'elattar add button --registry registry/generated/latest',
           ),
         ),
-        SizedBox(height: ds(4)),
-        DsPanel(
+        SizedBox(height: el(4)),
+        ElPanel(
           label: 'CONSOLE',
           note: 'DISCOVER BEFORE INSTALLING',
           child: DocsSelectableCodeBlock(
@@ -243,7 +246,7 @@ class _CliArticle extends StatelessWidget {
     ),
   );
 
-  Widget _exitCodes() => DsSection(
+  Widget _exitCodes() => ElSection(
     id: 'exit-codes',
     title: 'Exit codes',
     description: 'Every code `ElattarCli.run` can return, and what causes it.',
@@ -303,7 +306,7 @@ class _CliArticle extends StatelessWidget {
     ),
   );
 
-  Widget _output(DsThemeData theme) => DsSection(
+  Widget _output(ElThemeData theme) => ElSection(
     id: 'output',
     title: 'Output format',
     child: _prose(
@@ -318,7 +321,7 @@ class _CliArticle extends StatelessWidget {
     ),
   );
 
-  Widget _offline(DsThemeData theme) => DsSection(
+  Widget _offline(ElThemeData theme) => ElSection(
     id: 'offline',
     title: 'Offline and CI usage',
     child: _prose(
@@ -334,7 +337,7 @@ class _CliArticle extends StatelessWidget {
     ),
   );
 
-  Widget _conflicts(DsThemeData theme) => DsSection(
+  Widget _conflicts(ElThemeData theme) => ElSection(
     id: 'conflicts',
     title: 'Conflicts and recovery',
     child: Column(
@@ -348,7 +351,7 @@ class _CliArticle extends StatelessWidget {
           '--dry-run first to preview a plan without writing anything.',
           theme,
         ),
-        SizedBox(height: ds(3)),
+        SizedBox(height: el(3)),
         _prose(
           'doctor is the recovery entry point: it separately checks the '
           'Flutter project, elattar.yaml, whether pubspec.yaml\'s declared '

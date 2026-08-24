@@ -1,0 +1,39 @@
+{
+  "name": "nav-user",
+  "type": "component",
+  "version": "0.0.1",
+  "description": "`components/ui/nav-user.tsx` — *\\\"the account block a sidebar footer is",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/nav_user.dart",
+      "target": "@ui/nav_user.dart",
+      "sha256": "5b893254e0b2c5e337ed0607980b38b1659f35284ff6cb22c20b2e8686c3d2dc"
+    }
+  ],
+  "registryDependencies": [
+    "avatar",
+    "dropdown-menu",
+    "icon",
+    "menu",
+    "popover",
+    "sidebar",
+    "source-foundation"
+  ],
+  "semanticDependencies": [
+    "avatar",
+    "dropdown-menu",
+    "icon",
+    "menu",
+    "popover",
+    "sidebar"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "documentationRoute": "/components/nav-user",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/nav_user.dart",
+  "deprecated": false
+}

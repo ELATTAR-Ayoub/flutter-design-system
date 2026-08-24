@@ -1,4 +1,4 @@
-/// The docs chrome, `app/design-system/layout.tsx` + `components/ds/ds-nav.tsx`.
+/// The docs chrome, `app/design-system/layout.tsx` + `components/el/el-nav.tsx`.
 ///
 /// Three things the web gets from the platform and this file has to build:
 ///
@@ -19,23 +19,23 @@
 /// Ordered 2026-08-16 against screenshots: the header was rendering behind the
 /// phone's clock and the reading column behind the gesture bar. A browser on a
 /// desktop has neither obstruction, so there is no reference behaviour to port;
-/// [DsSafeArea]'s library note carries the ruling and this file consumes it at
+/// [ElSafeArea]'s library note carries the ruling and this file consumes it at
 /// three places:
 ///
-///  * the header **grows** by the status-bar inset ([DsSafeArea.topBarHeightOf])
+///  * the header **grows** by the status-bar inset ([ElSafeArea.topBarHeightOf])
 ///    and keeps painting across the whole of it, so the blur and the wash still
 ///    run to the top of the screen and only the row of controls moves down;
 ///  * both scroll views scroll *under* both bars and pay the bottom one at the
-///    end of their content ([DsSafeArea.scrollPaddingOf]), so the last section
+///    end of their content ([ElSafeArea.scrollPaddingOf]), so the last section
 ///    can be dragged clear of the gesture bar instead of hiding behind it;
 ///  * the horizontal insets: a landscape notch: are spent once on the shell
 ///    frame, which is also what stops the rail from paying for a bar it does
-///    not touch: [DsSafeArea] removes what it spends from the [MediaQuery] it
+///    not touch: [ElSafeArea] removes what it spends from the [MediaQuery] it
 ///    hands down, so everything below reads zero for those two sides.
 ///
 /// The glow is outside all of it and still bleeds off every edge, which is the
 /// half of the ruling that says what *not* to inset. Every inset is zero on a
-/// desktop, and [DsSafeArea] adds no widget at all when it is: so the geometry
+/// desktop, and [ElSafeArea] adds no widget at all when it is: so the geometry
 /// pins taken at 1440×900 measure the tree they always measured.
 library;
 
@@ -46,6 +46,7 @@ import 'package:elattar_design_system/elattar_design_system.dart';
 // Widgets: it is the port of `::selection`, and there is no widgets-layer
 // equivalent that brings its own handles and toolbar.
 import 'package:flutter/material.dart' show Navigator, SelectionArea;
+import 'package:flutter/services.dart' show SystemNavigator;
 import 'package:flutter/widgets.dart';
 
 import 'logo.dart';
@@ -70,23 +71,66 @@ const double _sheetHeaderAlpha = 0.5;
 /// it. Supervisor ruling F8 keeps that split: the widget is a package
 /// component, its mounting is the example's, and the queue behind it is a
 /// singleton here for the same reason sonner's is a module-level object there.
-final DsToastController docsToasts = DsToastController();
+final ElToastController docsToasts = ElToastController();
 
 /// The current route, and the only way to change it.
 ///
 /// The docs app has one route dimension (a path string) and no history, so a
 /// [ValueNotifier] is the whole router. It lives above the app's
-/// [WidgetsApp]: like [DsTheme]: because a pushed route (the mobile nav
+/// [WidgetsApp]: like [ElTheme]: because a pushed route (the mobile nav
 /// sheet) has to be able to navigate too.
-class AppRouter extends ValueNotifier<String> {
-  AppRouter({String route = dsRoot}) : super(route);
+///
+/// It also mixes in [WidgetsBindingObserver] so it is *itself* the seam that
+/// answers the browser: [navigate] tells the engine where the app went
+/// ([SystemNavigator.routeInformationUpdated]), and [didPushRouteInformation]
+/// is what the engine calls back when the address bar moves without the app
+/// asking: typed URL, reload, or a Back/Forward press. That is the smallest
+/// hookup available: there is no [Router] widget in this app (`MaterialApp`
+/// is built with `home:`, not `.router()`), so a
+/// [PlatformRouteInformationProvider] would need one built solely to host it.
+/// [WidgetsBindingObserver] is the notification `Router` itself is built on,
+/// available without adding a Router, and it can sit on the router object
+/// that already owns `value` instead of a new widget between [AppRouterScope]
+/// and [MaterialApp].
+class AppRouter extends ValueNotifier<String> with WidgetsBindingObserver {
+  AppRouter({String route = elRoot}) : super(route) {
+    WidgetsBinding.instance.addObserver(this);
+  }
 
   /// The path currently rendered, e.g. `/design-system/colors`.
   String get route => value;
 
   /// Goes to [href]. Idempotent: re-selecting the current page is a no-op, not
-  /// a rebuild.
-  void navigate(String href) => value = href;
+  /// a rebuild, and: since it is also the browser's Back button gaining a new
+  /// stop: not a new history entry either.
+  ///
+  /// Reports the change to the engine so the address bar, Back/Forward and
+  /// reload all agree with [value]; `replace: false` is a normal forward
+  /// navigation, which is what makes Back able to undo it.
+  void navigate(String href) {
+    final bool changed = href != value;
+    value = href;
+    if (changed) {
+      SystemNavigator.routeInformationUpdated(uri: Uri.parse(href));
+    }
+  }
+
+  /// Answers the browser's Back/Forward (and a typed/reloaded URL): the
+  /// engine has already moved the address bar, so this only adopts [value]
+  /// to match: calling [navigate] here would push a *second* history entry
+  /// on top of the one the browser just navigated to.
+  @override
+  Future<bool> didPushRouteInformation(RouteInformation routeInformation) {
+    final String path = routeInformation.uri.path;
+    value = path.isEmpty ? elRoot : path;
+    return Future<bool>.value(true);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
 
   /// The router governing [context].
   static AppRouter of(BuildContext context) => AppRouterScope.of(context);
@@ -106,6 +150,15 @@ class AppRouterScope extends InheritedNotifier<AppRouter> {
     assert(scope != null, 'No AppRouterScope found above this widget.');
     return scope!.notifier!;
   }
+
+  /// The router governing [context], or null when there is none.
+  ///
+  /// For widgets that route when the app supplies a router and stay inert
+  /// when it does not, such as a documentation shell mounted bare in a widget
+  /// test. [of] asserts instead, which is right for callers that genuinely
+  /// require one.
+  static AppRouter? maybeOf(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<AppRouterScope>()?.notifier;
 }
 
 /// Header, rail, reading column, atmosphere: everything around a page.
@@ -137,7 +190,7 @@ class _DocsShellState extends State<DocsShell> {
     // no position until the view it drives has laid out, so `maxScrollExtent`
     // does not exist yet and the rig's first question would throw.
     WidgetsBinding.instance.addPostFrameCallback((Duration _) {
-      if (mounted) dsInstallScrollBridge(_main);
+      if (mounted) elInstallScrollBridge(_main);
     });
   }
 
@@ -150,16 +203,16 @@ class _DocsShellState extends State<DocsShell> {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     final double viewport = MediaQuery.sizeOf(context).width;
-    final bool desktop = viewport >= DsBreakpoints.lg;
+    final bool desktop = viewport >= ElBreakpoints.lg;
     // What the header occupies, status bar included: the box it paints, the
     // gap the rail starts below, and the room the reading column scrolls under.
     // All three are the same number by construction, which is why it is read
     // once here rather than three times below.
-    final double header = DsSafeArea.topBarHeightOf(
+    final double header = ElSafeArea.topBarHeightOf(
       context,
-      DsWidths.siteHeader,
+      ElWidths.siteHeader,
     );
 
     return DefaultTextStyle(
@@ -168,24 +221,24 @@ class _DocsShellState extends State<DocsShell> {
       // states its own family, size and leading: but without this, anything
       // whose class declares no `color` would inherit the framework's default
       // instead of the token.
-      style: DsText.styleOf(context, DsType.body, color: theme.foreground),
+      style: ElText.styleOf(context, ElType.body, color: theme.foreground),
       child: Stack(
         children: <Widget>[
           // `background-attachment: fixed`: outside every scroll view.
-          const Positioned.fill(child: DsPageGlow()),
+          const Positioned.fill(child: ElPageGlow()),
           Positioned.fill(
             // The landscape notch, spent once for the whole frame: both columns
             // are inside it, and the two sides it pays are removed from the
             // [MediaQuery] below: so the rail does not then pay a right-hand
             // inset it is nowhere near. Vertical is *not* spent here; the header
             // and the two scroll views each owe a different thing.
-            child: DsSafeArea(
+            child: ElSafeArea(
               top: false,
               bottom: false,
               child: Center(
                 // `mx-auto max-w-(--width-shell)`.
                 child: SizedBox(
-                  width: DsWidths.shell,
+                  width: ElWidths.shell,
                   height: double.infinity,
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -226,7 +279,7 @@ class _DocsShellState extends State<DocsShell> {
           //: so a toast captured through the rig would still be animating.
           // The host paints nothing and takes no pointer until a toast is
           // queued.
-          Positioned.fill(child: DsToaster(controller: docsToasts)),
+          Positioned.fill(child: ElToaster(controller: docsToasts)),
         ],
       ),
     );
@@ -242,25 +295,25 @@ class _Header extends StatelessWidget {
     required this.desktop,
   });
 
-  final DsThemeData theme;
+  final ElThemeData theme;
   final double viewport;
   final bool desktop;
 
   @override
   Widget build(BuildContext context) {
-    final Widget gap = SizedBox(width: ds(4));
+    final Widget gap = SizedBox(width: el(4));
 
     return ClipRect(
       child: BackdropFilter(
-        filter: ui.ImageFilter.blur(sigmaX: DsBlurs.xl, sigmaY: DsBlurs.xl),
+        filter: ui.ImageFilter.blur(sigmaX: ElBlurs.xl, sigmaY: ElBlurs.xl),
         child: Container(
           decoration: BoxDecoration(
             color: theme.background.withValues(alpha: _headerAlpha),
             border: Border(
-              bottom: BorderSide(color: theme.border, width: DsWidths.hairline),
+              bottom: BorderSide(color: theme.border, width: ElWidths.hairline),
             ),
           ),
-          padding: EdgeInsets.symmetric(horizontal: ds(6)),
+          padding: EdgeInsets.symmetric(horizontal: el(6)),
           // Inside the decoration, so the wash, the blur and the bottom rule
           // still cover the status bar and only the controls clear it: and
           // inside the `px-6`, so a control clears the design padding *and* the
@@ -269,18 +322,18 @@ class _Header extends StatelessWidget {
           // the horizontal sides are this bar's own to pay, since it is a
           // sibling of the shell frame and so inherits none of what the frame
           // spent.
-          child: DsSafeArea(
+          child: ElSafeArea(
             bottom: false,
             child: Row(
               children: <Widget>[
                 // `lg:hidden`: the rail takes over above it.
                 if (!desktop) ...<Widget>[const _MobileNavTrigger(), gap],
-                DsPress(
-                  onTap: () => AppRouter.of(context).navigate(dsRoot),
+                ElPress(
+                  onTap: () => AppRouter.of(context).navigate(elRoot),
                   child: const Logo(),
                 ),
                 // `hidden sm:block`.
-                if (viewport >= DsBreakpoints.sm) ...<Widget>[
+                if (viewport >= ElBreakpoints.sm) ...<Widget>[
                   gap,
                   _VersionPill(theme: theme),
                 ],
@@ -293,11 +346,11 @@ class _Header extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: <Widget>[
                       // `hidden md:block`.
-                      if (viewport >= DsBreakpoints.md) ...<Widget>[
+                      if (viewport >= ElBreakpoints.md) ...<Widget>[
                         Flexible(
-                          child: DsText(
+                          child: ElText(
                             'Desktop-first · 1440 frame · Light & dark',
-                            DsType.micro,
+                            ElType.micro,
                           ),
                         ),
                         // The header's own `gap-4`…
@@ -306,23 +359,23 @@ class _Header extends StatelessWidget {
                         gap,
                       ],
                       if (desktop) ...<Widget>[
-                        DsButton(
-                          variant: DsButtonVariant.secondary,
-                          size: DsButtonSize.sm,
+                        ElButton(
+                          variant: ElButtonVariant.secondary,
+                          size: ElButtonSize.sm,
                           label: 'Open example app',
                           onPressed: () =>
                               AppRouter.of(context).navigate(showcaseRoute),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: <Widget>[
-                              DsIcon.lucide(
-                                DsLucide.layoutDashboard,
-                                size: DsIconSize.sm,
+                              ElIcon.lucide(
+                                ElLucide.layoutDashboard,
+                                size: ElIconSize.sm,
                               ),
-                              SizedBox(width: DsButton.gapFor(DsButtonSize.sm)),
-                              DsText(
+                              SizedBox(width: ElButton.gapFor(ElButtonSize.sm)),
+                              ElText(
                                 'Example app',
-                                DsComponentType.buttonLabel,
+                                ElComponentType.buttonLabel,
                               ),
                             ],
                           ),
@@ -346,19 +399,19 @@ class _Header extends StatelessWidget {
 class _VersionPill extends StatelessWidget {
   const _VersionPill({required this.theme});
 
-  final DsThemeData theme;
+  final ElThemeData theme;
 
   @override
   Widget build(BuildContext context) {
     return Semantics(
       label: 'Design system version',
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: ds(2.5), vertical: ds(1)),
+        padding: EdgeInsets.symmetric(horizontal: el(2.5), vertical: el(1)),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(DsRadii.pill),
-          border: Border.all(color: theme.border, width: DsWidths.hairline),
+          borderRadius: BorderRadius.circular(ElRadii.pill),
+          border: Border.all(color: theme.border, width: ElWidths.hairline),
         ),
-        child: DsText('Design System v0.1', DsType.micro),
+        child: ElText('Design System v0.1', ElType.micro),
       ),
     );
   }
@@ -371,16 +424,16 @@ class _MobileNavTrigger extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsButton(
-      variant: DsButtonVariant.outline,
-      size: DsButtonSize.icon,
+    return ElButton(
+      variant: ElButtonVariant.outline,
+      size: ElButtonSize.icon,
       label: 'Open design system navigation',
-      onPressed: () => DsSheet.showLeft(
+      onPressed: () => ElSheet.showLeft(
         context,
-        width: DsWidths.sidebarMobile,
+        width: ElWidths.sidebarMobile,
         builder: (BuildContext sheetContext) => const _MobileNavSheet(),
       ),
-      child: const DsIcon(DsIconGlyph.menu),
+      child: const ElIcon(ElIconGlyph.menu),
     );
   }
 }
@@ -392,7 +445,7 @@ class _MobileNavSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     // Both scopes live above the [WidgetsApp], so a pushed route reads them
     // exactly like the page under it: and reading the route *here* is what
     // `usePathname()` does inside the reference's `NavTree`: the sheet stays
@@ -411,7 +464,7 @@ class _MobileNavSheet extends StatelessWidget {
     }
 
     return SingleChildScrollView(
-      padding: EdgeInsets.symmetric(horizontal: ds(6)),
+      padding: EdgeInsets.symmetric(horizontal: el(6)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
@@ -419,35 +472,35 @@ class _MobileNavSheet extends StatelessWidget {
           // padding, keeping the room the close button needs.
           Container(
             width: double.infinity,
-            padding: EdgeInsets.only(top: ds(4), bottom: ds(4), right: ds(12)),
+            padding: EdgeInsets.only(top: el(4), bottom: el(4), right: el(12)),
             decoration: BoxDecoration(
               color: theme.muted.withValues(alpha: _sheetHeaderAlpha),
               border: Border(
                 bottom: BorderSide(
                   color: theme.border,
-                  width: DsWidths.hairline,
+                  width: ElWidths.hairline,
                 ),
               ),
             ),
             child: GestureDetector(
-              onTap: () => go(dsRoot),
+              onTap: () => go(elRoot),
               child: const Logo(),
             ),
           ),
           Padding(
-            padding: EdgeInsets.symmetric(vertical: ds(4)),
-            child: DsButton(
-              variant: DsButtonVariant.secondary,
-              size: DsButtonSize.md,
+            padding: EdgeInsets.symmetric(vertical: el(4)),
+            child: ElButton(
+              variant: ElButtonVariant.secondary,
+              size: ElButtonSize.md,
               label: 'Open example app',
               onPressed: openShowcase,
               contentAlignment: Alignment.center,
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  DsIcon.lucide(DsLucide.layoutDashboard, size: DsIconSize.sm),
-                  SizedBox(width: DsButton.gapFor(DsButtonSize.md)),
-                  DsText('Example app', DsComponentType.buttonLabel),
+                  ElIcon.lucide(ElLucide.layoutDashboard, size: ElIconSize.sm),
+                  SizedBox(width: ElButton.gapFor(ElButtonSize.md)),
+                  ElText('Example app', ElComponentType.buttonLabel),
                 ],
               ),
             ),
@@ -472,14 +525,14 @@ class _Sidebar extends StatelessWidget {
   final ScrollController controller;
   final String route;
 
-  /// The header's occupied height, [DsWidths.siteHeader] plus the status bar.
+  /// The header's occupied height, [ElWidths.siteHeader] plus the status bar.
   final double header;
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return SizedBox(
-      width: DsWidths.rail,
+      width: ElWidths.rail,
       child: Column(
         children: <Widget>[
           // The header's own space in the flow; the rail is stuck below it.
@@ -490,11 +543,11 @@ class _Sidebar extends StatelessWidget {
                 border: Border(
                   right: BorderSide(
                     color: theme.border,
-                    width: DsWidths.hairline,
+                    width: ElWidths.hairline,
                   ),
                 ),
               ),
-              child: DsThinScrollbar(
+              child: ElThinScrollbar(
                 controller: controller,
                 child: SingleChildScrollView(
                   controller: controller,
@@ -504,12 +557,12 @@ class _Sidebar extends StatelessWidget {
                   // it is inside the scrolled content either way; this is
                   // added to the viewport so the list can still be dragged
                   // clear. Horizontal reads zero here: the frame spent it.
-                  padding: DsSafeArea.scrollPaddingOf(
+                  padding: ElSafeArea.scrollPaddingOf(
                     context,
                     base: EdgeInsets.only(
-                      left: ds(6),
-                      right: ds(6),
-                      top: ds(10),
+                      left: el(6),
+                      right: el(6),
+                      top: el(10),
                     ),
                   ),
                   child: NavTree(
@@ -540,14 +593,14 @@ class _Main extends StatelessWidget {
   final ScrollController controller;
   final bool desktop;
 
-  /// The header's occupied height, [DsWidths.siteHeader] plus the status bar.
+  /// The header's occupied height, [ElWidths.siteHeader] plus the status bar.
   final double header;
 
   final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    return DsThinScrollbar(
+    return ElThinScrollbar(
       controller: controller,
       child: SingleChildScrollView(
         controller: controller,
@@ -558,19 +611,19 @@ class _Main extends StatelessWidget {
         // Bottom: the gesture bar, which the page scrolls under in the same way
         // and pays for at the end of its content. Both are zero-additions on a
         // desktop, where this is `EdgeInsets.only(top: 64)` and nothing else.
-        padding: DsSafeArea.scrollPaddingOf(
+        padding: ElSafeArea.scrollPaddingOf(
           context,
           base: EdgeInsets.only(top: header),
         ),
         child: Padding(
           padding: EdgeInsets.symmetric(
-            horizontal: desktop ? ds(12) : ds(6),
-            vertical: ds(12),
+            horizontal: desktop ? el(12) : el(6),
+            vertical: el(12),
           ),
           child: Align(
             alignment: Alignment.topCenter,
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: DsWidths.content),
+              constraints: const BoxConstraints(maxWidth: ElWidths.content),
               child: SelectionArea(child: child),
             ),
           ),
@@ -582,8 +635,8 @@ class _Main extends StatelessWidget {
 
 /// `scrollbar-thin`: `scrollbar-width: thin; scrollbar-color: var(--border)
 /// transparent`, WebKit 8px with a pill thumb.
-class DsThinScrollbar extends StatelessWidget {
-  const DsThinScrollbar({
+class ElThinScrollbar extends StatelessWidget {
+  const ElThinScrollbar({
     super.key,
     required this.controller,
     required this.child,
@@ -594,12 +647,12 @@ class DsThinScrollbar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return RawScrollbar(
       controller: controller,
       thumbColor: theme.border,
-      thickness: ds(2),
-      radius: Radius.circular(DsRadii.pill),
+      thickness: el(2),
+      radius: Radius.circular(ElRadii.pill),
       // A native scrollbar is not a hover affordance: it is there whenever the
       // page can move.
       thumbVisibility: true,
@@ -620,20 +673,20 @@ class NavTree extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
 
     return Semantics(
       container: true,
       label: 'Design system',
       child: Padding(
-        padding: EdgeInsets.only(bottom: ds(16)),
+        padding: EdgeInsets.only(bottom: el(16)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            for (final DsGroup group in dsGroups)
+            for (final ElGroup group in elGroups)
               Padding(
                 // `div.mb-8` per group.
-                padding: EdgeInsets.only(bottom: ds(8)),
+                padding: EdgeInsets.only(bottom: el(8)),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[
@@ -643,7 +696,7 @@ class NavTree extends StatelessWidget {
                       onTap: () => onNavigate?.call(group.href),
                     ),
                     // `mb-3`.
-                    SizedBox(height: ds(3)),
+                    SizedBox(height: el(3)),
                     DecoratedBox(
                       // `ul.space-y-px.border-l.border-border`. Painted, not
                       // laid out: every row's own `border-l` sits on this
@@ -660,7 +713,7 @@ class NavTree extends StatelessWidget {
                         border: Border(
                           left: BorderSide(
                             color: theme.border,
-                            width: DsWidths.hairline,
+                            width: ElWidths.hairline,
                           ),
                         ),
                       ),
@@ -672,7 +725,7 @@ class NavTree extends StatelessWidget {
                             i < group.categories.length;
                             i++
                           ) ...<Widget>[
-                            if (i > 0) SizedBox(height: DsWidths.hairline),
+                            if (i > 0) SizedBox(height: ElWidths.hairline),
                             _NavRow(
                               title: group.categories[i].title,
                               href: categoryHref(group, group.categories[i]),
@@ -715,7 +768,7 @@ class _GroupLabelState extends State<_GroupLabel> {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     // `text-action-ink` when this group's index page is the one you are on —
     // and `hover:text-muted-foreground` dims even that, which is the reference
     // as written.
@@ -737,7 +790,7 @@ class _GroupLabelState extends State<_GroupLabel> {
           child: _ColorFade(
             target: ink,
             builder: (BuildContext context, Color colour) =>
-                DsText(widget.title, DsType.label, color: colour),
+                ElText(widget.title, ElType.label, color: colour),
           ),
         ),
       ),
@@ -768,7 +821,7 @@ class _NavRowState extends State<_NavRow> {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     final bool active = widget.route == widget.href;
 
     // Active: `border-action bg-action/12 text-foreground`: a 1px blue rule
@@ -776,13 +829,13 @@ class _NavRowState extends State<_NavRow> {
     // carries 500). Otherwise: `border-transparent text-muted-foreground
     // hover:border-input hover:text-foreground`.
     final Color rule = active
-        ? DsPalette.action
+        ? ElPalette.action
         : _hovered
         ? theme.input
-        : dsTransparent;
+        : elTransparent;
     final Color wash = active
-        ? DsPalette.action.withValues(alpha: _activeRowAlpha)
-        : dsTransparent;
+        ? ElPalette.action.withValues(alpha: _activeRowAlpha)
+        : elTransparent;
     final Color ink = active || _hovered
         ? theme.foreground
         : theme.mutedForeground;
@@ -806,7 +859,7 @@ class _NavRowState extends State<_NavRow> {
                 decoration: BoxDecoration(
                   color: fill,
                   border: Border(
-                    left: BorderSide(color: border, width: DsWidths.hairline),
+                    left: BorderSide(color: border, width: ElWidths.hairline),
                   ),
                 ),
                 child: Padding(
@@ -816,14 +869,14 @@ class _NavRowState extends State<_NavRow> {
                   // than the padding alone would put it. Vertically there is
                   // no border to pay for, so `py-2` is `py-2`.
                   padding: EdgeInsets.only(
-                    left: ds(4) + DsWidths.hairline,
-                    top: ds(2),
-                    bottom: ds(2),
+                    left: el(4) + ElWidths.hairline,
+                    top: el(2),
+                    bottom: el(2),
                   ),
                   child: _ColorFade(
                     target: ink,
                     builder: (BuildContext context, Color colour) =>
-                        DsText(widget.title, DsType.nav, color: colour),
+                        ElText(widget.title, ElType.nav, color: colour),
                   ),
                 ),
               ),
@@ -837,7 +890,7 @@ class _NavRowState extends State<_NavRow> {
 
 /// `transition-colors duration-fast` for one colour.
 ///
-/// At [DsDurations.transitionDefault], not `--duration-fast`: Tailwind v4
+/// At [ElDurations.transitionDefault], not `--duration-fast`: Tailwind v4
 /// generates no `duration-fast` utility, so both nav levels fall through to
 /// `--default-transition-duration`. Probed at 0.25s on the live sidebar.
 class _ColorFade extends StatelessWidget {
@@ -850,8 +903,8 @@ class _ColorFade extends StatelessWidget {
   Widget build(BuildContext context) {
     return TweenAnimationBuilder<Color?>(
       tween: ColorTween(end: target),
-      duration: dsAnimationDuration(context, DsDurations.transitionDefault),
-      curve: DsCurves.out,
+      duration: elAnimationDuration(context, ElDurations.transitionDefault),
+      curve: ElCurves.out,
       builder: (BuildContext context, Color? colour, Widget? child) =>
           builder(context, colour ?? target),
     );

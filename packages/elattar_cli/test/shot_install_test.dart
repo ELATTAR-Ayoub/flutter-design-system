@@ -63,18 +63,18 @@ import 'package:elattar_design_system/elattar_design_system.dart';
 /// Shots are documentation-shaped code. The words below are a doc comment and
 /// a string literal, not directives, and the installer must leave both alone:
 /// rewriting them injects directives after a declaration has opened (which does
-/// not compile) or into the middle of a string, and the `as ds` form aborts the
+/// not compile) or into the middle of a string, and the `as el` form aborts the
 /// install outright.
 ///
 /// ```dart
 /// import 'package:elattar_design_system/elattar_design_system.dart';
 /// ```
-// import 'package:elattar_design_system/elattar_design_system.dart' as ds;
+// import 'package:elattar_design_system/elattar_design_system.dart' as el;
 class ConsoleShot extends StatelessWidget {
   const ConsoleShot({super.key});
 
   static const String snippet =
-      "import 'package:elattar_design_system/elattar_design_system.dart' as ds;";
+      "import 'package:elattar_design_system/elattar_design_system.dart' as el;";
 
   @override
   Widget build(BuildContext context) => const ShotFixturePanel(
@@ -283,13 +283,13 @@ flutter:
       expect(
         consoleText,
         contains(
-          "// import 'package:elattar_design_system/elattar_design_system.dart' as ds;",
+          "// import 'package:elattar_design_system/elattar_design_system.dart' as el;",
         ),
       );
       expect(
         consoleText,
         contains(
-          r'''"import 'package:elattar_design_system/elattar_design_system.dart' as ds;";''',
+          r'''"import 'package:elattar_design_system/elattar_design_system.dart' as el;";''',
         ),
       );
 

@@ -1,23 +1,23 @@
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/separator/meta.dart';
 import 'package:example/components_docs/separator/page.dart';
-import 'package:example/kit.dart' show DsSection;
+import 'package:example/kit.dart' show ElSection;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 Widget _harness({
   required Widget child,
-  required DsThemeController controller,
-}) => DsTheme(
+  required ElThemeController controller,
+}) => ElTheme(
   controller: controller,
   child: MaterialApp(home: SingleChildScrollView(child: child)),
 );
 
 void main() {
-  group('separator docs page (separator, empty, kbd)', () {
+  group('separator docs page', () {
     testWidgets(
-      'renders the article, the API tables for all three primitives, and a '
-      'live specimen of each',
+      'renders the article, the API tables, and a live specimen of both '
+      'orientations',
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(1440, 900);
         tester.view.devicePixelRatio = 1;
@@ -26,7 +26,7 @@ void main() {
         String? destination;
         await tester.pumpWidget(
           _harness(
-            controller: DsThemeController(mode: DsThemeMode.dark),
+            controller: ElThemeController(mode: ElThemeMode.dark),
             child: SeparatorDocPage(
               onNavigate: (String route) => destination = route,
             ),
@@ -38,62 +38,29 @@ void main() {
           findsOneWidget,
         );
 
-        // The API tables list every constructor parameter found in
-        // separator.dart, empty.dart, and kbd.dart.
-        for (final String param in <String>[
-          // DsSeparator
-          'orientation',
-          // DsEmpty family
-          'children',
-          'glyph',
-          'tone',
-          'text',
-          // DsKbd family already covered by 'text' and 'children' above.
-        ]) {
-          expect(find.text(param), findsWidgets, reason: 'missing $param');
-        }
+        expect(find.text('orientation'), findsWidgets);
 
-        // Live specimens of every real widget mount.
         expect(
           find.byWidgetPredicate(
             (Widget w) =>
-                w is DsSeparator &&
-                w.orientation == DsSeparatorOrientation.horizontal,
+                w is ElSeparator &&
+                w.orientation == ElSeparatorOrientation.horizontal,
           ),
           findsWidgets,
         );
         expect(
           find.byWidgetPredicate(
             (Widget w) =>
-                w is DsSeparator &&
-                w.orientation == DsSeparatorOrientation.vertical,
+                w is ElSeparator &&
+                w.orientation == ElSeparatorOrientation.vertical,
           ),
           findsWidgets,
         );
-        expect(find.byType(DsEmpty), findsWidgets);
-        expect(find.byType(DsEmptyHeader), findsWidgets);
-        expect(find.byType(DsEmptyMedia), findsWidgets);
-        expect(find.byType(DsEmptyTitle), findsWidgets);
-        expect(find.byType(DsEmptyDescription), findsWidgets);
-        expect(find.byType(DsEmptyContent), findsWidgets);
-        expect(find.byType(DsKbd), findsWidgets);
-        expect(find.byType(DsKbdGroup), findsWidgets);
 
         expect(separatorDoc.name, 'separator');
         expect(
           separatorDoc.exports,
-          containsAll(<String>[
-            'DsSeparator',
-            'DsSeparatorOrientation',
-            'DsEmpty',
-            'DsEmptyHeader',
-            'DsEmptyMedia',
-            'DsEmptyTitle',
-            'DsEmptyDescription',
-            'DsEmptyContent',
-            'DsKbd',
-            'DsKbdGroup',
-          ]),
+          containsAll(<String>['ElSeparator', 'ElSeparatorOrientation']),
         );
         expect(destination, isNull);
       },
@@ -108,7 +75,7 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: DsThemeController(mode: DsThemeMode.dark),
+            controller: ElThemeController(mode: ElThemeMode.dark),
             child: const SeparatorDocPage(),
           ),
         );
@@ -136,8 +103,8 @@ void main() {
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
 
-        final DsThemeController controller = DsThemeController(
-          mode: DsThemeMode.dark,
+        final ElThemeController controller = ElThemeController(
+          mode: ElThemeMode.dark,
         );
         await tester.pumpWidget(
           _harness(controller: controller, child: const SeparatorDocPage()),
@@ -156,7 +123,7 @@ void main() {
 
         // Flip the SAME controller in place, not a fresh widget tree: the
         // same object every real theme toggle mutates.
-        controller.setMode(DsThemeMode.light);
+        controller.setMode(ElThemeMode.light);
         await tester.pump();
 
         final ColoredBox lightBox = tester.widget<ColoredBox>(
@@ -177,9 +144,9 @@ void main() {
     );
 
     testWidgets(
-      'renders the shadcn-shaped section list, in order: shared frame '
-      'sections, then each component\'s own promoted sections, then API '
-      'Reference, then the six extra sections',
+      'renders the shadcn-shaped section list, in order: Installation, '
+      'Usage, then separator\'s own promoted sections, then API Reference, '
+      'then the six extra sections',
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(1440, 900);
         tester.view.devicePixelRatio = 1;
@@ -187,27 +154,23 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: DsThemeController(mode: DsThemeMode.dark),
+            controller: ElThemeController(mode: ElThemeMode.dark),
             child: const SeparatorDocPage(),
           ),
         );
 
         final List<String> sectionIds = tester
-            .widgetList<DsSection>(find.byType(DsSection))
-            .map((DsSection section) => section.id)
+            .widgetList<ElSection>(find.byType(ElSection))
+            .map((ElSection section) => section.id)
             .toList();
 
         expect(sectionIds, <String>[
           'install',
           'usage',
-          'composition',
-          'separator-vertical',
-          'separator-list',
-          'separator-menu',
-          'empty-input-group',
-          'kbd-group',
-          'kbd-button',
-          'kbd-input-group',
+          'vertical',
+          'menu',
+          'list',
+          'rtl',
           'api',
           'states',
           'accessibility',
@@ -217,32 +180,20 @@ void main() {
           'source',
         ]);
 
-        // No leftover "Overview" or "Variants" headings: their content
-        // moved into hero prose (no heading) and into API Reference.
-        expect(find.text('Overview'), findsNothing);
-        expect(find.text('Variants and sizes'), findsNothing);
+        // No leftover "empty"/"kbd" content: those are their own pages now.
+        expect(find.text('Empty: Input group'), findsNothing);
+        expect(find.text('Kbd: Group'), findsNothing);
+        expect(find.byType(ElEmpty), findsNothing);
+        expect(find.byType(ElKbd), findsNothing);
 
-        // Every promoted section names the component it belongs to. Scoped
-        // to the article: at this width (1440, >= DsBreakpoints.xl) the "ON
-        // THIS PAGE" rail is showing too, and it lists every one of these
-        // same titles again as a TOC entry (docs_layout.dart's
-        // _TableOfContents renders DsText(entry.title, ...) verbatim for
-        // each DocsTocEntry). That is by design, on both the old Row rail
-        // and today's Positioned one alike, so a plain find.text here would
-        // legitimately find two matches, not a rendering defect. Scoping to
-        // the article is what makes the assertion mean what its own comment
-        // says: the section *heading*, not any incidental mention.
         final Finder article = find.byKey(
           const ValueKey<String>('separator-doc-article'),
         );
         for (final String title in <String>[
-          'Separator: Vertical',
-          'Separator: List',
-          'Separator: Menu',
-          'Empty: Input group',
-          'Kbd: Group',
-          'Kbd: Button',
-          'Kbd: Input group',
+          'Vertical',
+          'Menu',
+          'List',
+          'RTL',
         ]) {
           expect(
             find.descendant(of: article, matching: find.text(title)),

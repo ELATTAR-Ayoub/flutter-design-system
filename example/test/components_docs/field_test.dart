@@ -3,9 +3,9 @@
 ///
 /// `field` is a family of nine classes plus one enum
 /// (`lib/src/components/field.dart`, read directly for Step 1 of the task
-/// cycle): [DsField], [DsFieldScope], [DsFieldActivator],
-/// [DsFieldOrientation], [DsFieldGroup], [DsFieldSet], [DsFieldLegend],
-/// [DsFieldLabel], [DsFieldDescription], [DsFieldError]. The API-completeness
+/// cycle): [ElField], [ElFieldScope], [ElFieldActivator],
+/// [ElFieldOrientation], [ElFieldGroup], [ElFieldSet], [ElFieldLegend],
+/// [ElFieldLabel], [ElFieldDescription], [ElFieldError]. The API-completeness
 /// test below checks each class's own [DocsApiTable] by title rather than one
 /// flat merged set, because several classes share parameter names (`label`,
 /// `enabled`, `focusNode`, `child`/`children`) and a flat set would not catch
@@ -13,7 +13,7 @@
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`, per the
-/// Phase J brief. The live `DsThemeController` is flipped in place for theme
+/// Phase J brief. The live `ElThemeController` is flipped in place for theme
 /// coverage rather than re-pumped under a new controller.
 library;
 
@@ -28,7 +28,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// The shadcn parity section order (worker brief, 2026-08-23): every
-/// `DsSection.id` this page renders, top to bottom. `overview` and
+/// `ElSection.id` this page renders, top to bottom. `overview` and
 /// `variants` are gone (shadcn's own field page has neither heading; the
 /// enum table now lives inside `api`), and the shadcn per-control headings
 /// (`input`, `textarea`, `select`, `slider`, `fieldset`, `checkbox`,
@@ -61,13 +61,13 @@ const List<String> _expectedSectionOrder = <String>[
 const Size _wide = Size(1440, 900);
 const Size _narrow = Size(390, 844);
 
-/// Every `DsApiTable` this page must render, by title, and every public
+/// Every `ElApiTable` this page must render, by title, and every public
 /// constructor parameter or static member of that class found by reading
 /// `lib/src/components/field.dart` directly (Step 1). The completeness test
 /// asserts each list is a subset of that specific table's own facts: not of
 /// a set merged across every table on the page.
 const Map<String, List<String>> _expectedApiTables = <String, List<String>>{
-  'DsField': <String>[
+  'ElField': <String>[
     'child',
     'label',
     'description',
@@ -76,10 +76,10 @@ const Map<String, List<String>> _expectedApiTables = <String, List<String>>{
     'enabled',
     'focusNode',
     'orientation',
-    'DsField.gap',
-    'DsField.describedGap',
+    'ElField.gap',
+    'ElField.describedGap',
   ],
-  'DsFieldScope': <String>[
+  'ElFieldScope': <String>[
     'label',
     'describedBy',
     'invalid',
@@ -87,56 +87,56 @@ const Map<String, List<String>> _expectedApiTables = <String, List<String>>{
     'focusNode',
     'activator',
     'child',
-    'DsFieldScope.maybeOf',
+    'ElFieldScope.maybeOf',
   ],
-  'DsFieldActivator': <String>['callback'],
-  'DsFieldGroup': <String>[
+  'ElFieldActivator': <String>['callback'],
+  'ElFieldGroup': <String>[
     'children',
     'nested',
-    'DsFieldGroup.gap',
-    'DsFieldGroup.nestedGap',
+    'ElFieldGroup.gap',
+    'ElFieldGroup.nestedGap',
   ],
-  'DsFieldSet': <String>[
+  'ElFieldSet': <String>[
     'children',
     'tightForGroup',
-    'DsFieldSet.gap',
-    'DsFieldSet.groupGap',
+    'ElFieldSet.gap',
+    'ElFieldSet.groupGap',
   ],
-  'DsFieldLegend': <String>['text', 'DsFieldLegend.spaceBelow'],
-  'DsFieldLabel': <String>[
+  'ElFieldLegend': <String>['text', 'ElFieldLegend.spaceBelow'],
+  'ElFieldLabel': <String>[
     'text',
     'spec',
     'focusNode',
     'activator',
     'enabled',
     'onTap',
-    'DsFieldLabel.normal',
-    'DsFieldLabel.disabledOpacity',
+    'ElFieldLabel.normal',
+    'ElFieldLabel.disabledOpacity',
   ],
-  'DsFieldDescription': <String>['text'],
-  'DsFieldError': <String>[
+  'ElFieldDescription': <String>['text'],
+  'ElFieldError': <String>[
     'messages',
-    'DsFieldError.listIndent',
-    'DsFieldError.itemGap',
+    'ElFieldError.listIndent',
+    'ElFieldError.itemGap',
   ],
-  'DsFieldOrientation': <String>['vertical', 'horizontal'],
+  'ElFieldOrientation': <String>['vertical', 'horizontal'],
 };
 
-Future<DsThemeController> _pump(
+Future<ElThemeController> _pump(
   WidgetTester tester, {
   Size size = _wide,
-  DsThemeMode mode = DsThemeMode.dark,
+  ElThemeMode mode = ElThemeMode.dark,
   ValueChanged<String>? onNavigate,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final DsThemeController theme = DsThemeController(mode: mode);
+  final ElThemeController theme = ElThemeController(mode: mode);
   addTearDown(theme.dispose);
 
   await tester.pumpWidget(
-    DsTheme(
+    ElTheme(
       controller: theme,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -187,8 +187,8 @@ void main() {
       await _pump(tester);
 
       final List<String> ids = tester
-          .widgetList<DsSection>(find.byType(DsSection))
-          .map((DsSection section) => section.id)
+          .widgetList<ElSection>(find.byType(ElSection))
+          .map((ElSection section) => section.id)
           .toList();
 
       expect(ids, _expectedSectionOrder);
@@ -196,7 +196,7 @@ void main() {
   );
 
   testWidgets(
-    'each DsApiTable covers every public constructor parameter and static '
+    'each ElApiTable covers every public constructor parameter and static '
     'of its own class',
     (WidgetTester tester) async {
       await _pump(tester);
@@ -219,7 +219,7 @@ void main() {
         expect(
           documented,
           isNotNull,
-          reason: 'no DsApiTable titled "${expected.key}" was rendered',
+          reason: 'no ElApiTable titled "${expected.key}" was rendered',
         );
         for (final String param in expected.value) {
           expect(
@@ -243,20 +243,20 @@ void main() {
       const Key toggleKey = ValueKey<String>('field-doc-toggle-error');
       // Scoped to this one toggleable specimen: the page's static
       // "Separable" pairing further down deliberately keeps a second,
-      // permanent DsFieldError mounted elsewhere on the same page, so a
-      // page-wide byType(DsFieldError) search cannot tell "this specimen's
+      // permanent ElFieldError mounted elsewhere on the same page, so a
+      // page-wide byType(ElFieldError) search cannot tell "this specimen's
       // error" from "that unrelated, always-on specimen's error".
       final Finder toggleField = find.byKey(
         const ValueKey<String>('field-doc-toggle-field'),
       );
       final Finder toggleFieldError = find.descendant(
         of: toggleField,
-        matching: find.byType(DsFieldError),
+        matching: find.byType(ElFieldError),
       );
       await tester.ensureVisible(find.byKey(inputKey));
 
-      // Rest: no error message, and DsFieldError builds no widget at all —
-      // not a zero-height live region, per DsFieldError.build's own
+      // Rest: no error message, and ElFieldError builds no widget at all —
+      // not a zero-height live region, per ElFieldError.build's own
       // "returns null when valid" contract.
       expect(toggleFieldError, findsNothing);
 
@@ -281,7 +281,7 @@ void main() {
 
   testWidgets(
     'the live horizontal field specimen toggles its wrapped checkbox on tap, '
-    'and the visible DsFieldLabel activates it too: DsFieldLabel\'s own '
+    'and the visible ElFieldLabel activates it too: ElFieldLabel\'s own '
     'activator ladder, not just the checkbox\'s own hit area',
     (WidgetTester tester) async {
       await _pump(tester);
@@ -289,19 +289,19 @@ void main() {
       const Key key = ValueKey<String>('field-doc-specimen-checkbox');
       await tester.ensureVisible(find.byKey(key));
       expect(
-        tester.widget<DsCheckbox>(find.byKey(key)).state,
-        DsCheckboxState.unchecked,
+        tester.widget<ElCheckbox>(find.byKey(key)).state,
+        ElCheckboxState.unchecked,
       );
 
       await tester.tap(find.byKey(key), warnIfMissed: false);
       await tester.pump();
       expect(
-        tester.widget<DsCheckbox>(find.byKey(key)).state,
-        DsCheckboxState.checked,
+        tester.widget<ElCheckbox>(find.byKey(key)).state,
+        ElCheckboxState.checked,
       );
 
-      // The field's own visible label, a plain DsText, not the checkbox's
-      // hit area, activates the control through DsFieldScope.activator,
+      // The field's own visible label, a plain ElText, not the checkbox's
+      // hit area, activates the control through ElFieldScope.activator,
       // exactly as an HTML <label for> click would.
       await tester.tap(
         find.text('Email me about product updates'),
@@ -309,8 +309,8 @@ void main() {
       );
       await tester.pump();
       expect(
-        tester.widget<DsCheckbox>(find.byKey(key)).state,
-        DsCheckboxState.unchecked,
+        tester.widget<ElCheckbox>(find.byKey(key)).state,
+        ElCheckboxState.unchecked,
       );
 
       expect(tester.takeException(), isNull);
@@ -349,13 +349,13 @@ void main() {
   testWidgets(
     'both themes render the article with no exceptions when flipped in place',
     (WidgetTester tester) async {
-      final DsThemeController theme = await _pump(
+      final ElThemeController theme = await _pump(
         tester,
-        mode: DsThemeMode.light,
+        mode: ElThemeMode.light,
       );
       expect(find.text(fieldDoc.title), findsWidgets);
 
-      theme.setMode(DsThemeMode.dark);
+      theme.setMode(ElThemeMode.dark);
       await tester.pump();
       expect(find.text(fieldDoc.title), findsWidgets);
       expect(tester.takeException(), isNull);

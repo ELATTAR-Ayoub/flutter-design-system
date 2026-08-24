@@ -9,20 +9,19 @@
     {
       "source": "lib/src/components/input.dart",
       "target": "@ui/input.dart",
-      "sha256": "997687ec2e4d1ccc526d77128dcbe4bd8613405c4c8f822f6e2689ddb5d62114"
+      "sha256": "cf265cf5434d927a680bed9a0edd0d45308e8da37641a99d670113ed71fae65d"
     }
   ],
   "registryDependencies": [
-    "source-foundation",
     "button",
     "field",
-    "ds-rule",
-    "machine-surface"
+    "machine-surface",
+    "source-foundation"
   ],
   "semanticDependencies": [
     "button",
     "field",
-    "ds-rule"
+    "machine-surface"
   ],
   "pubDependencies": {},
   "assets": [],

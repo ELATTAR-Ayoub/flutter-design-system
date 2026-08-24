@@ -17,7 +17,7 @@
 ///   (L2403–2406): *"a spinner that eases is a spinner that looks like it is
 ///   struggling."* It is the only animation in the system that does not take a
 ///   `--ease-*` curve.
-/// * **It is silent.** See [DsSpinner] itself — that one is a drift, not a
+/// * **It is silent.** See [ElSpinner] itself — that one is a drift, not a
 ///   decision, and the port reproduces it under supervisor ruling B9.
 library;
 
@@ -43,15 +43,15 @@ import 'icon_paths.dart';
 /// Flutter has no equivalent of "props silently lost to a destructure", so the
 /// port has to *choose*. It chooses the rendered behaviour over the written
 /// intent, consistent with how every other drift on this page is treated: the
-/// glyph is wrapped in [ExcludeSemantics] (which is what [DsIcon] does for a
+/// glyph is wrapped in [ExcludeSemantics] (which is what [ElIcon] does for a
 /// null `label` anyway, spelled out here so the choice is visible), and
-/// [DsButton] carries the busy state alone.
-class DsSpinner extends StatefulWidget {
-  const DsSpinner({super.key, this.size = DsSpinner.px, this.strokeOverride});
+/// [ElButton] carries the busy state alone.
+class ElSpinner extends StatefulWidget {
+  const ElSpinner({super.key, this.size = ElSpinner.px, this.strokeOverride});
 
   /// `size-4` — 16px, stated explicitly on the class list.
   ///
-  /// Named rather than inlined because [DsButton] has to reason about it: the
+  /// Named rather than inlined because [ElButton] has to reason about it: the
   /// spinner is what makes a loading button 24px wider than a resting one
   /// (16 for the glyph, 8 for the gap), and that arithmetic should read against
   /// one constant.
@@ -75,17 +75,17 @@ class DsSpinner extends StatefulWidget {
   final double? strokeOverride;
 
   @override
-  State<DsSpinner> createState() => _DsSpinnerState();
+  State<ElSpinner> createState() => _ElSpinnerState();
 }
 
-class _DsSpinnerState extends State<DsSpinner>
+class _ElSpinnerState extends State<ElSpinner>
     with SingleTickerProviderStateMixin {
   /// The duration named here is a placeholder for the first frame only —
-  /// [build] re-reads it through [dsAnimationDuration] every pass, the way
-  /// `DsPress`, `DsSlidingPillGroup` and `DsKeyframePlayer` all do.
+  /// [build] re-reads it through [elAnimationDuration] every pass, the way
+  /// `ElPress`, `ElSlidingPillGroup` and `ElKeyframePlayer` all do.
   late final AnimationController _controller = AnimationController(
     vsync: this,
-    duration: DsDurations.spin,
+    duration: ElDurations.spin,
   );
 
   /// Null until the first resolution, so a MediaQuery change that is *not* a
@@ -96,7 +96,7 @@ class _DsSpinnerState extends State<DsSpinner>
   void didChangeDependencies() {
     super.didChangeDependencies();
     final bool stilled =
-        dsAnimationDuration(context, DsDurations.spin) == Duration.zero;
+        elAnimationDuration(context, ElDurations.spin) == Duration.zero;
     if (_stilled == stilled) return;
     _stilled = stilled;
     _play();
@@ -125,7 +125,7 @@ class _DsSpinnerState extends State<DsSpinner>
 
   @override
   Widget build(BuildContext context) {
-    _controller.duration = dsAnimationDuration(context, DsDurations.spin);
+    _controller.duration = elAnimationDuration(context, ElDurations.spin);
 
     // `@keyframes pulls-spin { to { transform: rotate(360deg) } }`
     // (globals.css L2451–2453) — one property, one stop, and an implicit `from`
@@ -135,8 +135,8 @@ class _DsSpinnerState extends State<DsSpinner>
       child: ExcludeSemantics(
         child: RotationTransition(
           turns: _controller,
-          child: DsIcon(
-            DsIconGlyph.loaderCircle,
+          child: ElIcon(
+            ElIconGlyph.loaderCircle,
             // `Icon`'s own default: `size="md"`, which is 16px and therefore
             // stroke 2.4. The `size-4` class then sets the *rendered* box to
             // the same 16 — the one place on this page where the declared size
@@ -144,8 +144,9 @@ class _DsSpinnerState extends State<DsSpinner>
             sizePx: widget.size,
             // …and everywhere it does NOT agree, the stroke stays behind with
             // the prop. See [strokeOverride].
-            strokeOverride: widget.strokeOverride ?? DsIcon.strokeFor(DsSpinner.px),
-            tone: DsIconTone.inherit,
+            strokeOverride:
+                widget.strokeOverride ?? ElIcon.strokeFor(ElSpinner.px),
+            tone: ElIconTone.inherit,
           ),
         ),
       ),

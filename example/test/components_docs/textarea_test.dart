@@ -3,7 +3,7 @@
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`, per the
-/// Phase J brief. The live `DsThemeController` is flipped in place for theme
+/// Phase J brief. The live `ElThemeController` is flipped in place for theme
 /// coverage rather than re-pumped under a new controller.
 library;
 
@@ -12,14 +12,14 @@ import 'package:example/components_docs/textarea/meta.dart';
 import 'package:example/components_docs/textarea/page.dart';
 import 'package:example/docs/docs_code.dart';
 import 'package:example/docs/docs_facts.dart';
-import 'package:example/kit.dart' show DsSection;
+import 'package:example/kit.dart' show ElSection;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 const Size _wide = Size(1440, 900);
 const Size _narrow = Size(390, 844);
 
-/// Every public constructor parameter of `DsTextarea`, enumerated by reading
+/// Every public constructor parameter of `ElTextarea`, enumerated by reading
 /// `lib/src/components/textarea.dart` directly (Step 1 of the task cycle).
 /// The API table must cover all of these by name.
 const List<String> _textareaParams = <String>[
@@ -37,25 +37,25 @@ const List<String> _textareaParams = <String>[
 
 /// The rest of the public surface: the two static geometry getters.
 const List<String> _textareaStatics = <String>[
-  'DsTextarea.minHeight',
-  'DsTextarea.insets',
+  'ElTextarea.minHeight',
+  'ElTextarea.insets',
 ];
 
-Future<DsThemeController> _pump(
+Future<ElThemeController> _pump(
   WidgetTester tester, {
   Size size = _wide,
-  DsThemeMode mode = DsThemeMode.dark,
+  ElThemeMode mode = ElThemeMode.dark,
   ValueChanged<String>? onNavigate,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final DsThemeController theme = DsThemeController(mode: mode);
+  final ElThemeController theme = ElThemeController(mode: mode);
   addTearDown(theme.dispose);
 
   await tester.pumpWidget(
-    DsTheme(
+    ElTheme(
       controller: theme,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -106,8 +106,8 @@ void main() {
       await _pump(tester);
 
       final List<String> titles = tester
-          .widgetList<DsSection>(find.byType(DsSection))
-          .map((DsSection section) => section.title)
+          .widgetList<ElSection>(find.byType(ElSection))
+          .map((ElSection section) => section.title)
           .toList();
 
       expect(titles, <String>[
@@ -131,7 +131,7 @@ void main() {
   );
 
   testWidgets(
-    'the API table covers every DsTextarea constructor parameter and both '
+    'the API table covers every ElTextarea constructor parameter and both '
     'static geometry getters',
     (WidgetTester tester) async {
       await _pump(tester);
@@ -150,14 +150,14 @@ void main() {
         expect(
           documented,
           contains(param),
-          reason: 'DsTextarea constructor parameter "$param" is undocumented',
+          reason: 'ElTextarea constructor parameter "$param" is undocumented',
         );
       }
       for (final String member in _textareaStatics) {
         expect(
           documented,
           contains(member),
-          reason: 'DsTextarea static member "$member" is undocumented',
+          reason: 'ElTextarea static member "$member" is undocumented',
         );
       }
     },
@@ -223,23 +223,23 @@ void main() {
     'both themes render the article with no exceptions when flipped in '
     'place, at both wide and narrow widths',
     (WidgetTester tester) async {
-      DsThemeController theme = await _pump(
+      ElThemeController theme = await _pump(
         tester,
         size: _wide,
-        mode: DsThemeMode.light,
+        mode: ElThemeMode.light,
       );
       expect(find.text(textareaDoc.title), findsWidgets);
 
-      theme.setMode(DsThemeMode.dark);
+      theme.setMode(ElThemeMode.dark);
       await tester.pump();
       expect(find.text(textareaDoc.title), findsWidgets);
       expect(tester.takeException(), isNull);
 
-      theme = await _pump(tester, size: _narrow, mode: DsThemeMode.light);
+      theme = await _pump(tester, size: _narrow, mode: ElThemeMode.light);
       await tester.pumpAndSettle();
       expect(find.text(textareaDoc.title), findsWidgets);
 
-      theme.setMode(DsThemeMode.dark);
+      theme.setMode(ElThemeMode.dark);
       await tester.pump();
       expect(find.text(textareaDoc.title), findsWidgets);
       expect(tester.takeException(), isNull);

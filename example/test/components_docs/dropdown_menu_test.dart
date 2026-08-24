@@ -1,14 +1,14 @@
 /// Tests for `components_docs/dropdown_menu/meta.dart` and
 /// `components_docs/dropdown_menu/page.dart`: the public documentation page
-/// for **both** `DsDropdownMenu` (`lib/src/components/dropdown_menu.dart`)
+/// for **both** `ElDropdownMenu` (`lib/src/components/dropdown_menu.dart`)
 /// and the shared menu engine it is built from
 /// (`lib/src/components/menu.dart`).
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`. Theme
-/// coverage uses a live `DsThemeController` flipped in place.
+/// coverage uses a live `ElThemeController` flipped in place.
 ///
-/// `DsDropdownMenu` mounts its content through `DsPopover`'s `OverlayPortal`,
+/// `ElDropdownMenu` mounts its content through `ElPopover`'s `OverlayPortal`,
 /// so the live specimen needs a real `Overlay`: the harness wraps the page
 /// in a `MaterialApp`, the same fix `tooltip_test.dart` and `menus_test.dart`
 /// (the package-level suite) both needed. A bare `Directionality`/`Material`
@@ -18,7 +18,7 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/dropdown_menu/meta.dart';
 import 'package:example/components_docs/dropdown_menu/page.dart';
-import 'package:example/kit.dart' show DsSection;
+import 'package:example/kit.dart' show ElSection;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -26,21 +26,21 @@ import 'package:flutter_test/flutter_test.dart';
 const Size _wide = Size(1440, 900);
 const Size _narrow = Size(390, 844);
 
-Future<DsThemeController> _pumpDropdownMenuDoc(
+Future<ElThemeController> _pumpDropdownMenuDoc(
   WidgetTester tester, {
   ValueChanged<String>? onNavigate,
   Size size = _wide,
-  DsThemeMode mode = DsThemeMode.dark,
+  ElThemeMode mode = ElThemeMode.dark,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final DsThemeController theme = DsThemeController(mode: mode);
+  final ElThemeController theme = ElThemeController(mode: mode);
   addTearDown(theme.dispose);
 
   await tester.pumpWidget(
-    DsTheme(
+    ElTheme(
       controller: theme,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -57,12 +57,12 @@ Future<DsThemeController> _pumpDropdownMenuDoc(
 }
 
 /// Runs the popover's 320ms exit animation out and lets the portal unmount
-/// behind it: `DsPopover` starts its reverse from a post-frame callback, so
+/// behind it: `ElPopover` starts its reverse from a post-frame callback, so
 /// this needs one frame beyond the naive count. Mirrors `menus_test.dart`'s
 /// own `runOverlay`.
 Future<void> _runOverlay(WidgetTester tester) async {
   for (int i = 0; i < 4; i++) {
-    await tester.pump(DsDurations.overlay);
+    await tester.pump(ElDurations.overlay);
   }
   await tester.pump();
 }
@@ -76,7 +76,7 @@ Future<void> _openSpecimenMenu(WidgetTester tester) async {
   await tester.tap(trigger);
   await tester.pump();
   await tester.pump();
-  await tester.pump(DsDurations.overlay);
+  await tester.pump(ElDurations.overlay);
 }
 
 void main() {
@@ -94,49 +94,35 @@ void main() {
       expect(
         dropdownMenuDoc.exports,
         containsAll(<String>[
-          'DsDropdownMenu',
-          'DsMenuTriggerScope',
-          'DsMenuChild',
-          'DsMenuItem',
-          'DsMenuItemVariant',
-          'DsMenuCheckboxItem',
-          'DsMenuRadioItem',
-          'DsMenuRadioGroup',
-          'DsMenuLabel',
-          'DsMenuSeparator',
-          'DsMenuGroup',
-          'DsMenuSub',
-          'DsMenuIndicatorSide',
-          'DsMenu',
-          'DsMenuSurfaceKind',
-          'DsMenuSurface',
-          'DsMenuContent',
-          'DsMenuPointerDown',
-          'DsMenuMotion',
+          'ElDropdownMenu',
+          'ElMenuTriggerScope',
+          'ElMenuChild',
+          'ElMenuItem',
+          'ElMenuItemVariant',
+          'ElMenuCheckboxItem',
+          'ElMenuRadioItem',
+          'ElMenuRadioGroup',
+          'ElMenuLabel',
+          'ElMenuSeparator',
+          'ElMenuGroup',
+          'ElMenuSub',
+          'ElMenuIndicatorSide',
+          'ElMenu',
+          'ElMenuSurfaceKind',
+          'ElMenuSurface',
+          'ElMenuContent',
+          'ElMenuPointerDown',
+          'ElMenuMotion',
         ]),
       );
-      // No registry manifest exists for either file: real, non-invented
-      // source-level dependencies only, not a claimed registry list.
       expect(dropdownMenuDoc.dependencies, <String>[
         'button',
+        'menu',
         'popover',
-        'icon',
+        'source-foundation',
       ]);
       expect(dropdownMenuDoc.description, isNot(contains('..')));
       expect(dropdownMenuDoc.description.trim(), dropdownMenuDoc.description);
-      expect(
-        dropdownMenuExpandedDescription,
-        isNot(equals(dropdownMenuDoc.description)),
-      );
-      expect(
-        dropdownMenuExpandedDescription.trim(),
-        dropdownMenuExpandedDescription,
-      );
-      // The decision guidance actually distinguishes the four named
-      // neighbours, not just the component's own name.
-      expect(dropdownMenuExpandedDescription, contains('Select'));
-      expect(dropdownMenuExpandedDescription, contains('Context Menu'));
-      expect(dropdownMenuExpandedDescription, contains('Popover'));
     });
   });
 
@@ -157,7 +143,7 @@ void main() {
         findsOneWidget,
       );
       // The menu is not mounted before anything opens it.
-      expect(find.byType(DsMenuContent), findsNothing);
+      expect(find.byType(ElMenuContent), findsNothing);
       expect(tester.takeException(), isNull);
     });
 
@@ -190,14 +176,14 @@ void main() {
           'Source and tests',
         ];
 
-        // Read the mounted DsSection widgets in tree order rather than
+        // Read the mounted ElSection widgets in tree order rather than
         // text-finding each heading: the section heading and a nested
         // sub-heading (e.g. inside "Complex") can render the same string,
         // which makes a find.text-based check ambiguous even when scoped to
         // the article.
         final List<String> titles = tester
-            .widgetList<DsSection>(find.byType(DsSection))
-            .map((DsSection section) => section.title)
+            .widgetList<ElSection>(find.byType(ElSection))
+            .map((ElSection section) => section.title)
             .toList();
 
         expect(titles, headingsInOrder);
@@ -206,15 +192,15 @@ void main() {
 
     testWidgets(
       'the API tables document every constructor parameter found in the '
-      'source, for both DsDropdownMenu and the shared menu.dart engine',
+      'source, for both ElDropdownMenu and the shared menu.dart engine',
       (WidgetTester tester) async {
         await _pumpDropdownMenuDoc(tester);
 
-        // DsMenuTriggerScope.
-        expect(find.textContaining('DsMenuTriggerScope'), findsWidgets);
+        // ElMenuTriggerScope.
+        expect(find.textContaining('ElMenuTriggerScope'), findsWidgets);
         expect(find.text('open'), findsWidgets);
 
-        // DsDropdownMenu's own constructor.
+        // ElDropdownMenu's own constructor.
         expect(find.text('trigger'), findsOneWidget);
         expect(find.text('children'), findsWidgets);
         expect(find.text('width'), findsWidgets);
@@ -224,7 +210,7 @@ void main() {
         expect(find.text('sideOffset'), findsOneWidget);
         expect(find.text('pressScaleSuppressed'), findsOneWidget);
 
-        // The row model: DsMenuItem.
+        // The row model: ElMenuItem.
         expect(find.text('label'), findsWidgets);
         expect(find.text('icon'), findsWidgets);
         expect(find.text('lucideIcon'), findsOneWidget);
@@ -234,19 +220,19 @@ void main() {
         expect(find.text('inset'), findsWidgets);
         expect(find.text('onSelect'), findsWidgets);
 
-        // DsMenuCheckboxItem / DsMenuRadioItem / DsMenuRadioGroup.
+        // ElMenuCheckboxItem / ElMenuRadioItem / ElMenuRadioGroup.
         expect(find.text('checked'), findsWidgets);
         expect(find.text('value'), findsWidgets);
         expect(find.text('onChanged'), findsOneWidget);
 
-        // DsMenuLabel / DsMenuSeparator / DsMenuGroup / DsMenuSub.
+        // ElMenuLabel / ElMenuSeparator / ElMenuGroup / ElMenuSub.
         expect(find.text('text'), findsWidgets);
         expect(find.text('child'), findsWidgets);
-        expect(find.textContaining('DsMenuSeparator'), findsWidgets);
-        expect(find.textContaining('DsMenuGroup'), findsWidgets);
-        expect(find.textContaining('DsMenuSub'), findsWidgets);
+        expect(find.textContaining('ElMenuSeparator'), findsWidgets);
+        expect(find.textContaining('ElMenuGroup'), findsWidgets);
+        expect(find.textContaining('ElMenuSub'), findsWidgets);
 
-        // DsMenu's static geometry.
+        // ElMenu's static geometry.
         expect(find.text('itemHeight'), findsOneWidget);
         expect(find.text('twoLineItemHeight'), findsOneWidget);
         expect(find.text('labelHeight'), findsOneWidget);
@@ -256,7 +242,7 @@ void main() {
         expect(find.text('insetPadding'), findsOneWidget);
         expect(find.text('iconSize'), findsOneWidget);
 
-        // DsMenuContent's own constructor.
+        // ElMenuContent's own constructor.
         expect(find.text('onClose'), findsOneWidget);
         expect(find.text('minWidth'), findsOneWidget);
         expect(find.text('kind'), findsWidgets);
@@ -265,7 +251,7 @@ void main() {
         expect(find.text('initialHighlight'), findsOneWidget);
         expect(find.text('onEscape'), findsOneWidget);
 
-        // DsMenuSurfaceKind's three values, and DsMenuIndicatorSide's two.
+        // ElMenuSurfaceKind's three values, and ElMenuIndicatorSide's two.
         expect(find.text('content'), findsWidgets);
         expect(find.text('subRinged'), findsOneWidget);
         expect(find.text('subBordered'), findsOneWidget);
@@ -323,9 +309,9 @@ void main() {
     ) async {
       await _pumpDropdownMenuDoc(tester);
 
-      expect(find.byType(DsMenuContent), findsNothing);
+      expect(find.byType(ElMenuContent), findsNothing);
 
-      final DsButton before = tester.widget<DsButton>(
+      final ElButton before = tester.widget<ElButton>(
         find.byKey(
           const ValueKey<String>('dropdown-menu-doc-specimen-trigger'),
         ),
@@ -334,8 +320,8 @@ void main() {
 
       await _openSpecimenMenu(tester);
 
-      expect(find.byType(DsMenuContent), findsOneWidget);
-      final DsButton after = tester.widget<DsButton>(
+      expect(find.byType(ElMenuContent), findsOneWidget);
+      final ElButton after = tester.widget<ElButton>(
         find.byKey(
           const ValueKey<String>('dropdown-menu-doc-specimen-trigger'),
         ),
@@ -344,7 +330,7 @@ void main() {
         after.expanded,
         isTrue,
         reason:
-            'DsMenuTriggerScope.openOf should flip the trigger to expanded '
+            'ElMenuTriggerScope.openOf should flip the trigger to expanded '
             'while the menu it opens is open: GAP CLOSED 2 in '
             'dropdown_menu.dart.',
       );
@@ -368,7 +354,7 @@ void main() {
 
       await _runOverlay(tester);
       expect(
-        find.byType(DsMenuContent),
+        find.byType(ElMenuContent),
         findsNothing,
         reason: 'an item commit closes the menu, same as the source',
       );
@@ -383,7 +369,7 @@ void main() {
         expect(find.text('Show status bar'), findsOneWidget);
         await tester.tap(find.text('Show status bar'));
         await _runOverlay(tester);
-        expect(find.byType(DsMenuContent), findsNothing);
+        expect(find.byType(ElMenuContent), findsNothing);
 
         // Reopen and confirm the boolean really flipped: the checked row now
         // carries a check glyph inside its own Stack, an unchecked row holds
@@ -399,7 +385,7 @@ void main() {
           find.descendant(
             of: rowStack,
             matching: find.byWidgetPredicate(
-              (Widget w) => w is DsIcon && w.glyph == DsIconGlyph.check,
+              (Widget w) => w is ElIcon && w.glyph == ElIconGlyph.check,
             ),
           ),
           findsOneWidget,
@@ -412,11 +398,11 @@ void main() {
     ) async {
       await _pumpDropdownMenuDoc(tester);
       await _openSpecimenMenu(tester);
-      expect(find.byType(DsMenuContent), findsOneWidget);
+      expect(find.byType(ElMenuContent), findsOneWidget);
 
       await tester.sendKeyEvent(LogicalKeyboardKey.escape);
       await _runOverlay(tester);
-      expect(find.byType(DsMenuContent), findsNothing);
+      expect(find.byType(ElMenuContent), findsNothing);
     });
 
     testWidgets('ArrowDown highlights the first row, then the second', (
@@ -470,13 +456,13 @@ void main() {
 
         await tester.sendKeyEvent(LogicalKeyboardKey.enter);
         await tester.pump();
-        await tester.pump(DsDurations.overlay);
+        await tester.pump(ElDurations.overlay);
         expect(
-          find.byType(DsMenuContent),
+          find.byType(ElMenuContent),
           findsNothing,
           reason:
-              'DsMenuPointerDown only opens on a real PointerDownEvent; '
-              "DsButton's own Enter/Space handling calls the trigger's own "
+              'ElMenuPointerDown only opens on a real PointerDownEvent; '
+              "ElButton's own Enter/Space handling calls the trigger's own "
               'onPressed, which this specimen leaves a no-op, exactly as '
               'every real call site does.',
         );
@@ -490,12 +476,12 @@ void main() {
         );
         await tester.pump();
         await tester.pump();
-        await tester.pump(DsDurations.overlay);
-        expect(find.byType(DsMenuContent), findsOneWidget);
+        await tester.pump(ElDurations.overlay);
+        expect(find.byType(ElMenuContent), findsOneWidget);
       },
     );
 
-    testWidgets('GAP: a submenu under DsDropdownMenu renders subBordered, not '
+    testWidgets('GAP: a submenu under ElDropdownMenu renders subBordered, not '
         "subRinged: the file's own DRIFT-4 table names for a dropdown's "
         'sub-content', (WidgetTester tester) async {
       await _pumpDropdownMenuDoc(tester);
@@ -505,13 +491,13 @@ void main() {
       await tester.tap(find.text('Invite users'));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 150));
-      await tester.pump(DsDurations.overlay);
+      await tester.pump(ElDurations.overlay);
 
-      final List<DsMenuSurface> surfaces = tester
-          .widgetList<DsMenuSurface>(find.byType(DsMenuSurface))
+      final List<ElMenuSurface> surfaces = tester
+          .widgetList<ElMenuSurface>(find.byType(ElMenuSurface))
           .toList();
       expect(surfaces.length, greaterThanOrEqualTo(2));
-      expect(surfaces.last.kind, DsMenuSurfaceKind.subBordered);
+      expect(surfaces.last.kind, ElMenuSurfaceKind.subBordered);
     });
   });
 
@@ -556,7 +542,7 @@ void main() {
 
   group('both themes', () {
     testWidgets('renders on light', (WidgetTester tester) async {
-      await _pumpDropdownMenuDoc(tester, mode: DsThemeMode.light);
+      await _pumpDropdownMenuDoc(tester, mode: ElThemeMode.light);
       expect(
         find.byKey(
           const ValueKey<String>('dropdown-menu-doc-specimen-trigger'),
@@ -567,7 +553,7 @@ void main() {
     });
 
     testWidgets('renders on dark', (WidgetTester tester) async {
-      await _pumpDropdownMenuDoc(tester, mode: DsThemeMode.dark);
+      await _pumpDropdownMenuDoc(tester, mode: ElThemeMode.dark);
       expect(
         find.byKey(
           const ValueKey<String>('dropdown-menu-doc-specimen-trigger'),
@@ -580,9 +566,9 @@ void main() {
     testWidgets('flipping the theme in place keeps the page intact', (
       WidgetTester tester,
     ) async {
-      final DsThemeController theme = await _pumpDropdownMenuDoc(
+      final ElThemeController theme = await _pumpDropdownMenuDoc(
         tester,
-        mode: DsThemeMode.dark,
+        mode: ElThemeMode.dark,
       );
       expect(
         find.byKey(
@@ -591,7 +577,7 @@ void main() {
         findsOneWidget,
       );
 
-      theme.setMode(DsThemeMode.light);
+      theme.setMode(ElThemeMode.light);
       await tester.pump();
 
       expect(

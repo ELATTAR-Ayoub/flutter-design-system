@@ -1,11 +1,9 @@
 /// Public component documentation for the slider component.
 ///
 /// `sliderDoc` (from `meta.dart`) is the data source, not
-/// `componentDoc('slider')`: slider is not yet registered in
-/// `catalog.dart`'s `componentDocs` list, so calling that would throw. Adding
-/// it there is a supervisor-owned aggregation step (Phase J plan). Structure
+/// `componentDoc('slider')`; this page keeps its typed metadata import. Structure
 /// mirrors `components_docs/checkbox/page.dart`: one `DocsLayout` shell, one
-/// `DsSection` per anchor, and the shared docs primitives for every table,
+/// `ElSection` per anchor, and the shared docs primitives for every table,
 /// panel and code block.
 library;
 
@@ -32,9 +30,9 @@ class SliderDocPage extends StatelessWidget {
         title: sliderDoc.title,
         description: sliderDoc.description,
       ),
-      breadcrumbs: const <DsBreadcrumbEntry>[
-        DsBreadcrumbEntry.link('Components'),
-        DsBreadcrumbEntry.page('Slider'),
+      breadcrumbs: const <ElBreadcrumbEntry>[
+        ElBreadcrumbEntry.link('Components'),
+        ElBreadcrumbEntry.page('Slider'),
       ],
       toc: const <DocsTocEntry>[
         DocsTocEntry(title: 'Installation', anchor: 'install'),
@@ -66,7 +64,7 @@ class SliderDocPage extends StatelessWidget {
         route: '/components/textarea',
       ),
       onNavigate: onNavigate,
-      child: _SliderArticle(theme: DsTheme.of(context)),
+      child: _SliderArticle(theme: ElTheme.of(context)),
     );
   }
 }
@@ -74,7 +72,7 @@ class SliderDocPage extends StatelessWidget {
 class _SliderArticle extends StatelessWidget {
   const _SliderArticle({required this.theme});
 
-  final DsThemeData theme;
+  final ElThemeData theme;
 
   @override
   Widget build(BuildContext context) {
@@ -83,84 +81,81 @@ class _SliderArticle extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: DsWidths.prose),
-        child: DsText(
-          'What it solves, and when a neighbouring control answers the '
-              'same interaction better.',
-          DsType.body,
+          constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+          child: ElText(
+            'What it solves, and when a neighbouring control answers the '
+            'same interaction better.',
+            ElType.body,
+          ),
         ),
-      ),
-      SizedBox(height: ds(6)),
-      DsText(sliderExpandedDescription, DsType.body),
-        SizedBox(height: ds(6)),
+        SizedBox(height: el(6)),
         DocsInstallFacts(
-            title: 'Status',
-            facts: <DocsInstallFact>[
-              const DocsInstallFact(
-                label: 'Status',
-                value: 'Stable, not yet a registry item',
-                description:
-                    'Ported and tested against lib/src/components/slider.dart. '
-                    'It is not yet a registry item, so elattar add slider '
-                    'will not resolve: see Installation below.',
-              ),
-              DocsInstallFact(
-                label: 'Version',
-                value: '0.0.1',
-                description:
-                    'Tracks the package version; there is no registry schema '
-                    'version yet because there is no manifest.',
-              ),
-              const DocsInstallFact(
-                label: 'Platforms',
-                value: 'Android, iOS, Web, macOS, Windows, Linux',
-                description:
-                    'A pure Flutter widget tree: a Listener/MouseRegion for '
-                    'pointer input and DsMachineSurface fills for the track, '
-                    'range and thumb. No platform channel and no '
-                    'platform-specific branch.',
-              ),
-            ],
-          ),
-        SizedBox(height: ds(6)),
-        ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: DsWidths.prose),
-        child: DsText(
-          'Four live specimens, all built from the same DsSlider '
-              'constructor. Single value, Range and Custom range are '
-              'operable: drag a knob, or focus it (tap and Tab, or see the '
-              'Accessibility section) and use the arrow, Page and Home/End '
-              'keys. Disabled is deliberately inert.',
-          DsType.body,
+          title: 'Status',
+          facts: <DocsInstallFact>[
+            const DocsInstallFact(
+              label: 'Status',
+              value: 'Stable, installable through lattar add slider',
+              description:
+                  'Ported and tested against lib/src/components/slider.dart. '
+                  'It is not yet a registry item, so elattar add slider '
+                  'will not resolve: see Installation below.',
+            ),
+            DocsInstallFact(
+              label: 'Version',
+              value: '0.0.1',
+              description:
+                  'Tracks the package version; there is no registry schema '
+                  'version; the shipped manifest installs it.',
+            ),
+            const DocsInstallFact(
+              label: 'Platforms',
+              value: 'Android, iOS, Web, macOS, Windows, Linux',
+              description:
+                  'A pure Flutter widget tree: a Listener/MouseRegion for '
+                  'pointer input and ElMachineSurface fills for the track, '
+                  'range and thumb. No platform channel and no '
+                  'platform-specific branch.',
+            ),
+          ],
         ),
-      ),
-      SizedBox(height: ds(6)),
-      DocsCodeExample(
-            title: 'Slider specimens',
-            description: 'Every cell below renders a real DsSlider.',
-            preview: const _SliderPreview(),
-            manualFiles: <DocsCodeFile>[
-              DocsCodeFile(
-                path: sliderDoc.sourcePath,
-                code:
-                    '// slider has no registry manifest yet, so there is no\n'
-                    '// generated @ui/slider.dart payload to copy here.\n'
-                    '// See "Installation" below for what actually works today.',
-              ),
-            ],
+        SizedBox(height: el(6)),
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+          child: ElText(
+            'Four live specimens, all built from the same ElSlider '
+            'constructor. Single value, Range and Custom range are '
+            'operable: drag a knob, or focus it (tap and Tab, or see the '
+            'Accessibility section) and use the arrow, Page and Home/End '
+            'keys. Disabled is deliberately inert.',
+            ElType.body,
           ),
-        SizedBox(height: ds(6)),
-        DsSection(
+        ),
+        SizedBox(height: el(6)),
+        DocsCodeExample(
+          title: 'Slider specimens',
+          description: 'Every cell below renders a real ElSlider.',
+          preview: const _SliderPreview(),
+          manualFiles: <DocsCodeFile>[
+            DocsCodeFile(
+              path: sliderDoc.sourcePath,
+              code:
+                  '${sliderDoc.command}\n'
+                  '// Installs the generated @ui/slider.dart payload.',
+            ),
+          ],
+        ),
+        SizedBox(height: el(6)),
+        ElSection(
           id: 'install',
           title: 'Installation',
           description:
-              'Command install is not available yet: read this before '
+              'Command install is available: read this before '
               'reaching for elattar add slider.',
           child: DocsInstallFacts(
             facts: <DocsInstallFact>[
               const DocsInstallFact(
                 label: 'CLI',
-                value: 'Not available',
+                value: 'registry/components/slider.json',
                 description:
                     'slider is not yet a registry item, so `elattar add '
                     'slider` will not resolve. It is one of the Wave 2 form '
@@ -172,7 +167,7 @@ class _SliderArticle extends StatelessWidget {
                 value:
                     "import 'package:elattar_design_system/elattar_design_system.dart';",
                 description:
-                    'Depend on the package and use DsSlider directly, '
+                    'Depend on the package and use ElSlider directly, '
                     'exactly as this page does.',
               ),
               DocsInstallFact(
@@ -187,95 +182,95 @@ class _SliderArticle extends StatelessWidget {
             ],
           ),
         ),
-        SizedBox(height: ds(6)),
-        DsSection(
+        SizedBox(height: el(6)),
+        ElSection(
           id: 'usage',
           title: 'Usage',
           description:
-              'Import DsSlider and construct the smallest correct example.',
-          child: DsPanel(
+              'Import ElSlider and construct the smallest correct example.',
+          child: ElPanel(
             label: 'DART',
             note: 'SMALLEST CORRECT EXAMPLE',
             child: DocsSelectableCodeBlock(code: _smallestUsageCode),
           ),
         ),
-        SizedBox(height: ds(6)),
-        DsSection(
+        SizedBox(height: el(6)),
+        ElSection(
           id: 'variants',
           title: 'Variants and sizes',
           description:
               'No size or style variant: recorded rather than '
               'silently skipped.',
-          child: DsText(
-            'DsSlider fixes one geometry, like its checkbox/switch/radio '
-            'siblings: DsSlider.trackHeight at 10px and DsSlider.thumbSize '
+          child: ElText(
+            'ElSlider fixes one geometry, like its checkbox/switch/radio '
+            'siblings: ElSlider.trackHeight at 10px and ElSlider.thumbSize '
             'at 20px, with nothing smaller or larger to choose between. The '
             'source also carries dormant data-vertical classes for a '
             'vertical orientation, but no orientation parameter is exposed '
-            'on DsSlider and no call site in the corpus used it: recorded '
+            'on ElSlider and no call site in the corpus used it: recorded '
             'as unbuilt rather than shipped, the same ruling the source\'s '
             'own docstring states for the reference\'s vertical branch, so '
             'this page has no Vertical section to show.',
-            DsType.small,
+            ElType.small,
             color: theme.mutedForeground,
           ),
         ),
-        SizedBox(height: ds(6)),
-        DsSection(
+        SizedBox(height: el(6)),
+        ElSection(
           id: 'range',
           title: 'Range',
           description:
-              'Pass two entries in values and DsSlider renders a range '
+              'Pass two entries in values and ElSlider renders a range '
               'slider: one thumb per entry, each stopping at its neighbour '
               'rather than crossing it.',
-          child: DsPanel(
+          child: ElPanel(
             label: 'DART',
             note: 'A RANGE, TWO THUMBS',
             child: DocsSelectableCodeBlock(code: _rangeUsageCode),
           ),
         ),
-        SizedBox(height: ds(6)),
-        DsSection(
+        SizedBox(height: el(6)),
+        ElSection(
           id: 'multiple-thumbs',
           title: 'Multiple thumbs',
           description:
               'values is not limited to one or two entries: any length '
               'renders that many thumbs, each still clamped against its '
               'immediate neighbours by index.',
-          child: DsPanel(
+          child: ElPanel(
             label: 'DART',
             note: 'THREE THUMBS',
             child: DocsSelectableCodeBlock(code: _multipleThumbsCode),
           ),
         ),
-        SizedBox(height: ds(6)),
-        DsSection(
+        SizedBox(height: el(6)),
+        ElSection(
           id: 'controlled',
           title: 'Controlled',
           description:
-              'DsSlider renders no visible numeric readout of its own, '
+              'ElSlider renders no visible numeric readout of its own, '
               'label only supplies the accessible name, never on-screen '
-              'text. Pair it with a DsText showing the current value(s) '
+              'text. Pair it with a ElText showing the current value(s) '
               'when the user needs to see the number, not just feel the '
               'position.',
           child: const _VolumeExample(),
         ),
-        SizedBox(height: ds(6)),
-        DsSection(
+        SizedBox(height: el(6)),
+        ElSection(
           id: 'disabled',
           title: 'Disabled',
           description:
               'enabled: false dims the whole control and withdraws pointer '
               'and keyboard handling; see the live Disabled cell in Preview '
               'above.',
-          child: DsPanel(
+          child: ElPanel(
             label: 'DART',
             note: 'DISABLED',
             child: DocsSelectableCodeBlock(code: _disabledUsageCode),
           ),
         ),
-        SizedBox(height: ds(6)),
-        DsSection(
+        SizedBox(height: el(6)),
+        ElSection(
           id: 'composition',
           title: 'Composition',
           description:
@@ -284,13 +279,13 @@ class _SliderArticle extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              DsPanel(
+              ElPanel(
                 label: 'DART',
                 note: 'PRICE FILTER (RANGE, CUSTOM STEP)',
                 child: DocsSelectableCodeBlock(code: _priceFilterCode),
               ),
-              SizedBox(height: ds(5)),
-              DsPanel(
+              SizedBox(height: el(5)),
+              ElPanel(
                 label: 'DART',
                 note: 'RATING (SINGLE VALUE, STEP OF 1 ACROSS 0–5)',
                 child: DocsSelectableCodeBlock(code: _ratingCode),
@@ -298,15 +293,15 @@ class _SliderArticle extends StatelessWidget {
             ],
           ),
         ),
-        SizedBox(height: ds(6)),
-        DsSection(
+        SizedBox(height: el(6)),
+        ElSection(
           id: 'api',
           title: 'API Reference',
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               const DocsApiTable(
-                title: 'DsSlider',
+                title: 'ElSlider',
                 facts: <DocsApiFact>[
                   DocsApiFact(
                     name: 'values',
@@ -326,7 +321,7 @@ class _SliderArticle extends StatelessWidget {
                         'Called with the full next values list (same length) '
                         'after a legal move. Null makes the control '
                         'inoperable: the same "no handler, no operation" '
-                        'rule DsButton follows.',
+                        'rule ElButton follows.',
                   ),
                   DocsApiFact(
                     name: 'min',
@@ -373,19 +368,19 @@ class _SliderArticle extends StatelessWidget {
                   ),
                 ],
               ),
-              SizedBox(height: ds(5)),
+              SizedBox(height: el(5)),
               const DocsApiTable(
-                title: 'DsSlider statics',
+                title: 'ElSlider statics',
                 facts: <DocsApiFact>[
                   DocsApiFact(
-                    name: 'DsSlider.trackHeight',
+                    name: 'ElSlider.trackHeight',
                     type: 'static double',
                     description:
                         '10px: the height of the whole control, since the '
                         'root box IS the track.',
                   ),
                   DocsApiFact(
-                    name: 'DsSlider.thumbSize',
+                    name: 'ElSlider.thumbSize',
                     type: 'static double',
                     description:
                         '20px: each thumb overflows the 10px track by 5px '
@@ -393,9 +388,9 @@ class _SliderArticle extends StatelessWidget {
                   ),
                 ],
               ),
-              SizedBox(height: ds(5)),
-              DsText(
-                'What happens with an out-of-range value: DsSlider does not '
+              SizedBox(height: el(5)),
+              ElText(
+                'What happens with an out-of-range value: ElSlider does not '
                 'clamp the List<double> you pass into values. A number '
                 'below min or above max still renders: pinned to the near '
                 'edge of the track, because the fraction used to position '
@@ -408,14 +403,14 @@ class _SliderArticle extends StatelessWidget {
                 'out-of-range value is corrected on the very first '
                 'interaction and can never be produced by dragging or the '
                 'keyboard: only by a caller supplying it directly.',
-                DsType.small,
+                ElType.small,
                 color: theme.mutedForeground,
               ),
             ],
           ),
         ),
-        SizedBox(height: ds(6)),
-        DsSection(
+        SizedBox(height: el(6)),
+        ElSection(
           id: 'states',
           title: 'States and feedback',
           description:
@@ -430,8 +425,8 @@ class _SliderArticle extends StatelessWidget {
                     state: 'Rest',
                     treatment:
                         'Track: theme.muted fill, theme.input border, '
-                        'DsShadows.pressed. Thumb: theme.foreground, '
-                        'bordered theme.input, DsShadows.btn, with a '
+                        'ElShadows.pressed. Thumb: theme.foreground, '
+                        'bordered theme.input, ElShadows.btn, with a '
                         'zero-alpha ring slot already reserved.',
                     userSignal:
                         'A recessed 10px channel with the fill '
@@ -443,7 +438,7 @@ class _SliderArticle extends StatelessWidget {
                     treatment:
                         'Entering the thumb\'s 34x34 hit area (not the '
                         'painted 20px knob) fades a theme.ring ring in at '
-                        '50% alpha over 250ms on DsCurves.spring, and the '
+                        '50% alpha over 250ms on ElCurves.spring, and the '
                         'knob SNAPS: not tweens: to 1.10x scale in a '
                         'single frame.',
                     userSignal:
@@ -467,7 +462,7 @@ class _SliderArticle extends StatelessWidget {
                     state: 'Focus-visible',
                     treatment:
                         'Focusing a thumb lights the identical ring the '
-                        'hover and active states use, DsSlider has no '
+                        'hover and active states use, ElSlider has no '
                         'separate focus-only ring.',
                     userSignal:
                         'A visible ring with no scale change, since focus '
@@ -489,7 +484,7 @@ class _SliderArticle extends StatelessWidget {
                     state: 'Reduced motion',
                     treatment:
                         'The ring\'s colour tween collapses to zero via '
-                        'dsAnimationDuration; the scale snap was never '
+                        'elAnimationDuration; the scale snap was never '
                         'animated in the first place, so reduced motion '
                         'changes only the ring.',
                     userSignal:
@@ -499,30 +494,30 @@ class _SliderArticle extends StatelessWidget {
                   ),
                 ],
               ),
-              SizedBox(height: ds(4)),
-              DsText(
+              SizedBox(height: el(4)),
+              ElText(
                 'Omitted: Selected: a slider has no boolean "on" state to '
                 'select; its whole value IS the state, covered above and in '
-                'API. Error, DsSlider defines no invalid parameter and no '
-                'DsFieldScope participation at all; it is, in the source\'s '
+                'API. Error, ElSlider defines no invalid parameter and no '
+                'ElFieldScope participation at all; it is, in the source\'s '
                 'own words, the one control in this family with "no field '
                 'participation ... no aria-invalid, no data-invalid, no '
                 'FieldScope": so there is no destructive-ring row to show, '
                 'and this page will not invent one. Loading and Empty, '
-                'DsSlider is a synchronous primitive with no async '
+                'ElSlider is a synchronous primitive with no async '
                 'operation and nothing to list. Success: the component '
                 'defines no success semantics of its own. Also unlike its '
-                'checkbox/switch/radio siblings, DsSlider never imports '
-                'DsJellyReplay: there is no post-change squash animation '
+                'checkbox/switch/radio siblings, ElSlider never imports '
+                'ElJellyReplay: there is no post-change squash animation '
                 'anywhere in this control.',
-                DsType.small,
+                ElType.small,
                 color: theme.mutedForeground,
               ),
             ],
           ),
         ),
-        SizedBox(height: ds(6)),
-        DsSection(
+        SizedBox(height: el(6)),
+        ElSection(
           id: 'accessibility',
           title: 'Accessibility',
           child: DocsInstallFacts(
@@ -537,7 +532,7 @@ class _SliderArticle extends StatelessWidget {
                     'Each thumb gets its own Semantics node with slider: '
                     'true, container: true and enabled: reflecting whether '
                     'the control is actually operable (enabled && '
-                    'onChanged != null): not DsSlider.enabled alone.',
+                    'onChanged != null): not ElSlider.enabled alone.',
               ),
               const DocsInstallFact(
                 label: 'Label association',
@@ -555,7 +550,7 @@ class _SliderArticle extends StatelessWidget {
                 label: 'Value announcement',
                 value: 'Semantics.value, recomputed on every rebuild',
                 description:
-                    'DsSlider does supply a live value announcement that '
+                    'ElSlider does supply a live value announcement that '
                     'updates as the thumb moves: printed as a bare '
                     'integer ("40") when the value lands on a whole number '
                     'and as Dart\'s default decimal string otherwise, with '
@@ -589,7 +584,7 @@ class _SliderArticle extends StatelessWidget {
                 label: 'Touch target',
                 value: '34 x 34, centred on each 20 x 20 thumb',
                 description:
-                    'DsHitArea grows the pointer AND hover target past the '
+                    'ElHitArea grows the pointer AND hover target past the '
                     'painted knob, 8px past its 18px padding box on every '
                     'side, per selection_control.dart\'s own measured '
                     'table. The track itself carries no extra inset of its '
@@ -607,8 +602,8 @@ class _SliderArticle extends StatelessWidget {
                 label: 'Error wiring',
                 value: 'None',
                 description:
-                    'DsSlider has no invalid parameter and does not read '
-                    'or fold in an enclosing DsFieldScope\'s invalid flag '
+                    'ElSlider has no invalid parameter and does not read '
+                    'or fold in an enclosing ElFieldScope\'s invalid flag '
                     'at all: the one control in this family with no field '
                     'participation, stated in the source\'s own docstring. '
                     'A caller who needs an error state around a slider has '
@@ -636,18 +631,18 @@ class _SliderArticle extends StatelessWidget {
             ],
           ),
         ),
-        SizedBox(height: ds(6)),
-        DsSection(
+        SizedBox(height: el(6)),
+        ElSection(
           id: 'responsive',
           title: 'Responsive and platform behavior',
-          child: DsText(
-            'Unlike its checkbox/switch/radio siblings, DsSlider is not a '
-            'fixed-size atom: DsSlider.trackHeight (10px) and '
-            'DsSlider.thumbSize (20px) are fixed, but the control\'s WIDTH '
+          child: ElText(
+            'Unlike its checkbox/switch/radio siblings, ElSlider is not a '
+            'fixed-size atom: ElSlider.trackHeight (10px) and '
+            'ElSlider.thumbSize (20px) are fixed, but the control\'s WIDTH '
             'is fluid: a LayoutBuilder measures whatever width its parent '
             'constrains it to, and every fraction (thumb position, fill '
             'length) is computed against that measured width on every '
-            'layout pass. The same DsSlider genuinely stretches from a '
+            'layout pass. The same ElSlider genuinely stretches from a '
             'narrow mobile column to a wide desktop panel with no '
             'breakpoint logic of its own; what changes with layout belongs '
             'entirely to whatever composes it. Keyboard and pointer '
@@ -656,12 +651,12 @@ class _SliderArticle extends StatelessWidget {
             'here is web-only or desktop-only, though a coarse (touch) '
             'pointer still has to land within the same 34 x 34 hit area a '
             'mouse does; there is no separate touch-specific target.',
-            DsType.small,
+            ElType.small,
             color: theme.mutedForeground,
           ),
         ),
-        SizedBox(height: ds(6)),
-        DsSection(
+        SizedBox(height: el(6)),
+        ElSection(
           id: 'dependencies',
           title: 'Dependencies, files, assets, fonts and shaders',
           child: DocsInstallFacts(
@@ -678,9 +673,9 @@ class _SliderArticle extends StatelessWidget {
                 description:
                     'slider.dart imports these directly from '
                     'lib/src/components: button.dart for '
-                    'DsButton.withFocusRing (the ring-prepending shadow '
+                    'ElButton.withFocusRing (the ring-prepending shadow '
                     'helper the thumb uses) and selection_control.dart for '
-                    'DsHitArea, the shared hit-area/expander machinery '
+                    'ElHitArea, the shared hit-area/expander machinery '
                     'every control in this family relies on. Neither is '
                     'copyable in isolation: see Installation.',
               ),
@@ -691,10 +686,10 @@ class _SliderArticle extends StatelessWidget {
                     'foundation/shadows.dart, foundation/spacing.dart, '
                     'foundation/theme.dart, theme_scope.dart',
                 description:
-                    'DsMachineSurface for the track/fill/thumb painting, '
+                    'ElMachineSurface for the track/fill/thumb painting, '
                     'the sliderThumbHoverScale/sliderThumbActiveScale '
-                    'transform tokens, DsShadows.pressed/btn/btnPrimary, '
-                    'the ds() spacing scale, and the live theme.',
+                    'transform tokens, ElShadows.pressed/btn/btnPrimary, '
+                    'the el() spacing scale, and the live theme.',
               ),
               DocsInstallFact(
                 label: 'Exports',
@@ -708,13 +703,13 @@ class _SliderArticle extends StatelessWidget {
                 label: 'Assets',
                 value: 'none',
                 description:
-                    'The track, fill and thumb are DsMachineSurface fills, '
+                    'The track, fill and thumb are ElMachineSurface fills, '
                     'not an image or an icon-font glyph.',
               ),
               const DocsInstallFact(
                 label: 'Fonts',
                 value: 'none',
-                description: 'No text is rendered by DsSlider itself.',
+                description: 'No text is rendered by ElSlider itself.',
               ),
               const DocsInstallFact(
                 label: 'Shaders',
@@ -724,8 +719,8 @@ class _SliderArticle extends StatelessWidget {
             ],
           ),
         ),
-        SizedBox(height: ds(6)),
-        DsSection(
+        SizedBox(height: el(6)),
+        ElSection(
           id: 'theming',
           title: 'Theming notes',
           child: DocsInstallFacts(
@@ -756,22 +751,22 @@ class _SliderArticle extends StatelessWidget {
                     'theme.ring, at 50% alpha when hovered, dragged or '
                     'focused',
                 description:
-                    'Prepended in front of DsShadows.btn\'s own four '
-                    'layers via DsButton.withFocusRing: never replacing '
+                    'Prepended in front of ElShadows.btn\'s own four '
+                    'layers via ElButton.withFocusRing: never replacing '
                     'them.',
               ),
               DocsInstallFact(
                 label: 'Shadow',
                 value:
-                    'DsShadows.pressed (track) / DsShadows.btnPrimary '
-                    '(range) / DsShadows.btn (thumb)',
+                    'ElShadows.pressed (track) / ElShadows.btnPrimary '
+                    '(range) / ElShadows.btn (thumb)',
                 description:
                     'The raised/recessed vocabulary this control '
                     'shares with checkbox, switch and radio.',
               ),
               DocsInstallFact(
                 label: 'Radius',
-                value: 'DsRadii.pill (track ends) / full circle (thumb)',
+                value: 'ElRadii.pill (track ends) / full circle (thumb)',
                 description:
                     'The range itself paints no radius of its own: the '
                     'track\'s ClipRRect gives it its corners.',
@@ -779,21 +774,21 @@ class _SliderArticle extends StatelessWidget {
               DocsInstallFact(
                 label: 'Motion',
                 value:
-                    'DsDurations.transitionDefault on DsCurves.spring (ring '
+                    'ElDurations.transitionDefault on ElCurves.spring (ring '
                     'only); the scale change is unanimated',
                 description:
                     'The ring tweens and can overshoot before settling; the '
                     'hover/active scale snaps to its target in a single '
                     'frame, since Tailwind\'s scale utility on the '
                     'reference is not part of its transition list. '
-                    'dsAnimationDuration collapses the ring\'s duration to '
+                    'elAnimationDuration collapses the ring\'s duration to '
                     'zero under reduced motion.',
               ),
             ],
           ),
         ),
-        SizedBox(height: ds(6)),
-        DsSection(
+        SizedBox(height: el(6)),
+        ElSection(
           id: 'source',
           title: 'Source and tests',
           child: DocsInstallFacts(
@@ -807,7 +802,7 @@ class _SliderArticle extends StatelessWidget {
                 label: 'Shared machinery',
                 value: 'lib/src/components/selection_control.dart',
                 description:
-                    'DsHitArea: shared with the checkbox, switch and radio '
+                    'ElHitArea: shared with the checkbox, switch and radio '
                     'families and documented on their own component pages.',
               ),
               const DocsInstallFact(
@@ -838,7 +833,7 @@ class _SliderArticle extends StatelessWidget {
 
 const String _smallestUsageCode = '''double volume = 50;
 
-DsSlider(
+ElSlider(
   values: <double>[volume],
   min: 0,
   max: 100,
@@ -848,7 +843,7 @@ DsSlider(
 
 const String _rangeUsageCode = '''List<double> priceRange = <double>[10, 240];
 
-DsSlider(
+ElSlider(
   values: priceRange,
   min: 0,
   max: 500,
@@ -859,7 +854,7 @@ DsSlider(
 
 const String _multipleThumbsCode = '''List<double> tiers = <double>[20, 50, 80];
 
-DsSlider(
+ElSlider(
   values: tiers,
   min: 0,
   max: 100,
@@ -867,7 +862,7 @@ DsSlider(
   onChanged: (List<double> next) => setState(() => tiers = next),
 )''';
 
-const String _disabledUsageCode = '''const DsSlider(
+const String _disabledUsageCode = '''const ElSlider(
   values: <double>[40],
   enabled: false,
   label: 'Disabled',
@@ -875,7 +870,7 @@ const String _disabledUsageCode = '''const DsSlider(
 
 const String _priceFilterCode =
     '// priceRange holds the two thumb values, ascending.\n'
-    'DsSlider(\n'
+    'ElSlider(\n'
     '  values: priceRange,\n'
     '  min: 0,\n'
     '  max: 500,\n'
@@ -883,13 +878,13 @@ const String _priceFilterCode =
     "  label: 'Price range',\n"
     '  onChanged: (List<double> next) => setState(() => priceRange = next),\n'
     ')\n\n'
-    '// DsSlider draws no numeric readout of its own: the caller states it.\n'
-    'DsText(\n'
+    '// ElSlider draws no numeric readout of its own: the caller states it.\n'
+    'ElText(\n'
     "  '\${priceRange.first.round()} - \${priceRange.last.round()}',\n"
-    '  DsType.small,\n'
+    '  ElType.small,\n'
     ')';
 
-const String _ratingCode = '''DsSlider(
+const String _ratingCode = '''ElSlider(
   values: <double>[rating],
   min: 0,
   max: 5,
@@ -914,16 +909,16 @@ class _SliderPreviewState extends State<_SliderPreview> {
   @override
   Widget build(BuildContext context) {
     return Wrap(
-      spacing: ds(5),
-      runSpacing: ds(5),
+      spacing: el(5),
+      runSpacing: el(5),
       crossAxisAlignment: WrapCrossAlignment.center,
       children: <Widget>[
-        DsStateCell(
+        ElStateCell(
           label: 'Single value',
           note: 'Drag or use the arrow keys',
           child: SizedBox(
-            width: ds(60),
-            child: DsSlider(
+            width: el(60),
+            child: ElSlider(
               key: const ValueKey<String>('slider-live-specimen'),
               values: _single,
               label: 'Single value',
@@ -931,12 +926,12 @@ class _SliderPreviewState extends State<_SliderPreview> {
             ),
           ),
         ),
-        DsStateCell(
+        ElStateCell(
           label: 'Range',
           note: 'Two independent thumbs',
           child: SizedBox(
-            width: ds(60),
-            child: DsSlider(
+            width: el(60),
+            child: ElSlider(
               key: const ValueKey<String>('slider-live-range-specimen'),
               values: _range,
               label: 'Range',
@@ -944,12 +939,12 @@ class _SliderPreviewState extends State<_SliderPreview> {
             ),
           ),
         ),
-        DsStateCell(
+        ElStateCell(
           label: 'Custom range and step',
           note: 'min: 0, max: 500, step: 5',
           child: SizedBox(
-            width: ds(60),
-            child: DsSlider(
+            width: el(60),
+            child: ElSlider(
               values: _custom,
               min: 0,
               max: 500,
@@ -959,11 +954,11 @@ class _SliderPreviewState extends State<_SliderPreview> {
             ),
           ),
         ),
-        DsStateCell(
+        ElStateCell(
           label: 'Disabled',
           child: SizedBox(
-            width: ds(60),
-            child: const DsSlider(
+            width: el(60),
+            child: const ElSlider(
               values: <double>[40],
               enabled: false,
               label: 'Disabled',
@@ -990,21 +985,21 @@ class _VolumeExampleState extends State<_VolumeExample> {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return SizedBox(
-      width: ds(80),
+      width: el(80),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          DsSlider(
+          ElSlider(
             values: _volume,
             label: 'Volume',
             onChanged: (List<double> next) => setState(() => _volume = next),
           ),
-          SizedBox(height: ds(2)),
-          DsText(
+          SizedBox(height: el(2)),
+          ElText(
             'Volume: ${_volume.single.round()}',
-            DsType.small,
+            ElType.small,
             color: theme.mutedForeground,
           ),
         ],

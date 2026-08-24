@@ -8,7 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 /// live demo (`Preview`), Installation, Usage, Variants, With icon, With
 /// spinner, RTL, our own Composed-with-other-primitives addition, API
 /// Reference, then the six fixed extras. `Link` and `Custom Colors` are
-/// shadcn sections this component genuinely cannot do (DsBadge has no
+/// shadcn sections this component genuinely cannot do (ElBadge has no
 /// href/asChild and no colour-override parameter) and are asserted absent.
 const List<String> _expectedSectionHeadings = <String>[
   'Installation',
@@ -29,8 +29,8 @@ const List<String> _expectedSectionHeadings = <String>[
 
 Widget _harness({
   required Widget child,
-  required DsThemeController controller,
-}) => DsTheme(
+  required ElThemeController controller,
+}) => ElTheme(
   controller: controller,
   child: MaterialApp(home: SingleChildScrollView(child: child)),
 );
@@ -39,14 +39,14 @@ Widget _harness({
 ///
 /// `page.dart` wraps each preview specimen in a `KeyedSubtree` keyed
 /// `badge-preview:<variant.name>` specifically so a test can locate one
-/// variant's rendered [DsText] without reaching into `DsBadge`'s private
+/// variant's rendered [ElText] without reaching into `ElBadge`'s private
 /// `_ink`/`_fill` resolution.
-Color _inkOf(WidgetTester tester, DsBadgeVariant variant) {
+Color _inkOf(WidgetTester tester, ElBadgeVariant variant) {
   final Finder key = find.byKey(
     ValueKey<String>('badge-preview:${variant.name}'),
   );
-  final DsText text = tester.widget<DsText>(
-    find.descendant(of: key, matching: find.byType(DsText)).first,
+  final ElText text = tester.widget<ElText>(
+    find.descendant(of: key, matching: find.byType(ElText)).first,
   );
   return text.color!;
 }
@@ -54,22 +54,22 @@ Color _inkOf(WidgetTester tester, DsBadgeVariant variant) {
 /// Pairs whose ink is expected to coincide: asserted in the source itself
 /// (`badge.dart`'s `_ink`): outline/ghost both fall back to
 /// `mutedForeground`, and link/action both resolve to `actionInk`.
-const List<(DsBadgeVariant, DsBadgeVariant)> _sharedInkPairs =
-    <(DsBadgeVariant, DsBadgeVariant)>[
-      (DsBadgeVariant.outline, DsBadgeVariant.ghost),
-      (DsBadgeVariant.link, DsBadgeVariant.action),
+const List<(ElBadgeVariant, ElBadgeVariant)> _sharedInkPairs =
+    <(ElBadgeVariant, ElBadgeVariant)>[
+      (ElBadgeVariant.outline, ElBadgeVariant.ghost),
+      (ElBadgeVariant.link, ElBadgeVariant.action),
     ];
 
-bool _expectedShared(DsBadgeVariant a, DsBadgeVariant b) => _sharedInkPairs.any(
-  ((DsBadgeVariant, DsBadgeVariant) pair) =>
+bool _expectedShared(ElBadgeVariant a, ElBadgeVariant b) => _sharedInkPairs.any(
+  ((ElBadgeVariant, ElBadgeVariant) pair) =>
       (pair.$1 == a && pair.$2 == b) || (pair.$1 == b && pair.$2 == a),
 );
 
 /// Every variant not in [_sharedInkPairs] must remain visually distinguishable
 /// from every other variant within one theme.
-void _assertVariantsDistinguishable(Map<DsBadgeVariant, Color> inks) {
-  for (final DsBadgeVariant a in DsBadgeVariant.values) {
-    for (final DsBadgeVariant b in DsBadgeVariant.values) {
+void _assertVariantsDistinguishable(Map<ElBadgeVariant, Color> inks) {
+  for (final ElBadgeVariant a in ElBadgeVariant.values) {
+    for (final ElBadgeVariant b in ElBadgeVariant.values) {
       if (a == b) continue;
       if (_expectedShared(a, b)) {
         expect(
@@ -100,7 +100,7 @@ void main() {
         String? destination;
         await tester.pumpWidget(
           _harness(
-            controller: DsThemeController(mode: DsThemeMode.dark),
+            controller: ElThemeController(mode: ElThemeMode.dark),
             child: BadgeDocPage(
               onNavigate: (String route) => destination = route,
             ),
@@ -112,7 +112,7 @@ void main() {
           findsOneWidget,
         );
 
-        // The API table lists every DsBadge constructor parameter found in
+        // The API table lists every ElBadge constructor parameter found in
         // lib/src/components/badge.dart.
         for (final String param in <String>[
           'label',
@@ -125,18 +125,18 @@ void main() {
           expect(find.text(param), findsWidgets, reason: 'missing $param');
         }
 
-        // A live specimen of every DsBadgeVariant mounts somewhere on the
+        // A live specimen of every ElBadgeVariant mounts somewhere on the
         // page: not just the ones with distinct ink.
-        final Set<DsBadgeVariant> mounted = tester
-            .widgetList<DsBadge>(find.byType(DsBadge))
-            .map((DsBadge badge) => badge.variant)
+        final Set<ElBadgeVariant> mounted = tester
+            .widgetList<ElBadge>(find.byType(ElBadge))
+            .map((ElBadge badge) => badge.variant)
             .toSet();
-        expect(mounted, containsAll(DsBadgeVariant.values));
+        expect(mounted, containsAll(ElBadgeVariant.values));
 
         expect(badgeDoc.name, 'badge');
         expect(
           badgeDoc.exports,
-          containsAll(<String>['DsBadge', 'DsBadgeVariant']),
+          containsAll(<String>['ElBadge', 'ElBadgeVariant']),
         );
         expect(destination, isNull);
       },
@@ -151,7 +151,7 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: DsThemeController(mode: DsThemeMode.dark),
+            controller: ElThemeController(mode: ElThemeMode.dark),
             child: const BadgeDocPage(),
           ),
         );
@@ -178,43 +178,43 @@ void main() {
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
 
-        final DsThemeController controller = DsThemeController(
-          mode: DsThemeMode.dark,
+        final ElThemeController controller = ElThemeController(
+          mode: ElThemeMode.dark,
         );
         await tester.pumpWidget(
           _harness(controller: controller, child: const BadgeDocPage()),
         );
 
-        final Map<DsBadgeVariant, Color> darkInks = <DsBadgeVariant, Color>{
-          for (final DsBadgeVariant v in DsBadgeVariant.values)
+        final Map<ElBadgeVariant, Color> darkInks = <ElBadgeVariant, Color>{
+          for (final ElBadgeVariant v in ElBadgeVariant.values)
             v: _inkOf(tester, v),
         };
         _assertVariantsDistinguishable(darkInks);
 
         // Flip the SAME controller in place: not a fresh widget tree, the
         // same object every real theme toggle mutates.
-        controller.setMode(DsThemeMode.light);
+        controller.setMode(ElThemeMode.light);
         await tester.pump();
 
-        final Map<DsBadgeVariant, Color> lightInks = <DsBadgeVariant, Color>{
-          for (final DsBadgeVariant v in DsBadgeVariant.values)
+        final Map<ElBadgeVariant, Color> lightInks = <ElBadgeVariant, Color>{
+          for (final ElBadgeVariant v in ElBadgeVariant.values)
             v: _inkOf(tester, v),
         };
         _assertVariantsDistinguishable(lightInks);
 
-        // The semantic inks are theme-resolved tokens (DsPalette.*Deep in
-        // light, DsPalette.* in dark): they must actually move when the
+        // The semantic inks are theme-resolved tokens (ElPalette.*Deep in
+        // light, ElPalette.* in dark): they must actually move when the
         // theme flips, not just stay internally distinguishable.
-        for (final DsBadgeVariant v in <DsBadgeVariant>[
-          DsBadgeVariant.destructive,
-          DsBadgeVariant.outline,
-          DsBadgeVariant.ghost,
-          DsBadgeVariant.link,
-          DsBadgeVariant.action,
-          DsBadgeVariant.premium,
-          DsBadgeVariant.success,
-          DsBadgeVariant.warning,
-          DsBadgeVariant.info,
+        for (final ElBadgeVariant v in <ElBadgeVariant>[
+          ElBadgeVariant.destructive,
+          ElBadgeVariant.outline,
+          ElBadgeVariant.ghost,
+          ElBadgeVariant.link,
+          ElBadgeVariant.action,
+          ElBadgeVariant.premium,
+          ElBadgeVariant.success,
+          ElBadgeVariant.warning,
+          ElBadgeVariant.info,
         ]) {
           expect(
             lightInks[v],
@@ -235,15 +235,15 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: DsThemeController(mode: DsThemeMode.dark),
+            controller: ElThemeController(mode: ElThemeMode.dark),
             child: const BadgeDocPage(),
           ),
         );
 
         final List<String> headings = tester
-            .widgetList<DsText>(find.byType(DsText))
-            .where((DsText text) => text.spec == DsType.h3)
-            .map((DsText text) => text.text)
+            .widgetList<ElText>(find.byType(ElText))
+            .where((ElText text) => text.spec == ElType.h3)
+            .map((ElText text) => text.text)
             .toList();
 
         expect(headings, _expectedSectionHeadings);

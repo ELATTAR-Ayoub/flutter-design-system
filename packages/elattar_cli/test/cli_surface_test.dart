@@ -260,6 +260,33 @@ flutter:
   });
 
   group('registry values', () {
+    test('add --all expands to the generated component inventory', () async {
+      final Directory root = _flutterProject();
+      addTearDown(() => root.deleteSync(recursive: true));
+      _writePackageConfig(root, <String>['flutter']);
+
+      final ProcessResult init = await _run(root, <String>[
+        'init',
+        '--registry',
+        _registryPath,
+      ]);
+      expect(init.exitCode, 0, reason: '${init.stdout}${init.stderr}');
+
+      final ProcessResult add = await _run(root, <String>[
+        'add',
+        '--all',
+        '--dry-run',
+        '--registry',
+        _registryPath,
+      ]);
+
+      expect(add.exitCode, 0, reason: '${add.stdout}${add.stderr}');
+      expect('${add.stdout}', contains('dry-run wrote'));
+      expect('${add.stdout}', contains('lib/components/ui/accordion.dart'));
+      expect('${add.stdout}', contains('lib/components/ui/rule.dart'));
+      expect('${add.stdout}', contains('lib/components/ui/safe_area.dart'));
+    });
+
     test('a URL registry fails with a sentence, not a stack trace', () async {
       final _Capture capture = _Capture();
       final int code = await capture.cli.run(<String>[
@@ -337,7 +364,7 @@ flutter:
 
     test('a registry outside the project is not recorded at all', () {
       expect(projectRelativeRegistry('/work/app', '/work/design-system'), null);
-      expect(projectRelativeRegistry(r'C:\work\app', r'D:\ds\registry'), null);
+      expect(projectRelativeRegistry(r'C:\work\app', r'D:\el\registry'), null);
       // A sibling whose name merely starts with the project path is not inside
       // it.
       expect(projectRelativeRegistry('/work/app', '/work/app-2/reg'), null);

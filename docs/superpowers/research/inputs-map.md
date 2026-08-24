@@ -2,10 +2,10 @@
 
 **Files that produce the render** (all under `D:\DESIGN\Design-System-2026-8\design-system\`):
 - `app\design-system\components\base\inputs\page.tsx` — the page. **`"use client"`** (first base page that is), one page-local component (`PasswordField`, L54–77) and one page-level `useState` (`otp`, L82).
-- `components\ds\kit.tsx` — `Code`, `DoDont`, `DsPageHeader`, `DsSection`, `Meta`, `Note`, `PageFootNav`, `Panel`, **`StateCell`, `StateGrid`** (all 10 used; this is the first page in the corpus to use `StateGrid`).
+- `components\el\kit.tsx` — `Code`, `DoDont`, `ElPageHeader`, `ElSection`, `Meta`, `Note`, `PageFootNav`, `Panel`, **`StateCell`, `StateGrid`** (all 10 used; this is the first page in the corpus to use `StateGrid`).
 - `components\ui\input.tsx` (43 L) · `textarea.tsx` (23 L) · `input-group.tsx` (157 L) · `input-otp.tsx` (89 L) · `field.tsx` (245 L) · `label.tsx` (25 L) · `button.tsx` · `icon.tsx`
 - `node_modules\input-otp` v1.x — `OTPInput` supplies the whole OTP mechanism; the shadcn file is markup only.
-- `lib\ds\nav.ts` — `findCategory("base","inputs")`, `siblings("base","inputs")`
+- `lib\el\nav.ts` — `findCategory("base","inputs")`, `siblings("base","inputs")`
 - `app\design-system\layout.tsx` · `app\globals.css` · `app\layout.tsx`
 
 Read with **`shared-map.md`** (shell, kit anatomy, Icon ladder), **`shadows-map.md`** (§5.1–5.2 Button base + variants, §5.5 the bare Input, §11 tokens, §13 CSS→Flutter), **`typography-map.md`** (type classes). Nothing there is restated except where this page consumes it differently.
@@ -27,7 +27,7 @@ Identical to every docs page — `shared-map.md` §1. Load-bearing here:
 
 ---
 
-## 1 · Page header (`DsPageHeader`)
+## 1 · Page header (`ElPageHeader`)
 
 Anatomy per `shared-map.md` §2. Content, verbatim (`nav.ts`, all ASCII — no curly quotes, no dashes):
 
@@ -334,7 +334,7 @@ The caret itself (`input-otp.tsx:65–69`):
 
 A **1000ms square wave — 500ms on, 500ms off, hard cut, no fade.** `steps(1, end)` makes every gap a hold, and the 50 / 50.01 pair makes the cut unambiguous even without it. The utility's comment records why it exists: *"Was tw-animate-css's `animate-caret-blink` paired with a stock `duration-1000`, so neither its rhythm nor its timing followed the system."*
 
-**No fill mode is declared**, so under `prefers-reduced-motion: reduce` (the blanket rule at `globals.css:2534–2542` collapses duration to 0.01ms and iterations to 1) the caret reverts to the element's own resting style — **opacity 1, steady, visible**. In port terms: `DsKeyframeFill.none`.
+**No fill mode is declared**, so under `prefers-reduced-motion: reduce` (the blanket rule at `globals.css:2534–2542` collapses duration to 0.01ms and iterations to 1) the caret reverts to the element's own resting style — **opacity 1, steady, visible**. In port terms: `ElKeyframeFill.none`.
 
 `anim-caret` is the **only `anim-*` utility the motion page does not demonstrate**, which is exactly why `lib\src\motion\keyframes.dart` transcribes eleven tables and not twelve. See §16.2.
 
@@ -378,7 +378,7 @@ Then `<Note tone="error" title="Never colour alone" className="mt-4">` (16px abo
 | web | where | Flutter |
 |---|---|---|
 | `<label for=id>` | `FieldLabel htmlFor` (7 of 9 in §4, both in §5, all 3 here) | no equivalent. Make the label a tap target that calls `focusNode.requestFocus()`, and merge its text into the field's `Semantics(label:)`. |
-| `aria-label` on an unlabelled field | the 8 state cells + the password input | `Semantics(label:)` — `DsInput.label` already does this (`input.dart:270–271`) |
+| `aria-label` on an unlabelled field | the 8 state cells + the password input | `Semantics(label:)` — `ElInput.label` already does this (`input.dart:270–271`) |
 | `aria-invalid` | Input / Textarea / InputGroupInput | **`Semantics(validationResult: SemanticsValidationResult.invalid)`** — present in Flutter 3.44.8 (`sky_engine/lib/ui/semantics.dart:1666`, `SemanticsProperties.validationResult`), and it is what emits `aria-invalid` on web. |
 | `aria-describedby` | `v1`→`v1-err`, `v2`→`v2-err`, `v3`→`v3-ok` | no equivalent. Fold the description/error string into the field's `Semantics(hint:)`. |
 | `role="alert"` on `FieldError` | field.tsx:222 | `Semantics(liveRegion: true)` |
@@ -390,7 +390,7 @@ Then `<Note tone="error" title="Never colour alone" className="mt-4">` (16px abo
 | `type="password"` toggling | `PasswordField` | `obscureText: !visible` |
 | `spellCheck={false}` | OTP | `enableSuggestions: false, autocorrect: false` |
 
-Recommended composite: one `DsField` that owns label + control + description/error and publishes a single merged semantics node — `textField: true`, `label` = the visible label, `hint` = description or error, `validationResult` = invalid when the control is, and `liveRegion` on the error subtree only. That reproduces what a screen reader announces from the web page without inventing an id graph Flutter cannot express.
+Recommended composite: one `ElField` that owns label + control + description/error and publishes a single merged semantics node — `textField: true`, `label` = the visible label, `hint` = description or error, `validationResult` = invalid when the control is, and `liveRegion` on the error subtree only. That reproduces what a screen reader announces from the web page without inventing an id graph Flutter cannot express.
 
 ---
 
@@ -559,19 +559,19 @@ Blur/sigma, paint order, border-box and the ring composition are settled in `sha
 `EditableText(maxLines: null)` inside `ConstrainedBox(minHeight: 80)`. There is no maximum, and `resize: vertical` is UA chrome with no Flutter counterpart — drop it.
 
 ### 15.2 · Per-side borders and partial radii on the OTP slot
-`DsMachineSurface` already accepts a `BoxBorder` and a full `BorderRadius` (`machine_surface.dart:27–34`), and its box-sizing inset uses `border!.dimensions`, which is per-side. So `Border(top:…, right:…, bottom:…, left: BorderSide.none)` with `BorderRadius.only(topLeft:…, bottomLeft:…)` needs no change. The active slot's `z-10` is a paint-order concern: build the strip as a `Stack`, or reorder so the active slot paints last.
+`ElMachineSurface` already accepts a `BoxBorder` and a full `BorderRadius` (`machine_surface.dart:27–34`), and its box-sizing inset uses `border!.dimensions`, which is per-side. So `Border(top:…, right:…, bottom:…, left: BorderSide.none)` with `BorderRadius.only(topLeft:…, bottomLeft:…)` needs no change. The active slot's `z-10` is a paint-order concern: build the strip as a `Stack`, or reorder so the active slot paints last.
 
 ### 15.3 · The OTP input model
 Mirror the package: one focusable `EditableText` with `showCursor: false` and a transparent cursor, sized to the strip and hit-testing over it, driving painted slot boxes from `controller.value.text` and `selection`. Do **not** build six focusable fields — the selection semantics (`onFocus` → `setSelectionRange(min(len, max-1), len)`, and the middle-caret expansion to a 1-char range) are what make the ring land on the right box.
 
 ### 15.4 · `pulls-caret`
-`DsKeyframePlayer(duration: 1000ms, repeat: true, fill: DsKeyframeFill.none)` over a two-stop opacity table evaluated through the existing `DsSteps(1)` curve — the same machinery `DsSignOn` uses. Because `steps(1, end)` means "hold, then snap", model it as a discrete lookup (`t < 0.5 → 1`, else `0`) rather than a tween, exactly as `DsSignOn.frameAt` does.
+`ElKeyframePlayer(duration: 1000ms, repeat: true, fill: ElKeyframeFill.none)` over a two-stop opacity table evaluated through the existing `ElSteps(1)` curve — the same machinery `ElSignOn` uses. Because `steps(1, end)` means "hold, then snap", model it as a discrete lookup (`t < 0.5 → 1`, else `0`) rather than a tween, exactly as `ElSignOn.frameAt` does.
 
 ### 15.5 · Semantics
 See §7.2. `Semantics(validationResult:)` and `liveRegion:` exist in 3.44.8 and are the only two aria features on this page with real Flutter counterparts; `aria-describedby` and `for=` have none and must be collapsed into one merged node per field.
 
 ### 15.6 · Text metrics
-`text-sm` beats `.type-num`'s size, so an input's mono value is **13px/600/tabular/−0.01em**, i.e. `DsType.numSm`'s treatment at `DsType.small`'s size. Neither existing spec is it. Either add an `inputNum` spec in `typography.dart` or derive one by `copyWith`-ing `numBase` down to 13 — but do it in the foundation layer, because the token guard forbids a bare `fontSize:` anywhere else.
+`text-sm` beats `.type-num`'s size, so an input's mono value is **13px/600/tabular/−0.01em**, i.e. `ElType.numSm`'s treatment at `ElType.small`'s size. Neither existing spec is it. Either add an `inputNum` spec in `typography.dart` or derive one by `copyWith`-ing `numBase` down to 13 — but do it in the foundation layer, because the token guard forbids a bare `fontSize:` anywhere else.
 
 ---
 
@@ -583,57 +583,57 @@ Package root `D:\DESIGN\Design-System-2026-8\flutter-design-system\`.
 
 | need | where |
 |---|---|
-| Pill field: 40px, `--input` border, `--card` fill, permanent `pressed` socket, focus ring @35% + border `--primary`@50%, 250ms `--ease-out`, real caret, placeholder, `disabled` @45%, `label` semantics | `lib\src\components\input.dart` — `DsInput` (:62), `DsInput.height` (:95) |
+| Pill field: 40px, `--input` border, `--card` fill, permanent `pressed` socket, focus ring @35% + border `--primary`@50%, 250ms `--ease-out`, real caret, placeholder, `disabled` @45%, `label` semantics | `lib\src\components\input.dart` — `ElInput` (:62), `ElInput.height` (:95) |
 | Inset painting, per-side border, partial radius, box-sizing inset | `lib\src\effects\machine_surface.dart:27–94` |
-| Focus-ring composition (3px, in front of the element's shadow) | `DsButton.withFocusRing` (`button.dart:241`) |
+| Focus-ring composition (3px, in front of the element's shadow) | `ElButton.withFocusRing` (`button.dart:241`) |
 | All 7 button variants incl. `premium` + `ghost`, with foil and sheen | `button.dart:38–84`, `effects\foil_value.dart`, `effects\sheen_action.dart` |
 | `--shadow-pressed` and every other shadow token | `foundation\shadows.dart:197` |
 | `input`, `card`, `border`, `ring`, `primary`, `destructive`, `destructiveInk`, `valueInk`, `mutedForeground`, `radius`(=10) … — **nothing missing** | `foundation\theme.dart:94–268` |
-| `DsRadii.lg` 12, `.pill` 999, `.sm` 6; `DsWidths.hairline`; `ds(n)` | `foundation\spacing.dart:14, 66, 85–106` |
-| `DsDurations.base` 250, `DsCurves.out` | `foundation\motion.dart:27, 216` |
-| `DsType.numBase` / `numSm` / `serial` / `label` / `small` / `caption`; tabular figures wired | `foundation\typography.dart:501, 490, 420, 387, 336` |
-| `DsSteps(1, jump-end)`, `DsKeyframePlayer`, `DsKeyframeFill.none` | `motion\keyframes.dart:71, 260, 125` |
+| `ElRadii.lg` 12, `.pill` 999, `.sm` 6; `ElWidths.hairline`; `el(n)` | `foundation\spacing.dart:14, 66, 85–106` |
+| `ElDurations.base` 250, `ElCurves.out` | `foundation\motion.dart:27, 216` |
+| `ElType.numBase` / `numSm` / `serial` / `label` / `small` / `caption`; tabular figures wired | `foundation\typography.dart:501, 490, 420, 387, 336` |
+| `ElSteps(1, jump-end)`, `ElKeyframePlayer`, `ElKeyframeFill.none` | `motion\keyframes.dart:71, 260, 125` |
 | Glyphs `eye`, `eyeOff`, `search`, `lock`, `percent`, `minus`, `check`, `x`, `arrowLeft`, `arrowRight` | `components\icon_paths.dart:105–140` |
-| `DsIconSize.sm` (14) / `md` (16), `DsIconTone.subtle` | `components\icon.dart:30, 33, 76` |
-| Kit: `DsPageHeader`, `DsSection`, `DsPanel`, `DsMeta`, `DsCode`, `DsDoDont`, `DsNote`, `DsGrid`, `DsPageFootNav` | `example\lib\kit.dart:54, 148, 242, 390, 448, 735, 834, 908, 1156` |
+| `ElIconSize.sm` (14) / `md` (16), `ElIconTone.subtle` | `components\icon.dart:30, 33, 76` |
+| Kit: `ElPageHeader`, `ElSection`, `ElPanel`, `ElMeta`, `ElCode`, `ElDoDont`, `ElNote`, `ElGrid`, `ElPageFootNav` | `example\lib\kit.dart:54, 148, 242, 390, 448, 735, 834, 908, 1156` |
 | Nav entry for `inputs` — slug, title, blurb, all 10 chips; siblings resolve to Buttons / Forms | `example\lib\nav.dart:207–224`, `siblings` :731 |
-| Closest structural template | `example\lib\pages\shadows.dart` (its `#in-use` panel is the only existing `DsInput` call site, :429) |
+| Closest structural template | `example\lib\pages\shadows.dart` (its `#in-use` panel is the only existing `ElInput` call site, :429) |
 
 ### 16.2 · Missing — must be built
 
 | # | missing | notes |
 |---|---|---|
 | 1 | `example\lib\pages\inputs.dart` + a `switch` arm at `example\lib\main.dart:108–119` | currently falls through to `PlaceholderPage("Base Components" / "Inputs")` at :133 |
-| 2 | **`DsTextarea`** | 12px radius, `min-h 80`, `px-3.5 py-2.5`, `leading-relaxed` 1.625, auto-grow, same socket + focus/invalid recipe as `DsInput` |
-| 3 | **`DsInputGroup` + `DsInputGroupAddon` / `Text` / `Button` / `Input`** | the whole §4.2 machine, including the 16→8 clearance rule and the −2px button pull |
-| 4 | **`DsInputOtp`** (`Group`, `Slot`, `Separator`) | §6 whole; one hidden field driving painted 32px boxes |
+| 2 | **`ElTextarea`** | 12px radius, `min-h 80`, `px-3.5 py-2.5`, `leading-relaxed` 1.625, auto-grow, same socket + focus/invalid recipe as `ElInput` |
+| 3 | **`ElInputGroup` + `ElInputGroupAddon` / `Text` / `Button` / `Input`** | the whole §4.2 machine, including the 16→8 clearance rule and the −2px button pull |
+| 4 | **`ElInputOtp`** (`Group`, `Slot`, `Separator`) | §6 whole; one hidden field driving painted 32px boxes |
 | 5 | **`pulls-caret` keyframe table** | `keyframes.dart` has eleven and not this one — it is the only `anim-*` utility the motion page never demonstrates |
-| 6 | **`DsField` / `DsFieldLabel` / `DsFieldDescription` / `DsFieldError` / `DsFieldGroup`** | §7.1 + the merged-semantics contract of §7.2 |
-| 7 | **`DsStateGrid` / `DsStateCell`** in `example\lib\kit.dart` | nothing in the repo; the `gap-px` + `bg-border` hairline trick has no existing analogue |
-| 8 | **`DsInput` API surface** — no addon slots, no `invalid`, no `readOnly`, no `radius`, no `size`, no `keyboardType`/`autofillHints`, no `obscureText`, no multiline, no `controller`-less value seeding beyond a controller | `input.dart:63–72`. Every §3 and §4 specimen needs at least one of these. |
-| 9 | **`DsButtonSize.xs`** (24px, 6px padding, 4px gap) **and a `radius` override on `DsButton`** | `button.dart` hardcodes `BorderRadius.circular(DsRadii.pill)` at :471; `heightFor`/`gapFor`/`paddingXFor` (:201–226) are exhaustive switches |
-| 10 | **A 7px radius token** | `calc(var(--radius) - 3px)`; `DsRadii` has 6 and 10, not 7 |
+| 6 | **`ElField` / `ElFieldLabel` / `ElFieldDescription` / `ElFieldError` / `ElFieldGroup`** | §7.1 + the merged-semantics contract of §7.2 |
+| 7 | **`ElStateGrid` / `ElStateCell`** in `example\lib\kit.dart` | nothing in the repo; the `gap-px` + `bg-border` hairline trick has no existing analogue |
+| 8 | **`ElInput` API surface** — no addon slots, no `invalid`, no `readOnly`, no `radius`, no `size`, no `keyboardType`/`autofillHints`, no `obscureText`, no multiline, no `controller`-less value seeding beyond a controller | `input.dart:63–72`. Every §3 and §4 specimen needs at least one of these. |
+| 9 | **`ElButtonSize.xs`** (24px, 6px padding, 4px gap) **and a `radius` override on `ElButton`** | `button.dart` hardcodes `BorderRadius.circular(ElRadii.pill)` at :471; `heightFor`/`gapFor`/`paddingXFor` (:201–226) are exhaustive switches |
+| 10 | **A 7px radius token** | `calc(var(--radius) - 3px)`; `ElRadii` has 6 and 10, not 7 |
 | 11 | **An `inputNum` / `inputSerial` text spec** (13px + mono/600/tabular, and 13px + mono/uppercase/1.4) | §15.6; must live in `foundation\typography.dart` |
 | 12 | **Glyphs `atSign` and `ticket`** | not among the curated 63, so they are off-set additions alongside `rotateCcw` (`icon_paths.dart:150`) and **must not** enter the icons page registry. lucide-react v1.28.0 nodes: `at-sign` = `circle(12,12,4)` + `path "M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-4 8"`; `ticket` = `path "M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"` + `path "M13 5v2"` + `path "M13 17v2"` + `path "M13 11v2"` |
-| 13 | **A `DsDurations` entry for the caret's 1000ms** | `bloom` is also 1000ms but means `--duration-bloom`; see open question 4 |
+| 13 | **A `ElDurations` entry for the caret's 1000ms** | `bloom` is also 1000ms but means `--duration-bloom`; see open question 4 |
 | 14 | `_referenceHeight['inputs']` in `example\test\vertical_parity_probe_test.dart:45–50` and a `_referenceBreaks['inputs']` block in `wrap_parity_probe_test.dart:183–367` | both must be measured off the live dev server at 1440×900 first; the wrap probe asserts its table is fully spent |
 | 15 | `example\test\inputs_page_test.dart` | model on `shadows_page_test.dart` |
 
-**Port bug found in passing:** `DsInput` paints its selection at `theme.primary` @ **0.30** (`input.dart:55`, :180) while `globals.css:1008` and the example app's own `DefaultSelectionStyle` both say **0.35** (`example\lib\main.dart:27`). The field also ignores `::selection`'s `color: var(--foreground)`. One field in the system selects differently from every other.
+**Port bug found in passing:** `ElInput` paints its selection at `theme.primary` @ **0.30** (`input.dart:55`, :180) while `globals.css:1008` and the example app's own `DefaultSelectionStyle` both say **0.35** (`example\lib\main.dart:27`). The field also ignores `::selection`'s `color: var(--foreground)`. One field in the system selects differently from every other.
 
 ### 16.3 · Guard-test constraints
 
 `test\token_guard_test.dart` rules and the `// allow-hardcoded: <reason>` escape are unchanged (see `shadows-map.md` §14.3). Consequences specific to this page:
-- `rounded-lg` → `DsRadii.lg`; the 7px addon-button radius needs a **new** `DsRadii` member, not a literal.
+- `rounded-lg` → `ElRadii.lg`; the 7px addon-button radius needs a **new** `ElRadii` member, not a literal.
 - The two new glyph path strings are guard-clean by construction (coordinates in a `d` string trip nothing).
-- `pulls-caret`'s two stops and the 1000ms period need either a `DsDurations` member or an escape-hatch comment.
+- `pulls-caret`'s two stops and the 1000ms period need either a `ElDurations` member or an escape-hatch comment.
 - The scan is raw text **including comments**, so a doc comment that spells out `BoxShadow(` or `fontSize: 13` trips the same rule.
 
 ---
 
 ## 17 · Drift register (record, do not fix)
 
-1. **The eyebrow says "Base" twice.** `DsPageHeader eyebrow={`${group.title} · Base`}` with `group.title` = "Base Components" → **"Base Components · Base"**. Every other page passes a plain group title.
+1. **The eyebrow says "Base" twice.** `ElPageHeader eyebrow={`${group.title} · Base`}` with `group.title` = "Base Components" → **"Base Components · Base"**. Every other page passes a plain group title.
 2. **The opening Note's radius claim.** *"Both were changed: 40px and 10px"* — `input.tsx` is `rounded-pill` (**999px**), not 10. 10px is `--radius`, which only `input-group.tsx` reads and only via `calc()`.
 3. **The opening Note's fill claim.** *"Fields are also filled with `bg-muted`"* — every field in the family is **`bg-card`**. On light both are white-ish but different (`#FFFFFF` vs `#F4F4F5`); on dark they are `#18181B` vs `#27272A`, plainly distinct. Repeated by the API entry ("bg-muted fill"), so it is stated twice on one page.
 4. **The Hover specimen changes nothing.** `className="border-input"` is already in the base class list, and no `hover:` rule exists on any input primitive. The note "Border strengthens" describes an appearance the system does not have.
@@ -655,16 +655,16 @@ Package root `D:\DESIGN\Design-System-2026-8\flutter-design-system\`.
 
 ## 18 · Open questions for the supervisor
 
-1. **Scope of the component build.** This page needs five net-new components (`DsTextarea`, `DsInputGroup` family, `DsInputOtp`, `DsField` family, `DsStateGrid`) plus a substantial widening of `DsInput`. **Recommendation:** build them as real, reusable package components in `lib\src\components\`, not page-local specimens — `forms`, `selects` and `selection` are the next three siblings and every one of them consumes `DsField` and `DsInputGroup`. Budget accordingly rather than discovering it on the Forms page.
-2. **`DsInput`'s API shape.** The page demands prefix/suffix slots, `invalid`, `readOnly`, `keyboardType`, `autofillHints`, `obscureText`, a value seed and a radius override. **Recommendation:** keep `DsInput` as the bare pill and put the addon machinery in `DsInputGroup` — that is exactly how the reference splits it (`InputGroupInput` *strips* the Input rather than extending it), and it keeps the shadows page's existing call site untouched.
-3. **The Hover and Focus specimens (drifts 4 and 5).** Per the fidelity bar these ship as the reference renders them — cell 2 identical to cell 1, cell 3 painting a ring the component never produces. Confirm, because a Flutter `DsInput` with no way to force a fake focus appearance would need one added purely to reproduce a mistake.
-4. **The caret's 1000ms.** `DsDurations.bloom` is already 1000ms but means `--duration-bloom`. Add `DsDurations.caret = 1000ms` (a token the CSS does not name either — it is an inline `1s`), reuse `bloom`, or hold it in the OTP file with an escape hatch? **Recommendation:** a named `caret` member, consistent with how `beatHover`/`glint`/`foilDrift` were handled for the shadows page.
-5. **The 7px radius.** `calc(var(--radius) - 3px)` is derived, not a token. Add `DsRadii.addonButton = 7`, or expose `theme.radius` arithmetic at the call site? **Recommendation:** a derived getter next to `DsRadii` so the relationship to `--radius` = 10 survives a change to `--radius`, since that is what the CSS expresses.
+1. **Scope of the component build.** This page needs five net-new components (`ElTextarea`, `ElInputGroup` family, `ElInputOtp`, `ElField` family, `ElStateGrid`) plus a substantial widening of `ElInput`. **Recommendation:** build them as real, reusable package components in `lib\src\components\`, not page-local specimens — `forms`, `selects` and `selection` are the next three siblings and every one of them consumes `ElField` and `ElInputGroup`. Budget accordingly rather than discovering it on the Forms page.
+2. **`ElInput`'s API shape.** The page demands prefix/suffix slots, `invalid`, `readOnly`, `keyboardType`, `autofillHints`, `obscureText`, a value seed and a radius override. **Recommendation:** keep `ElInput` as the bare pill and put the addon machinery in `ElInputGroup` — that is exactly how the reference splits it (`InputGroupInput` *strips* the Input rather than extending it), and it keeps the shadows page's existing call site untouched.
+3. **The Hover and Focus specimens (drifts 4 and 5).** Per the fidelity bar these ship as the reference renders them — cell 2 identical to cell 1, cell 3 painting a ring the component never produces. Confirm, because a Flutter `ElInput` with no way to force a fake focus appearance would need one added purely to reproduce a mistake.
+4. **The caret's 1000ms.** `ElDurations.bloom` is already 1000ms but means `--duration-bloom`. Add `ElDurations.caret = 1000ms` (a token the CSS does not name either — it is an inline `1s`), reuse `bloom`, or hold it in the OTP file with an escape hatch? **Recommendation:** a named `caret` member, consistent with how `beatHover`/`glint`/`foilDrift` were handled for the shadows page.
+5. **The 7px radius.** `calc(var(--radius) - 3px)` is derived, not a token. Add `ElRadii.addonButton = 7`, or expose `theme.radius` arithmetic at the call site? **Recommendation:** a derived getter next to `ElRadii` so the relationship to `--radius` = 10 survives a change to `--radius`, since that is what the CSS expresses.
 6. **`atSign` and `ticket`.** Both are off the curated 63. Confirm they join `rotateCcw` as off-set glyphs and that `icons_page_test.dart`'s registry assertion must continue to exclude them.
 7. **The `type-num` size collapse (drift 8).** Ship the measured 13px, or the 15px the class nominally declares? **Recommendation:** ship 13px — it is what the browser paints, and the fidelity bar is measured parity, not stated intent. Flag it in the page's doc comment so the next reader does not "fix" it.
 8. **Two measurements are blocking.** `_referenceHeight['inputs']` and the wrap table both need the live page at 1440×900. Same question as shadows open-question 1: is that measurement mine to take, or supplied?
 9. **The `text-sm` line-height question (§4.3).** Whether Tailwind emits a `line-height` for `text-sm` given `--text-sm` has no companion token decides whether `.type-num`'s 1.2 survives on the `InputGroupText` spans and inside the textarea. One `getComputedStyle` call settles it; it should be taken in the same browser session as question 8, along with the `InputGroupButton` icon size in §4.4.
-10. **The selection-alpha bug (§16.2).** `DsInput` uses 0.30 where the reference and the rest of the port use 0.35. Fix it in this task, or spin it out? **Recommendation:** fix in place — it is one constant and the shadows page's own test does not assert it.
+10. **The selection-alpha bug (§16.2).** `ElInput` uses 0.30 where the reference and the rest of the port use 0.35. Fix it in this task, or spin it out? **Recommendation:** fix in place — it is one constant and the shadows page's own test does not assert it.
 
 
 ---
@@ -691,6 +691,6 @@ the rendered value is 250ms either way. Probed 2026-08-15 on
 already recorded as the framework default - correct as written.
 
 **Port impact.** `input.dart`, `input_group.dart` and `input_otp.dart` now spell
-`DsDurations.transitionDefault` rather than `.base`. **No render change** - the
+`ElDurations.transitionDefault` rather than `.base`. **No render change** - the
 edit exists so that a future retune of `--duration-base` moves only the
 `@utility` blocks, exactly as it would in the browser.

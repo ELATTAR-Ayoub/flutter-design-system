@@ -8,4 +8,4 @@ library;
 import 'package:flutter/widgets.dart';
 
 /// No-op off the web. The signature is the contract; the behaviour is not.
-void dsInstallScrollBridge(ScrollController controller) {}
+void elInstallScrollBridge(ScrollController controller) {}

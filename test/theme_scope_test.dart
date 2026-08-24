@@ -5,11 +5,11 @@ import 'package:flutter_test/flutter_test.dart';
 /// The scope layer: who owns the theme, how `system` resolves, and how a
 /// `.type-*` class becomes glyphs on screen.
 
-/// The minimum ancestry `DsTheme`/`DsText` need, with the platform brightness
+/// The minimum ancestry `ElTheme`/`ElText` need, with the platform brightness
 /// and the viewport under the test's control — the first is what `system` mode
 /// follows, the second is what the `clamp()` classes measure against.
 Widget host({
-  required DsThemeController controller,
+  required ElThemeController controller,
   required Widget child,
   Brightness platformBrightness = Brightness.dark,
   Size size = const Size(1440, 900),
@@ -18,7 +18,7 @@ Widget host({
     data: MediaQueryData(size: size, platformBrightness: platformBrightness),
     child: Directionality(
       textDirection: TextDirection.ltr,
-      child: DsTheme(controller: controller, child: child),
+      child: ElTheme(controller: controller, child: child),
     ),
   );
 }
@@ -28,222 +28,261 @@ Widget host({
 class Probe extends StatelessWidget {
   const Probe({super.key, required this.onBuild});
 
-  final void Function(DsThemeData theme) onBuild;
+  final void Function(ElThemeData theme) onBuild;
 
   @override
   Widget build(BuildContext context) {
-    onBuild(DsTheme.of(context));
+    onBuild(ElTheme.of(context));
     return const SizedBox.shrink();
   }
 }
 
 void main() {
-  group('DsThemeController', () {
+  group('ElThemeController', () {
     test('resolves the two explicit modes without consulting the platform', () {
-      final DsThemeController c = DsThemeController(mode: DsThemeMode.dark);
-      expect(c.resolve(Brightness.light), DsThemeKind.dark);
+      final ElThemeController c = ElThemeController(mode: ElThemeMode.dark);
+      expect(c.resolve(Brightness.light), ElThemeKind.dark);
 
-      c.setMode(DsThemeMode.light);
-      expect(c.resolve(Brightness.dark), DsThemeKind.light);
+      c.setMode(ElThemeMode.light);
+      expect(c.resolve(Brightness.dark), ElThemeKind.light);
     });
 
     test('system mode follows the platform brightness', () {
-      final DsThemeController c = DsThemeController(mode: DsThemeMode.system);
-      expect(c.resolve(Brightness.dark), DsThemeKind.dark);
-      expect(c.resolve(Brightness.light), DsThemeKind.light);
+      final ElThemeController c = ElThemeController(mode: ElThemeMode.system);
+      expect(c.resolve(Brightness.dark), ElThemeKind.dark);
+      expect(c.resolve(Brightness.light), ElThemeKind.light);
     });
 
     test('defaults to dark — the reference ThemeProvider does', () {
-      expect(DsThemeController().mode, DsThemeMode.dark);
+      expect(ElThemeController().mode, ElThemeMode.dark);
     });
 
     test('notifies once per real change, never on a no-op set', () {
-      final DsThemeController c = DsThemeController();
+      final ElThemeController c = ElThemeController();
       int notifications = 0;
       c.addListener(() => notifications++);
 
-      c.setMode(DsThemeMode.dark); // already dark
+      c.setMode(ElThemeMode.dark); // already dark
       expect(notifications, 0);
 
-      c.setMode(DsThemeMode.light);
+      c.setMode(ElThemeMode.light);
       expect(notifications, 1);
     });
   });
 
-  group('DsTheme', () {
-    testWidgets('mode dark resolves DsThemeData.dark', (WidgetTester t) async {
-      DsThemeData? seen;
-      await t.pumpWidget(host(
-        controller: DsThemeController(mode: DsThemeMode.dark),
-        child: Probe(onBuild: (DsThemeData d) => seen = d),
-      ));
+  group('ElTheme', () {
+    testWidgets('mode dark resolves ElThemeData.dark', (WidgetTester t) async {
+      ElThemeData? seen;
+      await t.pumpWidget(
+        host(
+          controller: ElThemeController(mode: ElThemeMode.dark),
+          child: Probe(onBuild: (ElThemeData d) => seen = d),
+        ),
+      );
 
-      expect(seen, same(DsThemeData.dark));
-      expect(seen!.background, DsThemeData.dark.background);
+      expect(seen, same(ElThemeData.dark));
+      expect(seen!.background, ElThemeData.dark.background);
     });
 
     testWidgets('setMode(light) rebuilds a dependent', (WidgetTester t) async {
-      final DsThemeController controller = DsThemeController();
-      final List<DsThemeKind> builds = <DsThemeKind>[];
-      await t.pumpWidget(host(
-        controller: controller,
-        child: Probe(onBuild: (DsThemeData d) => builds.add(d.kind)),
-      ));
-      expect(builds, <DsThemeKind>[DsThemeKind.dark]);
+      final ElThemeController controller = ElThemeController();
+      final List<ElThemeKind> builds = <ElThemeKind>[];
+      await t.pumpWidget(
+        host(
+          controller: controller,
+          child: Probe(onBuild: (ElThemeData d) => builds.add(d.kind)),
+        ),
+      );
+      expect(builds, <ElThemeKind>[ElThemeKind.dark]);
 
-      controller.setMode(DsThemeMode.light);
+      controller.setMode(ElThemeMode.light);
       await t.pump();
 
-      expect(builds, <DsThemeKind>[DsThemeKind.dark, DsThemeKind.light]);
+      expect(builds, <ElThemeKind>[ElThemeKind.dark, ElThemeKind.light]);
     });
 
-    testWidgets('system mode follows MediaQuery.platformBrightness',
-        (WidgetTester t) async {
-      final DsThemeController controller =
-          DsThemeController(mode: DsThemeMode.system);
-      DsThemeData? seen;
+    testWidgets('system mode follows MediaQuery.platformBrightness', (
+      WidgetTester t,
+    ) async {
+      final ElThemeController controller = ElThemeController(
+        mode: ElThemeMode.system,
+      );
+      ElThemeData? seen;
 
-      await t.pumpWidget(host(
-        controller: controller,
-        platformBrightness: Brightness.light,
-        child: Probe(onBuild: (DsThemeData d) => seen = d),
-      ));
-      expect(seen, same(DsThemeData.light));
+      await t.pumpWidget(
+        host(
+          controller: controller,
+          platformBrightness: Brightness.light,
+          child: Probe(onBuild: (ElThemeData d) => seen = d),
+        ),
+      );
+      expect(seen, same(ElThemeData.light));
 
-      await t.pumpWidget(host(
-        controller: controller,
-        child: Probe(onBuild: (DsThemeData d) => seen = d),
-      ));
-      expect(seen, same(DsThemeData.dark));
+      await t.pumpWidget(
+        host(
+          controller: controller,
+          child: Probe(onBuild: (ElThemeData d) => seen = d),
+        ),
+      );
+      expect(seen, same(ElThemeData.dark));
     });
 
-    testWidgets('controllerOf and modeOf expose the live controller',
-        (WidgetTester t) async {
-      final DsThemeController controller = DsThemeController();
+    testWidgets('controllerOf and modeOf expose the live controller', (
+      WidgetTester t,
+    ) async {
+      final ElThemeController controller = ElThemeController();
       late BuildContext captured;
 
-      await t.pumpWidget(host(
-        controller: controller,
-        child: Builder(builder: (BuildContext c) {
-          captured = c;
-          return const SizedBox.shrink();
-        }),
-      ));
+      await t.pumpWidget(
+        host(
+          controller: controller,
+          child: Builder(
+            builder: (BuildContext c) {
+              captured = c;
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
 
-      expect(DsTheme.controllerOf(captured), same(controller));
-      expect(DsTheme.modeOf(captured), DsThemeMode.dark);
+      expect(ElTheme.controllerOf(captured), same(controller));
+      expect(ElTheme.modeOf(captured), ElThemeMode.dark);
     });
   });
 
-  group('DsText', () {
+  group('ElText', () {
     Future<Text> render(
       WidgetTester t,
-      DsText text, {
-      DsThemeMode mode = DsThemeMode.dark,
+      ElText text, {
+      ElThemeMode mode = ElThemeMode.dark,
     }) async {
-      await t.pumpWidget(host(
-        controller: DsThemeController(mode: mode),
-        child: text,
-      ));
+      await t.pumpWidget(
+        host(
+          controller: ElThemeController(mode: mode),
+          child: text,
+        ),
+      );
       return t.widget<Text>(find.byType(Text));
     }
 
     testWidgets('uppercases when the class does', (WidgetTester t) async {
-      await render(t, DsText('Remaining supply', DsType.label));
+      await render(t, ElText('Remaining supply', ElType.label));
       expect(find.text('REMAINING SUPPLY'), findsOneWidget);
     });
 
-    testWidgets('leaves a class without text-transform alone',
-        (WidgetTester t) async {
-      await render(t, DsText('Remaining supply', DsType.body));
+    testWidgets('leaves a class without text-transform alone', (
+      WidgetTester t,
+    ) async {
+      await render(t, ElText('Remaining supply', ElType.body));
       expect(find.text('Remaining supply'), findsOneWidget);
     });
 
-    testWidgets("takes the class's own colour from the live theme",
-        (WidgetTester t) async {
-      final Text dark = await render(t, DsText('x', DsType.label));
-      expect(dark.style!.color, DsThemeData.dark.mutedForeground);
+    testWidgets("takes the class's own colour from the live theme", (
+      WidgetTester t,
+    ) async {
+      final Text dark = await render(t, ElText('x', ElType.label));
+      expect(dark.style!.color, ElThemeData.dark.mutedForeground);
 
-      final Text light = await render(t, DsText('x', DsType.label),
-          mode: DsThemeMode.light);
-      expect(light.style!.color, DsThemeData.light.mutedForeground);
+      final Text light = await render(
+        t,
+        ElText('x', ElType.label),
+        mode: ElThemeMode.light,
+      );
+      expect(light.style!.color, ElThemeData.light.mutedForeground);
     });
 
-    testWidgets('a class with no colour of its own inherits',
-        (WidgetTester t) async {
+    testWidgets('a class with no colour of its own inherits', (
+      WidgetTester t,
+    ) async {
       // No DefaultTextStyle above it → the surface colour, `--foreground`.
-      final Text bare = await render(t, DsText('x', DsType.body));
-      expect(bare.style!.color, DsThemeData.dark.foreground);
+      final Text bare = await render(t, ElText('x', ElType.body));
+      expect(bare.style!.color, ElThemeData.dark.foreground);
 
       // Inside one → whatever that ancestor set, exactly like CSS inheritance.
-      await t.pumpWidget(host(
-        controller: DsThemeController(),
-        child: DefaultTextStyle(
-          style: TextStyle(color: DsThemeData.dark.actionInk),
-          child: DsText('x', DsType.body),
+      await t.pumpWidget(
+        host(
+          controller: ElThemeController(),
+          child: DefaultTextStyle(
+            style: TextStyle(color: ElThemeData.dark.actionInk),
+            child: ElText('x', ElType.body),
+          ),
         ),
-      ));
-      expect(t.widget<Text>(find.byType(Text)).style!.color,
-          DsThemeData.dark.actionInk);
+      );
+      expect(
+        t.widget<Text>(find.byType(Text)).style!.color,
+        ElThemeData.dark.actionInk,
+      );
     });
 
     testWidgets('an explicit colour beats both', (WidgetTester t) async {
       final Text text = await render(
         t,
-        DsText('x', DsType.label, color: DsThemeData.dark.valueInk),
+        ElText('x', ElType.label, color: ElThemeData.dark.valueInk),
       );
-      expect(text.style!.color, DsThemeData.dark.valueInk);
+      expect(text.style!.color, ElThemeData.dark.valueInk);
     });
 
     testWidgets('renders the class metrics', (WidgetTester t) async {
-      final Text text = await render(t, DsText('x', DsType.numSm));
+      final Text text = await render(t, ElText('x', ElType.numSm));
       final TextStyle style = text.style!;
-      expect(style.fontSize, DsType.numSm.size);
-      expect(style.height, DsType.numSm.height);
-      expect(style.letterSpacing,
-          closeTo(DsType.numSm.tracking! * DsType.numSm.size!, 1e-9));
+      expect(style.fontSize, ElType.numSm.size);
+      expect(style.height, ElType.numSm.height);
+      expect(
+        style.letterSpacing,
+        closeTo(ElType.numSm.tracking! * ElType.numSm.size!, 1e-9),
+      );
       expect(style.fontFeatures, isNotEmpty);
     });
 
     testWidgets('fontSize carries the fluid classes', (WidgetTester t) async {
       final Text text = await render(
         t,
-        DsText('x', DsType.display, fontSize: DsType.displaySize(1440)),
+        ElText('x', ElType.display, fontSize: ElType.displaySize(1440)),
       );
-      expect(text.style!.fontSize, DsType.displaySize(1440));
+      expect(text.style!.fontSize, ElType.displaySize(1440));
     });
 
-    testWidgets('styleOf resolves the same style for spans',
-        (WidgetTester t) async {
+    testWidgets('styleOf resolves the same style for spans', (
+      WidgetTester t,
+    ) async {
       late TextStyle style;
-      await t.pumpWidget(host(
-        controller: DsThemeController(),
-        child: Builder(builder: (BuildContext c) {
-          style = DsText.styleOf(c, DsType.label);
-          return const SizedBox.shrink();
-        }),
-      ));
-      expect(style.color, DsThemeData.dark.mutedForeground);
-      expect(style.fontSize, DsType.label.size);
+      await t.pumpWidget(
+        host(
+          controller: ElThemeController(),
+          child: Builder(
+            builder: (BuildContext c) {
+              style = ElText.styleOf(c, ElType.label);
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+      expect(style.color, ElThemeData.dark.mutedForeground);
+      expect(style.fontSize, ElType.label.size);
     });
   });
 
-  group('DsFluid', () {
-    testWidgets('reads the clamp against the viewport width',
-        (WidgetTester t) async {
+  group('ElFluid', () {
+    testWidgets('reads the clamp against the viewport width', (
+      WidgetTester t,
+    ) async {
       late double display;
       late double h1;
-      await t.pumpWidget(host(
-        controller: DsThemeController(),
-        child: Builder(builder: (BuildContext c) {
-          display = DsFluid.display(c);
-          h1 = DsFluid.h1(c);
-          return const SizedBox.shrink();
-        }),
-      ));
+      await t.pumpWidget(
+        host(
+          controller: ElThemeController(),
+          child: Builder(
+            builder: (BuildContext c) {
+              display = ElFluid.display(c);
+              h1 = ElFluid.h1(c);
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
 
-      expect(display, DsType.displaySize(1440)); // 4.4vw of 1440 = 63.36
-      expect(h1, DsType.h1Size(1440)); // 2.8vw = 40.32, clamped to 40
+      expect(display, ElType.displaySize(1440)); // 4.4vw of 1440 = 63.36
+      expect(h1, ElType.h1Size(1440)); // 2.8vw = 40.32, clamped to 40
     });
   });
 }

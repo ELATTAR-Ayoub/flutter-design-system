@@ -11,7 +11,11 @@ import 'package:flutter/material.dart';
 import '../../kit.dart';
 import '../../nav.dart';
 import '../../components_docs/catalog.dart';
-import '../site_routes.dart' show skillsRoute;
+// `/docs` and `/components` are documentation pages, so they render in the
+// same [DocsLayout] shell every other documentation page uses, which is where
+// the shared left rail and the in-page right rail come from.
+import '../../docs/docs_layout.dart';
+import '../site_routes.dart' show componentsRoute, docsRoute, skillsRoute;
 import 'home_showcase.dart';
 
 typedef PublicNavigate = void Function(String route);
@@ -37,50 +41,50 @@ class PublicHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return _PublicPage(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          SizedBox(height: ds(4)),
+          SizedBox(height: el(4)),
           Center(child: _HeroPill(onNavigate: onNavigate)),
-          SizedBox(height: ds(6)),
+          SizedBox(height: el(6)),
           Center(
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: DsContainers.xl2),
-              child: DsText(
+              constraints: const BoxConstraints(maxWidth: ElContainers.xl2),
+              child: ElText(
                 'Build the interface\nyou mean.',
-                DsType.display,
-                fontSize: DsFluid.display(context),
+                ElType.display,
+                fontSize: ElFluid.display(context),
                 align: TextAlign.center,
                 color: theme.foreground,
               ),
             ),
           ),
-          SizedBox(height: ds(5)),
+          SizedBox(height: el(5)),
           Center(
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: DsContainers.md),
-              child: DsText(
+              constraints: const BoxConstraints(maxWidth: ElContainers.md),
+              child: ElText(
                 'A copy-first design system for Flutter. Start with the '
                 'foundation, add only the pieces you need, and keep every '
                 'decision visible in your own codebase.',
-                DsType.lead,
+                ElType.lead,
                 align: TextAlign.center,
               ),
             ),
           ),
-          SizedBox(height: ds(7)),
+          SizedBox(height: el(7)),
           Center(
-            child: DsButton(
-              size: DsButtonSize.lg,
+            child: ElButton(
+              size: ElButtonSize.lg,
               onPressed: onNavigate == null
                   ? null
                   : () => onNavigate!(publicDocsRoute),
               child: const Text('Start building'),
             ),
           ),
-          SizedBox(height: ds(16)),
+          SizedBox(height: el(16)),
           HomeMasonryGrid(sm: 2, lg: 3, children: homeShowcaseCards()),
         ],
       ),
@@ -90,8 +94,8 @@ class PublicHomePage extends StatelessWidget {
 
 /// The pill at the top of the hero: a small, tappable, pill-shaped link, the
 /// way https://ui.shadcn.com/ leads with "Introducing…" above its own
-/// headline. [DsButton] is already pill-radius by default (see
-/// `DsButton.build`'s `widget.radius ?? BorderRadius.circular(DsRadii.pill)`),
+/// headline. [ElButton] is already pill-radius by default (see
+/// `ElButton.build`'s `widget.radius ?? BorderRadius.circular(ElRadii.pill)`),
 /// so this is a plain outline button sized down, not a bespoke shape.
 class _HeroPill extends StatelessWidget {
   const _HeroPill({this.onNavigate});
@@ -99,9 +103,9 @@ class _HeroPill extends StatelessWidget {
   final PublicNavigate? onNavigate;
 
   @override
-  Widget build(BuildContext context) => DsButton(
-    size: DsButtonSize.sm,
-    variant: DsButtonVariant.outline,
+  Widget build(BuildContext context) => ElButton(
+    size: ElButtonSize.sm,
+    variant: ElButtonVariant.outline,
     onPressed: onNavigate == null
         ? null
         : () => onNavigate!(publicComponentsRoute),
@@ -109,11 +113,11 @@ class _HeroPill extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         const Text('Browse components'),
-        SizedBox(width: ds(1.5)),
-        const DsIcon(
-          DsIconGlyph.arrowRight,
-          size: DsIconSize.xs,
-          tone: DsIconTone.muted,
+        SizedBox(width: el(1.5)),
+        const ElIcon(
+          ElIconGlyph.arrowRight,
+          size: ElIconSize.xs,
+          tone: ElIconTone.muted,
         ),
       ],
     ),
@@ -125,91 +129,190 @@ class PublicDocsPage extends StatelessWidget {
 
   final PublicNavigate? onNavigate;
 
+  /// Rendered in [DocsLayout], the same shell every documentation page uses.
+  /// `/docs` is a documentation page, so it carries the identical left rail
+  /// for cross-page navigation and the identical right rail for in-page
+  /// navigation. Only the centre column differs from its siblings.
   @override
-  Widget build(BuildContext context) => _PublicPage(
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        const DsPageHeader(
-          eyebrow: 'ELATTAR DESIGN SYSTEM',
-          title: 'Documentation',
-          blurb:
-              'A practical path from the first install to a complete, local component system.',
-        ),
-        _DocsList(onNavigate: onNavigate),
-      ],
+  Widget build(BuildContext context) => DocsLayout(
+    route: docsRoute,
+    intro: const DocsPageIntro(
+      eyebrow: 'ELATTAR DESIGN SYSTEM',
+      title: 'Documentation',
+      description:
+          'A practical path from the first install to a complete, local '
+          'component system.',
+    ),
+    toc: const <DocsTocEntry>[DocsTocEntry(title: 'Guides', anchor: 'guides')],
+    onNavigate: onNavigate,
+    child: KeyedSubtree(
+      key: docsAnchorKey('guides'),
+      child: _DocsList(onNavigate: onNavigate),
     ),
   );
 }
 
+/// `/components`, reshaped to match the reference's own presentation
+/// (https://ui.shadcn.com/docs/components): a dense, grouped list of plain
+/// text links, not a stack of bordered cards. The reference itself carries no
+/// description, icon, or button per entry, and no blurb under a group
+/// heading: one line under the page title is the only prose on the page.
+/// That is reproduced here rather than improved on, per the parity brief.
+///
+/// Two link sections mirror the two catalogs this site actually has:
+/// [componentDocs] (34 individually documented components, alphabetical, one
+/// route each, the direct counterpart of the reference's "All Components")
+/// under "Ready to install", then one section per non-Foundations [ElGroup]
+/// listing its categories, since those are the site's only other
+/// individually routable pages. Foundations is excluded, as it was before
+/// this page was reshaped: it is not a component family.
 class PublicComponentsPage extends StatelessWidget {
   const PublicComponentsPage({super.key, this.onNavigate});
 
   final PublicNavigate? onNavigate;
 
+  /// Lists only the documented components, each of which has its own page
+  /// under `/components/<name>`.
+  ///
+  /// The `elGroups` categories that used to follow are gone: every one of them
+  /// linked into the legacy `/el/...` tree, which no longer exists. A page a
+  /// reader cannot open does not belong in an index.
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
-    final List<DsGroup> groups = dsGroups
-        .where((DsGroup group) => group.id != 'foundations')
-        .toList(growable: false);
-    return _PublicPage(
+    return DocsLayout(
+      route: componentsRoute,
+      intro: const DocsPageIntro(
+        eyebrow: 'COMPONENT LIBRARY',
+        title: 'Components',
+        description: 'Every component available in the library, in one place.',
+      ),
+      toc: const <DocsTocEntry>[
+        DocsTocEntry(title: 'Ready to install', anchor: 'ready'),
+      ],
+      onNavigate: onNavigate,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          const DsPageHeader(
-            eyebrow: 'COMPONENT LIBRARY',
-            title: 'Components',
-            blurb:
-                'Browse the building blocks, understand their intent, then copy the implementation into your project.',
-          ),
-          DsText('Ready to install', DsType.h3, color: theme.foreground),
-          SizedBox(height: ds(3)),
-          DsText(
-            'These pilot components have complete previews, installation paths, usage guidance, API tables, and accessibility notes.',
-            DsType.body,
-          ),
-          SizedBox(height: ds(5)),
-          DsGrid(
-            sm: 2,
-            xl: 3,
-            children: <Widget>[
-              for (final ComponentDocEntry component in componentDocs)
-                _PublicLinkCard(
-                  title: component.title,
-                  body: component.description,
-                  label: component.command,
-                  labelSpec: DsType.code,
-                  onPressed: onNavigate == null
-                      ? null
-                      : () => onNavigate!(component.route),
-                ),
-            ],
-          ),
-          SizedBox(height: ds(12)),
-          for (final DsGroup group in groups) ...<Widget>[
-            DsText(group.title, DsType.h3, color: theme.foreground),
-            SizedBox(height: ds(3)),
-            DsText(group.blurb, DsType.body),
-            SizedBox(height: ds(5)),
-            DsGrid(
-              sm: 2,
-              xl: 3,
-              children: <Widget>[
-                for (final DsCategory category in group.categories)
-                  _PublicLinkCard(
-                    title: category.title,
-                    body: category.blurb,
-                    label: '${category.contents.length} references',
-                    onPressed: onNavigate == null
-                        ? null
-                        : () => onNavigate!(categoryHref(group, category)),
+          KeyedSubtree(
+            key: docsAnchorKey('ready'),
+            child: _ComponentLinkSection(
+              title: 'Ready to install',
+              entries: <_ComponentLinkEntry>[
+                for (final ComponentDocEntry component in componentDocs)
+                  _ComponentLinkEntry(
+                    title: component.title,
+                    route: component.route,
                   ),
               ],
+              onNavigate: onNavigate,
             ),
-            SizedBox(height: ds(12)),
-          ],
+          ),
         ],
+      ),
+    );
+  }
+}
+
+/// One "Ready to install" or group heading plus its dense link grid: the
+/// reference's `## New Components` / `## All Components` shape, generalised
+/// to however many sections this site actually has.
+class _ComponentLinkSection extends StatelessWidget {
+  const _ComponentLinkSection({
+    required this.title,
+    required this.entries,
+    required this.onNavigate,
+  });
+
+  final String title;
+  final List<_ComponentLinkEntry> entries;
+  final PublicNavigate? onNavigate;
+
+  @override
+  Widget build(BuildContext context) {
+    final ElThemeData theme = ElTheme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        ElText(title, ElType.h3, color: theme.foreground),
+        SizedBox(height: el(4)),
+        ElGrid(
+          sm: 2,
+          lg: 3,
+          gap: el(2),
+          children: <Widget>[
+            for (final _ComponentLinkEntry entry in entries)
+              _ComponentLinkRow(
+                entry: entry,
+                onPressed: onNavigate == null
+                    ? null
+                    : () => onNavigate!(entry.route),
+              ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _ComponentLinkEntry {
+  const _ComponentLinkEntry({required this.title, required this.route});
+
+  final String title;
+  final String route;
+}
+
+/// One plain-text entry in the dense grid: no card, no description, no
+/// button, matching the reference's own `<Link>Accordion</Link>` shape. The
+/// hover cross-fade follows the same `TweenAnimationBuilder<Color?>` idiom
+/// `docs_sidebar.dart`'s `_SidebarRow` and `breadcrumb.dart` already use for a
+/// plain navigational link in this codebase.
+class _ComponentLinkRow extends StatefulWidget {
+  const _ComponentLinkRow({required this.entry, required this.onPressed});
+
+  final _ComponentLinkEntry entry;
+  final VoidCallback? onPressed;
+
+  @override
+  State<_ComponentLinkRow> createState() => _ComponentLinkRowState();
+}
+
+class _ComponentLinkRowState extends State<_ComponentLinkRow> {
+  bool _hovered = false;
+
+  void _hover(bool value) {
+    if (_hovered == value) return;
+    setState(() => _hovered = value);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final ElThemeData theme = ElTheme.of(context);
+    final Duration duration = elAnimationDuration(
+      context,
+      ElDurations.transitionDefault,
+    );
+    return Semantics(
+      link: true,
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        onEnter: (_) => _hover(true),
+        onExit: (_) => _hover(false),
+        child: GestureDetector(
+          onTap: widget.onPressed,
+          behavior: HitTestBehavior.opaque,
+          child: Padding(
+            padding: EdgeInsets.symmetric(vertical: el(1.5)),
+            child: TweenAnimationBuilder<Color?>(
+              tween: ColorTween(
+                end: _hovered ? theme.actionInk : theme.mutedForeground,
+              ),
+              duration: duration,
+              curve: ElCurves.out,
+              builder: (BuildContext context, Color? ink, Widget? _) =>
+                  ElText(widget.entry.title, ElType.small, color: ink),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -239,14 +342,14 @@ class _PublicPage extends StatelessWidget {
   final Widget child;
 
   @override
-  Widget build(BuildContext context) => DsSafeArea(
+  Widget build(BuildContext context) => ElSafeArea(
     top: false,
     bottom: true,
     child: Padding(
-      padding: EdgeInsets.symmetric(horizontal: ds(4), vertical: ds(8)),
+      padding: EdgeInsets.symmetric(horizontal: el(4), vertical: el(8)),
       child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: DsBreakpoints.xl),
+          constraints: const BoxConstraints(maxWidth: ElBreakpoints.xl),
           child: child,
         ),
       ),
@@ -259,39 +362,27 @@ class _PublicLinkCard extends StatelessWidget {
     required this.title,
     required this.body,
     required this.label,
-    this.labelSpec,
     this.onPressed,
   });
 
   final String title;
   final String body;
   final String label;
-
-  /// Typography for [label]. Defaults to the uppercase eyebrow style used by
-  /// the reference-count and docs-tag callers; pass [DsType.code] when the
-  /// label is a literal string a reader may copy, such as a CLI command,
-  /// since [DsType.label]'s `text-transform: uppercase` would otherwise
-  /// mangle it.
-  final DsTypeSpec? labelSpec;
   final VoidCallback? onPressed;
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
-    return DsCard(
+    final ElThemeData theme = ElTheme.of(context);
+    return ElCard(
       children: <Widget>[
-        DsCardHeader(
-          title: DsText(title, DsType.h4, color: theme.foreground),
-          description: DsText(
-            label,
-            labelSpec ?? DsType.label,
-            color: theme.actionInk,
-          ),
+        ElCardHeader(
+          title: ElText(title, ElType.h4, color: theme.foreground),
+          description: ElText(label, ElType.label, color: theme.actionInk),
         ),
-        DsCardContent(child: DsText(body, DsType.small)),
-        DsCardFooter(
-          child: DsButton(
-            variant: DsButtonVariant.ghost,
+        ElCardContent(child: ElText(body, ElType.small)),
+        ElCardFooter(
+          child: ElButton(
+            variant: ElButtonVariant.ghost,
             onPressed: onPressed,
             child: const Text('Open reference'),
           ),
@@ -354,7 +445,7 @@ class _DocsList extends StatelessWidget {
     children: <Widget>[
       for (final ({String title, String body, String route}) entry in _entries)
         Padding(
-          padding: EdgeInsets.only(bottom: ds(3)),
+          padding: EdgeInsets.only(bottom: el(3)),
           child: _PublicLinkCard(
             title: entry.title,
             body: entry.body,

@@ -9,21 +9,16 @@ import 'package:flutter_test/flutter_test.dart';
 /// `example/lib/` consumes those tokens and must not restate a number.
 ///
 /// Escape hatch: put `allow-hardcoded: <reason>` on the offending line.
-/// Bare `0` / `0.0` and `dsTransparent` are always legal.
+/// Bare `0` / `0.0` and `elTransparent` are always legal.
 ///
 /// This is a raw text scan, comments included — a doc comment that spells out a
 /// literal takes the same `allow-hardcoded:` note as code would.
 
 /// Directories exempt from the scan (relative to the repo root, posix slashes).
-const List<String> _exemptDirs = <String>[
-  'lib/src/foundation/',
-];
+const List<String> _exemptDirs = <String>['lib/src/foundation/'];
 
 /// Roots scanned, relative to the repo root.
-const List<String> _roots = <String>[
-  'lib',
-  'example/lib',
-];
+const List<String> _roots = <String>['lib', 'example/lib'];
 
 class _Rule {
   const _Rule(this.name, this.pattern, {this.zeroIsLegal = false});
@@ -44,17 +39,20 @@ const List<_Rule> _rules = <_Rule>[
   _Rule('hardcoded tracking', r'letterSpacing:\s*-?\d', zeroIsLegal: true),
   _Rule('hardcoded font weight', r'FontWeight\.w\d'),
   // `\b` so the rule catches stock `Curves.easeOut` without also catching
-  // `DsCurves.out`, which is the thing it exists to push callers towards.
-  _Rule('stock Flutter curve (use DsCurves)', r'\bCurves\.'),
-  _Rule('hardcoded duration', r'Duration\((milli|micro)seconds:\s*\d',
-      zeroIsLegal: true),
+  // `ElCurves.out`, which is the thing it exists to push callers towards.
+  _Rule('stock Flutter curve (use ElCurves)', r'\bCurves\.'),
+  _Rule(
+    'hardcoded duration',
+    r'Duration\((milli|micro)seconds:\s*\d',
+    zeroIsLegal: true,
+  ),
   _Rule('hardcoded radius', r'BorderRadius\.circular\(\d', zeroIsLegal: true),
-  _Rule('raw BoxShadow (use DsShadows/DsMachineSurface)', r'BoxShadow\('),
+  _Rule('raw BoxShadow (use ElShadows/ElMachineSurface)', r'BoxShadow\('),
   // Leading, not box height. A [TextStyle.height] is the unitless ratio CSS
   // calls `line-height`, so the scope is "the integer part is 0 or 1" — which
   // is every value the type scale declares and none of the pixel heights a box
   // takes (`h-9` is 36, a row is 40, an icon is 16, and all of them read off
-  // `ds()` or a component spec already).
+  // `el()` or a component spec already).
   //
   // `\b` before `height` is what keeps `maxHeight:`/`minHeight:` out; the
   // camel-cased `lineHeight:` never matches at all, this rule being
@@ -98,7 +96,10 @@ List<TokenViolation> scanSource(String posixPath, String source) {
     for (final _Rule rule in _rules) {
       for (final RegExpMatch match in rule.regExp.allMatches(line)) {
         if (rule.zeroIsLegal) {
-          final Match? number = _numberFromHere.matchAsPrefix(line, match.end - 1);
+          final Match? number = _numberFromHere.matchAsPrefix(
+            line,
+            match.end - 1,
+          );
           if (number != null && _zeroLiteral.hasMatch(number[0]!)) continue;
         }
         found.add(TokenViolation(posixPath, i + 1, rule.name, line));
@@ -123,7 +124,9 @@ void main() {
     int scanned = 0;
 
     for (final String root in _roots) {
-      for (final File file in _dartFilesUnder(Directory('${repoRoot.path}/$root'))) {
+      for (final File file in _dartFilesUnder(
+        Directory('${repoRoot.path}/$root'),
+      )) {
         final String posixPath = file.path
             .replaceAll(r'\', '/')
             .replaceFirst('${repoRoot.path.replaceAll(r'\', '/')}/', '');
@@ -132,11 +135,16 @@ void main() {
       }
     }
 
-    expect(scanned, greaterThan(0), reason: 'guard scanned nothing — wrong cwd?');
+    expect(
+      scanned,
+      greaterThan(0),
+      reason: 'guard scanned nothing — wrong cwd?',
+    );
     expect(
       violations,
       isEmpty,
-      reason: 'Literals are allowed ONLY in lib/src/foundation/.\n'
+      reason:
+          'Literals are allowed ONLY in lib/src/foundation/.\n'
           'Add `// allow-hardcoded: <reason>` to the line if it is genuinely '
           'unavoidable.\n${violations.join('\n')}',
     );
@@ -150,28 +158,37 @@ void main() {
         'hardcoded font size': 'const s = TextStyle(fontSize: 15);',
         'hardcoded tracking': 'const s = TextStyle(letterSpacing: -0.01);',
         'hardcoded font weight': 'const w = FontWeight.w650;',
-        'stock Flutter curve (use DsCurves)': 'final c = Curves.easeOut;',
+        'stock Flutter curve (use ElCurves)': 'final c = Curves.easeOut;',
         'hardcoded duration': 'const d = Duration(milliseconds: 250);',
         'hardcoded radius': 'final r = BorderRadius.circular(16);',
-        'raw BoxShadow (use DsShadows/DsMachineSurface)': 'const b = BoxShadow();',
+        'raw BoxShadow (use ElShadows/ElMachineSurface)':
+            'const b = BoxShadow();',
         'hardcoded line height': 'const s = TextStyle(height: 1.4);',
       };
       for (final MapEntry<String, String> sample in samples.entries) {
-        final List<TokenViolation> hits = scanSource('lib/src/probe.dart', sample.value);
-        expect(hits.map((TokenViolation v) => v.rule), contains(sample.key),
-            reason: 'rule "${sample.key}" did not fire on: ${sample.value}');
+        final List<TokenViolation> hits = scanSource(
+          'lib/src/probe.dart',
+          sample.value,
+        );
+        expect(
+          hits.map((TokenViolation v) => v.rule),
+          contains(sample.key),
+          reason: 'rule "${sample.key}" did not fire on: ${sample.value}',
+        );
       }
     });
 
-    test('DsCurves is the sanctioned spelling, not a violation', () {
-      expect(scanSource('lib/src/probe.dart', 'curve: DsCurves.out,'), isEmpty);
+    test('ElCurves is the sanctioned spelling, not a violation', () {
+      expect(scanSource('lib/src/probe.dart', 'curve: ElCurves.out,'), isEmpty);
       expect(
-        scanSource('lib/src/probe.dart', 'reverseCurve: DsCurves.out.flipped,'),
+        scanSource('lib/src/probe.dart', 'reverseCurve: ElCurves.out.flipped,'),
         isEmpty,
       );
       // …while the stock curve it replaces still trips, wherever it appears.
-      expect(scanSource('lib/src/probe.dart', 'curve: Curves.easeOut,'),
-          isNotEmpty);
+      expect(
+        scanSource('lib/src/probe.dart', 'curve: Curves.easeOut,'),
+        isNotEmpty,
+      );
       expect(scanSource('lib/src/probe.dart', 'Curves.linear;'), isNotEmpty);
     });
 
@@ -185,8 +202,11 @@ void main() {
         'height: 1.625,',
         '/// `line-height: 1.4` inside `@layer components`',
       ]) {
-        expect(scanSource('lib/src/probe.dart', leading), isNotEmpty,
-            reason: 'a line height escaped the guard: $leading');
+        expect(
+          scanSource('lib/src/probe.dart', leading),
+          isNotEmpty,
+          reason: 'a line height escaped the guard: $leading',
+        );
       }
 
       // What it must not swallow: a box is measured in pixels and reads its
@@ -200,36 +220,59 @@ void main() {
         'final double lineHeight = 1.4;',
         '// width: 20, height: 14, x: 2, y: 3, rx: 2',
       ]) {
-        expect(scanSource('lib/src/probe.dart', box), isEmpty,
-            reason: 'the line-height rule fired on a box: $box');
+        expect(
+          scanSource('lib/src/probe.dart', box),
+          isEmpty,
+          reason: 'the line-height rule fired on a box: $box',
+        );
       }
     });
 
     test('allow-hardcoded: exempts the line', () {
       expect(
-        scanSource('lib/src/probe.dart',
-            'final c = Curves.easeOut; // allow-hardcoded: probe'),
+        scanSource(
+          'lib/src/probe.dart',
+          'final c = Curves.easeOut; // allow-hardcoded: probe',
+        ),
         isEmpty,
       );
     });
 
     test('lib/src/foundation/ is exempt', () {
       expect(
-        scanSource('lib/src/foundation/colors.dart', 'const c = Color(0xFF92C2FC);'),
+        scanSource(
+          'lib/src/foundation/colors.dart',
+          'const c = Color(0xFF92C2FC);',
+        ),
         isEmpty,
       );
     });
 
     test('bare 0 and 0.0 are legal', () {
-      expect(scanSource('lib/src/probe.dart', 'TextStyle(letterSpacing: 0)'), isEmpty);
-      expect(scanSource('lib/src/probe.dart', 'TextStyle(fontSize: 0.0)'), isEmpty);
-      expect(scanSource('lib/src/probe.dart', 'BorderRadius.circular(0)'), isEmpty);
+      expect(
+        scanSource('lib/src/probe.dart', 'TextStyle(letterSpacing: 0)'),
+        isEmpty,
+      );
+      expect(
+        scanSource('lib/src/probe.dart', 'TextStyle(fontSize: 0.0)'),
+        isEmpty,
+      );
+      expect(
+        scanSource('lib/src/probe.dart', 'BorderRadius.circular(0)'),
+        isEmpty,
+      );
       // …but a real number still trips.
-      expect(scanSource('lib/src/probe.dart', 'TextStyle(fontSize: 0.5)'), isNotEmpty);
+      expect(
+        scanSource('lib/src/probe.dart', 'TextStyle(fontSize: 0.5)'),
+        isNotEmpty,
+      );
     });
 
-    test('dsTransparent is legal anywhere', () {
-      expect(scanSource('lib/src/probe.dart', 'color: dsTransparent,'), isEmpty);
+    test('elTransparent is legal anywhere', () {
+      expect(
+        scanSource('lib/src/probe.dart', 'color: elTransparent,'),
+        isEmpty,
+      );
     });
   });
 }

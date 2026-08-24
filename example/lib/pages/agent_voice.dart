@@ -74,8 +74,8 @@
 /// **before you arm it**, which is also the only state the capture rig ever
 /// sees. The control still arms: the pill tints, the glyph goes agent-blue and
 /// the live ring pulses: and the waveform stays flat because there is
-/// genuinely nothing to draw. `DsLiveWaveform.samples` and
-/// `DsBarVisualizer.spectrum` are the seam a product with a real audio plugin
+/// genuinely nothing to draw. `ElLiveWaveform.samples` and
+/// `ElBarVisualizer.spectrum` are the seam a product with a real audio plugin
 /// feeds.
 ///
 /// ## Drift register: recorded, shipped as written
@@ -113,11 +113,11 @@ import '../kit.dart';
 import '../nav.dart';
 
 /// `AGENT_STATE` in `OrbStates`: the four the specimen draws, in its order.
-const List<(DsOrbState, String)> _orbStates = <(DsOrbState, String)>[
-  (DsOrbState.idle, 'idle'),
-  (DsOrbState.listening, 'listening'),
-  (DsOrbState.thinking, 'thinking'),
-  (DsOrbState.talking, 'talking'),
+const List<(ElOrbState, String)> _orbStates = <(ElOrbState, String)>[
+  (ElOrbState.idle, 'idle'),
+  (ElOrbState.listening, 'listening'),
+  (ElOrbState.thinking, 'thinking'),
+  (ElOrbState.talking, 'talking'),
 ];
 
 /// A fixed phase per cell.
@@ -135,12 +135,12 @@ class AgentVoicePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsCategoryHit here = findCategory('agent', 'voice');
+    final ElCategoryHit here = findCategory('agent', 'voice');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        DsPageHeader(
+        ElPageHeader(
           // DRIFT 1.
           eyebrow: '${here.group.title} · Components',
           title: here.category.title,
@@ -150,9 +150,9 @@ class AgentVoicePage extends StatelessWidget {
         // `className="mb-12"`, 48px, above the first section rather than
         // inside it.
         Padding(
-          padding: EdgeInsets.only(bottom: ds(12)),
-          child: const DsNote(
-            tone: DsNoteTone.value,
+          padding: EdgeInsets.only(bottom: el(12)),
+          child: const ElNote(
+            tone: ElNoteTone.value,
             title: 'This specimen opens your microphone',
             // DRIFT 2.
             child: _MicrophoneNote(),
@@ -162,7 +162,7 @@ class AgentVoicePage extends StatelessWidget {
         const _OrbSection(),
         const _DictationSection(),
         const _SpeechSection(),
-        const DsPageFootNav(groupId: 'agent', slug: 'voice'),
+        const ElPageFootNav(groupId: 'agent', slug: 'voice'),
       ],
     );
   }
@@ -172,15 +172,15 @@ class _MicrophoneNote extends StatelessWidget {
   const _MicrophoneNote();
 
   @override
-  Widget build(BuildContext context) => DsText(
-        'Arming the control below asks the browser for microphone access and '
-        'reads the level from a live analyser. Nothing is recorded, stored or '
-        'sent anywhere: the amplitude drives the waveform and the transcript '
-        'is written into the box beside it, both in this tab. A waveform drawn '
-        'from fake data would prove nothing about whether the waveform works, '
-        'which is why this one is real.',
-        DsType.small,
-      );
+  Widget build(BuildContext context) => ElText(
+    'Arming the control below asks the browser for microphone access and '
+    'reads the level from a live analyser. Nothing is recorded, stored or '
+    'sent anywhere: the amplitude drives the waveform and the transcript '
+    'is written into the box beside it, both in this tab. A waveform drawn '
+    'from fake data would prove nothing about whether the waveform works, '
+    'which is why this one is real.',
+    ElType.small,
+  );
 }
 
 /* ── 1 · The listening surface ───────────────────────────────────────────── */
@@ -189,16 +189,17 @@ class _LiveSection extends StatelessWidget {
   const _LiveSection();
 
   @override
-  Widget build(BuildContext context) => const DsSection(
-        id: 'live',
-        title: 'The listening surface',
-        description: 'One pill, always. The border makes the two halves read '
-            'as a single object; the fill is what changes when it goes live.',
-        child: DsPanel(
-          label: 'MicControl · LiveWaveform · BarVisualizer',
-          child: _VoiceDemo(),
-        ),
-      );
+  Widget build(BuildContext context) => const ElSection(
+    id: 'live',
+    title: 'The listening surface',
+    description:
+        'One pill, always. The border makes the two halves read '
+        'as a single object; the fill is what changes when it goes live.',
+    child: ElPanel(
+      label: 'MicControl · LiveWaveform · BarVisualizer',
+      child: _VoiceDemo(),
+    ),
+  );
 }
 
 /// `agent-demo.tsx` L741, `export function VoiceDemo`.
@@ -219,7 +220,7 @@ class _VoiceDemoState extends State<_VoiceDemo> {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -229,22 +230,22 @@ class _VoiceDemoState extends State<_VoiceDemo> {
         Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            DsMicControl(
+            ElMicControl(
               listening: _listening,
               onToggle: () => setState(() => _listening = !_listening),
             ),
-            SizedBox(width: ds(6)),
+            SizedBox(width: el(6)),
             const Expanded(
               child: Align(
                 alignment: Alignment.centerLeft,
-                child: DsLiveWaveform(width: 320, height: 48),
+                child: ElLiveWaveform(width: 320, height: 48),
               ),
             ),
-            SizedBox(width: ds(6)),
-            const DsBarVisualizer(),
+            SizedBox(width: el(6)),
+            const ElBarVisualizer(),
           ],
         ),
-        SizedBox(height: ds(6)),
+        SizedBox(height: el(6)),
         // `rounded-lg border border-border bg-background p-5`, 85 tall: 2 of
         // border, 40 of padding, 43 of content. A [DecoratedBox] paints its
         // border without reserving room for it and comes out 2px short —
@@ -253,33 +254,33 @@ class _VoiceDemoState extends State<_VoiceDemo> {
         Container(
           decoration: BoxDecoration(
             color: theme.background,
-            border: Border.all(color: theme.border, width: DsWidths.hairline),
-            borderRadius: BorderRadius.circular(DsRadii.lg),
+            border: Border.all(color: theme.border, width: ElWidths.hairline),
+            borderRadius: BorderRadius.circular(ElRadii.lg),
           ),
-          padding: EdgeInsets.all(ds(5)),
+          padding: EdgeInsets.all(el(5)),
           child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.only(bottom: ds(2)),
-                  child: DsText(
-                    'Heard',
-                    DsType.label,
-                    color: theme.mutedForeground,
-                  ),
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Padding(
+                padding: EdgeInsets.only(bottom: el(2)),
+                child: ElText(
+                  'Heard',
+                  ElType.label,
+                  color: theme.mutedForeground,
                 ),
-                // `min-h-6`: the line is reserved whether or not it is
-                // filled (DRIFT 5). The placeholder is the supported branch:
-                // probe 6.
-                ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: ds(6)),
-                  child: DsText(
-                    'Arm the microphone and say something.',
-                    DsType.body,
-                    color: theme.mutedForeground,
-                  ),
+              ),
+              // `min-h-6`: the line is reserved whether or not it is
+              // filled (DRIFT 5). The placeholder is the supported branch:
+              // probe 6.
+              ConstrainedBox(
+                constraints: BoxConstraints(minHeight: el(6)),
+                child: ElText(
+                  'Arm the microphone and say something.',
+                  ElType.body,
+                  color: theme.mutedForeground,
                 ),
-              ],
+              ),
+            ],
           ),
         ),
       ],
@@ -293,40 +294,41 @@ class _OrbSection extends StatelessWidget {
   const _OrbSection();
 
   @override
-  Widget build(BuildContext context) => DsSection(
-        id: 'orb',
-        title: 'Orb states',
-        // DRIFT 3.
-        description: 'Where the cube says what the agent is doing, the orb '
-            'says that it is hearing you. It reacts to level rather than to '
-            'state, which is why it belongs next to the microphone and not in '
-            'the header.',
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+  Widget build(BuildContext context) => ElSection(
+    id: 'orb',
+    title: 'Orb states',
+    // DRIFT 3.
+    description:
+        'Where the cube says what the agent is doing, the orb '
+        'says that it is hearing you. It reacts to level rather than to '
+        'state, which is why it belongs next to the microphone and not in '
+        'the header.',
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        // `grid grid-cols-2 gap-px … sm:grid-cols-4`: the kit's lattice
+        // is the same frame, but the cell is the page's own: `p-6 gap-4`
+        // with the label UNDER the specimen, where [ElStateCell]'s block
+        // is `p-5` with a well above a name.
+        ElStateGrid.columns(
+          base: 2,
+          sm: 4,
           children: <Widget>[
-            // `grid grid-cols-2 gap-px … sm:grid-cols-4`: the kit's lattice
-            // is the same frame, but the cell is the page's own: `p-6 gap-4`
-            // with the label UNDER the specimen, where [DsStateCell]'s block
-            // is `p-5` with a well above a name.
-            DsStateGrid.columns(
-              base: 2,
-              sm: 4,
-              children: <Widget>[
-                for (int i = 0; i < _orbStates.length; i++)
-                  _OrbCell(
-                    state: _orbStates[i].$1,
-                    label: _orbStates[i].$2,
-                    seed: _orbSeeds[i],
-                  ),
-              ],
-            ),
-            Padding(
-              padding: EdgeInsets.only(top: ds(6)),
-              child: const _OrbNote(),
-            ),
+            for (int i = 0; i < _orbStates.length; i++)
+              _OrbCell(
+                state: _orbStates[i].$1,
+                label: _orbStates[i].$2,
+                seed: _orbSeeds[i],
+              ),
           ],
         ),
-      );
+        Padding(
+          padding: EdgeInsets.only(top: el(6)),
+          child: const _OrbNote(),
+        ),
+      ],
+    ),
+  );
 }
 
 /// One tile: `flex flex-col items-center gap-4 bg-background p-6`, holding a
@@ -338,7 +340,7 @@ class _OrbCell extends StatelessWidget {
     required this.seed,
   });
 
-  final DsOrbState state;
+  final ElOrbState state;
   final String label;
   final int seed;
 
@@ -347,20 +349,20 @@ class _OrbCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
-    return DsStateCell.bare(
-      padding: EdgeInsets.all(ds(6)),
+    final ElThemeData theme = ElTheme.of(context);
+    return ElStateCell.bare(
+      padding: EdgeInsets.all(el(6)),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          DsVoiceOrb(state: state, size: orbSize, seed: seed),
-          SizedBox(height: ds(4)),
+          ElVoiceOrb(state: state, size: orbSize, seed: seed),
+          SizedBox(height: el(4)),
           // `.type-micro` carries everything but the transform: the call site
           // uppercases, because a Flutter TextStyle cannot.
-          DsText(
+          ElText(
             label.toUpperCase(),
-            DsType.micro,
+            ElType.micro,
             color: theme.mutedForeground,
           ),
         ],
@@ -373,25 +375,27 @@ class _OrbNote extends StatelessWidget {
   const _OrbNote();
 
   @override
-  Widget build(BuildContext context) => DsRichText(
-        TextSpan(
-          children: <InlineSpan>[
-            const TextSpan(
-              text: 'Dictation and the orb share one analyser rather than '
-                  'opening two streams. Two ',
-            ),
-            DsCode.span('getUserMedia'),
-            const TextSpan(
-              text: ' calls on the same device is a permission prompt the user '
-                  'has already answered and a second stream the browser may or '
-                  'may not give you, so the orb runs in manual mode and is fed '
-                  'from the analyser that is already open: one stream, two '
-                  'consumers.',
-            ),
-          ],
+  Widget build(BuildContext context) => ElRichText(
+    TextSpan(
+      children: <InlineSpan>[
+        const TextSpan(
+          text:
+              'Dictation and the orb share one analyser rather than '
+              'opening two streams. Two ',
         ),
-        DsType.small,
-      );
+        ElCode.span('getUserMedia'),
+        const TextSpan(
+          text:
+              ' calls on the same device is a permission prompt the user '
+              'has already answered and a second stream the browser may or '
+              'may not give you, so the orb runs in manual mode and is fed '
+              'from the analyser that is already open: one stream, two '
+              'consumers.',
+        ),
+      ],
+    ),
+    ElType.small,
+  );
 }
 
 /* ── 3 · The dictation contract ──────────────────────────────────────────── */
@@ -400,48 +404,52 @@ class _DictationSection extends StatelessWidget {
   const _DictationSection();
 
   @override
-  Widget build(BuildContext context) => const DsSection(
-        id: 'dictation',
-        title: 'The dictation contract',
-        description: 'Speech recognition is a browser API with genuinely '
-            'different support across engines, so the hook states what it can '
-            'do rather than assuming.',
-        // DRIFT 4.
-        child: DsMeta(
-          items: <DsMetaItem>[
-            (
-              k: 'isSupported',
-              v: TextSpan(
-                text: 'boolean: false is a normal outcome, not an error '
-                    'state',
-              ),
-            ),
-            (k: 'isListening', v: TextSpan(text: 'boolean')),
-            (
-              k: 'level',
-              v: TextSpan(
-                text: 'number, 0 to 1, smoothed. Drives the scalar meter.',
-              ),
-            ),
-            (
-              k: 'analyser',
-              v: TextSpan(
-                text: 'AnalyserNode | null: live node for the waveform; null '
-                    'while the microphone is closed',
-              ),
-            ),
-            (
-              k: 'devices / deviceId / setDeviceId',
-              v: TextSpan(
-                text: 'AudioInput[]: labels are blank until permission has '
-                    'been granted once',
-              ),
-            ),
-            (k: 'start / stop / toggle', v: TextSpan(text: '() => void')),
-            (k: 'error', v: TextSpan(text: 'string | null')),
-          ],
+  Widget build(BuildContext context) => const ElSection(
+    id: 'dictation',
+    title: 'The dictation contract',
+    description:
+        'Speech recognition is a browser API with genuinely '
+        'different support across engines, so the hook states what it can '
+        'do rather than assuming.',
+    // DRIFT 4.
+    child: ElMeta(
+      items: <ElMetaItem>[
+        (
+          k: 'isSupported',
+          v: TextSpan(
+            text:
+                'boolean: false is a normal outcome, not an error '
+                'state',
+          ),
         ),
-      );
+        (k: 'isListening', v: TextSpan(text: 'boolean')),
+        (
+          k: 'level',
+          v: TextSpan(
+            text: 'number, 0 to 1, smoothed. Drives the scalar meter.',
+          ),
+        ),
+        (
+          k: 'analyser',
+          v: TextSpan(
+            text:
+                'AnalyserNode | null: live node for the waveform; null '
+                'while the microphone is closed',
+          ),
+        ),
+        (
+          k: 'devices / deviceId / setDeviceId',
+          v: TextSpan(
+            text:
+                'AudioInput[]: labels are blank until permission has '
+                'been granted once',
+          ),
+        ),
+        (k: 'start / stop / toggle', v: TextSpan(text: '() => void')),
+        (k: 'error', v: TextSpan(text: 'string | null')),
+      ],
+    ),
+  );
 }
 
 /* ── 4 · Speaking back ───────────────────────────────────────────────────── */
@@ -450,40 +458,40 @@ class _SpeechSection extends StatelessWidget {
   const _SpeechSection();
 
   @override
-  Widget build(BuildContext context) => const DsSection(
-        id: 'speech',
-        title: 'Speaking back',
-        description: 'The fourth seam. useBrowserSpeech is one SpeechAdapter, '
-            'not the only one: a product with its own voice implements the '
-            'same interface and the controls do not move.',
-        child: DsNote(
-          title: 'Markdown is not speakable',
-          child: _SpeechNote(),
-        ),
-      );
+  Widget build(BuildContext context) => const ElSection(
+    id: 'speech',
+    title: 'Speaking back',
+    description:
+        'The fourth seam. useBrowserSpeech is one SpeechAdapter, '
+        'not the only one: a product with its own voice implements the '
+        'same interface and the controls do not move.',
+    child: ElNote(title: 'Markdown is not speakable', child: _SpeechNote()),
+  );
 }
 
 class _SpeechNote extends StatelessWidget {
   const _SpeechNote();
 
   @override
-  Widget build(BuildContext context) => DsRichText(
-        TextSpan(
-          children: <InlineSpan>[
-            const TextSpan(
-              text: 'Reading a raw answer aloud gets you asterisks, pipe '
-                  'characters and fenced code read as punctuation. ',
-            ),
-            DsCode.span('speakableText'),
-            const TextSpan(
-              text: ' strips the markup, drops code blocks entirely and turns '
-                  'a table into a sentence before any of it reaches the '
-                  'synthesiser. It is exported separately because it is a pure '
-                  'function, and because a product supplying its own adapter '
-                  'still needs it.',
-            ),
-          ],
+  Widget build(BuildContext context) => ElRichText(
+    TextSpan(
+      children: <InlineSpan>[
+        const TextSpan(
+          text:
+              'Reading a raw answer aloud gets you asterisks, pipe '
+              'characters and fenced code read as punctuation. ',
         ),
-        DsType.small,
-      );
+        ElCode.span('speakableText'),
+        const TextSpan(
+          text:
+              ' strips the markup, drops code blocks entirely and turns '
+              'a table into a sentence before any of it reaches the '
+              'synthesiser. It is exported separately because it is a pure '
+              'function, and because a product supplying its own adapter '
+              'still needs it.',
+        ),
+      ],
+    ),
+    ElType.small,
+  );
 }

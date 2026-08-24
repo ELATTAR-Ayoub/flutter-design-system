@@ -1,0 +1,31 @@
+{
+  "name": "chart-cartesian",
+  "type": "component",
+  "version": "0.0.1",
+  "description": "The three cartesian families — `AreaChart`, `BarChart` and `LineChart`.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/chart_cartesian.dart",
+      "target": "@ui/chart_cartesian.dart",
+      "sha256": "8cd55ae27944dff6ffc31d4d5e17889d6f7f49088ba6150818ad81f8ffd269ac"
+    }
+  ],
+  "registryDependencies": [
+    "chart",
+    "chart-geometry",
+    "source-foundation"
+  ],
+  "semanticDependencies": [
+    "chart",
+    "chart-geometry"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "documentationRoute": "/components/chart-cartesian",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/chart_cartesian.dart",
+  "deprecated": false
+}

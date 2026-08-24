@@ -24,9 +24,9 @@ class ButtonDocPage extends StatelessWidget {
         title: entry.title,
         description: entry.description,
       ),
-      breadcrumbs: const <DsBreadcrumbEntry>[
-        DsBreadcrumbEntry.link('Components'),
-        DsBreadcrumbEntry.page('Button'),
+      breadcrumbs: const <ElBreadcrumbEntry>[
+        ElBreadcrumbEntry.link('Components'),
+        ElBreadcrumbEntry.page('Button'),
       ],
       sidebar: _sidebar(entry.route),
       toc: const <DocsTocEntry>[
@@ -59,9 +59,9 @@ class CardDocPage extends StatelessWidget {
         title: entry.title,
         description: entry.description,
       ),
-      breadcrumbs: const <DsBreadcrumbEntry>[
-        DsBreadcrumbEntry.link('Components'),
-        DsBreadcrumbEntry.page('Card'),
+      breadcrumbs: const <ElBreadcrumbEntry>[
+        ElBreadcrumbEntry.link('Components'),
+        ElBreadcrumbEntry.page('Card'),
       ],
       sidebar: _sidebar(entry.route),
       toc: const <DocsTocEntry>[
@@ -114,20 +114,20 @@ class _ButtonArticle extends StatelessWidget {
           description:
               'A primary action with an accessible label and focusable semantics.',
           preview: Wrap(
-            spacing: ds(3),
-            runSpacing: ds(3),
+            spacing: el(3),
+            runSpacing: el(3),
             children: <Widget>[
-              DsButton(onPressed: () {}, child: const Text('Save changes')),
-              DsButton(
-                variant: DsButtonVariant.outline,
+              ElButton(onPressed: () {}, child: const Text('Save changes')),
+              ElButton(
+                variant: ElButtonVariant.outline,
                 onPressed: () {},
                 child: const Text('Cancel'),
               ),
-              DsButton(
-                size: DsButtonSize.icon,
+              ElButton(
+                size: ElButtonSize.icon,
                 label: 'Open menu',
                 onPressed: () {},
-                child: const DsIcon(DsIconGlyph.menu),
+                child: const ElIcon(ElIconGlyph.menu),
               ),
             ],
           ),
@@ -141,7 +141,7 @@ class _ButtonArticle extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: ds(6)),
+      SizedBox(height: el(6)),
       _Anchor(
         'variants',
         child: const DocsApiTable(
@@ -149,24 +149,24 @@ class _ButtonArticle extends StatelessWidget {
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'variant',
-              type: 'DsButtonVariant',
+              type: 'ElButtonVariant',
               description:
                   'primary, premium, secondary, outline, ghost, destructive, link.',
             ),
             DocsApiFact(
               name: 'size',
-              type: 'DsButtonSize',
+              type: 'ElButtonSize',
               description: 'xs, sm, md, lg, xl, iconXs, iconSm, icon, iconLg.',
             ),
             DocsApiFact(
               name: 'emphasis',
-              type: 'DsButtonEmphasis',
+              type: 'ElButtonEmphasis',
               description: 'none or caps for uppercase CTA treatment.',
             ),
           ],
         ),
       ),
-      SizedBox(height: ds(6)),
+      SizedBox(height: el(6)),
       _Anchor(
         'states',
         child: const DocsStateMatrix(
@@ -194,7 +194,7 @@ class _ButtonArticle extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: ds(6)),
+      SizedBox(height: el(6)),
       _Anchor(
         'install',
         child: DocsInstallFacts(
@@ -219,7 +219,7 @@ class _ButtonArticle extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: ds(6)),
+      SizedBox(height: el(6)),
       _Anchor(
         'api',
         child: const DocsApiTable(
@@ -247,7 +247,7 @@ class _ButtonArticle extends StatelessWidget {
             ),
             DocsApiFact(
               name: 'surface',
-              type: 'DsButtonSurface?',
+              type: 'ElButtonSurface?',
               description: 'Optional semantic fill, border, and ink overrides.',
             ),
           ],
@@ -273,17 +273,17 @@ class _CardArticle extends StatelessWidget {
           title: 'Live preview',
           description:
               'A structured surface composed from header, content, and footer regions.',
-          preview: DsCard(
+          preview: ElCard(
             children: <Widget>[
-              const DsCardHeader(
-                title: DsCardTitle('Account'),
-                description: DsCardDescription('Manage your account settings.'),
+              const ElCardHeader(
+                title: ElCardTitle('Account'),
+                description: ElCardDescription('Manage your account settings.'),
               ),
-              const DsCardContent(
+              const ElCardContent(
                 child: Text('Your profile and security settings live here.'),
               ),
-              DsCardFooter(
-                child: DsButton(
+              ElCardFooter(
+                child: ElButton(
                   onPressed: () {},
                   child: const Text('Save changes'),
                 ),
@@ -300,31 +300,31 @@ class _CardArticle extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: ds(6)),
+      SizedBox(height: el(6)),
       _Anchor(
         'anatomy',
         child: const DocsApiTable(
           title: 'Anatomy',
           facts: <DocsApiFact>[
             DocsApiFact(
-              name: 'DsCardHeader',
+              name: 'ElCardHeader',
               type: 'Widget',
               description: 'Title, optional description, and optional action.',
             ),
             DocsApiFact(
-              name: 'DsCardContent',
+              name: 'ElCardContent',
               type: 'Widget',
               description: 'Horizontal card spacing around arbitrary content.',
             ),
             DocsApiFact(
-              name: 'DsCardFooter',
+              name: 'ElCardFooter',
               type: 'Widget',
               description: 'Muted footer band with a top rule.',
             ),
           ],
         ),
       ),
-      SizedBox(height: ds(6)),
+      SizedBox(height: el(6)),
       _Anchor(
         'install',
         child: DocsInstallFacts(
@@ -349,7 +349,7 @@ class _CardArticle extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: ds(6)),
+      SizedBox(height: el(6)),
       _Anchor(
         'api',
         child: const DocsApiTable(

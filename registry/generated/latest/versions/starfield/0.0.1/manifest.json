@@ -1,0 +1,29 @@
+{
+  "name": "starfield",
+  "type": "effect",
+  "version": "0.0.1",
+  "description": "`.starfield` — thirteen hand-placed sparkles and two slow sways",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/effects/starfield.dart",
+      "target": "@effects/starfield.dart",
+      "sha256": "61f7bb2b8bcc8ebecebd637321a4d5266033a37f12102c7e9948c6c9eb883ce3"
+    }
+  ],
+  "registryDependencies": [
+    "icon",
+    "source-foundation"
+  ],
+  "semanticDependencies": [
+    "icon"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "documentationRoute": "/docs/effects/starfield",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/effects/starfield.dart",
+  "deprecated": false
+}

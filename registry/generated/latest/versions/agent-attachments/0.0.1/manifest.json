@@ -1,0 +1,39 @@
+{
+  "name": "agent-attachments",
+  "type": "component",
+  "version": "0.0.1",
+  "description": "`components/agent/parts/attachments.tsx` — files, going both ways.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/agent_attachments.dart",
+      "target": "@ui/agent_attachments.dart",
+      "sha256": "c874bf2e8f594d311afd4f4c01106cc118391d0b24afb169ae0d7c11158ecdd3"
+    }
+  ],
+  "registryDependencies": [
+    "agent-core",
+    "attachment",
+    "button",
+    "dialog",
+    "icon",
+    "source-foundation",
+    "tooltip"
+  ],
+  "semanticDependencies": [
+    "agent-core",
+    "attachment",
+    "button",
+    "dialog",
+    "icon",
+    "tooltip"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "documentationRoute": "/components/agent-attachments",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/agent_attachments.dart",
+  "deprecated": false
+}

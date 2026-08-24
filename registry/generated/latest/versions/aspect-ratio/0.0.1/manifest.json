@@ -1,0 +1,24 @@
+{
+  "name": "aspect-ratio",
+  "type": "component",
+  "version": "0.0.1",
+  "description": "`components/ui/aspect-ratio.tsx` — eleven lines, no styling of its own.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/aspect_ratio.dart",
+      "target": "@ui/aspect_ratio.dart",
+      "sha256": "b2955c6d3390b2aaa0651768503e7bcf5767e725b581e002e0d786d3c6ee14c6"
+    }
+  ],
+  "registryDependencies": [],
+  "semanticDependencies": [],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "documentationRoute": "/components/aspect-ratio",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/aspect_ratio.dart",
+  "deprecated": false
+}

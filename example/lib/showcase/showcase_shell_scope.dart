@@ -19,7 +19,7 @@ class ShowcaseShellScope extends InheritedWidget {
   final bool compact;
 
   /// The dock's content height plus its visual breathing room.
-  static double get compactDockClearance => DsWidths.siteHeader + ds(12);
+  static double get compactDockClearance => ElWidths.siteHeader + el(12);
 
   static double bottomOverlayClearanceOf(BuildContext context) {
     final ShowcaseShellScope? scope = context

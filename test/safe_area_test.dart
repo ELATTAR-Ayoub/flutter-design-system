@@ -1,12 +1,12 @@
-/// [DsSafeArea] — the system-bar contract, driven.
+/// [ElSafeArea] — the system-bar contract, driven.
 ///
 /// A user-ordered mobile adaptation (2026-08-16), so there is no reference
 /// behaviour to compare against and no oracle to measure: what is pinned here
 /// is the ruling itself, in the three parts a caller can get wrong.
 ///
-///  1. **Content moves, paint does not.** The box around a [DsSafeArea] keeps
+///  1. **Content moves, paint does not.** The box around a [ElSafeArea] keeps
 ///     its size and position; only what is inside comes in.
-///  2. **Nothing is paid twice.** The insets a [DsSafeArea] spends are removed
+///  2. **Nothing is paid twice.** The insets a [ElSafeArea] spends are removed
 ///     from the [MediaQuery] it hands down, so a wrapper inside a wrapper — a
 ///     panel inside a sheet — adds nothing.
 ///  3. **Zero costs nothing.** With no bars, no widget joins the tree. This is
@@ -23,8 +23,7 @@ import 'package:flutter_test/flutter_test.dart';
 const EdgeInsets _phone = EdgeInsets.only(top: 47, bottom: 34);
 
 /// The same phone rotated — the notch is now a side, and the pill is shorter.
-const EdgeInsets _landscape =
-    EdgeInsets.only(left: 47, right: 34, bottom: 21);
+const EdgeInsets _landscape = EdgeInsets.only(left: 47, right: 34, bottom: 21);
 
 /// A software keyboard, which is **not** this file's inset.
 const EdgeInsets _keyboard = EdgeInsets.only(bottom: 336);
@@ -38,27 +37,21 @@ extension on WidgetTester {
     Widget child, {
     EdgeInsets bars = _phone,
     EdgeInsets viewInsets = EdgeInsets.zero,
-  }) =>
-      pumpWidget(
-        Directionality(
-          textDirection: TextDirection.ltr,
-          child: MediaQuery(
-            data: MediaQueryData(padding: bars, viewInsets: viewInsets),
-            child: child,
-          ),
-        ),
-      );
+  }) => pumpWidget(
+    Directionality(
+      textDirection: TextDirection.ltr,
+      child: MediaQuery(
+        data: MediaQueryData(padding: bars, viewInsets: viewInsets),
+        child: child,
+      ),
+    ),
+  );
 
   /// A 200×200 box with [child] inside it — the "background" whose geometry
   /// must not move, wrapped around the content that must.
   Widget boxed(Widget child) => Center(
-        child: SizedBox(
-          key: _outer,
-          width: 200,
-          height: 200,
-          child: child,
-        ),
-      );
+    child: SizedBox(key: _outer, width: 200, height: 200, child: child),
+  );
 
   /// How far [_inner]'s edges sit inside [_outer]'s, side by side.
   EdgeInsets get spend {
@@ -73,7 +66,7 @@ extension on WidgetTester {
   }
 }
 
-/// Reads [DsSafeArea]'s statics at the point in the tree it is mounted.
+/// Reads [ElSafeArea]'s statics at the point in the tree it is mounted.
 class _Probe extends StatelessWidget {
   const _Probe({this.onBuild});
 
@@ -91,7 +84,7 @@ void main() {
     testWidgets('reads MediaQueryData.padding', (WidgetTester tester) async {
       late EdgeInsets read;
       await tester.pumpBars(
-        _Probe(onBuild: (BuildContext c) => read = DsSafeArea.insetsOf(c)),
+        _Probe(onBuild: (BuildContext c) => read = ElSafeArea.insetsOf(c)),
       );
       expect(read, _phone);
     });
@@ -104,7 +97,7 @@ void main() {
         Directionality(
           textDirection: TextDirection.ltr,
           child: _Probe(
-            onBuild: (BuildContext c) => read = DsSafeArea.insetsOf(c),
+            onBuild: (BuildContext c) => read = ElSafeArea.insetsOf(c),
           ),
         ),
       );
@@ -116,7 +109,7 @@ void main() {
     ) async {
       late EdgeInsets read;
       await tester.pumpBars(
-        _Probe(onBuild: (BuildContext c) => read = DsSafeArea.insetsOf(c)),
+        _Probe(onBuild: (BuildContext c) => read = ElSafeArea.insetsOf(c)),
         viewInsets: _keyboard,
       );
       // `viewInsets.bottom` is 336 and this is 34: the two are different
@@ -130,7 +123,7 @@ void main() {
     testWidgets('moves its child and leaves the box around it alone', (
       WidgetTester tester,
     ) async {
-      await tester.pumpBars(tester.boxed(const DsSafeArea(child: _Probe())));
+      await tester.pumpBars(tester.boxed(const ElSafeArea(child: _Probe())));
 
       expect(tester.spend, _phone);
       // The half of the ruling that says what *not* to inset: whatever paints
@@ -142,7 +135,7 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpBars(
-        tester.boxed(const DsSafeArea(top: false, child: _Probe())),
+        tester.boxed(const ElSafeArea(top: false, child: _Probe())),
       );
       expect(tester.spend, const EdgeInsets.only(bottom: 34));
     });
@@ -151,7 +144,7 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpBars(
-        tester.boxed(const DsSafeArea(bottom: false, child: _Probe())),
+        tester.boxed(const ElSafeArea(bottom: false, child: _Probe())),
         bars: _landscape,
       );
       expect(tester.spend, const EdgeInsets.only(left: 47, right: 34));
@@ -163,10 +156,10 @@ void main() {
       late EdgeInsets nested;
       await tester.pumpBars(
         tester.boxed(
-          DsSafeArea(
-            child: DsSafeArea(
+          ElSafeArea(
+            child: ElSafeArea(
               child: _Probe(
-                onBuild: (BuildContext c) => nested = DsSafeArea.insetsOf(c),
+                onBuild: (BuildContext c) => nested = ElSafeArea.insetsOf(c),
               ),
             ),
           ),
@@ -174,7 +167,7 @@ void main() {
       );
 
       // The inner one read zero, so it added nothing: the pair spent the bars
-      // exactly once. This is what makes a [DsSafeArea] safe to write on a
+      // exactly once. This is what makes a [ElSafeArea] safe to write on a
       // panel that may or may not be inside a sheet that already paid.
       expect(nested, EdgeInsets.zero);
       expect(tester.spend, _phone);
@@ -184,7 +177,7 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpBars(
-        tester.boxed(const DsSafeArea(child: _Probe())),
+        tester.boxed(const ElSafeArea(child: _Probe())),
         bars: EdgeInsets.zero,
       );
 
@@ -193,14 +186,14 @@ void main() {
       // measures the same tree it did before this component existed.
       expect(
         find.descendant(
-          of: find.byType(DsSafeArea),
+          of: find.byType(ElSafeArea),
           matching: find.byType(Padding),
         ),
         findsNothing,
       );
       expect(
         find.descendant(
-          of: find.byType(DsSafeArea),
+          of: find.byType(ElSafeArea),
           matching: find.byType(MediaQuery),
         ),
         findsNothing,
@@ -217,10 +210,10 @@ void main() {
       await tester.pumpBars(
         _Probe(
           onBuild: (BuildContext c) =>
-              height = DsSafeArea.topBarHeightOf(c, DsWidths.siteHeader),
+              height = ElSafeArea.topBarHeightOf(c, ElWidths.siteHeader),
         ),
       );
-      expect(height, DsWidths.siteHeader + 47);
+      expect(height, ElWidths.siteHeader + 47);
     });
 
     testWidgets('is the bar\'s own height on a desktop', (
@@ -230,11 +223,11 @@ void main() {
       await tester.pumpBars(
         _Probe(
           onBuild: (BuildContext c) =>
-              height = DsSafeArea.topBarHeightOf(c, DsWidths.siteHeader),
+              height = ElSafeArea.topBarHeightOf(c, ElWidths.siteHeader),
         ),
         bars: EdgeInsets.zero,
       );
-      expect(height, DsWidths.siteHeader);
+      expect(height, ElWidths.siteHeader);
     });
   });
 
@@ -245,9 +238,9 @@ void main() {
       late EdgeInsets padding;
       await tester.pumpBars(
         _Probe(
-          onBuild: (BuildContext c) => padding = DsSafeArea.scrollPaddingOf(
+          onBuild: (BuildContext c) => padding = ElSafeArea.scrollPaddingOf(
             c,
-            base: const EdgeInsets.only(top: DsWidths.siteHeader),
+            base: const EdgeInsets.only(top: ElWidths.siteHeader),
           ),
         ),
       );
@@ -255,7 +248,7 @@ void main() {
       // it scrolls *under* it, and 64 is the room it leaves for it.
       expect(
         padding,
-        const EdgeInsets.only(top: DsWidths.siteHeader, bottom: 34),
+        const EdgeInsets.only(top: ElWidths.siteHeader, bottom: 34),
       );
     });
 
@@ -265,28 +258,25 @@ void main() {
       late EdgeInsets padding;
       await tester.pumpBars(
         _Probe(
-          onBuild: (BuildContext c) => padding = DsSafeArea.scrollPaddingOf(
+          onBuild: (BuildContext c) => padding = ElSafeArea.scrollPaddingOf(
             c,
             base: const EdgeInsets.all(24),
           ),
         ),
         bars: _landscape,
       );
-      expect(
-        padding,
-        const EdgeInsets.fromLTRB(24 + 47, 24, 24 + 34, 24 + 21),
-      );
+      expect(padding, const EdgeInsets.fromLTRB(24 + 47, 24, 24 + 34, 24 + 21));
     });
 
     testWidgets('hands the base straight back on a desktop', (
       WidgetTester tester,
     ) async {
-      const EdgeInsets base = EdgeInsets.only(top: DsWidths.siteHeader);
+      const EdgeInsets base = EdgeInsets.only(top: ElWidths.siteHeader);
       late EdgeInsets padding;
       await tester.pumpBars(
         _Probe(
           onBuild: (BuildContext c) =>
-              padding = DsSafeArea.scrollPaddingOf(c, base: base),
+              padding = ElSafeArea.scrollPaddingOf(c, base: base),
         ),
         bars: EdgeInsets.zero,
       );

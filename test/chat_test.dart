@@ -23,30 +23,30 @@ import 'package:flutter/services.dart' show FontLoader;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-Widget host(Widget child, {DsThemeMode mode = DsThemeMode.dark}) => MediaQuery(
-      data: const MediaQueryData(size: Size(1440, 900)),
-      child: Directionality(
-        textDirection: TextDirection.ltr,
-        child: DsTheme(
-          controller: DsThemeController(mode: mode),
-          child: Center(child: child),
-        ),
-      ),
-    );
+Widget host(Widget child, {ElThemeMode mode = ElThemeMode.dark}) => MediaQuery(
+  data: const MediaQueryData(size: Size(1440, 900)),
+  child: Directionality(
+    textDirection: TextDirection.ltr,
+    child: ElTheme(
+      controller: ElThemeController(mode: mode),
+      child: Center(child: child),
+    ),
+  ),
+);
 
 /// What [overlayHost] is currently showing.
 Widget _hosted = const SizedBox.shrink();
 
 /// A host with an [Overlay], for the one specimen that portals — the media
 /// preview mounts an `OverlayPortal` and needs a theatre to render into.
-Widget overlayHost(Widget child, {DsThemeMode mode = DsThemeMode.dark}) {
+Widget overlayHost(Widget child, {ElThemeMode mode = ElThemeMode.dark}) {
   _hosted = child;
   return MediaQuery(
     data: const MediaQueryData(size: Size(1440, 900)),
     child: Directionality(
       textDirection: TextDirection.ltr,
-      child: DsTheme(
-        controller: DsThemeController(mode: mode),
+      child: ElTheme(
+        controller: ElThemeController(mode: mode),
         child: Overlay(
           initialEntries: <OverlayEntry>[
             OverlayEntry(builder: (BuildContext _) => Center(child: _hosted)),
@@ -57,8 +57,8 @@ Widget overlayHost(Widget child, {DsThemeMode mode = DsThemeMode.dark}) {
   );
 }
 
-DsThemeData themeIn(WidgetTester t, Type of) =>
-    DsTheme.of(t.element(find.byType(of).first));
+ElThemeData themeIn(WidgetTester t, Type of) =>
+    ElTheme.of(t.element(find.byType(of).first));
 
 Size sizeOf(WidgetTester t, Finder f) => t.renderObject<RenderBox>(f).size;
 
@@ -128,18 +128,23 @@ void main() {
 
   /* ── Bubble ───────────────────────────────────────────────────────────── */
 
-  group('DsBubbleContent — the painted surface', () {
-    testWidgets('one line is 39.13 tall on every variant but ghost',
-        (WidgetTester t) async {
-      for (final DsBubbleVariant v in DsBubbleVariant.values) {
-        await t.pumpWidget(host(SizedBox(
-          width: _column,
-          child: DsBubble(
-            variant: v,
-            child: const DsBubbleContent(child: Text('Up 14% overnight')),
+  group('ElBubbleContent — the painted surface', () {
+    testWidgets('one line is 39.13 tall on every variant but ghost', (
+      WidgetTester t,
+    ) async {
+      for (final ElBubbleVariant v in ElBubbleVariant.values) {
+        await t.pumpWidget(
+          host(
+            SizedBox(
+              width: _column,
+              child: ElBubble(
+                variant: v,
+                child: const ElBubbleContent(child: Text('Up 14% overnight')),
+              ),
+            ),
           ),
-        )));
-        final double h = sizeOf(t, find.byType(DsBubbleContent)).height;
+        );
+        final double h = sizeOf(t, find.byType(ElBubbleContent)).height;
         // 21.125 line box + `py-2` twice + a 1px border twice = 39.125, and
         // `ghost` drops the padding and keeps the border.
         //
@@ -151,39 +156,50 @@ void main() {
         // accumulates it lives inside a fixed `h-80` panel.
         expect(
           h,
-          closeTo(v == DsBubbleVariant.ghost ? 23.125 : 39.125, 0.2),
+          closeTo(v == ElBubbleVariant.ghost ? 23.125 : 39.125, 0.2),
           reason: 'variant ${v.label}',
         );
       }
     });
 
-    testWidgets('13px on a 21.125px line box — leading-relaxed, not text-sm',
-        (WidgetTester t) async {
-      expect(DsComponentType.bubbleContent.size, 13);
-      expect(DsComponentType.bubbleContent.height, 1.625);
-      expect(13 * DsComponentType.bubbleContent.height!, closeTo(21.125, 0.001));
+    testWidgets('13px on a 21.125px line box — leading-relaxed, not text-sm', (
+      WidgetTester t,
+    ) async {
+      expect(ElComponentType.bubbleContent.size, 13);
+      expect(ElComponentType.bubbleContent.height, 1.625);
+      expect(
+        13 * ElComponentType.bubbleContent.height!,
+        closeTo(21.125, 0.001),
+      );
     });
 
-    testWidgets('the fills are the seven the reference paints',
-        (WidgetTester t) async {
-      await t.pumpWidget(host(SizedBox(
-        width: _column,
-        child: Column(
-          children: <Widget>[
-            for (final DsBubbleVariant v in DsBubbleVariant.values)
-              DsBubble(
-                variant: v,
-                child: const DsBubbleContent(child: Text('x')),
-              ),
-          ],
+    testWidgets('the fills are the seven the reference paints', (
+      WidgetTester t,
+    ) async {
+      await t.pumpWidget(
+        host(
+          SizedBox(
+            width: _column,
+            child: Column(
+              children: <Widget>[
+                for (final ElBubbleVariant v in ElBubbleVariant.values)
+                  ElBubble(
+                    variant: v,
+                    child: const ElBubbleContent(child: Text('x')),
+                  ),
+              ],
+            ),
+          ),
         ),
-      )));
-      final DsThemeData theme = themeIn(t, DsBubble);
+      );
+      final ElThemeData theme = themeIn(t, ElBubble);
       final List<BoxDecoration> decorations = t
-          .widgetList<AnimatedContainer>(find.descendant(
-            of: find.byType(DsBubbleContent),
-            matching: find.byType(AnimatedContainer),
-          ))
+          .widgetList<AnimatedContainer>(
+            find.descendant(
+              of: find.byType(ElBubbleContent),
+              matching: find.byType(AnimatedContainer),
+            ),
+          )
           .map((AnimatedContainer c) => c.decoration! as BoxDecoration)
           .toList();
 
@@ -203,57 +219,72 @@ void main() {
       expect((decorations[0].border! as Border).top.color.a, 0);
     });
 
-    testWidgets('a div bubble has no transition; an asChild one runs 250ms',
-        (WidgetTester t) async {
-      await t.pumpWidget(host(SizedBox(
-        width: _column,
-        child: Column(
-          children: <Widget>[
-            const DsBubble(child: DsBubbleContent(child: Text('inert'))),
-            DsBubble(
-              child: DsBubbleContent(
-                onPressed: () {},
-                child: const Text('control'),
-              ),
+    testWidgets('a div bubble has no transition; an asChild one runs 250ms', (
+      WidgetTester t,
+    ) async {
+      await t.pumpWidget(
+        host(
+          SizedBox(
+            width: _column,
+            child: Column(
+              children: <Widget>[
+                const ElBubble(child: ElBubbleContent(child: Text('inert'))),
+                ElBubble(
+                  child: ElBubbleContent(
+                    onPressed: () {},
+                    child: const Text('control'),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
-      )));
+      );
       final List<AnimatedContainer> boxes = t
-          .widgetList<AnimatedContainer>(find.descendant(
-            of: find.byType(DsBubbleContent),
-            matching: find.byType(AnimatedContainer),
-          ))
+          .widgetList<AnimatedContainer>(
+            find.descendant(
+              of: find.byType(ElBubbleContent),
+              matching: find.byType(AnimatedContainer),
+            ),
+          )
           .toList();
       // Measured `transition-property: all` at 0s on a div.
       expect(boxes[0].duration, Duration.zero);
       // Measured 0.25s on `cubic-bezier(0.22, 1, 0.36, 1)`.
-      expect(boxes[1].duration, DsDurations.transitionDefault);
-      expect(boxes[1].curve, DsCurves.out);
+      expect(boxes[1].duration, ElDurations.transitionDefault);
+      expect(boxes[1].curve, ElCurves.out);
     });
 
-    testWidgets('ghost is the only variant allowed the full column',
-        (WidgetTester t) async {
+    testWidgets('ghost is the only variant allowed the full column', (
+      WidgetTester t,
+    ) async {
       const String long =
           'Six cards, two of them graded, and every one of them listed inside '
           'the same eleven minutes on four accounts that had never bought this '
           'set before today, which is the part worth looking at.';
-      for (final DsBubbleVariant v in <DsBubbleVariant>[
-        DsBubbleVariant.muted,
-        DsBubbleVariant.ghost,
+      for (final ElBubbleVariant v in <ElBubbleVariant>[
+        ElBubbleVariant.muted,
+        ElBubbleVariant.ghost,
       ]) {
-        await t.pumpWidget(host(SizedBox(
-          width: _column,
-          child: DsBubble(
-            variant: v,
-            child: const DsBubbleContent(child: Text(long)),
+        await t.pumpWidget(
+          host(
+            SizedBox(
+              width: _column,
+              child: ElBubble(
+                variant: v,
+                child: const ElBubbleContent(child: Text(long)),
+              ),
+            ),
           ),
-        )));
-        final double w = sizeOf(t, find.byType(DsBubbleContent)).width;
-        if (v == DsBubbleVariant.ghost) {
+        );
+        final double w = sizeOf(t, find.byType(ElBubbleContent)).width;
+        if (v == ElBubbleVariant.ghost) {
           expect(w, closeTo(_column, 0.5));
         } else {
-          expect(w, lessThanOrEqualTo(_column * DsBubble.maxWidthFraction + 0.5));
+          expect(
+            w,
+            lessThanOrEqualTo(_column * ElBubble.maxWidthFraction + 0.5),
+          );
         }
       }
     });
@@ -261,345 +292,430 @@ void main() {
 
   /* ── Reactions ────────────────────────────────────────────────────────── */
 
-  group('DsBubbleReactions', () {
-    const List<DsBubbleReaction> reactions = <DsBubbleReaction>[
-      DsBubbleReaction(emoji: 'A', count: 12, label: 'fire', mine: true),
-      DsBubbleReaction(emoji: 'B', count: 8, label: 'a heart'),
+  group('ElBubbleReactions', () {
+    const List<ElBubbleReaction> reactions = <ElBubbleReaction>[
+      ElBubbleReaction(emoji: 'A', count: 12, label: 'fire', mine: true),
+      ElBubbleReaction(emoji: 'B', count: 8, label: 'a heart'),
     ];
 
-    testWidgets('the data rail drops its padding; the bare rail keeps 2/6',
-        (WidgetTester t) async {
-      await t.pumpWidget(host(SizedBox(
-        width: 400,
-        child: DsBubble(
-          reactions: const DsBubbleReactions(children: <Widget>[Text('A')]),
-          child: const DsBubbleContent(child: Text('Nice pull')),
+    testWidgets('the data rail drops its padding; the bare rail keeps 2/6', (
+      WidgetTester t,
+    ) async {
+      await t.pumpWidget(
+        host(
+          SizedBox(
+            width: 400,
+            child: ElBubble(
+              reactions: const ElBubbleReactions(children: <Widget>[Text('A')]),
+              child: const ElBubbleContent(child: Text('Nice pull')),
+            ),
+          ),
         ),
-      )));
-      Container rail = t.widget<Container>(find
-          .descendant(
-            of: find.byType(DsBubbleReactions),
-            matching: find.byType(Container),
-          )
-          .first);
+      );
+      Container rail = t.widget<Container>(
+        find
+            .descendant(
+              of: find.byType(ElBubbleReactions),
+              matching: find.byType(Container),
+            )
+            .first,
+      );
       expect(
         rail.padding,
-        EdgeInsets.symmetric(horizontal: ds(1.5), vertical: ds(0.5)),
+        EdgeInsets.symmetric(horizontal: el(1.5), vertical: el(0.5)),
       );
 
-      await t.pumpWidget(host(SizedBox(
-        width: 400,
-        child: DsBubble(
-          reactions: const DsBubbleReactions(reactions: reactions),
-          child: const DsBubbleContent(child: Text('Nice pull')),
+      await t.pumpWidget(
+        host(
+          SizedBox(
+            width: 400,
+            child: ElBubble(
+              reactions: const ElBubbleReactions(reactions: reactions),
+              child: const ElBubbleContent(child: Text('Nice pull')),
+            ),
+          ),
         ),
-      )));
-      rail = t.widget<Container>(find
-          .descendant(
-            of: find.byType(DsBubbleReactions),
-            matching: find.byType(Container),
-          )
-          .first);
+      );
+      rail = t.widget<Container>(
+        find
+            .descendant(
+              of: find.byType(ElBubbleReactions),
+              matching: find.byType(Container),
+            )
+            .first,
+      );
       // `has-[button]:p-0`.
       expect(rail.padding, EdgeInsets.zero);
     });
 
-    testWidgets('the rail rings 3px of --card and sits at z-index 10',
-        (WidgetTester t) async {
-      await t.pumpWidget(host(SizedBox(
-        width: 400,
-        child: DsBubble(
-          reactions: const DsBubbleReactions(children: <Widget>[Text('A')]),
-          child: const DsBubbleContent(child: Text('Nice pull')),
+    testWidgets('the rail rings 3px of --card and sits at z-index 10', (
+      WidgetTester t,
+    ) async {
+      await t.pumpWidget(
+        host(
+          SizedBox(
+            width: 400,
+            child: ElBubble(
+              reactions: const ElBubbleReactions(children: <Widget>[Text('A')]),
+              child: const ElBubbleContent(child: Text('Nice pull')),
+            ),
+          ),
         ),
-      )));
-      final DsThemeData theme = themeIn(t, DsBubble);
-      final Container rail = t.widget<Container>(find
-          .descendant(
-            of: find.byType(DsBubbleReactions),
-            matching: find.byType(Container),
-          )
-          .first);
+      );
+      final ElThemeData theme = themeIn(t, ElBubble);
+      final Container rail = t.widget<Container>(
+        find
+            .descendant(
+              of: find.byType(ElBubbleReactions),
+              matching: find.byType(Container),
+            )
+            .first,
+      );
       final BoxShadow ring =
           (rail.decoration! as BoxDecoration).boxShadow!.single;
       expect(ring.color, theme.card);
-      expect(ring.spreadRadius, DsBubbleReactions.ring);
+      expect(ring.spreadRadius, ElBubbleReactions.ring);
       expect(ring.blurRadius, 0);
       expect(ring.offset, Offset.zero);
     });
 
-    testWidgets('side flips the overhang; align flips the inset',
-        (WidgetTester t) async {
-      for (final DsBubbleSide side in DsBubbleSide.values) {
-        await t.pumpWidget(host(SizedBox(
-          width: 400,
-          child: DsBubble(
-            reactions: DsBubbleReactions(
-              side: side,
-              children: const <Widget>[Text('A')],
+    testWidgets('side flips the overhang; align flips the inset', (
+      WidgetTester t,
+    ) async {
+      for (final ElBubbleSide side in ElBubbleSide.values) {
+        await t.pumpWidget(
+          host(
+            SizedBox(
+              width: 400,
+              child: ElBubble(
+                reactions: ElBubbleReactions(
+                  side: side,
+                  children: const <Widget>[Text('A')],
+                ),
+                child: const ElBubbleContent(child: Text('Nice pull')),
+              ),
             ),
-            child: const DsBubbleContent(child: Text('Nice pull')),
           ),
-        )));
+        );
         final FractionalTranslation shift = t.widget<FractionalTranslation>(
           find.descendant(
-            of: find.byType(DsBubbleReactions),
+            of: find.byType(ElBubbleReactions),
             matching: find.byType(FractionalTranslation),
           ),
         );
         expect(
           shift.translation.dy,
-          side == DsBubbleSide.top
-              ? -DsBubbleReactions.overhang
-              : DsBubbleReactions.overhang,
+          side == ElBubbleSide.top
+              ? -ElBubbleReactions.overhang
+              : ElBubbleReactions.overhang,
         );
       }
     });
 
     testWidgets(
-        'the count opens over 250ms on ease-out — the duration-fast no-op',
-        (WidgetTester t) async {
-      await t.pumpWidget(host(SizedBox(
-        width: 400,
-        child: DsBubble(
-          reactions: const DsBubbleReactions(reactions: reactions),
-          child: const DsBubbleContent(child: Text('Nice pull')),
-        ),
-      )));
-      final TweenAnimationBuilder<double> reveal = t
-          .widgetList<TweenAnimationBuilder<double>>(
-              find.byType(TweenAnimationBuilder<double>))
-          .first;
-      expect(reveal.duration, DsDurations.transitionDefault);
-      expect(reveal.curve, DsCurves.out);
-    });
-
-    testWidgets('showCount: always cuts — no transition at all',
-        (WidgetTester t) async {
-      await t.pumpWidget(host(SizedBox(
-        width: 400,
-        child: DsBubble(
-          reactions: const DsBubbleReactions(
-            showCount: DsShowCount.always,
-            reactions: reactions,
+      'the count opens over 250ms on ease-out — the duration-fast no-op',
+      (WidgetTester t) async {
+        await t.pumpWidget(
+          host(
+            SizedBox(
+              width: 400,
+              child: ElBubble(
+                reactions: const ElBubbleReactions(reactions: reactions),
+                child: const ElBubbleContent(child: Text('Nice pull')),
+              ),
+            ),
           ),
-          child: const DsBubbleContent(child: Text('Nice pull')),
+        );
+        final TweenAnimationBuilder<double> reveal = t
+            .widgetList<TweenAnimationBuilder<double>>(
+              find.byType(TweenAnimationBuilder<double>),
+            )
+            .first;
+        expect(reveal.duration, ElDurations.transitionDefault);
+        expect(reveal.curve, ElCurves.out);
+      },
+    );
+
+    testWidgets('showCount: always cuts — no transition at all', (
+      WidgetTester t,
+    ) async {
+      await t.pumpWidget(
+        host(
+          SizedBox(
+            width: 400,
+            child: ElBubble(
+              reactions: const ElBubbleReactions(
+                showCount: ElShowCount.always,
+                reactions: reactions,
+              ),
+              child: const ElBubbleContent(child: Text('Nice pull')),
+            ),
+          ),
         ),
-      )));
+      );
       expect(find.byType(TweenAnimationBuilder<double>), findsNothing);
     });
 
-    testWidgets('the pill is 28 tall and mine carries border + fill + pressed',
-        (WidgetTester t) async {
-      await t.pumpWidget(host(SizedBox(
-        width: 400,
-        child: DsBubble(
-          reactions: const DsBubbleReactions(
-            showCount: DsShowCount.always,
-            reactions: reactions,
+    testWidgets(
+      'the pill is 28 tall and mine carries border + fill + pressed',
+      (WidgetTester t) async {
+        await t.pumpWidget(
+          host(
+            SizedBox(
+              width: 400,
+              child: ElBubble(
+                reactions: const ElBubbleReactions(
+                  showCount: ElShowCount.always,
+                  reactions: reactions,
+                ),
+                child: const ElBubbleContent(child: Text('Nice pull')),
+              ),
+            ),
           ),
-          child: const DsBubbleContent(child: Text('Nice pull')),
-        ),
-      )));
-      final List<Container> pills = t
-          .widgetList<Container>(find.descendant(
-            of: find.byType(DsBubbleReactions),
-            matching: find.byType(Container),
-          ))
-          .where((Container c) => c.constraints?.maxHeight == ds(7))
-          .toList();
-      expect(pills, hasLength(2));
-      final DsThemeData theme = themeIn(t, DsBubble);
-      final BoxDecoration mine = pills[0].decoration! as BoxDecoration;
-      final BoxDecoration theirs = pills[1].decoration! as BoxDecoration;
-      expect(mine.color, DsPalette.action.withValues(alpha: 0.10));
-      expect((mine.border! as Border).top.color,
-          DsPalette.action.withValues(alpha: 0.40));
-      expect(theirs.color, theme.muted);
-      expect((theirs.border! as Border).top.color, theme.border);
+        );
+        final List<Container> pills = t
+            .widgetList<Container>(
+              find.descendant(
+                of: find.byType(ElBubbleReactions),
+                matching: find.byType(Container),
+              ),
+            )
+            .where((Container c) => c.constraints?.maxHeight == el(7))
+            .toList();
+        expect(pills, hasLength(2));
+        final ElThemeData theme = themeIn(t, ElBubble);
+        final BoxDecoration mine = pills[0].decoration! as BoxDecoration;
+        final BoxDecoration theirs = pills[1].decoration! as BoxDecoration;
+        expect(mine.color, ElPalette.action.withValues(alpha: 0.10));
+        expect(
+          (mine.border! as Border).top.color,
+          ElPalette.action.withValues(alpha: 0.40),
+        );
+        expect(theirs.color, theme.muted);
+        expect((theirs.border! as Border).top.color, theme.border);
 
-      // The `sr-only` span is in the tree at rest, in both modes.
-      expect(find.bySemanticsLabel('12 reacted with fire'), findsOneWidget);
-      expect(find.bySemanticsLabel('8 reacted with a heart'), findsOneWidget);
-    });
+        // The `sr-only` span is in the tree at rest, in both modes.
+        expect(find.bySemanticsLabel('12 reacted with fire'), findsOneWidget);
+        expect(find.bySemanticsLabel('8 reacted with a heart'), findsOneWidget);
+      },
+    );
 
-    testWidgets('the pill wears `press`, not the button squish',
-        (WidgetTester t) async {
-      await t.pumpWidget(host(SizedBox(
-        width: 400,
-        child: DsBubble(
-          reactions: const DsBubbleReactions(reactions: reactions),
-          child: const DsBubbleContent(child: Text('Nice pull')),
+    testWidgets('the pill wears `press`, not the button squish', (
+      WidgetTester t,
+    ) async {
+      await t.pumpWidget(
+        host(
+          SizedBox(
+            width: 400,
+            child: ElBubble(
+              reactions: const ElBubbleReactions(reactions: reactions),
+              child: const ElBubbleContent(child: Text('Nice pull')),
+            ),
+          ),
         ),
-      )));
-      final DsPress press = t.widgetList<DsPress>(find.byType(DsPress)).first;
+      );
+      final ElPress press = t.widgetList<ElPress>(find.byType(ElPress)).first;
       // Measured: 0.9374 min at ~39ms, spring back peaking at 1.0058.
-      expect(press.scale, DsTransforms.pressScale);
-      expect(press.downDuration, DsDurations.pressDown);
-      expect(press.upDuration, DsDurations.base);
+      expect(press.scale, ElTransforms.pressScale);
+      expect(press.downDuration, ElDurations.pressDown);
+      expect(press.upDuration, ElDurations.base);
     });
   });
 
   /* ── Message ──────────────────────────────────────────────────────────── */
 
-  group('DsMessage', () {
-    testWidgets('the avatar lifts 32px only when the row carries a footer',
-        (WidgetTester t) async {
+  group('ElMessage', () {
+    testWidgets('the avatar lifts 32px only when the row carries a footer', (
+      WidgetTester t,
+    ) async {
       for (final bool withFooter in <bool>[false, true]) {
-        await t.pumpWidget(host(SizedBox(
-          width: _column,
-          child: DsMessage(
-            avatar: DsMessageAvatar(size: ds(8), lifted: withFooter,
-                child: const SizedBox()),
-            content: DsMessageContent(
-              header: const DsMessageHeader(text: 'Atlas'),
-              footer: withFooter ? const DsMessageFooter(text: '09:41') : null,
-              children: const <Widget>[
-                DsBubble(child: DsBubbleContent(child: Text('hi'))),
-              ],
+        await t.pumpWidget(
+          host(
+            SizedBox(
+              width: _column,
+              child: ElMessage(
+                avatar: ElMessageAvatar(
+                  size: el(8),
+                  lifted: withFooter,
+                  child: const SizedBox(),
+                ),
+                content: ElMessageContent(
+                  header: const ElMessageHeader(text: 'Atlas'),
+                  footer: withFooter
+                      ? const ElMessageFooter(text: '09:41')
+                      : null,
+                  children: const <Widget>[
+                    ElBubble(child: ElBubbleContent(child: Text('hi'))),
+                  ],
+                ),
+              ),
             ),
           ),
-        )));
+        );
         final Finder lift = find.descendant(
-          of: find.byType(DsMessageAvatar),
+          of: find.byType(ElMessageAvatar),
           matching: find.byType(Transform),
         );
         expect(lift, withFooter ? findsOneWidget : findsNothing);
       }
     });
 
-    testWidgets('align: end reverses the row and pushes the column to the end',
-        (WidgetTester t) async {
-      await t.pumpWidget(host(SizedBox(
-        width: _column,
-        child: DsMessage(
-          align: DsBubbleAlign.end,
-          avatar: DsMessageAvatar(size: ds(8), child: const SizedBox()),
-          content: const DsMessageContent(
-            children: <Widget>[
-              DsBubble(child: DsBubbleContent(child: Text('Leave it.'))),
-            ],
-          ),
-        ),
-      )));
-      final RenderBox row = t.renderObject<RenderBox>(find.byType(DsMessage));
-      final RenderBox avatar =
-          t.renderObject<RenderBox>(find.byType(DsMessageAvatar));
-      final RenderBox bubble =
-          t.renderObject<RenderBox>(find.byType(DsBubbleContent));
-      final double avatarX =
-          avatar.localToGlobal(Offset.zero, ancestor: row).dx;
-      final double bubbleX =
-          bubble.localToGlobal(Offset.zero, ancestor: row).dx;
-      // `flex-row-reverse`: the avatar is on the right of everything.
-      expect(avatarX, greaterThan(bubbleX));
-      // `self-end` on the bubble.
-      expect(bubbleX + bubble.size.width,
-          closeTo(avatarX - DsMessage.gap, 0.5));
-    });
-
-    testWidgets('header and footer are 12/16/500 inset 12px, zero on ghost',
-        (WidgetTester t) async {
-      expect(DsComponentType.messageMeta.size, 12);
-      expect(12 * DsComponentType.messageMeta.height!, closeTo(16, 0.001));
-
-      for (final bool ghost in <bool>[false, true]) {
-        await t.pumpWidget(host(SizedBox(
-          width: _column,
-          child: DsMessage(
-            ghost: ghost,
-            content: const DsMessageContent(
-              header: DsMessageHeader(text: 'Atlas'),
-              children: <Widget>[
-                DsBubble(child: DsBubbleContent(child: Text('hi'))),
-              ],
+    testWidgets(
+      'align: end reverses the row and pushes the column to the end',
+      (WidgetTester t) async {
+        await t.pumpWidget(
+          host(
+            SizedBox(
+              width: _column,
+              child: ElMessage(
+                align: ElBubbleAlign.end,
+                avatar: ElMessageAvatar(size: el(8), child: const SizedBox()),
+                content: const ElMessageContent(
+                  children: <Widget>[
+                    ElBubble(child: ElBubbleContent(child: Text('Leave it.'))),
+                  ],
+                ),
+              ),
             ),
           ),
-        )));
-        final Padding pad = t.widget<Padding>(find
-            .descendant(
-              of: find.byType(DsMessageHeader),
-              matching: find.byType(Padding),
-            )
-            .first);
+        );
+        final RenderBox row = t.renderObject<RenderBox>(find.byType(ElMessage));
+        final RenderBox avatar = t.renderObject<RenderBox>(
+          find.byType(ElMessageAvatar),
+        );
+        final RenderBox bubble = t.renderObject<RenderBox>(
+          find.byType(ElBubbleContent),
+        );
+        final double avatarX = avatar
+            .localToGlobal(Offset.zero, ancestor: row)
+            .dx;
+        final double bubbleX = bubble
+            .localToGlobal(Offset.zero, ancestor: row)
+            .dx;
+        // `flex-row-reverse`: the avatar is on the right of everything.
+        expect(avatarX, greaterThan(bubbleX));
+        // `self-end` on the bubble.
         expect(
-          (pad.padding as EdgeInsets).left,
-          ghost ? 0 : DsMessageHeader.inset,
+          bubbleX + bubble.size.width,
+          closeTo(avatarX - ElMessage.gap, 0.5),
+        );
+      },
+    );
+
+    testWidgets('header and footer are 12/16/500 inset 12px, zero on ghost', (
+      WidgetTester t,
+    ) async {
+      expect(ElComponentType.messageMeta.size, 12);
+      expect(12 * ElComponentType.messageMeta.height!, closeTo(16, 0.001));
+
+      for (final bool ghost in <bool>[false, true]) {
+        await t.pumpWidget(
+          host(
+            SizedBox(
+              width: _column,
+              child: ElMessage(
+                ghost: ghost,
+                content: const ElMessageContent(
+                  header: ElMessageHeader(text: 'Atlas'),
+                  children: <Widget>[
+                    ElBubble(child: ElBubbleContent(child: Text('hi'))),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+        final Padding pad = t.widget<Padding>(
+          find
+              .descendant(
+                of: find.byType(ElMessageHeader),
+                matching: find.byType(Padding),
+              )
+              .first,
         );
         expect(
-          sizeOf(t, find.byType(DsMessageHeader)).height,
+          (pad.padding as EdgeInsets).left,
+          ghost ? 0 : ElMessageHeader.inset,
+        );
+        expect(
+          sizeOf(t, find.byType(ElMessageHeader)).height,
           closeTo(16, 0.05),
         );
       }
     });
 
-    testWidgets('the column stacks on a 10px gap and the group on 8',
-        (WidgetTester t) async {
-      expect(DsMessageContent.gap, 10);
-      expect(DsMessageGroup.gap, 8);
-      expect(DsMessage.gap, 8);
-      expect(DsBubbleGroup.gap, 8);
+    testWidgets('the column stacks on a 10px gap and the group on 8', (
+      WidgetTester t,
+    ) async {
+      expect(ElMessageContent.gap, 10);
+      expect(ElMessageGroup.gap, 8);
+      expect(ElMessage.gap, 8);
+      expect(ElBubbleGroup.gap, 8);
     });
   });
 
   /* ── Message scroller ─────────────────────────────────────────────────── */
 
-  group('DsMessageScroller', () {
+  group('ElMessageScroller', () {
     Widget scroller(
-      DsMessageScrollerController c, {
+      ElMessageScrollerController c, {
       int turns = 11,
       double height = 320,
-    }) =>
-        host(SizedBox(
-          width: 1078,
-          height: height,
-          child: DsMessageScrollerProvider(
-            controller: c,
-            child: DsMessageScroller(
-              viewport: DsMessageScrollerViewport(
-                child: DsMessageScrollerContent(
-                  padding: EdgeInsets.all(ds(6)),
-                  children: <Widget>[
-                    for (int i = 0; i < turns; i++)
-                      DsMessageScrollerItem(
-                        messageId: 'm$i',
-                        child: DsMessage(
-                          content: DsMessageContent(
-                            children: <Widget>[
-                              DsBubble(
-                                variant: DsBubbleVariant.muted,
-                                child: DsBubbleContent(child: Text('turn $i')),
-                              ),
-                            ],
-                          ),
+    }) => host(
+      SizedBox(
+        width: 1078,
+        height: height,
+        child: ElMessageScrollerProvider(
+          controller: c,
+          child: ElMessageScroller(
+            viewport: ElMessageScrollerViewport(
+              child: ElMessageScrollerContent(
+                padding: EdgeInsets.all(el(6)),
+                children: <Widget>[
+                  for (int i = 0; i < turns; i++)
+                    ElMessageScrollerItem(
+                      messageId: 'm$i',
+                      child: ElMessage(
+                        content: ElMessageContent(
+                          children: <Widget>[
+                            ElBubble(
+                              variant: ElBubbleVariant.muted,
+                              child: ElBubbleContent(child: Text('turn $i')),
+                            ),
+                          ],
                         ),
                       ),
-                  ],
-                ),
+                    ),
+                ],
               ),
-              button: const DsMessageScrollerButton(),
             ),
+            button: const ElMessageScrollerButton(),
           ),
-        ));
+        ),
+      ),
+    );
 
-    testWidgets('the content column is 10px narrower — the stable gutter',
-        (WidgetTester t) async {
-      final DsMessageScrollerController c = DsMessageScrollerController(
-        defaultScrollPosition: DsScrollPosition.start,
+    testWidgets('the content column is 10px narrower — the stable gutter', (
+      WidgetTester t,
+    ) async {
+      final ElMessageScrollerController c = ElMessageScrollerController(
+        defaultScrollPosition: ElScrollPosition.start,
       );
       addTearDown(c.dispose);
       await t.pumpWidget(scroller(c));
       await t.pump();
       // Measured: a 1078px viewport hands its content 1068.
       expect(
-        sizeOf(t, find.byType(DsMessageScrollerContent)).width,
-        1078 - DsMessageScrollerViewport.gutter,
+        sizeOf(t, find.byType(ElMessageScrollerContent)).width,
+        1078 - ElMessageScrollerViewport.gutter,
       );
     });
 
-    testWidgets('eleven single-line turns stack to 718.38', (WidgetTester t) async {
-      final DsMessageScrollerController c = DsMessageScrollerController(
-        defaultScrollPosition: DsScrollPosition.start,
+    testWidgets('eleven single-line turns stack to 718.38', (
+      WidgetTester t,
+    ) async {
+      final ElMessageScrollerController c = ElMessageScrollerController(
+        defaultScrollPosition: ElScrollPosition.start,
       );
       addTearDown(c.dispose);
       await t.pumpWidget(scroller(c));
@@ -607,27 +723,28 @@ void main() {
       // `p-6` twice + eleven 39.125 items + ten 24px gaps = 718.375, less the
       // 0.125-per-line the engine quantises away (see the bubble height pin).
       expect(
-        sizeOf(t, find.byType(DsMessageScrollerContent)).height,
+        sizeOf(t, find.byType(ElMessageScrollerContent)).height,
         closeTo(48 + 11 * 39.125 + 10 * 24, 1.5),
       );
     });
 
-    testWidgets('defaultScrollPosition: start rests at the top',
-        (WidgetTester t) async {
-      final DsMessageScrollerController c = DsMessageScrollerController(
-        defaultScrollPosition: DsScrollPosition.start,
+    testWidgets('defaultScrollPosition: start rests at the top', (
+      WidgetTester t,
+    ) async {
+      final ElMessageScrollerController c = ElMessageScrollerController(
+        defaultScrollPosition: ElScrollPosition.start,
       );
       addTearDown(c.dispose);
       await t.pumpWidget(scroller(c));
       await t.pump();
       expect(c.offset, 0);
-      expect(c.scrollable(DsScrollDirection.end), isTrue);
-      expect(c.scrollable(DsScrollDirection.start), isFalse);
+      expect(c.scrollable(ElScrollDirection.end), isTrue);
+      expect(c.scrollable(ElScrollDirection.start), isFalse);
     });
 
     testWidgets('the edge threshold is 8, inclusive', (WidgetTester t) async {
-      final DsMessageScrollerController c = DsMessageScrollerController(
-        defaultScrollPosition: DsScrollPosition.start,
+      final ElMessageScrollerController c = ElMessageScrollerController(
+        defaultScrollPosition: ElScrollPosition.start,
       );
       addTearDown(c.dispose);
       await t.pumpWidget(scroller(c));
@@ -637,38 +754,43 @@ void main() {
       // Measured: still active at 8px from the end, inactive at 4.
       c.scroll.jumpTo(max - 8);
       await t.pump();
-      expect(c.scrollable(DsScrollDirection.end), isTrue);
+      expect(c.scrollable(ElScrollDirection.end), isTrue);
       c.scroll.jumpTo(max - 4);
       await t.pump();
-      expect(c.scrollable(DsScrollDirection.end), isFalse);
+      expect(c.scrollable(ElScrollDirection.end), isFalse);
     });
 
-    testWidgets('the button snaps its transforms and fades over 250ms',
-        (WidgetTester t) async {
-      final DsMessageScrollerController c = DsMessageScrollerController(
-        defaultScrollPosition: DsScrollPosition.start,
+    testWidgets('the button snaps its transforms and fades over 250ms', (
+      WidgetTester t,
+    ) async {
+      final ElMessageScrollerController c = ElMessageScrollerController(
+        defaultScrollPosition: ElScrollPosition.start,
       );
       addTearDown(c.dispose);
       await t.pumpWidget(scroller(c));
       await t.pump();
 
-      AnimatedOpacity fade() => t.widget<AnimatedOpacity>(find.descendant(
-            of: find.byType(DsMessageScrollerButton),
-            matching: find.byType(AnimatedOpacity),
-          ));
+      AnimatedOpacity fade() => t.widget<AnimatedOpacity>(
+        find.descendant(
+          of: find.byType(ElMessageScrollerButton),
+          matching: find.byType(AnimatedOpacity),
+        ),
+      );
       // The button wears three transforms: the translate, the scale, and the
       // arrow's own `rotate-180` hook. The scale is the second.
       double scale() => t
-          .widgetList<Transform>(find.descendant(
-            of: find.byType(DsMessageScrollerButton),
-            matching: find.byType(Transform),
-          ))
+          .widgetList<Transform>(
+            find.descendant(
+              of: find.byType(ElMessageScrollerButton),
+              matching: find.byType(Transform),
+            ),
+          )
           .elementAt(1)
           .transform
           .storage[0];
 
       expect(fade().opacity, 1);
-      expect(fade().curve, DsCurves.out);
+      expect(fade().curve, ElCurves.out);
       // Active: no scale.
       expect(scale(), 1);
 
@@ -676,67 +798,67 @@ void main() {
       await t.pump();
       expect(fade().opacity, 0);
       // `data-[active=false]:ease-in`.
-      expect(fade().curve, DsCurves.curveIn);
-      expect(fade().duration, DsDurations.transitionDefault);
+      expect(fade().curve, ElCurves.curveIn);
+      expect(fade().duration, ElDurations.transitionDefault);
       // `scale-95` — one frame, not a tween.
-      expect(scale(), closeTo(DsMessageScrollerButton.inactiveScale, 0.001));
+      expect(scale(), closeTo(ElMessageScrollerButton.inactiveScale, 0.001));
     });
 
-    testWidgets('the button disables itself once the edge is reached',
-        (WidgetTester t) async {
-      final DsMessageScrollerController c = DsMessageScrollerController(
-        defaultScrollPosition: DsScrollPosition.start,
+    testWidgets('the button disables itself once the edge is reached', (
+      WidgetTester t,
+    ) async {
+      final ElMessageScrollerController c = ElMessageScrollerController(
+        defaultScrollPosition: ElScrollPosition.start,
       );
       addTearDown(c.dispose);
       await t.pumpWidget(scroller(c));
       await t.pump();
-      expect(
-        t.widget<DsButton>(find.byType(DsButton)).onPressed,
-        isNotNull,
-      );
+      expect(t.widget<ElButton>(find.byType(ElButton)).onPressed, isNotNull);
       c.scroll.jumpTo(c.maxOffset);
       await t.pump();
-      expect(t.widget<DsButton>(find.byType(DsButton)).onPressed, isNull);
+      expect(t.widget<ElButton>(find.byType(ElButton)).onPressed, isNull);
       expect(
         find.descendant(
-          of: find.byType(DsMessageScrollerButton),
+          of: find.byType(ElMessageScrollerButton),
           matching: find.byType(IgnorePointer),
         ),
         // Two: this component's `pointer-events-none`, and the disabled
-        // `DsButton`'s own.
+        // `ElButton`'s own.
         findsNWidgets(2),
       );
     });
 
-    testWidgets('the button carries the five measured colour overrides',
-        (WidgetTester t) async {
-      final DsMessageScrollerController c = DsMessageScrollerController(
-        defaultScrollPosition: DsScrollPosition.start,
+    testWidgets('the button carries the five measured colour overrides', (
+      WidgetTester t,
+    ) async {
+      final ElMessageScrollerController c = ElMessageScrollerController(
+        defaultScrollPosition: ElScrollPosition.start,
       );
       addTearDown(c.dispose);
       await t.pumpWidget(scroller(c));
       await t.pump();
-      final DsThemeData theme = themeIn(t, DsMessageScroller);
-      final DsButton button = t.widget<DsButton>(find.byType(DsButton));
-      expect(button.variant, DsButtonVariant.secondary);
-      expect(button.size, DsButtonSize.iconSm);
+      final ElThemeData theme = themeIn(t, ElMessageScroller);
+      final ElButton button = t.widget<ElButton>(find.byType(ElButton));
+      expect(button.variant, ElButtonVariant.secondary);
+      expect(button.size, ElButtonSize.iconSm);
       expect(button.surface!.fill, theme.background);
       expect(button.surface!.hoverFill, theme.muted);
       expect(button.surface!.border, theme.border);
       expect(button.surface!.ink, theme.foreground);
     });
 
-    testWidgets('pressing it rides a √distance smooth scroll to the end',
-        (WidgetTester t) async {
-      final DsMessageScrollerController c = DsMessageScrollerController(
-        defaultScrollPosition: DsScrollPosition.start,
+    testWidgets('pressing it rides a √distance smooth scroll to the end', (
+      WidgetTester t,
+    ) async {
+      final ElMessageScrollerController c = ElMessageScrollerController(
+        defaultScrollPosition: ElScrollPosition.start,
       );
       addTearDown(c.dispose);
       await t.pumpWidget(scroller(c));
       await t.pump();
       final double max = c.maxOffset;
 
-      await t.tap(find.byType(DsMessageScrollerButton));
+      await t.tap(find.byType(ElMessageScrollerButton));
       await t.pump();
       expect(c.autoscrolling, isTrue);
       // 398px measured 335ms; this transcript's own travel is close to it, so
@@ -749,9 +871,11 @@ void main() {
       expect(c.autoscrolling, isFalse);
     });
 
-    testWidgets('scrollToMessage finds an item by its id', (WidgetTester t) async {
-      final DsMessageScrollerController c = DsMessageScrollerController(
-        defaultScrollPosition: DsScrollPosition.start,
+    testWidgets('scrollToMessage finds an item by its id', (
+      WidgetTester t,
+    ) async {
+      final ElMessageScrollerController c = ElMessageScrollerController(
+        defaultScrollPosition: ElScrollPosition.start,
       );
       addTearDown(c.dispose);
       await t.pumpWidget(scroller(c));
@@ -766,16 +890,16 @@ void main() {
 
   /* ── scroll-fade-b ────────────────────────────────────────────────────── */
 
-  group('DsScrollFade — the measured mask', () {
+  group('ElScrollFade — the measured mask', () {
     test('the full fade is min(12%, 40px) of the viewport', () {
       // 12% of 320 is 38.4, under the 40px cap.
       expect(
-        DsScrollFade.fadeFor(height: 320, offset: 0, max: 398),
+        ElScrollFade.fadeFor(height: 320, offset: 0, max: 398),
         closeTo(38.4, 0.001),
       );
       // 12% of 400 is 48, over the cap.
       expect(
-        DsScrollFade.fadeFor(height: 400, offset: 0, max: 398),
+        ElScrollFade.fadeFor(height: 400, offset: 0, max: 398),
         closeTo(40, 0.001),
       );
     });
@@ -783,7 +907,7 @@ void main() {
     test('it holds full height until the last 96px of travel', () {
       // Measured: full at scrollTop 299 of 398 (the range opens at 302).
       expect(
-        DsScrollFade.fadeFor(height: 320, offset: 299, max: 398),
+        ElScrollFade.fadeFor(height: 320, offset: 299, max: 398),
         closeTo(38.4, 0.001),
       );
     });
@@ -792,61 +916,64 @@ void main() {
       const double full = 38.4;
       // 358 / 398 — 58.33% through the 96px range, measured 0.358826 remaining.
       expect(
-        DsScrollFade.fadeFor(height: 320, offset: 358, max: 398) / full,
+        ElScrollFade.fadeFor(height: 320, offset: 358, max: 398) / full,
         closeTo(0.3588, 0.003),
       );
       // 374 — 75%, measured 0.129162.
       expect(
-        DsScrollFade.fadeFor(height: 320, offset: 374, max: 398) / full,
+        ElScrollFade.fadeFor(height: 320, offset: 374, max: 398) / full,
         closeTo(0.1292, 0.003),
       );
       // 382 — 87.5%, measured 0.0561308.
       expect(
-        DsScrollFade.fadeFor(height: 320, offset: 382, max: 398) / full,
+        ElScrollFade.fadeFor(height: 320, offset: 382, max: 398) / full,
         closeTo(0.0561, 0.003),
       );
       // The end.
-      expect(DsScrollFade.fadeFor(height: 320, offset: 398, max: 398), 0);
+      expect(ElScrollFade.fadeFor(height: 320, offset: 398, max: 398), 0);
     });
 
     test('the curve is CSS ease-in-out, not --ease-in-out', () {
       // The measurement that separates them: 0.6412 against 0.716.
-      expect(DsCurves.cssEaseInOut.transform(0.5833), closeTo(0.6437, 0.005));
-      expect(DsCurves.inOut.transform(0.5833), isNot(closeTo(0.6437, 0.02)));
+      expect(ElCurves.cssEaseInOut.transform(0.5833), closeTo(0.6437, 0.005));
+      expect(ElCurves.inOut.transform(0.5833), isNot(closeTo(0.6437, 0.02)));
     });
 
-    testWidgets('rendered: the bottom row is transparent and the top is opaque',
-        (WidgetTester t) async {
-      final DsMessageScrollerController c = DsMessageScrollerController(
-        defaultScrollPosition: DsScrollPosition.start,
+    testWidgets('rendered: the bottom row is transparent and the top is opaque', (
+      WidgetTester t,
+    ) async {
+      final ElMessageScrollerController c = ElMessageScrollerController(
+        defaultScrollPosition: ElScrollPosition.start,
       );
       addTearDown(c.dispose);
-      await t.pumpWidget(host(
-        RepaintBoundary(
-          key: rasterKey,
-          child: SizedBox(
-            width: 200,
-            height: 320,
-            child: DsMessageScrollerProvider(
-              controller: c,
-              child: DsMessageScroller(
-                viewport: DsMessageScrollerViewport(
-  child: const DsMessageScrollerContent(
-                    // One unbroken white column: `gap-6` between twenty boxes
-                    // would put transparent stripes where the mask is sampled.
-                    children: <Widget>[
-                      SizedBox(
-                        height: 800,
-                        child: ColoredBox(color: Color(0xFFFFFFFF)),
-                      ),
-                    ],
+      await t.pumpWidget(
+        host(
+          RepaintBoundary(
+            key: rasterKey,
+            child: SizedBox(
+              width: 200,
+              height: 320,
+              child: ElMessageScrollerProvider(
+                controller: c,
+                child: ElMessageScroller(
+                  viewport: ElMessageScrollerViewport(
+                    child: const ElMessageScrollerContent(
+                      // One unbroken white column: `gap-6` between twenty boxes
+                      // would put transparent stripes where the mask is sampled.
+                      children: <Widget>[
+                        SizedBox(
+                          height: 800,
+                          child: ColoredBox(color: Color(0xFFFFFFFF)),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
           ),
         ),
-      ));
+      );
       await t.pump();
 
       final ByteData shot = await raster(t);
@@ -860,159 +987,179 @@ void main() {
 
   /* ── Attachment ───────────────────────────────────────────────────────── */
 
-  group('DsAttachment', () {
+  group('ElAttachment', () {
     Widget card({
-      DsAttachmentState state = DsAttachmentState.done,
-      DsAttachmentSize size = DsAttachmentSize.md,
-      DsAttachmentOrientation orientation = DsAttachmentOrientation.horizontal,
+      ElAttachmentState state = ElAttachmentState.done,
+      ElAttachmentSize size = ElAttachmentSize.md,
+      ElAttachmentOrientation orientation = ElAttachmentOrientation.horizontal,
       bool content = true,
-    }) =>
-        host(SizedBox(
-          width: 400,
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: DsAttachment(
-              state: state,
-              size: size,
-              orientation: orientation,
-              media: DsAttachmentMedia(
-                child: DsIcon.lucide(
-                  DsLucide.fileText,
-                  sizePx: DsAttachmentMedia.glyphFor(size, orientation),
-                ),
+    }) => host(
+      SizedBox(
+        width: 400,
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: ElAttachment(
+            state: state,
+            size: size,
+            orientation: orientation,
+            media: ElAttachmentMedia(
+              child: ElIcon.lucide(
+                ElLucide.fileText,
+                sizePx: ElAttachmentMedia.glyphFor(size, orientation),
               ),
-              content: content
-                  ? const DsAttachmentContent(
-                      title: DsAttachmentTitle('rarity-table.csv'),
-                      description: DsAttachmentDescription('18 KB'),
-                    )
-                  : null,
             ),
+            content: content
+                ? const ElAttachmentContent(
+                    title: ElAttachmentTitle('rarity-table.csv'),
+                    description: ElAttachmentDescription('18 KB'),
+                  )
+                : null,
           ),
-        ));
+        ),
+      ),
+    );
 
-    testWidgets('padding is uniform — the has-content rules are dead',
-        (WidgetTester t) async {
-      const Map<DsAttachmentSize, double> measured = <DsAttachmentSize, double>{
-        DsAttachmentSize.md: 8,
-        DsAttachmentSize.sm: 6,
-        DsAttachmentSize.xs: 4,
+    testWidgets('padding is uniform — the has-content rules are dead', (
+      WidgetTester t,
+    ) async {
+      const Map<ElAttachmentSize, double> measured = <ElAttachmentSize, double>{
+        ElAttachmentSize.md: 8,
+        ElAttachmentSize.sm: 6,
+        ElAttachmentSize.xs: 4,
       };
-      for (final MapEntry<DsAttachmentSize, double> e in measured.entries) {
-        expect(DsAttachment.paddingFor(e.key), e.value);
+      for (final MapEntry<ElAttachmentSize, double> e in measured.entries) {
+        expect(ElAttachment.paddingFor(e.key), e.value);
       }
     });
 
-    testWidgets('the three horizontal rows measure 58 / 47 / 43',
-        (WidgetTester t) async {
-      const Map<DsAttachmentSize, double> measured = <DsAttachmentSize, double>{
-        DsAttachmentSize.md: 58,
-        DsAttachmentSize.sm: 47,
-        DsAttachmentSize.xs: 43,
+    testWidgets('the three horizontal rows measure 58 / 47 / 43', (
+      WidgetTester t,
+    ) async {
+      const Map<ElAttachmentSize, double> measured = <ElAttachmentSize, double>{
+        ElAttachmentSize.md: 58,
+        ElAttachmentSize.sm: 47,
+        ElAttachmentSize.xs: 43,
       };
-      for (final MapEntry<DsAttachmentSize, double> e in measured.entries) {
+      for (final MapEntry<ElAttachmentSize, double> e in measured.entries) {
         await t.pumpWidget(card(size: e.key));
         expect(
-          sizeOf(t, find.byType(DsAttachment)).height,
+          sizeOf(t, find.byType(ElAttachment)).height,
           closeTo(e.value, 0.6),
           reason: e.key.label,
         );
         // `min-w-40`.
         expect(
-          sizeOf(t, find.byType(DsAttachment)).width,
-          greaterThanOrEqualTo(DsAttachment.horizontalMinWidth),
+          sizeOf(t, find.byType(ElAttachment)).width,
+          greaterThanOrEqualTo(ElAttachment.horizontalMinWidth),
         );
       }
     });
 
-    testWidgets('a vertical card is 96 wide, or 120 once it carries content',
-        (WidgetTester t) async {
-      await t.pumpWidget(card(
-        orientation: DsAttachmentOrientation.vertical,
-        content: false,
-      ));
-      expect(sizeOf(t, find.byType(DsAttachment)).width, 96);
-      await t.pumpWidget(card(orientation: DsAttachmentOrientation.vertical));
-      expect(sizeOf(t, find.byType(DsAttachment)).width, 120);
+    testWidgets('a vertical card is 96 wide, or 120 once it carries content', (
+      WidgetTester t,
+    ) async {
+      await t.pumpWidget(
+        card(orientation: ElAttachmentOrientation.vertical, content: false),
+      );
+      expect(sizeOf(t, find.byType(ElAttachment)).width, 96);
+      await t.pumpWidget(card(orientation: ElAttachmentOrientation.vertical));
+      expect(sizeOf(t, find.byType(ElAttachment)).width, 120);
     });
 
-    testWidgets('the wells are 40 / 32 / 28 and xs takes the tighter radius',
-        (WidgetTester t) async {
-      expect(DsAttachmentMedia.wellFor(DsAttachmentSize.md), 40);
-      expect(DsAttachmentMedia.wellFor(DsAttachmentSize.sm), 32);
-      expect(DsAttachmentMedia.wellFor(DsAttachmentSize.xs), 28);
-      expect(DsAttachmentMedia.radiusFor(DsAttachmentSize.md), DsRadii.lg);
-      expect(DsAttachmentMedia.radiusFor(DsAttachmentSize.xs), DsRadii.md);
-      expect(DsAttachment.radiusFor(DsAttachmentSize.md), DsRadii.xl);
-      expect(DsAttachment.radiusFor(DsAttachmentSize.xs), DsRadii.lg);
+    testWidgets('the wells are 40 / 32 / 28 and xs takes the tighter radius', (
+      WidgetTester t,
+    ) async {
+      expect(ElAttachmentMedia.wellFor(ElAttachmentSize.md), 40);
+      expect(ElAttachmentMedia.wellFor(ElAttachmentSize.sm), 32);
+      expect(ElAttachmentMedia.wellFor(ElAttachmentSize.xs), 28);
+      expect(ElAttachmentMedia.radiusFor(ElAttachmentSize.md), ElRadii.lg);
+      expect(ElAttachmentMedia.radiusFor(ElAttachmentSize.xs), ElRadii.md);
+      expect(ElAttachment.radiusFor(ElAttachmentSize.md), ElRadii.xl);
+      expect(ElAttachment.radiusFor(ElAttachmentSize.xs), ElRadii.lg);
     });
 
-    testWidgets('the glyph is 16 / 16 / 14, and 24 in a vertical card',
-        (WidgetTester t) async {
-      const DsAttachmentOrientation h = DsAttachmentOrientation.horizontal;
-      const DsAttachmentOrientation v = DsAttachmentOrientation.vertical;
-      expect(DsAttachmentMedia.glyphFor(DsAttachmentSize.md, h), 16);
-      expect(DsAttachmentMedia.glyphFor(DsAttachmentSize.sm, h), 16);
-      expect(DsAttachmentMedia.glyphFor(DsAttachmentSize.xs, h), 14);
-      expect(DsAttachmentMedia.glyphFor(DsAttachmentSize.md, v), 24);
-      expect(DsAttachmentMedia.glyphFor(DsAttachmentSize.sm, v), 24);
+    testWidgets('the glyph is 16 / 16 / 14, and 24 in a vertical card', (
+      WidgetTester t,
+    ) async {
+      const ElAttachmentOrientation h = ElAttachmentOrientation.horizontal;
+      const ElAttachmentOrientation v = ElAttachmentOrientation.vertical;
+      expect(ElAttachmentMedia.glyphFor(ElAttachmentSize.md, h), 16);
+      expect(ElAttachmentMedia.glyphFor(ElAttachmentSize.sm, h), 16);
+      expect(ElAttachmentMedia.glyphFor(ElAttachmentSize.xs, h), 14);
+      expect(ElAttachmentMedia.glyphFor(ElAttachmentSize.md, v), 24);
+      expect(ElAttachmentMedia.glyphFor(ElAttachmentSize.sm, v), 24);
       // `xs` is written after `vertical`, so it wins even there.
-      expect(DsAttachmentMedia.glyphFor(DsAttachmentSize.xs, v), 14);
+      expect(ElAttachmentMedia.glyphFor(ElAttachmentSize.xs, v), 14);
     });
 
-    testWidgets('a vertical sm well stays 32 wide inside a 120 tile',
-        (WidgetTester t) async {
-      await t.pumpWidget(card(
-        size: DsAttachmentSize.sm,
-        orientation: DsAttachmentOrientation.vertical,
-      ));
+    testWidgets('a vertical sm well stays 32 wide inside a 120 tile', (
+      WidgetTester t,
+    ) async {
+      await t.pumpWidget(
+        card(
+          size: ElAttachmentSize.sm,
+          orientation: ElAttachmentOrientation.vertical,
+        ),
+      );
       // The *well*, not the slot: a vertical card stretches its children, so
       // the media slot spans the tile and lays a fixed well out at its start.
       expect(
         sizeOf(
           t,
-          find.descendant(
-            of: find.byType(DsAttachmentMedia),
-            matching: find.byType(SizedBox),
-          ).first,
+          find
+              .descendant(
+                of: find.byType(ElAttachmentMedia),
+                matching: find.byType(SizedBox),
+              )
+              .first,
         ),
         const Size(32, 32),
       );
 
-      await t.pumpWidget(card(
-        orientation: DsAttachmentOrientation.vertical,
-      ));
+      await t.pumpWidget(card(orientation: ElAttachmentOrientation.vertical));
       // `default` takes `w-full`: 120 less `p-2` twice and the border twice.
-      expect(sizeOf(t, find.byType(DsAttachmentMedia)).width, closeTo(102, 0.5));
+      expect(
+        sizeOf(t, find.byType(ElAttachmentMedia)).width,
+        closeTo(102, 0.5),
+      );
     });
 
-    testWidgets('error tints the border, the well and the description',
-        (WidgetTester t) async {
-      await t.pumpWidget(host(SizedBox(
-        width: 400,
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child: DsAttachment(
-            state: DsAttachmentState.error,
-            media: DsAttachmentMedia(
-              child: DsIcon.lucide(DsLucide.circleAlert, sizePx: 16),
-            ),
-            content: const DsAttachmentContent(
-              title: DsAttachmentTitle('rarity-table.csv'),
-              description: DsAttachmentDescription('Upload failed'),
+    testWidgets('error tints the border, the well and the description', (
+      WidgetTester t,
+    ) async {
+      await t.pumpWidget(
+        host(
+          SizedBox(
+            width: 400,
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: ElAttachment(
+                state: ElAttachmentState.error,
+                media: ElAttachmentMedia(
+                  child: ElIcon.lucide(ElLucide.circleAlert, sizePx: 16),
+                ),
+                content: const ElAttachmentContent(
+                  title: ElAttachmentTitle('rarity-table.csv'),
+                  description: ElAttachmentDescription('Upload failed'),
+                ),
+              ),
             ),
           ),
         ),
-      )));
-      final DsThemeData theme = themeIn(t, DsAttachment);
-      final BoxDecoration well = t
-          .widget<Container>(find
-              .descendant(
-                of: find.byType(DsAttachmentMedia),
-                matching: find.byType(Container),
-              )
-              .first)
-          .decoration! as BoxDecoration;
+      );
+      final ElThemeData theme = themeIn(t, ElAttachment);
+      final BoxDecoration well =
+          t
+                  .widget<Container>(
+                    find
+                        .descendant(
+                          of: find.byType(ElAttachmentMedia),
+                          matching: find.byType(Container),
+                        )
+                        .first,
+                  )
+                  .decoration!
+              as BoxDecoration;
       expect(well.color, theme.destructive.withValues(alpha: 0.10));
 
       final Text desc = t.widget<Text>(find.text('Upload failed'));
@@ -1020,40 +1167,43 @@ void main() {
     });
 
     testWidgets('idle is the only dashed card', (WidgetTester t) async {
-      for (final DsAttachmentState s in DsAttachmentState.values) {
+      for (final ElAttachmentState s in ElAttachmentState.values) {
         await t.pumpWidget(card(state: s));
-        // `DsIcon` is a `CustomPaint` too, so the dash is found by the slot it
+        // `ElIcon` is a `CustomPaint` too, so the dash is found by the slot it
         // paints in rather than by type.
         expect(
           find.descendant(
-            of: find.byType(DsAttachment),
+            of: find.byType(ElAttachment),
             matching: find.byWidgetPredicate(
               (Widget w) => w is CustomPaint && w.foregroundPainter != null,
             ),
           ),
-          s == DsAttachmentState.idle ? findsOneWidget : findsNothing,
+          s == ElAttachmentState.idle ? findsOneWidget : findsNothing,
           reason: s.name,
         );
       }
     });
 
-    testWidgets('rendered: the dashed border alternates ink and gap',
-        (WidgetTester t) async {
-      await t.pumpWidget(host(
-        RepaintBoundary(
-          key: rasterKey,
-          child: SizedBox(
-            width: 160,
-            height: 80,
-            child: DsAttachment(
-              state: DsAttachmentState.idle,
-              media: DsAttachmentMedia(
-                child: DsIcon.lucide(DsLucide.fileText, sizePx: 16),
+    testWidgets('rendered: the dashed border alternates ink and gap', (
+      WidgetTester t,
+    ) async {
+      await t.pumpWidget(
+        host(
+          RepaintBoundary(
+            key: rasterKey,
+            child: SizedBox(
+              width: 160,
+              height: 80,
+              child: ElAttachment(
+                state: ElAttachmentState.idle,
+                media: ElAttachmentMedia(
+                  child: ElIcon.lucide(ElLucide.fileText, sizePx: 16),
+                ),
               ),
             ),
           ),
         ),
-      ));
+      );
       await t.pump();
 
       final ByteData shot = await raster(t);
@@ -1064,15 +1214,14 @@ void main() {
       // The card's fill paints under the whole edge, so the dash is read as
       // "nearer `--border` than `--card`" rather than by alpha: the two are
       // rgb(39,39,42) and rgb(24,24,27) in dark, 15/255 apart.
-      final DsThemeData theme = themeIn(t, DsAttachment);
+      final ElThemeData theme = themeIn(t, ElAttachment);
       double distance(Color a, Color b) =>
           (a.r - b.r).abs() + (a.g - b.g).abs() + (a.b - b.b).abs();
       int flips = 0;
       bool? previous;
       for (int x = 40; x < 110; x++) {
         final Color px = pixelAt(shot, x, 0);
-        final bool ink =
-            distance(px, theme.border) < distance(px, theme.card);
+        final bool ink = distance(px, theme.border) < distance(px, theme.card);
         if (previous != null && ink != previous) flips++;
         previous = ink;
       }
@@ -1080,193 +1229,231 @@ void main() {
       expect(flips, greaterThan(8));
     });
 
-    testWidgets('the title shimmers only while uploading or processing',
-        (WidgetTester t) async {
-      for (final DsAttachmentState s in DsAttachmentState.values) {
+    testWidgets('the title shimmers only while uploading or processing', (
+      WidgetTester t,
+    ) async {
+      for (final ElAttachmentState s in ElAttachmentState.values) {
         await t.pumpWidget(card(state: s));
-        final bool shimmering = s == DsAttachmentState.uploading ||
-            s == DsAttachmentState.processing;
+        final bool shimmering =
+            s == ElAttachmentState.uploading ||
+            s == ElAttachmentState.processing;
         expect(
-          find.byType(DsShimmerText),
+          find.byType(ElShimmerText),
           shimmering ? findsOneWidget : findsNothing,
           reason: s.name,
         );
       }
     });
 
-    testWidgets('the image variant dims to 60% unless done or idle',
-        (WidgetTester t) async {
-      for (final DsAttachmentState s in DsAttachmentState.values) {
-        await t.pumpWidget(host(SizedBox(
-          width: 400,
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: DsAttachment(
-              state: s,
-              orientation: DsAttachmentOrientation.vertical,
-              media: const DsAttachmentMedia(
-                variant: DsAttachmentMediaVariant.image,
-                child: ColoredBox(color: Color(0xFF00FF00)),
+    testWidgets('the image variant dims to 60% unless done or idle', (
+      WidgetTester t,
+    ) async {
+      for (final ElAttachmentState s in ElAttachmentState.values) {
+        await t.pumpWidget(
+          host(
+            SizedBox(
+              width: 400,
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: ElAttachment(
+                  state: s,
+                  orientation: ElAttachmentOrientation.vertical,
+                  media: const ElAttachmentMedia(
+                    variant: ElAttachmentMediaVariant.image,
+                    child: ColoredBox(color: Color(0xFF00FF00)),
+                  ),
+                ),
               ),
             ),
           ),
-        )));
+        );
         final double opacity = t
-            .widget<Opacity>(find.descendant(
-              of: find.byType(DsAttachmentMedia),
-              matching: find.byType(Opacity),
-            ))
+            .widget<Opacity>(
+              find.descendant(
+                of: find.byType(ElAttachmentMedia),
+                matching: find.byType(Opacity),
+              ),
+            )
             .opacity;
         final bool lit =
-            s == DsAttachmentState.done || s == DsAttachmentState.idle;
-        expect(opacity, lit ? 1 : DsAttachmentMedia.imageDimmed, reason: s.name);
+            s == ElAttachmentState.done || s == ElAttachmentState.idle;
+        expect(
+          opacity,
+          lit ? 1 : ElAttachmentMedia.imageDimmed,
+          reason: s.name,
+        );
       }
     });
 
-    testWidgets('the save control rolls to a check for 1600ms and fires once',
-        (WidgetTester t) async {
+    testWidgets('the save control rolls to a check for 1600ms and fires once', (
+      WidgetTester t,
+    ) async {
       final List<String> saved = <String>[];
-      await t.pumpWidget(host(SizedBox(
-        width: 400,
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child: DsAttachment(
-            media: DsAttachmentMedia(
-              child: DsIcon.lucide(DsLucide.fileText, sizePx: 16),
-            ),
-            content: const DsAttachmentContent(
-              title: DsAttachmentTitle('grading-report.pdf'),
-            ),
-            actions: DsAttachmentActions(
-              children: <Widget>[
-                DsAttachmentAction(
-                  downloadName: 'grading-report.pdf',
-                  onDownload: saved.add,
+      await t.pumpWidget(
+        host(
+          SizedBox(
+            width: 400,
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: ElAttachment(
+                media: ElAttachmentMedia(
+                  child: ElIcon.lucide(ElLucide.fileText, sizePx: 16),
                 ),
-              ],
+                content: const ElAttachmentContent(
+                  title: ElAttachmentTitle('grading-report.pdf'),
+                ),
+                actions: ElAttachmentActions(
+                  children: <Widget>[
+                    ElAttachmentAction(
+                      downloadName: 'grading-report.pdf',
+                      onDownload: saved.add,
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ),
-      )));
+      );
 
-      expect(t.widget<DsIconSwap>(find.byType(DsIconSwap)).activeIndex, 0);
-      await t.tap(find.byType(DsAttachmentAction));
+      expect(t.widget<ElIconSwap>(find.byType(ElIconSwap)).activeIndex, 0);
+      await t.tap(find.byType(ElAttachmentAction));
       await t.pump();
       expect(saved, <String>['grading-report.pdf']);
-      expect(t.widget<DsIconSwap>(find.byType(DsIconSwap)).activeIndex, 1);
+      expect(t.widget<ElIconSwap>(find.byType(ElIconSwap)).activeIndex, 1);
 
-      await t.pump(DsAttachmentAction.savingWindow);
+      await t.pump(ElAttachmentAction.savingWindow);
       await t.pump();
-      expect(t.widget<DsIconSwap>(find.byType(DsIconSwap)).activeIndex, 0);
+      expect(t.widget<ElIconSwap>(find.byType(ElIconSwap)).activeIndex, 0);
       // Settle the swap's own tickers.
       await t.pump(const Duration(seconds: 1));
     });
 
-    testWidgets('a save control is a ghost icon-xs button with a label',
-        (WidgetTester t) async {
-      await t.pumpWidget(host(SizedBox(
-        width: 400,
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child: DsAttachment(
-            media: DsAttachmentMedia(
-              child: DsIcon.lucide(DsLucide.fileText, sizePx: 16),
-            ),
-            actions: const DsAttachmentActions(
-              children: <Widget>[
-                DsAttachmentAction(downloadName: 'grading-report.pdf'),
-              ],
+    testWidgets('a save control is a ghost icon-xs button with a label', (
+      WidgetTester t,
+    ) async {
+      await t.pumpWidget(
+        host(
+          SizedBox(
+            width: 400,
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: ElAttachment(
+                media: ElAttachmentMedia(
+                  child: ElIcon.lucide(ElLucide.fileText, sizePx: 16),
+                ),
+                actions: const ElAttachmentActions(
+                  children: <Widget>[
+                    ElAttachmentAction(downloadName: 'grading-report.pdf'),
+                  ],
+                ),
+              ),
             ),
           ),
         ),
-      )));
-      final DsButton button = t.widget<DsButton>(find.byType(DsButton));
-      expect(button.variant, DsButtonVariant.ghost);
-      expect(button.size, DsButtonSize.iconXs);
+      );
+      final ElButton button = t.widget<ElButton>(find.byType(ElButton));
+      expect(button.variant, ElButtonVariant.ghost);
+      expect(button.size, ElButtonSize.iconXs);
       expect(button.label, 'Download grading-report.pdf');
-      expect(sizeOf(t, find.byType(DsButton)), const Size(24, 24));
+      expect(sizeOf(t, find.byType(ElButton)), const Size(24, 24));
       await t.pump(const Duration(seconds: 1));
     });
 
-    testWidgets('a previewable well mounts a zoom-in trigger over the media',
-        (WidgetTester t) async {
-      await t.pumpWidget(overlayHost(SizedBox(
-        width: 400,
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child: DsAttachment(
-            orientation: DsAttachmentOrientation.vertical,
-            media: const DsAttachmentMedia(
-              variant: DsAttachmentMediaVariant.image,
-              previewName: 'sample-card.png',
-              preview: ColoredBox(color: Color(0xFF00FF00)),
-              child: ColoredBox(color: Color(0xFF00FF00)),
-            ),
-            content: const DsAttachmentContent(
-              title: DsAttachmentTitle('sample-card.png'),
+    testWidgets('a previewable well mounts a zoom-in trigger over the media', (
+      WidgetTester t,
+    ) async {
+      await t.pumpWidget(
+        overlayHost(
+          SizedBox(
+            width: 400,
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: ElAttachment(
+                orientation: ElAttachmentOrientation.vertical,
+                media: const ElAttachmentMedia(
+                  variant: ElAttachmentMediaVariant.image,
+                  previewName: 'sample-card.png',
+                  preview: ColoredBox(color: Color(0xFF00FF00)),
+                  child: ColoredBox(color: Color(0xFF00FF00)),
+                ),
+                content: const ElAttachmentContent(
+                  title: ElAttachmentTitle('sample-card.png'),
+                ),
+              ),
             ),
           ),
         ),
-      )));
-      expect(find.byType(DsAttachmentTrigger), findsOneWidget);
+      );
+      expect(find.byType(ElAttachmentTrigger), findsOneWidget);
       expect(
-        t.widget<DsAttachmentTrigger>(find.byType(DsAttachmentTrigger)).label,
+        t.widget<ElAttachmentTrigger>(find.byType(ElAttachmentTrigger)).label,
         'Open sample-card.png full size',
       );
-      final MouseRegion region = t.widget<MouseRegion>(find
-          .descendant(
-            of: find.byType(DsAttachmentTrigger),
-            matching: find.byType(MouseRegion),
-          )
-          .first);
+      final MouseRegion region = t.widget<MouseRegion>(
+        find
+            .descendant(
+              of: find.byType(ElAttachmentTrigger),
+              matching: find.byType(MouseRegion),
+            )
+            .first,
+      );
       expect(region.cursor, SystemMouseCursors.zoomIn);
     });
 
-    testWidgets('the tray keeps 12px gaps and fades only where it can travel',
-        (WidgetTester t) async {
-      expect(DsAttachmentGroup.gap, 12);
-      expect(DsAttachmentGroup.paddingY, 4);
-      expect(DsAttachmentGroup.scrollPadding, 4);
+    testWidgets('the tray keeps 12px gaps and fades only where it can travel', (
+      WidgetTester t,
+    ) async {
+      expect(ElAttachmentGroup.gap, 12);
+      expect(ElAttachmentGroup.paddingY, 4);
+      expect(ElAttachmentGroup.scrollPadding, 4);
     });
   });
 
   /* ── The shared foundation extensions ─────────────────────────────────── */
 
   group('foundation', () {
-    test('DsCurves.cssEaseInOut is the CSS keyword, not the token', () {
-      expect(DsCurves.cssEaseInOut, const Cubic(0.42, 0, 0.58, 1));
-      expect(DsCurves.cssEaseInOut, isNot(DsCurves.inOut));
+    test('ElCurves.cssEaseInOut is the CSS keyword, not the token', () {
+      expect(ElCurves.cssEaseInOut, const Cubic(0.42, 0, 0.58, 1));
+      expect(ElCurves.cssEaseInOut, isNot(ElCurves.inOut));
       // Not on `all`: it is a stock keyword the system did not choose.
-      expect(DsCurves.all.contains(DsCurves.cssEaseInOut), isFalse);
+      expect(ElCurves.all.contains(ElCurves.cssEaseInOut), isFalse);
     });
 
-    test('DsDurations.frame is one 60 Hz frame', () {
-      expect(DsDurations.frame.inMicroseconds, 16667);
+    test('ElDurations.frame is one 60 Hz frame', () {
+      expect(ElDurations.frame.inMicroseconds, 16667);
       // The measured law: 100px in ~168ms, 398px in ~335ms.
-      expect((DsDurations.frame * 10).inMilliseconds, closeTo(167, 2));
-      expect((DsDurations.frame * 19.95).inMilliseconds, closeTo(332, 4));
+      expect((ElDurations.frame * 10).inMilliseconds, closeTo(167, 2));
+      expect((ElDurations.frame * 19.95).inMilliseconds, closeTo(332, 4));
     });
 
     test('the four chat type specs are the measured ones', () {
-      expect(DsComponentType.bubbleContent.size, 13);
-      expect(DsComponentType.bubbleReactions.size, 13);
-      expect(DsComponentType.attachmentTitle.size, 13);
-      expect(13 * DsComponentType.attachmentTitle.height!, closeTo(16.25, 0.001));
-      expect(DsComponentType.attachmentTitleSm.size, 12);
-      expect(12 * DsComponentType.attachmentTitleSm.height!, closeTo(15, 0.001));
-      expect(DsComponentType.attachmentDescription.size, 12);
+      expect(ElComponentType.bubbleContent.size, 13);
+      expect(ElComponentType.bubbleReactions.size, 13);
+      expect(ElComponentType.attachmentTitle.size, 13);
       expect(
-        12 * DsComponentType.attachmentDescription.height!,
+        13 * ElComponentType.attachmentTitle.height!,
+        closeTo(16.25, 0.001),
+      );
+      expect(ElComponentType.attachmentTitleSm.size, 12);
+      expect(
+        12 * ElComponentType.attachmentTitleSm.height!,
+        closeTo(15, 0.001),
+      );
+      expect(ElComponentType.attachmentDescription.size, 12);
+      expect(
+        12 * ElComponentType.attachmentDescription.height!,
         closeTo(16, 0.001),
       );
     });
 
-    testWidgets('DsIcon.lucide paints the generated registry',
-        (WidgetTester t) async {
-      await t.pumpWidget(host(const DsIcon.lucide(DsLucide.bot)));
-      expect(sizeOf(t, find.byType(DsIcon)), const Size(16, 16));
-      expect(DsLucide.bot.name, 'bot');
-      expect(dsLucideByName['circle-alert'], DsLucide.circleAlert);
+    testWidgets('ElIcon.lucide paints the generated registry', (
+      WidgetTester t,
+    ) async {
+      await t.pumpWidget(host(const ElIcon.lucide(ElLucide.bot)));
+      expect(sizeOf(t, find.byType(ElIcon)), const Size(16, 16));
+      expect(ElLucide.bot.name, 'bot');
+      expect(elLucideByName['circle-alert'], ElLucide.circleAlert);
     });
   });
 }

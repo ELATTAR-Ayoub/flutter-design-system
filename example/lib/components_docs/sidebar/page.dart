@@ -21,10 +21,8 @@
 ///
 /// Three things this page does that its siblings do not:
 ///
-///  * **It never prints `elattar add sidebar`.** There is no
-///    `registry/components/sidebar.json`, so the Installation section says
-///    so and shows a manual copy instead. Printing a command that fails is
-///    worse than printing none.
+///  * **It installs as one family.** `elattar add sidebar` installs the
+///    sidebar manifest and its declared dependency closure.
 ///  * **Every number in the collapse contract is the package's own.** 256,
 ///    48, 64, 66, 0 and 250ms are what `test/sidebar_test.dart` pins against
 ///    the live reference, not estimates read off the class lists.
@@ -59,11 +57,11 @@ class SidebarDocPage extends StatelessWidget {
       intro: DocsPageIntro(
         eyebrow: 'COMPONENTS / BASE',
         title: entry.title,
-        description: sidebarExpandedDescription,
+        description: entry.description,
       ),
-      breadcrumbs: const <DsBreadcrumbEntry>[
-        DsBreadcrumbEntry.link('Components'),
-        DsBreadcrumbEntry.page('Sidebar'),
+      breadcrumbs: const <ElBreadcrumbEntry>[
+        ElBreadcrumbEntry.link('Components'),
+        ElBreadcrumbEntry.page('Sidebar'),
       ],
       sidebar: const <DocsSidebarEntry>[
         DocsSidebarEntry(title: 'Sheet', route: '/components/sheet'),
@@ -87,14 +85,8 @@ class SidebarDocPage extends StatelessWidget {
         DocsTocEntry(title: 'SidebarContent', anchor: 'sidebar-content'),
         DocsTocEntry(title: 'SidebarGroup', anchor: 'sidebar-group'),
         DocsTocEntry(title: 'SidebarMenu', anchor: 'sidebar-menu'),
-        DocsTocEntry(
-          title: 'SidebarMenuButton',
-          anchor: 'sidebar-menu-button',
-        ),
-        DocsTocEntry(
-          title: 'SidebarMenuAction',
-          anchor: 'sidebar-menu-action',
-        ),
+        DocsTocEntry(title: 'SidebarMenuButton', anchor: 'sidebar-menu-button'),
+        DocsTocEntry(title: 'SidebarMenuAction', anchor: 'sidebar-menu-action'),
         DocsTocEntry(title: 'SidebarMenuSub', anchor: 'sidebar-menu-sub'),
         DocsTocEntry(title: 'SidebarMenuBadge', anchor: 'sidebar-menu-badge'),
         DocsTocEntry(
@@ -103,10 +95,7 @@ class SidebarDocPage extends StatelessWidget {
         ),
         DocsTocEntry(title: 'SidebarTrigger', anchor: 'sidebar-trigger'),
         DocsTocEntry(title: 'SidebarRail', anchor: 'sidebar-rail'),
-        DocsTocEntry(
-          title: 'Controlled Sidebar',
-          anchor: 'controlled-sidebar',
-        ),
+        DocsTocEntry(title: 'Controlled Sidebar', anchor: 'controlled-sidebar'),
         DocsTocEntry(title: 'API Reference', anchor: 'api'),
         DocsTocEntry(title: 'States', anchor: 'states'),
         DocsTocEntry(title: 'Accessibility', anchor: 'accessibility'),
@@ -142,16 +131,16 @@ class _SidebarArticle extends StatelessWidget {
             '256 to 48 and back over 250ms.',
         preview: _ShellSpecimen(),
       ),
-      SizedBox(height: ds(10)),
-      DsSection(
+      SizedBox(height: el(10)),
+      ElSection(
         id: 'install',
         title: 'Installation',
         description:
-            'Sidebar has no registry manifest in this wave, so this page '
+            'Sidebar ships in the registry in this wave, so this page '
             'shows a manual copy rather than a CLI command that would fail.',
         child: _InstallSection(dependencies: entry.dependencies),
       ),
-      const DsSection(
+      const ElSection(
         id: 'usage',
         title: 'Usage',
         description:
@@ -160,7 +149,7 @@ class _SidebarArticle extends StatelessWidget {
             'main column.',
         child: _UsageSection(),
       ),
-      const DsSection(
+      const ElSection(
         id: 'composition',
         title: 'Composition',
         description:
@@ -169,7 +158,7 @@ class _SidebarArticle extends StatelessWidget {
             'its own.',
         child: _CompositionSection(),
       ),
-      const DsSection(
+      const ElSection(
         id: 'structure',
         title: 'Structure',
         description:
@@ -179,7 +168,7 @@ class _SidebarArticle extends StatelessWidget {
             'that flip it open and shut.',
         child: _StructureSection(),
       ),
-      const DsSection(
+      const ElSection(
         id: 'sidebar-provider',
         title: 'SidebarProvider',
         description:
@@ -189,7 +178,7 @@ class _SidebarArticle extends StatelessWidget {
             'ultimately measured from.',
         child: _ProviderSection(),
       ),
-      const DsSection(
+      const ElSection(
         id: 'sidebar',
         title: 'Sidebar',
         description:
@@ -198,16 +187,16 @@ class _SidebarArticle extends StatelessWidget {
             'mode live.',
         child: _VariantsSection(),
       ),
-      const DsSection(
+      const ElSection(
         id: 'use-sidebar',
         title: 'useSidebar',
         description:
             'The reference publishes a hook; this port publishes an '
             'inherited scope with the same surface, read as '
-            'DsSidebarScope.of(context) wherever a descendant needs it.',
+            'ElSidebarScope.of(context) wherever a descendant needs it.',
         child: _UseSidebarSection(),
       ),
-      const DsSection(
+      const ElSection(
         id: 'sidebar-header',
         title: 'SidebarHeader',
         description:
@@ -216,7 +205,7 @@ class _SidebarArticle extends StatelessWidget {
             'above for one in use.',
         child: _HeaderSection(),
       ),
-      const DsSection(
+      const ElSection(
         id: 'sidebar-footer',
         title: 'SidebarFooter',
         description:
@@ -224,7 +213,7 @@ class _SidebarArticle extends StatelessWidget {
             'holding the signed-in account.',
         child: _FooterSection(),
       ),
-      const DsSection(
+      const ElSection(
         id: 'sidebar-content',
         title: 'SidebarContent',
         description:
@@ -232,7 +221,7 @@ class _SidebarArticle extends StatelessWidget {
             'that pushes the footer to the floor.',
         child: _ContentSection(),
       ),
-      const DsSection(
+      const ElSection(
         id: 'sidebar-group',
         title: 'SidebarGroup',
         description:
@@ -240,7 +229,7 @@ class _SidebarArticle extends StatelessWidget {
             'optionally carrying a corner action.',
         child: _GroupSection(),
       ),
-      const DsSection(
+      const ElSection(
         id: 'sidebar-menu',
         title: 'SidebarMenu',
         description:
@@ -248,7 +237,7 @@ class _SidebarArticle extends StatelessWidget {
             'it, rather than each row painting its own selected fill.',
         child: _MenuSection(),
       ),
-      const DsSection(
+      const ElSection(
         id: 'sidebar-menu-button',
         title: 'SidebarMenuButton',
         description:
@@ -256,7 +245,7 @@ class _SidebarArticle extends StatelessWidget {
             'together decide what the row is called once it collapses.',
         child: _MenuButtonSection(),
       ),
-      const DsSection(
+      const ElSection(
         id: 'sidebar-menu-action',
         title: 'SidebarMenuAction',
         description:
@@ -264,7 +253,7 @@ class _SidebarArticle extends StatelessWidget {
             '24px ghost square pinned to the right edge.',
         child: _MenuActionSection(),
       ),
-      const DsSection(
+      const ElSection(
         id: 'sidebar-menu-sub',
         title: 'SidebarMenuSub',
         description:
@@ -272,7 +261,7 @@ class _SidebarArticle extends StatelessWidget {
             'items one level down.',
         child: _MenuSubSection(),
       ),
-      const DsSection(
+      const ElSection(
         id: 'sidebar-menu-badge',
         title: 'SidebarMenuBadge',
         description:
@@ -280,7 +269,7 @@ class _SidebarArticle extends StatelessWidget {
             'than inside its hit area.',
         child: _MenuBadgeSection(),
       ),
-      const DsSection(
+      const ElSection(
         id: 'sidebar-menu-skeleton',
         title: 'SidebarMenuSkeleton',
         description:
@@ -289,7 +278,7 @@ class _SidebarArticle extends StatelessWidget {
             'deep.',
         child: _MenuSkeletonSection(),
       ),
-      const DsSection(
+      const ElSection(
         id: 'sidebar-trigger',
         title: 'SidebarTrigger',
         description:
@@ -297,7 +286,7 @@ class _SidebarArticle extends StatelessWidget {
             'main column so it survives whatever the panel is doing.',
         child: _TriggerSection(),
       ),
-      const DsSection(
+      const ElSection(
         id: 'sidebar-rail',
         title: 'SidebarRail',
         description:
@@ -305,7 +294,7 @@ class _SidebarArticle extends StatelessWidget {
             'for the same toggle, never the only way to reach it.',
         child: _RailSection(),
       ),
-      const DsSection(
+      const ElSection(
         id: 'controlled-sidebar',
         title: 'Controlled Sidebar',
         description:
@@ -313,7 +302,7 @@ class _SidebarArticle extends StatelessWidget {
             'the provider then never holds desktop state of its own.',
         child: _ControlledSection(),
       ),
-      const DsSection(
+      const ElSection(
         id: 'api',
         title: 'API Reference',
         description:
@@ -322,7 +311,7 @@ class _SidebarArticle extends StatelessWidget {
             'parameter and its default.',
         child: _ApiSection(),
       ),
-      const DsSection(
+      const ElSection(
         id: 'states',
         title: 'States',
         description:
@@ -331,12 +320,12 @@ class _SidebarArticle extends StatelessWidget {
             'invented.',
         child: _StatesSection(),
       ),
-      const DsSection(
+      const ElSection(
         id: 'accessibility',
         title: 'Accessibility',
         child: _AccessibilitySection(),
       ),
-      const DsSection(
+      const ElSection(
         id: 'responsive',
         title: 'Responsive',
         description:
@@ -344,7 +333,7 @@ class _SidebarArticle extends StatelessWidget {
             'the desktop panel is not built at all.',
         child: _ResponsiveSection(),
       ),
-      DsSection(
+      ElSection(
         id: 'dependencies',
         title: 'Dependencies',
         description:
@@ -352,12 +341,12 @@ class _SidebarArticle extends StatelessWidget {
             'needs to install and run.',
         child: _DependenciesSection(dependencies: entry.dependencies),
       ),
-      const DsSection(
+      const ElSection(
         id: 'theming',
         title: 'Theming',
         child: _ThemingSection(),
       ),
-      DsSection(
+      ElSection(
         id: 'source',
         title: 'Source',
         child: _SourceSection(sourcePath: entry.sourcePath),
@@ -375,21 +364,21 @@ class _InstallSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        DsText(
-          'Sidebar has no registry manifest yet: registry/components/ holds '
+        ElText(
+          'Sidebar ships in the registry: registry/components/ holds '
           'twelve items and sidebar.json is not one of them. There is no '
           'CLI command to run, and this page will not print one that does '
           'not work. Copy the two source files below into '
           'lib/components/ui/ along with the thirteen component files they '
           'import, until a manifest ships.',
-          DsType.small,
+          ElType.small,
           color: theme.mutedForeground,
         ),
-        SizedBox(height: ds(4)),
+        SizedBox(height: el(4)),
         DocsCodeExample(
           title: 'Manual install',
           manualFiles: <DocsCodeFile>[
@@ -406,8 +395,8 @@ class _InstallSection extends StatelessWidget {
               path: 'lib/components/ui/nav_user.dart',
               title: 'nav_user.dart (public surface excerpt)',
               description:
-                  'The footer account block. It reads DsSidebarScope for '
-                  'isMobile and composes DsSidebarMenu, so it only works '
+                  'The footer account block. It reads ElSidebarScope for '
+                  'isMobile and composes ElSidebarMenu, so it only works '
                   'inside a provider.',
               code: _installNavUserExcerpt,
             ),
@@ -435,22 +424,22 @@ class _UsageSection extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
-      const DsPanel(
+      const ElPanel(
         label: 'DART',
         note: 'MINIMAL SHELL',
         child: DocsSelectableCodeBlock(code: _usageMinimalCode),
       ),
-      SizedBox(height: ds(5)),
-      DsNote(
+      SizedBox(height: el(5)),
+      ElNote(
         title: 'The one rule the compiler cannot enforce',
-        child: DsText(
-          'DsSidebarProvider.variant and DsSidebar.variant must be given the '
+        child: ElText(
+          'ElSidebarProvider.variant and ElSidebar.variant must be given the '
           'same value. On the web reference one is computed from the other '
           'through :has() and peer- selectors, which ask a parent about its '
           'descendants and a box about its sibling. Flutter can do neither, '
           'so the fact travels down twice and the call site is responsible '
           'for keeping the two in agreement.',
-          DsType.small,
+          ElType.small,
         ),
       ),
     ],
@@ -484,28 +473,28 @@ class _StructureSection extends StatelessWidget {
     title: 'The shell, top to bottom',
     facts: <DocsApiFact>[
       DocsApiFact(
-        name: 'DsSidebarProvider',
+        name: 'ElSidebarProvider',
         type: 'the state',
         description:
             'Owns open, openMobile and the Ctrl-B / Cmd-B shortcut. Wraps '
-            'one DsSidebar and one DsSidebarInset as its two flex children.',
+            'one ElSidebar and one ElSidebarInset as its two flex children.',
       ),
       DocsApiFact(
-        name: 'DsSidebar',
+        name: 'ElSidebar',
         type: 'the panel',
         description:
-            'Reads the provider through DsSidebarScope and lays out its '
+            'Reads the provider through ElSidebarScope and lays out its '
             'own regions: header, content, footer, and a rail on its edge.',
       ),
       DocsApiFact(
-        name: 'DsSidebarInset',
+        name: 'ElSidebarInset',
         type: 'the main column',
         description:
             "Beside the panel, wrapped in an Expanded that is free to be "
             "narrower than its content: the port's spelling of min-w-0.",
       ),
       DocsApiFact(
-        name: 'DsSidebarTrigger and DsSidebarRail',
+        name: 'ElSidebarTrigger and ElSidebarRail',
         type: 'the controls',
         description:
             'Two ways to flip the panel: a button in the main column, and '
@@ -528,7 +517,7 @@ class _ProviderSection extends StatelessWidget {
         name: 'expanded (any mode)',
         type: 'gap 256 / panel 256',
         description:
-            'DsWidths.sidebar. The gap is a real box in the row; the '
+            'ElWidths.sidebar. The gap is a real box in the row; the '
             'panel is an overflowing child of the gap, which is what a '
             'position: fixed container trapped by a transformed ancestor '
             'renders as.',
@@ -537,16 +526,16 @@ class _ProviderSection extends StatelessWidget {
         name: 'icon, variant: sidebar',
         type: 'gap 48 / panel 48',
         description:
-            'DsWidths.sidebarIcon. Both legs animate to the same 48, so '
+            'ElWidths.sidebarIcon. Both legs animate to the same 48, so '
             'the panel and the space it occupies stay identical.',
       ),
       DocsApiFact(
         name: 'icon, variant: floating or inset',
         type: 'gap 64 / panel 66',
         description:
-            'DsSidebar.insetIconGap is 48 + ds(4) = 64, because those '
+            'ElSidebar.insetIconGap is 48 + el(4) = 64, because those '
             'two variants pay their own 8px frame on both edges; '
-            'DsSidebar.insetIconWidth adds the two hairlines and is 66.',
+            'ElSidebar.insetIconWidth adds the two hairlines and is 66.',
       ),
       DocsApiFact(
         name: 'offcanvas',
@@ -568,18 +557,18 @@ class _ProviderSection extends StatelessWidget {
         name: 'duration and curve',
         type: '250ms, linear',
         description:
-            'DsDurations.transitionDefault on DsCurves.linear for all '
+            'ElDurations.transitionDefault on ElCurves.linear for all '
             'three legs: gap width, panel width, and the offcanvas '
             'slide. Measured as genuinely linear on the reference: even '
             'steps, no front-loading, no overshoot. Everything routes '
-            'through dsAnimationDuration, so reduced motion makes the '
+            'through elAnimationDuration, so reduced motion makes the '
             'whole collapse instant.',
       ),
       DocsApiFact(
         name: 'the row, mid-collapse',
         type: 'snaps, does not tween',
         description:
-            'DsSidebarMenuButton.iconSize (32) lands whole on the first '
+            'ElSidebarMenuButton.iconSize (32) lands whole on the first '
             'frame while the panel is still wide. The panel slides; its '
             'contents cut.',
       ),
@@ -597,7 +586,7 @@ class _VariantsSection extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
       const DocsApiTable(
-        title: 'DsSidebarCollapsible',
+        title: 'ElSidebarCollapsible',
         facts: <DocsApiFact>[
           DocsApiFact(
             name: 'offcanvas',
@@ -608,7 +597,7 @@ class _VariantsSection extends StatelessWidget {
           ),
           DocsApiFact(
             name: 'icon',
-            type: 'DsSidebarCollapsible',
+            type: 'ElSidebarCollapsible',
             description:
                 'The panel narrows to the icon rail and keeps its glyphs. '
                 'Labels, badges, actions and sub-menus go; rows and tooltips '
@@ -616,7 +605,7 @@ class _VariantsSection extends StatelessWidget {
           ),
           DocsApiFact(
             name: 'none',
-            type: 'DsSidebarCollapsible',
+            type: 'ElSidebarCollapsible',
             description:
                 'It does not collapse. No gap, no container, no rail, and '
                 'the trigger and keyboard shortcut still flip the provider '
@@ -624,9 +613,9 @@ class _VariantsSection extends StatelessWidget {
           ),
         ],
       ),
-      SizedBox(height: ds(5)),
+      SizedBox(height: el(5)),
       const DocsApiTable(
-        title: 'DsSidebarVariant',
+        title: 'ElSidebarVariant',
         facts: <DocsApiFact>[
           DocsApiFact(
             name: 'sidebar',
@@ -638,7 +627,7 @@ class _VariantsSection extends StatelessWidget {
           ),
           DocsApiFact(
             name: 'floating',
-            type: 'DsSidebarVariant',
+            type: 'ElSidebarVariant',
             description:
                 'Inset by 8 on both edges, the panel itself a rounded card '
                 'with a ring and a small shadow. No border, so it costs no '
@@ -646,7 +635,7 @@ class _VariantsSection extends StatelessWidget {
           ),
           DocsApiFact(
             name: 'inset',
-            type: 'DsSidebarVariant',
+            type: 'ElSidebarVariant',
             description:
                 'Also inset by 8, but it is the main column that becomes the '
                 'card: the provider paints the sidebar colour behind '
@@ -655,9 +644,9 @@ class _VariantsSection extends StatelessWidget {
           ),
         ],
       ),
-      SizedBox(height: ds(5)),
+      SizedBox(height: el(5)),
       const DocsApiTable(
-        title: 'DsSidebarSide',
+        title: 'ElSidebarSide',
         facts: <DocsApiFact>[
           DocsApiFact(
             name: 'left',
@@ -668,19 +657,19 @@ class _VariantsSection extends StatelessWidget {
           ),
           DocsApiFact(
             name: 'right',
-            type: 'DsSidebarSide',
+            type: 'ElSidebarSide',
             description:
                 'All four mirrored. The gap stays the first item in the row; '
                 'it is the panel inside it that moves.',
           ),
         ],
       ),
-      SizedBox(height: ds(5)),
+      SizedBox(height: el(5)),
       const DocsApiTable(
         title: 'Row ladders',
         facts: <DocsApiFact>[
           DocsApiFact(
-            name: 'DsSidebarMenuButtonSize.sm / md / lg',
+            name: 'ElSidebarMenuButtonSize.sm / md / lg',
             type: 'button xs / sm / lg',
             description:
                 'md is the default and measures 37.5px; lg measures 50 with '
@@ -689,13 +678,13 @@ class _VariantsSection extends StatelessWidget {
                 'inventing heights.',
           ),
           DocsApiFact(
-            name: 'DsSidebarMenuSubButtonSize.sm / md',
+            name: 'ElSidebarMenuSubButtonSize.sm / md',
             type: 'button xs / sm',
             description: 'md is the default: a 32px nested link.',
           ),
         ],
       ),
-      SizedBox(height: ds(5)),
+      SizedBox(height: el(5)),
       const DocsCodeExample(
         title: 'collapsible: offcanvas',
         description:
@@ -714,7 +703,7 @@ class _UseSidebarSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const DocsApiTable(
-    title: 'DsSidebarScope, read with .of(context)',
+    title: 'ElSidebarScope, read with .of(context)',
     facts: <DocsApiFact>[
       DocsApiFact(
         name: 'open / collapsed',
@@ -756,19 +745,19 @@ class _HeaderSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const DocsApiTable(
-    title: 'DsSidebarHeader',
+    title: 'ElSidebarHeader',
     facts: <DocsApiFact>[
       DocsApiFact(
         name: 'children',
         type: 'List<Widget>',
         description:
-            'Required. A column with ds(2) between children, inside the '
-            'region padding: ds(3) expanded, ds(2) in icon mode.',
+            'Required. A column with el(2) between children, inside the '
+            'region padding: el(3) expanded, el(2) in icon mode.',
       ),
       DocsApiFact(
         name: 'gap',
         type: 'static double (get)',
-        description: 'ds(2) = 8. Shared by the footer.',
+        description: 'el(2) = 8. Shared by the footer.',
       ),
     ],
   );
@@ -784,7 +773,7 @@ class _FooterSection extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
       const DocsApiTable(
-        title: 'DsSidebarFooter',
+        title: 'ElSidebarFooter',
         facts: <DocsApiFact>[
           DocsApiFact(
             name: 'children',
@@ -792,12 +781,12 @@ class _FooterSection extends StatelessWidget {
             description:
                 "Required. The header's twin. There is no mt-auto to port: "
                 'the content region between them takes the slack. Most '
-                'often holds a DsNavUser, the account block below.',
+                'often holds a ElNavUser, the account block below.',
           ),
         ],
       ),
-      SizedBox(height: ds(5)),
-      const DsPanel(
+      SizedBox(height: el(5)),
+      const ElPanel(
         label: 'DART',
         note: 'FOOTER ACCOUNT BLOCK',
         child: DocsSelectableCodeBlock(code: _usageNavUserCode),
@@ -813,10 +802,10 @@ class _ContentSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const DocsApiTable(
-    title: 'DsSidebarContent and DsSidebarSeparator',
+    title: 'ElSidebarContent and ElSidebarSeparator',
     facts: <DocsApiFact>[
       DocsApiFact(
-        name: 'DsSidebarContent.children',
+        name: 'ElSidebarContent.children',
         type: 'List<Widget>',
         description:
             'Default const []. The one scrolling region in the panel, and '
@@ -824,10 +813,10 @@ class _ContentSection extends StatelessWidget {
             'mode it stops scrolling and clips instead.',
       ),
       DocsApiFact(
-        name: 'DsSidebarSeparator()',
+        name: 'ElSidebarSeparator()',
         type: 'const, key only',
         description:
-            'A hairline in the sidebar border colour, inset ds(3), ds(2) '
+            'A hairline in the sidebar border colour, inset el(3), el(2) '
             'in icon mode.',
       ),
     ],
@@ -844,31 +833,31 @@ class _GroupSection extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
       const DocsApiTable(
-        title: 'DsSidebarGroup, DsSidebarGroupLabel, DsSidebarGroupAction',
+        title: 'ElSidebarGroup, ElSidebarGroupLabel, ElSidebarGroupAction',
         facts: <DocsApiFact>[
           DocsApiFact(
-            name: 'DsSidebarGroup.children',
+            name: 'ElSidebarGroup.children',
             type: 'List<Widget>',
             description: 'Required. A padded column, same region padding.',
           ),
           DocsApiFact(
-            name: 'DsSidebarGroupLabel(label)',
+            name: 'ElSidebarGroupLabel(label)',
             type: 'String, positional',
             description:
-                'Required. 32px tall, typed DsType.navSm at full strength: '
+                'Required. 32px tall, typed ElType.navSm at full strength: '
                 'dimming it to 70% would measure 2.76:1 against the 4.5:1 '
                 'it owes.',
           ),
           DocsApiFact(
-            name: 'DsSidebarGroupAction',
+            name: 'ElSidebarGroupAction',
             type: 'child, label, onPressed?',
             description:
                 'child and label required. A 24px ghost square for the '
                 "group's top-right corner, positioned by "
-                'DsSidebarCollapsibleGroup: nothing else holds one.',
+                'ElSidebarCollapsibleGroup: nothing else holds one.',
           ),
           DocsApiFact(
-            name: 'DsSidebarCollapsibleGroup',
+            name: 'ElSidebarCollapsibleGroup',
             type: 'label, toggleLabel, child',
             description:
                 'label, toggleLabel and child required. The trigger is the '
@@ -877,8 +866,8 @@ class _GroupSection extends StatelessWidget {
           ),
         ],
       ),
-      SizedBox(height: ds(5)),
-      const DsPanel(
+      SizedBox(height: el(5)),
+      const ElPanel(
         label: 'DART',
         note: 'DISCLOSURE GROUP',
         child: DocsSelectableCodeBlock(code: _usageGroupCode),
@@ -894,10 +883,10 @@ class _MenuSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const DocsApiTable(
-    title: 'DsSidebarMenu and DsSidebarMenuItem',
+    title: 'ElSidebarMenu and ElSidebarMenuItem',
     facts: <DocsApiFact>[
       DocsApiFact(
-        name: 'DsSidebarMenu.children',
+        name: 'ElSidebarMenu.children',
         type: 'List<Widget>',
         description:
             'Required. The menu owns one travelling pill; the rows never '
@@ -907,12 +896,12 @@ class _MenuSection extends StatelessWidget {
             'opens.',
       ),
       DocsApiFact(
-        name: 'DsSidebarMenu.gap',
+        name: 'ElSidebarMenu.gap',
         type: 'static double (get)',
-        description: 'ds(1) = 4, between rows.',
+        description: 'el(1) = 4, between rows.',
       ),
       DocsApiFact(
-        name: 'DsSidebarMenuItem.button / action / badge / submenu',
+        name: 'ElSidebarMenuItem.button / action / badge / submenu',
         type: 'Widget, Widget?, Widget?, Widget?',
         description:
             'button required. The other three are optional row furniture: '
@@ -933,7 +922,7 @@ class _MenuButtonSection extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
       const DocsApiTable(
-        title: 'DsSidebarMenuButton',
+        title: 'ElSidebarMenuButton',
         facts: <DocsApiFact>[
           DocsApiFact(
             name: 'isActive',
@@ -954,7 +943,7 @@ class _MenuButtonSection extends StatelessWidget {
           ),
           DocsApiFact(
             name: 'variant / size',
-            type: 'DsButtonVariant, DsSidebarMenuButtonSize',
+            type: 'ElButtonVariant, ElSidebarMenuButtonSize',
             description:
                 'Default ghost and md (37.5px tall). ghost rather than the '
                 'button default, because a column of rows each painting '
@@ -963,8 +952,8 @@ class _MenuButtonSection extends StatelessWidget {
           ),
         ],
       ),
-      SizedBox(height: ds(5)),
-      const DsPanel(
+      SizedBox(height: el(5)),
+      const ElPanel(
         label: 'DART',
         note: 'A COLLAPSING ROW',
         child: DocsSelectableCodeBlock(code: _usageRowCode),
@@ -980,7 +969,7 @@ class _MenuActionSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const DocsApiTable(
-    title: 'DsSidebarMenuAction',
+    title: 'ElSidebarMenuAction',
     facts: <DocsApiFact>[
       DocsApiFact(
         name: 'child / label / onPressed',
@@ -1000,24 +989,24 @@ class _MenuSubSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const DocsApiTable(
-    title: 'DsSidebarMenuSub, DsSidebarMenuSubItem, DsSidebarMenuSubButton',
+    title: 'ElSidebarMenuSub, ElSidebarMenuSubItem, ElSidebarMenuSubButton',
     facts: <DocsApiFact>[
       DocsApiFact(
-        name: 'DsSidebarMenuSub.children',
+        name: 'ElSidebarMenuSub.children',
         type: 'List<Widget>',
         description:
             'Required. The nested list, hung off a border spine. Renders '
             'nothing at all in icon mode.',
       ),
       DocsApiFact(
-        name: 'DsSidebarMenuSubButton.label',
+        name: 'ElSidebarMenuSubButton.label',
         type: 'String',
         description:
             'Required, and a String rather than a Widget: this part is '
             'always a link upstream, so it takes text.',
       ),
       DocsApiFact(
-        name: 'DsSidebarMenuSubButton.isActive',
+        name: 'ElSidebarMenuSubButton.isActive',
         type: 'bool',
         description:
             'Default false. A colour and nothing else: a sub-button never '
@@ -1035,10 +1024,10 @@ class _MenuBadgeSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const DocsApiTable(
-    title: 'DsSidebarMenuBadge',
+    title: 'ElSidebarMenuBadge',
     facts: <DocsApiFact>[
       DocsApiFact(
-        name: 'DsSidebarMenuBadge(count)',
+        name: 'ElSidebarMenuBadge(count)',
         type: 'String, positional',
         description:
             'Required. The count in the right lane, pointer-events-none '
@@ -1047,9 +1036,9 @@ class _MenuBadgeSection extends StatelessWidget {
       ),
       DocsApiFact(
         name: 'variant',
-        type: 'DsBadgeVariant',
+        type: 'ElBadgeVariant',
         description:
-            "Default DsBadgeVariant.secondary: the sidebar's own default, "
+            "Default ElBadgeVariant.secondary: the sidebar's own default, "
             "not the badge's.",
       ),
     ],
@@ -1063,13 +1052,12 @@ class _MenuSkeletonSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const DocsApiTable(
-    title: 'DsSidebarMenuSkeleton',
+    title: 'ElSidebarMenuSkeleton',
     facts: <DocsApiFact>[
       DocsApiFact(
         name: 'showIcon',
         type: 'bool',
-        description:
-            'Default false. Adds a 16px shimmer tile before the bar.',
+        description: 'Default false. Adds a 16px shimmer tile before the bar.',
       ),
       DocsApiFact(
         name: 'seed',
@@ -1082,7 +1070,7 @@ class _MenuSkeletonSection extends StatelessWidget {
       DocsApiFact(
         name: 'height',
         type: 'static double (get)',
-        description: 'ds(8) = 32, the same as a collapsed row.',
+        description: 'el(8) = 32, the same as a collapsed row.',
       ),
     ],
   );
@@ -1095,7 +1083,7 @@ class _TriggerSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const DocsApiTable(
-    title: 'DsSidebarTrigger',
+    title: 'ElSidebarTrigger',
     facts: <DocsApiFact>[
       DocsApiFact(
         name: 'onPressed',
@@ -1108,7 +1096,7 @@ class _TriggerSection extends StatelessWidget {
         name: 'accessible name',
         type: 'hard-coded',
         description:
-            'Both DsSidebarTrigger and DsSidebarRail publish "Toggle '
+            'Both ElSidebarTrigger and ElSidebarRail publish "Toggle '
             'Sidebar" as their name.',
       ),
     ],
@@ -1122,13 +1110,13 @@ class _RailSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const DocsApiTable(
-    title: 'DsSidebarRail',
+    title: 'ElSidebarRail',
     facts: <DocsApiFact>[
       DocsApiFact(
-        name: 'DsSidebarRail()',
+        name: 'ElSidebarRail()',
         type: 'const, key only',
         description:
-            'A marker. It renders SizedBox.shrink in the flow; DsSidebar '
+            'A marker. It renders SizedBox.shrink in the flow; ElSidebar '
             'sees it in children and paints the strip in the slot it '
             'computed, because only the panel knows where its edge is.',
       ),
@@ -1136,9 +1124,9 @@ class _RailSection extends StatelessWidget {
         name: 'hairline',
         type: 'static double (get)',
         description:
-            'ds(0.5) = 2. The hover rule down the middle of the strip. The '
+            'el(0.5) = 2. The hover rule down the middle of the strip. The '
             'rail takes no focus, reproducing the reference tabIndex of '
-            '-1: it is a pointer shortcut, and DsSidebarTrigger is always '
+            '-1: it is a pointer shortcut, and ElSidebarTrigger is always '
             'the reachable alternative.',
       ),
     ],
@@ -1151,7 +1139,7 @@ class _ControlledSection extends StatelessWidget {
   const _ControlledSection();
 
   @override
-  Widget build(BuildContext context) => const DsPanel(
+  Widget build(BuildContext context) => const ElPanel(
     label: 'DART',
     note: 'CONTROLLED',
     child: DocsSelectableCodeBlock(code: _usageControlledCode),
@@ -1168,14 +1156,14 @@ class _ApiSection extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
       const DocsApiTable(
-        title: 'DsSidebarProvider',
+        title: 'ElSidebarProvider',
         facts: <DocsApiFact>[
           DocsApiFact(
             name: 'children',
             type: 'List<Widget>',
             description:
                 "Required. The wrapper row's flex children: normally one "
-                'DsSidebar and one DsSidebarInset.',
+                'ElSidebar and one ElSidebarInset.',
           ),
           DocsApiFact(
             name: 'defaultOpen',
@@ -1202,10 +1190,10 @@ class _ApiSection extends StatelessWidget {
           ),
           DocsApiFact(
             name: 'variant',
-            type: 'DsSidebarVariant',
+            type: 'ElSidebarVariant',
             description:
-                'Default DsSidebarVariant.sidebar. Must match the variant '
-                'given to DsSidebar. Only inset changes what the provider '
+                'Default ElSidebarVariant.sidebar. Must match the variant '
+                'given to ElSidebar. Only inset changes what the provider '
                 'itself paints: it fills the whole row with the sidebar '
                 'colour.',
           ),
@@ -1229,40 +1217,40 @@ class _ApiSection extends StatelessWidget {
             name: 'isMobileWidth',
             type: 'static bool Function(double)',
             description:
-                'width < DsBreakpoints.md, i.e. under 768. The port of '
+                'width < ElBreakpoints.md, i.e. under 768. The port of '
                 'useIsMobile().',
           ),
         ],
       ),
-      SizedBox(height: ds(5)),
+      SizedBox(height: el(5)),
       const DocsApiTable(
-        title: 'DsSidebar',
+        title: 'ElSidebar',
         facts: <DocsApiFact>[
           DocsApiFact(
             name: 'children',
             type: 'List<Widget>',
             description:
                 "Required. The panel's regions, top to bottom. A "
-                'DsSidebarRail among them is what puts a rail on the edge; '
+                'ElSidebarRail among them is what puts a rail on the edge; '
                 'the widget itself contributes nothing to the column.',
           ),
           DocsApiFact(
             name: 'side',
-            type: 'DsSidebarSide',
-            description: 'Default DsSidebarSide.left.',
+            type: 'ElSidebarSide',
+            description: 'Default ElSidebarSide.left.',
           ),
           DocsApiFact(
             name: 'variant',
-            type: 'DsSidebarVariant',
+            type: 'ElSidebarVariant',
             description:
-                'Default DsSidebarVariant.sidebar. Must match '
-                'DsSidebarProvider.variant.',
+                'Default ElSidebarVariant.sidebar. Must match '
+                'ElSidebarProvider.variant.',
           ),
           DocsApiFact(
             name: 'collapsible',
-            type: 'DsSidebarCollapsible',
+            type: 'ElSidebarCollapsible',
             description:
-                'Default DsSidebarCollapsible.offcanvas: note that this is '
+                'Default ElSidebarCollapsible.offcanvas: note that this is '
                 'not the icon rail most shells want.',
           ),
           DocsApiFact(
@@ -1277,7 +1265,7 @@ class _ApiSection extends StatelessWidget {
             name: 'insetIconGap',
             type: 'static double (get)',
             description:
-                '64, DsWidths.sidebarIcon + ds(4). The collapsed gap under '
+                '64, ElWidths.sidebarIcon + el(4). The collapsed gap under '
                 'floating and inset.',
           ),
           DocsApiFact(
@@ -1288,42 +1276,42 @@ class _ApiSection extends StatelessWidget {
           DocsApiFact(
             name: 'framePadding',
             type: 'static double (get)',
-            description: 'ds(2) = 8. The p-2 floating and inset pay.',
+            description: 'el(2) = 8. The p-2 floating and inset pay.',
           ),
           DocsApiFact(
             name: 'railWidth',
             type: 'static double (get)',
-            description: 'ds(4) = 16. The strip straddling the panel edge.',
+            description: 'el(4) = 16. The strip straddling the panel edge.',
           ),
         ],
       ),
-      SizedBox(height: ds(5)),
+      SizedBox(height: el(5)),
       const DocsApiTable(
-        title: 'DsSidebarRail, DsSidebarTrigger, DsSidebarInset',
+        title: 'ElSidebarRail, ElSidebarTrigger, ElSidebarInset',
         facts: <DocsApiFact>[
           DocsApiFact(
-            name: 'DsSidebarRail()',
+            name: 'ElSidebarRail()',
             type: 'const, key only',
             description:
-                'A marker. It renders SizedBox.shrink in the flow; DsSidebar '
+                'A marker. It renders SizedBox.shrink in the flow; ElSidebar '
                 'sees it in children and paints the strip in the slot it '
                 'computed, because only the panel knows where its edge is.',
           ),
           DocsApiFact(
-            name: 'DsSidebarRail.hairline',
+            name: 'ElSidebarRail.hairline',
             type: 'static double (get)',
             description:
-                'ds(0.5) = 2. The hover rule down the middle of the strip.',
+                'el(0.5) = 2. The hover rule down the middle of the strip.',
           ),
           DocsApiFact(
-            name: 'DsSidebarTrigger.onPressed',
+            name: 'ElSidebarTrigger.onPressed',
             type: 'VoidCallback?',
             description:
                 'Default null. Called before the toggle, in that order. The '
                 'trigger toggles regardless.',
           ),
           DocsApiFact(
-            name: 'DsSidebarInset.child',
+            name: 'ElSidebarInset.child',
             type: 'Widget',
             description:
                 'Required. The main column beside the panel, wrapped in an '
@@ -1331,39 +1319,39 @@ class _ApiSection extends StatelessWidget {
                 "port's spelling of min-w-0.",
           ),
           DocsApiFact(
-            name: 'DsSidebarInset.margin',
+            name: 'ElSidebarInset.margin',
             type: 'static double (get)',
             description:
-                'ds(2) = 8. The inset variant only: 8px on three sides while '
+                'el(2) = 8. The inset variant only: 8px on three sides while '
                 'open, all four once collapsed.',
           ),
         ],
       ),
-      SizedBox(height: ds(5)),
+      SizedBox(height: el(5)),
       const DocsApiTable(
         title: 'Regions',
         facts: <DocsApiFact>[
           DocsApiFact(
-            name: 'DsSidebarHeader.children',
+            name: 'ElSidebarHeader.children',
             type: 'List<Widget>',
             description:
-                'Required. A column with ds(2) between children, inside the '
-                'region padding: ds(3) expanded, ds(2) in icon mode.',
+                'Required. A column with el(2) between children, inside the '
+                'region padding: el(3) expanded, el(2) in icon mode.',
           ),
           DocsApiFact(
-            name: 'DsSidebarHeader.gap',
+            name: 'ElSidebarHeader.gap',
             type: 'static double (get)',
-            description: 'ds(2) = 8. Shared by the footer.',
+            description: 'el(2) = 8. Shared by the footer.',
           ),
           DocsApiFact(
-            name: 'DsSidebarFooter.children',
+            name: 'ElSidebarFooter.children',
             type: 'List<Widget>',
             description:
                 "Required. The header's twin. There is no mt-auto to port: "
                 'the content region between them takes the slack.',
           ),
           DocsApiFact(
-            name: 'DsSidebarContent.children',
+            name: 'ElSidebarContent.children',
             type: 'List<Widget>',
             description:
                 'Default const []. The one scrolling region in the panel, '
@@ -1371,64 +1359,64 @@ class _ApiSection extends StatelessWidget {
                 'icon mode it stops scrolling and clips instead.',
           ),
           DocsApiFact(
-            name: 'DsSidebarSeparator()',
+            name: 'ElSidebarSeparator()',
             type: 'const, key only',
             description:
-                'A hairline in the sidebar border colour, inset ds(3), '
-                'ds(2) in icon mode. Painted here rather than composed from '
+                'A hairline in the sidebar border colour, inset el(3), '
+                'el(2) in icon mode. Painted here rather than composed from '
                 'the separator primitive, because both the colour and the '
                 'inset are overridden.',
           ),
           DocsApiFact(
-            name: 'DsSidebarGroup.children',
+            name: 'ElSidebarGroup.children',
             type: 'List<Widget>',
             description: 'Required. A padded column, same region padding.',
           ),
           DocsApiFact(
-            name: 'DsSidebarGroupContent.child',
+            name: 'ElSidebarGroupContent.child',
             type: 'Widget',
             description:
                 'Required. Renders its child verbatim: it has no type of '
                 'its own and exists so a call site reads like the reference.',
           ),
           DocsApiFact(
-            name: 'DsSidebarGroupLabel(label)',
+            name: 'ElSidebarGroupLabel(label)',
             type: 'String, positional',
             description:
-                'Required. 32px tall, typed DsType.navSm at full strength: '
+                'Required. 32px tall, typed ElType.navSm at full strength: '
                 'dimming it to 70% would measure 2.76:1 against the 4.5:1 it '
                 'owes.',
           ),
           DocsApiFact(
-            name: 'DsSidebarGroupLabel.padding',
+            name: 'ElSidebarGroupLabel.padding',
             type: 'EdgeInsetsGeometry?',
             description:
-                'Default null, which resolves to left ds(3) / right ds(10). '
-                'DsSidebarCollapsibleGroup passes EdgeInsets.zero, so on a '
+                'Default null, which resolves to left el(3) / right el(10). '
+                'ElSidebarCollapsibleGroup passes EdgeInsets.zero, so on a '
                 'real page the declared padding never renders.',
           ),
           DocsApiFact(
-            name: 'DsSidebarGroupLabel.height',
+            name: 'ElSidebarGroupLabel.height',
             type: 'static double (get)',
             description:
-                'ds(8) = 32. In icon mode the box animates to zero height '
+                'el(8) = 32. In icon mode the box animates to zero height '
                 'and zero opacity, so the collapsed group loses the whole '
                 'row.',
           ),
           DocsApiFact(
-            name: 'DsSidebarGroupAction',
+            name: 'ElSidebarGroupAction',
             type: 'child, label, onPressed?',
             description:
                 'child and label required. A 24px ghost square for the '
                 "group's top-right corner, positioned by "
-                'DsSidebarCollapsibleGroup: nothing else holds one. label '
+                'ElSidebarCollapsibleGroup: nothing else holds one. label '
                 'is its only accessible name.',
           ),
         ],
       ),
-      SizedBox(height: ds(5)),
+      SizedBox(height: el(5)),
       const DocsApiTable(
-        title: 'DsSidebarCollapsibleGroup',
+        title: 'ElSidebarCollapsibleGroup',
         facts: <DocsApiFact>[
           DocsApiFact(
             name: 'label',
@@ -1453,7 +1441,7 @@ class _ApiSection extends StatelessWidget {
             name: 'action',
             type: 'Widget?',
             description:
-                'Default null. A DsSidebarGroupAction, anchored in the '
+                'Default null. A ElSidebarGroupAction, anchored in the '
                 "group's top-right corner. Its presence also widens the "
                 "trigger's right margin.",
           ),
@@ -1467,20 +1455,20 @@ class _ApiSection extends StatelessWidget {
           DocsApiFact(
             name: 'triggerHeight',
             type: 'static double (get)',
-            description: 'ds(6) = 24.',
+            description: 'el(6) = 24.',
           ),
           DocsApiFact(
             name: 'lineOpen / lineClosed',
             type: 'static double (get)',
             description:
-                '1 and ds(1) = 4. The disclosure line thickens from a '
+                '1 and el(1) = 4. The disclosure line thickens from a '
                 'hairline to 4px while closed, over 250ms.',
           ),
         ],
       ),
-      SizedBox(height: ds(5)),
+      SizedBox(height: el(5)),
       const DocsApiTable(
-        title: 'DsSidebarMenu',
+        title: 'ElSidebarMenu',
         facts: <DocsApiFact>[
           DocsApiFact(
             name: 'children',
@@ -1495,54 +1483,54 @@ class _ApiSection extends StatelessWidget {
           DocsApiFact(
             name: 'gap',
             type: 'static double (get)',
-            description: 'ds(1) = 4, between rows.',
+            description: 'el(1) = 4, between rows.',
           ),
         ],
       ),
-      SizedBox(height: ds(5)),
+      SizedBox(height: el(5)),
       const DocsApiTable(
-        title: 'DsSidebarMenuItem',
+        title: 'ElSidebarMenuItem',
         facts: <DocsApiFact>[
           DocsApiFact(
             name: 'button',
             type: 'Widget',
             description:
-                'Required. The row: a DsSidebarMenuButton, or a dropdown '
+                'Required. The row: a ElSidebarMenuButton, or a dropdown '
                 'trigger wrapping one.',
           ),
           DocsApiFact(
             name: 'action',
             type: 'Widget?',
             description:
-                'Default null. A DsSidebarMenuAction, centred on the row and '
-                'pinned ds(1) from its right edge. Hidden in icon mode.',
+                'Default null. A ElSidebarMenuAction, centred on the row and '
+                'pinned el(1) from its right edge. Hidden in icon mode.',
           ),
           DocsApiFact(
             name: 'badge',
             type: 'Widget?',
             description:
-                'Default null. A DsSidebarMenuBadge, pinned ds(2) from the '
+                'Default null. A ElSidebarMenuBadge, pinned el(2) from the '
                 'right edge. Hidden in icon mode.',
           ),
           DocsApiFact(
             name: 'submenu',
             type: 'Widget?',
             description:
-                'Default null. A DsSidebarMenuSub, in flow under the row, '
+                'Default null. A ElSidebarMenuSub, in flow under the row, '
                 'which makes the item taller than its own button. This is '
                 'the one relational question Flutter can answer, because the '
                 'item is handed its children as a list.',
           ),
         ],
       ),
-      SizedBox(height: ds(5)),
+      SizedBox(height: el(5)),
       const DocsApiTable(
-        title: 'DsSidebarMenuButton',
+        title: 'ElSidebarMenuButton',
         facts: <DocsApiFact>[
           DocsApiFact(
             name: 'child',
             type: 'Widget',
-            description: 'Required. Normally a DsSidebarMenuRow.',
+            description: 'Required. Normally a ElSidebarMenuRow.',
           ),
           DocsApiFact(
             name: 'isActive',
@@ -1554,18 +1542,18 @@ class _ApiSection extends StatelessWidget {
           ),
           DocsApiFact(
             name: 'variant',
-            type: 'DsButtonVariant',
+            type: 'ElButtonVariant',
             description:
-                'Default DsButtonVariant.ghost: not the button default. A '
+                'Default ElButtonVariant.ghost: not the button default. A '
                 'column of rows each painting bg-primary would be a wall of '
                 'blue with no hierarchy left to spend.',
           ),
           DocsApiFact(
             name: 'size',
-            type: 'DsSidebarMenuButtonSize',
+            type: 'ElSidebarMenuButtonSize',
             description:
-                'Default DsSidebarMenuButtonSize.md, which is 37.5px tall at '
-                'h-auto with ds(2) padding.',
+                'Default ElSidebarMenuButtonSize.md, which is 37.5px tall at '
+                'h-auto with el(2) padding.',
           ),
           DocsApiFact(
             name: 'tooltip',
@@ -1608,51 +1596,50 @@ class _ApiSection extends StatelessWidget {
             name: 'padding / actionLane / badgeLane',
             type: 'static double (get)',
             description:
-                'ds(2) = 8, ds(10) = 40, ds(16) = 64. The right padding a '
+                'el(2) = 8, el(10) = 40, el(16) = 64. The right padding a '
                 'row reserves when its item carries an action or a badge.',
           ),
           DocsApiFact(
             name: 'iconSize',
             type: 'static double (get)',
             description:
-                'ds(8) = 32. The collapsed row is a hard square and gets '
+                'el(8) = 32. The collapsed row is a hard square and gets '
                 'there in one frame.',
           ),
         ],
       ),
-      SizedBox(height: ds(5)),
+      SizedBox(height: el(5)),
       const DocsApiTable(
-        title: 'Row content: DsSidebarMenuRow, DsSidebarMenuLabel',
+        title: 'Row content: ElSidebarMenuRow, ElSidebarMenuLabel',
         facts: <DocsApiFact>[
           DocsApiFact(
-            name: 'DsSidebarMenuRow.label',
+            name: 'ElSidebarMenuRow.label',
             type: 'Widget',
-            description:
-                'Required. The label span, expanded to fill the line.',
+            description: 'Required. The label span, expanded to fill the line.',
           ),
           DocsApiFact(
-            name: 'DsSidebarMenuRow.leading',
+            name: 'ElSidebarMenuRow.leading',
             type: 'Widget?',
             description:
                 'Default null. The glyph, already sized by the caller from '
-                "DsButton.iconPxFor. In icon mode the row renders this and "
+                "ElButton.iconPxFor. In icon mode the row renders this and "
                 'nothing else: and if it is null, the text label survives '
                 'the collapse instead, clipped to 32px.',
           ),
           DocsApiFact(
-            name: 'DsSidebarMenuRow.trailing',
+            name: 'ElSidebarMenuRow.trailing',
             type: 'Widget?',
             description: 'Default null. Anything after the label.',
           ),
           DocsApiFact(
-            name: 'DsSidebarMenuRow.size',
-            type: 'DsSidebarMenuButtonSize',
+            name: 'ElSidebarMenuRow.size',
+            type: 'ElSidebarMenuButtonSize',
             description:
                 'Default md. Only picks the gap between glyph and label; '
                 'pass the same value the button has.',
           ),
           DocsApiFact(
-            name: 'DsSidebarMenuLabel(text)',
+            name: 'ElSidebarMenuLabel(text)',
             type: 'String, positional',
             description:
                 'Required. One truncating line, laid out in a CSS line box '
@@ -1663,41 +1650,41 @@ class _ApiSection extends StatelessWidget {
           ),
         ],
       ),
-      SizedBox(height: ds(5)),
+      SizedBox(height: el(5)),
       const DocsApiTable(
-        title: 'DsSidebarMenuAction and DsSidebarMenuBadge',
+        title: 'ElSidebarMenuAction and ElSidebarMenuBadge',
         facts: <DocsApiFact>[
           DocsApiFact(
-            name: 'DsSidebarMenuAction.child / label / onPressed',
+            name: 'ElSidebarMenuAction.child / label / onPressed',
             type: 'Widget, String, VoidCallback?',
             description:
                 'child and label required. A 24px ghost square for the '
                 "row's right lane. label is its only accessible name.",
           ),
           DocsApiFact(
-            name: 'DsSidebarMenuBadge(count)',
+            name: 'ElSidebarMenuBadge(count)',
             type: 'String, positional',
             description:
                 'Required. The count in the right lane, pointer-events-none '
                 'so a click on it reaches the row underneath.',
           ),
           DocsApiFact(
-            name: 'DsSidebarMenuBadge.variant',
-            type: 'DsBadgeVariant',
+            name: 'ElSidebarMenuBadge.variant',
+            type: 'ElBadgeVariant',
             description:
-                "Default DsBadgeVariant.secondary: the sidebar's own "
+                "Default ElBadgeVariant.secondary: the sidebar's own "
                 "default, not the badge's.",
           ),
           DocsApiFact(
-            name: 'DsSidebarMenuBadge.paddingX / minWidth',
+            name: 'ElSidebarMenuBadge.paddingX / minWidth',
             type: 'static double (get)',
-            description: 'ds(1.5) = 6 and ds(5) = 20.',
+            description: 'el(1.5) = 6 and el(5) = 20.',
           ),
         ],
       ),
-      SizedBox(height: ds(5)),
+      SizedBox(height: el(5)),
       const DocsApiTable(
-        title: 'DsSidebarMenuSkeleton',
+        title: 'ElSidebarMenuSkeleton',
         facts: <DocsApiFact>[
           DocsApiFact(
             name: 'showIcon',
@@ -1725,35 +1712,35 @@ class _ApiSection extends StatelessWidget {
           DocsApiFact(
             name: 'height',
             type: 'static double (get)',
-            description: 'ds(8) = 32, the same as a collapsed row.',
+            description: 'el(8) = 32, the same as a collapsed row.',
           ),
         ],
       ),
-      SizedBox(height: ds(5)),
+      SizedBox(height: el(5)),
       const DocsApiTable(
         title: 'Sub-menu and field',
         facts: <DocsApiFact>[
           DocsApiFact(
-            name: 'DsSidebarMenuSub.children',
+            name: 'ElSidebarMenuSub.children',
             type: 'List<Widget>',
             description:
                 'Required. The nested list, hung off a border spine. Renders '
                 'nothing at all in icon mode.',
           ),
           DocsApiFact(
-            name: 'DsSidebarMenuSubItem.child',
+            name: 'ElSidebarMenuSubItem.child',
             type: 'Widget',
             description: 'Required. Renders its child verbatim.',
           ),
           DocsApiFact(
-            name: 'DsSidebarMenuSubButton.label',
+            name: 'ElSidebarMenuSubButton.label',
             type: 'String',
             description:
                 'Required, and a String rather than a Widget: this part is '
                 'always a link upstream, so it takes text.',
           ),
           DocsApiFact(
-            name: 'DsSidebarMenuSubButton.isActive',
+            name: 'ElSidebarMenuSubButton.isActive',
             type: 'bool',
             description:
                 'Default false. A colour and nothing else: a sub-button '
@@ -1761,38 +1748,39 @@ class _ApiSection extends StatelessWidget {
                 'thing on screen.',
           ),
           DocsApiFact(
-            name: 'DsSidebarMenuSubButton.variant / size / onPressed',
-            type: 'DsButtonVariant, DsSidebarMenuSubButtonSize, VoidCallback?',
+            name: 'ElSidebarMenuSubButton.variant / size / onPressed',
+            type: 'ElButtonVariant, ElSidebarMenuSubButtonSize, VoidCallback?',
             description: 'Defaults ghost, md, and null.',
           ),
           DocsApiFact(
-            name: 'DsSidebarInput.placeholder / label / controller / padding',
-            type: 'String?, String?, TextEditingController?, EdgeInsetsGeometry?',
+            name: 'ElSidebarInput.placeholder / label / controller / padding',
+            type:
+                'String?, String?, TextEditingController?, EdgeInsetsGeometry?',
             description:
                 'All default null. A 32px flat field filled with the '
                 'background colour rather than the input colour, so it reads '
                 'as a well cut into the panel. label is its accessible name.',
           ),
           DocsApiFact(
-            name: 'DsSidebarInput.height',
+            name: 'ElSidebarInput.height',
             type: 'static double (get)',
-            description: 'ds(8) = 32.',
+            description: 'el(8) = 32.',
           ),
         ],
       ),
-      SizedBox(height: ds(5)),
+      SizedBox(height: el(5)),
       const DocsApiTable(
-        title: 'Scopes: DsSidebarScope and DsSidebarChrome',
+        title: 'Scopes: ElSidebarScope and ElSidebarChrome',
         facts: <DocsApiFact>[
           DocsApiFact(
-            name: 'DsSidebarScope.open / collapsed',
+            name: 'ElSidebarScope.open / collapsed',
             type: 'bool / bool (get)',
             description:
                 "The desktop panel's flag, and its negation. This is the "
                 'whole of what the reference publishes as useSidebar().',
           ),
           DocsApiFact(
-            name: 'DsSidebarScope.openMobile',
+            name: 'ElSidebarScope.openMobile',
             type: 'bool',
             description:
                 "The mobile sheet's own flag: a separate boolean, as it is "
@@ -1800,19 +1788,19 @@ class _ApiSection extends StatelessWidget {
                 'closing the sheet does not collapse the panel.',
           ),
           DocsApiFact(
-            name: 'DsSidebarScope.isMobile',
+            name: 'ElSidebarScope.isMobile',
             type: 'bool',
             description: 'The viewport is under 768.',
           ),
           DocsApiFact(
-            name: 'DsSidebarScope.setOpen / setOpenMobile / toggleSidebar',
+            name: 'ElSidebarScope.setOpen / setOpenMobile / toggleSidebar',
             type: 'ValueChanged<bool>, ValueChanged<bool>, VoidCallback',
             description:
                 'toggleSidebar routes to whichever of the two flags the '
                 'current width says is live.',
           ),
           DocsApiFact(
-            name: 'DsSidebarScope.of / maybeOf',
+            name: 'ElSidebarScope.of / maybeOf',
             type: 'static',
             description:
                 'of asserts inside a provider, as useSidebar() throws; '
@@ -1820,15 +1808,15 @@ class _ApiSection extends StatelessWidget {
                 'reference would have had no consumer.',
           ),
           DocsApiFact(
-            name: 'DsSidebarChrome.side / variant / collapsible',
-            type: 'DsSidebarSide, DsSidebarVariant, DsSidebarCollapsible?',
+            name: 'ElSidebarChrome.side / variant / collapsible',
+            type: 'ElSidebarSide, ElSidebarVariant, ElSidebarCollapsible?',
             description:
                 'What the panel publishes to the regions inside it. '
                 'collapsible is the collapse mode while collapsed and null '
                 'while expanded, which is the reference conditional exactly.',
           ),
           DocsApiFact(
-            name: 'DsSidebarChrome.iconMode / iconModeOf',
+            name: 'ElSidebarChrome.iconMode / iconModeOf',
             type: 'bool (get) / static bool Function(BuildContext)',
             description:
                 'The one predicate fifteen layout rules read. False outside '
@@ -1837,41 +1825,41 @@ class _ApiSection extends StatelessWidget {
           ),
         ],
       ),
-      SizedBox(height: ds(5)),
+      SizedBox(height: el(5)),
       const DocsApiTable(
-        title: 'DsNavUser (nav_user.dart)',
+        title: 'ElNavUser (nav_user.dart)',
         facts: <DocsApiFact>[
           DocsApiFact(
-            name: 'DsNavUser.user',
-            type: 'DsNavUserAccount',
+            name: 'ElNavUser.user',
+            type: 'ElNavUserAccount',
             description:
                 'Required. Composes one lg row holding an avatar, a two-line '
                 'identity block and a chevron, opening a menu that repeats '
                 'the identity at its head.',
           ),
           DocsApiFact(
-            name: 'DsNavUser.items',
-            type: 'List<DsNavUserItem>',
+            name: 'ElNavUser.items',
+            type: 'List<ElNavUserItem>',
             description:
                 'Required, with no default on purpose: a default list would '
                 'put invented product actions into a chassis meant to travel '
                 'into the next project.',
           ),
           DocsApiFact(
-            name: 'DsNavUser.menuMinWidth',
+            name: 'ElNavUser.menuMinWidth',
             type: 'static double (get)',
-            description: 'ds(56) = 224, the floor under the trigger width.',
+            description: 'el(56) = 224, the floor under the trigger width.',
           ),
           DocsApiFact(
-            name: 'DsNavUserAccount.name / email / avatar',
+            name: 'ElNavUserAccount.name / email / avatar',
             type: 'String, String, ImageProvider?',
             description:
                 'name and email required. initials is derived: the first '
                 'letter of each of the first two words, uppercased.',
           ),
           DocsApiFact(
-            name: 'DsNavUserItem.label / icon / onSelect / destructive',
-            type: 'String, DsLucideGlyph?, VoidCallback?, bool',
+            name: 'ElNavUserItem.label / icon / onSelect / destructive',
+            type: 'String, ElLucideGlyph?, VoidCallback?, bool',
             description:
                 'label required; destructive defaults false. Destructive '
                 'items are gathered below a separator and rendered in the '
@@ -1896,8 +1884,7 @@ class _StatesSection extends StatelessWidget {
         treatment:
             'Expanded: a 256px panel of ghost rows on the sidebar colour. '
             'Collapsed: a 48px rail of 32px glyph squares.',
-        userSignal:
-            'The pill marks the active row; nothing else is painted.',
+        userSignal: 'The pill marks the active row; nothing else is painted.',
       ),
       DocsStateFact(
         state: 'Hover',
@@ -1945,7 +1932,7 @@ class _StatesSection extends StatelessWidget {
         state: 'Loading',
         treatment:
             'N/A: nothing in the family is asynchronous. '
-            'DsSidebarMenuSkeleton is a shimmer row a caller renders '
+            'ElSidebarMenuSkeleton is a shimmer row a caller renders '
             'instead of real rows while its own data loads; the menu has no '
             'loading state of its own to enter.',
         userSignal: 'N/A',
@@ -1953,7 +1940,7 @@ class _StatesSection extends StatelessWidget {
       DocsStateFact(
         state: 'Empty',
         treatment:
-            'Partly applicable. DsSidebarContent.children defaults to an '
+            'Partly applicable. ElSidebarContent.children defaults to an '
             'empty list and renders an empty scrolling column: there is no '
             'empty-state affordance, and none is invented here. A panel '
             'with nothing in it is a blank panel.',
@@ -1962,7 +1949,7 @@ class _StatesSection extends StatelessWidget {
       DocsStateFact(
         state: 'Error',
         treatment:
-            'N/A: no validation anywhere. DsSidebarInput delegates to the '
+            'N/A: no validation anywhere. ElSidebarInput delegates to the '
             'input primitive but exposes no invalid flag, so a sidebar '
             'field cannot be put into an error state through this API.',
         userSignal: 'N/A',
@@ -1976,7 +1963,7 @@ class _StatesSection extends StatelessWidget {
         state: 'Disabled',
         treatment:
             'N/A: there is no enabled or disabled parameter anywhere in '
-            'the family. DsSidebarMenuButton and DsSidebarMenuSubButton '
+            'the family. ElSidebarMenuButton and ElSidebarMenuSubButton '
             'substitute an empty callback when onPressed is null, so a row '
             'without a handler is an inert row rather than a disabled one, '
             'and it still reports itself as an enabled button.',
@@ -1988,12 +1975,11 @@ class _StatesSection extends StatelessWidget {
         state: 'Reduced motion',
         treatment:
             'Every animation in the family runs through '
-            'dsAnimationDuration: the three collapse legs, the group label '
+            'elAnimationDuration: the three collapse legs, the group label '
             'fold, the disclosure line, the rail hover, the pill travel and '
             'its fade, and the jelly squash. Under reduced motion the '
             'collapse is instant and the pill teleports.',
-        userSignal:
-            'The same end states, reached without travel.',
+        userSignal: 'The same end states, reached without travel.',
       ),
     ],
   );
@@ -2008,7 +1994,7 @@ class _AccessibilitySection extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
-      const DsPanel(
+      const ElPanel(
         label: 'What the semantics tree actually carries',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -2019,18 +2005,18 @@ class _AccessibilitySection extends StatelessWidget {
                   'trigger, the rail, each menu row, each sub-button, the '
                   'group and menu actions, and the disclosure line. The '
                   'panel itself is not a landmark and the groups are not '
-                  'headings, DsSidebarGroupLabel is plain text, so group '
+                  'headings, ElSidebarGroupLabel is plain text, so group '
                   'structure is visual only and a screen reader hears one '
                   'flat run of buttons.',
             ),
             _A11yRow(
               'Required labels',
-              'DsSidebarMenuButton resolves its accessible name as '
+              'ElSidebarMenuButton resolves its accessible name as '
                   'label ?? tooltip and hands it to the underlying button, '
-                  'which publishes it as a real name. DsSidebarTrigger and '
-                  'DsSidebarRail both hard-code "Toggle Sidebar". '
-                  'DsSidebarGroupAction and DsSidebarMenuAction each take a '
-                  'required label, which is their only name. DsSidebarInput '
+                  'which publishes it as a real name. ElSidebarTrigger and '
+                  'ElSidebarRail both hard-code "Toggle Sidebar". '
+                  'ElSidebarGroupAction and ElSidebarMenuAction each take a '
+                  'required label, which is their only name. ElSidebarInput '
                   'takes an optional label and has no other name if it is '
                   'omitted.',
             ),
@@ -2096,46 +2082,45 @@ class _AccessibilitySection extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: ds(5)),
-      DsNote(
-        title:
-            'Correcting a plausible assumption about the collapsed rail',
-        child: DsText(
+      SizedBox(height: el(5)),
+      ElNote(
+        title: 'Correcting a plausible assumption about the collapsed rail',
+        child: ElText(
           'The tooltip component wires no Semantics at all, which makes '
           '"an icon-only row whose only label is a tooltip" the obvious '
           'accessibility failure to expect here. Read against the source, '
-          'that is not what happens: DsSidebarMenuButton passes '
+          'that is not what happens: ElSidebarMenuButton passes '
           'label ?? tooltip down as the button accessible name, so a row '
           'given a tooltip is properly named in the semantics tree whether '
           'or not the tooltip overlay is ever shown, and whether or not the '
           'panel is collapsed. The tooltip string is doing double duty as '
           'an accessible name, which is exactly the wiring the tooltip '
           'component itself lacks.',
-          DsType.small,
+          ElType.small,
         ),
       ),
-      SizedBox(height: ds(5)),
-      DsNote(
-        tone: DsNoteTone.error,
+      SizedBox(height: el(5)),
+      ElNote(
+        tone: ElNoteTone.error,
         title: 'Known gap: a collapsed row with neither label nor tooltip',
-        child: DsText(
+        child: ElText(
           'The gap is narrower than the guess, and real. Both label and '
           'tooltip default to null, and nothing requires either. Expanded, '
           'such a row is still named, because its visible text supplies the '
-          'name. Collapsed, DsSidebarMenuRow drops the text and renders the '
+          'name. Collapsed, ElSidebarMenuRow drops the text and renders the '
           'glyph alone, and a glyph carries no text: so the row becomes an '
           'unnamed button, announced as "button" and nothing more, at '
           'exactly the moment its label disappeared from the screen. Always '
-          'give every DsSidebarMenuButton a tooltip, or an explicit label '
+          'give every ElSidebarMenuButton a tooltip, or an explicit label '
           'if the tooltip copy is wrong as a name. The same applies to '
-          'DsSidebarInput, whose label is optional and which has no other '
+          'ElSidebarInput, whose label is optional and which has no other '
           'accessible name. Separately, the rail publishes a named button '
           'node but takes no focus at all, reproducing the reference '
           'tabIndex of -1: it is a 16px control that a keyboard cannot '
           'reach. That is deliberate rather than accidental: '
-          'DsSidebarTrigger does the same job and is reachable, so the rail '
+          'ElSidebarTrigger does the same job and is reachable, so the rail '
           'is a pointer shortcut and never the only way to collapse.',
-          DsType.small,
+          ElType.small,
         ),
       ),
     ],
@@ -2158,8 +2143,8 @@ class _ResponsiveSection extends StatelessWidget {
             name: 'the threshold',
             type: 'width < 768',
             description:
-                'DsSidebarProvider.isMobileWidth compares the media query '
-                'width against DsBreakpoints.md. 767 is mobile, 768 is not. '
+                'ElSidebarProvider.isMobileWidth compares the media query '
+                'width against ElBreakpoints.md. 767 is mobile, 768 is not. '
                 'This is the port of a max-width media query, read from '
                 'MediaQuery rather than from the platform, so a resized '
                 'desktop window crosses it exactly as a phone does.',
@@ -2170,7 +2155,7 @@ class _ResponsiveSection extends StatelessWidget {
             description:
                 'The gap-and-container pair is not built at all. The panel '
                 'becomes a sheet on the same side at '
-                'DsWidths.sidebarMobile (288: deliberately wider than the '
+                'ElWidths.sidebarMobile (288: deliberately wider than the '
                 '256 desktop panel, because a sheet has no main column '
                 'beside it competing for the eye), with its close button '
                 'hidden and a container label of "Sidebar".',
@@ -2206,15 +2191,15 @@ class _ResponsiveSection extends StatelessWidget {
             name: 'the account menu',
             type: 'drops below on mobile',
             description:
-                'DsNavUser opens its menu to the right on desktop and below '
+                'ElNavUser opens its menu to the right on desktop and below '
                 'on mobile, because there is no room beside.',
           ),
         ],
       ),
-      SizedBox(height: ds(5)),
-      DsNote(
+      SizedBox(height: el(5)),
+      ElNote(
         title: 'Two known divergences worth planning around',
-        child: DsText(
+        child: ElText(
           'The rail paints as a 16px strip straddling the panel edge but '
           'only answers a click on its inner half: Flutter hit-tests '
           'nothing outside a box, and the outer half lies over the main '
@@ -2225,7 +2210,7 @@ class _ResponsiveSection extends StatelessWidget {
           'cookie and no store here, so open state does not survive a '
           'restart. If a project needs it, drive the panel with open and '
           'onOpenChange and persist it yourself.',
-          DsType.small,
+          ElType.small,
         ),
       ),
     ],
@@ -2244,7 +2229,7 @@ class _DependenciesSection extends StatelessWidget {
     facts: <DocsInstallFact>[
       const DocsInstallFact(
         label: 'Status',
-        value: 'Stable in the package: not in the registry',
+        value: 'Stable and installable through `elattar add sidebar`',
         description:
             'All thirty-six public names are exported from the public '
             'barrel and covered by test/sidebar_test.dart, but there is no '
@@ -2253,7 +2238,8 @@ class _DependenciesSection extends StatelessWidget {
       const DocsInstallFact(
         label: 'Version',
         value: '0.0.1',
-        description: "The package's own version: there is no manifest "
+        description:
+            "The package's own version: the manifest now ships "
             'version to quote.',
       ),
       const DocsInstallFact(
@@ -2271,7 +2257,8 @@ class _DependenciesSection extends StatelessWidget {
       ),
       const DocsInstallFact(
         label: 'Registry item',
-        value: 'none: no registry manifest exists',
+        value:
+            'badge, button, collapsible, icon, icon-swap, input, keyframes, machine-surface, sheet, skeleton, source-foundation, tooltip',
         description:
             'registry/components/sidebar.json has not been written, so the '
             'CLI cannot resolve this component and no install command is '
@@ -2296,7 +2283,7 @@ class _DependenciesSection extends StatelessWidget {
         value: dependencies.join(', '),
         description:
             'Source-level imports from lib/src/components: not a verified '
-            'registryDependencies list, because there is no manifest to '
+            'registryDependencies list from the shipped manifest, which '
             'verify against. The first nine belong to sidebar.dart, the '
             'last four to nav_user.dart.',
       ),
@@ -2324,8 +2311,7 @@ class _DependenciesSection extends StatelessWidget {
             'test/sidebar_test.dart covers collapse, variants, rows, the '
             'pill, tooltips, disclosure and the mobile branch against the '
             "reference's own measurements; this page's own test drives the "
-            'live specimens. No fixture install was run, because there is '
-            'no manifest to install.',
+            'live specimens and the registry manifest is fixture-tested.',
       ),
     ],
   );
@@ -2340,12 +2326,12 @@ class _ThemingSection extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
-      DsPanel(
+      ElPanel(
         label: 'What actually varies with the theme',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            DsText(
+            ElText(
               'The panel has its own colour pair, separate from the page: '
               'the sidebar fill and the sidebar foreground, which every '
               'region inherits as ambient ink. Borders inside the panel use '
@@ -2355,72 +2341,72 @@ class _ThemingSection extends StatelessWidget {
               'port of the reference --sidebar-* custom properties: fixed '
               'foundation tokens rather than CSS variables, but the same '
               'pair in both places.',
-              DsType.small,
+              ElType.small,
             ),
-            SizedBox(height: ds(3)),
-            DsText(
+            SizedBox(height: el(3)),
+            ElText(
               'The active row does not paint a fill. The pill does, from '
               'the secondary colour with the chip shadow spec, because a '
               'fill alone reads as a smudge and a fill with an edge reads '
               'as a surface. The active row changes only its ink, to the '
               'sidebar accent foreground.',
-              DsType.small,
+              ElType.small,
             ),
-            SizedBox(height: ds(3)),
-            DsText(
+            SizedBox(height: el(3)),
+            ElText(
               'The group label deliberately does not dim. Stock renders it '
               'at 70% strength, which it could afford because its token was '
               'a dark grey; here the token is already the lightest step '
               'that clears AA on both the background and the muted '
               'surfaces, and 70% of it measures 2.76:1 against the 4.5:1 it '
               'owes. At full strength it measures 4.83:1.',
-              DsType.small,
+              ElType.small,
             ),
-            SizedBox(height: ds(3)),
-            DsText(
+            SizedBox(height: el(3)),
+            ElText(
               'Two typed parts collide with their own utilities and lose, '
               'and both are reproduced rather than fixed: the menu badge '
               'keeps only its mono family, tabular figures and tracking, '
               'and the account avatar fallback keeps its weight but not its '
               'size.',
-              DsType.small,
+              ElType.small,
             ),
           ],
         ),
       ),
-      SizedBox(height: ds(5)),
+      SizedBox(height: el(5)),
       const DocsApiTable(
         title: 'Layout tokens the family exposes',
         facts: <DocsApiFact>[
           DocsApiFact(
-            name: 'DsWidths.sidebar',
+            name: 'ElWidths.sidebar',
             type: '256',
             description: 'The expanded panel and the offcanvas travel.',
           ),
           DocsApiFact(
-            name: 'DsWidths.sidebarIcon',
+            name: 'ElWidths.sidebarIcon',
             type: '48',
             description: 'The collapsed rail, and the hit-target floor.',
           ),
           DocsApiFact(
-            name: 'DsWidths.sidebarMobile',
+            name: 'ElWidths.sidebarMobile',
             type: '288',
             description: 'The sheet on a narrow viewport.',
           ),
           DocsApiFact(
-            name: 'DsBreakpoints.md',
+            name: 'ElBreakpoints.md',
             type: '768',
             description: 'The one threshold the family reads.',
           ),
           DocsApiFact(
-            name: 'DsDurations.transitionDefault',
+            name: 'ElDurations.transitionDefault',
             type: '250ms',
             description:
                 'The collapse, the group fold, the disclosure line and the '
                 'rail all run on it.',
           ),
           DocsApiFact(
-            name: 'DsRadii.lg',
+            name: 'ElRadii.lg',
             type: 'the row corner',
             description:
                 'Rows are rounded rather than pilled: a 240px pill is a '
@@ -2464,9 +2450,8 @@ class _SourceSection extends StatelessWidget {
             'github.com/ELATTAR-Ayoub/flutter-design-system/blob/'
             'main/lib/src/components/sidebar.dart',
         description:
-            'Composed from the same repository path every other manifest '
-            'uses: sidebar has no manifest of its own to quote a '
-            'sourceLink from.',
+            'Composed from the same repository path referenced by the '
+            'sidebar registry manifest.',
       ),
       const DocsInstallFact(
         label: 'Tests',
@@ -2499,27 +2484,23 @@ class _SourceSection extends StatelessWidget {
 
 /* ── Live specimens ──────────────────────────────────────────────────────── */
 
-const DsNavUserAccount _account = DsNavUserAccount(
+const ElNavUserAccount _account = ElNavUserAccount(
   name: 'Ayoub Elattar',
   email: 'ayoub@elattar.dev',
 );
 
-const List<DsNavUserItem> _accountItems = <DsNavUserItem>[
-  DsNavUserItem(label: 'Account', icon: DsLucide.badgeCheck),
-  DsNavUserItem(label: 'Billing', icon: DsLucide.creditCard),
-  DsNavUserItem(label: 'Notifications', icon: DsLucide.bell),
-  DsNavUserItem(
-    label: 'Sign out',
-    icon: DsLucide.logOut,
-    destructive: true,
-  ),
+const List<ElNavUserItem> _accountItems = <ElNavUserItem>[
+  ElNavUserItem(label: 'Account', icon: ElLucide.badgeCheck),
+  ElNavUserItem(label: 'Billing', icon: ElLucide.creditCard),
+  ElNavUserItem(label: 'Notifications', icon: ElLucide.bell),
+  ElNavUserItem(label: 'Sign out', icon: ElLucide.logOut, destructive: true),
 ];
 
-const List<({String label, DsIconGlyph icon})> _shellRows =
-    <({String label, DsIconGlyph icon})>[
-      (label: 'Overview', icon: DsIconGlyph.layers),
-      (label: 'Segments', icon: DsIconGlyph.star),
-      (label: 'Revenue', icon: DsIconGlyph.wallet),
+const List<({String label, ElIconGlyph icon})> _shellRows =
+    <({String label, ElIconGlyph icon})>[
+      (label: 'Overview', icon: ElIconGlyph.layers),
+      (label: 'Segments', icon: ElIconGlyph.star),
+      (label: 'Revenue', icon: ElIconGlyph.wallet),
     ];
 
 /// The primary specimen: a real app shell that collapses to an icon rail.
@@ -2528,31 +2509,31 @@ class _ShellSpecimen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return ClipRect(
       child: SizedBox(
         key: const ValueKey<String>('sidebar-doc-specimen-shell'),
-        height: ds(96),
-        child: DsSidebarProvider(
+        height: el(96),
+        child: ElSidebarProvider(
           children: <Widget>[
-            DsSidebar(
-              collapsible: DsSidebarCollapsible.icon,
+            ElSidebar(
+              collapsible: ElSidebarCollapsible.icon,
               children: <Widget>[
-                DsSidebarHeader(
+                ElSidebarHeader(
                   children: <Widget>[
-                    DsSidebarMenu(
+                    ElSidebarMenu(
                       children: <Widget>[
-                        DsSidebarMenuItem(
-                          button: DsSidebarMenuButton(
-                            size: DsSidebarMenuButtonSize.lg,
+                        ElSidebarMenuItem(
+                          button: ElSidebarMenuButton(
+                            size: ElSidebarMenuButtonSize.lg,
                             tooltip: 'Elattar',
-                            child: DsSidebarMenuRow(
-                              size: DsSidebarMenuButtonSize.lg,
-                              leading: DsIcon(
-                                DsIconGlyph.sparkles,
-                                sizePx: DsButton.iconPxFor(DsButtonSize.lg),
+                            child: ElSidebarMenuRow(
+                              size: ElSidebarMenuButtonSize.lg,
+                              leading: ElIcon(
+                                ElIconGlyph.sparkles,
+                                sizePx: ElButton.iconPxFor(ElButtonSize.lg),
                               ),
-                              label: const DsSidebarMenuLabel('Elattar'),
+                              label: const ElSidebarMenuLabel('Elattar'),
                             ),
                           ),
                         ),
@@ -2560,42 +2541,42 @@ class _ShellSpecimen extends StatelessWidget {
                     ),
                   ],
                 ),
-                DsSidebarContent(
+                ElSidebarContent(
                   children: <Widget>[
-                    DsSidebarGroup(
+                    ElSidebarGroup(
                       children: <Widget>[
-                        const DsSidebarGroupLabel('Platform'),
-                        DsSidebarGroupContent(
-                          child: DsSidebarMenu(
+                        const ElSidebarGroupLabel('Platform'),
+                        ElSidebarGroupContent(
+                          child: ElSidebarMenu(
                             children: <Widget>[
                               for (int i = 0; i < _shellRows.length; i++)
-                                DsSidebarMenuItem(
-                                  button: DsSidebarMenuButton(
+                                ElSidebarMenuItem(
+                                  button: ElSidebarMenuButton(
                                     isActive: i == 0,
                                     tooltip: _shellRows[i].label,
-                                    child: DsSidebarMenuRow(
-                                      leading: DsIcon(
+                                    child: ElSidebarMenuRow(
+                                      leading: ElIcon(
                                         _shellRows[i].icon,
-                                        sizePx: DsButton.iconPxFor(
-                                          DsButtonSize.sm,
+                                        sizePx: ElButton.iconPxFor(
+                                          ElButtonSize.sm,
                                         ),
                                       ),
-                                      label: DsSidebarMenuLabel(
+                                      label: ElSidebarMenuLabel(
                                         _shellRows[i].label,
                                       ),
                                     ),
                                   ),
                                   submenu: i == 0
-                                      ? const DsSidebarMenuSub(
+                                      ? const ElSidebarMenuSub(
                                           children: <Widget>[
-                                            DsSidebarMenuSubItem(
-                                              child: DsSidebarMenuSubButton(
+                                            ElSidebarMenuSubItem(
+                                              child: ElSidebarMenuSubButton(
                                                 label: 'Live',
                                                 isActive: true,
                                               ),
                                             ),
-                                            DsSidebarMenuSubItem(
-                                              child: DsSidebarMenuSubButton(
+                                            ElSidebarMenuSubItem(
+                                              child: ElSidebarMenuSubButton(
                                                 label: 'Archived',
                                               ),
                                             ),
@@ -2610,34 +2591,34 @@ class _ShellSpecimen extends StatelessWidget {
                     ),
                   ],
                 ),
-                const DsSidebarFooter(
+                const ElSidebarFooter(
                   children: <Widget>[
-                    DsNavUser(user: _account, items: _accountItems),
+                    ElNavUser(user: _account, items: _accountItems),
                   ],
                 ),
-                const DsSidebarRail(),
+                const ElSidebarRail(),
               ],
             ),
-            DsSidebarInset(
+            ElSidebarInset(
               child: Padding(
-                padding: EdgeInsets.all(ds(4)),
+                padding: EdgeInsets.all(el(4)),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Row(
                       children: <Widget>[
-                        const DsSidebarTrigger(),
-                        SizedBox(width: ds(2)),
-                        DsText('Overview', DsType.h4, color: theme.foreground),
+                        const ElSidebarTrigger(),
+                        SizedBox(width: el(2)),
+                        ElText('Overview', ElType.h4, color: theme.foreground),
                       ],
                     ),
-                    SizedBox(height: ds(3)),
-                    DsText(
+                    SizedBox(height: el(3)),
+                    ElText(
                       'The panel travels 256 to 48 over 250ms. The labels, '
                       'the nested list and the group heading go; the rows '
                       'stay, as 32px squares that name themselves through '
                       'their tooltips.',
-                      DsType.small,
+                      ElType.small,
                       color: theme.mutedForeground,
                     ),
                   ],
@@ -2657,36 +2638,36 @@ class _OffcanvasSpecimen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return ClipRect(
       child: SizedBox(
         key: const ValueKey<String>('sidebar-doc-specimen-offcanvas'),
-        height: ds(64),
-        child: DsSidebarProvider(
+        height: el(64),
+        child: ElSidebarProvider(
           children: <Widget>[
-            DsSidebar(
+            ElSidebar(
               children: <Widget>[
-                DsSidebarContent(
+                ElSidebarContent(
                   children: <Widget>[
-                    DsSidebarGroup(
+                    ElSidebarGroup(
                       children: <Widget>[
-                        const DsSidebarGroupLabel('Workspace'),
-                        DsSidebarGroupContent(
-                          child: DsSidebarMenu(
+                        const ElSidebarGroupLabel('Workspace'),
+                        ElSidebarGroupContent(
+                          child: ElSidebarMenu(
                             children: <Widget>[
                               for (int i = 0; i < _shellRows.length; i++)
-                                DsSidebarMenuItem(
-                                  button: DsSidebarMenuButton(
+                                ElSidebarMenuItem(
+                                  button: ElSidebarMenuButton(
                                     isActive: i == 1,
                                     tooltip: _shellRows[i].label,
-                                    child: DsSidebarMenuRow(
-                                      leading: DsIcon(
+                                    child: ElSidebarMenuRow(
+                                      leading: ElIcon(
                                         _shellRows[i].icon,
-                                        sizePx: DsButton.iconPxFor(
-                                          DsButtonSize.sm,
+                                        sizePx: ElButton.iconPxFor(
+                                          ElButtonSize.sm,
                                         ),
                                       ),
-                                      label: DsSidebarMenuLabel(
+                                      label: ElSidebarMenuLabel(
                                         _shellRows[i].label,
                                       ),
                                     ),
@@ -2699,21 +2680,21 @@ class _OffcanvasSpecimen extends StatelessWidget {
                     ),
                   ],
                 ),
-                const DsSidebarRail(),
+                const ElSidebarRail(),
               ],
             ),
-            DsSidebarInset(
+            ElSidebarInset(
               child: Padding(
-                padding: EdgeInsets.all(ds(4)),
+                padding: EdgeInsets.all(el(4)),
                 child: Row(
                   children: <Widget>[
-                    const DsSidebarTrigger(),
-                    SizedBox(width: ds(2)),
+                    const ElSidebarTrigger(),
+                    SizedBox(width: el(2)),
                     Expanded(
-                      child: DsText(
+                      child: ElText(
                         'Offcanvas: the gap closes to nothing and the panel '
                         'keeps its 256 as it leaves.',
-                        DsType.small,
+                        ElType.small,
                         color: theme.mutedForeground,
                       ),
                     ),
@@ -2735,59 +2716,55 @@ class _PartsSpecimen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => SizedBox(
     key: const ValueKey<String>('sidebar-doc-specimen-parts'),
-    height: ds(120),
-    child: DsSidebarProvider(
+    height: el(120),
+    child: ElSidebarProvider(
       children: <Widget>[
         Expanded(
-          child: DsSidebar(
-            collapsible: DsSidebarCollapsible.none,
+          child: ElSidebar(
+            collapsible: ElSidebarCollapsible.none,
             expand: true,
             children: <Widget>[
-              const DsSidebarHeader(
+              const ElSidebarHeader(
                 children: <Widget>[
-                  DsSidebarInput(placeholder: 'Search', label: 'Search'),
+                  ElSidebarInput(placeholder: 'Search', label: 'Search'),
                 ],
               ),
-              DsSidebarContent(
+              ElSidebarContent(
                 children: <Widget>[
-                  DsSidebarGroup(
+                  ElSidebarGroup(
                     children: <Widget>[
-                      const DsSidebarGroupLabel('Platform'),
-                      DsSidebarGroupContent(
-                        child: DsSidebarMenu(
+                      const ElSidebarGroupLabel('Platform'),
+                      ElSidebarGroupContent(
+                        child: ElSidebarMenu(
                           children: <Widget>[
-                            DsSidebarMenuItem(
-                              button: DsSidebarMenuButton(
+                            ElSidebarMenuItem(
+                              button: ElSidebarMenuButton(
                                 isActive: true,
                                 tooltip: 'Reports',
-                                child: DsSidebarMenuRow(
-                                  leading: DsIcon(
-                                    DsIconGlyph.layers,
-                                    sizePx: DsButton.iconPxFor(
-                                      DsButtonSize.sm,
-                                    ),
+                                child: ElSidebarMenuRow(
+                                  leading: ElIcon(
+                                    ElIconGlyph.layers,
+                                    sizePx: ElButton.iconPxFor(ElButtonSize.sm),
                                   ),
-                                  label: const DsSidebarMenuLabel('Reports'),
+                                  label: const ElSidebarMenuLabel('Reports'),
                                 ),
                               ),
-                              badge: const DsSidebarMenuBadge('3'),
+                              badge: const ElSidebarMenuBadge('3'),
                             ),
-                            DsSidebarMenuItem(
-                              button: DsSidebarMenuButton(
+                            ElSidebarMenuItem(
+                              button: ElSidebarMenuButton(
                                 tooltip: 'Segments',
-                                child: DsSidebarMenuRow(
-                                  leading: DsIcon(
-                                    DsIconGlyph.star,
-                                    sizePx: DsButton.iconPxFor(
-                                      DsButtonSize.sm,
-                                    ),
+                                child: ElSidebarMenuRow(
+                                  leading: ElIcon(
+                                    ElIconGlyph.star,
+                                    sizePx: ElButton.iconPxFor(ElButtonSize.sm),
                                   ),
-                                  label: const DsSidebarMenuLabel('Segments'),
+                                  label: const ElSidebarMenuLabel('Segments'),
                                 ),
                               ),
-                              action: const DsSidebarMenuAction(
+                              action: const ElSidebarMenuAction(
                                 label: 'Add segment',
-                                child: DsIcon(DsIconGlyph.plus),
+                                child: ElIcon(ElIconGlyph.plus),
                               ),
                             ),
                           ],
@@ -2795,39 +2772,37 @@ class _PartsSpecimen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const DsSidebarSeparator(),
-                  DsSidebarCollapsibleGroup(
+                  const ElSidebarSeparator(),
+                  ElSidebarCollapsibleGroup(
                     label: 'Collection',
                     toggleLabel: 'Toggle Collection group',
-                    action: const DsSidebarGroupAction(
+                    action: const ElSidebarGroupAction(
                       label: 'Add to collection',
-                      child: DsIcon(DsIconGlyph.plus),
+                      child: ElIcon(ElIconGlyph.plus),
                     ),
-                    child: DsSidebarMenu(
+                    child: ElSidebarMenu(
                       children: <Widget>[
-                        DsSidebarMenuItem(
-                          button: DsSidebarMenuButton(
+                        ElSidebarMenuItem(
+                          button: ElSidebarMenuButton(
                             tooltip: 'Wallet',
-                            child: DsSidebarMenuRow(
-                              leading: DsIcon(
-                                DsIconGlyph.wallet,
-                                sizePx: DsButton.iconPxFor(DsButtonSize.sm),
+                            child: ElSidebarMenuRow(
+                              leading: ElIcon(
+                                ElIconGlyph.wallet,
+                                sizePx: ElButton.iconPxFor(ElButtonSize.sm),
                               ),
-                              label: const DsSidebarMenuLabel('Wallet'),
+                              label: const ElSidebarMenuLabel('Wallet'),
                             ),
                           ),
-                          submenu: const DsSidebarMenuSub(
+                          submenu: const ElSidebarMenuSub(
                             children: <Widget>[
-                              DsSidebarMenuSubItem(
-                                child: DsSidebarMenuSubButton(
+                              ElSidebarMenuSubItem(
+                                child: ElSidebarMenuSubButton(
                                   label: 'Open',
                                   isActive: true,
                                 ),
                               ),
-                              DsSidebarMenuSubItem(
-                                child: DsSidebarMenuSubButton(
-                                  label: 'Settled',
-                                ),
+                              ElSidebarMenuSubItem(
+                                child: ElSidebarMenuSubButton(label: 'Settled'),
                               ),
                             ],
                           ),
@@ -2835,19 +2810,19 @@ class _PartsSpecimen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const DsSidebarGroup(
+                  const ElSidebarGroup(
                     children: <Widget>[
-                      DsSidebarGroupLabel('Loading'),
-                      DsSidebarGroupContent(
+                      ElSidebarGroupLabel('Loading'),
+                      ElSidebarGroupContent(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
-                            DsSidebarMenuSkeleton(
+                            ElSidebarMenuSkeleton(
                               showIcon: true,
                               seed: 'row-1',
                             ),
-                            DsSidebarMenuSkeleton(
+                            ElSidebarMenuSkeleton(
                               showIcon: true,
                               seed: 'row-2',
                             ),
@@ -2877,15 +2852,15 @@ class _A11yRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return Padding(
-      padding: EdgeInsets.only(bottom: last ? 0 : ds(3)),
+      padding: EdgeInsets.only(bottom: last ? 0 : el(3)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          DsText(label, DsType.label, color: theme.actionInk),
-          SizedBox(height: ds(1)),
-          DsText(body, DsType.small),
+          ElText(label, ElType.label, color: theme.actionInk),
+          SizedBox(height: el(1)),
+          ElText(body, ElType.small),
         ],
       ),
     );
@@ -2899,30 +2874,30 @@ const String _usageMinimalCode =
 
 // The provider owns the state and the Ctrl-B / Cmd-B shortcut; the panel
 // and the main column are its two flex children.
-DsSidebarProvider(
+ElSidebarProvider(
   children: <Widget>[
-    DsSidebar(
-      collapsible: DsSidebarCollapsible.icon,
+    ElSidebar(
+      collapsible: ElSidebarCollapsible.icon,
       children: <Widget>[
-        DsSidebarContent(
+        ElSidebarContent(
           children: <Widget>[
-            DsSidebarGroup(
+            ElSidebarGroup(
               children: <Widget>[
-                const DsSidebarGroupLabel('Platform'),
-                DsSidebarGroupContent(
-                  child: DsSidebarMenu(
+                const ElSidebarGroupLabel('Platform'),
+                ElSidebarGroupContent(
+                  child: ElSidebarMenu(
                     children: <Widget>[
-                      DsSidebarMenuItem(
-                        button: DsSidebarMenuButton(
+                      ElSidebarMenuItem(
+                        button: ElSidebarMenuButton(
                           isActive: true,
                           tooltip: 'Overview',
                           onPressed: () {},
-                          child: DsSidebarMenuRow(
-                            leading: DsIcon(
-                              DsIconGlyph.layers,
-                              sizePx: DsButton.iconPxFor(DsButtonSize.sm),
+                          child: ElSidebarMenuRow(
+                            leading: ElIcon(
+                              ElIconGlyph.layers,
+                              sizePx: ElButton.iconPxFor(ElButtonSize.sm),
                             ),
-                            label: const DsSidebarMenuLabel('Overview'),
+                            label: const ElSidebarMenuLabel('Overview'),
                           ),
                         ),
                       ),
@@ -2933,10 +2908,10 @@ DsSidebarProvider(
             ),
           ],
         ),
-        const DsSidebarRail(),
+        const ElSidebarRail(),
       ],
     ),
-    const DsSidebarInset(child: DsSidebarTrigger()),
+    const ElSidebarInset(child: ElSidebarTrigger()),
   ],
 )''';
 
@@ -2947,47 +2922,47 @@ const String _usageRowCode =
 // AND the accessible name handed to the button underneath. A row given
 // neither tooltip nor label becomes an unnamed button once collapsed,
 // because the visible text that was naming it is gone.
-DsSidebarMenuItem(
-  button: DsSidebarMenuButton(
+ElSidebarMenuItem(
+  button: ElSidebarMenuButton(
     isActive: selected == 'revenue',
     tooltip: 'Revenue',
     onPressed: () => select('revenue'),
-    child: DsSidebarMenuRow(
-      leading: DsIcon(
-        DsIconGlyph.wallet,
-        sizePx: DsButton.iconPxFor(DsButtonSize.sm),
+    child: ElSidebarMenuRow(
+      leading: ElIcon(
+        ElIconGlyph.wallet,
+        sizePx: ElButton.iconPxFor(ElButtonSize.sm),
       ),
-      label: const DsSidebarMenuLabel('Revenue'),
+      label: const ElSidebarMenuLabel('Revenue'),
     ),
   ),
   // Both hide themselves in icon mode, and both widen the row's right
   // padding while they are visible.
-  badge: const DsSidebarMenuBadge('3'),
+  badge: const ElSidebarMenuBadge('3'),
 )''';
 
 const String _usageGroupCode =
     '''// The disclosure line is the trigger, not the title and not the action:
 // clicking the action performs its verb, and the divider only changes
 // disclosure state.
-DsSidebarCollapsibleGroup(
+ElSidebarCollapsibleGroup(
   label: 'Collection',
   toggleLabel: 'Toggle Collection group',
-  action: DsSidebarGroupAction(
+  action: ElSidebarGroupAction(
     label: 'Add to collection',
     onPressed: () {},
-    child: const DsIcon(DsIconGlyph.plus),
+    child: const ElIcon(ElIconGlyph.plus),
   ),
-  child: DsSidebarMenu(
+  child: ElSidebarMenu(
     children: <Widget>[
-      DsSidebarMenuItem(
-        button: const DsSidebarMenuButton(
+      ElSidebarMenuItem(
+        button: const ElSidebarMenuButton(
           tooltip: 'Wallet',
-          child: DsSidebarMenuLabel('Wallet'),
+          child: ElSidebarMenuLabel('Wallet'),
         ),
-        submenu: DsSidebarMenuSub(
+        submenu: ElSidebarMenuSub(
           children: <Widget>[
-            DsSidebarMenuSubItem(
-              child: DsSidebarMenuSubButton(
+            ElSidebarMenuSubItem(
+              child: ElSidebarMenuSubButton(
                 label: 'Open',
                 isActive: true,
                 onPressed: () {},
@@ -3005,43 +2980,43 @@ const String _usageControlledCode =
 // fully replaces the provider's own setState, so a provider that ignores it
 // never moves. This is also the only way to persist panel state: the
 // reference writes a seven-day cookie and this port has no store.
-DsSidebarProvider(
+ElSidebarProvider(
   open: _open,
   onOpenChange: (bool next) => setState(() => _open = next),
-  variant: DsSidebarVariant.inset,
+  variant: ElSidebarVariant.inset,
   minHeight: MediaQuery.sizeOf(context).height,
   children: <Widget>[
-    DsSidebar(
+    ElSidebar(
       // Must match the provider, Flutter has no :has() or peer- selector,
       // so the fact travels down twice.
-      variant: DsSidebarVariant.inset,
-      collapsible: DsSidebarCollapsible.icon,
+      variant: ElSidebarVariant.inset,
+      collapsible: ElSidebarCollapsible.icon,
       children: <Widget>[/* regions */],
     ),
-    DsSidebarInset(child: page),
+    ElSidebarInset(child: page),
   ],
 )''';
 
 const String _usageNavUserCode =
     '''// nav_user.dart: the account block a sidebar footer is incomplete
-// without. It reads DsSidebarScope for isMobile, so it only works inside a
-// provider, and it composes DsSidebarMenu itself: put it straight into the
+// without. It reads ElSidebarScope for isMobile, so it only works inside a
+// provider, and it composes ElSidebarMenu itself: put it straight into the
 // footer, not inside another menu.
-DsSidebarFooter(
+ElSidebarFooter(
   children: <Widget>[
-    DsNavUser(
-      user: const DsNavUserAccount(
+    ElNavUser(
+      user: const ElNavUserAccount(
         name: 'Ayoub Elattar',
         email: 'ayoub@elattar.dev',
       ),
-      items: <DsNavUserItem>[
-        DsNavUserItem(label: 'Account', icon: DsLucide.badgeCheck),
-        DsNavUserItem(label: 'Billing', icon: DsLucide.creditCard),
+      items: <ElNavUserItem>[
+        ElNavUserItem(label: 'Account', icon: ElLucide.badgeCheck),
+        ElNavUserItem(label: 'Billing', icon: ElLucide.creditCard),
         // Destructive items are gathered below a separator, wherever they
         // sit in the list.
-        DsNavUserItem(
+        ElNavUserItem(
           label: 'Sign out',
-          icon: DsLucide.logOut,
+          icon: ElLucide.logOut,
           destructive: true,
           onSelect: signOut,
         ),
@@ -3050,44 +3025,44 @@ DsSidebarFooter(
   ],
 )''';
 
-const String _installShellExcerpt = '''enum DsSidebarSide { left, right }
+const String _installShellExcerpt = '''enum ElSidebarSide { left, right }
 
-enum DsSidebarVariant { sidebar, floating, inset }
+enum ElSidebarVariant { sidebar, floating, inset }
 
-enum DsSidebarCollapsible { offcanvas, icon, none }
+enum ElSidebarCollapsible { offcanvas, icon, none }
 
-class DsSidebarProvider extends StatefulWidget {
-  const DsSidebarProvider({
+class ElSidebarProvider extends StatefulWidget {
+  const ElSidebarProvider({
     super.key,
     required this.children,
     this.defaultOpen = true,
     this.open,
     this.onOpenChange,
-    this.variant = DsSidebarVariant.sidebar,
+    this.variant = ElSidebarVariant.sidebar,
     this.minHeight,
   });
 
   static const LogicalKeyboardKey shortcut = LogicalKeyboardKey.keyB;
-  static bool isMobileWidth(double width) => width < DsBreakpoints.md;
+  static bool isMobileWidth(double width) => width < ElBreakpoints.md;
 }
 
-class DsSidebar extends StatelessWidget {
-  const DsSidebar({
+class ElSidebar extends StatelessWidget {
+  const ElSidebar({
     super.key,
     required this.children,
-    this.side = DsSidebarSide.left,
-    this.variant = DsSidebarVariant.sidebar,
-    this.collapsible = DsSidebarCollapsible.offcanvas,
+    this.side = ElSidebarSide.left,
+    this.variant = ElSidebarVariant.sidebar,
+    this.collapsible = ElSidebarCollapsible.offcanvas,
     this.expand = false,
   });
 }
 
-// Plus: DsSidebarScope, DsSidebarChrome, DsSidebarRail, DsSidebarTrigger,
-// DsSidebarInset, and the region, group and menu parts: see the API
+// Plus: ElSidebarScope, ElSidebarChrome, ElSidebarRail, ElSidebarTrigger,
+// ElSidebarInset, and the region, group and menu parts: see the API
 // Reference section on this page for every one of them.''';
 
-const String _installNavUserExcerpt = '''class DsNavUserAccount {
-  const DsNavUserAccount({
+const String _installNavUserExcerpt = '''class ElNavUserAccount {
+  const ElNavUserAccount({
     required this.name,
     required this.email,
     this.avatar,
@@ -3096,8 +3071,8 @@ const String _installNavUserExcerpt = '''class DsNavUserAccount {
   String get initials;
 }
 
-class DsNavUserItem {
-  const DsNavUserItem({
+class ElNavUserItem {
+  const ElNavUserItem({
     required this.label,
     this.icon,
     this.onSelect,
@@ -3105,8 +3080,8 @@ class DsNavUserItem {
   });
 }
 
-class DsNavUser extends StatelessWidget {
-  const DsNavUser({super.key, required this.user, required this.items});
+class ElNavUser extends StatelessWidget {
+  const ElNavUser({super.key, required this.user, required this.items});
 
-  static double get menuMinWidth => ds(56);
+  static double get menuMinWidth => el(56);
 }''';

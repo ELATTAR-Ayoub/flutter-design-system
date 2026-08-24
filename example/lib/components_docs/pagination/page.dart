@@ -5,8 +5,8 @@
 /// as the reference's own top-of-page preview: no Overview, Status, or
 /// Preview heading precedes Installation. Then Installation, Usage,
 /// Composition, Truncation, Simple, Icons only, and RTL, in that order,
-/// then API Reference. Next.js has no counterpart here: DsPaginationLink
-/// and DsPaginationStep take onTap, not an href/asChild slot a router
+/// then API Reference. Next.js has no counterpart here: ElPaginationLink
+/// and ElPaginationStep take onTap, not an href/asChild slot a router
 /// component could be swapped into, so there is no router-integration
 /// seam to document (see Composition). Changelog has no counterpart
 /// either: it is the reference's own release history, not usage
@@ -18,16 +18,16 @@
 /// **The one fact this page exists to get right:** `lib/src/components/`
 /// `pagination.dart` contains zero truncation logic. There is no
 /// `siblingCount`, no `boundaryCount`, and no `generatePagination`-style
-/// helper anywhere in that file, [DsPagination.children] is a bare
+/// helper anywhere in that file, [ElPagination.children] is a bare
 /// `List<Widget>` and the caller decides, before it ever reaches the widget,
-/// exactly which [DsPaginationLink] / [DsPaginationEllipsis] /
-/// [DsPaginationStep] cells appear and in what order. The `1 … 46 47 48 …
+/// exactly which [ElPaginationLink] / [ElPaginationEllipsis] /
+/// [ElPaginationStep] cells appear and in what order. The `1 … 46 47 48 …
 /// 100` recipe the live demo and Truncation section render with is **this
 /// documentation page's own function** (`_truncatedPageRange` below), not a
 /// package API: see Truncation for the worked example and the exact rule
 /// it implements.
 ///
-/// `pagination` has no registry manifest yet
+/// `pagination` ships in the registry
 /// (`registry/components/pagination.json` does not exist): the Installation
 /// section says so honestly rather than presenting an `elattar add
 /// pagination` command that would fail.
@@ -54,20 +54,20 @@ class PaginationDocPage extends StatelessWidget {
       eyebrow: 'COMPONENTS / BASE',
       title: paginationDoc.title,
       description:
-          'DsPagination is a centred row of cells, page links, an optional '
+          'ElPagination is a centred row of cells, page links, an optional '
           'ellipsis, and a Previous/Next step, built entirely out of '
-          'DsButton: "every cell is a Button asChild wrapped around an '
+          'ElButton: "every cell is a Button asChild wrapped around an '
           '<a>, so the pill, the spring, the focus ring and the press are '
           'the button\'s and are not restated." Reach for it when the '
           'list is bounded and addressable, a grid or table with a known '
           'total page count, not for a feed that only grows from the top '
           '(that is a load-more button). Pair it with a range label at '
-          'the call site: DsPagination renders the page links only and '
+          'the call site: ElPagination renders the page links only and '
           'has no count or total of its own.',
     ),
-    breadcrumbs: const <DsBreadcrumbEntry>[
-      DsBreadcrumbEntry.link('Components'),
-      DsBreadcrumbEntry.page('Pagination'),
+    breadcrumbs: const <ElBreadcrumbEntry>[
+      ElBreadcrumbEntry.link('Components'),
+      ElBreadcrumbEntry.page('Pagination'),
     ],
     sidebar: _sidebar,
     toc: const <DocsTocEntry>[
@@ -173,13 +173,13 @@ class _PaginationArticle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return Column(
       key: const ValueKey<String>('pagination-doc-article'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         _liveDemo(),
-        SizedBox(height: ds(8)),
+        SizedBox(height: el(8)),
         _install(),
         _usage(),
         _composition(),
@@ -199,7 +199,7 @@ class _PaginationArticle extends StatelessWidget {
   }
 
   // The live demo, ahead of any heading: the same shape the reference page
-  // itself opens with (Previous, numbers, an ellipsis, Next). No DsSection
+  // itself opens with (Previous, numbers, an ellipsis, Next). No ElSection
   // wraps it, so it carries no Overview/Status/Preview heading of its own
   // before Installation.
   Widget _liveDemo() => DocsCodeExample(
@@ -214,10 +214,7 @@ class _PaginationArticle extends StatelessWidget {
         path: 'lib/components/ui/pagination.dart',
         code:
             "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
-            '// Pagination has no registry manifest yet: copy\n'
-            '// lib/src/components/pagination.dart from the package\n'
-            '// source directly. There is no generated CLI payload to\n'
-            '// fetch.',
+            '// Install with: elattar add pagination',
       ),
     ],
     preview: const KeyedSubtree(
@@ -226,11 +223,11 @@ class _PaginationArticle extends StatelessWidget {
     ),
   );
 
-  Widget _install() => DsSection(
+  Widget _install() => ElSection(
     id: 'install',
     title: 'Installation',
     description:
-        'pagination has no registry manifest yet, so `elattar add '
+        'pagination ships in the registry, so `elattar add '
         'pagination` is not available: install by copying the source '
         'file manually.',
     child: DocsInstallFacts(
@@ -238,11 +235,10 @@ class _PaginationArticle extends StatelessWidget {
       facts: <DocsInstallFact>[
         const DocsInstallFact(
           label: 'CLI',
-          value: 'Not available yet',
+          value: 'elattar add pagination',
           description:
-              'registry/components/pagination.json does not exist in '
-              'this checkout, so `elattar add pagination` has nothing to '
-              'resolve and will fail against the real registry client.',
+              'Installs registry/components/pagination.json and its declared '
+              'dependency closure.',
         ),
         const DocsInstallFact(
           label: 'Manual',
@@ -264,24 +260,24 @@ class _PaginationArticle extends StatelessWidget {
     ),
   );
 
-  Widget _usage() => DsSection(
+  Widget _usage() => ElSection(
     id: 'usage',
     title: 'Usage',
     description:
         'The smallest correct call: a fixed row with no computed range at '
         'all: then the shape a real caller with a page count builds.',
-    child: DsPanel(
+    child: ElPanel(
       label: 'DART',
       note: 'COMPOSE',
       child: DocsSelectableCodeBlock(code: _usageCode),
     ),
   );
 
-  Widget _composition() => DsSection(
+  Widget _composition() => ElSection(
     id: 'composition',
     title: 'Composition',
     description:
-        'DsPagination has no PaginationContent, PaginationItem, or '
+        'ElPagination has no PaginationContent, PaginationItem, or '
         'PaginationLink to assemble by hand: children is a bare '
         'List<Widget> and the caller builds each cell directly. The tree '
         'below is what a full row looks like once built; beneath it, the '
@@ -290,11 +286,11 @@ class _PaginationArticle extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        DsPanel(
-          label: 'What a DsPagination(children: […]) row assembles',
+        ElPanel(
+          label: 'What a ElPagination(children: […]) row assembles',
           child: DocsSelectableCodeBlock(code: _compositionTree),
         ),
-        SizedBox(height: ds(6)),
+        SizedBox(height: el(6)),
         DocsCodeExample(
           title: 'Composed with other primitives',
           description:
@@ -305,19 +301,19 @@ class _PaginationArticle extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               // Wrapped in the same horizontal scroll every specimen on
-              // this page uses, DsPagination's own Row neither wraps nor
+              // this page uses, ElPagination's own Row neither wraps nor
               // scrolls; see Responsive.
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
-                child: const DsPagination(
+                child: const ElPagination(
                   children: <Widget>[
-                    DsPaginationStep.previous(),
-                    DsPaginationLink(label: '1'),
-                    DsPaginationLink(label: '2', isActive: true),
-                    DsPaginationLink(label: '3'),
-                    DsPaginationEllipsis(),
-                    DsPaginationLink(label: '12'),
-                    DsPaginationStep.next(),
+                    ElPaginationStep.previous(),
+                    ElPaginationLink(label: '1'),
+                    ElPaginationLink(label: '2', isActive: true),
+                    ElPaginationLink(label: '3'),
+                    ElPaginationEllipsis(),
+                    ElPaginationLink(label: '12'),
+                    ElPaginationStep.next(),
                   ],
                 ),
               ),
@@ -330,15 +326,15 @@ class _PaginationArticle extends StatelessWidget {
               description:
                   'The marketplace/Stash pagination row this package '
                   'ships, unchanged: a hard-coded shape, not a derived one.',
-              code: '''const DsPagination(
+              code: '''const ElPagination(
   children: <Widget>[
-    DsPaginationStep.previous(),
-    DsPaginationLink(label: '1'),
-    DsPaginationLink(label: '2', isActive: true),
-    DsPaginationLink(label: '3'),
-    DsPaginationEllipsis(),
-    DsPaginationLink(label: '12'),
-    DsPaginationStep.next(),
+    ElPaginationStep.previous(),
+    ElPaginationLink(label: '1'),
+    ElPaginationLink(label: '2', isActive: true),
+    ElPaginationLink(label: '3'),
+    ElPaginationEllipsis(),
+    ElPaginationLink(label: '12'),
+    ElPaginationStep.next(),
   ],
 )''',
             ),
@@ -348,141 +344,141 @@ class _PaginationArticle extends StatelessWidget {
     ),
   );
 
-  Widget _truncation(DsThemeData theme) => DsSection(
+  Widget _truncation(ElThemeData theme) => ElSection(
     id: 'truncation',
     title: 'Truncation',
     description:
         'This is the one thing this page exists to get right: read it '
         'before reaching for Simple or Icons only.',
     child: ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: DsWidths.prose),
+      constraints: const BoxConstraints(maxWidth: ElWidths.prose),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          DsNote(
-            tone: DsNoteTone.value,
-            title: 'DsPagination computes none of this',
-            child: DsText(
+          ElNote(
+            tone: ElNoteTone.value,
+            title: 'ElPagination computes none of this',
+            child: ElText(
               'lib/src/components/pagination.dart is 227 lines and none of '
               'them compute a page range. There is no siblingCount, no '
               'boundaryCount, and no generatePagination-shaped helper '
-              'anywhere in the file. DsPagination.children is a bare '
+              'anywhere in the file. ElPagination.children is a bare '
               'List<Widget>: the caller decides, before construction, '
-              'exactly which DsPaginationLink, DsPaginationEllipsis, and '
-              'DsPaginationStep cells appear and in what order. If a page '
+              'exactly which ElPaginationLink, ElPaginationEllipsis, and '
+              'ElPaginationStep cells appear and in what order. If a page '
               'range needs computing, the call site computes it: the way '
               "example/lib/pages/navigation.dart's own reference section "
               'hard-codes one fixed shape (1, 2•, 3, …, 12) rather than '
               'deriving it from a page count.',
-              DsType.body,
+              ElType.body,
             ),
           ),
-          SizedBox(height: ds(4)),
-          DsText(
+          SizedBox(height: el(4)),
+          ElText(
             'The rule the specimens on this page render with, '
             '_truncatedPageRange in pagination/page.dart, this '
             'documentation page\'s own function, not a package API: is: ',
-            DsType.body,
+            ElType.body,
           ),
-          SizedBox(height: ds(2)),
+          SizedBox(height: el(2)),
           _bulletColumn(theme, <String>[
             'Page 1 and the last page are always shown.',
             'The current page keeps one sibling on each side '
                 '(siblingCount: 1: a call-site parameter of the demo '
-                'function, not of DsPagination).',
+                'function, not of ElPagination).',
             'A gap that hides exactly one page shows that page plainly '
                 'instead of an ellipsis: collapsing a single number into '
                 'a dots glyph the same width as the number would save '
                 'nothing.',
             'A gap that hides two or more pages collapses to exactly one '
-                'DsPaginationEllipsis cell.',
+                'ElPaginationEllipsis cell.',
           ]),
-          SizedBox(height: ds(4)),
-          DsPanel(
+          SizedBox(height: el(4)),
+          ElPanel(
             label: 'WORKED EXAMPLE',
             note: '100 pages, current page 47',
             child: Padding(
-              padding: EdgeInsets.all(ds(4)),
+              padding: EdgeInsets.all(el(4)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  DsText(
+                  ElText(
                     'siblingCount: 1 keeps 46 and 48. Page 1 and page 100 '
                     'are always shown. The gap between 1 and 46 hides 44 '
                     'pages, so it collapses to one ellipsis; the gap '
                     'between 48 and 100 hides 51 pages, so it collapses '
                     'to one ellipsis too.',
-                    DsType.small,
+                    ElType.small,
                     color: theme.mutedForeground,
                   ),
-                  SizedBox(height: ds(3)),
+                  SizedBox(height: el(3)),
                   const DocsSelectableCodeBlock(
                     code: '1  …  46  47  48  …  100',
                   ),
-                  SizedBox(height: ds(3)),
-                  DsText(
+                  SizedBox(height: el(3)),
+                  ElText(
                     'Move to page 2 instead and the picture changes: '
                     'siblings are 1 and 3, so the left side has nothing '
                     'left to hide (1 is both the boundary and the left '
                     'sibling) and only the right side collapses:',
-                    DsType.small,
+                    ElType.small,
                     color: theme.mutedForeground,
                   ),
-                  SizedBox(height: ds(3)),
+                  SizedBox(height: el(3)),
                   const DocsSelectableCodeBlock(code: '1  2  3  …  100'),
                 ],
               ),
             ),
           ),
-          SizedBox(height: ds(6)),
-          DsText(
+          SizedBox(height: el(6)),
+          ElText(
             'The same rule at the two boundaries a caller must decide by '
-            'omission, not by a disabled parameter: DsPaginationLink and '
-            'DsPaginationStep have no enabled flag; see States.',
-            DsType.body,
+            'omission, not by a disabled parameter: ElPaginationLink and '
+            'ElPaginationStep have no enabled flag; see States.',
+            ElType.body,
           ),
-          SizedBox(height: ds(4)),
+          SizedBox(height: el(4)),
           KeyedSubtree(
             key: const ValueKey<String>('pagination-preview:first-page'),
             child: _EdgeCaseSpecimen(
               caption: 'First page, Previous omitted entirely',
-              child: DsPagination(
+              child: ElPagination(
                 children: <Widget>[
-                  const DsPaginationLink(label: '1', isActive: true),
-                  const DsPaginationLink(label: '2'),
-                  const DsPaginationLink(label: '3'),
-                  const DsPaginationEllipsis(),
-                  const DsPaginationLink(label: '10'),
-                  const DsPaginationStep.next(),
+                  const ElPaginationLink(label: '1', isActive: true),
+                  const ElPaginationLink(label: '2'),
+                  const ElPaginationLink(label: '3'),
+                  const ElPaginationEllipsis(),
+                  const ElPaginationLink(label: '10'),
+                  const ElPaginationStep.next(),
                 ],
               ),
             ),
           ),
-          SizedBox(height: ds(4)),
+          SizedBox(height: el(4)),
           KeyedSubtree(
             key: const ValueKey<String>('pagination-preview:last-page'),
             child: _EdgeCaseSpecimen(
               caption: 'Last page, Next omitted entirely',
-              child: DsPagination(
+              child: ElPagination(
                 children: <Widget>[
-                  const DsPaginationStep.previous(),
-                  const DsPaginationLink(label: '1'),
-                  const DsPaginationEllipsis(),
-                  const DsPaginationLink(label: '8'),
-                  const DsPaginationLink(label: '9'),
-                  const DsPaginationLink(label: '10', isActive: true),
+                  const ElPaginationStep.previous(),
+                  const ElPaginationLink(label: '1'),
+                  const ElPaginationEllipsis(),
+                  const ElPaginationLink(label: '8'),
+                  const ElPaginationLink(label: '9'),
+                  const ElPaginationLink(label: '10', isActive: true),
                 ],
               ),
             ),
           ),
-          SizedBox(height: ds(4)),
+          SizedBox(height: el(4)),
           KeyedSubtree(
             key: const ValueKey<String>('pagination-preview:single-page'),
             child: _EdgeCaseSpecimen(
               caption: 'A single page: no siblings, no ellipsis, no steps',
-              child: const DsPagination(
+              child: const ElPagination(
                 children: <Widget>[
-                  DsPaginationLink(label: '1', isActive: true),
+                  ElPaginationLink(label: '1', isActive: true),
                 ],
               ),
             ),
@@ -492,7 +488,7 @@ class _PaginationArticle extends StatelessWidget {
     ),
   );
 
-  Widget _simple() => DsSection(
+  Widget _simple() => ElSection(
     id: 'simple',
     title: 'Simple',
     description:
@@ -503,26 +499,26 @@ class _PaginationArticle extends StatelessWidget {
       title: 'Simple pagination',
       preview: KeyedSubtree(
         key: const ValueKey<String>('pagination-simple'),
-        child: const DsPagination(
+        child: const ElPagination(
           children: <Widget>[
-            DsPaginationLink(label: '1'),
-            DsPaginationLink(label: '2', isActive: true),
-            DsPaginationLink(label: '3'),
-            DsPaginationLink(label: '4'),
-            DsPaginationLink(label: '5'),
+            ElPaginationLink(label: '1'),
+            ElPaginationLink(label: '2', isActive: true),
+            ElPaginationLink(label: '3'),
+            ElPaginationLink(label: '4'),
+            ElPaginationLink(label: '5'),
           ],
         ),
       ),
       manualFiles: const <DocsCodeFile>[
         DocsCodeFile(
           path: 'simple_pagination.dart',
-          code: '''const DsPagination(
+          code: '''const ElPagination(
   children: <Widget>[
-    DsPaginationLink(label: '1'),
-    DsPaginationLink(label: '2', isActive: true),
-    DsPaginationLink(label: '3'),
-    DsPaginationLink(label: '4'),
-    DsPaginationLink(label: '5'),
+    ElPaginationLink(label: '1'),
+    ElPaginationLink(label: '2', isActive: true),
+    ElPaginationLink(label: '3'),
+    ElPaginationLink(label: '4'),
+    ElPaginationLink(label: '5'),
   ],
 )''',
         ),
@@ -530,34 +526,34 @@ class _PaginationArticle extends StatelessWidget {
     ),
   );
 
-  Widget _iconsOnly() => DsSection(
+  Widget _iconsOnly() => ElSection(
     id: 'icons-only',
     title: 'Icons only',
     description:
         'Previous and Next with no page numbers between them: useful for '
         'a data table with its own rows-per-page control, where a page '
         'link row would only repeat what the table already shows. '
-        'DsPagination renders no rows-per-page picker of its own; pair '
+        'ElPagination renders no rows-per-page picker of its own; pair '
         'it with whatever selection control the table already owns, the '
         'same way Composition pairs the numbered row with a range label.',
     child: DocsCodeExample(
       title: 'Previous and Next only',
       preview: KeyedSubtree(
         key: const ValueKey<String>('pagination-icons-only'),
-        child: const DsPagination(
+        child: const ElPagination(
           children: <Widget>[
-            DsPaginationStep.previous(),
-            DsPaginationStep.next(),
+            ElPaginationStep.previous(),
+            ElPaginationStep.next(),
           ],
         ),
       ),
       manualFiles: const <DocsCodeFile>[
         DocsCodeFile(
           path: 'icons_only_pagination.dart',
-          code: '''const DsPagination(
+          code: '''const ElPagination(
   children: <Widget>[
-    DsPaginationStep.previous(),
-    DsPaginationStep.next(),
+    ElPaginationStep.previous(),
+    ElPaginationStep.next(),
   ],
 )''',
         ),
@@ -565,21 +561,21 @@ class _PaginationArticle extends StatelessWidget {
     ),
   );
 
-  Widget _rtl() => DsSection(
+  Widget _rtl() => ElSection(
     id: 'rtl',
     title: 'RTL',
     description:
         'A genuinely direction-aware cell, not a recorded gap: '
-        'DsPaginationStep builds its tight/loose padding from '
+        'ElPaginationStep builds its tight/loose padding from '
         'EdgeInsetsDirectional and resolves it against '
         'Directionality.of(context), so the tightened edge swaps sides '
         'under RTL the same way the reference\'s own pl-1.5!/pr-1.5! '
         'pair does. The chevron glyph itself does not mirror: '
-        'DsPaginationStep.previous always draws chevronLeft, regardless '
+        'ElPaginationStep.previous always draws chevronLeft, regardless '
         'of direction, exactly as the port\'s own source records.',
     child: DocsCodeExample(
       title: 'Right-to-left pagination',
-      // Same mitigation as every other specimen on this page: DsPagination's
+      // Same mitigation as every other specimen on this page: ElPagination's
       // own Row neither wraps nor scrolls, and Arabic Previous/Next words
       // plus three numbered cells overflow a 390px viewport unmitigated.
       preview: const Directionality(
@@ -588,13 +584,13 @@ class _PaginationArticle extends StatelessWidget {
           scrollDirection: Axis.horizontal,
           child: KeyedSubtree(
             key: ValueKey<String>('pagination-rtl'),
-            child: DsPagination(
+            child: ElPagination(
               children: <Widget>[
-                DsPaginationStep.previous(text: 'السابق'),
-                DsPaginationLink(label: '1'),
-                DsPaginationLink(label: '2', isActive: true),
-                DsPaginationLink(label: '3'),
-                DsPaginationStep.next(text: 'التالي'),
+                ElPaginationStep.previous(text: 'السابق'),
+                ElPaginationLink(label: '1'),
+                ElPaginationLink(label: '2', isActive: true),
+                ElPaginationLink(label: '3'),
+                ElPaginationStep.next(text: 'التالي'),
               ],
             ),
           ),
@@ -605,13 +601,13 @@ class _PaginationArticle extends StatelessWidget {
           path: 'rtl_pagination.dart',
           code: '''Directionality(
   textDirection: TextDirection.rtl,
-  child: DsPagination(
+  child: ElPagination(
     children: <Widget>[
-      DsPaginationStep.previous(text: 'السابق'),
-      DsPaginationLink(label: '1'),
-      DsPaginationLink(label: '2', isActive: true),
-      DsPaginationLink(label: '3'),
-      DsPaginationStep.next(text: 'التالي'),
+      ElPaginationStep.previous(text: 'السابق'),
+      ElPaginationLink(label: '1'),
+      ElPaginationLink(label: '2', isActive: true),
+      ElPaginationLink(label: '3'),
+      ElPaginationStep.next(text: 'التالي'),
     ],
   ),
 )''',
@@ -620,7 +616,7 @@ class _PaginationArticle extends StatelessWidget {
     ),
   );
 
-  Widget _api() => DsSection(
+  Widget _api() => ElSection(
     id: 'api',
     title: 'API Reference',
     description:
@@ -630,22 +626,22 @@ class _PaginationArticle extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         const DocsApiTable(
-          title: 'DsPagination',
+          title: 'ElPagination',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'children',
               type: 'List<Widget>',
               description:
-                  'Required. One cell each, in order, DsPaginationLink, '
-                  'DsPaginationEllipsis, and/or DsPaginationStep, already '
-                  'decided by the caller. DsPagination lays them out; it '
+                  'Required. One cell each, in order, ElPaginationLink, '
+                  'ElPaginationEllipsis, and/or ElPaginationStep, already '
+                  'decided by the caller. ElPagination lays them out; it '
                   'does not choose them.',
             ),
           ],
         ),
-        SizedBox(height: ds(5)),
+        SizedBox(height: el(5)),
         const DocsApiTable(
-          title: 'DsPaginationLink',
+          title: 'ElPaginationLink',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'label',
@@ -656,7 +652,7 @@ class _PaginationArticle extends StatelessWidget {
               name: 'isActive',
               type: 'bool',
               description:
-                  'Defaults to false. Picks the DsButton variant, '
+                  'Defaults to false. Picks the ElButton variant, '
                   'outline when true, ghost when false, and sets '
                   'Semantics.selected, which is what an assistive '
                   'technology reads as "current." There is no third '
@@ -666,26 +662,26 @@ class _PaginationArticle extends StatelessWidget {
               name: 'onTap',
               type: 'VoidCallback?',
               description:
-                  'Defaults to null, which DsPaginationLink itself '
+                  'Defaults to null, which ElPaginationLink itself '
                   'replaces with an empty closure before handing it to '
-                  'DsButton.onPressed: so the cell is always tappable. '
+                  'ElButton.onPressed: so the cell is always tappable. '
                   'There is no way to make one inert; see States.',
             ),
           ],
         ),
-        SizedBox(height: ds(5)),
+        SizedBox(height: el(5)),
         const DocsApiTable(
-          title: 'DsPaginationStep',
+          title: 'ElPaginationStep',
           facts: <DocsApiFact>[
             DocsApiFact(
-              name: 'DsPaginationStep.previous',
+              name: 'ElPaginationStep.previous',
               type: 'const constructor',
               description:
                   'A chevron-left icon before the word. Defaults text to '
                   '"Previous".',
             ),
             DocsApiFact(
-              name: 'DsPaginationStep.next',
+              name: 'ElPaginationStep.next',
               type: 'const constructor',
               description:
                   'A chevron-right icon after the word. Defaults text to '
@@ -705,14 +701,14 @@ class _PaginationArticle extends StatelessWidget {
               type: 'VoidCallback?',
               description:
                   'Same fallback-to-no-op behavior as '
-                  'DsPaginationLink.onTap: always tappable, never truly '
+                  'ElPaginationLink.onTap: always tappable, never truly '
                   'disabled.',
             ),
           ],
         ),
-        SizedBox(height: ds(5)),
+        SizedBox(height: el(5)),
         const DocsApiTable(
-          title: 'DsPaginationEllipsis',
+          title: 'ElPaginationEllipsis',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: '(no fields)',
@@ -725,36 +721,36 @@ class _PaginationArticle extends StatelessWidget {
             ),
           ],
         ),
-        SizedBox(height: ds(5)),
+        SizedBox(height: el(5)),
         const DocsApiTable(
           title: 'Static tokens',
           facts: <DocsApiFact>[
             DocsApiFact(
-              name: 'DsPagination.gap',
+              name: 'ElPagination.gap',
               type: 'static double',
               description: 'The 2px gap between cells (gap-0.5).',
             ),
             DocsApiFact(
-              name: 'DsPaginationStep.tightPadding',
+              name: 'ElPaginationStep.tightPadding',
               type: 'static double',
               description:
                   'The 6px !important-tightened edge: the side the '
                   'chevron sits against.',
             ),
             DocsApiFact(
-              name: 'DsPaginationStep.loosePadding',
+              name: 'ElPaginationStep.loosePadding',
               type: 'static double',
               description:
-                  'The untouched edge, DsButtonSize.md\'s own 16px '
+                  'The untouched edge, ElButtonSize.md\'s own 16px '
                   'horizontal padding, unchanged.',
             ),
             DocsApiFact(
-              name: 'DsPaginationEllipsis.boxSize',
+              name: 'ElPaginationEllipsis.boxSize',
               type: 'static double',
               description: 'The 32px square the glyph centres in (size-8).',
             ),
             DocsApiFact(
-              name: 'DsPaginationEllipsis.glyphSize',
+              name: 'ElPaginationEllipsis.glyphSize',
               type: 'static double',
               description: 'The 16px glyph itself (size-4).',
             ),
@@ -764,17 +760,17 @@ class _PaginationArticle extends StatelessWidget {
     ),
   );
 
-  Widget _states() => DsSection(
+  Widget _states() => ElSection(
     id: 'states',
     title: 'States',
     description:
-        'Every cell is a DsButton, so hover, focus-visible, and pressed '
+        'Every cell is a ElButton, so hover, focus-visible, and pressed '
         'are inherited wholesale: the source\'s own words are "the pill, '
         'the spring, the focus ring and the press are the button\'s and '
         'are not restated," and that is reflected here rather than '
-        're-described. There is no DsPaginationVariant and no size axis '
-        'of its own: DsPaginationLink\'s only look decision is isActive, '
-        'and every cell sits on a fixed DsButtonSize rung (icon for the '
+        're-described. There is no ElPaginationVariant and no size axis '
+        'of its own: ElPaginationLink\'s only look decision is isActive, '
+        'and every cell sits on a fixed ElButtonSize rung (icon for the '
         'numbers and the ellipsis box, md for Previous/Next) that a '
         'caller cannot override. The rows below are grouped and reasoned '
         'rather than invented for the ones that genuinely do not apply.',
@@ -783,8 +779,8 @@ class _PaginationArticle extends StatelessWidget {
         DocsStateFact(
           state: 'Rest',
           treatment:
-              'DsButtonVariant.ghost (numbers, Previous, Next) or '
-              '.outline (the active page) at rest, exactly as DsButton '
+              'ElButtonVariant.ghost (numbers, Previous, Next) or '
+              '.outline (the active page) at rest, exactly as ElButton '
               'paints those variants elsewhere.',
           userSignal:
               'The resting variant already distinguishes the '
@@ -794,17 +790,17 @@ class _PaginationArticle extends StatelessWidget {
           state: 'Hover / Focus-visible / Pressed',
           treatment:
               'Not repainted by pagination.dart: inherited entirely '
-              'from DsButton\'s own hover fill, focus ring, and press '
+              'from ElButton\'s own hover fill, focus ring, and press '
               'spring for whichever variant (ghost or outline) the cell '
               'resolved to.',
           userSignal:
               'Identical to hovering, focusing, or pressing any '
-              'other ghost/outline DsButton in the system.',
+              'other ghost/outline ElButton in the system.',
         ),
         DocsStateFact(
           state: 'Selected',
           treatment:
-              'isActive: true on DsPaginationLink switches the variant '
+              'isActive: true on ElPaginationLink switches the variant '
               'to outline and sets Semantics(selected: true): a real '
               'semantic flag, not styling alone. See Accessibility for '
               'what "selected" does and does not announce.',
@@ -815,22 +811,22 @@ class _PaginationArticle extends StatelessWidget {
         DocsStateFact(
           state: 'Disabled',
           treatment:
-              'N/A by design gap, not by choice, DsPaginationLink and '
-              'DsPaginationStep have no enabled/disabled parameter at '
-              'all. onTap ?? () {} means DsButton.onPressed is never '
-              'null, so DsButton\'s own _enabled is always true: a cell '
+              'N/A by design gap, not by choice, ElPaginationLink and '
+              'ElPaginationStep have no enabled/disabled parameter at '
+              'all. onTap ?? () {} means ElButton.onPressed is never '
+              'null, so ElButton\'s own _enabled is always true: a cell '
               'with no onTap given is still fully hoverable, focusable, '
               'and pressable, it just does nothing when pressed.',
           userSignal:
               'A caller wanting a "disabled Previous" on page 1 must '
-              'omit the DsPaginationStep.previous cell entirely: see '
+              'omit the ElPaginationStep.previous cell entirely: see '
               'the Truncation section\'s boundary specimens, because '
               'nothing here renders a dimmed, inert version of it.',
         ),
         DocsStateFact(
           state: 'Loading / Empty / Error / Success',
           treatment:
-              'N/A, DsPagination and its three cell types are all '
+              'N/A, ElPagination and its three cell types are all '
               'StatelessWidgets with no async parameter, no error state, '
               'and no empty-state rendering. A caller building a loading '
               'or empty list state owns that entirely outside this '
@@ -840,21 +836,21 @@ class _PaginationArticle extends StatelessWidget {
         DocsStateFact(
           state: 'Reduced motion',
           treatment:
-              'Not reimplemented here: whatever DsButton\'s own press '
+              'Not reimplemented here: whatever ElButton\'s own press '
               'spring does under a reduced-motion preference is what '
               'every pagination cell does too, because every cell is a '
-              'DsButton.',
-          userSignal: 'Same as any other DsButton on the page.',
+              'ElButton.',
+          userSignal: 'Same as any other ElButton on the page.',
         ),
       ],
     ),
   );
 
-  Widget _accessibility(DsThemeData theme) => DsSection(
+  Widget _accessibility(ElThemeData theme) => ElSection(
     id: 'accessibility',
     title: 'Accessibility',
     child: _bulletColumn(theme, <String>[
-      'Semantic role and name: DsPagination wraps its row in '
+      'Semantic role and name: ElPagination wraps its row in '
           "Semantics(container: true, label: 'pagination', "
           'explicitChildNodes: true): a named, boundary-marked group '
           'with a real accessible name. It does not set role: '
@@ -866,37 +862,37 @@ class _PaginationArticle extends StatelessWidget {
           'against the web reference\'s role="navigation", not an '
           'oversight left undone.',
       'Current-page announcement: the current page IS announced as a '
-          'state, not styling alone, DsPaginationLink wraps every cell '
+          'state, not styling alone, ElPaginationLink wraps every cell '
           'in Semantics(link: true, selected: isActive). The underlying '
           'flag is "selected," not the web reference\'s '
           'aria-current="page": a different attribute name, same '
           'practical outcome, assistive tech distinguishes the current '
           'page from the rest.',
-      'A merged role: DsButton itself also declares Semantics(button: '
+      'A merged role: ElButton itself also declares Semantics(button: '
           'true, enabled: true, ...) inside every cell, and neither '
           'wrapper sets its own container: true, so Flutter merges the '
           'two into one node carrying both link and button flags '
           'together. Recorded as observed, not corrected: the merge is '
-          'a property of how DsButton is composed into, not a defect '
+          'a property of how ElButton is composed into, not a defect '
           'unique to pagination.',
-      'Keyboard interactions: inherited from DsButton: focusable '
-          '(DsButton\'s canRequestFocus tracks its own _enabled, which is '
+      'Keyboard interactions: inherited from ElButton: focusable '
+          '(ElButton\'s canRequestFocus tracks its own _enabled, which is '
           'always true here; see States), and activated the same way '
-          'any other DsButton is, by keyboard or pointer. Pagination '
+          'any other ElButton is, by keyboard or pointer. Pagination '
           'adds no arrow-key roving-tabindex behavior of its own: every '
           'cell is its own stop in the tab order.',
       'Focus behavior: never moved automatically. Tapping a page number '
           'does not shift focus to a new location or announce the page '
           'change beyond the selected flag updating.',
-      'Touch target: whatever DsButtonSize.icon (40×40) and '
-          'DsButtonSize.md (Previous/Next, auto-width) already '
+      'Touch target: whatever ElButtonSize.icon (40×40) and '
+          'ElButtonSize.md (Previous/Next, auto-width) already '
           'guarantee, pagination adds no padding of its own around a '
           'cell.',
       'Non-colour signal: the outline vs. ghost variant border, plus '
           'the label text itself ("1" vs. "2"), are the visible '
           'signals: colour is never the only cue for which page is '
           'current.',
-      'Screen-reader announcements for the ellipsis: DsPaginationEllipsis '
+      'Screen-reader announcements for the ellipsis: ElPaginationEllipsis '
           'wraps its glyph in ExcludeSemantics, so nothing is announced '
           'for it at all: no "more pages," no count of hidden pages. '
           'The source\'s own comment records the same intent the '
@@ -909,11 +905,11 @@ class _PaginationArticle extends StatelessWidget {
     ]),
   );
 
-  Widget _responsive(DsThemeData theme) => DsSection(
+  Widget _responsive(ElThemeData theme) => ElSection(
     id: 'responsive',
     title: 'Responsive',
     child: _bulletColumn(theme, <String>[
-      'DsPagination lays its children out in a plain Row with '
+      'ElPagination lays its children out in a plain Row with '
           'mainAxisAlignment.center: a Row, not a Wrap. It does not '
           'wrap onto a second line and it does not scroll on its own. A '
           'long page range at a narrow width (the classic case: this '
@@ -921,14 +917,14 @@ class _PaginationArticle extends StatelessWidget {
           'that Row and trigger a RenderFlex overflow unless the call '
           'site does something about it.',
       'This page\'s own mitigation, used for every specimen above: '
-          'wrap DsPagination in a horizontally scrollable region '
+          'wrap ElPagination in a horizontally scrollable region '
           '(SingleChildScrollView(scrollDirection: Axis.horizontal)). '
-          'That is docs-authored composition, not a DsPagination '
+          'That is docs-authored composition, not a ElPagination '
           'feature: the alternative most callers reach for instead is '
           'shrinking siblingCount at narrow widths so the row simply has '
           'fewer cells to lay out.',
-      'Cell sizes do not change with width, DsButtonSize.icon stays a '
-          'fixed 40×40 and DsButtonSize.md keeps its own padding at '
+      'Cell sizes do not change with width, ElButtonSize.icon stays a '
+          'fixed 40×40 and ElButtonSize.md keeps its own padding at '
           'every breakpoint; nothing here reflows or shrinks a cell for '
           'a small screen.',
       'Platform parity: Android, iOS, Web, macOS, Windows, and Linux '
@@ -937,7 +933,7 @@ class _PaginationArticle extends StatelessWidget {
     ]),
   );
 
-  Widget _dependencies() => DsSection(
+  Widget _dependencies() => ElSection(
     id: 'dependencies',
     title: 'Dependencies',
     description:
@@ -949,10 +945,11 @@ class _PaginationArticle extends StatelessWidget {
       facts: <DocsInstallFact>[
         const DocsInstallFact(
           label: 'Status',
-          value: 'Stable primitive, not yet registered in the CLI',
+          value:
+              'Stable primitive, installable through `elattar add pagination`',
           description:
-              'DsPagination, DsPaginationLink, DsPaginationStep, and '
-              'DsPaginationEllipsis are all exported from the public '
+              'ElPagination, ElPaginationLink, ElPaginationStep, and '
+              'ElPaginationEllipsis are all exported from the public '
               'barrel today.',
         ),
         const DocsInstallFact(
@@ -964,7 +961,7 @@ class _PaginationArticle extends StatelessWidget {
         ),
         const DocsInstallFact(
           label: 'Registry item',
-          value: 'not yet registered',
+          value: 'registry/components/pagination.json',
           description:
               'No registry/components/pagination.json exists. This is a '
               'source-only component today.',
@@ -978,10 +975,10 @@ class _PaginationArticle extends StatelessWidget {
           label: 'Direct imports',
           value: 'button, icon, icon_paths, foundation/spacing',
           description:
-              'button.dart (DsButton, DsButtonVariant, DsButtonSize: '
-              'every cell is one), icon.dart (DsIcon, DsIconTone) and '
-              'icon_paths.dart (DsIconGlyph: the chevrons and the '
-              'ellipsis glyph), and foundation/spacing.dart (ds()) for '
+              'button.dart (ElButton, ElButtonVariant, ElButtonSize: '
+              'every cell is one), icon.dart (ElIcon, ElIconTone) and '
+              'icon_paths.dart (ElIconGlyph: the chevrons and the '
+              'ellipsis glyph), and foundation/spacing.dart (el()) for '
               'every measurement on this page. No import of theme.dart, '
               'colors.dart, or shadows.dart directly: see Theming.',
         ),
@@ -1015,39 +1012,39 @@ class _PaginationArticle extends StatelessWidget {
     ),
   );
 
-  Widget _theming(DsThemeData theme) => DsSection(
+  Widget _theming(ElThemeData theme) => ElSection(
     id: 'theming',
     title: 'Theming',
     child: _bulletColumn(theme, <String>[
-      'DsPagination, DsPaginationLink, DsPaginationStep, and '
-          'DsPaginationEllipsis paint no colour of their own: no '
+      'ElPagination, ElPaginationLink, ElPaginationStep, and '
+          'ElPaginationEllipsis paint no colour of their own: no '
           'DecoratedBox, no BoxDecoration, no direct theme.* read '
           'anywhere in pagination.dart. Every fill, border, and ink a '
-          'cell shows comes from the DsButton it wraps (outline or '
-          'ghost variant) or from DsIcon(tone: inherit) reading the '
+          'cell shows comes from the ElButton it wraps (outline or '
+          'ghost variant) or from ElIcon(tone: inherit) reading the '
           'button\'s own DefaultTextStyle.',
-      'Type is inherited, not owned: DsButtonSize.icon sets no text-* '
+      'Type is inherited, not owned: ElButtonSize.icon sets no text-* '
           'class of its own, so the page numbers ("1", "2", "12") render '
           'at the ambient body type, while Previous and Next sit one '
-          'size class smaller (DsButtonSize.md\'s own text-sm) because '
+          'size class smaller (ElButtonSize.md\'s own text-sm) because '
           'they carry a word, not a bare number, a fact about '
-          'DsButton\'s size rungs, not a themeable pagination property.',
-      'DsPaginationEllipsis is a fixed 32px square in the 40px row, 4px '
+          'ElButton\'s size rungs, not a themeable pagination property.',
+      'ElPaginationEllipsis is a fixed 32px square in the 40px row, 4px '
           'shorter on every side than the number cells beside it, at '
           'every theme and breakpoint: sizing is not a themeable token '
           'here.',
-      'Flipping DsThemeController between light and dark re-resolves '
-          'DsButton\'s own outline/ghost tokens exactly as it does '
-          'anywhere else DsButton is used: pagination has no cached or '
+      'Flipping ElThemeController between light and dark re-resolves '
+          'ElButton\'s own outline/ghost tokens exactly as it does '
+          'anywhere else ElButton is used: pagination has no cached or '
           'independent colour of its own to go stale.',
       'There is no pagination-specific theming surface to override: a '
           'caller who needs a different look for a cell is overriding '
-          'DsButton\'s variant tokens, not a parameter this component '
+          'ElButton\'s variant tokens, not a parameter this component '
           'exposes.',
     ]),
   );
 
-  Widget _source() => DsSection(
+  Widget _source() => ElSection(
     id: 'source',
     title: 'Source',
     child: DocsInstallFacts(
@@ -1088,7 +1085,7 @@ class _PaginationArticle extends StatelessWidget {
 
 /// The interactive worked example: 100 pages, starting on page 47. Tapping
 /// any rendered page number (or Previous/Next) moves the current page and
-/// re-truncates the row around it: a real, mounted [DsPagination], not an
+/// re-truncates the row around it: a real, mounted [ElPagination], not an
 /// illustration.
 class _TruncatedPaginationSpecimen extends StatefulWidget {
   const _TruncatedPaginationSpecimen();
@@ -1110,7 +1107,7 @@ class _TruncatedPaginationSpecimenState
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     final List<int?> range = _truncatedPageRange(
       totalPages: _totalPages,
       currentPage: _current,
@@ -1119,29 +1116,29 @@ class _TruncatedPaginationSpecimenState
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         // Horizontal scroll is this page's own mitigation for the Row that
-        // DsPagination itself never wraps or scrolls: see Responsive.
+        // ElPagination itself never wraps or scrolls: see Responsive.
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
-          child: DsPagination(
+          child: ElPagination(
             children: <Widget>[
-              DsPaginationStep.previous(onTap: () => _goTo(_current - 1)),
+              ElPaginationStep.previous(onTap: () => _goTo(_current - 1)),
               for (final int? page in range)
                 if (page == null)
-                  const DsPaginationEllipsis()
+                  const ElPaginationEllipsis()
                 else
-                  DsPaginationLink(
+                  ElPaginationLink(
                     label: '$page',
                     isActive: page == _current,
                     onTap: () => _goTo(page),
                   ),
-              DsPaginationStep.next(onTap: () => _goTo(_current + 1)),
+              ElPaginationStep.next(onTap: () => _goTo(_current + 1)),
             ],
           ),
         ),
-        SizedBox(height: ds(3)),
-        DsText(
+        SizedBox(height: el(3)),
+        ElText(
           'Current page: $_current of $_totalPages',
-          DsType.small,
+          ElType.small,
           color: theme.mutedForeground,
         ),
       ],
@@ -1149,10 +1146,10 @@ class _TruncatedPaginationSpecimenState
   }
 }
 
-/// A static, non-interactive [DsPagination] specimen plus its own caption:
+/// A static, non-interactive [ElPagination] specimen plus its own caption:
 /// the shape for a boundary or degenerate composition (first page, last
 /// page, a single page) that the caller decides by which cells it includes,
-/// not by a parameter DsPagination reads.
+/// not by a parameter ElPagination reads.
 class _EdgeCaseSpecimen extends StatelessWidget {
   const _EdgeCaseSpecimen({required this.caption, required this.child});
 
@@ -1161,71 +1158,70 @@ class _EdgeCaseSpecimen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        DsText(caption, DsType.small, color: theme.mutedForeground),
-        SizedBox(height: ds(2)),
+        ElText(caption, ElType.small, color: theme.mutedForeground),
+        SizedBox(height: el(2)),
         SingleChildScrollView(scrollDirection: Axis.horizontal, child: child),
       ],
     );
   }
 }
 
-Widget _bulletColumn(DsThemeData theme, List<String> lines) => Column(
+Widget _bulletColumn(ElThemeData theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: DsWidths.prose),
-        child: DsText('•  $line', DsType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
       ),
-      SizedBox(height: ds(2)),
+      SizedBox(height: el(2)),
     ],
   ],
 );
 
-const String _compositionTree =
-    '''DsPagination(children: [ … ])
+const String _compositionTree = '''ElPagination(children: [ … ])
  // each cell in children is one of:
- DsPaginationStep.previous()   // chevron + word, before the numbers
- DsPaginationLink(label: '1')  // one numbered page
- DsPaginationEllipsis()        // a collapsed run of hidden pages
- DsPaginationStep.next()       // chevron + word, after the numbers''';
+ ElPaginationStep.previous()   // chevron + word, before the numbers
+ ElPaginationLink(label: '1')  // one numbered page
+ ElPaginationEllipsis()        // a collapsed run of hidden pages
+ ElPaginationStep.next()       // chevron + word, after the numbers''';
 
 const String _usageCode = '''
 // The smallest correct call: a fixed row, no computed range at all.
-const DsPagination(
+const ElPagination(
   children: <Widget>[
-    DsPaginationStep.previous(),
-    DsPaginationLink(label: '1', isActive: true),
-    DsPaginationLink(label: '2'),
-    DsPaginationLink(label: '3'),
-    DsPaginationStep.next(),
+    ElPaginationStep.previous(),
+    ElPaginationLink(label: '1', isActive: true),
+    ElPaginationLink(label: '2'),
+    ElPaginationLink(label: '3'),
+    ElPaginationStep.next(),
   ],
 )
 
 // A real caller with a page count computes the range itself: pagination
 // does not do this for you (see Truncation): then builds the same shapes:
-DsPagination(
+ElPagination(
   children: <Widget>[
-    DsPaginationStep.previous(onTap: page > 1 ? () => goTo(page - 1) : null),
+    ElPaginationStep.previous(onTap: page > 1 ? () => goTo(page - 1) : null),
     for (final int? p in myTruncatedRange(total: total, current: page))
       if (p == null)
-        const DsPaginationEllipsis()
+        const ElPaginationEllipsis()
       else
-        DsPaginationLink(
+        ElPaginationLink(
           label: '\$p',
           isActive: p == page,
           onTap: () => goTo(p),
         ),
-    DsPaginationStep.next(
+    ElPaginationStep.next(
       onTap: page < total ? () => goTo(page + 1) : null,
     ),
   ],
 )
 
 // onTap: null above is still tappable: it just becomes a no-op via
-// `onTap ?? () {}`. Omit the whole DsPaginationStep cell instead if the
+// `onTap ?? () {}`. Omit the whole ElPaginationStep cell instead if the
 // boundary must render as genuinely inert; see States.''';

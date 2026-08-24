@@ -3,29 +3,29 @@
 /// Section shape mirrors `https://ui.shadcn.com/docs/components/base/toast`
 /// section for section: a live demo ahead of any heading, Installation,
 /// Usage, then the component's own sections -- When to use it, Types
-/// (`DsToastType`'s six values), Action, Promise -- then API Reference.
+/// (`ElToastType`'s six values), Action, Promise -- then API Reference.
 /// shadcn's Toast API Reference links out to Base UI's own docs; this page
-/// tables the equivalent surface directly instead, since [DsToaster] and
-/// [DsToastController] are this package's own implementation rather than a
+/// tables the equivalent surface directly instead, since [ElToaster] and
+/// [ElToastController] are this package's own implementation rather than a
 /// wrapper over a third-party primitive. States, Accessibility, Responsive,
 /// Dependencies, Theming, and Source are this package's own six sections,
-/// added after API Reference. Each gets its own [DsSection]; title/
+/// added after API Reference. Each gets its own [ElSection]; title/
 /// description and previous/next come from [DocsLayout].
 ///
-/// [DsToaster] and [DsToastController] are the Flutter analogue of sonner's
+/// [ElToaster] and [ElToastController] are the Flutter analogue of sonner's
 /// own split, `lib/src/components/toaster.dart`'s own library doc states it
 /// plainly: a host mounted once, and a controller a caller fires into from
 /// anywhere. Both halves are documented in full below: the host's own two
 /// constructor parameters, its 21 static timing-and-layout constants, and
-/// every method [DsToastController] exposes as the actual imperative surface
+/// every method [ElToastController] exposes as the actual imperative surface
 /// (`controller.success(...)` and friends): nothing here manufactures a
 /// shadcn/sonner example the Dart API does not support.
 ///
-/// The live specimen mounts [DsToaster] the same way the real app does --
+/// The live specimen mounts [ElToaster] the same way the real app does --
 /// `Positioned.fill` inside a `Stack`, exactly as `example/lib/site/
 /// site_shell.dart`'s `SiteShell` and `example/lib/showcase/
 /// showcase_app.dart`'s `SignalStudioApp` both mount it: over a
-/// [DsToastController] this page owns and disposes itself, rather than
+/// [ElToastController] this page owns and disposes itself, rather than
 /// reaching into the site's shared `siteToasts` singleton.
 library;
 
@@ -51,9 +51,9 @@ class ToasterDocPage extends StatelessWidget {
       title: toasterDoc.title,
       description: toasterDoc.description,
     ),
-    breadcrumbs: const <DsBreadcrumbEntry>[
-      DsBreadcrumbEntry.link('Components'),
-      DsBreadcrumbEntry.page('Toaster'),
+    breadcrumbs: const <ElBreadcrumbEntry>[
+      ElBreadcrumbEntry.link('Components'),
+      ElBreadcrumbEntry.page('Toaster'),
     ],
     toc: const <DocsTocEntry>[
       DocsTocEntry(title: 'Installation', anchor: 'install'),
@@ -89,19 +89,19 @@ class _ToasterArticle extends StatelessWidget {
     children: <Widget>[
       // Live demo, ahead of any heading -- exactly as shadcn's own "Show
       // Toast" trigger sits above its first Installation heading. A real
-      // DsToastController, fired into by the controls below, over a real
-      // DsToaster mounted the same Positioned.fill-inside-a-Stack way the
+      // ElToastController, fired into by the controls below, over a real
+      // ElToaster mounted the same Positioned.fill-inside-a-Stack way the
       // public site's own shell mounts it. Nothing paints until a control is
-      // pressed -- DsToaster.build returns an empty box while its controller
+      // pressed -- ElToaster.build returns an empty box while its controller
       // is queue-empty, the same as it does at the app root.
       Padding(
-        padding: EdgeInsets.only(bottom: ds(20)),
+        padding: EdgeInsets.only(bottom: el(20)),
         child: DocsCodeExample(
           title: 'Live specimen',
           description:
-              'Each control calls a different DsToastController method; '
-              '"Clear all" calls DsToastController.clear(). Resize the '
-              'window below 600px (DsToaster.mobileBreakpoint) to see the '
+              'Each control calls a different ElToastController method; '
+              '"Clear all" calls ElToastController.clear(). Resize the '
+              'window below 600px (ElToaster.mobileBreakpoint) to see the '
               'compact, top-anchored, full-width treatment take over.',
           preview: const _ToasterPreview(),
           manualFiles: const <DocsCodeFile>[
@@ -117,7 +117,7 @@ class _ToasterArticle extends StatelessWidget {
 
       // Installation with Command/Manual tabs, plus the status facts a
       // caller needs before copying the source (no CLI item yet).
-      DsSection(
+      ElSection(
         id: 'install',
         title: 'Installation',
         description:
@@ -141,7 +141,7 @@ class _ToasterArticle extends StatelessWidget {
                       'Paste the full toaster.dart source here; its '
                       'imports (effects/bloom_cosmic.dart, effects/'
                       'machine_surface.dart, foundation/*, theme_scope.dart, '
-                      'ds_safe_area.dart, icon.dart, icon_paths.dart) '
+                      'el_safe_area.dart, icon.dart, icon_paths.dart) '
                       'resolve once the file sits beside the rest of '
                       'components/ui.',
                   code:
@@ -151,13 +151,13 @@ class _ToasterArticle extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: ds(5)),
+            SizedBox(height: el(5)),
             const DocsInstallFacts(
               title: 'Installation facts',
               facts: <DocsInstallFact>[
                 DocsInstallFact(
                   label: 'Status',
-                  value: 'Source-available, not registry-listed',
+                  value: 'Registry install available',
                   description:
                       'Ships in the package today; elattar add toaster is '
                       'not wired up yet.',
@@ -186,10 +186,10 @@ class _ToasterArticle extends StatelessWidget {
       // Usage: the smallest correct example, matching shadcn's own import +
       // basic-construction Usage section. Action and Promise get their own
       // sections below, mirroring the counterpart's own split.
-      DsSection(
+      ElSection(
         id: 'usage',
         title: 'Usage',
-        child: DsPanel(
+        child: ElPanel(
           label: 'DART',
           note: 'SMALLEST CORRECT EXAMPLE',
           child: const DocsSelectableCodeBlock(code: _smallestUsageCode),
@@ -197,10 +197,10 @@ class _ToasterArticle extends StatelessWidget {
       ),
 
       // When to use it: decision guidance shadcn's own toast page has no
-      // counterpart for, since DsAlert and DsAlertDialog are this package's
+      // counterpart for, since ElAlert and ElAlertDialog are this package's
       // own siblings rather than Base UI primitives shadcn's page would
       // cross-link to.
-      DsSection(
+      ElSection(
         id: 'when-to-use',
         title: 'When to use it',
         description:
@@ -208,90 +208,90 @@ class _ToasterArticle extends StatelessWidget {
             'and clears itself on a timer -- never a question, and never '
             'part of the page\'s own content.',
         child: const _Prose(<String>[
-          'DsToaster and DsToastController together are the Flutter '
-              'analogue of sonner\'s own split: DsToaster is a host, '
+          'ElToaster and ElToastController together are the Flutter '
+              'analogue of sonner\'s own split: ElToaster is a host, '
               'mounted once near the app root -- Positioned.fill inside a '
               'Stack, exactly as this page\'s own live specimen does it -- '
               'and it paints nothing until something is queued. Every '
               'toast is fired into it from anywhere by holding a reference '
-              'to the DsToastController it is mounted with, the way '
+              'to the ElToastController it is mounted with, the way '
               'toast(...) is a module-level singleton on the web. At most '
-              'DsToaster.visibleLimit (3) are ever on screen at once; a '
+              'ElToaster.visibleLimit (3) are ever on screen at once; a '
               'fourth toast waits its turn with its own auto-dismiss clock '
               'unstarted.',
-          'Reach for an alert (DsAlert) instead when the message belongs '
+          'Reach for an alert (ElAlert) instead when the message belongs '
               'to the page\'s own content and should stay exactly where '
-              'it is mounted until whatever renders it removes it. DsAlert '
+              'it is mounted until whatever renders it removes it. ElAlert '
               'never times out and never floats -- it lays out like any '
               'other block in the page\'s own flow, and the caller owns '
-              'its lifetime; DsToaster owns a toast\'s lifetime instead, '
-              'on a real clock (DsToaster.lifetime, 4000ms by default).',
+              'its lifetime; ElToaster owns a toast\'s lifetime instead, '
+              'on a real clock (ElToaster.lifetime, 4000ms by default).',
           'Reach for an alert dialog instead when the situation blocks '
               'the page and demands one answer before the user can '
               'continue -- a confirmation, an irreversible action. It '
-              'shares DsDialogContent\'s own panel and its scrim, both of '
+              'shares ElDialogContent\'s own panel and its scrim, both of '
               'which a toast has neither of: a toast never intercepts a '
               'pointer outside its own box, and it clears itself without '
               'asking.',
         ]),
       ),
 
-      // Types: the six DsToastType values (five typed, one default) -- the
+      // Types: the six ElToastType values (five typed, one default) -- the
       // status variants shadcn's own Types section demonstrates.
-      DsSection(
+      ElSection(
         id: 'types',
         title: 'Types',
         description:
-            'Six DsToastType values (five typed, one default), each '
+            'Six ElToastType values (five typed, one default), each '
             'selecting an icon glyph, an ink color, and the bloom\'s two '
             'stops -- the card fill, border, radius and padding never '
             'change.',
         child: const DocsApiTable(
-          title: 'DsToastType',
+          title: 'ElToastType',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'success',
-              type: 'DsToastType',
+              type: 'ElToastType',
               description:
-                  'data-type="success". Icon: DsIconGlyph.circleCheck. '
+                  'data-type="success". Icon: ElIconGlyph.circleCheck. '
                   'Ink: theme.successInk. Bloom: --color-success / '
                   '--color-value.',
             ),
             DocsApiFact(
               name: 'info',
-              type: 'DsToastType',
+              type: 'ElToastType',
               description:
-                  'data-type="info". Icon: DsIconGlyph.info. Ink: '
+                  'data-type="info". Icon: ElIconGlyph.info. Ink: '
                   'theme.infoInk.',
             ),
             DocsApiFact(
               name: 'warning',
-              type: 'DsToastType',
+              type: 'ElToastType',
               description:
-                  'data-type="warning". Icon: DsIconGlyph.alertTriangle. '
+                  'data-type="warning". Icon: ElIconGlyph.alertTriangle. '
                   'Ink: theme.warningInk. Its bloom pair '
-                  '(DsBloomCosmic.toastWarning) is the one variant that '
-                  'does not match DsAlert\'s own warning bloom.',
+                  '(ElBloomCosmic.toastWarning) is the one variant that '
+                  'does not match ElAlert\'s own warning bloom.',
             ),
             DocsApiFact(
               name: 'error',
-              type: 'DsToastType',
+              type: 'ElToastType',
               description:
-                  'data-type="error". Icon: DsIconGlyph.octagonX. Ink: '
+                  'data-type="error". Icon: ElIconGlyph.octagonX. Ink: '
                   'theme.destructiveInk.',
             ),
             DocsApiFact(
               name: 'loading',
-              type: 'DsToastType',
+              type: 'ElToastType',
               description:
-                  'data-type="loading". Icon: DsIconGlyph.loaderCircle, '
+                  'data-type="loading". Icon: ElIconGlyph.loaderCircle, '
                   'and it does not spin -- the source ships it with no '
                   'spin animation, confirmed against the live reference '
                   'too. The one type with no auto-dismiss clock at all.',
             ),
             DocsApiFact(
               name: 'normal',
-              type: 'DsToastType',
+              type: 'ElToastType',
               description:
                   'The default (label reads "default" -- default is a '
                   'Dart keyword). No data-type attribute is ever set, and '
@@ -303,32 +303,32 @@ class _ToasterArticle extends StatelessWidget {
         ),
       ),
 
-      // Action: adding an action pill via DsToastAction, mirroring shadcn's
+      // Action: adding an action pill via ElToastAction, mirroring shadcn's
       // own actionProps section.
-      DsSection(
+      ElSection(
         id: 'action',
         title: 'Action',
         description:
-            'Pass action to any DsToastController call to add a pill at '
+            'Pass action to any ElToastController call to add a pill at '
             'the far right of the row. Pressing it runs onPressed first '
             'and dismisses the toast right after, whether or not '
             'onPressed is null.',
-        child: DsPanel(
+        child: ElPanel(
           label: 'DART',
           note: 'ERROR TOAST WITH AN ACTION',
           child: const DocsSelectableCodeBlock(code: _actionUsageCode),
         ),
       ),
 
-      // Promise: DsToastController.promise, mirroring shadcn's own Promise
+      // Promise: ElToastController.promise, mirroring shadcn's own Promise
       // section (loading, then a success or error transition). The manual
       // loading + settle flow is the same shape written by hand, for an
       // async sequence that does not reduce to a single Future.
-      DsSection(
+      ElSection(
         id: 'promise',
         title: 'Promise',
         description:
-            'DsToastController.promise shows the loading message '
+            'ElToastController.promise shows the loading message '
             'immediately and swaps the settled one into the SAME toast '
             'when the future completes -- same id, same box, same '
             'position in the stack, no exit and no second entrance. The '
@@ -339,13 +339,13 @@ class _ToasterArticle extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            DsPanel(
+            ElPanel(
               label: 'DART',
               note: 'PROMISE-BACKED SAVE',
               child: const DocsSelectableCodeBlock(code: _promiseUsageCode),
             ),
-            SizedBox(height: ds(5)),
-            DsPanel(
+            SizedBox(height: el(5)),
+            ElPanel(
               label: 'DART',
               note: 'MANUAL LOADING + SETTLE',
               child: const DocsSelectableCodeBlock(code: _compositionCode),
@@ -359,14 +359,14 @@ class _ToasterArticle extends StatelessWidget {
       // shadcn's own Toast API Reference links out to Base UI's docs; this
       // page tables the equivalent surface directly, since it is this
       // package's own implementation rather than a third-party wrapper.
-      DsSection(
+      ElSection(
         id: 'api',
         title: 'API Reference',
         description:
-            'Every DsToaster constructor parameter and static member, '
-            'every DsToastController method, and every DsToastMessage / '
-            'DsToastAction field, read directly from '
-            'lib/src/components/toaster.dart. DsToastController also '
+            'Every ElToaster constructor parameter and static member, '
+            'every ElToastController method, and every ElToastMessage / '
+            'ElToastAction field, read directly from '
+            'lib/src/components/toaster.dart. ElToastController also '
             'exposes length, visibleCount, and messageOf(id) under '
             '@visibleForTesting -- test-only introspection, not part of '
             'the surface a call site is meant to drive, so they are noted '
@@ -375,11 +375,11 @@ class _ToasterArticle extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             const DocsApiTable(
-              title: 'DsToaster -- the overlay host (constructor)',
+              title: 'ElToaster -- the overlay host (constructor)',
               facts: <DocsApiFact>[
                 DocsApiFact(
                   name: 'controller',
-                  type: 'DsToastController',
+                  type: 'ElToastController',
                   description:
                       'Required. The queue this host paints from -- fire '
                       'real toasts into it by calling its show / success / '
@@ -388,36 +388,36 @@ class _ToasterArticle extends StatelessWidget {
                 ),
                 DocsApiFact(
                   name: 'position',
-                  type: 'DsToastPosition',
+                  type: 'ElToastPosition',
                   description:
-                      'Optional, defaults to DsToastPosition.bottomRight. '
+                      'Optional, defaults to ElToastPosition.bottomRight. '
                       'The wide-viewport corner only -- at or below '
-                      'DsToaster.mobileBreakpoint (600px) the stack always '
+                      'ElToaster.mobileBreakpoint (600px) the stack always '
                       're-anchors to the top edge regardless of this '
                       'value; see Responsive below.',
                 ),
               ],
             ),
-            SizedBox(height: ds(8)),
+            SizedBox(height: el(8)),
             const DocsApiTable(
-              title: 'DsToaster -- static timing & layout constants',
+              title: 'ElToaster -- static timing & layout constants',
               facts: <DocsApiFact>[
                 DocsApiFact(
-                  name: 'DsToaster.width (static)',
+                  name: 'ElToaster.width (static)',
                   type: 'double',
                   description:
                       '356 -- the fixed toast width on a wide viewport '
                       '(sonner\'s width: var(--width, 22.25rem)).',
                 ),
                 DocsApiFact(
-                  name: 'DsToaster.gap (static)',
+                  name: 'ElToaster.gap (static)',
                   type: 'double',
                   description:
                       '14 -- the vertical space between two stacked '
                       'toasts (sonner\'s GAP).',
                 ),
                 DocsApiFact(
-                  name: 'DsToaster.viewportOffset (static)',
+                  name: 'ElToaster.viewportOffset (static)',
                   type: 'double',
                   description:
                       '24 -- the inset from each edge of the anchored '
@@ -425,7 +425,7 @@ class _ToasterArticle extends StatelessWidget {
                       'VIEWPORT_OFFSET).',
                 ),
                 DocsApiFact(
-                  name: 'DsToaster.mobileViewportOffset (static)',
+                  name: 'ElToaster.mobileViewportOffset (static)',
                   type: 'double',
                   description:
                       '16 -- the inset on every edge once compact, '
@@ -433,14 +433,14 @@ class _ToasterArticle extends StatelessWidget {
                       '(sonner\'s MOBILE_VIEWPORT_OFFSET).',
                 ),
                 DocsApiFact(
-                  name: 'DsToaster.mobileBreakpoint (static)',
+                  name: 'ElToaster.mobileBreakpoint (static)',
                   type: 'double',
                   description:
                       '600 -- sonner\'s one and only breakpoint '
                       '(@media (max-width: 600px), inclusive).',
                 ),
                 DocsApiFact(
-                  name: 'DsToaster.visibleLimit (static)',
+                  name: 'ElToaster.visibleLimit (static)',
                   type: 'int',
                   description:
                       '3 -- at most this many toasts are painted at once '
@@ -448,50 +448,50 @@ class _ToasterArticle extends StatelessWidget {
                       'the third waits its turn with its clock unstarted.',
                 ),
                 DocsApiFact(
-                  name: 'DsToaster.lifetime (static)',
+                  name: 'ElToaster.lifetime (static)',
                   type: 'Duration',
                   description:
                       'Duration(seconds: 4) -- 4000ms. Sonner\'s '
-                      'TOAST_LIFETIME, and DsToastMessage.duration\'s own '
+                      'TOAST_LIFETIME, and ElToastMessage.duration\'s own '
                       'default.',
                 ),
                 DocsApiFact(
-                  name: 'DsToaster.unmountDelay (static)',
+                  name: 'ElToaster.unmountDelay (static)',
                   type: 'Duration',
                   description:
-                      'Duration(milliseconds: 200) -- 200ms. How long a ' // allow-hardcoded: prose describing DsToaster.unmountDelay, not a value used
+                      'Duration(milliseconds: 200) -- 200ms. How long a ' // allow-hardcoded: prose describing ElToaster.unmountDelay, not a value used
                       'dismissed toast stays mounted after '
-                      'DsToastController.dismiss before it is actually '
+                      'ElToastController.dismiss before it is actually '
                       'removed (sonner\'s TIME_BEFORE_UNMOUNT); every exit '
                       'transition runs longer than this, so every one is '
                       'cut off partway.',
                 ),
                 DocsApiFact(
-                  name: 'DsToaster.transition (static)',
+                  name: 'ElToaster.transition (static)',
                   type: 'Duration',
                   description:
-                      'Duration(milliseconds: 400) -- 400ms. The window ' // allow-hardcoded: prose describing DsToaster.transition, not a value used
+                      'Duration(milliseconds: 400) -- 400ms. The window ' // allow-hardcoded: prose describing ElToaster.transition, not a value used
                       'the entrance, the collapse, the expand, and two of '
                       'the three exits all ride.',
                 ),
                 DocsApiFact(
-                  name: 'DsToaster.collapsedExitTransform (static)',
+                  name: 'ElToaster.collapsedExitTransform (static)',
                   type: 'Duration',
                   description:
-                      'Duration(milliseconds: 500) -- 500ms. The transform ' // allow-hardcoded: prose describing DsToaster.collapsedExitTransform, not a value used
+                      'Duration(milliseconds: 500) -- 500ms. The transform ' // allow-hardcoded: prose describing ElToaster.collapsedExitTransform, not a value used
                       'half of a back toast\'s collapsed exit; its opacity '
                       'half is unmountDelay\'s 200ms.',
                 ),
                 DocsApiFact(
-                  name: 'DsToaster.swipeOutDuration (static)',
+                  name: 'ElToaster.swipeOutDuration (static)',
                   type: 'Duration',
                   description:
-                      'Duration(milliseconds: 200) -- 200ms. The ' // allow-hardcoded: prose describing DsToaster.swipeOutDuration, not a value used
+                      'Duration(milliseconds: 200) -- 200ms. The ' // allow-hardcoded: prose describing ElToaster.swipeOutDuration, not a value used
                       'thrown-away animation once a swipe clears the '
                       'threshold.',
                 ),
                 DocsApiFact(
-                  name: 'DsToaster.swipeThreshold (static)',
+                  name: 'ElToaster.swipeThreshold (static)',
                   type: 'double',
                   description:
                       '45 -- a swipe must travel this many px (or clear '
@@ -499,21 +499,21 @@ class _ToasterArticle extends StatelessWidget {
                       'snaps back with no transition at all.',
                 ),
                 DocsApiFact(
-                  name: 'DsToaster.swipeVelocity (static)',
+                  name: 'ElToaster.swipeVelocity (static)',
                   type: 'double',
                   description:
                       '110 -- the release-velocity gate, in px per second '
                       '(sonner\'s 0.11 px/ms).',
                 ),
                 DocsApiFact(
-                  name: 'DsToaster.stackScaleStep (static)',
+                  name: 'ElToaster.stackScaleStep (static)',
                   type: 'double',
                   description:
                       '0.05 -- each collapsed back toast scales down by '
                       'one more of these (1 minus 0.05 times its index).',
                 ),
                 DocsApiFact(
-                  name: 'DsToaster.collapsedExitTravel (static)',
+                  name: 'ElToaster.collapsedExitTravel (static)',
                   type: 'double',
                   description:
                       '0.40 -- how far, as a fraction of its own box, a '
@@ -521,46 +521,46 @@ class _ToasterArticle extends StatelessWidget {
                       'out.',
                 ),
                 DocsApiFact(
-                  name: 'DsToaster.isCompact (static)',
+                  name: 'ElToaster.isCompact (static)',
                   type: 'bool Function(double viewportWidth)',
                   description:
                       'Whether a viewport this wide takes the compact, '
                       'top-anchored treatment.',
                 ),
                 DocsApiFact(
-                  name: 'DsToaster.positionFor (static)',
-                  type: 'DsToastPosition Function(DsToastPosition, double)',
+                  name: 'ElToaster.positionFor (static)',
+                  type: 'ElToastPosition Function(ElToastPosition, double)',
                   description:
                       'The resolved corner for a viewport this wide -- '
                       'position itself above mobileBreakpoint, its '
                       'topAnchored twin at or below it.',
                 ),
                 DocsApiFact(
-                  name: 'DsToaster.offsetFor (static)',
+                  name: 'ElToaster.offsetFor (static)',
                   type: 'double Function(double viewportWidth)',
                   description:
                       'viewportOffset or mobileViewportOffset, whichever '
                       'this width takes.',
                 ),
                 DocsApiFact(
-                  name: 'DsToaster.widthFor (static)',
+                  name: 'ElToaster.widthFor (static)',
                   type: 'double Function(double viewportWidth)',
                   description:
                       '356, or the full compact width minus two '
                       'mobileViewportOffset insets, never negative.',
                 ),
                 DocsApiFact(
-                  name: 'DsToaster.paddingFor (static)',
+                  name: 'ElToaster.paddingFor (static)',
                   type:
                       'EdgeInsets Function(double, EdgeInsets, '
-                      'DsToastPosition)',
+                      'ElToastPosition)',
                   description:
                       'offsetFor on every edge, plus '
                       'MediaQueryData.padding on the one edge the stack '
                       'is actually anchored to.',
                 ),
                 DocsApiFact(
-                  name: 'DsToaster.dampen (static)',
+                  name: 'ElToaster.dampen (static)',
                   type: 'double Function(double delta)',
                   description:
                       'The drag dampening applied against the corner\'s '
@@ -568,13 +568,13 @@ class _ToasterArticle extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: ds(8)),
+            SizedBox(height: el(8)),
             const DocsApiTable(
-              title: 'DsToastController -- the imperative API ("toast(...)")',
+              title: 'ElToastController -- the imperative API ("toast(...)")',
               facts: <DocsApiFact>[
                 DocsApiFact(
                   name: 'show',
-                  type: 'int Function(DsToastMessage message)',
+                  type: 'int Function(ElToastMessage message)',
                   description:
                       'Queues message and returns its id -- the one '
                       'primitive every typed helper below calls.',
@@ -583,35 +583,35 @@ class _ToasterArticle extends StatelessWidget {
                   name: 'success',
                   type:
                       'int Function(String title, {String? description, '
-                      'DsIconGlyph? glyph, DsToastAction? action})',
+                      'ElIconGlyph? glyph, ElToastAction? action})',
                   description: 'toast.success(title).',
                 ),
                 DocsApiFact(
                   name: 'error',
                   type:
                       'int Function(String title, {String? description, '
-                      'DsIconGlyph? glyph, DsToastAction? action})',
+                      'ElIconGlyph? glyph, ElToastAction? action})',
                   description: 'toast.error(title).',
                 ),
                 DocsApiFact(
                   name: 'info',
                   type:
                       'int Function(String title, {String? description, '
-                      'DsIconGlyph? glyph, DsToastAction? action})',
+                      'ElIconGlyph? glyph, ElToastAction? action})',
                   description: 'toast.info(title).',
                 ),
                 DocsApiFact(
                   name: 'warning',
                   type:
                       'int Function(String title, {String? description, '
-                      'DsIconGlyph? glyph, DsToastAction? action})',
+                      'ElIconGlyph? glyph, ElToastAction? action})',
                   description: 'toast.warning(title).',
                 ),
                 DocsApiFact(
                   name: 'loading',
                   type:
                       'int Function(String title, {String? description, '
-                      'DsIconGlyph? glyph, DsToastAction? action})',
+                      'ElIconGlyph? glyph, ElToastAction? action})',
                   description:
                       'toast.loading(title) -- the one call that leaves a '
                       'toast on screen indefinitely, with no clock. '
@@ -634,7 +634,7 @@ class _ToasterArticle extends StatelessWidget {
                 ),
                 DocsApiFact(
                   name: 'settle',
-                  type: 'void Function(int id, DsToastMessage next)',
+                  type: 'void Function(int id, ElToastMessage next)',
                   description:
                       'Replaces a live toast\'s message in place, the way '
                       'promise does. A no-op once the toast has gone.',
@@ -644,7 +644,7 @@ class _ToasterArticle extends StatelessWidget {
                   type: 'void Function(int id)',
                   description:
                       'toast.dismiss(id) -- starts the 200ms unmount '
-                      'window (DsToaster.unmountDelay).',
+                      'window (ElToaster.unmountDelay).',
                 ),
                 DocsApiFact(
                   name: 'clear',
@@ -655,9 +655,9 @@ class _ToasterArticle extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: ds(8)),
+            SizedBox(height: el(8)),
             const DocsApiTable(
-              title: 'DsToastMessage -- one queued toast (constructor)',
+              title: 'ElToastMessage -- one queued toast (constructor)',
               facts: <DocsApiFact>[
                 DocsApiFact(
                   name: 'title',
@@ -676,15 +676,15 @@ class _ToasterArticle extends StatelessWidget {
                 ),
                 DocsApiFact(
                   name: 'type',
-                  type: 'DsToastType',
+                  type: 'ElToastType',
                   description:
-                      'Optional, defaults to DsToastType.normal. Selects '
+                      'Optional, defaults to ElToastType.normal. Selects '
                       'the icon, its ink color, and the bloom\'s two '
                       'stops -- see Types.',
                 ),
                 DocsApiFact(
                   name: 'glyph',
-                  type: 'DsIconGlyph?',
+                  type: 'ElIconGlyph?',
                   description:
                       'Optional, defaults to null. Overrides type\'s own '
                       'icon -- a different glyph on a typed toast, or any '
@@ -694,9 +694,9 @@ class _ToasterArticle extends StatelessWidget {
                   name: 'duration',
                   type: 'Duration',
                   description:
-                      'Optional, defaults to DsToaster.lifetime '
+                      'Optional, defaults to ElToaster.lifetime '
                       '(Duration(seconds: 4), 4000ms). Ignored entirely '
-                      'while type is DsToastType.loading, which has no '
+                      'while type is ElToastType.loading, which has no '
                       'clock.',
                 ),
                 DocsApiFact(
@@ -704,22 +704,22 @@ class _ToasterArticle extends StatelessWidget {
                   type: 'bool',
                   description:
                       'Optional, defaults to false. Set for every state '
-                      'of a DsToastController.promise toast, loading and '
+                      'of a ElToastController.promise toast, loading and '
                       'settled alike -- what turns its glyph swap into a '
                       'cross-fade instead of a cut.',
                 ),
                 DocsApiFact(
                   name: 'action',
-                  type: 'DsToastAction?',
+                  type: 'ElToastAction?',
                   description:
                       'Optional, defaults to null. The action pill at the '
                       'far right of the row -- see Action.',
                 ),
               ],
             ),
-            SizedBox(height: ds(8)),
+            SizedBox(height: el(8)),
             const DocsApiTable(
-              title: 'DsToastAction -- the optional action pill (constructor)',
+              title: 'ElToastAction -- the optional action pill (constructor)',
               facts: <DocsApiFact>[
                 DocsApiFact(
                   name: 'label',
@@ -741,11 +741,11 @@ class _ToasterArticle extends StatelessWidget {
       ),
 
       // States and feedback.
-      DsSection(
+      ElSection(
         id: 'states',
         title: 'States',
         description:
-            'Unlike DsAlert, DsToaster is not purely presentational -- it '
+            'Unlike ElAlert, ElToaster is not purely presentational -- it '
             'owns a lifetime clock, a hover-pause, and a swipe gesture. '
             'Rows that do not apply are marked N/A with the reason.',
         child: const DocsStateMatrix(
@@ -753,10 +753,10 @@ class _ToasterArticle extends StatelessWidget {
             DocsStateFact(
               state: 'Rest',
               treatment:
-                  'A queued toast enters over DsToaster.transition '
+                  'A queued toast enters over ElToaster.transition '
                   '(400ms) and its 4000ms auto-dismiss clock '
-                  '(DsToaster.lifetime) starts the moment it becomes one '
-                  'of the DsToaster.visibleLimit (3) visible toasts -- a '
+                  '(ElToaster.lifetime) starts the moment it becomes one '
+                  'of the ElToaster.visibleLimit (3) visible toasts -- a '
                   'queued fourth toast does not count down while it '
                   'waits.',
               userSignal:
@@ -789,7 +789,7 @@ class _ToasterArticle extends StatelessWidget {
                   'A tap anywhere on the toast body dismisses it '
                   'immediately (the port\'s own addition -- sonner itself '
                   'has no tap-to-dismiss). A drag past '
-                  'DsToaster.swipeThreshold (45px) or DsToaster.'
+                  'ElToaster.swipeThreshold (45px) or ElToaster.'
                   'swipeVelocity throws it out on the swiped axis; short '
                   'of that it snaps back with no transition at all.',
               userSignal:
@@ -805,28 +805,28 @@ class _ToasterArticle extends StatelessWidget {
             DocsStateFact(
               state: 'Loading',
               treatment:
-                  'DsToastType.loading is the one type with no clock at '
-                  'all -- it stays on screen until DsToastController.'
+                  'ElToastType.loading is the one type with no clock at '
+                  'all -- it stays on screen until ElToastController.'
                   'dismiss, or until promise / settle replaces it in '
                   'place.',
               userSignal:
-                  'Its glyph (DsIconGlyph.loaderCircle) holds still -- '
+                  'Its glyph (ElIconGlyph.loaderCircle) holds still -- '
                   'the source ships it with no spin animation.',
             ),
             DocsStateFact(
               state: 'Empty',
               treatment:
                   'N/A -- title is a required, non-null String on '
-                  'DsToastMessage; there is no contentless toast to '
+                  'ElToastMessage; there is no contentless toast to '
                   'render.',
               userSignal: 'Not applicable.',
             ),
             DocsStateFact(
               state: 'Error / Success',
               treatment:
-                  'A compile-time type choice (DsToastType.error / '
-                  '.success on DsToastMessage), not a runtime transition '
-                  'on the same toast -- unless DsToastController.promise '
+                  'A compile-time type choice (ElToastType.error / '
+                  '.success on ElToastMessage), not a runtime transition '
+                  'on the same toast -- unless ElToastController.promise '
                   'or settle swaps one type into the other in place.',
               userSignal:
                   'Icon glyph, its ink color, and the bloom\'s two stops '
@@ -836,7 +836,7 @@ class _ToasterArticle extends StatelessWidget {
               state: 'Disabled',
               treatment:
                   'N/A on the toast body -- nothing here is a form '
-                  'control. DsToastAction.onPressed is itself nullable; '
+                  'control. ElToastAction.onPressed is itself nullable; '
                   'the pill still dismisses the toast when pressed even '
                   'when it is null.',
               userSignal: 'Not applicable.',
@@ -859,7 +859,7 @@ class _ToasterArticle extends StatelessWidget {
       ),
 
       // Accessibility and keyboard behavior.
-      DsSection(
+      ElSection(
         id: 'a11y',
         title: 'Accessibility',
         child: const _LabeledFacts(<(String, String)>[
@@ -876,7 +876,7 @@ class _ToasterArticle extends StatelessWidget {
             'Required labels',
             'title is the only required accessible content. container: '
                 'true makes this node a semantics boundary, and the '
-                'title/description DsText children below it are not '
+                'title/description ElText children below it are not '
                 'boundaries of their own, so their literal text merges '
                 'upward into this one node rather than staying separate -- '
                 'verified on this page\'s own live-specimen test: the '
@@ -888,7 +888,7 @@ class _ToasterArticle extends StatelessWidget {
           (
             'Keyboard interactions',
             'None. The toast body has no FocusNode, and the action '
-                'pill -- rendered by hand rather than as a real DsButton, '
+                'pill -- rendered by hand rather than as a real ElButton, '
                 'because sonner renders [data-button] itself -- wires '
                 'only a MouseRegion and a GestureDetector, with no Focus '
                 'or onKeyEvent of its own. A toast\'s action cannot '
@@ -938,20 +938,20 @@ class _ToasterArticle extends StatelessWidget {
             'Live-region announcement timing is the platform '
                 'accessibility service\'s call (TalkBack, VoiceOver, web '
                 'ARIA), not something this widget schedules -- the same '
-                'disclaimer DsAlert\'s own page states for its '
+                'disclaimer ElAlert\'s own page states for its '
                 'role="alert" region.',
           ),
         ]),
       ),
 
       // Responsive and platform behavior.
-      DsSection(
+      ElSection(
         id: 'responsive',
         title: 'Responsive',
         child: const _Prose(<String>[
-          'DsToaster.position (default DsToastPosition.bottomRight) '
+          'ElToaster.position (default ElToastPosition.bottomRight) '
               'chooses the corner only on a wide viewport. At or below '
-              'DsToaster.mobileBreakpoint (600px, inclusive -- a '
+              'ElToaster.mobileBreakpoint (600px, inclusive -- a '
               'max-width query) the stack always re-anchors to the top '
               'edge, keeping the side it was on -- a deliberate '
               'departure the source states plainly: sonner\'s own live '
@@ -959,12 +959,12 @@ class _ToasterArticle extends StatelessWidget {
               'the compact top anchor is a design order here, not '
               'something measured off the reference.',
           'Going compact also widens every toast: width drops from the '
-              'fixed DsToaster.width (356px) to the full viewport minus '
-              'two DsToaster.mobileViewportOffset (16px) insets, '
-              'replacing the wide viewport\'s DsToaster.viewportOffset '
+              'fixed ElToaster.width (356px) to the full viewport minus '
+              'two ElToaster.mobileViewportOffset (16px) insets, '
+              'replacing the wide viewport\'s ElToaster.viewportOffset '
               '(24px) on every edge at once.',
           'The anchored edge additionally pays MediaQueryData.padding '
-              'on top of that inset (DsToaster.paddingFor), so a '
+              'on top of that inset (ElToaster.paddingFor), so a '
               'top-anchored compact stack clears a phone\'s status bar '
               'and a bottom-anchored one clears its gesture bar; the '
               'other three edges keep the un-padded number, since the '
@@ -975,7 +975,7 @@ class _ToasterArticle extends StatelessWidget {
       ),
 
       // Dependencies, files, assets, fonts, and shaders.
-      DsSection(
+      ElSection(
         id: 'dependencies',
         title: 'Dependencies',
         child: const DocsInstallFacts(
@@ -985,9 +985,9 @@ class _ToasterArticle extends StatelessWidget {
               label: 'Files',
               value: 'lib/src/components/toaster.dart',
               description:
-                  'One file; every public class -- DsToaster, DsToast, '
-                  'DsToastController, DsToastMessage, DsToastAction, '
-                  'DsToastType, DsToastPosition -- lives here.',
+                  'One file; every public class -- ElToaster, ElToast, '
+                  'ElToastController, ElToastMessage, ElToastAction, '
+                  'ElToastType, ElToastPosition -- lives here.',
             ),
             DocsInstallFact(
               label: 'Package imports',
@@ -997,16 +997,16 @@ class _ToasterArticle extends StatelessWidget {
                   'foundation/motion.dart, foundation/shadows.dart, '
                   'foundation/spacing.dart, foundation/theme.dart, '
                   'foundation/typography.dart, theme_scope.dart, '
-                  'ds_safe_area.dart, icon.dart, icon_paths.dart',
+                  'el_safe_area.dart, icon.dart, icon_paths.dart',
               description:
-                  'DsBloomCosmic paints the fill and its idle/hover/'
-                  'starfield animation; DsMachineSurface paints the '
-                  'border and the e3 shadow; DsSafeArea supplies the '
+                  'ElBloomCosmic paints the fill and its idle/hover/'
+                  'starfield animation; ElMachineSurface paints the '
+                  'border and the e3 shadow; ElSafeArea supplies the '
                   'system-bar insets the compact anchor pays.',
             ),
             DocsInstallFact(
               label: 'Registry dependencies',
-              value: 'none declared -- toaster has no registry manifest yet',
+              value: 'none declared -- toaster ships in the registry',
               description:
                   'A real registry/components/toaster.json is a later '
                   'pass; see Installation above.',
@@ -1025,25 +1025,25 @@ class _ToasterArticle extends StatelessWidget {
       ),
 
       // Theming notes.
-      DsSection(
+      ElSection(
         id: 'theming',
         title: 'Theming',
         child: const _Prose(<String>[
           'Every toast shares one card surface -- the same --popover '
               'fill, the same 1px border, the same e3 shadow -- and a '
-              'type spends exactly the same one token pair DsAlert\'s own '
+              'type spends exactly the same one token pair ElAlert\'s own '
               'variants do: the icon\'s ink color and the bloom\'s two '
-              'stops, both read from DsThemeData. Title and description '
+              'stops, both read from ElThemeData. Title and description '
               'colors never move with type; only the glyph does.',
-          'Flip DsThemeController between light and dark and every '
+          'Flip ElThemeController between light and dark and every '
               'visible toast\'s ink and bloom follow the active theme '
               'immediately -- nothing on this page opts out, matching '
-              'DsAlert\'s own theming note.',
+              'ElAlert\'s own theming note.',
         ]),
       ),
 
       // Source, tests, report issue, and edit docs.
-      DsSection(
+      ElSection(
         id: 'source',
         title: 'Source',
         child: DocsInstallFacts(
@@ -1059,7 +1059,7 @@ class _ToasterArticle extends StatelessWidget {
               label: 'Package tests',
               value: 'test/feedback_effects_test.dart',
               description:
-                  'Exercises DsToaster\'s full choreography directly -- '
+                  'Exercises ElToaster\'s full choreography directly -- '
                   'the stack collapse, the hover-expand, all three exits, '
                   'the swipe gesture, and the timers -- rasterized and '
                   'geometry-checked, not just mounted. This documentation '
@@ -1085,8 +1085,8 @@ class _ToasterArticle extends StatelessWidget {
   );
 }
 
-/// A real [DsToastController], fired into by real controls, over a real
-/// [DsToaster] -- mounted the same `Positioned.fill` inside a `Stack` way
+/// A real [ElToastController], fired into by real controls, over a real
+/// [ElToaster] -- mounted the same `Positioned.fill` inside a `Stack` way
 /// `site_shell.dart`'s `SiteShell` and `showcase_app.dart`'s
 /// `SignalStudioApp` both mount it. Owns and disposes its own controller
 /// rather than reaching into the site's shared `siteToasts` singleton, so
@@ -1099,7 +1099,7 @@ class _ToasterPreview extends StatefulWidget {
 }
 
 class _ToasterPreviewState extends State<_ToasterPreview> {
-  final DsToastController _controller = DsToastController();
+  final ElToastController _controller = ElToastController();
 
   @override
   void dispose() {
@@ -1112,40 +1112,40 @@ class _ToasterPreviewState extends State<_ToasterPreview> {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
       Wrap(
-        spacing: ds(3),
-        runSpacing: ds(3),
+        spacing: el(3),
+        runSpacing: el(3),
         children: <Widget>[
-          DsButton(
-            variant: DsButtonVariant.secondary,
-            size: DsButtonSize.sm,
+          ElButton(
+            variant: ElButtonVariant.secondary,
+            size: ElButtonSize.sm,
             onPressed: () => _controller.success(
               'Changes saved',
               description: 'Your profile was updated successfully.',
             ),
             child: const Text('Show success'),
           ),
-          DsButton(
-            variant: DsButtonVariant.secondary,
-            size: DsButtonSize.sm,
+          ElButton(
+            variant: ElButtonVariant.secondary,
+            size: ElButtonSize.sm,
             onPressed: () => _controller.error(
               'Payment failed',
               description: 'We could not process your card ending in 4242.',
-              action: DsToastAction(label: 'Retry', onPressed: () {}),
+              action: ElToastAction(label: 'Retry', onPressed: () {}),
             ),
             child: const Text('Show error + action'),
           ),
-          DsButton(
-            variant: DsButtonVariant.secondary,
-            size: DsButtonSize.sm,
+          ElButton(
+            variant: ElButtonVariant.secondary,
+            size: ElButtonSize.sm,
             onPressed: () => _controller.info(
               'New feature available',
               description: 'The command palette is now available via Cmd+K.',
             ),
             child: const Text('Show info'),
           ),
-          DsButton(
-            variant: DsButtonVariant.secondary,
-            size: DsButtonSize.sm,
+          ElButton(
+            variant: ElButtonVariant.secondary,
+            size: ElButtonSize.sm,
             onPressed: () => _controller.warning(
               'Withdrawal under review',
               description:
@@ -1154,31 +1154,31 @@ class _ToasterPreviewState extends State<_ToasterPreview> {
             ),
             child: const Text('Show warning'),
           ),
-          DsButton(
-            variant: DsButtonVariant.secondary,
-            size: DsButtonSize.sm,
+          ElButton(
+            variant: ElButtonVariant.secondary,
+            size: ElButtonSize.sm,
             onPressed: () => _controller.promise<void>(
-              Future<void>.delayed(DsDurations.reward),
+              Future<void>.delayed(ElDurations.reward),
               loading: 'Saving…',
               success: 'Saved',
               error: 'Could not save',
             ),
             child: const Text('Show promise'),
           ),
-          DsButton(
-            variant: DsButtonVariant.outline,
-            size: DsButtonSize.sm,
+          ElButton(
+            variant: ElButtonVariant.outline,
+            size: ElButtonSize.sm,
             onPressed: _controller.clear,
             child: const Text('Clear all'),
           ),
         ],
       ),
-      SizedBox(height: ds(6)),
+      SizedBox(height: el(6)),
       SizedBox(
-        height: ds(105),
+        height: el(105),
         child: Stack(
           children: <Widget>[
-            Positioned.fill(child: DsToaster(controller: _controller)),
+            Positioned.fill(child: ElToaster(controller: _controller)),
           ],
         ),
       ),
@@ -1194,13 +1194,13 @@ class _Prose extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ConstrainedBox(
-    constraints: const BoxConstraints(maxWidth: DsWidths.prose),
+    constraints: const BoxConstraints(maxWidth: ElWidths.prose),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         for (int i = 0; i < paragraphs.length; i++) ...<Widget>[
-          if (i > 0) SizedBox(height: ds(4)),
-          DsText(paragraphs[i], DsType.body),
+          if (i > 0) SizedBox(height: el(4)),
+          ElText(paragraphs[i], ElType.body),
         ],
       ],
     ),
@@ -1216,15 +1216,15 @@ class _LabeledFacts extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ConstrainedBox(
-    constraints: const BoxConstraints(maxWidth: DsWidths.prose),
+    constraints: const BoxConstraints(maxWidth: ElWidths.prose),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         for (int i = 0; i < entries.length; i++) ...<Widget>[
-          if (i > 0) SizedBox(height: ds(4)),
-          DsText(entries[i].$1, DsType.label),
-          SizedBox(height: ds(1)),
-          DsText(entries[i].$2, DsType.body),
+          if (i > 0) SizedBox(height: el(4)),
+          ElText(entries[i].$1, ElType.label),
+          SizedBox(height: el(1)),
+          ElText(entries[i].$2, ElType.body),
         ],
       ],
     ),
@@ -1232,13 +1232,13 @@ class _LabeledFacts extends StatelessWidget {
 }
 
 const String _previewCode = '''
-final DsToastController controller = DsToastController();
+final ElToastController controller = ElToastController();
 
 // Mounted once, near the app root:
 Stack(
   children: [
     // ...the rest of the app...
-    Positioned.fill(child: DsToaster(controller: controller)),
+    Positioned.fill(child: ElToaster(controller: controller)),
   ],
 )
 
@@ -1251,7 +1251,7 @@ controller.success(
 controller.error(
   'Payment failed',
   description: 'We could not process your card ending in 4242.',
-  action: DsToastAction(label: 'Retry', onPressed: retry),
+  action: ElToastAction(label: 'Retry', onPressed: retry),
 );
 
 controller.info(
@@ -1275,10 +1275,10 @@ controller.clear();
 ''';
 
 const String _smallestUsageCode =
-    '''final DsToastController toasts = DsToastController();
+    '''final ElToastController toasts = ElToastController();
 
 // Mounted once, near the app root:
-Positioned.fill(child: DsToaster(controller: toasts))
+Positioned.fill(child: ElToaster(controller: toasts))
 
 // Fired from anywhere that holds `toasts`:
 toasts.success('Changes saved');''';
@@ -1286,7 +1286,7 @@ toasts.success('Changes saved');''';
 const String _actionUsageCode = '''toasts.error(
   'Payment failed',
   description: 'We could not process your card ending in 4242.',
-  action: DsToastAction(label: 'Retry', onPressed: retryPayment),
+  action: ElToastAction(label: 'Retry', onPressed: retryPayment),
 );''';
 
 const String _promiseUsageCode = '''toasts.promise<void>(
@@ -1297,19 +1297,19 @@ const String _promiseUsageCode = '''toasts.promise<void>(
 );''';
 
 const String _compositionCode =
-    '''Future<void> handleSave(DsToastController toasts) async {
+    '''Future<void> handleSave(ElToastController toasts) async {
   final int id = toasts.loading('Saving…');
   try {
     await saveProfile();
-    toasts.settle(id, const DsToastMessage(
+    toasts.settle(id, const ElToastMessage(
       title: 'Saved',
-      type: DsToastType.success,
+      type: ElToastType.success,
       promise: true,
     ));
   } catch (_) {
-    toasts.settle(id, const DsToastMessage(
+    toasts.settle(id, const ElToastMessage(
       title: 'Could not save',
-      type: DsToastType.error,
+      type: ElToastType.error,
       promise: true,
     ));
   }

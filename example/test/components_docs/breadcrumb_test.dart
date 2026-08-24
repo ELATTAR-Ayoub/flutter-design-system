@@ -5,35 +5,35 @@
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`: the
 /// discipline `skills_docs_test.dart` already carries. Theme coverage uses a
-/// live `DsThemeController` flipped in place rather than two independent
+/// live `ElThemeController` flipped in place rather than two independent
 /// pumps.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/breadcrumb/meta.dart';
 import 'package:example/components_docs/breadcrumb/page.dart';
-import 'package:example/kit.dart' show DsSection;
+import 'package:example/kit.dart' show ElSection;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 const Size _wide = Size(1440, 900);
 const Size _narrow = Size(390, 844);
 
-Future<DsThemeController> _pumpBreadcrumbDoc(
+Future<ElThemeController> _pumpBreadcrumbDoc(
   WidgetTester tester, {
   ValueChanged<String>? onNavigate,
   Size size = _wide,
-  DsThemeMode mode = DsThemeMode.dark,
+  ElThemeMode mode = ElThemeMode.dark,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final DsThemeController theme = DsThemeController(mode: mode);
+  final ElThemeController theme = ElThemeController(mode: mode);
   addTearDown(theme.dispose);
 
   await tester.pumpWidget(
-    DsTheme(
+    ElTheme(
       controller: theme,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -58,7 +58,7 @@ void main() {
       expect(breadcrumbDoc.sourcePath, 'lib/src/components/breadcrumb.dart');
       expect(
         breadcrumbDoc.exports,
-        containsAll(<String>['DsBreadcrumb', 'DsBreadcrumbEntry']),
+        containsAll(<String>['ElBreadcrumb', 'ElBreadcrumbEntry']),
       );
       // Short description: one sentence, no trailing dot-dot.
       expect(breadcrumbDoc.description, isNot(contains('..')));
@@ -73,8 +73,8 @@ void main() {
         await _pumpBreadcrumbDoc(tester);
 
         final List<String> titles = tester
-            .widgetList<DsSection>(find.byType(DsSection))
-            .map((DsSection section) => section.title)
+            .widgetList<ElSection>(find.byType(ElSection))
+            .map((ElSection section) => section.title)
             .toList();
 
         expect(titles, <String>[
@@ -104,12 +104,12 @@ void main() {
         find.byKey(const ValueKey<String>('breadcrumb-doc-article')),
         findsOneWidget,
       );
-      expect(find.byType(DsBreadcrumb), findsWidgets);
+      expect(find.byType(ElBreadcrumb), findsWidgets);
       // A real specimen renders at least one derived chevron separator.
       expect(
         tester
-            .widgetList<DsIcon>(find.byType(DsIcon))
-            .where((DsIcon icon) => icon.glyph == DsIconGlyph.chevronRight),
+            .widgetList<ElIcon>(find.byType(ElIcon))
+            .where((ElIcon icon) => icon.glyph == ElIconGlyph.chevronRight),
         isNotEmpty,
       );
       expect(tester.takeException(), isNull);
@@ -120,15 +120,15 @@ void main() {
       (WidgetTester tester) async {
         await _pumpBreadcrumbDoc(tester);
 
-        // DsBreadcrumb.items
+        // ElBreadcrumb.items
         expect(find.text('items'), findsOneWidget);
-        expect(find.textContaining('List<DsBreadcrumbEntry>'), findsWidgets);
-        // DsBreadcrumbEntry.link(label, {onTap})
-        expect(find.textContaining('DsBreadcrumbEntry.link'), findsWidgets);
+        expect(find.textContaining('List<ElBreadcrumbEntry>'), findsWidgets);
+        // ElBreadcrumbEntry.link(label, {onTap})
+        expect(find.textContaining('ElBreadcrumbEntry.link'), findsWidgets);
         expect(find.text('label'), findsWidgets);
         expect(find.text('onTap'), findsOneWidget);
-        // DsBreadcrumbEntry.page(label)
-        expect(find.textContaining('DsBreadcrumbEntry.page'), findsWidgets);
+        // ElBreadcrumbEntry.page(label)
+        expect(find.textContaining('ElBreadcrumbEntry.page'), findsWidgets);
         // The derived, read-only isPage field.
         expect(find.text('isPage'), findsOneWidget);
         // The two static layout constants.
@@ -137,18 +137,16 @@ void main() {
       },
     );
 
-    testWidgets('installation is honest that no registry manifest exists yet', (
+    testWidgets('installation shows the shipped registry command', (
       WidgetTester tester,
     ) async {
       await _pumpBreadcrumbDoc(tester);
 
-      // The catalog's own `elattar add breadcrumb` formula must never be
-      // rendered as if it were a working command.
-      expect(find.text('elattar add breadcrumb'), findsNothing);
+      expect(find.text('elattar add breadcrumb'), findsOneWidget);
       expect(
         find.textContaining('breadcrumb.json'),
         findsWidgets,
-        reason: 'the page must name the missing manifest file honestly',
+        reason: 'the page must name the shipped manifest',
       );
     });
 
@@ -170,16 +168,16 @@ void main() {
     ) async {
       await _pumpBreadcrumbDoc(tester);
 
-      final DsBreadcrumb single = tester.widget<DsBreadcrumb>(
+      final ElBreadcrumb single = tester.widget<ElBreadcrumb>(
         find.byWidgetPredicate(
-          (Widget widget) => widget is DsBreadcrumb && widget.items.length == 1,
+          (Widget widget) => widget is ElBreadcrumb && widget.items.length == 1,
         ),
       );
       expect(single.items.single.isPage, isTrue);
     });
 
     testWidgets(
-      'the RTL specimen composes DsBreadcrumb under a Directionality',
+      'the RTL specimen composes ElBreadcrumb under a Directionality',
       (WidgetTester tester) async {
         await _pumpBreadcrumbDoc(tester);
 
@@ -269,30 +267,30 @@ void main() {
 
   group('both themes', () {
     testWidgets('renders on light', (WidgetTester tester) async {
-      await _pumpBreadcrumbDoc(tester, mode: DsThemeMode.light);
-      expect(find.byType(DsBreadcrumb), findsWidgets);
+      await _pumpBreadcrumbDoc(tester, mode: ElThemeMode.light);
+      expect(find.byType(ElBreadcrumb), findsWidgets);
       expect(tester.takeException(), isNull);
     });
 
     testWidgets('renders on dark', (WidgetTester tester) async {
-      await _pumpBreadcrumbDoc(tester, mode: DsThemeMode.dark);
-      expect(find.byType(DsBreadcrumb), findsWidgets);
+      await _pumpBreadcrumbDoc(tester, mode: ElThemeMode.dark);
+      expect(find.byType(ElBreadcrumb), findsWidgets);
       expect(tester.takeException(), isNull);
     });
 
     testWidgets('flipping the theme in place keeps the page intact', (
       WidgetTester tester,
     ) async {
-      final DsThemeController theme = await _pumpBreadcrumbDoc(
+      final ElThemeController theme = await _pumpBreadcrumbDoc(
         tester,
-        mode: DsThemeMode.dark,
+        mode: ElThemeMode.dark,
       );
-      expect(find.byType(DsBreadcrumb), findsWidgets);
+      expect(find.byType(ElBreadcrumb), findsWidgets);
 
-      theme.setMode(DsThemeMode.light);
+      theme.setMode(ElThemeMode.light);
       await tester.pump();
 
-      expect(find.byType(DsBreadcrumb), findsWidgets);
+      expect(find.byType(ElBreadcrumb), findsWidgets);
       expect(tester.takeException(), isNull);
     });
   });

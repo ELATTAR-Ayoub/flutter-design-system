@@ -4,7 +4,7 @@
 /// most of its Wave 1 siblings: already carries a real
 /// `registry/components/tooltip.json` manifest, so the Installation section
 /// below renders the genuine `elattar add tooltip` command rather than a
-/// "not available yet" disclosure.
+/// shipped install command and registry dependencies.
 ///
 /// **Reshaped to mirror `https://ui.shadcn.com/docs/components/tooltip`**
 /// (also resolves at the `/base/` path), section for section: Preview
@@ -17,12 +17,12 @@
 ///
 ///  * **With Keyboard Shortcut**: skipped. Their `TooltipContent` takes
 ///    arbitrary children, so their demo pairs a label with a separately
-///    styled `<kbd>` chip. `DsTooltip.label` and `DsTooltipContent.label`
+///    styled `<kbd>` chip. `ElTooltip.label` and `ElTooltipContent.label`
 ///    are both a single `String`: there is no child slot to hold a second,
 ///    differently styled element, so their demo cannot be composed here
 ///    without inventing an API surface the source does not have.
 ///  * **RTL**: skipped. `_TooltipLayout.getPositionForChild` positions
-///    `DsTooltipSide.right` off `anchor.right`, a physical, LTR-only
+///    `ElTooltipSide.right` off `anchor.right`, a physical, LTR-only
 ///    coordinate: the source never reads `Directionality`, so there is no
 ///    flip to demonstrate.
 ///
@@ -36,7 +36,7 @@
 /// real source (`lib/src/components/tooltip.dart`), which is the documented
 /// source of truth here:
 ///
-///  * The touch path is a **tap**, not a long press, [DsTooltip] opens on
+///  * The touch path is a **tap**, not a long press, [ElTooltip] opens on
 ///    a `PointerDownEvent`, immediately, with no dwell. The Responsive
 ///    section below documents this as measured from the source, not as the
 ///    brief's assumption.
@@ -72,11 +72,11 @@ class TooltipDocPage extends StatelessWidget {
       intro: DocsPageIntro(
         eyebrow: 'COMPONENTS / BASE',
         title: entry.title,
-        description: tooltipExpandedDescription,
+        description: entry.description,
       ),
-      breadcrumbs: const <DsBreadcrumbEntry>[
-        DsBreadcrumbEntry.link('Components'),
-        DsBreadcrumbEntry.page('Tooltip'),
+      breadcrumbs: const <ElBreadcrumbEntry>[
+        ElBreadcrumbEntry.link('Components'),
+        ElBreadcrumbEntry.page('Tooltip'),
       ],
       sidebar: const <DocsSidebarEntry>[
         DocsSidebarEntry(title: 'Toggle', route: '/components/toggle'),
@@ -125,25 +125,25 @@ class _TooltipArticle extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: DsWidths.prose),
-        child: DsText(
+        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+        child: ElText(
           'A pointer resting on a trigger for 200ms opens the label; a '
-            'finger opens it on the spot with a single tap, no dwell. Both '
-            'paths close automatically: hover on pointer-exit, touch on a '
-            'second tap, a tap elsewhere, or after a 1.5s dwell if nothing '
-            'else closes it first.',
-          DsType.body,
+          'finger opens it on the spot with a single tap, no dwell. Both '
+          'paths close automatically: hover on pointer-exit, touch on a '
+          'second tap, a tap elsewhere, or after a 1.5s dwell if nothing '
+          'else closes it first.',
+          ElType.body,
         ),
       ),
-      SizedBox(height: ds(6)),
+      SizedBox(height: el(6)),
       DocsCodeExample(
-          title: 'Tooltip specimens',
-          description:
-              'Hover a trigger with a mouse, or tap one on a touch device.',
-          preview: const _TooltipPreview(),
-          command: DocsCodeCommand(command: entry.command),
-        ),
-      DsSection(
+        title: 'Tooltip specimens',
+        description:
+            'Hover a trigger with a mouse, or tap one on a touch device.',
+        preview: const _TooltipPreview(),
+        command: DocsCodeCommand(command: entry.command),
+      ),
+      ElSection(
         id: 'install',
         title: 'Installation',
         description:
@@ -169,48 +169,48 @@ class _TooltipArticle extends StatelessWidget {
           ],
         ),
       ),
-      DsSection(
+      ElSection(
         id: 'usage',
         title: 'Usage',
         description: 'The smallest correct composition: a label and a child.',
-        child: DsPanel(
+        child: ElPanel(
           label: 'DART',
           note: 'MINIMAL',
           child: DocsSelectableCodeBlock(code: _usageBasicCode),
         ),
       ),
-      DsSection(
+      ElSection(
         id: 'composition',
         title: 'Composition',
         description:
             "shadcn's Tooltip composes three pieces the caller assembles: "
             'Tooltip, TooltipTrigger asChild, and TooltipContent. '
-            'DsTooltip is one widget instead: it owns the hover and tap '
-            "wiring itself and builds DsTooltipContent through an "
-            'OverlayPortal for you. DsTooltipContent is exported and '
+            'ElTooltip is one widget instead: it owns the hover and tap '
+            "wiring itself and builds ElTooltipContent through an "
+            'OverlayPortal for you. ElTooltipContent is exported and '
             'public, but a caller does not normally construct it by hand.',
-        child: DsPanel(
+        child: ElPanel(
           label: 'SHAPE',
           child: DocsSelectableCodeBlock(code: _compositionTreeCode),
         ),
       ),
-      DsSection(
+      ElSection(
         id: 'side',
         title: 'Side',
         description:
             "shadcn's Side section offers four positions: left, top, "
-            'bottom, right. DsTooltipSide has two: top, the default seen '
+            'bottom, right. ElTooltipSide has two: top, the default seen '
             "above, and right, the shape a collapsed sidebar rail row "
             'needs when it has no other label.',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             const DocsApiTable(
-              title: 'DsTooltipSide',
+              title: 'ElTooltipSide',
               facts: <DocsApiFact>[
                 DocsApiFact(
                   name: 'top',
-                  type: 'DsTooltipSide',
+                  type: 'ElTooltipSide',
                   description:
                       'The default. Content sits above the trigger, '
                       "centered, with the arrow lane below it: the "
@@ -218,7 +218,7 @@ class _TooltipArticle extends StatelessWidget {
                 ),
                 DocsApiFact(
                   name: 'right',
-                  type: 'DsTooltipSide',
+                  type: 'ElTooltipSide',
                   description:
                       "Content sits to the trigger's right, vertically "
                       'centered, arrow lane on its left: the shape a '
@@ -227,8 +227,8 @@ class _TooltipArticle extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: ds(5)),
-            DsPanel(
+            SizedBox(height: el(5)),
+            ElPanel(
               label: 'DART',
               note: 'RIGHT',
               child: DocsSelectableCodeBlock(code: _sideRightCode),
@@ -236,7 +236,7 @@ class _TooltipArticle extends StatelessWidget {
           ],
         ),
       ),
-      DsSection(
+      ElSection(
         id: 'toolbar',
         title: 'In a toolbar',
         description:
@@ -248,16 +248,16 @@ class _TooltipArticle extends StatelessWidget {
           preview: _TooltipComposition(),
         ),
       ),
-      DsSection(
+      ElSection(
         id: 'disabled-button',
         title: 'Disabled button',
         description:
             "shadcn's own Disabled Button demo needs a span wrapper "
             'around the trigger: a native disabled button drops pointer '
             "events entirely, so TooltipTrigger asChild would have "
-            "nothing left to hover. DsTooltip needs no such workaround: "
+            "nothing left to hover. ElTooltip needs no such workaround: "
             'its MouseRegion and Listener sit around the trigger, not '
-            "inside it, and a disabled DsButton's own IgnorePointer only "
+            "inside it, and a disabled ElButton's own IgnorePointer only "
             "removes the button's own input, not the region watching it "
             'from outside. A disabled trigger still opens its tooltip on '
             'hover or tap.',
@@ -266,23 +266,23 @@ class _TooltipArticle extends StatelessWidget {
           preview: _TooltipDisabledPreview(),
         ),
       ),
-      DsSection(
+      ElSection(
         id: 'hidden-trigger',
         title: 'Hidden trigger',
         description:
             "shadcn has no counterpart for this: it is SidebarMenuButton's "
-            'own pattern, where every row stays wrapped in a DsTooltip '
+            'own pattern, where every row stays wrapped in a ElTooltip '
             "from the start and hidden only turns false once the panel "
             "has collapsed to a rail and the row's own text label has "
             'gone. hidden keeps the hover and tap wiring alive; it just '
             'paints nothing.',
-        child: DsPanel(
+        child: ElPanel(
           label: 'DART',
           note: 'HIDDEN',
           child: DocsSelectableCodeBlock(code: _hiddenTriggerCode),
         ),
       ),
-      DsSection(
+      ElSection(
         id: 'api',
         title: 'API Reference',
         description:
@@ -292,7 +292,7 @@ class _TooltipArticle extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             const DocsApiTable(
-              title: 'DsTooltip',
+              title: 'ElTooltip',
               facts: <DocsApiFact>[
                 DocsApiFact(
                   name: 'label',
@@ -312,15 +312,15 @@ class _TooltipArticle extends StatelessWidget {
                   name: 'delay',
                   type: 'Duration',
                   description:
-                      'Default DsDurations.tooltipDelay (200ms). '
+                      'Default ElDurations.tooltipDelay (200ms). '
                       'Hover-intent delay before a pointer-opened label '
                       'shows; a tap has no dwell and ignores this.',
                 ),
                 DocsApiFact(
                   name: 'side',
-                  type: 'DsTooltipSide',
+                  type: 'ElTooltipSide',
                   description:
-                      'Default DsTooltipSide.top. Which edge of the '
+                      'Default ElTooltipSide.top. Which edge of the '
                       'trigger the content sits on.',
                 ),
                 DocsApiFact(
@@ -333,9 +333,9 @@ class _TooltipArticle extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: ds(5)),
+            SizedBox(height: el(5)),
             const DocsApiTable(
-              title: 'DsTooltipContent',
+              title: 'ElTooltipContent',
               facts: <DocsApiFact>[
                 DocsApiFact(
                   name: 'label',
@@ -344,9 +344,9 @@ class _TooltipArticle extends StatelessWidget {
                 ),
                 DocsApiFact(
                   name: 'side',
-                  type: 'DsTooltipSide',
+                  type: 'ElTooltipSide',
                   description:
-                      'Default DsTooltipSide.top. Which edge the arrow '
+                      'Default ElTooltipSide.top. Which edge the arrow '
                       'lane sits on relative to the pill.',
                 ),
               ],
@@ -354,7 +354,7 @@ class _TooltipArticle extends StatelessWidget {
           ],
         ),
       ),
-      DsSection(
+      ElSection(
         id: 'states',
         title: 'States and feedback',
         description:
@@ -430,7 +430,7 @@ class _TooltipArticle extends StatelessWidget {
             DocsStateFact(
               state: 'Disabled',
               treatment:
-                  'N/A, DsTooltip has no enabled or disabled parameter of '
+                  'N/A, ElTooltip has no enabled or disabled parameter of '
                   'its own; a caller wraps whatever trigger it likes, '
                   'including a disabled one, and the label still opens.',
               userSignal: 'N/A',
@@ -439,7 +439,7 @@ class _TooltipArticle extends StatelessWidget {
               state: 'Reduced motion',
               treatment:
                   'The 320ms fade, zoom, and slide-in transition runs '
-                  'through dsAnimationDuration, so it collapses under '
+                  'through elAnimationDuration, so it collapses under '
                   'reduced motion. The 200ms hover delay and 1500ms '
                   'touchDwell are timing, not motion, and are unaffected.',
               userSignal:
@@ -449,20 +449,20 @@ class _TooltipArticle extends StatelessWidget {
           ],
         ),
       ),
-      DsSection(
+      ElSection(
         id: 'accessibility',
         title: 'Accessibility and keyboard behavior',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            DsPanel(
+            ElPanel(
               label: 'What the semantics tree actually carries',
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   _A11yRow(
                     'Semantic role',
-                    'DsTooltip renders no Semantics node of its own '
+                    'ElTooltip renders no Semantics node of its own '
                         'anywhere in its source: not on the trigger, not '
                         'on the pill, and nothing wires the label into the '
                         "accessible name of whatever child it wraps.",
@@ -471,7 +471,7 @@ class _TooltipArticle extends StatelessWidget {
                     'Required labels',
                     'None are set automatically. If a trigger has no '
                         'other accessible name of its own (no visible '
-                        'text, no Semantics label, no DsButton.label), the '
+                        'text, no Semantics label, no ElButton.label), the '
                         'tooltip does not supply one either.',
                   ),
                   const _A11yRow(
@@ -489,9 +489,9 @@ class _TooltipArticle extends StatelessWidget {
                   ),
                   const _A11yRow(
                     'Touch target',
-                    'DsTooltip adds no padding of its own; the tap target '
+                    'ElTooltip adds no padding of its own; the tap target '
                         "is whatever the wrapped trigger already provides "
-                        '(a DsButton icon size, for example).',
+                        '(a ElButton icon size, for example).',
                   ),
                   const _A11yRow(
                     'Non-color signal',
@@ -500,7 +500,7 @@ class _TooltipArticle extends StatelessWidget {
                   ),
                   const _A11yRow(
                     'Error wiring',
-                    'None, DsTooltip never participates in form '
+                    'None, ElTooltip never participates in form '
                         'validation or an error state.',
                   ),
                   const _A11yRow(
@@ -518,11 +518,11 @@ class _TooltipArticle extends StatelessWidget {
                 ],
               ),
             ),
-            SizedBox(height: ds(5)),
-            DsNote(
-              tone: DsNoteTone.error,
+            SizedBox(height: el(5)),
+            ElNote(
+              tone: ElNoteTone.error,
               title: "Known gap: a tooltip cannot be a control's only name",
-              child: DsText(
+              child: ElText(
                 'The source itself composes exactly the risky case: a '
                 "SidebarMenuButton-style collapsed rail row, where the "
                 "tooltip's label is used as the only name a control has "
@@ -533,35 +533,35 @@ class _TooltipArticle extends StatelessWidget {
                 'accessible name at all in that state. If a trigger has '
                 'no other name, pair the tooltip label with a real '
                 'accessible name on the trigger itself (for example '
-                'DsButton.label): do not rely on the tooltip alone to '
+                'ElButton.label): do not rely on the tooltip alone to '
                 'supply it.',
-                DsType.small,
+                ElType.small,
               ),
             ),
           ],
         ),
       ),
-      DsSection(
+      ElSection(
         id: 'responsive',
         title: 'Responsive and platform behavior',
         description:
             "Routed on the event's own PointerDeviceKind, never on the "
             'platform: a hybrid machine gets both paths at once, and '
             'each pointer is judged as it arrives.',
-        child: DsPanel(
+        child: ElPanel(
           label: 'Pointer versus touch',
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              DsText(
+              ElText(
                 'Pointer (mouse, a stylus hovering): resting on the '
                 'trigger for delay (200ms default, '
-                'DsDurations.tooltipDelay) opens the label; the pointer '
+                'ElDurations.tooltipDelay) opens the label; the pointer '
                 'leaving the trigger closes it.',
-                DsType.small,
+                ElType.small,
               ),
-              SizedBox(height: ds(3)),
-              DsText(
+              SizedBox(height: el(3)),
+              ElText(
                 'Touch: this is a tap, not a long press. A single tap on '
                 'the trigger opens the label immediately, with no dwell, '
                 'delayDuration is a hover-intent filter, and a tap has '
@@ -570,29 +570,29 @@ class _TooltipArticle extends StatelessWidget {
                 'through a translucent barrier that observes the pointer '
                 'without stealing it, so the dismissing tap still reaches '
                 'whatever it landed on.',
-                DsType.small,
+                ElType.small,
               ),
-              SizedBox(height: ds(3)),
-              DsText(
+              SizedBox(height: el(3)),
+              ElText(
                 'If nothing else closes it first, a tap-opened label '
                 'takes itself down automatically after '
-                'DsTooltip.touchDwell (1500ms: ten steps of '
-                'DsDurations.fast) so it can never be stranded on screen.',
-                DsType.small,
+                'ElTooltip.touchDwell (1500ms: ten steps of '
+                'ElDurations.fast) so it can never be stranded on screen.',
+                ElType.small,
               ),
-              SizedBox(height: ds(3)),
-              DsText(
+              SizedBox(height: el(3)),
+              ElText(
                 'This is a deliberate mobile adaptation ordered on top of '
                 'a reference that has no touch path of its own: hover '
                 'does not exist on a touch screen. It is documented in '
                 "the source's own top-of-file comment.",
-                DsType.small,
+                ElType.small,
               ),
             ],
           ),
         ),
       ),
-      DsSection(
+      ElSection(
         id: 'dependencies',
         title: 'Dependencies, files, and disclosure',
         description:
@@ -657,52 +657,52 @@ class _TooltipArticle extends StatelessWidget {
               label: 'Verified',
               value: 'package tests + this docs specimen',
               description:
-                  "test/dialogs_test.dart's DsTooltip and "
-                  "'DsTooltip: the tap path' groups, plus this page's "
+                  "test/dialogs_test.dart's ElTooltip and "
+                  "'ElTooltip: the tap path' groups, plus this page's "
                   'own live specimens. No fixture install was run as part '
                   'of writing this page.',
             ),
           ],
         ),
       ),
-      DsSection(
+      ElSection(
         id: 'theming',
         title: 'Theming notes',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            DsPanel(
+            ElPanel(
               label: 'What actually varies with the theme',
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  DsText(
+                  ElText(
                     'The pill is a fixed, inverted pairing, '
                     'theme.foreground fill, theme.background ink: the '
                     'same relationship a native OS tooltip uses, and it '
                     'does not change with a surface or variant parameter '
-                    'because DsTooltip has none.',
-                    DsType.small,
+                    'because ElTooltip has none.',
+                    ElType.small,
                   ),
-                  SizedBox(height: ds(3)),
-                  DsText(
+                  SizedBox(height: el(3)),
+                  ElText(
                     'The label always renders at '
-                    'DsComponentType.tooltipLabel (12px, weight 400) and '
-                    'the pill corner radius is always DsRadii.md, '
+                    'ElComponentType.tooltipLabel (12px, weight 400) and '
+                    'the pill corner radius is always ElRadii.md, '
                     'neither is configurable per instance.',
-                    DsType.small,
+                    ElType.small,
                   ),
-                  SizedBox(height: ds(3)),
-                  DsText(
+                  SizedBox(height: el(3)),
+                  ElText(
                     'The arrow is painted, not composed, and always fills '
                     'with theme.foreground to match the pill exactly, so '
                     'it never reads as a separate shape in either theme.',
-                    DsType.small,
+                    ElType.small,
                   ),
                 ],
               ),
             ),
-            SizedBox(height: ds(5)),
+            SizedBox(height: el(5)),
             const DocsApiTable(
               title: 'Layout tokens',
               facts: <DocsApiFact>[
@@ -717,14 +717,14 @@ class _TooltipArticle extends StatelessWidget {
                   name: 'arrowRadius',
                   type: 'static double (get)',
                   description:
-                      'rounded-xs corner radius on the arrow, DsRadii.xs.',
+                      'rounded-xs corner radius on the arrow, ElRadii.xs.',
                 ),
                 DocsApiFact(
                   name: 'arrowLift',
                   type: 'static double (get)',
                   description:
                       "How far the arrow's centre is pushed out of its "
-                      'lane: half the arrow plus DsRadii.xs.',
+                      'lane: half the arrow plus ElRadii.xs.',
                 ),
                 DocsApiFact(
                   name: 'horizontalPadding',
@@ -747,7 +747,7 @@ class _TooltipArticle extends StatelessWidget {
                   name: 'touchDwell',
                   type: 'static Duration (get)',
                   description:
-                      '1500ms (ten steps of DsDurations.fast): how long '
+                      '1500ms (ten steps of ElDurations.fast): how long '
                       'a tap-opened label stays up on its own before it '
                       'closes itself.',
                 ),
@@ -756,7 +756,7 @@ class _TooltipArticle extends StatelessWidget {
           ],
         ),
       ),
-      DsSection(
+      ElSection(
         id: 'source',
         title: 'Source and tests',
         child: DocsInstallFacts(
@@ -777,7 +777,7 @@ class _TooltipArticle extends StatelessWidget {
             const DocsInstallFact(
               label: 'Tests',
               value:
-                  'test/dialogs_test.dart (DsTooltip, DsTooltip: the '
+                  'test/dialogs_test.dart (ElTooltip, ElTooltip: the '
                   'tap path)',
               description:
                   'Package-level behavioral coverage: geometry, the '
@@ -801,44 +801,44 @@ class _TooltipArticle extends StatelessWidget {
 const String _usageBasicCode =
     '''import 'package:elattar_design_system/elattar_design_system.dart';
 
-DsTooltip(
+ElTooltip(
   label: 'Add to favourites',
-  child: DsButton(
-    variant: DsButtonVariant.ghost,
-    size: DsButtonSize.icon,
+  child: ElButton(
+    variant: ElButtonVariant.ghost,
+    size: ElButtonSize.icon,
     label: 'Add to favourites',
     onPressed: () {},
-    child: const DsIcon(DsIconGlyph.heart, size: DsIconSize.md),
+    child: const ElIcon(ElIconGlyph.heart, size: ElIconSize.md),
   ),
 )''';
 
 /// The real shape: one widget wrapping a trigger, no separate Trigger or
 /// Content pieces for the caller to assemble.
 const String _compositionTreeCode =
-    '''DsTooltip                              // one widget, not three
+    '''ElTooltip                              // one widget, not three
 ├─ child                              the trigger, rendered verbatim
-└─ (built for you) DsTooltipContent   never constructed by the caller
+└─ (built for you) ElTooltipContent   never constructed by the caller
    └─ label                          the pill's text, positioned by `side`''';
 
-const String _sideRightCode = '''DsTooltip(
+const String _sideRightCode = '''ElTooltip(
   label: 'Dashboard',
-  side: DsTooltipSide.right,
-  child: DsButton(
-    variant: DsButtonVariant.ghost,
-    size: DsButtonSize.icon,
+  side: ElTooltipSide.right,
+  child: ElButton(
+    variant: ElButtonVariant.ghost,
+    size: ElButtonSize.icon,
     label: 'Dashboard',
     onPressed: () {},
-    child: const DsIcon(DsIconGlyph.layoutGrid, size: DsIconSize.md),
+    child: const ElIcon(ElIconGlyph.layoutGrid, size: ElIconSize.md),
   ),
 )''';
 
 const String _hiddenTriggerCode =
     '''// SidebarMenuButton's own pattern: every row stays wrapped in a
-// DsTooltip from the start, and `hidden` only turns false once the panel
+// ElTooltip from the start, and `hidden` only turns false once the panel
 // has collapsed to a rail and the row's own text label has gone.
-DsTooltip(
+ElTooltip(
   label: 'Dashboard',
-  side: DsTooltipSide.right,
+  side: ElTooltipSide.right,
   hidden: !collapsed,
   child: sidebarRow,
 )''';
@@ -852,15 +852,15 @@ class _A11yRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return Padding(
-      padding: EdgeInsets.only(bottom: last ? 0 : ds(3)),
+      padding: EdgeInsets.only(bottom: last ? 0 : el(3)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          DsText(label, DsType.label, color: theme.actionInk),
-          SizedBox(height: ds(1)),
-          DsText(body, DsType.small),
+          ElText(label, ElType.label, color: theme.actionInk),
+          SizedBox(height: el(1)),
+          ElText(body, ElType.small),
         ],
       ),
     );
@@ -875,59 +875,59 @@ class _TooltipPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        DsText('Top side: the default', DsType.label),
-        SizedBox(height: ds(3)),
+        ElText('Top side: the default', ElType.label),
+        SizedBox(height: el(3)),
         Wrap(
-          spacing: ds(4),
-          runSpacing: ds(4),
+          spacing: el(4),
+          runSpacing: el(4),
           children: <Widget>[
-            DsTooltip(
+            ElTooltip(
               key: const ValueKey<String>('tooltip-doc-specimen-top'),
               label: 'Add to favourites',
-              child: DsButton(
-                variant: DsButtonVariant.ghost,
-                size: DsButtonSize.icon,
+              child: ElButton(
+                variant: ElButtonVariant.ghost,
+                size: ElButtonSize.icon,
                 label: 'Add to favourites',
                 onPressed: () {},
-                child: const DsIcon(DsIconGlyph.heart, size: DsIconSize.md),
+                child: const ElIcon(ElIconGlyph.heart, size: ElIconSize.md),
               ),
             ),
-            DsTooltip(
+            ElTooltip(
               label: 'Settings',
-              child: DsButton(
-                variant: DsButtonVariant.ghost,
-                size: DsButtonSize.icon,
+              child: ElButton(
+                variant: ElButtonVariant.ghost,
+                size: ElButtonSize.icon,
                 label: 'Settings',
                 onPressed: () {},
-                child: const DsIcon(DsIconGlyph.settings, size: DsIconSize.md),
+                child: const ElIcon(ElIconGlyph.settings, size: ElIconSize.md),
               ),
             ),
           ],
         ),
-        SizedBox(height: ds(6)),
-        DsText("Right side: a collapsed rail row's only label", DsType.label),
-        SizedBox(height: ds(3)),
-        DsTooltip(
+        SizedBox(height: el(6)),
+        ElText("Right side: a collapsed rail row's only label", ElType.label),
+        SizedBox(height: el(3)),
+        ElTooltip(
           key: const ValueKey<String>('tooltip-doc-specimen-right'),
           label: 'Dashboard',
-          side: DsTooltipSide.right,
-          child: DsButton(
-            variant: DsButtonVariant.ghost,
-            size: DsButtonSize.icon,
+          side: ElTooltipSide.right,
+          child: ElButton(
+            variant: ElButtonVariant.ghost,
+            size: ElButtonSize.icon,
             label: 'Dashboard',
             onPressed: () {},
-            child: const DsIcon(DsIconGlyph.layoutGrid, size: DsIconSize.md),
+            child: const ElIcon(ElIconGlyph.layoutGrid, size: ElIconSize.md),
           ),
         ),
-        SizedBox(height: ds(6)),
-        DsText(
+        SizedBox(height: el(6)),
+        ElText(
           'A mouse resting on either trigger for 200ms opens the label; a '
           'finger opens it on the spot with a single tap, no dwell.',
-          DsType.small,
+          ElType.small,
           color: theme.mutedForeground,
         ),
       ],
@@ -942,41 +942,41 @@ class _TooltipComposition extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
         Expanded(
-          child: DsText(
+          child: ElText(
             'Autumn Collection',
-            DsType.h4,
+            ElType.h4,
             color: theme.foreground,
           ),
         ),
-        SizedBox(width: ds(3)),
+        SizedBox(width: el(3)),
         Wrap(
-          spacing: ds(2),
+          spacing: el(2),
           children: <Widget>[
-            DsTooltip(
+            ElTooltip(
               label: 'Add to favourites',
-              child: DsButton(
-                variant: DsButtonVariant.ghost,
-                size: DsButtonSize.icon,
+              child: ElButton(
+                variant: ElButtonVariant.ghost,
+                size: ElButtonSize.icon,
                 label: 'Add to favourites',
                 onPressed: () {},
-                child: const DsIcon(DsIconGlyph.heart, size: DsIconSize.md),
+                child: const ElIcon(ElIconGlyph.heart, size: ElIconSize.md),
               ),
             ),
-            DsTooltip(
+            ElTooltip(
               label: 'Filter and sort',
-              child: DsButton(
-                variant: DsButtonVariant.ghost,
-                size: DsButtonSize.icon,
+              child: ElButton(
+                variant: ElButtonVariant.ghost,
+                size: ElButtonSize.icon,
                 label: 'Filters',
                 onPressed: () {},
-                child: const DsIcon(
-                  DsIconGlyph.slidersHorizontal,
-                  size: DsIconSize.md,
+                child: const ElIcon(
+                  ElIconGlyph.slidersHorizontal,
+                  size: ElIconSize.md,
                 ),
               ),
             ),
@@ -987,7 +987,7 @@ class _TooltipComposition extends StatelessWidget {
   }
 }
 
-/// A disabled trigger, still wrapped in a live [DsTooltip]. Unlike the
+/// A disabled trigger, still wrapped in a live [ElTooltip]. Unlike the
 /// reference, which needs a `<span>` wrapper for a disabled button to stay
 /// hoverable, this needs no workaround: the tooltip's MouseRegion and
 /// Listener sit around the trigger, not inside it.
@@ -996,26 +996,26 @@ class _TooltipDisabledPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        DsTooltip(
+        ElTooltip(
           key: const ValueKey<String>('tooltip-doc-specimen-disabled'),
           label: 'Add to favourites',
-          child: DsButton(
-            variant: DsButtonVariant.ghost,
-            size: DsButtonSize.icon,
+          child: ElButton(
+            variant: ElButtonVariant.ghost,
+            size: ElButtonSize.icon,
             label: 'Add to favourites',
             onPressed: null,
-            child: const DsIcon(DsIconGlyph.heart, size: DsIconSize.md),
+            child: const ElIcon(ElIconGlyph.heart, size: ElIconSize.md),
           ),
         ),
-        SizedBox(height: ds(3)),
-        DsText(
+        SizedBox(height: el(3)),
+        ElText(
           'Faded and inert to a click, still hoverable: the label opens '
           'the same way it does on an enabled trigger.',
-          DsType.small,
+          ElType.small,
           color: theme.mutedForeground,
         ),
       ],

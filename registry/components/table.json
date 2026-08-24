@@ -1,0 +1,25 @@
+{
+  "name": "table",
+  "type": "component",
+  "version": "0.0.1",
+  "description": "`components/ui/table.tsx` — the eight slots, and the one thing about them",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/table.dart",
+      "target": "@ui/table.dart",
+      "sha256": "a362e2e90d9c0126d357f6cddd026b74c70ee9ba6fa979a47cf50507d2c3bbd2"
+    }
+  ],
+  "registryDependencies": [
+    "source-foundation"
+  ],
+  "semanticDependencies": [],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "documentationRoute": "/components/table",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/table.dart"
+}

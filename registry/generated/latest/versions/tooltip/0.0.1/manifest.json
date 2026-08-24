@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/tooltip.dart",
       "target": "@ui/tooltip.dart",
-      "sha256": "02e0e9faf9d39be68ae1f3b369bce8eabcaf24e05649eba338c3d4903dae6631"
+      "sha256": "e5f23266cb2929623ad429bdb51338caac86ce18c6162c227bfce6c45473736b"
     }
   ],
   "registryDependencies": [

@@ -13,7 +13,7 @@ Add the public Home, Docs, Components, Shots, and Skills destinations without br
 - Added immutable public route and search metadata, including GitHub Pages-safe query links.
 - Added a responsive public shell with desktop/mobile navigation, documentation search, theme selection, footer, and GitHub callback seam.
 - Added useful first-pass Home, Docs, Components, Shots, and Skills pages.
-- Kept the existing `dsGroups`, `DocsShell`, specimen routes, and `pageFor` contract intact.
+- Kept the existing `elGroups`, `DocsShell`, specimen routes, and `pageFor` contract intact.
 - Made the deployed web build open the public Home route while non-web tests retain the legacy overview default.
 - Replaced generic Flutter web title, description, manifest name, colors, and orientation.
 - Rebuilt the web target and confirmed the earlier CupertinoIcons warning is not reproducible.

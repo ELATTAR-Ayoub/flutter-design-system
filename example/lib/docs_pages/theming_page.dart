@@ -3,7 +3,7 @@
 /// Content contract: `docs/superpowers/plans/2026-08-21-public-website-ui-
 /// information-architecture.md` section 7.7. Explains semantic roles rather
 /// than a palette editor that does not exist, and reads its swatches from
-/// `DsTheme.of(context)` live so they cannot disagree with what the app
+/// `ElTheme.of(context)` live so they cannot disagree with what the app
 /// itself paints with — the same discipline `example/lib/token_swatch.dart`
 /// documents for the legacy `/design-system/colors` gallery, applied here at
 /// docs-page scale rather than reusing that page's own engine.
@@ -29,13 +29,13 @@ class ThemingDocsPage extends StatelessWidget {
       eyebrow: 'DOCS',
       title: 'Theming',
       description:
-          'Semantic tokens, DsThemeController, light and dark resolution, '
+          'Semantic tokens, ElThemeController, light and dark resolution, '
           'and how a consumer overrides them — read live from the theme '
           'this page itself renders with.',
     ),
-    breadcrumbs: const <DsBreadcrumbEntry>[
-      DsBreadcrumbEntry.link('Docs'),
-      DsBreadcrumbEntry.page('Theming'),
+    breadcrumbs: const <ElBreadcrumbEntry>[
+      ElBreadcrumbEntry.link('Docs'),
+      ElBreadcrumbEntry.page('Theming'),
     ],
     toc: const <DocsTocEntry>[
       DocsTocEntry(title: 'Overview', anchor: 'overview'),
@@ -68,7 +68,7 @@ class _ThemingArticle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return Column(
       key: const ValueKey<String>('theming-doc-article'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -88,55 +88,73 @@ class _ThemingArticle extends StatelessWidget {
     );
   }
 
-  Widget _prose(String text, DsThemeData theme, {DsTypeSpec? spec}) =>
+  Widget _prose(String text, ElThemeData theme, {ElTypeSpec? spec}) =>
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: DsWidths.prose),
-        child: DsText(text, spec ?? DsType.body),
+        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+        child: ElText(text, spec ?? ElType.body),
       );
 
-  Widget _overview(DsThemeData theme) => DsSection(
+  Widget _overview(ElThemeData theme) => ElSection(
     id: 'overview',
     title: 'Overview',
-    child: _prose(
-      'Every color a component paints with comes from DsTheme.of(context), '
-      'a DsThemeData instance resolved from a live DsThemeController — never '
-      'a literal picked per widget. There is no palette editor: the two '
-      'DsThemeData instances (light, dark) are fixed in '
-      'lib/src/foundation/theme.dart, and customization means either editing '
-      'that file directly (source mode) or choosing which of the two paints '
-      '(package mode). Both are covered below.',
-      theme,
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        _prose(
+          'Every color a component paints with comes from '
+          'ElTheme.of(context), a ElThemeData instance resolved from a live '
+          'ElThemeController, never a literal picked per widget. There is '
+          'no palette editor: the two ElThemeData instances (light, dark) '
+          'are fixed in lib/src/foundation/theme.dart, and customization '
+          'means either editing that file directly (source mode) or '
+          'choosing which of the two paints (package mode). Both are '
+          'covered below.',
+          theme,
+        ),
+        SizedBox(height: el(4)),
+        ElAlert(
+          variant: ElAlertVariant.success,
+          icon: const ElIcon(ElIconGlyph.circleCheck),
+          title: 'Recommended: edit theme.dart directly',
+          description:
+              'Package mode fixes ElThemeData.light/dark to the version '
+              'you depend on, with no per-token override. A real token '
+              'change means source mode: elattar init --foundation source, '
+              'then edit lib/design_system/foundation/theme.dart. See '
+              'Source-mode customization below.',
+        ),
+      ],
     ),
   );
 
-  Widget _primitives(DsThemeData theme) => DsSection(
+  Widget _primitives(ElThemeData theme) => ElSection(
     id: 'primitives',
     title: 'Primitive versus semantic colors',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         _prose(
-          'DsPalette (lib/src/foundation/colors.dart) holds fixed, '
+          'ElPalette (lib/src/foundation/colors.dart) holds fixed, '
           'theme-independent brand hues — action, value, success, warning, '
           'info, plus bright/dark/deep variants of each. These do not '
           'change between light and dark.',
           theme,
         ),
-        SizedBox(height: ds(3)),
+        SizedBox(height: el(3)),
         _prose(
-          'DsThemeData is the semantic layer built from them: background, '
+          'ElThemeData is the semantic layer built from them: background, '
           'foreground, card, border, and the *Ink roles below all resolve '
           'differently per theme, even where they derive from the same '
-          'DsPalette primitive.',
+          'ElPalette primitive.',
           theme,
         ),
-        SizedBox(height: ds(4)),
+        SizedBox(height: el(4)),
         _PrimitiveSwatchRow(theme: theme),
       ],
     ),
   );
 
-  Widget _surfaces(DsThemeData theme) => DsSection(
+  Widget _surfaces(ElThemeData theme) => ElSection(
     id: 'surfaces',
     title: 'Surface and foreground pairs',
     description:
@@ -146,35 +164,35 @@ class _ThemingArticle extends StatelessWidget {
     child: _SemanticSwatchGrid(theme: theme),
   );
 
-  Widget _actionValue(DsThemeData theme) => DsSection(
+  Widget _actionValue(ElThemeData theme) => ElSection(
     id: 'action-value',
     title: 'Action versus value',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         _prose(
-          'Action (DsPalette.action, theme.actionInk) marks links, active '
+          'Action (ElPalette.action, theme.actionInk) marks links, active '
           'navigation, focus rings, and primary commands — the interactive '
           'thread that runs through the whole interface. Value '
-          '(DsPalette.value, theme.valueInk) is reserved for outcomes worth '
+          '(ElPalette.value, theme.valueInk) is reserved for outcomes worth '
           'calling out — a "Featured" or "Pro" badge, a highlighted metric '
           '— and stays out of ordinary navigation so it keeps its weight.',
           theme,
         ),
-        SizedBox(height: ds(4)),
+        SizedBox(height: el(4)),
         Wrap(
-          spacing: ds(3),
-          runSpacing: ds(3),
+          spacing: el(3),
+          runSpacing: el(3),
           children: <Widget>[
             _InkChip(
               label: 'Action',
               ink: theme.actionInk,
-              fill: DsPalette.action,
+              fill: ElPalette.action,
             ),
             _InkChip(
               label: 'Value',
               ink: theme.valueInk,
-              fill: DsPalette.value,
+              fill: ElPalette.value,
             ),
           ],
         ),
@@ -182,28 +200,28 @@ class _ThemingArticle extends StatelessWidget {
     ),
   );
 
-  Widget _status(DsThemeData theme) => DsSection(
+  Widget _status(ElThemeData theme) => ElSection(
     id: 'status',
     title: 'Status and -ink roles',
     description:
-        'Success, warning, info, and destructive each carry a DsPalette '
-        'fill and a matching *Ink foreground on DsThemeData, used only for '
+        'Success, warning, info, and destructive each carry a ElPalette '
+        'fill and a matching *Ink foreground on ElThemeData, used only for '
         'genuine status — never as a decorative accent.',
     child: Wrap(
-      spacing: ds(3),
-      runSpacing: ds(3),
+      spacing: el(3),
+      runSpacing: el(3),
       children: <Widget>[
         _InkChip(
           label: 'Success',
           ink: theme.successInk,
-          fill: DsPalette.success,
+          fill: ElPalette.success,
         ),
         _InkChip(
           label: 'Warning',
           ink: theme.warningInk,
-          fill: DsPalette.warning,
+          fill: ElPalette.warning,
         ),
-        _InkChip(label: 'Info', ink: theme.infoInk, fill: DsPalette.info),
+        _InkChip(label: 'Info', ink: theme.infoInk, fill: ElPalette.info),
         _InkChip(
           label: 'Destructive',
           ink: theme.destructiveInk,
@@ -213,31 +231,31 @@ class _ThemingArticle extends StatelessWidget {
     ),
   );
 
-  Widget _resolution(DsThemeData theme) => DsSection(
+  Widget _resolution(ElThemeData theme) => ElSection(
     id: 'resolution',
     title: 'Light, dark, and system',
     description:
-        'DsThemeController holds a DsThemeMode (light, system, dark — dark '
-        'is the default). DsTheme.of(context) resolves it against the '
-        'platform brightness in system mode and returns DsThemeData.light '
-        'or DsThemeData.dark. Flip the control below — it holds its own '
+        'ElThemeController holds a ElThemeMode (light, system, dark — dark '
+        'is the default). ElTheme.of(context) resolves it against the '
+        'platform brightness in system mode and returns ElThemeData.light '
+        'or ElThemeData.dark. Flip the control below — it holds its own '
         'controller, independent of the page around it.',
     child: const _ThemeModeDemo(),
   );
 
-  Widget _typography(DsThemeData theme) => DsSection(
+  Widget _typography(ElThemeData theme) => ElSection(
     id: 'typography',
     title: 'Typography selection',
     child: _prose(
-      'Type is a token axis of its own: every DsText call takes a '
-      'DsTypeSpec from DsType (or a component-scoped DsComponentType spec) '
+      'Type is a token axis of its own: every ElText call takes a '
+      'ElTypeSpec from ElType (or a component-scoped ElComponentType spec) '
       'rather than a raw TextStyle. See Typeset for the full scale, the '
       'fluid clamps, and the three font families.',
       theme,
     ),
   );
 
-  Widget _tokens(DsThemeData theme) => DsSection(
+  Widget _tokens(ElThemeData theme) => ElSection(
     id: 'tokens',
     title: 'Radius, shadow, and motion roles',
     child: Column(
@@ -247,30 +265,30 @@ class _ThemingArticle extends StatelessWidget {
           title: 'Other foundation token families',
           facts: <DocsApiFact>[
             DocsApiFact(
-              name: 'DsRadii',
+              name: 'ElRadii',
               type: 'lib/src/foundation/spacing.dart',
               description:
                   'xs 2, sm 6, md 10, lg 12, xl 16 — corner radii components '
                   'select by role, not by literal.',
             ),
             DocsApiFact(
-              name: 'DsShadows',
+              name: 'ElShadows',
               type: 'lib/src/foundation/shadows.dart',
               description:
                   'Named elevation specs (e.g. chip, btnValue) consumed by '
-                  'DsMachineSurface, matched CSS-blur-exact to the '
+                  'ElMachineSurface, matched CSS-blur-exact to the '
                   'reference.',
             ),
             DocsApiFact(
-              name: 'DsDurations / DsCurves',
+              name: 'ElDurations / ElCurves',
               type: 'lib/src/foundation/motion.dart',
               description:
                   'tick 80ms, fast 150ms, base 250ms; curves spring/out/'
-                  'curveIn. dsAnimationDuration() collapses any of them to '
+                  'curveIn. elAnimationDuration() collapses any of them to '
                   'zero under reduced motion.',
             ),
             DocsApiFact(
-              name: 'DsWidths / DsBreakpoints',
+              name: 'ElWidths / ElBreakpoints',
               type: 'lib/src/foundation/spacing.dart',
               description:
                   'Layout measures (content 1080, page 1200, shell 1680) and '
@@ -283,13 +301,13 @@ class _ThemingArticle extends StatelessWidget {
     ),
   );
 
-  Widget _sourceMode(DsThemeData theme) => DsSection(
+  Widget _sourceMode(ElThemeData theme) => ElSection(
     id: 'source-mode',
     title: 'Source-mode customization',
     child: _prose(
       'After `elattar init --foundation source`, '
       'lib/design_system/foundation/theme.dart is a full local copy of this '
-      'file — edit DsThemeData.light / .dark directly to change a token. '
+      'file — edit ElThemeData.light / .dark directly to change a token. '
       'The change applies everywhere a copied component reads that token, '
       'because every copied component imports the same local file. There is '
       'no build step or codegen between the edit and the next hot reload.',
@@ -297,14 +315,14 @@ class _ThemingArticle extends StatelessWidget {
     ),
   );
 
-  Widget _packageMode(DsThemeData theme) => DsSection(
+  Widget _packageMode(ElThemeData theme) => ElSection(
     id: 'package-mode',
     title: 'Package-mode theme configuration',
     child: _prose(
-      'DsTheme takes exactly one configurable input — the controller\'s '
-      'DsThemeMode — and no per-field override parameter. Depending on '
+      'ElTheme takes exactly one configurable input — the controller\'s '
+      'ElThemeMode — and no per-field override parameter. Depending on '
       'elattar_design_system as a package (see Installation) means the two '
-      'DsThemeData instances are fixed by the version you depend on; '
+      'ElThemeData instances are fixed by the version you depend on; '
       'choosing light, dark, or system through the controller is the whole '
       'surface. Changing an individual token in package mode means forking '
       'the dependency, which is precisely the tradeoff source mode exists '
@@ -313,16 +331,16 @@ class _ThemingArticle extends StatelessWidget {
     ),
   );
 
-  Widget _verification(DsThemeData theme) => DsSection(
+  Widget _verification(ElThemeData theme) => ElSection(
     id: 'verification',
     title: 'Contrast and reduced-motion verification',
     child: _prose(
       'Foreground/background contrast is not asserted by hand: the colors '
       'gallery inside this same documentation app (example/lib/'
       'token_swatch.dart) computes WCAG 2.x relative luminance and contrast '
-      'ratio from the live resolved DsThemeData for every paired token, in '
+      'ratio from the live resolved ElThemeData for every paired token, in '
       'both themes. Reduced motion is verified the same way motion itself '
-      'is produced: dsAnimationDuration() reads '
+      'is produced: elAnimationDuration() reads '
       'MediaQuery.disableAnimations and collapses every duration it is '
       'asked for to zero, rather than a component checking the flag itself.',
       theme,
@@ -330,7 +348,7 @@ class _ThemingArticle extends StatelessWidget {
   );
 }
 
-/// A DsPalette primitive next to the semantic ink DsThemeData resolves it
+/// A ElPalette primitive next to the semantic ink ElThemeData resolves it
 /// into for the current theme, so the difference in [_actionValue]/[_status]
 /// is something the reader can see, not just be told.
 class _InkChip extends StatelessWidget {
@@ -342,55 +360,55 @@ class _InkChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    padding: EdgeInsets.symmetric(horizontal: ds(3), vertical: ds(2)),
+    padding: EdgeInsets.symmetric(horizontal: el(3), vertical: el(2)),
     decoration: BoxDecoration(
       color: fill.withValues(alpha: 0.12),
-      borderRadius: BorderRadius.circular(DsRadii.md),
+      borderRadius: BorderRadius.circular(ElRadii.md),
     ),
-    child: DsText(label, DsType.label, color: ink),
+    child: ElText(label, ElType.label, color: ink),
   );
 }
 
-/// Live swatches of the DsPalette primitives — same values on both themes,
+/// Live swatches of the ElPalette primitives — same values on both themes,
 /// which is the point being demonstrated.
 class _PrimitiveSwatchRow extends StatelessWidget {
   const _PrimitiveSwatchRow({required this.theme});
 
-  final DsThemeData theme;
+  final ElThemeData theme;
 
   static final List<(String, Color)> _primitives = <(String, Color)>[
-    ('action', DsPalette.action),
-    ('value', DsPalette.value),
-    ('success', DsPalette.success),
-    ('warning', DsPalette.warning),
-    ('info', DsPalette.info),
+    ('action', ElPalette.action),
+    ('value', ElPalette.value),
+    ('success', ElPalette.success),
+    ('warning', ElPalette.warning),
+    ('info', ElPalette.info),
   ];
 
   @override
   Widget build(BuildContext context) => Wrap(
-    spacing: ds(4),
-    runSpacing: ds(3),
+    spacing: el(4),
+    runSpacing: el(3),
     children: <Widget>[
       for (final (String name, Color color) in _primitives)
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Container(
-              width: ds(16),
-              height: ds(16),
+              width: el(16),
+              height: el(16),
               decoration: BoxDecoration(
                 color: color,
-                borderRadius: BorderRadius.circular(DsRadii.sm),
+                borderRadius: BorderRadius.circular(ElRadii.sm),
                 border: Border.all(
                   color: theme.border,
-                  width: DsWidths.hairline,
+                  width: ElWidths.hairline,
                 ),
               ),
             ),
-            SizedBox(height: ds(1)),
-            DsText(
-              'DsPalette.$name',
-              DsType.caption,
+            SizedBox(height: el(1)),
+            ElText(
+              'ElPalette.$name',
+              ElType.caption,
               color: theme.mutedForeground,
             ),
           ],
@@ -404,7 +422,7 @@ class _PrimitiveSwatchRow extends StatelessWidget {
 class _SemanticSwatchGrid extends StatelessWidget {
   const _SemanticSwatchGrid({required this.theme});
 
-  final DsThemeData theme;
+  final ElThemeData theme;
 
   @override
   Widget build(BuildContext context) {
@@ -431,18 +449,18 @@ class _SemanticSwatchGrid extends StatelessWidget {
       children: <Widget>[
         for (final (String label, Color surface, Color foreground) in pairs)
           Padding(
-            padding: EdgeInsets.only(bottom: ds(2)),
+            padding: EdgeInsets.only(bottom: el(2)),
             child: Container(
-              padding: EdgeInsets.symmetric(horizontal: ds(4), vertical: ds(3)),
+              padding: EdgeInsets.symmetric(horizontal: el(4), vertical: el(3)),
               decoration: BoxDecoration(
                 color: surface,
-                borderRadius: BorderRadius.circular(DsRadii.md),
+                borderRadius: BorderRadius.circular(ElRadii.md),
                 border: Border.all(
                   color: theme.border,
-                  width: DsWidths.hairline,
+                  width: ElWidths.hairline,
                 ),
               ),
-              child: DsText(label, DsType.small, color: foreground),
+              child: ElText(label, ElType.small, color: foreground),
             ),
           ),
       ],
@@ -450,7 +468,7 @@ class _SemanticSwatchGrid extends StatelessWidget {
   }
 }
 
-/// A minimal Light/System/Dark control over its own [DsThemeController],
+/// A minimal Light/System/Dark control over its own [ElThemeController],
 /// independent of the app theme this page renders inside — flipping it
 /// re-resolves [_SemanticSwatchGrid] live underneath, the same way a
 /// consuming application's own toggle would.
@@ -462,8 +480,8 @@ class _ThemeModeDemo extends StatefulWidget {
 }
 
 class _ThemeModeDemoState extends State<_ThemeModeDemo> {
-  final DsThemeController _controller = DsThemeController(
-    mode: DsThemeMode.dark,
+  final ElThemeController _controller = ElThemeController(
+    mode: ElThemeMode.dark,
   );
 
   @override
@@ -473,43 +491,43 @@ class _ThemeModeDemoState extends State<_ThemeModeDemo> {
   }
 
   @override
-  Widget build(BuildContext context) => DsTheme(
+  Widget build(BuildContext context) => ElTheme(
     controller: _controller,
     child: Builder(
       builder: (BuildContext context) {
-        final DsThemeData demoTheme = DsTheme.of(context);
+        final ElThemeData demoTheme = ElTheme.of(context);
         return Container(
-          padding: EdgeInsets.all(ds(5)),
+          padding: EdgeInsets.all(el(5)),
           decoration: BoxDecoration(
             color: demoTheme.background,
-            borderRadius: BorderRadius.circular(DsRadii.lg),
+            borderRadius: BorderRadius.circular(ElRadii.lg),
             border: Border.all(
               color: demoTheme.border,
-              width: DsWidths.hairline,
+              width: ElWidths.hairline,
             ),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Wrap(
-                spacing: ds(2),
+                spacing: el(2),
                 children: <Widget>[
-                  for (final DsThemeMode mode in DsThemeMode.values)
+                  for (final ElThemeMode mode in ElThemeMode.values)
                     KeyedSubtree(
                       key: ValueKey<String>('theming-doc-mode:${mode.name}'),
-                      child: DsButton(
+                      child: ElButton(
                         onPressed: () =>
                             setState(() => _controller.setMode(mode)),
                         variant: _controller.mode == mode
-                            ? DsButtonVariant.primary
-                            : DsButtonVariant.outline,
-                        size: DsButtonSize.sm,
-                        child: DsText(mode.name, DsComponentType.buttonLabelSm),
+                            ? ElButtonVariant.primary
+                            : ElButtonVariant.outline,
+                        size: ElButtonSize.sm,
+                        child: ElText(mode.name, ElComponentType.buttonLabelSm),
                       ),
                     ),
                 ],
               ),
-              SizedBox(height: ds(4)),
+              SizedBox(height: el(4)),
               _SemanticSwatchGrid(theme: demoTheme),
             ],
           ),

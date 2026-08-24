@@ -2,20 +2,20 @@ import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/accordion/meta.dart';
 import 'package:example/components_docs/accordion/page.dart';
 import 'package:example/docs/docs_code.dart';
-import 'package:example/kit.dart' show DsSection;
+import 'package:example/kit.dart' show ElSection;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// Real test-view sizing only: [tester.view.physicalSize] plus
 /// [WidgetTester.view]'s own reset, never a synthetic `MediaQuery` override.
-/// [controller] is a single live [DsThemeController] the caller can flip in
-/// place with [DsThemeController.setMode] instead of rebuilding a second tree
+/// [controller] is a single live [ElThemeController] the caller can flip in
+/// place with [ElThemeController.setMode] instead of rebuilding a second tree
 /// for the other theme.
 Widget _harness({
   required Widget child,
-  required DsThemeController controller,
+  required ElThemeController controller,
 }) {
-  return DsTheme(
+  return ElTheme(
     controller: controller,
     child: MaterialApp(home: SingleChildScrollView(child: child)),
   );
@@ -29,7 +29,7 @@ void main() {
       expect(accordionDoc.sourcePath, 'lib/src/components/accordion.dart');
       expect(
         accordionDoc.exports,
-        containsAll(<String>['DsAccordion', 'DsAccordionItem']),
+        containsAll(<String>['ElAccordion', 'ElAccordionItem']),
       );
       expect(accordionDoc.description, isNotEmpty);
       expect(accordionDoc.route, '/components/accordion');
@@ -44,8 +44,8 @@ void main() {
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
 
-        final DsThemeController controller = DsThemeController(
-          mode: DsThemeMode.dark,
+        final ElThemeController controller = ElThemeController(
+          mode: ElThemeMode.dark,
         );
         await tester.pumpWidget(
           _harness(controller: controller, child: const AccordionDocPage()),
@@ -53,8 +53,8 @@ void main() {
         await tester.pumpAndSettle();
 
         final List<String> titles = tester
-            .widgetList<DsSection>(find.byType(DsSection))
-            .map((DsSection section) => section.title)
+            .widgetList<ElSection>(find.byType(ElSection))
+            .map((ElSection section) => section.title)
             .toList();
 
         expect(titles, <String>[
@@ -80,8 +80,8 @@ void main() {
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
 
-      final DsThemeController controller = DsThemeController(
-        mode: DsThemeMode.dark,
+      final ElThemeController controller = ElThemeController(
+        mode: ElThemeMode.dark,
       );
       await tester.pumpWidget(
         _harness(controller: controller, child: const AccordionDocPage()),
@@ -94,23 +94,23 @@ void main() {
       );
       expect(find.text('Accordion'), findsWidgets);
       expect(find.byType(DocsCodeExample), findsAtLeastNWidgets(1));
-      expect(find.byType(DsAccordion), findsWidgets);
+      expect(find.byType(ElAccordion), findsWidgets);
 
-      // DsAccordion's constructor parameters, from lib/src/components/
+      // ElAccordion's constructor parameters, from lib/src/components/
       // accordion.dart: items, openIndex, onChanged.
       for (final String param in <String>['items', 'openIndex', 'onChanged']) {
         expect(
           find.text(param),
           findsAtLeastNWidgets(1),
-          reason: 'DsAccordion.$param missing from the API table',
+          reason: 'ElAccordion.$param missing from the API table',
         );
       }
-      // DsAccordionItem's constructor parameters: title, content.
+      // ElAccordionItem's constructor parameters: title, content.
       for (final String param in <String>['title', 'content']) {
         expect(
           find.text(param),
           findsAtLeastNWidgets(1),
-          reason: 'DsAccordionItem.$param missing from the API table',
+          reason: 'ElAccordionItem.$param missing from the API table',
         );
       }
 
@@ -127,8 +127,8 @@ void main() {
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
 
-      final DsThemeController controller = DsThemeController(
-        mode: DsThemeMode.light,
+      final ElThemeController controller = ElThemeController(
+        mode: ElThemeMode.light,
       );
       await tester.pumpWidget(
         _harness(controller: controller, child: const AccordionDocPage()),
@@ -146,14 +146,14 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('the live specimen mounts a real DsAccordion that opens, '
+    testWidgets('the live specimen mounts a real ElAccordion that opens, '
         'switches, and collapses to nothing', (WidgetTester tester) async {
       tester.view.physicalSize = const Size(1440, 900);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
 
-      final DsThemeController controller = DsThemeController(
-        mode: DsThemeMode.dark,
+      final ElThemeController controller = ElThemeController(
+        mode: ElThemeMode.dark,
       );
       await tester.pumpWidget(
         _harness(controller: controller, child: const AccordionDocPage()),
@@ -198,8 +198,8 @@ void main() {
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
 
-      final DsThemeController controller = DsThemeController(
-        mode: DsThemeMode.dark,
+      final ElThemeController controller = ElThemeController(
+        mode: ElThemeMode.dark,
       );
       await tester.pumpWidget(
         _harness(controller: controller, child: const AccordionDocPage()),
@@ -207,7 +207,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
 
-      controller.setMode(DsThemeMode.light);
+      controller.setMode(ElThemeMode.light);
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
       expect(find.byType(AccordionDocPage), findsOneWidget);
@@ -221,8 +221,8 @@ void main() {
       addTearDown(tester.view.reset);
 
       String? destination;
-      final DsThemeController controller = DsThemeController(
-        mode: DsThemeMode.dark,
+      final ElThemeController controller = ElThemeController(
+        mode: ElThemeMode.dark,
       );
       await tester.pumpWidget(
         _harness(

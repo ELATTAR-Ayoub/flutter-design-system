@@ -17,7 +17,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// `hsl(0 0% 100%)`.
-final Color _white = dsHsl(0, 0, 100);
+final Color _white = elHsl(0, 0, 100);
 
 /// One row of the map's expected-badge tables.
 typedef _Expected = ({String token, double ratio, String verdict});
@@ -97,8 +97,8 @@ const List<_Printed> _printed = <_Printed>[
   (token: '--destructive', dark: '#dc2626', light: '#dc2626'),
 ];
 
-DsThemeData _theme(DsThemeKind kind) =>
-    kind == DsThemeKind.dark ? DsThemeData.dark : DsThemeData.light;
+ElThemeData _theme(ElThemeKind kind) =>
+    kind == ElThemeKind.dark ? ElThemeData.dark : ElThemeData.light;
 
 final RegExp _hexText = RegExp(r'^#([0-9a-f]{3}|[0-9a-f]{6})$');
 
@@ -123,40 +123,37 @@ Color _parseCss(String text) {
   return Color(int.parse('FF$full', radix: 16));
 }
 
-Widget _scope(Widget child, DsThemeMode mode) => DsTheme(
-      controller: DsThemeController(mode: mode),
-      child: Directionality(
-        textDirection: TextDirection.ltr,
-        child: MediaQuery(
-          data: const MediaQueryData(size: Size(1440, 900)),
-          child: Center(child: child),
-        ),
-      ),
-    );
+Widget _scope(Widget child, ElThemeMode mode) => ElTheme(
+  controller: ElThemeController(mode: mode),
+  child: Directionality(
+    textDirection: TextDirection.ltr,
+    child: MediaQuery(
+      data: const MediaQueryData(size: Size(1440, 900)),
+      child: Center(child: child),
+    ),
+  ),
+);
 
 void main() {
-  group('dsContrastRatio', () {
+  group('elContrastRatio', () {
     test('the two headline numbers on zinc 950 and on white', () {
       // The plan calls this one "white on dark bg ≈ 19.0", and the token it
       // means is `--foreground`, which on dark is `hsl(0 0% 98%)` — near-white,
       // not white. That is the 19.0 the page prints.
       expect(
-        dsContrastRatio(DsThemeData.dark.foreground, dsHsl(240, 10, 3.9)),
+        elContrastRatio(ElThemeData.dark.foreground, elHsl(240, 10, 3.9)),
         closeTo(19.0, 0.15),
       );
       // Actual white against the same fill is the *light* theme's pair read
       // backwards, and measures 19.9 — colors-map §5's other foreground row.
-      expect(
-        dsContrastRatio(_white, dsHsl(240, 10, 3.9)),
-        closeTo(19.9, 0.15),
-      );
+      expect(elContrastRatio(_white, elHsl(240, 10, 3.9)), closeTo(19.9, 0.15));
     });
 
     test('dark muted-foreground clears AAA on the page', () {
       expect(
-        dsContrastRatio(
-          DsThemeData.dark.mutedForeground,
-          DsThemeData.dark.background,
+        elContrastRatio(
+          ElThemeData.dark.mutedForeground,
+          ElThemeData.dark.background,
         ),
         closeTo(13.5, 0.15),
       );
@@ -164,28 +161,28 @@ void main() {
 
     test('the light theme reverses the two ramp ends', () {
       expect(
-        dsContrastRatio(DsPalette.valueDark, DsThemeData.light.background),
+        elContrastRatio(ElPalette.valueDark, ElThemeData.light.background),
         closeTo(5.0, 0.15),
       );
       expect(
-        dsContrastRatio(DsPalette.action, DsThemeData.light.background),
+        elContrastRatio(ElPalette.action, ElThemeData.light.background),
         closeTo(4.6, 0.15),
       );
       // The end that fails outright on white.
       expect(
-        dsContrastRatio(DsPalette.actionBright, DsThemeData.light.background),
+        elContrastRatio(ElPalette.actionBright, ElThemeData.light.background),
         closeTo(1.9, 0.15),
       );
     });
 
     test('order does not matter — the brighter side takes the numerator', () {
-      final double forwards = dsContrastRatio(
-        DsThemeData.dark.foreground,
-        DsThemeData.dark.background,
+      final double forwards = elContrastRatio(
+        ElThemeData.dark.foreground,
+        ElThemeData.dark.background,
       );
-      final double backwards = dsContrastRatio(
-        DsThemeData.dark.background,
-        DsThemeData.dark.foreground,
+      final double backwards = elContrastRatio(
+        ElThemeData.dark.background,
+        ElThemeData.dark.foreground,
       );
       expect(forwards, closeTo(backwards, 0.0001));
     });
@@ -193,61 +190,70 @@ void main() {
     test('a translucent foreground is composited before it is measured', () {
       // A 12% action wash on the page reads as a near-page colour, not as
       // action's own ratio.
-      final Color wash = DsPalette.action.withValues(alpha: 0.12);
+      final Color wash = ElPalette.action.withValues(alpha: 0.12);
       expect(
-        dsContrastRatio(wash, DsThemeData.dark.background),
-        lessThan(dsContrastRatio(DsPalette.action, DsThemeData.dark.background)),
+        elContrastRatio(wash, ElThemeData.dark.background),
+        lessThan(
+          elContrastRatio(ElPalette.action, ElThemeData.dark.background),
+        ),
       );
-      expect(dsContrastRatio(wash, DsThemeData.dark.background), lessThan(1.5));
+      expect(elContrastRatio(wash, ElThemeData.dark.background), lessThan(1.5));
     });
   });
 
-  group('dsContrastVerdict', () {
+  group('elContrastVerdict', () {
     test('grades on the raw ratio, at the standard\'s own thresholds', () {
-      expect(dsContrastVerdict(21), 'AAA');
-      expect(dsContrastVerdict(7), 'AAA');
-      expect(dsContrastVerdict(6.99), 'AA');
-      expect(dsContrastVerdict(4.5), 'AA');
-      expect(dsContrastVerdict(4.49), 'AA large / UI only');
-      expect(dsContrastVerdict(3), 'AA large / UI only');
-      expect(dsContrastVerdict(2.99), 'Fails');
-      expect(dsContrastVerdict(1), 'Fails');
+      expect(elContrastVerdict(21), 'AAA');
+      expect(elContrastVerdict(7), 'AAA');
+      expect(elContrastVerdict(6.99), 'AA');
+      expect(elContrastVerdict(4.5), 'AA');
+      expect(elContrastVerdict(4.49), 'AA large / UI only');
+      expect(elContrastVerdict(3), 'AA large / UI only');
+      expect(elContrastVerdict(2.99), 'Fails');
+      expect(elContrastVerdict(1), 'Fails');
     });
 
     test('rounding for the reader does not round for the grader', () {
       // `--color-value-dark` on dark: 3.98 prints as 4.0 and is still graded
       // below AA.
       const double raw = 3.98;
-      expect(dsContrastRatioLabel(raw), '4.0');
-      expect(dsContrastVerdict(raw), 'AA large / UI only');
-      expect(dsContrastBadgeText(raw), 'Contrast 4.0:1 · AA large / UI only');
+      expect(elContrastRatioLabel(raw), '4.0');
+      expect(elContrastVerdict(raw), 'AA large / UI only');
+      expect(elContrastBadgeText(raw), 'Contrast 4.0:1 · AA large / UI only');
     });
   });
 
   group('the badge strings the page prints', () {
-    ({double ratio, String text}) badge(String token, DsThemeKind kind) {
-      final DsThemeData theme =
-          kind == DsThemeKind.dark ? DsThemeData.dark : DsThemeData.light;
-      final double ratio = DsTokenRegistry.contrastRatio(token, theme);
-      return (ratio: ratio, text: dsContrastBadgeText(ratio));
+    ({double ratio, String text}) badge(String token, ElThemeKind kind) {
+      final ElThemeData theme = kind == ElThemeKind.dark
+          ? ElThemeData.dark
+          : ElThemeData.light;
+      final double ratio = ElTokenRegistry.contrastRatio(token, theme);
+      return (ratio: ratio, text: elContrastBadgeText(ratio));
     }
 
     test('dark muted-foreground', () {
-      expect(badge('--muted-foreground', DsThemeKind.dark).text,
-          'Contrast 13.5:1 · AAA');
+      expect(
+        badge('--muted-foreground', ElThemeKind.dark).text,
+        'Contrast 13.5:1 · AAA',
+      );
     });
 
     test('dark value-dark — the 3.98 that prints 4.0', () {
-      final ({double ratio, String text}) measured =
-          badge('--color-value-dark', DsThemeKind.dark);
+      final ({double ratio, String text}) measured = badge(
+        '--color-value-dark',
+        ElThemeKind.dark,
+      );
       expect(measured.ratio, lessThan(4.0));
       expect(measured.ratio, closeTo(3.98, 0.1));
       expect(measured.text, 'Contrast 4.0:1 · AA large / UI only');
     });
 
     test('light action-bright', () {
-      expect(badge('--color-action-bright', DsThemeKind.light).text,
-          'Contrast 1.9:1 · Fails');
+      expect(
+        badge('--color-action-bright', ElThemeKind.light).text,
+        'Contrast 1.9:1 · Fails',
+      );
     });
   });
 
@@ -256,7 +262,7 @@ void main() {
       expect(_printed, hasLength(18));
       for (final _Printed row in _printed) {
         expect(
-          DsTokenRegistry.has(row.token),
+          ElTokenRegistry.has(row.token),
           isTrue,
           reason: '${row.token} is swatched on the page but not registered',
         );
@@ -264,8 +270,7 @@ void main() {
       // Fourteen of the eighteen carry a badge; the four pure fills do not.
       expect(_dark, hasLength(14));
       expect(_light, hasLength(14));
-      final Set<String> measured =
-          _dark.map((_Expected e) => e.token).toSet();
+      final Set<String> measured = _dark.map((_Expected e) => e.token).toSet();
       expect(
         _printed
             .map((_Printed r) => r.token)
@@ -279,11 +284,11 @@ void main() {
     for (final _Printed row in _printed) {
       test('${row.token} prints the map\'s value in both themes', () {
         expect(
-          DsTokenRegistry.printedValue(row.token, DsThemeKind.dark),
+          ElTokenRegistry.printedValue(row.token, ElThemeKind.dark),
           row.dark,
         );
         expect(
-          DsTokenRegistry.printedValue(row.token, DsThemeKind.light),
+          ElTokenRegistry.printedValue(row.token, ElThemeKind.light),
           row.light,
         );
       });
@@ -296,70 +301,90 @@ void main() {
       // The raw numbers are 0.06 apart — inside the map's stated ±0.1 — so the
       // engine stands and the transcript is what needs the correction. Pinned
       // here so the disagreement is a recorded fact rather than a surprise.
-      final double raw =
-          DsTokenRegistry.contrastRatio('--foreground', DsThemeData.dark);
+      final double raw = ElTokenRegistry.contrastRatio(
+        '--foreground',
+        ElThemeData.dark,
+      );
       expect(raw, closeTo(19.0611, 0.0005));
       expect(raw, closeTo(19.0, 0.1)); // still inside the map's allowance
-      expect(dsContrastBadgeText(raw), 'Contrast 19.1:1 · AAA');
+      expect(elContrastBadgeText(raw), 'Contrast 19.1:1 · AAA');
     });
 
-    for (final (DsThemeKind kind, List<_Expected> table) in <(
-      DsThemeKind,
-      List<_Expected>
-    )>[
-      (DsThemeKind.dark, _dark),
-      (DsThemeKind.light, _light),
-    ]) {
-      final DsThemeData theme =
-          kind == DsThemeKind.dark ? DsThemeData.dark : DsThemeData.light;
+    for (final (ElThemeKind kind, List<_Expected> table)
+        in <(ElThemeKind, List<_Expected>)>[
+          (ElThemeKind.dark, _dark),
+          (ElThemeKind.light, _light),
+        ]) {
+      final ElThemeData theme = kind == ElThemeKind.dark
+          ? ElThemeData.dark
+          : ElThemeData.light;
       for (final _Expected row in table) {
         test('${kind.name} ${row.token}', () {
-          final double ratio = DsTokenRegistry.contrastRatio(row.token, theme);
+          final double ratio = ElTokenRegistry.contrastRatio(row.token, theme);
           expect(
             ratio,
             closeTo(row.ratio, 0.1),
-            reason: '${row.token} on ${kind.name}: colors-map says '
+            reason:
+                '${row.token} on ${kind.name}: colors-map says '
                 '${row.ratio}, we measure ${ratio.toStringAsFixed(3)}',
           );
-          expect(dsContrastVerdict(ratio), row.verdict);
+          expect(elContrastVerdict(ratio), row.verdict);
         });
       }
     }
   });
 
-  group('DsTokenRegistry', () {
+  group('ElTokenRegistry', () {
     test('prints the compiled stylesheet\'s hex, per theme', () {
       // `globals.css` authors `hsl(240 10% 3.9%)` here; the browser is served
       // — and therefore reads back — the minifier's `#09090b`.
-      expect(DsTokenRegistry.printedValue('--background', DsThemeKind.dark),
-          '#09090b');
-      expect(DsTokenRegistry.printedValue('--background', DsThemeKind.light),
-          '#fff');
-      expect(DsTokenRegistry.printedValue('--muted-foreground', DsThemeKind.dark),
-          '#d4d4d8');
       expect(
-          DsTokenRegistry.printedValue('--muted-foreground', DsThemeKind.light),
-          '#62626a');
+        ElTokenRegistry.printedValue('--background', ElThemeKind.dark),
+        '#09090b',
+      );
+      expect(
+        ElTokenRegistry.printedValue('--background', ElThemeKind.light),
+        '#fff',
+      );
+      expect(
+        ElTokenRegistry.printedValue('--muted-foreground', ElThemeKind.dark),
+        '#d4d4d8',
+      );
+      expect(
+        ElTokenRegistry.printedValue('--muted-foreground', ElThemeKind.light),
+        '#62626a',
+      );
       // A token authored as hex passes through untouched.
-      expect(DsTokenRegistry.printedValue('--color-value', DsThemeKind.dark),
-          '#a3e635');
+      expect(
+        ElTokenRegistry.printedValue('--color-value', ElThemeKind.dark),
+        '#a3e635',
+      );
       // A ramp token is declared once, so it prints the same text in both.
-      expect(DsTokenRegistry.printedValue('--color-value', DsThemeKind.light),
-          '#a3e635');
-      expect(DsTokenRegistry.printedValue('--destructive', DsThemeKind.dark),
-          '#dc2626');
+      expect(
+        ElTokenRegistry.printedValue('--color-value', ElThemeKind.light),
+        '#a3e635',
+      );
+      expect(
+        ElTokenRegistry.printedValue('--destructive', ElThemeKind.dark),
+        '#dc2626',
+      );
       // The ink tokens are the ones that flip.
       expect(
-          DsTokenRegistry.printedValue('--color-action-ink', DsThemeKind.dark),
-          '#92c2fc');
+        ElTokenRegistry.printedValue('--color-action-ink', ElThemeKind.dark),
+        '#92c2fc',
+      );
       expect(
-          DsTokenRegistry.printedValue('--color-action-ink', DsThemeKind.light),
-          '#143694');
-      expect(DsTokenRegistry.printedValue('--color-value-ink', DsThemeKind.dark),
-          '#d9f99d');
+        ElTokenRegistry.printedValue('--color-action-ink', ElThemeKind.light),
+        '#143694',
+      );
       expect(
-          DsTokenRegistry.printedValue('--color-value-ink', DsThemeKind.light),
-          '#4d7c0f');
+        ElTokenRegistry.printedValue('--color-value-ink', ElThemeKind.dark),
+        '#d9f99d',
+      );
+      expect(
+        ElTokenRegistry.printedValue('--color-value-ink', ElThemeKind.light),
+        '#4d7c0f',
+      );
     });
 
     test('the three-digit collapse is the only shape variation', () {
@@ -367,16 +392,16 @@ void main() {
       // nibbles, and the reference prints it `#fff`. Everything else is six
       // digits — including `#fafafa`, which looks collapsible and is not
       // (`fa` is two different nibbles).
-      expect(dsCssColorText(dsHsl(0, 0, 100)), '#fff');
-      expect(dsCssColorText(DsThemeData.dark.foreground), '#fafafa');
-      expect(dsCssColorText(DsThemeData.light.background), '#fff');
-      expect(dsCssColorText(DsThemeData.light.card), '#fff');
+      expect(elCssColorText(elHsl(0, 0, 100)), '#fff');
+      expect(elCssColorText(ElThemeData.dark.foreground), '#fafafa');
+      expect(elCssColorText(ElThemeData.light.background), '#fff');
+      expect(elCssColorText(ElThemeData.light.card), '#fff');
       // Every registered token, both themes, is one of the two hex shapes and
       // is lowercase — the minifier never emits anything else here.
-      for (final String token in DsTokenRegistry.names) {
-        for (final DsThemeKind kind in DsThemeKind.values) {
+      for (final String token in ElTokenRegistry.names) {
+        for (final ElThemeKind kind in ElThemeKind.values) {
           expect(
-            DsTokenRegistry.printedValue(token, kind),
+            ElTokenRegistry.printedValue(token, kind),
             matches(_hexText),
             reason: '$token on ${kind.name}',
           );
@@ -385,25 +410,31 @@ void main() {
     });
 
     test('resolves through the live theme, not through the printed text', () {
-      expect(DsTokenRegistry.resolve('--background', DsThemeData.dark),
-          DsThemeData.dark.background);
-      expect(DsTokenRegistry.resolve('--color-action-ink', DsThemeData.light),
-          DsPalette.actionDark);
-      expect(DsTokenRegistry.resolve('--color-value', DsThemeData.light),
-          DsPalette.value);
+      expect(
+        ElTokenRegistry.resolve('--background', ElThemeData.dark),
+        ElThemeData.dark.background,
+      );
+      expect(
+        ElTokenRegistry.resolve('--color-action-ink', ElThemeData.light),
+        ElPalette.actionDark,
+      );
+      expect(
+        ElTokenRegistry.resolve('--color-value', ElThemeData.light),
+        ElPalette.value,
+      );
     });
 
-    test('what a token paints is what it prints — every token, both themes',
-        () {
+    test('what a token paints is what it prints — every token, both themes', () {
       // The swatch colour and the readout beside it are the same colour. Since
       // the readout is derived, this proves the derivation loses nothing on the
       // way out and comes back to the byte it started from.
-      for (final String token in DsTokenRegistry.names) {
-        for (final DsThemeKind kind in DsThemeKind.values) {
+      for (final String token in ElTokenRegistry.names) {
+        for (final ElThemeKind kind in ElThemeKind.values) {
           expect(
-            DsTokenRegistry.resolve(token, _theme(kind)),
-            _parseCss(DsTokenRegistry.printedValue(token, kind)),
-            reason: '$token on ${kind.name}: the painted colour and the printed '
+            ElTokenRegistry.resolve(token, _theme(kind)),
+            _parseCss(ElTokenRegistry.printedValue(token, kind)),
+            reason:
+                '$token on ${kind.name}: the painted colour and the printed '
                 'value disagree — one of the two halves is wrong',
           );
         }
@@ -411,38 +442,44 @@ void main() {
     });
 
     test('an unregistered name is an error, not a silent zero', () {
-      expect(DsTokenRegistry.has('--not-a-token'), isFalse);
-      expect(() => DsTokenRegistry.resolve('--not-a-token', DsThemeData.dark),
-          throwsArgumentError);
+      expect(ElTokenRegistry.has('--not-a-token'), isFalse);
       expect(
-        () => DsTokenRegistry.printedValue('--not-a-token', DsThemeKind.dark),
+        () => ElTokenRegistry.resolve('--not-a-token', ElThemeData.dark),
+        throwsArgumentError,
+      );
+      expect(
+        () => ElTokenRegistry.printedValue('--not-a-token', ElThemeKind.dark),
         throwsArgumentError,
       );
     });
   });
 
   group('the widgets', () {
-    testWidgets('a swatch row prints name, value, token and badge',
-        (WidgetTester tester) async {
+    testWidgets('a swatch row prints name, value, token and badge', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         _scope(
-          const DsTokenSwatchList(
+          const ElTokenSwatchList(
             rows: <Widget>[
-              DsTokenSwatch(
+              ElTokenSwatch(
                 token: '--muted-foreground',
                 name: 'Muted foreground',
                 use: 'Secondary text, metadata, helper copy.',
               ),
             ],
           ),
-          DsThemeMode.dark,
+          ElThemeMode.dark,
         ),
       );
 
       expect(find.text('Muted foreground'), findsOneWidget);
       expect(find.text('#d4d4d8'), findsOneWidget);
       expect(find.text('--muted-foreground'), findsOneWidget);
-      expect(find.text('Secondary text, metadata, helper copy.'), findsOneWidget);
+      expect(
+        find.text('Secondary text, metadata, helper copy.'),
+        findsOneWidget,
+      );
       // `.type-micro` uppercases the whole badge.
       expect(
         find.textContaining('CONTRAST 13.5:1 · AAA', findRichText: true),
@@ -450,44 +487,46 @@ void main() {
       );
     });
 
-    testWidgets('at sm the row is an 88 / 208 / flex grid with 24px gaps',
-        (WidgetTester tester) async {
+    testWidgets('at sm the row is an 88 / 208 / flex grid with 24px gaps', (
+      WidgetTester tester,
+    ) async {
       // `sm:grid-cols-[5.5rem_minmax(0,13rem)_1fr] sm:gap-6 p-4`, and the
       // swatch tightens from `h-16` to `sm:h-14`.
       await tester.pumpWidget(
         _scope(
-          const DsTokenSwatch(
+          const ElTokenSwatch(
             token: '--muted-foreground',
             name: 'Muted foreground',
             use: 'Secondary text, metadata, helper copy.',
           ),
-          DsThemeMode.dark,
+          ElThemeMode.dark,
         ),
       );
 
       final Finder swatch = find.byType(DecoratedBox);
-      expect(tester.getSize(swatch), Size(ds(22), ds(14)));
+      expect(tester.getSize(swatch), Size(el(22), el(14)));
 
       final double left = tester.getTopLeft(swatch).dx;
       // Column two starts after the swatch track plus one gap…
       expect(
         tester.getTopLeft(find.text('Muted foreground')).dx,
-        closeTo(left + ds(22) + ds(6), 0.01),
+        closeTo(left + el(22) + el(6), 0.01),
       );
       // …and column three after the 13rem name track plus another gap.
       expect(
         tester
             .getTopLeft(find.text('Secondary text, metadata, helper copy.'))
             .dx,
-        closeTo(left + ds(22) + ds(6) + ds(52) + ds(6), 0.01),
+        closeTo(left + el(22) + el(6) + el(52) + el(6), 0.01),
       );
     });
 
-    testWidgets('below sm the three cells stack instead',
-        (WidgetTester tester) async {
+    testWidgets('below sm the three cells stack instead', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
-        DsTheme(
-          controller: DsThemeController(mode: DsThemeMode.dark),
+        ElTheme(
+          controller: ElThemeController(mode: ElThemeMode.dark),
           child: Directionality(
             textDirection: TextDirection.ltr,
             child: MediaQuery(
@@ -497,7 +536,7 @@ void main() {
                 alignment: Alignment.topLeft,
                 child: SizedBox(
                   width: 400,
-                  child: const DsTokenSwatch(
+                  child: const ElTokenSwatch(
                     token: '--muted-foreground',
                     name: 'Muted foreground',
                     use: 'Secondary text, metadata, helper copy.',
@@ -511,7 +550,7 @@ void main() {
 
       final Finder swatch = find.byType(DecoratedBox);
       // `h-16` — the taller mobile swatch, full width of the column.
-      expect(tester.getSize(swatch).height, ds(16));
+      expect(tester.getSize(swatch).height, el(16));
 
       final Offset mark = tester.getTopLeft(swatch);
       final Offset name = tester.getTopLeft(find.text('Muted foreground'));
@@ -519,40 +558,42 @@ void main() {
       expect(name.dx, closeTo(mark.dx, 0.01));
     });
 
-    testWidgets('the badge renders uppercase, and only the verdict is tinted',
-        (WidgetTester tester) async {
+    testWidgets('the badge renders uppercase, and only the verdict is tinted', (
+      WidgetTester tester,
+    ) async {
       // `.type-micro` carries `text-transform: uppercase`, and the property is
       // inherited, so the verdict span uppercases with the sentence around it.
       // The authored copy is `Contrast 13.5:1 · AAA`; the pixels are its caps.
-      expect(DsType.micro.uppercase, isTrue);
+      expect(ElType.micro.uppercase, isTrue);
 
       await tester.pumpWidget(
-        _scope(const DsContrastBadge('--muted-foreground'), DsThemeMode.dark),
+        _scope(const ElContrastBadge('--muted-foreground'), ElThemeMode.dark),
       );
 
-      final double raw = DsTokenRegistry.contrastRatio(
+      final double raw = ElTokenRegistry.contrastRatio(
         '--muted-foreground',
-        DsThemeData.dark,
+        ElThemeData.dark,
       );
-      expect(dsContrastBadgeText(raw), 'Contrast 13.5:1 · AAA');
+      expect(elContrastBadgeText(raw), 'Contrast 13.5:1 · AAA');
 
       final TextSpan root =
           tester.widget<Text>(find.byType(Text)).textSpan! as TextSpan;
-      expect(root.toPlainText(), dsContrastBadgeText(raw).toUpperCase());
+      expect(root.toPlainText(), elContrastBadgeText(raw).toUpperCase());
 
       final List<InlineSpan> spans = root.children!;
       expect(spans, hasLength(2));
       expect((spans[0] as TextSpan).text, 'CONTRAST 13.5:1 · ');
       expect((spans[1] as TextSpan).text, 'AAA');
       // The sentence is muted; only the verdict word takes value ink.
-      expect(root.style!.color, DsThemeData.dark.mutedForeground);
-      expect((spans[1] as TextSpan).style!.color, DsThemeData.dark.valueInk);
+      expect(root.style!.color, ElThemeData.dark.mutedForeground);
+      expect((spans[1] as TextSpan).style!.color, ElThemeData.dark.valueInk);
     });
 
-    testWidgets('a failing verdict takes destructive ink instead',
-        (WidgetTester tester) async {
+    testWidgets('a failing verdict takes destructive ink instead', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
-        _scope(const DsContrastBadge('--color-value'), DsThemeMode.light),
+        _scope(const ElContrastBadge('--color-value'), ElThemeMode.light),
       );
 
       final TextSpan root =
@@ -560,77 +601,82 @@ void main() {
       expect(root.toPlainText(), 'CONTRAST 1.5:1 · FAILS');
       expect(
         (root.children![1] as TextSpan).style!.color,
-        DsThemeData.light.destructiveInk,
+        ElThemeData.light.destructiveInk,
       );
     });
 
-    testWidgets('a badge can be measured against a surface other than the page',
-        (WidgetTester tester) async {
+    testWidgets('a badge can be measured against a surface other than the page', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         _scope(
-          const DsContrastBadge('--destructive', against: '--card'),
-          DsThemeMode.dark,
+          const ElContrastBadge('--destructive', against: '--card'),
+          ElThemeMode.dark,
         ),
       );
 
-      final double onCard = dsContrastRatio(
-        DsThemeData.dark.destructive,
-        DsThemeData.dark.card,
+      final double onCard = elContrastRatio(
+        ElThemeData.dark.destructive,
+        ElThemeData.dark.card,
       );
       // colors-map drift #5: red measures ~4.1 on the page and lower on a card.
       expect(onCard, lessThan(4.1));
       expect(
         tester.widget<Text>(find.byType(Text)).textSpan!.toPlainText(),
-        dsContrastBadgeText(onCard).toUpperCase(),
+        elContrastBadgeText(onCard).toUpperCase(),
       );
     });
 
-    testWidgets('an unregistered token renders the em dash, never a crash',
-        (WidgetTester tester) async {
+    testWidgets('an unregistered token renders the em dash, never a crash', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         _scope(
           const Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              DsTokenValue('--not-a-token'),
-              DsContrastBadge('--not-a-token'),
+              ElTokenValue('--not-a-token'),
+              ElContrastBadge('--not-a-token'),
             ],
           ),
-          DsThemeMode.dark,
+          ElThemeMode.dark,
         ),
       );
 
       expect(find.text('—'), findsNWidgets(2));
     });
 
-    testWidgets('measure: false drops the badge — the pure fills',
-        (WidgetTester tester) async {
+    testWidgets('measure: false drops the badge — the pure fills', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         _scope(
-          const DsTokenSwatch(
+          const ElTokenSwatch(
             token: '--card',
             name: 'Card',
             use: 'Containers.',
             measure: false,
           ),
-          DsThemeMode.dark,
+          ElThemeMode.dark,
         ),
       );
 
       expect(find.text('Card'), findsOneWidget);
-      expect(find.byType(DsContrastBadge), findsNothing);
+      expect(find.byType(ElContrastBadge), findsNothing);
     });
 
-    testWidgets('the badge re-measures when the theme flips',
-        (WidgetTester tester) async {
-      final DsThemeController controller =
-          DsThemeController(mode: DsThemeMode.dark);
+    testWidgets('the badge re-measures when the theme flips', (
+      WidgetTester tester,
+    ) async {
+      final ElThemeController controller = ElThemeController(
+        mode: ElThemeMode.dark,
+      );
       await tester.pumpWidget(
-        DsTheme(
+        ElTheme(
           controller: controller,
           child: const Directionality(
             textDirection: TextDirection.ltr,
-            child: Center(child: DsContrastBadge('--color-action-bright')),
+            child: Center(child: ElContrastBadge('--color-action-bright')),
           ),
         ),
       );
@@ -640,7 +686,7 @@ void main() {
         findsOneWidget,
       );
 
-      controller.setMode(DsThemeMode.light);
+      controller.setMode(ElThemeMode.light);
       await tester.pump();
 
       expect(

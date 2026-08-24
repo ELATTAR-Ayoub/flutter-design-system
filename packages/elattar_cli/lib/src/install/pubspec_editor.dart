@@ -75,6 +75,29 @@ class PubspecEditor {
     );
   }
 
+  String addShaders(String source, Iterable<String> shaders) {
+    final List<String> additions = shaders
+        .where((String value) => value.trim().isNotEmpty)
+        .where((String value) => !source.contains('    - $value'))
+        .toList();
+    if (additions.isEmpty) return source;
+    final Match? match = _flutterBlock.firstMatch(source);
+    if (match == null)
+      return '$source\nflutter:\n  shaders:\n${additions.map((String v) => '    - $v\n').join()}';
+    final String body = match.group(1) ?? '';
+    if (body.contains(RegExp(r'^  shaders:\s*$', multiLine: true))) {
+      final int end = _sectionEnd(body, '  shaders:');
+      final String updated =
+          '${body.substring(0, end)}${additions.map((String v) => '    - $v\n').join()}${body.substring(end)}';
+      return source.replaceRange(match.start, match.end, 'flutter:\n$updated');
+    }
+    return source.replaceRange(
+      match.start,
+      match.end,
+      'flutter:\n$body  shaders:\n${additions.map((String v) => '    - $v\n').join()}',
+    );
+  }
+
   /// One `- family:` entry per family, in first-seen order, with every face of
   /// that family beneath it. Two `- family:` entries with the same name are a
   /// duplicate key that `flutter_tools` resolves by keeping only one.

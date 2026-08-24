@@ -23,17 +23,17 @@
 /// own readers; the stylesheet writes every one of them as `color-mix(in oklab,
 /// var(--color-value-bright) N%, white)` — the sheen's peak 95% at L2014, the
 /// corner light 75% at L2020, the glint's shoulders 45% at L1985/L1987 and its
-/// core 15% at L1986 — so they are computed here from [DsPalette] through
-/// [DsOklab.mix] like every other stop, and a rebrand of the value ramp carries
+/// core 15% at L1986 — so they are computed here from [ElPalette] through
+/// [ElOklab.mix] like every other stop, and a rebrand of the value ramp carries
 /// through this file untouched. Each derivation was checked against the map's
 /// hex and lands on it exactly; no hex from that table appears in `lib/`.
 /// `color-mix(…, X N%, transparent)` is the same colour at `N%` alpha
-/// (colors.dart L110–115), so the striations are [DsPalette.valueBright] at an
+/// (colors.dart L110–115), so the striations are [ElPalette.valueBright] at an
 /// alpha rather than the `rgba(217,249,157,…)` a devtools readout shows.
 ///
 /// **Painting order.** CSS paints a box in one fixed order: outer `box-shadow`,
 /// `background-color`, `background-image`, inset `box-shadow`, border, inline
-/// content, then positioned `::before`/`::after`. [DsMachineSurface.fill] is a
+/// content, then positioned `::before`/`::after`. [ElMachineSurface.fill] is a
 /// flat [Color] and cannot carry a gradient, so the ramp is spliced in from
 /// outside by a [Stack] whose children are that list in that order: the outer
 /// shadows, the ramp, the surface (inset shadows, border, label), then the two
@@ -65,7 +65,7 @@
 /// repainting the page.
 ///
 /// **Both loops run off ONE elapsed clock, and the glint's hover retiming
-/// therefore JUMPS — measured** (see [DsFoilValue.phaseAt]). CSS keeps an
+/// therefore JUMPS — measured** (see [ElFoilValue.phaseAt]). CSS keeps an
 /// animation's elapsed `currentTime` across a change to `animation-duration`
 /// and re-divides it; it does not preserve the phase. `foil-value:hover::before`
 /// changes nothing but the duration — 5.5s → 2.4s — so the glint teleports to
@@ -74,7 +74,7 @@
 /// and is a different animation.
 ///
 /// **Reduced motion.** Both loops re-read their period through
-/// [dsAnimationDuration] on each build, so under `MediaQuery.disableAnimations`
+/// [elAnimationDuration] on each build, so under `MediaQuery.disableAnimations`
 /// they get [Duration.zero], stop, and paint frame 0 — the glint invisible at
 /// `opacity: 0`, the foil at the drift's opening offsets. That is the port of
 /// the reference's blanket `prefers-reduced-motion` rule (globals.css
@@ -103,9 +103,9 @@ import 'machine_surface.dart';
 
 /// The CSS keyword `white`, the far side of five `color-mix()` stops here.
 ///
-/// Spelled through [dsHsl] rather than as a hex so it arrives by the same
+/// Spelled through [elHsl] rather than as a hex so it arrives by the same
 /// converter every other colour in the port does.
-final Color _white = dsHsl(0, 0, 100);
+final Color _white = elHsl(0, 0, 100);
 
 // ── The utility's own geometry ───────────────────────────────────────────────
 // Angles, sizes and stop positions belonging to this one effect. No other
@@ -185,14 +185,14 @@ const double _glintCoreMix = 0.15;
 /// The premium Button's surface: metal ramp, drifting foil, sweeping glint,
 /// wrapped around [child].
 ///
-/// Takes the same [DsShadowSpec], [BorderRadius] and [BoxBorder] a
-/// [DsMachineSurface] would, and splices the ramp in where CSS puts it. The
+/// Takes the same [ElShadowSpec], [BorderRadius] and [BoxBorder] a
+/// [ElMachineSurface] would, and splices the ramp in where CSS puts it. The
 /// caller stays in charge of which spec is live — `--shadow-btn-value` at rest,
 /// `--shadow-glow-value` on hover, `--shadow-btn-down` while pressed, any of
 /// them already carrying a prepended focus-ring layer — because that state
 /// table belongs to the Button, not to its surface.
-class DsFoilValue extends StatefulWidget {
-  const DsFoilValue({
+class ElFoilValue extends StatefulWidget {
+  const ElFoilValue({
     super.key,
     required this.spec,
     required this.radius,
@@ -203,7 +203,7 @@ class DsFoilValue extends StatefulWidget {
 
   /// The `--shadow-*` token to paint: outer layers under the ramp, inset layers
   /// over it.
-  final DsShadowSpec spec;
+  final ElShadowSpec spec;
 
   /// The shape. The ramp, both pseudo-layers and the inset shadows are all
   /// clipped to it — `border-radius: inherit` on the pseudo-elements, and
@@ -220,7 +220,7 @@ class DsFoilValue extends StatefulWidget {
 
   final Widget child;
 
-  /// The ramp's seven stops, oklab-mixed from [DsPalette] exactly as
+  /// The ramp's seven stops, oklab-mixed from [ElPalette] exactly as
   /// `linear-gradient(176deg, …)` does (L1964–1973).
   ///
   /// `176deg` is 4° off straight down — CSS measures gradient angles clockwise
@@ -237,13 +237,13 @@ class DsFoilValue extends StatefulWidget {
   /// the failure looks exactly like a design choice.
   @visibleForTesting
   static final List<Color> rampColors = <Color>[
-    DsOklab.mix(DsPalette.valueBright, _white, 0.94),
-    DsPalette.valueBright,
-    DsPalette.value,
-    DsOklab.mix(DsPalette.valueDark, DsPalette.value, 0.42),
-    DsPalette.value,
-    DsPalette.valueBright,
-    DsOklab.mix(DsPalette.valueBright, _white, 0.90),
+    ElOklab.mix(ElPalette.valueBright, _white, 0.94),
+    ElPalette.valueBright,
+    ElPalette.value,
+    ElOklab.mix(ElPalette.valueDark, ElPalette.value, 0.42),
+    ElPalette.value,
+    ElPalette.valueBright,
+    ElOklab.mix(ElPalette.valueBright, _white, 0.90),
   ];
 
   /// Where [rampColors] sit, as the `0..1` fractions Skia wants rather than the
@@ -310,7 +310,7 @@ class DsFoilValue extends StatefulWidget {
   ///
   /// A plain lerp because `value-foil-drift` is declared `linear` (L2030) —
   /// **no curve at all**. The controller's raw value drives it; there is no
-  /// [CurvedAnimation] anywhere near this, and `DsCurves` has no `linear`
+  /// [CurvedAnimation] anywhere near this, and `ElCurves` has no `linear`
   /// member to reach for by mistake.
   @visibleForTesting
   static double driftPosition(int layer, double t) =>
@@ -401,19 +401,21 @@ class DsFoilValue extends StatefulWidget {
   }
 
   @override
-  State<DsFoilValue> createState() => _DsFoilValueState();
+  State<ElFoilValue> createState() => _ElFoilValueState();
 }
 
 /// One `value-glint` keyframe gap, on `--ease-in-out`. The shape
 /// `sliding_pill.dart` uses for `yuki-jelly` (L257–262).
 TweenSequenceItem<double> _glintStep(double from, double to, double weight) =>
     TweenSequenceItem<double>(
-      tween: Tween<double>(begin: from, end: to)
-          .chain(CurveTween(curve: DsCurves.inOut)),
+      tween: Tween<double>(
+        begin: from,
+        end: to,
+      ).chain(CurveTween(curve: ElCurves.inOut)),
       weight: weight,
     );
 
-class _DsFoilValueState extends State<DsFoilValue>
+class _ElFoilValueState extends State<ElFoilValue>
     with SingleTickerProviderStateMixin {
   /// **One clock for both pseudo-elements**, and the reason it is a bare
   /// [Ticker] rather than two [AnimationController]s: what a browser preserves
@@ -431,8 +433,9 @@ class _DsFoilValueState extends State<DsFoilValue>
   /// Both animations' `currentTime`, and the repaint trigger for the shared
   /// painter (`::after` blends over `::before`'s result, so they paint
   /// together).
-  final ValueNotifier<Duration> _elapsed =
-      ValueNotifier<Duration>(Duration.zero);
+  final ValueNotifier<Duration> _elapsed = ValueNotifier<Duration>(
+    Duration.zero,
+  );
 
   /// Whether the clock is running. It stops for exactly one reason — reduced
   /// motion — because both of these animations are `infinite` and have no
@@ -455,7 +458,7 @@ class _DsFoilValueState extends State<DsFoilValue>
   void _onTick(Duration elapsed) => _elapsed.value = elapsed;
 
   /// Starts or stills the shared clock. Where the two animations stand once it
-  /// is running is [DsFoilValue.phaseAt], which is where the B10b ruling is
+  /// is running is [ElFoilValue.phaseAt], which is where the B10b ruling is
   /// recorded.
   void _run(bool running) {
     if (running == _running) return;
@@ -470,13 +473,15 @@ class _DsFoilValueState extends State<DsFoilValue>
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
 
-    final Duration driftPeriod =
-        dsAnimationDuration(context, DsDurations.foilDrift);
-    final Duration glintPeriod = dsAnimationDuration(
+    final Duration driftPeriod = elAnimationDuration(
       context,
-      widget.hovered ? DsDurations.glintHover : DsDurations.glint,
+      ElDurations.foilDrift,
+    );
+    final Duration glintPeriod = elAnimationDuration(
+      context,
+      widget.hovered ? ElDurations.glintHover : ElDurations.glint,
     );
     _run(driftPeriod > Duration.zero || glintPeriod > Duration.zero);
 
@@ -510,8 +515,8 @@ class _DsFoilValueState extends State<DsFoilValue>
           ),
           // 3 — inset `box-shadow`, border, then inline content. The one
           // non-positioned child, so the Stack takes its size from here.
-          DsMachineSurface(
-            spec: DsShadowSpec(widget.spec.insetLayers),
+          ElMachineSurface(
+            spec: ElShadowSpec(widget.spec.insetLayers),
             radius: widget.radius,
             border: widget.border,
             child: widget.child,
@@ -525,11 +530,11 @@ class _DsFoilValueState extends State<DsFoilValue>
                   animation: _elapsed,
                   builder: (BuildContext context, Widget? _) => CustomPaint(
                     painter: _PseudoPainter(
-                      drift: DsFoilValue.phaseAt(_elapsed.value, driftPeriod),
-                      glint: DsFoilValue.phaseAt(_elapsed.value, glintPeriod),
+                      drift: ElFoilValue.phaseAt(_elapsed.value, driftPeriod),
+                      glint: ElFoilValue.phaseAt(_elapsed.value, glintPeriod),
                       opacity: widget.hovered
-                          ? DsFoilValue.foilHoverOpacity
-                          : DsFoilValue.foilOpacity,
+                          ? ElFoilValue.foilHoverOpacity
+                          : ElFoilValue.foilOpacity,
                     ),
                   ),
                 ),
@@ -557,13 +562,13 @@ class _RampPainter extends CustomPainter {
         ..shader = ui.Gradient.linear(
           from,
           to,
-          DsFoilValue.rampColors,
-          DsFoilValue.rampStops,
+          ElFoilValue.rampColors,
+          ElFoilValue.rampStops,
         ),
     );
   }
 
-  /// Nothing here depends on state: the stops come from [DsPalette], which does
+  /// Nothing here depends on state: the stops come from [ElPalette], which does
   /// not flip with the theme. The value ramp is the one surface in the system
   /// that looks the same on a white page as on a black one.
   @override
@@ -588,8 +593,8 @@ class _PseudoPainter extends CustomPainter {
   /// `value-glint` progress, `0..1`. The easing is inside the animatables.
   final double glint;
 
-  /// `::after`'s own opacity — [DsFoilValue.foilOpacity], or
-  /// [DsFoilValue.foilHoverOpacity] while hovered.
+  /// `::after`'s own opacity — [ElFoilValue.foilOpacity], or
+  /// [ElFoilValue.foilHoverOpacity] while hovered.
   final double opacity;
 
   @override
@@ -603,24 +608,27 @@ class _PseudoPainter extends CustomPainter {
   /// `::before` — one band on a 260%-wide image, screened, at the keyframe's
   /// opacity and position.
   void _paintGlint(Canvas canvas, Rect box) {
-    final double alpha = DsFoilValue.glintOpacity.transform(glint);
+    final double alpha = ElFoilValue.glintOpacity.transform(glint);
     if (alpha <= 0) return;
 
     final Rect image = _imageRect(
       box,
       sizeX: _glintWidth,
       sizeY: 1,
-      posX: DsFoilValue.glintPosition.transform(glint),
+      posX: ElFoilValue.glintPosition.transform(glint),
       posY: _foilPosY,
     );
     final (Offset from, Offset to) = _gradientLine(_glintAngle, image);
-    final Color edge =
-        DsOklab.mix(DsPalette.valueBright, _white, _glintEdgeMix);
+    final Color edge = ElOklab.mix(
+      ElPalette.valueBright,
+      _white,
+      _glintEdgeMix,
+    );
 
     // `opacity` and `mix-blend-mode` are the pseudo-element's, so they apply to
     // the finished layer rather than to the gradient inside it. The layer's
     // bounds are the button's box, which is also `overflow-hidden`.
-    canvas.saveLayer(box, _groupPaint(alpha, DsFoilValue.glintBlend));
+    canvas.saveLayer(box, _groupPaint(alpha, ElFoilValue.glintBlend));
     canvas.drawRect(
       image,
       Paint()
@@ -633,7 +641,7 @@ class _PseudoPainter extends CustomPainter {
             // contributes no colour at all (`page_glow.dart` L109–117).
             edge.withValues(alpha: 0),
             edge,
-            DsOklab.mix(DsPalette.valueBright, _white, _glintCoreMix),
+            ElOklab.mix(ElPalette.valueBright, _white, _glintCoreMix),
             edge,
             edge.withValues(alpha: 0),
           ],
@@ -652,9 +660,9 @@ class _PseudoPainter extends CustomPainter {
   /// `::after` — three background layers under one group alpha and one
   /// soft-light blend.
   void _paintFoil(Canvas canvas, Rect box) {
-    canvas.saveLayer(box, _groupPaint(opacity, DsFoilValue.foilBlend));
+    canvas.saveLayer(box, _groupPaint(opacity, ElFoilValue.foilBlend));
     // CSS paints the FIRST-listed background layer on top, so the three are
-    // walked backwards — the same reversal `DsShadowSpec.outerShadows` makes.
+    // walked backwards — the same reversal `ElShadowSpec.outerShadows` makes.
     _paintCorner(canvas, box);
     _paintSheen(canvas, box);
     _paintStriations(canvas, box);
@@ -668,10 +676,10 @@ class _PseudoPainter extends CustomPainter {
       box,
       sizeX: _foilSizes[2],
       sizeY: 1,
-      posX: DsFoilValue.driftPosition(2, drift),
+      posX: ElFoilValue.driftPosition(2, drift),
       posY: _foilPosY,
     );
-    final Color light = DsOklab.mix(DsPalette.valueBright, _white, _cornerMix);
+    final Color light = ElOklab.mix(ElPalette.valueBright, _white, _cornerMix);
     canvas.drawRect(
       image,
       Paint()
@@ -694,12 +702,15 @@ class _PseudoPainter extends CustomPainter {
       box,
       sizeX: _foilSizes[1],
       sizeY: 1,
-      posX: DsFoilValue.driftPosition(1, drift),
+      posX: ElFoilValue.driftPosition(1, drift),
       posY: _foilPosY,
     );
     final (Offset from, Offset to) = _gradientLine(_sheenAngle, image);
-    final Color peak =
-        DsOklab.mix(DsPalette.valueBright, _white, _sheenPeakMix);
+    final Color peak = ElOklab.mix(
+      ElPalette.valueBright,
+      _white,
+      _sheenPeakMix,
+    );
     canvas.drawRect(
       image,
       Paint()
@@ -709,8 +720,8 @@ class _PseudoPainter extends CustomPainter {
           <Color>[
             peak.withValues(alpha: 0),
             peak,
-            DsPalette.valueBright.withValues(alpha: _sheenTailAlpha),
-            DsPalette.valueBright.withValues(alpha: 0),
+            ElPalette.valueBright.withValues(alpha: _sheenTailAlpha),
+            ElPalette.valueBright.withValues(alpha: 0),
           ],
           const <double>[_sheenIn, _sheenPeak, _sheenTail, _sheenOut],
         ),
@@ -724,7 +735,7 @@ class _PseudoPainter extends CustomPainter {
       box,
       sizeX: _foilSizes[0],
       sizeY: 1,
-      posX: DsFoilValue.driftPosition(0, drift),
+      posX: ElFoilValue.driftPosition(0, drift),
       posY: _foilPosY,
     );
     final (Offset from, Offset to) = _gradientLine(_striationAngle, image);
@@ -740,10 +751,10 @@ class _PseudoPainter extends CustomPainter {
           from,
           from + tile,
           <Color>[
-            DsPalette.valueBright.withValues(alpha: _striationAlpha),
-            DsPalette.valueBright.withValues(alpha: _striationAlpha),
-            DsPalette.valueBright.withValues(alpha: 0),
-            DsPalette.valueBright.withValues(alpha: 0),
+            ElPalette.valueBright.withValues(alpha: _striationAlpha),
+            ElPalette.valueBright.withValues(alpha: _striationAlpha),
+            ElPalette.valueBright.withValues(alpha: 0),
+            ElPalette.valueBright.withValues(alpha: 0),
           ],
           <double>[0, duty, duty, 1],
           TileMode.repeated,
@@ -821,7 +832,7 @@ Rect _imageRect(
 /// that plainly.
 Paint _groupPaint(double opacity, BlendMode blend) => Paint()
   ..blendMode = blend
-  ..color = dsTransparent.withValues(alpha: opacity);
+  ..color = elTransparent.withValues(alpha: opacity);
 
 /// CSS `radial-gradient(<rx> <ry> at <cx> <cy>, …)`, every value a fraction of
 /// [box]'s own width or height.

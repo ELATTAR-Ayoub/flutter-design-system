@@ -1,0 +1,35 @@
+{
+  "name": "accordion",
+  "type": "component",
+  "version": "0.0.1",
+  "description": "`components/ui/accordion.tsx` — a set of related disclosures where only one",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/accordion.dart",
+      "target": "@ui/accordion.dart",
+      "sha256": "40ff818aafcb31196ae1a89d1d6ee0fe8315077ead4453f3a47971e3fba970cb"
+    }
+  ],
+  "registryDependencies": [
+    "button",
+    "collapsible",
+    "icon",
+    "machine-surface",
+    "source-foundation"
+  ],
+  "semanticDependencies": [
+    "button",
+    "collapsible",
+    "icon",
+    "machine-surface"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "documentationRoute": "/components/accordion",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/accordion.dart",
+  "deprecated": false
+}

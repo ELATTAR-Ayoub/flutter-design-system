@@ -9,15 +9,15 @@ library;
 ///
 /// `--spacing` is never redeclared in `globals.css`, so it keeps Tailwind v4's
 /// default `0.25rem` = 4px, and every gap in that file is
-/// `calc(var(--spacing) * n)`. [ds] is that multiplication: `ds(6)` is `gap-6`
+/// `calc(var(--spacing) * n)`. [el] is that multiplication: `el(6)` is `gap-6`
 /// is 24px.
-double ds(num n) => n.toDouble() * 4.0;
+double el(num n) => n.toDouble() * 4.0;
 
 /// The measures the shell and its pages are built on — globals.css L228–322.
 ///
 /// These are the widths that are neither a component's own size nor a fraction
 /// of the viewport; each is a `--width-*` / `--height-*` token in the reference.
-class DsWidths {
+class ElWidths {
   /// `--width-shell: 1680px` — globals.css L228. The outer frame the sidebar
   /// and the main column share.
   static const double shell = 1680;
@@ -41,6 +41,17 @@ class DsWidths {
   /// `--width-rail: 15rem` = 240px — globals.css L251. The reading rail: a
   /// table of contents, an anchor list, an article's metadata column.
   static const double rail = 240;
+
+  /// **640px.** Not a `globals.css` token: this project's own reference has
+  /// no rung between [prose] (720) and [rail] (240). Recorded here because
+  /// it is a real measure read off a live page, not a guess — the shadcn
+  /// docs site's own article column (`max-w-160` on
+  /// `https://ui.shadcn.com/docs/installation`, confirmed via its own
+  /// rendered layout) caps at exactly this width, distinct from both
+  /// [content] (the wider three-column shell measure) and [prose] (this
+  /// port's own plain-text column). The documentation article reads at
+  /// this width, not [content], to match that reference.
+  static const double article = 640;
 
   /// `--width-sidebar: 16rem` = 256px — globals.css L320. The app shell's
   /// navigation panel.
@@ -74,8 +85,8 @@ class DsWidths {
 /// The corner ladder — globals.css L324–339.
 ///
 /// Both theme blocks also set `--radius: 10px` (L605 / L814), which is
-/// numerically [md]; it is exposed per theme as `DsThemeData.radius`.
-class DsRadii {
+/// numerically [md]; it is exposed per theme as `ElThemeData.radius`.
+class ElRadii {
   /// `--radius-xs: 2px` — L324. Tips and swatches only: a tooltip arrow, a
   /// chart legend key. Nothing with content in it should be this sharp.
   static const double xs = 2;
@@ -119,7 +130,7 @@ class DsRadii {
   ///
   /// The base is [md] because `--radius` resolves to 10px in *both* theme
   /// blocks (globals.css L605 / L814) — numerically the same 10 the
-  /// `--radius-md` rung carries. [DsThemeData.radius] is the per-theme reading
+  /// `--radius-md` rung carries. [ElThemeData.radius] is the per-theme reading
   /// of `--radius`; if the two themes ever disagree, that is what this should
   /// be derived from instead, and this getter is the one place to change.
   static double get addonButton => md - _addonButtonInset;
@@ -132,8 +143,8 @@ class DsRadii {
 /// deviation** (Filter Effects §8.4), unlike `box-shadow`, whose blur radius
 /// is twice sigma. These values therefore go straight into
 /// `ImageFilter.blur(sigmaX:, sigmaY:)` with no conversion.
-class DsBlurs {
-  const DsBlurs._();
+class ElBlurs {
+  const ElBlurs._();
 
   /// `--blur-xs: 4px` — `backdrop-blur-xs` on the sheet overlay.
   static const double xs = 4;
@@ -146,11 +157,11 @@ class DsBlurs {
 /// Tailwind's stock container ladder — the `--container-*` scale, which
 /// `globals.css` never redeclares, so the framework defaults render.
 ///
-/// Only the rungs the port actually reaches for are transcribed, on [DsBlurs]'s
+/// Only the rungs the port actually reaches for are transcribed, on [ElBlurs]'s
 /// precedent: a ladder with no consumer is a guess about what the reference
 /// will need next.
-class DsContainers {
-  const DsContainers._();
+class ElContainers {
+  const ElContainers._();
 
   /// `--container-sm: 24rem` = **384px** — `max-w-sm`.
   ///
@@ -182,7 +193,7 @@ class DsContainers {
 ///
 /// `globals.css` never redeclares `--breakpoint-*`, so the framework defaults
 /// stand; the shell is desktop-first and shows its sidebar from [lg] up.
-class DsBreakpoints {
+class ElBreakpoints {
   /// 640px.
   static const double sm = 640;
 

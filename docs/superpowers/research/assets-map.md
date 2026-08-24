@@ -60,10 +60,10 @@ Weight tokens: `--font-weight-normal: 400; --font-weight-medium: 500; --font-wei
 **Shell — root layout (`app/layout.tsx`) + docs layout (`app/design-system/layout.tsx`):**
 | Icon | Where | Rendered spec |
 |---|---|---|
-| `Menu` | `components/ds/ds-nav.tsx` `DsMobileNav` trigger (Button variant outline size icon, `lg:hidden`) | via `Icon`, md 16px, stroke 2.4, tone inherit |
+| `Menu` | `components/el/el-nav.tsx` `ElMobileNav` trigger (Button variant outline size icon, `lg:hidden`) | via `Icon`, md 16px, stroke 2.4, tone inherit |
 | `XIcon` | `components/ui/sheet.tsx` close button inside the mobile nav SheetContent (absolute top-3 right-3, `size="icon-sm"`, sr-only "Close") | via `Icon`, md 16px, stroke 2.4 |
-| `SunIcon`, `MonitorIcon`, `MoonIcon` | `components/ds/theme-toggle.tsx` (Light · System · Dark radiogroup, order: light/system/dark) | direct render, `size-3.5` = 14px, stroke 2 |
-| *(custom, not lucide)* logo chevron | `components/ds/logo.tsx` `LogoMark` | inline SVG `viewBox="0 0 24 24"`, `size-4` (16px) in a `size-7` (28px) `rounded-md bg-action` tile; path 1 `M6 15.5 12 6l6 9.5` stroke `var(--primary-foreground)` width 2.4 linecap square; path 2 `M6 19h12` stroke `var(--color-value-bright)` width 2.4. Wordmark text: `ELATTAR` + `.DS` in `text-value-ink`, `.type-wordmark` |
+| `SunIcon`, `MonitorIcon`, `MoonIcon` | `components/el/theme-toggle.tsx` (Light · System · Dark radiogroup, order: light/system/dark) | direct render, `size-3.5` = 14px, stroke 2 |
+| *(custom, not lucide)* logo chevron | `components/el/logo.tsx` `LogoMark` | inline SVG `viewBox="0 0 24 24"`, `size-4` (16px) in a `size-7` (28px) `rounded-md bg-action` tile; path 1 `M6 15.5 12 6l6 9.5` stroke `var(--primary-foreground)` width 2.4 linecap square; path 2 `M6 19h12` stroke `var(--color-value-bright)` width 2.4. Wordmark text: `ELATTAR` + `ELATTAR` in `text-value-ink`, `.type-wordmark` |
 | `CircleCheckIcon`, `InfoIcon`, `TriangleAlertIcon`, `OctagonXIcon`, `Loader2Icon` | `components/ui/sonner.tsx` Toaster (mounted globally in root layout, bottom-right) | only visible when a toast fires — none fire on these four pages |
 
 **Overview `/design-system` (`app/design-system/page.tsx`):**

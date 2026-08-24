@@ -53,13 +53,8 @@ const double _ringAlpha = 0.10;
 const double _bandAlpha = 0.50;
 
 /// The card's own surface.
-class DsCard extends StatelessWidget {
-  const DsCard({
-    super.key,
-    required this.children,
-    this.fill,
-    this.ringColor,
-  });
+class ElCard extends StatelessWidget {
+  const ElCard({super.key, required this.children, this.fill, this.ringColor});
 
   /// `CardHeader`, `CardContent`, `CardFooter` — in the order they are written.
   final List<Widget> children;
@@ -73,31 +68,31 @@ class DsCard extends StatelessWidget {
   final Color? ringColor;
 
   /// `[--card-spacing:--spacing(4)]` — the padding *and* the gap.
-  static double get spacing => ds(4);
+  static double get spacing => el(4);
 
   /// `rounded-xl`.
-  static double get radius => DsRadii.xl;
+  static double get radius => ElRadii.xl;
 
   /// `ring-1`.
-  static double get ringWidth => DsWidths.hairline;
+  static double get ringWidth => ElWidths.hairline;
 
   /// The default ring colour.
-  static Color ringOf(DsThemeData theme) =>
+  static Color ringOf(ElThemeData theme) =>
       theme.foreground.withValues(alpha: _ringAlpha);
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     final BorderRadius shape = BorderRadius.circular(radius);
     final Color ring = ringColor ?? ringOf(theme);
     // `has-data-[slot=card-footer]:pb-0`.
-    final bool footer = children.isNotEmpty && children.last is DsCardFooter;
+    final bool footer = children.isNotEmpty && children.last is ElCardFooter;
 
     return DecoratedBox(
       decoration: BoxDecoration(
         borderRadius: shape,
-        boxShadow: DsShadowSpec(<DsShadowLayer>[
-          DsShadowLayer(0, 0, 0, ringWidth, (DsThemeData _) => ring),
+        boxShadow: ElShadowSpec(<ElShadowLayer>[
+          ElShadowLayer(0, 0, 0, ringWidth, (ElThemeData _) => ring),
         ]).outerShadows(theme),
       ),
       child: ClipRRect(
@@ -128,8 +123,8 @@ class DsCard extends StatelessWidget {
 
 /// `<CardHeader>` — `grid auto-rows-min items-start gap-1
 /// px-(--card-spacing)`.
-class DsCardHeader extends StatelessWidget {
-  const DsCardHeader({
+class ElCardHeader extends StatelessWidget {
+  const ElCardHeader({
     super.key,
     required this.title,
     this.description,
@@ -147,7 +142,7 @@ class DsCardHeader extends StatelessWidget {
   final Widget? action;
 
   /// `gap-1` — both the row gap and the column gap.
-  static double get gap => ds(1);
+  static double get gap => el(1);
 
   @override
   Widget build(BuildContext context) {
@@ -164,7 +159,7 @@ class DsCardHeader extends StatelessWidget {
     );
 
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: DsCard.spacing),
+      padding: EdgeInsets.symmetric(horizontal: ElCard.spacing),
       child: action == null
           ? column
           : Row(
@@ -185,41 +180,40 @@ class DsCardHeader extends StatelessWidget {
 }
 
 /// `<CardTitle>` — `font-heading text-base leading-snug font-medium`.
-class DsCardTitle extends StatelessWidget {
-  const DsCardTitle(this.text, {super.key});
+class ElCardTitle extends StatelessWidget {
+  const ElCardTitle(this.text, {super.key});
 
   final String text;
 
   @override
-  Widget build(BuildContext context) =>
-      DsText(text, DsComponentType.cardTitle);
+  Widget build(BuildContext context) => ElText(text, ElComponentType.cardTitle);
 }
 
 /// `<CardDescription>` — `text-sm text-muted-foreground`.
-class DsCardDescription extends StatelessWidget {
-  const DsCardDescription(this.text, {super.key});
+class ElCardDescription extends StatelessWidget {
+  const ElCardDescription(this.text, {super.key});
 
   final String text;
 
   @override
-  Widget build(BuildContext context) => DsText(
-        text,
-        DsComponentType.textSm,
-        color: DsTheme.of(context).mutedForeground,
-      );
+  Widget build(BuildContext context) => ElText(
+    text,
+    ElComponentType.textSm,
+    color: ElTheme.of(context).mutedForeground,
+  );
 }
 
 /// `<CardContent>` — `px-(--card-spacing)` and nothing else.
-class DsCardContent extends StatelessWidget {
-  const DsCardContent({super.key, required this.child});
+class ElCardContent extends StatelessWidget {
+  const ElCardContent({super.key, required this.child});
 
   final Widget child;
 
   @override
   Widget build(BuildContext context) => Padding(
-        padding: EdgeInsets.symmetric(horizontal: DsCard.spacing),
-        child: child,
-      );
+    padding: EdgeInsets.symmetric(horizontal: ElCard.spacing),
+    child: child,
+  );
 }
 
 /// `<CardFooter>` — `flex items-center rounded-b-xl border-t bg-muted/50
@@ -228,20 +222,20 @@ class DsCardContent extends StatelessWidget {
 /// The class carries `rounded-b-xl` and the card already clips, so the corner
 /// is drawn once; what the band needs from this widget is its rule and its
 /// fill.
-class DsCardFooter extends StatelessWidget {
-  const DsCardFooter({super.key, required this.child});
+class ElCardFooter extends StatelessWidget {
+  const ElCardFooter({super.key, required this.child});
 
   final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return Container(
-      padding: EdgeInsets.all(DsCard.spacing),
+      padding: EdgeInsets.all(ElCard.spacing),
       decoration: BoxDecoration(
         color: theme.muted.withValues(alpha: _bandAlpha),
         border: Border(
-          top: BorderSide(color: theme.border, width: DsWidths.hairline),
+          top: BorderSide(color: theme.border, width: ElWidths.hairline),
         ),
       ),
       child: child,

@@ -5,8 +5,16 @@
   "description": "Accessible hover and focus explanation surface with semantic side and transition behavior.",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
-  "files": [{"source": "lib/src/components/tooltip.dart", "target": "@ui/tooltip.dart", "sha256": "02e0e9faf9d39be68ae1f3b369bce8eabcaf24e05649eba338c3d4903dae6631"}],
-  "registryDependencies": ["source-foundation"],
+  "files": [
+    {
+      "source": "lib/src/components/tooltip.dart",
+      "target": "@ui/tooltip.dart",
+      "sha256": "e5f23266cb2929623ad429bdb51338caac86ce18c6162c227bfce6c45473736b"
+    }
+  ],
+  "registryDependencies": [
+    "source-foundation"
+  ],
   "semanticDependencies": [],
   "pubDependencies": {},
   "assets": [],

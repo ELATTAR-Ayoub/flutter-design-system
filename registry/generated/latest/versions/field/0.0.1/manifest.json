@@ -9,15 +9,15 @@
     {
       "source": "lib/src/components/field.dart",
       "target": "@ui/field.dart",
-      "sha256": "8b64fe758d7dae09ff46253dd1acacd95d2cdc63d573ae857d265c3e47482ef3"
+      "sha256": "c1d4c4503e48e1e9c3643601751f265dc56041c3117ba7fadd6e627048a29705"
     }
   ],
   "registryDependencies": [
-    "source-foundation",
-    "ds-rule"
+    "rule",
+    "source-foundation"
   ],
   "semanticDependencies": [
-    "ds-rule"
+    "rule"
   ],
   "pubDependencies": {},
   "assets": [],

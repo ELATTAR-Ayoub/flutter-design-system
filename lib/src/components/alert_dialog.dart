@@ -45,7 +45,7 @@
 ///
 /// Not built: `AlertDialogMedia` and the `size="sm"` two-column footer. Both
 /// are real exports with no consumer in the corpus — the `asChild` precedent —
-/// and [DsAlertDialogSize] records the second so a caller can ask for it.
+/// and [ElAlertDialogSize] records the second so a caller can ask for it.
 library;
 
 import 'package:flutter/widgets.dart';
@@ -63,7 +63,7 @@ import 'tooltip.dart';
 const double _bandAlpha = 0.5;
 
 /// `data-size` — `default` and `sm`, whose only difference is the footer.
-enum DsAlertDialogSize {
+enum ElAlertDialogSize {
   /// `data-[size=default]:max-w-xs data-[size=default]:sm:max-w-sm`, and a
   /// header that starts left rather than centred from `sm:` up.
   ///
@@ -79,71 +79,68 @@ enum DsAlertDialogSize {
 }
 
 /// `AlertDialog` — trigger, portal, overlay, content.
-class DsAlertDialog extends StatelessWidget {
-  const DsAlertDialog({
+class ElAlertDialog extends StatelessWidget {
+  const ElAlertDialog({
     super.key,
     required this.trigger,
     required this.content,
     this.onOpenChange,
   });
 
-  final DsModalTriggerBuilder trigger;
-  final DsModalContentBuilder content;
+  final ElModalTriggerBuilder trigger;
+  final ElModalContentBuilder content;
   final ValueChanged<bool>? onOpenChange;
 
   @override
-  Widget build(BuildContext context) => DsModalPortal(
-        trigger: trigger,
-        content: content,
-        onOpenChange: onOpenChange,
-        // *"Not dismissible by overlay click"* — and measured refusing to be.
-        dismissOnOverlayTap: false,
-        transition: (
-          BuildContext context,
-          Animation<double> animation,
-          Widget child,
-        ) =>
-            DsJellyTransition(animation: animation, child: child),
-      );
+  Widget build(BuildContext context) => ElModalPortal(
+    trigger: trigger,
+    content: content,
+    onOpenChange: onOpenChange,
+    // *"Not dismissible by overlay click"* — and measured refusing to be.
+    dismissOnOverlayTap: false,
+    transition:
+        (BuildContext context, Animation<double> animation, Widget child) =>
+            ElJellyTransition(animation: animation, child: child),
+  );
 }
 
 /// `AlertDialogContent` — the panel.
-class DsAlertDialogContent extends StatelessWidget {
-  const DsAlertDialogContent({
+class ElAlertDialogContent extends StatelessWidget {
+  const ElAlertDialogContent({
     super.key,
     required this.header,
     required this.footer,
-    this.size = DsAlertDialogSize.normal,
+    this.size = ElAlertDialogSize.normal,
   });
 
-  final DsAlertDialogHeader header;
-  final DsAlertDialogFooter footer;
-  final DsAlertDialogSize size;
+  final ElAlertDialogHeader header;
+  final ElAlertDialogFooter footer;
+  final ElAlertDialogSize size;
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
-    final double pad = DsDialogContent.padding;
+    final ElThemeData theme = ElTheme.of(context);
+    final double pad = ElDialogContent.padding;
 
     return ConstrainedBox(
       constraints: BoxConstraints(
-        maxWidth: size == DsAlertDialogSize.normal
-            ? DsDialogContent.maxWidth
-            : DsContainers.xs,
+        maxWidth: size == ElAlertDialogSize.normal
+            ? ElDialogContent.maxWidth
+            : ElContainers.xs,
       ),
       child: DefaultTextStyle(
         // `text-popover-foreground` and **no `text-sm`** — the content itself
         // stays at the document's own 16px, and every string inside it carries
         // its own class. Measured: `font-size: 16px` on the content, 15 on the
         // title, 13 on the description.
-        style: DefaultTextStyle.of(context)
-            .style
-            .copyWith(color: theme.popoverForeground),
-        child: DsMachineSurface(
+        style: DefaultTextStyle.of(
+          context,
+        ).style.copyWith(color: theme.popoverForeground),
+        child: ElMachineSurface(
           // The same panel as `DialogContent`'s — one ring, no elevation —
           // named from the one place so the two cannot drift apart.
-          spec: DsDialogContent.ringSpec,
-          radius: BorderRadius.circular(DsDialogContent.radius),
+          spec: ElDialogContent.ringSpec,
+          radius: BorderRadius.circular(ElDialogContent.radius),
           fill: theme.popover,
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -151,7 +148,7 @@ class DsAlertDialogContent extends StatelessWidget {
             children: <Widget>[
               // USER-ORDERED MOBILE ADAPTATION — the question scrolls, the
               // decision does not. Same mechanism and same reasoning as
-              // [DsDialogContent]'s, with one band instead of two: a loose
+              // [ElDialogContent]'s, with one band instead of two: a loose
               // [Flexible] leaves the layout untouched wherever there is room,
               // and the footer is the one thing that must stay reachable when
               // there is not. A long consequence — the danger zone's
@@ -186,8 +183,8 @@ class DsAlertDialogContent extends StatelessWidget {
 }
 
 /// `AlertDialogHeader` — the question, straight on the panel.
-class DsAlertDialogHeader extends StatelessWidget {
-  const DsAlertDialogHeader({
+class ElAlertDialogHeader extends StatelessWidget {
+  const ElAlertDialogHeader({
     super.key,
     required this.title,
     required this.description,
@@ -197,32 +194,36 @@ class DsAlertDialogHeader extends StatelessWidget {
   final Widget description;
 
   /// `gap-1.5`.
-  static double get gap => ds(1.5);
+  static double get gap => el(1.5);
 
   @override
   Widget build(BuildContext context) => Column(
-        // `sm:place-items-start sm:text-left` — the branch every measured frame
-        // is in. Below `sm` it is `place-items-center text-center`, which the
-        // port's 1440 frame never reaches.
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[title, SizedBox(height: gap), description],
-      );
+    // `sm:place-items-start sm:text-left` — the branch every measured frame
+    // is in. Below `sm` it is `place-items-center text-center`, which the
+    // port's 1440 frame never reaches.
+    crossAxisAlignment: CrossAxisAlignment.start,
+    mainAxisSize: MainAxisSize.min,
+    children: <Widget>[
+      title,
+      SizedBox(height: gap),
+      description,
+    ],
+  );
 }
 
 /// `AlertDialogTitle` — `font-heading text-base font-medium`, no leading
 /// override.
-class DsAlertDialogTitle extends StatelessWidget {
-  const DsAlertDialogTitle(this.text, {super.key});
+class ElAlertDialogTitle extends StatelessWidget {
+  const ElAlertDialogTitle(this.text, {super.key});
 
   final String text;
 
   @override
-  Widget build(BuildContext context) => DsText(
-        text,
-        DsComponentType.overlayTitle,
-        color: DsTheme.of(context).foreground,
-      );
+  Widget build(BuildContext context) => ElText(
+    text,
+    ElComponentType.overlayTitle,
+    color: ElTheme.of(context).foreground,
+  );
 }
 
 /// `AlertDialogDescription` — `text-sm text-balance text-muted-foreground
@@ -233,22 +234,22 @@ class DsAlertDialogTitle extends StatelessWidget {
 /// pretty mode, so the description wraps greedily and the measured height is
 /// the greedy one. The reference's own 55.69px three-line box is what the
 /// oracle pins.
-class DsAlertDialogDescription extends StatelessWidget {
-  const DsAlertDialogDescription(this.text, {super.key});
+class ElAlertDialogDescription extends StatelessWidget {
+  const ElAlertDialogDescription(this.text, {super.key});
 
   final String text;
 
   @override
-  Widget build(BuildContext context) => DsText(
-        text,
-        DsComponentType.sheetBody,
-        color: DsTheme.of(context).mutedForeground,
-      );
+  Widget build(BuildContext context) => ElText(
+    text,
+    ElComponentType.sheetBody,
+    color: ElTheme.of(context).mutedForeground,
+  );
 }
 
 /// `AlertDialogFooter` — the band, because *"the footer is the decision"*.
-class DsAlertDialogFooter extends StatelessWidget {
-  const DsAlertDialogFooter({
+class ElAlertDialogFooter extends StatelessWidget {
+  const ElAlertDialogFooter({
     super.key,
     required this.cancel,
     required this.action,
@@ -262,19 +263,19 @@ class DsAlertDialogFooter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
-    final double pad = DsDialogContent.padding;
+    final ElThemeData theme = ElTheme.of(context);
+    final double pad = ElDialogContent.padding;
 
     // [Container] pays for the rule out of the band's own box — see
-    // `DsDialogFooter`.
+    // `ElDialogFooter`.
     return Container(
       decoration: BoxDecoration(
         color: theme.muted.withValues(alpha: _bandAlpha),
         borderRadius: BorderRadius.vertical(
-          bottom: Radius.circular(DsDialogContent.radius),
+          bottom: Radius.circular(ElDialogContent.radius),
         ),
         border: Border(
-          top: BorderSide(color: theme.border, width: DsWidths.hairline),
+          top: BorderSide(color: theme.border, width: ElWidths.hairline),
         ),
       ),
       child: Padding(
@@ -290,7 +291,7 @@ class DsAlertDialogFooter extends StatelessWidget {
             // *"Delete my account and all files"* beside *"Keep my account"*
             // needs 373px inside a 352px band, and both shrink to fit.
             Flexible(child: cancel),
-            SizedBox(width: ds(2)),
+            SizedBox(width: el(2)),
             Flexible(child: action),
           ],
         ),
@@ -307,24 +308,24 @@ class DsAlertDialogFooter extends StatelessWidget {
 /// `disabled={undefined}`, so a `loading` passed to a `Button asChild` *"would
 /// have been accepted by the type and then done nothing at all — a silent no-op
 /// on the one button in the system where 'did that register?' matters most."*
-/// The port has no `asChild`, so [DsButton.loading] is the real thing and the
+/// The port has no `asChild`, so [ElButton.loading] is the real thing and the
 /// prop simply forwards — but the reasoning is kept, because it is the
 /// justification for the state existing at all.
-class DsAlertDialogAction extends StatelessWidget {
-  const DsAlertDialogAction({
+class ElAlertDialogAction extends StatelessWidget {
+  const ElAlertDialogAction({
     super.key,
     required this.label,
     this.onPressed,
-    this.variant = DsButtonVariant.destructive,
-    this.size = DsButtonSize.md,
+    this.variant = ElButtonVariant.destructive,
+    this.size = ElButtonSize.md,
     this.loading = false,
     this.tooltip,
   });
 
   final String label;
   final VoidCallback? onPressed;
-  final DsButtonVariant variant;
-  final DsButtonSize size;
+  final ElButtonVariant variant;
+  final ElButtonSize size;
 
   /// *"Swaps in a spinner, sets `aria-busy`, and blocks a second press."*
   final bool loading;
@@ -334,45 +335,45 @@ class DsAlertDialogAction extends StatelessWidget {
   final String? tooltip;
 
   @override
-  Widget build(BuildContext context) => DsTooltip(
-        label: tooltip ?? label,
-        child: DsButton(
-          variant: variant,
-          size: size,
-          loading: loading,
-          onPressed: loading ? null : onPressed,
-          child: _ButtonLabel(label),
-        ),
-      );
+  Widget build(BuildContext context) => ElTooltip(
+    label: tooltip ?? label,
+    child: ElButton(
+      variant: variant,
+      size: size,
+      loading: loading,
+      onPressed: loading ? null : onPressed,
+      child: _ButtonLabel(label),
+    ),
+  );
 }
 
 /// `AlertDialogCancel` — `variant="outline"`, and the same tooltip rule.
-class DsAlertDialogCancel extends StatelessWidget {
-  const DsAlertDialogCancel({
+class ElAlertDialogCancel extends StatelessWidget {
+  const ElAlertDialogCancel({
     super.key,
     required this.label,
     this.onPressed,
-    this.variant = DsButtonVariant.outline,
-    this.size = DsButtonSize.md,
+    this.variant = ElButtonVariant.outline,
+    this.size = ElButtonSize.md,
     this.tooltip,
   });
 
   final String label;
   final VoidCallback? onPressed;
-  final DsButtonVariant variant;
-  final DsButtonSize size;
+  final ElButtonVariant variant;
+  final ElButtonSize size;
   final String? tooltip;
 
   @override
-  Widget build(BuildContext context) => DsTooltip(
-        label: tooltip ?? label,
-        child: DsButton(
-          variant: variant,
-          size: size,
-          onPressed: onPressed,
-          child: _ButtonLabel(label),
-        ),
-      );
+  Widget build(BuildContext context) => ElTooltip(
+    label: tooltip ?? label,
+    child: ElButton(
+      variant: variant,
+      size: size,
+      onPressed: onPressed,
+      child: _ButtonLabel(label),
+    ),
+  );
 }
 
 /// `ButtonLabel` — `min-w-0 truncate`, the span both `AlertDialogAction` and
@@ -387,10 +388,6 @@ class _ButtonLabel extends StatelessWidget {
   final String text;
 
   @override
-  Widget build(BuildContext context) => Text(
-        text,
-        maxLines: 1,
-        softWrap: false,
-        overflow: TextOverflow.ellipsis,
-      );
+  Widget build(BuildContext context) =>
+      Text(text, maxLines: 1, softWrap: false, overflow: TextOverflow.ellipsis);
 }

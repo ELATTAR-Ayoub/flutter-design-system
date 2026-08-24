@@ -6,19 +6,19 @@
 /// demo sits above the first heading, exactly as the reference has it, with
 /// no `Overview`, `Status`, or `Preview` heading anywhere; the Version and
 /// Platforms facts a Status section would have carried live inside
-/// Installation instead, since avatar has no registry manifest yet.
+/// Installation instead, since avatar ships in the registry.
 ///
 /// `avatar` is not backed by a registry manifest yet: see the Installation
 /// section below for exactly what that means today. Three of the live
-/// specimens on this page feed [DsAvatar] bytes that never touch the
+/// specimens on this page feed [ElAvatar] bytes that never touch the
 /// network: a tiny valid local PNG for the "image loads" state, and four
 /// bytes that are not a decodable image at all for the "decode fails" state.
 /// Both were verified against the real widget before being written here,
 /// see `example/test/components_docs/avatar_test.dart`.
 ///
-/// **Skipped from the reference:** "Avatar Group with Icon". [DsAvatarGroup]
-/// composes [DsAvatarGroupCount] for its overflow indicator, and
-/// [DsAvatarGroupCount] takes only a `String label`, there is no icon slot
+/// **Skipped from the reference:** "Avatar Group with Icon". [ElAvatarGroup]
+/// composes [ElAvatarGroupCount] for its overflow indicator, and
+/// [ElAvatarGroupCount] takes only a `String label`, there is no icon slot
 /// on it to swap the count text for a glyph. Faking one here would draw a
 /// capability this widget does not have, so the section is not built.
 library;
@@ -47,18 +47,18 @@ class AvatarDocPage extends StatelessWidget {
         eyebrow: 'COMPONENTS / BASE',
         title: 'Avatar',
         description:
-            'Use DsAvatar to represent a person or account: a photo when one '
-            'loads, initials underneath when it does not. Reach for DsIcon '
+            'Use ElAvatar to represent a person or account: a photo when one '
+            'loads, initials underneath when it does not. Reach for ElIcon '
             'instead when the mark is a generic glyph rather than an '
-            'identity; reach for DsItemMedia or a plain image when the '
+            'identity; reach for ElItemMedia or a plain image when the '
             'content is not a person or account at all; and use the '
-            'separate agent_avatar.dart family (DsCubeAvatar / DsAgentCube) '
+            'separate agent_avatar.dart family (ElCubeAvatar / ElAgentCube) '
             'for the animated isometric agent face: a different component '
             'with a different rendering model, not a variant of this one.',
       ),
-      breadcrumbs: const <DsBreadcrumbEntry>[
-        DsBreadcrumbEntry.link('Components'),
-        DsBreadcrumbEntry.page('Avatar'),
+      breadcrumbs: const <ElBreadcrumbEntry>[
+        ElBreadcrumbEntry.link('Components'),
+        ElBreadcrumbEntry.page('Avatar'),
       ],
       toc: const <DocsTocEntry>[
         DocsTocEntry(title: 'Installation', anchor: 'install'),
@@ -68,10 +68,7 @@ class AvatarDocPage extends StatelessWidget {
         DocsTocEntry(title: 'Badge', anchor: 'badge'),
         DocsTocEntry(title: 'Badge with icon', anchor: 'badge-icon'),
         DocsTocEntry(title: 'Avatar group', anchor: 'avatar-group'),
-        DocsTocEntry(
-          title: 'Avatar group count',
-          anchor: 'avatar-group-count',
-        ),
+        DocsTocEntry(title: 'Avatar group count', anchor: 'avatar-group-count'),
         DocsTocEntry(title: 'Sizes', anchor: 'sizes'),
         DocsTocEntry(title: 'Dropdown', anchor: 'dropdown'),
         DocsTocEntry(title: 'RTL', anchor: 'rtl'),
@@ -98,7 +95,7 @@ class _AvatarArticle extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
       // shadcn: the live demo that opens the page, before any heading. No
-      // DsSection, no id, no TOC entry: matching the reference exactly,
+      // ElSection, no id, no TOC entry: matching the reference exactly,
       // "before any heading" means before Installation's own heading too.
       DocsCodeExample(
         title: 'Avatar specimens',
@@ -115,38 +112,36 @@ class _AvatarArticle extends StatelessWidget {
             path: 'main.dart',
             title: 'Import from the package',
             description:
-                'avatar has no registry manifest yet, so it is not copied '
+                'avatar ships in the registry, so it is not copied '
                 'into lib/components/ui/. Import it directly instead.',
             code:
                 "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
-                '// DsAvatar, DsAvatarBadge, DsAvatarGroup and\n'
-                '// DsAvatarGroupCount are all exported from the barrel.',
+                '// ElAvatar, ElAvatarBadge, ElAvatarGroup and\n'
+                '// ElAvatarGroupCount are all exported from the barrel.',
           ),
         ],
       ),
-      SizedBox(height: ds(8)),
+      SizedBox(height: el(8)),
       // shadcn: Installation, Command and Manual tabs.
-      DsSection(
+      ElSection(
         id: 'install',
         title: 'Installation',
         description:
-            'Manual only, for now: there is no elattar add avatar command.',
+            'Install with `elattar add avatar`, or copy the source file manually when you need a local fork.',
         child: const DocsInstallFacts(
           facts: <DocsInstallFact>[
             DocsInstallFact(
               label: 'CLI',
-              value: 'Not available yet',
+              value: 'elattar add avatar',
               description:
-                  'avatar has no registry/components/avatar.json manifest, '
-                  'so elattar add avatar does not exist. Adding one means '
-                  'declaring its real transitive dependencies, which is '
-                  'tracked separately rather than invented here.',
+                  'Installs registry/components/avatar.json and its declared '
+                  'dependency closure.',
             ),
             DocsInstallFact(
               label: 'Package import',
               value:
                   "import 'package:elattar_design_system/elattar_design_system.dart';",
-              description: 'Use DsAvatar straight from the package today.',
+              description: 'Use ElAvatar straight from the package today.',
             ),
             DocsInstallFact(
               label: 'Source path',
@@ -162,7 +157,7 @@ class _AvatarArticle extends StatelessWidget {
               label: 'Platforms',
               value: 'Android, iOS, Web, macOS, Windows, Linux',
               description:
-                  'DsAvatar is built entirely from Flutter framework '
+                  'ElAvatar is built entirely from Flutter framework '
                   'primitives (CustomPaint, DecoratedBox, Image) with no '
                   'platform channels, so it renders the same everywhere '
                   'Flutter itself runs.',
@@ -170,9 +165,9 @@ class _AvatarArticle extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: ds(6)),
+      SizedBox(height: el(6)),
       // shadcn: Usage, imports plus basic construction.
-      DsSection(
+      ElSection(
         id: 'usage',
         title: 'Usage',
         description:
@@ -181,19 +176,19 @@ class _AvatarArticle extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            DsPanel(
+            ElPanel(
               label: 'DART',
               note: 'SMALLEST EXAMPLE',
               child: DocsSelectableCodeBlock(code: _smallestUsageCode),
             ),
-            SizedBox(height: ds(4)),
-            DsPanel(
+            SizedBox(height: el(4)),
+            ElPanel(
               label: 'DART',
               note: 'IMAGE WITH A FALLBACK',
               child: DocsSelectableCodeBlock(code: _imageUsageCode),
             ),
-            SizedBox(height: ds(4)),
-            DsPanel(
+            SizedBox(height: el(4)),
+            ElPanel(
               label: 'DART',
               note: 'RING AND BADGE',
               child: DocsSelectableCodeBlock(code: _ringBadgeUsageCode),
@@ -201,28 +196,28 @@ class _AvatarArticle extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: ds(6)),
-      // shadcn: Composition, the widget-hierarchy tree. DsAvatar is one
+      SizedBox(height: el(6)),
+      // shadcn: Composition, the widget-hierarchy tree. ElAvatar is one
       // widget with a Stack of optional layers, not a family of separate
       // subcomponents the way Avatar/AvatarImage/AvatarFallback are on the
-      // reference; DsAvatarGroup is the one real parent/child composition
+      // reference; ElAvatarGroup is the one real parent/child composition
       // this family has, so both anatomies are shown together here.
-      DsSection(
+      ElSection(
         id: 'composition',
         title: 'Composition',
         description:
-            'DsAvatar folds AvatarImage and AvatarFallback into one '
+            'ElAvatar folds AvatarImage and AvatarFallback into one '
             'widget\'s Stack rather than two composable subcomponents. '
-            'DsAvatarGroup is the family\'s one real parent/child tree.',
-        child: DsPanel(
+            'ElAvatarGroup is the family\'s one real parent/child tree.',
+        child: ElPanel(
           label: 'DART',
           note: 'ANATOMY',
           child: const DocsSelectableCodeBlock(code: _compositionAnatomyCode),
         ),
       ),
-      SizedBox(height: ds(6)),
+      SizedBox(height: el(6)),
       // shadcn: Basic, a simple avatar with an image and a fallback.
-      DsSection(
+      ElSection(
         id: 'basic',
         title: 'Basic',
         description:
@@ -240,9 +235,9 @@ class _AvatarArticle extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: ds(6)),
+      SizedBox(height: el(6)),
       // shadcn: Badge, a status dot pinned to the corner.
-      DsSection(
+      ElSection(
         id: 'badge',
         title: 'Badge',
         description: 'A status dot pinned to the bottom-right corner.',
@@ -258,14 +253,14 @@ class _AvatarArticle extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: ds(6)),
+      SizedBox(height: el(6)),
       // shadcn: Badge with Icon, a glyph inside the badge instead of no
       // content at all.
-      DsSection(
+      ElSection(
         id: 'badge-icon',
         title: 'Badge with icon',
         description:
-            'DsAvatarBadge.child takes any widget; no corpus call site '
+            'ElAvatarBadge.child takes any widget; no corpus call site '
             'used it until this specimen, so this is new code exercising a '
             'real, already-public slot rather than a fabricated one.',
         child: DocsCodeExample(
@@ -280,14 +275,14 @@ class _AvatarArticle extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: ds(6)),
+      SizedBox(height: el(6)),
       // shadcn: Avatar Group, overlapping circles.
-      DsSection(
+      ElSection(
         id: 'avatar-group',
         title: 'Avatar group',
         description:
-            'DsAvatarGroup overlaps its children by 8px each and forces '
-            'DsAvatarGroup.ringOf(context) onto every one of them, so the '
+            'ElAvatarGroup overlaps its children by 8px each and forces '
+            'ElAvatarGroup.ringOf(context) onto every one of them, so the '
             'circles stay separated against the page background.',
         child: DocsCodeExample(
           title: 'Avatar group',
@@ -301,14 +296,14 @@ class _AvatarArticle extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: ds(6)),
+      SizedBox(height: el(6)),
       // shadcn: Avatar Group Count, a "+N" overflow indicator at the end of
       // the group.
-      DsSection(
+      ElSection(
         id: 'avatar-group-count',
         title: 'Avatar group count',
         description:
-            'DsAvatarGroupCount reads the group\'s own ring rather than '
+            'ElAvatarGroupCount reads the group\'s own ring rather than '
             'carrying one of its own, so it slots in as the group\'s last '
             'child like any other overflow indicator would.',
         child: DocsCodeExample(
@@ -324,16 +319,16 @@ class _AvatarArticle extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: ds(6)),
+      SizedBox(height: el(6)),
       // shadcn: Sizes.
-      DsSection(
+      ElSection(
         id: 'sizes',
         title: 'Sizes',
         description:
             'size picks a rung (sm/md/lg); sizePx overrides only the box. '
             'The badge dot always scales off size, even when sizePx has '
             'overridden the diameter: the same class-beats-attribute split '
-            'DsIcon.sizePx carries, verified in the package\'s own '
+            'ElIcon.sizePx carries, verified in the package\'s own '
             'test/data_display_test.dart.',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -349,12 +344,12 @@ class _AvatarArticle extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: ds(4)),
+            SizedBox(height: el(4)),
             const _Bullets(
               items: <String>[
-                'DsAvatarSize.sm, 24px avatar, 8px badge dot.',
-                'DsAvatarSize.md, 32px avatar (the default), 10px badge dot.',
-                'DsAvatarSize.lg, 40px avatar, 12px badge dot.',
+                'ElAvatarSize.sm, 24px avatar, 8px badge dot.',
+                'ElAvatarSize.md, 32px avatar (the default), 10px badge dot.',
+                'ElAvatarSize.lg, 40px avatar, 12px badge dot.',
                 'sizePx: 40 with size left at its default md still draws a '
                     '10px badge, not the 12px an lg avatar would carry: the '
                     'attribute (size) drives the badge; the class (sizePx) '
@@ -364,14 +359,14 @@ class _AvatarArticle extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: ds(6)),
+      SizedBox(height: el(6)),
       // shadcn: Dropdown, an avatar used as a menu trigger.
-      DsSection(
+      ElSection(
         id: 'dropdown',
         title: 'Dropdown',
         description:
-            'DsAvatar takes no onTap of its own, so any pressable ancestor '
-            'can use one as its trigger: here, DsDropdownMenu.trigger, the '
+            'ElAvatar takes no onTap of its own, so any pressable ancestor '
+            'can use one as its trigger: here, ElDropdownMenu.trigger, the '
             'same pattern the sidebar footer\'s NavUser composes.',
         child: DocsCodeExample(
           title: 'Dropdown',
@@ -385,57 +380,53 @@ class _AvatarArticle extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: ds(6)),
+      SizedBox(height: el(6)),
       // shadcn: RTL.
-      DsSection(
+      ElSection(
         id: 'rtl',
         title: 'RTL',
         description:
             'The circle itself has no direction to flip; what does flip is '
             'a composition around it, an identity row\'s avatar and text '
-            'trade sides under a Directionality the same way DsBreadcrumb\'s '
+            'trade sides under a Directionality the same way ElBreadcrumb\'s '
             'own RTL specimen does.',
         child: DocsCodeExample(
           title: 'RTL',
           preview: const _RtlPreview(),
           manualFiles: const <DocsCodeFile>[
-            DocsCodeFile(
-              path: 'avatar_rtl.dart',
-              title: 'RTL',
-              code: _rtlCode,
-            ),
+            DocsCodeFile(path: 'avatar_rtl.dart', title: 'RTL', code: _rtlCode),
           ],
         ),
       ),
-      SizedBox(height: ds(6)),
-      DsSection(
+      SizedBox(height: el(6)),
+      ElSection(
         id: 'api',
         title: 'API Reference',
         description:
-            'Every public constructor parameter on DsAvatar, followed by the '
-            'size rungs and the supporting types (DsAvatarBadge, '
-            'DsAvatarGroup, DsAvatarGroupCount, DsAvatarRing, '
-            'dsAvatarRingWidth, DsAvatarRimPainter) it is built from.',
+            'Every public constructor parameter on ElAvatar, followed by the '
+            'size rungs and the supporting types (ElAvatarBadge, '
+            'ElAvatarGroup, ElAvatarGroupCount, ElAvatarRing, '
+            'elAvatarRingWidth, ElAvatarRimPainter) it is built from.',
         child: const Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            DocsApiTable(title: 'DsAvatar', facts: _dsAvatarFacts),
+            DocsApiTable(title: 'ElAvatar', facts: _dsAvatarFacts),
             SizedBox(height: 24),
-            DocsApiTable(title: 'DsAvatarSize', facts: _dsAvatarSizeFacts),
+            DocsApiTable(title: 'ElAvatarSize', facts: _dsAvatarSizeFacts),
             SizedBox(height: 24),
             DocsApiTable(title: 'Supporting types', facts: _supportingFacts),
           ],
         ),
       ),
-      SizedBox(height: ds(6)),
-      DsSection(
+      SizedBox(height: el(6)),
+      ElSection(
         id: 'states',
         title: 'States',
         description:
-            'DsAvatar is not interactive on its own, so hover, focus, press, '
+            'ElAvatar is not interactive on its own, so hover, focus, press, '
             'select, and disabled do not apply to it directly: wrap it in a '
             'pressable ancestor, as NavUser wraps it in a '
-            'DsSidebarMenuButton, if the composition needs one of those.',
+            'ElSidebarMenuButton, if the composition needs one of those.',
         child: const DocsStateMatrix(
           facts: <DocsStateFact>[
             DocsStateFact(
@@ -465,7 +456,7 @@ class _AvatarArticle extends StatelessWidget {
             DocsStateFact(
               state: 'Error (image)',
               treatment:
-                  'DsAvatar wires no errorBuilder, so a decode/load failure '
+                  'ElAvatar wires no errorBuilder, so a decode/load failure '
                   'is reported to FlutterError and the Image paints '
                   'nothing: the fallback beneath keeps showing through.',
               userSignal:
@@ -476,10 +467,10 @@ class _AvatarArticle extends StatelessWidget {
             DocsStateFact(
               state: 'Hover / Focus-visible / Pressed / Selected / Disabled',
               treatment:
-                  'N/A, DsAvatar takes no onTap/onPressed and paints no '
+                  'N/A, ElAvatar takes no onTap/onPressed and paints no '
                   'interactive state of its own.',
               userSignal:
-                  'Add these by wrapping DsAvatar in an interactive '
+                  'Add these by wrapping ElAvatar in an interactive '
                   'ancestor; they are that ancestor\'s states, not this '
                   'widget\'s.',
             ),
@@ -492,30 +483,30 @@ class _AvatarArticle extends StatelessWidget {
             ),
             DocsStateFact(
               state: 'Reduced motion',
-              treatment: 'N/A, DsAvatar performs no animation.',
+              treatment: 'N/A, ElAvatar performs no animation.',
               userSignal: 'Nothing to freeze; there is nothing moving.',
             ),
           ],
         ),
       ),
-      SizedBox(height: ds(6)),
-      DsSection(
+      SizedBox(height: el(6)),
+      ElSection(
         id: 'accessibility',
         title: 'Accessibility',
         description:
-            'DsAvatar does not wrap itself in a Semantics node: read '
+            'ElAvatar does not wrap itself in a Semantics node: read '
             'directly from lib/src/components/avatar.dart, there is none in '
             'the class.',
         child: const _Bullets(
           items: <String>[
             'Give a standalone avatar its own label: wrap it in '
                 'Semantics(label: "…profile photo", image: true, child: '
-                'DsAvatar(...)).',
+                'ElAvatar(...)).',
             'When the avatar sits beside visible identity text: as it does '
                 'in the sidebar footer\'s NavUser: that adjacent text '
                 'already names the person, so no extra label is needed '
                 'there.',
-            'DsAvatar is not focusable and defines no keyboard behavior of '
+            'ElAvatar is not focusable and defines no keyboard behavior of '
                 'its own; keyboard interaction belongs to whatever '
                 'interactive ancestor wraps it.',
             'The default 24-40px box can sit under common touch-target '
@@ -529,27 +520,27 @@ class _AvatarArticle extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: ds(6)),
-      DsSection(
+      SizedBox(height: el(6)),
+      ElSection(
         id: 'responsive',
         title: 'Responsive',
         description:
-            'DsAvatar has no internal breakpoints and no platform-specific '
+            'ElAvatar has no internal breakpoints and no platform-specific '
             'behavior; it is a fixed-size visual mark start to finish.',
         child: const _Bullets(
           items: <String>[
-            'Choose a DsAvatarSize rung per breakpoint, or compute an '
+            'Choose a ElAvatarSize rung per breakpoint, or compute an '
                 'explicit sizePx from the surrounding layout: the widget '
                 'does not adapt on its own.',
-            'DsAvatarGroup.overlap is a fixed 8px constant; it does not '
+            'ElAvatarGroup.overlap is a fixed 8px constant; it does not '
                 'scale with viewport width.',
             'No platform channels are used, so behavior is identical on '
                 'every Flutter target this package supports.',
           ],
         ),
       ),
-      SizedBox(height: ds(6)),
-      DsSection(
+      SizedBox(height: el(6)),
+      ElSection(
         id: 'dependencies',
         title: 'Dependencies',
         description:
@@ -561,29 +552,29 @@ class _AvatarArticle extends StatelessWidget {
             DocsInstallFact(
               label: 'Files',
               value: 'lib/src/components/avatar.dart',
-              description: 'One file; DsAvatar is not split across sources.',
+              description: 'One file; ElAvatar is not split across sources.',
             ),
             DocsInstallFact(
               label: 'Assets',
               value: 'None',
               description:
-                  'DsAvatar takes any ImageProvider the caller supplies; it '
+                  'ElAvatar takes any ImageProvider the caller supplies; it '
                   'ships no bundled asset of its own.',
             ),
             DocsInstallFact(
               label: 'Fonts and shaders',
               value: 'None beyond the foundation',
               description:
-                  'The fallback text uses whichever DsTypeSpec is passed or '
-                  'defaulted (DsFonts.mono for avatarFallback, DsFonts.sans '
+                  'The fallback text uses whichever ElTypeSpec is passed or '
+                  'defaulted (ElFonts.mono for avatarFallback, ElFonts.sans '
                   'for avatarInitials): both already shipped by the '
                   'foundation, not by this component.',
             ),
           ],
         ),
       ),
-      SizedBox(height: ds(6)),
-      DsSection(
+      SizedBox(height: el(6)),
+      ElSection(
         id: 'theming',
         title: 'Theming',
         description:
@@ -594,23 +585,23 @@ class _AvatarArticle extends StatelessWidget {
             'The fallback fill/ink default to theme.muted / '
                 'theme.mutedForeground; fallbackFill and fallbackInk '
                 'override either independently, as the leaderboard leader '
-                'specimen does with DsPalette.value.',
+                'specimen does with ElPalette.value.',
             'The hairline rim always resolves to theme.border: there is '
                 'no parameter that overrides its color.',
             'The rim blends darken against a light theme and lighten '
-                'against a dark one (theme.kind == DsThemeKind.dark), so '
+                'against a dark one (theme.kind == ElThemeKind.dark), so '
                 'the same rim reads on a photo and on a flat fill in both '
                 'modes without ever being drawn as a solid line over the '
                 'subject.',
             'ring and badge take explicit colors from the call site, '
-                'DsAvatarGroup.ringOf(context) is the one built-in helper, '
+                'ElAvatarGroup.ringOf(context) is the one built-in helper, '
                 'resolving to theme.background at the shared '
-                'dsAvatarRingWidth.',
+                'elAvatarRingWidth.',
           ],
         ),
       ),
-      SizedBox(height: ds(6)),
-      DsSection(
+      SizedBox(height: el(6)),
+      ElSection(
         id: 'source',
         title: 'Source',
         description:
@@ -627,15 +618,15 @@ class _AvatarArticle extends StatelessWidget {
             DocsInstallFact(
               label: 'Exports',
               value:
-                  'DsAvatar, DsAvatarSize, DsAvatarRing, dsAvatarRingWidth, '
-                  'DsAvatarBadge, DsAvatarGroup, DsAvatarGroupCount, '
-                  'DsAvatarRimPainter',
+                  'ElAvatar, ElAvatarSize, ElAvatarRing, elAvatarRingWidth, '
+                  'ElAvatarBadge, ElAvatarGroup, ElAvatarGroupCount, '
+                  'ElAvatarRimPainter',
               description: 'Public symbols available after import.',
             ),
             DocsInstallFact(
               label: 'Tests',
               value:
-                  'test/data_display_test.dart (DsAvatar group), '
+                  'test/data_display_test.dart (ElAvatar group), '
                   'example/test/components_docs/avatar_test.dart',
               description:
                   'The package\'s own behavioral tests, and this '
@@ -648,99 +639,99 @@ class _AvatarArticle extends StatelessWidget {
   );
 }
 
-const String _smallestUsageCode = '''const DsAvatar(fallback: 'AB')''';
+const String _smallestUsageCode = '''const ElAvatar(fallback: 'AB')''';
 
-const String _imageUsageCode = '''DsAvatar(
+const String _imageUsageCode = '''ElAvatar(
   fallback: 'AB',
   image: NetworkImage(user.photoUrl),
-  fallbackSpec: DsComponentType.avatarFallback,
+  fallbackSpec: ElComponentType.avatarFallback,
 )''';
 
-const String _ringBadgeUsageCode = '''DsAvatar(
+const String _ringBadgeUsageCode = '''ElAvatar(
   fallback: '#1',
-  sizePx: ds(10),
-  ring: (color: DsPalette.value, width: dsAvatarRingWidth),
-  badge: DsAvatarBadge(fill: DsPalette.value),
+  sizePx: el(10),
+  ring: (color: ElPalette.value, width: elAvatarRingWidth),
+  badge: ElAvatarBadge(fill: ElPalette.value),
 )''';
 
-const String _compositionAnatomyCode = '''DsAvatar
+const String _compositionAnatomyCode = '''ElAvatar
   Stack
-    fallback circle        // DecoratedBox + DsText, always painted first
+    fallback circle        // DecoratedBox + ElText, always painted first
     Image                  // only when `image` is supplied and decodes
-    DsAvatarRimPainter     // the always-on hairline rim, painted last
+    ElAvatarRimPainter     // the always-on hairline rim, painted last
     _AvatarBadgeBox        // only when `badge` is supplied
 
-DsAvatarGroup
+ElAvatarGroup
   children: [
-    DsAvatar(...), DsAvatar(...), ...,
-    DsAvatarGroupCount('+N'),   // optional, always last
+    ElAvatar(...), ElAvatar(...), ...,
+    ElAvatarGroupCount('+N'),   // optional, always last
   ]''';
 
-const String _basicCode = '''DsAvatar(fallback: 'AB')
+const String _basicCode = '''ElAvatar(fallback: 'AB')
 
-DsAvatar(
+ElAvatar(
   fallback: 'AB',
   image: NetworkImage(user.photoUrl),
 )''';
 
-const String _badgeCode = '''DsAvatar(
+const String _badgeCode = '''ElAvatar(
   fallback: 'AB',
-  size: DsAvatarSize.lg,
-  badge: DsAvatarBadge(fill: DsPalette.value),
+  size: ElAvatarSize.lg,
+  badge: ElAvatarBadge(fill: ElPalette.value),
 )''';
 
-const String _badgeIconCode = '''DsAvatar(
+const String _badgeIconCode = '''ElAvatar(
   fallback: 'AB',
-  size: DsAvatarSize.lg,
-  badge: DsAvatarBadge(
-    fill: DsPalette.value,
-    child: const DsIcon(
-      DsIconGlyph.plus,
-      size: DsIconSize.xs,
-      tone: DsIconTone.normal,
+  size: ElAvatarSize.lg,
+  badge: ElAvatarBadge(
+    fill: ElPalette.value,
+    child: const ElIcon(
+      ElIconGlyph.plus,
+      size: ElIconSize.xs,
+      tone: ElIconTone.normal,
     ),
   ),
 )''';
 
-const String _avatarGroupCode = '''DsAvatarGroup(
+const String _avatarGroupCode = '''ElAvatarGroup(
   children: <Widget>[
     for (final String initials in <String>['VW', 'EM', 'TC', 'SW'])
-      DsAvatar(
+      ElAvatar(
         fallback: initials,
-        fallbackSpec: DsComponentType.avatarFallback,
-        ring: DsAvatarGroup.ringOf(context),
+        fallbackSpec: ElComponentType.avatarFallback,
+        ring: ElAvatarGroup.ringOf(context),
       ),
   ],
 )''';
 
-const String _avatarGroupCountCode = '''DsAvatarGroup(
+const String _avatarGroupCountCode = '''ElAvatarGroup(
   children: <Widget>[
     for (final String initials in <String>['VW', 'EM', 'TC', 'SW'])
-      DsAvatar(
+      ElAvatar(
         fallback: initials,
-        fallbackSpec: DsComponentType.avatarFallback,
-        ring: DsAvatarGroup.ringOf(context),
+        fallbackSpec: ElComponentType.avatarFallback,
+        ring: ElAvatarGroup.ringOf(context),
       ),
-    const DsAvatarGroupCount('+248'),
+    const ElAvatarGroupCount('+248'),
   ],
 )''';
 
-const String _sizesCode = '''DsAvatar(fallback: 'AB', size: DsAvatarSize.sm)
-DsAvatar(fallback: 'AB') // size: DsAvatarSize.md, the default
-DsAvatar(fallback: 'AB', size: DsAvatarSize.lg)''';
+const String _sizesCode = '''ElAvatar(fallback: 'AB', size: ElAvatarSize.sm)
+ElAvatar(fallback: 'AB') // size: ElAvatarSize.md, the default
+ElAvatar(fallback: 'AB', size: ElAvatarSize.lg)''';
 
-const String _dropdownCode = '''DsDropdownMenu(
-  trigger: const DsAvatar(
+const String _dropdownCode = '''ElDropdownMenu(
+  trigger: const ElAvatar(
     fallback: 'AB',
-    fallbackSpec: DsComponentType.avatarFallback,
+    fallbackSpec: ElComponentType.avatarFallback,
   ),
-  children: <DsMenuChild>[
-    const DsMenuLabel('My Account'),
-    const DsMenuSeparator(),
-    DsMenuItem(label: 'Profile', icon: DsIconGlyph.user, onSelect: () {}),
-    DsMenuItem(label: 'Billing', icon: DsIconGlyph.creditCard, onSelect: () {}),
-    const DsMenuSeparator(),
-    DsMenuItem(label: 'Log out', icon: DsIconGlyph.logOut, onSelect: () {}),
+  children: <ElMenuChild>[
+    const ElMenuLabel('My Account'),
+    const ElMenuSeparator(),
+    ElMenuItem(label: 'Profile', icon: ElIconGlyph.user, onSelect: () {}),
+    ElMenuItem(label: 'Billing', icon: ElIconGlyph.creditCard, onSelect: () {}),
+    const ElMenuSeparator(),
+    ElMenuItem(label: 'Log out', icon: ElIconGlyph.logOut, onSelect: () {}),
   ],
 )''';
 
@@ -748,7 +739,7 @@ const String _rtlCode = '''Directionality(
   textDirection: TextDirection.rtl,
   child: Row(
     children: <Widget>[
-      DsAvatar(fallback: 'أف', fallbackSpec: DsComponentType.avatarFallback),
+      ElAvatar(fallback: 'أف', fallbackSpec: ElComponentType.avatarFallback),
       // name and email column, same as the LTR identity row
     ],
   ),
@@ -771,14 +762,14 @@ const List<DocsApiFact> _dsAvatarFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'size',
-    type: 'DsAvatarSize',
+    type: 'ElAvatarSize',
     description: 'sm, md (default), or lg. Always drives the badge rung.',
   ),
   DocsApiFact(
     name: 'fallbackSpec',
-    type: 'DsTypeSpec?',
+    type: 'ElTypeSpec?',
     description:
-        'The fallback text\'s type. Defaults to DsComponentType.textSm; '
+        'The fallback text\'s type. Defaults to ElComponentType.textSm; '
         'avatarFallback and avatarInitials are the two named specs the '
         'corpus reaches for instead.',
   ),
@@ -791,14 +782,14 @@ const List<DocsApiFact> _dsAvatarFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'ring',
-    type: 'DsAvatarRing?',
+    type: 'ElAvatarRing?',
     description:
         'An outset colored ring: costs the box nothing, so a ringed '
         'avatar still measures exactly its own diameter.',
   ),
   DocsApiFact(
     name: 'badge',
-    type: 'DsAvatarBadge?',
+    type: 'ElAvatarBadge?',
     description: 'A status dot pinned to the bottom-right corner.',
   ),
   DocsApiFact(
@@ -816,79 +807,79 @@ const List<DocsApiFact> _dsAvatarFacts = <DocsApiFact>[
 const List<DocsApiFact> _dsAvatarSizeFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'sm',
-    type: 'DsAvatarSize',
-    description: '24px avatar (ds(6)); 8px badge dot (ds(2)).',
+    type: 'ElAvatarSize',
+    description: '24px avatar (el(6)); 8px badge dot (el(2)).',
   ),
   DocsApiFact(
     name: 'md',
-    type: 'DsAvatarSize',
+    type: 'ElAvatarSize',
     description:
-        '32px avatar (ds(8)): the default, and the only rung the corpus '
-        'renders live today; 10px badge dot (ds(2.5)).',
+        '32px avatar (el(8)): the default, and the only rung the corpus '
+        'renders live today; 10px badge dot (el(2.5)).',
   ),
   DocsApiFact(
     name: 'lg',
-    type: 'DsAvatarSize',
-    description: '40px avatar (ds(10)); 12px badge dot (ds(3)).',
+    type: 'ElAvatarSize',
+    description: '40px avatar (el(10)); 12px badge dot (el(3)).',
   ),
 ];
 
 const List<DocsApiFact> _supportingFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'DsAvatarBadge.fill',
+    name: 'ElAvatarBadge.fill',
     type: 'Color',
     description:
         'Required: every real call site overrides the dot\'s fill, so '
         'there is no default color.',
   ),
   DocsApiFact(
-    name: 'DsAvatarBadge.child',
+    name: 'ElAvatarBadge.child',
     type: 'Widget?',
     description:
         'An optional glyph inside the dot: the Badge with icon section '
         'above is this page\'s own specimen of it.',
   ),
   DocsApiFact(
-    name: 'DsAvatarGroup.children',
+    name: 'ElAvatarGroup.children',
     type: 'List<Widget>',
-    description: 'The avatars, then optionally a DsAvatarGroupCount last.',
+    description: 'The avatars, then optionally a ElAvatarGroupCount last.',
   ),
   DocsApiFact(
-    name: 'DsAvatarGroup.overlap',
+    name: 'ElAvatarGroup.overlap',
     type: 'static double',
     description:
-        '8px (ds(2)): how far each child after the first is pulled left.',
+        '8px (el(2)): how far each child after the first is pulled left.',
   ),
   DocsApiFact(
-    name: 'DsAvatarGroup.ringOf(context)',
-    type: 'static DsAvatarRing',
+    name: 'ElAvatarGroup.ringOf(context)',
+    type: 'static ElAvatarRing',
     description:
-        'theme.background at dsAvatarRingWidth: the ring every child in '
+        'theme.background at elAvatarRingWidth: the ring every child in '
         'a group should wear so overlapping circles stay separated.',
   ),
   DocsApiFact(
-    name: "DsAvatarGroupCount(label, {spec})",
+    name: "ElAvatarGroupCount(label, {spec})",
     type: 'Widget',
     description:
         'A "+248"-style overflow count, sized and ringed like a group '
         'avatar (32px, the group\'s default rung).',
   ),
   DocsApiFact(
-    name: 'DsAvatarRing',
+    name: 'ElAvatarRing',
     type: 'typedef ({Color color, double width})',
     description: 'The record type ring expects.',
   ),
   DocsApiFact(
-    name: 'dsAvatarRingWidth',
+    name: 'elAvatarRingWidth',
     type: 'double',
     description: '2: the width both ring call sites in the corpus use.',
   ),
   DocsApiFact(
-    name: 'DsAvatarRimPainter',
+    name: 'ElAvatarRimPainter',
     type: 'CustomPainter',
     description:
         'Paints the always-on hairline rim in theme.border, blended '
-        'darken (light) or lighten (dark). Built internally by DsAvatar; '
+        'darken (light) or lighten (dark). Built internally by ElAvatar; '
         'not meant to be constructed directly.',
   ),
 ];
@@ -914,46 +905,46 @@ class _AvatarPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return Wrap(
-      spacing: ds(6),
-      runSpacing: ds(4),
+      spacing: el(6),
+      runSpacing: el(4),
       crossAxisAlignment: WrapCrossAlignment.center,
       children: <Widget>[
         Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             Wrap(
-              spacing: ds(3),
-              runSpacing: ds(3),
+              spacing: el(3),
+              runSpacing: el(3),
               crossAxisAlignment: WrapCrossAlignment.center,
               children: <Widget>[
-                DsAvatar(
+                ElAvatar(
                   fallback: 'AB',
-                  size: DsAvatarSize.sm,
-                  fallbackSpec: DsComponentType.avatarInitials,
+                  size: ElAvatarSize.sm,
+                  fallbackSpec: ElComponentType.avatarInitials,
                 ),
-                DsAvatar(
+                ElAvatar(
                   fallback: 'AB',
-                  fallbackSpec: DsComponentType.avatarFallback,
+                  fallbackSpec: ElComponentType.avatarFallback,
                 ),
-                const DsAvatar(fallback: 'AB', size: DsAvatarSize.lg),
-                DsAvatar(
+                const ElAvatar(fallback: 'AB', size: ElAvatarSize.lg),
+                ElAvatar(
                   fallback: '#1',
                   sizePx: 40,
-                  ring: (color: DsPalette.value, width: dsAvatarRingWidth),
+                  ring: (color: ElPalette.value, width: elAvatarRingWidth),
                 ),
-                DsAvatar(
+                ElAvatar(
                   fallback: 'AB',
-                  size: DsAvatarSize.lg,
-                  badge: DsAvatarBadge(fill: DsPalette.value),
+                  size: ElAvatarSize.lg,
+                  badge: ElAvatarBadge(fill: ElPalette.value),
                 ),
               ],
             ),
-            SizedBox(height: ds(2)),
-            DsText(
+            SizedBox(height: el(2)),
+            ElText(
               'sm, md, lg, a value ring, and a status badge',
-              DsType.small,
+              ElType.small,
               color: theme.mutedForeground,
             ),
           ],
@@ -962,27 +953,27 @@ class _AvatarPreview extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             Wrap(
-              spacing: ds(3),
-              runSpacing: ds(3),
+              spacing: el(3),
+              runSpacing: el(3),
               crossAxisAlignment: WrapCrossAlignment.center,
               children: <Widget>[
-                DsAvatar(
+                ElAvatar(
                   fallback: 'AB',
-                  size: DsAvatarSize.lg,
+                  size: ElAvatarSize.lg,
                   image: MemoryImage(_validAvatarPng),
                 ),
-                DsAvatar(
+                ElAvatar(
                   fallback: 'AB',
-                  size: DsAvatarSize.lg,
+                  size: ElAvatarSize.lg,
                   image: MemoryImage(_corruptAvatarBytes),
                 ),
               ],
             ),
-            SizedBox(height: ds(2)),
-            DsText(
+            SizedBox(height: el(2)),
+            ElText(
               'A decodable local image, and a deliberately corrupt one, '
               'the initials stay on screen either way',
-              DsType.small,
+              ElType.small,
               color: theme.mutedForeground,
             ),
           ],
@@ -997,32 +988,28 @@ class _BasicPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return Wrap(
-      spacing: ds(6),
-      runSpacing: ds(4),
+      spacing: el(6),
+      runSpacing: el(4),
       crossAxisAlignment: WrapCrossAlignment.center,
       children: <Widget>[
         Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            const DsAvatar(fallback: 'AB'),
-            SizedBox(height: ds(2)),
-            DsText(
-              'Fallback only',
-              DsType.small,
-              color: theme.mutedForeground,
-            ),
+            const ElAvatar(fallback: 'AB'),
+            SizedBox(height: el(2)),
+            ElText('Fallback only', ElType.small, color: theme.mutedForeground),
           ],
         ),
         Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            DsAvatar(fallback: 'AB', image: MemoryImage(_validAvatarPng)),
-            SizedBox(height: ds(2)),
-            DsText(
+            ElAvatar(fallback: 'AB', image: MemoryImage(_validAvatarPng)),
+            SizedBox(height: el(2)),
+            ElText(
               'Image and fallback',
-              DsType.small,
+              ElType.small,
               color: theme.mutedForeground,
             ),
           ],
@@ -1036,10 +1023,10 @@ class _BadgePreview extends StatelessWidget {
   const _BadgePreview();
 
   @override
-  Widget build(BuildContext context) => DsAvatar(
+  Widget build(BuildContext context) => ElAvatar(
     fallback: 'AB',
-    size: DsAvatarSize.lg,
-    badge: DsAvatarBadge(fill: DsPalette.value),
+    size: ElAvatarSize.lg,
+    badge: ElAvatarBadge(fill: ElPalette.value),
   );
 }
 
@@ -1047,15 +1034,15 @@ class _BadgeIconPreview extends StatelessWidget {
   const _BadgeIconPreview();
 
   @override
-  Widget build(BuildContext context) => DsAvatar(
+  Widget build(BuildContext context) => ElAvatar(
     fallback: 'AB',
-    size: DsAvatarSize.lg,
-    badge: DsAvatarBadge(
-      fill: DsPalette.value,
-      child: const DsIcon(
-        DsIconGlyph.plus,
-        size: DsIconSize.xs,
-        tone: DsIconTone.normal,
+    size: ElAvatarSize.lg,
+    badge: ElAvatarBadge(
+      fill: ElPalette.value,
+      child: const ElIcon(
+        ElIconGlyph.plus,
+        size: ElIconSize.xs,
+        tone: ElIconTone.normal,
       ),
     ),
   );
@@ -1066,13 +1053,13 @@ class _AvatarGroupPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Builder(
-    builder: (BuildContext context) => DsAvatarGroup(
+    builder: (BuildContext context) => ElAvatarGroup(
       children: <Widget>[
         for (final String initials in <String>['VW', 'EM', 'TC', 'SW'])
-          DsAvatar(
+          ElAvatar(
             fallback: initials,
-            fallbackSpec: DsComponentType.avatarFallback,
-            ring: DsAvatarGroup.ringOf(context),
+            fallbackSpec: ElComponentType.avatarFallback,
+            ring: ElAvatarGroup.ringOf(context),
           ),
       ],
     ),
@@ -1084,15 +1071,15 @@ class _AvatarGroupCountPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Builder(
-    builder: (BuildContext context) => DsAvatarGroup(
+    builder: (BuildContext context) => ElAvatarGroup(
       children: <Widget>[
         for (final String initials in <String>['VW', 'EM', 'TC', 'SW'])
-          DsAvatar(
+          ElAvatar(
             fallback: initials,
-            fallbackSpec: DsComponentType.avatarFallback,
-            ring: DsAvatarGroup.ringOf(context),
+            fallbackSpec: ElComponentType.avatarFallback,
+            ring: ElAvatarGroup.ringOf(context),
           ),
-        const DsAvatarGroupCount('+248'),
+        const ElAvatarGroupCount('+248'),
       ],
     ),
   );
@@ -1103,17 +1090,17 @@ class _SizesPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Wrap(
-    spacing: ds(4),
-    runSpacing: ds(3),
+    spacing: el(4),
+    runSpacing: el(3),
     crossAxisAlignment: WrapCrossAlignment.center,
     children: <Widget>[
-      DsAvatar(
+      ElAvatar(
         fallback: 'AB',
-        size: DsAvatarSize.sm,
-        fallbackSpec: DsComponentType.avatarInitials,
+        size: ElAvatarSize.sm,
+        fallbackSpec: ElComponentType.avatarInitials,
       ),
-      DsAvatar(fallback: 'AB', fallbackSpec: DsComponentType.avatarFallback),
-      const DsAvatar(fallback: 'AB', size: DsAvatarSize.lg),
+      ElAvatar(fallback: 'AB', fallbackSpec: ElComponentType.avatarFallback),
+      const ElAvatar(fallback: 'AB', size: ElAvatarSize.lg),
     ],
   );
 }
@@ -1122,23 +1109,23 @@ class _DropdownPreview extends StatelessWidget {
   const _DropdownPreview();
 
   @override
-  Widget build(BuildContext context) => DsDropdownMenu(
-    width: ds(52),
-    trigger: DsAvatar(
+  Widget build(BuildContext context) => ElDropdownMenu(
+    width: el(52),
+    trigger: ElAvatar(
       fallback: 'AB',
-      fallbackSpec: DsComponentType.avatarFallback,
+      fallbackSpec: ElComponentType.avatarFallback,
     ),
-    children: <DsMenuChild>[
-      const DsMenuLabel('My Account'),
-      const DsMenuSeparator(),
-      DsMenuItem(label: 'Profile', icon: DsIconGlyph.user, onSelect: () {}),
-      DsMenuItem(
+    children: <ElMenuChild>[
+      const ElMenuLabel('My Account'),
+      const ElMenuSeparator(),
+      ElMenuItem(label: 'Profile', icon: ElIconGlyph.user, onSelect: () {}),
+      ElMenuItem(
         label: 'Billing',
-        icon: DsIconGlyph.creditCard,
+        icon: ElIconGlyph.creditCard,
         onSelect: () {},
       ),
-      const DsMenuSeparator(),
-      DsMenuItem(label: 'Log out', icon: DsIconGlyph.logOut, onSelect: () {}),
+      const ElMenuSeparator(),
+      ElMenuItem(label: 'Log out', icon: ElIconGlyph.logOut, onSelect: () {}),
     ],
   );
 }
@@ -1148,25 +1135,25 @@ class _RtlPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          DsAvatar(
+          ElAvatar(
             fallback: 'أف',
-            fallbackSpec: DsComponentType.avatarFallback,
+            fallbackSpec: ElComponentType.avatarFallback,
           ),
-          SizedBox(width: ds(2)),
+          SizedBox(width: el(2)),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              DsText('أسترا فالي', DsType.nav, color: theme.foreground),
-              DsText(
+              ElText('أسترا فالي', ElType.nav, color: theme.foreground),
+              ElText(
                 'astra@elattar.dev',
-                DsType.small,
+                ElType.small,
                 color: theme.mutedForeground,
               ),
             ],
@@ -1184,22 +1171,22 @@ class _Bullets extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
-    return DsPanel(
+    final ElThemeData theme = ElTheme.of(context);
+    return ElPanel(
       label: 'Guidance',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           for (int i = 0; i < items.length; i++) ...<Widget>[
-            if (i > 0) SizedBox(height: ds(2)),
+            if (i > 0) SizedBox(height: el(2)),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                DsText('•  ', DsType.small, color: theme.mutedForeground),
+                ElText('•  ', ElType.small, color: theme.mutedForeground),
                 Expanded(
-                  child: DsText(
+                  child: ElText(
                     items[i],
-                    DsType.small,
+                    ElType.small,
                     color: theme.mutedForeground,
                   ),
                 ),

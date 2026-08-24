@@ -6,10 +6,10 @@
 /// in a consumer project, but they are ordinary Dart expressions, so no amount
 /// of import rewriting reaches them and no analyzer can flag them.
 ///
-/// The case this exists for is `DsFonts.package`. Inside this package the
+/// The case this exists for is `ElFonts.package`. Inside this package the
 /// three faces are declared in the PACKAGE pubspec, so `flutter_tools` bundles
 /// them under `packages/elattar_design_system/<Family>` and every `TextStyle`
-/// carries `package: DsFonts.package` to reach them. A consumer declares the
+/// carries `package: ElFonts.package` to reach them. A consumer declares the
 /// same faces in its OWN pubspec, where that prefix resolves to nothing: the
 /// text compiles, analyzes clean, and renders in the platform fallback face.
 ///
@@ -47,7 +47,7 @@ class SourceRewrite {
   final String reason;
 }
 
-/// The logical target carrying `DsFonts`.
+/// The logical target carrying `ElFonts`.
 const String typographyTarget = '@foundation/typography.dart';
 
 /// Every rewrite the installer applies. Additions belong here, not in ad-hoc
@@ -63,8 +63,8 @@ const List<SourceRewrite> installSourceRewrites = <SourceRewrite>[
       '  /// bundles them for every dependent app under the prefixed family',
       '  /// `packages/elattar_design_system/<Family>` (flutter_tools `asset.dart`).',
       '  /// `TextStyle(package: …)` applies exactly that prefix, which is why',
-      '  /// [DsTypeSpec.family] stays the bare family name and',
-      '  /// [DsTypeSpec.resolve] passes this: call sites never think about prefixing.',
+      '  /// [ElTypeSpec.family] stays the bare family name and',
+      '  /// [ElTypeSpec.resolve] passes this: call sites never think about prefixing.',
       "  static const String package = 'elattar_design_system';",
     ],
     replacement: <String>[
@@ -80,7 +80,7 @@ const List<SourceRewrite> installSourceRewrites = <SourceRewrite>[
       '  static const String? package = null;',
     ],
     reason:
-        'DsFonts.package prefixes every font family with '
+        'ElFonts.package prefixes every font family with '
         '"packages/elattar_design_system/", which resolves to nothing in a '
         'consumer project that declares the same faces itself',
   ),

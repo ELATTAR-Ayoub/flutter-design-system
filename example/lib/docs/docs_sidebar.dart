@@ -75,7 +75,7 @@ class DocsSidebar extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           for (int i = 0; i < groups.length; i++) ...<Widget>[
-            if (i > 0) SizedBox(height: ds(6)),
+            if (i > 0) SizedBox(height: el(6)),
             _SidebarGroup(group: groups[i], onNavigate: onNavigate),
           ],
         ],
@@ -92,50 +92,96 @@ class _SidebarGroup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ElThemeData theme = ElTheme.of(context);
     return Column(
       key: ValueKey<String>('docs-sidebar-group:${group.label}'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        DsText(group.label, DsType.label),
-        SizedBox(height: ds(3)),
-        for (final DocsSidebarEntry entry in group.items)
-          _SidebarRow(entry: entry, onNavigate: onNavigate),
+        ElText(group.label, ElType.label, color: theme.mutedForeground),
+        SizedBox(height: el(3)),
+        for (int i = 0; i < group.items.length; i++) ...<Widget>[
+          if (i > 0) SizedBox(height: el(1)),
+          _SidebarRow(entry: group.items[i], onNavigate: onNavigate),
+        ],
       ],
     );
   }
 }
 
-class _SidebarRow extends StatelessWidget {
+/// One row. Tracks its own hover so a resting hover and the active row paint
+/// the identical fill. Measured on the reference: its `SidebarMenuButton`
+/// carries `hover:bg-sidebar-accent hover:text-sidebar-accent-foreground`
+/// beside `data-active:bg-accent`, the same token family for both states. The
+/// pill is what carries the hierarchy, the rest of the rail declines to.
+///
+/// The ink cross-fade follows `_DsCrumbState` in `breadcrumb.dart`, a
+/// `MouseRegion` flipping a bool into a `TweenAnimationBuilder<Color?>` that
+/// rides [ElDurations.transitionDefault] on [ElCurves.out]. The pill itself
+/// is not put through the same builder, since `TweenAnimationBuilder` asserts
+/// its `tween.end` is non-null, and the resting pill has to be a literal
+/// `null` fill, not a zero-alpha colour, for the decoration to read as "no
+/// pill" rather than "an invisible one." It swaps directly on the same build
+/// that flips [_hovered] instead.
+class _SidebarRow extends StatefulWidget {
   const _SidebarRow({required this.entry, required this.onNavigate});
 
   final DocsSidebarEntry entry;
   final ValueChanged<String> onNavigate;
 
   @override
+  State<_SidebarRow> createState() => _SidebarRowState();
+}
+
+class _SidebarRowState extends State<_SidebarRow> {
+  bool _hovered = false;
+
+  void _hover(bool value) {
+    if (_hovered == value) return;
+    setState(() => _hovered = value);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
+    final DocsSidebarEntry entry = widget.entry;
+    final bool filled = entry.selected || _hovered;
+    final Duration duration = elAnimationDuration(
+      context,
+      ElDurations.transitionDefault,
+    );
+
     return Semantics(
       link: true,
       selected: entry.selected,
       child: MouseRegion(
         cursor: SystemMouseCursors.click,
+        onEnter: (_) => _hover(true),
+        onExit: (_) => _hover(false),
         child: GestureDetector(
-          onTap: () => onNavigate(entry.route),
+          onTap: () => widget.onNavigate(entry.route),
           behavior: HitTestBehavior.opaque,
           child: SelectionContainer.disabled(
             child: Container(
               key: ValueKey<String>('docs-sidebar:${entry.route}'),
-              padding: EdgeInsets.symmetric(horizontal: ds(3), vertical: ds(2)),
+              padding: EdgeInsets.symmetric(horizontal: el(3), vertical: el(2)),
               decoration: BoxDecoration(
-                color: entry.selected ? theme.muted : null,
-                borderRadius: BorderRadius.circular(DsRadii.md),
+                color: filled ? theme.sidebarAccent : null,
+                borderRadius: BorderRadius.circular(ElRadii.md),
               ),
-              child: DsText(
-                entry.title,
-                DsType.small,
-                color: entry.selected
-                    ? theme.foreground
-                    : theme.mutedForeground,
+              child: TweenAnimationBuilder<Color?>(
+                tween: ColorTween(
+                  end: filled
+                      ? theme.sidebarAccentForeground
+                      : theme.sidebarForeground,
+                ),
+                duration: duration,
+                curve: ElCurves.out,
+                builder: (BuildContext context, Color? ink, Widget? _) =>
+                    ElText(
+                      entry.title,
+                      ElType.small,
+                      color: ink ?? theme.sidebarForeground,
+                    ),
               ),
             ),
           ),

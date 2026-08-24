@@ -48,7 +48,7 @@ That location is a binding product convention.
 6. **Deterministic installs.** Registry versions, dependency resolution, generated barrels, and file hashes make the same command produce a predictable result.
 7. **Honest upgrades.** Package-mode upgrades and source-mode upgrades are different workflows and are documented as such.
 8. **Complete components.** A registry item includes required source, dependencies, assets, shaders, configuration, documentation, states, and tests—not only its primary Dart file.
-9. **The package remains authoritative.** Public `Ds*` APIs, foundations, tests, specimens, and token guards define what the website and registry may distribute.
+9. **The package remains authoritative.** Public `El*` APIs, foundations, tests, specimens, and token guards define what the website and registry may distribute.
 
 ## 3. Distribution architecture
 
@@ -193,7 +193,7 @@ Source mode stores colors in:
 lib/design_system/foundation/colors.dart
 ```
 
-The file separates primitive palette values from semantic roles. Components consume semantic theme colors through `DsTheme.of(context)` and never depend directly on product-specific palette choices.
+The file separates primitive palette values from semantic roles. Components consume semantic theme colors through `ElTheme.of(context)` and never depend directly on product-specific palette choices.
 
 ### 5.2 Typography
 
@@ -213,7 +213,7 @@ The typed foundation replaces Tailwind's configuration and utilities:
 |---|---|
 | CSS color variables | `colors.dart` and semantic theme data |
 | Font variables and type utilities | `typography.dart` |
-| Spacing scale | `spacing.dart` and `ds(...)` |
+| Spacing scale | `spacing.dart` and `el(...)` |
 | Radius, border, and surface utilities | `surfaces.dart` |
 | Shadow utilities | `shadows.dart` |
 | Breakpoints and containers | `media.dart` |
@@ -838,7 +838,7 @@ Only after conflict fixtures and migration tests are mature:
 
 ## 11. Documentation website plan
 
-The existing Flutter example app becomes the public documentation website. It consumes public `Ds*` APIs and foundation tokens; it does not create an unrelated web-only visual system.
+The existing Flutter example app becomes the public documentation website. It consumes public `El*` APIs and foundation tokens; it does not create an unrelated web-only visual system.
 
 ### 11.1 Required sections
 

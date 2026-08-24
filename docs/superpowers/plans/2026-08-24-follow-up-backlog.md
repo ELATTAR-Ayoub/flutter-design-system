@@ -111,13 +111,13 @@ Recounted across all 35 page tests:
 
 | Mechanism | Files |
 |---|---|
-| `widgetList<DsSection>` | 23 |
+| `widgetList<ElSection>` | 23 |
 | ordered `anchorKey` loop | 10 |
 | heading text plus `getTopLeft` dy ordering | 2 (alert_dialog, badge) |
 | no order assertion at all | 0 |
 
 35 of 35 assert section order. The original "only 14" came from grepping for
-`widgetList<DsSection>` alone, which is one of three mechanisms in use, so the
+`widgetList<ElSection>` alone, which is one of three mechanisms in use, so the
 absence of the other two forms was reported as absence of the property. It was
 also stale by the time it was recorded, since several tests were converted during
 the day's work.
@@ -159,7 +159,7 @@ Should be one mechanical commit touching nothing else.
 ### 11. 35 components have no documentation page at all. READY
 
 12 agent-family, 4 charts, plus `attachment`, `bubble`, `message`,
-`message_scroller`, `questionnaire`, `voice`, `ds_safe_area`, `icon_swap`.
+`message_scroller`, `questionnaire`, `voice`, `el_safe_area`, `icon_swap`.
 Out of scope for the parity plan, which reshapes pages that already exist.
 
 ### 16. Two strings in `buttons.dart` still carry the sweep's colon. READY
@@ -220,7 +220,7 @@ silently. Fails no test today.
 
 ### 15. Testing a settled spinner: use reduced motion, never TickerMode. READY
 
-Recorded as a convention, not a defect. `DsSpinner` calls
+Recorded as a convention, not a defect. `ElSpinner` calls
 `AnimationController.repeat()`, so `pumpAndSettle()` on a page containing one
 never terminates.
 
@@ -233,8 +233,8 @@ There are two correct answers and both already exist in this codebase:
    advanced rather than merely existed.
 2. If a test genuinely needs a SETTLED spinner, wrap in
    `MediaQuery(data: ...copyWith(disableAnimations: true))`. That exercises the
-   real reduced-motion path a user gets: `dsAnimationDuration` in
-   `theme_scope.dart:332` returns `Duration.zero`, and `DsSpinner` reads exactly
+   real reduced-motion path a user gets: `elAnimationDuration` in
+   `theme_scope.dart:332` returns `Duration.zero`, and `ElSpinner` reads exactly
    that to still itself, stopping at 0 degrees upright because that is the
    resting style the reference holds.
 

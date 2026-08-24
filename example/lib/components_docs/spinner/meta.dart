@@ -2,12 +2,13 @@
 ///
 /// `spinner` has a real `registry/components/spinner.json` manifest —
 /// [dependencies] is that manifest's own `registryDependencies` list,
-/// verbatim: so the icon page's installation section can render the real
+/// verbatim: so `page.dart`'s installation section can render the real
 /// `elattar add spinner` command.
 ///
-/// Spinner is documented on the icon page rather than its own, because the
-/// three smallest registry-backed primitives: icon, spinner and ds-rule —
-/// read better together than as three near-empty pages.
+/// `spinner` has its own page (`page.dart`), shaped to mirror
+/// https://ui.shadcn.com/docs/components/base/spinner's own section list —
+/// see that file's library doc for the shadcn-parity notes and the one
+/// section it honestly skips.
 library;
 
 import '../catalog.dart';
@@ -18,7 +19,7 @@ const ComponentDocEntry spinnerDoc = ComponentDocEntry(
   description:
       'A looping indeterminate activity indicator that settles under reduced motion.',
   // registry/components/spinner.json's registryDependencies, verbatim.
-  dependencies: <String>['source-foundation'],
-  exports: <String>['DsSpinner'],
+  dependencies: <String>['icon', 'source-foundation'],
+  exports: <String>['ElSpinner'],
   sourcePath: 'lib/src/components/spinner.dart',
 );

@@ -30,8 +30,8 @@ void _setViewSize(WidgetTester tester, Size size) {
 }
 
 Widget _harness({required Widget child, ScrollController? scrollController}) =>
-    DsTheme(
-      controller: DsThemeController(mode: DsThemeMode.dark),
+    ElTheme(
+      controller: ElThemeController(mode: ElThemeMode.dark),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         home: SingleChildScrollView(controller: scrollController, child: child),
@@ -75,7 +75,7 @@ void main() {
       await tester.pump();
 
       // Both keys belong to Examples subsections only the reference page
-      // builds (a per-DsButtonSize breakdown and the "Emphasis (caps)"
+      // builds (a per-ElButtonSize breakdown and the "Emphasis (caps)"
       // specimen); the retired `button_card_pages.dart` ButtonDocPage has
       // neither.
       expect(
@@ -181,7 +181,7 @@ void main() {
 
       await tester.tap(
         find.byKey(
-          const ValueKey<String>('docs-layout-toc-child:api-dsbutton'),
+          const ValueKey<String>('docs-layout-toc-child:api-elbutton'),
         ),
       );
       // Advance past the 400ms scroll-to-anchor animation without settling —

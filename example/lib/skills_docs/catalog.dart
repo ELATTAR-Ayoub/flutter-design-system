@@ -270,7 +270,7 @@ const SkillDocEntry _elattarFlutterUiDirector = SkillDocEntry(
   title: 'Elattar Flutter UI Director',
   summary:
       'Directs coding agents to build Flutter UI from the Elattar design '
-      'system: public Ds* API discovery, foundation tokens, component '
+      'system: public El* API discovery, foundation tokens, component '
       'placement, state and accessibility coverage, responsive contracts, and '
       'a verification ladder.',
   description:
@@ -280,7 +280,7 @@ const SkillDocEntry _elattarFlutterUiDirector = SkillDocEntry(
       'documenting Flutter screens, flows, dashboards, mobile navigation, '
       'component specimens, loading/empty/error/success feedback, responsive '
       'behavior, visual verification, or agent-console experiences that must '
-      'use the local Ds* APIs and token source of truth.',
+      'use the local El* APIs and token source of truth.',
   version: '0.0.1',
   pluginName: 'elattar-design-system',
   marketplaceName: 'elattar',
@@ -292,13 +292,13 @@ const SkillDocEntry _elattarFlutterUiDirector = SkillDocEntry(
         'writing anything.',
     'Classify the work and name its primary action, critical states, and '
         'supported form factors.',
-    'Inventory the relevant public Ds* APIs, foundations, and specimens '
+    'Inventory the relevant public El* APIs, foundations, and specimens '
         'before proposing a primitive.',
     'State the dominant visual idea, hierarchy, and one restrained '
         'supporting effect.',
     'Define normal, loading, empty, error, success, disabled, focus, and '
         'recovery states before writing widgets.',
-    'Compose Ds* widgets outside the system-owned component directory; keep '
+    'Compose El* widgets outside the system-owned component directory; keep '
         'system components reusable.',
     'Apply adaptive layout, safe areas, themes, input, and motion contracts.',
     'Add or update a specimen and focused tests, then run the verification '

@@ -15,7 +15,7 @@ Fidelity bar (from the user, twice enforced): **1:1 — "the same in every fucki
 ## 2. Scope
 
 **In scope**
-- Package layers: `foundation/` (all tokens), `effects/` (only what these surfaces need: machine shadows incl. inset, glows, page glow), `motion/` (press, lift, slide-pill + jelly, curves), `components/` (DsIcon, DsButton outline/ghost variants, DsSheet for mobile nav).
+- Package layers: `foundation/` (all tokens), `effects/` (only what these surfaces need: machine shadows incl. inset, glows, page glow), `motion/` (press, lift, slide-pill + jelly, curves), `components/` (ElIcon, ElButton outline/ghost variants, ElSheet for mobile nav).
 - Docs shell: sticky blurred header (logo, version pill, tagline, 3-way theme toggle with travelling jelly pill), 240px sidebar with the **full 4-group nav tree** (all 32 links, verbatim), responsive (<1024px: burger + left sheet), page glow, thin scrollbars, focus/selection styling.
 - Pages: overview, colors (live-measured contrast), typography (full specimen incl. prose demo), spacing. PageFootNav between them.
 - Routes referenced by nav/foot-nav but out of scope (shadows, motion, icons, component families) render a minimal placeholder using the same shell (header eyebrow "Foundations" + title + "Not ported yet" in type-small) — links must not dead-end.
@@ -34,30 +34,30 @@ flutter-design-system/               (git repo, package elattar_design_system)
   assets/fonts/GeistMono-Variable.ttf (copied from reference node_modules)
   lib/elattar_design_system.dart     (single export barrel)
   lib/src/foundation/                ← ONLY place literals are allowed
-    colors.dart        raw ramps + state palette (DsPalette; theme-independent)
-    theme.dart         DsThemeData: every semantic token per theme (light/dark blocks of globals.css)
-    typography.dart    DsType: every .type-* class as a TextStyle factory (incl. clamp() rules)
+    colors.dart        raw ramps + state palette (ElPalette; theme-independent)
+    theme.dart         ElThemeData: every semantic token per theme (light/dark blocks of globals.css)
+    typography.dart    ElType: every .type-* class as a TextStyle factory (incl. clamp() rules)
     spacing.dart       ds4 unit + scale, widths (shell/content/page/prose...), radii
-    shadows.dart       DsShadowSpec (layers w/ inset flag) e1–e4, key, pressed, btn*, chip, glows + per-theme inks
+    shadows.dart       ElShadowSpec (layers w/ inset flag) e1–e4, key, pressed, btn*, chip, glows + per-theme inks
     motion.dart        durations (tick..bloom), curves (spring/out/in/inOut/settle/standard/outFlex as cubic-beziers)
   lib/src/effects/
-    machine_surface.dart   DsMachineSurface — paints DsShadowSpec incl. inset layers (clip RRect, difference ring, MaskFilter)
+    machine_surface.dart   ElMachineSurface — paints ElShadowSpec incl. inset layers (clip RRect, difference ring, MaskFilter)
     page_glow.dart         fixed-viewport radial gradient behind scroll content
   lib/src/motion/
-    press.dart         DsPress: 40ms scale-in (0.94 default), 250ms spring-back
-    lift.dart          DsLift: hover translateY(-3) + e3 + border-color, 250ms out/standard
-    sliding_pill.dart  DsSlidingPill + jelly replay (yuki-jelly keyframes as TweenSequence)
+    press.dart         ElPress: 40ms scale-in (0.94 default), 250ms spring-back
+    lift.dart          ElLift: hover translateY(-3) + e3 + border-color, 250ms out/standard
+    sliding_pill.dart  ElSlidingPill + jelly replay (yuki-jelly keyframes as TweenSequence)
   lib/src/components/
-    icon.dart          DsIcon: 8 embedded Lucide 1.28.0 paths (Menu, X, Sun, Monitor, Moon, ArrowLeft, ArrowRight, Check),
+    icon.dart          ElIcon: 8 embedded Lucide 1.28.0 paths (Menu, X, Sun, Monitor, Moon, ArrowLeft, ArrowRight, Check),
                        size ladder 12/14/16/20/24/32/40, stroke 2.4/2.4/2.4/2.4/2/1.5/1.6 (web-computed), tones
-    button.dart        DsButton: outline/ghost + icon sizes used by the shell (API shaped for all 7 variants later)
-    sheet.dart         DsSheet: left sheet (overlay bg-background/15 + blur-xs, panel slide+fade 320ms/out)
-  lib/src/theme_scope.dart  DsTheme InheritedWidget + DsThemeMode (light/system/dark) controller
+    button.dart        ElButton: outline/ghost + icon sizes used by the shell (API shaped for all 7 variants later)
+    sheet.dart         ElSheet: left sheet (overlay bg-background/15 + blur-xs, panel slide+fade 320ms/out)
+  lib/src/theme_scope.dart  ElTheme InheritedWidget + ElThemeMode (light/system/dark) controller
   example/                     (the docs app)
-    lib/main.dart              MaterialApp-free custom WidgetsApp/Router or minimal MaterialApp with DsTheme
-    lib/nav.dart               DS_GROUPS verbatim port of lib/ds/nav.ts (all groups/categories/blurbs/contents)
+    lib/main.dart              MaterialApp-free custom WidgetsApp/Router or minimal MaterialApp with ElTheme
+    lib/nav.dart               EL_GROUPS verbatim port of lib/el/nav.ts (all groups/categories/blurbs/contents)
     lib/shell.dart             header + sidebar + content frame (1680/240/1080, px-6 py-12 lg:px-12)
-    lib/kit.dart               DsPageHeader, DsSection, Panel, Meta, Code, DoDont, Note, IndexGrid/IndexCard, PageFootNav
+    lib/kit.dart               ElPageHeader, ElSection, Panel, Meta, Code, DoDont, Note, IndexGrid/IndexCard, PageFootNav
     lib/token_swatch.dart      TokenSwatch/TokenSwatchList/TokenValue/ContrastBadge + live contrast engine
     lib/pages/{overview,colors,typography,spacing,placeholder}.dart
   test/                        guard + contract tests
@@ -65,9 +65,9 @@ flutter-design-system/               (git repo, package elattar_design_system)
 ```
 
 Key contracts:
-- `DsThemeData` exposes every semantic token (`background, card, muted, accent, foreground, mutedForeground, border, input, primary, ring, actionInk, valueInk, successInk/…, pageGlow, ink1..4, rim, rimStrong, wall`) resolved per theme; raw ramps live on `DsPalette` and never flip.
-- `DsType` styles carry family/size/height/weight/tracking/uppercase-flag/tabular exactly as the web classes; call sites never restate numbers. `typeDisplay(context)`/`typeH1(context)` compute clamp() from viewport width.
-- Colors with CSS `color-mix(in oklab, X n%, transparent)` resolve to X at n% alpha (mixing toward transparent preserves hue in premultiplied oklab); genuine two-color oklab mixes use an OKLab implementation in foundation (`DsOklab.mix`). OKLCH relative-color tokens (`--bubble-tinted`) are computed, not hardcoded, with chroma-reduction gamut mapping (recorded decision).
+- `ElThemeData` exposes every semantic token (`background, card, muted, accent, foreground, mutedForeground, border, input, primary, ring, actionInk, valueInk, successInk/…, pageGlow, ink1..4, rim, rimStrong, wall`) resolved per theme; raw ramps live on `ElPalette` and never flip.
+- `ElType` styles carry family/size/height/weight/tracking/uppercase-flag/tabular exactly as the web classes; call sites never restate numbers. `typeDisplay(context)`/`typeH1(context)` compute clamp() from viewport width.
+- Colors with CSS `color-mix(in oklab, X n%, transparent)` resolve to X at n% alpha (mixing toward transparent preserves hue in premultiplied oklab); genuine two-color oklab mixes use an OKLab implementation in foundation (`ElOklab.mix`). OKLCH relative-color tokens (`--bubble-tinted`) are computed, not hardcoded, with chroma-reduction gamut mapping (recorded decision).
 - Fonts follow tokens, not prose (recorded decision): Inter Local (variable TTF from the reference's own binary), Geist Mono (reference's TTF), Redaction 35. Weight 650 via `FontVariation('wght', 650)`; tabular via `FontFeature.tabularFigures()`.
 
 ## 4. The four pages — content contract
@@ -80,7 +80,7 @@ Each page implements its research map section-for-section (maps carry verbatim c
 |---|---|
 | body fixed radial page glow | `PageGlow` paints gradient in shell Stack behind scrollable; does not scroll |
 | header `bg-background/85 backdrop-blur-xl` | ClipRect+BackdropFilter(blur 24) over scroll content, header painted 85% background |
-| inset/mixed box-shadows (shadow-btn on outline button) | DsMachineSurface custom painter |
+| inset/mixed box-shadows (shadow-btn on outline button) | ElMachineSurface custom painter |
 | `lift` hover | MouseRegion + AnimatedContainer-equivalent (transform/box-shadow 250ms out, border 250ms standard) |
 | `press` active | Listener: 40ms scale to 0.94 on down, 250ms `--ease-spring` back on up |
 | theme-toggle travelling pill + jelly | measured target rects; position/size 250ms spring, opacity 150ms out; on arrival replay yuki-jelly TweenSequence (0.6s ease-out; scale x/y per keyframes); hidden before first measurement, first move without transition |
@@ -96,13 +96,13 @@ Breakpoints: Tailwind stock sm 640 / md 768 / lg 1024 / xl 1280 mapped by viewpo
 
 ## 6. What the guard enforces
 
-`test/token_guard_test.dart` regex-scans `lib/` + `example/lib/`: `Color(0x…)`, `Color.fromRGBO/fromARGB`, `fontSize:`, `letterSpacing:`, `FontWeight.w…`, `Duration(milliseconds: <literal>)`, `Curves.` (must use DsMotion curves), `BorderRadius.circular(<literal>)`, raw `BoxShadow(` outside foundation/effects — allowed only under `lib/src/foundation/`; escape hatch comment `allow-hardcoded: <reason>`. `dsTransparent` and bare `0` legal. Asset test asserts the three font files exist and are registered.
+`test/token_guard_test.dart` regex-scans `lib/` + `example/lib/`: `Color(0x…)`, `Color.fromRGBO/fromARGB`, `fontSize:`, `letterSpacing:`, `FontWeight.w…`, `Duration(milliseconds: <literal>)`, `Curves.` (must use ElMotion curves), `BorderRadius.circular(<literal>)`, raw `BoxShadow(` outside foundation/effects — allowed only under `lib/src/foundation/`; escape hatch comment `allow-hardcoded: <reason>`. `elTransparent` and bare `0` legal. Asset test asserts the three font files exist and are registered.
 
 ## 7. Verification protocol (the definition of done)
 
 1. `flutter analyze` + `flutter test` green.
 2. Reference up: `npm run dev` in the web repo (port noted at runtime). Flutter app built for web (`flutter run -d web-server`) — same engine text stack as the comparisons demand; also runs on Windows desktop.
-3. In-app browser at **1440-wide viewport**: for each page × {dark, light}: screenshot the reference and the port at the same scroll positions, section by section (header, each DsSection, foot-nav). Compare: layout metrics, type sizes/weights/tracking, colors, borders, shadows, badge values ("Contrast 13.5:1 · AAA" strings must match), copy verbatim.
+3. In-app browser at **1440-wide viewport**: for each page × {dark, light}: screenshot the reference and the port at the same scroll positions, section by section (header, each ElSection, foot-nav). Compare: layout metrics, type sizes/weights/tracking, colors, borders, shadows, badge values ("Contrast 13.5:1 · AAA" strings must match), copy verbatim.
 4. Interactions checked live: card lift hover, press scale, theme-toggle pill travel + jelly, sidebar active states, prose link underline fade.
 5. Fix → re-screenshot until no visible difference; only then report done, with the screenshot evidence named honestly (measured vs looked-at).
 

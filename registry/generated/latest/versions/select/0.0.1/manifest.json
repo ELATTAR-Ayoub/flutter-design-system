@@ -9,20 +9,22 @@
     {
       "source": "lib/src/components/select.dart",
       "target": "@ui/select.dart",
-      "sha256": "7c2bf1d0a8d3c6fd859297a489c7dce4a6654ac0edd4d43a300eb90fce747b59"
+      "sha256": "85e960c69d929988c6dbba075be41e276736b5671d946e2f32d43e0c6509c2d3"
     }
   ],
   "registryDependencies": [
-    "source-foundation",
     "button",
     "field",
     "icon",
+    "machine-surface",
     "popover",
-    "machine-surface"
+    "source-foundation"
   ],
   "semanticDependencies": [
+    "button",
     "field",
     "icon",
+    "machine-surface",
     "popover"
   ],
   "pubDependencies": {},

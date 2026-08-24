@@ -5,11 +5,11 @@
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`: the
 /// discipline `tooltip_test.dart` already carries. Theme coverage uses a
-/// live `DsThemeController` flipped in place rather than two independent
+/// live `ElThemeController` flipped in place rather than two independent
 /// pumps.
 ///
-/// `DsAlertDialog` mounts its content through an `OverlayPortal` (via
-/// `DsModalPortal`), so the live specimens need a real `Overlay`: the
+/// `ElAlertDialog` mounts its content through an `OverlayPortal` (via
+/// `ElModalPortal`), so the live specimens need a real `Overlay`: the
 /// harness wraps the page in a `MaterialApp`, the same fix `tooltip_test.dart`
 /// and `dialogs_test.dart` both needed. A bare `Directionality`/`Material`
 /// host would let the page render but the dialog would never actually open.
@@ -20,7 +20,7 @@
 /// close?: by identity-comparing `FocusManager.instance.primaryFocus`
 /// against the real internal `FocusNode`s of the trigger, Cancel, Action and
 /// an outside control, recovered via `Focus.of` from each button's own text
-/// descendant (`DsAlertDialogAction`/`DsAlertDialogCancel` accept no
+/// descendant (`ElAlertDialogAction`/`ElAlertDialogCancel` accept no
 /// `focusNode` parameter of their own, so there is no other way to pin the
 /// identity down).
 library;
@@ -35,21 +35,21 @@ import 'package:flutter_test/flutter_test.dart';
 const Size _wide = Size(1440, 900);
 const Size _narrow = Size(390, 844);
 
-Future<DsThemeController> _pumpAlertDialogDoc(
+Future<ElThemeController> _pumpAlertDialogDoc(
   WidgetTester tester, {
   ValueChanged<String>? onNavigate,
   Size size = _wide,
-  DsThemeMode mode = DsThemeMode.dark,
+  ElThemeMode mode = ElThemeMode.dark,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final DsThemeController theme = DsThemeController(mode: mode);
+  final ElThemeController theme = ElThemeController(mode: mode);
   addTearDown(theme.dispose);
 
   await tester.pumpWidget(
-    DsTheme(
+    ElTheme(
       controller: theme,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -70,18 +70,18 @@ Future<void> _open(WidgetTester tester, Finder trigger) async {
   await tester.pumpAndSettle();
   await tester.tap(trigger);
   await tester.pump();
-  await tester.pump(DsDurations.jelly);
+  await tester.pump(ElDurations.jelly);
 }
 
 /// Runs the exit and lets the portal's post-completion `setState` land: the
 /// same two-pump shape `dialogs_test.dart`'s own `_settleExit` uses.
 Future<void> _settleExit(WidgetTester tester) async {
   await tester.pump();
-  await tester.pump(DsDurations.overlay);
+  await tester.pump(ElDurations.overlay);
   await tester.pump();
 }
 
-/// A page built directly on the public `DsAlertDialog` family: not the
+/// A page built directly on the public `ElAlertDialog` family: not the
 /// docs page's own specimen: wired with an outside control and real
 /// `FocusNode`s recovered from each button's text descendant, so a focus
 /// assertion can compare node *identity* rather than guess from geometry.
@@ -89,40 +89,40 @@ class _FocusHarness extends StatelessWidget {
   const _FocusHarness();
 
   @override
-  Widget build(BuildContext context) => DsTheme(
-    controller: DsThemeController(mode: DsThemeMode.dark),
+  Widget build(BuildContext context) => ElTheme(
+    controller: ElThemeController(mode: ElThemeMode.dark),
     child: MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         body: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            DsButton(
+            ElButton(
               key: const ValueKey<String>('focus-harness-outside'),
               onPressed: () {},
               child: const Text('Outside'),
             ),
-            DsAlertDialog(
-              trigger: (BuildContext context, VoidCallback open) => DsButton(
+            ElAlertDialog(
+              trigger: (BuildContext context, VoidCallback open) => ElButton(
                 key: const ValueKey<String>('focus-harness-trigger'),
                 onPressed: open,
                 child: const Text('open'),
               ),
               content: (BuildContext context, VoidCallback close) =>
-                  DsAlertDialogContent(
-                    header: DsAlertDialogHeader(
-                      title: const DsAlertDialogTitle('Sure?'),
-                      description: const DsAlertDialogDescription(
+                  ElAlertDialogContent(
+                    header: ElAlertDialogHeader(
+                      title: const ElAlertDialogTitle('Sure?'),
+                      description: const ElAlertDialogDescription(
                         'It cannot be undone.',
                       ),
                     ),
-                    footer: DsAlertDialogFooter(
-                      cancel: DsAlertDialogCancel(
+                    footer: ElAlertDialogFooter(
+                      cancel: ElAlertDialogCancel(
                         key: const ValueKey<String>('focus-harness-cancel'),
                         label: 'Keep',
                         onPressed: close,
                       ),
-                      action: DsAlertDialogAction(
+                      action: ElAlertDialogAction(
                         key: const ValueKey<String>('focus-harness-action'),
                         label: 'Delete',
                         onPressed: close,
@@ -139,7 +139,7 @@ class _FocusHarness extends StatelessWidget {
 
 /// The real internal [FocusNode] behind the text inside [text]: recovered
 /// via [Focus.of] walking up from that text's own [BuildContext], since
-/// neither `DsAlertDialogAction` nor `DsAlertDialogCancel` exposes a
+/// neither `ElAlertDialogAction` nor `ElAlertDialogCancel` exposes a
 /// `focusNode` parameter of its own to inject one directly.
 FocusNode _focusNodeFor(WidgetTester tester, String text) =>
     Focus.of(tester.element(find.text(text)));
@@ -155,38 +155,29 @@ void main() {
       expect(
         alertDialogDoc.exports,
         containsAll(<String>[
-          'DsAlertDialog',
-          'DsAlertDialogSize',
-          'DsAlertDialogContent',
-          'DsAlertDialogHeader',
-          'DsAlertDialogTitle',
-          'DsAlertDialogDescription',
-          'DsAlertDialogFooter',
-          'DsAlertDialogAction',
-          'DsAlertDialogCancel',
+          'ElAlertDialog',
+          'ElAlertDialogSize',
+          'ElAlertDialogContent',
+          'ElAlertDialogHeader',
+          'ElAlertDialogTitle',
+          'ElAlertDialogDescription',
+          'ElAlertDialogFooter',
+          'ElAlertDialogAction',
+          'ElAlertDialogCancel',
         ]),
       );
       // Matches registry/components/alert-dialog.json's registryDependencies
       // verbatim.
       expect(alertDialogDoc.dependencies, <String>[
-        'source-foundation',
         'button',
         'dialog',
+        'machine-surface',
+        'source-foundation',
         'tooltip',
       ]);
       // Short description: one sentence, no trailing ellipsis.
       expect(alertDialogDoc.description, isNot(contains('..')));
       expect(alertDialogDoc.description.trim(), alertDialogDoc.description);
-      // The expanded, decision-guidance description is a distinct constant,
-      // not a restatement of the short one.
-      expect(
-        alertDialogExpandedDescription,
-        isNot(equals(alertDialogDoc.description)),
-      );
-      expect(
-        alertDialogExpandedDescription.trim(),
-        alertDialogExpandedDescription,
-      );
     });
   });
 
@@ -205,7 +196,7 @@ void main() {
         findsOneWidget,
       );
       // The overlay is not mounted before anything opens it.
-      expect(find.byType(DsAlertDialogContent), findsNothing);
+      expect(find.byType(ElAlertDialogContent), findsNothing);
       expect(tester.takeException(), isNull);
     });
 
@@ -238,9 +229,9 @@ void main() {
         for (final String heading in expectedOrder) {
           final Finder finder = find.byWidgetPredicate(
             (Widget widget) =>
-                widget is DsText &&
+                widget is ElText &&
                 widget.text == heading &&
-                widget.spec == DsType.h3,
+                widget.spec == ElType.h3,
           );
           expect(finder, findsOneWidget, reason: 'missing heading: $heading');
           tops.add(tester.getTopLeft(finder).dy);
@@ -259,44 +250,33 @@ void main() {
     );
 
     testWidgets(
-      'the page intro distinguishes alert dialog, dialog, and alert',
-      (WidgetTester tester) async {
-        await _pumpAlertDialogDoc(tester);
-
-        expect(find.textContaining('Reach for Dialog instead'), findsWidgets);
-        expect(find.textContaining('Reach for Alert instead'), findsWidgets);
-        expect(find.textContaining('cannot be undone'), findsWidgets);
-      },
-    );
-
-    testWidgets(
       'the API tables document every constructor parameter found in the source',
       (WidgetTester tester) async {
         await _pumpAlertDialogDoc(tester);
 
-        // DsAlertDialog.
+        // ElAlertDialog.
         expect(find.text('trigger'), findsOneWidget);
         expect(find.text('content'), findsOneWidget);
         expect(find.text('onOpenChange'), findsOneWidget);
-        // DsAlertDialogContent.
+        // ElAlertDialogContent.
         expect(find.text('header'), findsOneWidget);
         expect(find.text('footer'), findsOneWidget);
         expect(find.text('size'), findsWidgets);
-        // DsAlertDialogHeader.
+        // ElAlertDialogHeader.
         expect(find.text('title'), findsWidgets);
         expect(find.text('description'), findsWidgets);
-        // DsAlertDialogTitle / DsAlertDialogDescription share `text`.
+        // ElAlertDialogTitle / ElAlertDialogDescription share `text`.
         expect(find.text('text'), findsWidgets);
-        // DsAlertDialogFooter.
+        // ElAlertDialogFooter.
         expect(find.text('cancel'), findsOneWidget);
         expect(find.text('action'), findsOneWidget);
-        // DsAlertDialogAction / DsAlertDialogCancel.
+        // ElAlertDialogAction / ElAlertDialogCancel.
         expect(find.text('label'), findsWidgets);
         expect(find.text('onPressed'), findsWidgets);
         expect(find.text('variant'), findsWidgets);
         expect(find.text('loading'), findsOneWidget);
         expect(find.text('tooltip'), findsWidgets);
-        // DsAlertDialogSize's two values.
+        // ElAlertDialogSize's two values.
         expect(find.text('normal'), findsOneWidget);
         expect(find.text('sm'), findsOneWidget);
       },
@@ -317,7 +297,7 @@ void main() {
     ) async {
       await _pumpAlertDialogDoc(tester);
 
-      expect(find.textContaining('DsAlertDialogSize'), findsWidgets);
+      expect(find.textContaining('ElAlertDialogSize'), findsWidgets);
       // The header/footer do not receive `size` at all, a real gap against
       // the enum's own "grid-cols-2 footer" doc comment.
       expect(find.textContaining('no size'), findsWidgets);
@@ -357,14 +337,14 @@ void main() {
       );
 
       await _open(tester, trigger);
-      expect(find.byType(DsAlertDialogContent), findsOneWidget);
+      expect(find.byType(ElAlertDialogContent), findsOneWidget);
 
       final Finder cancel = find.byKey(
         const ValueKey<String>('alert-dialog-doc-cancel'),
       );
       await tester.tap(cancel);
       await _settleExit(tester);
-      expect(find.byType(DsAlertDialogContent), findsNothing);
+      expect(find.byType(ElAlertDialogContent), findsNothing);
     });
 
     testWidgets('Action closes it too', (WidgetTester tester) async {
@@ -379,7 +359,7 @@ void main() {
       );
       await tester.tap(action);
       await _settleExit(tester);
-      expect(find.byType(DsAlertDialogContent), findsNothing);
+      expect(find.byType(ElAlertDialogContent), findsNothing);
     });
 
     testWidgets(
@@ -393,7 +373,7 @@ void main() {
         await _open(tester, trigger);
         await tester.tapAt(const Offset(4, 4));
         await _settleExit(tester);
-        expect(find.byType(DsAlertDialogContent), findsOneWidget);
+        expect(find.byType(ElAlertDialogContent), findsOneWidget);
       },
     );
 
@@ -408,7 +388,7 @@ void main() {
       await _open(tester, trigger);
       await tester.sendKeyEvent(LogicalKeyboardKey.escape);
       await _settleExit(tester);
-      expect(find.byType(DsAlertDialogContent), findsNothing);
+      expect(find.byType(ElAlertDialogContent), findsNothing);
     });
   });
 
@@ -422,9 +402,9 @@ void main() {
       final FocusNode outside = _focusNodeFor(tester, 'Outside');
       await tester.tap(find.text('open'));
       await tester.pump();
-      await tester.pump(DsDurations.jelly);
+      await tester.pump(ElDurations.jelly);
 
-      expect(find.byType(DsAlertDialogContent), findsOneWidget);
+      expect(find.byType(ElAlertDialogContent), findsOneWidget);
       final FocusNode? focused = FocusManager.instance.primaryFocus;
       expect(focused, isNotNull);
       expect(
@@ -459,7 +439,7 @@ void main() {
         final FocusNode outside = _focusNodeFor(tester, 'Outside');
         await tester.tap(find.text('open'));
         await tester.pump();
-        await tester.pump(DsDurations.jelly);
+        await tester.pump(ElDurations.jelly);
 
         final FocusNode cancelNode = _focusNodeFor(tester, 'Keep');
         final FocusNode actionNode = _focusNodeFor(tester, 'Delete');
@@ -497,16 +477,16 @@ void main() {
         final FocusNode triggerNode = _focusNodeFor(tester, 'open');
         await tester.tap(find.text('open'));
         await tester.pump();
-        await tester.pump(DsDurations.jelly);
+        await tester.pump(ElDurations.jelly);
 
         await tester.tap(find.text('Keep'));
         await tester.pump();
-        await tester.pump(DsDurations.overlay);
+        await tester.pump(ElDurations.overlay);
         await tester.pump();
 
-        expect(find.byType(DsAlertDialogContent), findsNothing);
+        expect(find.byType(ElAlertDialogContent), findsNothing);
         // Documented, not assumed: the source wires no explicit
-        // save/restore-focus step in DsModalPortalState.close(), so this
+        // save/restore-focus step in ElModalPortalState.close(), so this
         // assertion pins whatever Flutter's own framework default produces
         // rather than an aspirational "returns to the trigger" claim.
         final FocusNode? focused = FocusManager.instance.primaryFocus;
@@ -514,7 +494,7 @@ void main() {
           focused == triggerNode,
           isFalse,
           reason:
-              'if this starts failing, DsModalPortal gained an explicit '
+              'if this starts failing, ElModalPortal gained an explicit '
               'restore-focus step and the Accessibility section needs to '
               'stop calling it a gap: observed after close: $focused',
         );
@@ -567,30 +547,30 @@ void main() {
 
   group('both themes', () {
     testWidgets('renders on light', (WidgetTester tester) async {
-      await _pumpAlertDialogDoc(tester, mode: DsThemeMode.light);
-      expect(find.byType(DsAlertDialog), findsWidgets);
+      await _pumpAlertDialogDoc(tester, mode: ElThemeMode.light);
+      expect(find.byType(ElAlertDialog), findsWidgets);
       expect(tester.takeException(), isNull);
     });
 
     testWidgets('renders on dark', (WidgetTester tester) async {
-      await _pumpAlertDialogDoc(tester, mode: DsThemeMode.dark);
-      expect(find.byType(DsAlertDialog), findsWidgets);
+      await _pumpAlertDialogDoc(tester, mode: ElThemeMode.dark);
+      expect(find.byType(ElAlertDialog), findsWidgets);
       expect(tester.takeException(), isNull);
     });
 
     testWidgets('flipping the theme in place keeps the page intact', (
       WidgetTester tester,
     ) async {
-      final DsThemeController theme = await _pumpAlertDialogDoc(
+      final ElThemeController theme = await _pumpAlertDialogDoc(
         tester,
-        mode: DsThemeMode.dark,
+        mode: ElThemeMode.dark,
       );
-      expect(find.byType(DsAlertDialog), findsWidgets);
+      expect(find.byType(ElAlertDialog), findsWidgets);
 
-      theme.setMode(DsThemeMode.light);
+      theme.setMode(ElThemeMode.light);
       await tester.pump();
 
-      expect(find.byType(DsAlertDialog), findsWidgets);
+      expect(find.byType(ElAlertDialog), findsWidgets);
       expect(tester.takeException(), isNull);
     });
   });

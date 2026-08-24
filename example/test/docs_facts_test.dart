@@ -3,8 +3,8 @@ import 'package:example/docs/docs_facts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-Widget _harness(Widget child) => DsTheme(
-  controller: DsThemeController(mode: DsThemeMode.dark),
+Widget _harness(Widget child) => ElTheme(
+  controller: ElThemeController(mode: ElThemeMode.dark),
   child: MaterialApp(
     debugShowCheckedModeBanner: false,
     home: SingleChildScrollView(child: child),

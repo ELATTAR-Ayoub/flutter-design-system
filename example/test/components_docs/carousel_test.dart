@@ -1,24 +1,23 @@
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/carousel/meta.dart';
 import 'package:example/components_docs/carousel/page.dart';
-import 'package:example/kit.dart';
+import 'package:example/kit.dart' show ElSection;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// The page's own section order, live demo excluded (it has no heading):
-/// the shadcn parity brief requires this exact order and this exact set.
-/// `nav-user` and `marker-variants` are ours only (no shadcn counterpart
-/// for either component), grouped under their own names in the
-/// component-specific zone between Composition and API Reference, per
-/// `example/lib/components_docs/carousel/page.dart`'s own library doc.
-const List<String> _carouselSectionOrder = <String>[
+/// Trimmed on 2026-08-24: `ElNavUser` and `ElMarker` moved to
+/// `nav_user_test.dart` and `marker_test.dart` along with their pages, so
+/// nothing about either is asserted here any more.
+///
+/// The page's own section order, live demo excluded (it has no heading).
+const List<String> _sectionOrder = <String>[
   'install',
   'usage',
+  'motion',
   'composition',
   'sizes',
   'rtl',
-  'nav-user',
-  'marker-variants',
+  'not-ported',
   'api',
   'states',
   'accessibility',
@@ -28,18 +27,69 @@ const List<String> _carouselSectionOrder = <String>[
   'source',
 ];
 
+/// The same list by title, for the order assertion. `find.text` would match
+/// each of these twice at desktop width (heading plus right-rail TOC entry),
+/// so the order is read off the mounted `ElSection` widgets instead.
+const List<String> _sectionTitles = <String>[
+  'Installation',
+  'Usage',
+  'How the motion works',
+  'Composition',
+  'Sizes',
+  'RTL',
+  'What this port leaves out',
+  'API Reference',
+  'States',
+  'Accessibility',
+  'Responsive',
+  'Dependencies',
+  'Theming',
+  'Source',
+];
+
+/// Every named constructor parameter `ElCarousel` declares
+/// (`lib/src/components/carousel.dart`), excluding `key`: the same set the
+/// page's `ElCarousel` API table claims to cover.
+const List<String> _carouselConstructorParams = <String>[
+  'basis',
+  'items',
+  'padding',
+  'previousLabel',
+  'nextLabel',
+];
+
 Widget _harness({
   required Widget child,
-  required DsThemeController controller,
-}) => DsTheme(
+  required ElThemeController controller,
+}) => ElTheme(
   controller: controller,
-  child: MaterialApp(home: SingleChildScrollView(child: child)),
+  child: MaterialApp(
+    debugShowCheckedModeBanner: false,
+    home: Scaffold(body: SingleChildScrollView(child: child)),
+  ),
 );
 
 void main() {
+  group('meta', () {
+    test('carouselDoc names ElCarousel only, after the split', () {
+      expect(carouselDoc.name, 'carousel');
+      expect(carouselDoc.title, 'Carousel');
+      expect(carouselDoc.route, '/components/carousel');
+      expect(carouselDoc.sourcePath, 'lib/src/components/carousel.dart');
+      expect(carouselDoc.exports, <String>[
+        'ElCarousel',
+        'ElCarouselController',
+      ]);
+      // The two families that moved out are gone from this entry.
+      expect(carouselDoc.exports, isNot(contains('ElNavUser')));
+      expect(carouselDoc.exports, isNot(contains('ElMarker')));
+    });
+  });
+
   group('carousel docs page', () {
     testWidgets(
-      'renders the article, API tables, and live specimens at desktop size',
+      'renders the article, both API tables, and the live specimens at '
+      'desktop size',
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(1440, 900);
         tester.view.devicePixelRatio = 1;
@@ -48,93 +98,107 @@ void main() {
         String? destination;
         await tester.pumpWidget(
           _harness(
-            controller: DsThemeController(mode: DsThemeMode.dark),
+            controller: ElThemeController(mode: ElThemeMode.dark),
             child: CarouselDocPage(
               onNavigate: (String route) => destination = route,
             ),
           ),
         );
+        // A single frame, never pumpAndSettle: the engine is an integrator
+        // with no end time, so a settle on a moving carousel would never
+        // return.
+        await tester.pump();
 
         expect(
           find.byKey(const ValueKey<String>('carousel-doc-article')),
           findsOneWidget,
         );
 
-        // Verify carousel API table parameters.
-        for (final String param in <String>[
-          'basis',
-          'items',
-          'padding',
-          'previousLabel',
-          'nextLabel',
+        for (final String param in _carouselConstructorParams) {
+          expect(
+            find.text(param),
+            findsWidgets,
+            reason: 'missing ElCarousel param $param',
+          );
+        }
+
+        // The ElCarouselController table names its own constructor
+        // parameter and its public members, which the pre-split table did
+        // not.
+        for (final String member in <String>[
+          'ElCarouselController({vsync})',
+          'instant',
+          'location',
+          'selectedIndex',
+          'canScrollPrev',
+          'canScrollNext',
+          'snaps',
+          'setMetrics({viewSize, slideSizes})',
+          'scrollTo(int index)',
+          'scrollPrev()',
+          'scrollNext()',
+          'dragStart(double pointerX)',
+          'dragUpdate(double pointerX)',
+          'dragEnd()',
+          'dispose()',
         ]) {
           expect(
-            find.text(param),
+            find.text(member),
             findsWidgets,
-            reason: 'missing carousel param $param',
+            reason: 'missing ElCarouselController member $member',
           );
         }
 
-        // Verify nav_user API table.
-        for (final String param in <String>['user', 'items', 'name', 'email']) {
+        // Every live specimen this page's own source keys is mounted.
+        for (final String key in <String>[
+          'carousel-preview',
+          'carousel-example:in-panel',
+          'carousel-example:basis-half',
+          'carousel-example:basis-third',
+          'carousel-example:rtl',
+        ]) {
           expect(
-            find.text(param),
-            findsWidgets,
-            reason: 'missing nav_user param $param',
+            find.byKey(ValueKey<String>(key)),
+            findsOneWidget,
+            reason: 'missing specimen $key',
           );
         }
 
-        // Verify marker API table.
-        for (final String param in <String>['label', 'variant', 'icon']) {
-          expect(
-            find.text(param),
-            findsWidgets,
-            reason: 'missing marker param $param',
-          );
-        }
+        // Both basis values the Sizes section claims to show are real.
+        final Set<double> mountedBases = tester
+            .widgetList<ElCarousel>(find.byType(ElCarousel))
+            .map((ElCarousel carousel) => carousel.basis)
+            .toSet();
+        expect(mountedBases, containsAll(<double>[0.5, 0.333]));
 
-        // Live carousel specimen mounts.
-        expect(
-          find.byType(DsCarousel),
-          findsWidgets,
-          reason: 'carousel specimen not mounted',
-        );
-
-        // Live nav_user specimen mounts.
-        expect(
-          find.byType(DsNavUser),
-          findsWidgets,
-          reason: 'nav_user specimen not mounted',
-        );
-
-        // Live marker specimens mount (normal, separator, border variants).
-        expect(
-          find.byType(DsMarker),
-          findsWidgets,
-          reason: 'marker specimens not mounted',
-        );
-
-        // Verify metadata.
-        expect(carouselDoc.name, 'carousel');
-        expect(
-          carouselDoc.exports,
-          containsAll(<String>[
-            'DsCarousel',
-            'DsCarouselController',
-            'DsNavUser',
-            'DsNavUserAccount',
-            'DsNavUserItem',
-            'DsMarker',
-            'DsMarkerVariant',
-          ]),
-        );
         expect(destination, isNull);
+      },
+    );
 
-        // Every shadcn-mirrored section (plus the two ours-only sections)
-        // renders, in exactly the order the reshape brief requires.
+    testWidgets(
+      'sections render in the documented order, section for section',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(1440, 900);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+
+        await tester.pumpWidget(
+          _harness(
+            controller: ElThemeController(mode: ElThemeMode.dark),
+            child: const CarouselDocPage(),
+          ),
+        );
+        await tester.pump();
+
+        final List<String> titles = tester
+            .widgetList<ElSection>(find.byType(ElSection))
+            .map((ElSection section) => section.title)
+            .toList();
+        expect(titles, _sectionTitles);
+
         double? previousTop;
-        for (final String id in _carouselSectionOrder) {
-          final Finder finder = find.byKey(DsSection.anchorKey(id));
+        for (final String id in _sectionOrder) {
+          final Finder finder = find.byKey(ElSection.anchorKey(id));
           expect(finder, findsOneWidget, reason: 'missing section "$id"');
           final double top = tester.getTopLeft(finder).dy;
           if (previousTop != null) {
@@ -150,6 +214,91 @@ void main() {
     );
 
     testWidgets(
+      'the six skipped reference sections and the missing-controller root '
+      'cause are both still on the page',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(1440, 900);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+
+        await tester.pumpWidget(
+          _harness(
+            controller: ElThemeController(mode: ElThemeMode.dark),
+            child: const CarouselDocPage(),
+          ),
+        );
+        await tester.pump();
+
+        for (final String skipped in <String>[
+          'Spacing',
+          'Orientation',
+          'Options',
+          'API state-tracking',
+          'Events',
+          'Plugins',
+        ]) {
+          expect(
+            find.text(skipped),
+            findsWidgets,
+            reason: 'skipped section "$skipped" is no longer disclosed',
+          );
+        }
+
+        // The honest skip's own causal framing, verbatim: ElCarousel really
+        // does declare no `controller` parameter, so the page must not
+        // start implying that the exported controller is attachable.
+        expect(
+          find.text(
+            'ElCarousel builds this controller internally: the '
+            'constructor above has no controller parameter. Nothing '
+            'outside ElCarousel can read selectedIndex, canScrollPrev, '
+            'or canScrollNext, or add its own listener, today.',
+          ),
+          findsOneWidget,
+          reason: 'the ElCarouselController caveat panel text changed',
+        );
+      },
+    );
+
+    testWidgets('carousel arrows are real focusable buttons with labels', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+
+      await tester.pumpWidget(
+        _harness(
+          controller: ElThemeController(mode: ElThemeMode.dark),
+          child: const CarouselDocPage(),
+        ),
+      );
+      await tester.pump();
+
+      final List<ElButton> buttons = tester
+          .widgetList<ElButton>(find.byType(ElButton))
+          .toList();
+      expect(buttons.length, greaterThanOrEqualTo(2));
+
+      final Set<String?> labels = buttons
+          .map((ElButton button) => button.label)
+          .toSet();
+      expect(labels, contains('Previous slide'));
+      expect(labels, contains('Next slide'));
+
+      // The previous arrow starts disabled: canScrollPrev is false at index
+      // 0, which the page's own States and Accessibility sections claim.
+      final Iterable<ElButton> previous = buttons.where(
+        (ElButton button) => button.label == 'Previous slide',
+      );
+      expect(previous, isNotEmpty);
+      expect(
+        previous.every((ElButton button) => button.onPressed == null),
+        isTrue,
+      );
+    });
+
+    testWidgets(
       'renders at narrow width with the anchor strip instead of a rail',
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(390, 844);
@@ -158,10 +307,11 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: DsThemeController(mode: DsThemeMode.dark),
+            controller: ElThemeController(mode: ElThemeMode.dark),
             child: const CarouselDocPage(),
           ),
         );
+        await tester.pump();
 
         expect(
           find.byKey(const ValueKey<String>('carousel-doc-article')),
@@ -179,129 +329,49 @@ void main() {
     );
 
     testWidgets(
-      'carousel, nav_user, and marker render correctly in light and dark themes',
+      'survives a live theme flip in place without losing a specimen',
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(1440, 900);
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
 
-        final DsThemeController controller = DsThemeController(
-          mode: DsThemeMode.dark,
+        final ElThemeController controller = ElThemeController(
+          mode: ElThemeMode.dark,
         );
         await tester.pumpWidget(
           _harness(controller: controller, child: const CarouselDocPage()),
         );
-
-        // Verify all live components render in dark theme.
-        expect(find.byType(DsCarousel), findsWidgets);
-        expect(find.byType(DsNavUser), findsWidgets);
-        expect(find.byType(DsMarker), findsWidgets);
-
-        // Flip the SAME controller in place.
-        controller.setMode(DsThemeMode.light);
         await tester.pump();
 
-        // Verify components still render in light theme.
-        expect(find.byType(DsCarousel), findsWidgets);
-        expect(find.byType(DsNavUser), findsWidgets);
-        expect(find.byType(DsMarker), findsWidgets);
+        final ElThemeData darkTheme = ElTheme.of(
+          tester.element(
+            find.byKey(const ValueKey<String>('carousel-doc-article')),
+          ),
+        );
+
+        // Flip the SAME controller in place. A single pump(), never
+        // pumpAndSettle().
+        controller.setMode(ElThemeMode.light);
+        await tester.pump();
+
+        final ElThemeData lightTheme = ElTheme.of(
+          tester.element(
+            find.byKey(const ValueKey<String>('carousel-doc-article')),
+          ),
+        );
+        expect(lightTheme.background, isNot(darkTheme.background));
+        expect(lightTheme.foreground, isNot(darkTheme.foreground));
+
+        for (final String key in <String>[
+          'carousel-preview',
+          'carousel-example:in-panel',
+          'carousel-example:basis-half',
+          'carousel-example:basis-third',
+          'carousel-example:rtl',
+        ]) {
+          expect(find.byKey(ValueKey<String>(key)), findsOneWidget);
+        }
       },
     );
-
-    testWidgets('carousel navigation buttons are real focusable buttons', (
-      WidgetTester tester,
-    ) async {
-      tester.view.physicalSize = const Size(1440, 900);
-      tester.view.devicePixelRatio = 1;
-      addTearDown(tester.view.reset);
-
-      await tester.pumpWidget(
-        _harness(
-          controller: DsThemeController(mode: DsThemeMode.dark),
-          child: const CarouselDocPage(),
-        ),
-      );
-
-      // Find carousel buttons in the preview.
-      final List<DsButton> buttons = tester
-          .widgetList<DsButton>(find.byType(DsButton))
-          .toList();
-
-      // Carousel preview should have at least previous and next buttons.
-      expect(buttons.length, greaterThanOrEqualTo(2));
-
-      // Verify buttons have semantic labels for accessibility.
-      bool hasPreviousLabel = false;
-      bool hasNextLabel = false;
-
-      for (final DsButton button in buttons) {
-        if (button.label == 'Previous slide') {
-          hasPreviousLabel = true;
-        }
-        if (button.label == 'Next slide') {
-          hasNextLabel = true;
-        }
-      }
-
-      expect(hasPreviousLabel, true, reason: 'Previous button missing label');
-      expect(hasNextLabel, true, reason: 'Next button missing label');
-    });
-
-    testWidgets('marker variants render as distinct types', (
-      WidgetTester tester,
-    ) async {
-      tester.view.physicalSize = const Size(1440, 900);
-      tester.view.devicePixelRatio = 1;
-      addTearDown(tester.view.reset);
-
-      await tester.pumpWidget(
-        _harness(
-          controller: DsThemeController(mode: DsThemeMode.dark),
-          child: const CarouselDocPage(),
-        ),
-      );
-
-      // Verify all three marker variants are rendered.
-      final List<DsMarker> markers = tester
-          .widgetList<DsMarker>(find.byType(DsMarker))
-          .toList();
-
-      expect(markers.length, greaterThanOrEqualTo(3));
-
-      final Set<DsMarkerVariant> variants = markers
-          .map((DsMarker m) => m.variant)
-          .toSet();
-
-      expect(
-        variants,
-        containsAll(<DsMarkerVariant>[
-          DsMarkerVariant.normal,
-          DsMarkerVariant.separator,
-          DsMarkerVariant.border,
-        ]),
-      );
-    });
-
-    testWidgets('nav_user account row renders with name and email', (
-      WidgetTester tester,
-    ) async {
-      tester.view.physicalSize = const Size(1440, 900);
-      tester.view.devicePixelRatio = 1;
-      addTearDown(tester.view.reset);
-
-      await tester.pumpWidget(
-        _harness(
-          controller: DsThemeController(mode: DsThemeMode.dark),
-          child: const CarouselDocPage(),
-        ),
-      );
-
-      // Verify the account row text appears.
-      expect(find.text('Alex Johnson'), findsWidgets);
-      expect(find.text('alex@example.com'), findsWidgets);
-
-      // Verify nav_user is rendered.
-      expect(find.byType(DsNavUser), findsWidgets);
-    });
   });
 }

@@ -3,12 +3,12 @@
 /// Mirrors `button_card_pages.dart`'s use of the Phase C docs primitives
 /// (`DocsLayout`, `DocsCodeExample`, `DocsApiTable`, `DocsStateMatrix`,
 /// `DocsInstallFacts`) and `dialog_page.dart`'s use of `kit.dart`'s
-/// `DsSection` for titled, anchor-registered content blocks, `badge` needs
-/// enough distinct sections (IA §9.1's eighteen) that `DsSection`'s built-in
+/// `ElSection` for titled, anchor-registered content blocks, `badge` needs
+/// enough distinct sections (IA §9.1's eighteen) that `ElSection`'s built-in
 /// heading and anchor registration earns its keep over hand-rolling a title
 /// plus a `docsAnchorKey` wrap per block.
 ///
-/// `badge` has no registry manifest yet (`registry/components/badge.json`
+/// `badge` ships in the registry (`registry/components/badge.json`
 /// does not exist): every install-facing panel below says so honestly
 /// rather than presenting a CLI command that would fail.
 library;
@@ -35,9 +35,9 @@ class BadgeDocPage extends StatelessWidget {
       title: badgeDoc.title,
       description: badgeDoc.description,
     ),
-    breadcrumbs: const <DsBreadcrumbEntry>[
-      DsBreadcrumbEntry.link('Components'),
-      DsBreadcrumbEntry.page('Badge'),
+    breadcrumbs: const <ElBreadcrumbEntry>[
+      ElBreadcrumbEntry.link('Components'),
+      ElBreadcrumbEntry.page('Badge'),
     ],
     sidebar: _sidebar,
     toc: const <DocsTocEntry>[
@@ -91,13 +91,13 @@ const List<DocsSidebarEntry> _sidebar = <DocsSidebarEntry>[
   DocsSidebarEntry(title: 'Tooltip', route: '/components/tooltip'),
 ];
 
-/// One specimen of every [DsBadgeVariant], each wrapped in a
+/// One specimen of every [ElBadgeVariant], each wrapped in a
 /// [KeyedSubtree] the docs test locates directly: see the test file's own
 /// note on why: it reads the resolved ink straight off the rendered
-/// [DsText] rather than re-deriving `DsBadge`'s private colour mapping.
+/// [ElText] rather than re-deriving `ElBadge`'s private colour mapping.
 class _VariantLabel {
   const _VariantLabel(this.variant, this.label);
-  final DsBadgeVariant variant;
+  final ElBadgeVariant variant;
   final String label;
 }
 
@@ -105,17 +105,17 @@ class _VariantLabel {
 /// in `badge.dart` uses as its example call site, where one exists (`action`
 /// → "New release", `premium` → "Featured").
 const List<_VariantLabel> _variantSpecimens = <_VariantLabel>[
-  _VariantLabel(DsBadgeVariant.primary, 'New'),
-  _VariantLabel(DsBadgeVariant.secondary, 'Draft'),
-  _VariantLabel(DsBadgeVariant.destructive, 'Failed'),
-  _VariantLabel(DsBadgeVariant.outline, 'Outline'),
-  _VariantLabel(DsBadgeVariant.ghost, 'Ghost'),
-  _VariantLabel(DsBadgeVariant.link, 'Docs'),
-  _VariantLabel(DsBadgeVariant.action, 'New release'),
-  _VariantLabel(DsBadgeVariant.premium, 'Featured'),
-  _VariantLabel(DsBadgeVariant.success, 'Active'),
-  _VariantLabel(DsBadgeVariant.warning, 'Pending'),
-  _VariantLabel(DsBadgeVariant.info, 'Beta'),
+  _VariantLabel(ElBadgeVariant.primary, 'New'),
+  _VariantLabel(ElBadgeVariant.secondary, 'Draft'),
+  _VariantLabel(ElBadgeVariant.destructive, 'Failed'),
+  _VariantLabel(ElBadgeVariant.outline, 'Outline'),
+  _VariantLabel(ElBadgeVariant.ghost, 'Ghost'),
+  _VariantLabel(ElBadgeVariant.link, 'Docs'),
+  _VariantLabel(ElBadgeVariant.action, 'New release'),
+  _VariantLabel(ElBadgeVariant.premium, 'Featured'),
+  _VariantLabel(ElBadgeVariant.success, 'Active'),
+  _VariantLabel(ElBadgeVariant.warning, 'Pending'),
+  _VariantLabel(ElBadgeVariant.info, 'Beta'),
 ];
 
 class _BadgeArticle extends StatelessWidget {
@@ -123,7 +123,7 @@ class _BadgeArticle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return Column(
       key: const ValueKey<String>('badge-doc-article'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -148,97 +148,95 @@ class _BadgeArticle extends StatelessWidget {
   }
 
   /// The live-demo slot shadcn's own badge page renders before its first
-  /// heading: this port's `DsSection` always carries a heading, so `Preview`
+  /// heading: this port's `ElSection` always carries a heading, so `Preview`
   /// stands in for it, carrying the component's own framing prose (what it
-  /// is, when to reach for it instead of `DsKbd` or `DsButton`) ahead of a
+  /// is, when to reach for it instead of `ElKbd` or `ElButton`) ahead of a
   /// small representative demo. The full eleven-variant grid lives under
   /// `Variants` below, mirroring shadcn's own split between its top demo
   /// (four badges) and its later `Variants` section (all five).
-  Widget _preview(DsThemeData theme) => Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: DsWidths.prose),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              DsText(
-                'DsBadge renders a small pill: a fixed 20px-tall, '
-                'label-sized chip used to mark a status, a count, or a '
-                'category: never an action. Eleven variants map to six '
-                'semantic fills (success, warning, info, destructive, '
-                'action, premium) plus primary and secondary, and three '
-                'unfilled treatments (outline, ghost, link) for contexts '
-                'that want restraint.',
-                DsType.body,
-              ),
-              SizedBox(height: ds(4)),
-              DsText(
-                'Reach for it over DsKbd when the content is a status word '
-                'or a count rather than a literal keystroke: kbd renders a '
-                'monospace key cap, badge renders a semantic chip. Reach '
-                'for it over a plain label when the value needs its own '
-                'filled, bordered, or coloured surface to separate it from '
-                'surrounding prose. And reach for DsButton instead the '
-                'moment the chip needs to respond to a tap: DsBadge '
-                'carries no GestureDetector, no FocusNode, and no pressed '
-                'or hover state by design: its own source docstring puts '
-                'it plainly: "a badge is a label, not a button, and it '
-                'must not invite a click."',
-                DsType.body,
-              ),
-              SizedBox(height: ds(4)),
-              DsText(
-                'Status: stable primitive, not yet registered in the CLI '
-                '(see Installation). Platforms: Android, iOS, Web, macOS, '
-                'Windows, Linux, the same six every widget in this package '
-                'targets.',
-                DsType.small,
-                color: theme.mutedForeground,
-              ),
-            ],
-          ),
-        ),
-        SizedBox(height: ds(6)),
-        DocsCodeExample(
-          title: 'Badge specimens',
-          manualFiles: const <DocsCodeFile>[
-            DocsCodeFile(
-              path: 'lib/components/ui/badge.dart',
-              code:
-                  "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
-                  '// Badge has no registry manifest yet: copy\n'
-                  '// lib/src/components/badge.dart from the package source\n'
-                  '// directly. There is no generated CLI payload to fetch.',
+  Widget _preview(ElThemeData theme) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: <Widget>[
+      ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            ElText(
+              'ElBadge renders a small pill: a fixed 20px-tall, '
+              'label-sized chip used to mark a status, a count, or a '
+              'category: never an action. Eleven variants map to six '
+              'semantic fills (success, warning, info, destructive, '
+              'action, premium) plus primary and secondary, and three '
+              'unfilled treatments (outline, ghost, link) for contexts '
+              'that want restraint.',
+              ElType.body,
+            ),
+            SizedBox(height: el(4)),
+            ElText(
+              'Reach for it over ElKbd when the content is a status word '
+              'or a count rather than a literal keystroke: kbd renders a '
+              'monospace key cap, badge renders a semantic chip. Reach '
+              'for it over a plain label when the value needs its own '
+              'filled, bordered, or coloured surface to separate it from '
+              'surrounding prose. And reach for ElButton instead the '
+              'moment the chip needs to respond to a tap: ElBadge '
+              'carries no GestureDetector, no FocusNode, and no pressed '
+              'or hover state by design: its own source docstring puts '
+              'it plainly: "a badge is a label, not a button, and it '
+              'must not invite a click."',
+              ElType.body,
+            ),
+            SizedBox(height: el(4)),
+            ElText(
+              'Status: stable primitive, installable through the CLI '
+              '(see Installation). Platforms: Android, iOS, Web, macOS, '
+              'Windows, Linux, the same six every widget in this package '
+              'targets.',
+              ElType.small,
+              color: theme.mutedForeground,
             ),
           ],
-          preview: Wrap(
-            spacing: ds(3),
-            runSpacing: ds(3),
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: const <Widget>[
-              DsBadge(label: 'New'),
-              DsBadge(label: 'Draft', variant: DsBadgeVariant.secondary),
-              DsBadge(label: 'Failed', variant: DsBadgeVariant.destructive),
-              DsBadge(label: 'Outline', variant: DsBadgeVariant.outline),
-            ],
-          ),
         ),
-      ],
-    );
+      ),
+      SizedBox(height: el(6)),
+      DocsCodeExample(
+        title: 'Badge specimens',
+        manualFiles: const <DocsCodeFile>[
+          DocsCodeFile(
+            path: 'lib/components/ui/badge.dart',
+            code:
+                "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
+                '// Install with: elattar add badge',
+          ),
+        ],
+        preview: Wrap(
+          spacing: el(3),
+          runSpacing: el(3),
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: const <Widget>[
+            ElBadge(label: 'New'),
+            ElBadge(label: 'Draft', variant: ElBadgeVariant.secondary),
+            ElBadge(label: 'Failed', variant: ElBadgeVariant.destructive),
+            ElBadge(label: 'Outline', variant: ElBadgeVariant.outline),
+          ],
+        ),
+      ),
+    ],
+  );
 
-  Widget _install() => DsSection(
+  Widget _install() => ElSection(
     id: 'install',
     title: 'Installation',
     description:
-        'badge has no registry manifest yet, so `elattar add badge` is not '
+        'badge ships in the registry, so `elattar add badge` is not '
         'available: install by copying the source file manually.',
     child: DocsInstallFacts(
       title: 'Installation facts',
       facts: <DocsInstallFact>[
         const DocsInstallFact(
           label: 'Registry item',
-          value: 'not yet registered',
+          value: 'registry/components/badge.json',
           description:
               'No registry/components/badge.json exists. This is a '
               'source-only component today.',
@@ -257,9 +255,9 @@ class _BadgeArticle extends StatelessWidget {
           label: 'Dependencies',
           value: 'source-foundation, machine-surface',
           description:
-              'What a future manifest would need to resolve: colors, '
+              'What the shipped manifest resolves: colors, '
               'shadows, spacing, theme, typography, and the '
-              'DsMachineSurface effect. None of this is resolved '
+              'ElMachineSurface effect. None of this is resolved '
               'automatically today; copy the imports by hand.',
         ),
         const DocsInstallFact(
@@ -292,18 +290,18 @@ class _BadgeArticle extends StatelessWidget {
     ),
   );
 
-  Widget _usage() => DsSection(
+  Widget _usage() => ElSection(
     id: 'usage',
     title: 'Usage',
     description: 'The smallest correct call, then the shapes seen above.',
-    child: DsPanel(
+    child: ElPanel(
       label: 'DART',
       note: 'COMPOSE',
       child: DocsSelectableCodeBlock(code: _usageCode),
     ),
   );
 
-  Widget _api() => DsSection(
+  Widget _api() => ElSection(
     id: 'api',
     title: 'API Reference',
     child: Column(
@@ -319,25 +317,25 @@ class _BadgeArticle extends StatelessWidget {
             ),
             DocsApiFact(
               name: 'variant',
-              type: 'DsBadgeVariant',
+              type: 'ElBadgeVariant',
               description:
                   'Defaults to primary. Selects the fill, ink, and '
                   'shadow: see Variants.',
             ),
             DocsApiFact(
               name: 'spec',
-              type: 'DsTypeSpec?',
+              type: 'ElTypeSpec?',
               description:
-                  'Overrides DsComponentType.badgeLabel, the resolved type '
-                  'spec the label renders with. DsSidebarMenuBadge passes '
-                  'DsComponentType.sidebarMenuBadge here.',
+                  'Overrides ElComponentType.badgeLabel, the resolved type '
+                  'spec the label renders with. ElSidebarMenuBadge passes '
+                  'ElComponentType.sidebarMenuBadge here.',
             ),
             DocsApiFact(
               name: 'paddingX',
               type: 'double?',
               description:
                   'Overrides the 8px horizontal padding on each side '
-                  '(DsBadge.horizontalPadding).',
+                  '(ElBadge.horizontalPadding).',
             ),
             DocsApiFact(
               name: 'minWidth',
@@ -355,28 +353,28 @@ class _BadgeArticle extends StatelessWidget {
             ),
           ],
         ),
-        SizedBox(height: ds(6)),
+        SizedBox(height: el(6)),
         const DocsApiTable(
           title: 'Static tokens',
           facts: <DocsApiFact>[
             DocsApiFact(
-              name: 'DsBadge.height',
+              name: 'ElBadge.height',
               type: 'static double',
               description:
                   'The hard 20px border-box height every badge renders at.',
             ),
             DocsApiFact(
-              name: 'DsBadge.horizontalPadding',
+              name: 'ElBadge.horizontalPadding',
               type: 'static double',
               description: 'The default paddingX, 8px.',
             ),
             DocsApiFact(
-              name: 'DsBadge.glyphSize',
+              name: 'ElBadge.glyphSize',
               type: 'static double',
               description: 'The forced glyph square, 12px.',
             ),
             DocsApiFact(
-              name: 'DsBadge.glyphGap',
+              name: 'ElBadge.glyphGap',
               type: 'static double',
               description: 'The gap between glyph and label, 4px.',
             ),
@@ -386,35 +384,35 @@ class _BadgeArticle extends StatelessWidget {
     ),
   );
 
-  Widget _variants() => DsSection(
+  Widget _variants() => ElSection(
     id: 'variants',
     title: 'Variants',
     description:
-        'All eleven DsBadgeVariant values. Badge has no size axis: every '
-        'chip is the same hard 20px border box (DsBadge.height); content '
+        'All eleven ElBadgeVariant values. Badge has no size axis: every '
+        'chip is the same hard 20px border box (ElBadge.height); content '
         'never grows it. Use paddingX or minWidth to adjust footprint '
         'instead of a size enum.',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        DsPanel(
+        ElPanel(
           label: 'PREVIEW',
           child: Wrap(
-            spacing: ds(3),
-            runSpacing: ds(3),
+            spacing: el(3),
+            runSpacing: el(3),
             crossAxisAlignment: WrapCrossAlignment.center,
             children: <Widget>[
               for (final _VariantLabel spec in _variantSpecimens)
                 KeyedSubtree(
                   key: ValueKey<String>('badge-preview:${spec.variant.name}'),
-                  child: DsBadge(label: spec.label, variant: spec.variant),
+                  child: ElBadge(label: spec.label, variant: spec.variant),
                 ),
             ],
           ),
         ),
-        SizedBox(height: ds(6)),
+        SizedBox(height: el(6)),
         const DocsApiTable(
-          title: 'DsBadgeVariant',
+          title: 'ElBadgeVariant',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'primary',
@@ -462,7 +460,7 @@ class _BadgeArticle extends StatelessWidget {
               type: 'filled',
               description:
                   'Added for this system (not in the original shadcn set). A '
-                  '12%-alpha tint of DsPalette.action; ink is theme.actionInk, '
+                  '12%-alpha tint of ElPalette.action; ink is theme.actionInk, '
                   'same ink as link. ramp-chip + shadow-chip. The media '
                   'dialog\'s "New release".',
             ),
@@ -470,7 +468,7 @@ class _BadgeArticle extends StatelessWidget {
               name: 'premium',
               type: 'filled',
               description:
-                  'A 12%-alpha tint of DsPalette.value; ink is theme.valueInk. '
+                  'A 12%-alpha tint of ElPalette.value; ink is theme.valueInk. '
                   'The one variant using shadow-btn-value instead of '
                   'shadow-chip: used for Featured, Limited, and anything '
                   'carrying value.',
@@ -479,21 +477,21 @@ class _BadgeArticle extends StatelessWidget {
               name: 'success',
               type: 'filled',
               description:
-                  'A 12%-alpha tint of DsPalette.success; ink is '
+                  'A 12%-alpha tint of ElPalette.success; ink is '
                   'theme.successInk. ramp-chip + shadow-chip.',
             ),
             DocsApiFact(
               name: 'warning',
               type: 'filled',
               description:
-                  'A 12%-alpha tint of DsPalette.warning; ink is '
+                  'A 12%-alpha tint of ElPalette.warning; ink is '
                   'theme.warningInk. ramp-chip + shadow-chip.',
             ),
             DocsApiFact(
               name: 'info',
               type: 'filled',
               description:
-                  'A 12%-alpha tint of DsPalette.info; ink is theme.infoInk. '
+                  'A 12%-alpha tint of ElPalette.info; ink is theme.infoInk. '
                   'ramp-chip + shadow-chip.',
             ),
           ],
@@ -502,86 +500,86 @@ class _BadgeArticle extends StatelessWidget {
     ),
   );
 
-  Widget _withIcon() => DsSection(
+  Widget _withIcon() => ElSection(
     id: 'with-icon',
     title: 'With icon',
     description:
         'A leading glyph, forced to 12px square with a 4px gap before the '
         'label regardless of the icon\'s own size: the data page\'s '
         '"Featured" chips.',
-    child: DsPanel(
+    child: ElPanel(
       label: 'PREVIEW',
-      child: const DsBadge(
+      child: const ElBadge(
         label: 'Featured',
-        variant: DsBadgeVariant.premium,
-        glyph: DsIcon(
-          DsIconGlyph.star,
-          size: DsIconSize.xs,
-          tone: DsIconTone.inherit,
+        variant: ElBadgeVariant.premium,
+        glyph: ElIcon(
+          ElIconGlyph.star,
+          size: ElIconSize.xs,
+          tone: ElIconTone.inherit,
         ),
       ),
     ),
   );
 
-  Widget _withSpinner() => DsSection(
+  Widget _withSpinner() => ElSection(
     id: 'with-spinner',
     title: 'With spinner',
     description:
-        'The glyph slot takes any widget, including DsSpinner: sized down '
-        'to DsBadge.glyphSize (12px) so it fills the same square an icon '
+        'The glyph slot takes any widget, including ElSpinner: sized down '
+        'to ElBadge.glyphSize (12px) so it fills the same square an icon '
         'would.',
-    child: DsPanel(
+    child: ElPanel(
       label: 'PREVIEW',
       child: Wrap(
-        spacing: ds(3),
-        runSpacing: ds(3),
+        spacing: el(3),
+        runSpacing: el(3),
         crossAxisAlignment: WrapCrossAlignment.center,
         children: <Widget>[
-          DsBadge(
+          ElBadge(
             label: 'Deleting',
-            variant: DsBadgeVariant.destructive,
-            glyph: DsSpinner(size: DsBadge.glyphSize),
+            variant: ElBadgeVariant.destructive,
+            glyph: ElSpinner(size: ElBadge.glyphSize),
           ),
-          DsBadge(
+          ElBadge(
             label: 'Generating',
-            variant: DsBadgeVariant.action,
-            glyph: DsSpinner(size: DsBadge.glyphSize),
+            variant: ElBadgeVariant.action,
+            glyph: ElSpinner(size: ElBadge.glyphSize),
           ),
         ],
       ),
     ),
   );
 
-  Widget _rtl() => DsSection(
+  Widget _rtl() => ElSection(
     id: 'rtl',
     title: 'RTL',
     description:
-        'DsBadge paints no direction-specific layout of its own: it sizes '
+        'ElBadge paints no direction-specific layout of its own: it sizes '
         'to its label and centres its content either way, the same '
         'composition read right-to-left under a Directionality.',
-    child: DsPanel(
+    child: ElPanel(
       label: 'PREVIEW',
       child: Directionality(
         textDirection: TextDirection.rtl,
         child: Wrap(
-          spacing: ds(3),
-          runSpacing: ds(3),
+          spacing: el(3),
+          runSpacing: el(3),
           crossAxisAlignment: WrapCrossAlignment.center,
           children: <Widget>[
-            DsBadge(label: 'جديد'),
-            DsBadge(label: 'مسودة', variant: DsBadgeVariant.secondary),
-            DsBadge(label: 'فشل', variant: DsBadgeVariant.destructive),
+            ElBadge(label: 'جديد'),
+            ElBadge(label: 'مسودة', variant: ElBadgeVariant.secondary),
+            ElBadge(label: 'فشل', variant: ElBadgeVariant.destructive),
           ],
         ),
       ),
     ),
   );
 
-  Widget _states() => DsSection(
+  Widget _states() => ElSection(
     id: 'states',
     title: 'States and feedback',
     description:
-        'DsBadge is a static, presentational StatelessWidget: it has no '
+        'ElBadge is a static, presentational StatelessWidget: it has no '
         'onPressed/enabled parameter, no GestureDetector, no FocusNode, and '
         'no async flag anywhere in its build method. Most of IA §9.7\'s rows '
         'genuinely do not apply here, so they are grouped into one row below '
@@ -601,7 +599,7 @@ class _BadgeArticle extends StatelessWidget {
           state: 'Error / Success',
           treatment:
               'Not a live transition on one badge: choose '
-              'DsBadgeVariant.destructive or .success at construction time '
+              'ElBadgeVariant.destructive or .success at construction time '
               'instead. See Variants.',
           userSignal: 'A different badge instance, not a state change.',
         ),
@@ -609,7 +607,7 @@ class _BadgeArticle extends StatelessWidget {
           state: 'Reduced motion',
           treatment:
               'N/A: no AnimationController and no motion token appears in '
-              'DsBadge.build.',
+              'ElBadge.build.',
           userSignal: 'Nothing animates, so nothing needs to still.',
         ),
         DocsStateFact(
@@ -617,40 +615,40 @@ class _BadgeArticle extends StatelessWidget {
               'Hover / Focus-visible / Pressed / Selected / Loading / '
               'Empty / Disabled',
           treatment:
-              'N/A, DsBadge is a StatelessWidget with no gesture, focus, '
+              'N/A, ElBadge is a StatelessWidget with no gesture, focus, '
               'or async wiring; there is no onPressed/enabled parameter to '
               'hold any of these.',
           userSignal:
-              'Wrap in DsButton (or your own GestureDetector) at the call '
-              'site if the chip must respond to input, DsBadge '
+              'Wrap in ElButton (or your own GestureDetector) at the call '
+              'site if the chip must respond to input, ElBadge '
               'intentionally does not.',
         ),
       ],
     ),
   );
 
-  Widget _accessibility(DsThemeData theme) => DsSection(
+  Widget _accessibility(ElThemeData theme) => ElSection(
     id: 'accessibility',
     title: 'Accessibility and keyboard behavior',
     child: _bullets(theme, <String>[
-      'Semantic role: none of its own, DsBadge builds no Semantics node. '
+      'Semantic role: none of its own, ElBadge builds no Semantics node. '
           'The label reaches assistive tech as ordinary static text, not as '
           'a button, link, or image.',
       'Required labels: none beyond `label` itself: there is no separate '
           'semanticLabel or tooltip parameter.',
-      'Keyboard interactions: none. DsBadge is never in the tab order.',
+      'Keyboard interactions: none. ElBadge is never in the tab order.',
       'Focus behavior: never receives focus: no Focus widget or FocusNode '
           'exists in its build method.',
       'Touch target: not applicable: a badge is not tappable, so it makes '
           'no target-size guarantee. A caller that wraps one to be tappable '
           '(e.g. inside a GestureDetector) owns that guarantee, not '
-          'DsBadge.',
+          'ElBadge.',
       'Non-colour signals: the label word itself is the signal: every '
           'variant reads correctly from its text alone ("Failed", "Active", '
           '"Pending"), and outline/ghost/link additionally drop the fill '
           'entirely so colour is never the only cue.',
       'Error wiring: none: a badge is not a form control and cannot '
-          'associate with a field\'s error text; use DsInput\'s own invalid '
+          'associate with a field\'s error text; use ElInput\'s own invalid '
           'state for that.',
       'Screen-reader announcements: none: there is no liveRegion. A badge '
           'whose label changes across a rebuild (e.g. "Pending" → "Active") '
@@ -662,17 +660,17 @@ class _BadgeArticle extends StatelessWidget {
     ]),
   );
 
-  Widget _responsive(DsThemeData theme) => DsSection(
+  Widget _responsive(ElThemeData theme) => ElSection(
     id: 'responsive',
     title: 'Responsive and platform behavior',
     child: _bullets(theme, <String>[
-      'No responsive branching, DsBadge reads no breakpoint from '
+      'No responsive branching, ElBadge reads no breakpoint from '
           'BuildContext and renders identically at 390px and 1440px; only '
           'the label string can change the width it occupies.',
-      'Height is fixed at 20px (DsBadge.height) everywhere; width is '
+      'Height is fixed at 20px (ElBadge.height) everywhere; width is '
           'intrinsic to the label plus 16px of horizontal padding unless '
           'paddingX/minWidth override it.',
-      'Long labels are not truncated by DsBadge itself: overflow-hidden '
+      'Long labels are not truncated by ElBadge itself: overflow-hidden '
           'clips the 16px line box to the 14px content box vertically, but '
           'there is no horizontal ellipsis. A very long label simply widens '
           'the chip; constrain the surrounding layout if the label is '
@@ -682,26 +680,26 @@ class _BadgeArticle extends StatelessWidget {
     ]),
   );
 
-  Widget _dependencies(DsThemeData theme) => DsSection(
+  Widget _dependencies(ElThemeData theme) => ElSection(
     id: 'dependencies',
     title: 'Dependencies, files, and assets',
     child: _bullets(theme, <String>[
       'File: lib/src/components/badge.dart (one file, no companion parts).',
-      'Foundation imports: foundation/colors.dart (dsHsl, DsPalette), '
-          'foundation/shadows.dart (DsShadows.chip, DsShadows.btnValue), '
-          'foundation/spacing.dart (ds()), foundation/theme.dart '
-          '(DsThemeData), foundation/typography.dart (DsComponentType).',
-      'Effect import: effects/machine_surface.dart (DsMachineSurface), '
+      'Foundation imports: foundation/colors.dart (elHsl, ElPalette), '
+          'foundation/shadows.dart (ElShadows.chip, ElShadows.btnValue), '
+          'foundation/spacing.dart (el()), foundation/theme.dart '
+          '(ElThemeData), foundation/typography.dart (ElComponentType).',
+      'Effect import: effects/machine_surface.dart (ElMachineSurface), '
           'paints the fill, border, and shadow together for every filled '
           'variant.',
-      'Scope import: theme_scope.dart (DsText, DsTheme).',
-      'Assets: none. Fonts: none beyond the system type scale every DsText '
+      'Scope import: theme_scope.dart (ElText, ElTheme).',
+      'Assets: none. Fonts: none beyond the system type scale every ElText '
           'call already depends on. Shaders: none: the ramp-chip highlight '
           'is a LinearGradient, not a fragment shader.',
     ]),
   );
 
-  Widget _composition() => DsSection(
+  Widget _composition() => ElSection(
     id: 'composition',
     title: 'Composed with other primitives',
     description:
@@ -718,19 +716,19 @@ class _BadgeArticle extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              DsText('Workspace plan', DsType.label),
-              SizedBox(width: ds(2)),
-              const DsBadge(label: 'Pro', variant: DsBadgeVariant.premium),
+              ElText('Workspace plan', ElType.label),
+              SizedBox(width: el(2)),
+              const ElBadge(label: 'Pro', variant: ElBadgeVariant.premium),
             ],
           ),
-          SizedBox(height: ds(4)),
+          SizedBox(height: el(4)),
           Wrap(
-            spacing: ds(2),
-            runSpacing: ds(2),
+            spacing: el(2),
+            runSpacing: el(2),
             children: const <Widget>[
-              DsBadge(label: 'Design', variant: DsBadgeVariant.outline),
-              DsBadge(label: 'Flutter', variant: DsBadgeVariant.outline),
-              DsBadge(label: 'Tokens', variant: DsBadgeVariant.outline),
+              ElBadge(label: 'Design', variant: ElBadgeVariant.outline),
+              ElBadge(label: 'Flutter', variant: ElBadgeVariant.outline),
+              ElBadge(label: 'Tokens', variant: ElBadgeVariant.outline),
             ],
           ),
         ],
@@ -738,49 +736,49 @@ class _BadgeArticle extends StatelessWidget {
       manualFiles: const <DocsCodeFile>[
         DocsCodeFile(
           path: 'sidebar_menu_badge_precedent.dart',
-          title: 'The DsSidebarMenuBadge precedent',
+          title: 'The ElSidebarMenuBadge precedent',
           description:
-              'lib/src/components/sidebar.dart composes DsBadge directly, '
+              'lib/src/components/sidebar.dart composes ElBadge directly, '
               'overriding spec/paddingX/minWidth exactly as documented '
               'above, rather than adding a new widget:',
-          code: '''DsBadge(
+          code: '''ElBadge(
   label: count,
-  variant: DsBadgeVariant.secondary,
-  spec: DsComponentType.sidebarMenuBadge,
-  paddingX: ds(1.5),
-  minWidth: ds(5),
+  variant: ElBadgeVariant.secondary,
+  spec: ElComponentType.sidebarMenuBadge,
+  paddingX: el(1.5),
+  minWidth: el(5),
 )''',
         ),
       ],
     ),
   );
 
-  Widget _theming(DsThemeData theme) => DsSection(
+  Widget _theming(ElThemeData theme) => ElSection(
     id: 'theming',
     title: 'Theming notes',
     child: _bullets(theme, <String>[
-      'Every colour DsBadge paints comes from the live theme: '
-          'DsTheme.of(context).primary/secondary/destructive for the base '
-          'three fills, DsPalette.action/value/success/warning/info for the '
+      'Every colour ElBadge paints comes from the live theme: '
+          'ElTheme.of(context).primary/secondary/destructive for the base '
+          'three fills, ElPalette.action/value/success/warning/info for the '
           'six semantic tints, and the matching *Ink getters for text. '
-          'Flipping DsThemeController between light and dark re-resolves '
+          'Flipping ElThemeController between light and dark re-resolves '
           'every one: nothing is cached.',
       'The ramp-chip highlight is NOT theme-aware: it is a fixed white-to-'
           'black alpha gradient (18% white top, 5% white mid, 14% black '
           'bottom) painted as its own layer over the fill in both themes, '
           'a deliberate port of the reference\'s own utility, not a token '
           'gap.',
-      'The two shadow specs, DsShadows.chip and, for premium only, '
-          'DsShadows.btnValue: are the badge entries in the machine-shadow '
-          'family. Overriding them is not exposed as a DsBadge parameter.',
-      'DsBadge declares no colour-override parameter of its own (no fill '
+      'The two shadow specs, ElShadows.chip and, for premium only, '
+          'ElShadows.btnValue: are the badge entries in the machine-shadow '
+          'family. Overriding them is not exposed as a ElBadge parameter.',
+      'ElBadge declares no colour-override parameter of its own (no fill '
           'or color argument): every fill is variant-derived. A call site '
           'that needs a colour outside the eleven variants is a signal to '
-          'add a new DsBadgeVariant, not to bypass the token system.',
+          'add a new ElBadgeVariant, not to bypass the token system.',
     ]),
   );
 
-  Widget _source() => DsSection(
+  Widget _source() => ElSection(
     id: 'source',
     title: 'Source, tests, and docs',
     child: DocsInstallFacts(
@@ -817,34 +815,34 @@ class _BadgeArticle extends StatelessWidget {
   );
 }
 
-Widget _bullets(DsThemeData theme, List<String> lines) => Column(
+Widget _bullets(ElThemeData theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: DsWidths.prose),
-        child: DsText('•  $line', DsType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
       ),
-      SizedBox(height: ds(2)),
+      SizedBox(height: el(2)),
     ],
   ],
 );
 
 const String _usageCode = '''
 // The smallest correct call: variant defaults to primary.
-DsBadge(label: 'New')
+ElBadge(label: 'New')
 
 // A semantic variant with a leading glyph, matching the data page's
 // "Featured" chips (Icon size="xs" tone="inherit" in the reference).
-DsBadge(
+ElBadge(
   label: 'Featured',
-  variant: DsBadgeVariant.premium,
-  glyph: const DsIcon(
-    DsIconGlyph.star,
-    size: DsIconSize.xs,
-    tone: DsIconTone.inherit,
+  variant: ElBadgeVariant.premium,
+  glyph: const ElIcon(
+    ElIconGlyph.star,
+    size: ElIconSize.xs,
+    tone: ElIconTone.inherit,
   ),
 )
 
 // An unfilled variant for a low-emphasis tag.
-DsBadge(label: 'Draft', variant: DsBadgeVariant.outline)''';
+ElBadge(label: 'Draft', variant: ElBadgeVariant.outline)''';

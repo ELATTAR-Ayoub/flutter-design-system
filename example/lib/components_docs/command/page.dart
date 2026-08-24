@@ -1,37 +1,48 @@
-/// Public documentation page for `DsCommand` and `DsCombobox`.
+/// Public documentation page for the `command` component.
 ///
-/// One page, two paired "filter as you type" components with opposite shapes.
-/// Command is inline with nothing to anchor to; Combobox is a form control
-/// anchored to a DsPopover. The distinction is the reason this page exists.
+/// **Split from a combined page.** This file used to document `ElCommand`
+/// and `ElCombobox<T>` together, on the argument that two "filter as you
+/// type" surfaces read as one idea. They are two separately barrel-exported
+/// public components with two source files, so each now owns a page:
+/// everything about `ElCombobox` moved to `../combobox/page.dart` and is
+/// gone from here, not duplicated.
 ///
-/// Section shape mirrors both shadcn counterparts, section for section:
-/// `https://ui.shadcn.com/docs/components/base/command` and
-/// `https://ui.shadcn.com/docs/components/base/combobox`. The live demo sits
-/// unheaded above Installation, exactly as both of theirs do; Installation,
-/// Usage, Composition and Filtering are shared, cross-cutting sections that
-/// name both components; Shortcuts, Groups, Scrollable and In a panel are
-/// Command's own; Invalid and Disabled are Combobox's own. Command's shadcn
-/// `About`, `Basic` (the `CommandDialog` demo) and `RTL` have no counterpart
-/// here: the port credits `cmdk` in Installation rather than a separate
-/// heading, `inDialog` is documented but the dialog wrapper itself is
-/// recorded, not built, and no `Directionality`-aware behaviour exists to
-/// demonstrate. Combobox's shadcn `Multiple Selection`, `Clear Button`,
-/// `Groups`, `Custom Items`, `Auto Highlight`, `Popup`, `Input Group` and
-/// `RTL` have no counterpart either: `DsCombobox` is a flat single-select
-/// list with no multi-select, no clear button, no grouped items, no custom
-/// item renderer, no fixed highlight-on-open, no button-trigger variant and
-/// no exposed input-group customisation. API Reference is the last mirrored
-/// section; States, Accessibility, Responsive, Dependencies, Theming and
-/// Source are this package's own six, unchanged in content.
+/// **Shape.** Copies `button/page.dart`'s frame, the Phase F/J reference
+/// shape: an unheaded live demo above the first heading (a bare
+/// [DocsCodeExample], no [ElSection], so it owns no TOC entry), then
+/// Installation, Usage, then this component's own sections, then API
+/// Reference last of the component-specific sections, then exactly States,
+/// Accessibility, Responsive, Dependencies, Theming, Source. Section titles
+/// carry no `Command` prefix: after the split the page is about one
+/// component and the prefix would say nothing.
 ///
-/// `DsCombobox` mounts its list through a `DsPopover` (an `OverlayPortal`), so
-/// the live combobox specimen needs a real `Overlay`: the test harness wraps
-/// the page in a `MaterialApp`. `DsCommand` has nothing to anchor to and mounts
-/// inline, but the shared harness still supplies MaterialApp for the combobox.
+/// Grounded against https://ui.shadcn.com/docs/components/base/command,
+/// whose own `<h2>` list is About, Installation, Usage, Composition, Basic,
+/// Shortcuts, Groups, Scrollable, RTL, API Reference. Composition,
+/// Shortcuts, Groups and Scrollable land here under those names. Filtering
+/// and In a panel are this port's own additions, and they earn their place:
+/// the ported scorer re-ranks rows, which the reference documents nowhere,
+/// and `ElCommand` owns neither its opening nor its dismissal, so how a
+/// container mounts it is the first thing a caller needs. Three of shadcn's
+/// sections are skipped rather than faked, and named in the Scrollable
+/// section's own SKIPPED panel: About (the port credits `cmdk` in
+/// Installation instead of under a heading of its own), Basic (their
+/// `CommandDialog` demo: [ElCommand.inDialog] adjusts the palette's own
+/// fill, border and row radius for that presentation, but the dialog
+/// wrapper is recorded, not built) and RTL (no `Directionality` or
+/// `TextDirection` branch anywhere in `command.dart`, and the docs shell
+/// this page renders inside carries no direction toggle to demonstrate one
+/// against).
 ///
-/// Neither component has a registry manifest yet, and neither `elattar add`
-/// command works: the Installation section says so without printing a command
-/// line that would fail if a reader copied it.
+/// **No overlay here.** `ElCommand` mounts inline and anchors to nothing:
+/// `command.dart`'s own "Why this file does not build on `ElPopover`". So
+/// unlike the combobox page, this one's live specimen needs no real
+/// [Overlay] to work. `command_test.dart` still wraps it in a `MaterialApp`
+/// for the ordinary reasons a docs page needs one.
+///
+/// [ComponentDocEntry.description] is the page's only rendered description:
+/// the short, one-sentence form. No second, longer paragraph renders
+/// beneath it; Installation is the first section after the hero.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
@@ -54,13 +65,12 @@ class CommandDocPage extends StatelessWidget {
     intro: DocsPageIntro(
       eyebrow: 'COMPONENTS / BASE',
       title: commandDoc.title,
-      description: commandExpandedDescription,
+      description: commandDoc.description,
     ),
-    breadcrumbs: const <DsBreadcrumbEntry>[
-      DsBreadcrumbEntry.link('Components'),
-      DsBreadcrumbEntry.page('Command & Combobox'),
+    breadcrumbs: const <ElBreadcrumbEntry>[
+      ElBreadcrumbEntry.link('Components'),
+      ElBreadcrumbEntry.page('Command'),
     ],
-    sidebar: _sidebar,
     toc: const <DocsTocEntry>[
       DocsTocEntry(title: 'Installation', anchor: 'install'),
       DocsTocEntry(title: 'Usage', anchor: 'usage'),
@@ -70,9 +80,20 @@ class CommandDocPage extends StatelessWidget {
       DocsTocEntry(title: 'Groups', anchor: 'groups'),
       DocsTocEntry(title: 'Scrollable', anchor: 'scrollable'),
       DocsTocEntry(title: 'In a panel', anchor: 'in-a-panel'),
-      DocsTocEntry(title: 'Invalid', anchor: 'invalid'),
-      DocsTocEntry(title: 'Disabled', anchor: 'disabled'),
-      DocsTocEntry(title: 'API Reference', anchor: 'api'),
+      DocsTocEntry(
+        title: 'API Reference',
+        anchor: 'api',
+        children: <DocsTocEntry>[
+          DocsTocEntry(title: 'ElCommand', anchor: 'api-elcommand'),
+          DocsTocEntry(
+            title: 'ElCommand static helpers',
+            anchor: 'api-elcommand-static',
+          ),
+          DocsTocEntry(title: 'ElCommandItem', anchor: 'api-elcommanditem'),
+          DocsTocEntry(title: 'ElCommandGroup', anchor: 'api-elcommandgroup'),
+          DocsTocEntry(title: 'elCommandScore', anchor: 'api-elcommandscore'),
+        ],
+      ),
       DocsTocEntry(title: 'States', anchor: 'states'),
       DocsTocEntry(title: 'Accessibility', anchor: 'accessibility'),
       DocsTocEntry(title: 'Responsive', anchor: 'responsive'),
@@ -89,957 +110,548 @@ class CommandDocPage extends StatelessWidget {
   );
 }
 
-const List<DocsSidebarEntry> _sidebar = <DocsSidebarEntry>[
-  DocsSidebarEntry(title: 'Button', route: '/components/button'),
-  DocsSidebarEntry(title: 'Card', route: '/components/card'),
-  DocsSidebarEntry(title: 'Input', route: '/components/input'),
-  DocsSidebarEntry(title: 'Dialog', route: '/components/dialog'),
-  DocsSidebarEntry(title: 'Alert Dialog', route: '/components/alert-dialog'),
-  DocsSidebarEntry(title: 'Select', route: '/components/select'),
-  DocsSidebarEntry(
-    title: 'Command & Combobox',
-    route: '/components/command',
-    selected: true,
-  ),
-];
-
 class _CommandArticle extends StatelessWidget {
   const _CommandArticle();
 
   @override
-  Widget build(BuildContext context) => Column(
-    key: const ValueKey<String>('command-doc-article'),
-    crossAxisAlignment: CrossAxisAlignment.stretch,
-    children: <Widget>[
-      _hero(),
-      _install(),
-      _usage(),
-      _composition(),
-      _filtering(),
-      _shortcuts(),
-      _groups(),
-      _scrollable(),
-      _inAPanel(),
-      _invalid(),
-      _disabled(),
-      _api(),
-      _states(),
-      _accessibility(),
-      _responsive(),
-      _dependencies(),
-      _theming(),
-      _source(),
+  Widget build(BuildContext context) {
+    final ElThemeData theme = ElTheme.of(context);
+    return Column(
+      key: const ValueKey<String>('command-doc-article'),
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        _preview(),
+        SizedBox(height: el(6)),
+        _install(),
+        SizedBox(height: el(6)),
+        _usage(),
+        SizedBox(height: el(6)),
+        _composition(),
+        _filtering(theme),
+        _shortcuts(),
+        _groups(theme),
+        _scrollable(theme),
+        _inAPanel(),
+        _api(),
+        _states(),
+        _accessibility(theme),
+        _responsive(theme),
+        _dependencies(theme),
+        _theming(theme),
+        _source(),
+      ],
+    );
+  }
+
+  /// The live-demo slot shadcn renders before its first heading. [ElSection]
+  /// always carries a heading, so this is a bare [DocsCodeExample] instead:
+  /// no title text of its own in the article flow, and no TOC entry.
+  Widget _preview() => DocsCodeExample(
+    title: 'Command',
+    description:
+        'Live. Type in the search field: rows drop out as the filter '
+        'narrows, and the survivors re-rank inside their own group.',
+    preview: const _CommandSpecimen(),
+    manualFiles: const <DocsCodeFile>[
+      DocsCodeFile(
+        path: 'command_preview.dart',
+        title: 'The palette above',
+        code: _usageCommandCode,
+      ),
     ],
   );
 
-  /// The live-demo slot both shadcn pages render before their first heading.
-  /// `DsSection` always carries a heading, so this is a plain widget instead:
-  /// no `DsSection`, no title text, no TOC entry, exactly as unheaded as the
-  /// reference.
-  Widget _hero() => Padding(
-    padding: EdgeInsets.only(bottom: ds(20)),
-    child: DocsCodeExample(
-      title: 'Command and Combobox specimens',
-      description:
-          'Command inline with nothing around it, and Combobox anchored to '
-          'its own input. Both are live: type in either one.',
-      manualFiles: const <DocsCodeFile>[
-        DocsCodeFile(
-          path: 'lib/components/ui/command.dart',
-          code:
-              "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
-              '// Copy lib/src/components/command.dart and\n'
-              '// lib/src/components/combobox.dart from the package source.\n'
-              '// There is no generated CLI payload for either one yet.',
-        ),
-      ],
-      preview: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          DsText('Command: inline, always visible', DsType.label),
-          SizedBox(height: ds(2)),
-          const _CommandSpecimen(),
-          SizedBox(height: ds(6)),
-          DsText('Combobox: anchored to its own input', DsType.label),
-          SizedBox(height: ds(2)),
-          const _ComboboxSpecimen(),
-        ],
-      ),
-    ),
-  );
-
-  Widget _install() => DsSection(
+  Widget _install() => ElSection(
     id: 'install',
     title: 'Installation',
     description:
-        'Command ports cmdk\'s own filter and re-sort scorer; Combobox has '
-        'no such upstream library. Neither component has a registry '
-        'manifest, so the CLI cannot install either one today. Both are '
-        'exported from the package barrel and usable through the published '
-        'package right now.',
-    child: DocsInstallFacts(
-      title: 'Installation facts',
-      facts: <DocsInstallFact>[
-        const DocsInstallFact(
-          label: 'CLI install',
-          value: 'Not available yet',
-          description:
-              'There is no registry payload for command and none for '
-              'combobox, so the registry client has nothing to resolve for '
-              'either name.',
-        ),
-        const DocsInstallFact(
-          label: 'Registry item',
-          value: 'Not available yet',
-          description:
-              'Neither registry/components/command.json nor '
-              'registry/components/combobox.json exists. Source-only '
-              'components, both of them.',
-        ),
-        const DocsInstallFact(
-          label: 'Destination',
-          value: 'lib/components/ui/command.dart, .../combobox.dart',
-          description: 'Two files; one source library each.',
-        ),
-        const DocsInstallFact(
-          label: 'Dependencies',
-          value:
-              'source-foundation, icon, input, input_group, field, popover, '
-              'select',
-          description:
-              'What the two sources really import from lib/src/components/. '
-              'Not a validated registryDependencies list: there is no '
-              'manifest for it to come from.',
-        ),
-        const DocsInstallFact(
-          label: 'Assets',
-          value: 'none',
-          description: 'No images, icon fonts, or binary assets.',
-        ),
-        const DocsInstallFact(
-          label: 'Shaders',
-          value: 'none',
-          description: 'Not applicable.',
-        ),
-        const DocsInstallFact(
-          label: 'Platforms',
-          value: 'Android, iOS, Web, macOS, Windows, Linux',
-          description: 'Pure widget composition; nothing platform-gated.',
-        ),
-        const DocsInstallFact(
-          label: 'Verified',
-          value: 'package suite plus this page\'s specimens',
-          description:
-              'test/selects_test.dart covers DsCombobox and '
-              'dsCollatorContains; the command suite covers dsCommandScore '
-              'and the re-sort. This page adds two live specimens.',
-        ),
-      ],
-    ),
-  );
-
-  Widget _usage() => DsSection(
-    id: 'usage',
-    title: 'Usage',
-    description: 'Both shapes as they appear in the demo above.',
+        'Already reachable today through both the published package and the '
+        'registry: ElCommand is barrel-exported, and the shipped manifest '
+        'resolves through the elattar CLI.',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        DsPanel(
-          label: 'DART',
-          note: 'COMMAND: inline, fires callbacks',
-          child: DocsSelectableCodeBlock(code: _usageCommandCode),
+        ElPanel(
+          label: 'PACKAGE IMPORT',
+          note: 'DART',
+          child: const DocsSelectableCodeBlock(
+            code:
+                "import 'package:elattar_design_system/"
+                "elattar_design_system.dart';\n",
+          ),
         ),
-        SizedBox(height: ds(5)),
-        DsPanel(
-          label: 'DART',
-          note: 'COMBOBOX: anchored, holds a value',
-          child: DocsSelectableCodeBlock(code: _usageComboboxCode),
+        SizedBox(height: el(4)),
+        DocsInstallFacts(
+          title: 'Manual and CLI facts',
+          facts: <DocsInstallFact>[
+            const DocsInstallFact(
+              label: 'CLI',
+              value: 'elattar add command',
+              description:
+                  'Resolves the shipped registry/components/command.json '
+                  'manifest. Use the package import above when you want the '
+                  'published package, or use the CLI when you want the '
+                  'generated local copy.',
+            ),
+            DocsInstallFact(
+              label: 'Manual copy target',
+              value: 'lib/components/ui/command.dart',
+              description:
+                  'Copy ${commandDoc.sourcePath} into components/ui and '
+                  'keep its relative imports pointed at the same '
+                  'foundation and sibling-component files: see '
+                  'Dependencies below for the exact list.',
+            ),
+            DocsInstallFact(
+              label: 'Registry dependencies',
+              value: commandDoc.dependencies.join(', '),
+              description:
+                  'What registry/components/command.json lists as '
+                  'registryDependencies, read directly from the shipped '
+                  'manifest.',
+            ),
+            const DocsInstallFact(
+              label: 'Upstream',
+              value: 'cmdk 1.1.1',
+              description:
+                  'elCommandScore is that library\'s own scorer, ported '
+                  'whole rather than approximated, because cmdk filters '
+                  'AND re-sorts and row order is therefore visible '
+                  'fidelity.',
+            ),
+            const DocsInstallFact(
+              label: 'Assets and shaders',
+              value: 'none',
+              description: 'Pure widget composition; nothing platform-gated.',
+            ),
+          ],
         ),
       ],
     ),
   );
 
-  Widget _composition() => DsSection(
+  Widget _usage() => ElSection(
+    id: 'usage',
+    title: 'Usage',
+    description:
+        'The smallest correct construction: a list of groups, each holding '
+        'rows. Every example below only changes named arguments on top of '
+        'this.',
+    child: ElPanel(
+      label: 'DART',
+      note: 'MINIMAL',
+      child: const DocsSelectableCodeBlock(code: _usageCommandCode),
+    ),
+  );
+
+  Widget _composition() => ElSection(
     id: 'composition',
     title: 'Composition',
     description:
-        'shadcn assembles Command from five caller-composed pieces (Command, '
-        'CommandInput, CommandList, CommandGroup, CommandItem) and Combobox '
-        'from four (Combobox.Root, Combobox.Input, Combobox.List, '
-        'Combobox.Item). Both ports are one widget instead, configured '
-        'through data: the shape below is that data hierarchy, not a widget '
-        'tree.',
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        DsPanel(
-          label: 'SHAPE',
-          note: 'COMMAND',
-          child: DocsSelectableCodeBlock(code: _compositionTreeCommandCode),
-        ),
-        SizedBox(height: ds(5)),
-        DsPanel(
-          label: 'SHAPE',
-          note: 'COMBOBOX',
-          child: DocsSelectableCodeBlock(code: _compositionTreeComboboxCode),
-        ),
-      ],
+        'shadcn assembles Command from five caller-composed pieces '
+        '(Command, CommandInput, CommandList, CommandGroup, CommandItem). '
+        'This port is one widget configured through data instead, so the '
+        'shape below is a data hierarchy rather than a widget tree: the '
+        'search field, the empty row and the scrolling list are built for '
+        'you and are not addressable from a call site.',
+    child: ElPanel(
+      label: 'SHAPE',
+      note: 'ANATOMY',
+      child: const DocsSelectableCodeBlock(code: _compositionTreeCommandCode),
     ),
   );
 
-  Widget _filtering() => DsSection(
+  Widget _filtering(ElThemeData theme) => ElSection(
     id: 'filtering',
     title: 'Filtering',
     description:
-        'The single most common way to reach for the wrong one of these two '
-        'is to assume they filter alike. They do not.',
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        DsPanel(
-          label: 'Command: dsCommandScore, a ported fuzzy ranker',
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              DsText(
-                'dsCommandScore(string, abbreviation, [aliases]) is cmdk\'s '
-                'own scorer, ported whole. It returns a double: 0 hides the '
-                'row, and anything above it ranks the row. Letters need not '
-                'be adjacent, so "gts" still finds "Go to Stash": but where '
-                'a letter lands matters enormously, because a match at the '
-                'start of a word scores far higher than the same letter '
-                'inside one.',
-                DsType.small,
-              ),
-              SizedBox(height: ds(3)),
-              DsText(
-                'The measured worked example, taken from the source\'s own '
-                'note and reproducible in the live specimen above: type a '
-                'single "t". Go to Stash rises above Open Wallet, reversing '
-                'the source order, because the "t" beginning the word "to" '
-                'scores 0.891 while the "t" buried inside "Wallet" scores '
-                '0.17. Rows re-sort inside their own group on every '
-                'keystroke: see Groups below for what does not re-sort.',
-                DsType.small,
-              ),
-              SizedBox(height: ds(3)),
-              DsText(
-                'keywords are appended to the searchable string rather than '
-                'scored separately, so keywords: [\'money\'] makes '
-                '"Open Wallet money" the text being matched. Pass '
-                'shouldFilter: false to hold the rows still and filter '
-                'server-side instead, or filter to substitute a scorer of '
-                'your own.',
-                DsType.small,
-              ),
-            ],
-          ),
-        ),
-        SizedBox(height: ds(5)),
-        DsPanel(
-          label: 'Combobox: dsCollatorContains, a plain substring match',
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              DsText(
-                'dsCollatorContains(label, query) does exactly what its name '
-                'says: it asks whether the label contains the query, with no '
-                'ranking of any kind. Rows that match keep their source '
-                'order; rows that do not are dropped. Nothing ever moves up '
-                'the list.',
-                DsType.small,
-              ),
-              SizedBox(height: ds(3)),
-              DsText(
-                'It is a substring test, not a prefix test: typing "rift" '
-                'finds Golden Rift even though the query starts in the middle '
-                'of the second word. Before comparing, both sides are folded '
-                'the way a base-sensitivity collator folds them: case is '
-                'ignored, accents are stripped, and whitespace and '
-                'punctuation are skipped entirely. So "éclipse" matches '
-                'Eclipse, and a stray hyphen or space in the query never '
-                'costs a match.',
-                DsType.small,
-              ),
-              SizedBox(height: ds(3)),
-              DsText(
-                'Because there is no scoring, a long list filtered to a '
-                'single letter stays long. Combobox is the right shape when '
-                'the reader knows roughly what the value is called; Command '
-                'is the right shape when they know what they want to do but '
-                'not what it is named.',
-                DsType.small,
-              ),
-            ],
-          ),
-        ),
-      ],
+        'Not in shadcn\'s own section list, and the single most surprising '
+        'thing about this component: the rows do not just disappear, they '
+        'move.',
+    child: ElPanel(
+      label: 'elCommandScore, a ported fuzzy ranker',
+      child: _bullets(theme, <String>[
+        'elCommandScore(string, abbreviation, [aliases]) returns a double: '
+            '0 hides the row entirely, 1 is a perfect match, and anything '
+            'between ranks it. Letters need not be adjacent, so "gts" '
+            'still finds "Go to Stash": but where a letter lands matters '
+            'enormously, because a match at the start of a word scores far '
+            'higher than the same letter inside one.',
+        'The measured worked example, from the source\'s own note and '
+            'reproducible in the live palette above: type a single "t". Go '
+            'to Stash rises above Open Wallet, reversing the source order, '
+            'because the "t" beginning the word "to" scores 0.891 while '
+            'the "t" buried inside "Wallet" scores 0.17.',
+        'An empty query short-circuits both passes, so source order '
+            'stands. That is deliberate rather than an optimisation: '
+            'scoring every row against "" returns the same value for all '
+            'of them, and sorting a flat field would shuffle the list for '
+            'no reason.',
+        'keywords are appended to the searchable string rather than scored '
+            'separately, so a row with keywords: [\'money\'] is matched as '
+            '"Open Wallet money".',
+        'What gets scored is ElCommandItem.searchValue, not the label. '
+            'Left null, value derives from label, subtitle, meta and '
+            'shortcut concatenated with nothing between them, which means '
+            'a price or a key hint IS searchable: the Eclipse Vault row '
+            'above carries \$48.00 as its meta, and typing 48 finds it.',
+        'Pass shouldFilter: false to hold the rows exactly as given and '
+            'filter server-side instead, or filter to substitute a scorer '
+            'of your own. Both leave the highlight behaviour untouched.',
+      ]),
     ),
   );
 
-  Widget _shortcuts() => DsSection(
+  Widget _shortcuts() => ElSection(
     id: 'shortcuts',
     title: 'Shortcuts',
     description:
-        'shadcn renders a CommandShortcut, a right-aligned key hint, beside '
-        'a row. DsCommandItem.shortcut is the same slot, and it plays no '
-        'part in filtering. meta (a price, a count) is a second, independent '
-        'trailing slot: a row can carry both at once.',
-    child: DsPanel(
+        'shadcn renders a CommandShortcut, a right-aligned key hint, '
+        'beside a row. ElCommandItem.shortcut is the same slot. meta (a '
+        'price, a count, a timestamp) is a second, independent trailing '
+        'slot, and a row can carry both at once: they differ in type spec, '
+        'in whether the selected row brightens them, and in whether they '
+        'displace the trailing check indicator.',
+    child: ElPanel(
       label: 'DART',
       note: 'SHORTCUT',
-      child: DocsSelectableCodeBlock(code: _shortcutsCode),
+      child: const DocsSelectableCodeBlock(code: _shortcutsCode),
     ),
   );
 
-  Widget _groups() => DsSection(
+  Widget _groups(ElThemeData theme) => ElSection(
     id: 'groups',
     title: 'Groups',
     description:
-        'DsCommandGroup renders an optional heading above its rows, and '
-        'separatorBefore draws a rule above the whole group: both visible in '
-        'the demo above, where Actions carries a separator before it and '
-        'Packs does not.',
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        DsText(
-          'A group whose rows are all filtered away hides its heading with '
-          'them: type a query neither group\'s rows can match, and both '
-          'headings disappear along with every row.',
-          DsType.small,
-        ),
-        SizedBox(height: ds(3)),
-        DsText(
-          'Rows re-sort inside their own group on every keystroke, but the '
-          'groups themselves do not: a faithfully reproduced upstream bug '
-          'rather than a design choice. cmdk\'s second sort pass builds a '
-          'selector from a React useId while the element carries its '
-          'heading instead, so the selector matches nothing and the pass is '
-          'a silent no-op. DsCommand.sortsGroups is a static false that '
-          'records it.',
-          DsType.small,
-        ),
-      ],
-    ),
+        'ElCommandGroup renders an optional heading above its rows, and '
+        'separatorBefore draws a rule above the whole group: both visible '
+        'in the palette above, where Actions carries a separator before it '
+        'and Packs does not.',
+    child: _bullets(theme, <String>[
+      'A group whose rows are all filtered away hides its heading with '
+          'them, and stops occupying space entirely: type a query neither '
+          'group can match and both headings disappear along with every '
+          'row.',
+      'The separator is not painted while a query is running. It leaves '
+          'the tree on the first keystroke and comes back when the field '
+          'is cleared, which is a one-hairline swing in the palette\'s '
+          'height.',
+      'Rows re-sort inside their own group on every keystroke, but the '
+          'groups themselves never move: a faithfully reproduced upstream '
+          'bug rather than a design choice. cmdk\'s second sort pass '
+          'builds its selector from a React useId while the element '
+          'carries its heading instead, so the selector matches nothing '
+          'and the pass is a silent no-op. ElCommand.sortsGroups is a '
+          'static false that records it.',
+      'Alt+ArrowDown and Alt+ArrowUp step to the next or previous '
+          'group\'s first enabled row, falling back to a plain one-row '
+          'step when there is no such group.',
+    ]),
   );
 
-  Widget _scrollable() => DsSection(
+  Widget _scrollable(ElThemeData theme) => ElSection(
     id: 'scrollable',
     title: 'Scrollable',
     description:
         'Once the rows need more room than the palette allows, the list '
-        'caps its height and scrolls internally instead of growing the page '
-        'around it, the same shape shadcn\'s own Scrollable example '
-        'demonstrates. DsCommand.listMaxHeight is the cap; nothing above it '
-        'changes the palette\'s outer size.',
-    child: ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: DsWidths.prose),
-      child: DsText(
-        'The demo above stays short enough that this never triggers; a '
-        'caller feeding it twenty rows would see the same internal scroll, '
-        'not a taller palette.',
-        DsType.small,
-      ),
-    ),
-  );
-
-  Widget _inAPanel() => DsSection(
-    id: 'in-a-panel',
-    title: 'In a panel',
-    description:
-        'This site\'s own header search: Command mounted in a panel that '
-        'owns both opening and dismissal, because Command owns neither.',
-    child: DsPanel(
-      label: 'DART',
-      note: 'COMMAND IN A SEARCH PANEL',
-      child: DocsSelectableCodeBlock(code: _compositionCommandCode),
-    ),
-  );
-
-  Widget _invalid() => DsSection(
-    id: 'invalid',
-    title: 'Invalid',
-    description:
-        'The same control wearing the error ring, for a failed field '
-        'validation. The message itself belongs to the surrounding DsField, '
-        'the way DsInput and DsSelect already work.',
-    child: DsPanel(
-      label: 'DART',
-      note: 'COMBOBOX, INVALID',
-      child: DocsSelectableCodeBlock(code: _compositionComboboxCode),
-    ),
-  );
-
-  Widget _disabled() => DsSection(
-    id: 'disabled',
-    title: 'Disabled',
-    description:
-        'Non-interactive: the popup never opens. enabled: false and a null '
-        'onChanged both reach the same state; a null onChanged is the more '
-        'common real cause, because it usually falls out of a form that has '
-        'nothing to submit to yet.',
-    child: DsPanel(
-      label: 'DART',
-      note: 'COMBOBOX, DISABLED',
-      child: DocsSelectableCodeBlock(code: _disabledComboboxCode),
-    ),
-  );
-
-  Widget _api() => DsSection(
-    id: 'api',
-    title: 'API Reference',
-    description:
-        'Every constructor parameter and top-level function both source '
-        'files declare.',
+        'caps its height and scrolls internally rather than growing the '
+        'page around it: ElCommand.listMaxHeight is that cap, and nothing '
+        'above it changes the palette\'s outer size. An arrow move scrolls '
+        'the newly highlighted row into view; a hover deliberately does '
+        'not, because a row you just pointed at is already on screen.',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        const DocsApiTable(
-          title: 'DsCommand',
-          facts: <DocsApiFact>[
-            DocsApiFact(
-              name: 'groups',
-              type: 'List<DsCommandGroup>',
-              description:
-                  'Required. Every row on the palette, in source order, '
-                  'grouped.',
-            ),
-            DocsApiFact(
-              name: 'placeholder',
-              type: 'String?',
-              description: 'The search field\'s empty hint.',
-            ),
-            DocsApiFact(
-              name: 'emptyLabel',
-              type: 'String?',
-              description:
-                  'What renders when the filter leaves nothing. Null shows '
-                  'an empty list rather than a message.',
-            ),
-            DocsApiFact(
-              name: 'controller',
-              type: 'TextEditingController?',
-              description:
-                  'An optional controller for the search field, for callers '
-                  'that need to read or clear the query from outside.',
-            ),
-            DocsApiFact(
-              name: 'focusNode',
-              type: 'FocusNode?',
-              description: 'An optional node for the search field.',
-            ),
-            DocsApiFact(
-              name: 'shouldFilter',
-              type: 'bool',
-              description:
-                  'Defaults to true. False leaves the rows exactly as passed '
-                  '— the escape hatch for server-side or async filtering.',
-            ),
-            DocsApiFact(
-              name: 'filter',
-              type: 'double Function(String, String, List<String>)?',
-              description:
-                  'Replaces dsCommandScore. Return 0 to hide a row; larger '
-                  'is better.',
-            ),
-            DocsApiFact(
-              name: 'loop',
-              type: 'bool',
-              description:
-                  'Defaults to false. Whether arrow-key navigation wraps '
-                  'from the last row back to the first.',
-            ),
-            DocsApiFact(
-              name: 'vimBindings',
-              type: 'bool',
-              description:
-                  'Defaults to true. Ctrl+N/Ctrl+P and Ctrl+J/Ctrl+K move '
-                  'the highlight alongside the arrow keys.',
-            ),
-            DocsApiFact(
-              name: 'label',
-              type: 'String?',
-              description: 'The accessible name for the palette as a whole.',
-            ),
-            DocsApiFact(
-              name: 'onValueChanged',
-              type: 'ValueChanged<String>?',
-              description:
-                  'Called with the query on every keystroke: how a caller '
-                  'drives its own async search.',
-            ),
-            DocsApiFact(
-              name: 'inDialog',
-              type: 'bool',
-              description:
-                  'Defaults to false. True adjusts the palette for the '
-                  'centred-dialog presentation cmdk also ships. The dialog '
-                  'wrapper itself is recorded, not built: this only changes '
-                  'the palette\'s own fill and border.',
-            ),
-          ],
-        ),
-        SizedBox(height: ds(6)),
-        const DocsApiTable(
-          title: 'DsCommandItem',
-          facts: <DocsApiFact>[
-            DocsApiFact(
-              name: 'label',
-              type: 'String',
-              description:
-                  'Required. The visible row text, and what is scored.',
-            ),
-            DocsApiFact(
-              name: 'icon',
-              type: 'DsIconGlyph?',
-              description: 'A leading glyph from the system icon set.',
-            ),
-            DocsApiFact(
-              name: 'lucideIcon',
-              type: 'String?',
-              description:
-                  'A leading glyph named from the Lucide set instead, for '
-                  'rows whose icon has no system equivalent.',
-            ),
-            DocsApiFact(
-              name: 'iconTone',
-              type: 'DsIconTone?',
-              description: 'Overrides the leading glyph\'s tone.',
-            ),
-            DocsApiFact(
-              name: 'subtitle',
-              type: 'String?',
-              description: 'A second line under the label.',
-            ),
-            DocsApiFact(
-              name: 'meta',
-              type: 'String?',
-              description:
-                  'Trailing metadata: a price, a count, a timestamp: set '
-                  'apart from the shortcut.',
-            ),
-            DocsApiFact(
-              name: 'shortcut',
-              type: 'String?',
-              description: 'A trailing key hint, rendered as a kbd cap.',
-            ),
-            DocsApiFact(
-              name: 'value',
-              type: 'String?',
-              description:
-                  'The identity used for selection and for the scored '
-                  'string when it should differ from the label.',
-            ),
-            DocsApiFact(
-              name: 'keywords',
-              type: 'List<String>',
-              description:
-                  'Defaults to empty. Appended to the searchable text: see '
-                  'Filtering.',
-            ),
-            DocsApiFact(
-              name: 'enabled',
-              type: 'bool',
-              description:
-                  'Defaults to true. A disabled row still renders and is '
-                  'still filtered, but cannot be highlighted or picked.',
-            ),
-            DocsApiFact(
-              name: 'onSelect',
-              type: 'VoidCallback?',
-              description:
-                  'Fired when the row is committed by Enter or by a tap. '
-                  'Command holds no value of its own: this callback is the '
-                  'entire result.',
-            ),
-          ],
-        ),
-        SizedBox(height: ds(6)),
-        const DocsApiTable(
-          title: 'DsCommandGroup',
-          facts: <DocsApiFact>[
-            DocsApiFact(
-              name: 'items',
-              type: 'List<DsCommandItem>',
-              description: 'Required. The group\'s rows, in source order.',
-            ),
-            DocsApiFact(
-              name: 'heading',
-              type: 'String?',
-              description:
-                  'The group label. A group whose rows are all filtered away '
-                  'hides its heading with them.',
-            ),
-            DocsApiFact(
-              name: 'separatorBefore',
-              type: 'bool',
-              description: 'Defaults to false. Draws a rule above the group.',
-            ),
-          ],
-        ),
-        SizedBox(height: ds(6)),
-        const DocsApiTable(
-          title: 'dsCommandScore(string, abbreviation, [aliases])',
-          facts: <DocsApiFact>[
-            DocsApiFact(
-              name: 'string',
-              type: 'String',
-              description: 'The row text being scored.',
-            ),
-            DocsApiFact(
-              name: 'abbreviation',
-              type: 'String',
-              description: 'The query typed so far.',
-            ),
-            DocsApiFact(
-              name: 'aliases',
-              type: 'List<String>',
-              description:
-                  'Defaults to empty. The item\'s keywords, appended to the '
-                  'subject rather than scored on their own.',
-            ),
-          ],
-        ),
-        SizedBox(height: ds(6)),
-        const DocsApiTable(
-          title: 'DsCombobox<T>',
-          facts: <DocsApiFact>[
-            DocsApiFact(
-              name: 'items',
-              type: 'List<DsComboboxItem<T>>',
-              description:
-                  'Required. DsComboboxItem is a typedef for DsSelectOption, '
-                  'so a list written for DsSelect drops in unchanged.',
-            ),
-            DocsApiFact(
-              name: 'value',
-              type: 'T?',
-              description:
-                  'Required. The controlled selection, which persists after '
-                  'the popup closes: the thing Command has no equivalent of.',
-            ),
-            DocsApiFact(
-              name: 'onChanged',
-              type: 'ValueChanged<T>?',
-              description: 'Required. Null disables the control outright.',
-            ),
-            DocsApiFact(
-              name: 'placeholder',
-              type: 'String?',
-              description: 'The input\'s empty hint.',
-            ),
-            DocsApiFact(
-              name: 'emptyLabel',
-              type: 'String?',
-              description: 'What the popup shows when nothing matches.',
-            ),
-            DocsApiFact(
-              name: 'enabled',
-              type: 'bool',
-              description:
-                  'Defaults to true. Composes with DsFieldScope the way '
-                  'DsInput and DsSelect do.',
-            ),
-            DocsApiFact(
-              name: 'invalid',
-              type: 'bool',
-              description:
-                  'Defaults to false. Paints the error ring; the message '
-                  'itself belongs to the surrounding DsField.',
-            ),
-            DocsApiFact(
-              name: 'focusNode',
-              type: 'FocusNode?',
-              description: 'An optional node for the text input.',
-            ),
-            DocsApiFact(
-              name: 'label',
-              type: 'String?',
-              description:
-                  'The field label, when not supplied by an enclosing '
-                  'DsField.',
-            ),
-            DocsApiFact(
-              name: 'hint',
-              type: 'String?',
-              description: 'Helper text under the field.',
-            ),
-            DocsApiFact(
-              name: 'filter',
-              type: 'bool Function(String label, String query)?',
-              description:
-                  'Replaces dsCollatorContains. Return true to keep the row.',
-            ),
-          ],
-        ),
-        SizedBox(height: ds(6)),
-        const DocsApiTable(
-          title: 'dsCollatorContains(label, query)',
-          facts: <DocsApiFact>[
-            DocsApiFact(
-              name: 'label',
-              type: 'String',
-              description: 'The row text being tested.',
-            ),
-            DocsApiFact(
-              name: 'query',
-              type: 'String',
-              description:
-                  'The query typed so far. Both sides are case-folded, '
-                  'accent-stripped, and punctuation-skipped before the '
-                  'substring test runs.',
-            ),
-          ],
+        _bullets(theme, <String>[
+          'The palette above stays short enough that the cap never '
+              'triggers. A caller feeding it twenty rows would see the '
+              'same internal scroll, not a taller palette.',
+        ]),
+        SizedBox(height: el(3)),
+        ElPanel(
+          label: 'ABOUT, BASIC, RTL',
+          note: 'SKIPPED',
+          child: _bullets(theme, <String>[
+            'About: shadcn opens with a credit to cmdk under its own '
+                'heading. This page credits it in Installation instead, '
+                'beside the version the scorer was ported from, where a '
+                'reader deciding whether to adopt the component will '
+                'actually be looking.',
+            'Basic: their demo is CommandDialog, the palette inside a '
+                'centred dialog. ElCommand.inDialog reproduces what that '
+                'presentation does to the palette itself (its own fill '
+                'and border, and a wider row radius), but the dialog '
+                'wrapper is recorded, not built, so there is no live '
+                'specimen to show and none is faked here.',
+            'RTL: there is no Directionality or TextDirection branch '
+                'anywhere in command.dart, and the docs shell this page '
+                'renders inside carries no direction toggle to '
+                'demonstrate one against.',
+          ]),
         ),
       ],
     ),
   );
 
-  Widget _states() => DsSection(
+  Widget _inAPanel() => ElSection(
+    id: 'in-a-panel',
+    title: 'In a panel',
+    description:
+        'ElCommand owns neither its opening nor its dismissal, because it '
+        'has no container of its own to dismiss. Whatever mounts it owns '
+        'both: this site\'s own header search is the worked example.',
+    child: ElPanel(
+      label: 'DART',
+      note: 'COMMAND IN A SEARCH PANEL',
+      child: const DocsSelectableCodeBlock(code: _inAPanelCode),
+    ),
+  );
+
+  Widget _api() => ElSection(
+    id: 'api',
+    title: 'API Reference',
+    description:
+        'Every constructor parameter, static helper and top-level '
+        'function lib/src/components/command.dart declares: one table '
+        'each, read off the real constructors.',
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        KeyedSubtree(
+          key: docsAnchorKey('api-elcommand'),
+          child: const DocsApiTable(title: 'ElCommand', facts: _commandFacts),
+        ),
+        SizedBox(height: el(6)),
+        KeyedSubtree(
+          key: docsAnchorKey('api-elcommand-static'),
+          child: const DocsApiTable(
+            title: 'ElCommand static helpers',
+            facts: _commandStaticFacts,
+          ),
+        ),
+        SizedBox(height: el(6)),
+        KeyedSubtree(
+          key: docsAnchorKey('api-elcommanditem'),
+          child: const DocsApiTable(
+            title: 'ElCommandItem',
+            facts: _commandItemFacts,
+          ),
+        ),
+        SizedBox(height: el(6)),
+        KeyedSubtree(
+          key: docsAnchorKey('api-elcommandgroup'),
+          child: const DocsApiTable(
+            title: 'ElCommandGroup',
+            facts: _commandGroupFacts,
+          ),
+        ),
+        SizedBox(height: el(6)),
+        KeyedSubtree(
+          key: docsAnchorKey('api-elcommandscore'),
+          child: const DocsApiTable(
+            title: 'elCommandScore(string, abbreviation, [aliases]) → double',
+            facts: _commandScoreFacts,
+          ),
+        ),
+      ],
+    ),
+  );
+
+  Widget _states() => ElSection(
     id: 'states',
     title: 'States',
-    child: const DocsStateMatrix(
-      facts: <DocsStateFact>[
-        DocsStateFact(
-          state: 'Rest',
-          treatment:
-              'Command: the search field plus every row. Combobox: a closed '
-              'input showing the selected label, or the placeholder.',
-          userSignal: 'Command is already open; Combobox waits to be asked.',
-        ),
-        DocsStateFact(
-          state: 'Filtered',
-          treatment:
-              'Command re-ranks and drops rows on every keystroke. Combobox '
-              'drops non-matching rows and keeps the rest in source order.',
-          userSignal: 'The list shortens; in Command it also reorders.',
-        ),
-        DocsStateFact(
-          state: 'Highlighted',
-          treatment:
-              'Command highlights the best row automatically as soon as the '
-              'rows register, before anything is touched, so Enter always '
-              'has a target.',
-          userSignal: 'One row is visibly armed.',
-        ),
-        DocsStateFact(
-          state: 'Selected',
-          treatment:
-              'Command fires onSelect and keeps nothing. Combobox writes the '
-              'value, closes the popup, and shows the chosen label.',
-          userSignal: 'Command acts; Combobox remembers.',
-        ),
-        DocsStateFact(
-          state: 'Empty',
-          treatment:
-              'Both render emptyLabel when the filter leaves nothing. Null '
-              'leaves the region blank instead.',
-          userSignal: 'A sentence where the rows were.',
-        ),
-        DocsStateFact(
-          state: 'Disabled',
-          treatment:
-              'Combobox: enabled: false, or a null onChanged. Command has no '
-              'disabled flag of its own: individual rows do (enabled), and '
-              'the container disables the whole palette.',
-          userSignal: 'No highlight, no commit.',
-        ),
-        DocsStateFact(
-          state: 'Loading',
-          treatment:
-              'Neither has a loading state. A caller doing async work drives '
-              'shouldFilter: false and swaps the rows itself.',
-          userSignal: 'Whatever the caller renders in the rows.',
-        ),
-        DocsStateFact(
-          state: 'Reduced motion',
-          treatment:
-              'Command does not animate at all. Combobox\'s popup runs the '
-              'shared DsPopover transition, which collapses to zero through '
-              'dsAnimationDuration.',
-          userSignal: 'The popup appears without animated travel.',
-        ),
-      ],
-    ),
+    description:
+        'Read off _DsCommandState, not inferred: the palette is always '
+        'open, so every state below is a state of its list rather than of '
+        'its visibility.',
+    child: const DocsStateMatrix(facts: _stateFacts),
   );
 
-  Widget _accessibility() => DsSection(
+  Widget _accessibility(ElThemeData theme) => ElSection(
     id: 'accessibility',
     title: 'Accessibility',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        DsPanel(
-          label: 'Keyboard',
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              DsText(
-                'Both keep the caret in the text field at all times and move '
-                'a highlight rather than focus, so typing never stops '
-                'working. ArrowUp and ArrowDown move the highlight; Enter '
-                'commits it. Command adds Ctrl+N/Ctrl+P and Ctrl+J/Ctrl+K '
-                'while vimBindings is true, and wraps at the ends when loop '
-                'is true. Combobox closes its popup on Escape and commits on '
-                'Enter; Command has no dismissal of its own, because it has '
-                'no container of its own to dismiss.',
-                DsType.small,
-              ),
-            ],
-          ),
+        ElPanel(
+          label: 'Keyboard and semantics',
+          child: _bullets(theme, <String>[
+            'The caret never leaves the search field. Arrow keys move a '
+                'highlight rather than focus, so typing keeps working '
+                'throughout: the root key handler sits above the text '
+                'field in the tree and sees Home, End and the arrows '
+                'before the field turns them into caret moves.',
+            'ArrowDown and ArrowUp step one row; Home and End jump to the '
+                'first and last; Alt+Arrow steps by group; Meta+Arrow '
+                'jumps to the far end. Enter and NumpadEnter commit the '
+                'highlighted row and fire its onSelect.',
+            'Ctrl+N and Ctrl+J step down, Ctrl+P and Ctrl+K step up, '
+                'while vimBindings is true (the default). Worth naming: '
+                'the reference advertises Ctrl+K as the shortcut that '
+                'OPENS a palette, while inside one Ctrl+K already means '
+                'move up.',
+            'loop is false by default, so the arrows stop dead at both '
+                'ends rather than wrapping.',
+            'Each row reports itself as a button carrying its selected '
+                'and enabled state, and its accessible name joins the '
+                'label to the shortcut when a row has one. The palette as '
+                'a whole is a semantics container named by label.',
+          ]),
         ),
-        SizedBox(height: ds(5)),
-        DsPanel(
+        SizedBox(height: el(5)),
+        ElPanel(
           label: 'Known gaps',
           note: 'REPORTED, NOT IDEALISED',
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              DsText(
-                'Known gap: no live region. Neither component announces how '
-                'many rows survived the filter. A sighted reader sees the '
-                'list collapse from twenty rows to two; a screen-reader user '
-                'is told nothing at all, and finds out only by arrowing '
-                'through what is left. The reference has the same hole, and '
-                'closing it means adding a live region that speaks the '
-                'result count on each keystroke: a real change to both '
-                'components, not a prop.',
-                DsType.small,
-              ),
-              SizedBox(height: ds(3)),
-              DsText(
-                'Known gap: the combobox highlight is not announced. The '
-                'highlighted row is painted, but no relationship is wired '
-                'from the input to the row that Enter would commit, so '
-                'assistive tech does not read the active option as the '
-                'highlight moves. Command has the same shape of gap on its '
-                'own rows.',
-                DsType.small,
-              ),
-              SizedBox(height: ds(3)),
-              DsText(
-                'Known gap: no role wiring between the field and the popup. '
-                'Neither surface declares itself as a listbox with an owned '
-                'set of options, so the popup reads as ordinary content that '
-                'happens to have appeared.',
-                DsType.small,
-              ),
-            ],
-          ),
+          child: _bullets(theme, <String>[
+            'Known gap: no live region. Nothing announces how many rows '
+                'survived the filter. A sighted reader sees the list '
+                'collapse from twenty rows to two; a screen-reader user is '
+                'told nothing, and finds out only by arrowing through what '
+                'is left. The reference has the same hole, and closing it '
+                'means adding a live region that speaks the result count '
+                'on each keystroke: a real change to the component, not a '
+                'parameter.',
+            'Known gap: the highlight is painted but not announced. No '
+                'relationship is wired from the search field to the row '
+                'Enter would commit, so assistive tech does not read the '
+                'active option as the highlight moves.',
+            'Known gap: no listbox role wiring. The palette does not '
+                'declare itself as a listbox owning a set of options, so '
+                'the rows read as ordinary buttons that happen to sit '
+                'under a text field.',
+            'Known gap: the search field has no focus affordance at all, '
+                'and this one is reproduced deliberately. The reference '
+                'kills the socket shadow outright and its focus predicate '
+                'looks for a data-slot the command input never carries, so '
+                'neither the ring nor a border change can ever fire. It is '
+                'the one text field in the system that shows nothing when '
+                'focused.',
+          ]),
         ),
       ],
     ),
   );
 
-  Widget _responsive() => DsSection(
+  Widget _responsive(ElThemeData theme) => ElSection(
     id: 'responsive',
     title: 'Responsive',
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        DsText(
-          'Command fills the width it is given and caps its list height, '
-          'scrolling inside it: so a phone viewport shows the same palette '
-          'as a desktop one, just shorter.',
-          DsType.small,
-        ),
-        SizedBox(height: ds(3)),
-        DsText(
-          'Combobox sizes its popup from the measured anchor width and caps '
-          'its height against the room the positioner reports, so a popup '
-          'near the bottom of a short viewport shrinks rather than '
-          'overflowing. Neither component branches on platform.',
-          DsType.small,
-        ),
-      ],
-    ),
+    child: _bullets(theme, <String>[
+      'No breakpoint branching anywhere in command.dart: BuildContext '
+          'width is never read for a layout decision, and the same widget '
+          'tree renders at 390px and 1440px.',
+      'The palette fills the width it is given and caps its list height, '
+          'scrolling inside it, so a phone viewport shows the same palette '
+          'as a desktop one: just shorter, with more scrolling.',
+      'Every measurement is a fixed 4px-grid value through el() or a '
+          'component type spec, never a viewport fraction: see the static '
+          'helpers table above for the whole set.',
+      'Row text is single-line and ellipsised rather than wrapped, so a '
+          'long label shortens instead of growing the row. The one row '
+          'that is taller is a row carrying a subtitle, which is a second '
+          'line by construction.',
+      'Platform parity: Android, iOS, Web, macOS, Windows and Linux all '
+          'render the same tree. No dart:io Platform branch anywhere in '
+          'the file, and the vim bindings are Ctrl-based on every one of '
+          'them.',
+    ]),
   );
 
-  Widget _dependencies() => DsSection(
+  Widget _dependencies(ElThemeData theme) => ElSection(
     id: 'dependencies',
     title: 'Dependencies',
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        DsText(
-          'Files: lib/src/components/command.dart and '
-          'lib/src/components/combobox.dart.',
-          DsType.small,
-        ),
-        SizedBox(height: ds(3)),
-        DsText(
-          'Command imports icon and input from the component layer. Combobox '
-          'imports input_group, field, popover, and select: the last of '
-          'those because DsComboboxItem is a typedef for DsSelectOption and '
-          'the two share their row paint.',
-          DsType.small,
-        ),
-        SizedBox(height: ds(3)),
-        DsText(
-          'Foundation: colors, motion, spacing, theme, typography. Assets: '
-          'none. Shaders: none.',
-          DsType.small,
-        ),
-      ],
-    ),
+    child: _bullets(theme, <String>[
+      'File: lib/src/components/command.dart. One file, no companions, and '
+          'shipped registry manifest.',
+      'Flutter imports: dart:math (the score decay), '
+          'package:flutter/services.dart (LogicalKeyboardKey, '
+          'HardwareKeyboard, KeyEvent), package:flutter/widgets.dart.',
+      'Foundation imports: foundation/colors.dart, '
+          'foundation/spacing.dart (el()), foundation/theme.dart, '
+          'foundation/typography.dart, theme_scope.dart (ElText, ElTheme).',
+      'Component imports: icon.dart (ElIcon, ElIconGlyph, ElIconTone), '
+          'icon_paths.dart and icon_paths.g.dart (ElLucideGlyph, for '
+          'ElCommandItem.lucideIcon), input.dart (ElInput, the search '
+          'field), input_group.dart (ElInputGroupAddon, for the addon '
+          'inset only).',
+      'Notably NOT imported: popover.dart. The palette is inline and '
+          'anchors to nothing, which is why nothing on this page needs an '
+          'Overlay to work: see Composition.',
+      'It also does not import input_group.dart\'s own ElInputGroup '
+          'widget, only its addon inset. That widget fixes a 40px pill, a '
+          'card fill and a pressed shadow, all three of which this control '
+          'overrides, so the recipe is reused where the widget cannot be.',
+      'Assets: none. Shaders: none.',
+    ]),
   );
 
-  Widget _theming() => DsSection(
+  Widget _theming(ElThemeData theme) => ElSection(
     id: 'theming',
     title: 'Theming',
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        DsText(
-          'Every colour in both components resolves from the live theme: the '
-          'search field and rows from the input and popover families, the '
-          'highlight from accent, headings and meta from mutedForeground. '
-          'Flipping DsThemeController re-resolves all of them.',
-          DsType.small,
-        ),
-        SizedBox(height: ds(3)),
-        DsText(
-          'Combobox\'s popup is a DsPopoverSurface, so its radius, shadow, '
-          'and ring are the shared overlay recipe rather than anything this '
-          'component owns: a change there moves every popup in the system '
-          'together.',
-          DsType.small,
-        ),
-      ],
-    ),
+    child: _bullets(theme, <String>[
+      'Every colour resolves from ElTheme.of(context) at build time: the '
+          'palette fill from card (or popover under inDialog), its stroke '
+          'from border, the search field from input at a fixed alpha for '
+          'both fill and border, the highlighted row from muted, headings '
+          'and trailing meta from mutedForeground. Flipping '
+          'ElThemeController re-resolves all of them on the next frame.',
+      'The highlighted row uses muted, which is a third highlight token '
+          'in this corpus after the select row\'s accent and the combobox '
+          'row\'s accent. Reproduced drift, not a choice this port made.',
+      'Type is by role, never by size: rows and the empty row read the '
+          'sheet-body spec, headings the menu-heading spec (the weight-500 '
+          'member of a three-way group-label split), shortcuts the '
+          'menu-shortcut spec, and subtitles and meta the caption spec. '
+          'The prices riding the shortcut spec are sans rather than the '
+          'numeric foundation, which is reproduced upstream drift.',
+      'Shape is fixed rather than parameterised: the palette corners at '
+          'the extra-large radius, its search field at large, and a row at '
+          'medium (large under inDialog). No caller-facing radius '
+          'parameter exists.',
+      'Nothing here animates. There is no transition on the row '
+          'highlight, so it snaps: which also means this component has '
+          'nothing to reduce under a reduced-motion setting.',
+    ]),
   );
 
-  Widget _source() => DsSection(
+  Widget _source() => ElSection(
     id: 'source',
     title: 'Source',
     child: DocsInstallFacts(
       title: 'Reference',
       facts: <DocsInstallFact>[
         DocsInstallFact(
-          label: 'Source, Command',
+          label: 'Source',
           value: commandDoc.sourcePath,
-          description: 'DsCommand, its item and group types, dsCommandScore.',
+          description:
+              'Authoritative implementation: ElCommand, ElCommandItem, '
+              'ElCommandGroup and elCommandScore. The truth this page was '
+              'written from.',
         ),
         const DocsInstallFact(
-          label: 'Source, Combobox',
-          value: comboboxSourcePath,
-          description: 'DsCombobox and dsCollatorContains.',
+          label: 'Sibling component',
+          value: 'lib/src/components/combobox.dart',
+          description:
+              'ElCombobox, the anchored form control that used to share '
+              'this page. It has its own page now, at /components/'
+              'combobox: reach for it when the reader knows roughly what '
+              'the value is called, and for Command when they know what '
+              'they want to do but not what it is named.',
         ),
         const DocsInstallFact(
           label: 'Package tests',
-          value: 'test/selects_test.dart',
+          value: 'test/components_test.dart',
           description:
-              'The DsCombobox group, including dsCollatorContains\' folding '
-              'and substring behaviour.',
+              'ElCommand and elCommandScore are covered inside the shared '
+              'components suite, including the re-sort. There is no '
+              'dedicated command_test.dart in the package.',
         ),
         const DocsInstallFact(
           label: 'Docs test',
           value: 'example/test/components_docs/command_test.dart',
           description:
-              'Covers this page: both API tables, both live specimens, the '
-              'filtering worked example, and both themes.',
+              'Covers this page: the section order, every API table, the '
+              'live palette\'s filtering and re-sort, Enter committing a '
+              'row, and both themes at two viewport widths.',
         ),
         const DocsInstallFact(
           label: 'Edit these docs',
@@ -1051,79 +663,79 @@ class _CommandArticle extends StatelessWidget {
   );
 }
 
+Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: <Widget>[
+    for (final String line in lines) ...<Widget>[
+      ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+      ),
+      SizedBox(height: el(2)),
+    ],
+  ],
+);
+
 const String _usageCommandCode = '''
-DsCommand(
+import 'package:elattar_design_system/elattar_design_system.dart';
+
+ElCommand(
   placeholder: 'Type to filter...',
   emptyLabel: 'Nothing matches that.',
-  groups: <DsCommandGroup>[
-    DsCommandGroup(
+  label: 'Docs command palette',
+  groups: <ElCommandGroup>[
+    ElCommandGroup(
       heading: 'Packs',
-      items: <DsCommandItem>[
-        DsCommandItem(
+      items: <ElCommandItem>[
+        ElCommandItem(
           label: 'Eclipse Vault',
           meta: '\\\$48.00',
           onSelect: () => open('eclipse'),
         ),
       ],
     ),
-    DsCommandGroup(
+    ElCommandGroup(
       heading: 'Actions',
       separatorBefore: true,
-      items: <DsCommandItem>[
-        DsCommandItem(
+      items: <ElCommandItem>[
+        ElCommandItem(
           label: 'Open Wallet',
           keywords: <String>['money'],
-          shortcut: 'Ctrl+W',
           onSelect: openWallet,
+        ),
+        ElCommandItem(
+          label: 'Go to Stash',
+          onSelect: openStash,
         ),
       ],
     ),
   ],
-)
-''';
-
-const String _usageComboboxCode = '''
-DsCombobox<String>(
-  value: selectedSet,
-  onChanged: (String next) => setState(() => selectedSet = next),
-  placeholder: 'Search sets...',
-  emptyLabel: 'No set by that name.',
-  items: const <DsComboboxItem<String>>[
-    DsComboboxItem<String>(value: 'golden', label: 'Golden Rift'),
-    DsComboboxItem<String>(value: 'mystic', label: 'Mystic Surge'),
-  ],
-)
-''';
+)''';
 
 const String _compositionTreeCommandCode =
-    '''DsCommand                       // one widget, not five
-├─ groups: List<DsCommandGroup>
-│  └─ DsCommandGroup
-│     ├─ heading                    the group label
-│     └─ items: List<DsCommandItem>
-│        └─ DsCommandItem           one filterable, selectable row
-└─ (built for you) the search field, the empty state, the scrolling list''';
-
-const String _compositionTreeComboboxCode =
-    '''DsCombobox<T>                   // one widget, not four
-├─ items: List<DsComboboxItem<T>>
-│  └─ DsComboboxItem<T>             one option (a DsSelectOption<T>)
-└─ (built for you) the input, the DsPopover, and the filtered list''';
+    '''ElCommand                       // one widget, not five
+├─ groups: List<ElCommandGroup>
+│  └─ ElCommandGroup
+│     ├─ heading                    the group label, optional
+│     ├─ separatorBefore            a rule above the whole group
+│     └─ items: List<ElCommandItem>
+│        └─ ElCommandItem           one filterable, selectable row
+└─ (built for you) the search field, the empty row, the scrolling list''';
 
 const String _shortcutsCode = '''
-DsCommandItem(
+ElCommandItem(
   label: 'Open Wallet',
   keywords: <String>['money'],
-  shortcut: 'Ctrl+W',
+  shortcut: 'Ctrl+W',     // a trailing key hint, right-aligned
+  meta: '2 accounts',     // and a second, independent trailing slot
   onSelect: openWallet,
-)
-''';
+)''';
 
-const String _compositionCommandCode = '''
+const String _inAPanelCode = '''
 // This site's own header search: Command mounted in a panel that owns both
 // opening and dismissal, because Command owns neither.
-DsPanel(
-  child: DsCommand(
+ElPanel(
+  child: ElCommand(
     groups: searchGroups(
       onPick: (String route) {
         onNavigate(route);
@@ -1131,32 +743,404 @@ DsPanel(
       },
     ),
     placeholder: 'Search the docs...',
-    onValueChanged: (String query) => setState(() => _query = query),
+    onValueChanged: (String value) => setState(() => _highlighted = value),
   ),
-)
-''';
+)''';
 
-const String _compositionComboboxCode = '''
-DsField(
-  label: 'Card set',
-  hint: 'Start typing to narrow the list.',
-  child: DsCombobox<String>(
-    items: cardSets,
-    value: selectedSet,
-    invalid: submitted && selectedSet == null,
-    onChanged: (String next) => setState(() => selectedSet = next),
+// ── API tables, read off lib/src/components/command.dart ────────────────────
+
+const List<DocsApiFact> _commandFacts = <DocsApiFact>[
+  DocsApiFact(
+    name: 'groups',
+    type: 'List<ElCommandGroup>',
+    description:
+        'Required. Every row on the palette, in source order, grouped. The '
+        'groups are never reordered: see ElCommand.sortsGroups below.',
   ),
-)
-''';
+  DocsApiFact(
+    name: 'placeholder',
+    type: 'String?',
+    description: 'Optional. Defaults to null. The search field\'s empty hint.',
+  ),
+  DocsApiFact(
+    name: 'emptyLabel',
+    type: 'String?',
+    description:
+        'Optional. Defaults to null, which renders NO empty row at all: an '
+        'empty list rather than a message. Non-null, it mounts exactly '
+        'when the filtered count reaches zero.',
+  ),
+  DocsApiFact(
+    name: 'controller',
+    type: 'TextEditingController?',
+    description:
+        'Optional. Defaults to null, which lets the palette own its own. '
+        'Supply one to read or clear the query from outside.',
+  ),
+  DocsApiFact(
+    name: 'focusNode',
+    type: 'FocusNode?',
+    description:
+        'Optional. Defaults to null, which lets the search field own its '
+        'own node.',
+  ),
+  DocsApiFact(
+    name: 'shouldFilter',
+    type: 'bool',
+    description:
+        'Optional. Defaults to true, which is cmdk\'s own default and '
+        'means automatic filtering AND sorting. False shows every row in '
+        'source order and leaves the narrowing to the caller: the escape '
+        'hatch for a server-side or async search.',
+  ),
+  DocsApiFact(
+    name: 'filter',
+    type:
+        'double Function(String value, String search, List<String> keywords)?',
+    description:
+        'Optional. Defaults to null, which uses elCommandScore. Return 0 '
+        'to hide a row; larger is better. The first argument is the row\'s '
+        'searchValue, not its label.',
+  ),
+  DocsApiFact(
+    name: 'loop',
+    type: 'bool',
+    description:
+        'Optional. Defaults to false, matching the reference, which leaves '
+        'the prop unset. True wraps arrow navigation from the last row '
+        'back to the first.',
+  ),
+  DocsApiFact(
+    name: 'vimBindings',
+    type: 'bool',
+    description:
+        'Optional. Defaults to true. Ctrl+N and Ctrl+J step down, Ctrl+P '
+        'and Ctrl+K step up, alongside the arrow keys.',
+  ),
+  DocsApiFact(
+    name: 'label',
+    type: 'String?',
+    description:
+        'Optional. Defaults to null. The accessible name: it names the '
+        'palette\'s semantics container and is passed to the search field '
+        'as its own label, which the reference renders into a visually '
+        'hidden element.',
+  ),
+  DocsApiFact(
+    name: 'onValueChanged',
+    type: 'ValueChanged<String>?',
+    description:
+        'Optional. Defaults to null. Fires with the HIGHLIGHTED row\'s '
+        'searchValue whenever the highlight moves, which includes the '
+        'automatic move back to the top on every keystroke. It is not the '
+        'query: read the query from a controller instead.',
+  ),
+  DocsApiFact(
+    name: 'inDialog',
+    type: 'bool',
+    description:
+        'Optional. Defaults to false. True adjusts the palette for the '
+        'centred-dialog presentation cmdk also ships: the popover fill '
+        'instead of the card fill, no stroke of its own, and a wider row '
+        'radius. The dialog wrapper itself is recorded, not built.',
+  ),
+];
 
-const String _disabledComboboxCode = '''
-DsCombobox<String>(
-  items: cardSets,
-  value: selectedSet,
-  onChanged: null,
-  placeholder: 'Search sets...',
-)
-''';
+const List<DocsApiFact> _commandStaticFacts = <DocsApiFact>[
+  DocsApiFact(
+    name: 'ElCommand.padding',
+    type: 'static double',
+    description:
+        'The palette\'s own inset, and the distance the separator bleeds '
+        'back out through it.',
+  ),
+  DocsApiFact(
+    name: 'ElCommand.listMaxHeight',
+    type: 'static double',
+    description:
+        'The cap the row list scrolls inside: 288px. Nothing above it '
+        'changes the palette\'s outer size.',
+  ),
+  DocsApiFact(
+    name: 'ElCommand.inputHeight',
+    type: 'static double',
+    description:
+        'The search field\'s height: 32px, where the rest of the input '
+        'family sits at 40.',
+  ),
+  DocsApiFact(
+    name: 'ElCommand.inputFillAlpha',
+    type: 'static const double',
+    description:
+        'One alpha, applied to both the search field\'s fill and its '
+        'border, over the theme\'s input colour.',
+  ),
+  DocsApiFact(
+    name: 'ElCommand.searchGlyphOpacity',
+    type: 'static const double',
+    description:
+        'The leading search glyph\'s opacity. An opacity, not a colour: '
+        'the glyph reads mutedForeground and then fades, which measures '
+        'differently from foreground at the same alpha.',
+  ),
+  DocsApiFact(
+    name: 'ElCommand.disabledOpacity',
+    type: 'static const double',
+    description: 'What a row with enabled: false fades to.',
+  ),
+  DocsApiFact(
+    name: 'ElCommand.itemHeight',
+    type: 'static double',
+    description:
+        'One single-line row, derived from the sheet-body type spec plus '
+        'its vertical padding rather than hardcoded.',
+  ),
+  DocsApiFact(
+    name: 'ElCommand.headingHeight',
+    type: 'static double',
+    description: 'One group heading, derived from the menu-heading type spec.',
+  ),
+  DocsApiFact(
+    name: 'ElCommand.emptyHeight',
+    type: 'static double',
+    description:
+        'The empty row, which is a body line box inside a much deeper '
+        'padding than a row takes.',
+  ),
+  DocsApiFact(
+    name: 'ElCommand.sortsGroups',
+    type: 'static bool',
+    description:
+        'False, and it is a record rather than a switch: rows re-sort '
+        'inside their group, groups never move. Reproduced upstream bug, '
+        'documented in Groups above.',
+  ),
+];
+
+const List<DocsApiFact> _commandItemFacts = <DocsApiFact>[
+  DocsApiFact(
+    name: 'label',
+    type: 'String',
+    description:
+        'Required. The row\'s visible copy, and the first thing folded '
+        'into what gets scored.',
+  ),
+  DocsApiFact(
+    name: 'icon',
+    type: 'ElIconGlyph?',
+    description:
+        'Optional. Defaults to null. A leading glyph from the curated '
+        'system set. The row, not the call site, decides its size.',
+  ),
+  DocsApiFact(
+    name: 'lucideIcon',
+    type: 'ElLucideGlyph?',
+    description:
+        'Optional. Defaults to null. The same slot over the generated '
+        'Lucide registry, for a row whose glyph has no curated '
+        'equivalent. Ignored when icon is given.',
+  ),
+  DocsApiFact(
+    name: 'iconTone',
+    type: 'ElIconTone?',
+    description:
+        'Optional. Defaults to null, which leaves the row\'s own subtle '
+        'tone in charge. A selected row overrules whatever this says, the '
+        'same way it overrules the default.',
+  ),
+  DocsApiFact(
+    name: 'subtitle',
+    type: 'String?',
+    description:
+        'Optional. Defaults to null. A second, caption-sized line under '
+        'the label, which grows the row by one line box. It is part of '
+        'the searched text.',
+  ),
+  DocsApiFact(
+    name: 'meta',
+    type: 'String?',
+    description:
+        'Optional. Defaults to null. Trailing metadata that is NOT a '
+        'shortcut: a price, a count, a timestamp. It stays muted on the '
+        'selected row, and unlike a shortcut it does not displace the '
+        'trailing check indicator.',
+  ),
+  DocsApiFact(
+    name: 'shortcut',
+    type: 'String?',
+    description:
+        'Optional. Defaults to null. A trailing key hint on the '
+        'menu-shortcut spec, which brightens with the selected row and '
+        'takes the place of the trailing check indicator entirely.',
+  ),
+  DocsApiFact(
+    name: 'value',
+    type: 'String?',
+    description:
+        'Optional. Defaults to null, which derives the identity from the '
+        'rendered text: see searchValue below. Set it when selection '
+        'identity or the scored string should differ from what the row '
+        'shows.',
+  ),
+  DocsApiFact(
+    name: 'keywords',
+    type: 'List<String>',
+    description:
+        'Optional. Defaults to an empty list. Appended to the searchable '
+        'string rather than scored separately: see Filtering.',
+  ),
+  DocsApiFact(
+    name: 'enabled',
+    type: 'bool',
+    description:
+        'Optional. Defaults to true. A disabled row still renders and is '
+        'still filtered, but fades and can be neither highlighted nor '
+        'committed: the arrows step over it.',
+  ),
+  DocsApiFact(
+    name: 'onSelect',
+    type: 'VoidCallback?',
+    description:
+        'Optional. Defaults to null. Fired when the row is committed by '
+        'Enter or by a tap, and by nothing else. Command holds no value '
+        'of its own, so this callback is the entire result.',
+  ),
+  DocsApiFact(
+    name: 'searchValue',
+    type: 'String (getter)',
+    description:
+        'Not a constructor parameter: the derived string the matcher '
+        'actually sees, and the identity the highlight is stored under. '
+        'It is value when given, otherwise label, subtitle, meta and '
+        'shortcut concatenated with nothing between them, trimmed.',
+  ),
+];
+
+const List<DocsApiFact> _commandGroupFacts = <DocsApiFact>[
+  DocsApiFact(
+    name: 'items',
+    type: 'List<ElCommandItem>',
+    description:
+        'Required. The group\'s rows, in source order. They re-sort '
+        'inside this group when a query is running, and never leave it.',
+  ),
+  DocsApiFact(
+    name: 'heading',
+    type: 'String?',
+    description:
+        'Optional. Defaults to null, which renders a group with no '
+        'heading element at all while keeping its padding. A group whose '
+        'rows are all filtered away hides its heading with them.',
+  ),
+  DocsApiFact(
+    name: 'separatorBefore',
+    type: 'bool',
+    description:
+        'Optional. Defaults to false. Draws a full-bleed hairline above '
+        'this group, modelled as the group\'s own property rather than a '
+        'sibling list entry so the arrangement cannot drift. It is not '
+        'painted at all while a query is running.',
+  ),
+];
+
+const List<DocsApiFact> _commandScoreFacts = <DocsApiFact>[
+  DocsApiFact(
+    name: 'string',
+    type: 'String',
+    description:
+        'Positional, required. The row text being scored: in practice a '
+        'ElCommandItem.searchValue.',
+  ),
+  DocsApiFact(
+    name: 'abbreviation',
+    type: 'String',
+    description: 'Positional, required. The query typed so far.',
+  ),
+  DocsApiFact(
+    name: 'aliases',
+    type: 'List<String>',
+    description:
+        'Positional, optional. Defaults to an empty list. The row\'s '
+        'keywords, appended to the subject rather than scored on their '
+        'own.',
+  ),
+  DocsApiFact(
+    name: 'returns',
+    type: 'double',
+    description:
+        '0 hides the row entirely; 1 is a perfect match. cmdk\'s own '
+        'scorer, ported whole rather than approximated.',
+  ),
+];
+
+const List<DocsStateFact> _stateFacts = <DocsStateFact>[
+  DocsStateFact(
+    state: 'Rest',
+    treatment:
+        'The search field plus every row, in source order. The palette is '
+        'inline and always open: there is no closed state to document.',
+    userSignal: 'Everything is already visible.',
+  ),
+  DocsStateFact(
+    state: 'Filtered',
+    treatment:
+        'Every keystroke re-scores each row, drops the zeroes, and '
+        're-sorts the survivors inside their own group, source index '
+        'breaking a tie. The separator leaves the tree while a query '
+        'runs.',
+    userSignal: 'The list shortens AND reorders, not just shortens.',
+  ),
+  DocsStateFact(
+    state: 'Highlighted',
+    treatment:
+        'The first valid row is armed one frame after mount, before '
+        'anything is touched, and the highlight returns to the top on '
+        'every keystroke. A hover takes it too, and keeps it: moving off '
+        'the palette leaves the last-hovered row armed.',
+    userSignal: 'One row is visibly armed, so Enter always has a target.',
+  ),
+  DocsStateFact(
+    state: 'Committed',
+    treatment:
+        'Enter or a tap fires the row\'s onSelect and keeps nothing: no '
+        'value is stored, no field is written, the palette does not '
+        'close, because it owns no container to close.',
+    userSignal: 'Something happens elsewhere; the palette stays as it was.',
+  ),
+  DocsStateFact(
+    state: 'Empty',
+    treatment:
+        'emptyLabel mounts exactly when the filtered count reaches zero, '
+        'including a palette with no rows and no query. Null renders no '
+        'empty row at all.',
+    userSignal: 'A sentence where the rows were, or nothing.',
+  ),
+  DocsStateFact(
+    state: 'Disabled row',
+    treatment:
+        'enabled: false fades the row and takes it out of the ring the '
+        'arrows walk, while leaving it rendered and still filtered. There '
+        'is no disabled flag for the palette as a whole: a container that '
+        'needs one disables itself.',
+    userSignal: 'A faded row nothing can arm or commit.',
+  ),
+  DocsStateFact(
+    state: 'Loading',
+    treatment:
+        'There is none. A caller doing async work passes shouldFilter: '
+        'false and swaps the rows itself, rendering its own progress '
+        'affordance outside the palette.',
+    userSignal: 'Whatever the caller puts in the rows.',
+  ),
+  DocsStateFact(
+    state: 'Reduced motion',
+    treatment:
+        'Nothing to reduce: this component runs no animation at all. The '
+        'row highlight has no transition and snaps, which is the '
+        'reference\'s behaviour too.',
+    userSignal: 'Identical either way.',
+  ),
+];
 
 /// The live command palette.
 ///
@@ -1177,22 +1161,22 @@ class _CommandSpecimenState extends State<_CommandSpecimen> {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     final String? picked = _lastPicked;
     return KeyedSubtree(
       key: const ValueKey<String>('command-doc-command-specimen'),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          DsCommand(
+          ElCommand(
             placeholder: 'Type to filter...',
             emptyLabel: 'Nothing matches that.',
             label: 'Docs command palette',
-            groups: <DsCommandGroup>[
-              DsCommandGroup(
+            groups: <ElCommandGroup>[
+              ElCommandGroup(
                 heading: 'Packs',
-                items: <DsCommandItem>[
-                  DsCommandItem(
+                items: <ElCommandItem>[
+                  ElCommandItem(
                     label: 'Eclipse Vault',
                     meta: '\$48.00',
                     onSelect: () =>
@@ -1200,16 +1184,16 @@ class _CommandSpecimenState extends State<_CommandSpecimen> {
                   ),
                 ],
               ),
-              DsCommandGroup(
+              ElCommandGroup(
                 heading: 'Actions',
                 separatorBefore: true,
-                items: <DsCommandItem>[
-                  DsCommandItem(
+                items: <ElCommandItem>[
+                  ElCommandItem(
                     label: 'Open Wallet',
                     keywords: const <String>['money'],
                     onSelect: () => setState(() => _lastPicked = 'Open Wallet'),
                   ),
-                  DsCommandItem(
+                  ElCommandItem(
                     label: 'Go to Stash',
                     onSelect: () => setState(() => _lastPicked = 'Go to Stash'),
                   ),
@@ -1217,71 +1201,10 @@ class _CommandSpecimenState extends State<_CommandSpecimen> {
               ),
             ],
           ),
-          SizedBox(height: ds(3)),
-          DsText(
+          SizedBox(height: el(3)),
+          ElText(
             picked == null ? 'Nothing picked yet' : 'Last picked: $picked',
-            DsType.small,
-            color: theme.mutedForeground,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// The live combobox.
-///
-/// The card sets are the package suite's own list, minus Eclipse Vault: that
-/// label already appears on the command palette above, and a docs page that
-/// printed the same string in two live specimens would make every assertion
-/// about it ambiguous.
-class _ComboboxSpecimen extends StatefulWidget {
-  const _ComboboxSpecimen();
-
-  @override
-  State<_ComboboxSpecimen> createState() => _ComboboxSpecimenState();
-}
-
-class _ComboboxSpecimenState extends State<_ComboboxSpecimen> {
-  static const List<DsComboboxItem<String>> _sets = <DsComboboxItem<String>>[
-    DsComboboxItem<String>(value: 'golden', label: 'Golden Rift'),
-    DsComboboxItem<String>(value: 'mystic', label: 'Mystic Surge'),
-    DsComboboxItem<String>(value: 'shadow', label: 'Shadow Core'),
-    DsComboboxItem<String>(value: 'celestial', label: 'Celestial Strike'),
-    DsComboboxItem<String>(value: 'origin', label: 'Origin Pulse'),
-  ];
-
-  String? _selected;
-
-  String? get _selectedLabel {
-    final String? value = _selected;
-    if (value == null) return null;
-    for (final DsComboboxItem<String> item in _sets) {
-      if (item.value == value) return item.label;
-    }
-    return null;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
-    final String? label = _selectedLabel;
-    return KeyedSubtree(
-      key: const ValueKey<String>('command-doc-combobox-specimen'),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          DsCombobox<String>(
-            items: _sets,
-            value: _selected,
-            onChanged: (String next) => setState(() => _selected = next),
-            placeholder: 'Search sets...',
-            emptyLabel: 'No set by that name.',
-          ),
-          SizedBox(height: ds(3)),
-          DsText(
-            label == null ? 'Nothing selected yet' : 'Selected: $label',
-            DsType.small,
+            ElType.small,
             color: theme.mutedForeground,
           ),
         ],

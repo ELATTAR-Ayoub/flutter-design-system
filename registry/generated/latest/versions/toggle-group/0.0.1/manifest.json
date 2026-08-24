@@ -1,0 +1,33 @@
+{
+  "name": "toggle-group",
+  "type": "component",
+  "version": "0.0.1",
+  "description": "`components/ui/toggle-group.tsx` — three mutually exclusive options and one",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/toggle_group.dart",
+      "target": "@ui/toggle_group.dart",
+      "sha256": "d0b3d62d1338f6c2ab3098141d6c13a2ecedb85a351681a5dcee442794aa1ee5"
+    }
+  ],
+  "registryDependencies": [
+    "machine-surface",
+    "sliding-pill",
+    "source-foundation",
+    "toggle"
+  ],
+  "semanticDependencies": [
+    "machine-surface",
+    "sliding-pill",
+    "toggle"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "documentationRoute": "/components/toggle-group",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/toggle_group.dart",
+  "deprecated": false
+}

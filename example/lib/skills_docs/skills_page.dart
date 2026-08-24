@@ -77,7 +77,7 @@ class SkillsPage extends StatelessWidget {
         title: skill.title,
         description: skill.description,
       ),
-      breadcrumbs: const <DsBreadcrumbEntry>[DsBreadcrumbEntry.page('Skills')],
+      breadcrumbs: const <ElBreadcrumbEntry>[ElBreadcrumbEntry.page('Skills')],
       sidebar: _sidebar(skill.route),
       toc: const <DocsTocEntry>[
         DocsTocEntry(title: 'Overview', anchor: 'overview'),
@@ -132,17 +132,17 @@ class _SkillArticle extends StatelessWidget {
         key: docsAnchorKey('overview'),
         child: _OverviewPanel(entry: entry),
       ),
-      SizedBox(height: ds(6)),
+      SizedBox(height: el(6)),
       KeyedSubtree(
         key: docsAnchorKey('agents'),
         child: _AgentsPanel(entry: entry),
       ),
-      SizedBox(height: ds(6)),
+      SizedBox(height: el(6)),
       KeyedSubtree(
         key: docsAnchorKey('install'),
         child: _InstallPanel(entry: entry),
       ),
-      SizedBox(height: ds(6)),
+      SizedBox(height: el(6)),
       KeyedSubtree(
         key: docsAnchorKey('files'),
         child: DocsFileTree(
@@ -155,7 +155,7 @@ class _SkillArticle extends StatelessWidget {
           files: _files,
         ),
       ),
-      SizedBox(height: ds(6)),
+      SizedBox(height: el(6)),
       KeyedSubtree(
         key: docsAnchorKey('version'),
         child: _VersionPanel(entry: entry),
@@ -171,23 +171,23 @@ class _OverviewPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return Semantics(
       key: const ValueKey<String>('skill-overview'),
       container: true,
       label: 'Overview',
-      child: DsPanel(
+      child: ElPanel(
         label: 'Overview',
         note: '${entry.workflow.length} workflow steps',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            DsText(entry.summary, DsType.body, color: theme.foreground),
-            SizedBox(height: ds(5)),
-            DsText('WORKFLOW', DsType.label, color: theme.mutedForeground),
-            SizedBox(height: ds(3)),
+            ElText(entry.summary, ElType.body, color: theme.foreground),
+            SizedBox(height: el(5)),
+            ElText('WORKFLOW', ElType.label, color: theme.mutedForeground),
+            SizedBox(height: el(3)),
             for (int i = 0; i < entry.workflow.length; i++) ...<Widget>[
-              if (i > 0) SizedBox(height: ds(2)),
+              if (i > 0) SizedBox(height: el(2)),
               _WorkflowStep(index: i + 1, text: entry.workflow[i]),
             ],
           ],
@@ -205,7 +205,7 @@ class _WorkflowStep extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return Semantics(
       container: true,
       label: 'Step $index: $text',
@@ -213,14 +213,14 @@ class _WorkflowStep extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           SizedBox(
-            width: ds(6),
-            child: DsText(
+            width: el(6),
+            child: ElText(
               '$index.',
-              DsType.small,
+              ElType.small,
               color: theme.mutedForeground,
             ),
           ),
-          Expanded(child: DsText(text, DsType.small)),
+          Expanded(child: ElText(text, ElType.small)),
         ],
       ),
     );
@@ -234,29 +234,29 @@ class _AgentsPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return Semantics(
       key: const ValueKey<String>('skill-agents'),
       container: true,
       label: 'Supported agents',
-      child: DsPanel(
+      child: ElPanel(
         label: 'Supported agents',
         note: '${entry.supportedAgents.length} verified',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            DsRow(
+            ElRow(
               children: <Widget>[
                 for (final String agent in entry.supportedAgents)
-                  DsBadge(label: agent, variant: DsBadgeVariant.success),
+                  ElBadge(label: agent, variant: ElBadgeVariant.success),
               ],
             ),
-            SizedBox(height: ds(3)),
-            DsText(
+            SizedBox(height: el(3)),
+            ElText(
               'This skill is written for, and verified only against, the '
               'harness named above. No other agent harness has a recorded '
               'install route, so none is claimed here.',
-              DsType.small,
+              ElType.small,
               color: theme.mutedForeground,
             ),
           ],
@@ -273,25 +273,25 @@ class _InstallPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return Semantics(
       key: const ValueKey<String>('skill-install'),
       container: true,
       label: 'Install and manage',
-      child: DsPanel(
+      child: ElPanel(
         label: 'Install & manage',
         note: '${entry.installRoutes.length} routes',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            DsText(
+            ElText(
               entry.licenseStatus,
-              DsType.small,
+              ElType.small,
               color: theme.mutedForeground,
             ),
             for (final SkillInstallRoute route
                 in entry.installRoutes) ...<Widget>[
-              SizedBox(height: ds(6)),
+              SizedBox(height: el(6)),
               _RoutePanel(route: route),
             ],
           ],
@@ -310,18 +310,18 @@ class _RoutePanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return Semantics(
       container: true,
       label:
           '${route.title}, ${_pending ? 'pending verification' : 'works today'}',
       child: Container(
         key: ValueKey<String>('skill-route:${route.id}'),
-        padding: EdgeInsets.all(ds(5)),
+        padding: EdgeInsets.all(el(5)),
         decoration: BoxDecoration(
           color: theme.card,
-          borderRadius: BorderRadius.circular(DsRadii.lg),
-          border: Border.all(color: theme.border, width: DsWidths.hairline),
+          borderRadius: BorderRadius.circular(ElRadii.lg),
+          border: Border.all(color: theme.border, width: ElWidths.hairline),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -329,26 +329,26 @@ class _RoutePanel extends StatelessWidget {
             Wrap(
               alignment: WrapAlignment.spaceBetween,
               crossAxisAlignment: WrapCrossAlignment.center,
-              runSpacing: ds(2),
-              spacing: ds(3),
+              runSpacing: el(2),
+              spacing: el(3),
               children: <Widget>[
-                DsText(route.title, DsType.label, color: theme.foreground),
-                DsBadge(
+                ElText(route.title, ElType.label, color: theme.foreground),
+                ElBadge(
                   label: _pending ? 'Pending verification' : 'Works today',
                   variant: _pending
-                      ? DsBadgeVariant.warning
-                      : DsBadgeVariant.success,
+                      ? ElBadgeVariant.warning
+                      : ElBadgeVariant.success,
                 ),
               ],
             ),
-            SizedBox(height: ds(2)),
-            DsText(route.summary, DsType.small, color: theme.mutedForeground),
+            SizedBox(height: el(2)),
+            ElText(route.summary, ElType.small, color: theme.mutedForeground),
             if (route.blockedBy != null) ...<Widget>[
-              SizedBox(height: ds(3)),
-              DsNote(
-                tone: DsNoteTone.error,
+              SizedBox(height: el(3)),
+              ElNote(
+                tone: ElNoteTone.error,
                 title: 'Pending',
-                child: DsText(route.blockedBy!, DsType.small),
+                child: ElText(route.blockedBy!, ElType.small),
               ),
             ],
             _RouteAction(label: 'Install', commands: route.install),
@@ -376,23 +376,23 @@ class _RouteAction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (commands.isEmpty && note == null) return const SizedBox.shrink();
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return Padding(
-      padding: EdgeInsets.only(top: ds(4)),
+      padding: EdgeInsets.only(top: el(4)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          DsText(
+          ElText(
             label.toUpperCase(),
-            DsType.label,
+            ElType.label,
             color: theme.mutedForeground,
           ),
-          SizedBox(height: ds(2)),
+          SizedBox(height: el(2)),
           if (commands.isEmpty)
-            DsText(note!, DsType.small, color: theme.mutedForeground)
+            ElText(note!, ElType.small, color: theme.mutedForeground)
           else
             for (int i = 0; i < commands.length; i++) ...<Widget>[
-              if (i > 0) SizedBox(height: ds(3)),
+              if (i > 0) SizedBox(height: el(3)),
               _CommandBlock(command: commands[i]),
             ],
         ],
@@ -408,7 +408,7 @@ class _CommandBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     // Mapped onto `docs_code.dart`'s own command type rather than a
     // hand-rolled equivalent: see that file's `DocsCodeCommand` and this
     // page's library doc.
@@ -420,16 +420,16 @@ class _CommandBlock extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        DsText(docsCommand.label, DsType.small, color: theme.foreground),
+        ElText(docsCommand.label, ElType.small, color: theme.foreground),
         if (docsCommand.description != null) ...<Widget>[
-          SizedBox(height: ds(1)),
-          DsText(
+          SizedBox(height: el(1)),
+          ElText(
             docsCommand.description!,
-            DsType.small,
+            ElType.small,
             color: theme.mutedForeground,
           ),
         ],
-        SizedBox(height: ds(2)),
+        SizedBox(height: el(2)),
         DocsSelectableCodeBlock(
           key: ValueKey<String>('skill-command:${docsCommand.command}'),
           code: docsCommand.command,

@@ -1,17 +1,16 @@
 /// Tests for `components_docs/scroll_area/page.dart`'s [ScrollAreaDocPage]:
-/// the ONE page documenting THREE layout components: [DsScrollArea],
-/// [DsResizablePanelGroup], and [DsAspectRatio].
+/// [ElScrollArea] only. `ElResizablePanelGroup` and `ElAspectRatio` were
+/// split off into their own routes and their own test files
+/// (`resizable_test.dart`, `aspect_ratio_test.dart`); see
+/// `scroll_area/meta.dart`'s library note for the split.
 ///
-/// All three read from `lib/src/components/scroll_area.dart`,
-/// `resizable.dart`, and `aspect_ratio.dart` directly, every public class,
-/// enum, and constructor parameter enumerated below is one this page's API
-/// tables must cover.
-///
-/// The completeness test checks each class's own [DocsApiTable] by title.
+/// Reads `lib/src/components/scroll_area.dart` directly; every public
+/// class, enum, and constructor parameter enumerated below is one this
+/// page's API tables must cover.
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`. The live
-/// `DsThemeController` is flipped in place for theme coverage.
+/// `ElThemeController` is flipped in place for theme coverage.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
@@ -19,48 +18,41 @@ import 'package:example/components_docs/scroll_area/meta.dart';
 import 'package:example/components_docs/scroll_area/page.dart';
 import 'package:example/docs/docs_code.dart';
 import 'package:example/docs/docs_facts.dart';
-import 'package:example/kit.dart' show DsSection;
+import 'package:example/kit.dart' show ElSection;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 const Size _wide = Size(1440, 900);
 const Size _narrow = Size(390, 844);
 
-/// Every `DsApiTable` this page must render, by title, and every public
+/// Every `ElApiTable` this page must render, by title, and every public
 /// constructor parameter or static member of that class, read directly off
-/// `lib/src/components/scroll_area.dart`, `resizable.dart`, and
-/// `aspect_ratio.dart`.
+/// `lib/src/components/scroll_area.dart`.
 const Map<String, List<String>> _expectedApiTables = <String, List<String>>{
-  // ── scroll_area.dart ──
-  'DsScrollArea': <String>[
+  'ElScrollArea': <String>[
     'child',
     'borderRadius',
     'horizontalBar',
     'controller',
   ],
-  'DsScrollAreaBehavior': <String>['DsScrollAreaBehavior'],
-  // ── resizable.dart ──
-  'DsResizablePanelGroup': <String>['panels', 'withHandle', 'minHeight'],
-  'DsResizablePanel': <String>['child', 'defaultSize', 'minSize'],
-  // ── aspect_ratio.dart ──
-  'DsAspectRatio': <String>['ratio', 'child', 'margin'],
+  'ElScrollAreaBehavior': <String>['ElScrollAreaBehavior'],
 };
 
-Future<DsThemeController> _pump(
+Future<ElThemeController> _pump(
   WidgetTester tester, {
   Size size = _wide,
-  DsThemeMode mode = DsThemeMode.dark,
+  ElThemeMode mode = ElThemeMode.dark,
   ValueChanged<String>? onNavigate,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final DsThemeController theme = DsThemeController(mode: mode);
+  final ElThemeController theme = ElThemeController(mode: mode);
   addTearDown(theme.dispose);
 
   await tester.pumpWidget(
-    DsTheme(
+    ElTheme(
       controller: theme,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -79,27 +71,21 @@ Future<DsThemeController> _pump(
 void main() {
   testWidgets(
     'sections render in the shadcn-mirrored order, section for section, '
-    'with each of the three families\' own sections grouped under its own '
-    'name',
+    'with no leftover Resizable/Aspect ratio section from the merged page',
     (WidgetTester tester) async {
       await _pump(tester);
 
       final List<String> titles = tester
-          .widgetList<DsSection>(find.byType(DsSection))
-          .map((DsSection section) => section.title)
+          .widgetList<ElSection>(find.byType(ElSection))
+          .map((ElSection section) => section.title)
           .toList();
 
       expect(titles, <String>[
         'Installation',
         'Usage',
         'Composition',
-        'Scroll area: Horizontal scrolling',
-        'Scroll area: RTL',
-        'Resizable: Handle',
-        'Resizable: RTL',
-        'Aspect ratio: Square',
-        'Aspect ratio: Portrait',
-        'Aspect ratio: RTL',
+        'Horizontal scrolling',
+        'RTL',
         'API Reference',
         'States',
         'Accessibility',
@@ -108,14 +94,6 @@ void main() {
         'Theming',
         'Source',
       ]);
-
-      // The exact-order equality above already proves the old house shape
-      // (Overview, Status, Preview, Variants) is gone: any leftover section
-      // would show up as an extra or misplaced title. DsSection is the only
-      // heading-producing wrapper on this page, so no separate find.text
-      // check is needed (and 'Preview' is also DocsCodeExample's own
-      // internal tab label, so a bare find.text('Preview') would be
-      // ambiguous rather than meaningful).
     },
   );
 
@@ -148,8 +126,8 @@ void main() {
   );
 
   testWidgets(
-    'each DsApiTable covers every public constructor parameter and static '
-    'of its own class, across all three components',
+    'each ElApiTable covers every public constructor parameter and static '
+    'of ElScrollArea',
     (WidgetTester tester) async {
       await _pump(tester);
 
@@ -171,7 +149,7 @@ void main() {
         expect(
           documented,
           isNotNull,
-          reason: 'no DsApiTable titled "${expected.key}" was rendered',
+          reason: 'no ElApiTable titled "${expected.key}" was rendered',
         );
         for (final String param in expected.value) {
           expect(
@@ -181,125 +159,101 @@ void main() {
           );
         }
       }
+
+      // No leftover ElResizablePanelGroup/ElAspectRatio tables from the
+      // pre-split page.
+      expect(byTitle.containsKey('ElResizablePanelGroup'), isFalse);
+      expect(byTitle.containsKey('ElResizablePanel'), isFalse);
+      expect(byTitle.containsKey('ElAspectRatio'), isFalse);
     },
   );
 
   testWidgets(
-    'DsScrollArea renders the scroll container with content that can scroll',
+    'ElScrollArea renders the scroll container with content that can scroll',
     (WidgetTester tester) async {
       await _pump(tester);
 
-      // The preview shows a scroll area with multiple items. Verify the
-      // container exists and is scrollable.
       final Finder scrollArea = find.byKey(
         const ValueKey<String>('scroll-area-doc-preview'),
       );
       expect(scrollArea, findsOneWidget);
       expect(tester.takeException(), isNull);
+      expect(find.byType(ElResizablePanelGroup), findsNothing);
+      expect(find.byType(ElAspectRatio), findsNothing);
     },
   );
-
-  testWidgets(
-    'DsResizablePanelGroup renders resizable panels with a draggable '
-    'separator, in the live demo and the Handle and RTL specimens',
-    (WidgetTester tester) async {
-      await _pump(tester);
-
-      // Live demo, Resizable: Handle (two groups), Resizable: RTL.
-      final Finder panelGroup = find.byType(DsResizablePanelGroup);
-      expect(panelGroup, findsAtLeastNWidgets(4));
-
-      // The group should render and be ready for interaction.
-      expect(tester.takeException(), isNull);
-    },
-  );
-
-  testWidgets('DsAspectRatio locks a box to the specified ratio', (
-    WidgetTester tester,
-  ) async {
-    await _pump(tester);
-
-    final Finder aspectRatio = find.byType(DsAspectRatio);
-    expect(aspectRatio, findsWidgets);
-
-    // Verify the aspect ratio widgets render with no exceptions.
-    expect(tester.takeException(), isNull);
-  });
 
   testWidgets(
     'both themes render the article with no exceptions when flipped in '
     'place',
     (WidgetTester tester) async {
-      final DsThemeController theme = await _pump(
+      final ElThemeController theme = await _pump(
         tester,
-        mode: DsThemeMode.light,
+        mode: ElThemeMode.light,
       );
       expect(find.text(scrollAreaDoc.title), findsWidgets);
 
-      theme.setMode(DsThemeMode.dark);
+      theme.setMode(ElThemeMode.dark);
       await tester.pump();
       expect(find.text(scrollAreaDoc.title), findsWidgets);
       expect(tester.takeException(), isNull);
     },
   );
 
-  testWidgets(
-    'installation is honest that none of the three has a registry manifest '
-    'yet, no elattar add command is presented as working',
-    (WidgetTester tester) async {
-      await _pump(tester);
+  testWidgets('installation presents the working scroll-area CLI command', (
+    WidgetTester tester,
+  ) async {
+    await _pump(tester);
 
-      expect(find.textContaining('Not available'), findsWidgets);
-      expect(find.textContaining('elattar add scroll-area'), findsNothing);
-      expect(find.textContaining('elattar add resizable'), findsNothing);
-      expect(find.textContaining('elattar add aspect-ratio'), findsNothing);
-    },
-  );
+    expect(find.textContaining('elattar add scroll-area'), findsWidgets);
+  });
 
-  testWidgets(
-    'the state matrix documents rest, hover, drag, focus with N/A reasons '
-    'where a state belongs to one family and not the others',
-    (WidgetTester tester) async {
-      await _pump(tester);
+  testWidgets('the state matrix documents rest, hover, and drag', (
+    WidgetTester tester,
+  ) async {
+    await _pump(tester);
 
-      final DocsStateMatrix matrix = tester.widget<DocsStateMatrix>(
-        find.byType(DocsStateMatrix),
-      );
-      final Set<String> states = matrix.facts
-          .map((DocsStateFact fact) => fact.state)
-          .toSet();
+    final DocsStateMatrix matrix = tester.widget<DocsStateMatrix>(
+      find.byType(DocsStateMatrix),
+    );
+    final Set<String> states = matrix.facts
+        .map((DocsStateFact fact) => fact.state)
+        .toSet();
 
-      for (final String expected in <String>[
-        'Rest',
-        'Hover',
-        'Drag',
-        'Focus',
-      ]) {
-        expect(
-          states,
-          contains(expected),
-          reason: 'state matrix is missing the "$expected" row',
-        );
-      }
-    },
-  );
-
-  testWidgets(
-    'the three families are documented with their public names and exports',
-    (WidgetTester tester) async {
-      await _pump(tester);
-
-      expect(scrollAreaDoc.name, 'scroll_area');
+    for (final String expected in <String>['Rest', 'Hover', 'Drag']) {
       expect(
-        scrollAreaDoc.exports,
-        containsAll(<String>[
-          'DsScrollArea',
-          'DsResizablePanelGroup',
-          'DsResizablePanel',
-          'DsAspectRatio',
-        ]),
+        states,
+        contains(expected),
+        reason: 'state matrix is missing the "$expected" row',
       );
-      expect(tester.takeException(), isNull);
+    }
+  });
+
+  testWidgets(
+    'the pager navigates through DocsLayout.onNavigate, back to Resizable '
+    'and forward to Layout',
+    (WidgetTester tester) async {
+      String? destination;
+      await _pump(tester, onNavigate: (String route) => destination = route);
+
+      final Finder resizableLink = find.text('Resizable').first;
+      await tester.ensureVisible(resizableLink);
+      await tester.pump();
+      await tester.tap(resizableLink);
+      expect(destination, '/components/resizable');
     },
   );
+
+  testWidgets('the component is documented with its public name and exports', (
+    WidgetTester tester,
+  ) async {
+    await _pump(tester);
+
+    expect(scrollAreaDoc.name, 'scroll_area');
+    expect(
+      scrollAreaDoc.exports,
+      containsAll(<String>['ElScrollArea', 'ElScrollAreaBehavior']),
+    );
+    expect(tester.takeException(), isNull);
+  });
 }

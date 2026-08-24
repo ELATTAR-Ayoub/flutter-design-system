@@ -10,7 +10,7 @@
 /// `--font-sans` is `"Inter Local"`, the woff2 behind it is genuinely Inter
 /// Variable, and there is no Space Grotesk asset anywhere in the reference.
 /// The recorded decision is *fonts follow tokens, copy follows the reference*:
-/// this page renders [DsFonts.sans] (Inter) and still says Space Grotesk,
+/// this page renders [ElFonts.sans] (Inter) and still says Space Grotesk,
 /// exactly as the reference does. Two more of its own claims are kept the same
 /// way: "Nine classes" over ten specimen rows, and `.type-micro` called "the
 /// floor … never smaller" while `.type-tag` ships a step below it.
@@ -34,7 +34,7 @@ import '../nav.dart';
 ///
 /// 15rem is 240px, which is `--width-rail`; the reference writes the length
 /// rather than the token, and they are the same measure.
-const double _specColumn = DsWidths.rail;
+const double _specColumn = ElWidths.rail;
 
 /// The four figures both columns of the tabular demo print, in source order.
 const List<String> _tabularValues = <String>[
@@ -52,12 +52,12 @@ class TypographyPage extends StatelessWidget {
   Widget build(BuildContext context) {
     // `findCategory("foundations", "typography")`: the header's copy is the
     // nav registry's, so the page cannot drift from the tree that links to it.
-    final DsCategoryHit here = findCategory('foundations', 'typography');
+    final ElCategoryHit here = findCategory('foundations', 'typography');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        DsPageHeader(
+        ElPageHeader(
           eyebrow: here.group.title,
           title: here.category.title,
           blurb: here.category.blurb,
@@ -68,10 +68,10 @@ class TypographyPage extends StatelessWidget {
         const _NumericScaleSection(),
         const _PairingSection(),
         const _ProseSection(),
-        const DsSection(
+        const ElSection(
           id: 'rules',
           title: 'Rules',
-          child: DsDoDont(
+          child: ElDoDont(
             dos: <String>[
               'Always apply a .type-* or .type-num-* class — never a raw pixel size in a utility.',
               'Put numerical values in the Geist Mono type-num foundation so comparable figures stay tabular.',
@@ -86,7 +86,7 @@ class TypographyPage extends StatelessWidget {
             ],
           ),
         ),
-        const DsPageFootNav(groupId: 'foundations', slug: 'typography'),
+        const ElPageFootNav(groupId: 'foundations', slug: 'typography'),
       ],
     );
   }
@@ -100,9 +100,9 @@ class _RuleSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
 
-    return DsSection(
+    return ElSection(
       id: 'rule',
       title: 'Two foundation faces',
       description:
@@ -111,10 +111,10 @@ class _RuleSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          DsGrid(
+          ElGrid(
             sm: 2,
             children: <Widget>[
-              DsPanel(
+              ElPanel(
                 // Says Space Grotesk; renders Inter. See the library note.
                 label: 'Space Grotesk — words',
                 child: _FaceSpecimen(
@@ -123,15 +123,15 @@ class _RuleSection extends StatelessWidget {
                       'Headings, body, buttons, labels, navigation, card names, '
                       'pack names. A geometric grotesk: technical enough to feel '
                       'engineered, open enough to stay readable at 11px.',
-                  specimen: DsText(
+                  specimen: ElText(
                     'Aa',
-                    DsType.display,
-                    fontSize: DsFluid.display(context),
+                    ElType.display,
+                    fontSize: ElFluid.display(context),
                     color: theme.foreground,
                   ),
                 ),
               ),
-              DsPanel(
+              ElPanel(
                 label: 'Geist Mono — numerical values',
                 child: _FaceSpecimen(
                   token: '--font-mono',
@@ -139,30 +139,31 @@ class _RuleSection extends StatelessWidget {
                       'Prices, balances, dates, quantities, statistics, serials '
                       'and code. Numerical variants are tabular so aligned '
                       'values do not jitter.',
-                  specimen: DsText('0123', DsType.numXl, color: theme.valueInk),
+                  specimen: ElText('0123', ElType.numXl, color: theme.valueInk),
                 ),
               ),
             ],
           ),
-          SizedBox(height: ds(4)),
-          DsNote(
+          SizedBox(height: el(4)),
+          ElNote(
             title: 'The rule',
-            child: DsRichText(
+            child: ElRichText(
               TextSpan(
                 children: <InlineSpan>[
                   const TextSpan(text: 'Words use Space Grotesk through '),
-                  DsCode.span('.type-*'),
+                  ElCode.span('.type-*'),
                   const TextSpan(
                     text: '. Numerical values use Geist Mono through ',
                   ),
-                  DsCode.span('.type-num-*'),
+                  ElCode.span('.type-num-*'),
                   const TextSpan(
-                    text: '. Each named foundation owns its complete font, '
+                    text:
+                        '. Each named foundation owns its complete font, '
                         'size, line-height, weight and tracking.',
                   ),
                 ],
               ),
-              DsType.small,
+              ElType.small,
             ),
           ),
         ],
@@ -188,16 +189,16 @@ class _FaceSpecimen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         specimen,
-        SizedBox(height: ds(5)),
-        DsText(copy, DsType.small),
-        SizedBox(height: ds(4)),
-        DsText(token, DsType.code, color: theme.mutedForeground),
+        SizedBox(height: el(5)),
+        ElText(copy, ElType.small),
+        SizedBox(height: el(4)),
+        ElText(token, ElType.code, color: theme.mutedForeground),
       ],
     );
   }
@@ -209,7 +210,7 @@ class _FaceSpecimen extends StatelessWidget {
 ///
 /// `grid gap-4 border-b border-border px-6 py-7 last:border-b-0
 /// lg:grid-cols-[15rem_1fr] lg:gap-8`: the hairline and the corner clipping
-/// belong to the [DsDividedList] these are stacked in, so this is the cell
+/// belong to the [ElDividedList] these are stacked in, so this is the cell
 /// padding and the two-column split only.
 class _Spec extends StatelessWidget {
   const _Spec({required this.cls, required this.use, required this.child});
@@ -223,20 +224,20 @@ class _Spec extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
-    final bool wide = MediaQuery.sizeOf(context).width >= DsBreakpoints.lg;
+    final ElThemeData theme = ElTheme.of(context);
+    final bool wide = MediaQuery.sizeOf(context).width >= ElBreakpoints.lg;
 
     final Widget meta = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        DsText('.$cls', DsType.code, color: theme.actionInk),
-        SizedBox(height: ds(2)),
-        DsText(use, DsType.small),
+        ElText('.$cls', ElType.code, color: theme.actionInk),
+        SizedBox(height: el(2)),
+        ElText(use, ElType.small),
       ],
     );
 
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: ds(6), vertical: ds(7)),
+      padding: EdgeInsets.symmetric(horizontal: el(6), vertical: el(7)),
       child: wide
           ? IntrinsicHeight(
               child: Row(
@@ -245,7 +246,7 @@ class _Spec extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
                   SizedBox(width: _specColumn, child: meta),
-                  SizedBox(width: ds(8)),
+                  SizedBox(width: el(8)),
                   Expanded(
                     child: Align(alignment: Alignment.centerLeft, child: child),
                   ),
@@ -254,7 +255,11 @@ class _Spec extends StatelessWidget {
             )
           : Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[meta, SizedBox(height: ds(4)), child],
+              children: <Widget>[
+                meta,
+                SizedBox(height: el(4)),
+                child,
+              ],
             ),
     );
   }
@@ -268,58 +273,59 @@ class _WordScaleSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
 
-    return DsSection(
+    return ElSection(
       id: 'words',
       title: 'Word scale',
       description:
           'Nine classes cover every piece of text in the product. Display is '
           'reserved for the landing hero and pack-opening moments — nothing '
           'else earns it.',
-      child: DsDividedList(
-        radius: DsRadii.xl,
+      child: ElDividedList(
+        radius: ElRadii.xl,
         children: <Widget>[
           _Spec(
             cls: 'type-display',
             use: 'Landing hero. Pack-opening reveal. Once per page, at most.',
-            child: DsText(
+            child: ElText(
               'Pull something legendary',
-              DsType.display,
-              fontSize: DsFluid.display(context),
+              ElType.display,
+              fontSize: ElFluid.display(context),
               color: theme.foreground,
             ),
           ),
           _Spec(
             cls: 'type-h1',
             use: 'The page heading. Exactly one per screen.',
-            child: DsText(
+            child: ElText(
               'Pack Marketplace',
-              DsType.h1,
-              fontSize: DsFluid.h1(context),
+              ElType.h1,
+              fontSize: ElFluid.h1(context),
               color: theme.foreground,
             ),
           ),
           _Spec(
             cls: 'type-h2',
-            use: 'Major page sections — Featured Packs, Live Pulls, Top Grails.',
-            child: DsText('Featured Packs', DsType.h2, color: theme.foreground),
+            use:
+                'Major page sections — Featured Packs, Live Pulls, Top Grails.',
+            child: ElText('Featured Packs', ElType.h2, color: theme.foreground),
           ),
           _Spec(
             cls: 'type-h3',
             use: 'Card titles, module headings, modal titles.',
-            child: DsText(
+            child: ElText(
               'Eclipse Vault — Series I',
-              DsType.h3,
+              ElType.h3,
               color: theme.foreground,
             ),
           ),
           _Spec(
             cls: 'type-h4',
             use: 'Pack names on cards, collectible card names, row titles.',
-            child: DsText(
+            child: ElText(
               'Voidwing Ascendant',
-              DsType.h4,
+              ElType.h4,
               color: theme.foreground,
             ),
           ),
@@ -329,41 +335,42 @@ class _WordScaleSection extends StatelessWidget {
           _Spec(
             cls: 'type-lead',
             use: 'The sentence under a page heading. One per screen.',
-            child: DsText(
+            child: ElText(
               'Every pack lists its odds, its remaining supply and its top '
               'possible hit before you spend anything.',
-              DsType.lead,
+              ElType.lead,
             ),
           ),
           _Spec(
             cls: 'type-body',
             use: 'Standard interface copy, descriptions, dialog content.',
-            child: DsText(
+            child: ElText(
               'Cards land in your Stash the moment a pack finishes opening. '
               'From there you can keep them, sell them back at the listed '
               'value, or add them to a shipment.',
-              DsType.body,
+              ElType.body,
               color: theme.mutedForeground,
             ),
           ),
           _Spec(
             cls: 'type-small',
             use: 'Helper text, secondary detail, table cells, filter labels.',
-            child: DsText(
+            child: ElText(
               'Sell-back values are quoted at the time of sale and may move '
               'with the market.',
-              DsType.small,
+              ElType.small,
             ),
           ),
           _Spec(
             cls: 'type-label',
             use: 'Section eyebrows, panel labels, field labels, rarity names.',
-            child: DsText('Remaining supply', DsType.label),
+            child: ElText('Remaining supply', ElType.label),
           ),
           _Spec(
             cls: 'type-micro',
-            use: 'The floor. Badge text, pip captions, chart axes. Never smaller.',
-            child: DsText('Limited edition', DsType.micro),
+            use:
+                'The floor. Badge text, pip captions, chart axes. Never smaller.',
+            child: ElText('Limited edition', ElType.micro),
           ),
         ],
       ),
@@ -379,9 +386,9 @@ class _NumericScaleSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
 
-    return DsSection(
+    return ElSection(
       id: 'numbers',
       title: 'Numeric scale',
       description:
@@ -391,60 +398,63 @@ class _NumericScaleSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          DsDividedList(
-            radius: DsRadii.xl,
+          ElDividedList(
+            radius: ElRadii.xl,
             children: <Widget>[
               _Spec(
                 cls: 'type-num-xl',
-                use: 'Wallet available balance. Total inventory value. Hero figures.',
-                child: DsText(
+                use:
+                    'Wallet available balance. Total inventory value. Hero figures.',
+                child: ElText(
                   r'$12,480.65',
-                  DsType.numXl,
+                  ElType.numXl,
                   color: theme.foreground,
                 ),
               ),
               _Spec(
                 cls: 'type-num-lg',
-                use: 'Card value in the inspection modal. Reward amounts. Stat tiles.',
-                child: DsText(
+                use:
+                    'Card value in the inspection modal. Reward amounts. Stat tiles.',
+                child: ElText(
                   r'$1,240.00',
-                  DsType.numLg,
+                  ElType.numLg,
                   color: theme.valueInk,
                 ),
               ),
               _Spec(
                 cls: 'type-num-md',
                 use: 'Pack price. Card value on a tile. Leaderboard points.',
-                child: DsText(r'$48.00', DsType.numMd, color: theme.valueInk),
+                child: ElText(r'$48.00', ElType.numMd, color: theme.valueInk),
               ),
               _Spec(
                 cls: 'type-num',
                 use: 'Table figures, transaction amounts, quantities, odds.',
-                child: DsText('1,284', DsType.numBase, color: theme.foreground),
+                child: ElText('1,284', ElType.numBase, color: theme.foreground),
               ),
               _Spec(
                 cls: 'type-num-sm',
-                use: 'Timestamps, supply counters, token names, metadata figures.',
-                child: DsText(
+                use:
+                    'Timestamps, supply counters, token names, metadata figures.',
+                child: ElText(
                   '412 / 2,000',
-                  DsType.numSm,
+                  ElType.numSm,
                   color: theme.mutedForeground,
                 ),
               ),
             ],
           ),
-          SizedBox(height: ds(4)),
-          DsPanel(
+          SizedBox(height: el(4)),
+          ElPanel(
             label: 'Why tabular matters',
             note: 'font-variant-numeric: tabular-nums',
-            child: DsGrid(
+            child: ElGrid(
               sm: 2,
-              gap: ds(6),
+              gap: el(6),
               children: <Widget>[
                 _FigureColumn(
                   heading: 'Tabular — the product',
                   headingInk: theme.valueInk,
-                  spec: DsType.numBase,
+                  spec: ElType.numBase,
                   valueColor: theme.foreground,
                   caption:
                       'Decimal points align. Digits keep their column as values '
@@ -459,7 +469,7 @@ class _NumericScaleSection extends StatelessWidget {
                 _FigureColumn(
                   heading: 'Proportional — rejected',
                   headingInk: theme.destructiveInk,
-                  spec: DsType.section,
+                  spec: ElType.section,
                   caption:
                       'Proportional figures do not align, and every live update '
                       'nudges the layout.',
@@ -487,7 +497,7 @@ class _FigureColumn extends StatelessWidget {
   final Color headingInk;
 
   /// `.type-num` on the left, `.type-section` on the right.
-  final DsTypeSpec spec;
+  final ElTypeSpec spec;
 
   /// Only the tabular column states one; the rejected column takes the muted
   /// colour `.type-section` brings with it.
@@ -497,23 +507,23 @@ class _FigureColumn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        DsText(heading, DsType.label, color: headingInk),
-        SizedBox(height: ds(3)),
+        ElText(heading, ElType.label, color: headingInk),
+        SizedBox(height: el(3)),
         for (int i = 0; i < _tabularValues.length; i++) ...<Widget>[
           // `space-y-1.5`.
-          if (i > 0) SizedBox(height: ds(1.5)),
+          if (i > 0) SizedBox(height: el(1.5)),
           Container(
-            padding: EdgeInsets.only(bottom: ds(1.5)),
+            padding: EdgeInsets.only(bottom: el(1.5)),
             decoration: BoxDecoration(
               border: Border(
                 bottom: BorderSide(
                   color: theme.border,
-                  width: DsWidths.hairline,
+                  width: ElWidths.hairline,
                 ),
               ),
             ),
@@ -521,14 +531,14 @@ class _FigureColumn extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                DsText('Row', DsType.small),
-                DsText(_tabularValues[i], spec, color: valueColor),
+                ElText('Row', ElType.small),
+                ElText(_tabularValues[i], spec, color: valueColor),
               ],
             ),
           ),
         ],
-        SizedBox(height: ds(3)),
-        DsText(caption, DsType.small),
+        SizedBox(height: el(3)),
+        ElText(caption, ElType.small),
       ],
     );
   }
@@ -542,32 +552,32 @@ class _PairingSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
 
-    return DsSection(
+    return ElSection(
       id: 'pairing',
       title: 'Pairing the foundations',
       description:
           'Words stay in Space Grotesk while numerical values use Geist Mono. '
           'The named classes carry each treatment without page-level '
           'typography values.',
-      child: DsPanel(
+      child: ElPanel(
         label: 'Canonical pairings',
-        child: DsGrid(
+        child: ElGrid(
           sm: 2,
           lg: 3,
-          gap: ds(5),
+          gap: el(5),
           children: <Widget>[
             _PairingCard(
               label: 'Pack price',
-              figure: DsText(r'$48.00', DsType.numMd, color: theme.valueInk),
+              figure: ElText(r'$48.00', ElType.numMd, color: theme.valueInk),
               caption: const TextSpan(text: '6 cards per pack'),
             ),
             _PairingCard(
               label: 'Available balance',
-              figure: DsText(
+              figure: ElText(
                 r'$1,204.80',
-                DsType.numLg,
+                ElType.numLg,
                 color: theme.foreground,
               ),
               caption: TextSpan(
@@ -582,7 +592,7 @@ class _PairingSection extends StatelessWidget {
             ),
             _PairingCard(
               label: 'Legendary odds',
-              figure: DsText('1 in 240', DsType.numMd, color: theme.foreground),
+              figure: ElText('1 in 240', ElType.numMd, color: theme.foreground),
               caption: const TextSpan(text: '0.42% per card'),
             ),
           ],
@@ -608,23 +618,23 @@ class _PairingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
 
     return Container(
-      padding: EdgeInsets.all(ds(5)),
+      padding: EdgeInsets.all(el(5)),
       decoration: BoxDecoration(
         color: theme.card,
-        borderRadius: BorderRadius.circular(DsRadii.lg),
-        border: Border.all(color: theme.border, width: DsWidths.hairline),
+        borderRadius: BorderRadius.circular(ElRadii.lg),
+        border: Border.all(color: theme.border, width: ElWidths.hairline),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          DsText(label, DsType.label),
-          SizedBox(height: ds(2)),
+          ElText(label, ElType.label),
+          SizedBox(height: el(2)),
           figure,
-          SizedBox(height: ds(1)),
-          DsRichText(caption, DsType.small),
+          SizedBox(height: el(1)),
+          ElRichText(caption, ElType.small),
         ],
       ),
     );
@@ -639,18 +649,20 @@ class _ProseSection extends StatelessWidget {
   const _ProseSection();
 
   /// `Meta`: six rows, verbatim.
-  static const List<DsMetaItem> _meta = <DsMetaItem>[
+  static const List<ElMetaItem> _meta = <ElMetaItem>[
     (
       k: 'What it owns',
       v: TextSpan(
-        text: 'Vertical rhythm on the 8-point scale, list markers and indents, '
+        text:
+            'Vertical rhythm on the 8-point scale, list markers and indents, '
             'link treatment, quote rule, and code and table chrome.',
       ),
     ),
     (
       k: 'Anchors',
       v: TextSpan(
-        text: 'Nothing. html carries scroll-padding-block-start: '
+        text:
+            'Nothing. html carries scroll-padding-block-start: '
             'var(--scroll-offset), derived from --height-site-header. A '
             'scroll-margin here as well would add to it — measured at 192px '
             'below a 64px header before it was removed.',
@@ -659,7 +671,8 @@ class _ProseSection extends StatelessWidget {
     (
       k: 'Wide tables scroll',
       v: TextSpan(
-        text: 'A table is display:block with width:max-content capped at 100%, '
+        text:
+            'A table is display:block with width:max-content capped at 100%, '
             "so it is its own scroll port on the system's thin rail. It takes "
             'content width rather than filling the measure — the trade for '
             'never being clipped, which is what happened at 375px before the '
@@ -669,7 +682,8 @@ class _ProseSection extends StatelessWidget {
     (
       k: 'What it does not own',
       v: TextSpan(
-        text: 'Sizes. Every one lives in the .type-* role it shares a '
+        text:
+            'Sizes. Every one lives in the .type-* role it shares a '
             'declaration block with. It also sets no max-width — the measure '
             'belongs to the page container, and two owners for one number is '
             'how --width-page spent months as prose on the Spacing page.',
@@ -678,7 +692,8 @@ class _ProseSection extends StatelessWidget {
     (
       k: '--width-prose',
       v: TextSpan(
-        text: '720px. Narrower than --width-content (1080px) because that '
+        text:
+            '720px. Narrower than --width-content (1080px) because that '
             'column carries specimens and panels beside the copy, while this '
             'one carries nothing but sentences.',
       ),
@@ -686,7 +701,8 @@ class _ProseSection extends StatelessWidget {
     (
       k: 'Headings start at h2',
       v: TextSpan(
-        text: "The page heading is the page's own h1. .prose styles h1 anyway, "
+        text:
+            "The page heading is the page's own h1. .prose styles h1 anyway, "
             'because an unstyled browser default is worse than a heading level '
             'used wrongly — but a document that opens with h2 is the '
             'convention.',
@@ -697,9 +713,9 @@ class _ProseSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // `bodyClassName="p-6 sm:p-10"`.
-    final bool wide = MediaQuery.sizeOf(context).width >= DsBreakpoints.sm;
+    final bool wide = MediaQuery.sizeOf(context).width >= ElBreakpoints.sm;
 
-    return DsSection(
+    return ElSection(
       id: 'prose',
       title: 'Prose',
       description:
@@ -711,46 +727,46 @@ class _ProseSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          DsPanel(
+          ElPanel(
             label: 'Long-form content',
             note: 'max-w-(--width-prose) · 720px',
-            bodyPadding: EdgeInsets.all(wide ? ds(10) : ds(6)),
+            bodyPadding: EdgeInsets.all(wide ? el(10) : el(6)),
             child: Align(
               alignment: Alignment.topLeft,
               child: ConstrainedBox(
                 // `max-w-(--width-prose)`: the measure, stated once.
-                constraints: const BoxConstraints(maxWidth: DsWidths.prose),
+                constraints: const BoxConstraints(maxWidth: ElWidths.prose),
                 child: const _Prose(),
               ),
             ),
           ),
-          SizedBox(height: ds(4)),
-          const DsMeta(items: _meta),
-          SizedBox(height: ds(4)),
-          DsNote(
-            tone: DsNoteTone.error,
+          SizedBox(height: el(4)),
+          const ElMeta(items: _meta),
+          SizedBox(height: el(4)),
+          ElNote(
+            tone: ElNoteTone.error,
             title: 'Two mechanisms that do not work',
-            child: DsRichText(
+            child: ElRichText(
               TextSpan(
                 children: <InlineSpan>[
-                  DsCode.span('@apply type-h2'),
+                  ElCode.span('@apply type-h2'),
                   const TextSpan(text: ' inside a '),
-                  DsCode.span('.prose h2'),
+                  ElCode.span('.prose h2'),
                   const TextSpan(text: ' rule fails the build outright — '),
                   const TextSpan(
                     text: 'Cannot apply unknown utility class',
                     style: TextStyle(fontStyle: FontStyle.italic),
                   ),
                   const TextSpan(text: ' — because '),
-                  DsCode.span('@apply'),
+                  ElCode.span('@apply'),
                   const TextSpan(text: ' reaches Tailwind utilities and '),
-                  DsCode.span('@utility'),
+                  ElCode.span('@utility'),
                   const TextSpan(
                     text: ' registrations, and the type scale lives in ',
                   ),
-                  DsCode.span('@layer components'),
+                  ElCode.span('@layer components'),
                   const TextSpan(text: '. The call-site spelling '),
-                  DsCode.span('[&_h2]:type-h2'),
+                  ElCode.span('[&_h2]:type-h2'),
                   const TextSpan(
                     text: ' is the same wall from the other side and fails ',
                   ),
@@ -759,13 +775,14 @@ class _ProseSection extends StatelessWidget {
                     style: TextStyle(fontStyle: FontStyle.italic),
                   ),
                   const TextSpan(
-                    text: ', which is the worse of the two: no error, no class, '
+                    text:
+                        ', which is the worse of the two: no error, no class, '
                         'every guard green, and the size quietly falling back '
                         'to inherited.',
                   ),
                 ],
               ),
-              DsType.small,
+              ElType.small,
             ),
           ),
         ],
@@ -797,79 +814,81 @@ class _Prose extends StatelessWidget {
 
   /// Stacks [blocks] with their margins collapsed.
   static Widget _column(List<_ProseBlock> blocks) => Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          for (int i = 0; i < blocks.length; i++) ...<Widget>[
-            if (i > 0)
-              SizedBox(height: math.max(blocks[i - 1].bottom, blocks[i].top)),
-            blocks[i].child,
-          ],
-        ],
-      );
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: <Widget>[
+      for (int i = 0; i < blocks.length; i++) ...<Widget>[
+        if (i > 0)
+          SizedBox(height: math.max(blocks[i - 1].bottom, blocks[i].top)),
+        blocks[i].child,
+      ],
+    ],
+  );
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     // `.prose { color: var(--foreground) }`: inherited by every element that
     // does not state a colour, which is all of them but the blockquote.
-    final TextStyle paragraph = DsText.styleOf(
+    final TextStyle paragraph = ElText.styleOf(
       context,
-      DsType.body,
+      ElType.body,
       color: theme.foreground,
     );
 
     return _column(<_ProseBlock>[
       // h2, `margin-block: 40px 16px`.
       (
-        top: ds(10),
-        bottom: ds(4),
-        child: DsText(
+        top: el(10),
+        bottom: el(4),
+        child: ElText(
           'Refunds and cancellations',
-          DsType.h2,
+          ElType.h2,
           color: theme.foreground,
         ),
       ),
       // p, `margin-block: 16px`.
       (
-        top: ds(4),
-        bottom: ds(4),
-        child: DsRichText(
+        top: el(4),
+        bottom: el(4),
+        child: ElRichText(
           TextSpan(
             children: <InlineSpan>[
               const TextSpan(
                 text: 'Every element here is unstyled markup inside a single ',
               ),
-              DsCode.span('prose'),
+              ElCode.span('prose'),
               const TextSpan(
-                text: ' wrapper. The heading above is the same declaration '
+                text:
+                    ' wrapper. The heading above is the same declaration '
                     'block as ',
               ),
-              DsCode.span('.type-h2'),
+              ElCode.span('.type-h2'),
               const TextSpan(
-                text: ' — not a copy of its size, the block itself — so '
+                text:
+                    ' — not a copy of its size, the block itself — so '
                     'retuning the scale moves both and neither can drift from '
                     'the other.',
               ),
             ],
           ),
-          DsType.body,
+          ElType.body,
           color: theme.foreground,
         ),
       ),
-      (top: ds(4), bottom: ds(4), child: const _ProseLinkParagraph()),
+      (top: el(4), bottom: el(4), child: const _ProseLinkParagraph()),
       // h3, `margin-block: 32px 12px`.
       (
-        top: ds(8),
-        bottom: ds(3),
-        child: DsText(
+        top: el(8),
+        bottom: el(3),
+        child: ElText(
           'What a reader is entitled to',
-          DsType.h3,
+          ElType.h3,
           color: theme.foreground,
         ),
       ),
       (
-        top: ds(4),
-        bottom: ds(4),
+        top: el(4),
+        bottom: el(4),
         child: _ProseList(
           style: paragraph,
           items: <_ProseListItem>[
@@ -888,8 +907,8 @@ class _Prose extends StatelessWidget {
         ),
       ),
       (
-        top: ds(4),
-        bottom: ds(4),
+        top: el(4),
+        bottom: el(4),
         child: _ProseQuote(
           'Nested lists take the interior step rather than the block step, so '
           'a sub-clause reads as part of its parent rather than as a new '
@@ -897,13 +916,13 @@ class _Prose extends StatelessWidget {
         ),
       ),
       (
-        top: ds(8),
-        bottom: ds(3),
-        child: DsText('Ordered steps', DsType.h3, color: theme.foreground),
+        top: el(8),
+        bottom: el(3),
+        child: ElText('Ordered steps', ElType.h3, color: theme.foreground),
       ),
       (
-        top: ds(4),
-        bottom: ds(4),
+        top: el(4),
+        bottom: el(4),
         child: _ProseList(
           ordered: true,
           style: paragraph,
@@ -921,45 +940,49 @@ class _Prose extends StatelessWidget {
       // `.type-label`, so it renders 11px uppercase muted, not 17px foreground.
       // `:where(.prose) h4` weighs one element; the class beats it.
       (
-        top: ds(6),
-        bottom: ds(2),
-        child: DsText('An explicit class still wins inside prose', DsType.label),
+        top: el(6),
+        bottom: el(2),
+        child: ElText(
+          'An explicit class still wins inside prose',
+          ElType.label,
+        ),
       ),
       (
-        top: ds(4),
-        bottom: ds(4),
-        child: DsRichText(
+        top: el(4),
+        bottom: el(4),
+        child: ElRichText(
           TextSpan(
             children: <InlineSpan>[
               const TextSpan(text: 'That heading is an '),
-              DsCode.span('h4'),
+              ElCode.span('h4'),
               const TextSpan(text: ' carrying '),
-              DsCode.span('.type-label'),
+              ElCode.span('.type-label'),
               const TextSpan(text: '. The prose selector is wrapped in '),
-              DsCode.span(':where()'),
+              ElCode.span(':where()'),
               const TextSpan(
-                text: ', so it weighs one element and any real class beats '
+                text:
+                    ', so it weighs one element and any real class beats '
                     'it — ',
               ),
-              DsCode.span('.prose'),
+              ElCode.span('.prose'),
               const TextSpan(text: ' is a default, not a cage.'),
             ],
           ),
-          DsType.body,
+          ElType.body,
           color: theme.foreground,
         ),
       ),
       // hr, `margin-block: 40px; border: 0; border-block-start: 1px solid
       // var(--border)`.
       (
-        top: ds(10),
-        bottom: ds(10),
+        top: el(10),
+        bottom: el(10),
         child: SizedBox(
-          height: DsWidths.hairline,
+          height: ElWidths.hairline,
           child: ColoredBox(color: theme.border),
         ),
       ),
-      (top: ds(4), bottom: ds(4), child: const _ProseTable()),
+      (top: el(4), bottom: el(4), child: const _ProseTable()),
     ]);
   }
 }
@@ -983,8 +1006,7 @@ class _ProseLinkParagraphState extends State<_ProseLinkParagraph> {
   @override
   void initState() {
     super.initState();
-    _tap = TapGestureRecognizer()
-      ..onTap = () => DsSection.scrollTo('prose');
+    _tap = TapGestureRecognizer()..onTap = () => ElSection.scrollTo('prose');
   }
 
   @override
@@ -995,20 +1017,21 @@ class _ProseLinkParagraphState extends State<_ProseLinkParagraph> {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
 
     return TweenAnimationBuilder<Color?>(
-      tween: ColorTween(end: _hovered ? dsTransparent : theme.actionInk),
-      duration: dsAnimationDuration(context, DsDurations.fast),
-      curve: DsCurves.out,
+      tween: ColorTween(end: _hovered ? elTransparent : theme.actionInk),
+      duration: elAnimationDuration(context, ElDurations.fast),
+      curve: ElCurves.out,
       builder: (BuildContext context, Color? underline, Widget? child) {
-        return DsRichText(
+        return ElRichText(
           TextSpan(
             children: <InlineSpan>[
               const TextSpan(text: 'Links take '),
-              DsCode.span('--color-action-ink'),
+              ElCode.span('--color-action-ink'),
               const TextSpan(
-                text: ', which is the only shade of the action ramp that reads '
+                text:
+                    ', which is the only shade of the action ramp that reads '
                     'in both themes, and they are underlined at rest because ',
               ),
               TextSpan(
@@ -1026,12 +1049,13 @@ class _ProseLinkParagraphState extends State<_ProseLinkParagraph> {
                     setState(() => _hovered = false),
               ),
               const TextSpan(
-                text: ' is one signal where the accessibility contract asks '
+                text:
+                    ' is one signal where the accessibility contract asks '
                     'for two.',
               ),
             ],
           ),
-          DsType.body,
+          ElType.body,
           color: theme.foreground,
         );
       },
@@ -1059,7 +1083,7 @@ class _ProseList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     // `li::marker { color: var(--muted-foreground) }`.
     final TextStyle marker = style.copyWith(color: theme.mutedForeground);
 
@@ -1068,17 +1092,17 @@ class _ProseList extends StatelessWidget {
       children: <Widget>[
         for (int i = 0; i < items.length; i++) ...<Widget>[
           // `li + li { margin-block-start: 8px }`.
-          if (i > 0) SizedBox(height: ds(2)),
+          if (i > 0) SizedBox(height: el(2)),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               SizedBox(
                 // `padding-inline-start: 24px` on the list: the marker sits
                 // inside it, set against the content edge.
-                width: ds(6),
+                width: el(6),
                 child: Padding(
-                  padding: EdgeInsets.only(right: ds(2)),
-                  child: DsLineBox(
+                  padding: EdgeInsets.only(right: el(2)),
+                  child: ElLineBox(
                     style: marker,
                     child: Text(
                       ordered ? '${i + 1}.' : '•',
@@ -1092,13 +1116,13 @@ class _ProseList extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[
-                    DsLineBox(
+                    ElLineBox(
                       style: style,
                       child: Text(items[i].text, style: style),
                     ),
                     if (items[i].nested != null) ...<Widget>[
                       // Nested `li > ul { margin-block: 8px }`.
-                      SizedBox(height: ds(2)),
+                      SizedBox(height: el(2)),
                       _ProseList(
                         style: style,
                         items: <_ProseListItem>[
@@ -1126,24 +1150,24 @@ class _ProseQuote extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     // `blockquote`, `.type-body`, muted and italic.
-    final TextStyle quote = DsText.styleOf(
+    final TextStyle quote = ElText.styleOf(
       context,
-      DsType.body,
+      ElType.body,
       color: theme.mutedForeground,
     ).copyWith(fontStyle: FontStyle.italic);
 
     return Container(
-      padding: EdgeInsets.only(left: ds(4)),
+      padding: EdgeInsets.only(left: el(4)),
       decoration: BoxDecoration(
         border: Border(
           // `border-inline-start: 2px solid var(--input)`: the stronger
           // hairline, at double width.
-          left: BorderSide(color: theme.input, width: ds(0.5)),
+          left: BorderSide(color: theme.input, width: el(0.5)),
         ),
       ),
-      child: DsLineBox(
+      child: ElLineBox(
         style: quote,
         child: Text(text, style: quote),
       ),
@@ -1174,18 +1198,18 @@ class _ProseTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
 
     Widget cell(Widget child) => Container(
-          // `padding: 12px 16px`.
-          padding: EdgeInsets.symmetric(horizontal: ds(4), vertical: ds(3)),
-          decoration: BoxDecoration(
-            border: Border(
-              bottom: BorderSide(color: theme.border, width: DsWidths.hairline),
-            ),
-          ),
-          child: child,
-        );
+      // `padding: 12px 16px`.
+      padding: EdgeInsets.symmetric(horizontal: el(4), vertical: el(3)),
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(color: theme.border, width: ElWidths.hairline),
+        ),
+      ),
+      child: child,
+    );
 
     return Align(
       alignment: Alignment.centerLeft,
@@ -1202,16 +1226,14 @@ class _ProseTable extends StatelessWidget {
                 decoration: BoxDecoration(color: theme.muted),
                 children: <Widget>[
                   for (final String head in _head)
-                    cell(DsText(head, DsType.label)),
+                    cell(ElText(head, ElType.label)),
                 ],
               ),
               for (final List<String> row in _rows)
                 TableRow(
                   children: <Widget>[
                     for (final String value in row)
-                      cell(
-                        DsText(value, DsType.body, color: theme.foreground),
-                      ),
+                      cell(ElText(value, ElType.body, color: theme.foreground)),
                   ],
                 ),
             ],

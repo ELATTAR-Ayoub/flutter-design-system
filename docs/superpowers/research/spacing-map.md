@@ -2,9 +2,9 @@
 
 **Files that produce the render** (all under `D:\DESIGN\Design-System-2026-8\design-system\`):
 - `app\design-system\spacing\page.tsx` — the page (server component, no client code, no local components; all data in three module-level arrays: `spacing`, `radii`, `elevation`)
-- `components\ds\kit.tsx` — `DsPageHeader`, `DsSection`, `Panel`, `Meta`, `Code`, `DoDont`, `Note`, `PageFootNav` (all used)
+- `components\el\kit.tsx` — `ElPageHeader`, `ElSection`, `Panel`, `Meta`, `Code`, `DoDont`, `Note`, `PageFootNav` (all used)
 - `components\ui\icon.tsx` — `Icon` (used inside `DoDont` and `PageFootNav`)
-- `lib\ds\nav.ts` — `findCategory("foundations","spacing")` supplies header copy; `siblings()` supplies foot-nav
+- `lib\el\nav.ts` — `findCategory("foundations","spacing")` supplies header copy; `siblings()` supplies foot-nav
 - `app\design-system\layout.tsx` — shell around the page
 - `app\globals.css` — every token/class referenced below
 - `app\layout.tsx` — loads `GeistMono` (`--font-geist-mono`) on `<html>`
@@ -23,7 +23,7 @@
 
 ---
 
-## 1 · Page header (`DsPageHeader`)
+## 1 · Page header (`ElPageHeader`)
 
 `<header class="mb-14 border-b border-border pb-10">` (56px below, 40px inner bottom)
 1. Eyebrow: `type-label text-action-ink` → **"Foundations"** — 11px/1, 600, uppercase, tracking 0.16em; color `--action-ink` (dark: `hsl(213 94% 78%)` ≈ #92C2FC; light: `hsl(224 76% 33%)` ≈ #143694).
@@ -35,7 +35,7 @@
 
 ## 2 · Section `#scale` — "Spacing scale"
 
-`DsSection` shell (all sections): `<section class="mb-20">` (80px); heading block `mb-6`; `<h2 class="type-h3 text-foreground">` — 21px (1.3125rem)/1.3, 600, −0.01em; description `type-small mt-2 max-w-2xl` — 13px/1.5, 400, muted.
+`ElSection` shell (all sections): `<section class="mb-20">` (80px); heading block `mb-6`; `<h2 class="type-h3 text-foreground">` — 21px (1.3125rem)/1.3, 600, −0.01em; description `type-small mt-2 max-w-2xl` — 13px/1.5, 400, muted.
 
 Heading: **"Spacing scale"**
 Description (verbatim): **"An 8-point system with a 4px half-step for tight interior spacing. Tailwind's default 0.25rem unit already matches, so the class number is simply the pixel value divided by four."**

@@ -1,6 +1,6 @@
 # Map — `/design-system` overview page (app/design-system/page.tsx)
 
-Source files read in full: `app/design-system/page.tsx`, `app/design-system/layout.tsx`, `components/ds/kit.tsx`, `components/ds/ds-nav.tsx`, `components/ds/theme-toggle.tsx`, `components/ds/logo.tsx`, `components/ui/icon.tsx`, `components/ui/sliding-indicator.tsx`, `lib/ds/nav.ts`, `app/globals.css` (tokens, type classes, motion utilities).
+Source files read in full: `app/design-system/page.tsx`, `app/design-system/layout.tsx`, `components/el/kit.tsx`, `components/el/el-nav.tsx`, `components/el/theme-toggle.tsx`, `components/el/logo.tsx`, `components/ui/icon.tsx`, `components/ui/sliding-indicator.tsx`, `lib/el/nav.ts`, `app/globals.css` (tokens, type classes, motion utilities).
 
 ---
 
@@ -9,27 +9,27 @@ Source files read in full: `app/design-system/page.tsx`, `app/design-system/layo
 Wrapper: `div.flex.min-h-dvh.flex-col`.
 
 **Header** — `sticky top-0 z-40 flex h-(--height-site-header) shrink-0 items-center gap-4 border-b border-border bg-background/85 px-6 backdrop-blur-xl`. `--height-site-header: 4rem` (64px). Children left→right:
-1. `DsMobileNav` — visible `<lg` only: `Button variant="outline" size="icon"` (`size-10`, `border-input bg-card shadow-btn hover:bg-muted active:shadow-btn-down`, rounded per Button) containing `Icon icon={Menu}` (16px, stroke 2.4) + `sr-only` "Open design system navigation". Opens shadcn `Sheet side="left"` `w-72 overflow-y-auto px-6` with `SheetHeader px-0` → `SheetTitle` → Logo link → same `NavTree` as sidebar.
+1. `ElMobileNav` — visible `<lg` only: `Button variant="outline" size="icon"` (`size-10`, `border-input bg-card shadow-btn hover:bg-muted active:shadow-btn-down`, rounded per Button) containing `Icon icon={Menu}` (16px, stroke 2.4) + `sr-only` "Open design system navigation". Opens shadcn `Sheet side="left"` `w-72 overflow-y-auto px-6` with `SheetHeader px-0` → `SheetTitle` → Logo link → same `NavTree` as sidebar.
 2. `Link href="/design-system"` class `press` wrapping `Logo`.
 3. Version pill: `<span class="type-micro hidden rounded-pill border border-border px-2.5 py-1 sm:block" aria-label="Design system version">` — text verbatim: **"Design System v0.1"**.
 4. `<span class="ml-auto type-micro hidden md:block">` — verbatim: **"Desktop-first · 1440 frame · Light & dark"** (`&amp;` → "&").
 5. `ThemeToggle className="ml-auto md:ml-4"`.
 
 **Body row**: `div.mx-auto flex w-full max-w-(--width-shell) flex-1 items-start` — `--width-shell: 1680px`.
-- `DsSidebar`: `aside.sticky top-(--height-site-header) hidden h-[calc(100dvh-var(--height-site-header))] w-60 shrink-0 overflow-y-auto border-r border-border px-6 pt-10 scrollbar-thin lg:block` (240px wide; thin scrollbar: `scrollbar-width: thin; scrollbar-color: var(--border) transparent`, WebKit 8px, thumb `--border` radius 999px, hover `--muted-foreground`).
+- `ElSidebar`: `aside.sticky top-(--height-site-header) hidden h-[calc(100dvh-var(--height-site-header))] w-60 shrink-0 overflow-y-auto border-r border-border px-6 pt-10 scrollbar-thin lg:block` (240px wide; thin scrollbar: `scrollbar-width: thin; scrollbar-color: var(--border) transparent`, WebKit 8px, thumb `--border` radius 999px, hover `--muted-foreground`).
 - `main.min-w-0 flex-1 px-6 py-12 lg:px-12` → inner `div.mx-auto max-w-(--width-content)` — `--width-content: 1080px`. Page children render here.
 
 **NavTree** (sidebar + sheet): `nav[aria-label="Design system"].pb-16`; per group `div.mb-8`: group link `type-label mb-3 block transition-colors duration-fast hover:text-muted-foreground`, `text-action-ink` when `pathname === group.href` else `text-muted-foreground` — on this route the **Foundations** group link is active (its href IS `/design-system`). Category list `ul.space-y-px.border-l.border-border`; item link `type-nav -ml-px block border-l py-2 pl-4 transition-colors duration-fast`; active: `border-action bg-action/12 text-foreground` + `aria-current="page"`; inactive: `border-transparent text-muted-foreground hover:border-input hover:text-foreground`. Group order: Foundations (6), Base Components (14), Agent (6), Site Pages (6).
 
 **ThemeToggle** — three-way `role="radiogroup"` `aria-label="Colour theme"`: `relative inline-flex items-center gap-px rounded-pill border border-border bg-muted p-0.5`. First child `SlidingIndicator`: absolutely positioned travelling pill (`pointer-events-none absolute top-0 left-0 w-0 opacity-0 slide-pill`; inner span `block size-full rounded-pill bg-card shadow-e1`). `slide-pill` = transition `transform/width/height 250ms var(--ease-spring)`, `opacity 150ms var(--ease-out)`. Pill measures the checked option via MutationObserver on `data-state` + ResizeObserver; first move renders with `transition: none` (appears in place); each subsequent landing replays `anim-jelly` = `yuki-jelly 0.6s var(--ease-out) both` (keyframes: 0% scale3d(1,1,1) → 30% (1.18,0.82,1) → 45% (0.88,1.12,1) → 60% (1.06,0.94,1) → 78% (0.98,1.02,1) → 100% (1,1,1)). Options (order): Light/SunIcon, System/MonitorIcon, Dark/MoonIcon — each `button role="radio"` `press relative z-10 grid size-7 place-items-center rounded-pill transition-colors duration-fast ease-out`, active `text-foreground` else `text-muted-foreground hover:text-foreground`, icon `size-3.5` (14px). Pre-hydration nothing is checked → pill `opacity: 0` (uses `useSyncExternalStore`, server snapshot false).
 
-**Logo** — `span.flex.items-center.gap-2.5`: `LogoMark` = `span aria-hidden` `relative grid size-7 shrink-0 place-items-center rounded-md bg-action` containing `svg viewBox="0 0 24 24" class="size-4" fill="none"` with two paths: chevron `d="M6 15.5 12 6l6 9.5"` stroke `var(--primary-foreground)` width 2.4 linecap square; baseline `d="M6 19h12"` stroke `var(--color-value-bright)` width 2.4. Wordmark: `span.type-wordmark.text-foreground` → `ELATTAR` + nested `span.text-value-ink` → `.DS`.
+**Logo** — `span.flex.items-center.gap-2.5`: `LogoMark` = `span aria-hidden` `relative grid size-7 shrink-0 place-items-center rounded-md bg-action` containing `svg viewBox="0 0 24 24" class="size-4" fill="none"` with two paths: chevron `d="M6 15.5 12 6l6 9.5"` stroke `var(--primary-foreground)` width 2.4 linecap square; baseline `d="M6 19h12"` stroke `var(--color-value-bright)` width 2.4. Wordmark: `span.type-wordmark.text-foreground` → `ELATTAR` + nested `span.text-value-ink` → `ELATTAR`.
 
-Page atmosphere (from `@layer base`): `body` carries `background-image: radial-gradient(120% 90% at 62% 34%, var(--page-glow) 0%, transparent 64%); background-attachment: fixed; background-repeat: no-repeat` over `bg-background`. `--page-glow`: dark `hsl(240 8% 10%)`, light `hsl(240 30% 98%)`. `html`: `scroll-behavior: smooth`, `scroll-padding-block-start: var(--scroll-offset)` where `--scroll-offset = calc(4rem + var(--spacing)*8)` = 96px (no `scroll-mt-*` anywhere — `DsSection` deliberately has none). `:focus-visible` = `outline: 2px solid var(--ring); outline-offset: 2px`. `::selection` = `color-mix(in oklab, var(--color-action) 35%, transparent)` behind `var(--foreground)`. Default transition: 250ms `var(--ease-out)`.
+Page atmosphere (from `@layer base`): `body` carries `background-image: radial-gradient(120% 90% at 62% 34%, var(--page-glow) 0%, transparent 64%); background-attachment: fixed; background-repeat: no-repeat` over `bg-background`. `--page-glow`: dark `hsl(240 8% 10%)`, light `hsl(240 30% 98%)`. `html`: `scroll-behavior: smooth`, `scroll-padding-block-start: var(--scroll-offset)` where `--scroll-offset = calc(4rem + var(--spacing)*8)` = 96px (no `scroll-mt-*` anywhere — `ElSection` deliberately has none). `:focus-visible` = `outline: 2px solid var(--ring); outline-offset: 2px`. `::selection` = `color-mix(in oklab, var(--color-action) 35%, transparent)` behind `var(--foreground)`. Default transition: 250ms `var(--ease-out)`.
 
 ---
 
-## 1. Page header — `DsPageHeader`
+## 1. Page header — `ElPageHeader`
 
 `header.mb-14.border-b.border-border.pb-10`:
 - Eyebrow `p.type-label.text-action-ink` — verbatim: **"Elattar's Design System"**
@@ -41,9 +41,9 @@ Page atmosphere (from `@layer base`): `body` carries `background-image: radial-g
 
 ## 2. Section `#foundations` — "Foundations"
 
-`DsSection` markup: `section#foundations.mb-20` → `div.mb-6` → `h2.type-h3.text-foreground` **"Foundations"** + `p.type-small.mt-2.max-w-2xl` **"The decisions everything else inherits. Change something here and it propagates through every base component and the entire agent console."** (Note: section titles are `h2` styled with `.type-h3`.)
+`ElSection` markup: `section#foundations.mb-20` → `div.mb-6` → `h2.type-h3.text-foreground` **"Foundations"** + `p.type-small.mt-2.max-w-2xl` **"The decisions everything else inherits. Change something here and it propagates through every base component and the entire agent console."** (Note: section titles are `h2` styled with `.type-h3`.)
 
-Body: `IndexGrid` = `div.grid.gap-4.sm:grid-cols-2.xl:grid-cols-3` (1 col → 2 ≥640px → 3 ≥1280px, 16px gap) with **6 `IndexCard`s**, order and verbatim data from `lib/ds/nav.ts`:
+Body: `IndexGrid` = `div.grid.gap-4.sm:grid-cols-2.xl:grid-cols-3` (1 col → 2 ≥640px → 3 ≥1280px, 16px gap) with **6 `IndexCard`s**, order and verbatim data from `lib/el/nav.ts`:
 
 | # | Title (h3) | href | Blurb (verbatim) | Chips (verbatim, in order) |
 |---|---|---|---|---|
@@ -54,7 +54,7 @@ Body: `IndexGrid` = `div.grid.gap-4.sm:grid-cols-2.xl:grid-cols-3` (1 col → 2 
 | 5 | Motion | `/design-system/motion` | "Durations, easing curves and the named animations — each one running live so timing can be judged, not guessed." | Durations · Easing · Interaction utilities · Named animations · Reveal choreography · Reduced motion |
 | 6 | Icons | `/design-system/icons` | "The Icon component wrapping Lucide: fixed sizes, stroke rules, and the curated icon set, grouped by domain." | Icon component · Sizes · Tones · Navigation set · Action set · Domain set |
 
-**IndexCard anatomy** (`components/ds/kit.tsx`): `Link` class `lift group flex flex-col rounded-xl border border-border bg-card p-5 hover:border-action/45` (radius 16px, padding 20px).
+**IndexCard anatomy** (`components/el/kit.tsx`): `Link` class `lift group flex flex-col rounded-xl border border-border bg-card p-5 hover:border-action/45` (radius 16px, padding 20px).
 - Top row: `div.flex.items-start.justify-between.gap-3` → `h3.type-h4.text-foreground` (title) + `Icon icon={ArrowRight} size="md" tone="muted"` className `mt-0.5 transition-[transform,color] duration-fast group-hover:translate-x-0.5 group-hover:text-action-ink` (16×16px, strokeWidth attr 2.4, `text-muted-foreground` at rest).
 - Blurb: `p.type-small.mt-2.grow`.
 - Chips: `ul.mt-4.flex.flex-wrap.gap-1.5.border-t.border-border.pt-4`; each `li.type-caption.rounded-sm.bg-muted.px-2.py-1.text-muted-foreground` (radius 6px).
@@ -64,7 +64,7 @@ Body: `IndexGrid` = `div.grid.gap-4.sm:grid-cols-2.xl:grid-cols-3` (1 col → 2 
 
 ## 3. Section `#components` — "Components"
 
-`DsSection id="components"`, `h2.type-h3` **"Components"**, description (verbatim): **"Three families, deliberately separated. Base is the generic chassis any product could use. Agent is a complete AI console, written from scratch and pointed at a transport you supply. Site pages own no visual values of their own — only the composition rules that assemble the other two into a page."**
+`ElSection id="components"`, `h2.type-h3` **"Components"**, description (verbatim): **"Three families, deliberately separated. Base is the generic chassis any product could use. Agent is a complete AI console, written from scratch and pointed at a transport you supply. Site pages own no visual values of their own — only the composition rules that assemble the other two into a page."**
 
 Body: `div.grid.gap-4.md:grid-cols-2` (1 col → 2 ≥768px; the third card wraps to row 2 left cell). **3 group cards**, inline in page.tsx (not IndexCard — larger padding, different label row):
 
@@ -74,7 +74,7 @@ Card markup: `Link` class `lift group flex flex-col rounded-xl border border-bor
 - `ul.mt-5.flex.flex-wrap.gap-1.5.border-t.border-border.pt-5`; each `li.type-caption.rounded-sm.bg-muted.px-2.py-1.text-muted-foreground` = category titles.
 - Same `lift` hover as IndexCard.
 
-Verbatim card data (order = DS_GROUPS order minus foundations):
+Verbatim card data (order = EL_GROUPS order minus foundations):
 
 **1. Base Components** — label **"14 sets"** — href `/design-system/components/base` — blurb: **"The shadcn chassis, restyled onto this system's tokens. Generic, reusable, product-agnostic."** — chips: Buttons · Inputs · Forms · Selects & Pickers · Selection Controls · Dialogs & Overlays · Menus · Navigation · Feedback · Chat · Data Display · Charts · Layout Primitives · Sidebar.
 
@@ -86,7 +86,7 @@ Verbatim card data (order = DS_GROUPS order minus foundations):
 
 ## 4. Section `#rules` — "The rules that outrank taste"
 
-`DsSection id="rules"`, `h2.type-h3` **"The rules that outrank taste"**, description: **"Six non-negotiables. If a screen breaks one of these, the screen is wrong — not the rule."**
+`ElSection id="rules"`, `h2.type-h3` **"The rules that outrank taste"**, description: **"Six non-negotiables. If a screen breaks one of these, the screen is wrong — not the rule."**
 
 Body: `ol.divide-y.divide-border.overflow-hidden.rounded-xl.border.border-border.bg-card` (one card, 16px radius, 1px row dividers). Each `li.flex.gap-5.px-6.py-5`:
 - Number: `span.type-num-sm.shrink-0.text-action-ink`, zero-padded `01`–`06` (Geist Mono, 12px, 600, tabular).
@@ -104,7 +104,7 @@ Verbatim rules:
 
 ## 5. Closing `Note` (tone="value")
 
-`div.rounded-lg.border.p-5` + tone classes `border-value/30 bg-value/[0.08] text-value-ink` (12px radius). Title `p.type-label.mb-2` (inherits value-ink): **"Scope of this phase"**. Body `div.type-small.text-muted-foreground`, verbatim: **"This is the design system and component library. The ten product screens are built on top of it and are tracked separately — nothing in here implements a real wallet, payment, blockchain or shipping integration. All figures, packs, cards and users are placeholder data."** Not inside a DsSection — no `mb-20`; it is the last child of the page.
+`div.rounded-lg.border.p-5` + tone classes `border-value/30 bg-value/[0.08] text-value-ink` (12px radius). Title `p.type-label.mb-2` (inherits value-ink): **"Scope of this phase"**. Body `div.type-small.text-muted-foreground`, verbatim: **"This is the design system and component library. The ten product screens are built on top of it and are tracked separately — nothing in here implements a real wallet, payment, blockchain or shipping integration. All figures, packs, cards and users are placeholder data."** Not inside a ElSection — no `mb-20`; it is the last child of the page.
 
 ---
 
@@ -119,7 +119,7 @@ Verbatim rules:
 - `.type-label`: 0.6875rem (11px) / 1 / 600 / uppercase / tracking 0.16em / color `--muted-foreground`
 - `.type-caption`: 0.65625rem (10.5px) / 1.35 / 500
 - `.type-micro`: 0.65625rem / 1 / 600 / uppercase / tracking 0.18em / color `--muted-foreground`
-- `.type-chip`: 0.71875rem (11.5px) / 1.2 / 500 (used by DsPageHeader chips — not rendered here)
+- `.type-chip`: 0.71875rem (11.5px) / 1.2 / 500 (used by ElPageHeader chips — not rendered here)
 - `.type-nav`: 0.84375rem (13.5px) / 1.2 / 500 (sidebar)
 - `.type-num-sm`: `--font-mono` (Geist Mono) / 0.75rem (12px) / 1.2 / 600 / tabular-nums / tracking −0.01em
 - `.type-wordmark`: 0.9375rem (15px) / 1 / 700 / tracking −0.01em
@@ -201,5 +201,5 @@ shape on `/design-system/components/base/navigation`'s `type-nav press` rows.
 
 **Port impact.** `example\lib\kit.dart`'s `_CardArrow`,
 `example\lib\shell.dart`'s `_ColorFade` (shared by both nav levels) and
-`example\lib\theme_toggle.dart` moved from `DsDurations.fast` to
-`DsDurations.transitionDefault`.
+`example\lib\theme_toggle.dart` moved from `ElDurations.fast` to
+`ElDurations.transitionDefault`.

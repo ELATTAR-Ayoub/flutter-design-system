@@ -18,7 +18,7 @@
 /// | `text-sm` | 13px, no `font-weight` of its own → `html`'s 400 |
 /// | `shadow-pressed` | permanent |
 /// | `outline-none` | — |
-/// | `transition-[box-shadow,border-color,background-color] duration-base ease-out` | 250ms on `--ease-out` — from `--default-transition-duration`; `duration-base` emits nothing ([DsDurations.transitionDefault]) |
+/// | `transition-[box-shadow,border-color,background-color] duration-base ease-out` | 250ms on `--ease-out` — from `--default-transition-duration`; `duration-base` emits nothing ([ElDurations.transitionDefault]) |
 /// | `placeholder:text-muted-foreground` | — |
 /// | `focus-visible:border-primary/50` | note `--primary`, not `--ring` |
 /// | `focus-visible:ring-3 focus-visible:ring-ring/35` | **added to** `shadow-pressed`, not replacing it: the ring lives in `--tw-ring-shadow` and the socket in `--tw-shadow` |
@@ -28,9 +28,9 @@
 /// **Ruling I2 — this stays the bare pill.** The reference splits addons out
 /// rather than folding them in: `InputGroupInput` *strips* this component
 /// (`border-0 shadow-none ring-0 bg-transparent rounded-none`) and lets the
-/// wrapper paint everything. So [DsInput] grows a [DsInput.bare] mode and a
-/// [DsInput.padding] override — the two things the strip list amounts to — and
-/// nothing resembling a prefix or suffix slot. `DsInputGroup` is the socket.
+/// wrapper paint everything. So [ElInput] grows a [ElInput.bare] mode and a
+/// [ElInput.padding] override — the two things the strip list amounts to — and
+/// nothing resembling a prefix or suffix slot. `ElInputGroup` is the socket.
 ///
 /// DOCUMENTED DRIFT (shadows-map §12.7): the component's JSDoc claims *"a
 /// placeholder at 60% muted"*. The class is `placeholder:text-muted-foreground`
@@ -45,14 +45,14 @@
 /// invite-code field carries a placeholder that is already uppercase and no
 /// seeded value.
 ///
-/// USER-ORDERED MOBILE ADAPTATION: this file also owns [DsFieldVisibility], the
+/// USER-ORDERED MOBILE ADAPTATION: this file also owns [ElFieldVisibility], the
 /// whole family's one keyboard-avoidance mechanism — the field surface is
 /// shared here, so the focus plumbing that keeps a focused field off the
 /// software keyboard is shared here too. It is inert wherever there is no
 /// software keyboard, so nothing on a desktop frame changes by a pixel.
 library;
 
-// `rendering.dart` for [RenderAbstractViewport], which [DsFieldVisibility]
+// `rendering.dart` for [RenderAbstractViewport], which [ElFieldVisibility]
 // measures the keyboard against; it re-exports `semantics.dart`, which this
 // file used to import for [SemanticsValidationResult] alone.
 import 'package:flutter/rendering.dart';
@@ -76,7 +76,7 @@ const double _focusBorderAlpha = 0.50;
 const double _focusRingAlpha = 0.35;
 
 /// `aria-invalid:ring-destructive/20`. The bare field declares **no `dark:`
-/// variant**, so this alpha is both themes — unlike `DsInputGroup`, which rings
+/// variant**, so this alpha is both themes — unlike `ElInputGroup`, which rings
 /// at 40% on dark. Same error state, two reds, depending only on whether an
 /// addon happens to be present (inputs-map drift 6).
 const double _invalidRingAlpha = 0.20;
@@ -89,8 +89,8 @@ const double _disabledOpacity = 0.45;
 /// Editable, keyboard-focusable, with a real caret — *"everything is a live
 /// component"*. The shadows page's own section description promises "focus the
 /// field", so the field is focusable in fact and not in appearance.
-class DsInput extends StatefulWidget {
-  const DsInput({
+class ElInput extends StatefulWidget {
+  const ElInput({
     super.key,
     this.controller,
     this.initialValue,
@@ -114,9 +114,9 @@ class DsInput extends StatefulWidget {
     this.flat = false,
     this.radius,
   }) : assert(
-          controller == null || initialValue == null,
-          'A controller already carries the value — seed it there instead.',
-        );
+         controller == null || initialValue == null,
+         'A controller already carries the value — seed it there instead.',
+       );
 
   /// Supply one to read or seed the text; otherwise the field owns its own and
   /// disposes it.
@@ -132,7 +132,7 @@ class DsInput extends StatefulWidget {
 
   /// Supply one to drive focus from outside; otherwise the field owns its own.
   ///
-  /// A [DsFieldScope]'s node wins over the owned one and loses to this — the
+  /// A [ElFieldScope]'s node wins over the owned one and loses to this — the
   /// child's own props beat what the slot merges in, which is the order
   /// `FormControl`'s Radix `Slot` uses (forms-map §3.1).
   final FocusNode? focusNode;
@@ -160,7 +160,7 @@ class DsInput extends StatefulWidget {
 
   /// `aria-invalid` — the single switch for the error appearance.
   ///
-  /// ORed with the scope's, so a `DsField` carrying an error marks its control
+  /// ORed with the scope's, so a `ElField` carrying an error marks its control
   /// without the call site restating it — the `FormControl` contract.
   ///
   /// The paint **beats focus**: the `aria-invalid:` rules are emitted after the
@@ -182,17 +182,17 @@ class DsInput extends StatefulWidget {
   ///
   /// Ruling I7: a `.type-*` class lives in `@layer components` and `text-sm` is
   /// a utility, so **the utility wins the properties they share** and the class
-  /// contributes only what it alone declares. [DsComponentType.inputNum] and
-  /// [DsComponentType.inputSerial] are those two collapses already resolved in
-  /// the foundation layer; passing [DsType.numBase] here would render 15px and
+  /// contributes only what it alone declares. [ElComponentType.inputNum] and
+  /// [ElComponentType.inputSerial] are those two collapses already resolved in
+  /// the foundation layer; passing [ElType.numBase] here would render 15px and
   /// be wrong by two pixels.
   ///
-  /// Defaults to [DsComponentType.sheetBody] — the bare `text-sm`, 13/400.
-  final DsTypeSpec? textSpec;
+  /// Defaults to [ElComponentType.sheetBody] — the bare `text-sm`, 13/400.
+  final ElTypeSpec? textSpec;
 
   /// The accessible name, for a field with no visible `<label>`.
   ///
-  /// A [DsFieldScope] supplies it from the visible `DsFieldLabel`, which is the
+  /// A [ElFieldScope] supplies it from the visible `ElFieldLabel`, which is the
   /// `<label for=…>` translation: one string, announced once.
   final String? label;
 
@@ -219,7 +219,7 @@ class DsInput extends StatefulWidget {
   /// This is the group's clearance rule (inputs-map §4.2) arriving from
   /// outside: four `has-*` selectors at (0,2,1) beat the input's own `px-4` at
   /// (0,1,0) and drop the padding to 8px on whichever side an addon occupies.
-  /// `DsInputGroupInput` computes it; nothing else should need to.
+  /// `ElInputGroupInput` computes it; nothing else should need to.
   final EdgeInsetsGeometry? padding;
 
   /// Overrides `h-10`.
@@ -252,21 +252,21 @@ class DsInput extends StatefulWidget {
   /// `h-6 rounded-sm px-1.5 py-0 shadow-none` — *(measured 348 × 24 at
   /// `border-radius: 6px`)*. A pill on a 24px box would be a lozenge sitting
   /// inside a 12px-cornered row, which is the same argument `SidebarMenuButton`
-  /// makes against [DsButton.radius].
+  /// makes against [ElButton.radius].
   final BorderRadius? radius;
 
-  /// `h-10` — 40px, deliberately level with a default `DsButton`.
-  static double get height => ds(10);
+  /// `h-10` — 40px, deliberately level with a default `ElButton`.
+  static double get height => el(10);
 
   /// `px-4 py-1` — the field's own padding, before any clearance override.
   static EdgeInsets get insets =>
-      EdgeInsets.symmetric(horizontal: ds(4), vertical: ds(1));
+      EdgeInsets.symmetric(horizontal: el(4), vertical: el(1));
 
   @override
-  State<DsInput> createState() => _DsInputState();
+  State<ElInput> createState() => _ElInputState();
 }
 
-class _DsInputState extends State<DsInput> {
+class _ElInputState extends State<ElInput> {
   final GlobalKey<EditableTextState> _editableKey =
       GlobalKey<EditableTextState>();
 
@@ -279,8 +279,9 @@ class _DsInputState extends State<DsInput> {
 
   TextEditingController get _controller =>
       widget.controller ??
-      (_ownedController ??=
-          TextEditingController(text: widget.initialValue ?? ''));
+      (_ownedController ??= TextEditingController(
+        text: widget.initialValue ?? '',
+      ));
 
   FocusNode get _focusNode =>
       widget.focusNode ?? _scopeFocusNode ?? (_ownedFocusNode ??= FocusNode());
@@ -299,19 +300,19 @@ class _DsInputState extends State<DsInput> {
   ///
   /// Tracked by identity rather than by "is a listener attached", because three
   /// separate things can swap the resolved node — a new `focusNode` prop, a new
-  /// [DsFieldScope], or the first fall-through to the owned one — and every one
+  /// [ElFieldScope], or the first fall-through to the owned one — and every one
   /// of them has to detach the old object and attach the new.
   FocusNode? _hookedNode;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _scopeFocusNode = DsFieldScope.maybeOf(context)?.focusNode;
+    _scopeFocusNode = ElFieldScope.maybeOf(context)?.focusNode;
     _syncFocusHook();
   }
 
   @override
-  void didUpdateWidget(DsInput old) {
+  void didUpdateWidget(ElInput old) {
     super.didUpdateWidget(old);
     if (old.controller != widget.controller) {
       (old.controller ?? _ownedController)?.removeListener(_onTextChanged);
@@ -349,8 +350,8 @@ class _DsInputState extends State<DsInput> {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
-    final DsFieldScope? scope = DsFieldScope.maybeOf(context);
+    final ElThemeData theme = ElTheme.of(context);
+    final ElFieldScope? scope = ElFieldScope.maybeOf(context);
 
     // The slot merge (`FormControl`): the scope supplies what the id graph
     // would have wired, and the child's own props win where both speak.
@@ -359,14 +360,14 @@ class _DsInputState extends State<DsInput> {
     final String? label = widget.label ?? scope?.label;
     final String? hint = widget.hint ?? scope?.describedBy;
 
-    final DsTypeSpec spec = widget.textSpec ?? DsComponentType.sheetBody;
+    final ElTypeSpec spec = widget.textSpec ?? ElComponentType.sheetBody;
 
     // `input { color: inherit }` (Preflight L243–252), never overridden by the
-    // component. Passing no colour is how [DsText.styleOf] spells that, and it
+    // component. Passing no colour is how [ElText.styleOf] spells that, and it
     // is load-bearing twice: `Field`'s `data-[invalid=true]:text-destructive-ink`
     // turns the typed text red through it (forms-map §3.2), and the state
     // grid's Read-only cell gets its muted ink the same way.
-    final TextStyle textStyle = DsText.styleOf(context, spec);
+    final TextStyle textStyle = ElText.styleOf(context, spec);
 
     final Widget editable = EditableText(
       key: _editableKey,
@@ -381,15 +382,16 @@ class _DsInputState extends State<DsInput> {
       // iOS's floating-cursor ghost. Never seen on the docs surface, but
       // [EditableText] requires it.
       backgroundCursorColor: theme.mutedForeground,
-      selectionColor:
-          theme.primary.withValues(alpha: DsFieldSurface.selectionAlpha),
+      selectionColor: theme.primary.withValues(
+        alpha: ElFieldSurface.selectionAlpha,
+      ),
       onChanged: widget.onChanged,
       onSubmitted: widget.onSubmitted,
     );
 
     final Widget placeholder = widget.placeholder == null
         ? const SizedBox.shrink()
-        : DsText(
+        : ElText(
             widget.placeholder!,
             spec,
             color: theme.mutedForeground,
@@ -407,7 +409,7 @@ class _DsInputState extends State<DsInput> {
       ],
     );
 
-    final EdgeInsetsGeometry padding = widget.padding ?? DsInput.insets;
+    final EdgeInsetsGeometry padding = widget.padding ?? ElInput.insets;
 
     Widget field;
     if (widget.bare) {
@@ -427,7 +429,10 @@ class _DsInputState extends State<DsInput> {
         radius: widget.radius,
         child: line,
       );
-      field = SizedBox(height: widget.boxHeight ?? DsInput.height, child: field);
+      field = SizedBox(
+        height: widget.boxHeight ?? ElInput.height,
+        child: field,
+      );
     }
 
     // [EditableText] does not handle its own pointer gestures — `TextField`
@@ -467,21 +472,21 @@ class _DsInputState extends State<DsInput> {
       );
     }
 
-    // USER-ORDERED MOBILE ADAPTATION — see [DsFieldVisibility]. Outermost, so
+    // USER-ORDERED MOBILE ADAPTATION — see [ElFieldVisibility]. Outermost, so
     // what gets revealed is the whole control including its socket, and free on
     // every desktop frame.
-    return DsFieldVisibility(focusNode: _focusNode, child: field);
+    return ElFieldVisibility(focusNode: _focusNode, child: field);
   }
 }
 
 /// The pill, its permanent socket, and the one ring that ever joins it.
 ///
-/// Split out of [DsInput] so `DsTextarea` can wear the identical recipe at a
+/// Split out of [ElInput] so `ElTextarea` can wear the identical recipe at a
 /// different radius and height without either restating it — the reference
 /// keeps the two class lists in lockstep too, and §12.3's "identical except"
 /// table is exactly this widget's parameter list.
-class DsFieldSurface extends StatelessWidget {
-  const DsFieldSurface({
+class ElFieldSurface extends StatelessWidget {
+  const ElFieldSurface({
     super.key,
     required this.radius,
     required this.focused,
@@ -495,7 +500,7 @@ class DsFieldSurface extends StatelessWidget {
   /// app-level rule that reaches every field in this family because none of
   /// them overrides it.
   ///
-  /// Was 0.30 on `DsInput` while the stylesheet and the example app's own
+  /// Was 0.30 on `ElInput` while the stylesheet and the example app's own
   /// `DefaultSelectionStyle` both said 0.35; one field in the system selected
   /// differently from every other. Ruling I10, fixed here so the textarea
   /// cannot drift from the input again.
@@ -513,17 +518,17 @@ class DsFieldSurface extends StatelessWidget {
   /// `aria-invalid` — beats [focused] on both properties they share.
   final bool invalid;
 
-  /// Overrides `bg-card` — see [DsInput.fill].
+  /// Overrides `bg-card` — see [ElInput.fill].
   final Color? fill;
 
-  /// `shadow-none`: the socket goes, the ring stays — see [DsInput.flat].
+  /// `shadow-none`: the socket goes, the ring stays — see [ElInput.flat].
   final bool flat;
 
   final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
 
     // `aria-invalid:` is emitted after `focus-visible:` at equal specificity,
     // so it wins outright: an errored field shows no focus ring at all, only
@@ -531,51 +536,58 @@ class DsFieldSurface extends StatelessWidget {
     final Color border = invalid
         ? theme.destructive
         : focused
-            ? theme.primary.withValues(alpha: _focusBorderAlpha)
-            : theme.input;
+        ? theme.primary.withValues(alpha: _focusBorderAlpha)
+        : theme.input;
     final Color ring = invalid
         ? theme.destructive.withValues(alpha: _invalidRingAlpha)
         : focused
-            ? theme.ring.withValues(alpha: _focusRingAlpha)
-            // Not `dsTransparent`: a ring fading out through black would tint
-            // the pixels it is leaving. Its own hue at zero alpha fades to
-            // nothing, which is what an alpha transition does in CSS.
-            : theme.ring.withValues(alpha: 0);
+        ? theme.ring.withValues(alpha: _focusRingAlpha)
+        // Not `elTransparent`: a ring fading out through black would tint
+        // the pixels it is leaving. Its own hue at zero alpha fades to
+        // nothing, which is what an alpha transition does in CSS.
+        : theme.ring.withValues(alpha: 0);
 
     // `transition-[box-shadow,border-color,background-color]` at the
     // framework default on `--ease-out` — the `duration-base` class beside
     // it emits nothing. The border tint and the ring change together and
     // only together, so they ride one duration.
-    final Duration duration =
-        dsAnimationDuration(context, DsDurations.transitionDefault);
+    final Duration duration = elAnimationDuration(
+      context,
+      ElDurations.transitionDefault,
+    );
 
     return TweenAnimationBuilder<Color?>(
       tween: ColorTween(end: border),
       duration: duration,
-      curve: DsCurves.out,
+      curve: ElCurves.out,
       builder: (BuildContext context, Color? b, Widget? _) =>
           TweenAnimationBuilder<Color?>(
-        tween: ColorTween(end: ring),
-        duration: duration,
-        curve: DsCurves.out,
-        builder: (BuildContext context, Color? r, Widget? _) {
-          // The ring is ADDED to `shadow-pressed`, never replacing it — the
-          // socket is what makes the field read as editable and it never rises.
-          final Color ringColor = r ?? ring;
-          final DsShadowSpec base = flat ? DsShadows.none : DsShadows.pressed;
-          final DsShadowSpec spec = ringColor.a == 0
-              ? base
-              : DsButton.withFocusRing(base, ringColor);
+            tween: ColorTween(end: ring),
+            duration: duration,
+            curve: ElCurves.out,
+            builder: (BuildContext context, Color? r, Widget? _) {
+              // The ring is ADDED to `shadow-pressed`, never replacing it — the
+              // socket is what makes the field read as editable and it never rises.
+              final Color ringColor = r ?? ring;
+              final ElShadowSpec base = flat
+                  ? ElShadows.none
+                  : ElShadows.pressed;
+              final ElShadowSpec spec = ringColor.a == 0
+                  ? base
+                  : ElButton.withFocusRing(base, ringColor);
 
-          return DsMachineSurface(
-            spec: spec,
-            radius: radius,
-            fill: fill ?? theme.card,
-            border: Border.all(color: b ?? border, width: DsWidths.hairline),
-            child: child,
-          );
-        },
-      ),
+              return ElMachineSurface(
+                spec: spec,
+                radius: radius,
+                fill: fill ?? theme.card,
+                border: Border.all(
+                  color: b ?? border,
+                  width: ElWidths.hairline,
+                ),
+                child: child,
+              );
+            },
+          ),
     );
   }
 }
@@ -594,7 +606,7 @@ class DsFieldSurface extends StatelessWidget {
 /// composer was typed into from behind the keyboard.
 ///
 /// **One place, so the class of bug cannot come back.** Every field in the
-/// family — [DsInput], `DsTextarea`, `DsInputOtp`, the agent composer — wraps
+/// family — [ElInput], `ElTextarea`, `ElInputOtp`, the agent composer — wraps
 /// itself in one of these and passes the focus node it actually resolved. A
 /// control added later inherits the behaviour by using the same plumbing rather
 /// than by remembering a rule; the mechanism is not restated anywhere.
@@ -613,12 +625,12 @@ class DsFieldSurface extends StatelessWidget {
 ///
 /// **It composes with whoever else made room.** The reveal asks how much of the
 /// enclosing viewport the keyboard is actually standing on, so a scroller an
-/// ancestor has already lifted clear of the keyboard — [DsAgentConsole]'s own
+/// ancestor has already lifted clear of the keyboard — [ElAgentConsole]'s own
 /// composer lift, a sheet that resized — contributes zero occlusion and the
 /// field is merely brought inside the viewport with a margin. Nothing
 /// double-counts.
-class DsFieldVisibility extends StatefulWidget {
-  const DsFieldVisibility({
+class ElFieldVisibility extends StatefulWidget {
+  const ElFieldVisibility({
     super.key,
     required this.focusNode,
     required this.child,
@@ -627,7 +639,7 @@ class DsFieldVisibility extends StatefulWidget {
   /// The node whose focus decides when to reveal.
   ///
   /// A field that resolves its node from three places — its own prop, the
-  /// [DsFieldScope]'s, the one it owns — passes whichever won, so the reveal
+  /// [ElFieldScope]'s, the one it owns — passes whichever won, so the reveal
   /// follows the same node the caret does.
   final FocusNode focusNode;
 
@@ -636,20 +648,20 @@ class DsFieldVisibility extends StatefulWidget {
   /// The clearance left between the field and the edge it is pushed off — the
   /// `gap-2` rung, the smallest gap in the system that reads as deliberate
   /// rather than as a rounding error.
-  static double get margin => ds(2);
+  static double get margin => el(2);
 
   /// How long the reveal takes.
   ///
-  /// [DsDurations.fast] rather than the transition default: the OS keyboard is
+  /// [ElDurations.fast] rather than the transition default: the OS keyboard is
   /// already sliding up over it, and a field that arrives first reads as having
   /// been in the clear all along.
-  static Duration get travel => DsDurations.fast;
+  static Duration get travel => ElDurations.fast;
 
   @override
-  State<DsFieldVisibility> createState() => _DsFieldVisibilityState();
+  State<ElFieldVisibility> createState() => _ElFieldVisibilityState();
 }
 
-class _DsFieldVisibilityState extends State<DsFieldVisibility> {
+class _ElFieldVisibilityState extends State<ElFieldVisibility> {
   /// `MediaQuery.viewInsets.bottom` — how much of the window the keyboard has
   /// taken.
   ///
@@ -674,7 +686,7 @@ class _DsFieldVisibilityState extends State<DsFieldVisibility> {
   }
 
   @override
-  void didUpdateWidget(DsFieldVisibility old) {
+  void didUpdateWidget(ElFieldVisibility old) {
     super.didUpdateWidget(old);
     if (identical(old.focusNode, widget.focusNode)) return;
     old.focusNode.removeListener(_onFocusChanged);
@@ -752,11 +764,12 @@ class _DsFieldVisibilityState extends State<DsFieldVisibility> {
     if (position.axis != Axis.vertical || !position.hasPixels) return;
     if (!position.hasContentDimensions) return;
 
-    final RenderAbstractViewport? viewport =
-        RenderAbstractViewport.maybeOf(target);
+    final RenderAbstractViewport? viewport = RenderAbstractViewport.maybeOf(
+      target,
+    );
     if (viewport == null) return;
 
-    final double margin = DsFieldVisibility.margin;
+    final double margin = ElFieldVisibility.margin;
     final Rect bounds = target.paintBounds;
     // The rect is the field's own box grown by the margin, and grown again at
     // the bottom by however much of THIS viewport the keyboard covers. Revealing
@@ -769,9 +782,12 @@ class _DsFieldVisibilityState extends State<DsFieldVisibility> {
       bounds.bottom + margin + _occlusionOf(viewport),
     );
 
-    final double leading = viewport.getOffsetToReveal(target, 0, rect: rect).offset;
-    final double trailing =
-        viewport.getOffsetToReveal(target, 1, rect: rect).offset;
+    final double leading = viewport
+        .getOffsetToReveal(target, 0, rect: rect)
+        .offset;
+    final double trailing = viewport
+        .getOffsetToReveal(target, 1, rect: rect)
+        .offset;
     final double pixels = position.pixels;
 
     final double wanted;
@@ -787,12 +803,16 @@ class _DsFieldVisibilityState extends State<DsFieldVisibility> {
       return;
     }
 
-    final double landing =
-        wanted.clamp(position.minScrollExtent, position.maxScrollExtent);
+    final double landing = wanted.clamp(
+      position.minScrollExtent,
+      position.maxScrollExtent,
+    );
     if (landing == pixels) return;
 
-    final Duration travel =
-        dsAnimationDuration(context, DsFieldVisibility.travel);
+    final Duration travel = elAnimationDuration(
+      context,
+      ElFieldVisibility.travel,
+    );
     // `prefers-reduced-motion` collapses the beat to nothing, and a driven
     // scroll activity refuses a zero duration — so at zero it is a jump, which
     // is what "no animation" means for a scroll offset.
@@ -800,7 +820,7 @@ class _DsFieldVisibilityState extends State<DsFieldVisibility> {
       position.jumpTo(landing);
       return;
     }
-    position.animateTo(landing, duration: travel, curve: DsCurves.out);
+    position.animateTo(landing, duration: travel, curve: ElCurves.out);
   }
 
   /// How much of [viewport]'s own box the keyboard is standing on.
@@ -827,7 +847,7 @@ class _DsFieldVisibilityState extends State<DsFieldVisibility> {
   Widget build(BuildContext context) => widget.child;
 }
 
-/// [DsFieldSurface] at the pill radius, with the field's own padding inside it.
+/// [ElFieldSurface] at the pill radius, with the field's own padding inside it.
 class _Socket extends StatelessWidget {
   const _Socket({
     required this.focused,
@@ -846,13 +866,13 @@ class _Socket extends StatelessWidget {
   final bool flat;
   final Widget child;
 
-  /// [DsInput.radius] — null keeps the pill.
+  /// [ElInput.radius] — null keeps the pill.
   final BorderRadius? radius;
 
   @override
   Widget build(BuildContext context) {
-    return DsFieldSurface(
-      radius: radius ?? BorderRadius.circular(DsRadii.pill),
+    return ElFieldSurface(
+      radius: radius ?? BorderRadius.circular(ElRadii.pill),
       focused: focused,
       invalid: invalid,
       fill: fill,

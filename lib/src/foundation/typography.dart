@@ -17,8 +17,8 @@ import 'package:flutter/painting.dart';
 /// Families follow the **tokens**, not the prose: the comment above
 /// `--font-sans` (globals.css L167–168) says *"Space Grotesk owns words"*,
 /// while the token it introduces is `"Inter Local"`. The token is what renders.
-class DsFonts {
-  const DsFonts._();
+class ElFonts {
+  const ElFonts._();
 
   /// `--font-sans: "Inter Local", …` (globals.css L169). `html` carries
   /// `font-sans`, so every class without its own `font-family` inherits this.
@@ -42,8 +42,8 @@ class DsFonts {
   /// bundles them for every dependent app under the prefixed family
   /// `packages/elattar_design_system/<Family>` (flutter_tools `asset.dart`).
   /// `TextStyle(package: …)` applies exactly that prefix, which is why
-  /// [DsTypeSpec.family] stays the bare family name and
-  /// [DsTypeSpec.resolve] passes this: call sites never think about prefixing.
+  /// [ElTypeSpec.family] stays the bare family name and
+  /// [ElTypeSpec.resolve] passes this: call sites never think about prefixing.
   static const String package = 'elattar_design_system';
 }
 
@@ -52,9 +52,9 @@ class DsFonts {
 /// Only five classes do (`.type-lead`, `.type-small`, `.type-label`,
 /// `.type-micro`, `.type-section` — all `--muted-foreground`); every other
 /// class inherits its colour from the surface it sits on, which is
-/// [DsTypeColor.none]. The theme resolves this to a real [Color]; this layer
+/// [ElTypeColor.none]. The theme resolves this to a real [Color]; this layer
 /// only records which token the class named.
-enum DsTypeColor {
+enum ElTypeColor {
   /// No `color` declaration — inherits.
   none,
 
@@ -71,10 +71,10 @@ enum DsTypeColor {
 /// straight onto [TextStyle.height]), and [tracking] is the CSS `letter-spacing`
 /// in **em** — [resolve] multiplies it by the resolved font size to reach
 /// Flutter's px `letterSpacing`.
-class DsTypeSpec {
+class ElTypeSpec {
   /// Records one class. Pass [wght] rather than [weight]: it drives both the
   /// variable-font axis and the static fallback, so the two cannot drift.
-  DsTypeSpec({
+  ElTypeSpec({
     required this.family,
     this.size,
     this.height,
@@ -82,7 +82,7 @@ class DsTypeSpec {
     this.tracking,
     this.uppercase = false,
     this.tabular = false,
-    this.defaultColor = DsTypeColor.none,
+    this.defaultColor = ElTypeColor.none,
     this.fontStyle = FontStyle.normal,
   }) : weight = wght == null ? null : _staticFallback(wght),
        variations = wght == null
@@ -105,9 +105,9 @@ class DsTypeSpec {
   final String family;
 
   /// `font-size` in px, or null when the class has no intrinsic px size:
-  /// `.type-display` and `.type-h1` are `clamp()` (see [DsType.displaySize] /
-  /// [DsType.h1Size]) and `.type-accent` is `em`-relative
-  /// (see [DsType.accentSize]). The caller passes the resolved px to [resolve].
+  /// `.type-display` and `.type-h1` are `clamp()` (see [ElType.displaySize] /
+  /// [ElType.h1Size]) and `.type-accent` is `em`-relative
+  /// (see [ElType.accentSize]). The caller passes the resolved px to [resolve].
   final double? size;
 
   /// `line-height` as a unitless ratio, or null when the class declares none
@@ -131,14 +131,14 @@ class DsTypeSpec {
 
   /// `text-transform: uppercase`.
   ///
-  /// A flag only — this layer performs no string transform. `DsText` does.
+  /// A flag only — this layer performs no string transform. `ElText` does.
   final bool uppercase;
 
   /// `font-variant-numeric: tabular-nums`.
   final bool tabular;
 
   /// The `color` the class sets on itself, if any.
-  final DsTypeColor defaultColor;
+  final ElTypeColor defaultColor;
 
   /// `font-style` — italic only for `.type-accent`.
   final FontStyle fontStyle;
@@ -182,7 +182,7 @@ class DsTypeSpec {
       inherit: inherit,
       color: color,
       fontFamily: family,
-      package: DsFonts.package,
+      package: ElFonts.package,
       fontSize: fontSize,
       height: lineHeight,
       // CSS splits a line's leading in half, above the glyphs and below them.
@@ -205,7 +205,7 @@ class DsTypeSpec {
   /// axis default (14) and text runs measure a few px off the reference —
   /// enough to move line-wrap points at 13–15px and to widen the 40px `h1`.
   List<FontVariation>? _variationsFor(double fontSize) {
-    if (family != DsFonts.sans) {
+    if (family != ElFonts.sans) {
       return variations.isEmpty ? null : variations;
     }
     // allow-hardcoded: Inter Variable's own opsz axis range (14–32), a font
@@ -264,8 +264,8 @@ class DsTypeSpec {
 /// same place either way. It is recorded because it is the reason `sm` and
 /// `default` — both 13px — are not the same text style, and because a caller
 /// that ever sizes a container to a button label's line box would see it.
-class DsComponentType {
-  const DsComponentType._();
+class ElComponentType {
+  const ElComponentType._();
 
   /// The ratios Tailwind's own `text-*` utilities carry, as globals.css leaves
   /// them.
@@ -297,15 +297,15 @@ class DsComponentType {
   ///
   /// Phases 1 and 2 never caught it because nothing they measured could: CSS
   /// centres glyphs in their line box by splitting the leading in half, and
-  /// [DsTypeSpec] sets [TextLeadingDistribution.even] to match, so a
+  /// [ElTypeSpec] sets [TextLeadingDistribution.even] to match, so a
   /// single-line centred label does not move when its line box grows. Only
   /// multi-line copy — [sheetBody]'s — changes spacing.
   ///
   /// Kept under the bare name [buttonLabel] rather than renamed to match its
   /// siblings: it is the cva's `defaultVariants.size`, and it is the style the
   /// rest of the port means when it says "a button label".
-  static final DsTypeSpec buttonLabel = DsTypeSpec(
-    family: DsFonts.sans,
+  static final ElTypeSpec buttonLabel = ElTypeSpec(
+    family: ElFonts.sans,
     size: 13,
     height: _leadingSm,
     wght: 500,
@@ -313,8 +313,8 @@ class DsComponentType {
 
   /// `Button` `size="xs"`: `text-xs` → `--text-num-sm` **12px**, leading 16.0.
   /// The one rung whose size is unique in the ladder.
-  static final DsTypeSpec buttonLabelXs = DsTypeSpec(
-    family: DsFonts.sans,
+  static final ElTypeSpec buttonLabelXs = ElTypeSpec(
+    family: ElFonts.sans,
     size: 12,
     height: _leadingXs,
     wght: 500,
@@ -340,8 +340,8 @@ class DsComponentType {
   /// `font-size: 13px; line-height: 19.5px` and stands **37.5px** tall
   /// (19.5 + `py-2` + a 1px border); with the face's own leading it comes out
   /// 34, and the whole page runs short.
-  static final DsTypeSpec buttonLabelSm = DsTypeSpec(
-    family: DsFonts.sans,
+  static final ElTypeSpec buttonLabelSm = ElTypeSpec(
+    family: ElFonts.sans,
     size: 13,
     height: _leadingInherited,
     wght: 500,
@@ -351,8 +351,8 @@ class DsComponentType {
   ///
   /// Same correction as [buttonLabelSm], and the same measurement: the `lg`
   /// sidebar row computes `15px / 22.5px` and is 50px tall around a 32px tile.
-  static final DsTypeSpec buttonLabelLg = DsTypeSpec(
-    family: DsFonts.sans,
+  static final ElTypeSpec buttonLabelLg = ElTypeSpec(
+    family: ElFonts.sans,
     size: 15,
     height: _leadingInherited,
     wght: 500,
@@ -369,8 +369,8 @@ class DsComponentType {
 
   /// `Button` `size="xl"`: `text-base` → `--text-body` **15px**, leading 22.5.
   /// Same size as [buttonLabelLg], different leading, same reason as `sm`.
-  static final DsTypeSpec buttonLabelXl = DsTypeSpec(
-    family: DsFonts.sans,
+  static final ElTypeSpec buttonLabelXl = ElTypeSpec(
+    family: ElFonts.sans,
     size: 15,
     height: _leadingBase,
     wght: 500,
@@ -386,10 +386,10 @@ class DsComponentType {
   /// label from 13px to 12 (buttons-map drift 22). It is an axis, not a rung:
   /// one style for all nine sizes.
   ///
-  /// [DsTypeSpec.uppercase] is a flag, not a transform — the widget that
-  /// renders the label performs it, the way `DsText` does.
-  static final DsTypeSpec buttonLabelCaps = DsTypeSpec(
-    family: DsFonts.sans,
+  /// [ElTypeSpec.uppercase] is a flag, not a transform — the widget that
+  /// renders the label performs it, the way `ElText` does.
+  static final ElTypeSpec buttonLabelCaps = ElTypeSpec(
+    family: ElFonts.sans,
     size: 12,
     wght: 600,
     tracking: 0.09,
@@ -403,16 +403,16 @@ class DsComponentType {
   /// Value-identical to [buttonLabel] and named separately because the
   /// reference declares it separately: a `Toggle` is not a `Button` and its
   /// class list can move without the button's.
-  static final DsTypeSpec toggleLabel = DsTypeSpec(
-    family: DsFonts.sans,
+  static final ElTypeSpec toggleLabel = ElTypeSpec(
+    family: ElFonts.sans,
     size: 13,
     height: _leadingSm,
     wght: 500,
   );
 
   /// `ButtonGroupText`'s `text-sm font-medium` (`button-group.tsx` L44).
-  static final DsTypeSpec buttonGroupText = DsTypeSpec(
-    family: DsFonts.sans,
+  static final ElTypeSpec buttonGroupText = ElTypeSpec(
+    family: ElFonts.sans,
     size: 13,
     height: _leadingSm,
     wght: 500,
@@ -442,8 +442,8 @@ class DsComponentType {
   /// Leading: `.type-num` declares `line-height: 1.2`, which no utility
   /// overrides, so the component-layer value survives where the two the
   /// utilities beat do not.
-  static final DsTypeSpec buttonGroupNum = DsTypeSpec(
-    family: DsFonts.mono,
+  static final ElTypeSpec buttonGroupNum = ElTypeSpec(
+    family: ElFonts.mono,
     size: 13,
     height: 1.2,
     wght: 500,
@@ -457,8 +457,8 @@ class DsComponentType {
   /// `font-sans` is declared even though `html` already carries it: a `<kbd>`
   /// is one of the elements Preflight resets to the monospace stack, so the
   /// class is undoing a UA default rather than restating an inherited one.
-  static final DsTypeSpec kbdKey = DsTypeSpec(
-    family: DsFonts.sans,
+  static final ElTypeSpec kbdKey = ElTypeSpec(
+    family: ElFonts.sans,
     size: 12,
     height: _leadingXs,
     wght: 500,
@@ -470,8 +470,8 @@ class DsComponentType {
   // `--text-xs: var(--text-num-sm)` repoints, carrying Tailwind's own
   // `--text-xs--line-height: calc(1 / .75)` and therefore a 16px line box.
   //
-  // Ruling L8: these are component roles, not a new `DsType` rung. The port has
-  // no 12px sans class at all — `DsType.numSm` is mono, and the three existing
+  // Ruling L8: these are component roles, not a new `ElType` rung. The port has
+  // no 12px sans class at all — `ElType.numSm` is mono, and the three existing
   // 12px component roles ([buttonLabelXs], [buttonLabelCaps], [kbdKey]) all
   // declare a weight the menu family does not.
   //
@@ -497,9 +497,9 @@ class DsComponentType {
   ///
   /// The colour is not recorded here: `text-muted-foreground` is a utility on
   /// the element, not a declaration the class makes about itself, and the
-  /// widget passes it — the same division [DsInputGroupText] follows.
-  static final DsTypeSpec menuLabel = DsTypeSpec(
-    family: DsFonts.sans,
+  /// widget passes it — the same division [ElInputGroupText] follows.
+  static final ElTypeSpec menuLabel = ElTypeSpec(
+    family: ElFonts.sans,
     size: 12,
     height: _leadingXs,
     wght: 400,
@@ -517,13 +517,13 @@ class DsComponentType {
   /// *(measured)* the live palette's heading computes
   /// **`font-size: 12px`, `line-height: 16px`, `font-weight: 500`** at
   /// `font-variation-settings: normal` — a static face selection, not an axis
-  /// tweak, which is why [DsTypeSpec] carrying `wght: 500` reproduces it on
+  /// tweak, which is why [ElTypeSpec] carrying `wght: 500` reproduces it on
   /// both the variable and the fallback face.
   ///
   /// One weight step is the whole difference from [menuLabel], and that step is
   /// selects-map drift 6: three group labels, three sets of numbers, one role.
-  static final DsTypeSpec menuHeading = DsTypeSpec(
-    family: DsFonts.sans,
+  static final ElTypeSpec menuHeading = ElTypeSpec(
+    family: ElFonts.sans,
     size: 12,
     height: _leadingXs,
     wght: 500,
@@ -544,8 +544,8 @@ class DsComponentType {
   /// Declared this wave although its consumer arrives with `command.dart`:
   /// this file has one writer per wave, and a shortcut column typed by hand at
   /// the call site would put `fontSize:` in a component the guard scans.
-  static final DsTypeSpec menuShortcut = DsTypeSpec(
-    family: DsFonts.sans,
+  static final ElTypeSpec menuShortcut = ElTypeSpec(
+    family: ElFonts.sans,
     size: 12,
     height: _leadingXs,
     wght: 400,
@@ -565,7 +565,7 @@ class DsComponentType {
   /// `navigationMenuTriggerStyle()`'s `text-nav font-medium`
   /// (`components/ui/navigation-menu.tsx` L107) — 13.5px / 500 / **1.5**.
   ///
-  /// **Not [DsType.nav], and the difference is measurable.** `.type-nav`
+  /// **Not [ElType.nav], and the difference is measurable.** `.type-nav`
   /// (globals.css L1128) sets `--text-nav` *and* `line-height: 1.2`; the
   /// `text-nav` **utility** sets only the size, and Tailwind supplies its own
   /// 1.5 because globals.css declares no `--text-nav--line-height`. Probed on
@@ -578,9 +578,9 @@ class DsComponentType {
   /// It reaches the same three sites the utility does: the trigger, the plain
   /// link that borrows `navigationMenuTriggerStyle()`, and the `type-nav` title
   /// span inside a panel link — no: that last one is the *class* and stays on
-  /// [DsType.nav]. Two sites.
-  static final DsTypeSpec navMenuTrigger = DsTypeSpec(
-    family: DsFonts.sans,
+  /// [ElType.nav]. Two sites.
+  static final ElTypeSpec navMenuTrigger = ElTypeSpec(
+    family: ElFonts.sans,
     size: 13.5,
     height: _leadingNavUtility,
     wght: 500,
@@ -594,10 +594,10 @@ class DsComponentType {
   /// spec's doc. This is the one site where the correction is **visible**:
   /// `SheetContent` sets the mobile nav sheet's ambient text style, and a
   /// paragraph's line spacing does change when its line box goes from `normal`
-  /// to 18.5714px. `DsInput`, the other consumer, does not move — a single line
+  /// to 18.5714px. `ElInput`, the other consumer, does not move — a single line
   /// centred in a fixed 40px pill lands where it always did.
-  static final DsTypeSpec sheetBody = DsTypeSpec(
-    family: DsFonts.sans,
+  static final ElTypeSpec sheetBody = ElTypeSpec(
+    family: ElFonts.sans,
     size: 13,
     height: _leadingSm,
     wght: 400,
@@ -622,8 +622,8 @@ class DsComponentType {
   /// measured title is **15px in a 15px box** where its four siblings sit in
   /// 22.5. That is what lets the dialog's header band close at 93px with an
   /// 8px gap under the title rather than a 15px optical one.
-  static final DsTypeSpec dialogTitle = DsTypeSpec(
-    family: DsFonts.heading,
+  static final ElTypeSpec dialogTitle = ElTypeSpec(
+    family: ElFonts.heading,
     size: _textBase,
     height: 1,
     wght: 500,
@@ -636,8 +636,8 @@ class DsComponentType {
   /// The alert dialog is where the difference reads: its title is the
   /// question, it wraps to two lines on the narrow content, and `leading-none`
   /// would set those two lines solid.
-  static final DsTypeSpec overlayTitle = DsTypeSpec(
-    family: DsFonts.heading,
+  static final ElTypeSpec overlayTitle = ElTypeSpec(
+    family: ElFonts.heading,
     size: _textBase,
     height: _leadingBase,
     wght: 500,
@@ -646,10 +646,10 @@ class DsComponentType {
   /// `PopoverTitle`'s bare `font-medium` — no size and no family of its own,
   /// so it takes `PopoverContent`'s `text-sm`: 13px / 500 / 1.428571.
   ///
-  /// Sans, not [DsFonts.heading]: `popover.tsx` writes no `font-heading`, and
+  /// Sans, not [ElFonts.heading]: `popover.tsx` writes no `font-heading`, and
   /// a popover header is a label on a panel rather than a heading over a task.
-  static final DsTypeSpec popoverTitle = DsTypeSpec(
-    family: DsFonts.sans,
+  static final ElTypeSpec popoverTitle = ElTypeSpec(
+    family: ElFonts.sans,
     size: 13,
     height: _leadingSm,
     wght: 500,
@@ -658,8 +658,8 @@ class DsComponentType {
   /// `TooltipContent`'s `text-xs` — 12px / 400 / 1.333333, inheriting `html`'s
   /// weight. A tooltip is a label, and the class list gives it no weight of
   /// its own.
-  static final DsTypeSpec tooltipLabel = DsTypeSpec(
-    family: DsFonts.sans,
+  static final ElTypeSpec tooltipLabel = ElTypeSpec(
+    family: ElFonts.sans,
     size: 12,
     height: _leadingXs,
     wght: 400,
@@ -670,10 +670,10 @@ class DsComponentType {
   /// **Not `.type-badge`.** That class (11px, 600, uppercase, 0.14em) is a
   /// different object with an unfortunately similar name; `badge.tsx` never
   /// reaches for it, and the measured chip on the media dialog is 12px at 500
-  /// with no transform. [DsType.badge] stays where it is for the callers that
+  /// with no transform. [ElType.badge] stays where it is for the callers that
   /// do want the class.
-  static final DsTypeSpec badgeLabel = DsTypeSpec(
-    family: DsFonts.sans,
+  static final ElTypeSpec badgeLabel = ElTypeSpec(
+    family: ElFonts.sans,
     size: 12,
     height: _leadingXs,
     wght: 500,
@@ -696,12 +696,12 @@ class DsComponentType {
   /// `SidebarMenuBadge`'s `.type-num-xs` over `Badge`'s own `text-xs
   /// font-medium` — **12px / 500 / 1.333333, mono, tabular, −0.01em**.
   ///
-  /// [DsType.numXs] is 11px at 600; `text-xs` (→ `--text-num-sm`, 12px) and
+  /// [ElType.numXs] is 11px at 600; `text-xs` (→ `--text-num-sm`, 12px) and
   /// `font-medium` both outrank it. *(Measured: `font-size: 12px`,
   /// `font-weight: 500`, `line-height: 16px`, `letter-spacing: -0.12px`,
   /// `font-variant-numeric: tabular-nums`, family `GeistMono`.)*
-  static final DsTypeSpec sidebarMenuBadge = DsTypeSpec(
-    family: DsFonts.mono,
+  static final ElTypeSpec sidebarMenuBadge = ElTypeSpec(
+    family: ElFonts.mono,
     size: 12,
     height: _leadingXs,
     wght: 500,
@@ -717,8 +717,8 @@ class DsComponentType {
   /// size but **no** weight, so `.type-num-sm`'s 600 survives and its 12px
   /// does not. *(Measured: 13px / 600 / 18.5714px / −0.13px / tabular /
   /// `GeistMono`.)*
-  static final DsTypeSpec avatarFallback = DsTypeSpec(
-    family: DsFonts.mono,
+  static final ElTypeSpec avatarFallback = ElTypeSpec(
+    family: ElFonts.mono,
     size: 13,
     height: _leadingSm,
     wght: 600,
@@ -733,7 +733,7 @@ class DsComponentType {
   //
   // `--leading-*` is never redeclared in globals.css, so Tailwind's stock
   // ratios stand. They are unitless multipliers of the element's own font size,
-  // which is what [DsTypeSpec.height] is.
+  // which is what [ElTypeSpec.height] is.
 
   /// `--leading-snug: 1.375` — Tailwind stock, undeclared in globals.css.
   static const double _leadingSnug = 1.375;
@@ -747,8 +747,8 @@ class DsComponentType {
   /// The rung `FieldError` and the OTP slots sit on. Same size and leading as
   /// [buttonLabel] at `html`'s inherited 400 instead of `font-medium`'s 500,
   /// which is the only thing that separates the two.
-  static final DsTypeSpec textSm = DsTypeSpec(
-    family: DsFonts.sans,
+  static final ElTypeSpec textSm = ElTypeSpec(
+    family: ElFonts.sans,
     size: 13,
     height: _leadingSm,
     wght: 400,
@@ -759,8 +759,8 @@ class DsComponentType {
   /// The one place in the family that tightens the leading: a label is a short
   /// run above a control, and `text-sm`'s own 1.428571 would push it away from
   /// the field it names.
-  static final DsTypeSpec fieldLabel = DsTypeSpec(
-    family: DsFonts.sans,
+  static final ElTypeSpec fieldLabel = ElTypeSpec(
+    family: ElFonts.sans,
     size: 13,
     height: _leadingSnug,
     wght: 500,
@@ -772,8 +772,8 @@ class DsComponentType {
   /// The opposite override to [fieldLabel] and for the opposite reason: a
   /// textarea is the one control on the page that holds real paragraphs, and
   /// paragraphs need air between the lines.
-  static final DsTypeSpec textareaBody = DsTypeSpec(
-    family: DsFonts.sans,
+  static final ElTypeSpec textareaBody = ElTypeSpec(
+    family: ElFonts.sans,
     size: 13,
     height: _leadingRelaxed,
     wght: 400,
@@ -791,8 +791,8 @@ class DsComponentType {
   /// The leading is `text-sm`'s 1.428571 rather than `.type-num`'s 1.2, because
   /// here the utility carries a companion `--text-sm--line-height` and a
   /// utility beats a component layer on every property it declares.
-  static final DsTypeSpec inputNum = DsTypeSpec(
-    family: DsFonts.mono,
+  static final ElTypeSpec inputNum = ElTypeSpec(
+    family: ElFonts.mono,
     size: 13,
     height: _leadingSm,
     wght: 600,
@@ -805,8 +805,8 @@ class DsComponentType {
   /// `.type-serial` declares **no `font-weight` at all** (globals.css L1211),
   /// so the 400 recorded here is not the class's, it is `html`'s, inherited
   /// through it. Mono, uppercase and −0.01em survive; the size drops 15 → 13.
-  static final DsTypeSpec inputSerial = DsTypeSpec(
-    family: DsFonts.mono,
+  static final ElTypeSpec inputSerial = ElTypeSpec(
+    family: ElFonts.mono,
     size: 13,
     height: _leadingSm,
     wght: 400,
@@ -829,8 +829,8 @@ class DsComponentType {
   /// 13px site in the port whose line box is 21.125 rather than 18.5714. It is
   /// what makes every single-line bubble on the page **39.13px** tall:
   /// 21.125 + `py-2` twice + the 1px transparent border twice.
-  static final DsTypeSpec bubbleContent = DsTypeSpec(
-    family: DsFonts.sans,
+  static final ElTypeSpec bubbleContent = ElTypeSpec(
+    family: ElFonts.sans,
     size: 13,
     height: _leadingRelaxed,
     wght: 400,
@@ -839,11 +839,11 @@ class DsComponentType {
   /// `MessageHeader` / `MessageFooter` — `text-xs font-medium`, **12px / 16px
   /// / 500**.
   ///
-  /// Value-identical to [DsType.badge] and declared separately for the same
+  /// Value-identical to [ElType.badge] and declared separately for the same
   /// reason [toggleLabel] is: the reference declares it separately, and a
   /// message's byline is free to move without a badge's.
-  static final DsTypeSpec messageMeta = DsTypeSpec(
-    family: DsFonts.sans,
+  static final ElTypeSpec messageMeta = ElTypeSpec(
+    family: ElFonts.sans,
     size: 12,
     height: _leadingXs,
     wght: 500,
@@ -851,8 +851,8 @@ class DsComponentType {
 
   /// `BubbleReactions`' own `text-sm` — 13px / 18.5714px / 400, inherited by
   /// the bare rail's emoji spans and by every reaction pill.
-  static final DsTypeSpec bubbleReactions = DsTypeSpec(
-    family: DsFonts.sans,
+  static final ElTypeSpec bubbleReactions = ElTypeSpec(
+    family: ElFonts.sans,
     size: 13,
     height: _leadingSm,
     wght: 400,
@@ -861,8 +861,8 @@ class DsComponentType {
   /// `AttachmentTitle`'s `font-medium` under `Attachment size="default"`'s
   /// `text-sm` and `AttachmentContent`'s `leading-tight` — **13px / 16.25px /
   /// 500**.
-  static final DsTypeSpec attachmentTitle = DsTypeSpec(
-    family: DsFonts.sans,
+  static final ElTypeSpec attachmentTitle = ElTypeSpec(
+    family: ElFonts.sans,
     size: 13,
     height: _leadingTight,
     wght: 500,
@@ -870,8 +870,8 @@ class DsComponentType {
 
   /// The same title under `size="sm"` / `size="xs"`, whose root is `text-xs` —
   /// **12px / 15px / 500**.
-  static final DsTypeSpec attachmentTitleSm = DsTypeSpec(
-    family: DsFonts.sans,
+  static final ElTypeSpec attachmentTitleSm = ElTypeSpec(
+    family: ElFonts.sans,
     size: 12,
     height: _leadingTight,
     wght: 500,
@@ -880,8 +880,8 @@ class DsComponentType {
   /// `AttachmentDescription`'s `text-xs` — 12px / 16px / 400, on every size,
   /// because the description states its own size and the root's does not reach
   /// it.
-  static final DsTypeSpec attachmentDescription = DsTypeSpec(
-    family: DsFonts.sans,
+  static final ElTypeSpec attachmentDescription = ElTypeSpec(
+    family: ElFonts.sans,
     size: 12,
     height: _leadingXs,
     wght: 400,
@@ -906,8 +906,8 @@ class DsComponentType {
   /// every `th` and `td` under it takes the resolved 13px *and* the resolved
   /// 18.5714px line box, because an inherited `line-height` inherits as the
   /// computed pixel value rather than as the ratio.
-  static final DsTypeSpec tableHead = DsTypeSpec(
-    family: DsFonts.sans,
+  static final ElTypeSpec tableHead = ElTypeSpec(
+    family: ElFonts.sans,
     size: 13,
     height: _leadingSm,
     wght: 500,
@@ -920,8 +920,8 @@ class DsComponentType {
   /// same face at `text-base`'s own 1.5; a card title tightens to
   /// `leading-snug`, so it sits 1.875px shorter and closer to the description
   /// under it.
-  static final DsTypeSpec cardTitle = DsTypeSpec(
-    family: DsFonts.heading,
+  static final ElTypeSpec cardTitle = ElTypeSpec(
+    family: ElFonts.heading,
     size: _textBase,
     height: _leadingSnug,
     wght: 500,
@@ -932,8 +932,8 @@ class DsComponentType {
   /// Numerically [fieldLabel], and named separately because it is a different
   /// component's declaration: `item.tsx` writes the three utilities itself and
   /// has no `field.tsx` in its cascade.
-  static final DsTypeSpec itemTitle = DsTypeSpec(
-    family: DsFonts.sans,
+  static final ElTypeSpec itemTitle = ElTypeSpec(
+    family: ElFonts.sans,
     size: 13,
     height: _leadingSnug,
     wght: 500,
@@ -947,8 +947,8 @@ class DsComponentType {
   /// reason (there it is a *missing* companion key; here it is an explicit
   /// utility). A row's description is the one string in an `Item` that is
   /// allowed to wrap, and 1.5 is what separates the two lines.
-  static final DsTypeSpec itemDescription = DsTypeSpec(
-    family: DsFonts.sans,
+  static final ElTypeSpec itemDescription = ElTypeSpec(
+    family: ElFonts.sans,
     size: 13,
     height: _leadingNormal,
     wght: 400,
@@ -964,8 +964,8 @@ class DsComponentType {
   /// survives is the one thing `text-sm` does not declare: **the 500 weight**.
   /// *(Measured on the 24px avatar: 13px/18.5714px/500, where the class alone
   /// would render 10.5/14.175.)*
-  static final DsTypeSpec avatarInitials = DsTypeSpec(
-    family: DsFonts.sans,
+  static final ElTypeSpec avatarInitials = ElTypeSpec(
+    family: ElFonts.sans,
     size: 13,
     height: _leadingSm,
     wght: 500,
@@ -976,9 +976,9 @@ class DsComponentType {
   // `NavUser`, measured on a different page, and byte-identical. One spelling.
 }
 
-/// Every `.type-*` class in globals.css, one [DsTypeSpec] each.
-class DsType {
-  const DsType._();
+/// Every `.type-*` class in globals.css, one [ElTypeSpec] each.
+class ElType {
+  const ElType._();
 
   // ── Fluid sizes ──────────────────────────────────────────────────────────
 
@@ -999,24 +999,24 @@ class DsType {
 
   /// `.type-display` — heading face, clamp 44–64/1, 500,
   /// `--tracking-display` −0.03em (globals.css L1019).
-  static final DsTypeSpec display = DsTypeSpec(
-    family: DsFonts.heading,
+  static final ElTypeSpec display = ElTypeSpec(
+    family: ElFonts.heading,
     height: 1,
     wght: 500,
     tracking: -0.03,
   );
 
   /// `.type-h1` — clamp 32–40/1.1, 700, `--tracking-tight` −0.02em (L1070).
-  static final DsTypeSpec h1 = DsTypeSpec(
-    family: DsFonts.sans,
+  static final ElTypeSpec h1 = ElTypeSpec(
+    family: ElFonts.sans,
     height: 1.1,
     wght: 700,
     tracking: -0.02,
   );
 
   /// `.type-h2` — 28px (1.75rem)/1.2, **650**, −0.015em (L1077).
-  static final DsTypeSpec h2 = DsTypeSpec(
-    family: DsFonts.sans,
+  static final ElTypeSpec h2 = ElTypeSpec(
+    family: ElFonts.sans,
     size: 28,
     height: 1.2,
     wght: 650,
@@ -1024,8 +1024,8 @@ class DsType {
   );
 
   /// `.type-h3` — 21px (1.3125rem)/1.3, 600, −0.01em (L1084).
-  static final DsTypeSpec h3 = DsTypeSpec(
-    family: DsFonts.sans,
+  static final ElTypeSpec h3 = ElTypeSpec(
+    family: ElFonts.sans,
     size: 21,
     height: 1.3,
     wght: 600,
@@ -1033,42 +1033,42 @@ class DsType {
   );
 
   /// `.type-h4` — 17px (1.0625rem)/1.4, 600, no tracking (L1091).
-  static final DsTypeSpec h4 = DsTypeSpec(
-    family: DsFonts.sans,
+  static final ElTypeSpec h4 = ElTypeSpec(
+    family: ElFonts.sans,
     size: 17,
     height: 1.4,
     wght: 600,
   );
 
   /// `.type-lead` — 17px (1.0625rem)/1.65, 400, muted-foreground (L1099).
-  static final DsTypeSpec lead = DsTypeSpec(
-    family: DsFonts.sans,
+  static final ElTypeSpec lead = ElTypeSpec(
+    family: ElFonts.sans,
     size: 17,
     height: 1.65,
     wght: 400,
-    defaultColor: DsTypeColor.muted,
+    defaultColor: ElTypeColor.muted,
   );
 
   /// `.type-body` — `--text-body` 15px/1.6, 400 (L1105).
-  static final DsTypeSpec body = DsTypeSpec(
-    family: DsFonts.sans,
+  static final ElTypeSpec body = ElTypeSpec(
+    family: ElFonts.sans,
     size: 15,
     height: 1.6,
     wght: 400,
   );
 
   /// `.type-small` — `--text-small` 13px/1.5, 400, muted-foreground (L1120).
-  static final DsTypeSpec small = DsTypeSpec(
-    family: DsFonts.sans,
+  static final ElTypeSpec small = ElTypeSpec(
+    family: ElFonts.sans,
     size: 13,
     height: 1.5,
     wght: 400,
-    defaultColor: DsTypeColor.muted,
+    defaultColor: ElTypeColor.muted,
   );
 
   /// `.type-nav` — `--text-nav` 13.5px/1.2, 500 (L1128).
-  static final DsTypeSpec nav = DsTypeSpec(
-    family: DsFonts.sans,
+  static final ElTypeSpec nav = ElTypeSpec(
+    family: ElFonts.sans,
     size: 13.5,
     height: 1.2,
     wght: 500,
@@ -1076,24 +1076,24 @@ class DsType {
 
   /// `.type-nav-sm` — `--text-chip` 11.5px/1.2, 500 (L1139).
   /// The dense step of [nav]; sentence case is the whole point of the class.
-  static final DsTypeSpec navSm = DsTypeSpec(
-    family: DsFonts.sans,
+  static final ElTypeSpec navSm = ElTypeSpec(
+    family: ElFonts.sans,
     size: 11.5,
     height: 1.2,
     wght: 500,
   );
 
   /// `.type-chip` — `--text-chip` 11.5px/1.2, 500 (L1145).
-  static final DsTypeSpec chip = DsTypeSpec(
-    family: DsFonts.sans,
+  static final ElTypeSpec chip = ElTypeSpec(
+    family: ElFonts.sans,
     size: 11.5,
     height: 1.2,
     wght: 500,
   );
 
   /// `.type-caption` — `--text-micro` 10.5px/1.35, 500 (L1151).
-  static final DsTypeSpec caption = DsTypeSpec(
-    family: DsFonts.sans,
+  static final ElTypeSpec caption = ElTypeSpec(
+    family: ElFonts.sans,
     size: 10.5,
     height: 1.35,
     wght: 500,
@@ -1101,38 +1101,38 @@ class DsType {
 
   /// `.type-code` — mono, `--text-code` 12.5px/1.4, **no font-weight
   /// declaration** — it inherits (L1157).
-  static final DsTypeSpec code = DsTypeSpec(
-    family: DsFonts.mono,
+  static final ElTypeSpec code = ElTypeSpec(
+    family: ElFonts.mono,
     size: 12.5,
     height: 1.4,
   );
 
   /// `.type-label` — `--text-label` 11px/1, 600, uppercase,
   /// `--tracking-label` 0.16em, muted-foreground (L1164).
-  static final DsTypeSpec label = DsTypeSpec(
-    family: DsFonts.sans,
+  static final ElTypeSpec label = ElTypeSpec(
+    family: ElFonts.sans,
     size: 11,
     height: 1,
     wght: 600,
     tracking: 0.16,
     uppercase: true,
-    defaultColor: DsTypeColor.muted,
+    defaultColor: ElTypeColor.muted,
   );
 
   /// `.type-section` — `--text-small` 13px/1.4, 600, muted-foreground (L1192).
   /// The label's quiet twin: a group heading in sentence case.
-  static final DsTypeSpec section = DsTypeSpec(
-    family: DsFonts.sans,
+  static final ElTypeSpec section = ElTypeSpec(
+    family: ElFonts.sans,
     size: 13,
     height: 1.4,
     wght: 600,
-    defaultColor: DsTypeColor.muted,
+    defaultColor: ElTypeColor.muted,
   );
 
   /// `.type-wordmark` — `--text-body` 15px/1, 700,
   /// `--tracking-num` −0.01em (L1201).
-  static final DsTypeSpec wordmark = DsTypeSpec(
-    family: DsFonts.sans,
+  static final ElTypeSpec wordmark = ElTypeSpec(
+    family: ElFonts.sans,
     size: 15,
     height: 1,
     wght: 700,
@@ -1142,8 +1142,8 @@ class DsType {
   /// `.type-serial` — mono, `--text-body` 15px/1.4, uppercase,
   /// `--tracking-num` −0.01em, **no font-weight declaration** — it inherits
   /// (L1211).
-  static final DsTypeSpec serial = DsTypeSpec(
-    family: DsFonts.mono,
+  static final ElTypeSpec serial = ElTypeSpec(
+    family: ElFonts.mono,
     size: 15,
     height: 1.4,
     tracking: -0.01,
@@ -1152,20 +1152,20 @@ class DsType {
 
   /// `.type-micro` — `--text-micro` 10.5px/1, 600, uppercase,
   /// `--tracking-micro` 0.18em, muted-foreground (L1218).
-  static final DsTypeSpec micro = DsTypeSpec(
-    family: DsFonts.sans,
+  static final ElTypeSpec micro = ElTypeSpec(
+    family: ElFonts.sans,
     size: 10.5,
     height: 1,
     wght: 600,
     tracking: 0.18,
     uppercase: true,
-    defaultColor: DsTypeColor.muted,
+    defaultColor: ElTypeColor.muted,
   );
 
   /// `.type-tag` — `--text-tag` 10px/1, 600, uppercase,
   /// `--tracking-tag` 0.12em (L1238). The smallest step.
-  static final DsTypeSpec tag = DsTypeSpec(
-    family: DsFonts.sans,
+  static final ElTypeSpec tag = ElTypeSpec(
+    family: ElFonts.sans,
     size: 10,
     height: 1,
     wght: 600,
@@ -1175,8 +1175,8 @@ class DsType {
 
   /// `.type-badge` — `--text-label` 11px/1, 600, uppercase,
   /// `--tracking-badge` 0.14em (L1246).
-  static final DsTypeSpec badge = DsTypeSpec(
-    family: DsFonts.sans,
+  static final ElTypeSpec badge = ElTypeSpec(
+    family: ElFonts.sans,
     size: 11,
     height: 1,
     wght: 600,
@@ -1187,8 +1187,8 @@ class DsType {
   /// `.type-accent` — Redaction 35, 1.055em, italic, 400,
   /// `--tracking-display` −0.03em, **no line-height declaration** — it
   /// inherits (L1046).
-  static final DsTypeSpec accent = DsTypeSpec(
-    family: DsFonts.accent,
+  static final ElTypeSpec accent = ElTypeSpec(
+    family: ElFonts.accent,
     wght: 400,
     tracking: -0.03,
     fontStyle: FontStyle.italic,
@@ -1201,8 +1201,8 @@ class DsType {
 
   /// `.type-num-xs` — mono, `--text-label` 11px/1.2, 600, tabular,
   /// −0.01em (L1267).
-  static final DsTypeSpec numXs = DsTypeSpec(
-    family: DsFonts.mono,
+  static final ElTypeSpec numXs = ElTypeSpec(
+    family: ElFonts.mono,
     size: 11,
     height: 1.2,
     wght: 600,
@@ -1212,8 +1212,8 @@ class DsType {
 
   /// `.type-num-sm` — mono, `--text-num-sm` 12px/1.2, 600, tabular,
   /// −0.01em (L1271).
-  static final DsTypeSpec numSm = DsTypeSpec(
-    family: DsFonts.mono,
+  static final ElTypeSpec numSm = ElTypeSpec(
+    family: ElFonts.mono,
     size: 12,
     height: 1.2,
     wght: 600,
@@ -1223,8 +1223,8 @@ class DsType {
 
   /// `.type-num` — mono, `--text-body` 15px/1.2, 600, tabular, −0.01em
   /// (L1275). Named `numBase` because Dart reserves `num`.
-  static final DsTypeSpec numBase = DsTypeSpec(
-    family: DsFonts.mono,
+  static final ElTypeSpec numBase = ElTypeSpec(
+    family: ElFonts.mono,
     size: 15,
     height: 1.2,
     wght: 600,
@@ -1234,8 +1234,8 @@ class DsType {
 
   /// `.type-num-md` — mono, 20px (1.25rem)/1.15, 600, tabular,
   /// −0.01em (L1279).
-  static final DsTypeSpec numMd = DsTypeSpec(
-    family: DsFonts.mono,
+  static final ElTypeSpec numMd = ElTypeSpec(
+    family: ElFonts.mono,
     size: 20,
     height: 1.15,
     wght: 600,
@@ -1245,8 +1245,8 @@ class DsType {
 
   /// `.type-num-lg` — mono, 28px (1.75rem)/1.05, 600, tabular,
   /// −0.01em (L1283).
-  static final DsTypeSpec numLg = DsTypeSpec(
-    family: DsFonts.mono,
+  static final ElTypeSpec numLg = ElTypeSpec(
+    family: ElFonts.mono,
     size: 28,
     height: 1.05,
     wght: 600,
@@ -1256,8 +1256,8 @@ class DsType {
 
   /// `.type-num-xl` — mono, 40px (2.5rem)/1, 600, tabular, and the one
   /// numeric that leaves `--tracking-num`: −0.025em (L1287).
-  static final DsTypeSpec numXl = DsTypeSpec(
-    family: DsFonts.mono,
+  static final ElTypeSpec numXl = ElTypeSpec(
+    family: ElFonts.mono,
     size: 40,
     height: 1,
     wght: 600,
@@ -1266,7 +1266,7 @@ class DsType {
   );
 
   /// All 27 classes, in the order globals.css declares them (L1019–1292).
-  static final List<DsTypeSpec> all = <DsTypeSpec>[
+  static final List<ElTypeSpec> all = <ElTypeSpec>[
     display,
     accent,
     h1,

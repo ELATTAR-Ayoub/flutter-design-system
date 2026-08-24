@@ -158,6 +158,7 @@ class ElattarCli {
   Future<int> _runAdd(_ArgCursor cursor) async {
     bool overwrite = false;
     bool dryRun = false;
+    bool addAll = false;
     String? registryPath;
     final List<String> names = <String>[];
     while (cursor.hasNext) {
@@ -166,6 +167,8 @@ class ElattarCli {
         overwrite = true;
       } else if (value == '--dry-run') {
         dryRun = true;
+      } else if (value == '--all') {
+        addAll = true;
       } else if (value == '--registry') {
         registryPath = cursor.requireValue('--registry');
       } else {
@@ -174,9 +177,6 @@ class ElattarCli {
         }
         names.add(value);
       }
-    }
-    if (names.isEmpty) {
-      throw const FormatException('add requires at least one item name.');
     }
     final FlutterProject project = discoverFlutterProject();
     final File configFile = File(_join(project.root.path, 'elattar.yaml'));
@@ -201,6 +201,11 @@ class ElattarCli {
     final _RegistryContext registry = _RegistryContext.fromLatestDirectory(
       registryDirectory,
     );
+    final List<String> requestedNames = await _resolvedAddNames(
+      registry: registry,
+      names: names,
+      addAll: addAll,
+    );
     final File manifestFile = _manifestFile(project.root);
     if (!manifestFile.existsSync()) {
       throw const ElattarManifestException(
@@ -210,7 +215,9 @@ class ElattarCli {
     final ElattarManifest manifest = ElattarManifest.load(manifestFile);
     config.validateAgainst(manifest);
 
-    final List<RegistryItem> resolved = await registry.client.resolve(names);
+    final List<RegistryItem> resolved = await registry.client.resolve(
+      requestedNames,
+    );
     final _MutationResult mutation = _planMutation(
       project: project,
       registry: registry,
@@ -657,7 +664,7 @@ class ElattarCli {
       '  elattar init [--foundation source] [--yes] [--dry-run] [--registry PATH]',
     );
     _stdout(
-      '  elattar add <items...> [--overwrite] [--dry-run] [--registry PATH]',
+      '  elattar add <items...> [--all] [--overwrite] [--dry-run] [--registry PATH]',
     );
     _stdout('  elattar list [--registry PATH]');
     _stdout('  elattar search <query> [--registry PATH]');
@@ -694,6 +701,81 @@ class ElattarCli {
 
   static void _defaultStdout(String line) => stdout.writeln(line);
   static void _defaultStderr(String line) => stderr.writeln(line);
+}
+
+Future<List<String>> _resolvedAddNames({
+  required _RegistryContext registry,
+  required List<String> names,
+  required bool addAll,
+}) async {
+  if (!addAll) {
+    if (names.isEmpty) {
+      throw const FormatException('add requires at least one item name.');
+    }
+    return names;
+  }
+  final List<String> curated = _loadInstallableComponentOwners(
+    registry.repositoryRoot,
+  );
+  if (curated.isNotEmpty) {
+    return _dedupeNames(<String>[...curated, ...names]);
+  }
+  final List<RegistryItem> allComponents = await registry.client.list(
+    type: RegistryItemType.component,
+  );
+  if (allComponents.isEmpty) {
+    throw const FormatException('The registry has no component items to add.');
+  }
+  return _dedupeNames(<String>[
+    for (final RegistryItem item in allComponents) item.name,
+    ...names,
+  ]);
+}
+
+List<String> _loadInstallableComponentOwners(Directory repositoryRoot) {
+  final File inventoryFile = File(
+    _join(repositoryRoot.path, 'registry/component_inventory.json'),
+  );
+  if (!inventoryFile.existsSync()) return const <String>[];
+  final Object? decoded;
+  try {
+    decoded = jsonDecode(inventoryFile.readAsStringSync());
+  } on Object catch (error) {
+    throw FormatException(
+      'registry/component_inventory.json is invalid: $error',
+    );
+  }
+  if (decoded is! Map<String, Object?>) {
+    throw const FormatException(
+      'registry/component_inventory.json must be a JSON object.',
+    );
+  }
+  final Object? rawOwners = decoded['installableOwners'];
+  if (rawOwners is! List<Object?>) {
+    throw const FormatException(
+      'registry/component_inventory.json.installableOwners must be an array.',
+    );
+  }
+  return _dedupeNames(<String>[
+    for (final Object? value in rawOwners)
+      if (value is String && value.trim().isNotEmpty)
+        value
+      else
+        throw const FormatException(
+          'registry/component_inventory.json.installableOwners must contain non-empty strings.',
+        ),
+  ]);
+}
+
+List<String> _dedupeNames(List<String> names) {
+  final List<String> deduped = <String>[];
+  final Set<String> seen = <String>{};
+  for (final String name in names) {
+    if (seen.add(name)) {
+      deduped.add(name);
+    }
+  }
+  return deduped;
 }
 
 class _RegistryContext {

@@ -2,7 +2,7 @@
 ///
 /// USER-ORDERED MOBILE ADAPTATION (2026-08-16). Screenshots showed [DocsShell]'s
 /// header behind the phone's clock and the reading column behind the gesture
-/// bar; the ruling, which [DsSafeArea]'s library note carries in full, is that
+/// bar; the ruling, which [ElSafeArea]'s library note carries in full, is that
 /// backgrounds keep painting edge-to-edge and content clears the bars. Both
 /// halves are asserted here, because a fix that satisfies only the first is the
 /// bug and a fix that satisfies only the second is a letterbox.
@@ -22,6 +22,7 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/logo.dart';
 import 'package:example/main.dart';
+import 'package:example/nav.dart';
 import 'package:example/pages/sidebar_demo.dart';
 import 'package:example/shell.dart';
 import 'package:example/theme_toggle.dart';
@@ -34,15 +35,16 @@ const double _statusBar = 47;
 const double _gestureBar = 34;
 
 /// Wide enough for the sidebar demo's panel to be a column rather than a sheet
-/// (`DsSidebarProvider.isMobileWidth`), and still carrying both bars — a large
+/// (`ElSidebarProvider.isMobileWidth`), and still carrying both bars — a large
 /// foldable, or a phone in landscape with the notch on top.
 const Size _tablet = Size(900, 700);
 
 /// The frame the port is verified at, where every inset is zero.
 const Size _desktop = Size(1440, 900);
+const Key _contentKey = ValueKey<String>('safe-area-content');
 
 /// What a top bar occupies once it has paid the status bar.
-const double _headerWithBar = DsWidths.siteHeader + _statusBar;
+const double _headerWithBar = ElWidths.siteHeader + _statusBar;
 
 extension on WidgetTester {
   /// Sizes the viewport and, unless [bars] is false, tells the window it has a
@@ -55,8 +57,10 @@ extension on WidgetTester {
     view.devicePixelRatio = 1;
     view.physicalSize = size;
     if (bars) {
-      const FakeViewPadding padding =
-          FakeViewPadding(top: _statusBar, bottom: _gestureBar);
+      const FakeViewPadding padding = FakeViewPadding(
+        top: _statusBar,
+        bottom: _gestureBar,
+      );
       view.padding = padding;
       view.viewPadding = padding;
     }
@@ -69,22 +73,47 @@ extension on WidgetTester {
   /// `shell_test`'s own boot, plus the viewport this file is arguing about.
   Future<void> pumpApp(Size size, {bool bars = true}) async {
     useViewport(size, bars: bars);
-    await pumpWidget(const DocsApp());
+    final ElThemeController theme = ElThemeController(mode: ElThemeMode.light);
+    final AppRouter router = AppRouter(route: elRoot);
+    addTearDown(theme.dispose);
+    addTearDown(router.dispose);
+
+    await pumpWidget(
+      ElTheme(
+        controller: theme,
+        child: AppRouterScope(
+          router: router,
+          child: MaterialApp(
+            debugShowCheckedModeBanner: false,
+            home: DocsShell(
+              route: elRoot,
+              child: SelectionArea(
+                key: _contentKey,
+                child: SizedBox(
+                  height: 2000,
+                  child: ElText('Safe area fixture', ElType.body),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
     await pump();
-    await pumpAndSettle();
+    await pump(ElDurations.slow);
   }
 
   /// The demo alone, under reduced motion — `sidebar_demo_test`'s harness, so
   /// the panel's three chained tweens are not measured mid-flight.
   Future<void> pumpDemo(Size size, {bool bars = true}) async {
     useViewport(size, bars: bars);
-    final DsThemeController theme = DsThemeController(mode: DsThemeMode.light);
+    final ElThemeController theme = ElThemeController(mode: ElThemeMode.light);
     final AppRouter router = AppRouter(route: sidebarDemoRoute);
     addTearDown(theme.dispose);
     addTearDown(router.dispose);
 
     await pumpWidget(
-      DsTheme(
+      ElTheme(
         controller: theme,
         child: AppRouterScope(
           router: router,
@@ -101,26 +130,24 @@ extension on WidgetTester {
       ),
     );
     await pump();
-    await pump(DsDurations.slow);
+    await pump(ElDurations.slow);
   }
 
   /// The docs header's painted box — the blurred, washed, bottom-ruled band.
   Rect get headerBox => getRect(
-        find
-            .ancestor(of: find.byType(Logo), matching: find.byType(ClipRect))
-            .last,
-      );
+    find.ancestor(of: find.byType(Logo), matching: find.byType(ClipRect)).last,
+  );
 
   /// The reading column's scroll view — named by the page it carries, since
-  /// above `lg` the rail is a second [DsThinScrollbar] beside it.
+  /// above `lg` the rail is a second [ElThinScrollbar] beside it.
   SingleChildScrollView get readingColumn => widget<SingleChildScrollView>(
-        find
-            .ancestor(
-              of: find.byType(SelectionArea),
-              matching: find.byType(SingleChildScrollView),
-            )
-            .first,
-      );
+    find
+        .ancestor(
+          of: find.byKey(_contentKey),
+          matching: find.byType(SingleChildScrollView),
+        )
+        .first,
+  );
 }
 
 void main() {
@@ -166,7 +193,7 @@ void main() {
       // Spent, not merely declared: at rest the page's first pixel is below the
       // header rather than behind it.
       expect(
-        tester.getTopLeft(find.byType(SelectionArea)).dy,
+        tester.getTopLeft(find.byKey(_contentKey)).dy,
         greaterThanOrEqualTo(_headerWithBar),
       );
     });
@@ -180,7 +207,7 @@ void main() {
       // what not to inset: the atmosphere is outside the frame's safe area and
       // fills the window, bars included.
       expect(
-        tester.getRect(find.byType(DsPageGlow)),
+        tester.getRect(find.byType(ElPageGlow)),
         Rect.fromLTWH(0, 0, _phone.width, _phone.height),
       );
     });
@@ -189,12 +216,10 @@ void main() {
         'reachable', (WidgetTester tester) async {
       await tester.pumpApp(_phone);
 
-      final Finder burger =
-          find.bySemanticsLabel('Open design system navigation');
-      expect(
-        tester.getTopLeft(burger).dy,
-        greaterThanOrEqualTo(_statusBar),
+      final Finder burger = find.bySemanticsLabel(
+        'Open design system navigation',
       );
+      expect(tester.getTopLeft(burger).dy, greaterThanOrEqualTo(_statusBar));
 
       // The trigger is not merely drawn clear of the status bar, it is hittable
       // there — a control under a system bar takes no taps, which is the half
@@ -217,10 +242,10 @@ void main() {
       // this file changed.
       final Rect header = tester.headerBox;
       expect(header.top, 0);
-      expect(header.height, DsWidths.siteHeader);
+      expect(header.height, ElWidths.siteHeader);
       expect(
         tester.readingColumn.padding,
-        const EdgeInsets.only(top: DsWidths.siteHeader),
+        const EdgeInsets.only(top: ElWidths.siteHeader),
       );
     });
 
@@ -233,14 +258,11 @@ void main() {
         of: find.byType(NavTree),
         matching: find.byType(SingleChildScrollView),
       );
-      expect(tester.getTopLeft(rail).dy, DsWidths.siteHeader);
+      expect(tester.getTopLeft(rail).dy, ElWidths.siteHeader);
       // `sticky top-(--height-site-header)`: the rail owns the window from the
       // header's edge to the floor, and with no bars there is nothing else to
       // pay for.
-      expect(
-        tester.getRect(rail).bottom,
-        _desktop.height,
-      );
+      expect(tester.getRect(rail).bottom, _desktop.height);
     });
   });
 
@@ -253,7 +275,7 @@ void main() {
       final Rect bar = tester.getRect(
         find
             .ancestor(
-              of: find.byType(DsSidebarTrigger),
+              of: find.byType(ElSidebarTrigger),
               matching: find.byType(Container),
             )
             .first,
@@ -261,7 +283,7 @@ void main() {
       expect(bar.top, 0);
       expect(bar.height, _headerWithBar);
       expect(
-        tester.getTopLeft(find.byType(DsSidebarTrigger)).dy,
+        tester.getTopLeft(find.byType(ElSidebarTrigger)).dy,
         greaterThanOrEqualTo(_statusBar),
       );
     });
@@ -273,14 +295,14 @@ void main() {
 
       final SingleChildScrollView scroller = tester.widget(
         find.descendant(
-          of: find.byType(DsSidebarInset),
+          of: find.byType(ElSidebarInset),
           matching: find.byType(SingleChildScrollView),
         ),
       );
       // `p-6` on all four sides, plus the bar on the one side that has one.
       expect(
         scroller.padding,
-        EdgeInsets.fromLTRB(ds(6), ds(6), ds(6), ds(6) + _gestureBar),
+        EdgeInsets.fromLTRB(el(6), el(6), el(6), el(6) + _gestureBar),
       );
     });
 
@@ -291,17 +313,14 @@ void main() {
 
       // The panel is a column at this width, not a sheet, so its own fill is
       // what reaches the top and bottom of the screen…
-      final Rect panel = tester.getRect(find.byType(DsSidebar));
+      final Rect panel = tester.getRect(find.byType(ElSidebar));
       expect(panel.top, 0);
       expect(panel.bottom, _tablet.height);
 
       // …and the two rows at its ends are the ones that must not.
+      expect(tester.getRect(find.byType(ElSidebarHeader)).top, _statusBar);
       expect(
-        tester.getRect(find.byType(DsSidebarHeader)).top,
-        _statusBar,
-      );
-      expect(
-        tester.getRect(find.byType(DsSidebarFooter)).bottom,
+        tester.getRect(find.byType(ElSidebarFooter)).bottom,
         _tablet.height - _gestureBar,
       );
     });
@@ -311,9 +330,9 @@ void main() {
     ) async {
       await tester.pumpDemo(_desktop, bars: false);
 
-      expect(tester.getRect(find.byType(DsSidebarHeader)).top, 0);
+      expect(tester.getRect(find.byType(ElSidebarHeader)).top, 0);
       expect(
-        tester.getRect(find.byType(DsSidebarFooter)).bottom,
+        tester.getRect(find.byType(ElSidebarFooter)).bottom,
         _desktop.height,
       );
     });

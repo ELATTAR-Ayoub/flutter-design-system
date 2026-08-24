@@ -8,7 +8,7 @@ import 'showcase_share_dialog.dart';
 class SignalStudioReelsPage extends StatefulWidget {
   const SignalStudioReelsPage({super.key, required this.toasts});
 
-  final DsToastController toasts;
+  final ElToastController toasts;
 
   @override
   State<SignalStudioReelsPage> createState() => _SignalStudioReelsPageState();
@@ -35,15 +35,15 @@ class _SignalStudioReelsPageState extends State<SignalStudioReelsPage> {
       'Recovering reel',
       description: 'Reconnecting this cut without moving your place.',
     );
-    await Future<void>.delayed(DsDurations.slow);
+    await Future<void>.delayed(ElDurations.slow);
     if (!mounted) return;
     setState(() => _unavailableState = _UnavailableReelState.recovered);
     widget.toasts.settle(
       toast,
-      const DsToastMessage(
+      const ElToastMessage(
         title: 'Reel restored',
         description: 'Blue-hour studies is ready to watch.',
-        type: DsToastType.success,
+        type: ElToastType.success,
         promise: true,
       ),
     );
@@ -67,7 +67,7 @@ class _SignalStudioReelsPageState extends State<SignalStudioReelsPage> {
       builder: (BuildContext context, BoxConstraints constraints) {
         final double height = constraints.maxHeight.isFinite
             ? constraints.maxHeight
-            : ds(96);
+            : el(96);
         return SizedBox(
           height: height,
           child: PageView(
@@ -172,7 +172,7 @@ class _ReelFrame extends StatelessWidget {
   final VoidCallback onToggleDetails;
   final VoidCallback onLike;
   final VoidCallback onSave;
-  final DsToastController toasts;
+  final ElToastController toasts;
 
   @override
   Widget build(BuildContext context) => _PortraitReelStage(
@@ -182,23 +182,23 @@ class _ReelFrame extends StatelessWidget {
       fit: StackFit.expand,
       children: <Widget>[
         Image(image: asset, fit: BoxFit.cover),
-        const Positioned.fill(child: DsMediaScrim(child: SizedBox.expand())),
+        const Positioned.fill(child: ElMediaScrim(child: SizedBox.expand())),
         if (expanded)
           const Positioned.fill(
-            child: IgnorePointer(child: DsMediaScrim(child: SizedBox.expand())),
+            child: IgnorePointer(child: ElMediaScrim(child: SizedBox.expand())),
           ),
         Positioned.fill(
           child: Align(
             alignment: Alignment.bottomCenter,
             child: DefaultTextStyle(
-              style: DsText.styleOf(
+              style: ElText.styleOf(
                 context,
-                DsType.body,
-                color: DsMediaScrimTokens.foreground,
+                ElType.body,
+                color: ElMediaScrimTokens.foreground,
               ),
               child: Padding(
-                padding: EdgeInsets.all(ds(4)),
-                child: DsCollapsible(
+                padding: EdgeInsets.all(el(4)),
+                child: ElCollapsible(
                   open: expanded,
                   trigger: _ReelTrigger(
                     reelIndex: reelIndex,
@@ -207,7 +207,7 @@ class _ReelFrame extends StatelessWidget {
                     onToggleDetails: onToggleDetails,
                   ),
                   content: Padding(
-                    padding: EdgeInsets.only(top: ds(3)),
+                    padding: EdgeInsets.only(top: el(3)),
                     child: _ReelMenu(
                       reelIndex: reelIndex,
                       title: title,
@@ -247,26 +247,26 @@ class _PortraitReelStage extends StatelessWidget {
   Widget build(BuildContext context) {
     final double dock = ShowcaseShellScope.bottomOverlayClearanceOf(context);
     return Padding(
-      padding: DsSafeArea.scrollPaddingOf(
+      padding: ElSafeArea.scrollPaddingOf(
         context,
         base: EdgeInsets.only(
-          left: ds(4),
-          top: ds(4),
-          right: ds(4),
-          bottom: ds(4) + dock,
+          left: el(4),
+          top: el(4),
+          right: el(4),
+          bottom: el(4) + dock,
         ),
       ),
       child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: DsContainers.md),
+          constraints: const BoxConstraints(maxWidth: ElContainers.md),
           child: Semantics(
             container: true,
             label: semanticsLabel,
-            child: DsAspectRatio(
+            child: ElAspectRatio(
               key: stageKey,
-              ratio: DsMediaRatios.portrait,
+              ratio: ElMediaRatios.portrait,
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(DsRadii.xl3),
+                borderRadius: BorderRadius.circular(ElRadii.xl3),
                 child: child,
               ),
             ),
@@ -292,34 +292,34 @@ class _ReelTrigger extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double glyph = DsButton.iconPxFor(DsButtonSize.icon);
+    final double glyph = ElButton.iconPxFor(ElButtonSize.icon);
     return Row(
       children: <Widget>[
         Expanded(
-          child: DsText(
+          child: ElText(
             title,
-            DsType.h3,
-            color: DsMediaScrimTokens.foreground,
+            ElType.h3,
+            color: ElMediaScrimTokens.foreground,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
         ),
-        SizedBox(width: ds(3)),
+        SizedBox(width: el(3)),
         Semantics(
           expanded: expanded,
-          child: DsButton(
-            size: DsButtonSize.icon,
-            variant: DsButtonVariant.secondary,
+          child: ElButton(
+            size: ElButtonSize.icon,
+            variant: ElButtonVariant.secondary,
             label: expanded ? 'Hide reel details' : 'Show reel details',
             onPressed: onToggleDetails,
-            child: DsIconSwap(
+            child: ElIconSwap(
               key: ValueKey<String>('reel-menu-icon-swap-$reelIndex'),
               activeIndex: expanded ? 1 : 0,
-              window: ds(5),
+              window: el(5),
               cell: glyph,
               icons: const <Widget>[
-                DsIcon.lucide(DsLucide.ellipsis, size: DsIconSize.sm),
-                DsIcon.lucide(DsLucide.chevronUp, size: DsIconSize.sm),
+                ElIcon.lucide(ElLucide.ellipsis, size: ElIconSize.sm),
+                ElIcon.lucide(ElLucide.chevronUp, size: ElIconSize.sm),
               ],
             ),
           ),
@@ -354,63 +354,63 @@ class _ReelMenu extends StatelessWidget {
   final VoidCallback onFollow;
   final VoidCallback onLike;
   final VoidCallback onSave;
-  final DsToastController toasts;
+  final ElToastController toasts;
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        DsText(caption, DsType.small, color: DsMediaScrimTokens.foreground),
-        SizedBox(height: ds(2)),
+        ElText(caption, ElType.small, color: ElMediaScrimTokens.foreground),
+        SizedBox(height: el(2)),
         Row(
           children: <Widget>[
-            const DsIcon.lucide(DsLucide.eye, size: DsIconSize.sm),
-            SizedBox(width: ds(2)),
-            DsText(
+            const ElIcon.lucide(ElLucide.eye, size: ElIconSize.sm),
+            SizedBox(width: el(2)),
+            ElText(
               '$views views',
-              DsType.small,
-              color: DsMediaScrimTokens.foreground,
+              ElType.small,
+              color: ElMediaScrimTokens.foreground,
             ),
-            SizedBox(width: ds(3)),
-            const DsIcon.lucide(DsLucide.clock, size: DsIconSize.sm),
-            SizedBox(width: ds(2)),
-            DsText('0:24', DsType.small, color: DsMediaScrimTokens.foreground),
+            SizedBox(width: el(3)),
+            const ElIcon.lucide(ElLucide.clock, size: ElIconSize.sm),
+            SizedBox(width: el(2)),
+            ElText('0:24', ElType.small, color: ElMediaScrimTokens.foreground),
           ],
         ),
-        SizedBox(height: ds(3)),
+        SizedBox(height: el(3)),
         Row(
           children: <Widget>[
-            DsAvatar(
+            ElAvatar(
               fallback: 'AR',
-              size: DsAvatarSize.sm,
+              size: ElAvatarSize.sm,
               fallbackFill: theme.secondary,
               fallbackInk: theme.actionInk,
             ),
-            SizedBox(width: ds(3)),
+            SizedBox(width: el(3)),
             Expanded(
-              child: DsText(
+              child: ElText(
                 'Ari Rocha',
-                DsComponentType.cardTitle,
-                color: DsMediaScrimTokens.foreground,
+                ElComponentType.cardTitle,
+                color: ElMediaScrimTokens.foreground,
               ),
             ),
-            DsButton(
-              size: DsButtonSize.sm,
+            ElButton(
+              size: ElButtonSize.sm,
               variant: following
-                  ? DsButtonVariant.secondary
-                  : DsButtonVariant.primary,
+                  ? ElButtonVariant.secondary
+                  : ElButtonVariant.primary,
               onPressed: onFollow,
-              child: DsText(
+              child: ElText(
                 following ? 'Following' : 'Follow',
-                DsComponentType.buttonLabel,
+                ElComponentType.buttonLabel,
               ),
             ),
           ],
         ),
-        SizedBox(height: ds(3)),
+        SizedBox(height: el(3)),
         _ReelActions(
           reelIndex: reelIndex,
           title: title,
@@ -442,7 +442,7 @@ class _ReelActions extends StatelessWidget {
   final bool saved;
   final VoidCallback onLike;
   final VoidCallback onSave;
-  final DsToastController toasts;
+  final ElToastController toasts;
 
   @override
   Widget build(BuildContext context) => Row(
@@ -452,9 +452,9 @@ class _ReelActions extends StatelessWidget {
       _ReelAction(
         swapKey: ValueKey<String>('reel-like-icon-swap-$reelIndex'),
         label: liked ? 'Remove like' : 'Like reel',
-        inactiveGlyph: DsLucide.heart,
-        activeGlyph: DsLucide.heartPulse,
-        activeTone: DsIconTone.action,
+        inactiveGlyph: ElLucide.heart,
+        activeGlyph: ElLucide.heartPulse,
+        activeTone: ElIconTone.action,
         value: 'Like',
         active: liked,
         onPressed: onLike,
@@ -468,7 +468,7 @@ class _ReelActions extends StatelessWidget {
         toasts: toasts,
         trigger: (BuildContext context, VoidCallback open) => _ReelStaticAction(
           label: 'Share reel',
-          glyph: DsLucide.share2,
+          glyph: ElLucide.share2,
           value: 'Share',
           onPressed: open,
         ),
@@ -477,9 +477,9 @@ class _ReelActions extends StatelessWidget {
       _ReelAction(
         swapKey: ValueKey<String>('reel-bookmark-icon-swap-$reelIndex'),
         label: saved ? 'Remove saved reel' : 'Save reel',
-        inactiveGlyph: DsLucide.bookmark,
-        activeGlyph: DsLucide.bookmarkCheck,
-        activeTone: DsIconTone.value,
+        inactiveGlyph: ElLucide.bookmark,
+        activeGlyph: ElLucide.bookmarkCheck,
+        activeTone: ElIconTone.value,
         value: 'Bookmark',
         active: saved,
         onPressed: onSave,
@@ -494,20 +494,20 @@ class _CommentsDialog extends StatelessWidget {
   final String title;
 
   @override
-  Widget build(BuildContext context) => DsDialog(
+  Widget build(BuildContext context) => ElDialog(
     trigger: (BuildContext context, VoidCallback open) => _ReelStaticAction(
       label: 'Open comments',
-      glyph: DsLucide.messageCircle,
+      glyph: ElLucide.messageCircle,
       value: 'Comments',
       onPressed: open,
     ),
-    content: (BuildContext context, VoidCallback close) => DsDialogContent(
+    content: (BuildContext context, VoidCallback close) => ElDialogContent(
       onClose: close,
       children: <Widget>[
-        DsDialogHeader(
+        ElDialogHeader(
           children: <Widget>[
-            const DsDialogTitle('Studio conversation'),
-            DsDialogDescription('Audience notes on “$title”'),
+            const ElDialogTitle('Studio conversation'),
+            ElDialogDescription('Audience notes on “$title”'),
           ],
         ),
         const Column(
@@ -518,13 +518,13 @@ class _CommentsDialog extends StatelessWidget {
               handle: '@minamakes · 12m',
               body: 'The pacing makes the final reveal feel earned.',
             ),
-            DsSeparator(),
+            ElSeparator(),
             _Comment(
               author: 'Jon Bell',
               handle: '@joninframes · 28m',
               body: 'Would love a breakdown of the lighting setup next.',
             ),
-            DsSeparator(),
+            ElSeparator(),
             _Comment(
               author: 'Leila Studio',
               handle: '@leilastudio · 41m',
@@ -532,12 +532,12 @@ class _CommentsDialog extends StatelessWidget {
             ),
           ],
         ),
-        DsDialogFooter(
+        ElDialogFooter(
           children: <Widget>[
-            DsButton(
-              variant: DsButtonVariant.secondary,
+            ElButton(
+              variant: ElButtonVariant.secondary,
               onPressed: close,
-              child: DsText('Close', DsComponentType.buttonLabel),
+              child: ElText('Close', ElComponentType.buttonLabel),
             ),
           ],
         ),
@@ -559,20 +559,20 @@ class _Comment extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: EdgeInsets.symmetric(vertical: ds(3)),
+    padding: EdgeInsets.symmetric(vertical: el(3)),
     child: Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        DsAvatar(fallback: author.substring(0, 1), size: DsAvatarSize.sm),
-        SizedBox(width: ds(3)),
+        ElAvatar(fallback: author.substring(0, 1), size: ElAvatarSize.sm),
+        SizedBox(width: el(3)),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              DsText(author, DsComponentType.cardTitle),
-              DsText(handle, DsType.small),
-              SizedBox(height: ds(1)),
-              DsText(body, DsType.body),
+              ElText(author, ElComponentType.cardTitle),
+              ElText(handle, ElType.small),
+              SizedBox(height: el(1)),
+              ElText(body, ElType.body),
             ],
           ),
         ),
@@ -595,29 +595,29 @@ class _ReelAction extends StatelessWidget {
 
   final Key swapKey;
   final String label;
-  final DsLucideGlyph inactiveGlyph;
-  final DsLucideGlyph activeGlyph;
-  final DsIconTone activeTone;
+  final ElLucideGlyph inactiveGlyph;
+  final ElLucideGlyph activeGlyph;
+  final ElIconTone activeTone;
   final String value;
   final bool active;
   final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
-    final double glyph = DsButton.iconPxFor(DsButtonSize.icon);
-    final Widget control = DsButton(
-      size: DsButtonSize.icon,
-      variant: active ? DsButtonVariant.secondary : DsButtonVariant.ghost,
+    final double glyph = ElButton.iconPxFor(ElButtonSize.icon);
+    final Widget control = ElButton(
+      size: ElButtonSize.icon,
+      variant: active ? ElButtonVariant.secondary : ElButtonVariant.ghost,
       label: label,
       onPressed: onPressed,
-      child: DsIconSwap(
+      child: ElIconSwap(
         key: swapKey,
         activeIndex: active ? 1 : 0,
-        window: ds(5),
+        window: el(5),
         cell: glyph,
         icons: <Widget>[
-          DsIcon.lucide(inactiveGlyph, size: DsIconSize.sm),
-          DsIcon.lucide(activeGlyph, size: DsIconSize.sm, tone: activeTone),
+          ElIcon.lucide(inactiveGlyph, size: ElIconSize.sm),
+          ElIcon.lucide(activeGlyph, size: ElIconSize.sm, tone: activeTone),
         ],
       ),
     );
@@ -625,8 +625,8 @@ class _ReelAction extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         Semantics(toggled: active, child: control),
-        SizedBox(height: ds(1)),
-        DsText(value, DsType.small, color: DsMediaScrimTokens.foreground),
+        SizedBox(height: el(1)),
+        ElText(value, ElType.small, color: ElMediaScrimTokens.foreground),
       ],
     );
   }
@@ -641,7 +641,7 @@ class _ReelStaticAction extends StatelessWidget {
   });
 
   final String label;
-  final DsLucideGlyph glyph;
+  final ElLucideGlyph glyph;
   final String value;
   final VoidCallback onPressed;
 
@@ -649,15 +649,15 @@ class _ReelStaticAction extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     mainAxisSize: MainAxisSize.min,
     children: <Widget>[
-      DsButton(
-        size: DsButtonSize.icon,
-        variant: DsButtonVariant.secondary,
+      ElButton(
+        size: ElButtonSize.icon,
+        variant: ElButtonVariant.secondary,
         label: label,
         onPressed: onPressed,
-        child: DsIcon.lucide(glyph, size: DsIconSize.sm),
+        child: ElIcon.lucide(glyph, size: ElIconSize.sm),
       ),
-      SizedBox(height: ds(1)),
-      DsText(value, DsType.small, color: DsMediaScrimTokens.foreground),
+      SizedBox(height: el(1)),
+      ElText(value, ElType.small, color: ElMediaScrimTokens.foreground),
     ],
   );
 }
@@ -674,29 +674,29 @@ class _UnavailableReel extends StatelessWidget {
     child: Stack(
       fit: StackFit.expand,
       children: <Widget>[
-        ColoredBox(color: DsTheme.of(context).muted),
+        ColoredBox(color: ElTheme.of(context).muted),
         Positioned.fill(
-          child: DsMediaScrim(
+          child: ElMediaScrim(
             child: Align(
               alignment: Alignment.bottomCenter,
               child: Padding(
-                padding: EdgeInsets.all(ds(4)),
+                padding: EdgeInsets.all(el(4)),
                 child: Row(
                   children: <Widget>[
                     Expanded(
-                      child: DsText(
+                      child: ElText(
                         'Reel unavailable.',
-                        DsType.h3,
-                        color: DsMediaScrimTokens.foreground,
+                        ElType.h3,
+                        color: ElMediaScrimTokens.foreground,
                       ),
                     ),
-                    SizedBox(width: ds(3)),
-                    DsButton(
-                      size: DsButtonSize.sm,
-                      variant: DsButtonVariant.secondary,
+                    SizedBox(width: el(3)),
+                    ElButton(
+                      size: ElButtonSize.sm,
+                      variant: ElButtonVariant.secondary,
                       label: 'Retry reel',
                       onPressed: onRetry,
-                      child: DsText('Retry', DsComponentType.buttonLabelSm),
+                      child: ElText('Retry', ElComponentType.buttonLabelSm),
                     ),
                   ],
                 ),
@@ -719,17 +719,17 @@ class _RetryTitleSkeleton extends StatelessWidget {
     child: Stack(
       fit: StackFit.expand,
       children: <Widget>[
-        ColoredBox(color: DsTheme.of(context).muted),
+        ColoredBox(color: ElTheme.of(context).muted),
         Positioned.fill(
-          child: DsMediaScrim(
+          child: ElMediaScrim(
             child: Align(
               alignment: Alignment.bottomLeft,
               child: Padding(
-                padding: EdgeInsets.all(ds(4)),
-                child: DsSkeleton(
+                padding: EdgeInsets.all(el(4)),
+                child: ElSkeleton(
                   key: const Key('reel-retry-title-skeleton'),
-                  width: ds(48),
-                  height: ds(7),
+                  width: el(48),
+                  height: el(7),
                 ),
               ),
             ),

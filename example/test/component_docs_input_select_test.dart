@@ -4,16 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  // A bare `Material` has no `Overlay`, so `DsSelect`'s popover menu — which
+  // A bare `Material` has no `Overlay`, so `ElSelect`'s popover menu — which
   // inserts into `Overlay.maybeOf(context)` and silently no-ops without one
-  // (see `DsSelectState._openMenu`) — would never open under test. `MaterialApp`
+  // (see `ElSelectState._openMenu`) — would never open under test. `MaterialApp`
   // supplies the `Navigator`/`Overlay` every other page harness in this suite
   // relies on for the same reason (see `component_docs_dialog_test.dart`).
   Widget host(Widget child, {Size size = const Size(1280, 900)}) {
     return MediaQuery(
       data: MediaQueryData(size: size),
-      child: DsTheme(
-        controller: DsThemeController(mode: DsThemeMode.dark),
+      child: ElTheme(
+        controller: ElThemeController(mode: ElThemeMode.dark),
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
           home: SingleChildScrollView(child: child),
@@ -34,14 +34,14 @@ void main() {
 
     expect(find.text('Input'), findsAtLeastNWidgets(1));
     expect(find.byKey(const ValueKey<String>('docs-layout-sidebar')), findsOne);
-    expect(find.byType(DsInput), findsAtLeastNWidgets(1));
+    expect(find.byType(ElInput), findsAtLeastNWidgets(1));
     expect(find.text('State matrix'), findsOneWidget);
 
-    await tester.tap(find.widgetWithText(DsButton, 'Invalid').first);
+    await tester.tap(find.widgetWithText(ElButton, 'Invalid').first);
     await tester.pumpAndSettle();
     expect(find.text('That address is missing a valid domain.'), findsWidgets);
 
-    await tester.tap(find.widgetWithText(DsButton, 'Read only').first);
+    await tester.tap(find.widgetWithText(ElButton, 'Read only').first);
     await tester.pumpAndSettle();
     final EditableText editable = tester.widget<EditableText>(
       find.byType(EditableText).first,
@@ -52,7 +52,7 @@ void main() {
     // catalog rather than a hand-picked five-page list, so the pager's own
     // "next" neighbour is whichever entry actually follows `input` there —
     // `input_group`, not `card`. See `catalog.dart`'s declared order.
-    final Finder nextLink = find.widgetWithText(DsButton, 'Input group').last;
+    final Finder nextLink = find.widgetWithText(ElButton, 'Input group').last;
     await tester.ensureVisible(nextLink);
     await tester.tap(nextLink);
     await tester.pumpAndSettle();
@@ -91,10 +91,10 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Select'), findsAtLeastNWidgets(1));
-    expect(find.byType(DsSelect<String>), findsAtLeastNWidgets(1));
+    expect(find.byType(ElSelect<String>), findsAtLeastNWidgets(1));
     expect(find.text('Grouped menu'), findsOneWidget);
 
-    await tester.tap(find.widgetWithText(DsButton, 'Size sm').first);
+    await tester.tap(find.widgetWithText(ElButton, 'Size sm').first);
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('Choose a sort order').first);
@@ -106,7 +106,7 @@ void main() {
     await tester.tap(
       find
           .descendant(
-            of: find.byType(DsSelectMenu<String>).first,
+            of: find.byType(ElSelectMenu<String>).first,
             matching: find.text('Most popular'),
           )
           .first,
@@ -118,7 +118,7 @@ void main() {
     // real "next" neighbour in the 34-entry `componentDocs` catalog is
     // `separator`, not `dialog`.
     final Finder nextLink = find
-        .widgetWithText(DsButton, 'Separator, Empty & Kbd')
+        .widgetWithText(ElButton, 'Separator, Empty & Kbd')
         .last;
     await tester.ensureVisible(nextLink);
     await tester.tap(nextLink);
@@ -142,11 +142,11 @@ void main() {
       findsOneWidget,
     );
     final Finder expandToggle = find
-        .widgetWithText(DsButton, 'Expand off')
+        .widgetWithText(ElButton, 'Expand off')
         .first;
     await tester.ensureVisible(expandToggle);
     await tester.tap(expandToggle);
     await tester.pumpAndSettle();
-    expect(find.widgetWithText(DsButton, 'Expand on'), findsOneWidget);
+    expect(find.widgetWithText(ElButton, 'Expand on'), findsOneWidget);
   });
 }

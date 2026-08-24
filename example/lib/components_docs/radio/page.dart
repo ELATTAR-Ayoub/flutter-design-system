@@ -1,9 +1,7 @@
 /// Public component documentation for the radio group component.
 ///
 /// `radioDoc` (from `meta.dart`) is the data source, not
-/// `componentDoc('radio')`: radio is not yet registered in `catalog.dart`'s
-/// `componentDocs` list, so calling that would throw. Adding it there is a
-/// supervisor-owned aggregation step (Phase J plan).
+/// `componentDoc('radio')`; this page keeps its typed metadata import.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
@@ -28,17 +26,17 @@ class RadioDocPage extends StatelessWidget {
         eyebrow: 'COMPONENTS / BASE',
         title: radioDoc.title,
         description:
-            'DsRadioGroup lets a user pick exactly one value out of a small '
+            'ElRadioGroup lets a user pick exactly one value out of a small '
             'set of options that all stay visible on screen at once, '
             '"daily" or "weekly" payout, never both, and never neither once '
             'something is chosen. Its options exist only in relation to each '
             'other: selecting one always deselects whichever was selected '
             'before, because the whole group shares a single value. Reach '
-            'for DsCheckbox instead when the value is independent of every '
+            'for ElCheckbox instead when the value is independent of every '
             'other option on the screen, "notify me by email" is true or '
             'false on its own, with no sibling it competes against, and a '
             'checkbox group (unlike a radio group) can legitimately have '
-            'every box checked at once. Reach for DsSelect instead once the '
+            'every box checked at once. Reach for ElSelect instead once the '
             'option count grows past what is comfortable to lay out on '
             'screen, or the choice does not need to stay visible until the '
             'user actually opens it: a radio group spends permanent space '
@@ -46,9 +44,9 @@ class RadioDocPage extends StatelessWidget {
             'while a select collapses the same list behind one trigger and '
             'costs nothing until it is opened.',
       ),
-      breadcrumbs: const <DsBreadcrumbEntry>[
-        DsBreadcrumbEntry.link('Components'),
-        DsBreadcrumbEntry.page('Radio group'),
+      breadcrumbs: const <ElBreadcrumbEntry>[
+        ElBreadcrumbEntry.link('Components'),
+        ElBreadcrumbEntry.page('Radio group'),
       ],
       toc: const <DocsTocEntry>[
         DocsTocEntry(title: 'Installation', anchor: 'install'),
@@ -82,7 +80,7 @@ class RadioDocPage extends StatelessWidget {
         route: '/components/selection_control',
       ),
       onNavigate: onNavigate,
-      child: _RadioArticle(theme: DsTheme.of(context)),
+      child: _RadioArticle(theme: ElTheme.of(context)),
     );
   }
 }
@@ -90,7 +88,7 @@ class RadioDocPage extends StatelessWidget {
 class _RadioArticle extends StatelessWidget {
   const _RadioArticle({required this.theme});
 
-  final DsThemeData theme;
+  final ElThemeData theme;
 
   @override
   Widget build(BuildContext context) {
@@ -99,35 +97,34 @@ class _RadioArticle extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: DsWidths.prose),
-        child: DsText(
-          'Six live specimens, all built from real DsRadioGroup and '
-              'DsRadioGroupItem widgets. Payout rhythm, Focus-visible and '
-              'Error are operable: tap an option. Disabled, Disabled '
-              '(selected) and Group disabled are deliberately inert; all '
-              'three are explained in States below.',
-          DsType.body,
-        ),
-      ),
-      SizedBox(height: ds(6)),
-      DocsCodeExample(
-            title: 'Radio group specimens',
-            description:
-                'Every cell below renders a real DsRadioGroup wrapping real '
-                'DsRadioGroupItem children.',
-            preview: const _RadioPreview(),
-            manualFiles: <DocsCodeFile>[
-              DocsCodeFile(
-                path: radioDoc.sourcePath,
-                code:
-                    '// radio has no registry manifest yet, so there is no\n'
-                    '// generated @ui/radio.dart payload to copy here.\n'
-                    '// See "Installation" below for what actually works today.',
-              ),
-            ],
+          constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+          child: ElText(
+            'Six live specimens, all built from real ElRadioGroup and '
+            'ElRadioGroupItem widgets. Payout rhythm, Focus-visible and '
+            'Error are operable: tap an option. Disabled, Disabled '
+            '(selected) and Group disabled are deliberately inert; all '
+            'three are explained in States below.',
+            ElType.body,
           ),
-        SizedBox(height: ds(6)),
-        DsSection(
+        ),
+        SizedBox(height: el(6)),
+        DocsCodeExample(
+          title: 'Radio group specimens',
+          description:
+              'Every cell below renders a real ElRadioGroup wrapping real '
+              'ElRadioGroupItem children.',
+          preview: const _RadioPreview(),
+          manualFiles: <DocsCodeFile>[
+            DocsCodeFile(
+              path: radioDoc.sourcePath,
+              code:
+                  '${radioDoc.command}\n'
+                  '// Installs the generated @ui/radio.dart payload.',
+            ),
+          ],
+        ),
+        SizedBox(height: el(6)),
+        ElSection(
           id: 'install',
           title: 'Installation',
           description:
@@ -138,7 +135,7 @@ class _RadioArticle extends StatelessWidget {
             facts: <DocsInstallFact>[
               const DocsInstallFact(
                 label: 'Status',
-                value: 'Stable, not yet a registry item',
+                value: 'Stable, installable through lattar add radio',
                 description:
                     'Ported and tested against lib/src/components/radio.dart. '
                     'It is not yet a registry item, so elattar add radio '
@@ -154,7 +151,7 @@ class _RadioArticle extends StatelessWidget {
               ),
               const DocsInstallFact(
                 label: 'CLI',
-                value: 'Not available',
+                value: 'registry/components/radio.json',
                 description:
                     'radio is not yet a registry item, so `elattar add '
                     'radio` will not resolve. It is one of the Wave 2 form '
@@ -166,8 +163,8 @@ class _RadioArticle extends StatelessWidget {
                 value:
                     "import 'package:elattar_design_system/elattar_design_system.dart';",
                 description:
-                    'Depend on the package and use DsRadioGroup and '
-                    'DsRadioGroupItem directly, exactly as this page does.',
+                    'Depend on the package and use ElRadioGroup and '
+                    'ElRadioGroupItem directly, exactly as this page does.',
               ),
               DocsInstallFact(
                 label: 'Manual: source mode (not recommended yet)',
@@ -181,8 +178,8 @@ class _RadioArticle extends StatelessWidget {
             ],
           ),
         ),
-        SizedBox(height: ds(6)),
-        DsSection(
+        SizedBox(height: el(6)),
+        ElSection(
           id: 'usage',
           title: 'Usage',
           description:
@@ -191,43 +188,43 @@ class _RadioArticle extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              DsPanel(
+              ElPanel(
                 label: 'DART',
                 note: 'SMALLEST CORRECT EXAMPLE',
                 child: DocsSelectableCodeBlock(code: _smallestUsageCode),
               ),
-              SizedBox(height: ds(5)),
-              DsText(
-                'A bare DsRadioGroupItem renders no visible text of its own, '
+              SizedBox(height: el(5)),
+              ElText(
+                'A bare ElRadioGroupItem renders no visible text of its own, '
                 'its label only supplies the accessible name, the same rule '
-                'DsCheckbox follows. The real composed-forms pattern pairs a '
-                'DsFieldSet and DsFieldLegend for the group\'s visible '
-                'caption with one horizontal DsField per item for each '
+                'ElCheckbox follows. The real composed-forms pattern pairs a '
+                'ElFieldSet and ElFieldLegend for the group\'s visible '
+                'caption with one horizontal ElField per item for each '
                 'option\'s own visible label: exactly what the source '
-                'comments on DsRadioGroup and DsRadioGroupItem describe, and '
+                'comments on ElRadioGroup and ElRadioGroupItem describe, and '
                 'what the composed forms page in this repository actually '
                 'builds:',
-                DsType.small,
+                ElType.small,
                 color: theme.mutedForeground,
               ),
-              SizedBox(height: ds(3)),
+              SizedBox(height: el(3)),
               const _PayoutRhythmExample(),
-              SizedBox(height: ds(3)),
-              DsPanel(
+              SizedBox(height: el(3)),
+              ElPanel(
                 label: 'DART',
                 note: 'FIELDSET + LEGEND + PER-ITEM FIELD',
                 child: DocsSelectableCodeBlock(code: _fieldSetUsageCode),
               ),
-              SizedBox(height: ds(5)),
-              DsText(
+              SizedBox(height: el(5)),
+              ElText(
                 'A group can hold more than two named options with no '
                 'visible caption at all, when the surrounding UI already '
                 'names the choice:',
-                DsType.small,
+                ElType.small,
                 color: theme.mutedForeground,
               ),
-              SizedBox(height: ds(3)),
-              DsPanel(
+              SizedBox(height: el(3)),
+              ElPanel(
                 label: 'DART',
                 note: 'THREE NAMED OPTIONS, NO VISIBLE CAPTION',
                 child: DocsSelectableCodeBlock(code: _planPickerCode),
@@ -235,66 +232,66 @@ class _RadioArticle extends StatelessWidget {
             ],
           ),
         ),
-        SizedBox(height: ds(6)),
-        DsSection(
+        SizedBox(height: el(6)),
+        ElSection(
           id: 'composition',
           title: 'Composition',
           description:
               'The shape every example on this page builds on: a '
-              'DsRadioGroup owns the value, and each DsRadioGroupItem '
+              'ElRadioGroup owns the value, and each ElRadioGroupItem '
               'inside it answers only to that one value.',
-          child: DsPanel(
+          child: ElPanel(
             label: 'DART',
             note: 'BARE ITEM VS. FIELD-WRAPPED ITEM',
             child: DocsSelectableCodeBlock(code: _compositionTreeCode),
           ),
         ),
-        SizedBox(height: ds(6)),
-        DsSection(
+        SizedBox(height: el(6)),
+        ElSection(
           id: 'description',
           title: 'Description',
           description:
-              'A one-line description per option, the same DsField.'
-              'description prop DsCheckbox and every other field-composed '
+              'A one-line description per option, the same ElField.'
+              'description prop ElCheckbox and every other field-composed '
               'control reads.',
-          child: DsPanel(
+          child: ElPanel(
             label: 'DART',
             note: 'FIELDSET + PER-ITEM LABEL AND DESCRIPTION',
             child: DocsSelectableCodeBlock(code: _descriptionUsageCode),
           ),
         ),
-        SizedBox(height: ds(6)),
-        DsSection(
+        SizedBox(height: el(6)),
+        ElSection(
           id: 'choice-card',
           title: 'Choice Card',
           description:
-              'DsRadioGroupItem has no card variant of its own, but a '
-              'DsCard wrapping a horizontal DsField composes one: the '
+              'ElRadioGroupItem has no card variant of its own, but a '
+              'ElCard wrapping a horizontal ElField composes one: the '
               'field\'s own label-tap wiring still selects the item, the '
               'card only supplies the border.',
-          child: DsPanel(
+          child: ElPanel(
             label: 'DART',
-            note: 'DSCARD + FIELD + ITEM, THREE PLANS',
+            note: 'ELCARD + FIELD + ITEM, THREE PLANS',
             child: DocsSelectableCodeBlock(code: _choiceCardCode),
           ),
         ),
-        SizedBox(height: ds(6)),
-        DsSection(
+        SizedBox(height: el(6)),
+        ElSection(
           id: 'fieldset',
           title: 'Fieldset',
           description:
-              'The full grouped shape: a DsFieldSet and DsFieldLegend for '
-              'the group\'s own visible caption, one horizontal DsField per '
-              'option, and a DsFieldError row that mounts only once there '
+              'The full grouped shape: a ElFieldSet and ElFieldLegend for '
+              'the group\'s own visible caption, one horizontal ElField per '
+              'option, and a ElFieldError row that mounts only once there '
               'is an error to show.',
-          child: DsPanel(
+          child: ElPanel(
             label: 'DART',
             note: 'SHIPPING METHOD, FULL FIELDSET COMPOSITION',
             child: DocsSelectableCodeBlock(code: _shippingMethodCode),
           ),
         ),
-        SizedBox(height: ds(6)),
-        DsSection(
+        SizedBox(height: el(6)),
+        ElSection(
           id: 'disabled',
           title: 'Disabled',
           description:
@@ -302,14 +299,14 @@ class _RadioArticle extends StatelessWidget {
               'regardless of each item\'s own enabled flag; live specimens '
               'for this and for a single disabled item are in Preview '
               'above.',
-          child: DsPanel(
+          child: ElPanel(
             label: 'DART',
             note: 'GROUP DISABLED, ONCHANGED: NULL',
             child: DocsSelectableCodeBlock(code: _disabledUsageCode),
           ),
         ),
-        SizedBox(height: ds(6)),
-        DsSection(
+        SizedBox(height: el(6)),
+        ElSection(
           id: 'invalid',
           title: 'Invalid',
           description:
@@ -317,26 +314,26 @@ class _RadioArticle extends StatelessWidget {
               'flag) paints the destructive border and ring on every item; '
               'the live "Error" specimen in Preview above shows the '
               'painted result.',
-          child: DsPanel(
+          child: ElPanel(
             label: 'DART',
             note: 'GROUP INVALID, WITH A HINT',
             child: DocsSelectableCodeBlock(code: _invalidUsageCode),
           ),
         ),
-        SizedBox(height: ds(6)),
-        DsSection(
+        SizedBox(height: el(6)),
+        ElSection(
           id: 'api',
           title: 'API Reference',
           description:
-              'Neither DsRadioGroup nor DsRadioGroupItem takes a variant or '
-              'size parameter: DsRadioGroupItem.size fixes one 20px '
-              'geometry, level with DsCheckbox, and there is no third '
-              '"held" state the way DsCheckbox has an inert flag.',
+              'Neither ElRadioGroup nor ElRadioGroupItem takes a variant or '
+              'size parameter: ElRadioGroupItem.size fixes one 20px '
+              'geometry, level with ElCheckbox, and there is no third '
+              '"held" state the way ElCheckbox has an inert flag.',
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               const DocsApiTable(
-                title: 'DsRadioGroup<T>',
+                title: 'ElRadioGroup<T>',
                 facts: <DocsApiFact>[
                   DocsApiFact(
                     name: 'value',
@@ -358,25 +355,25 @@ class _RadioArticle extends StatelessWidget {
                     name: 'children',
                     type: 'List<Widget>',
                     description:
-                        'The rows. Each holds a DsRadioGroupItem<T> '
+                        'The rows. Each holds a ElRadioGroupItem<T> '
                         'somewhere inside it: either bare, or wrapped in its '
-                        'own DsField for a visible per-option label.',
+                        'own ElField for a visible per-option label.',
                   ),
                   DocsApiFact(
                     name: 'gap',
                     type: 'double?',
                     description:
                         'The vertical space between rows. Defaults to '
-                        'DsRadioGroup.defaultGap (8px); the composed forms '
-                        'page passes DsFieldSet.groupGap (12px) instead.',
+                        'ElRadioGroup.defaultGap (8px); the composed forms '
+                        'page passes ElFieldSet.groupGap (12px) instead.',
                   ),
                   DocsApiFact(
                     name: 'enabled',
                     type: 'bool',
                     description:
                         'Defaults to true. Disables every item; ANDed with '
-                        'the enclosing DsFieldScope\'s own enabled flag when '
-                        'the group itself sits in a DsField.',
+                        'the enclosing ElFieldScope\'s own enabled flag when '
+                        'the group itself sits in a ElField.',
                   ),
                   DocsApiFact(
                     name: 'invalid',
@@ -384,14 +381,14 @@ class _RadioArticle extends StatelessWidget {
                     description:
                         'Defaults to false. true paints the destructive '
                         'border and ring on every item. ORed with the '
-                        'enclosing DsFieldScope\'s own invalid flag.',
+                        'enclosing ElFieldScope\'s own invalid flag.',
                   ),
                   DocsApiFact(
                     name: 'focusNode',
                     type: 'FocusNode?',
                     description:
                         'The node a failed form submit lands on, adopted '
-                        'from the enclosing DsFieldScope when null. The '
+                        'from the enclosing ElFieldScope when null. The '
                         'group itself never keeps this focus: it forwards '
                         'it straight to the roving tab-stop item, so a '
                         'keyboard user always lands on a real, operable '
@@ -419,9 +416,9 @@ class _RadioArticle extends StatelessWidget {
                   ),
                 ],
               ),
-              SizedBox(height: ds(5)),
+              SizedBox(height: el(5)),
               const DocsApiTable(
-                title: 'DsRadioGroupItem<T>',
+                title: 'ElRadioGroupItem<T>',
                 facts: <DocsApiFact>[
                   DocsApiFact(
                     name: 'value',
@@ -438,7 +435,7 @@ class _RadioArticle extends StatelessWidget {
                     description:
                         'Defaults to true. ANDed with the group\'s own '
                         'enabled flag and, when this item sits in its own '
-                        'nested DsField, with that field\'s enabled flag too.',
+                        'nested ElField, with that field\'s enabled flag too.',
                   ),
                   DocsApiFact(
                     name: 'invalid',
@@ -446,7 +443,7 @@ class _RadioArticle extends StatelessWidget {
                     description:
                         'Defaults to false. ORed with the group\'s invalid '
                         'flag and, when this item has its own nested '
-                        'DsField, with that field\'s invalid flag.',
+                        'ElField, with that field\'s invalid flag.',
                   ),
                   DocsApiFact(
                     name: 'forceFocusRing',
@@ -462,7 +459,7 @@ class _RadioArticle extends StatelessWidget {
                     description:
                         'This item\'s own accessible name: never the '
                         'group\'s legend. Falls back to this item\'s own '
-                        'nested DsField\'s label when it has one, and to '
+                        'nested ElField\'s label when it has one, and to '
                         'nothing when it does not.',
                   ),
                   DocsApiFact(
@@ -475,23 +472,23 @@ class _RadioArticle extends StatelessWidget {
                   ),
                 ],
               ),
-              SizedBox(height: ds(5)),
+              SizedBox(height: el(5)),
               const DocsApiTable(
                 title: 'Static helpers',
                 facts: <DocsApiFact>[
                   DocsApiFact(
-                    name: 'DsRadioGroup.defaultGap',
+                    name: 'ElRadioGroup.defaultGap',
                     type: 'static double',
                     description:
                         'The Root\'s own row gap, 8px, used whenever gap is '
                         'left null.',
                   ),
                   DocsApiFact(
-                    name: 'DsRadioGroupItem.size',
+                    name: 'ElRadioGroupItem.size',
                     type: 'static double',
                     description:
                         'The 20px circle: sized to sit level with '
-                        'DsCheckbox rather than the reference\'s own smaller '
+                        'ElCheckbox rather than the reference\'s own smaller '
                         'default.',
                   ),
                 ],
@@ -499,8 +496,8 @@ class _RadioArticle extends StatelessWidget {
             ],
           ),
         ),
-        SizedBox(height: ds(6)),
-        DsSection(
+        SizedBox(height: el(6)),
+        ElSection(
           id: 'states',
           title: 'States and feedback',
           description:
@@ -562,7 +559,7 @@ class _RadioArticle extends StatelessWidget {
                         'the group\'s onChanged: null (which disables every '
                         'item even when each item\'s own enabled stays '
                         'true); or one item\'s own enabled: false, '
-                        'including through that item\'s own nested DsField '
+                        'including through that item\'s own nested ElField '
                         'going disabled.',
                     userSignal:
                         '50% opacity, out of the tab order, deaf to pointer '
@@ -581,26 +578,26 @@ class _RadioArticle extends StatelessWidget {
                   ),
                 ],
               ),
-              SizedBox(height: ds(4)),
-              DsText(
+              SizedBox(height: el(4)),
+              ElText(
                 'Omitted: Hover: no control in this family authors a '
                 'hover skin; only the pointer cursor changes. Pressed, '
                 'there is no separate pointer-down look; each socket that '
                 'actually changes value squashes once, after the change, '
-                'via DsJellyReplay: both the item that becomes selected '
+                'via ElJellyReplay: both the item that becomes selected '
                 'and the one that was selected a moment ago squash, because '
                 'both genuinely changed state. Loading and Empty, '
-                'DsRadioGroup is a synchronous primitive with no async '
+                'ElRadioGroup is a synchronous primitive with no async '
                 'operation and nothing to list, so neither applies. Success '
                 '— the component defines no success semantics of its own.',
-                DsType.small,
+                ElType.small,
                 color: theme.mutedForeground,
               ),
             ],
           ),
         ),
-        SizedBox(height: ds(6)),
-        DsSection(
+        SizedBox(height: el(6)),
+        ElSection(
           id: 'accessibility',
           title: 'Accessibility',
           child: DocsInstallFacts(
@@ -627,8 +624,8 @@ class _RadioArticle extends StatelessWidget {
                     'own label (or its own nested field\'s: never the '
                     'group\'s) is announced as that one option\'s name. '
                     'Neither is rendered as visible text on its own; a '
-                    'DsFieldSet + DsFieldLegend gives the group a visible '
-                    'caption, and a per-item DsField gives each option one.',
+                    'ElFieldSet + ElFieldLegend gives the group a visible '
+                    'caption, and a per-item ElField gives each option one.',
               ),
               const DocsInstallFact(
                 label: 'Keyboard: tab stop',
@@ -664,7 +661,7 @@ class _RadioArticle extends StatelessWidget {
                 value: 'border-ring plus a 3px ring at 50% alpha',
                 description:
                     'The group\'s own Focus node (adopted from a '
-                    'DsFieldScope, e.g. a failed form submit) skips '
+                    'ElFieldScope, e.g. a failed form submit) skips '
                     'traversal and immediately forwards to the tab-stop '
                     'item rather than holding focus itself: the group is '
                     'not itself operable, so a keyboard user always sees '
@@ -676,11 +673,11 @@ class _RadioArticle extends StatelessWidget {
                     'Tapping the group\'s label focuses; tapping an '
                     'item\'s own label selects',
                 description:
-                    'A DsFieldSet + DsFieldLegend caption over the whole '
+                    'A ElFieldSet + ElFieldLegend caption over the whole '
                     'group only moves focus to the tab-stop item when '
                     'tapped: a legend cannot select on behalf of a set it '
                     'only names. A visible label from an item\'s own nested '
-                    'DsField genuinely selects that one option when tapped, '
+                    'ElField genuinely selects that one option when tapped, '
                     'the same activator wiring an HTML <label for> click '
                     'uses.',
               ),
@@ -688,8 +685,8 @@ class _RadioArticle extends StatelessWidget {
                 label: 'Touch target',
                 value: '42 x 34, centred on each 20 x 20 circle',
                 description:
-                    'DsHitArea grows the hit test past the painted circle, '
-                    'identical to DsCheckbox\'s own measurement, 2px short '
+                    'ElHitArea grows the hit test past the painted circle, '
+                    'identical to ElCheckbox\'s own measurement, 2px short '
                     'of the system\'s own 44px floor on both axes, recorded '
                     'rather than corrected.',
               ),
@@ -707,9 +704,9 @@ class _RadioArticle extends StatelessWidget {
                     'invalid, ORed across the item, the group, and a '
                     'per-item nested field',
                 description:
-                    'A DsField around the whole group folds its own invalid '
+                    'A ElField around the whole group folds its own invalid '
                     'flag in at the group level, reaching every item; a '
-                    'DsField around one item folds in at that item alone.',
+                    'ElField around one item folds in at that item alone.',
               ),
               const DocsInstallFact(
                 label: 'Screen-reader announcements',
@@ -723,31 +720,31 @@ class _RadioArticle extends StatelessWidget {
             ],
           ),
         ),
-        SizedBox(height: ds(6)),
-        DsSection(
+        SizedBox(height: el(6)),
+        ElSection(
           id: 'responsive',
           title: 'Responsive and platform behavior',
-          child: DsText(
-            'DsRadioGroup fills whatever width it is given (a loose, not a '
+          child: ElText(
+            'ElRadioGroup fills whatever width it is given (a loose, not a '
             'stretching, constraint), but does not stretch its rows to '
-            'match: a bare DsRadioGroupItem stays a fixed 20 x 20 circle '
-            'with a fixed 42 x 34 hit area while a DsField row placed '
+            'match: a bare ElRadioGroupItem stays a fixed 20 x 20 circle '
+            'with a fixed 42 x 34 hit area while a ElField row placed '
             'beside it still fills the available width: the same '
             'distinction a CSS grid\'s default item-stretch would blur, '
             'made explicit here because the item declares its own size. '
             'What reflows with layout belongs to whatever composes the '
-            'group: a DsFieldSet + DsFieldLegend wraps its own caption, and '
+            'group: a ElFieldSet + ElFieldLegend wraps its own caption, and '
             'a settings page decides its own row wrapping. Keyboard '
             'activation (Enter/Space, the roving tab stop, and the arrow '
             'keys) and pointer activation behave identically on every '
             'Flutter target this package supports; there is no platform '
             'channel and nothing here is web-only or desktop-only.',
-            DsType.small,
+            ElType.small,
             color: theme.mutedForeground,
           ),
         ),
-        SizedBox(height: ds(6)),
-        DsSection(
+        SizedBox(height: el(6)),
+        ElSection(
           id: 'dependencies',
           title: 'Dependencies, files, assets, fonts and shaders',
           child: DocsInstallFacts(
@@ -766,9 +763,9 @@ class _RadioArticle extends StatelessWidget {
                 description:
                     'radio.dart imports these directly: selection_control.dart '
                     'for the shared socket / hit-area / focus-ring machinery '
-                    '(DsSelectionControl), field.dart for DsFieldScope '
+                    '(ElSelectionControl), field.dart for ElFieldScope '
                     'wiring, effects/machine_surface.dart for the raised dot\'s '
-                    'own surface (DsMachineSurface: used directly here, '
+                    'own surface (ElMachineSurface: used directly here, '
                     'unlike checkbox\'s hand-drawn path), and '
                     'motion/keyframes.dart for the dot-pop player. None are '
                     'copyable in isolation: see Installation.',
@@ -781,7 +778,7 @@ class _RadioArticle extends StatelessWidget {
                     'theme_scope.dart',
                 description:
                     'Token sources: durations and curves, shadow specs, the '
-                    'ds() spacing scale, and the live theme.',
+                    'el() spacing scale, and the live theme.',
               ),
               DocsInstallFact(
                 label: 'Exports',
@@ -794,14 +791,14 @@ class _RadioArticle extends StatelessWidget {
                 value: 'none',
                 description:
                     'The dot is a plain filled circle drawn with '
-                    'DsMachineSurface, not an image or an icon-font glyph, '
+                    'ElMachineSurface, not an image or an icon-font glyph, '
                     'radio needs no icon grid at all, unlike checkbox\'s '
                     'hand-authored tick path.',
               ),
               const DocsInstallFact(
                 label: 'Fonts',
                 value: 'none',
-                description: 'No text is rendered by DsRadioGroupItem itself.',
+                description: 'No text is rendered by ElRadioGroupItem itself.',
               ),
               const DocsInstallFact(
                 label: 'Shaders',
@@ -811,8 +808,8 @@ class _RadioArticle extends StatelessWidget {
             ],
           ),
         ),
-        SizedBox(height: ds(6)),
-        DsSection(
+        SizedBox(height: el(6)),
+        ElSection(
           id: 'theming',
           title: 'Theming notes',
           child: DocsInstallFacts(
@@ -841,8 +838,8 @@ class _RadioArticle extends StatelessWidget {
               DocsInstallFact(
                 label: 'Shadow',
                 value:
-                    'DsShadows.pressed (rest) / DsShadows.btnPrimary '
-                    '(selected) on the socket; DsShadows.e1 on the dot',
+                    'ElShadows.pressed (rest) / ElShadows.btnPrimary '
+                    '(selected) on the socket; ElShadows.e1 on the dot',
                 description:
                     'The socket shadow spec, composed with the focus or '
                     'invalid ring; the dot carries its own raised shadow, '
@@ -852,36 +849,36 @@ class _RadioArticle extends StatelessWidget {
                 label: 'Radius',
                 value: 'BorderRadius.circular(size / 2)',
                 description:
-                    'A full circle: half the 20px box, not a named DsRadii '
+                    'A full circle: half the 20px box, not a named ElRadii '
                     'token.',
               ),
               DocsInstallFact(
                 label: 'Motion',
                 value:
-                    'DsDurations.transitionDefault, DsDotPop, '
-                    'DsJellyReplay',
+                    'ElDurations.transitionDefault, ElDotPop, '
+                    'ElJellyReplay',
                 description:
                     'Socket colour/border/ring tween duration, the dot\'s '
                     'own pop-in keyframe (scale and opacity, on the spring '
                     'curve), and the post-selection squash: all resolved '
-                    'through dsAnimationDuration, so reduced motion '
+                    'through elAnimationDuration, so reduced motion '
                     'shortens or removes them automatically.',
               ),
               DocsInstallFact(
                 label: 'Row gap',
                 value:
-                    'DsRadioGroup.defaultGap (8px) or DsFieldSet.groupGap '
+                    'ElRadioGroup.defaultGap (8px) or ElFieldSet.groupGap '
                     '(12px)',
                 description:
                     'The group\'s own default, or the tighter step the '
                     'composed forms page passes when the group sits inside '
-                    'a DsFieldSet.',
+                    'a ElFieldSet.',
               ),
             ],
           ),
         ),
-        SizedBox(height: ds(6)),
-        DsSection(
+        SizedBox(height: el(6)),
+        ElSection(
           id: 'source',
           title: 'Source and tests',
           child: DocsInstallFacts(
@@ -895,7 +892,7 @@ class _RadioArticle extends StatelessWidget {
                 label: 'Shared machinery',
                 value: 'lib/src/components/selection_control.dart',
                 description:
-                    'DsSelectionControl, DsHitArea and DsJellyReplay, '
+                    'ElSelectionControl, ElHitArea and ElJellyReplay, '
                     'shared with the checkbox and switch families and '
                     'documented on their own component pages.',
               ),
@@ -904,8 +901,8 @@ class _RadioArticle extends StatelessWidget {
                 value: 'test/selection_feedback_test.dart',
                 description:
                     'State-matrix, arrow-key traversal, roving-tabindex and '
-                    'field-adoption coverage for DsRadioGroup and '
-                    'DsRadioGroupItem in the package itself.',
+                    'field-adoption coverage for ElRadioGroup and '
+                    'ElRadioGroupItem in the package itself.',
               ),
               const DocsInstallFact(
                 label: 'Docs page tests',
@@ -925,13 +922,13 @@ class _RadioArticle extends StatelessWidget {
 
 const String _smallestUsageCode = '''String? payout;
 
-DsRadioGroup<String>(
+ElRadioGroup<String>(
   value: payout,
   label: 'Payout rhythm',
   onChanged: (String next) => setState(() => payout = next),
   children: const <Widget>[
-    DsRadioGroupItem<String>(value: 'daily', label: 'Daily'),
-    DsRadioGroupItem<String>(value: 'weekly', label: 'Weekly'),
+    ElRadioGroupItem<String>(value: 'daily', label: 'Daily'),
+    ElRadioGroupItem<String>(value: 'weekly', label: 'Weekly'),
   ],
 )''';
 
@@ -941,26 +938,26 @@ Column(
   crossAxisAlignment: CrossAxisAlignment.stretch,
   mainAxisSize: MainAxisSize.min,
   children: <Widget>[
-    const DsFieldLegend('Payout rhythm'),
-    SizedBox(height: DsFieldLegend.spaceBelow),
-    DsFieldSet(
+    const ElFieldLegend('Payout rhythm'),
+    SizedBox(height: ElFieldLegend.spaceBelow),
+    ElFieldSet(
       tightForGroup: true,
       children: <Widget>[
-        DsRadioGroup<String>(
+        ElRadioGroup<String>(
           value: payout,
-          gap: DsFieldSet.groupGap,
+          gap: ElFieldSet.groupGap,
           label: 'Payout rhythm',
           onChanged: (String next) => setState(() => payout = next),
           children: const <Widget>[
-            DsField(
+            ElField(
               label: 'Daily',
-              orientation: DsFieldOrientation.horizontal,
-              child: DsRadioGroupItem<String>(value: 'daily'),
+              orientation: ElFieldOrientation.horizontal,
+              child: ElRadioGroupItem<String>(value: 'daily'),
             ),
-            DsField(
+            ElField(
               label: 'Weekly',
-              orientation: DsFieldOrientation.horizontal,
-              child: DsRadioGroupItem<String>(value: 'weekly'),
+              orientation: ElFieldOrientation.horizontal,
+              child: ElRadioGroupItem<String>(value: 'weekly'),
             ),
           ],
         ),
@@ -971,14 +968,14 @@ Column(
 
 const String _planPickerCode = '''String? plan = 'pro';
 
-DsRadioGroup<String>(
+ElRadioGroup<String>(
   value: plan,
   label: 'Plan',
   onChanged: (String next) => setState(() => plan = next),
   children: const <Widget>[
-    DsRadioGroupItem<String>(value: 'free', label: 'Free'),
-    DsRadioGroupItem<String>(value: 'pro', label: 'Pro'),
-    DsRadioGroupItem<String>(value: 'vault', label: 'Vault'),
+    ElRadioGroupItem<String>(value: 'free', label: 'Free'),
+    ElRadioGroupItem<String>(value: 'pro', label: 'Pro'),
+    ElRadioGroupItem<String>(value: 'vault', label: 'Vault'),
   ],
 )''';
 
@@ -989,37 +986,37 @@ Column(
   crossAxisAlignment: CrossAxisAlignment.stretch,
   mainAxisSize: MainAxisSize.min,
   children: <Widget>[
-    const DsFieldLegend('Shipping method'),
-    SizedBox(height: DsFieldLegend.spaceBelow),
-    DsFieldSet(
+    const ElFieldLegend('Shipping method'),
+    SizedBox(height: ElFieldLegend.spaceBelow),
+    ElFieldSet(
       tightForGroup: true,
       children: <Widget>[
-        DsRadioGroup<String>(
+        ElRadioGroup<String>(
           value: method,
-          gap: DsFieldSet.groupGap,
+          gap: ElFieldSet.groupGap,
           invalid: errors.isNotEmpty,
           label: 'Shipping method',
           hint: errors.isEmpty ? null : errors.join(' '),
           onChanged: (String next) => setState(() => method = next),
           children: const <Widget>[
-            DsField(
+            ElField(
               label: 'Standard, 5 to 7 days',
-              orientation: DsFieldOrientation.horizontal,
-              child: DsRadioGroupItem<String>(value: 'standard'),
+              orientation: ElFieldOrientation.horizontal,
+              child: ElRadioGroupItem<String>(value: 'standard'),
             ),
-            DsField(
+            ElField(
               label: 'Express, 2 days',
-              orientation: DsFieldOrientation.horizontal,
-              child: DsRadioGroupItem<String>(value: 'express'),
+              orientation: ElFieldOrientation.horizontal,
+              child: ElRadioGroupItem<String>(value: 'express'),
             ),
-            DsField(
+            ElField(
               label: 'Overnight',
-              orientation: DsFieldOrientation.horizontal,
-              child: DsRadioGroupItem<String>(value: 'overnight'),
+              orientation: ElFieldOrientation.horizontal,
+              child: ElRadioGroupItem<String>(value: 'overnight'),
             ),
           ],
         ),
-        if (errors.isNotEmpty) DsFieldError(errors),
+        if (errors.isNotEmpty) ElFieldError(errors),
       ],
     ),
   ],
@@ -1027,18 +1024,18 @@ Column(
 
 /// A bare item next to a field-wrapped one: the two valid shapes every
 /// other example on this page is built from.
-const String _compositionTreeCode = '''DsRadioGroup<String>(
+const String _compositionTreeCode = '''ElRadioGroup<String>(
   value: value,
   onChanged: onChanged,
   children: <Widget>[
     // Bare: the label is announced, never painted.
-    const DsRadioGroupItem<String>(value: 'a', label: 'A'),
+    const ElRadioGroupItem<String>(value: 'a', label: 'A'),
     // Field-wrapped: the label is painted AND announced, and tapping it
     // selects this item, the same activator wiring an HTML label uses.
-    DsField(
+    ElField(
       label: 'B',
-      orientation: DsFieldOrientation.horizontal,
-      child: const DsRadioGroupItem<String>(value: 'b'),
+      orientation: ElFieldOrientation.horizontal,
+      child: const ElRadioGroupItem<String>(value: 'b'),
     ),
   ],
 )''';
@@ -1049,28 +1046,28 @@ Column(
   crossAxisAlignment: CrossAxisAlignment.stretch,
   mainAxisSize: MainAxisSize.min,
   children: <Widget>[
-    const DsFieldLegend('Digest frequency'),
-    SizedBox(height: DsFieldLegend.spaceBelow),
-    DsFieldSet(
+    const ElFieldLegend('Digest frequency'),
+    SizedBox(height: ElFieldLegend.spaceBelow),
+    ElFieldSet(
       tightForGroup: true,
       children: <Widget>[
-        DsRadioGroup<String>(
+        ElRadioGroup<String>(
           value: frequency,
-          gap: DsFieldSet.groupGap,
+          gap: ElFieldSet.groupGap,
           label: 'Digest frequency',
           onChanged: (String next) => setState(() => frequency = next),
           children: const <Widget>[
-            DsField(
+            ElField(
               label: 'Daily',
               description: 'One email every morning.',
-              orientation: DsFieldOrientation.horizontal,
-              child: DsRadioGroupItem<String>(value: 'daily'),
+              orientation: ElFieldOrientation.horizontal,
+              child: ElRadioGroupItem<String>(value: 'daily'),
             ),
-            DsField(
+            ElField(
               label: 'Weekly',
               description: 'One email every Monday.',
-              orientation: DsFieldOrientation.horizontal,
-              child: DsRadioGroupItem<String>(value: 'weekly'),
+              orientation: ElFieldOrientation.horizontal,
+              child: ElRadioGroupItem<String>(value: 'weekly'),
             ),
           ],
         ),
@@ -1081,44 +1078,44 @@ Column(
 
 const String _choiceCardCode = '''String? plan = 'pro';
 
-DsRadioGroup<String>(
+ElRadioGroup<String>(
   value: plan,
   label: 'Plan',
-  gap: ds(3),
+  gap: el(3),
   onChanged: (String next) => setState(() => plan = next),
   children: <Widget>[
-    DsCard(
+    ElCard(
       children: <Widget>[
-        DsCardContent(
-          child: DsField(
+        ElCardContent(
+          child: ElField(
             label: 'Free',
             description: 'For trying things out.',
-            orientation: DsFieldOrientation.horizontal,
-            child: const DsRadioGroupItem<String>(value: 'free'),
+            orientation: ElFieldOrientation.horizontal,
+            child: const ElRadioGroupItem<String>(value: 'free'),
           ),
         ),
       ],
     ),
-    DsCard(
+    ElCard(
       children: <Widget>[
-        DsCardContent(
-          child: DsField(
+        ElCardContent(
+          child: ElField(
             label: 'Pro',
             description: 'For a team that ships every week.',
-            orientation: DsFieldOrientation.horizontal,
-            child: const DsRadioGroupItem<String>(value: 'pro'),
+            orientation: ElFieldOrientation.horizontal,
+            child: const ElRadioGroupItem<String>(value: 'pro'),
           ),
         ),
       ],
     ),
-    DsCard(
+    ElCard(
       children: <Widget>[
-        DsCardContent(
-          child: DsField(
+        ElCardContent(
+          child: ElField(
             label: 'Vault',
             description: 'For everything that must never move.',
-            orientation: DsFieldOrientation.horizontal,
-            child: const DsRadioGroupItem<String>(value: 'vault'),
+            orientation: ElFieldOrientation.horizontal,
+            child: const ElRadioGroupItem<String>(value: 'vault'),
           ),
         ),
       ],
@@ -1126,23 +1123,23 @@ DsRadioGroup<String>(
   ],
 )''';
 
-const String _disabledUsageCode = '''DsRadioGroup<String>(
+const String _disabledUsageCode = '''ElRadioGroup<String>(
   value: null,
   onChanged: null,
   children: const <Widget>[
-    DsRadioGroupItem<String>(value: 'daily', label: 'Daily'),
-    DsRadioGroupItem<String>(value: 'weekly', label: 'Weekly'),
+    ElRadioGroupItem<String>(value: 'daily', label: 'Daily'),
+    ElRadioGroupItem<String>(value: 'weekly', label: 'Weekly'),
   ],
 )''';
 
-const String _invalidUsageCode = '''DsRadioGroup<String>(
+const String _invalidUsageCode = '''ElRadioGroup<String>(
   value: method,
   invalid: true,
   hint: 'Choose a shipping method.',
   onChanged: (String next) => setState(() => method = next),
   children: const <Widget>[
-    DsRadioGroupItem<String>(value: 'standard', label: 'Standard'),
-    DsRadioGroupItem<String>(value: 'express', label: 'Express'),
+    ElRadioGroupItem<String>(value: 'standard', label: 'Standard'),
+    ElRadioGroupItem<String>(value: 'express', label: 'Express'),
   ],
 )''';
 
@@ -1162,32 +1159,32 @@ class _RadioPreviewState extends State<_RadioPreview> {
   @override
   Widget build(BuildContext context) {
     return Wrap(
-      spacing: ds(3),
-      runSpacing: ds(3),
+      spacing: el(3),
+      runSpacing: el(3),
       children: <Widget>[
-        DsStateCell(
+        ElStateCell(
           label: 'Payout rhythm',
           note: 'Tap an option: the previous one deselects',
-          child: DsRadioGroup<String>(
+          child: ElRadioGroup<String>(
             key: const ValueKey<String>('radio-live-specimen'),
             value: _payout,
             label: 'Payout rhythm',
             onChanged: (String next) => setState(() => _payout = next),
             children: const <Widget>[
-              DsRadioGroupItem<String>(value: 'daily', label: 'Daily'),
-              DsRadioGroupItem<String>(value: 'weekly', label: 'Weekly'),
-              DsRadioGroupItem<String>(value: 'monthly', label: 'Monthly'),
+              ElRadioGroupItem<String>(value: 'daily', label: 'Daily'),
+              ElRadioGroupItem<String>(value: 'weekly', label: 'Weekly'),
+              ElRadioGroupItem<String>(value: 'monthly', label: 'Monthly'),
             ],
           ),
         ),
-        DsStateCell(
+        ElStateCell(
           label: 'Focus-visible',
           note: 'Ring painted, not focused',
-          child: DsRadioGroup<String>(
+          child: ElRadioGroup<String>(
             value: _focusValue,
             onChanged: (String next) => setState(() => _focusValue = next),
             children: <Widget>[
-              DsRadioGroupItem<String>(
+              ElRadioGroupItem<String>(
                 value: 'focus',
                 forceFocusRing: true,
                 label: 'Focus-visible',
@@ -1195,27 +1192,27 @@ class _RadioPreviewState extends State<_RadioPreview> {
             ],
           ),
         ),
-        DsStateCell(
+        ElStateCell(
           label: 'Error',
           note: 'invalid: true',
-          child: DsRadioGroup<String>(
+          child: ElRadioGroup<String>(
             value: _errorValue,
             invalid: true,
             onChanged: (String next) => setState(() => _errorValue = next),
             children: const <Widget>[
-              DsRadioGroupItem<String>(value: 'daily', label: 'Daily'),
-              DsRadioGroupItem<String>(value: 'weekly', label: 'Weekly'),
+              ElRadioGroupItem<String>(value: 'daily', label: 'Daily'),
+              ElRadioGroupItem<String>(value: 'weekly', label: 'Weekly'),
             ],
           ),
         ),
-        DsStateCell(
+        ElStateCell(
           label: 'Disabled',
           note: 'enabled: false on the item itself',
-          child: DsRadioGroup<String>(
+          child: ElRadioGroup<String>(
             value: null,
             onChanged: (String _) {},
             children: const <Widget>[
-              DsRadioGroupItem<String>(
+              ElRadioGroupItem<String>(
                 value: 'daily',
                 enabled: false,
                 label: 'Disabled',
@@ -1223,14 +1220,14 @@ class _RadioPreviewState extends State<_RadioPreview> {
             ],
           ),
         ),
-        DsStateCell(
+        ElStateCell(
           label: 'Disabled (selected)',
           note: 'enabled: false, and it is the group\'s value',
-          child: DsRadioGroup<String>(
+          child: ElRadioGroup<String>(
             value: 'daily',
             onChanged: (String _) {},
             children: const <Widget>[
-              DsRadioGroupItem<String>(
+              ElRadioGroupItem<String>(
                 value: 'daily',
                 enabled: false,
                 label: 'Disabled selected',
@@ -1238,14 +1235,14 @@ class _RadioPreviewState extends State<_RadioPreview> {
             ],
           ),
         ),
-        const DsStateCell(
+        const ElStateCell(
           label: 'Group disabled',
           note: 'onChanged: null: no item in the group can be operated',
-          child: DsRadioGroup<String>(
+          child: ElRadioGroup<String>(
             value: 'weekly',
             onChanged: null,
             children: <Widget>[
-              DsRadioGroupItem<String>(value: 'weekly', label: 'Weekly'),
+              ElRadioGroupItem<String>(value: 'weekly', label: 'Weekly'),
             ],
           ),
         ),
@@ -1273,26 +1270,26 @@ class _PayoutRhythmExampleState extends State<_PayoutRhythmExample> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        const DsFieldLegend('Payout rhythm'),
-        SizedBox(height: DsFieldLegend.spaceBelow),
-        DsFieldSet(
+        const ElFieldLegend('Payout rhythm'),
+        SizedBox(height: ElFieldLegend.spaceBelow),
+        ElFieldSet(
           tightForGroup: true,
           children: <Widget>[
-            DsRadioGroup<String>(
+            ElRadioGroup<String>(
               value: _payout,
-              gap: DsFieldSet.groupGap,
+              gap: ElFieldSet.groupGap,
               label: 'Payout rhythm',
               onChanged: (String next) => setState(() => _payout = next),
               children: <Widget>[
-                DsField(
+                ElField(
                   label: 'Daily',
-                  orientation: DsFieldOrientation.horizontal,
-                  child: const DsRadioGroupItem<String>(value: 'daily'),
+                  orientation: ElFieldOrientation.horizontal,
+                  child: const ElRadioGroupItem<String>(value: 'daily'),
                 ),
-                DsField(
+                ElField(
                   label: 'Weekly',
-                  orientation: DsFieldOrientation.horizontal,
-                  child: const DsRadioGroupItem<String>(value: 'weekly'),
+                  orientation: ElFieldOrientation.horizontal,
+                  child: const ElRadioGroupItem<String>(value: 'weekly'),
                 ),
               ],
             ),

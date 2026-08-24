@@ -38,9 +38,9 @@ class SwitchDocPage extends StatelessWidget {
         title: switchDoc.title,
         description: switchDoc.description,
       ),
-      breadcrumbs: const <DsBreadcrumbEntry>[
-        DsBreadcrumbEntry.link('Components'),
-        DsBreadcrumbEntry.page('Switch'),
+      breadcrumbs: const <ElBreadcrumbEntry>[
+        ElBreadcrumbEntry.link('Components'),
+        ElBreadcrumbEntry.page('Switch'),
       ],
       sidebar: _sidebar(switchDoc.route),
       // No entry for the hero demo: it renders before any heading, the same
@@ -101,52 +101,41 @@ class _SwitchArticle extends StatelessWidget {
     key: const ValueKey<String>('switch-doc-article'),
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
-      _heroExpansion(),
-      SizedBox(height: ds(6)),
       _Anchor('preview', child: const _PreviewSection()),
-      SizedBox(height: ds(8)),
+      SizedBox(height: el(8)),
       const _InstallSection(),
-      SizedBox(height: ds(2)),
+      SizedBox(height: el(2)),
       const _UsageSection(),
-      SizedBox(height: ds(2)),
+      SizedBox(height: el(2)),
       const _DescriptionSection(),
-      SizedBox(height: ds(2)),
+      SizedBox(height: el(2)),
       const _ChoiceCardSection(),
-      SizedBox(height: ds(2)),
+      SizedBox(height: el(2)),
       const _DisabledSection(),
-      SizedBox(height: ds(2)),
+      SizedBox(height: el(2)),
       const _InvalidSection(),
-      SizedBox(height: ds(2)),
+      SizedBox(height: el(2)),
       const _SizeSection(),
-      SizedBox(height: ds(2)),
+      SizedBox(height: el(2)),
       const _ApiSection(),
-      SizedBox(height: ds(2)),
+      SizedBox(height: el(2)),
       const _StatesSection(),
-      SizedBox(height: ds(2)),
+      SizedBox(height: el(2)),
       const _AccessibilitySection(),
-      SizedBox(height: ds(2)),
+      SizedBox(height: el(2)),
       const _ResponsiveSection(),
-      SizedBox(height: ds(2)),
+      SizedBox(height: el(2)),
       const _DependenciesSection(),
-      SizedBox(height: ds(2)),
+      SizedBox(height: el(2)),
       const _ThemingSection(),
-      SizedBox(height: ds(2)),
+      SizedBox(height: el(2)),
       const _SourceSection(),
     ],
   );
 }
 
-/// The CONTENT RULES' expanded description, "switch vs. checkbox": plain
-/// hero prose above the fold, not a [DsSection], so it carries no heading
-/// and no TOC anchor of its own, the same as `button/page.dart`'s own
-/// `_heroExpansion()`.
-Widget _heroExpansion() => ConstrainedBox(
-  constraints: const BoxConstraints(maxWidth: DsWidths.prose),
-  child: DsText(switchExpandedDescription, DsType.body),
-);
-
 /// The shadcn page's own un-headed hero demo ("Airplane Mode"): a single
-/// interactive switch wired to a real [DsField] label. Tap the pill or the
+/// interactive switch wired to a real [ElField] label. Tap the pill or the
 /// words beside it: both flip the same value.
 class _PreviewSection extends StatelessWidget {
   const _PreviewSection();
@@ -155,14 +144,14 @@ class _PreviewSection extends StatelessWidget {
   Widget build(BuildContext context) => const DocsCodeExample(
     title: 'Live preview',
     description:
-        'A single interactive switch, wired to a real DsField label. Tap '
+        'A single interactive switch, wired to a real ElField label. Tap '
         'the pill or the words beside it: both flip the same value.',
     preview: _LiveSpecimen(),
   );
 }
 
-/// The one specimen the tests tap: a real, stateful [DsSwitch] behind a
-/// [DsField] label, so both the control's own semantics and the label's
+/// The one specimen the tests tap: a real, stateful [ElSwitch] behind a
+/// [ElField] label, so both the control's own semantics and the label's
 /// activation wiring are exercised together.
 class _LiveSpecimen extends StatefulWidget {
   const _LiveSpecimen();
@@ -176,26 +165,26 @@ class _LiveSpecimenState extends State<_LiveSpecimen> {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return SizedBox(
       width: 320,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          DsField(
+          ElField(
             label: 'Email notifications',
             description: 'Applies immediately: there is no Save button.',
-            orientation: DsFieldOrientation.horizontal,
-            child: DsSwitch(
+            orientation: ElFieldOrientation.horizontal,
+            child: ElSwitch(
               key: const ValueKey<String>('switch-doc-live-specimen'),
               value: _on,
               onChanged: (bool next) => setState(() => _on = next),
             ),
           ),
-          SizedBox(height: ds(3)),
-          DsText(
+          SizedBox(height: el(3)),
+          ElText(
             _on ? 'Currently on.' : 'Currently off.',
-            DsType.small,
+            ElType.small,
             color: theme.mutedForeground,
           ),
         ],
@@ -205,22 +194,17 @@ class _LiveSpecimenState extends State<_LiveSpecimen> {
 }
 
 /// shadcn's Installation section: CLI and Manual tabs. switch has not
-/// shipped a registry manifest yet, so there is no `elattar add switch` to
-/// run: the Manual tab is the whole story, and the description says so
-/// rather than printing a command that does not work.
+/// ships a registry manifest and installs through `elattar add switch`.
 class _InstallSection extends StatelessWidget {
   const _InstallSection();
 
   @override
-  Widget build(BuildContext context) => DsSection(
+  Widget build(BuildContext context) => ElSection(
     id: 'install',
     title: 'Installation',
     description:
-        'Switch has not shipped a registry manifest yet: there is no '
-        '"elattar add switch" to run, and this page will not print one that '
-        'does not work. Copy the source below (and its '
-        'selection_control.dart dependency) into lib/components/ui/ until a '
-        'manifest ships.',
+        '`elattar add switch` installs the component and its declared '
+        'dependency closure.',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
@@ -237,13 +221,13 @@ class _InstallSection extends StatelessWidget {
                   'the full source.',
               code:
                   "import 'package:flutter/widgets.dart';\n\n"
-                  'enum DsSwitchSize { sm, md }\n\n'
-                  'class DsSwitch extends StatelessWidget {\n'
-                  '  const DsSwitch({\n'
+                  'enum ElSwitchSize { sm, md }\n\n'
+                  'class ElSwitch extends StatelessWidget {\n'
+                  '  const ElSwitch({\n'
                   '    super.key,\n'
                   '    required this.value,\n'
                   '    this.onChanged,\n'
-                  '    this.size = DsSwitchSize.md,\n'
+                  '    this.size = ElSwitchSize.md,\n'
                   '    this.enabled = true,\n'
                   '    this.invalid = false,\n'
                   '    this.focusNode,\n'
@@ -252,7 +236,7 @@ class _InstallSection extends StatelessWidget {
                   '  });\n\n'
                   '  final bool value;\n'
                   '  final ValueChanged<bool>? onChanged;\n'
-                  '  final DsSwitchSize size;\n'
+                  '  final ElSwitchSize size;\n'
                   '  final bool enabled;\n'
                   '  final bool invalid;\n'
                   '  final FocusNode? focusNode;\n'
@@ -263,14 +247,14 @@ class _InstallSection extends StatelessWidget {
             ),
           ],
         ),
-        SizedBox(height: ds(4)),
+        SizedBox(height: el(4)),
         DocsInstallFacts(
           facts: <DocsInstallFact>[
             const DocsInstallFact(
               label: 'Registry item',
               value: 'Not yet published',
               description:
-                  'switch has no registry manifest in this wave: install '
+                  'switch ships in the registry in this wave: install '
                   'by copying source rather than running a CLI command.',
             ),
             const DocsInstallFact(
@@ -308,10 +292,10 @@ class _InstallSection extends StatelessWidget {
               value: 'Package tests + this page\'s own specimen test',
               description:
                   'test/selection_feedback_test.dart covers geometry, '
-                  'motion curves, colors, the hit area and DsField wiring; '
+                  'motion curves, colors, the hit area and ElField wiring; '
                   'example/test/components_docs/switch_test.dart covers '
                   'this page. No fixture/registry install check yet, '
-                  'because there is no manifest to install.',
+                  'because the shipped manifest installs it.',
             ),
           ],
         ),
@@ -327,13 +311,13 @@ class _UsageSection extends StatelessWidget {
   const _UsageSection();
 
   @override
-  Widget build(BuildContext context) => const DsSection(
+  Widget build(BuildContext context) => const ElSection(
     id: 'usage',
     title: 'Usage',
     description:
         'The smallest correct example: a controlled boolean with no label '
         'of its own.',
-    child: DsPanel(
+    child: ElPanel(
       label: 'DART',
       note: 'MINIMAL',
       child: DocsSelectableCodeBlock(code: _usageCode),
@@ -343,25 +327,25 @@ class _UsageSection extends StatelessWidget {
 
 const String _usageCode =
     "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
-    'DsSwitch(\n'
+    'ElSwitch(\n'
     '  value: notificationsOn,\n'
     '  onChanged: (bool next) => setState(() => notificationsOn = next),\n'
     ')';
 
 /// shadcn's Description example: a switch paired with a visible label AND
-/// helper text, both wired through one [DsField]. New specimen code: the
+/// helper text, both wired through one [ElField]. New specimen code: the
 /// page's existing labelled-row example (below, in Choice card) carries no
 /// description text of its own, so it does not cover this case.
 class _DescriptionSection extends StatelessWidget {
   const _DescriptionSection();
 
   @override
-  Widget build(BuildContext context) => DsSection(
+  Widget build(BuildContext context) => ElSection(
     id: 'description',
     title: 'Description',
     description:
         'A label and a line of helper text under it, both published '
-        'through DsFieldScope so the switch adopts them as its accessible '
+        'through ElFieldScope so the switch adopts them as its accessible '
         'name and hint without repeating either string.',
     child: DocsCodeExample(
       title: 'Marketing emails',
@@ -370,12 +354,12 @@ class _DescriptionSection extends StatelessWidget {
         DocsCodeFile(
           path: 'description_example.dart',
           code:
-              'DsField(\n'
+              'ElField(\n'
               "  label: 'Marketing emails',\n"
               "  description: 'Product announcements and offers, at most "
               "once a week.',\n"
-              '  orientation: DsFieldOrientation.horizontal,\n'
-              '  child: DsSwitch(\n'
+              '  orientation: ElFieldOrientation.horizontal,\n'
+              '  child: ElSwitch(\n'
               '    value: marketingOn,\n'
               '    onChanged: (bool next) => setState(() => marketingOn '
               '= next),\n'
@@ -400,11 +384,11 @@ class _DescriptionPreviewState extends State<_DescriptionPreview> {
   @override
   Widget build(BuildContext context) => SizedBox(
     width: 320,
-    child: DsField(
+    child: ElField(
       label: 'Marketing emails',
       description: 'Product announcements and offers, at most once a week.',
-      orientation: DsFieldOrientation.horizontal,
-      child: DsSwitch(
+      orientation: ElFieldOrientation.horizontal,
+      child: ElSwitch(
         value: _on,
         onChanged: (bool next) => setState(() => _on = next),
       ),
@@ -414,17 +398,17 @@ class _DescriptionPreviewState extends State<_DescriptionPreview> {
 
 /// shadcn's Choice Card example: several toggle rows grouped in one card.
 /// Carries the page's existing composition forward unchanged: one
-/// DsFieldGroup, several horizontal DsField rows, one DsSwitch each.
+/// ElFieldGroup, several horizontal ElField rows, one ElSwitch each.
 class _ChoiceCardSection extends StatelessWidget {
   const _ChoiceCardSection();
 
   @override
-  Widget build(BuildContext context) => const DsSection(
+  Widget build(BuildContext context) => const ElSection(
     id: 'choice-card',
     title: 'Choice card',
     description:
-        'A composed settings list: one DsFieldGroup, several horizontal '
-        'DsField rows, one DsSwitch each: shadcn\'s own "several toggles '
+        'A composed settings list: one ElFieldGroup, several horizontal '
+        'ElField rows, one ElSwitch each: shadcn\'s own "several toggles '
         'grouped in a card" pattern.',
     child: _PreferencesComposition(),
   );
@@ -447,14 +431,14 @@ class _PreferencesCompositionState extends State<_PreferencesComposition> {
   ];
 
   @override
-  Widget build(BuildContext context) => DsFieldGroup(
+  Widget build(BuildContext context) => ElFieldGroup(
     children: <Widget>[
       for (int i = 0; i < _rows.length; i++)
-        DsField(
+        ElField(
           label: _rows[i].$1,
           description: _rows[i].$2,
-          orientation: DsFieldOrientation.horizontal,
-          child: DsSwitch(
+          orientation: ElFieldOrientation.horizontal,
+          child: ElSwitch(
             value: _values[i],
             label: _rows[i].$1,
             onChanged: (bool next) => setState(() => _values[i] = next),
@@ -470,7 +454,7 @@ class _DisabledSection extends StatelessWidget {
   const _DisabledSection();
 
   @override
-  Widget build(BuildContext context) => DsSection(
+  Widget build(BuildContext context) => ElSection(
     id: 'disabled',
     title: 'Disabled',
     description:
@@ -479,19 +463,19 @@ class _DisabledSection extends StatelessWidget {
     child: DocsCodeExample(
       title: 'Disabled',
       preview: Wrap(
-        spacing: ds(6),
+        spacing: el(6),
         crossAxisAlignment: WrapCrossAlignment.center,
         children: const <Widget>[
-          DsSwitch(value: false, enabled: false),
-          DsSwitch(value: true, enabled: false),
+          ElSwitch(value: false, enabled: false),
+          ElSwitch(value: true, enabled: false),
         ],
       ),
       manualFiles: const <DocsCodeFile>[
         DocsCodeFile(
           path: 'disabled_example.dart',
           code:
-              'DsSwitch(value: false, enabled: false)\n\n'
-              'DsSwitch(value: true, enabled: false)',
+              'ElSwitch(value: false, enabled: false)\n\n'
+              'ElSwitch(value: true, enabled: false)',
         ),
       ],
     ),
@@ -499,12 +483,12 @@ class _DisabledSection extends StatelessWidget {
 }
 
 /// shadcn's Invalid example: `invalid: true` paints the destructive
-/// border/ring, ORed with an enclosing DsFieldScope's own invalid flag.
+/// border/ring, ORed with an enclosing ElFieldScope's own invalid flag.
 class _InvalidSection extends StatelessWidget {
   const _InvalidSection();
 
   @override
-  Widget build(BuildContext context) => const DsSection(
+  Widget build(BuildContext context) => const ElSection(
     id: 'invalid',
     title: 'Invalid',
     description:
@@ -514,12 +498,12 @@ class _InvalidSection extends StatelessWidget {
         'below.',
     child: DocsCodeExample(
       title: 'Invalid',
-      preview: DsSwitch(value: false, invalid: true, onChanged: _noop),
+      preview: ElSwitch(value: false, invalid: true, onChanged: _noop),
       manualFiles: <DocsCodeFile>[
         DocsCodeFile(
           path: 'invalid_example.dart',
           code:
-              'DsSwitch(value: false, invalid: true, onChanged: (bool '
+              'ElSwitch(value: false, invalid: true, onChanged: (bool '
               'next) {})',
         ),
       ],
@@ -529,13 +513,13 @@ class _InvalidSection extends StatelessWidget {
 
 void _noop(bool _) {}
 
-/// The two rungs of [DsSwitchSize], as a table and as a live side-by-side:
+/// The two rungs of [ElSwitchSize], as a table and as a live side-by-side:
 /// shadcn's own "Size" example, singular.
 class _SizeSection extends StatelessWidget {
   const _SizeSection();
 
   @override
-  Widget build(BuildContext context) => DsSection(
+  Widget build(BuildContext context) => ElSection(
     id: 'size',
     title: 'Size',
     child: Column(
@@ -545,22 +529,22 @@ class _SizeSection extends StatelessWidget {
           title: 'Size',
           facts: <DocsApiFact>[
             DocsApiFact(
-              name: 'DsSwitchSize.sm',
+              name: 'ElSwitchSize.sm',
               type: '36 × 20 track, 16px thumb',
               description: '16px of travel. data-size="sm" on the reference.',
             ),
             DocsApiFact(
-              name: 'DsSwitchSize.md',
+              name: 'ElSwitchSize.md',
               type: '44 × 24 track, 20px thumb',
               description:
-                  '20px of travel. The default value of DsSwitch.size: '
+                  '20px of travel. The default value of ElSwitch.size: '
                   'named md rather than default because default is a Dart '
                   'keyword; .label still reports "default", the attribute '
                   'value the reference writes.',
             ),
           ],
         ),
-        SizedBox(height: ds(4)),
+        SizedBox(height: el(4)),
         const _SizePreview(),
       ],
     ),
@@ -582,17 +566,17 @@ class _SizePreviewState extends State<_SizePreview> {
   Widget build(BuildContext context) => DocsCodeExample(
     title: 'Both sizes, side by side',
     preview: Wrap(
-      spacing: ds(8),
-      runSpacing: ds(4),
+      spacing: el(8),
+      runSpacing: el(4),
       crossAxisAlignment: WrapCrossAlignment.center,
       children: <Widget>[
-        DsSwitch(
-          size: DsSwitchSize.sm,
+        ElSwitch(
+          size: ElSwitchSize.sm,
           value: _sm,
           label: 'Small',
           onChanged: (bool next) => setState(() => _sm = next),
         ),
-        DsSwitch(
+        ElSwitch(
           value: _md,
           label: 'Default',
           onChanged: (bool next) => setState(() => _md = next),
@@ -602,14 +586,14 @@ class _SizePreviewState extends State<_SizePreview> {
   );
 }
 
-/// Every DsSwitch constructor parameter and both DsSwitchSize rungs. shadcn's
+/// Every ElSwitch constructor parameter and both ElSwitchSize rungs. shadcn's
 /// own API Reference just links out to Base UI's docs; ours renders a real
 /// table, an addition their page does not have.
 class _ApiSection extends StatelessWidget {
   const _ApiSection();
 
   @override
-  Widget build(BuildContext context) => const DsSection(
+  Widget build(BuildContext context) => const ElSection(
     id: 'api',
     title: 'API Reference',
     child: DocsApiTable(
@@ -631,8 +615,8 @@ class _ApiSection extends StatelessWidget {
         ),
         DocsApiFact(
           name: 'size',
-          type: 'DsSwitchSize',
-          description: 'Defaults to DsSwitchSize.md. See Size above.',
+          type: 'ElSwitchSize',
+          description: 'Defaults to ElSwitchSize.md. See Size above.',
         ),
         DocsApiFact(
           name: 'enabled',
@@ -647,22 +631,22 @@ class _ApiSection extends StatelessWidget {
           type: 'bool',
           description:
               'Defaults to false. Paints the destructive border/ring. ORed '
-              'with the enclosing DsFieldScope\'s own invalid flag.',
+              'with the enclosing ElFieldScope\'s own invalid flag.',
         ),
         DocsApiFact(
           name: 'focusNode',
           type: 'FocusNode?',
           description:
-              'Optional. Falls back to a DsFieldScope\'s node when null, so '
-              'DsForm.focusFirstError can land on the switch itself.',
+              'Optional. Falls back to a ElFieldScope\'s node when null, so '
+              'ElForm.focusFirstError can land on the switch itself.',
         ),
         DocsApiFact(
           name: 'label',
           type: 'String?',
           description:
               'Optional accessible name for a switch whose visible label is '
-              'a sibling. Falls back to the enclosing DsFieldScope\'s '
-              'label: typically supplied by DsField.',
+              'a sibling. Falls back to the enclosing ElFieldScope\'s '
+              'label: typically supplied by ElField.',
         ),
         DocsApiFact(
           name: 'hint',
@@ -670,7 +654,7 @@ class _ApiSection extends StatelessWidget {
           description:
               'Optional description/error text, resolved into the '
               'control\'s semantics hint. Falls back to the enclosing '
-              'DsFieldScope\'s describedBy.',
+              'ElFieldScope\'s describedBy.',
         ),
       ],
     ),
@@ -685,8 +669,8 @@ class _StatesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
-    return DsSection(
+    final ElThemeData theme = ElTheme.of(context);
+    return ElSection(
       id: 'states',
       title: 'States',
       child: Column(
@@ -698,7 +682,7 @@ class _StatesSection extends StatelessWidget {
                 state: 'Off (rest)',
                 treatment:
                     'value: false. Fill theme.muted, border theme.input, '
-                    'DsShadows.pressed: a socket recessed below the '
+                    'ElShadows.pressed: a socket recessed below the '
                     'surrounding surface.',
                 userSignal:
                     'The thumb rests at the track\'s left edge; the darker, '
@@ -708,7 +692,7 @@ class _StatesSection extends StatelessWidget {
                 state: 'On (selected)',
                 treatment:
                     'value: true. Fill/border theme.primary, '
-                    'DsShadows.btnPrimary: the socket lights and casts a '
+                    'ElShadows.btnPrimary: the socket lights and casts a '
                     'glow beneath the thumb.',
                 userSignal:
                     'The thumb travels to the right edge AND the socket '
@@ -759,24 +743,24 @@ class _StatesSection extends StatelessWidget {
                 state: 'Reduced motion',
                 treatment:
                     'MediaQuery.disableAnimations true collapses every '
-                    'tween to Duration.zero via dsAnimationDuration.',
+                    'tween to Duration.zero via elAnimationDuration.',
                 userSignal:
                     'The thumb still lands at the correct on/off position, '
                     'instantly, with no travel and no spring overshoot.',
               ),
             ],
           ),
-          SizedBox(height: ds(3)),
+          SizedBox(height: el(3)),
           ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: DsWidths.prose),
-            child: DsText(
+            constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+            child: ElText(
               'Pressed is not a row: the reference\'s Switch class list '
               'carries no active-state transform of its own, so there is '
               'no distinct pressed visual beyond the value change itself. '
               'Loading, Empty and Success are not rows either: a boolean '
               'control has no asynchronous operation, so inventing them '
               'would describe behavior the source does not have.',
-              DsType.small,
+              ElType.small,
               color: theme.mutedForeground,
             ),
           ),
@@ -793,31 +777,31 @@ class _AccessibilitySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
-    return DsSection(
+    final ElThemeData theme = ElTheme.of(context);
+    return ElSection(
       id: 'accessibility',
       title: 'Accessibility',
       child: _bullets(theme, <String>[
         'Semantic role: a Semantics(toggled: value) node inside the hit '
             'area, so assistive technology announces it as a switch/toggle '
             'and reads its state as on or off, not merely checked.',
-        'Accessible name: required. Pass DsSwitch.label directly, or wrap '
-            'the control in a DsField(label: …); the field publishes the '
-            'same string through DsFieldScope and the control adopts it '
+        'Accessible name: required. Pass ElSwitch.label directly, or wrap '
+            'the control in a ElField(label: …); the field publishes the '
+            'same string through ElFieldScope and the control adopts it '
             'automatically when its own label is left null.',
-        'Label activation: inside a horizontal DsField, tapping the label '
-            'text flips the switch too: DsField registers a '
-            'DsFieldActivator and DsSwitch fills it with its own toggle '
+        'Label activation: inside a horizontal ElField, tapping the label '
+            'text flips the switch too: ElField registers a '
+            'ElFieldActivator and ElSwitch fills it with its own toggle '
             'callback.',
         'Keyboard: Tab moves focus onto an enabled switch; Enter or Space '
             'activates it, wired by hand onto a Focus widget the same way '
             'a native <button> would answer both keys.',
-        'Focus routing: an explicit DsSwitch.focusNode wins over one '
-            'supplied by an enclosing DsFieldScope, which in turn wins '
-            'over none, so DsForm.focusFirstError can land on the switch '
+        'Focus routing: an explicit ElSwitch.focusNode wins over one '
+            'supplied by an enclosing ElFieldScope, which in turn wins '
+            'over none, so ElForm.focusFirstError can land on the switch '
             'itself.',
         'Touch target: the painted pill is 44 × 24 (or 36 × 20 at '
-            'DsSwitchSize.sm), but DsHitArea invisibly grows the tappable '
+            'ElSwitchSize.sm), but ElHitArea invisibly grows the tappable '
             'region by 12px on each side and 8px above/below the padding '
             'box: 66 × 38 at the default size, 58 × 34 at sm.',
         'Non-color signal: on and off are never distinguished by hue '
@@ -825,16 +809,16 @@ class _AccessibilitySection extends StatelessWidget {
             'socket\'s depth (recessed vs. lit) both change with the '
             'value, so the state reads correctly even without color '
             'vision.',
-        'Error wiring: DsSwitch(invalid: true) paints the destructive '
+        'Error wiring: ElSwitch(invalid: true) paints the destructive '
             'ring but sets no semantics validation result of its own; '
             'that announcement comes from the enclosing '
-            'DsField/DsFieldScope, whose own Semantics node carries it '
+            'ElField/ElFieldScope, whose own Semantics node carries it '
             'for every control inside, whether or not that control reads '
             'the scope at all.',
         'Known gap, spelling: the switch spells its disabled state '
             '`data-disabled:` while Checkbox, RadioGroupItem and Select '
             'spell it `disabled:` on the reference (forms-map drift 14). '
-            'Same intent, two selector families, one DsSwitch.enabled.',
+            'Same intent, two selector families, one ElSwitch.enabled.',
       ]),
     );
   }
@@ -842,7 +826,7 @@ class _AccessibilitySection extends StatelessWidget {
 
 /// Layout, breakpoints, and platform behavior: split out from
 /// Accessibility, matching `button/page.dart`'s own separation of the two
-/// concerns. shadcn covers this ground with its RTL example; DsSwitch does
+/// concerns. shadcn covers this ground with its RTL example; ElSwitch does
 /// not mirror under RTL (see the note below), so RTL is skipped rather than
 /// faked, per the worker brief.
 class _ResponsiveSection extends StatelessWidget {
@@ -850,8 +834,8 @@ class _ResponsiveSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
-    return DsSection(
+    final ElThemeData theme = ElTheme.of(context);
+    return ElSection(
       id: 'responsive',
       title: 'Responsive',
       child: _bullets(theme, <String>[
@@ -859,7 +843,7 @@ class _ResponsiveSection extends StatelessWidget {
             'width is never read for a layout decision; the same widget '
             'renders identically at 390px and 1440px.',
         'Every measurement (trackWidth, trackHeight, thumbSize, travel) '
-            'is a fixed value keyed only to DsSwitchSize, never to '
+            'is a fixed value keyed only to ElSwitchSize, never to '
             'viewport.',
         'Platform parity: Android, iOS, Web, macOS, Windows and Linux all '
             'render the same widget tree: switch.dart imports no dart:io '
@@ -883,8 +867,8 @@ class _DependenciesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
-    return DsSection(
+    final ElThemeData theme = ElTheme.of(context);
+    return ElSection(
       id: 'dependencies',
       title: 'Dependencies',
       child: _bullets(theme, <String>[
@@ -893,18 +877,18 @@ class _DependenciesSection extends StatelessWidget {
             'socket, focus ring and hit area (documented separately).',
         'Flutter imports: package:flutter/widgets.dart only, no material '
             'and no services.',
-        'Foundation imports: effects/machine_surface.dart (DsMachineSurface, '
-            'the raised thumb), foundation/motion.dart (DsDurations, '
-            'DsCurves, dsAnimationDuration), foundation/shadows.dart '
-            '(DsShadows), foundation/spacing.dart (ds()), and '
-            'foundation/theme.dart plus theme_scope.dart (DsTheme, DsText).',
-        'Component imports: field.dart (DsFieldScope, for label/hint/'
+        'Foundation imports: effects/machine_surface.dart (ElMachineSurface, '
+            'the raised thumb), foundation/motion.dart (ElDurations, '
+            'ElCurves, elAnimationDuration), foundation/shadows.dart '
+            '(ElShadows), foundation/spacing.dart (el()), and '
+            'foundation/theme.dart plus theme_scope.dart (ElTheme, ElText).',
+        'Component imports: field.dart (ElFieldScope, for label/hint/'
             'enabled/invalid inheritance and label-tap activation) and '
-            'selection_control.dart (DsSelectionControl, the shared '
+            'selection_control.dart (ElSelectionControl, the shared '
             'track/focus-ring/hit-area primitive Checkbox and '
             'RadioGroupItem also build on).',
         'Internal dependencies (this page\'s own honest list, since no '
-            'registry manifest exists yet): ${switchDoc.dependencies.join(', ')}.',
+            'registry dependencies resolved by lattar add switch: ${switchDoc.dependencies.join(', ')}.',
       ]),
     );
   }
@@ -917,20 +901,20 @@ class _ThemingSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
-    return DsSection(
+    final ElThemeData theme = ElTheme.of(context);
+    return ElSection(
       id: 'theming',
       title: 'Theming',
       child: _bullets(theme, <String>[
-        'Every color routes through DsTheme.of(context) (primary, muted, '
+        'Every color routes through ElTheme.of(context) (primary, muted, '
             'input, border, foreground), so light and dark resolve '
             'automatically; nothing on this page is a literal Color.',
         'bg-muted is the one resting fill in this control family that is '
             'not --card: a socket you can see into needs to be darker '
             'than the surface it is cut out of.',
-        'Motion runs on DsDurations.transitionDefault (250ms): the '
-            'track\'s fill, border and ring tween on DsCurves.out, while '
-            'the thumb\'s own transform tweens on DsCurves.spring and '
+        'Motion runs on ElDurations.transitionDefault (250ms): the '
+            'track\'s fill, border and ring tween on ElCurves.out, while '
+            'the thumb\'s own transform tweens on ElCurves.spring and '
             'briefly overshoots the track\'s edge before settling: the '
             'one place in the control where the two halves of the same '
             'surface run different curves.',
@@ -945,7 +929,7 @@ class _SourceSection extends StatelessWidget {
   const _SourceSection();
 
   @override
-  Widget build(BuildContext context) => DsSection(
+  Widget build(BuildContext context) => ElSection(
     id: 'source',
     title: 'Source',
     child: DocsInstallFacts(
@@ -965,7 +949,7 @@ class _SourceSection extends StatelessWidget {
           value: 'test/selection_feedback_test.dart',
           description:
               'Covers geometry, motion curves, colors, the hit area and '
-              'DsField wiring for the whole selection-control family.',
+              'ElField wiring for the whole selection-control family.',
         ),
         const DocsInstallFact(
           label: 'Docs test',
@@ -984,15 +968,15 @@ class _SourceSection extends StatelessWidget {
 
 /// Bulleted prose at reading width, matching `button/page.dart`'s own
 /// private `_bullets` helper: one bullet per bound fact, not a table.
-Widget _bullets(DsThemeData theme, List<String> lines) => Column(
+Widget _bullets(ElThemeData theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: DsWidths.prose),
-        child: DsText('•  $line', DsType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
       ),
-      SizedBox(height: ds(2)),
+      SizedBox(height: el(2)),
     ],
   ],
 );
@@ -1007,7 +991,7 @@ class _Anchor extends StatelessWidget {
   // Same convention `button_card_pages.dart` uses: this key is the one the
   // table of contents and the mobile anchor strip look the section up by.
   // Used only for the un-headed hero demo above: every other section below
-  // gets its anchor from [DsSection] itself.
+  // gets its anchor from [ElSection] itself.
   Widget build(BuildContext context) =>
       KeyedSubtree(key: docsAnchorKey(name), child: child);
 }

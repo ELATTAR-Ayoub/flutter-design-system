@@ -22,39 +22,39 @@ computed-style answers inputs-map §18.9 needs).
 | # | Ruling |
 |---|---|
 | B1 | All nine sections including IconSwap — the chips are a subset in the reference too. |
-| B2 | Per-size button type lives in `DsComponentType` (foundation owns sizes; one owner). |
+| B2 | Per-size button type lives in `ElComponentType` (foundation owns sizes; one owner). |
 | B3 | Build `icon-xs`: nine of nine cva sizes; the printed API row stays true. |
 | B4 | No `asChild` port. Meta row verbatim; divergence recorded. |
-| B5 | The loading spinner glyph (lucide `loader-circle`) joins the off-curated set like `rotateCcw`; `DsSpinner` + `DsButton.loading` ship now (also F2). |
+| B5 | The loading spinner glyph (lucide `loader-circle`) joins the off-curated set like `rotateCcw`; `ElSpinner` + `ElButton.loading` ship now (also F2). |
 | B6/B7 | Toggle/ToggleGroup genuinely interactive; single-type deselection mirrored (`activeIndex: -1` path). |
 | B8 | The Hover-identical-to-Default and hand-drawn Focus cells reproduce exactly; drift register carries the observation. |
 | B9 | Spinner a11y mirrors the web (excluded from semantics; button exposes busy); recorded. |
-| B10 | `_HairlineGrid`/`_EntryCell` promote to kit as `DsStateGrid`/`DsStateCell` (kit is the buttons-page builder's single-writer file this wave; the icons page migrates to them in the same edit). |
+| B10 | `_HairlineGrid`/`_EntryCell` promote to kit as `ElStateGrid`/`ElStateCell` (kit is the buttons-page builder's single-writer file this wave; the icons page migrates to them in the same edit). |
 | B11 | Route arms + `shell_test` tightening (`isNotNull` must not pass on `PlaceholderPage`) happen at integration, supervisor-assigned. NOTE: the map's "three unrouted pages" claim is stale — shadows/motion/icons are wired and verified. |
 | B12/I8/F3 | Oracles are supervisor-measured BEFORE page tasks; forms is measured pristine (nothing typed, nothing submitted) and its page test pumps the same pristine state. |
-| B13 | Reduced motion = instant (durations to zero via `dsAnimationDuration`), never disabled; foil/loopers freeze at frame 0. Confirmed equivalence. |
+| B13 | Reduced motion = instant (durations to zero via `elAnimationDuration`), never disabled; foil/loopers freeze at frame 0. Confirmed equivalence. |
 | I1 | All five net-new input components are real package components — `forms`, `selects`, `selection` consume them next. |
-| I2 | `DsInput` stays the bare pill; addon machinery lives in `DsInputGroup` (the reference strips, not extends). Existing call sites untouched. |
+| I2 | `ElInput` stays the bare pill; addon machinery lives in `ElInputGroup` (the reference strips, not extends). Existing call sites untouched. |
 | I3 | Drifted Hover/Focus input cells ship exactly; the fake focus ring is page-local painting, not a component API. |
-| I4/F6 | Off-scale timings become named `DsDurations` members (`caret` 1000, plus forms' 200/280/320/600/900 under their utility names) — one policy, the phase-2 precedent. |
-| I5 | `DsRadii.addonButton` as a derived getter (`radius − 3`), preserving the CSS relationship. |
+| I4/F6 | Off-scale timings become named `ElDurations` members (`caret` 1000, plus forms' 200/280/320/600/900 under their utility names) — one policy, the phase-2 precedent. |
+| I5 | `ElRadii.addonButton` as a derived getter (`radius − 3`), preserving the CSS relationship. |
 | I6 | `atSign`/`ticket` join the off-curated glyphs; the registry tests keep excluding them. |
 | I7 | Ship the measured 13px where `text-sm` beats `.type-num` (utilities beat components); doc-comment the collapse. |
-| I10 | Fix the `DsInput` selection-alpha bug (0.30 → 0.35) in the P2 task. |
-| F1 | Scope: form/field/validator layer + `DsButton.loading` fully; Textarea/Checkbox/Radio/Switch to full parity; `DsSelect` and `DsAlert` to the fidelity this page renders (working menu; static-bloom alert), full matrices deferred to `selects`/`feedback`. |
+| I10 | Fix the `ElInput` selection-alpha bug (0.30 → 0.35) in the P2 task. |
+| F1 | Scope: form/field/validator layer + `ElButton.loading` fully; Textarea/Checkbox/Radio/Switch to full parity; `ElSelect` and `ElAlert` to the fidelity this page renders (working menu; static-bloom alert), full matrices deferred to `selects`/`feedback`. |
 | F4 | **Deliberate behavioural fix, flagged for user sign-off in the phase report:** focus-on-error is implemented correctly for ALL fields; the reference's silent failure on the composed form is recorded as divergence. An invisible a11y regression is the one drift class we do not ship. |
 | F5 | `aria-invalid` erasing the focus ring reproduces exactly — visible, measured, the reference's own cascade. |
-| F7 | Validator = dependency-free `DsRule<T>` lists with first-issue / all-issues collection; the Zod-4 email regex ships verbatim as one rule. |
-| F8 | `DsToaster` widget in `lib/`; its mounting in `example/lib/shell.dart` (narrow grant to the forms-page builder), mirroring the root-layout split. |
+| F7 | Validator = dependency-free `ElRule<T>` lists with first-issue / all-issues collection; the Zod-4 email regex ships verbatim as one rule. |
+| F8 | `ElToaster` widget in `lib/`; its mounting in `example/lib/shell.dart` (narrow grant to the forms-page builder), mirroring the root-layout split. |
 | F9 | Both AccountForms live. |
-| D-carry | `DsPressKey` promotion from the motion page happens only if the buttons page needs it (map says no) — otherwise it stays page-local. |
+| D-carry | `ElPressKey` promotion from the motion page happens only if the buttons page needs it (map says no) — otherwise it stays page-local. |
 
 ## Wave P — package components (3 parallel Opus builders)
 
 **P1 — controls.** Owns: `lib/src/components/button.dart`, new
 `spinner.dart`, `toggle.dart`, `toggle_group.dart`, `kbd.dart`,
 `button_group.dart`, `icon_swap.dart`; `lib/src/foundation/typography.dart`
-(`DsComponentType` per-size button styles + caps) and
+(`ElComponentType` per-size button styles + caps) and
 `lib/src/foundation/motion.dart` (all new duration tokens for the whole
 phase, incl. `caret` and forms' five); `lib/src/motion/keyframes.dart`
 (check-draw / dash-draw / dot-pop / swap-roll additions); the loader glyph in
@@ -65,7 +65,7 @@ Spec: buttons-map §component anatomies + forms-map §submit states.
 **P2 — text entry & field layer.** Owns: `lib/src/components/input.dart`
 (alpha fix + minimal widening per I2), new `textarea.dart`,
 `input_group.dart`, `input_otp.dart`, `field.dart` (Field/Label/Error/
-Description), `form.dart` + `ds_rule.dart` (controller + validator per F7);
+Description), `form.dart` + `rule.dart` (controller + validator per F7);
 package tests. Spec: inputs-map §anatomies + forms-map §wiring contract
 (ids → describedby/invalid → `Semantics(validationResult:, liveRegion:)`).
 
@@ -83,7 +83,7 @@ its own files.
 ## Wave Q — pages (3 parallel, after P; oracles in briefs)
 
 **Q1 — buttons page.** Owns `example/lib/pages/buttons.dart`, its test, and
-`example/lib/kit.dart` (single writer: `DsStateGrid`/`DsStateCell`
+`example/lib/kit.dart` (single writer: `ElStateGrid`/`ElStateCell`
 promotion + icons-page migration to them). Nine sections, oracle-pinned
 geometry group, drift register (24 entries).
 

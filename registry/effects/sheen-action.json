@@ -5,9 +5,20 @@
   "description": "Action sheen effect for primary interactive surfaces.",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
-  "files": [{"source": "lib/src/effects/sheen_action.dart", "target": "@effects/sheen_action.dart", "sha256": "bde8fd6414a89866b893e397caa5dcebd902b012ac6b2a286430e1af7c944bb5"}],
-  "registryDependencies": ["source-foundation", "machine-surface"],
-  "semanticDependencies": ["machine-surface"],
+  "files": [
+    {
+      "source": "lib/src/effects/sheen_action.dart",
+      "target": "@effects/sheen_action.dart",
+      "sha256": "b2371a385c517a5ed6126518076244c672c422b32a525b6c42eda01aeaf9b1a7"
+    }
+  ],
+  "registryDependencies": [
+    "machine-surface",
+    "source-foundation"
+  ],
+  "semanticDependencies": [
+    "machine-surface"
+  ],
   "pubDependencies": {},
   "assets": [],
   "fonts": [],

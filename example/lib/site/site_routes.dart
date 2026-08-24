@@ -46,7 +46,7 @@ class SiteRoute {
 /// A searchable destination, including the existing design-system routes.
 ///
 /// [groupId] and [slug] are populated only for entries sourced from
-/// [dsGroups]. They let search results link back to the existing docs pages
+/// [elGroups]. They let search results link back to the existing docs pages
 /// without duplicating or changing that registry.
 class SearchRoute {
   const SearchRoute({
@@ -146,7 +146,7 @@ const List<SiteRoute> siteRoutes = <SiteRoute>[
     section: SiteSection.docs,
     title: 'Theming',
     description:
-        'Semantic tokens, DsThemeController, light and dark resolution, and '
+        'Semantic tokens, ElThemeController, light and dark resolution, and '
         'how a consumer overrides them.',
     keywords: <String>['theming', 'theme', 'tokens', 'dark mode', 'colors'],
   ),
@@ -272,7 +272,7 @@ final List<SearchRoute> searchableRoutes = List<SearchRoute>.unmodifiable(
           ...component.exports,
         ]),
       ),
-    for (final DsGroup group in dsGroups)
+    for (final ElGroup group in elGroups)
       SearchRoute(
         path: group.href,
         title: group.title,
@@ -284,8 +284,8 @@ final List<SearchRoute> searchableRoutes = List<SearchRoute>.unmodifiable(
         ]),
         groupId: group.id,
       ),
-    for (final DsGroup group in dsGroups)
-      for (final DsCategory category in group.categories)
+    for (final ElGroup group in elGroups)
+      for (final ElCategory category in group.categories)
         SearchRoute(
           path: categoryHref(group, category),
           title: category.title,

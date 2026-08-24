@@ -21,15 +21,15 @@ class ShowcaseShareDialog extends StatelessWidget {
   final String description;
   final String subject;
   final String link;
-  final DsToastController toasts;
-  final DsModalTriggerBuilder trigger;
+  final ElToastController toasts;
+  final ElModalTriggerBuilder trigger;
 
   void _copy() {
     Clipboard.setData(ClipboardData(text: link));
     toasts.success(
       'Share link copied',
       description: '“$subject” is ready to send.',
-      glyph: DsIconGlyph.copy,
+      glyph: ElIconGlyph.copy,
     );
   }
 
@@ -37,80 +37,80 @@ class ShowcaseShareDialog extends StatelessWidget {
     toasts.success(
       'Ready for $network',
       description: '$subject and its public link are prepared for your post.',
-      glyph: DsIconGlyph.externalLink,
+      glyph: ElIconGlyph.externalLink,
     );
   }
 
   @override
-  Widget build(BuildContext context) => DsDialog(
+  Widget build(BuildContext context) => ElDialog(
     trigger: trigger,
-    content: (BuildContext context, VoidCallback close) => DsDialogContent(
+    content: (BuildContext context, VoidCallback close) => ElDialogContent(
       onClose: close,
       children: <Widget>[
-        DsDialogHeader(
+        ElDialogHeader(
           children: <Widget>[
-            DsDialogTitle(dialogTitle),
-            DsDialogDescription(description),
+            ElDialogTitle(dialogTitle),
+            ElDialogDescription(description),
           ],
         ),
-        DsFieldGroup(
+        ElFieldGroup(
           children: <Widget>[
-            DsField(
+            ElField(
               label: 'Public link',
               description: 'Anyone with this link can view $subject.',
-              child: DsInput(initialValue: link, readOnly: true),
+              child: ElInput(initialValue: link, readOnly: true),
             ),
-            DsButton(
+            ElButton(
               key: const Key('share-copy-link'),
-              variant: DsButtonVariant.primary,
+              variant: ElButtonVariant.primary,
               label: 'Copy link',
               onPressed: _copy,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  const DsIcon.lucide(DsLucide.copy, size: DsIconSize.sm),
-                  SizedBox(width: DsButton.gapFor(DsButtonSize.md)),
-                  DsText('Copy link', DsComponentType.buttonLabel),
+                  const ElIcon.lucide(ElLucide.copy, size: ElIconSize.sm),
+                  SizedBox(width: ElButton.gapFor(ElButtonSize.md)),
+                  ElText('Copy link', ElComponentType.buttonLabel),
                 ],
               ),
             ),
             Row(
               children: <Widget>[
                 Expanded(
-                  child: DsButton(
+                  child: ElButton(
                     key: const Key('share-threads'),
-                    variant: DsButtonVariant.secondary,
+                    variant: ElButtonVariant.secondary,
                     label: 'Prepare for Threads',
                     onPressed: () => _preparePost('Threads'),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
-                        const DsIcon.lucide(
-                          DsLucide.atSign,
-                          size: DsIconSize.sm,
+                        const ElIcon.lucide(
+                          ElLucide.atSign,
+                          size: ElIconSize.sm,
                         ),
-                        SizedBox(width: DsButton.gapFor(DsButtonSize.md)),
-                        DsText('Threads', DsComponentType.buttonLabel),
+                        SizedBox(width: ElButton.gapFor(ElButtonSize.md)),
+                        ElText('Threads', ElComponentType.buttonLabel),
                       ],
                     ),
                   ),
                 ),
-                SizedBox(width: ds(3)),
+                SizedBox(width: el(3)),
                 Expanded(
-                  child: DsButton(
+                  child: ElButton(
                     key: const Key('share-x'),
-                    variant: DsButtonVariant.secondary,
+                    variant: ElButtonVariant.secondary,
                     label: 'Prepare for X',
                     onPressed: () => _preparePost('X'),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
-                        const DsIcon.lucide(DsLucide.send, size: DsIconSize.sm),
-                        SizedBox(width: DsButton.gapFor(DsButtonSize.md)),
-                        DsText('X', DsComponentType.buttonLabel),
+                        const ElIcon.lucide(ElLucide.send, size: ElIconSize.sm),
+                        SizedBox(width: ElButton.gapFor(ElButtonSize.md)),
+                        ElText('X', ElComponentType.buttonLabel),
                       ],
                     ),
                   ),
@@ -119,13 +119,13 @@ class ShowcaseShareDialog extends StatelessWidget {
             ),
           ],
         ),
-        DsDialogFooter(
+        ElDialogFooter(
           children: <Widget>[
-            DsButton(
+            ElButton(
               key: const Key('share-done'),
-              variant: DsButtonVariant.ghost,
+              variant: ElButtonVariant.ghost,
               onPressed: close,
-              child: DsText('Done', DsComponentType.buttonLabel),
+              child: ElText('Done', ElComponentType.buttonLabel),
             ),
           ],
         ),

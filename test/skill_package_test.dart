@@ -74,13 +74,14 @@ Map<String, dynamic> _parseFrontmatter(String content) {
   final List<String> lines = content.split('\n');
   if (lines.isEmpty || lines.first.trim() != '---') {
     throw const FormatException(
-        'skill file must open with a `---` frontmatter fence on line 1');
+      'skill file must open with a `---` frontmatter fence on line 1',
+    );
   }
-  final int closeIndex =
-      lines.indexWhere((String l) => l.trim() == '---', 1);
+  final int closeIndex = lines.indexWhere((String l) => l.trim() == '---', 1);
   if (closeIndex == -1) {
     throw const FormatException(
-        'skill file frontmatter fence opened with `---` but never closed');
+      'skill file frontmatter fence opened with `---` but never closed',
+    );
   }
   final String yamlText = lines.sublist(1, closeIndex).join('\n');
   final dynamic doc = loadYaml(yamlText);
@@ -116,10 +117,11 @@ File _canonicalSkillFile() {
   }
   if (matches.length != 1) {
     throw StateError(
-        'expected exactly one SKILL.md declaring name: $_skillName, found '
-        '${matches.length}: ${matches.map((File f) => f.path).toList()} '
-        '(all SKILL.md files on disk: '
-        '${allSkillFiles.map((File f) => f.path).toList()})');
+      'expected exactly one SKILL.md declaring name: $_skillName, found '
+      '${matches.length}: ${matches.map((File f) => f.path).toList()} '
+      '(all SKILL.md files on disk: '
+      '${allSkillFiles.map((File f) => f.path).toList()})',
+    );
   }
   return matches.single;
 }
@@ -137,7 +139,7 @@ class _PathClaim {
 }
 
 /// Loose filter for "this backtick span looks like a repository-relative
-/// path", not a shell flag, a `Ds<Type>` generic, a `package:` import URI, or
+/// path", not a shell flag, a `El<Type>` generic, a `package:` import URI, or
 /// prose. Deliberately conservative: false negatives just mean a claim isn't
 /// checked, false positives would make the test fail on non-claims.
 bool _looksLikeRepoPath(String token) {
@@ -194,11 +196,11 @@ List<_PathClaim> _extractPathClaims(String content) {
   for (int i = 0; i < lines.length; i++) {
     final String line = lines[i];
 
-    final RegExpMatch? heading =
-        RegExp(r'^#{1,6}\s+(.*)$').firstMatch(line);
+    final RegExpMatch? heading = RegExp(r'^#{1,6}\s+(.*)$').firstMatch(line);
     if (heading != null) {
       final String headingText = heading.group(1)!.toLowerCase();
-      headingIsConsumer = headingText.contains('consumer mode') ||
+      headingIsConsumer =
+          headingText.contains('consumer mode') ||
           headingText.contains('consumer project');
       inTable = false;
       headerCells = null;
@@ -214,10 +216,12 @@ List<_PathClaim> _extractPathClaims(String content) {
       }
       if (_isTableSeparatorRow(cells)) continue;
 
-      final bool rowHasConsumerMarker =
-          line.toLowerCase().contains('**consumer mode**');
+      final bool rowHasConsumerMarker = line.toLowerCase().contains(
+        '**consumer mode**',
+      );
       for (int col = 0; col < cells.length; col++) {
-        final bool columnIsConsumer = headerCells != null &&
+        final bool columnIsConsumer =
+            headerCells != null &&
             col < headerCells.length &&
             headerCells[col].toLowerCase().contains('consumer');
         final bool isConsumer =
@@ -279,13 +283,17 @@ void main() {
         if (frontmatter['name'] == _skillName) matches.add(file);
       }
 
-      expect(matches, hasLength(1),
-          reason: 'exactly one SKILL.md may declare `name: $_skillName` — '
-              'a second copy under .agents/, .claude/skills/, or a '
-              'generated output directory means the skill can drift from '
-              'itself. Matches: ${matches.map((File f) => f.path).toList()}; '
-              'all SKILL.md on disk: '
-              '${allSkillFiles.map((File f) => f.path).toList()}');
+      expect(
+        matches,
+        hasLength(1),
+        reason:
+            'exactly one SKILL.md may declare `name: $_skillName` — '
+            'a second copy under .agents/, .claude/skills/, or a '
+            'generated output directory means the skill can drift from '
+            'itself. Matches: ${matches.map((File f) => f.path).toList()}; '
+            'all SKILL.md on disk: '
+            '${allSkillFiles.map((File f) => f.path).toList()}',
+      );
     });
   });
 
@@ -301,62 +309,91 @@ void main() {
 
     test('frontmatter parses and stays inside the documented shape', () {
       final File skillFile = _canonicalSkillFile();
-      final Map<String, dynamic> frontmatter =
-          _parseFrontmatter(skillFile.readAsStringSync());
+      final Map<String, dynamic> frontmatter = _parseFrontmatter(
+        skillFile.readAsStringSync(),
+      );
 
-      final Iterable<String> unknownKeys =
-          frontmatter.keys.where((String k) => !allowedKeys.contains(k));
-      expect(unknownKeys, isEmpty,
-          reason: 'frontmatter keys must be a subset of $allowedKeys, found '
-              'unexpected: ${unknownKeys.toList()}');
+      final Iterable<String> unknownKeys = frontmatter.keys.where(
+        (String k) => !allowedKeys.contains(k),
+      );
+      expect(
+        unknownKeys,
+        isEmpty,
+        reason:
+            'frontmatter keys must be a subset of $allowedKeys, found '
+            'unexpected: ${unknownKeys.toList()}',
+      );
 
-      expect(frontmatter['name'], isA<String>(),
-          reason: '`name` is required');
-      expect(frontmatter['description'], isA<String>(),
-          reason: '`description` is required');
+      expect(frontmatter['name'], isA<String>(), reason: '`name` is required');
+      expect(
+        frontmatter['description'],
+        isA<String>(),
+        reason: '`description` is required',
+      );
 
       final String name = frontmatter['name'] as String;
-      expect(name.length, lessThanOrEqualTo(64),
-          reason: '`name` must be <= 64 chars, got ${name.length}');
       expect(
-          RegExp(r'^[a-z0-9]+(-[a-z0-9]+)*$').hasMatch(name), isTrue,
-          reason: '`name` must be kebab-case, got "$name"');
+        name.length,
+        lessThanOrEqualTo(64),
+        reason: '`name` must be <= 64 chars, got ${name.length}',
+      );
+      expect(
+        RegExp(r'^[a-z0-9]+(-[a-z0-9]+)*$').hasMatch(name),
+        isTrue,
+        reason: '`name` must be kebab-case, got "$name"',
+      );
 
       final String description = frontmatter['description'] as String;
-      expect(description.length, lessThanOrEqualTo(1024),
-          reason: '`description` must be <= 1024 chars, got '
-              '${description.length}');
-      expect(description.contains('<'), isFalse,
-          reason: '`description` must not contain `<`');
-      expect(description.contains('>'), isFalse,
-          reason: '`description` must not contain `>`');
+      expect(
+        description.length,
+        lessThanOrEqualTo(1024),
+        reason:
+            '`description` must be <= 1024 chars, got '
+            '${description.length}',
+      );
+      expect(
+        description.contains('<'),
+        isFalse,
+        reason: '`description` must not contain `<`',
+      );
+      expect(
+        description.contains('>'),
+        isFalse,
+        reason: '`description` must not contain `>`',
+      );
     });
   });
 
   group('Test 3 — the skill\'s own links resolve', () {
-    test('every references/*.md link resolves and no reference is orphaned',
-        () {
+    test('every references/*.md link resolves and no reference is orphaned', () {
       final File skillFile = _canonicalSkillFile();
       final Directory skillDir = skillFile.parent;
       final String content = skillFile.readAsStringSync();
 
-      final RegExp linkPattern =
-          RegExp(r'\]\((references/[^)\s]+\.md)\)');
+      final RegExp linkPattern = RegExp(r'\]\((references/[^)\s]+\.md)\)');
       final Set<String> linked = <String>{
         for (final RegExpMatch m in linkPattern.allMatches(content))
           m.group(1)!,
       };
 
-      expect(linked, isNotEmpty,
-          reason: 'SKILL.md should link to at least one references/*.md '
-              'file — found none, which means this pattern stopped '
-              'matching the real markup');
+      expect(
+        linked,
+        isNotEmpty,
+        reason:
+            'SKILL.md should link to at least one references/*.md '
+            'file — found none, which means this pattern stopped '
+            'matching the real markup',
+      );
 
       for (final String relative in linked) {
         final File target = File('${skillDir.path}/$relative');
-        expect(target.existsSync(), isTrue,
-            reason: 'SKILL.md links to `$relative` but that file does not '
-                'exist at ${target.path}');
+        expect(
+          target.existsSync(),
+          isTrue,
+          reason:
+              'SKILL.md links to `$relative` but that file does not '
+              'exist at ${target.path}',
+        );
       }
 
       final Directory referencesDir = Directory('${skillDir.path}/references');
@@ -368,9 +405,13 @@ void main() {
       };
 
       final Set<String> orphaned = onDisk.difference(linked);
-      expect(orphaned, isEmpty,
-          reason: 'reference files exist but are never linked from '
-              'SKILL.md (renamed or added without being routed): $orphaned');
+      expect(
+        orphaned,
+        isEmpty,
+        reason:
+            'reference files exist but are never linked from '
+            'SKILL.md (renamed or added without being routed): $orphaned',
+      );
     });
   });
 
@@ -390,43 +431,63 @@ void main() {
 
     test('required this-repository paths are named and real', () {
       final File skillFile = _canonicalSkillFile();
-      final File systemMap =
-          File('${skillFile.parent.path}/references/system-map.md');
-      expect(systemMap.existsSync(), isTrue,
-          reason: 'references/system-map.md is missing');
+      final File systemMap = File(
+        '${skillFile.parent.path}/references/system-map.md',
+      );
+      expect(
+        systemMap.existsSync(),
+        isTrue,
+        reason: 'references/system-map.md is missing',
+      );
 
-      final List<_PathClaim> claims =
-          _extractPathClaims(systemMap.readAsStringSync());
+      final List<_PathClaim> claims = _extractPathClaims(
+        systemMap.readAsStringSync(),
+      );
       final Set<String> thisRepoPaths = <String>{
         for (final _PathClaim c in claims)
           if (!c.isConsumerClaim) c.path,
       };
 
       for (final String required in requiredThisRepoPaths) {
-        expect(thisRepoPaths, contains(required),
-            reason: 'system-map.md should name `$required` as a '
-                'this-repository source of truth (either it was removed, '
-                'or it now only appears inside a consumer-mode section — '
-                'both are regressions the skill must not ship silently)');
-        expect(_repoPathExists(required), isTrue,
-            reason: 'system-map.md claims `$required` exists in this '
-                'repository, but it does not');
+        expect(
+          thisRepoPaths,
+          contains(required),
+          reason:
+              'system-map.md should name `$required` as a '
+              'this-repository source of truth (either it was removed, '
+              'or it now only appears inside a consumer-mode section — '
+              'both are regressions the skill must not ship silently)',
+        );
+        expect(
+          _repoPathExists(required),
+          isTrue,
+          reason:
+              'system-map.md claims `$required` exists in this '
+              'repository, but it does not',
+        );
       }
     });
 
     test('every this-repository path claim in system-map.md is real', () {
       final File skillFile = _canonicalSkillFile();
-      final File systemMap =
-          File('${skillFile.parent.path}/references/system-map.md');
-      final List<_PathClaim> claims =
-          _extractPathClaims(systemMap.readAsStringSync());
+      final File systemMap = File(
+        '${skillFile.parent.path}/references/system-map.md',
+      );
+      final List<_PathClaim> claims = _extractPathClaims(
+        systemMap.readAsStringSync(),
+      );
 
-      final List<_PathClaim> thisRepoClaims =
-          claims.where((_PathClaim c) => !c.isConsumerClaim).toList();
-      expect(thisRepoClaims, isNotEmpty,
-          reason: 'found no this-repository path claims at all — the '
-              'consumer/repository classifier likely stopped matching the '
-              'real markup shape');
+      final List<_PathClaim> thisRepoClaims = claims
+          .where((_PathClaim c) => !c.isConsumerClaim)
+          .toList();
+      expect(
+        thisRepoClaims,
+        isNotEmpty,
+        reason:
+            'found no this-repository path claims at all — the '
+            'consumer/repository classifier likely stopped matching the '
+            'real markup shape',
+      );
 
       final List<String> stale = <String>[];
       for (final _PathClaim claim in thisRepoClaims) {
@@ -434,10 +495,14 @@ void main() {
           stale.add('line ${claim.lineNumber}: `${claim.path}`');
         }
       }
-      expect(stale, isEmpty,
-          reason: 'system-map.md names these as this-repository paths, but '
-              'none of them exist on disk — a stale skill silently '
-              'misleads every agent that loads it:\n${stale.join('\n')}');
+      expect(
+        stale,
+        isEmpty,
+        reason:
+            'system-map.md names these as this-repository paths, but '
+            'none of them exist on disk — a stale skill silently '
+            'misleads every agent that loads it:\n${stale.join('\n')}',
+      );
     });
 
     test('consumer-mode paths are not asserted against this repository', () {
@@ -445,10 +510,12 @@ void main() {
       // consumer-only path such as `lib/components/ui/` genuinely does not
       // exist here, and the previous two tests must not have flagged it.
       final File skillFile = _canonicalSkillFile();
-      final File systemMap =
-          File('${skillFile.parent.path}/references/system-map.md');
-      final List<_PathClaim> claims =
-          _extractPathClaims(systemMap.readAsStringSync());
+      final File systemMap = File(
+        '${skillFile.parent.path}/references/system-map.md',
+      );
+      final List<_PathClaim> claims = _extractPathClaims(
+        systemMap.readAsStringSync(),
+      );
       final Set<String> consumerPaths = <String>{
         for (final _PathClaim c in claims)
           if (c.isConsumerClaim) c.path,
@@ -456,104 +523,155 @@ void main() {
       // If system-map.md has not yet grown a consumer-mode section this is
       // vacuously true and the test still passes — it only ever fails when
       // the classifier mis-sorts a real consumer path into the repo bucket.
-      expect(consumerPaths.intersection(requiredThisRepoPaths.toSet()),
-          isEmpty,
-          reason: 'a this-repository required path was classified as a '
-              'consumer-mode claim, which would silently exempt it from '
-              'existence checking');
+      expect(
+        consumerPaths.intersection(requiredThisRepoPaths.toSet()),
+        isEmpty,
+        reason:
+            'a this-repository required path was classified as a '
+            'consumer-mode claim, which would silently exempt it from '
+            'existence checking',
+      );
     });
   });
 
   group('Test 5 — plugin manifest wiring', () {
-    test('marketplace.json and plugin.json resolve to the canonical SKILL.md',
-        () {
-      final File marketplaceFile = File('.claude-plugin/marketplace.json');
-      final File pluginFile = File('.claude-plugin/plugin.json');
-      expect(marketplaceFile.existsSync(), isTrue,
-          reason: '.claude-plugin/marketplace.json is required for '
-              '`/plugin marketplace add` to find this repository');
-      expect(pluginFile.existsSync(), isTrue,
-          reason: '.claude-plugin/plugin.json is required for '
-              '`/plugin install` to work');
+    test(
+      'marketplace.json and plugin.json resolve to the canonical SKILL.md',
+      () {
+        final File marketplaceFile = File('.claude-plugin/marketplace.json');
+        final File pluginFile = File('.claude-plugin/plugin.json');
+        expect(
+          marketplaceFile.existsSync(),
+          isTrue,
+          reason:
+              '.claude-plugin/marketplace.json is required for '
+              '`/plugin marketplace add` to find this repository',
+        );
+        expect(
+          pluginFile.existsSync(),
+          isTrue,
+          reason:
+              '.claude-plugin/plugin.json is required for '
+              '`/plugin install` to work',
+        );
 
-      final Map<String, dynamic> marketplace =
-          jsonDecode(marketplaceFile.readAsStringSync())
-              as Map<String, dynamic>;
-      final Map<String, dynamic> plugin =
-          jsonDecode(pluginFile.readAsStringSync()) as Map<String, dynamic>;
+        final Map<String, dynamic> marketplace =
+            jsonDecode(marketplaceFile.readAsStringSync())
+                as Map<String, dynamic>;
+        final Map<String, dynamic> plugin =
+            jsonDecode(pluginFile.readAsStringSync()) as Map<String, dynamic>;
 
-      final List<dynamic> plugins = marketplace['plugins'] as List<dynamic>;
-      expect(plugins, isNotEmpty,
-          reason: 'marketplace.json declares no plugins');
+        final List<dynamic> plugins = marketplace['plugins'] as List<dynamic>;
+        expect(
+          plugins,
+          isNotEmpty,
+          reason: 'marketplace.json declares no plugins',
+        );
 
-      final String pluginName = plugin['name'] as String;
-      final Map<String, dynamic> entry = plugins
-          .cast<Map<String, dynamic>>()
-          .firstWhere(
-            (Map<String, dynamic> p) => p['name'] == pluginName,
-            orElse: () => throw StateError(
+        final String pluginName = plugin['name'] as String;
+        final Map<String, dynamic> entry = plugins
+            .cast<Map<String, dynamic>>()
+            .firstWhere(
+              (Map<String, dynamic> p) => p['name'] == pluginName,
+              orElse: () => throw StateError(
                 'marketplace.json has no plugin entry named "$pluginName" '
                 '(from plugin.json) — `/plugin install $pluginName` would '
-                'fail to resolve'),
-          );
+                'fail to resolve',
+              ),
+            );
 
-      final String source = entry['source'] as String;
-      expect(source, isNotEmpty, reason: 'plugin source must not be empty');
+        final String source = entry['source'] as String;
+        expect(source, isNotEmpty, reason: 'plugin source must not be empty');
 
-      final Directory sourceDir =
-          Directory('${_repoRoot.path}/$source');
-      expect(sourceDir.existsSync(), isTrue,
-          reason: 'declared plugin source "$source" does not resolve to a '
-              'directory in this repository');
+        final Directory sourceDir = Directory('${_repoRoot.path}/$source');
+        expect(
+          sourceDir.existsSync(),
+          isTrue,
+          reason:
+              'declared plugin source "$source" does not resolve to a '
+              'directory in this repository',
+        );
 
-      final File canonicalSkillFile = _canonicalSkillFile();
-      final String expectedRelative =
-          _normalizeRelativePath('$source/skills/$_skillName/SKILL.md');
-      final String canonicalRelative = _normalizeRelativePath(
-          canonicalSkillFile.path.replaceAll(r'\', '/').replaceFirst(
-              '${_repoRoot.path.replaceAll(r'\', '/')}/', ''));
-      expect(expectedRelative, equals(canonicalRelative),
-          reason: '<source>/skills/$_skillName/SKILL.md should resolve to '
+        final File canonicalSkillFile = _canonicalSkillFile();
+        final String expectedRelative = _normalizeRelativePath(
+          '$source/skills/$_skillName/SKILL.md',
+        );
+        final String canonicalRelative = _normalizeRelativePath(
+          canonicalSkillFile.path
+              .replaceAll(r'\', '/')
+              .replaceFirst('${_repoRoot.path.replaceAll(r'\', '/')}/', ''),
+        );
+        expect(
+          expectedRelative,
+          equals(canonicalRelative),
+          reason:
+              '<source>/skills/$_skillName/SKILL.md should resolve to '
               'the same file Test 1 found ($canonicalRelative), got '
               '$expectedRelative — `/plugin install` would load a '
               'different file than the one this repository treats as '
-              'authoritative');
+              'authoritative',
+        );
 
-      final File resolvedSkillFile =
-          File('${_repoRoot.path}/$expectedRelative');
-      expect(resolvedSkillFile.existsSync(), isTrue,
-          reason: '<source>/skills/$_skillName/SKILL.md does not exist — '
-              '`/plugin install` would break');
-      expect(resolvedSkillFile.readAsStringSync(),
-          canonicalSkillFile.readAsStringSync(),
-          reason: 'the plugin-resolved SKILL.md and the canonical SKILL.md '
-              'have diverging content, which should be impossible for the '
-              'same file — check for encoding differences');
-
-      // plugin.json's own `skills` payload list should point at the same
-      // directory, independent of how the marketplace resolved `source`.
-      if (plugin.containsKey('skills')) {
-        final List<String> declaredSkills =
-            (plugin['skills'] as List<dynamic>).cast<String>();
-        final bool pointsAtCanonical = declaredSkills.any((String s) =>
-            _normalizeRelativePath(s) ==
-            _normalizeRelativePath('skills/$_skillName'));
-        expect(pointsAtCanonical, isTrue,
-            reason: 'plugin.json `skills` list $declaredSkills does not '
-                'include skills/$_skillName');
-      }
-
-      final Object? version = plugin['version'];
-      expect(version, isA<String>(), reason: 'plugin.json must set `version`');
-      final String versionString = version as String;
-      expect(versionString, isNotEmpty,
-          reason: 'plugin.json `version` must not be empty');
-      expect(
-          RegExp(r'^\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?$')
-              .hasMatch(versionString),
+        final File resolvedSkillFile = File(
+          '${_repoRoot.path}/$expectedRelative',
+        );
+        expect(
+          resolvedSkillFile.existsSync(),
           isTrue,
-          reason: 'plugin.json `version` "$versionString" is not '
-              'semver-shaped (MAJOR.MINOR.PATCH)');
-    });
+          reason:
+              '<source>/skills/$_skillName/SKILL.md does not exist — '
+              '`/plugin install` would break',
+        );
+        expect(
+          resolvedSkillFile.readAsStringSync(),
+          canonicalSkillFile.readAsStringSync(),
+          reason:
+              'the plugin-resolved SKILL.md and the canonical SKILL.md '
+              'have diverging content, which should be impossible for the '
+              'same file — check for encoding differences',
+        );
+
+        // plugin.json's own `skills` payload list should point at the same
+        // directory, independent of how the marketplace resolved `source`.
+        if (plugin.containsKey('skills')) {
+          final List<String> declaredSkills =
+              (plugin['skills'] as List<dynamic>).cast<String>();
+          final bool pointsAtCanonical = declaredSkills.any(
+            (String s) =>
+                _normalizeRelativePath(s) ==
+                _normalizeRelativePath('skills/$_skillName'),
+          );
+          expect(
+            pointsAtCanonical,
+            isTrue,
+            reason:
+                'plugin.json `skills` list $declaredSkills does not '
+                'include skills/$_skillName',
+          );
+        }
+
+        final Object? version = plugin['version'];
+        expect(
+          version,
+          isA<String>(),
+          reason: 'plugin.json must set `version`',
+        );
+        final String versionString = version as String;
+        expect(
+          versionString,
+          isNotEmpty,
+          reason: 'plugin.json `version` must not be empty',
+        );
+        expect(
+          RegExp(
+            r'^\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?$',
+          ).hasMatch(versionString),
+          isTrue,
+          reason:
+              'plugin.json `version` "$versionString" is not '
+              'semver-shaped (MAJOR.MINOR.PATCH)',
+        );
+      },
+    );
   });
 }

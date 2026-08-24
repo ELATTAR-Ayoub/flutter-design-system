@@ -1,0 +1,28 @@
+{
+  "name": "progress",
+  "type": "component",
+  "version": "0.0.1",
+  "description": "`components/ui/progress.tsx` — a filled channel, not a hair.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/progress.dart",
+      "target": "@ui/progress.dart",
+      "sha256": "779108d9bbd3fe2426da98d8744a069cbab00b89eb8171cb6f67c58a9dac9588"
+    }
+  ],
+  "registryDependencies": [
+    "machine-surface",
+    "source-foundation"
+  ],
+  "semanticDependencies": [
+    "machine-surface"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "documentationRoute": "/components/progress",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/progress.dart"
+}

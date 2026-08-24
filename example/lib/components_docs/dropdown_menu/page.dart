@@ -1,42 +1,40 @@
-/// Public component documentation for `DsDropdownMenu`
+/// Public component documentation for `ElDropdownMenu`
 /// (`lib/src/components/dropdown_menu.dart`) **and** the shared menu engine
 /// it is built from (`lib/src/components/menu.dart`): one page, because
 /// `menu.dart`'s own library doc names itself as "the shared body of
 /// `dropdown-menu.tsx`, `context-menu.tsx` and `menubar.tsx`": it is not a
 /// second component to choose between, it is the row model, geometry,
-/// surface and keyboard behaviour [DsDropdownMenu] mounts. See
+/// surface and keyboard behaviour [ElDropdownMenu] mounts. See
 /// `meta.dart`'s own library doc for the full reasoning, which mirrors the
 /// precedent `toggle/meta.dart` set for `toggle.dart` + `toggle_group.dart`.
 ///
 /// `dropdownMenuDoc` (from `meta.dart`) is the data source, not
-/// `componentDoc('dropdown-menu')`: dropdown-menu is not yet registered in
-/// `catalog.dart`'s `componentDocs` list, so calling that would throw. Adding
-/// it there is a supervisor-owned aggregation step (Phase J plan).
+/// `componentDoc('dropdown-menu')`; this page keeps its typed metadata import.
 ///
 /// Two corrections against the task brief, both resolved in favour of the
 /// real source, which is the documented source of truth here:
 ///
 ///  * **Enter/Space on a focused trigger does not open the menu.**
-///    [DsMenuPointerDown] opens exclusively on a raw `PointerDownEvent`; a
-///    button's own keyboard activation (`DsButton._onKey`) calls the
+///    [ElMenuPointerDown] opens exclusively on a raw `PointerDownEvent`; a
+///    button's own keyboard activation (`ElButton._onKey`) calls the
 ///    trigger's own `onPressed` directly, bypassing the `Listener` entirely.
 ///    Every real call site: this page's own specimen included: leaves that
 ///    `onPressed` a no-op, because the actual open mechanism lives one level
 ///    up. The Accessibility section documents this plainly, pinned by a live
 ///    test that focuses the trigger's real `FocusNode` and presses Enter.
-///  * **A dropdown's own submenu renders `DsMenuSurfaceKind.subBordered`,
+///  * **A dropdown's own submenu renders `ElMenuSurfaceKind.subBordered`,
 ///    not `subRinged`.** `menu.dart`'s own DRIFT-4 comment table says a
 ///    `DropdownMenuSubContent` should carry `subRinged` (`shadow-lg ring-1`)
 ///    and only `ContextMenuSubContent` should carry `subBordered`
-///    (`shadow-lg border`). But `_buildRow`'s `DsMenuSub` case maps **any**
-///    `content`-kind parent to `subBordered`, and neither `DsDropdownMenu`
+///    (`shadow-lg border`). But `_buildRow`'s `ElMenuSub` case maps **any**
+///    `content`-kind parent to `subBordered`, and neither `ElDropdownMenu`
 ///    nor `context_menu.dart` nor `menubar.dart` ever passes a `kind`
-///    override away from `DsMenuContent`'s own `content` default: so the
+///    override away from `ElMenuContent`'s own `content` default: so the
 ///    distinction the comment describes is not what the code does. The
 ///    API Reference section documents this (folded in with the enum
 ///    tables, not a standalone Variants heading, see below), pinned by a
 ///    live test that opens a submenu and reads the mounted
-///    `DsMenuSurface.kind` back.
+///    `ElMenuSurface.kind` back.
 ///
 /// **Shadcn-parity reshape** (against
 /// `https://ui.shadcn.com/docs/components/base/dropdown-menu`; `.../base/
@@ -48,7 +46,7 @@
 /// (their enum tables folded in, not a standalone Variants heading), then
 /// Elattar's own six. Two shadcn variants are skipped rather than faked:
 /// "Checkboxes Icons" and "Radio Icons", because neither
-/// [DsMenuCheckboxItem] nor `DsMenuRadioItem` declares an icon parameter.
+/// [ElMenuCheckboxItem] nor `ElMenuRadioItem` declares an icon parameter.
 /// RTL is skipped too: nothing in either file overrides `Directionality`,
 /// so a mirrored layout is architecturally plausible but unverified by any
 /// live test in this pass, and this page only asserts what a test pins.
@@ -77,11 +75,11 @@ class DropdownMenuDocPage extends StatelessWidget {
       intro: DocsPageIntro(
         eyebrow: 'COMPONENTS / BASE',
         title: entry.title,
-        description: dropdownMenuExpandedDescription,
+        description: entry.description,
       ),
-      breadcrumbs: const <DsBreadcrumbEntry>[
-        DsBreadcrumbEntry.link('Components'),
-        DsBreadcrumbEntry.page('Dropdown Menu'),
+      breadcrumbs: const <ElBreadcrumbEntry>[
+        ElBreadcrumbEntry.link('Components'),
+        ElBreadcrumbEntry.page('Dropdown Menu'),
       ],
       sidebar: const <DocsSidebarEntry>[
         DocsSidebarEntry(title: 'Drawer', route: '/components/drawer'),
@@ -142,37 +140,37 @@ class _DropdownMenuArticle extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: DsWidths.prose),
-        child: DsText(
-          'A trigger button opens a real DsDropdownMenu built from every '
-            'row shape menu.dart declares: a label, a group, a submenu, a '
-            'checkbox row with live state, a radio group with live state, '
-            'and a destructive item. Tap the trigger, or focus it and '
-            'press Enter: only one of those two opens it; the '
-            'Accessibility section says which and why.',
-          DsType.body,
+        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+        child: ElText(
+          'A trigger button opens a real ElDropdownMenu built from every '
+          'row shape menu.dart declares: a label, a group, a submenu, a '
+          'checkbox row with live state, a radio group with live state, '
+          'and a destructive item. Tap the trigger, or focus it and '
+          'press Enter: only one of those two opens it; the '
+          'Accessibility section says which and why.',
+          ElType.body,
         ),
       ),
-      SizedBox(height: ds(6)),
+      SizedBox(height: el(6)),
       DocsCodeExample(
-          title: 'Dropdown menu specimen',
-          description:
-              'A real DsDropdownMenu, not a static mock: open it, pick a '
-              'row, watch “Last action” update underneath.',
-          preview: const _DropdownMenuPreview(),
-        ),
-      SizedBox(height: ds(6)),
-      DsSection(
+        title: 'Dropdown menu specimen',
+        description:
+            'A real ElDropdownMenu, not a static mock: open it, pick a '
+            'row, watch “Last action” update underneath.',
+        preview: const _DropdownMenuPreview(),
+      ),
+      SizedBox(height: el(6)),
+      ElSection(
         id: 'install',
         title: 'Installation',
         description:
-            'Command install is not available yet: read this before '
+            'Command install is available: read this before '
             'reaching for elattar add dropdown-menu.',
         child: DocsInstallFacts(
           facts: <DocsInstallFact>[
             const DocsInstallFact(
               label: 'Status',
-              value: 'Stable, not yet a registry item',
+              value: 'Stable and installable through lattar add dropdown-menu',
               description:
                   'Ported and tested against lib/src/components/'
                   'dropdown_menu.dart and lib/src/components/menu.dart, the '
@@ -185,7 +183,7 @@ class _DropdownMenuArticle extends StatelessWidget {
               value: '0.0.1',
               description:
                   'Tracks the package version; there is no registry schema '
-                  'version yet because there is no manifest.',
+                  'version; the shipped manifest installs it.',
             ),
             const DocsInstallFact(
               label: 'CLI',
@@ -203,8 +201,8 @@ class _DropdownMenuArticle extends StatelessWidget {
                   "import 'package:elattar_design_system/"
                   "elattar_design_system.dart';",
               description:
-                  'Depend on the package and use DsDropdownMenu, '
-                  'DsMenuItem, and the rest of the row model directly, '
+                  'Depend on the package and use ElDropdownMenu, '
+                  'ElMenuItem, and the rest of the row model directly, '
                   'exactly as this page does.',
             ),
             DocsInstallFact(
@@ -221,41 +219,41 @@ class _DropdownMenuArticle extends StatelessWidget {
               label: 'Platforms',
               value: 'Android, iOS, Web, macOS, Windows, Linux',
               description:
-                  'A pure Flutter widget tree built on DsPopover’s '
+                  'A pure Flutter widget tree built on ElPopover’s '
                   'OverlayPortal: no platform channel and no '
                   'platform-specific branch in either file.',
             ),
           ],
         ),
       ),
-      SizedBox(height: ds(6)),
-      DsSection(
+      SizedBox(height: el(6)),
+      ElSection(
         id: 'usage',
         title: 'Usage',
         description:
             'Import the package, then hand a trigger and a row list to '
-            'DsDropdownMenu. The Examples below build on this same shape.',
-        child: DsPanel(
+            'ElDropdownMenu. The Examples below build on this same shape.',
+        child: ElPanel(
           label: 'DART',
           note: 'SMALLEST CORRECT EXAMPLE',
           child: DocsSelectableCodeBlock(code: _usageBasicCode),
         ),
       ),
-      SizedBox(height: ds(6)),
-      DsSection(
+      SizedBox(height: el(6)),
+      ElSection(
         id: 'composition',
         title: 'Composition',
         description:
             'The row shapes menu.dart declares, nested the way '
-            'DsDropdownMenu actually mounts them: one trigger, one row '
-            'list. Every leaf below is a DsMenuChild.',
-        child: DsPanel(
+            'ElDropdownMenu actually mounts them: one trigger, one row '
+            'list. Every leaf below is a ElMenuChild.',
+        child: ElPanel(
           label: 'STRUCTURE',
           child: DocsSelectableCodeBlock(code: _compositionTreeCode),
         ),
       ),
-      SizedBox(height: ds(6)),
-      DsSection(
+      SizedBox(height: el(6)),
+      ElSection(
         id: 'example-basic',
         title: 'Basic',
         description: 'Grouped commands, a label, and a destructive row.',
@@ -267,11 +265,11 @@ class _DropdownMenuArticle extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: ds(5)),
-      DsSection(
+      SizedBox(height: el(5)),
+      ElSection(
         id: 'example-submenu',
         title: 'Submenu',
-        description: 'A DsMenuSub row opens a nested DsMenuContent.',
+        description: 'A ElMenuSub row opens a nested ElMenuContent.',
         child: DocsCodeExample(
           title: 'Submenu',
           preview: const _DropdownMenuExampleSubmenu(),
@@ -280,11 +278,11 @@ class _DropdownMenuArticle extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: ds(5)),
-      DsSection(
+      SizedBox(height: el(5)),
+      ElSection(
         id: 'example-shortcuts',
         title: 'Shortcuts',
-        description: 'DsMenuItem.shortcut renders a right-aligned key hint.',
+        description: 'ElMenuItem.shortcut renders a right-aligned key hint.',
         child: DocsCodeExample(
           title: 'Shortcuts',
           preview: const _DropdownMenuExampleShortcuts(),
@@ -293,11 +291,11 @@ class _DropdownMenuArticle extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: ds(5)),
-      DsSection(
+      SizedBox(height: el(5)),
+      ElSection(
         id: 'example-icons',
         title: 'Icons',
-        description: 'DsMenuItem.icon adds a leading glyph to a row.',
+        description: 'ElMenuItem.icon adds a leading glyph to a row.',
         child: DocsCodeExample(
           title: 'Icons',
           preview: const _DropdownMenuExampleIcons(),
@@ -306,12 +304,12 @@ class _DropdownMenuArticle extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: ds(5)),
-      DsSection(
+      SizedBox(height: el(5)),
+      ElSection(
         id: 'example-checkboxes',
         title: 'Checkboxes',
         description:
-            'DsMenuCheckboxItem is a controlled boolean row. GAP: it has '
+            'ElMenuCheckboxItem is a controlled boolean row. GAP: it has '
             'no icon parameter, so a leading-icon checkbox row (shadcn’s '
             'own "Checkboxes Icons" variant) is not reachable from this '
             'component; not built here rather than faked.',
@@ -319,20 +317,17 @@ class _DropdownMenuArticle extends StatelessWidget {
           title: 'Checkboxes',
           preview: const _DropdownMenuExampleCheckboxes(),
           manualFiles: const <DocsCodeFile>[
-            DocsCodeFile(
-              path: 'checkboxes.dart',
-              code: _exampleCheckboxesCode,
-            ),
+            DocsCodeFile(path: 'checkboxes.dart', code: _exampleCheckboxesCode),
           ],
         ),
       ),
-      SizedBox(height: ds(5)),
-      DsSection(
+      SizedBox(height: el(5)),
+      ElSection(
         id: 'example-radio-group',
         title: 'Radio group',
         description:
-            'DsMenuRadioGroup and DsMenuRadioItem: exactly one row wears '
-            'the tick. GAP: DsMenuRadioItem also has no icon parameter, '
+            'ElMenuRadioGroup and ElMenuRadioItem: exactly one row wears '
+            'the tick. GAP: ElMenuRadioItem also has no icon parameter, '
             'so shadcn’s "Radio Icons" variant is not reachable either.',
         child: DocsCodeExample(
           title: 'Radio group',
@@ -345,12 +340,12 @@ class _DropdownMenuArticle extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: ds(5)),
-      DsSection(
+      SizedBox(height: el(5)),
+      ElSection(
         id: 'example-destructive',
         title: 'Destructive',
         description:
-            'DsMenuItemVariant.destructive recolours a row for an '
+            'ElMenuItemVariant.destructive recolours a row for an '
             'irreversible action.',
         child: DocsCodeExample(
           title: 'Destructive',
@@ -363,8 +358,8 @@ class _DropdownMenuArticle extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: ds(5)),
-      DsSection(
+      SizedBox(height: el(5)),
+      ElSection(
         id: 'example-complex',
         title: 'Complex',
         description:
@@ -378,8 +373,8 @@ class _DropdownMenuArticle extends StatelessWidget {
           preview: _DropdownMenuComposition(),
         ),
       ),
-      SizedBox(height: ds(6)),
-      DsSection(
+      SizedBox(height: el(6)),
+      ElSection(
         id: 'api',
         title: 'API Reference',
         description:
@@ -389,24 +384,24 @@ class _DropdownMenuArticle extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             const DocsApiTable(
-              title: 'DsMenuTriggerScope',
+              title: 'ElMenuTriggerScope',
               facts: <DocsApiFact>[
                 DocsApiFact(
                   name: 'open',
                   type: 'bool',
                   description:
                       "Required. aria-expanded: whether the menu under "
-                      'this trigger is open. Published by DsDropdownMenu '
+                      'this trigger is open. Published by ElDropdownMenu '
                       'and read back with the static openOf(context), which '
-                      'DsButton.expanded resolves against so an open '
+                      'ElButton.expanded resolves against so an open '
                       "trigger holds its hover fill after the pointer "
                       'leaves it.',
                 ),
               ],
             ),
-            SizedBox(height: ds(5)),
+            SizedBox(height: el(5)),
             const DocsApiTable(
-              title: 'DsDropdownMenu',
+              title: 'ElDropdownMenu',
               facts: <DocsApiFact>[
                 DocsApiFact(
                   name: 'trigger',
@@ -414,11 +409,11 @@ class _DropdownMenuArticle extends StatelessWidget {
                   description:
                       "Required. The caller's own control, rendered "
                       'verbatim (DropdownMenuTrigger asChild) and wrapped '
-                      'in DsMenuPointerDown and DsMenuTriggerScope.',
+                      'in ElMenuPointerDown and ElMenuTriggerScope.',
                 ),
                 DocsApiFact(
                   name: 'children',
-                  type: 'List<DsMenuChild>',
+                  type: 'List<ElMenuChild>',
                   description: "Required. DropdownMenuContent's own rows.",
                 ),
                 DocsApiFact(
@@ -426,23 +421,23 @@ class _DropdownMenuArticle extends StatelessWidget {
                   type: 'double?',
                   description:
                       'Default null. An explicit w-* on the content. Null '
-                      "falls back to minWidth's floor (DsMenu."
+                      "falls back to minWidth's floor (ElMenu."
                       "minWidthDropdown, 160, when minWidth is also null).",
                 ),
                 DocsApiFact(
                   name: 'align',
-                  type: 'DsPopoverAlign',
+                  type: 'ElPopoverAlign',
                   description:
-                      'Default DsPopoverAlign.start: the file’s '
-                      'own default, not DsPopover’s own '
-                      '(DsPopoverAlign.center).',
+                      'Default ElPopoverAlign.start: the file’s '
+                      'own default, not ElPopover’s own '
+                      '(ElPopoverAlign.center).',
                 ),
                 DocsApiFact(
                   name: 'side',
-                  type: 'DsPopoverSide',
+                  type: 'ElPopoverSide',
                   description:
-                      'Default DsPopoverSide.bottom. The sidebar’s own '
-                      'account trigger passes DsPopoverSide.right when '
+                      'Default ElPopoverSide.bottom. The sidebar’s own '
+                      'account trigger passes ElPopoverSide.right when '
                       'there is no room under a 256px panel.',
                 ),
                 DocsApiFact(
@@ -450,30 +445,30 @@ class _DropdownMenuArticle extends StatelessWidget {
                   type: 'bool',
                   description:
                       'Default true. False keeps the popover permanently '
-                      "closed and stops DsMenuPointerDown from forwarding "
+                      "closed and stops ElMenuPointerDown from forwarding "
                       "the trigger's own pointer-down at all.",
                 ),
                 DocsApiFact(
                   name: 'sideOffset',
                   type: 'static double (get)',
                   description:
-                      'ds(1), 4px: one spacing unit under the '
+                      'el(1), 4px: one spacing unit under the '
                       'trigger, edges flush with align: start.',
                 ),
                 DocsApiFact(
                   name: 'pressScaleSuppressed',
                   type: 'static bool (get)',
                   description:
-                      'Always true. Every DsDropdownMenu trigger suppresses '
+                      'Always true. Every ElDropdownMenu trigger suppresses '
                       'the press-scale a plain button takes, matching '
                       'aria-haspopup’s active:not-aria-[haspopup]:'
                       'scale-95.',
                 ),
               ],
             ),
-            SizedBox(height: ds(5)),
+            SizedBox(height: el(5)),
             const DocsApiTable(
-              title: 'DsMenuItem',
+              title: 'ElMenuItem',
               facts: <DocsApiFact>[
                 DocsApiFact(
                   name: 'label',
@@ -482,14 +477,14 @@ class _DropdownMenuArticle extends StatelessWidget {
                 ),
                 DocsApiFact(
                   name: 'icon',
-                  type: 'DsIconGlyph?',
+                  type: 'ElIconGlyph?',
                   description:
-                      "The leading glyph, forced to DsMenu.iconSize (16px) "
+                      "The leading glyph, forced to ElMenu.iconSize (16px) "
                       'regardless of the icon’s own default size.',
                 ),
                 DocsApiFact(
                   name: 'lucideIcon',
-                  type: 'DsLucideGlyph?',
+                  type: 'ElLucideGlyph?',
                   description:
                       'The same leading slot over the generated lucide '
                       'registry, for a glyph icon does not carry. Ignored '
@@ -500,8 +495,8 @@ class _DropdownMenuArticle extends StatelessWidget {
                   type: 'String?',
                   description:
                       "A second line under label: gap-1, "
-                      'flex-col items-start. Makes the row DsMenu.'
-                      'twoLineItemHeight tall instead of DsMenu.itemHeight.',
+                      'flex-col items-start. Makes the row ElMenu.'
+                      'twoLineItemHeight tall instead of ElMenu.itemHeight.',
                 ),
                 DocsApiFact(
                   name: 'shortcut',
@@ -512,9 +507,9 @@ class _DropdownMenuArticle extends StatelessWidget {
                 ),
                 DocsApiFact(
                   name: 'variant',
-                  type: 'DsMenuItemVariant',
+                  type: 'ElMenuItemVariant',
                   description:
-                      'Default DsMenuItemVariant.normal. destructive '
+                      'Default ElMenuItemVariant.normal. destructive '
                       'recolours the label, icon and shortcut to '
                       'destructiveInk and tints the highlight instead of '
                       'using accent.',
@@ -523,7 +518,7 @@ class _DropdownMenuArticle extends StatelessWidget {
                   name: 'enabled',
                   type: 'bool',
                   description:
-                      'Default true. False dims the row to DsMenu’s '
+                      'Default true. False dims the row to ElMenu’s '
                       'disabled opacity (0.50) and removes it from the '
                       'roving-focus and typeahead set entirely.',
                 ),
@@ -544,9 +539,9 @@ class _DropdownMenuArticle extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: ds(5)),
+            SizedBox(height: el(5)),
             const DocsApiTable(
-              title: 'DsMenuCheckboxItem',
+              title: 'ElMenuCheckboxItem',
               facts: <DocsApiFact>[
                 DocsApiFact(
                   name: 'label',
@@ -565,7 +560,7 @@ class _DropdownMenuArticle extends StatelessWidget {
                   name: 'enabled',
                   type: 'bool',
                   description:
-                      'Default true. Same effect as DsMenuItem.enabled.',
+                      'Default true. Same effect as ElMenuItem.enabled.',
                 ),
                 DocsApiFact(
                   name: 'inset',
@@ -579,14 +574,14 @@ class _DropdownMenuArticle extends StatelessWidget {
                       'Called on commit with what the row would become '
                       '(!checked). The menu still closes after, even with '
                       'onSelect left null: a controlled row with no '
-                      'handler, the same pattern DsSelect’s own S4 '
+                      'handler, the same pattern ElSelect’s own S4 '
                       'precedent names.',
                 ),
               ],
             ),
-            SizedBox(height: ds(5)),
+            SizedBox(height: el(5)),
             const DocsApiTable(
-              title: 'DsMenuRadioItem',
+              title: 'ElMenuRadioItem',
               facts: <DocsApiFact>[
                 DocsApiFact(
                   name: 'value',
@@ -605,9 +600,9 @@ class _DropdownMenuArticle extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: ds(5)),
+            SizedBox(height: el(5)),
             const DocsApiTable(
-              title: 'DsMenuRadioGroup',
+              title: 'ElMenuRadioGroup',
               facts: <DocsApiFact>[
                 DocsApiFact(
                   name: 'value',
@@ -618,7 +613,7 @@ class _DropdownMenuArticle extends StatelessWidget {
                 ),
                 DocsApiFact(
                   name: 'children',
-                  type: 'List<DsMenuRadioItem>',
+                  type: 'List<ElMenuRadioItem>',
                   description: 'Required.',
                 ),
                 DocsApiFact(
@@ -627,13 +622,13 @@ class _DropdownMenuArticle extends StatelessWidget {
                   description:
                       'Called on commit with the tapped row’s value. '
                       'Null is the same controlled-no-handler shape as '
-                      'DsMenuCheckboxItem.onSelect.',
+                      'ElMenuCheckboxItem.onSelect.',
                 ),
               ],
             ),
-            SizedBox(height: ds(5)),
+            SizedBox(height: el(5)),
             const DocsApiTable(
-              title: 'DsMenuLabel',
+              title: 'ElMenuLabel',
               facts: <DocsApiFact>[
                 DocsApiFact(
                   name: 'text',
@@ -656,25 +651,25 @@ class _DropdownMenuArticle extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: ds(5)),
-            DsPanel(
-              label: 'DsMenuSeparator',
-              child: DsText(
-                'DsMenuSeparator takes no constructor parameters at all '
-                '— const DsMenuSeparator() is the whole of it. It '
-                'paints a single 1px rule at DsMenu.separatorHeight (17), '
+            SizedBox(height: el(5)),
+            ElPanel(
+              label: 'ElMenuSeparator',
+              child: ElText(
+                'ElMenuSeparator takes no constructor parameters at all '
+                '— const ElMenuSeparator() is the whole of it. It '
+                'paints a single 1px rule at ElMenu.separatorHeight (17), '
                 'running the full content width by cancelling the '
                 'content’s own p-2 with a negative margin.',
-                DsType.small,
+                ElType.small,
               ),
             ),
-            SizedBox(height: ds(5)),
+            SizedBox(height: el(5)),
             const DocsApiTable(
-              title: 'DsMenuGroup',
+              title: 'ElMenuGroup',
               facts: <DocsApiFact>[
                 DocsApiFact(
                   name: 'children',
-                  type: 'List<DsMenuChild>',
+                  type: 'List<ElMenuChild>',
                   description:
                       "Required. A role=\"group\" wrapper that paints "
                       'nothing: its rows sit flush with the rows '
@@ -682,9 +677,9 @@ class _DropdownMenuArticle extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: ds(5)),
+            SizedBox(height: el(5)),
             const DocsApiTable(
-              title: 'DsMenuSub',
+              title: 'ElMenuSub',
               facts: <DocsApiFact>[
                 DocsApiFact(
                   name: 'label',
@@ -693,12 +688,12 @@ class _DropdownMenuArticle extends StatelessWidget {
                 ),
                 DocsApiFact(
                   name: 'children',
-                  type: 'List<DsMenuChild>',
+                  type: 'List<ElMenuChild>',
                   description: "Required. The submenu's own rows.",
                 ),
                 DocsApiFact(
                   name: 'icon',
-                  type: 'DsIconGlyph?',
+                  type: 'ElIconGlyph?',
                   description: 'The sub-trigger’s own leading glyph.',
                 ),
                 DocsApiFact(
@@ -713,13 +708,13 @@ class _DropdownMenuArticle extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: ds(5)),
+            SizedBox(height: el(5)),
             const DocsApiTable(
-              title: 'DsMenuContent',
+              title: 'ElMenuContent',
               facts: <DocsApiFact>[
                 DocsApiFact(
                   name: 'children',
-                  type: 'List<DsMenuChild>',
+                  type: 'List<ElMenuChild>',
                   description: 'Required.',
                 ),
                 DocsApiFact(
@@ -739,22 +734,22 @@ class _DropdownMenuArticle extends StatelessWidget {
                   name: 'minWidth',
                   type: 'double?',
                   description:
-                      'Null takes DsMenu.minWidthMenu (144). '
-                      'DsDropdownMenu itself always passes DsMenu.'
+                      'Null takes ElMenu.minWidthMenu (144). '
+                      'ElDropdownMenu itself always passes ElMenu.'
                       'minWidthDropdown (160) here.',
                 ),
                 DocsApiFact(
                   name: 'kind',
-                  type: 'DsMenuSurfaceKind',
+                  type: 'ElMenuSurfaceKind',
                   description:
-                      'Default DsMenuSurfaceKind.content: see '
+                      'Default ElMenuSurfaceKind.content: see '
                       'Variants for what a submenu actually resolves to.',
                 ),
                 DocsApiFact(
                   name: 'indicatorSide',
-                  type: 'DsMenuIndicatorSide',
+                  type: 'ElMenuIndicatorSide',
                   description:
-                      'Default DsMenuIndicatorSide.end. DsDropdownMenu '
+                      'Default ElMenuIndicatorSide.end. ElDropdownMenu '
                       'never overrides this: start is reachable only '
                       'from a menubar, documented here because it is '
                       'declared in this same file.',
@@ -772,7 +767,7 @@ class _DropdownMenuArticle extends StatelessWidget {
                   type: 'int',
                   description:
                       'Default -1, Radix’s own "nothing focused yet". '
-                      'DsDropdownMenu never overrides this either, '
+                      'ElDropdownMenu never overrides this either, '
                       'see the Accessibility section for what that means '
                       'in practice.',
                 ),
@@ -786,9 +781,9 @@ class _DropdownMenuArticle extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: ds(5)),
+            SizedBox(height: el(5)),
             const DocsApiTable(
-              title: 'DsMenuSurface',
+              title: 'ElMenuSurface',
               facts: <DocsApiFact>[
                 DocsApiFact(
                   name: 'child',
@@ -797,14 +792,14 @@ class _DropdownMenuArticle extends StatelessWidget {
                 ),
                 DocsApiFact(
                   name: 'kind',
-                  type: 'DsMenuSurfaceKind',
-                  description: 'Default DsMenuSurfaceKind.content.',
+                  type: 'ElMenuSurfaceKind',
+                  description: 'Default ElMenuSurfaceKind.content.',
                 ),
               ],
             ),
-            SizedBox(height: ds(5)),
+            SizedBox(height: el(5)),
             const DocsApiTable(
-              title: 'DsMenuPointerDown',
+              title: 'ElMenuPointerDown',
               facts: <DocsApiFact>[
                 DocsApiFact(
                   name: 'child',
@@ -825,27 +820,27 @@ class _DropdownMenuArticle extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: ds(5)),
+            SizedBox(height: el(5)),
             const DocsApiTable(
-              title: 'DsMenuMotion',
+              title: 'ElMenuMotion',
               facts: <DocsApiFact>[
                 DocsApiFact(
                   name: 'duration',
                   type: 'static Duration (get)',
-                  description: 'DsDurations.overlay, 320ms.',
+                  description: 'ElDurations.overlay, 320ms.',
                 ),
                 DocsApiFact(
                   name: 'slideSides',
-                  type: 'static Set<DsPopoverSide> (get)',
+                  type: 'static Set<ElPopoverSide> (get)',
                   description:
-                      'All four DsPopoverSide values: the overlay '
+                      'All four ElPopoverSide values: the overlay '
                       'slides in from whichever side it actually lands on.',
                 ),
               ],
             ),
-            SizedBox(height: ds(5)),
+            SizedBox(height: el(5)),
             const DocsApiTable(
-              title: 'DsMenu: static geometry',
+              title: 'ElMenu: static geometry',
               facts: <DocsApiFact>[
                 DocsApiFact(
                   name: 'itemHeight',
@@ -862,7 +857,7 @@ class _DropdownMenuArticle extends StatelessWidget {
                 DocsApiFact(
                   name: 'labelHeight',
                   type: 'static double (get)',
-                  description: 'DsMenuLabel’s own row, 32.',
+                  description: 'ElMenuLabel’s own row, 32.',
                 ),
                 DocsApiFact(
                   name: 'separatorHeight',
@@ -916,19 +911,19 @@ class _DropdownMenuArticle extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: ds(6)),
+            SizedBox(height: el(6)),
             const DocsApiTable(
-              title: 'DsMenuItemVariant',
+              title: 'ElMenuItemVariant',
               facts: <DocsApiFact>[
                 DocsApiFact(
                   name: 'normal',
-                  type: 'DsMenuItemVariant',
+                  type: 'ElMenuItemVariant',
                   description:
                       'The default. accent fill, popoverForeground ink.',
                 ),
                 DocsApiFact(
                   name: 'destructive',
-                  type: 'DsMenuItemVariant',
+                  type: 'ElMenuItemVariant',
                   description:
                       'destructiveInk label/icon/shortcut in every state; a '
                       'highlighted row tints with destructive at 10% '
@@ -936,92 +931,92 @@ class _DropdownMenuArticle extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: ds(5)),
+            SizedBox(height: el(5)),
             const DocsApiTable(
-              title: 'DsMenuIndicatorSide',
+              title: 'ElMenuIndicatorSide',
               facts: <DocsApiFact>[
                 DocsApiFact(
                   name: 'end',
-                  type: 'DsMenuIndicatorSide',
+                  type: 'ElMenuIndicatorSide',
                   description:
                       'py-2 pr-9 pl-3, tick at right-3. What every row this '
                       'page’s specimen renders uses, '
-                      'DsDropdownMenu never changes DsMenuContent’s '
+                      'ElDropdownMenu never changes ElMenuContent’s '
                       'own end default.',
                 ),
                 DocsApiFact(
                   name: 'start',
-                  type: 'DsMenuIndicatorSide',
+                  type: 'ElMenuIndicatorSide',
                   description:
                       'py-2 pr-3 pl-9, tick at left-1.5: the '
                       'menubar’s own mirror image, alone. Declared '
                       'here because it lives in menu.dart; not reachable '
-                      'from DsDropdownMenu itself.',
+                      'from ElDropdownMenu itself.',
                 ),
               ],
             ),
-            SizedBox(height: ds(5)),
+            SizedBox(height: el(5)),
             const DocsApiTable(
-              title: 'DsMenuSurfaceKind',
+              title: 'ElMenuSurfaceKind',
               facts: <DocsApiFact>[
                 DocsApiFact(
                   name: 'content',
-                  type: 'DsMenuSurfaceKind',
+                  type: 'ElMenuSurfaceKind',
                   description:
                       'shadow-md ring-1 ring-foreground/10: what '
-                      'every top-level DsMenuContent renders with, '
-                      'DsDropdownMenu’s own content included.',
+                      'every top-level ElMenuContent renders with, '
+                      'ElDropdownMenu’s own content included.',
                 ),
                 DocsApiFact(
                   name: 'subRinged',
-                  type: 'DsMenuSurfaceKind',
+                  type: 'ElMenuSurfaceKind',
                   description:
                       'shadow-lg ring-1 ring-foreground/10. Declared, and '
-                      'reachable if a caller builds DsMenuContent directly '
+                      'reachable if a caller builds ElMenuContent directly '
                       'and passes it: but nothing in this file ever '
                       'does. See the GAP note below.',
                 ),
                 DocsApiFact(
                   name: 'subBordered',
-                  type: 'DsMenuSurfaceKind',
+                  type: 'ElMenuSurfaceKind',
                   description:
-                      'shadow-lg border, no ring. What a DsDropdownMenu '
+                      'shadow-lg border, no ring. What a ElDropdownMenu '
                       'submenu actually renders: see the GAP note '
                       'below.',
                 ),
               ],
             ),
-            SizedBox(height: ds(5)),
-            DsNote(
-              tone: DsNoteTone.error,
+            SizedBox(height: el(5)),
+            ElNote(
+              tone: ElNoteTone.error,
               title:
                   'GAP: a dropdown’s own submenu is subBordered, '
                   'not subRinged',
-              child: DsText(
+              child: ElText(
                 'menu.dart’s own DRIFT-4 comment table names '
                 'DropdownMenuSubContent and MenubarSubContent as '
                 'shadow-lg ring-1 (subRinged), and ContextMenuSubContent '
                 'alone as shadow-lg border (subBordered). The code does '
-                'not draw that distinction: _buildRow’s DsMenuSub '
+                'not draw that distinction: _buildRow’s ElMenuSub '
                 'case maps ANY content-kind parent to subBordered '
-                '(`kind: widget.kind == DsMenuSurfaceKind.content ? '
-                'DsMenuSurfaceKind.subBordered : widget.kind`), and '
-                'DsDropdownMenu never passes a kind override away from '
-                'DsMenuContent’s own content default: confirmed '
+                '(`kind: widget.kind == ElMenuSurfaceKind.content ? '
+                'ElMenuSurfaceKind.subBordered : widget.kind`), and '
+                'ElDropdownMenu never passes a kind override away from '
+                'ElMenuContent’s own content default: confirmed '
                 'by reading dropdown_menu.dart’s content builder, '
                 'which passes children, width, minWidth and onClose only. '
                 'A live test on this page opens the specimen’s '
                 '“Invite users” submenu and reads the mounted '
-                'DsMenuSurface.kind back as subBordered, pinning this as '
+                'ElMenuSurface.kind back as subBordered, pinning this as '
                 'observed behaviour rather than a reading of the comment.',
-                DsType.small,
+                ElType.small,
               ),
             ),
           ],
         ),
       ),
-      SizedBox(height: ds(6)),
-      DsSection(
+      SizedBox(height: el(6)),
+      ElSection(
         id: 'states',
         title: 'States and feedback',
         description:
@@ -1033,7 +1028,7 @@ class _DropdownMenuArticle extends StatelessWidget {
             DocsStateFact(
               state: 'Rest',
               treatment:
-                  'DsMenuContent is not mounted; only the trigger renders.',
+                  'ElMenuContent is not mounted; only the trigger renders.',
               userSignal: 'Nothing besides the trigger is on screen.',
             ),
             DocsStateFact(
@@ -1069,8 +1064,8 @@ class _DropdownMenuArticle extends StatelessWidget {
             DocsStateFact(
               state: 'Selected',
               treatment:
-                  'A checked DsMenuCheckboxItem or the active '
-                  'DsMenuRadioItem mounts a real check glyph inside its '
+                  'A checked ElMenuCheckboxItem or the active '
+                  'ElMenuRadioItem mounts a real check glyph inside its '
                   'own Stack; an unchecked row holds no indicator element '
                   'at all, not merely a hidden one.',
               userSignal: 'A 16px tick appears in the row’s gutter.',
@@ -1087,7 +1082,7 @@ class _DropdownMenuArticle extends StatelessWidget {
               state: 'Empty',
               treatment:
                   'Not a designed state rather than a guarded one, '
-                  'children: <DsMenuChild>[] renders a popup that is only '
+                  'children: <ElMenuChild>[] renders a popup that is only '
                   'its own p-2 twice (16px), with no placeholder.',
               userSignal: 'A near-empty 16px popup, with no explanation.',
             ),
@@ -1106,8 +1101,8 @@ class _DropdownMenuArticle extends StatelessWidget {
             DocsStateFact(
               state: 'Disabled',
               treatment:
-                  'DsDropdownMenu.enabled: false keeps _isOpen permanently '
-                  'false and stops DsMenuPointerDown forwarding the '
+                  'ElDropdownMenu.enabled: false keeps _isOpen permanently '
+                  'false and stops ElMenuPointerDown forwarding the '
                   'trigger’s pointer-down at all. Per-row enabled: '
                   'false instead dims just that row to 0.50 opacity and '
                   'drops it from the roving-focus and typeahead set.',
@@ -1118,8 +1113,8 @@ class _DropdownMenuArticle extends StatelessWidget {
             DocsStateFact(
               state: 'Reduced motion',
               treatment:
-                  'DsPopover resolves its 320ms enter/exit through '
-                  'dsAnimationDuration(context, DsDurations.overlay), so '
+                  'ElPopover resolves its 320ms enter/exit through '
+                  'elAnimationDuration(context, ElDurations.overlay), so '
                   'reduced motion collapses it. The per-row highlight was '
                   'already an instant snap (0s) with nothing to reduce.',
               userSignal:
@@ -1129,14 +1124,14 @@ class _DropdownMenuArticle extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: ds(6)),
-      DsSection(
+      SizedBox(height: el(6)),
+      ElSection(
         id: 'accessibility',
         title: 'Accessibility and keyboard behavior',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            DsPanel(
+            ElPanel(
               label: 'What the semantics tree actually carries',
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1156,14 +1151,14 @@ class _DropdownMenuArticle extends StatelessWidget {
                     'A row’s accessible name is its own label text '
                         '(and subtitle, concatenated, on a two-line row). '
                         'The trigger’s accessible name is whatever '
-                        'DsButton.label the caller supplies: nothing '
+                        'ElButton.label the caller supplies: nothing '
                         'here supplies one automatically.',
                   ),
                   const _A11yRow(
                     'Keyboard interactions: once the menu is open',
                     'ArrowDown / ArrowUp move the highlight one row; Home / '
                         'End jump to the first / last: none of them '
-                        'wrap, unlike DsSelect’s own menu. ArrowRight '
+                        'wrap, unlike ElSelect’s own menu. ArrowRight '
                         'opens a highlighted sub-trigger’s submenu and '
                         'focuses its first row; ArrowLeft closes one '
                         'submenu level and returns focus to its trigger. '
@@ -1182,10 +1177,10 @@ class _DropdownMenuArticle extends StatelessWidget {
                     'Keyboard interactions: opening the menu',
                     'GAP: Enter or Space on a focused trigger does not '
                         'open the menu: only a real pointer down '
-                        'does. DsMenuPointerDown is a bare Listener that '
+                        'does. ElMenuPointerDown is a bare Listener that '
                         'reacts exclusively to PointerDownEvent; a '
-                        'DsButton’s own keyboard activation '
-                        '(DsButton._onKey, on Enter/Space) calls the '
+                        'ElButton’s own keyboard activation '
+                        '(ElButton._onKey, on Enter/Space) calls the '
                         'trigger’s own onPressed directly and never '
                         'touches that Listener. Every real call site '
                         '— this page’s own specimen included '
@@ -1205,7 +1200,7 @@ class _DropdownMenuArticle extends StatelessWidget {
                   ),
                   const _A11yRow(
                     'Focus behavior',
-                    'DsMenuContent takes focus itself the frame after it '
+                    'ElMenuContent takes focus itself the frame after it '
                         'mounts (autofocus: true by default: false '
                         'only for a submenu opened by hover, until '
                         'ArrowRight or Enter promotes it). Nothing in '
@@ -1218,7 +1213,7 @@ class _DropdownMenuArticle extends StatelessWidget {
                   ),
                   const _A11yRow(
                     'Touch target',
-                    'DsMenu.itemHeight is ≈34.57px: below the '
+                    'ElMenu.itemHeight is ≈34.57px: below the '
                         '44 / 48px baseline most touch-target guidance '
                         'names: and is not configurable per row or '
                         'per instance.',
@@ -1260,8 +1255,8 @@ class _DropdownMenuArticle extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: ds(6)),
-      DsSection(
+      SizedBox(height: el(6)),
+      ElSection(
         id: 'responsive',
         title: 'Responsive and platform behavior',
         description:
@@ -1269,43 +1264,43 @@ class _DropdownMenuArticle extends StatelessWidget {
             'once open, every row interaction: tap, arrow keys, '
             'typeahead: works identically on touch, mouse, and '
             'keyboard, with the single exception documented above.',
-        child: DsPanel(
+        child: ElPanel(
           label: 'Touch versus pointer versus keyboard',
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              DsText(
+              ElText(
                 'A submenu’s hover-open path (100ms after the pointer '
                 'enters its trigger) has no touch equivalent: there '
                 'is no hover on a touch screen: but every '
-                'DsMenuSub row also carries a real onTap that opens it '
+                'ElMenuSub row also carries a real onTap that opens it '
                 'directly, so a tap reaches the same submenu a mouse '
                 'hover does, just without the dwell.',
-                DsType.small,
+                ElType.small,
               ),
-              SizedBox(height: ds(3)),
-              DsText(
-                'Row height (DsMenu.itemHeight, ≈34.57px), the '
-                'content’s min-width floor (DsMenu.minWidthDropdown, '
+              SizedBox(height: el(3)),
+              ElText(
+                'Row height (ElMenu.itemHeight, ≈34.57px), the '
+                'content’s min-width floor (ElMenu.minWidthDropdown, '
                 '160), and every other geometry constant are fixed values '
                 '— none scale with platform, density, or text-scale '
                 'settings.',
-                DsType.small,
+                ElType.small,
               ),
-              SizedBox(height: ds(3)),
-              DsText(
-                'DsPopover’s own collision handling (not part of '
+              SizedBox(height: el(3)),
+              ElText(
+                'ElPopover’s own collision handling (not part of '
                 'this file) is what keeps the popup on-screen when the '
                 'trigger sits near a viewport edge: nothing in '
                 'dropdown_menu.dart or menu.dart repeats that logic.',
-                DsType.small,
+                ElType.small,
               ),
             ],
           ),
         ),
       ),
-      SizedBox(height: ds(6)),
-      DsSection(
+      SizedBox(height: el(6)),
+      ElSection(
         id: 'dependencies',
         title: 'Dependencies, files, and disclosure',
         description:
@@ -1315,14 +1310,14 @@ class _DropdownMenuArticle extends StatelessWidget {
           facts: <DocsInstallFact>[
             const DocsInstallFact(
               label: 'Registry item',
-              value: 'none yet',
+              value: 'registry/components/dropdown-menu.json',
               description:
                   'No registry/components/dropdown-menu.json or menu.json '
                   'exists: elattar add dropdown-menu is not yet '
                   'wired to anything.',
             ),
             DocsInstallFact(
-              label: 'Destination (once a manifest exists)',
+              label: 'Destination',
               value:
                   'lib/components/ui/dropdown_menu.dart, '
                   'lib/components/ui/menu.dart',
@@ -1367,8 +1362,8 @@ class _DropdownMenuArticle extends StatelessWidget {
               label: 'Verified',
               value: 'package tests + this docs specimen',
               description:
-                  'test/menus_test.dart’s DsMenu geometry and '
-                  'DsDropdownMenu groups, plus this page’s own live '
+                  'test/menus_test.dart’s ElMenu geometry and '
+                  'ElDropdownMenu groups, plus this page’s own live '
                   'open / activate / dismiss / keyboard-gap / '
                   'submenu-surface specimens. No fixture install was run, '
                   'since no manifest exists to install.',
@@ -1376,52 +1371,52 @@ class _DropdownMenuArticle extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: ds(6)),
-      DsSection(
+      SizedBox(height: el(6)),
+      ElSection(
         id: 'theming',
         title: 'Theming notes',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            DsPanel(
+            ElPanel(
               label: 'What actually varies with the theme',
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  DsText(
-                    'DsMenuSurface wraps DsPopoverSurface, so the '
+                  ElText(
+                    'ElMenuSurface wraps ElPopoverSurface, so the '
                     'content’s fill and ink are theme.popover / '
                     'theme.popoverForeground: the same pairing '
                     'every popover-family surface uses, not a menu-'
                     'specific pair.',
-                    DsType.small,
+                    ElType.small,
                   ),
-                  SizedBox(height: ds(3)),
-                  DsText(
+                  SizedBox(height: el(3)),
+                  ElText(
                     'A highlighted normal row fills with theme.accent and '
                     'inks with theme.accentForeground. A highlighted '
                     'destructive row instead fills with theme.destructive '
                     'at 10% alpha on light / 20% on dark, and keeps '
                     'theme.destructiveInk for its label, icon and '
                     'shortcut in every state, not only while highlighted.',
-                    DsType.small,
+                    ElType.small,
                   ),
-                  SizedBox(height: ds(3)),
-                  DsText(
+                  SizedBox(height: el(3)),
+                  ElText(
                     'theme.border draws every separator; theme.'
                     'mutedForeground draws a label’s text, a row’s '
                     'subtitle, and a shortcut at rest. Nothing here reads '
-                    'a value or surface variant, DsMenuItem carries '
+                    'a value or surface variant, ElMenuItem carries '
                     'no such parameter.',
-                    DsType.small,
+                    ElType.small,
                   ),
-                  SizedBox(height: ds(3)),
-                  DsText(
-                    'The elevation recipe (DsMenuSurfaceKind) is the one '
+                  SizedBox(height: el(3)),
+                  ElText(
+                    'The elevation recipe (ElMenuSurfaceKind) is the one '
                     'part of the surface that is not purely color '
                     '— see the GAP note in Variants for what a '
-                    'DsDropdownMenu submenu actually renders with.',
-                    DsType.small,
+                    'ElDropdownMenu submenu actually renders with.',
+                    ElType.small,
                   ),
                 ],
               ),
@@ -1429,8 +1424,8 @@ class _DropdownMenuArticle extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: ds(6)),
-      DsSection(
+      SizedBox(height: el(6)),
+      ElSection(
         id: 'source',
         title: 'Source and tests',
         child: DocsInstallFacts(
@@ -1439,7 +1434,7 @@ class _DropdownMenuArticle extends StatelessWidget {
             DocsInstallFact(
               label: 'Source: the trigger root',
               value: entry.sourcePath,
-              description: 'DsDropdownMenu and DsMenuTriggerScope.',
+              description: 'ElDropdownMenu and ElMenuTriggerScope.',
             ),
             DocsInstallFact(
               label: 'Source: the shared engine',
@@ -1467,8 +1462,8 @@ class _DropdownMenuArticle extends StatelessWidget {
               label: 'Tests',
               value: 'test/menus_test.dart',
               description:
-                  'Package-level behavioral coverage: DsMenu geometry, '
-                  'and the full DsDropdownMenu group: opening, '
+                  'Package-level behavioral coverage: ElMenu geometry, '
+                  'and the full ElDropdownMenu group: opening, '
                   'placement, highlighting, typeahead, Escape, checkbox '
                   'and radio commit, submenu timing and barrier behaviour.',
             ),
@@ -1487,127 +1482,126 @@ class _DropdownMenuArticle extends StatelessWidget {
   );
 }
 
-const String _usageBasicCode = '''DsDropdownMenu(
-  trigger: DsButton(
-    variant: DsButtonVariant.outline,
+const String _usageBasicCode = '''ElDropdownMenu(
+  trigger: ElButton(
+    variant: ElButtonVariant.outline,
     label: 'Open menu',
     suppressPressScale: true,
     onPressed: () {},
-    child: const DsText('Open menu', DsComponentType.buttonLabel),
+    child: const ElText('Open menu', ElComponentType.buttonLabel),
   ),
-  children: <DsMenuChild>[
-    DsMenuItem(label: 'Edit', onSelect: () {}),
-    DsMenuItem(label: 'Duplicate', onSelect: () {}),
-    const DsMenuSeparator(),
-    DsMenuItem(
+  children: <ElMenuChild>[
+    ElMenuItem(label: 'Edit', onSelect: () {}),
+    ElMenuItem(label: 'Duplicate', onSelect: () {}),
+    const ElMenuSeparator(),
+    ElMenuItem(
       label: 'Delete',
-      variant: DsMenuItemVariant.destructive,
+      variant: ElMenuItemVariant.destructive,
       onSelect: () {},
     ),
   ],
 )''';
 
-const String _usageGroupedCode = '''DsDropdownMenu(
-  width: ds(60),
+const String _usageGroupedCode = '''ElDropdownMenu(
+  width: el(60),
   trigger: accountTrigger, // the caller's own control, rendered as-is
-  children: <DsMenuChild>[
-    const DsMenuLabel('My Account'),
-    const DsMenuSeparator(),
-    DsMenuGroup(children: <DsMenuChild>[
-      DsMenuItem(
+  children: <ElMenuChild>[
+    const ElMenuLabel('My Account'),
+    const ElMenuSeparator(),
+    ElMenuGroup(children: <ElMenuChild>[
+      ElMenuItem(
         label: 'Profile',
-        icon: DsIconGlyph.user,
+        icon: ElIconGlyph.user,
         shortcut: '⇧⌘P',
         onSelect: openProfile,
       ),
-      DsMenuItem(
+      ElMenuItem(
         label: 'Billing',
-        icon: DsIconGlyph.creditCard,
+        icon: ElIconGlyph.creditCard,
         shortcut: '⌘B',
         onSelect: openBilling,
       ),
     ]),
-    const DsMenuSeparator(),
-    DsMenuItem(
+    const ElMenuSeparator(),
+    ElMenuItem(
       label: 'Log out',
-      icon: DsIconGlyph.logOut,
-      variant: DsMenuItemVariant.destructive,
+      icon: ElIconGlyph.logOut,
+      variant: ElMenuItemVariant.destructive,
       onSelect: signOut,
     ),
   ],
 )''';
 
-const String _compositionTreeCode =
-    '''DsDropdownMenu(
-  trigger: yourOwnWidget,      // wrapped in DsMenuPointerDown + DsMenuTriggerScope
-  children: <DsMenuChild>[     // -> mounted inside DsMenuContent
-    DsMenuLabel('...'),
-    const DsMenuSeparator(),
-    DsMenuGroup(
-      children: <DsMenuChild>[
-        DsMenuItem(...),        // icon, lucideIcon, subtitle, shortcut, variant
+const String _compositionTreeCode = '''ElDropdownMenu(
+  trigger: yourOwnWidget,      // wrapped in ElMenuPointerDown + ElMenuTriggerScope
+  children: <ElMenuChild>[     // -> mounted inside ElMenuContent
+    ElMenuLabel('...'),
+    const ElMenuSeparator(),
+    ElMenuGroup(
+      children: <ElMenuChild>[
+        ElMenuItem(...),        // icon, lucideIcon, subtitle, shortcut, variant
       ],
     ),
-    const DsMenuSeparator(),
-    DsMenuSub(
+    const ElMenuSeparator(),
+    ElMenuSub(
       label: '...',
-      children: <DsMenuChild>[  // -> a nested DsMenuContent, its own DsMenuSurface
-        DsMenuItem(...),
+      children: <ElMenuChild>[  // -> a nested ElMenuContent, its own ElMenuSurface
+        ElMenuItem(...),
       ],
     ),
-    const DsMenuSeparator(),
-    DsMenuCheckboxItem(...),
-    DsMenuRadioGroup(
-      children: <DsMenuRadioItem>[
-        DsMenuRadioItem(...),
+    const ElMenuSeparator(),
+    ElMenuCheckboxItem(...),
+    ElMenuRadioGroup(
+      children: <ElMenuRadioItem>[
+        ElMenuRadioItem(...),
       ],
     ),
   ],
 )''';
 
-const String _exampleSubmenuCode = '''DsDropdownMenu(
+const String _exampleSubmenuCode = '''ElDropdownMenu(
   trigger: triggerButton,
-  children: <DsMenuChild>[
-    DsMenuItem(label: 'Edit', onSelect: () {}),
-    DsMenuSub(
+  children: <ElMenuChild>[
+    ElMenuItem(label: 'Edit', onSelect: () {}),
+    ElMenuSub(
       label: 'Invite users',
-      icon: DsIconGlyph.plus,
-      children: <DsMenuChild>[
-        DsMenuItem(label: 'Email', onSelect: inviteByEmail),
-        DsMenuItem(label: 'Message', onSelect: inviteByMessage),
+      icon: ElIconGlyph.plus,
+      children: <ElMenuChild>[
+        ElMenuItem(label: 'Email', onSelect: inviteByEmail),
+        ElMenuItem(label: 'Message', onSelect: inviteByMessage),
       ],
     ),
   ],
 )''';
 
-const String _exampleShortcutsCode = '''DsDropdownMenu(
+const String _exampleShortcutsCode = '''ElDropdownMenu(
   trigger: accountTrigger,
-  children: <DsMenuChild>[
-    DsMenuItem(label: 'Profile', shortcut: '⇧⌘P', onSelect: openProfile),
-    DsMenuItem(label: 'Billing', shortcut: '⌘B', onSelect: openBilling),
+  children: <ElMenuChild>[
+    ElMenuItem(label: 'Profile', shortcut: '⇧⌘P', onSelect: openProfile),
+    ElMenuItem(label: 'Billing', shortcut: '⌘B', onSelect: openBilling),
   ],
 )''';
 
-const String _exampleIconsCode = '''DsDropdownMenu(
+const String _exampleIconsCode = '''ElDropdownMenu(
   trigger: accountTrigger,
-  children: <DsMenuChild>[
-    DsMenuItem(
+  children: <ElMenuChild>[
+    ElMenuItem(
       label: 'Profile',
-      icon: DsIconGlyph.user,
+      icon: ElIconGlyph.user,
       onSelect: openProfile,
     ),
-    DsMenuItem(
+    ElMenuItem(
       label: 'Billing',
-      icon: DsIconGlyph.creditCard,
+      icon: ElIconGlyph.creditCard,
       onSelect: openBilling,
     ),
   ],
 )''';
 
-const String _exampleCheckboxesCode = '''DsDropdownMenu(
+const String _exampleCheckboxesCode = '''ElDropdownMenu(
   trigger: viewOptionsTrigger,
-  children: <DsMenuChild>[
-    DsMenuCheckboxItem(
+  children: <ElMenuChild>[
+    ElMenuCheckboxItem(
       label: 'Show status bar',
       checked: showStatusBar,
       onSelect: (bool next) => setState(() => showStatusBar = next),
@@ -1615,29 +1609,29 @@ const String _exampleCheckboxesCode = '''DsDropdownMenu(
   ],
 )''';
 
-const String _exampleRadioGroupCode = '''DsDropdownMenu(
+const String _exampleRadioGroupCode = '''ElDropdownMenu(
   trigger: viewOptionsTrigger,
-  children: <DsMenuChild>[
-    DsMenuRadioGroup(
+  children: <ElMenuChild>[
+    ElMenuRadioGroup(
       value: panelPosition,
       onChanged: (String next) => setState(() => panelPosition = next),
-      children: const <DsMenuRadioItem>[
-        DsMenuRadioItem(value: 'left', label: 'Panel on left'),
-        DsMenuRadioItem(value: 'right', label: 'Panel on right'),
+      children: const <ElMenuRadioItem>[
+        ElMenuRadioItem(value: 'left', label: 'Panel on left'),
+        ElMenuRadioItem(value: 'right', label: 'Panel on right'),
       ],
     ),
   ],
 )''';
 
-const String _exampleDestructiveCode = '''DsDropdownMenu(
+const String _exampleDestructiveCode = '''ElDropdownMenu(
   trigger: triggerButton,
-  children: <DsMenuChild>[
-    DsMenuItem(label: 'Edit', onSelect: () {}),
-    DsMenuItem(label: 'Duplicate', onSelect: () {}),
-    const DsMenuSeparator(),
-    DsMenuItem(
+  children: <ElMenuChild>[
+    ElMenuItem(label: 'Edit', onSelect: () {}),
+    ElMenuItem(label: 'Duplicate', onSelect: () {}),
+    const ElMenuSeparator(),
+    ElMenuItem(
       label: 'Delete',
-      variant: DsMenuItemVariant.destructive,
+      variant: ElMenuItemVariant.destructive,
       onSelect: () {},
     ),
   ],
@@ -1652,15 +1646,15 @@ class _A11yRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return Padding(
-      padding: EdgeInsets.only(bottom: last ? 0 : ds(3)),
+      padding: EdgeInsets.only(bottom: last ? 0 : el(3)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          DsText(label, DsType.label, color: theme.actionInk),
-          SizedBox(height: ds(1)),
-          DsText(body, DsType.small),
+          ElText(label, ElType.label, color: theme.actionInk),
+          SizedBox(height: el(1)),
+          ElText(body, ElType.small),
         ],
       ),
     );
@@ -1686,99 +1680,99 @@ class _DropdownMenuPreviewState extends State<_DropdownMenuPreview> {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        DsDropdownMenu(
-          width: ds(60),
+        ElDropdownMenu(
+          width: el(60),
           trigger: Builder(
-            builder: (BuildContext triggerContext) => DsButton(
+            builder: (BuildContext triggerContext) => ElButton(
               key: const ValueKey<String>('dropdown-menu-doc-specimen-trigger'),
-              variant: DsButtonVariant.outline,
+              variant: ElButtonVariant.outline,
               label: 'Account menu',
               suppressPressScale: true,
-              expanded: DsMenuTriggerScope.openOf(triggerContext),
+              expanded: ElMenuTriggerScope.openOf(triggerContext),
               onPressed: () {},
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  const DsIcon(DsIconGlyph.user, size: DsIconSize.sm),
-                  SizedBox(width: ds(2)),
-                  DsText('Account menu', DsComponentType.buttonLabel),
-                  SizedBox(width: ds(2)),
-                  const DsIcon(DsIconGlyph.chevronDown, size: DsIconSize.sm),
+                  const ElIcon(ElIconGlyph.user, size: ElIconSize.sm),
+                  SizedBox(width: el(2)),
+                  ElText('Account menu', ElComponentType.buttonLabel),
+                  SizedBox(width: el(2)),
+                  const ElIcon(ElIconGlyph.chevronDown, size: ElIconSize.sm),
                 ],
               ),
             ),
           ),
-          children: <DsMenuChild>[
-            const DsMenuLabel('Account'),
-            const DsMenuSeparator(),
-            DsMenuGroup(
-              children: <DsMenuChild>[
-                DsMenuItem(
+          children: <ElMenuChild>[
+            const ElMenuLabel('Account'),
+            const ElMenuSeparator(),
+            ElMenuGroup(
+              children: <ElMenuChild>[
+                ElMenuItem(
                   label: 'Profile',
-                  icon: DsIconGlyph.user,
+                  icon: ElIconGlyph.user,
                   shortcut: '⇧⌘P',
                   onSelect: () => _act('Profile'),
                 ),
-                DsMenuItem(
+                ElMenuItem(
                   label: 'Billing',
-                  icon: DsIconGlyph.creditCard,
+                  icon: ElIconGlyph.creditCard,
                   shortcut: '⌘B',
                   onSelect: () => _act('Billing'),
                 ),
-                DsMenuItem(
+                ElMenuItem(
                   label: 'Settings',
-                  icon: DsIconGlyph.settings,
+                  icon: ElIconGlyph.settings,
                   onSelect: () => _act('Settings'),
                 ),
               ],
             ),
-            const DsMenuSeparator(),
-            DsMenuSub(
+            const ElMenuSeparator(),
+            ElMenuSub(
               label: 'Invite users',
-              icon: DsIconGlyph.plus,
-              children: <DsMenuChild>[
-                DsMenuItem(
+              icon: ElIconGlyph.plus,
+              children: <ElMenuChild>[
+                ElMenuItem(
                   label: 'Email',
                   onSelect: () => _act('Invite by email'),
                 ),
-                DsMenuItem(
+                ElMenuItem(
                   label: 'Message',
                   onSelect: () => _act('Invite by message'),
                 ),
               ],
             ),
-            const DsMenuSeparator(),
-            DsMenuCheckboxItem(
+            const ElMenuSeparator(),
+            ElMenuCheckboxItem(
               label: 'Show status bar',
               checked: _statusBar,
               onSelect: (bool next) => setState(() => _statusBar = next),
             ),
-            const DsMenuSeparator(),
-            DsMenuRadioGroup(
+            const ElMenuSeparator(),
+            ElMenuRadioGroup(
               value: _panel,
               onChanged: (String next) => setState(() => _panel = next),
-              children: const <DsMenuRadioItem>[
-                DsMenuRadioItem(value: 'left', label: 'Panel on left'),
-                DsMenuRadioItem(value: 'right', label: 'Panel on right'),
+              children: const <ElMenuRadioItem>[
+                ElMenuRadioItem(value: 'left', label: 'Panel on left'),
+                ElMenuRadioItem(value: 'right', label: 'Panel on right'),
               ],
             ),
-            const DsMenuSeparator(),
-            DsMenuItem(
+            const ElMenuSeparator(),
+            ElMenuItem(
               label: 'Log out',
-              icon: DsIconGlyph.logOut,
-              variant: DsMenuItemVariant.destructive,
+              icon: ElIconGlyph.logOut,
+              variant: ElMenuItemVariant.destructive,
               onSelect: () => _act('Log out'),
             ),
           ],
         ),
-        SizedBox(height: ds(4)),
-        DsText(
+        SizedBox(height: el(4)),
+        ElText(
           'Last action: $_lastAction',
-          DsType.small,
+          ElType.small,
           key: const ValueKey<String>('dropdown-menu-doc-last-action'),
           color: theme.mutedForeground,
         ),
@@ -1794,44 +1788,44 @@ class _DropdownMenuComposition extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
         Expanded(
-          child: DsText(
+          child: ElText(
             'INV-2049 · Autumn Collection',
-            DsType.body,
+            ElType.body,
             color: theme.foreground,
           ),
         ),
-        SizedBox(width: ds(3)),
-        DsDropdownMenu(
-          align: DsPopoverAlign.end,
-          trigger: DsButton(
-            variant: DsButtonVariant.ghost,
-            size: DsButtonSize.icon,
+        SizedBox(width: el(3)),
+        ElDropdownMenu(
+          align: ElPopoverAlign.end,
+          trigger: ElButton(
+            variant: ElButtonVariant.ghost,
+            size: ElButtonSize.icon,
             label: 'Row actions',
             suppressPressScale: true,
             onPressed: () {},
-            child: const DsIcon(DsIconGlyph.ellipsis, size: DsIconSize.md),
+            child: const ElIcon(ElIconGlyph.ellipsis, size: ElIconSize.md),
           ),
-          children: <DsMenuChild>[
-            DsMenuItem(
+          children: <ElMenuChild>[
+            ElMenuItem(
               label: 'View invoice',
-              icon: DsIconGlyph.eye,
+              icon: ElIconGlyph.eye,
               onSelect: () {},
             ),
-            DsMenuItem(
+            ElMenuItem(
               label: 'Duplicate',
-              icon: DsIconGlyph.copy,
+              icon: ElIconGlyph.copy,
               onSelect: () {},
             ),
-            const DsMenuSeparator(),
-            DsMenuItem(
+            const ElMenuSeparator(),
+            ElMenuItem(
               label: 'Delete',
-              icon: DsIconGlyph.trash2,
-              variant: DsMenuItemVariant.destructive,
+              icon: ElIconGlyph.trash2,
+              variant: ElMenuItemVariant.destructive,
               onSelect: () {},
             ),
           ],
@@ -1847,113 +1841,113 @@ class _DropdownMenuExampleBasic extends StatelessWidget {
   const _DropdownMenuExampleBasic();
 
   @override
-  Widget build(BuildContext context) => DsDropdownMenu(
-    width: ds(56),
-    trigger: DsButton(
+  Widget build(BuildContext context) => ElDropdownMenu(
+    width: el(56),
+    trigger: ElButton(
       key: const ValueKey<String>('dropdown-menu-example-basic-trigger'),
-      variant: DsButtonVariant.outline,
+      variant: ElButtonVariant.outline,
       label: 'Account',
       suppressPressScale: true,
       onPressed: () {},
-      child: DsText('Account', DsComponentType.buttonLabel),
+      child: ElText('Account', ElComponentType.buttonLabel),
     ),
-    children: <DsMenuChild>[
-      const DsMenuLabel('My Account'),
-      const DsMenuSeparator(),
-      DsMenuGroup(
-        children: <DsMenuChild>[
-          DsMenuItem(label: 'Profile', onSelect: () {}),
-          DsMenuItem(label: 'Billing', onSelect: () {}),
+    children: <ElMenuChild>[
+      const ElMenuLabel('My Account'),
+      const ElMenuSeparator(),
+      ElMenuGroup(
+        children: <ElMenuChild>[
+          ElMenuItem(label: 'Profile', onSelect: () {}),
+          ElMenuItem(label: 'Billing', onSelect: () {}),
         ],
       ),
-      const DsMenuSeparator(),
-      DsMenuItem(
+      const ElMenuSeparator(),
+      ElMenuItem(
         label: 'Log out',
-        variant: DsMenuItemVariant.destructive,
+        variant: ElMenuItemVariant.destructive,
         onSelect: () {},
       ),
     ],
   );
 }
 
-/// A DsMenuSub row opening a nested submenu: the same "Invite users" shape
+/// A ElMenuSub row opening a nested submenu: the same "Invite users" shape
 /// the rich Preview specimen above already carries.
 class _DropdownMenuExampleSubmenu extends StatelessWidget {
   const _DropdownMenuExampleSubmenu();
 
   @override
-  Widget build(BuildContext context) => DsDropdownMenu(
-    trigger: DsButton(
+  Widget build(BuildContext context) => ElDropdownMenu(
+    trigger: ElButton(
       key: const ValueKey<String>('dropdown-menu-example-submenu-trigger'),
-      variant: DsButtonVariant.outline,
+      variant: ElButtonVariant.outline,
       label: 'Actions',
       suppressPressScale: true,
       onPressed: () {},
-      child: DsText('Actions', DsComponentType.buttonLabel),
+      child: ElText('Actions', ElComponentType.buttonLabel),
     ),
-    children: <DsMenuChild>[
-      DsMenuItem(label: 'Edit', onSelect: () {}),
-      DsMenuSub(
+    children: <ElMenuChild>[
+      ElMenuItem(label: 'Edit', onSelect: () {}),
+      ElMenuSub(
         label: 'Invite users',
-        icon: DsIconGlyph.plus,
-        children: <DsMenuChild>[
-          DsMenuItem(label: 'Email', onSelect: () {}),
-          DsMenuItem(label: 'Message', onSelect: () {}),
+        icon: ElIconGlyph.plus,
+        children: <ElMenuChild>[
+          ElMenuItem(label: 'Email', onSelect: () {}),
+          ElMenuItem(label: 'Message', onSelect: () {}),
         ],
       ),
     ],
   );
 }
 
-/// DsMenuItem.shortcut: a key hint, right-aligned and muted at rest.
+/// ElMenuItem.shortcut: a key hint, right-aligned and muted at rest.
 class _DropdownMenuExampleShortcuts extends StatelessWidget {
   const _DropdownMenuExampleShortcuts();
 
   @override
-  Widget build(BuildContext context) => DsDropdownMenu(
-    trigger: DsButton(
+  Widget build(BuildContext context) => ElDropdownMenu(
+    trigger: ElButton(
       key: const ValueKey<String>('dropdown-menu-example-shortcuts-trigger'),
-      variant: DsButtonVariant.outline,
+      variant: ElButtonVariant.outline,
       label: 'Account',
       suppressPressScale: true,
       onPressed: () {},
-      child: DsText('Account', DsComponentType.buttonLabel),
+      child: ElText('Account', ElComponentType.buttonLabel),
     ),
-    children: <DsMenuChild>[
-      DsMenuItem(label: 'Profile', shortcut: '⇧⌘P', onSelect: () {}),
-      DsMenuItem(label: 'Billing', shortcut: '⌘B', onSelect: () {}),
+    children: <ElMenuChild>[
+      ElMenuItem(label: 'Profile', shortcut: '⇧⌘P', onSelect: () {}),
+      ElMenuItem(label: 'Billing', shortcut: '⌘B', onSelect: () {}),
     ],
   );
 }
 
-/// DsMenuItem.icon: a leading glyph forced into DsMenu.iconSize (16px).
+/// ElMenuItem.icon: a leading glyph forced into ElMenu.iconSize (16px).
 class _DropdownMenuExampleIcons extends StatelessWidget {
   const _DropdownMenuExampleIcons();
 
   @override
-  Widget build(BuildContext context) => DsDropdownMenu(
-    trigger: DsButton(
+  Widget build(BuildContext context) => ElDropdownMenu(
+    trigger: ElButton(
       key: const ValueKey<String>('dropdown-menu-example-icons-trigger'),
-      variant: DsButtonVariant.outline,
+      variant: ElButtonVariant.outline,
       label: 'Account',
       suppressPressScale: true,
       onPressed: () {},
-      child: DsText('Account', DsComponentType.buttonLabel),
+      child: ElText('Account', ElComponentType.buttonLabel),
     ),
-    children: <DsMenuChild>[
-      DsMenuItem(label: 'Profile', icon: DsIconGlyph.user, onSelect: () {}),
-      DsMenuItem(
+    children: <ElMenuChild>[
+      ElMenuItem(label: 'Profile', icon: ElIconGlyph.user, onSelect: () {}),
+      ElMenuItem(
         label: 'Billing',
-        icon: DsIconGlyph.creditCard,
+        icon: ElIconGlyph.creditCard,
         onSelect: () {},
       ),
     ],
   );
 }
 
-/// DsMenuCheckboxItem, wired to real state so the tick genuinely toggles,
+/// ElMenuCheckboxItem, wired to real state so the tick genuinely toggles,
 /// plus a disabled row for contrast. GAP: neither row can carry a leading
-/// icon, DsMenuCheckboxItem declares no icon parameter, see the section
+/// icon, ElMenuCheckboxItem declares no icon parameter, see the section
 /// description above.
 class _DropdownMenuExampleCheckboxes extends StatefulWidget {
   const _DropdownMenuExampleCheckboxes();
@@ -1968,22 +1962,22 @@ class _DropdownMenuExampleCheckboxesState
   bool _statusBar = true;
 
   @override
-  Widget build(BuildContext context) => DsDropdownMenu(
-    trigger: DsButton(
+  Widget build(BuildContext context) => ElDropdownMenu(
+    trigger: ElButton(
       key: const ValueKey<String>('dropdown-menu-example-checkboxes-trigger'),
-      variant: DsButtonVariant.outline,
+      variant: ElButtonVariant.outline,
       label: 'View',
       suppressPressScale: true,
       onPressed: () {},
-      child: DsText('View', DsComponentType.buttonLabel),
+      child: ElText('View', ElComponentType.buttonLabel),
     ),
-    children: <DsMenuChild>[
-      DsMenuCheckboxItem(
+    children: <ElMenuChild>[
+      ElMenuCheckboxItem(
         label: 'Show status bar',
         checked: _statusBar,
         onSelect: (bool next) => setState(() => _statusBar = next),
       ),
-      const DsMenuCheckboxItem(
+      const ElMenuCheckboxItem(
         label: 'Show activity bar',
         checked: false,
         enabled: false,
@@ -1992,8 +1986,8 @@ class _DropdownMenuExampleCheckboxesState
   );
 }
 
-/// DsMenuRadioGroup and DsMenuRadioItem: exactly one row wears the tick.
-/// GAP: DsMenuRadioItem also declares no icon parameter, see the section
+/// ElMenuRadioGroup and ElMenuRadioItem: exactly one row wears the tick.
+/// GAP: ElMenuRadioItem also declares no icon parameter, see the section
 /// description above.
 class _DropdownMenuExampleRadioGroup extends StatefulWidget {
   const _DropdownMenuExampleRadioGroup();
@@ -2008,55 +2002,51 @@ class _DropdownMenuExampleRadioGroupState
   String _panel = 'left';
 
   @override
-  Widget build(BuildContext context) => DsDropdownMenu(
-    trigger: DsButton(
-      key: const ValueKey<String>(
-        'dropdown-menu-example-radio-group-trigger',
-      ),
-      variant: DsButtonVariant.outline,
+  Widget build(BuildContext context) => ElDropdownMenu(
+    trigger: ElButton(
+      key: const ValueKey<String>('dropdown-menu-example-radio-group-trigger'),
+      variant: ElButtonVariant.outline,
       label: 'Panel position',
       suppressPressScale: true,
       onPressed: () {},
-      child: DsText('Panel position', DsComponentType.buttonLabel),
+      child: ElText('Panel position', ElComponentType.buttonLabel),
     ),
-    children: <DsMenuChild>[
-      DsMenuRadioGroup(
+    children: <ElMenuChild>[
+      ElMenuRadioGroup(
         value: _panel,
         onChanged: (String next) => setState(() => _panel = next),
-        children: const <DsMenuRadioItem>[
-          DsMenuRadioItem(value: 'left', label: 'Panel on left'),
-          DsMenuRadioItem(value: 'right', label: 'Panel on right'),
+        children: const <ElMenuRadioItem>[
+          ElMenuRadioItem(value: 'left', label: 'Panel on left'),
+          ElMenuRadioItem(value: 'right', label: 'Panel on right'),
         ],
       ),
     ],
   );
 }
 
-/// DsMenuItemVariant.destructive: destructiveInk label/icon/shortcut in
+/// ElMenuItemVariant.destructive: destructiveInk label/icon/shortcut in
 /// every state, tinted with destructive rather than accent while
 /// highlighted.
 class _DropdownMenuExampleDestructive extends StatelessWidget {
   const _DropdownMenuExampleDestructive();
 
   @override
-  Widget build(BuildContext context) => DsDropdownMenu(
-    trigger: DsButton(
-      key: const ValueKey<String>(
-        'dropdown-menu-example-destructive-trigger',
-      ),
-      variant: DsButtonVariant.outline,
+  Widget build(BuildContext context) => ElDropdownMenu(
+    trigger: ElButton(
+      key: const ValueKey<String>('dropdown-menu-example-destructive-trigger'),
+      variant: ElButtonVariant.outline,
       label: 'Item',
       suppressPressScale: true,
       onPressed: () {},
-      child: DsText('Item', DsComponentType.buttonLabel),
+      child: ElText('Item', ElComponentType.buttonLabel),
     ),
-    children: <DsMenuChild>[
-      DsMenuItem(label: 'Edit', onSelect: () {}),
-      DsMenuItem(label: 'Duplicate', onSelect: () {}),
-      const DsMenuSeparator(),
-      DsMenuItem(
+    children: <ElMenuChild>[
+      ElMenuItem(label: 'Edit', onSelect: () {}),
+      ElMenuItem(label: 'Duplicate', onSelect: () {}),
+      const ElMenuSeparator(),
+      ElMenuItem(
         label: 'Delete',
-        variant: DsMenuItemVariant.destructive,
+        variant: ElMenuItemVariant.destructive,
         onSelect: () {},
       ),
     ],

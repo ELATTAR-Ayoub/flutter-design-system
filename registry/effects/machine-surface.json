@@ -5,8 +5,16 @@
   "description": "Reusable raised and pressed machine-surface effect used by controls and overlays.",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
-  "files": [{"source": "lib/src/effects/machine_surface.dart", "target": "@effects/machine_surface.dart", "sha256": "3b93ce4fd3a885c3bc991624e25f98a1b7a9f7dfaf2a6200aa018a21a6e52623"}],
-  "registryDependencies": ["source-foundation"],
+  "files": [
+    {
+      "source": "lib/src/effects/machine_surface.dart",
+      "target": "@effects/machine_surface.dart",
+      "sha256": "2cd5fcbef7dd7cca3977175bac3cbbc3fad7b1ee940eddd940d1d533a9fa2df1"
+    }
+  ],
+  "registryDependencies": [
+    "source-foundation"
+  ],
   "semanticDependencies": [],
   "pubDependencies": {},
   "assets": [],

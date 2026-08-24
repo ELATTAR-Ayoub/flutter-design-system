@@ -1,5 +1,5 @@
 # globals.css — Complete Map for Flutter Port
-Source: `D:/DESIGN/Design-System-2026-8/design-system/app/globals.css` (3693 lines, read in full). Supporting: `postcss.config.mjs`, `package.json`, `tsconfig.json`, `app/layout.tsx`, `components/ds/theme-provider.tsx`, `public/fonts/`.
+Source: `D:/DESIGN/Design-System-2026-8/design-system/app/globals.css` (3693 lines, read in full). Supporting: `postcss.config.mjs`, `package.json`, `tsconfig.json`, `app/layout.tsx`, `components/el/theme-provider.tsx`, `public/fonts/`.
 
 ## 0. File preamble (L1–45)
 - L1 `@import "tailwindcss"` (Tailwind v4, CSS-first config — there is NO tailwind.config file; all config lives in this CSS via `@theme`).
@@ -22,7 +22,7 @@ Source: `D:/DESIGN/Design-System-2026-8/design-system/app/globals.css` (3693 lin
 - Geist Mono has no true italic; `.type-accent` italic on the mono face would be synthesized — but `.type-accent` actually uses Redaction 35 which IS an italic file (comment L1043–1045 describes the mono-italic plan; the token points at Redaction 35 — another prose-vs-token drift; the token wins).
 
 ## 2. Theme switching mechanism
-- **Class-based**, via next-themes: `ThemeProvider` (`components/ds/theme-provider.tsx`) → `<NextThemes attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>`. Class is written on `<html>` pre-hydration (inline script; `suppressHydrationWarning` on `<html>`).
+- **Class-based**, via next-themes: `ThemeProvider` (`components/el/theme-provider.tsx`) → `<NextThemes attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>`. Class is written on `<html>` pre-hydration (inline script; `suppressHydrationWarning` on `<html>`).
 - Theme blocks: **`:root, .light`** = light (L546–735); **`.dark`** = dark (L741–942). Default presented theme is **dark**; `enableSystem` means OS preference honored. `.light` exists so a light island inside a dark page resolves correctly (subtree theming for side-by-side specimens).
 - `html { color-scheme: light }` / `html.dark { color-scheme: dark }` (L950–968) — UA-painted controls/scrollbars/caret follow.
 - Third scoped theme: **`.theme-reference`** (L3520–3553) with dark twin **`.dark .theme-reference, .theme-reference.dark`** (L3555–3576) — a page-scoped repaint in a reference site's sampled values, NOT reachable from `:root`.
@@ -250,7 +250,7 @@ Every class, full values (family defaults to inherited `--font-sans` unless stat
 - `value-foil-drift` (L1915): 0% `background-position: 0% 50%, -60% 50%, 50% 50%`; 100% `140% 50%, 160% 50%, 50% 50%`.
 - `value-glint` (L1930): 0%,54% `background-position:135% 50%; opacity:0`; 60% `opacity:1`; 94% `opacity:1`; 100% `background-position:-55% 50%; opacity:0`.
 - `action-beat` (L2059): 0% `scale(0.55), op 0`; 10% `scale(1), op 0.62`; 24% `scale(1.32), op 0`; 30% `scale(0.7), op 0`; 40% `scale(1.06), op 0.34`; 54% `scale(1.38), op 0`; 100% `scale(1.38), op 0`.
-- `ds-sweep` (L2195): from `width:0` to `width:100%`. `ds-travel` (L2203): from `translateX(0)` to `translateX(calc(100% - 1.5rem))`.
+- `el-sweep` (L2195): from `width:0` to `width:100%`. `el-travel` (L2203): from `translateX(0)` to `translateX(calc(100% - 1.5rem))`.
 - `check-draw` (L2212): `stroke-dashoffset: 22 → 0`. `dash-draw` (L2220): `12 → 0`.
 - `dot-pop` (L2228): 0% `scale(0), op 0`; 55% `scale(1.35), op 1`; 100% `scale(1), op 1`.
 - `yuki-pop-in` (L2424): 0% `op 0, scale3d(0.25,0.25,1)`; 55% `op 1, scale3d(0.92,1.08,1)`; 80% `scale3d(1.04,0.97,1)`; 92% `scale3d(0.99,1.01,1)`; 100% `scale3d(1,1,1)`.
@@ -316,7 +316,7 @@ Type: `.type-display` 2.25rem/1/500/-0.02em, `@media (width >= 64rem)` 3.5rem; `
 6. **isolation: isolate** L1707 — blend must not reach below the card. Flutter: blend within a saved layer.
 7. **filter: blur() on painted layers**: bloom ::before 16px, ::after 10px (L1742/1777); animated blur in keyframes `yuki-blur-in`, `yuki-intro-rise/-focus`, `pulls-blur-out/in` (animating blur is expensive in Flutter — ImageFiltered per frame).
 8. **filter: drop-shadow (two-pass) following image alpha**: starfield L3424–3426. Flutter: two stacked blurred copies of the star painter.
-9. **Inset box-shadows** (multi-layer, mixed inset+outer): every machine shadow (e-family, key, pressed, btn, chip, glass rims). Flutter: no inset shadow primitive — the port already has `DsMachineSurface` for this (per memory).
+9. **Inset box-shadows** (multi-layer, mixed inset+outer): every machine shadow (e-family, key, pressed, btn, chip, glass rims). Flutter: no inset shadow primitive — the port already has `ElMachineSurface` for this (per memory).
 10. **background-clip: text** shimmer: `anim-shimmer-text` L3056–3068. Flutter: ShaderMask over Text.
 11. **repeating-linear-gradient** 1px striations: foil L2006, sheen L2136. Flutter: tiled gradient or custom painter.
 12. **Standalone transform longhands composing** (`scale`/`rotate`/`translate` animating independently of a `transform` animation): bloom hover scale L1836–1846; starfield sway (`rotate`) + hover (`translate`/`scale`) L3427–3460. Flutter: compose in one Transform — trivially fine there.

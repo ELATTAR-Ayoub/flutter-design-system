@@ -16,7 +16,7 @@
 ///     small; it compiles to `:has(*[data-size="sm"])`, and each row ends in a
 ///     `<Button size="sm">Manage</Button>` that matches it. *(Measured: `gap:
 ///     10px`, with every item reporting `data-size="default"`.)* Reproduced —
-///     see [DsItemGroup.gap].
+///     see [ElItemGroup.gap].
 ///  3. **`duration-fast` is a no-op, twice on this page.** `item.tsx` line 45
 ///     and
 ///     the navigating stat's `Card` both write `transition-colors
@@ -36,13 +36,13 @@
 ///     `border-collapse: collapse` splits the rule between its two rows, and
 ///     `[&_tr:last-child]:border-0` removes only the *bottom* half.
 ///     *(Measured on all three multi-row tables: 37 / 37 / 37 / 37 / **36.5**.)*
-///     See [DsTable] for the whole model.
+///     See [ElTable] for the whole model.
 ///  7. **`Stat`'s API list is one row longer than the component.** §API names
 ///     *"Badge variant: default · blue · premium …"*, `blue` is not one of the
 ///     cva's ten, and `link` is. The copy ships as written.
 ///  8. **The empty state's dashed border never paints.** `Empty` carries
 ///     `border-dashed` with no `border-*` width, so the filtered-to-nothing
-///     panel is a bordered rectangle in prose only: the `DsEmpty` family's
+///     panel is a bordered rectangle in prose only: the `ElEmpty` family's
 ///     own recorded gap, reached here for the first time by a call site.
 ///  9. **The reload button's `disabled` is the only thing that stops a second
 ///     click.** `RELOAD_MS` is 1100 and the comment beside it says it is *"a
@@ -67,21 +67,22 @@ const double _measureMd = 448;
 /// long a thing takes to move; this is how long a server takes to answer, and
 /// the two are unrelated, `--duration-slow` is 400ms and no API is that
 /// polite."*
-const Duration _reloadWait =
-    Duration(milliseconds: 1100); // allow-hardcoded: RELOAD_MS: a network
+const Duration _reloadWait = Duration(
+  milliseconds: 1100,
+); // allow-hardcoded: RELOAD_MS: a network
 // wait, not a motion value; the source says so beside it.
 
 /// `mt-5`: the caption under a specimen.
-double get _captionGap => ds(5);
+double get _captionGap => el(5);
 
 /// `mt-6`: the wider caption gap, and the gap over a trailing Note.
-double get _wideGap => ds(6);
+double get _wideGap => el(6);
 
 /// `mt-4`: between two panels.
-double get _panelGap => ds(4);
+double get _panelGap => el(4);
 
 /// `space-y-6` in the marker panel, and `gap-8` in the stat grids.
-double get _markerGap => ds(6);
+double get _markerGap => el(6);
 
 /// `filter: grayscale(1)`, in Flutter's vocabulary.
 ///
@@ -99,45 +100,55 @@ const ColorFilter _grayscale = ColorFilter.matrix(<double>[
 ///
 /// `dir` decides three things at once: the glyph, its tone, and whether the
 /// amount takes the value ramp.
-const List<({String type, String detail, String amount, bool incoming,
-    String status})> _tx = <({String type, String detail, String amount,
-    bool incoming, String status})>[
-  (
-    type: 'Pack purchase',
-    detail: 'Eclipse Vault × 3',
-    amount: '−\$144.00',
-    incoming: false,
-    status: 'Completed'
-  ),
-  (
-    type: 'Card sale',
-    detail: 'Voidwing Ascendant',
-    amount: '+\$1,240.00',
-    incoming: true,
-    status: 'Completed'
-  ),
-  (
-    type: 'Deposit',
-    detail: 'Visa ···· 6411',
-    amount: '+\$250.00',
-    incoming: true,
-    status: 'Completed'
-  ),
-  (
-    type: 'Withdrawal',
-    detail: 'USDC · 0xA71c…4F2b',
-    amount: '−\$800.00',
-    incoming: false,
-    status: 'Pending'
-  ),
-  (
-    type: 'Reward',
-    detail: 'Weekly leaderboard · 4th',
-    amount: '+\$50.00',
-    incoming: true,
-    status: 'Completed'
-  ),
-];
+const List<
+  ({String type, String detail, String amount, bool incoming, String status})
+>
+_tx =
+    <
+      ({
+        String type,
+        String detail,
+        String amount,
+        bool incoming,
+        String status,
+      })
+    >[
+      (
+        type: 'Pack purchase',
+        detail: 'Eclipse Vault × 3',
+        amount: '−\$144.00',
+        incoming: false,
+        status: 'Completed',
+      ),
+      (
+        type: 'Card sale',
+        detail: 'Voidwing Ascendant',
+        amount: '+\$1,240.00',
+        incoming: true,
+        status: 'Completed',
+      ),
+      (
+        type: 'Deposit',
+        detail: 'Visa ···· 6411',
+        amount: '+\$250.00',
+        incoming: true,
+        status: 'Completed',
+      ),
+      (
+        type: 'Withdrawal',
+        detail: 'USDC · 0xA71c…4F2b',
+        amount: '−\$800.00',
+        incoming: false,
+        status: 'Pending',
+      ),
+      (
+        type: 'Reward',
+        detail: 'Weekly leaderboard · 4th',
+        amount: '+\$50.00',
+        incoming: true,
+        status: 'Completed',
+      ),
+    ];
 
 /* ── Page ────────────────────────────────────────────────────────────────── */
 
@@ -152,35 +163,35 @@ class _DataPageState extends State<DataPage> {
   /// *"The whole grid reloads together, ONE reveal rather than a stagger.
   /// Both are legal (§4); mixing them without deciding is what looks
   /// accidental."*
-  DsStatState _live = DsStatState.ready;
+  ElStatState _live = ElStatState.ready;
 
   void _reload() {
-    setState(() => _live = DsStatState.loading);
+    setState(() => _live = ElStatState.loading);
     Future<void>.delayed(_reloadWait, () {
-      if (mounted) setState(() => _live = DsStatState.ready);
+      if (mounted) setState(() => _live = ElStatState.ready);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final DsCategoryHit here = findCategory('base', 'data');
+    final ElCategoryHit here = findCategory('base', 'data');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        DsPageHeader(
+        ElPageHeader(
           // DRIFT 1.
           eyebrow: '${here.group.title} · Base',
           title: here.category.title,
           blurb: here.category.blurb,
           contents: here.category.contents,
         ),
-        const DsNote(
+        const ElNote(
           title: 'Charts are not on this page',
           child: _ChartsNoteBody(),
         ),
         // `className="mb-12"`.
-        SizedBox(height: ds(12)),
+        SizedBox(height: el(12)),
         const _TableSection(),
         const _DataTableSection(),
         const _BadgeSection(),
@@ -192,7 +203,7 @@ class _DataPageState extends State<DataPage> {
         const _SeparatorSection(),
         const _ApiSection(),
         const _RulesSection(),
-        const DsPageFootNav(groupId: 'base', slug: 'data'),
+        const ElPageFootNav(groupId: 'base', slug: 'data'),
       ],
     );
   }
@@ -206,9 +217,9 @@ class _Caption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-        padding: EdgeInsets.only(top: _captionGap),
-        child: DsText(text, DsType.small),
-      );
+    padding: EdgeInsets.only(top: _captionGap),
+    child: ElText(text, ElType.small),
+  );
 }
 
 /// The same, when the line carries an emphasis or a code chip.
@@ -220,39 +231,40 @@ class _RichCaption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-        padding: EdgeInsets.only(top: gap ?? _captionGap),
-        child: DsRichText(span, DsType.small),
-      );
+    padding: EdgeInsets.only(top: gap ?? _captionGap),
+    child: ElRichText(span, ElType.small),
+  );
 }
 
 /// An `<em>` inside a `.type-small` line.
 InlineSpan _em(String text) => TextSpan(
-      text: text,
-      style: const TextStyle(fontStyle: FontStyle.italic),
-    );
+  text: text,
+  style: const TextStyle(fontStyle: FontStyle.italic),
+);
 
 class _ChartsNoteBody extends StatelessWidget {
   const _ChartsNoteBody();
 
   @override
-  Widget build(BuildContext context) => DsRichText(
-        TextSpan(
-          children: <InlineSpan>[
-            DsCode.span('components/ui/chart.tsx'),
-            const TextSpan(text: ' and the five '),
-            DsCode.span('--chart-*'),
-            const TextSpan(text: ' tokens have a page to themselves: '),
-            DsCode.span('/design-system/components/base/charts'),
-            const TextSpan(
-              text: '. Every family is there: area, bar, line, pie, radar, '
-                  'radial: along with the one thing that could not live here, '
-                  'which is how a library that animates in JavaScript reads '
-                  'this system’s motion tokens instead of copying them.',
-            ),
-          ],
+  Widget build(BuildContext context) => ElRichText(
+    TextSpan(
+      children: <InlineSpan>[
+        ElCode.span('components/ui/chart.tsx'),
+        const TextSpan(text: ' and the five '),
+        ElCode.span('--chart-*'),
+        const TextSpan(text: ' tokens have a page to themselves: '),
+        ElCode.span('/design-system/components/base/charts'),
+        const TextSpan(
+          text:
+              '. Every family is there: area, bar, line, pie, radar, '
+              'radial: along with the one thing that could not live here, '
+              'which is how a library that animates in JavaScript reads '
+              'this system’s motion tokens instead of copying them.',
         ),
-        DsType.small,
-      );
+      ],
+    ),
+    ElType.small,
+  );
 }
 
 /* ── §1 · table ──────────────────────────────────────────────────────────── */
@@ -262,84 +274,87 @@ class _TableSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
 
-    return DsSection(
+    return ElSection(
       id: 'table',
       title: 'Table',
-      description: 'Transaction history and pull history. Every figure is '
+      description:
+          'Transaction history and pull history. Every figure is '
           'right-aligned and tabular so the decimal points form a column the '
           'eye can scan.',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          DsPanel(
+          ElPanel(
             label: 'Transaction history',
             flush: true,
-            child: DsTable(
+            child: ElTable(
               caption: 'Showing the 5 most recent transactions of 248.',
-              header: const <DsTableCellSpec>[
-                DsTableCellSpec(child: Text('Type')),
-                DsTableCellSpec(child: Text('Detail')),
-                DsTableCellSpec(child: Text('Amount'), align: DsTableAlign.end),
-                DsTableCellSpec(child: Text('Status'), align: DsTableAlign.end),
+              header: const <ElTableCellSpec>[
+                ElTableCellSpec(child: Text('Type')),
+                ElTableCellSpec(child: Text('Detail')),
+                ElTableCellSpec(child: Text('Amount'), align: ElTableAlign.end),
+                ElTableCellSpec(child: Text('Status'), align: ElTableAlign.end),
               ],
-              rows: <DsTableRowSpec>[
+              rows: <ElTableRowSpec>[
                 for (final ({
-                  String type,
-                  String detail,
-                  String amount,
-                  bool incoming,
-                  String status
-                }) row in _tx)
-                  DsTableRowSpec(
-                    cells: <DsTableCellSpec>[
-                      DsTableCellSpec(
+                      String type,
+                      String detail,
+                      String amount,
+                      bool incoming,
+                      String status,
+                    })
+                    row
+                    in _tx)
+                  ElTableRowSpec(
+                    cells: <ElTableCellSpec>[
+                      ElTableCellSpec(
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
-                            DsIcon.lucide(
+                            ElIcon.lucide(
                               row.incoming
-                                  ? DsLucide.arrowDownLeft
-                                  : DsLucide.arrowUpRight,
-                              size: DsIconSize.sm,
+                                  ? ElLucide.arrowDownLeft
+                                  : ElLucide.arrowUpRight,
+                              size: ElIconSize.sm,
                               tone: row.incoming
-                                  ? DsIconTone.success
-                                  : DsIconTone.subtle,
+                                  ? ElIconTone.success
+                                  : ElIconTone.subtle,
                             ),
-                            SizedBox(width: ds(2)),
-                            DsText(
+                            SizedBox(width: el(2)),
+                            ElText(
                               row.type,
-                              DsComponentType.textSm,
+                              ElComponentType.textSm,
                               color: theme.foreground,
                             ),
                           ],
                         ),
                       ),
-                      DsTableCellSpec(
-                        child: DsText(
+                      ElTableCellSpec(
+                        child: ElText(
                           row.detail,
-                          DsComponentType.textSm,
+                          ElComponentType.textSm,
                           color: theme.mutedForeground,
                         ),
                       ),
-                      DsTableCellSpec(
-                        align: DsTableAlign.end,
-                        child: DsText(
+                      ElTableCellSpec(
+                        align: ElTableAlign.end,
+                        child: ElText(
                           row.amount,
-                          DsType.numBase,
+                          ElType.numBase,
                           color: row.incoming
                               ? theme.valueInk
                               : theme.foreground,
                         ),
                       ),
-                      DsTableCellSpec(
-                        align: DsTableAlign.end,
-                        child: DsBadge(
+                      ElTableCellSpec(
+                        align: ElTableAlign.end,
+                        child: ElBadge(
                           label: row.status,
                           variant: row.status == 'Pending'
-                              ? DsBadgeVariant.warning
-                              : DsBadgeVariant.success,
+                              ? ElBadgeVariant.warning
+                              : ElBadgeVariant.success,
                         ),
                       ),
                     ],
@@ -349,7 +364,7 @@ class _TableSection extends StatelessWidget {
           ),
           // `className="mt-4"`.
           SizedBox(height: _panelGap),
-          const DsNote(
+          const ElNote(
             title: 'Money in versus money out',
             child: _MoneyNoteBody(),
           ),
@@ -363,28 +378,31 @@ class _MoneyNoteBody extends StatelessWidget {
   const _MoneyNoteBody();
 
   @override
-  Widget build(BuildContext context) => DsRichText(
-        TextSpan(
-          children: <InlineSpan>[
-            const TextSpan(
-              text: 'Direction is carried three ways at once: the sign on the '
-                  'number, the arrow glyph, and colour. Incoming takes the ',
-            ),
-            _em('value'),
-            const TextSpan(
-              text: ' ramp: money arriving is worth, which is what that ramp '
-                  'means: and outgoing is plain text. Never red for outgoing, '
-                  'because a purchase is not an error. Not ',
-            ),
-            DsCode.span('success'),
-            const TextSpan(
-              text: ' either: §1.5 keeps a completed sale from looking like a '
-                  'valuable one in the same row.',
-            ),
-          ],
+  Widget build(BuildContext context) => ElRichText(
+    TextSpan(
+      children: <InlineSpan>[
+        const TextSpan(
+          text:
+              'Direction is carried three ways at once: the sign on the '
+              'number, the arrow glyph, and colour. Incoming takes the ',
         ),
-        DsType.small,
-      );
+        _em('value'),
+        const TextSpan(
+          text:
+              ' ramp: money arriving is worth, which is what that ramp '
+              'means: and outgoing is plain text. Never red for outgoing, '
+              'because a purchase is not an error. Not ',
+        ),
+        ElCode.span('success'),
+        const TextSpan(
+          text:
+              ' either: §1.5 keeps a completed sale from looking like a '
+              'valuable one in the same row.',
+        ),
+      ],
+    ),
+    ElType.small,
+  );
 }
 
 /* ── §2 · data table ─────────────────────────────────────────────────────── */
@@ -393,134 +411,146 @@ class _DataTableSection extends StatelessWidget {
   const _DataTableSection();
 
   @override
-  Widget build(BuildContext context) => DsSection(
-        id: 'data-table',
-        title: 'Data Table',
-        description: 'Sorting, filtering, selection and pagination composed '
-            'over the Table above. shadcn ships this as a recipe rather than a '
-            'file, because the interesting part is always the column '
-            'definitions: and those belong to whatever is being listed.',
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            const DsPanel(
-              label: 'Sort a column, filter, select rows, page through',
-              child: DataTableDemo(),
+  Widget build(BuildContext context) => ElSection(
+    id: 'data-table',
+    title: 'Data Table',
+    description:
+        'Sorting, filtering, selection and pagination composed '
+        'over the Table above. shadcn ships this as a recipe rather than a '
+        'file, because the interesting part is always the column '
+        'definitions: and those belong to whatever is being listed.',
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        const ElPanel(
+          label: 'Sort a column, filter, select rows, page through',
+          child: DataTableDemo(),
+        ),
+        SizedBox(height: _wideGap),
+        const ElPanel(
+          label: 'Loading: skeleton rows on the real footprint',
+          child: DataTableDemo(loading: true),
+        ),
+        SizedBox(height: _wideGap),
+        const ElNote(
+          tone: ElNoteTone.value,
+          title: 'TanStack Table is pinned to v8, on purpose',
+          child: _PinnedNoteBody(),
+        ),
+        SizedBox(height: _wideGap),
+        const ElNote(
+          tone: ElNoteTone.value,
+          title: 'The two states a table demo always skips',
+          child: _SkippedNoteBody(),
+        ),
+        SizedBox(height: _wideGap),
+        ElMeta(
+          items: <ElMetaItem>[
+            (
+              k: 'useReactTable',
+              v: const TextSpan(
+                text:
+                    'The hook. Feed it data, columns and one get*RowModel '
+                    'per feature you want: core, sorted, filtered, '
+                    'paginated.',
+              ),
             ),
-            SizedBox(height: _wideGap),
-            const DsPanel(
-              label: 'Loading: skeleton rows on the real footprint',
-              child: DataTableDemo(loading: true),
+            (
+              k: 'flexRender',
+              v: const TextSpan(
+                text:
+                    'Renders a header or cell definition, whether it is a '
+                    'string, a component or a function.',
+              ),
             ),
-            SizedBox(height: _wideGap),
-            const DsNote(
-              tone: DsNoteTone.value,
-              title: 'TanStack Table is pinned to v8, on purpose',
-              child: _PinnedNoteBody(),
+            (
+              k: 'getRowId',
+              v: const TextSpan(
+                text:
+                    'Give it a stable id from your data. Without it '
+                    'selection is keyed by array index, and breaks the '
+                    'moment anything sorts.',
+              ),
             ),
-            SizedBox(height: _wideGap),
-            const DsNote(
-              tone: DsNoteTone.value,
-              title: 'The two states a table demo always skips',
-              child: _SkippedNoteBody(),
+            (
+              k: 'state + on…Change',
+              v: const TextSpan(
+                text:
+                    'Always a pair. A controlled slice handed in without '
+                    'its writer is read once and then ignored: the filter '
+                    'box types fine and never filters.',
+              ),
             ),
-            SizedBox(height: _wideGap),
-            DsMeta(
-              items: <DsMetaItem>[
-                (
-                  k: 'useReactTable',
-                  v: const TextSpan(
-                    text: 'The hook. Feed it data, columns and one get*RowModel '
-                        'per feature you want: core, sorted, filtered, '
-                        'paginated.',
-                  ),
-                ),
-                (
-                  k: 'flexRender',
-                  v: const TextSpan(
-                    text: 'Renders a header or cell definition, whether it is a '
-                        'string, a component or a function.',
-                  ),
-                ),
-                (
-                  k: 'getRowId',
-                  v: const TextSpan(
-                    text: 'Give it a stable id from your data. Without it '
-                        'selection is keyed by array index, and breaks the '
-                        'moment anything sorts.',
-                  ),
-                ),
-                (
-                  k: 'state + on…Change',
-                  v: const TextSpan(
-                    text: 'Always a pair. A controlled slice handed in without '
-                        'its writer is read once and then ignored: the filter '
-                        'box types fine and never filters.',
-                  ),
-                ),
-                (
-                  k: 'aria-sort',
-                  v: const TextSpan(
-                    text: 'On the TableHead, not on the button. The trigger '
-                        'inside it is a real <button> so sorting is reachable '
-                        'by keyboard.',
-                  ),
-                ),
-              ],
+            (
+              k: 'aria-sort',
+              v: const TextSpan(
+                text:
+                    'On the TableHead, not on the button. The trigger '
+                    'inside it is a real <button> so sorting is reachable '
+                    'by keyboard.',
+              ),
             ),
           ],
         ),
-      );
+      ],
+    ),
+  );
 }
 
 class _PinnedNoteBody extends StatelessWidget {
   const _PinnedNoteBody();
 
   @override
-  Widget build(BuildContext context) => DsRichText(
-        TextSpan(
-          children: <InlineSpan>[
-            const TextSpan(
-              text: 'Data Table is the one shadcn entry that is not a file you '
-                  'own: it is a recipe driving ',
-            ),
-            DsCode.span('@tanstack/react-table'),
-            const TextSpan(
-              text: ', a separate library on its own release schedule. That '
-                  'library has a v9 which is a full API rewrite, and under it '
-                  'not one line of shadcn’s published example compiles. So the '
-                  'dependency is pinned to v8: the version their docs are '
-                  'written against, which means the code on their site pastes '
-                  'in here and works. Treat the pin as load-bearing.',
-            ),
-          ],
+  Widget build(BuildContext context) => ElRichText(
+    TextSpan(
+      children: <InlineSpan>[
+        const TextSpan(
+          text:
+              'Data Table is the one shadcn entry that is not a file you '
+              'own: it is a recipe driving ',
         ),
-        DsType.small,
-      );
+        ElCode.span('@tanstack/react-table'),
+        const TextSpan(
+          text:
+              ', a separate library on its own release schedule. That '
+              'library has a v9 which is a full API rewrite, and under it '
+              'not one line of shadcn’s published example compiles. So the '
+              'dependency is pinned to v8: the version their docs are '
+              'written against, which means the code on their site pastes '
+              'in here and works. Treat the pin as load-bearing.',
+        ),
+      ],
+    ),
+    ElType.small,
+  );
 }
 
 class _SkippedNoteBody extends StatelessWidget {
   const _SkippedNoteBody();
 
   @override
-  Widget build(BuildContext context) => DsRichText(
-        TextSpan(
-          children: <InlineSpan>[
-            const TextSpan(text: 'Filter this table down to nothing and you '
-                'get an '),
-            DsCode.span('Empty'),
-            const TextSpan(
-              text: ' with a way back out, not a blank rectangle. The second '
-                  'panel is the loading state: skeleton rows carrying the same '
-                  'cell count, padding and height as real ones, so nothing '
-                  'moves when the data lands. A generic grey block here would '
-                  'be a layout jump, which is worse than the spinner it was '
-                  'meant to avoid.',
-            ),
-          ],
+  Widget build(BuildContext context) => ElRichText(
+    TextSpan(
+      children: <InlineSpan>[
+        const TextSpan(
+          text:
+              'Filter this table down to nothing and you '
+              'get an ',
         ),
-        DsType.small,
-      );
+        ElCode.span('Empty'),
+        const TextSpan(
+          text:
+              ' with a way back out, not a blank rectangle. The second '
+              'panel is the loading state: skeleton rows carrying the same '
+              'cell count, padding and height as real ones, so nothing '
+              'moves when the data lands. A generic grey block here would '
+              'be a layout jump, which is worse than the spinner it was '
+              'meant to avoid.',
+        ),
+      ],
+    ),
+    ElType.small,
+  );
 }
 
 /* ── §3 · badge ──────────────────────────────────────────────────────────── */
@@ -529,95 +559,109 @@ class _BadgeSection extends StatelessWidget {
   const _BadgeSection();
 
   @override
-  Widget build(BuildContext context) => DsSection(
-        id: 'badge',
-        title: 'Badge',
-        description: 'Short status and category labels. Five semantic variants '
-            'were added to the stock set so badges can carry the product’s own '
-            'meanings.',
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            const DsPanel(
-              label: 'Variants',
-              child: DsRow(
+  Widget build(BuildContext context) => ElSection(
+    id: 'badge',
+    title: 'Badge',
+    description:
+        'Short status and category labels. Five semantic variants '
+        'were added to the stock set so badges can carry the product’s own '
+        'meanings.',
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        const ElPanel(
+          label: 'Variants',
+          child: ElRow(
+            children: <Widget>[
+              ElBadge(label: 'Default'),
+              ElBadge(label: 'Selected', variant: ElBadgeVariant.action),
+              ElBadge(label: 'Featured', variant: ElBadgeVariant.premium),
+              ElBadge(label: '6 Cards', variant: ElBadgeVariant.secondary),
+              ElBadge(label: 'Limited', variant: ElBadgeVariant.outline),
+              ElBadge(label: 'Available', variant: ElBadgeVariant.success),
+              ElBadge(label: 'Low supply', variant: ElBadgeVariant.warning),
+              ElBadge(label: 'New set', variant: ElBadgeVariant.info),
+              ElBadge(label: 'Sold out', variant: ElBadgeVariant.destructive),
+              ElBadge(label: 'Draft', variant: ElBadgeVariant.ghost),
+            ],
+          ),
+        ),
+        SizedBox(height: _panelGap),
+        ElPanel(
+          label: 'With glyphs',
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              const ElRow(
                 children: <Widget>[
-                  DsBadge(label: 'Default'),
-                  DsBadge(label: 'Selected', variant: DsBadgeVariant.action),
-                  DsBadge(label: 'Featured', variant: DsBadgeVariant.premium),
-                  DsBadge(label: '6 Cards', variant: DsBadgeVariant.secondary),
-                  DsBadge(label: 'Limited', variant: DsBadgeVariant.outline),
-                  DsBadge(label: 'Available', variant: DsBadgeVariant.success),
-                  DsBadge(label: 'Low supply', variant: DsBadgeVariant.warning),
-                  DsBadge(label: 'New set', variant: DsBadgeVariant.info),
-                  DsBadge(
-                    label: 'Sold out',
-                    variant: DsBadgeVariant.destructive,
+                  ElBadge(
+                    label: 'Featured',
+                    variant: ElBadgeVariant.premium,
+                    glyph: ElIcon.lucide(
+                      ElLucide.star,
+                      size: ElIconSize.xs,
+                      tone: ElIconTone.inherit,
+                    ),
                   ),
-                  DsBadge(label: 'Draft', variant: DsBadgeVariant.ghost),
-                ],
-              ),
-            ),
-            SizedBox(height: _panelGap),
-            DsPanel(
-              label: 'With glyphs',
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  const DsRow(
-                    children: <Widget>[
-                      DsBadge(
-                        label: 'Featured',
-                        variant: DsBadgeVariant.premium,
-                        glyph: DsIcon.lucide(DsLucide.star,
-                            size: DsIconSize.xs, tone: DsIconTone.inherit),
-                      ),
-                      DsBadge(
-                        label: 'Hot',
-                        variant: DsBadgeVariant.destructive,
-                        glyph: DsIcon.lucide(DsLucide.flame,
-                            size: DsIconSize.xs, tone: DsIconTone.inherit),
-                      ),
-                      DsBadge(
-                        label: 'New',
-                        variant: DsBadgeVariant.action,
-                        glyph: DsIcon.lucide(DsLucide.zap,
-                            size: DsIconSize.xs, tone: DsIconTone.inherit),
-                      ),
-                      DsBadge(
-                        label: 'Legendary hit',
-                        variant: DsBadgeVariant.premium,
-                        glyph: DsIcon.lucide(DsLucide.crown,
-                            size: DsIconSize.xs, tone: DsIconTone.inherit),
-                      ),
-                      DsBadge(
-                        label: 'Verified',
-                        variant: DsBadgeVariant.success,
-                        glyph: DsIcon.lucide(DsLucide.shieldCheck,
-                            size: DsIconSize.xs, tone: DsIconTone.inherit),
-                      ),
-                    ],
+                  ElBadge(
+                    label: 'Hot',
+                    variant: ElBadgeVariant.destructive,
+                    glyph: ElIcon.lucide(
+                      ElLucide.flame,
+                      size: ElIconSize.xs,
+                      tone: ElIconTone.inherit,
+                    ),
                   ),
-                  _RichCaption(
-                    TextSpan(
-                      children: <InlineSpan>[
-                        const TextSpan(text: 'Rank and tier badges are '),
-                        _em('not'),
-                        const TextSpan(
-                          text: ' here. Anything that carries product meaning, '
-                              'a pip count, a scarcity step: belongs to the '
-                              'product that means it, built on top of this '
-                              'Badge rather than added to it.',
-                        ),
-                      ],
+                  ElBadge(
+                    label: 'New',
+                    variant: ElBadgeVariant.action,
+                    glyph: ElIcon.lucide(
+                      ElLucide.zap,
+                      size: ElIconSize.xs,
+                      tone: ElIconTone.inherit,
+                    ),
+                  ),
+                  ElBadge(
+                    label: 'Legendary hit',
+                    variant: ElBadgeVariant.premium,
+                    glyph: ElIcon.lucide(
+                      ElLucide.crown,
+                      size: ElIconSize.xs,
+                      tone: ElIconTone.inherit,
+                    ),
+                  ),
+                  ElBadge(
+                    label: 'Verified',
+                    variant: ElBadgeVariant.success,
+                    glyph: ElIcon.lucide(
+                      ElLucide.shieldCheck,
+                      size: ElIconSize.xs,
+                      tone: ElIconTone.inherit,
                     ),
                   ),
                 ],
               ),
-            ),
-          ],
+              _RichCaption(
+                TextSpan(
+                  children: <InlineSpan>[
+                    const TextSpan(text: 'Rank and tier badges are '),
+                    _em('not'),
+                    const TextSpan(
+                      text:
+                          ' here. Anything that carries product meaning, '
+                          'a pip count, a scarcity step: belongs to the '
+                          'product that means it, built on top of this '
+                          'Badge rather than added to it.',
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
-      );
+      ],
+    ),
+  );
 }
 
 /* ── §4 · avatar ─────────────────────────────────────────────────────────── */
@@ -627,51 +671,53 @@ class _AvatarSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
 
-    return DsSection(
+    return ElSection(
       id: 'avatar',
       title: 'Avatar',
-      description: 'Collectors on live pulls and the leaderboard. Initials are '
+      description:
+          'Collectors on live pulls and the leaderboard. Initials are '
           'the fallback, and the verified tick is an AvatarBadge rather than a '
           'separate element.',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          DsPanel(
+          ElPanel(
             label: 'Sizes and states',
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                DsRow(
-                  align: DsRowAlign.center,
+                ElRow(
+                  align: ElRowAlign.center,
                   children: <Widget>[
                     // `className="size-6"` with `.type-caption` on the
                     // fallback: the class beats the class, twice.
-                    DsAvatar(
+                    ElAvatar(
                       fallback: 'VW',
-                      sizePx: ds(6),
-                      fallbackSpec: DsComponentType.avatarInitials,
+                      sizePx: el(6),
+                      fallbackSpec: ElComponentType.avatarInitials,
                     ),
-                    DsAvatar(
+                    ElAvatar(
                       fallback: 'VW',
-                      sizePx: ds(8),
-                      fallbackSpec: DsComponentType.avatarFallback,
+                      sizePx: el(8),
+                      fallbackSpec: ElComponentType.avatarFallback,
                     ),
-                    DsAvatar(fallback: 'VW', sizePx: ds(10)),
-                    DsAvatar(fallback: 'VW', sizePx: ds(12)),
-                    DsAvatar(
+                    ElAvatar(fallback: 'VW', sizePx: el(10)),
+                    ElAvatar(fallback: 'VW', sizePx: el(12)),
+                    ElAvatar(
                       fallback: 'VW',
-                      sizePx: ds(10),
-                      badge: DsAvatarBadge(fill: DsPalette.value),
+                      sizePx: el(10),
+                      badge: ElAvatarBadge(fill: ElPalette.value),
                     ),
-                    DsAvatar(
+                    ElAvatar(
                       fallback: '#1',
-                      sizePx: ds(10),
+                      sizePx: el(10),
                       // `ring-2 ring-value`, *"one of lime's permitted jobs."*
-                      ring: (color: DsPalette.value, width: dsAvatarRingWidth),
-                      fallbackFill:
-                          DsPalette.value.withValues(alpha: _valueTint),
+                      ring: (color: ElPalette.value, width: elAvatarRingWidth),
+                      fallbackFill: ElPalette.value.withValues(
+                        alpha: _valueTint,
+                      ),
                       fallbackInk: theme.valueInk,
                     ),
                   ],
@@ -684,19 +730,24 @@ class _AvatarSection extends StatelessWidget {
             ),
           ),
           SizedBox(height: _panelGap),
-          DsPanel(
+          ElPanel(
             label: 'Avatar group: who opened this pack',
             child: Builder(
-              builder: (BuildContext context) => DsAvatarGroup(
+              builder: (BuildContext context) => ElAvatarGroup(
                 children: <Widget>[
-                  for (final String initials in <String>['VW', 'EM', 'TC', 'SW'])
-                    DsAvatar(
+                  for (final String initials in <String>[
+                    'VW',
+                    'EM',
+                    'TC',
+                    'SW',
+                  ])
+                    ElAvatar(
                       fallback: initials,
-                      sizePx: ds(8),
-                      fallbackSpec: DsComponentType.avatarFallback,
-                      ring: DsAvatarGroup.ringOf(context),
+                      sizePx: el(8),
+                      fallbackSpec: ElComponentType.avatarFallback,
+                      ring: ElAvatarGroup.ringOf(context),
                     ),
-                  const DsAvatarGroupCount('+248'),
+                  const ElAvatarGroupCount('+248'),
                 ],
               ),
             ),
@@ -717,51 +768,52 @@ class _CardSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
 
-    return DsSection(
+    return ElSection(
       id: 'card',
       title: 'Card',
-      description: 'The generic container. A product builds its own richer '
+      description:
+          'The generic container. A product builds its own richer '
           'cards on top of this one rather than forking it, so a token change '
           'still reaches them.',
       // `<div className="grid gap-4 md:grid-cols-2">`.
-      child: DsGrid(
+      child: ElGrid(
         md: 2,
         children: <Widget>[
-          DsPanel(
+          ElPanel(
             label: 'Card with action',
-            child: DsCard(
+            child: ElCard(
               children: <Widget>[
-                const DsCardHeader(
-                  title: DsCardTitle('Weekly competition'),
-                  description: DsCardDescription(
+                const ElCardHeader(
+                  title: ElCardTitle('Weekly competition'),
+                  description: ElCardDescription(
                     'Ends in 2 days, 14 hours. Top 100 collectors share the '
                     'pool.',
                   ),
-                  action: DsBadge(
+                  action: ElBadge(
                     label: 'Live',
-                    variant: DsBadgeVariant.premium,
+                    variant: ElBadgeVariant.premium,
                   ),
                 ),
-                DsCardContent(
+                ElCardContent(
                   // `flex items-baseline justify-between`.
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.baseline,
                     textBaseline: TextBaseline.alphabetic,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      DsText('Prize pool', DsType.label),
-                      DsText(
+                      ElText('Prize pool', ElType.label),
+                      ElText(
                         r'$24,000.00',
-                        DsType.numMd,
+                        ElType.numMd,
                         color: theme.valueInk,
                       ),
                     ],
                   ),
                 ),
-                DsCardFooter(
-                  child: DsButton(
+                ElCardFooter(
+                  child: ElButton(
                     expanded: true,
                     onPressed: () {},
                     child: const Text('View Leaderboard'),
@@ -770,37 +822,37 @@ class _CardSection extends StatelessWidget {
               ],
             ),
           ),
-          DsPanel(
+          ElPanel(
             label: 'Card with figures',
-            child: DsCard(
+            child: ElCard(
               children: <Widget>[
-                const DsCardHeader(
-                  title: DsCardTitle('Your collection'),
-                  description: DsCardDescription('Across 8 card sets.'),
+                const ElCardHeader(
+                  title: ElCardTitle('Your collection'),
+                  description: ElCardDescription('Across 8 card sets.'),
                 ),
-                DsCardContent(
+                ElCardContent(
                   // `grid grid-cols-2 gap-5`.
-                  child: DsGrid(
+                  child: ElGrid(
                     base: 2,
-                    gap: ds(5),
+                    gap: el(5),
                     children: <Widget>[
                       for (final ({String k, String v}) figure
                           in const <({String k, String v})>[
-                        (k: 'Total value', v: r'$12,480.65'),
-                        (k: 'Cards owned', v: '1,284'),
-                        (k: 'Packs opened', v: '412'),
-                        (k: 'Best pull', v: r'$4,900.00'),
-                      ])
+                            (k: 'Total value', v: r'$12,480.65'),
+                            (k: 'Cards owned', v: '1,284'),
+                            (k: 'Packs opened', v: '412'),
+                            (k: 'Best pull', v: r'$4,900.00'),
+                          ])
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
-                            DsText(figure.k, DsType.label),
+                            ElText(figure.k, ElType.label),
                             // `mt-1.5`.
-                            SizedBox(height: ds(1.5)),
-                            DsText(
+                            SizedBox(height: el(1.5)),
+                            ElText(
                               figure.v,
-                              DsType.numMd,
+                              ElType.numMd,
                               color: theme.foreground,
                             ),
                           ],
@@ -820,32 +872,32 @@ class _CardSection extends StatelessWidget {
 /* ── §6 · stat ───────────────────────────────────────────────────────────── */
 
 /// The three figures the Anatomy and colour-blindness panels repeat.
-const DsStatDelta _up = (value: '8.2%', direction: DsStatDirection.up);
-const DsStatDelta _refund = (value: '0.3%', direction: DsStatDirection.up);
-const DsStatDelta _flat = (value: '0.0%', direction: DsStatDirection.flat);
-const DsStatDelta _down = (value: '4.1%', direction: DsStatDirection.down);
+const ElStatDelta _up = (value: '8.2%', direction: ElStatDirection.up);
+const ElStatDelta _refund = (value: '0.3%', direction: ElStatDirection.up);
+const ElStatDelta _flat = (value: '0.0%', direction: ElStatDirection.flat);
+const ElStatDelta _down = (value: '4.1%', direction: ElStatDirection.down);
 
 class _StatSection extends StatelessWidget {
   const _StatSection({required this.live, required this.onReload});
 
-  final DsStatState live;
+  final ElStatState live;
   final VoidCallback onReload;
 
-  static const DsStat _revenue = DsStat(
+  static const ElStat _revenue = ElStat(
     label: 'Revenue',
     value: r'$12,480',
     delta: _up,
     hint: 'vs last month',
   );
 
-  static const DsStat _withdrawals = DsStat(
+  static const ElStat _withdrawals = ElStat(
     label: 'Withdrawals',
     value: r'$3,120',
     delta: _down,
     hint: 'vs last month',
   );
 
-  static const DsStat _packs = DsStat(
+  static const ElStat _packs = ElStat(
     label: 'Packs opened',
     value: '412',
     delta: _flat,
@@ -853,337 +905,340 @@ class _StatSection extends StatelessWidget {
   );
 
   @override
-  Widget build(BuildContext context) => DsSection(
-        id: 'stat',
-        title: 'Stat',
-        description: 'A labelled figure, an optional delta against a previous '
-            'period, and an optional trailing hint. It draws no container of '
-            'its own, so it composes into a Card, a Panel, a table cell or a '
-            'page header without a second surface appearing inside the first.',
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+  Widget build(BuildContext context) => ElSection(
+    id: 'stat',
+    title: 'Stat',
+    description:
+        'A labelled figure, an optional delta against a previous '
+        'period, and an optional trailing hint. It draws no container of '
+        'its own, so it composes into a Card, a Panel, a table cell or a '
+        'page header without a second surface appearing inside the first.',
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        ElPanel(
+          label: 'Anatomy',
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              ElGrid(
+                sm: 3,
+                gap: el(8),
+                children: const <Widget>[
+                  _revenue,
+                  ElStat(
+                    label: 'Refund rate',
+                    value: '1.4%',
+                    delta: _refund,
+                    betterWhen: ElStatDirection.down,
+                    hint: 'vs last month',
+                  ),
+                  _packs,
+                ],
+              ),
+              _RichCaption(
+                TextSpan(
+                  children: <InlineSpan>[
+                    const TextSpan(text: 'The middle one is rising and is '),
+                    _em('not'),
+                    const TextSpan(
+                      text:
+                          ' good news. Refund rate, churn and latency all '
+                          'improve by falling, so ',
+                    ),
+                    ElCode.span('betterWhen="down"'),
+                    const TextSpan(
+                      text:
+                          ' flips which direction earns the green. '
+                          'Without it a component that colours every '
+                          'up-arrow green tells a lie by default.',
+                    ),
+                  ],
+                ),
+                gap: _wideGap,
+              ),
+            ],
+          ),
+        ),
+        SizedBox(height: _panelGap),
+        ElPanel(
+          label: 'Direction survives colour blindness',
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              // `space-y-6`.
+              ElGrid(
+                sm: 3,
+                gap: el(8),
+                children: const <Widget>[_revenue, _withdrawals, _packs],
+              ),
+              SizedBox(height: _markerGap),
+              const ElSeparator(),
+              SizedBox(height: _markerGap),
+              ColorFiltered(
+                colorFilter: _grayscale,
+                child: ElGrid(
+                  sm: 3,
+                  gap: el(8),
+                  children: const <Widget>[_revenue, _withdrawals, _packs],
+                ),
+              ),
+              SizedBox(height: _wideGap),
+              const ElNote(
+                title: 'A coloured arrow is one signal',
+                child: _OneSignalBody(),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(height: _panelGap),
+        ElPanel(
+          label:
+              'The delta on its own, for a cell that already has a '
+              'header',
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              const _DeltaCellTable(),
+              _RichCaption(
+                TextSpan(
+                  children: <InlineSpan>[
+                    const TextSpan(
+                      text:
+                          'A table gives its columns '
+                          'headers, so a whole ',
+                    ),
+                    ElCode.span('Stat'),
+                    const TextSpan(
+                      text:
+                          ' in a revenue cell would print “Revenue” once '
+                          'per row under a heading that already says it. ',
+                    ),
+                    ElCode.span('StatDeltaMark'),
+                    const TextSpan(text: ' is the same mark '),
+                    ElCode.span('Stat'),
+                    const TextSpan(
+                      text:
+                          ' draws, exported so the cell composes it '
+                          'instead of redrawing an arrow and a sign of its '
+                          'own: which would be a fork every guard here '
+                          'stays green on. The two columns above move in '
+                          'the ',
+                    ),
+                    _em('same'),
+                    const TextSpan(
+                      text: ' direction and only one of them is good news; ',
+                    ),
+                    ElCode.span('betterWhen'),
+                    const TextSpan(
+                      text:
+                          ' is required rather than defaulted on the bare '
+                          'mark, because a caller reaching past ',
+                    ),
+                    ElCode.span('Stat'),
+                    const TextSpan(
+                      text: ' for it is already thinking about direction.',
+                    ),
+                  ],
+                ),
+                gap: _wideGap,
+              ),
+            ],
+          ),
+        ),
+        SizedBox(height: _panelGap),
+        const ElStateGrid(
+          cols: 5,
           children: <Widget>[
-            DsPanel(
-              label: 'Anatomy',
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  DsGrid(
-                    sm: 3,
-                    gap: ds(8),
-                    children: const <Widget>[
-                      _revenue,
-                      DsStat(
-                        label: 'Refund rate',
-                        value: '1.4%',
-                        delta: _refund,
-                        betterWhen: DsStatDirection.down,
-                        hint: 'vs last month',
-                      ),
-                      _packs,
-                    ],
-                  ),
-                  _RichCaption(
-                    TextSpan(
-                      children: <InlineSpan>[
-                        const TextSpan(
-                          text: 'The middle one is rising and is ',
-                        ),
-                        _em('not'),
-                        const TextSpan(
-                          text: ' good news. Refund rate, churn and latency all '
-                              'improve by falling, so ',
-                        ),
-                        DsCode.span('betterWhen="down"'),
-                        const TextSpan(
-                          text: ' flips which direction earns the green. '
-                              'Without it a component that colours every '
-                              'up-arrow green tells a lie by default.',
-                        ),
-                      ],
-                    ),
-                    gap: _wideGap,
-                  ),
-                ],
+            ElStateCell(
+              label: 'rest',
+              note: 'the figure has landed',
+              child: _revenue,
+            ),
+            ElStateCell(
+              label: 'loading',
+              note: 'skeleton, same footprint',
+              child: ElStat(
+                label: 'Revenue',
+                value: r'$12,480',
+                delta: _up,
+                hint: 'vs last month',
+                state: ElStatState.loading,
               ),
             ),
-            SizedBox(height: _panelGap),
-            DsPanel(
-              label: 'Direction survives colour blindness',
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  // `space-y-6`.
-                  DsGrid(
-                    sm: 3,
-                    gap: ds(8),
-                    children: const <Widget>[_revenue, _withdrawals, _packs],
-                  ),
-                  SizedBox(height: _markerGap),
-                  const DsSeparator(),
-                  SizedBox(height: _markerGap),
-                  ColorFiltered(
-                    colorFilter: _grayscale,
-                    child: DsGrid(
-                      sm: 3,
-                      gap: ds(8),
-                      children: const <Widget>[
-                        _revenue,
-                        _withdrawals,
-                        _packs,
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: _wideGap),
-                  const DsNote(
-                    title: 'A coloured arrow is one signal',
-                    child: _OneSignalBody(),
-                  ),
-                ],
+            ElStateCell(
+              label: 'error',
+              note: 'what failed',
+              child: ElStat(
+                label: 'Revenue',
+                value: r'$12,480',
+                delta: _up,
+                state: ElStatState.error,
+                message: 'Could not load',
               ),
             ),
-            SizedBox(height: _panelGap),
-            DsPanel(
-              label: 'The delta on its own, for a cell that already has a '
-                  'header',
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  const _DeltaCellTable(),
-                  _RichCaption(
-                    TextSpan(
-                      children: <InlineSpan>[
-                        const TextSpan(text: 'A table gives its columns '
-                            'headers, so a whole '),
-                        DsCode.span('Stat'),
-                        const TextSpan(
-                          text: ' in a revenue cell would print “Revenue” once '
-                              'per row under a heading that already says it. ',
-                        ),
-                        DsCode.span('StatDeltaMark'),
-                        const TextSpan(
-                          text: ' is the same mark ',
-                        ),
-                        DsCode.span('Stat'),
-                        const TextSpan(
-                          text: ' draws, exported so the cell composes it '
-                              'instead of redrawing an arrow and a sign of its '
-                              'own: which would be a fork every guard here '
-                              'stays green on. The two columns above move in '
-                              'the ',
-                        ),
-                        _em('same'),
-                        const TextSpan(
-                          text: ' direction and only one of them is good news; ',
-                        ),
-                        DsCode.span('betterWhen'),
-                        const TextSpan(
-                          text: ' is required rather than defaulted on the bare '
-                              'mark, because a caller reaching past ',
-                        ),
-                        DsCode.span('Stat'),
-                        const TextSpan(
-                          text: ' for it is already thinking about direction.',
-                        ),
-                      ],
-                    ),
-                    gap: _wideGap,
-                  ),
-                ],
+            ElStateCell(
+              label: 'empty',
+              note: 'why there is nothing',
+              child: ElStat(
+                label: 'Revenue',
+                value: r'$12,480',
+                delta: _up,
+                state: ElStatState.empty,
+                message: 'No sales this period',
               ),
             ),
-            SizedBox(height: _panelGap),
-            const DsStateGrid(
-              cols: 5,
-              children: <Widget>[
-                DsStateCell(
-                  label: 'rest',
-                  note: 'the figure has landed',
-                  child: _revenue,
-                ),
-                DsStateCell(
-                  label: 'loading',
-                  note: 'skeleton, same footprint',
-                  child: DsStat(
-                    label: 'Revenue',
-                    value: r'$12,480',
-                    delta: _up,
-                    hint: 'vs last month',
-                    state: DsStatState.loading,
-                  ),
-                ),
-                DsStateCell(
-                  label: 'error',
-                  note: 'what failed',
-                  child: DsStat(
-                    label: 'Revenue',
-                    value: r'$12,480',
-                    delta: _up,
-                    state: DsStatState.error,
-                    message: 'Could not load',
-                  ),
-                ),
-                DsStateCell(
-                  label: 'empty',
-                  note: 'why there is nothing',
-                  child: DsStat(
-                    label: 'Revenue',
-                    value: r'$12,480',
-                    delta: _up,
-                    state: DsStatState.empty,
-                    message: 'No sales this period',
-                  ),
-                ),
-                DsStateCell(
-                  label: 'disabled',
-                  note: 'opacity-45, aria-disabled',
-                  child: DsStat(
-                    label: 'Revenue',
-                    value: r'$12,480',
-                    delta: _up,
-                    hint: 'vs last month',
-                    disabled: true,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: _panelGap),
-            DsPanel(
-              label: 'Loading, live',
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  DsGrid(
-                    sm: 4,
-                    gap: ds(8),
-                    children: <Widget>[
-                      DsStat(
-                        label: 'Revenue',
-                        value: r'$12,480',
-                        delta: _up,
-                        hint: 'vs last month',
-                        state: live,
-                      ),
-                      DsStat(
-                        label: 'Refund rate',
-                        value: '1.4%',
-                        delta: _refund,
-                        betterWhen: DsStatDirection.down,
-                        hint: 'vs last month',
-                        state: live,
-                      ),
-                      DsStat(
-                        label: 'Packs opened',
-                        value: '412',
-                        delta: _flat,
-                        hint: 'vs last month',
-                        state: live,
-                      ),
-                      DsStat(
-                        label: 'Card sets',
-                        value: '8',
-                        hint: 'no comparison',
-                        state: live,
-                      ),
-                    ],
-                  ),
-                  // `<Row className="mt-8">`.
-                  SizedBox(height: ds(8)),
-                  DsRow(
-                    children: <Widget>[
-                      DsButton(
-                        variant: DsButtonVariant.secondary,
-                        onPressed:
-                            live == DsStatState.loading ? null : onReload,
-                        child: const Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            DsIcon.lucide(
-                              DsLucide.rotateCcw,
-                              size: DsIconSize.md,
-                              tone: DsIconTone.inherit,
-                            ),
-                            _ButtonGap(),
-                            Text('Reload Figures'),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  _RichCaption(
-                    TextSpan(
-                      children: <InlineSpan>[
-                        const TextSpan(
-                          text: 'Only the figure and the delta are skeletons. '
-                              'The label and the hint are chrome you already '
-                              'know before the request returns, so they stay '
-                              'real text: which is also what makes the '
-                              'footprint provably identical in both states '
-                              'rather than approximately so. The last stat has '
-                              'no delta and reserves no delta line, in either '
-                              'state. The swap is ',
-                        ),
-                        _em('one'),
-                        const TextSpan(text: ' event: '),
-                        DsCode.span('anim-swap-in'),
-                        const TextSpan(
-                          text: ' on the arriving figure, never a fade out '
-                              'followed by a fade in.',
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: _panelGap),
-            DsPanel(
-              label: 'When a stat navigates',
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  const DsGrid(
-                    sm: 2,
-                    lg: 3,
-                    children: <Widget>[_NavigatingStat()],
-                  ),
-                  _RichCaption(
-                    TextSpan(
-                      children: <InlineSpan>[
-                        const TextSpan(
-                          text: 'A Stat is not a control and carries no hover, '
-                              'focus or pressed state of its own: applying one '
-                              'would promise an affordance that is not there. '
-                              'When a figure navigates, the ',
-                        ),
-                        _em('wrapper'),
-                        const TextSpan(
-                          text: ' is the control: it takes the surface change '
-                              'on hover, the global focus ring, and ',
-                        ),
-                        DsCode.span('press-spring'),
-                        const TextSpan(text: ' for the press. One transform '
-                            'utility, not two, '),
-                        DsCode.span('lift'),
-                        const TextSpan(text: ' and '),
-                        DsCode.span('press-spring'),
-                        const TextSpan(
-                          text: ' both write the whole ',
-                        ),
-                        DsCode.span('transition'),
-                        const TextSpan(
-                          text: ' shorthand, and §4 is explicit that which one '
-                              'wins is not something to rely on.',
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+            ElStateCell(
+              label: 'disabled',
+              note: 'opacity-45, aria-disabled',
+              child: ElStat(
+                label: 'Revenue',
+                value: r'$12,480',
+                delta: _up,
+                hint: 'vs last month',
+                disabled: true,
               ),
             ),
           ],
         ),
-      );
+        SizedBox(height: _panelGap),
+        ElPanel(
+          label: 'Loading, live',
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              ElGrid(
+                sm: 4,
+                gap: el(8),
+                children: <Widget>[
+                  ElStat(
+                    label: 'Revenue',
+                    value: r'$12,480',
+                    delta: _up,
+                    hint: 'vs last month',
+                    state: live,
+                  ),
+                  ElStat(
+                    label: 'Refund rate',
+                    value: '1.4%',
+                    delta: _refund,
+                    betterWhen: ElStatDirection.down,
+                    hint: 'vs last month',
+                    state: live,
+                  ),
+                  ElStat(
+                    label: 'Packs opened',
+                    value: '412',
+                    delta: _flat,
+                    hint: 'vs last month',
+                    state: live,
+                  ),
+                  ElStat(
+                    label: 'Card sets',
+                    value: '8',
+                    hint: 'no comparison',
+                    state: live,
+                  ),
+                ],
+              ),
+              // `<Row className="mt-8">`.
+              SizedBox(height: el(8)),
+              ElRow(
+                children: <Widget>[
+                  ElButton(
+                    variant: ElButtonVariant.secondary,
+                    onPressed: live == ElStatState.loading ? null : onReload,
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        ElIcon.lucide(
+                          ElLucide.rotateCcw,
+                          size: ElIconSize.md,
+                          tone: ElIconTone.inherit,
+                        ),
+                        _ButtonGap(),
+                        Text('Reload Figures'),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              _RichCaption(
+                TextSpan(
+                  children: <InlineSpan>[
+                    const TextSpan(
+                      text:
+                          'Only the figure and the delta are skeletons. '
+                          'The label and the hint are chrome you already '
+                          'know before the request returns, so they stay '
+                          'real text: which is also what makes the '
+                          'footprint provably identical in both states '
+                          'rather than approximately so. The last stat has '
+                          'no delta and reserves no delta line, in either '
+                          'state. The swap is ',
+                    ),
+                    _em('one'),
+                    const TextSpan(text: ' event: '),
+                    ElCode.span('anim-swap-in'),
+                    const TextSpan(
+                      text:
+                          ' on the arriving figure, never a fade out '
+                          'followed by a fade in.',
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(height: _panelGap),
+        ElPanel(
+          label: 'When a stat navigates',
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              const ElGrid(sm: 2, lg: 3, children: <Widget>[_NavigatingStat()]),
+              _RichCaption(
+                TextSpan(
+                  children: <InlineSpan>[
+                    const TextSpan(
+                      text:
+                          'A Stat is not a control and carries no hover, '
+                          'focus or pressed state of its own: applying one '
+                          'would promise an affordance that is not there. '
+                          'When a figure navigates, the ',
+                    ),
+                    _em('wrapper'),
+                    const TextSpan(
+                      text:
+                          ' is the control: it takes the surface change '
+                          'on hover, the global focus ring, and ',
+                    ),
+                    ElCode.span('press-spring'),
+                    const TextSpan(
+                      text:
+                          ' for the press. One transform '
+                          'utility, not two, ',
+                    ),
+                    ElCode.span('lift'),
+                    const TextSpan(text: ' and '),
+                    ElCode.span('press-spring'),
+                    const TextSpan(text: ' both write the whole '),
+                    ElCode.span('transition'),
+                    const TextSpan(
+                      text:
+                          ' shorthand, and §4 is explicit that which one '
+                          'wins is not something to rely on.',
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
 }
 
 /// `size="default"`'s `gap-2`.
@@ -1191,25 +1246,26 @@ class _ButtonGap extends StatelessWidget {
   const _ButtonGap();
 
   @override
-  Widget build(BuildContext context) => SizedBox(width: ds(2));
+  Widget build(BuildContext context) => SizedBox(width: el(2));
 }
 
 class _OneSignalBody extends StatelessWidget {
   const _OneSignalBody();
 
   @override
-  Widget build(BuildContext context) => DsRichText(
-        const TextSpan(
-          text: 'The lower row is the same markup with every hue removed, and '
-              'it still reads. Direction is carried by the glyph’s shape, by '
-              'the sign the component writes onto the number, and by a visually '
-              'hidden word for assistive tech. Colour is the fourth signal, not '
-              'the first: and it is never a red/green pair: the unfavourable '
-              'direction is plain text, exactly as money leaving a wallet is '
-              '(§1.4). Red means error, and a dip is not an error.',
-        ),
-        DsType.small,
-      );
+  Widget build(BuildContext context) => ElRichText(
+    const TextSpan(
+      text:
+          'The lower row is the same markup with every hue removed, and '
+          'it still reads. Direction is carried by the glyph’s shape, by '
+          'the sign the component writes onto the number, and by a visually '
+          'hidden word for assistive tech. Colour is the fourth signal, not '
+          'the first: and it is never a red/green pair: the unfavourable '
+          'direction is plain text, exactly as money leaving a wallet is '
+          '(§1.4). Red means error, and a dip is not an error.',
+    ),
+    ElType.small,
+  );
 }
 
 /// The one-row table under *"The delta on its own"*.
@@ -1218,43 +1274,41 @@ class _DeltaCellTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
 
-    Widget cell(String figure, DsStatDelta delta, DsStatDirection better) =>
+    Widget cell(String figure, ElStatDelta delta, ElStatDirection better) =>
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            DsText(figure, DsType.numSm, color: theme.foreground),
+            ElText(figure, ElType.numSm, color: theme.foreground),
             // `gap-0.5`.
-            SizedBox(height: ds(0.5)),
-            DsStatDeltaMark(delta: delta, betterWhen: better),
+            SizedBox(height: el(0.5)),
+            ElStatDeltaMark(delta: delta, betterWhen: better),
           ],
         );
 
-    return DsTable(
-      header: const <DsTableCellSpec>[
-        DsTableCellSpec(child: Text('Campaign')),
-        DsTableCellSpec(child: Text('Revenue')),
-        DsTableCellSpec(child: Text('Refund rate')),
+    return ElTable(
+      header: const <ElTableCellSpec>[
+        ElTableCellSpec(child: Text('Campaign')),
+        ElTableCellSpec(child: Text('Revenue')),
+        ElTableCellSpec(child: Text('Refund rate')),
       ],
-      rows: <DsTableRowSpec>[
-        DsTableRowSpec(
-          cells: <DsTableCellSpec>[
-            const DsTableCellSpec(child: Text('Stir in strength')),
-            DsTableCellSpec(
-              child: cell(
-                r'$12,180',
-                (value: '16%', direction: DsStatDirection.up),
-                DsStatDirection.up,
-              ),
+      rows: <ElTableRowSpec>[
+        ElTableRowSpec(
+          cells: <ElTableCellSpec>[
+            const ElTableCellSpec(child: Text('Stir in strength')),
+            ElTableCellSpec(
+              child: cell(r'$12,180', (
+                value: '16%',
+                direction: ElStatDirection.up,
+              ), ElStatDirection.up),
             ),
-            DsTableCellSpec(
-              child: cell(
-                '1.4%',
-                (value: '0.3%', direction: DsStatDirection.up),
-                DsStatDirection.down,
-              ),
+            ElTableCellSpec(
+              child: cell('1.4%', (
+                value: '0.3%',
+                direction: ElStatDirection.up,
+              ), ElStatDirection.down),
             ),
           ],
         ),
@@ -1282,31 +1336,31 @@ class _NavigatingStatState extends State<_NavigatingStat> {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
 
     return MouseRegion(
       onEnter: (_) => setState(() => _hovered = true),
       onExit: (_) => setState(() => _hovered = false),
-      child: DsPress(
-        scale: DsTransforms.pressSpringScale,
-        upDuration: DsDurations.pressSpringUp,
+      child: ElPress(
+        scale: ElTransforms.pressSpringScale,
+        upDuration: ElDurations.pressSpringUp,
         onTap: () {},
         child: TweenAnimationBuilder<Color?>(
           // `transition-colors duration-fast`, DRIFT 3.
-          duration: dsAnimationDuration(context, DsDurations.transitionDefault),
-          curve: DsCurves.out,
+          duration: elAnimationDuration(context, ElDurations.transitionDefault),
+          curve: ElCurves.out,
           tween: ColorTween(end: _hovered ? theme.accent : theme.card),
-          builder: (BuildContext context, Color? fill, Widget? child) => DsCard(
+          builder: (BuildContext context, Color? fill, Widget? child) => ElCard(
             fill: fill,
             // DRIFT 4: `box-shadow` is not in `transition-colors`' property
             // list, so the ring is a hard cut.
             ringColor: _hovered
-                ? DsPalette.action.withValues(alpha: _hoverRingAlpha)
-                : DsCard.ringOf(theme),
+                ? ElPalette.action.withValues(alpha: _hoverRingAlpha)
+                : ElCard.ringOf(theme),
             children: <Widget>[child!],
           ),
-          child: const DsCardContent(
-            child: DsStat(
+          child: const ElCardContent(
+            child: ElStat(
               label: 'Revenue',
               value: r'$12,480',
               delta: _up,
@@ -1326,62 +1380,63 @@ class _ItemSection extends StatelessWidget {
 
   static const List<({String title, String desc, String badge})> _methods =
       <({String title, String desc, String badge})>[
-    (
-      title: 'Visa ···· 6411',
-      desc: 'Expires 04/29 · Default',
-      badge: 'Default'
-    ),
-    (title: 'Mastercard ···· 2087', desc: 'Expires 11/27', badge: ''),
-    (title: 'USDC wallet', desc: '0xA71c…4F2b · Arbitrum', badge: ''),
-  ];
+        (
+          title: 'Visa ···· 6411',
+          desc: 'Expires 04/29 · Default',
+          badge: 'Default',
+        ),
+        (title: 'Mastercard ···· 2087', desc: 'Expires 11/27', badge: ''),
+        (title: 'USDC wallet', desc: '0xA71c…4F2b · Arbitrum', badge: ''),
+      ];
 
   @override
-  Widget build(BuildContext context) => DsSection(
-        id: 'item',
-        title: 'Item',
-        description: 'A structured list row: media, content, actions. Used for '
-            'payment methods, shipment lines and settings rows.',
-        child: DsPanel(
-          label: 'Payment methods',
-          flush: true,
-          child: DsItemGroup(
-            children: <Widget>[
-              for (final ({String title, String desc, String badge}) method
-                  in _methods)
-                DsItem(
-                  media: const DsItemMedia(
-                    child: DsIcon.lucide(
-                      DsLucide.arrowUpRight,
-                      size: DsIconSize.md,
-                      tone: DsIconTone.subtle,
-                    ),
-                  ),
-                  content: DsItemContent(
-                    children: <Widget>[
-                      DsItemTitle(method.title),
-                      DsItemDescription(method.desc),
-                    ],
-                  ),
-                  actions: DsItemActions(
-                    children: <Widget>[
-                      if (method.badge.isNotEmpty)
-                        DsBadge(
-                          label: method.badge,
-                          variant: DsBadgeVariant.action,
-                        ),
-                      DsButton(
-                        variant: DsButtonVariant.ghost,
-                        size: DsButtonSize.sm,
-                        onPressed: () {},
-                        child: const Text('Manage'),
-                      ),
-                    ],
-                  ),
+  Widget build(BuildContext context) => ElSection(
+    id: 'item',
+    title: 'Item',
+    description:
+        'A structured list row: media, content, actions. Used for '
+        'payment methods, shipment lines and settings rows.',
+    child: ElPanel(
+      label: 'Payment methods',
+      flush: true,
+      child: ElItemGroup(
+        children: <Widget>[
+          for (final ({String title, String desc, String badge}) method
+              in _methods)
+            ElItem(
+              media: const ElItemMedia(
+                child: ElIcon.lucide(
+                  ElLucide.arrowUpRight,
+                  size: ElIconSize.md,
+                  tone: ElIconTone.subtle,
                 ),
-            ],
-          ),
-        ),
-      );
+              ),
+              content: ElItemContent(
+                children: <Widget>[
+                  ElItemTitle(method.title),
+                  ElItemDescription(method.desc),
+                ],
+              ),
+              actions: ElItemActions(
+                children: <Widget>[
+                  if (method.badge.isNotEmpty)
+                    ElBadge(
+                      label: method.badge,
+                      variant: ElBadgeVariant.action,
+                    ),
+                  ElButton(
+                    variant: ElButtonVariant.ghost,
+                    size: ElButtonSize.sm,
+                    onPressed: () {},
+                    child: const Text('Manage'),
+                  ),
+                ],
+              ),
+            ),
+        ],
+      ),
+    ),
+  );
 }
 
 /* ── §8 · marker ─────────────────────────────────────────────────────────── */
@@ -1390,102 +1445,106 @@ class _MarkerSection extends StatelessWidget {
   const _MarkerSection();
 
   @override
-  Widget build(BuildContext context) => DsSection(
-        id: 'marker',
-        title: 'Marker',
-        description: 'A note about a list, sitting in the list. Not a highlight '
-            '— it draws no background and will not emphasise a matched '
-            'substring. Reach for it when something happened between the rows '
-            'around it.',
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            DsPanel(
-              label: 'Three variants',
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  const DsMarker(
-                    icon: DsIcon.lucide(
-                      DsLucide.info,
-                      size: DsIconSize.sm,
-                      tone: DsIconTone.muted,
-                    ),
-                    label: 'default: bare row, for a container that already '
-                        'frames it',
-                  ),
-                  SizedBox(height: _markerGap),
-                  const DsMarker(
-                    variant: DsMarkerVariant.separator,
-                    label: 'separator: divides before from after',
-                  ),
-                  SizedBox(height: _markerGap),
-                  const DsMarker(
-                    variant: DsMarkerVariant.border,
-                    label: 'border: heads what follows',
-                  ),
-                ],
+  Widget build(BuildContext context) => ElSection(
+    id: 'marker',
+    title: 'Marker',
+    description:
+        'A note about a list, sitting in the list. Not a highlight '
+        '— it draws no background and will not emphasise a matched '
+        'substring. Reach for it when something happened between the rows '
+        'around it.',
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        ElPanel(
+          label: 'Three variants',
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              const ElMarker(
+                icon: ElIcon.lucide(
+                  ElLucide.info,
+                  size: ElIconSize.sm,
+                  tone: ElIconTone.muted,
+                ),
+                label:
+                    'default: bare row, for a container that already '
+                    'frames it',
               ),
-            ),
-            SizedBox(height: _panelGap),
-            DsPanel(
-              label: 'In use: the agent console, where a stream was stopped',
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  DsText(
-                    'The assistant was mid-sentence and the user pressed stop. '
-                    'Without the marker this reads as a finished answer that '
-                    'trails off.',
-                    DsType.small,
-                  ),
-                  // `space-y-4`.
-                  SizedBox(height: _panelGap),
-                  const DsMarker(
-                    variant: DsMarkerVariant.separator,
-                    icon: DsIcon.lucide(
-                      DsLucide.square,
-                      size: DsIconSize.sm,
-                      tone: DsIconTone.muted,
-                    ),
-                    label: 'Stopped by you',
-                  ),
-                ],
+              SizedBox(height: _markerGap),
+              const ElMarker(
+                variant: ElMarkerVariant.separator,
+                label: 'separator: divides before from after',
               ),
-            ),
-            SizedBox(height: _panelGap),
-            const DsNote(
-              tone: DsNoteTone.error,
-              title: 'Not an Alert',
-              child: _NotAnAlertBody(),
-            ),
-          ],
+              SizedBox(height: _markerGap),
+              const ElMarker(
+                variant: ElMarkerVariant.border,
+                label: 'border: heads what follows',
+              ),
+            ],
+          ),
         ),
-      );
+        SizedBox(height: _panelGap),
+        ElPanel(
+          label: 'In use: the agent console, where a stream was stopped',
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              ElText(
+                'The assistant was mid-sentence and the user pressed stop. '
+                'Without the marker this reads as a finished answer that '
+                'trails off.',
+                ElType.small,
+              ),
+              // `space-y-4`.
+              SizedBox(height: _panelGap),
+              const ElMarker(
+                variant: ElMarkerVariant.separator,
+                icon: ElIcon.lucide(
+                  ElLucide.square,
+                  size: ElIconSize.sm,
+                  tone: ElIconTone.muted,
+                ),
+                label: 'Stopped by you',
+              ),
+            ],
+          ),
+        ),
+        SizedBox(height: _panelGap),
+        const ElNote(
+          tone: ElNoteTone.error,
+          title: 'Not an Alert',
+          child: _NotAnAlertBody(),
+        ),
+      ],
+    ),
+  );
 }
 
 class _NotAnAlertBody extends StatelessWidget {
   const _NotAnAlertBody();
 
   @override
-  Widget build(BuildContext context) => DsRichText(
-        TextSpan(
-          children: <InlineSpan>[
-            const TextSpan(
-              text: 'A marker reports; it never competes with what it '
-                  'annotates. If what you are marking is a ',
-            ),
-            _em('problem'),
-            const TextSpan(text: ', that is an '),
-            DsCode.span('Alert'),
-            const TextSpan(
-              text: ', §5’s table is explicit that a persistent condition '
-                  'worth explaining gets its own surface.',
-            ),
-          ],
+  Widget build(BuildContext context) => ElRichText(
+    TextSpan(
+      children: <InlineSpan>[
+        const TextSpan(
+          text:
+              'A marker reports; it never competes with what it '
+              'annotates. If what you are marking is a ',
         ),
-        DsType.small,
-      );
+        _em('problem'),
+        const TextSpan(text: ', that is an '),
+        ElCode.span('Alert'),
+        const TextSpan(
+          text:
+              ', §5’s table is explicit that a persistent condition '
+              'worth explaining gets its own surface.',
+        ),
+      ],
+    ),
+    ElType.small,
+  );
 }
 
 /* ── §9 · separator ──────────────────────────────────────────────────────── */
@@ -1495,18 +1554,18 @@ class _SeparatorSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
 
-    Widget figure(String text) => Center(
-          child: DsText(text, DsType.numSm, color: theme.mutedForeground),
-        );
+    Widget figure(String text) =>
+        Center(child: ElText(text, ElType.numSm, color: theme.mutedForeground));
 
-    return DsSection(
+    return ElSection(
       id: 'separator',
       title: 'Separator',
-      description: 'A hairline. It uses the border token, so it holds up on '
+      description:
+          'A hairline. It uses the border token, so it holds up on '
           'every surface in the ladder without being restyled.',
-      child: DsPanel(
+      child: ElPanel(
         label: 'Horizontal and vertical',
         child: Align(
           alignment: AlignmentDirectional.centerStart,
@@ -1517,28 +1576,28 @@ class _SeparatorSection extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                DsText('Available balance', DsType.small),
+                ElText('Available balance', ElType.small),
                 // `className="my-4"`.
                 SizedBox(height: _panelGap),
-                const DsSeparator(),
+                const ElSeparator(),
                 SizedBox(height: _panelGap),
-                DsText('Bonus balance', DsType.small),
+                ElText('Bonus balance', ElType.small),
                 SizedBox(height: _panelGap),
-                const DsSeparator(),
+                const ElSeparator(),
                 SizedBox(height: _panelGap),
                 SizedBox(
                   // `flex h-6 items-center gap-4`.
-                  height: ds(6),
+                  height: el(6),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: <Widget>[
                       figure('412 packs'),
                       SizedBox(width: _panelGap),
-                      const DsSeparator.vertical(),
+                      const ElSeparator.vertical(),
                       SizedBox(width: _panelGap),
                       figure('1,284 cards'),
                       SizedBox(width: _panelGap),
-                      const DsSeparator.vertical(),
+                      const ElSeparator.vertical(),
                       SizedBox(width: _panelGap),
                       figure('8 sets'),
                     ],
@@ -1559,81 +1618,90 @@ class _ApiSection extends StatelessWidget {
   const _ApiSection();
 
   @override
-  Widget build(BuildContext context) => DsSection(
-        id: 'api',
-        title: 'API',
-        child: DsMeta(
-          items: <DsMetaItem>[
-            (
-              // DRIFT 7: `blue` is not a variant and `link` is.
-              k: 'Badge variant',
-              v: const TextSpan(
-                text: 'default · blue · premium · secondary · outline · ghost · '
-                    'success · warning · info · destructive · link.',
-              ),
-            ),
-            (
-              k: 'Avatar',
-              v: const TextSpan(
-                text: 'AvatarImage with AvatarFallback for initials. '
-                    'AvatarBadge for a status dot, AvatarGroup + '
-                    'AvatarGroupCount for stacks.',
-              ),
-            ),
-            (
-              k: 'Card',
-              v: const TextSpan(
-                text: 'CardHeader + CardTitle + CardDescription + CardAction '
-                    '(top-right) + CardContent + CardFooter.',
-              ),
-            ),
-            (
-              k: 'Stat',
-              v: const TextSpan(
-                text: 'label + value, plus optional delta, hint and message. '
-                    'Draws no container: put it in a Card, a Panel or a '
-                    'header.',
-              ),
-            ),
-            (
-              k: 'Stat delta',
-              v: const TextSpan(
-                text: '{ value: "8.2%", direction: "up" | "down" | "flat" }. '
-                    'Unsigned: the component writes the + or the −.',
-              ),
-            ),
-            (
-              k: 'Stat betterWhen',
-              v: const TextSpan(
-                text: '"up" (default) or "down". Which direction earns the '
-                    'favourable colour. Set it to down for churn, refunds and '
-                    'latency.',
-              ),
-            ),
-            (
-              k: 'Stat state',
-              v: const TextSpan(
-                text: 'ready · loading · error · empty. Plus a separate '
-                    'disabled flag, which is orthogonal to all four.',
-              ),
-            ),
-            (
-              k: 'Item',
-              v: const TextSpan(
-                text: 'ItemMedia + ItemContent (ItemTitle, ItemDescription) + '
-                    'ItemActions. Wrap in ItemGroup for a divided list.',
-              ),
-            ),
-            (
-              k: 'TableHead className="text-right"',
-              v: const TextSpan(
-                text: 'Required on numeric columns; pair with type-num on the '
-                    'cell.',
-              ),
-            ),
-          ],
+  Widget build(BuildContext context) => ElSection(
+    id: 'api',
+    title: 'API',
+    child: ElMeta(
+      items: <ElMetaItem>[
+        (
+          // DRIFT 7: `blue` is not a variant and `link` is.
+          k: 'Badge variant',
+          v: const TextSpan(
+            text:
+                'default · blue · premium · secondary · outline · ghost · '
+                'success · warning · info · destructive · link.',
+          ),
         ),
-      );
+        (
+          k: 'Avatar',
+          v: const TextSpan(
+            text:
+                'AvatarImage with AvatarFallback for initials. '
+                'AvatarBadge for a status dot, AvatarGroup + '
+                'AvatarGroupCount for stacks.',
+          ),
+        ),
+        (
+          k: 'Card',
+          v: const TextSpan(
+            text:
+                'CardHeader + CardTitle + CardDescription + CardAction '
+                '(top-right) + CardContent + CardFooter.',
+          ),
+        ),
+        (
+          k: 'Stat',
+          v: const TextSpan(
+            text:
+                'label + value, plus optional delta, hint and message. '
+                'Draws no container: put it in a Card, a Panel or a '
+                'header.',
+          ),
+        ),
+        (
+          k: 'Stat delta',
+          v: const TextSpan(
+            text:
+                '{ value: "8.2%", direction: "up" | "down" | "flat" }. '
+                'Unsigned: the component writes the + or the −.',
+          ),
+        ),
+        (
+          k: 'Stat betterWhen',
+          v: const TextSpan(
+            text:
+                '"up" (default) or "down". Which direction earns the '
+                'favourable colour. Set it to down for churn, refunds and '
+                'latency.',
+          ),
+        ),
+        (
+          k: 'Stat state',
+          v: const TextSpan(
+            text:
+                'ready · loading · error · empty. Plus a separate '
+                'disabled flag, which is orthogonal to all four.',
+          ),
+        ),
+        (
+          k: 'Item',
+          v: const TextSpan(
+            text:
+                'ItemMedia + ItemContent (ItemTitle, ItemDescription) + '
+                'ItemActions. Wrap in ItemGroup for a divided list.',
+          ),
+        ),
+        (
+          k: 'TableHead className="text-right"',
+          v: const TextSpan(
+            text:
+                'Required on numeric columns; pair with type-num on the '
+                'cell.',
+          ),
+        ),
+      ],
+    ),
+  );
 }
 
 /* ── §11 · rules ─────────────────────────────────────────────────────────── */
@@ -1642,33 +1710,33 @@ class _RulesSection extends StatelessWidget {
   const _RulesSection();
 
   @override
-  Widget build(BuildContext context) => const DsSection(
-        id: 'rules',
-        title: 'Rules',
-        child: DsDoDont(
-          dos: <String>[
-            'Right-align numeric table columns and use the shared tabular '
-                'type-num foundation.',
-            'Show money direction with a sign, a glyph and colour together.',
-            'Use initials as the avatar fallback: never a generic silhouette.',
-            'Keep badges to one or two words.',
-            'Say what a table is showing and out of how many, in the caption.',
-            'Give a Stat’s delta a glyph and a sign, so it reads without '
-                'colour.',
-            'Say which direction is good: betterWhen="down" for churn and '
-                'refunds.',
-          ],
-          donts: <String>[
-            'Don’t colour an outgoing purchase red; red means error, not '
-                'spending.',
-            'Don’t colour a falling figure red either: a dip is not an error.',
-            'Don’t put a border or a fill on a Stat; the container it sits in '
-                'owns that.',
-            'Don’t encode rank or tier in a base Badge: anything carrying '
-                'pips belongs to the product, not the chassis.',
-            'Don’t left-align a column of prices.',
-            'Don’t use a Card where an Item row would be denser and clearer.',
-          ],
-        ),
-      );
+  Widget build(BuildContext context) => const ElSection(
+    id: 'rules',
+    title: 'Rules',
+    child: ElDoDont(
+      dos: <String>[
+        'Right-align numeric table columns and use the shared tabular '
+            'type-num foundation.',
+        'Show money direction with a sign, a glyph and colour together.',
+        'Use initials as the avatar fallback: never a generic silhouette.',
+        'Keep badges to one or two words.',
+        'Say what a table is showing and out of how many, in the caption.',
+        'Give a Stat’s delta a glyph and a sign, so it reads without '
+            'colour.',
+        'Say which direction is good: betterWhen="down" for churn and '
+            'refunds.',
+      ],
+      donts: <String>[
+        'Don’t colour an outgoing purchase red; red means error, not '
+            'spending.',
+        'Don’t colour a falling figure red either: a dip is not an error.',
+        'Don’t put a border or a fill on a Stat; the container it sits in '
+            'owns that.',
+        'Don’t encode rank or tier in a base Badge: anything carrying '
+            'pips belongs to the product, not the chassis.',
+        'Don’t left-align a column of prices.',
+        'Don’t use a Card where an Item row would be denser and clearer.',
+      ],
+    ),
+  );
 }

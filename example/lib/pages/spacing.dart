@@ -9,9 +9,9 @@
 /// (spacing-map §11: copy is the page, tokens are the system):
 /// * the Meta copy calls `--width-page` **1320px**: twice, in `#grid` and in
 ///   the `2xl` breakpoint row: while the token declares 1200
-///   ([DsWidths.page], which carries the same drift note);
+///   ([ElWidths.page], which carries the same drift note);
 /// * `#radius` is labelled "Seven steps" and calls `3xl` the largest allowed,
-///   while [DsRadii] carries nine (`xs` 2px and `4xl` 32px are undocumented
+///   while [ElRadii] carries nine (`xs` 2px and `4xl` 32px are undocumented
 ///   here);
 /// * `#scale` rules that a gap off the ten-step list is wrong, while the docs
 ///   chrome it is printed on uses 6/10/20/28/56px steps of its own.
@@ -36,10 +36,10 @@ const double _glowBorderAlpha = 0.40;
 const double _leadingSnug = 1.375;
 
 /// `w-36`: the column one radius specimen occupies.
-final double _radiusCellWidth = ds(36);
+final double _radiusCellWidth = el(36);
 
 /// `h-24`: the height every specimen box on this page shares.
-final double _specimenHeight = ds(24);
+final double _specimenHeight = el(24);
 
 /* ── Page data (the reference's three module-level arrays) ───────────────── */
 
@@ -47,7 +47,7 @@ final double _specimenHeight = ds(24);
 ///
 /// [n] is the Tailwind class number, which *is* the pixel value divided by
 /// four: the page's whole argument: so the bar's width, the printed px and
-/// the class name all derive from it through [ds] rather than being restated.
+/// the class name all derive from it through [el] rather than being restated.
 typedef _Step = ({int n, String use});
 
 const List<_Step> _scale = <_Step>[
@@ -68,27 +68,27 @@ const List<_Step> _scale = <_Step>[
 typedef _Radius = ({String name, double px, String use});
 
 final List<_Radius> _radii = <_Radius>[
-  (name: 'sm', px: DsRadii.sm, use: 'Badges, pips, small chips, inline code.'),
+  (name: 'sm', px: ElRadii.sm, use: 'Badges, pips, small chips, inline code.'),
   (
     name: 'md',
-    px: DsRadii.md,
+    px: ElRadii.md,
     use: 'Buttons, inputs, rows, dropdown items. The default.',
   ),
   (
     name: 'lg',
-    px: DsRadii.lg,
+    px: ElRadii.lg,
     use: 'Cards, pack cards, collectible tiles, panels.',
   ),
-  (name: 'xl', px: DsRadii.xl, use: 'Large cards, dialogs, feature panels.'),
-  (name: '2xl', px: DsRadii.xl2, use: 'Promotional panels, pack stage.'),
+  (name: 'xl', px: ElRadii.xl, use: 'Large cards, dialogs, feature panels.'),
+  (name: '2xl', px: ElRadii.xl2, use: 'Promotional panels, pack stage.'),
   (
     name: '3xl',
-    px: DsRadii.xl3,
+    px: ElRadii.xl3,
     use: 'The landing hero panel. Largest allowed.',
   ),
   (
     name: 'pill',
-    px: DsRadii.pill,
+    px: ElRadii.pill,
     use: 'Pills, filter chips, avatars, live indicator.',
   ),
 ];
@@ -98,7 +98,7 @@ final List<_Radius> _radii = <_Radius>[
 typedef _Elevation = ({
   String token,
   String cls,
-  DsShadowSpec spec,
+  ElShadowSpec spec,
   String use,
 });
 
@@ -106,25 +106,25 @@ final List<_Elevation> _elevation = <_Elevation>[
   (
     token: '--shadow-e1',
     cls: 'shadow-e1',
-    spec: DsShadows.e1,
+    spec: ElShadows.e1,
     use: 'Resting rows, chips, table headers. Barely there.',
   ),
   (
     token: '--shadow-e2',
     cls: 'shadow-e2',
-    spec: DsShadows.e2,
+    spec: ElShadows.e2,
     use: 'Cards and pack cards at rest.',
   ),
   (
     token: '--shadow-e3',
     cls: 'shadow-e3',
-    spec: DsShadows.e3,
+    spec: ElShadows.e3,
     use: 'Hovered cards, popovers, dropdowns, sticky bars.',
   ),
   (
     token: '--shadow-e4',
     cls: 'shadow-e4',
-    spec: DsShadows.e4,
+    spec: ElShadows.e4,
     use: 'Dialogs, drawers, the pack-opening stage.',
   ),
 ];
@@ -138,12 +138,12 @@ class SpacingPage extends StatelessWidget {
   Widget build(BuildContext context) {
     // The header reads its own copy out of the nav registry, exactly as
     // `findCategory("foundations", "spacing")` does in the reference.
-    final DsCategoryHit here = findCategory('foundations', 'spacing');
+    final ElCategoryHit here = findCategory('foundations', 'spacing');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        DsPageHeader(
+        ElPageHeader(
           eyebrow: here.group.title,
           title: here.category.title,
           blurb: here.category.blurb,
@@ -154,10 +154,10 @@ class SpacingPage extends StatelessWidget {
         const _ElevationSection(),
         const _GridSection(),
         const _BreakpointsSection(),
-        const DsSection(
+        const ElSection(
           id: 'rules',
           title: 'Rules',
-          child: DsDoDont(
+          child: ElDoDont(
             dos: <String>[
               'Pick gaps from the scale — 4, 8, 12, 16, 24, 32, 40, 48, 64, 80.',
               'Let radius follow surface size: badges 6, buttons 10, cards 12, '
@@ -178,7 +178,7 @@ class SpacingPage extends StatelessWidget {
             ],
           ),
         ),
-        const DsPageFootNav(groupId: 'foundations', slug: 'spacing'),
+        const ElPageFootNav(groupId: 'foundations', slug: 'spacing'),
       ],
     );
   }
@@ -191,10 +191,11 @@ class _ScaleSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsSection(
+    return ElSection(
       id: 'scale',
       title: 'Spacing scale',
-      description: 'An 8-point system with a 4px half-step for tight interior '
+      description:
+          'An 8-point system with a 4px half-step for tight interior '
           "spacing. Tailwind's default 0.25rem unit already matches, so the "
           'class number is simply the pixel value divided by four.',
       child: Column(
@@ -202,20 +203,20 @@ class _ScaleSection extends StatelessWidget {
         children: <Widget>[
           // `overflow-hidden rounded-xl border border-border bg-card` with a
           // hairline between rows and none at the card's edges.
-          DsDividedList(
-            radius: DsRadii.xl,
+          ElDividedList(
+            radius: ElRadii.xl,
             children: <Widget>[
               for (final _Step step in _scale) _ScaleRow(step: step),
             ],
           ),
-          SizedBox(height: ds(4)),
-          DsNote(
-            tone: DsNoteTone.error,
+          SizedBox(height: el(4)),
+          ElNote(
+            tone: ElNoteTone.error,
             title: 'The only spacing rule',
-            child: DsText(
+            child: ElText(
               'If a gap is not on this scale, it is wrong. There is no 18px, '
               'no 30px and no 50px anywhere in the product.',
-              DsType.small,
+              ElType.small,
             ),
           ),
         ],
@@ -233,18 +234,18 @@ class _ScaleRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
-    final bool wide = MediaQuery.sizeOf(context).width >= DsBreakpoints.sm;
-    final double px = ds(step.n);
+    final ElThemeData theme = ElTheme.of(context);
+    final bool wide = MediaQuery.sizeOf(context).width >= ElBreakpoints.sm;
+    final double px = el(step.n);
 
-    final Widget size = DsText(
+    final Widget size = ElText(
       '${px.toInt()}px',
-      DsType.numBase,
+      ElType.numBase,
       color: theme.foreground,
     );
-    final Widget className = DsText(
+    final Widget className = ElText(
       'gap-${step.n}',
-      DsType.numSm,
+      ElType.numSm,
       color: theme.actionInk,
     );
     // `flex items-center gap-4`: the bar, then what the step is for.
@@ -254,29 +255,29 @@ class _ScaleRow extends StatelessWidget {
           // `style={{ width: s.px }}`: the specimen is the measure, so this
           // is the one width on the page that is stated in pixels.
           width: px,
-          height: ds(3),
+          height: el(3),
           child: DecoratedBox(
             decoration: BoxDecoration(
-              color: DsPalette.action,
-              borderRadius: BorderRadius.circular(DsRadii.sm),
+              color: ElPalette.action,
+              borderRadius: BorderRadius.circular(ElRadii.sm),
             ),
           ),
         ),
-        SizedBox(width: ds(4)),
-        Expanded(child: DsText(step.use, DsType.small)),
+        SizedBox(width: el(4)),
+        Expanded(child: ElText(step.use, ElType.small)),
       ],
     );
 
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: ds(6), vertical: ds(4)),
+      padding: EdgeInsets.symmetric(horizontal: el(6), vertical: el(4)),
       child: wide
           ? Row(
               children: <Widget>[
                 // `4rem` / `5rem`, then the rest of the row.
-                SizedBox(width: ds(16), child: size),
-                SizedBox(width: ds(6)),
-                SizedBox(width: ds(20), child: className),
-                SizedBox(width: ds(6)),
+                SizedBox(width: el(16), child: size),
+                SizedBox(width: el(6)),
+                SizedBox(width: el(20), child: className),
+                SizedBox(width: el(6)),
                 Expanded(child: demo),
               ],
             )
@@ -284,9 +285,9 @@ class _ScaleRow extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 size,
-                SizedBox(height: ds(4)),
+                SizedBox(height: el(4)),
                 className,
-                SizedBox(height: ds(4)),
+                SizedBox(height: el(4)),
                 demo,
               ],
             ),
@@ -301,19 +302,20 @@ class _RadiusSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsSection(
+    return ElSection(
       id: 'radius',
       title: 'Radius ladder',
-      description: 'Radius encodes size: the bigger the surface, the softer '
+      description:
+          'Radius encodes size: the bigger the surface, the softer '
           "the corner. This overrides shadcn's computed radius scale with "
           'explicit values.',
       // "Seven steps" of nine: `--radius-xs` and `--radius-4xl` exist and are
       // not shown here. The label is the reference's, kept.
-      child: DsPanel(
+      child: ElPanel(
         label: 'Seven steps',
         child: Wrap(
-          spacing: ds(5),
-          runSpacing: ds(5),
+          spacing: el(5),
+          runSpacing: el(5),
           children: <Widget>[
             for (final _Radius radius in _radii) _RadiusCell(radius: radius),
           ],
@@ -326,7 +328,7 @@ class _RadiusSection extends StatelessWidget {
 /// `999` for the pill, `6px`… for every other rung: the reference's own
 /// special case, printed off the token either way.
 String _radiusLabel(double px) =>
-    px == DsRadii.pill ? '${px.toInt()}' : '${px.toInt()}px';
+    px == ElRadii.pill ? '${px.toInt()}' : '${px.toInt()}px';
 
 class _RadiusCell extends StatelessWidget {
   const _RadiusCell({required this.radius});
@@ -335,7 +337,7 @@ class _RadiusCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
 
     return SizedBox(
       width: _radiusCellWidth,
@@ -350,21 +352,21 @@ class _RadiusCell extends StatelessWidget {
               color: theme.muted,
               // `style={{ borderRadius: r.px }}`: the specimen is the value.
               borderRadius: BorderRadius.circular(radius.px),
-              border: Border.all(color: theme.input, width: DsWidths.hairline),
+              border: Border.all(color: theme.input, width: ElWidths.hairline),
             ),
-            child: DsText(
+            child: ElText(
               _radiusLabel(radius.px),
-              DsType.numSm,
+              ElType.numSm,
               color: theme.mutedForeground,
             ),
           ),
-          SizedBox(height: ds(3)),
-          DsText(
+          SizedBox(height: el(3)),
+          ElText(
             'rounded-${radius.name}',
-            DsType.numSm,
+            ElType.numSm,
             color: theme.actionInk,
           ),
-          SizedBox(height: ds(1)),
+          SizedBox(height: el(1)),
           _UseCopy(radius.use),
         ],
       ),
@@ -379,35 +381,36 @@ class _ElevationSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsSection(
+    return ElSection(
       id: 'elevation',
       title: 'Elevation',
-      description: 'Four neutral depth steps, plus two glows that are strictly '
+      description:
+          'Four neutral depth steps, plus two glows that are strictly '
           'rationed. On a near-black background a shadow reads as a soft '
           'darkening, so depth mostly comes from the surface ladder — shadows '
           'only confirm it.',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          DsPanel(
+          ElPanel(
             label: 'Neutral depth',
-            child: DsGrid(
+            child: ElGrid(
               sm: 2,
               lg: 4,
-              gap: ds(6),
+              gap: el(6),
               children: <Widget>[
                 for (final _Elevation step in _elevation)
                   _ElevationCell(step: step),
               ],
             ),
           ),
-          SizedBox(height: ds(4)),
-          DsPanel(
+          SizedBox(height: el(4)),
+          ElPanel(
             label: 'Rationed glow',
             note: 'Selected · rare · premium only',
-            child: DsGrid(
+            child: ElGrid(
               sm: 2,
-              gap: ds(6),
+              gap: el(6),
               children: const <Widget>[_ActionGlowCell(), _ValueGlowCell()],
             ),
           ),
@@ -424,7 +427,7 @@ class _ElevationCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -434,20 +437,16 @@ class _ElevationCell extends StatelessWidget {
           alignment: Alignment.center,
           decoration: BoxDecoration(
             color: theme.card,
-            borderRadius: BorderRadius.circular(DsRadii.lg),
-            border: Border.all(color: theme.border, width: DsWidths.hairline),
+            borderRadius: BorderRadius.circular(ElRadii.lg),
+            border: Border.all(color: theme.border, width: ElWidths.hairline),
             // `e1`–`e4` are outer-only, so a plain decoration paints them all.
             boxShadow: step.spec.outerShadows(theme),
           ),
-          child: DsText(
-            step.cls,
-            DsType.numSm,
-            color: theme.mutedForeground,
-          ),
+          child: ElText(step.cls, ElType.numSm, color: theme.mutedForeground),
         ),
-        SizedBox(height: ds(3)),
-        DsText(step.token, DsType.numSm, color: theme.actionInk),
-        SizedBox(height: ds(1)),
+        SizedBox(height: el(3)),
+        ElText(step.token, ElType.numSm, color: theme.actionInk),
+        SizedBox(height: el(1)),
         _UseCopy(step.use),
       ],
     );
@@ -461,11 +460,12 @@ class _ActionGlowCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _GlowCell(
-      spec: DsShadows.glowAction,
-      rim: DsPalette.action,
+      spec: ElShadows.glowAction,
+      rim: ElPalette.action,
       label: 'glow-action',
-      ink: DsTheme.of(context).actionInk,
-      lead: 'Selected pack, focused primary CTA, active opening stage. '
+      ink: ElTheme.of(context).actionInk,
+      lead:
+          'Selected pack, focused primary CTA, active opening stage. '
           'Signals ',
       emphasis: 'this is the thing you chose',
     );
@@ -479,11 +479,12 @@ class _ValueGlowCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _GlowCell(
-      spec: DsShadows.glowValue,
-      rim: DsPalette.value,
+      spec: ElShadows.glowValue,
+      rim: ElPalette.value,
       label: 'glow-value',
-      ink: DsTheme.of(context).valueInk,
-      lead: 'Legendary or mythic reveal, reward unlock, premium action. '
+      ink: ElTheme.of(context).valueInk,
+      lead:
+          'Legendary or mythic reveal, reward unlock, premium action. '
           'Signals ',
       emphasis: 'this is worth something',
     );
@@ -500,7 +501,7 @@ class _GlowCell extends StatelessWidget {
     required this.emphasis,
   });
 
-  final DsShadowSpec spec;
+  final ElShadowSpec spec;
 
   /// The ramp the `border-<ramp>/40` rim is cut from.
   final Color rim;
@@ -516,7 +517,7 @@ class _GlowCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -526,17 +527,17 @@ class _GlowCell extends StatelessWidget {
           alignment: Alignment.center,
           decoration: BoxDecoration(
             color: theme.card,
-            borderRadius: BorderRadius.circular(DsRadii.lg),
+            borderRadius: BorderRadius.circular(ElRadii.lg),
             border: Border.all(
               color: rim.withValues(alpha: _glowBorderAlpha),
-              width: DsWidths.hairline,
+              width: ElWidths.hairline,
             ),
             boxShadow: spec.outerShadows(theme),
           ),
-          child: DsText(label, DsType.numSm, color: ink),
+          child: ElText(label, ElType.numSm, color: ink),
         ),
-        SizedBox(height: ds(3)),
-        DsRichText(
+        SizedBox(height: el(3)),
+        ElRichText(
           TextSpan(
             children: <InlineSpan>[
               TextSpan(text: lead),
@@ -547,7 +548,7 @@ class _GlowCell extends StatelessWidget {
               const TextSpan(text: '.'),
             ],
           ),
-          DsType.small,
+          ElType.small,
         ),
       ],
     );
@@ -561,10 +562,11 @@ class _GridSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsSection(
+    return ElSection(
       id: 'grid',
       title: 'Grid and content width',
-      description: 'Desktop-first on a 1440px frame. Content is capped so that '
+      description:
+          'Desktop-first on a 1440px frame. Content is capped so that '
           'grids never stretch into unreadable rows on ultrawide displays. '
           'Every measure below is a token; this section used to state three of '
           'them as prose only, which meant a container had nothing to read and '
@@ -572,12 +574,13 @@ class _GridSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          const DsMeta(
-            items: <DsMetaItem>[
+          const ElMeta(
+            items: <ElMetaItem>[
               (
                 k: 'Design frame',
                 v: TextSpan(
-                  text: '1440px wide — the canvas everything is composed '
+                  text:
+                      '1440px wide — the canvas everything is composed '
                       'against. Not a token: it is the canvas, not a measure '
                       'anything renders at.',
                 ),
@@ -585,7 +588,8 @@ class _GridSection extends StatelessWidget {
               (
                 k: '--width-shell',
                 v: TextSpan(
-                  text: '1680px. The outer frame the sidebar and main column '
+                  text:
+                      '1680px. The outer frame the sidebar and main column '
                       'share on the documentation site.',
                 ),
               ),
@@ -594,28 +598,32 @@ class _GridSection extends StatelessWidget {
               (
                 k: '--width-page',
                 v: TextSpan(
-                  text: '1320px. The cap for customer-facing pages — FAQ, '
+                  text:
+                      '1320px. The cap for customer-facing pages — FAQ, '
                       'about, contact, help, legal.',
                 ),
               ),
               (
                 k: '--width-content',
                 v: TextSpan(
-                  text: '1080px. A documentation column: copy with specimens, '
+                  text:
+                      '1080px. A documentation column: copy with specimens, '
                       'panels and tables beside it.',
                 ),
               ),
               (
                 k: '--width-prose',
                 v: TextSpan(
-                  text: '720px. A reading column carrying nothing but '
+                  text:
+                      '720px. A reading column carrying nothing but '
                       'sentences. See Typography → Prose.',
                 ),
               ),
               (
                 k: '--height-site-header',
                 v: TextSpan(
-                  text: '4rem. Every sticky header. --scroll-offset derives '
+                  text:
+                      '4rem. Every sticky header. --scroll-offset derives '
                       'from it, so an anchored heading cannot land underneath '
                       'one.',
                 ),
@@ -623,7 +631,8 @@ class _GridSection extends StatelessWidget {
               (
                 k: 'Page margin',
                 v: TextSpan(
-                  text: 'px-6 md:px-8 lg:px-12 — 24px mobile · 32px tablet · '
+                  text:
+                      'px-6 md:px-8 lg:px-12 — 24px mobile · 32px tablet · '
                       '48px desktop. All on the scale above.',
                 ),
               ),
@@ -633,14 +642,14 @@ class _GridSection extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: ds(4)),
-          DsPanel(
+          SizedBox(height: el(4)),
+          ElPanel(
             label: '12 columns · 24px gutters',
             // `grid-cols-12` with no responsive step: twelve columns at every
             // width, which is the claim being demonstrated.
-            child: DsGrid(
+            child: ElGrid(
               base: 12,
-              gap: ds(6),
+              gap: el(6),
               children: <Widget>[
                 for (int i = 1; i <= 12; i++) _GridCell(column: i),
               ],
@@ -659,15 +668,15 @@ class _GridCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return Container(
-      height: ds(20),
+      height: el(20),
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: DsPalette.action.withValues(alpha: _gridCellAlpha),
-        borderRadius: BorderRadius.circular(DsRadii.sm),
+        color: ElPalette.action.withValues(alpha: _gridCellAlpha),
+        borderRadius: BorderRadius.circular(ElRadii.sm),
       ),
-      child: DsText('$column', DsType.numSm, color: theme.actionInk),
+      child: ElText('$column', ElType.numSm, color: theme.actionInk),
     );
   }
 }
@@ -679,10 +688,11 @@ class _BreakpointsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsSection(
+    return ElSection(
       id: 'breakpoints',
       title: 'Breakpoints',
-      description: "Tailwind's stock scale, unmodified, and these are the real "
+      description:
+          "Tailwind's stock scale, unmodified, and these are the real "
           'numbers rather than an intent. This section described a 1200px '
           'desktop boundary that no breakpoint has ever fired at; the values '
           'below are the ones every component in this repository is actually '
@@ -690,19 +700,21 @@ class _BreakpointsSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          const DsMeta(
-            items: <DsMetaItem>[
+          const ElMeta(
+            items: <ElMetaItem>[
               (
                 k: 'sm — 640px',
                 v: TextSpan(
-                  text: 'The first column split. Two-up state grids, '
+                  text:
+                      'The first column split. Two-up state grids, '
                       'side-by-side panels.',
                 ),
               ),
               (
                 k: 'md — 768px',
                 v: TextSpan(
-                  text: 'The mobile boundary, and the one the old prose got '
+                  text:
+                      'The mobile boundary, and the one the old prose got '
                       'right. Tables stop becoming card lists; the section '
                       'spacing steps up.',
                 ),
@@ -710,14 +722,16 @@ class _BreakpointsSection extends StatelessWidget {
               (
                 k: 'lg — 1024px',
                 v: TextSpan(
-                  text: 'The documentation sidebar appears; page gutters reach '
+                  text:
+                      'The documentation sidebar appears; page gutters reach '
                       '48px.',
                 ),
               ),
               (
                 k: 'xl — 1280px',
                 v: TextSpan(
-                  text: 'The true desktop layout switch. Four-up grids, full '
+                  text:
+                      'The true desktop layout switch. Four-up grids, full '
                       '12 columns.',
                 ),
               ),
@@ -725,36 +739,38 @@ class _BreakpointsSection extends StatelessWidget {
               (
                 k: '2xl — 1536px',
                 v: TextSpan(
-                  text: 'Rarely reached for. --width-page caps at 1320px, so '
+                  text:
+                      'Rarely reached for. --width-page caps at 1320px, so '
                       'most layouts have stopped growing by here.',
                 ),
               ),
             ],
           ),
-          SizedBox(height: ds(4)),
-          DsNote(
+          SizedBox(height: el(4)),
+          ElNote(
             title: 'Why the scale was not overridden',
-            child: DsRichText(
+            child: ElRichText(
               TextSpan(
                 children: <InlineSpan>[
                   const TextSpan(
                     text: 'The obvious fix for a 1200px intent is a ',
                   ),
-                  DsCode.span('--breakpoint-xl'),
+                  ElCode.span('--breakpoint-xl'),
                   const TextSpan(
-                    text: ' override. It was rejected: every one of the '
+                    text:
+                        ' override. It was rejected: every one of the '
                         'sixty-eight base components is written against the '
                         'stock scale, so moving a boundary re-flows all of '
                         'them silently and nothing in the build reports it. '
                         'The prose was wrong, not the scale. Use ',
                   ),
-                  DsCode.span('xl:'),
+                  ElCode.span('xl:'),
                   const TextSpan(text: ' for the desktop switch and '),
-                  DsCode.span('md:'),
+                  ElCode.span('md:'),
                   const TextSpan(text: ' for the mobile boundary.'),
                 ],
               ),
-              DsType.small,
+              ElType.small,
             ),
           ),
         ],
@@ -777,10 +793,15 @@ class _UseCopy extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextStyle style = DsText.styleOf(context, DsType.small)
-        .copyWith(height: _leadingSnug);
-    // Not a `.type-*` class, so it cannot go through [DsText]: but the line
+    final TextStyle style = ElText.styleOf(
+      context,
+      ElType.small,
+    ).copyWith(height: _leadingSnug);
+    // Not a `.type-*` class, so it cannot go through [ElText]: but the line
     // box still has to be the one CSS lays out.
-    return DsLineBox(style: style, child: Text(text, style: style));
+    return ElLineBox(
+      style: style,
+      child: Text(text, style: style),
+    );
   }
 }

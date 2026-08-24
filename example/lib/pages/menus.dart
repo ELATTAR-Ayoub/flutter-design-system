@@ -56,8 +56,8 @@
 ///     `aria-haspopup="menu"` *(probed on all three)*, which cancels the
 ///     Button's `active:not-aria-[haspopup]:scale-95`: selects-map drift 20,
 ///     one component over. Reproduced: every trigger on this page passes
-///     [DsButton.suppressPressScale], and the open fill beside it comes from
-///     [DsMenuTriggerScope] (GAP CLOSED 1 and 2 on [DsDropdownMenu]).
+///     [ElButton.suppressPressScale], and the open fill beside it comes from
+///     [ElMenuTriggerScope] (GAP CLOSED 1 and 2 on [ElDropdownMenu]).
 ///  9. **`Icon size="sm"` renders at 16px, not 14.** Every row's
 ///     `[&_svg:not([class*='size-'])]:size-4` beats the SVG's own attributes
 ///     while `strokeWidth` stays at the 14px-derived 2.4. Seven sites here;
@@ -97,19 +97,19 @@ import '../nav.dart';
 const double _measureXs = 320;
 
 /// `className="w-60"` on the account menu, 240.
-double get _accountMenuWidth => ds(60);
+double get _accountMenuWidth => el(60);
 
 /// `className="w-52"` on the Columns and Sort menus, 208.
-double get _optionMenuWidth => ds(52);
+double get _optionMenuWidth => el(52);
 
 /// `size-7` on the avatar, 28, one off the component's own `size-8` default.
-double get _avatarSize => ds(7);
+double get _avatarSize => el(7);
 
 /// `h-40` on the card.
-double get _cardHeight => ds(40);
+double get _cardHeight => el(40);
 
 /// `mt-5`: the caption under every specimen.
-double get _captionGap => ds(5);
+double get _captionGap => el(5);
 
 /* ── Page ────────────────────────────────────────────────────────────────── */
 
@@ -118,12 +118,12 @@ class MenusPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsCategoryHit here = findCategory('base', 'menus');
+    final ElCategoryHit here = findCategory('base', 'menus');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        DsPageHeader(
+        ElPageHeader(
           // DRIFT 1.
           eyebrow: '${here.group.title} · Base',
           title: here.category.title,
@@ -135,7 +135,7 @@ class MenusPage extends StatelessWidget {
         const _MenubarSection(),
         const _ApiSection(),
         const _RulesSection(),
-        const DsPageFootNav(groupId: 'base', slug: 'menus'),
+        const ElPageFootNav(groupId: 'base', slug: 'menus'),
       ],
     );
   }
@@ -149,9 +149,9 @@ class _Caption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-        padding: EdgeInsets.only(top: _captionGap),
-        child: DsText(text, DsType.small),
-      );
+    padding: EdgeInsets.only(top: _captionGap),
+    child: ElText(text, ElType.small),
+  );
 }
 
 /* ── §1 · dropdown ───────────────────────────────────────────────────────── */
@@ -162,73 +162,76 @@ class _DropdownSection extends StatelessWidget {
   /// `<DropdownMenuLabel>` is a two-line block here, not a string: a
   /// `--foreground` name over a `.type-micro` line with a 12px verified tick in
   /// it. The rest of the menu is four rows and two rules.
-  static List<DsMenuChild> _account(BuildContext context) => <DsMenuChild>[
-        const DsMenuLabel('voidwing', child: _AccountLabel()),
-        const DsMenuSeparator(),
-        // `DropdownMenuGroup`: a `role="group"` that paints nothing.
-        const DsMenuGroup(children: <DsMenuChild>[
-          DsMenuItem(
-            label: 'Wallet',
-            icon: DsIconGlyph.wallet,
-            // *"The balance rides in the shortcut slot on the right: a real
-            // number in the normal product face with tabular numerals"*, says
-            // the caption. The class is `text-xs tracking-widest` **sans**;
-            // the caption describes a face the slot does not use.
-            shortcut: r'$1,204.80',
-          ),
-          DsMenuItem(label: 'Favourites', icon: DsIconGlyph.heart),
-          DsMenuItem(label: 'Preferences', icon: DsIconGlyph.settings),
-        ]),
-        const DsMenuSeparator(),
-        const DsMenuItem(
-          label: 'Sign out',
-          icon: DsIconGlyph.logOut,
-          variant: DsMenuItemVariant.destructive,
+  static List<ElMenuChild> _account(BuildContext context) => <ElMenuChild>[
+    const ElMenuLabel('voidwing', child: _AccountLabel()),
+    const ElMenuSeparator(),
+    // `DropdownMenuGroup`: a `role="group"` that paints nothing.
+    const ElMenuGroup(
+      children: <ElMenuChild>[
+        ElMenuItem(
+          label: 'Wallet',
+          icon: ElIconGlyph.wallet,
+          // *"The balance rides in the shortcut slot on the right: a real
+          // number in the normal product face with tabular numerals"*, says
+          // the caption. The class is `text-xs tracking-widest` **sans**;
+          // the caption describes a face the slot does not use.
+          shortcut: r'$1,204.80',
         ),
-      ];
+        ElMenuItem(label: 'Favourites', icon: ElIconGlyph.heart),
+        ElMenuItem(label: 'Preferences', icon: ElIconGlyph.settings),
+      ],
+    ),
+    const ElMenuSeparator(),
+    const ElMenuItem(
+      label: 'Sign out',
+      icon: ElIconGlyph.logOut,
+      variant: ElMenuItemVariant.destructive,
+    ),
+  ];
 
   /// `<DropdownMenuCheckboxItem checked>` ×2 then ×2 unchecked, with no
   /// handler, DRIFT 6.
-  static const List<DsMenuChild> _columns = <DsMenuChild>[
-    DsMenuLabel('Visible columns'),
-    DsMenuSeparator(),
-    DsMenuCheckboxItem(label: 'Rarity', checked: true),
-    DsMenuCheckboxItem(label: 'Value', checked: true),
-    DsMenuCheckboxItem(label: 'Condition', checked: false),
-    DsMenuCheckboxItem(label: 'Acquired', checked: false),
+  static const List<ElMenuChild> _columns = <ElMenuChild>[
+    ElMenuLabel('Visible columns'),
+    ElMenuSeparator(),
+    ElMenuCheckboxItem(label: 'Rarity', checked: true),
+    ElMenuCheckboxItem(label: 'Value', checked: true),
+    ElMenuCheckboxItem(label: 'Condition', checked: false),
+    ElMenuCheckboxItem(label: 'Acquired', checked: false),
   ];
 
   /// `<DropdownMenuRadioGroup value="value">`, also handler-free.
-  static const List<DsMenuChild> _sort = <DsMenuChild>[
-    DsMenuLabel('Sort cards by'),
-    DsMenuSeparator(),
-    DsMenuRadioGroup(
+  static const List<ElMenuChild> _sort = <ElMenuChild>[
+    ElMenuLabel('Sort cards by'),
+    ElMenuSeparator(),
+    ElMenuRadioGroup(
       value: 'value',
-      children: <DsMenuRadioItem>[
-        DsMenuRadioItem(value: 'value', label: 'Highest value'),
-        DsMenuRadioItem(value: 'rarity', label: 'Rarity'),
-        DsMenuRadioItem(value: 'recent', label: 'Recently acquired'),
+      children: <ElMenuRadioItem>[
+        ElMenuRadioItem(value: 'value', label: 'Highest value'),
+        ElMenuRadioItem(value: 'rarity', label: 'Rarity'),
+        ElMenuRadioItem(value: 'recent', label: 'Recently acquired'),
       ],
     ),
   ];
 
   @override
   Widget build(BuildContext context) {
-    return DsSection(
+    return ElSection(
       id: 'dropdown',
       title: 'Dropdown Menu',
-      description: 'The account menu in the top navigation is the most-used '
+      description:
+          'The account menu in the top navigation is the most-used '
           'instance. Destructive items sit last, below a separator, so a '
           'mis-click cannot reach them.',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          DsPanel(
+          ElPanel(
             label: 'Account dropdown',
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                DsDropdownMenu(
+                ElDropdownMenu(
                   width: _accountMenuWidth,
                   children: _account(context),
                   trigger: const _AccountTrigger(),
@@ -242,23 +245,23 @@ class _DropdownSection extends StatelessWidget {
             ),
           ),
           // `className="mt-4"`.
-          SizedBox(height: ds(4)),
-          DsPanel(
+          SizedBox(height: el(4)),
+          ElPanel(
             label: 'Checkbox and radio items',
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 // `flex flex-wrap gap-3`.
                 Wrap(
-                  spacing: ds(3),
-                  runSpacing: ds(3),
+                  spacing: el(3),
+                  runSpacing: el(3),
                   children: <Widget>[
-                    DsDropdownMenu(
+                    ElDropdownMenu(
                       width: _optionMenuWidth,
                       children: _columns,
                       trigger: const _OutlineTrigger('Columns'),
                     ),
-                    DsDropdownMenu(
+                    ElDropdownMenu(
                       width: _optionMenuWidth,
                       children: _sort,
                       trigger: const _OutlineTrigger('Sort'),
@@ -287,21 +290,21 @@ class _AccountTrigger extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
-    return DsButton(
-      variant: DsButtonVariant.ghost,
+    final ElThemeData theme = ElTheme.of(context);
+    return ElButton(
+      variant: ElButtonVariant.ghost,
       // The two attributes `asChild` merges into this element. `aria-haspopup`
       // is a constant of the arrangement, DRIFT 8, the trigger does not
       // squish: and `aria-expanded` is the menu's own state, read from the
-      // scope [DsDropdownMenu] publishes it on: `ghost` holds
+      // scope [ElDropdownMenu] publishes it on: `ghost` holds
       // `bg-secondary text-foreground` for as long as the menu is open,
       // pointer or no pointer.
       suppressPressScale: true,
-      expanded: DsMenuTriggerScope.openOf(context),
+      expanded: ElMenuTriggerScope.openOf(context),
       // `px-2` beats the `default` rung's own `px-4` through twMerge.
-      padding: EdgeInsets.symmetric(horizontal: ds(2)),
+      padding: EdgeInsets.symmetric(horizontal: el(2)),
       // The menu opens on **pointer-down**, one level up in
-      // `DsMenuPointerDown`: Radix's trigger never waits for the click. This
+      // `ElMenuPointerDown`: Radix's trigger never waits for the click. This
       // handler is the `asChild` arrangement itself: the page's `<Button>` has
       // no `onClick` of its own and is enabled all the same, and a `null` here
       // would dim it to 45% and stop the press ever reaching the trigger.
@@ -311,9 +314,9 @@ class _AccountTrigger extends StatelessWidget {
         children: <Widget>[
           const _Avatar('VW'),
           // `gap-2.5`, 10, not the rung's own 8.
-          SizedBox(width: ds(2.5)),
+          SizedBox(width: el(2.5)),
           // `<span className="type-small text-foreground">`.
-          DsText('voidwing', DsType.small, color: theme.foreground),
+          ElText('voidwing', ElType.small, color: theme.foreground),
         ],
       ),
     );
@@ -327,16 +330,16 @@ class _OutlineTrigger extends StatelessWidget {
   final String label;
 
   @override
-  Widget build(BuildContext context) => DsButton(
-        variant: DsButtonVariant.outline,
-        // See [_AccountTrigger]: the press is handled on pointer-down, and
-        // the same two `asChild` attributes land here. `outline`'s open fill is
-        // `aria-expanded:bg-muted`, which is its hover fill.
-        suppressPressScale: true,
-        expanded: DsMenuTriggerScope.openOf(context),
-        onPressed: () {},
-        child: DsText(label, DsComponentType.buttonLabel),
-      );
+  Widget build(BuildContext context) => ElButton(
+    variant: ElButtonVariant.outline,
+    // See [_AccountTrigger]: the press is handled on pointer-down, and
+    // the same two `asChild` attributes land here. `outline`'s open fill is
+    // `aria-expanded:bg-muted`, which is its hover fill.
+    suppressPressScale: true,
+    expanded: ElMenuTriggerScope.openOf(context),
+    onPressed: () {},
+    child: ElText(label, ElComponentType.buttonLabel),
+  );
 }
 
 /// `<Avatar className="size-7"><AvatarFallback className="type-num-sm">`.
@@ -352,7 +355,7 @@ class _Avatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return SizedBox(
       width: _avatarSize,
       height: _avatarSize,
@@ -360,11 +363,11 @@ class _Avatar extends StatelessWidget {
         decoration: BoxDecoration(
           color: theme.muted,
           shape: BoxShape.circle,
-          border: Border.all(color: theme.border, width: DsWidths.hairline),
+          border: Border.all(color: theme.border, width: ElWidths.hairline),
         ),
         child: Center(
           // `className="type-num-sm"` beats `AvatarFallback`'s own `text-sm`.
-          child: DsText(initials, DsType.numSm, color: theme.mutedForeground),
+          child: ElText(initials, ElType.numSm, color: theme.mutedForeground),
         ),
       ),
     );
@@ -378,16 +381,20 @@ class _AccountLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         // `<span className="block text-foreground">`: no `font-*` of its own,
         // so it inherits the label's own 12px / 500.
-        DsText('voidwing', DsComponentType.menuHeading, color: theme.foreground),
+        ElText(
+          'voidwing',
+          ElComponentType.menuHeading,
+          color: theme.foreground,
+        ),
         // `mt-1`.
-        SizedBox(height: ds(1)),
+        SizedBox(height: el(1)),
         // `<span className="type-micro mt-1 flex items-center gap-1.5">`.
         Row(
           mainAxisSize: MainAxisSize.min,
@@ -395,14 +402,14 @@ class _AccountLabel extends StatelessWidget {
           children: <Widget>[
             // `size="xs"`: and the label carries no `size-4` rule, so this
             // one really is 12px. DRIFT 9's exception.
-            const DsIcon(
-              DsIconGlyph.shieldCheck,
-              size: DsIconSize.xs,
-              tone: DsIconTone.success,
+            const ElIcon(
+              ElIconGlyph.shieldCheck,
+              size: ElIconSize.xs,
+              tone: ElIconTone.success,
             ),
             // `gap-1.5`.
-            SizedBox(width: ds(1.5)),
-            DsText('Verified · Rank 24', DsType.micro),
+            SizedBox(width: el(1.5)),
+            ElText('Verified · Rank 24', ElType.micro),
           ],
         ),
       ],
@@ -415,41 +422,42 @@ class _AccountLabel extends StatelessWidget {
 class _ContextSection extends StatelessWidget {
   const _ContextSection();
 
-  static const List<DsMenuChild> _stash = <DsMenuChild>[
-    DsMenuItem(label: 'Favourite', icon: DsIconGlyph.heart, shortcut: 'F'),
-    DsMenuItem(label: 'Share pull', icon: DsIconGlyph.share2),
-    DsMenuSub(
+  static const List<ElMenuChild> _stash = <ElMenuChild>[
+    ElMenuItem(label: 'Favourite', icon: ElIconGlyph.heart, shortcut: 'F'),
+    ElMenuItem(label: 'Share pull', icon: ElIconGlyph.share2),
+    ElMenuSub(
       label: 'Shipping',
-      icon: DsIconGlyph.truck,
-      children: <DsMenuChild>[
-        DsMenuItem(label: 'Add to shipment'),
-        DsMenuItem(label: 'Ship immediately'),
+      icon: ElIconGlyph.truck,
+      children: <ElMenuChild>[
+        ElMenuItem(label: 'Add to shipment'),
+        ElMenuItem(label: 'Ship immediately'),
       ],
     ),
-    DsMenuSeparator(),
-    DsMenuItem(
+    ElMenuSeparator(),
+    ElMenuItem(
       label: r'Sell for $1,240.00',
-      icon: DsIconGlyph.trash2,
-      variant: DsMenuItemVariant.destructive,
+      icon: ElIconGlyph.trash2,
+      variant: ElMenuItemVariant.destructive,
     ),
   ];
 
   @override
   Widget build(BuildContext context) {
-    return DsSection(
+    return ElSection(
       id: 'context',
       title: 'Context Menu',
-      description: 'Right-click on a card in the Stash. It is always a '
+      description:
+          'Right-click on a card in the Stash. It is always a '
           'shortcut to actions that exist elsewhere too: never the only route '
           'to something.',
-      child: DsPanel(
+      child: ElPanel(
         label: 'Right-click the card',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            DsContextMenu(
+            ElContextMenu(
               // `className="w-56"`.
-              width: ds(56),
+              width: el(56),
               children: _stash,
               child: const _StashCard(),
             ),
@@ -471,7 +479,7 @@ class _StashCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return ConstrainedBox(
       constraints: BoxConstraints(maxWidth: _measureXs),
       child: SizedBox(
@@ -479,8 +487,8 @@ class _StashCard extends StatelessWidget {
         child: DecoratedBox(
           decoration: BoxDecoration(
             color: theme.card,
-            borderRadius: BorderRadius.circular(DsRadii.lg),
-            border: Border.all(color: theme.border, width: DsWidths.hairline),
+            borderRadius: BorderRadius.circular(ElRadii.lg),
+            border: Border.all(color: theme.border, width: ElWidths.hairline),
           ),
           // `place-items-center` on a one-cell grid.
           child: Center(
@@ -488,24 +496,23 @@ class _StashCard extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                DsText(
+                ElText(
                   'Voidwing Ascendant',
-                  DsType.h4,
+                  ElType.h4,
                   color: theme.foreground,
                   align: TextAlign.center,
                 ),
                 // `mt-2`.
-                SizedBox(height: ds(2)),
-                DsText(
+                SizedBox(height: el(2)),
+                ElText(
                   'Legendary',
-                  DsType.label,
+                  ElType.label,
                   color: theme.valueInk,
                   align: TextAlign.center,
                 ),
                 // `mt-3`.
-                SizedBox(height: ds(3)),
-                DsText('Right-click me', DsType.small,
-                    align: TextAlign.center),
+                SizedBox(height: el(3)),
+                ElText('Right-click me', ElType.small, align: TextAlign.center),
               ],
             ),
           ),
@@ -520,39 +527,49 @@ class _StashCard extends StatelessWidget {
 class _MenubarSection extends StatelessWidget {
   const _MenubarSection();
 
-  static const List<DsMenubarMenu> _admin = <DsMenubarMenu>[
-    DsMenubarMenu(label: 'Packs', children: <DsMenuChild>[
-      DsMenuItem(label: 'New pack', shortcut: '⌘N'),
-      DsMenuItem(label: 'Import card set'),
-      DsMenuSeparator(),
-      DsMenuItem(label: 'Publish queue'),
-    ]),
-    DsMenubarMenu(label: 'Users', children: <DsMenuChild>[
-      DsMenuItem(label: 'Search users'),
-      DsMenuItem(label: 'Verification queue'),
-    ]),
-    DsMenubarMenu(label: 'Wallet', children: <DsMenuChild>[
-      DsMenuItem(label: 'Withdrawal approvals'),
-      DsMenuItem(label: 'Transaction audit'),
-    ]),
+  static const List<ElMenubarMenu> _admin = <ElMenubarMenu>[
+    ElMenubarMenu(
+      label: 'Packs',
+      children: <ElMenuChild>[
+        ElMenuItem(label: 'New pack', shortcut: '⌘N'),
+        ElMenuItem(label: 'Import card set'),
+        ElMenuSeparator(),
+        ElMenuItem(label: 'Publish queue'),
+      ],
+    ),
+    ElMenubarMenu(
+      label: 'Users',
+      children: <ElMenuChild>[
+        ElMenuItem(label: 'Search users'),
+        ElMenuItem(label: 'Verification queue'),
+      ],
+    ),
+    ElMenubarMenu(
+      label: 'Wallet',
+      children: <ElMenuChild>[
+        ElMenuItem(label: 'Withdrawal approvals'),
+        ElMenuItem(label: 'Transaction audit'),
+      ],
+    ),
   ];
 
   @override
   Widget build(BuildContext context) {
-    return DsSection(
+    return ElSection(
       id: 'menubar',
       title: 'Menubar',
-      description: 'Not used in the collector-facing product. It is here '
+      description:
+          'Not used in the collector-facing product. It is here '
           'because the admin surface will need it: pack management, card '
           'management and audit logs.',
-      child: const DsPanel(
+      child: const ElPanel(
         label: 'Admin menubar',
         note: 'Future admin surface',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             // DRIFT 2, 32px triggers in a 32px bar with 4px of padding.
-            DsMenubar(menus: _admin),
+            ElMenubar(menus: _admin),
             _Caption(
               'Included so the design system can absorb the admin panel later '
               'without inventing new patterns, per the brief.',
@@ -571,22 +588,24 @@ class _ApiSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsSection(
+    return ElSection(
       id: 'api',
       title: 'API',
-      child: DsMeta(
-        items: <DsMetaItem>[
+      child: ElMeta(
+        items: <ElMetaItem>[
           (
             k: 'DropdownMenuItem variant',
             v: const TextSpan(
-              text: '"default" or "destructive". Destructive items go last, '
+              text:
+                  '"default" or "destructive". Destructive items go last, '
                   'after a separator.',
             ),
           ),
           (
             k: 'DropdownMenuShortcut',
             v: const TextSpan(
-              text: 'Right-aligned slot. Used for keyboard hints and for live '
+              text:
+                  'Right-aligned slot. Used for keyboard hints and for live '
                   'figures like a balance.',
             ),
           ),
@@ -603,7 +622,8 @@ class _ApiSection extends StatelessWidget {
           (
             k: 'ContextMenuSub',
             v: const TextSpan(
-              text: 'One nesting level only. Deeper hierarchies belong in a '
+              text:
+                  'One nesting level only. Deeper hierarchies belong in a '
                   'dialog.',
             ),
           ),
@@ -620,13 +640,13 @@ class _RulesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsSection(
+    return ElSection(
       id: 'rules',
       title: 'Rules',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          const DsDoDont(
+          const ElDoDont(
             dos: <String>[
               'Put destructive items last, separated from everything above '
                   'them.',
@@ -646,10 +666,10 @@ class _RulesSection extends StatelessWidget {
             ],
           ),
           // `className="mt-4"` on both Notes.
-          SizedBox(height: ds(4)),
-          const DsNote(child: _AccentNoteBody()),
-          SizedBox(height: ds(4)),
-          const DsNote(
+          SizedBox(height: el(4)),
+          const ElNote(child: _AccentNoteBody()),
+          SizedBox(height: el(4)),
+          const ElNote(
             title: 'Geometry, and why it drifts',
             child: _GeometryNoteBody(),
           ),
@@ -665,20 +685,21 @@ class _AccentNoteBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsRichText(
+    return ElRichText(
       TextSpan(
         children: <InlineSpan>[
           const TextSpan(text: 'Menu items take '),
-          DsCode.span('--accent'),
+          ElCode.span('--accent'),
           const TextSpan(text: ' on hover and sit on '),
-          DsCode.span('--popover'),
+          ElCode.span('--popover'),
           const TextSpan(
-            text: ', which is why a menu reads as floating without needing a '
+            text:
+                ', which is why a menu reads as floating without needing a '
                 'glow.',
           ),
         ],
       ),
-      DsType.small,
+      ElType.small,
     );
   }
 }
@@ -690,29 +711,36 @@ class _GeometryNoteBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsRichText(
+    return ElRichText(
       TextSpan(
         children: <InlineSpan>[
           const TextSpan(text: '8px container inset, '),
-          DsCode.span('px-3 py-2'),
-          const TextSpan(text: ' items, 8px gap: a 36px row. Stock shadcn '
-              'ships '),
-          DsCode.span('p-1'),
-          const TextSpan(text: ' and '),
-          DsCode.span('px-1.5 py-1'),
+          ElCode.span('px-3 py-2'),
           const TextSpan(
-            text: ', which is 4px and 6px/4px: not on the 8-point scale and '
+            text:
+                ' items, 8px gap: a 36px row. Stock shadcn '
+                'ships ',
+          ),
+          ElCode.span('p-1'),
+          const TextSpan(text: ' and '),
+          ElCode.span('px-1.5 py-1'),
+          const TextSpan(
+            text:
+                ', which is 4px and 6px/4px: not on the 8-point scale and '
                 'visibly cramped next to our controls. The same rhythm is '
                 'applied to Dropdown, Context Menu, Menubar, Select and '
                 'Command so a list looks the same wherever it appears. '
                 'Re-running ',
           ),
-          DsCode.span('npx shadcn add'),
-          const TextSpan(text: ' on any of them brings the tight values '
-              'straight back.'),
+          ElCode.span('npx shadcn add'),
+          const TextSpan(
+            text:
+                ' on any of them brings the tight values '
+                'straight back.',
+          ),
         ],
       ),
-      DsType.small,
+      ElType.small,
     );
   }
 }

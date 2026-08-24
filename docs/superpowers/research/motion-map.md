@@ -2,14 +2,14 @@
 
 **Files that produce the render** (all under `D:\DESIGN\Design-System-2026-8\design-system\`):
 - `app\design-system\motion\page.tsx` — the page. **`"use client"`** — the only foundation page with local state (`const [run, setRun] = useState(0)`). Module-level data: two arrays (`durations` ×6, `easings` ×4) and one local component (`CurveGraph`).
-- `components\ds\kit.tsx` — `DsPageHeader`, `DsSection`, `Panel`, `Meta`, `Code`, `Note`, `DoDont`, `PageFootNav` (all eight used).
+- `components\el\kit.tsx` — `ElPageHeader`, `ElSection`, `Panel`, `Meta`, `Code`, `Note`, `DoDont`, `PageFootNav` (all eight used).
 - `components\ui\button.tsx` — `Button variant="outline" size="sm"` ×3 (the three replay buttons).
 - `components\ui\icon.tsx` — `Icon` with lucide `RotateCcw` (×3) and `Sparkles` (×1), plus `Check`/`X`/`ArrowLeft`/`ArrowRight` inside kit.
-- `lib\ds\nav.ts` — `findCategory("foundations","motion")` supplies header copy; `siblings()` supplies foot nav.
+- `lib\el\nav.ts` — `findCategory("foundations","motion")` supplies header copy; `siblings()` supplies foot nav.
 - `app\design-system\layout.tsx` — shell (identical to the other foundation pages; see `shared-map.md` §1).
 - `app\globals.css` — **every keyframe, utility, duration and easing token below**. Line numbers cited throughout.
 
-**This map assumes you also hold `shared-map.md`.** Kit anatomy (Panel/Note/Meta/DoDont/PageFootNav/DsSection/DsPageHeader), the shell, the type scale and the shadow ladder are documented there and are not repeated except where this page uses them in a way the other pages do not.
+**This map assumes you also hold `shared-map.md`.** Kit anatomy (Panel/Note/Meta/DoDont/PageFootNav/ElSection/ElPageHeader), the shell, the type scale and the shadow ladder are documented there and are not repeated except where this page uses them in a way the other pages do not.
 
 ---
 
@@ -31,13 +31,13 @@ Panels are `border` (1px) + body `p-6` (24px), `box-sizing: border-box` → **bo
 
 Duration bar track: row grid `sm:grid-cols-[13rem_4rem_1fr]` + `gap-4` inside 1030 → 208 | 64 | **726** with two 16px gaps. Track is 726 × 32px (`h-8`).
 
-Section rhythm: `DsSection` = `mb-20` (80px), heading block `mb-6`, `<h2 class="type-h3">`, description `type-small mt-2 max-w-2xl` (672px cap).
+Section rhythm: `ElSection` = `mb-20` (80px), heading block `mb-6`, `<h2 class="type-h3">`, description `type-small mt-2 max-w-2xl` (672px cap).
 
 ---
 
-## 1 · Page header (`DsPageHeader`)
+## 1 · Page header (`ElPageHeader`)
 
-From `lib\ds\nav.ts` foundations→motion (nav.ts:99–112), verbatim:
+From `lib\el\nav.ts` foundations→motion (nav.ts:99–112), verbatim:
 1. Eyebrow `type-label text-action-ink` → **"Foundations"**
 2. `<h1 class="type-h1 mt-4 text-foreground">` → **"Motion"**
 3. Blurb `type-lead mt-4 max-w-2xl` → **"Durations, easing curves and the named animations — each one running live so timing can be judged, not guessed."** (real em dash U+2014)
@@ -82,7 +82,7 @@ Body, in order:
 2. `<div class="space-y-4">` → six rows, each `grid items-center gap-4 sm:grid-cols-[13rem_4rem_1fr]`:
    - col 1 `type-num-sm text-action-ink` → the token literal
    - col 2 `type-num-sm text-muted-foreground` → `{ms}ms`
-   - col 3 the track: `h-8 overflow-hidden rounded-sm bg-muted` (32px tall, 6px radius, `--muted`), containing the bar `h-full rounded-sm bg-action` with **inline** `animation: ds-sweep {ms}ms var(--ease-out) both` and `key={`${token}-${run}`}`.
+   - col 3 the track: `h-8 overflow-hidden rounded-sm bg-muted` (32px tall, 6px radius, `--muted`), containing the bar `h-full rounded-sm bg-action` with **inline** `animation: el-sweep {ms}ms var(--ease-out) both` and `key={`${token}-${run}`}`.
 3. `<div class="mt-6 space-y-2 border-t border-border pt-5">` → six `<p class="type-small">` each = `<span class="type-num-sm text-muted-foreground">{ms}ms</span>` + `" — "` + use copy.
 
 The source carries an `allow-dynamic-motion:` comment justifying the inline per-row duration ("this page IS the duration scale"). Port it as data-driven, not as six hardcoded widgets.
@@ -98,14 +98,14 @@ The source carries an `allow-dynamic-motion:` comment justifying the inline per-
 
 Rows render in **array order**, which is *not* ascending: 80, 150, 250, 400, **320**, 550. `--duration-slow` (400) sits above `--duration-overlay` (320). Keep the order.
 
-**`ds-sweep`** (globals.css:2195–2202) — animates `width`, nothing else:
+**`el-sweep`** (globals.css:2195–2202) — animates `width`, nothing else:
 
 | stop | width |
 |---|---|
 | `from` | `0` |
 | `to` | `100%` |
 
-Fill `both`, curve `--ease-out` `cubic-bezier(0.22,1,0.36,1)`. On the 726px track the bar grows 0 → 726px. Flutter: animate a `SizedBox`/`FractionallySizedBox` factor 0→1 over `DsCurves.out`; the parent clips (`overflow-hidden`), so a plain `ClipRRect(BorderRadius.circular(DsRadii.sm))` is enough. The *bar* also carries `rounded-sm`, so at small widths it is a 6px-radius pill, not a square sliver.
+Fill `both`, curve `--ease-out` `cubic-bezier(0.22,1,0.36,1)`. On the 726px track the bar grows 0 → 726px. Flutter: animate a `SizedBox`/`FractionallySizedBox` factor 0→1 over `ElCurves.out`; the parent clips (`overflow-hidden`), so a plain `ClipRRect(BorderRadius.circular(ElRadii.sm))` is enough. The *bar* also carries `rounded-sm`, so at small widths it is a 6px-radius pill, not a square sliver.
 
 ---
 
@@ -169,7 +169,7 @@ Spring overshoot derivation (for a parity probe): with P0=(0,100), P1=(34,−56)
 
 ⚠ **The dashed line is invisible.** `<line y=0 … 0..100>` lies exactly on the `<rect>`'s own top edge, same colour, same 1-unit width. The rect's solid stroke paints over the dashes. Draw both (order: rect, then line, then path) and expect no visible dash. It is dead ink, not a missing feature.
 
-**Painter recipe.** `Path()..moveTo(0,100)..cubicTo(x1*100, 100-y1*100, x2*100, 100-y2*100, 100, 0)`, then a canvas transform implementing `meet`: `canvas.translate(dx, 0); canvas.scale(s); canvas.translate(8, 58);`. Stroke widths must be authored in **user units and scaled by the same transform** (a `Paint.strokeWidth` set post-scale will not match). `stroke` colours: rect/line `--border`, path `--color-action`. Default SVG caps are `butt` and joins `miter` — Flutter defaults to `StrokeCap.butt`/`StrokeJoin.miter`, so no override needed (note this differs from `DsIcon`'s `_GlyphPainter`, which sets round caps for lucide).
+**Painter recipe.** `Path()..moveTo(0,100)..cubicTo(x1*100, 100-y1*100, x2*100, 100-y2*100, 100, 0)`, then a canvas transform implementing `meet`: `canvas.translate(dx, 0); canvas.scale(s); canvas.translate(8, 58);`. Stroke widths must be authored in **user units and scaled by the same transform** (a `Paint.strokeWidth` set post-scale will not match). `stroke` colours: rect/line `--border`, path `--color-action`. Default SVG caps are `butt` and joins `miter` — Flutter defaults to `StrokeCap.butt`/`StrokeJoin.miter`, so no override needed (note this differs from `ElIcon`'s `_GlyphPainter`, which sets round caps for lucide).
 
 Accessibility label verbatim: `` `Easing curve ${pts.join(", ")}` `` → e.g. **"Easing curve 0.34, 1.56, 0.64, 1"** (JS `join` prints `1`, not `1.0`).
 
@@ -178,7 +178,7 @@ Accessibility label verbatim: `` `Easing curve ${pts.join(", ")}` `` → e.g. **
 ```tsx
 <div className="mt-4 h-6 rounded-sm bg-muted">
   <div key={`${e.token}-${run}`} className="size-6 rounded-sm bg-value"
-       style={{ animation: `ds-travel var(--duration-bloom) ${e.curve} both` }} />
+       style={{ animation: `el-travel var(--duration-bloom) ${e.curve} both` }} />
 </div>
 ```
 
@@ -186,7 +186,7 @@ Track: 482 × 24px, `rounded-sm` 6px, `--muted`. Chip: 24 × 24px (`size-6`), `r
 
 Duration is **`--duration-bloom` = 1000ms** (globals.css:411) — the page's own comment records that this replaced "the 900ms literal that was here". Easing is the row's own `e.curve` string, i.e. each chip runs its own curve over an identical fixed time. The source comment states the intent: "the travel time is fixed on purpose so every curve is judged over the same distance".
 
-**`ds-travel`** (globals.css:2203–2210):
+**`el-travel`** (globals.css:2203–2210):
 
 | stop | transform |
 |---|---|
@@ -195,7 +195,7 @@ Duration is **`--duration-bloom` = 1000ms** (globals.css:411) — the page's own
 
 ⚠⚠ **DRIFT — the chip does not move.** In CSS, a percentage inside `translateX` resolves against **the transformed element's own border box**, never the parent. The chip is `size-6` = 1.5rem = 24px wide, so `100%` = 24px and `calc(100% − 1.5rem)` = **0px**. The animation runs for 1000ms and translates by zero. The four easing panels communicate their curve through `CurveGraph` alone; the lime square is static.
 
-The intended reading — "travel the track, minus the chip's own width" — would require the percentage to resolve against the 482px track, which `translateX` cannot do. **Do not fix it.** Port `ds-travel` as `translateX(elementWidth − 24px)`, which evaluates to 0 for this call site and stays faithful if the utility is ever reused on a wider element. Flag it in the port's own comments. (Confidence: derived from spec, not observed — see Open questions Q1 for the one-line browser check.)
+The intended reading — "travel the track, minus the chip's own width" — would require the percentage to resolve against the 482px track, which `translateX` cannot do. **Do not fix it.** Port `el-travel` as `translateX(elementWidth − 24px)`, which evaluates to 0 for this call site and stays faithful if the utility is ever reused on a wider element. Flag it in the port's own comments. (Confidence: derived from spec, not observed — see Open questions Q1 for the one-line browser check.)
 
 ---
 
@@ -253,16 +253,16 @@ The *section description* and `RULES.md`:461 both assert the blanket 40/250. The
 
 Shadow values these depend on (globals.css:354–377, ink themed):
 - `--shadow-key: 0 4px 0 var(--wall), 0 7px 12px var(--ink-3)`
-- `--shadow-key-down: 0 1px 0 var(--wall), inset 0 2px 5px var(--ink-3)` — **has an inset layer** → `DsMachineSurface`
+- `--shadow-key-down: 0 1px 0 var(--wall), inset 0 2px 5px var(--ink-3)` — **has an inset layer** → `ElMachineSurface`
 - `--shadow-btn: inset 0 1px 0 var(--rim), inset 0 -2px 4px var(--ink-2), 0 1px 2px var(--ink-2), 0 3px 8px -2px var(--ink-2)`
 - `--shadow-btn-primary: inset 0 1px 0 var(--rim-strong), inset 0 -2px 5px var(--ink-2), 0 1px 2px var(--ink-2), 0 4px 10px -2px color-mix(in oklab, var(--color-action) 55%, transparent)`
 - `--shadow-e3: 0 2px 4px var(--ink-2), 0 14px 28px -8px var(--ink-3)`
 - `--wall`: dark `hsl(240 6% 8%)`, light `hsl(240 6% 82%)`; `--rim`: dark `rgb(255 255 255/.14)`, light `hsl(0 0% 100%/.85)`; `--rim-strong`: dark `rgb(255 255 255/.28)`, light `hsl(0 0% 100%/.4)`
 - `--ink-1..4`: dark `rgb(0 0 0 /.35/.5/.6/.75)`, light `hsl(240 20% 20% /.04/.07/.11/.16)`
 
-Remember the recorded port rule: **CSS blur = 2σ; Flutter derives σ = r·0.57735 + 0.5** — `DsShadowLayer.blurRadius` stores the inverted value. Never pass CSS blur numbers into `BoxShadow` directly.
+Remember the recorded port rule: **CSS blur = 2σ; Flutter derives σ = r·0.57735 + 0.5** — `ElShadowLayer.blurRadius` stores the inverted value. Never pass CSS blur numbers into `BoxShadow` directly.
 
-**Hover has no equivalent on touch.** `.lift` is hover-only in CSS. `DsLiftCard` already models it via `MouseRegion`; on a touch platform the demo is simply static, matching the web.
+**Hover has no equivalent on touch.** `.lift` is hover-only in CSS. `ElLiftCard` already models it via `MouseRegion`; on a touch platform the demo is simply static, matching the web.
 
 ---
 
@@ -333,7 +333,7 @@ Copy: **"The only animation allowed to run forever, and only on the live indicat
 
 ### 6.3 · Keyframes — every stop, verbatim (globals.css:2424–2531)
 
-CSS applies the animation's timing function **between each adjacent pair of stops**, not once across the whole run. The Flutter house pattern (`sliding_pill.dart:217–245`) is `TweenSequence` with one `TweenSequenceItem` per gap, each wrapped in its own `CurveTween(curve: DsCurves.X)`, weights = the percentage gaps. Reuse it.
+CSS applies the animation's timing function **between each adjacent pair of stops**, not once across the whole run. The Flutter house pattern (`sliding_pill.dart:217–245`) is `TweenSequence` with one `TweenSequenceItem` per gap, each wrapped in its own `CurveTween(curve: ElCurves.X)`, weights = the percentage gaps. Reuse it.
 
 **`yuki-pop-in`** (2424–2430) — `.anim-pop-in`, 550ms, `--ease-out`, `both`. Weights 55 / 25 / 12 / 8.
 
@@ -387,7 +387,7 @@ Source comment (2372–2375): the keyframes drive `transform` only, never `trans
 | *(implicit 0%)* | element's own — none |
 | `to` | `rotate(360deg)` |
 
-`steps(8)` defaults to `steps(8, jump-end)` → **eight held positions of 45°**, each **175ms**: 0°, 45°, 90°, 135°, 180°, 225°, 270°, 315°. `360°` is never displayed; the cycle wraps to 0°. Flutter: no stock `Curve` does this — build `class DsSteps extends Curve { transform(t) => (t * n).floorToDouble() / n; }` (the `jump-end` variant) and note that `Curve` is asked for `t ∈ [0,1]`; guard `t == 1.0` to return `(n-1)/n` only if you want the visual to match CSS on the wrap frame, which for an infinite loop is unobservable.
+`steps(8)` defaults to `steps(8, jump-end)` → **eight held positions of 45°**, each **175ms**: 0°, 45°, 90°, 135°, 180°, 225°, 270°, 315°. `360°` is never displayed; the cycle wraps to 0°. Flutter: no stock `Curve` does this — build `class ElSteps extends Curve { transform(t) => (t * n).floorToDouble() / n; }` (the `jump-end` variant) and note that `Curve` is asked for `t ∈ [0,1]`; guard `t == 1.0` to return `(n-1)/n` only if you want the visual to match CSS on the wrap frame, which for an infinite loop is unobservable.
 
 **`yuki-sign-on`** (2474–2481) — `.anim-sign-on`, 900ms, `steps(1, end)`, `both`. `steps(1, jump-end)` applied *between every pair* means **no interpolation at all** — each stop's value is held until the next stop's time, then snaps.
 
@@ -444,7 +444,7 @@ Flutter: a `LinearGradient` with stops `[0, 0.5, 1]` painted into a rect of widt
 | 0%, 100% | 1 | `0 0 0 0 rgba(61, 220, 151, 0.5)` |
 | 50% | 0.75 | `0 0 0 5px rgba(61, 220, 151, 0)` |
 
-Offset 0, blur 0, **spread 0 → 5px**, alpha 0.5 → 0. A hard-edged ring expanding 5px outward from the 8px dot while fading. Flutter has no `spread` on `BoxShadow` in the CSS sense for a *hard* ring — paint it as a stroked/filled circle of radius `4 + 5t` behind the dot with alpha `0.5(1−t)`, and the dot itself at `opacity` `1 → 0.75 → 1`. Interpolate both halves of the cycle with `DsCurves.inOut`.
+Offset 0, blur 0, **spread 0 → 5px**, alpha 0.5 → 0. A hard-edged ring expanding 5px outward from the 8px dot while fading. Flutter has no `spread` on `BoxShadow` in the CSS sense for a *hard* ring — paint it as a stroked/filled circle of radius `4 + 5t` behind the dot with alpha `0.5(1−t)`, and the dot itself at `opacity` `1 → 0.75 → 1`. Interpolate both halves of the cycle with `ElCurves.inOut`.
 
 ⚠ **Colour drift.** `rgba(61, 220, 151, …)` = **#3DDC97**, a hard-coded green from an earlier palette. The dot's own fill is `bg-success` = `--color-success` **#10b981**. The ring and the dot are different greens, in both themes. Port both values as written.
 
@@ -517,12 +517,12 @@ Note what it does **not** do: `animation-delay` survives, and `animation-fill-mo
 
 ### 8.2 · Per-demo behaviour under reduced motion — the authoritative table
 
-Flutter equivalent: `MediaQuery.maybeDisableAnimationsOf(context)`; the port routes durations through `dsAnimationDuration(context, d)` (`lib\src\theme_scope.dart:327–335`), which returns `Duration.zero`. For *display* of the flag (this section describes it but does not read it), use the MediaQuery directly.
+Flutter equivalent: `MediaQuery.maybeDisableAnimationsOf(context)`; the port routes durations through `elAnimationDuration(context, d)` (`lib\src\theme_scope.dart:327–335`), which returns `Duration.zero`. For *display* of the flag (this section describes it but does not read it), use the MediaQuery directly.
 
 | demo | rule that applies | resulting frozen state |
 |---|---|---|
-| `ds-sweep` ×6 (duration bars) | blanket only; fill `both` | Bar holds `to` → **full-width (726px) blue bar**, all six identical. The section's entire point is destroyed by design. |
-| `ds-travel` ×4 (easing chips) | blanket only; fill `both` | Holds `to` → `translateX(0)` (see §4.2) — **visually unchanged**, because the animation was already a no-op. |
+| `el-sweep` ×6 (duration bars) | blanket only; fill `both` | Bar holds `to` → **full-width (726px) blue bar**, all six identical. The section's entire point is destroyed by design. |
+| `el-travel` ×4 (easing chips) | blanket only; fill `both` | Holds `to` → `translateX(0)` (see §4.2) — **visually unchanged**, because the animation was already a no-op. |
 | `.anim-pop-in` | blanket **+ special case** | `opacity: 1; transform: none` forced. Final frame, no 0.01ms scale flash. |
 | `.anim-jelly` | blanket only; fill `both` | Holds 100% = `scale3d(1,1,1)` = identity → **no visible change**. |
 | `.anim-spring-up` | blanket only; fill `both` | Holds 100% = `translateY(0)`, opacity 1 (last declared at 55%). Correct final frame. |
@@ -533,7 +533,7 @@ Flutter equivalent: `MediaQuery.maybeDisableAnimationsOf(context)`; the port rou
 | `.anim-shimmer` | blanket; **no fill** | Runs once in 0.01ms, then `background-position` reverts to the element default `0% 0`. The utility's own `background` + `background-size: 200% 100%` are **not** in the keyframes, so they persist → a **static left-anchored gradient**, dark at the left edge, `--accent` band at the box's right edge. |
 | `.anim-pulse-live` | blanket; **no fill** | One 0.01ms cycle, then reverts → **plain 8px `--color-success` dot, no ring, opacity 1**. |
 | `press` / `click-spring` / `press-spring` / `press-key` / `lift` / `btn-spring` | blanket `transition-duration: 0.01ms` | State changes still happen, instantly and without easing. The buttons **still squish** on press (scale 0.9 / 0.92, 3px key travel) and `.lift` still jumps −3px on hover — they just teleport. Do not disable them. |
-| anchor scroll | `scroll-behavior: auto !important` | Jump, no smooth travel. (`DsSection.scrollTo` already routes through `dsAnimationDuration`.) |
+| anchor scroll | `scroll-behavior: auto !important` | Jump, no smooth travel. (`ElSection.scrollTo` already routes through `elAnimationDuration`.) |
 | **replay buttons** | — | Still functional. Re-keying still remounts; each demo just re-freezes to its table row above. |
 
 ---
@@ -590,7 +590,7 @@ Unkeyed: the three infinite demos (ratchet, shimmer, pulse-live), the three pres
 
 **Buttons** (identical shape ×3): `Button variant="outline" size="sm"` → `h-8` (32px), `px-3.5` (14px), `gap-1.5` (6px), `rounded-pill` (999px), `text-small` (13px) `font-medium` (500), `border-input bg-card text-foreground shadow-btn`, `hover:bg-muted`, `active:shadow-btn-down`, base `btn-spring` + `active:not-aria-[haspopup]:scale-95`. Child `<Icon icon={RotateCcw} size="sm" tone="inherit"/>` → 14px, strokeWidth 2.4, `text-current` (= `--foreground`). Labels: **"Replay"**, **"Replay curves"**, **"Replay all"**. Placement: durations → inside the panel body, `mb-5 flex justify-end`; easing → after the grid, `mt-4 flex justify-end`; named → before the grid, `mb-5 flex justify-end`.
 
-**Flutter translation.** Hold `int _run = 0` in the page's `State`. Wrap each finite demo in `KeyedSubtree(key: ValueKey('$name-$_run'), child: …)` where the child is a small `StatefulWidget` that creates its `AnimationController` in `initState` and calls `forward()` — the remount then reproduces React's semantics exactly, including "a demo that was mid-flight restarts". The alternative (`controller.forward(from: 0)` broadcast via a `ValueNotifier`) is equivalent for these nine but diverges for `ds-sweep`'s `both` fill; prefer the key. All controllers must take `dsAnimationDuration(context, …)`.
+**Flutter translation.** Hold `int _run = 0` in the page's `State`. Wrap each finite demo in `KeyedSubtree(key: ValueKey('$name-$_run'), child: …)` where the child is a small `StatefulWidget` that creates its `AnimationController` in `initState` and calls `forward()` — the remount then reproduces React's semantics exactly, including "a demo that was mid-flight restarts". The alternative (`controller.forward(from: 0)` broadcast via a `ValueNotifier`) is equivalent for these nine but diverges for `el-sweep`'s `both` fill; prefer the key. All controllers must take `elAnimationDuration(context, …)`.
 
 ---
 
@@ -671,23 +671,23 @@ The page documents **6 of 10** durations (tick, fast, base, slow, overlay, rewar
 
 Verified against `D:\DESIGN\Design-System-2026-8\flutter-design-system` at HEAD `b6ad6a3`.
 
-**Verified: there was never a `DsAnims` / `DsAnimate` keyframe player in this repository.** `git log --all --diff-filter=D --name-only` returns empty (no file has ever been deleted); a content scan of every commit in every ref for `DsAnims|DsAnimate|DsKeyframe` under `lib/` returns zero hits. `lib/src/motion` has exactly three commits, all additive. Plan for building from scratch, not for restoring.
+**Verified: there was never a `ElAnims` / `ElAnimate` keyframe player in this repository.** `git log --all --diff-filter=D --name-only` returns empty (no file has ever been deleted); a content scan of every commit in every ref for `ElAnims|ElAnimate|ElKeyframe` under `lib/` returns zero hits. `lib/src/motion` has exactly three commits, all additive. Plan for building from scratch, not for restoring.
 
 ### 14.1 · Exists — reuse as-is
 
 | Thing | Location | Notes |
 |---|---|---|
-| `DsDurations` | `lib\src\foundation\motion.dart` | `tick` 80, `fast` 150, `base` 250, `slow` 400, `overlay` 320, `jelly` 420, `reward` 550, `bloom` 1000, `sway` 44s, `swayAlt` 33s, `pressDown` 40ms, `animJelly` 600ms |
-| `DsTransforms` | same | `pressScale` 0.94, `clickSpringScale` 0.9, `pressSpringScale` 0.92, `buttonScale` 0.95, `liftY` −3, `keyDownY` 3 |
-| `DsCurves` | same | `spring`, `out`, `curveIn` (renamed from `--ease-in`), `inOut`, `settle`, `standard`, `outFlex`, plus `DsCurves.all` (7 items — ready-made for the easing gallery, but its order is `[spring, out, curveIn, inOut, outFlex, settle, standard]`, **not** the page's four-item order) |
-| `dsAnimationDuration(context, d)` | `lib\src\theme_scope.dart:327–335` | the `prefers-reduced-motion` port; returns `Duration.zero` under `MediaQuery.disableAnimations` |
-| `DsPress` | `lib\src\motion\press.dart` | asymmetric: `duration: pressDown` / `reverseDuration: base`, `DsCurves.spring` + `.flipped`; unclamped `Transform.scale` so overshoot carries; both durations re-read per build through `dsAnimationDuration` |
-| `DsLift`, `DsLiftCard` | `lib\src\motion\lift.dart` | 250ms; `DsCurves.out` for rise+shadow, `DsCurves.standard` for border tint — matches `lift` exactly; `translateY(-3)`; shadow lerps from a transparent zero-size layer |
-| `DsSlidingPillGroup` + private `_jellyScale` | `lib\src\motion\sliding_pill.dart:217–245` | **the only keyframe implementation in the tree** — `TweenSequence<Offset>` with per-segment `CurveTween(DsCurves.out)` and weights 30/15/15/18/22 = `yuki-jelly`. This is the pattern to generalise. |
-| Docs kit | `example\lib\kit.dart` | `DsPageHeader`(48) · `DsSection`(142) · `DsPanel`(236) · `DsMeta`(384, `typedef DsMetaItem = ({String k, InlineSpan v})`) · `DsCode`(442, + `DsCode.span`) · `DsDoDont`(641) · `DsNote`(740, `enum DsNoteTone{action,value,error}`) · `DsDividedList`(1196) · `DsPageFootNav`(1062) |
-| `DsButton` | `lib\src\components\button.dart` | `variant: DsButtonVariant.outline` ✅, `size: DsButtonSize.sm` ✅ (h 32, `paddingXFor` ds(3.5), `gapFor` ds(1.5)); press = `DsPress(scale: buttonScale, downDuration: tick, upDuration: base)` |
-| `DsIcon` + path layer | `lib\src\components\icon.dart`, `icon_paths.dart` | sizes xs 12 … xl3 40, `strokeFor(px)` 2.4/2/1.6, tones incl. `inherit` and `action`; full SVG `d` parser (`DsIconPathElement`, arcs → cubics) |
-| `DsMachineSurface` | `lib\src\effects\machine_surface.dart` | required for every inset shadow (`shadow-key-down`, `shadow-btn*`) |
+| `ElDurations` | `lib\src\foundation\motion.dart` | `tick` 80, `fast` 150, `base` 250, `slow` 400, `overlay` 320, `jelly` 420, `reward` 550, `bloom` 1000, `sway` 44s, `swayAlt` 33s, `pressDown` 40ms, `animJelly` 600ms |
+| `ElTransforms` | same | `pressScale` 0.94, `clickSpringScale` 0.9, `pressSpringScale` 0.92, `buttonScale` 0.95, `liftY` −3, `keyDownY` 3 |
+| `ElCurves` | same | `spring`, `out`, `curveIn` (renamed from `--ease-in`), `inOut`, `settle`, `standard`, `outFlex`, plus `ElCurves.all` (7 items — ready-made for the easing gallery, but its order is `[spring, out, curveIn, inOut, outFlex, settle, standard]`, **not** the page's four-item order) |
+| `elAnimationDuration(context, d)` | `lib\src\theme_scope.dart:327–335` | the `prefers-reduced-motion` port; returns `Duration.zero` under `MediaQuery.disableAnimations` |
+| `ElPress` | `lib\src\motion\press.dart` | asymmetric: `duration: pressDown` / `reverseDuration: base`, `ElCurves.spring` + `.flipped`; unclamped `Transform.scale` so overshoot carries; both durations re-read per build through `elAnimationDuration` |
+| `ElLift`, `ElLiftCard` | `lib\src\motion\lift.dart` | 250ms; `ElCurves.out` for rise+shadow, `ElCurves.standard` for border tint — matches `lift` exactly; `translateY(-3)`; shadow lerps from a transparent zero-size layer |
+| `ElSlidingPillGroup` + private `_jellyScale` | `lib\src\motion\sliding_pill.dart:217–245` | **the only keyframe implementation in the tree** — `TweenSequence<Offset>` with per-segment `CurveTween(ElCurves.out)` and weights 30/15/15/18/22 = `yuki-jelly`. This is the pattern to generalise. |
+| Docs kit | `example\lib\kit.dart` | `ElPageHeader`(48) · `ElSection`(142) · `ElPanel`(236) · `ElMeta`(384, `typedef ElMetaItem = ({String k, InlineSpan v})`) · `ElCode`(442, + `ElCode.span`) · `ElDoDont`(641) · `ElNote`(740, `enum ElNoteTone{action,value,error}`) · `ElDividedList`(1196) · `ElPageFootNav`(1062) |
+| `ElButton` | `lib\src\components\button.dart` | `variant: ElButtonVariant.outline` ✅, `size: ElButtonSize.sm` ✅ (h 32, `paddingXFor` el(3.5), `gapFor` el(1.5)); press = `ElPress(scale: buttonScale, downDuration: tick, upDuration: base)` |
+| `ElIcon` + path layer | `lib\src\components\icon.dart`, `icon_paths.dart` | sizes xs 12 … xl3 40, `strokeFor(px)` 2.4/2/1.6, tones incl. `inherit` and `action`; full SVG `d` parser (`ElIconPathElement`, arcs → cubics) |
+| `ElMachineSurface` | `lib\src\effects\machine_surface.dart` | required for every inset shadow (`shadow-key-down`, `shadow-btn*`) |
 | `Path.cubicTo` precedent | `icon_paths.dart:427–441, 489–491, 641` + `test\icon_paths_test.dart` | cubic drawing is already proven |
 | Nav registration | `example\lib\nav.dart:160–173` | motion category **already registered** with the correct slug, title, blurb and six `contents` strings; route resolves to `/design-system/motion` |
 
@@ -695,36 +695,36 @@ Verified against `D:\DESIGN\Design-System-2026-8\flutter-design-system` at HEAD 
 
 | Thing | Why / where |
 |---|---|
-| **A shared keyframe player** | Nothing public exists. Generalise `_jellyScale`'s pattern into e.g. `DsKeyframes` (foundation) + a `DsKeyframePlayer` widget: `TweenSequence` over `(stop%, value)` pairs, per-segment `CurveTween`, `fillMode` semantics (`both` vs none — the reduced-motion table in §8.2 hinges on it). |
-| **Eight of the nine named animations** | Only `yuki-jelly` exists (and only privately). Needed: `yuki-pop-in`, `yuki-spring-up`, `yuki-jelly-in`, `yuki-ratchet`, `yuki-sign-on`, `pulls-reveal`, `pulls-shimmer`, `pulls-pulse-live` — plus the page's own `ds-sweep` and `ds-travel`. |
+| **A shared keyframe player** | Nothing public exists. Generalise `_jellyScale`'s pattern into e.g. `ElKeyframes` (foundation) + a `ElKeyframePlayer` widget: `TweenSequence` over `(stop%, value)` pairs, per-segment `CurveTween`, `fillMode` semantics (`both` vs none — the reduced-motion table in §8.2 hinges on it). |
+| **Eight of the nine named animations** | Only `yuki-jelly` exists (and only privately). Needed: `yuki-pop-in`, `yuki-spring-up`, `yuki-jelly-in`, `yuki-ratchet`, `yuki-sign-on`, `pulls-reveal`, `pulls-shimmer`, `pulls-pulse-live` — plus the page's own `el-sweep` and `el-travel`. |
 | **A `steps()` `Curve`** | For `yuki-ratchet` `steps(8)` and `yuki-sign-on` `steps(1, end)`. `docs\superpowers\research\globals-map.md:324` already flags this. Note: `steps(1,end)` between *every* keyframe pair = a stepwise timeline, which may be simpler to model as a discrete `ValueListenable<int>` than as a `Curve`. |
 | **Duration tokens for the literals** | `motion.dart` has no constant for 0.55s, 0.8s, 0.9s, 1.4s, 2s, or the ratchet's 175ms step. The guard-as-test forbids literals outside `lib/src/foundation/`, so add them there (`popIn`, `springUp`, `signOn`, `ratchet`, `shimmer`, `pulseLive`) rather than annotating call sites. |
-| **`RotateCcw` and `Sparkles` glyphs** | `enum DsIconGlyph` has exactly 8 members (`menu, x, sun, monitor, moon, arrowLeft, arrowRight, check`). Neither exists. Precedent for adding a glyph **without touching the package enum**: `example\lib\logo.dart:19–24, 114–166` declares a file-local `const DsIconPathElement` and strokes it in its own `CustomPainter`. |
-| **Leading-icon composition on `DsButton`** | `DsButton` takes one `child`, no icon parameter. Compose `Row(children: [glyph, SizedBox(width: DsButton.gapFor(size)), Text(...)])` — the public statics `heightFor`/`paddingXFor`/`gapFor`/`isSquare` exist for exactly this. |
+| **`RotateCcw` and `Sparkles` glyphs** | `enum ElIconGlyph` has exactly 8 members (`menu, x, sun, monitor, moon, arrowLeft, arrowRight, check`). Neither exists. Precedent for adding a glyph **without touching the package enum**: `example\lib\logo.dart:19–24, 114–166` declares a file-local `const ElIconPathElement` and strokes it in its own `CustomPainter`. |
+| **Leading-icon composition on `ElButton`** | `ElButton` takes one `child`, no icon parameter. Compose `Row(children: [glyph, SizedBox(width: ElButton.gapFor(size)), Text(...)])` — the public statics `heightFor`/`paddingXFor`/`gapFor`/`isSquare` exist for exactly this. |
 | **`CurveGraph` painter** | New `CustomPainter` implementing the `xMidYMid meet` letterbox of §4.1. Do not fill the box. |
-| **`.click-spring` / `.press-spring` / `.press-key` demo widgets** | `DsPress` covers click-spring (0.9 / 40ms / 250ms) and press-spring (0.92 / 40ms — but **220ms** release, which `DsPress` cannot express from `DsDurations` alone; a 220ms token or an explicit `upDuration` is needed). `press-key` is **not** covered at all: linear 80ms, `translateY(+3)`, and a `shadow-key` → `shadow-key-down` swap that needs `DsMachineSurface`. |
+| **`.click-spring` / `.press-spring` / `.press-key` demo widgets** | `ElPress` covers click-spring (0.9 / 40ms / 250ms) and press-spring (0.92 / 40ms — but **220ms** release, which `ElPress` cannot express from `ElDurations` alone; a 220ms token or an explicit `upDuration` is needed). `press-key` is **not** covered at all: linear 80ms, `translateY(+3)`, and a `shadow-key` → `shadow-key-down` swap that needs `ElMachineSurface`. |
 | **`example\lib\pages\motion.dart`** | Does not exist. `/design-system/motion` currently renders `PlaceholderPage(eyebrow: 'Foundations', title: 'Motion')` with the literal string `'Not ported yet'` (`example\lib\pages\placeholder.dart`, 45 lines). |
-| **Route entry** | `example\lib\main.dart:100–108` `pageFor(String route)` switch — add `'$dsRoot/motion' => const MotionPage(),` + import. |
+| **Route entry** | `example\lib\main.dart:100–108` `pageFor(String route)` switch — add `'$elRoot/motion' => const MotionPage(),` + import. |
 
 ### 14.3 · Constraints the implementer must respect
 
-- **Token guard** (`test\token_guard_test.dart`) scans `lib\` and `example\lib\` (exempting only `lib/src/foundation/`) and fails on `Color(0x`, `fontSize: <digit>`, `letterSpacing: <digit>`, `FontWeight.w<digit>`, **`\bCurves.`** (stock Flutter curves banned — use `DsCurves`), `Duration(milliseconds:/microseconds: <digit>`, `BorderRadius.circular(<digit>`, **`BoxShadow(`**. Comments are scanned too. Escape hatch: trailing `// allow-hardcoded: <reason>` — see `sliding_pill.dart:236–245` for how keyframe geometry is annotated.
+- **Token guard** (`test\token_guard_test.dart`) scans `lib\` and `example\lib\` (exempting only `lib/src/foundation/`) and fails on `Color(0x`, `fontSize: <digit>`, `letterSpacing: <digit>`, `FontWeight.w<digit>`, **`\bCurves.`** (stock Flutter curves banned — use `ElCurves`), `Duration(milliseconds:/microseconds: <digit>`, `BorderRadius.circular(<digit>`, **`BoxShadow(`**. Comments are scanned too. Escape hatch: trailing `// allow-hardcoded: <reason>` — see `sliding_pill.dart:236–245` for how keyframe geometry is annotated.
 - **Nav `contents` is a contract** (`nav.dart` docstring): the six strings promise six sections exist. The page ships **seven** sections (`#rules` has no chip) — matching the web. Do not add a seventh chip.
 - **Zero third-party dependencies** (`pubspec.yaml`: only `flutter`, `flutter_test`, `flutter_lints`, `yaml`). No animation package, no SVG package.
-- **Existing bug, fix while in there:** `lib\src\motion\sliding_pill.dart:71–74` — the `_jelly` `AnimationController`'s duration is set once at field init to `DsDurations.animJelly` and never routed through `dsAnimationDuration`, so the arrival squash ignores reduced motion while the travel and fade honour it.
+- **Existing bug, fix while in there:** `lib\src\motion\sliding_pill.dart:71–74` — the `_jelly` `AnimationController`'s duration is set once at field init to `ElDurations.animJelly` and never routed through `elAnimationDuration`, so the arrival squash ignores reduced motion while the travel and fade honour it.
 
 ---
 
 ## 15 · Open questions
 
-1. **`ds-travel` = 0px (D1) — confirm in the browser before shipping the no-op.** Derived from the CSS transform spec (percentages resolve against the element's own border box), not observed. One-line check on the running reference: `getComputedStyle(document.querySelector('.size-6.bg-value')).transform` mid-animation, or `document.querySelector('.size-6.bg-value').getBoundingClientRect().left` at t=0 vs t=900ms. If it *does* move, the reference behaves differently from spec and this map's §4.2 must be rewritten.
-2. **`press-spring`'s 220ms.** It is a raw `0.22s` outside the duration scale. Add a `DsDurations.pressSpringUp = 220ms` token, or express it as an explicit `upDuration` at the call site with an `allow-hardcoded:` note? The guard makes the first cleaner; the second keeps the drift visible in the demo, which the fidelity bar may prefer.
+1. **`el-travel` = 0px (D1) — confirm in the browser before shipping the no-op.** Derived from the CSS transform spec (percentages resolve against the element's own border box), not observed. One-line check on the running reference: `getComputedStyle(document.querySelector('.size-6.bg-value')).transform` mid-animation, or `document.querySelector('.size-6.bg-value').getBoundingClientRect().left` at t=0 vs t=900ms. If it *does* move, the reference behaves differently from spec and this map's §4.2 must be rewritten.
+2. **`press-spring`'s 220ms.** It is a raw `0.22s` outside the duration scale. Add a `ElDurations.pressSpringUp = 220ms` token, or express it as an explicit `upDuration` at the call site with an `allow-hardcoded:` note? The guard makes the first cleaner; the second keeps the drift visible in the demo, which the fidelity bar may prefer.
 3. **`brightness()` under a theme swap.** The pre-computed colours in §6.3 are clamped per theme. Should the port apply a live `ColorFilter.matrix` (exactly reproduces CSS, including clamping) or precomputed `Color`s (cheaper, simpler probes)? Recommend the matrix, with the table as the probe oracle.
 4. **`pulls-reveal` perspective.** Confirmed no `perspective` on the element or any ancestor → orthographic Y-squash. Worth one visual A/B against the reference, because an orthographic 3-D rotate is unusual enough that it may read as a bug in review.
 5. **Base font size on the three press buttons.** They carry no `.type-*` class, so they inherit. `html` sets only `font-sans`; `body` sets no size. Confirm the computed value is the browser default 16px (not 15px from `.type-body`) before hardcoding — measure with the existing probe rig.
 6. **`.anim-shimmer`'s frozen gradient under reduced motion** (§8.2) depends on `background-position`'s initial value being `0% 0`. Worth one screenshot in reduced-motion mode; it is the least obvious row in that table.
 7. **Ratchet wrap frame.** `steps(8, jump-end)` never shows 360°. For an infinite loop this is unobservable, but if the port ever plays it finitely (reduced motion runs it once), decide whether the single 0.01ms run lands on 0° (matches CSS + no fill) or 315°.
-8. **Should `DsCurves.all` be reordered?** Its docstring claims globals.css declaration order but lists `outFlex` 5th where the field order puts it 7th. Unrelated to this page (which needs only four curves, in its own order), but it will mislead whoever builds a full easing gallery later.
+8. **Should `ElCurves.all` be reordered?** Its docstring claims globals.css declaration order but lists `outFlex` 5th where the field order puts it 7th. Unrelated to this page (which needs only four curves, in its own order), but it will mislead whoever builds a full easing gallery later.
 
 
 ---
@@ -758,8 +758,8 @@ globals.css:392-394 points the framework default at `--duration-base` to stop a
 generated. The two values agree today; they are two declarations, not one.
 
 **Port impact.** `lib\src\foundation\motion.dart` gained
-`DsDurations.transitionDefault` (250ms) for exactly this, documented and cited to
-the probe. Spell `DsDurations.base` **only** where the reference reads
+`ElDurations.transitionDefault` (250ms) for exactly this, documented and cited to
+the probe. Spell `ElDurations.base` **only** where the reference reads
 `var(--duration-base)` directly; every `transition-*` **utility** maps to
 `transitionDefault`. Nine call sites moved on 2026-08-15 - two of them
 (`checkbox.dart`, `radio.dart`) were rendering at 150ms and are now correct; the

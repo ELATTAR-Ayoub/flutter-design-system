@@ -1,0 +1,31 @@
+{
+  "name": "textarea",
+  "type": "component",
+  "version": "0.0.1",
+  "description": "`components/ui/textarea.tsx` — the same socket, the wrong shape for a pill.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/textarea.dart",
+      "target": "@ui/textarea.dart",
+      "sha256": "98693354f74091478f7ca34c89647191432f0592656ab11802883564e33db4ab"
+    }
+  ],
+  "registryDependencies": [
+    "field",
+    "input",
+    "source-foundation"
+  ],
+  "semanticDependencies": [
+    "field",
+    "input"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "documentationRoute": "/components/textarea",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/textarea.dart",
+  "deprecated": false
+}

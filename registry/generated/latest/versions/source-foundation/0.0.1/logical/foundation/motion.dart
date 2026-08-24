@@ -11,8 +11,8 @@ import 'package:flutter/animation.dart';
 /// The scale's own thesis (globals.css L390–391): *"`tick` is the machine
 /// beat: a press registers in 80ms, then springs back over `base`. That
 /// asymmetry — instant in, springy out — is the whole feel."*
-class DsDurations {
-  const DsDurations._();
+class ElDurations {
+  const ElDurations._();
 
   /// `--duration-tick: 80ms` (L398) — the press-down beat.
   static const Duration tick = Duration(milliseconds: 80);
@@ -51,7 +51,7 @@ class DsDurations {
   /// whose class list names a duration token: checkbox, radio item, switch
   /// track, switch thumb, slider thumb, the withdrawal option card, `Input`,
   /// `Textarea`, `InputGroup`, `Item`, tabs trigger, the navigation-menu
-  /// chevron, both `DsNav` link levels, the theme-toggle option, and the
+  /// chevron, both `ElNav` link levels, the theme-toggle option, and the
   /// index-card chevron. The control group confirms the mechanism rather than
   /// the number: `:where(.prose) a` and `slide-pill`'s opacity leg read
   /// `var(--duration-fast)` directly and report **0.15s** on the same pages.
@@ -69,7 +69,7 @@ class DsDurations {
   static const Duration overlay = Duration(milliseconds: 320);
 
   /// `--duration-jelly: 420ms` (L406). Longer than [overlay] because
-  /// [DsCurves.spring] spends its last stretch settling an overshoot.
+  /// [ElCurves.spring] spends its last stretch settling an overshoot.
   static const Duration jelly = Duration(milliseconds: 420);
 
   /// `--duration-reward: 550ms` (L407).
@@ -82,7 +82,7 @@ class DsDurations {
   // and a duration nobody can point at a source for is a guess.
 
   /// **vaul**'s drawer, enter and exit — measured 500ms on the live reference
-  /// (2026-08-16), on [DsCurves.vaul].
+  /// (2026-08-16), on [ElCurves.vaul].
   ///
   /// `--duration-overlay` does not reach it: vaul ships its own `fadeIn` /
   /// `slideFromBottom` keyframes and its own stylesheet, and the
@@ -129,8 +129,8 @@ class DsDurations {
   /// **16.8 ms per √px**, one frame, so the port computes
   /// `frame × sqrt(distancePx)` rather than pinning either measurement.
   ///
-  /// The shape runs on [DsCurves.cssEase]; see
-  /// `DsMessageScrollerController.scrollToEnd` for the residual that fit
+  /// The shape runs on [ElCurves.cssEase]; see
+  /// `ElMessageScrollerController.scrollToEnd` for the residual that fit
   /// leaves.
   static const Duration frame = Duration(microseconds: 16667);
 
@@ -347,10 +347,10 @@ class DsDurations {
 /// globals.css L2277–2330.
 ///
 /// Geometry rather than timing, but it belongs to the same utilities as
-/// [DsDurations.pressDown] and is a token by the same argument: a press that
+/// [ElDurations.pressDown] and is a token by the same argument: a press that
 /// is 0.94 on one surface and 0.95 on another is drift, not design.
-class DsTransforms {
-  const DsTransforms._();
+class ElTransforms {
+  const ElTransforms._();
 
   /// `press` `:active { transform: scale(0.94) }` (L2281). The default squish
   /// for anything clickable that is not a `Button`.
@@ -385,7 +385,7 @@ class DsTransforms {
   /// rAF-sampled through a real pointer gesture (1440 × 900, 2026-08-15): the
   /// sampler saw `none → 1.1 → 1.25 → 1.1` with **zero** intermediate frames
   /// across ~100 samples. The ring beside it does tween, on
-  /// [DsCurves.spring] over [DsDurations.transitionDefault].
+  /// [ElCurves.spring] over [ElDurations.transitionDefault].
   static const double sliderThumbHoverScale = 1.10;
 
   /// `Slider`'s thumb `active:scale-125` — Tailwind `scale-125` = 1.25.
@@ -419,8 +419,8 @@ class DsTransforms {
 ///
 /// The CSS names map one-to-one; only `--ease-in` is renamed ([curveIn]),
 /// because `in` is a reserved-ish identifier in Dart call sites.
-class DsCurves {
-  const DsCurves._();
+class ElCurves {
+  const ElCurves._();
 
   /// `--ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1)` (L420) —
   /// overshoot + settle.
@@ -477,7 +477,7 @@ class DsCurves {
   /// choreography — enter, stack collapse, expand-on-hover, two of the three
   /// exits, the child fade, the container's own travel and the promise icon's
   /// swap — runs on the CSS initial value. A foreign library's default, on the
-  /// same argument [DsToaster.unmountDelay] carries: putting it on the system's
+  /// same argument [ElToaster.unmountDelay] carries: putting it on the system's
   /// motion scale would let a rebrand silently retime a third-party component,
   /// and snapping it to [standard] `(0.4, 0, 0.2, 1)` would retime every toast
   /// today.

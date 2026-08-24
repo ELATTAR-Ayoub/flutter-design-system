@@ -3,7 +3,7 @@
 **Status:** Proposed implementation specification
 **Date:** 2026-08-21
 **Reference role:** shadcn/ui supplies information-architecture and code-distribution patterns, not branding or a layout to copy
-**Implementation authority:** this Flutter package, its public `Ds*` APIs, foundations, tests, and specimens
+**Implementation authority:** this Flutter package, its public `El*` APIs, foundations, tests, and specimens
 
 ## 1. Decision summary
 
@@ -164,7 +164,7 @@ The mobile header contains:
 - Search trigger.
 - Theme selector.
 
-GitHub moves into the navigation sheet so the header remains calm. The menu opens a full-height `DsSheet` with Docs, Components, Shots, Skills, version, and GitHub. It preserves safe areas and logical focus return.
+GitHub moves into the navigation sheet so the header remains calm. The menu opens a full-height `ElSheet` with Docs, Components, Shots, Skills, version, and GitHub. It preserves safe areas and logical focus return.
 
 ### 4.3 Search and command palette
 
@@ -210,13 +210,13 @@ The first three reading steps are:
 - Action color marks links, active navigation, focus, and primary commands.
 - Value color is reserved for valuable outcomes and brand moments, not generic navigation.
 - Status colors appear only for status.
-- `DsPageGlow` may provide the site-wide light source.
+- `ElPageGlow` may provide the site-wide light source.
 - Use at most one supporting material effect per page region; do not combine glow, starfield, glass, bloom, foil, and machine surfaces as decoration.
 - Component specimens show their own intended material without the docs frame competing.
 
 ### 5.4 Typography
 
-- `DsText` and `DsType` own all interface and article typography.
+- `ElText` and `ElType` own all interface and article typography.
 - Display type appears on the Home hero only.
 - Documentation page titles use the page-title role, not display type.
 - Code and commands use the system mono role.
@@ -229,7 +229,7 @@ The first three reading steps are:
 - Preview/code switching preserves the specimen frame and swaps content without reflow shock.
 - Copy success is immediate and short.
 - Sidebar/TOC scroll tracking must not produce constant decorative motion.
-- All motion resolves through `DsDurations`, `DsCurves`, and existing motion widgets.
+- All motion resolves through `ElDurations`, `ElCurves`, and existing motion widgets.
 - Reduced motion produces an equally legible static result.
 
 ## 6. Home page
@@ -412,7 +412,7 @@ Explain:
 
 - What Elattar is.
 - Source-first ownership.
-- Composition through public `Ds*` APIs.
+- Composition through public `El*` APIs.
 - Registry and CLI distribution.
 - Beautiful, coherent defaults.
 - Flutter platform support.
@@ -627,7 +627,7 @@ Begin with the smallest correct Dart example:
 ```dart
 import 'package:my_app/components/ui/ui.dart';
 
-DsButton(
+ElButton(
   label: 'Continue',
   onPressed: () {},
 )
@@ -760,7 +760,7 @@ A shot registry item installs composition files to an explicit application-facin
 
 ### 11.1 Purpose
 
-Show developers how the Elattar skill teaches supported coding agents to discover public `Ds*` APIs, use tokens, install components, compose screens, cover states, and verify Flutter UI correctly.
+Show developers how the Elattar skill teaches supported coding agents to discover public `El*` APIs, use tokens, install components, compose screens, cover states, and verify Flutter UI correctly.
 
 ### 11.2 Page structure
 
@@ -924,21 +924,21 @@ The actual Dart examples and live specimens remain authored code because generat
 
 The repository already supplies suitable foundations or components for:
 
-- `DsPageGlow`.
-- `DsSafeArea`.
-- `DsSidebar` family.
-- `DsNavigationMenu`.
-- `DsBreadcrumb`.
-- `DsTabs`.
-- `DsCommand`.
-- `DsCard` family.
-- `DsButton` and `DsButtonGroup`.
-- `DsInput` and input groups.
-- `DsSkeleton`.
-- `DsEmpty`.
-- `DsToaster`.
+- `ElPageGlow`.
+- `ElSafeArea`.
+- `ElSidebar` family.
+- `ElNavigationMenu`.
+- `ElBreadcrumb`.
+- `ElTabs`.
+- `ElCommand`.
+- `ElCard` family.
+- `ElButton` and `ElButtonGroup`.
+- `ElInput` and input groups.
+- `ElSkeleton`.
+- `ElEmpty`.
+- `ElToaster`.
 - Alerts, dialogs, sheets, drawers, popovers, and tooltips.
-- Existing documentation `DsCode` and `DsCodeBlock` in `example/lib/kit.dart`.
+- Existing documentation `ElCode` and `ElCodeBlock` in `example/lib/kit.dart`.
 - Existing site-page primitives and reading-navigation contracts documented by the Site group.
 
 Inspect constructors, tests, and examples before using any of them. The plan does not assume an unverified API shape.
@@ -1014,7 +1014,7 @@ GitHub, pub.dev, and raw source failures cannot be controlled by the site; label
 - API tables become horizontal scroll regions or labeled property cards.
 - Shot file tree becomes a file selector above code.
 - Specimens use mobile-native structure rather than a scaled desktop frame.
-- `DsSafeArea` is applied once at page boundaries.
+- `ElSafeArea` is applied once at page boundaries.
 
 ## 17. Accessibility requirements
 
@@ -1106,7 +1106,7 @@ Capture and inspect:
 ### Phase B — Home
 
 - Build hero, install panel, living showcase, how-it-works, foundations, families, featured shots, skill feature, and open-source close.
-- Use only public `Ds*` APIs and foundation tokens.
+- Use only public `El*` APIs and foundation tokens.
 
 **Exit:** the product can be understood and installed from the home page without reading every doc.
 
@@ -1169,7 +1169,7 @@ Capture and inspect:
 10. Theme control supports Light, Dark, and System.
 11. Search covers docs, components, shots, CLI, and skills.
 12. Loading, empty, error, success, disabled, focus, offline/cached, and recovery states are designed where applicable.
-13. Public content uses actual `Ds*` APIs and tokens; the legacy web project remains lineage only.
+13. Public content uses actual `El*` APIs and tokens; the legacy web project remains lineage only.
 14. GitHub Pages direct links, browser history, safe areas, keyboard access, reduced motion, and code selection are verified.
 15. No shadcn brand, prose, recognizable full layout, or unsupported web-only feature is copied.
 

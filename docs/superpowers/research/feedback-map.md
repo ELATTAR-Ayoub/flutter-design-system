@@ -9,14 +9,14 @@ resolves it. Confirmed against the live server at `http://localhost:3000/design-
 - `app\design-system\components\base\feedback\page.tsx` — the page. **`"use client"`** (`:1`). 520 lines, **no
   page-local components at all** — one module-level const (`PROGRESS_TONES`, `:55–60`) and one default export. The
   simplest page structure in the base group; the complexity is entirely in the effects.
-- `components\ds\kit.tsx` — `DsPageHeader`, `DsSection`, `Panel` (`:100–113` strip + body), **`Row` (`:116–141`)**,
+- `components\el\kit.tsx` — `ElPageHeader`, `ElSection`, `Panel` (`:100–113` strip + body), **`Row` (`:116–141`)**,
   `Meta` (`:202`), `Code` (`:229`), `DoDont` (`:238`), `Note` (`:272–297`), `PageFootNav`. `StateGrid`/`StateCell` are
   **not** used here.
 - `components\ui\alert.tsx` — 131 lines. `Alert` (`:61`), `AlertTitle` (`:91`), `AlertDescription` (`:104`),
   **`AlertAction` (`:120–128`)**. Carries `bloom-cosmic` and the `.starfield` span (`:85`).
 - `components\ui\sonner.tsx` — 63 lines. `TOAST_ICONS` (`:18–24`), `ToastType` (`:26`), `Toaster` (`:28–60`).
   Mounted once at `app\layout.tsx:39` as `<Toaster position="bottom-right" />`.
-- `components\ds\toast-preview.tsx` — 55 lines. `ToastPreview` (`:18–49`) renders **sonner's own markup minus
+- `components\el\toast-preview.tsx` — 55 lines. `ToastPreview` (`:18–49`) renders **sonner's own markup minus
   `data-sonner-toast`**; `ToastPreviewStack` (`:52–54`) = `<ul class="flex list-none flex-col gap-4">`.
 - `components\ui\progress.tsx` — 102 lines. `progressIndicatorVariants` (`:43–64`, **5 tones**), `Progress`
   (`:66–99`). Radix `Progress.Root`/`.Indicator`.
@@ -30,7 +30,7 @@ resolves it. Confirmed against the live server at `http://localhost:3000/design-
 - `node_modules\sonner\dist\styles.css` — **725 lines, the enter/exit choreography.** Transcribed in §6.3. It is
   injected into `<head>` at runtime, **unlayered**, which is why `.cn-toast` needs three classes (§6.2).
 - `node_modules\sonner\dist\index.mjs` — the runtime constants (`:411–425`) and the timer lifecycle (`:505–625`).
-- `lib\ds\nav.ts:237–251` — `findCategory("base","feedback")`; `siblings()` → prev **Navigation**, next **Chat**.
+- `lib\el\nav.ts:237–251` — `findCategory("base","feedback")`; `siblings()` → prev **Navigation**, next **Chat**.
 - `app\globals.css` — `@utility bloom-cosmic` (`:1663–1847`), `@keyframes cosmic-drift-deep/near` (`:1864–1877`),
   `.cn-toast` block (`:2584–2812`), theme blend split (`:3235–3287`), `.starfield` (`:3364–3488`),
   `anim-shimmer` (`:2344–2353`), `anim-spin` (`:2407–2409`), durations (`:395–433`), light bloom vars (`:699–715`),
@@ -70,7 +70,7 @@ Per-section rendered heights *(measured)*: `alert` 747.42 · `toast` 959.80 · `
 
 ---
 
-## 1 · Page header (`DsPageHeader`)
+## 1 · Page header (`ElPageHeader`)
 
 1. Eyebrow `type-label text-action-ink` → **"Base Components · Base"** *(measured)* — the same double-"Base" as
    every base page (`forms-map.md` drift 1). Separator **U+00B7**. Render it as written.
@@ -92,7 +92,7 @@ The Flutter nav registry already carries all seven byte-for-byte (`example\lib\n
 
 ## 2 · Section inventory (verbatim)
 
-Seven `DsSection`s, `PageFootNav` last. Shell: `<section id class="mb-20">`; `<h2 class="type-h3">`; description
+Seven `ElSection`s, `PageFootNav` last. Shell: `<section id class="mb-20">`; `<h2 class="type-h3">`; description
 `type-small mt-2 max-w-2xl`.
 
 | # | `id` | title | description (verbatim) |
@@ -192,16 +192,16 @@ All five: `<Icon size="md" tone="inherit"/>` → 16px, strokeWidth 2.4, `aria-hi
 
 ### 3.3 · What phase 3 shipped, and the four in-file deferrals
 
-`lib\src\components\alert.dart` (217 lines) ships `DsAlertVariant` (`:48`, five members, `normal` for `default`
-because `default` is a Dart keyword), `inkOf` (`:81–87`), `DsAlert` (`:92`) with `title` / `description` / `icon` /
-`variant`, radius `DsRadii.lg` (`:120`), row gap `ds(1)` (`:129`), icon nudge `ds(0.5)` (`:146`), icon gap `ds(3)`
+`lib\src\components\alert.dart` (217 lines) ships `ElAlertVariant` (`:48`, five members, `normal` for `default`
+because `default` is a Dart keyword), `inkOf` (`:81–87`), `ElAlert` (`:92`) with `title` / `description` / `icon` /
+`variant`, radius `ElRadii.lg` (`:120`), row gap `el(1)` (`:129`), icon nudge `el(0.5)` (`:146`), icon gap `el(3)`
 (`:153`), padding `16/14` (`:161`), hairline border (`:197`), border-box correction (`:203`), per-variant bloom
 dispatch (`:165–191`), and `Semantics(container: true, liveRegion: true)` (`:208–213`).
 
 The deferral record, **verbatim** (`alert.dart:27–36`):
 
 > Scope, per supervisor ruling F1: the fidelity the forms page renders. The bloom is mounted **static** — see
-> `DsBloomCosmic`, which records why the two infinite drifts and the starfield wait for the `feedback` page.
+> `ElBloomCosmic`, which records why the two infinite drifts and the starfield wait for the `feedback` page.
 >
 > Not ported, and recorded rather than guessed:
 >  * `AlertAction` (`absolute top-2 right-2`, with `has-data-[slot=alert-action]:pr-20`) — no call site on this page;
@@ -212,7 +212,7 @@ And the warning-variant pointer (`alert.dart:66–70`), verbatim:
 
 > The pair carries the longest comment in `alert.tsx`: it used to be the value ramp's two ends and *"worked only by
 > accident"*, glowing purple under an amber glyph once the value ramp moved. The toast never got the fix — see
-> `DsBloomCosmic.toastWarning`.
+> `ElBloomCosmic.toastWarning`.
 
 **Build scope for this page, from that record:**
 
@@ -385,11 +385,11 @@ The port's deferral, **verbatim** (`bloom_cosmic.dart:45–58`):
 And the theme-variable follow-up (`bloom_cosmic.dart:71–78`), verbatim:
 
 > `--bloom-void` / `--bloom-l` / `--bloom-c` / `--bloom-lift` / `--bloom-hot-c` are declared in the two theme blocks
-> (globals.css L680–715 light, L885–898 dark) beside every other token — but `DsThemeData` does not carry them yet
+> (globals.css L680–715 light, L885–898 dark) beside every other token — but `ElThemeData` does not carry them yet
 > and `foundation/theme.dart` is not this task's file. They live here, next to the only effect that reads them,
 > until that file is next opened.
 >
-> FOLLOW-UP: move these five onto `DsThemeData` and delete `_BloomInk.of`.
+> FOLLOW-UP: move these five onto `ElThemeData` and delete `_BloomInk.of`.
 
 **Because the resting frame is `0%` of both keyframes** (`translate3d(0,0,0) rotate(0) scale(1)` /
 `scale(1.04)`), the static bloom already shipped is exactly the `t=0` frame of the deep layer and the `t=0` frame of
@@ -566,7 +566,7 @@ hole.
 **The pinned drift, confirmed in the browser:** a **warning toast** blooms `#d9f99d`/`#4d7c0f` — pale lime over dark
 olive — under a `#fbbf24` amber glyph, while a **warning Alert** blooms `#fbbf24`/`#1a6ef4`. The toast still carries
 the pair the Alert was moved off. **Both ship as written.** The port already records it at
-`bloom_cosmic.dart:274–277` and dispatches `DsBloomCosmic.toastWarning`.
+`bloom_cosmic.dart:274–277` and dispatches `ElBloomCosmic.toastWarning`.
 
 The bloom reclaim (`globals.css:2642–2651`) restates only inset/width/height on both pseudos, from the same four
 variables — verified working: on a live `data-expanded="true"` toast the near layer measured **304.438px wide** with
@@ -669,19 +669,19 @@ Swipe-out keyframes (`:377–423`), all `from { transform: var(--y) translateX/Y
 >    page.
 >  * swipe-to-dismiss (`SWIPE_THRESHOLD` 45) and hover-to-pause. A tap dismisses.
 >  * `[data-button]` — the action pill. No call site on the forms page.
->  * the starfield on `[data-content]`. See `DsBloomCosmic`.
+>  * the starfield on `[data-content]`. See `ElBloomCosmic`.
 
 **§6.3 above is that transcription.** It is the single largest new fact this map contributes.
 
 `toaster.dart:52–57` — the KNOWN GAP note:
 
 > **KNOWN GAP — two glyphs.** `TOAST_ICONS` maps success to lucide's `CircleCheck` and error to `OctagonX`, and
-> `DsIconGlyph` carries neither; `icon_paths.dart` is another task's file this wave. `DsToastType.glyph` therefore
-> answers `null` for those two and `DsToast.glyph` overrides it, so a call site can supply the geometry the moment
+> `ElIconGlyph` carries neither; `icon_paths.dart` is another task's file this wave. `ElToastType.glyph` therefore
+> answers `null` for those two and `ElToast.glyph` overrides it, so a call site can supply the geometry the moment
 > it lands. Everything else — the ink, the bloom, the anatomy — is complete.
 
-**This note is now stale.** `DsIconGlyph.circleCheck` exists (`icon_paths.dart:186`, geometry `:1032–1035`) and
-`DsIconGlyph.octagonX` exists (`:190`, geometry `:1041`). `DsToastType.glyph` (`toaster.dart:138–143`) still returns
+**This note is now stale.** `ElIconGlyph.circleCheck` exists (`icon_paths.dart:186`, geometry `:1032–1035`) and
+`ElIconGlyph.octagonX` exists (`:190`, geometry `:1041`). `ElToastType.glyph` (`toaster.dart:138–143`) still returns
 `null` for both and `test\selection_feedback_test.dart:866–887` still asserts `isNull`. Closing it is a two-line
 edit plus a test flip.
 
@@ -1070,7 +1070,7 @@ Sonner ships **its own** `@media (prefers-reduced-motion)` (`styles.css:703–71
 removes it entirely. Immaterial in a browser, but the port has one switch (`main.dart:84–85`, `?motion=reduced`),
 so pick one behaviour and record it.
 
-New `DsDurations` members needed: **18s** and **11s**. `sway` (44s) and `swayAlt` (33s) already exist unused
+New `ElDurations` members needed: **18s** and **11s**. `sway` (44s) and `swayAlt` (33s) already exist unused
 (`motion.dart:46`, `:51`); `bloom` (1000ms) exists at `:43`; `shimmer` (1400ms) at `:158`; `spin` (900ms) at `:107`.
 11s collides numerically with `foilDrift` (`motion.dart:195`) and must be spelled separately, on the
 `popIn`/`reward` precedent (`motion.dart:83–85`).
@@ -1085,21 +1085,21 @@ Package root `D:\DESIGN\Design-System-2026-8\flutter-design-system\`.
 
 | need | where |
 |---|---|
-| `DsAlert` — 5 variants, `inkOf`, 16/14 padding, r12, 4px row gap, 12px icon gap, 2px icon nudge, hairline border + border-box correction, `liveRegion` | `lib\src\components\alert.dart:48`, `:92`, `:120–213` |
-| `DsBloomCosmic` — static, 8 named ctors, full oklch derivation, blend/void split, all 5 gradient ramps, the radial mask via `dstIn` | `lib\src\effects\bloom_cosmic.dart:204`, `:218–288`, `:333–361`, `:393–514` |
-| `DsToaster` + `DsToastController` — 356/14/24/3-visible/4000/200, per-id timers, lifetime-starts-on-visibility, idempotent dismiss, 4 positions | `lib\src\components\toaster.dart:76–96`, `:186–247`, `:269–415` |
-| `DsToast` — 16px padding, 4px content gap, 12px icon gap, 2px icon nudge, `DsShadows.e3`, `liveRegion`, tap-to-dismiss | `toaster.dart:436–518` |
-| `DsToastType` — 6 members, ink table, bloom dispatch incl. `toastWarning` | `toaster.dart:98–143`, `:527–546` |
+| `ElAlert` — 5 variants, `inkOf`, 16/14 padding, r12, 4px row gap, 12px icon gap, 2px icon nudge, hairline border + border-box correction, `liveRegion` | `lib\src\components\alert.dart:48`, `:92`, `:120–213` |
+| `ElBloomCosmic` — static, 8 named ctors, full oklch derivation, blend/void split, all 5 gradient ramps, the radial mask via `eltIn` | `lib\src\effects\bloom_cosmic.dart:204`, `:218–288`, `:333–361`, `:393–514` |
+| `ElToaster` + `ElToastController` — 356/14/24/3-visible/4000/200, per-id timers, lifetime-starts-on-visibility, idempotent dismiss, 4 positions | `lib\src\components\toaster.dart:76–96`, `:186–247`, `:269–415` |
+| `ElToast` — 16px padding, 4px content gap, 12px icon gap, 2px icon nudge, `ElShadows.e3`, `liveRegion`, tap-to-dismiss | `toaster.dart:436–518` |
+| `ElToastType` — 6 members, ink table, bloom dispatch incl. `toastWarning` | `toaster.dart:98–143`, `:527–546` |
 | Toaster **already mounted app-wide** — `docsToasts` singleton | `example\lib\shell.dart:49`, `:183` |
-| `DsSpinner` — 16px default, `DsDurations.spin` 900ms, linear, reduced-motion → still at 0° | `lib\src\components\spinner.dart:49–136` |
-| `DsShimmer` — the `pulls-shimmer` motion table: 1400ms, `inOut`, `tileFactor` 2, `fromPercent` 2 → `toPercent` −2, `gradient(theme)` = popover/accent/popover with `TileMode.repeated` | `lib\src\motion\keyframes.dart:875–917` |
-| `DsDurations.sway` 44s / `.swayAlt` 33s / `.bloom` 1000ms / `.shimmer` 1400ms / `.spin` 900ms | `lib\src\foundation\motion.dart:46 / 51 / 43 / 158 / 107` |
-| `DsCurves.inOut` `(0.65,0,0.35,1)` / `.out` `(0.22,1,0.36,1)` | `motion.dart:278 / 271` |
+| `ElSpinner` — 16px default, `ElDurations.spin` 900ms, linear, reduced-motion → still at 0° | `lib\src\components\spinner.dart:49–136` |
+| `ElShimmer` — the `pulls-shimmer` motion table: 1400ms, `inOut`, `tileFactor` 2, `fromPercent` 2 → `toPercent` −2, `gradient(theme)` = popover/accent/popover with `TileMode.repeated` | `lib\src\motion\keyframes.dart:875–917` |
+| `ElDurations.sway` 44s / `.swayAlt` 33s / `.bloom` 1000ms / `.shimmer` 1400ms / `.spin` 900ms | `lib\src\foundation\motion.dart:46 / 51 / 43 / 158 / 107` |
+| `ElCurves.inOut` `(0.65,0,0.35,1)` / `.out` `(0.22,1,0.36,1)` | `motion.dart:278 / 271` |
 | All 10 glyphs this page needs: `info` `:144`, `circleCheck` `:186`, `hourglass` `:139`, `circleX` `:205`, `alertTriangle` `:146`, `packageOpen` `:103`, `search` `:88`, `octagonX` `:190`, `loaderCircle` `:162` | `lib\src\components\icon_paths.dart` |
-| Kit: `DsPageHeader :54` · `DsSection :148` · `DsPanel :242` · **`DsRow :466`** (+`DsRowAlign :450`, `gap` = 16 at `:478`) · `DsMeta :679` · `DsCode :737` · `DsDoDont :1025` · `DsNote :1124` (+`DsNoteTone :1121`) · `DsGrid :1198` · `DsPageFootNav :1446` | `example\lib\kit.dart` |
+| Kit: `ElPageHeader :54` · `ElSection :148` · `ElPanel :242` · **`ElRow :466`** (+`ElRowAlign :450`, `gap` = 16 at `:478`) · `ElMeta :679` · `ElCode :737` · `ElDoDont :1025` · `ElNote :1124` (+`ElNoteTone :1121`) · `ElGrid :1198` · `ElPageFootNav :1446` | `example\lib\kit.dart` |
 | Nav entry for `feedback` — slug/title/blurb/7 contents, verbatim; siblings resolve to Navigation/Chat | `example\lib\nav.dart:305–319`, `:731–747` |
-| `DsShadows.e3 / pressed / btn / btnPrimary / btnValue` | `lib\src\foundation\shadows.dart` |
-| `DsMachineSurface` (inset painting, CSS paint order) | `lib\src\effects\machine_surface.dart:26` |
+| `ElShadows.e3 / pressed / btn / btnPrimary / btnValue` | `lib\src\foundation\shadows.dart` |
+| `ElMachineSurface` (inset painting, CSS paint order) | `lib\src\effects\machine_surface.dart:26` |
 | Reduced-motion boot param `?motion=reduced` | `example\lib\main.dart:84–85`, docs `:67–83` |
 
 ### 15.2 · Missing — must be built
@@ -1107,35 +1107,35 @@ Package root `D:\DESIGN\Design-System-2026-8\flutter-design-system\`.
 | # | missing | notes |
 |---|---|---|
 | 1 | **The two bloom drifts** | 18s + 11s, `alternate`, `EI`, 3 keyframe stops each (deep) / 4 (near). Must compose `translate3d` + `rotate` + `scale` into one `Matrix4` about `transform-origin` 88%/82% and 90%/86%. §17 Q1. |
-| 2 | **The bloom hover swell** | `scale` 2.2 / 2.5 over 1000ms `EO`, **multiplied onto** the drift matrix, not replacing it. Needs a `MouseRegion` on `DsAlert` and `DsToast`. |
-| 3 | **`DsStarfield`** | 13 sparkles, 2 clusters, the 24×24 four-point path, per-instance opacity/translate/scale, `right bottom` / `right top` anchoring **with clipping**, two `drop-shadow` passes (blur = glow-size and 3×), two sways (44s/33s, ±6°/±5°, origin = the anchored corner), and the hover nudge. On a toast it must anchor to the **toast box**, not `[data-content]`. §5. |
+| 2 | **The bloom hover swell** | `scale` 2.2 / 2.5 over 1000ms `EO`, **multiplied onto** the drift matrix, not replacing it. Needs a `MouseRegion` on `ElAlert` and `ElToast`. |
+| 3 | **`ElStarfield`** | 13 sparkles, 2 clusters, the 24×24 four-point path, per-instance opacity/translate/scale, `right bottom` / `right top` anchoring **with clipping**, two `drop-shadow` passes (blur = glow-size and 3×), two sways (44s/33s, ±6°/±5°, origin = the anchored corner), and the hover nudge. On a toast it must anchor to the **toast box**, not `[data-content]`. §5. |
 | 4 | **`AlertAction`** | `Stack` + `Positioned(top: 8, right: 8)`, with the base padding switching to `pr-20` (80px) when present. |
 | 5 | **Sonner's choreography** | enter `translateY(100%) → 0` + fade over 400ms `ease`; collapsed stack at `translateY(−14n)` `scale(1−0.05n)` with children at opacity 0 and height pinned to the front toast's; expand-on-hover to `translateY(−offset)` at natural height; exit front `translateY(100%)` + fade 400ms; exit back-collapsed `translateY(40%)` over 500/200ms. §6.3. **The current port stacks at full size with a flat 14px gap and no entrance.** |
 | 6 | **Hover-to-pause** | pause on hover **and** on app-backgrounded, resuming from the stored remainder (`index.mjs:585–603`), not restarting. |
 | 7 | **Swipe-to-dismiss** | threshold 45px or velocity > 0.11; exit animation 200ms `ease-out` in the swipe direction, `forwards`. |
 | 8 | **Toast action pill (`[data-button]`)** | 32 × auto, 14px inline padding, pill, `--secondary` → hover `--accent`, 13/500, 250ms `EO`, `margin-left: auto`. Needed by the `error` preview and the live error toast. |
 | 9 | **`toast.promise`** | loading → success/error swap in place, 300ms icon fade-in, no auto-dismiss while loading. The page's Promise button resolves after 1800ms. |
-| 10 | **`DsToastController.info/warning/loading/promise`** | only `show`, `success`, `error`, `dismiss`, `clear` exist (`toaster.dart:200–247`). The page fires **neutral, success, error, warning and promise**. |
-| 11 | **`DsToastType.glyph` for success/error** | returns `null` despite `circleCheck`/`octagonX` existing. Two-line fix + flip `selection_feedback_test.dart:866–887`. |
-| 12 | **`DsProgress`** | Absent repo-wide. 10px channel, r999, 1px `--input`, `--muted` fill, `shadow-pressed`, 5 tones with `-ink` fills and `btnPrimary`/`btnValue`/`btn` shadows, 250ms `EO` fill transition, `Semantics(value:)`. Closest existing thing is `DsSweep` (`keyframes.dart:1028`) with `widthFactor` at `:1042–1043`. |
-| 13 | **`DsSkeleton`** | Widget absent; the **motion table exists** (`DsShimmer`, `keyframes.dart:875`). Needs a widget with a `radius` default of `md` (10) and a `span` mode (inline, `align-middle`). 24 instances on this page. |
-| 14 | **`DsEmpty` family** | Absent entirely. `DsEmpty` (r16, 24 pad, 16 gap, centred, `text-balance`), `DsEmptyHeader` (384 max, 8 gap), `DsEmptyMedia` (32 box, r12, `--muted`, **16px glyph** — drift 9), `DsEmptyTitle` (13/500/−0.26/`font-heading`), `DsEmptyDescription` (13/1.625), `DsEmptyContent` (384 max, 10 gap). |
+| 10 | **`ElToastController.info/warning/loading/promise`** | only `show`, `success`, `error`, `dismiss`, `clear` exist (`toaster.dart:200–247`). The page fires **neutral, success, error, warning and promise**. |
+| 11 | **`ElToastType.glyph` for success/error** | returns `null` despite `circleCheck`/`octagonX` existing. Two-line fix + flip `selection_feedback_test.dart:866–887`. |
+| 12 | **`ElProgress`** | Absent repo-wide. 10px channel, r999, 1px `--input`, `--muted` fill, `shadow-pressed`, 5 tones with `-ink` fills and `btnPrimary`/`btnValue`/`btn` shadows, 250ms `EO` fill transition, `Semantics(value:)`. Closest existing thing is `ElSweep` (`keyframes.dart:1028`) with `widthFactor` at `:1042–1043`. |
+| 13 | **`ElSkeleton`** | Widget absent; the **motion table exists** (`ElShimmer`, `keyframes.dart:875`). Needs a widget with a `radius` default of `md` (10) and a `span` mode (inline, `align-middle`). 24 instances on this page. |
+| 14 | **`ElEmpty` family** | Absent entirely. `ElEmpty` (r16, 24 pad, 16 gap, centred, `text-balance`), `ElEmptyHeader` (384 max, 8 gap), `ElEmptyMedia` (32 box, r12, `--muted`, **16px glyph** — drift 9), `ElEmptyTitle` (13/500/−0.26/`font-heading`), `ElEmptyDescription` (13/1.625), `ElEmptyContent` (384 max, 10 gap). |
 | 15 | **`example\lib\pages\feedback.dart`** + a `main.dart` arm | `main.dart:156–170` routes ten pages; `feedback` falls to `_placeholderFor` (`:174–189`). Needs an import in the alphabetical block (`:15–25`), an arm after `:167`, and the "ten real routes" doc at `:148` updated. |
 | 16 | **`_referenceHeight` for `feedback`** | `example\test\vertical_parity_probe_test.dart:180–188` lists 7 routes; heights at `:56–64`. **Measured: 6106px** at 1440×900, dark, pristine. §17 Q6. |
 | 17 | Wrap-parity + page tests | `example\test\wrap_parity_probe_test.dart`; page test modelled on `example\test\forms_page_test.dart`. Package tests extend `test\selection_feedback_test.dart` (Alert `:683–765`, bloom `:767–817`, toast `:819–888`, toaster `:1367–1443`). |
-| 18 | **Bloom theme vars onto `DsThemeData`** | The five still live at `bloom_cosmic.dart:82–106` with a standing FOLLOW-UP. This page opens the effect anyway. |
+| 18 | **Bloom theme vars onto `ElThemeData`** | The five still live at `bloom_cosmic.dart:82–106` with a standing FOLLOW-UP. This page opens the effect anyway. |
 
 ### 15.3 · Guard-test constraints
 
 `test\token_guard_test.dart:40–63` forbids, outside `lib/src/foundation/` (`:18–20`), across roots `lib` and
 `example/lib` (`:23–26`): `Color(0x`, `Color.from`, `fontSize:\s*\d`, `letterSpacing:\s*-?\d`, `FontWeight.w\d`,
 `\bCurves.`, `Duration((milli|micro)seconds:\s*\d`, `BorderRadius.circular(\d`, `BoxShadow(`,
-`\bheight:\s*[01](?!\d)`. Bare `0`/`0.0` and `dsTransparent` are always legal. Escape hatch:
+`\bheight:\s*[01](?!\d)`. Bare `0`/`0.0` and `elTransparent` are always legal. Escape hatch:
 **`allow-hardcoded: <reason>` anywhere on the line** (plain substring test at `:96`). **Raw text scan including
 comments** (`:11–15`).
 
 Consequences here:
-- **18s and 11s** need `DsDurations` members (11s must not reuse `foilDrift`).
+- **18s and 11s** need `ElDurations` members (11s must not reuse `foilDrift`).
 - The starfield's 13 opacity/translate/scale triples, the two viewBoxes (260×96, 200×64), the sparkle path and the
   ±6°/±5° amplitudes are all literals. They are **geometry** — put the path in `icon_paths.dart` beside the other
   transcribed paths and the placement table in the starfield's own file, on the `bloom_cosmic.dart` precedent
@@ -1145,8 +1145,8 @@ Consequences here:
   tokens. Follow `toaster.dart:95`'s precedent exactly:
   `// allow-hardcoded: sonner's TIME_BEFORE_UNMOUNT, a runtime constant, not a --duration-* token`.
 - Sonner's transition easing is **CSS's unnamed `ease`** = `cubic-bezier(.25,.1,.25,1)`, which is **not** in
-  `DsCurves` (`motion.dart:261–308`). `\bCurves.` is banned, so `Curves.ease` is unavailable; a new
-  `DsCurves.cssEase` is needed, or an escape hatch. §17 Q5.
+  `ElCurves` (`motion.dart:261–308`). `\bCurves.` is banned, so `Curves.ease` is unavailable; a new
+  `ElCurves.cssEase` is needed, or an escape hatch. §17 Q5.
 - Doc comments quoting `blur(16px)` or `Duration(milliseconds: 400)` will trip the scanner. Write timings in prose.
 
 ---
@@ -1162,7 +1162,7 @@ Consequences here:
    `--bloom-1: #fbbf24` (amber) / `--bloom-2: #1a6ef4`. `.cn-toast[data-type="warning"]` → `--bloom-1: #d9f99d`
    (pale lime) / `--bloom-2: #4d7c0f` (dark olive), under a `#fbbf24` glyph. `alert.tsx:39–49` documents fixing
    exactly this bug on the Alert and the toast never got the change. **Both ship as written.** Port already
-   dispatches `DsBloomCosmic.toastWarning` and records it at `bloom_cosmic.dart:274–277`.
+   dispatches `ElBloomCosmic.toastWarning` and records it at `bloom_cosmic.dart:274–277`.
 3. **Specimen 5 is `variant="info"` wearing an `AlertTriangle`** and warning copy ("Purchase limit approaching…
    Limits are set in Preferences"). It renders a cyan `#22d3ee` triangle over a cyan bloom. Every other specimen's
    glyph matches its variant. Render as written.
@@ -1212,9 +1212,9 @@ Consequences here:
     spinner should be 2 by the ladder's own rule; it is 2.4.
 12. **`Alert` has `role="alert"` and no `aria-live`.** *(measured.)* Five permanently-mounted `role="alert"`
     regions on one page is exactly what `forms-map.md`'s §3 Note calls an anti-pattern for `FieldError`. The port's
-    `DsAlert` already sets `liveRegion: true` (`alert.dart:208–213`), which is the same shape.
+    `ElAlert` already sets `liveRegion: true` (`alert.dart:208–213`), which is the same shape.
 13. **The live toast carries `role: null`, `aria-live: null`, `tabindex="0"`.** *(measured.)* Sonner announces
-    through a separate visually-hidden region, not through the toast element; the port's `DsToast` uses
+    through a separate visually-hidden region, not through the toast element; the port's `ElToast` uses
     `Semantics(liveRegion: true, label: title)` on the toast itself (`toaster.dart:511–514`) — a deliberate,
     already-shipped divergence.
 14. **Two reduced-motion regimes.** `globals.css:2534–2542` collapses durations to 0.01ms; `sonner/styles.css:703`
@@ -1242,7 +1242,7 @@ Consequences here:
    `Matrix4.identity() ..translate(originX, originY) ..scale(hoverScale) ..multiply(driftMatrix) ..translate(-originX, -originY)`,
    with `hoverScale` from a separate 1000ms `AnimationController` and `driftMatrix` from the keyframe player. The
    origins differ per layer (88%/82% deep, 90%/86% near) and the starfield's differ again (100%/100%, 100%/0%).
-   Confirm this is the shape you want before I plan, because it decides whether `DsBloomCosmic` stays a
+   Confirm this is the shape you want before I plan, because it decides whether `ElBloomCosmic` stays a
    `StatelessWidget` + `CustomPaint` or becomes a `StatefulWidget`.
 2. **69 infinite animations at rest.** §10 counts 20 bloom/starfield animations on the Alerts, 20 on the toast
    previews, 24 shimmers and 5 spinners, before a toast is fired. Phase 3 deferred these citing RULES §4's
@@ -1263,17 +1263,17 @@ Consequences here:
    about a sonner stack and the page's whole §2 is about toasts. But it means a measure-then-lay-out pass (drift
    17) and it changes a shipped, tested contract (`selection_feedback_test.dart:1376–1442`). Needs your call.
 5. **Sonner's unnamed `ease`.** All the toast choreography runs on CSS's default `ease` =
-   `cubic-bezier(.25,.1,.25,1)`, which is in neither `--ease-*` nor `DsCurves`. **Recommendation:** add
-   `DsCurves.cssEase` with a doc comment saying it is a foreign library's default and deliberately not on the
+   `cubic-bezier(.25,.1,.25,1)`, which is in neither `--ease-*` nor `ElCurves`. **Recommendation:** add
+   `ElCurves.cssEase` with a doc comment saying it is a foreign library's default and deliberately not on the
    system's motion scale — same reasoning as `_unmount` at `toaster.dart:90–95`. The alternative (snapping it to
-   `DsCurves.standard` `(0.4,0,0.2,1)`) would be a silent retiming of every toast.
+   `ElCurves.standard` `(0.4,0,0.2,1)`) would be a silent retiming of every toast.
 6. **`_referenceHeight` for `feedback` = 6106px?** *(measured at 1440×900, dark, pristine — nothing hovered, no
    toast fired.)* Two risks: the page's height is stable (no stateful content), but **firing a toast does not
    change document height** (the toaster is `position: fixed`), so pristine is safe here — unlike `forms`.
-   **Recommendation:** add `'feedback': '$dsRoot/components/base/feedback'` to
+   **Recommendation:** add `'feedback': '$elRoot/components/base/feedback'` to
    `vertical_parity_probe_test.dart:180–188` with 6106.0 at the existing 0.5px tolerance. Confirm you want the
    probe extended rather than skipped, and note that `shadows`/`motion`/`icons` are still absent from that map.
-7. **Where does `DsStarfield` live?** It is used by `DsAlert` (its own span) and `DsToast` (hung off the content
+7. **Where does `ElStarfield` live?** It is used by `ElAlert` (its own span) and `ElToast` (hung off the content
    slot but anchored to the toast box). **Recommendation:** `lib\src\effects\starfield.dart` beside
    `bloom_cosmic.dart`, exported from the barrel, with the 24×24 sparkle path in `icon_paths.dart` as an off-set
    addition like `rotateCcw` — it is transcribed geometry and that file already holds transcribed geometry, and it
@@ -1282,10 +1282,10 @@ Consequences here:
    suppression of the 4000ms clock while loading (`index.mjs:581`: `if (toast.promise && toastType === 'loading' ||
    toast.duration === Infinity || toast.type === 'loading') return`). **Recommendation:** yes — the page ships a
    Promise button and it is the only demo of the loading type outside the static preview. It also forces
-   `DsToastController` to grow `info`/`warning`/`loading`, which the page needs anyway.
-9. **Close the two stale records while the files are open?** (a) `DsToastType.glyph` returns `null` for
+   `ElToastController` to grow `info`/`warning`/`loading`, which the page needs anyway.
+9. **Close the two stale records while the files are open?** (a) `ElToastType.glyph` returns `null` for
    success/error although `circleCheck`/`octagonX` now exist, and a test asserts the `null`; (b) the five bloom
-   theme vars still live in `bloom_cosmic.dart` with a standing FOLLOW-UP to move them to `DsThemeData`.
+   theme vars still live in `bloom_cosmic.dart` with a standing FOLLOW-UP to move them to `ElThemeData`.
    **Recommendation:** do both — (a) is two lines and a test flip, (b) is this page's own effect file. Confirm,
    since (b) touches `foundation\theme.dart`.
 10. **`AlertAction` and the reserved lane.** `has-data-[slot=alert-action]:pr-20` widens the right padding to 80px
@@ -1305,7 +1305,7 @@ Consequences here:
   pinned in the port.
 - **Enter curve measured** as CSS `ease` `cubic-bezier(.25,.1,.25,1)`
   (opacity 0.314@20.3%/0.645@38.3%/0.9445@69.6%); swipe-out release is CSS
-  `ease-out` `(0,0,.58,1)` — both named in DsCurves (cssEase/cssEaseOut).
+  `ease-out` `(0,0,.58,1)` — both named in ElCurves (cssEase/cssEaseOut).
 - **Reduced motion:** `transition: none`, toast appears at identity/opacity 1,
   and STILL expires on its 4000ms clock — timers are not motion.
 - **Blanked back toasts:** `li` opacity 1 with content/icon at 0; both bloom

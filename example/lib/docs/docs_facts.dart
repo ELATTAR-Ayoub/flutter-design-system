@@ -54,7 +54,7 @@ class DocsApiTable extends StatelessWidget {
   Widget build(BuildContext context) => _DocsFactPanel(
     title: title,
     child: _FactScroll(
-      minWidth: ds(132),
+      minWidth: el(132),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
@@ -81,7 +81,7 @@ class DocsStateMatrix extends StatelessWidget {
   Widget build(BuildContext context) => _DocsFactPanel(
     title: title,
     child: _FactScroll(
-      minWidth: ds(132),
+      minWidth: el(132),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
@@ -116,7 +116,7 @@ class DocsInstallFacts extends StatelessWidget {
       children: <Widget>[
         for (final DocsInstallFact fact in facts)
           Padding(
-            padding: EdgeInsets.only(bottom: ds(4)),
+            padding: EdgeInsets.only(bottom: el(4)),
             child: _InstallRow(fact: fact),
           ),
       ],
@@ -132,23 +132,23 @@ class _DocsFactPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return Semantics(
       container: true,
       label: title,
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: theme.card,
-          borderRadius: BorderRadius.circular(DsRadii.xl),
-          border: Border.all(color: theme.border, width: DsWidths.hairline),
+          borderRadius: BorderRadius.circular(ElRadii.xl),
+          border: Border.all(color: theme.border, width: ElWidths.hairline),
         ),
         child: Padding(
-          padding: EdgeInsets.all(ds(5)),
+          padding: EdgeInsets.all(el(5)),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              DsText(title, DsType.h4, color: theme.foreground),
-              SizedBox(height: ds(4)),
+              ElText(title, ElType.h4, color: theme.foreground),
+              SizedBox(height: el(4)),
               child,
             ],
           ),
@@ -181,20 +181,20 @@ class _TableHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return Container(
-      padding: EdgeInsets.only(bottom: ds(2)),
+      padding: EdgeInsets.only(bottom: el(2)),
       decoration: BoxDecoration(
         border: Border(
-          bottom: BorderSide(color: theme.border, width: DsWidths.hairline),
+          bottom: BorderSide(color: theme.border, width: ElWidths.hairline),
         ),
       ),
       child: Row(
         children: <Widget>[
           for (final String cell in cells)
             SizedBox(
-              width: ds(44),
-              child: DsText(cell, DsType.label, color: theme.mutedForeground),
+              width: el(44),
+              child: ElText(cell, ElType.label, color: theme.mutedForeground),
             ),
         ],
       ),
@@ -209,15 +209,15 @@ class _FactRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return Semantics(
       container: true,
       label: cells.join(', '),
       child: Container(
-        padding: EdgeInsets.symmetric(vertical: ds(3)),
+        padding: EdgeInsets.symmetric(vertical: el(3)),
         decoration: BoxDecoration(
           border: Border(
-            bottom: BorderSide(color: theme.border, width: DsWidths.hairline),
+            bottom: BorderSide(color: theme.border, width: ElWidths.hairline),
           ),
         ),
         child: Row(
@@ -225,12 +225,12 @@ class _FactRow extends StatelessWidget {
           children: <Widget>[
             for (int index = 0; index < cells.length; index++)
               SizedBox(
-                width: ds(44),
+                width: el(44),
                 child: Padding(
-                  padding: EdgeInsets.only(right: ds(3)),
+                  padding: EdgeInsets.only(right: el(3)),
                   child: _SelectableFactText(
                     text: cells[index],
-                    spec: index == 0 ? DsType.body : DsType.small,
+                    spec: index == 0 ? ElType.body : ElType.small,
                     color: index == 0
                         ? theme.foreground
                         : theme.mutedForeground,
@@ -251,22 +251,22 @@ class _InstallRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return Semantics(
       container: true,
       label: '${fact.label}: ${fact.value}. ${fact.description}',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          DsText(fact.label, DsType.label, color: theme.actionInk),
-          SizedBox(height: ds(1)),
+          ElText(fact.label, ElType.label, color: theme.actionInk),
+          SizedBox(height: el(1)),
           _SelectableFactText(
             text: fact.value,
-            spec: DsType.code,
+            spec: ElType.code,
             color: theme.foreground,
           ),
-          SizedBox(height: ds(1)),
-          DsText(fact.description, DsType.small),
+          SizedBox(height: el(1)),
+          ElText(fact.description, ElType.small),
         ],
       ),
     );
@@ -281,10 +281,10 @@ class _SelectableFactText extends StatelessWidget {
   });
 
   final String text;
-  final DsTypeSpec spec;
+  final ElTypeSpec spec;
   final Color color;
 
   @override
   Widget build(BuildContext context) =>
-      SelectableText(text, style: DsText.styleOf(context, spec, color: color));
+      SelectableText(text, style: ElText.styleOf(context, spec, color: color));
 }

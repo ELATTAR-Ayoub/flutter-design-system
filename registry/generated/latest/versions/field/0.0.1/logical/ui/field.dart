@@ -14,8 +14,8 @@
 ///
 /// **Three different line-heights on three consecutive lines.** The family
 /// types itself out of Tailwind's `text-sm` rung with `leading-*` overrides and
-/// never touches a `.type-*` class, which is why [DsComponentType.fieldLabel],
-/// [DsComponentType.textSm] and [DsType.small] are three different specs here
+/// never touches a `.type-*` class, which is why [ElComponentType.fieldLabel],
+/// [ElComponentType.textSm] and [ElType.small] are three different specs here
 /// rather than one.
 ///
 /// ## The wiring contract
@@ -35,7 +35,7 @@
 /// | `role="alert"` on `FieldError` | `Semantics(liveRegion: true)`, on the error subtree only |
 /// | `role="group"` on `Field` | the field's own container node |
 ///
-/// The threading itself is [DsFieldScope]. A Radix `Slot` merges props onto
+/// The threading itself is [ElFieldScope]. A Radix `Slot` merges props onto
 /// whatever child it is given; the Flutter analogue of that is context, so a
 /// control reads what the field knows instead of the field reaching into the
 /// control. Order of precedence is the Slot's own: **the child's own props
@@ -48,7 +48,7 @@
 /// despite the API row claiming Field *"handles the invalid colouring for the
 /// whole group"*. The **forms** page does set it (`data-invalid={fieldState
 /// .invalid}`), and there it fires. Both behaviours fall out of one switch:
-/// [DsField.invalid] colours the subtree, and a page that marks only its
+/// [ElField.invalid] colours the subtree, and a page that marks only its
 /// control leaves the field valid.
 library;
 
@@ -60,7 +60,7 @@ import '../foundation/theme.dart';
 import '../foundation/typography.dart';
 import '../text_layout.dart';
 import '../theme_scope.dart';
-import 'ds_rule.dart';
+import 'rule.dart';
 
 /// What activating a field **does** — a one-slot holder a control fills in.
 ///
@@ -69,7 +69,7 @@ import 'ds_rule.dart';
 /// no id graph to forward a click along, and a label cannot know what
 /// activating an arbitrary control means, so the control says so.
 ///
-/// Mutable on purpose, and deliberately not part of [DsFieldScope]'s equality:
+/// Mutable on purpose, and deliberately not part of [ElFieldScope]'s equality:
 /// a control registers during its own `build`, which is after the scope above
 /// it was built. A `ValueNotifier` would be the same holder plus a notification
 /// nobody listens for — the label reads the callback at tap time, not at build
@@ -77,12 +77,12 @@ import 'ds_rule.dart';
 ///
 /// ```dart
 /// // In a control's build, once it knows what it would do:
-/// DsFieldScope.maybeOf(context)?.activator?.callback = _toggle;
+/// ElFieldScope.maybeOf(context)?.activator?.callback = _toggle;
 /// ```
 ///
 /// A control that leaves it null is not broken: a text field's activation *is*
-/// focus, and [DsFieldLabel] falls back to the scope's focus node.
-class DsFieldActivator {
+/// focus, and [ElFieldLabel] falls back to the scope's focus node.
+class ElFieldActivator {
   /// What a tap on the label should do. Null until a control registers.
   VoidCallback? callback;
 }
@@ -92,8 +92,8 @@ class DsFieldActivator {
 /// Everything the id graph would have carried, in the one direction Flutter can
 /// carry it. A control opts in by reading it; nothing is forced on a child that
 /// does not.
-class DsFieldScope extends InheritedWidget {
-  const DsFieldScope({
+class ElFieldScope extends InheritedWidget {
+  const ElFieldScope({
     super.key,
     this.label,
     this.describedBy,
@@ -123,16 +123,16 @@ class DsFieldScope extends InheritedWidget {
 
   /// Where the control registers what activating this field does.
   ///
-  /// A [DsField] supplies one; a scope built by hand may leave it null, which
-  /// is how a caller keeps [DsFieldLabel] from attaching any recogniser of its
+  /// A [ElField] supplies one; a scope built by hand may leave it null, which
+  /// is how a caller keeps [ElFieldLabel] from attaching any recogniser of its
   /// own and takes the tap with a handler of its own instead.
-  final DsFieldActivator? activator;
+  final ElFieldActivator? activator;
 
-  static DsFieldScope? maybeOf(BuildContext context) =>
-      context.dependOnInheritedWidgetOfExactType<DsFieldScope>();
+  static ElFieldScope? maybeOf(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<ElFieldScope>();
 
   @override
-  bool updateShouldNotify(DsFieldScope old) =>
+  bool updateShouldNotify(ElFieldScope old) =>
       old.label != label ||
       old.describedBy != describedBy ||
       old.invalid != invalid ||
@@ -142,7 +142,7 @@ class DsFieldScope extends InheritedWidget {
 }
 
 /// `fieldVariants`' `orientation`.
-enum DsFieldOrientation {
+enum ElFieldOrientation {
   /// `flex-col *:w-full` — the default, and every field on both ported pages
   /// except the switch and the checkbox.
   vertical,
@@ -153,8 +153,8 @@ enum DsFieldOrientation {
 }
 
 /// `FieldGroup` — `flex w-full flex-col gap-5`.
-class DsFieldGroup extends StatelessWidget {
-  const DsFieldGroup({super.key, required this.children, this.nested = false});
+class ElFieldGroup extends StatelessWidget {
+  const ElFieldGroup({super.key, required this.children, this.nested = false});
 
   final List<Widget> children;
 
@@ -164,17 +164,14 @@ class DsFieldGroup extends StatelessWidget {
 
   /// `gap-5` — 20px between fields, the measure both pages' panels are built
   /// on.
-  static double get gap => ds(5);
+  static double get gap => el(5);
 
   /// `gap-4` — 16px, the nested step.
-  static double get nestedGap => ds(4);
+  static double get nestedGap => el(4);
 
   @override
   Widget build(BuildContext context) {
-    return _Stack(
-      gap: nested ? nestedGap : gap,
-      children: children,
-    );
+    return _Stack(gap: nested ? nestedGap : gap, children: children);
   }
 }
 
@@ -185,10 +182,10 @@ class DsFieldGroup extends StatelessWidget {
 /// gap between "Payout rhythm" and its radios is 6px, not 6 + the fieldset's
 /// own 12)*. CSS lifts a `<legend>` out of the fieldset's anonymous flex content
 /// box and renders it over the border, so the box's `gap` never applies to it
-/// and only its own `mb-1.5` does. A leading [DsFieldLegend] child is therefore
+/// and only its own `mb-1.5` does. A leading [ElFieldLegend] child is therefore
 /// special-cased to that 6px; every other gap in the set is the normal one.
-class DsFieldSet extends StatelessWidget {
-  const DsFieldSet({
+class ElFieldSet extends StatelessWidget {
+  const ElFieldSet({
     super.key,
     required this.children,
     this.tightForGroup = false,
@@ -206,27 +203,29 @@ class DsFieldSet extends StatelessWidget {
   final bool tightForGroup;
 
   /// `gap-4` — 16px.
-  static double get gap => ds(4);
+  static double get gap => el(4);
 
   /// `gap-3` — 12px, the selection-group step.
-  static double get groupGap => ds(3);
+  static double get groupGap => el(3);
 
   @override
   Widget build(BuildContext context) {
     final double normal = tightForGroup ? groupGap : gap;
     // The one thing a `has-` selector could tell CSS that a parent can tell
     // itself: whether its own first child is the legend. A type check, for the
-    // same reason `DsInputGroupAddon` sniffs for a button — the selector is
+    // same reason `ElInputGroupAddon` sniffs for a button — the selector is
     // about a direct child's identity, which is exactly what this reads.
     final bool leadingLegend =
-        children.isNotEmpty && children.first is DsFieldLegend;
+        children.isNotEmpty && children.first is ElFieldLegend;
 
     final List<Widget> rows = <Widget>[];
     for (int i = 0; i < children.length; i++) {
       if (i > 0) {
-        rows.add(SizedBox(
-          height: i == 1 && leadingLegend ? DsFieldLegend.spaceBelow : normal,
-        ));
+        rows.add(
+          SizedBox(
+            height: i == 1 && leadingLegend ? ElFieldLegend.spaceBelow : normal,
+          ),
+        );
       }
       rows.add(children[i]);
     }
@@ -244,40 +243,45 @@ class DsFieldSet extends StatelessWidget {
 /// The page's one legend sits over a radio group, because `<label for>` may
 /// only point at a labelable element and a RadioGroup container is a `div`, so
 /// `FormLabel`'s `htmlFor` would announce nothing (`page.tsx:322–325`).
-class DsFieldLegend extends StatelessWidget {
-  const DsFieldLegend(this.text, {super.key});
+class ElFieldLegend extends StatelessWidget {
+  const ElFieldLegend(this.text, {super.key});
 
   final String text;
 
   /// `mb-1.5` — 6px, **on top of** the enclosing `FieldSet`'s own flex gap. A
   /// margin and a gap both apply in CSS, so the legend clears its group by 22px
   /// and not by 16.
-  static double get spaceBelow => ds(1.5);
+  static double get spaceBelow => el(1.5);
 
   @override
   Widget build(BuildContext context) {
     // 13 / 500 / 1.428571: `font-medium` at `text-sm`, with **no** `leading-*`
     // override, so it keeps the utility's own ratio rather than the label's
     // 1.375. Composed from the two specs that each carry half of it rather than
-    // typing a third — the size and weight are [DsComponentType.fieldLabel]'s,
-    // the leading is [DsComponentType.textSm]'s.
-    final TextStyle style = DsText.styleOf(context, DsComponentType.fieldLabel)
-        .copyWith(height: DsComponentType.textSm.height);
+    // typing a third — the size and weight are [ElComponentType.fieldLabel]'s,
+    // the leading is [ElComponentType.textSm]'s.
+    final TextStyle style = ElText.styleOf(
+      context,
+      ElComponentType.fieldLabel,
+    ).copyWith(height: ElComponentType.textSm.height);
     return Align(
       alignment: AlignmentDirectional.centerStart,
       // Shrink-wrap the height: these align horizontally, and a block element
       // in a flex column is its content's height and never its container's. In
-      // a `DsField`'s Column the constraint is unbounded and an [Align] already
+      // a `ElField`'s Column the constraint is unbounded and an [Align] already
       // wraps; anywhere the height is bounded it would otherwise swallow it.
       heightFactor: 1,
-      // [DsLineBox] rather than a bare [Text], for the reason every rendered
+      // [ElLineBox] rather than a bare [Text], for the reason every rendered
       // string in this port carries one: the engine rounds a line's ascent and
       // descent to whole pixels before adding them, so a paragraph quantizes UP
       // to the next half pixel and the declared box is not what renders. This
       // is the one spec composed at a call site rather than named in the
-      // foundation, so it reaches for `DsLineBox` directly where the others go
-      // through `DsText`.
-      child: DsLineBox(style: style, child: Text(text, style: style)),
+      // foundation, so it reaches for `ElLineBox` directly where the others go
+      // through `ElText`.
+      child: ElLineBox(
+        style: style,
+        child: Text(text, style: style),
+      ),
     );
   }
 }
@@ -285,11 +289,11 @@ class DsFieldLegend extends StatelessWidget {
 /// One field: a label, the control it names, and what is said about it.
 ///
 /// The four slots are passed as data rather than composed as children so the
-/// field can publish [DsFieldScope] and place the description's conditional
-/// gap. [DsFieldLabel], [DsFieldDescription] and [DsFieldError] stay public for
+/// field can publish [ElFieldScope] and place the description's conditional
+/// gap. [ElFieldLabel], [ElFieldDescription] and [ElFieldError] stay public for
 /// the compositions this shape does not cover.
-class DsField extends StatefulWidget {
-  const DsField({
+class ElField extends StatefulWidget {
+  const ElField({
     super.key,
     required this.child,
     this.label,
@@ -298,7 +302,7 @@ class DsField extends StatefulWidget {
     this.invalid,
     this.enabled = true,
     this.focusNode,
-    this.orientation = DsFieldOrientation.vertical,
+    this.orientation = ElFieldOrientation.vertical,
   });
 
   /// The control.
@@ -328,10 +332,10 @@ class DsField extends StatefulWidget {
   /// The node the label focuses, and the one a failed submit lands on.
   final FocusNode? focusNode;
 
-  final DsFieldOrientation orientation;
+  final ElFieldOrientation orientation;
 
   /// `gap-2` — 8px between label, control and what follows.
-  static double get gap => ds(2);
+  static double get gap => el(2);
 
   /// `nth-last-2:-mt-1` — the description tucks 4px closer to the control the
   /// moment an error appears below it *(measured: forms-map §3.2 records the
@@ -340,34 +344,31 @@ class DsField extends StatefulWidget {
   /// `FieldError` renders `null` when valid, so the description's position in
   /// the child list — and therefore which of `last:mt-0` and `nth-last-2:-mt-1`
   /// matches — changes with validity. Nothing animates it; it is a relayout.
-  static double get describedGap => gap - ds(1);
+  static double get describedGap => gap - el(1);
 
   @override
-  State<DsField> createState() => _DsFieldState();
+  State<ElField> createState() => _ElFieldState();
 }
 
-class _DsFieldState extends State<DsField> {
+class _ElFieldState extends State<ElField> {
   /// Stateful for exactly this: the holder has to outlive a rebuild, or the
   /// control would register into an object the label no longer reads.
-  final DsFieldActivator _activator = DsFieldActivator();
+  final ElFieldActivator _activator = ElFieldActivator();
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     final String? label = widget.label;
     final String? description = widget.description;
-    final List<String> messages = DsRules.dedupe(widget.errors);
+    final List<String> messages = ElRules.dedupe(widget.errors);
     final bool isInvalid = widget.invalid ?? messages.isNotEmpty;
-    final double gap = DsField.gap;
+    final double gap = ElField.gap;
 
     // `aria-describedby="{id}-description {id}-message"` — one id list, read in
     // DOM order, so one string in the same order.
-    final String described = <String>[
-      ?description,
-      ...messages,
-    ].join(' ');
+    final String described = <String>[?description, ...messages].join(' ');
 
-    final Widget control = DsFieldScope(
+    final Widget control = ElFieldScope(
       label: label,
       describedBy: described.isEmpty ? null : described,
       invalid: isInvalid,
@@ -382,7 +383,7 @@ class _DsFieldState extends State<DsField> {
         // The activator is handed over rather than read from context: the scope
         // wraps the control alone, so the label is its sibling and cannot see
         // it. Same reason `focusNode` has always been passed here.
-        : DsFieldLabel(
+        : ElFieldLabel(
             label,
             focusNode: widget.focusNode,
             activator: _activator,
@@ -391,52 +392,53 @@ class _DsFieldState extends State<DsField> {
 
     final List<Widget> rows = <Widget>[];
     switch (widget.orientation) {
-      case DsFieldOrientation.vertical:
+      case ElFieldOrientation.vertical:
         if (labelWidget != null) {
           rows
             ..add(labelWidget)
             ..add(SizedBox(height: gap));
         }
         rows.add(control);
-      case DsFieldOrientation.horizontal:
-        rows.add(Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            // **Control first.** All three horizontal fields on the reference
-            // put the control in the DOM before its label — a radio, a switch
-            // and a checkbox each sit at the LEFT of their row — and
-            // `*:data-[slot=field-label]:flex-auto` then grows the label into
-            // the slack beside it. That growth is not decoration: it is what
-            // makes the rest of the row a click target.
-            //
-            // `control`, never the bare `child`: the scope has to wrap the
-            // control on BOTH branches. This is the branch the switch and the
-            // checkbox live on, so a field that publishes nothing here is a
-            // field whose focus-on-error and accessible name go missing on
-            // exactly the controls that need them most.
-            control,
-            if (labelWidget != null) SizedBox(width: gap),
-            if (labelWidget != null) Expanded(child: labelWidget),
-          ],
-        ));
+      case ElFieldOrientation.horizontal:
+        rows.add(
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              // **Control first.** All three horizontal fields on the reference
+              // put the control in the DOM before its label — a radio, a switch
+              // and a checkbox each sit at the LEFT of their row — and
+              // `*:data-[slot=field-label]:flex-auto` then grows the label into
+              // the slack beside it. That growth is not decoration: it is what
+              // makes the rest of the row a click target.
+              //
+              // `control`, never the bare `child`: the scope has to wrap the
+              // control on BOTH branches. This is the branch the switch and the
+              // checkbox live on, so a field that publishes nothing here is a
+              // field whose focus-on-error and accessible name go missing on
+              // exactly the controls that need them most.
+              control,
+              if (labelWidget != null) SizedBox(width: gap),
+              if (labelWidget != null) Expanded(child: labelWidget),
+            ],
+          ),
+        );
     }
 
     if (description != null) {
       rows
-        ..add(SizedBox(
-            height: messages.isEmpty ? gap : DsField.describedGap))
+        ..add(SizedBox(height: messages.isEmpty ? gap : ElField.describedGap))
         // Excluded because the string is already the control's `hint`, which
         // is where `aria-describedby` lands. Left in, it merges into this
         // field's one node as part of the control's NAME — "Email Receipts and
         // nothing else." — which is neither what the web announces nor what a
-        // name is for. The standalone [DsFieldDescription] announces itself
+        // name is for. The standalone [ElFieldDescription] announces itself
         // normally; only the copy this field has already folded is silenced.
-        ..add(ExcludeSemantics(child: DsFieldDescription(description)));
+        ..add(ExcludeSemantics(child: ElFieldDescription(description)));
     }
     if (messages.isNotEmpty) {
       rows
         ..add(SizedBox(height: gap))
-        ..add(DsFieldError(messages));
+        ..add(ElFieldError(messages));
     }
 
     Widget field = Column(
@@ -463,7 +465,7 @@ class _DsFieldState extends State<DsField> {
     // The control inside publishes a validation result too, from the same
     // scope, and a merge keeps the parent's — so stating it here costs nothing
     // and buys the case that matters: a control that does **not** read
-    // [DsFieldScope] still ends up inside a node a screen reader hears as
+    // [ElFieldScope] still ends up inside a node a screen reader hears as
     // invalid. An error nobody is told about is the one drift class this port
     // does not ship, and it must not depend on every control opting in.
     return Semantics(
@@ -491,8 +493,8 @@ class _DsFieldState extends State<DsField> {
 /// | rung | when | what happens |
 /// |---|---|---|
 /// | [onTap] | the caller states its own handler | it is called, and nothing else is |
-/// | [DsFieldScope.activator] | a control registered a callback | the control is **activated** |
-/// | [DsFieldScope.focusNode] | a node is offered, no activator | the control is focused |
+/// | [ElFieldScope.activator] | a control registered a callback | the control is **activated** |
+/// | [ElFieldScope.focusNode] | a node is offered, no activator | the control is focused |
 /// | — | none of those | **no recogniser is attached at all** |
 ///
 /// The last rung is not a fallthrough, it is a feature: a caller composing its
@@ -500,8 +502,8 @@ class _DsFieldState extends State<DsField> {
 /// neither activator nor node, and the label then contests nothing. An inner
 /// recogniser would win the gesture arena over an ancestor's and leave the row
 /// focusing where it should be toggling.
-class DsFieldLabel extends StatelessWidget {
-  const DsFieldLabel(
+class ElFieldLabel extends StatelessWidget {
+  const ElFieldLabel(
     this.text, {
     super.key,
     this.spec,
@@ -514,7 +516,7 @@ class DsFieldLabel extends StatelessWidget {
   final String text;
 
   /// The type this label is typed in, defaulting to
-  /// [DsComponentType.fieldLabel].
+  /// [ElComponentType.fieldLabel].
   ///
   /// A hook rather than a `weight:` or a `bold:` flag, because what the class
   /// list does is substitute one resolved style for another: the selection
@@ -522,7 +524,7 @@ class DsFieldLabel extends StatelessWidget {
   /// `Label`'s `font-medium` and leaves `text-sm leading-snug` standing
   /// (`selection/page.tsx:100`). [normal] is that exact substitution; anything
   /// else a call site needs is another spec.
-  final DsTypeSpec? spec;
+  final ElTypeSpec? spec;
 
   /// `FieldLabel className="font-normal"` — 13 / 1.375 / **400**.
   ///
@@ -531,33 +533,33 @@ class DsFieldLabel extends StatelessWidget {
   /// size and the tightened leading survive it untouched and only the weight
   /// moves.
   ///
-  /// **The weight is borrowed from [DsComponentType.textSm], not typed.**
+  /// **The weight is borrowed from [ElComponentType.textSm], not typed.**
   /// `font-normal` sets the same 400 that `html` gives every unstyled element,
   /// and `text-sm` is where this family already records that number — so the
   /// axis value is read off the token instead of being restated here, which is
   /// what keeps a fourth copy of "400" out of the component layer and this file
-  /// out of the token guard's way. Same composition [DsFieldLegend] performs one
+  /// out of the token guard's way. Same composition [ElFieldLegend] performs one
   /// property along: it borrows `text-sm`'s leading and keeps this label's
   /// weight, and this borrows the weight and keeps the leading.
-  static final DsTypeSpec normal = DsTypeSpec(
-    family: DsComponentType.fieldLabel.family,
-    size: DsComponentType.fieldLabel.size,
-    height: DsComponentType.fieldLabel.height,
-    wght: DsComponentType.textSm.variations.first.value,
+  static final ElTypeSpec normal = ElTypeSpec(
+    family: ElComponentType.fieldLabel.family,
+    size: ElComponentType.fieldLabel.size,
+    height: ElComponentType.fieldLabel.height,
+    wght: ElComponentType.textSm.variations.first.value,
   );
 
   /// Focused on tap, when no activator is registered. Falls back to the
-  /// enclosing [DsFieldScope]'s node.
+  /// enclosing [ElFieldScope]'s node.
   final FocusNode? focusNode;
 
   /// Where the control registered what activating this field does.
   ///
-  /// Passed explicitly by [DsField], because the label is a **sibling** of the
+  /// Passed explicitly by [ElField], because the label is a **sibling** of the
   /// scope rather than a descendant of it — the scope wraps the control alone,
   /// so that a control reads it and the label's own text does not. A standalone
   /// label inside a hand-built scope falls back to reading it from context,
   /// exactly as [focusNode] does.
-  final DsFieldActivator? activator;
+  final ElFieldActivator? activator;
 
   final bool enabled;
 
@@ -573,9 +575,9 @@ class DsFieldLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsFieldScope? scope = DsFieldScope.maybeOf(context);
+    final ElFieldScope? scope = ElFieldScope.maybeOf(context);
     final FocusNode? node = focusNode ?? scope?.focusNode;
-    final DsFieldActivator? holder = activator ?? scope?.activator;
+    final ElFieldActivator? holder = activator ?? scope?.activator;
 
     // Resolved at tap time, not at build time: a control registers during its
     // own build, which runs after this one, so reading `activator.callback`
@@ -600,12 +602,12 @@ class DsFieldLabel extends StatelessWidget {
     // No colour: `Label` declares none, so it inherits — which is what lets
     // `Field`'s invalid colouring reach it.
     //
-    // [DsText] and not a bare [Text]: it wraps the paragraph in a [DsLineBox],
+    // [ElText] and not a bare [Text]: it wraps the paragraph in a [ElLineBox],
     // which holds the line to `font-size × line-height` instead of the engine's
     // rounded metrics. A bare `Text` renders this label 18.0 tall against a
     // declared 17.875 — an eighth of a pixel that a column of sixteen fields
     // turns into two.
-    Widget label = DsText(text, spec ?? DsComponentType.fieldLabel);
+    Widget label = ElText(text, spec ?? ElComponentType.fieldLabel);
 
     if (action != null && enabled) {
       label = GestureDetector(
@@ -623,7 +625,7 @@ class DsFieldLabel extends StatelessWidget {
       alignment: AlignmentDirectional.centerStart,
       // Shrink-wrap the height: these align horizontally, and a block element
       // in a flex column is its content's height and never its container's. In
-      // a `DsField`'s Column the constraint is unbounded and an [Align] already
+      // a `ElField`'s Column the constraint is unbounded and an [Align] already
       // wraps; anywhere the height is bounded it would otherwise swallow it.
       heightFactor: 1,
       // The string is already the control's accessible name. Announcing it here
@@ -635,8 +637,8 @@ class DsFieldLabel extends StatelessWidget {
 }
 
 /// `FieldDescription` — 13 / 1.5 / 400 / `--muted-foreground`.
-class DsFieldDescription extends StatelessWidget {
-  const DsFieldDescription(this.text, {super.key});
+class ElFieldDescription extends StatelessWidget {
+  const ElFieldDescription(this.text, {super.key});
 
   final String text;
 
@@ -646,7 +648,7 @@ class DsFieldDescription extends StatelessWidget {
     // exactly `.type-small`'s four values. Reused rather than re-transcribed:
     // the numbers are the same numbers, and a second spec carrying them would
     // be a second place for them to drift.
-    return DsText(text, DsType.small, align: TextAlign.start);
+    return ElText(text, ElType.small, align: TextAlign.start);
   }
 }
 
@@ -656,40 +658,37 @@ class DsFieldDescription extends StatelessWidget {
 /// (`ul.ml-4.list-disc.gap-1`). The list branch fires in exactly one place in
 /// the corpus — the password form under `criteriaMode: "all"` — and it is the
 /// entire reason §3 of the forms page exists.
-class DsFieldError extends StatelessWidget {
-  const DsFieldError(this.messages, {super.key});
+class ElFieldError extends StatelessWidget {
+  const ElFieldError(this.messages, {super.key});
 
   final List<String> messages;
 
   /// `ml-4` — 16px. With Preflight zeroing the list's padding, this margin is
   /// where the disc markers hang: the item text starts at 16px and the marker
   /// paints to the left of it, inside the indent.
-  static double get listIndent => ds(4);
+  static double get listIndent => el(4);
 
   /// `gap-1` — 4px between items.
-  static double get itemGap => ds(1);
+  static double get itemGap => el(1);
 
   @override
   Widget build(BuildContext context) {
-    final List<String> unique = DsRules.dedupe(messages);
+    final List<String> unique = ElRules.dedupe(messages);
     // `FieldError` returns `null` when there is nothing to say. Not a
     // zero-height box carrying a live region — an empty live region on every
     // field is the anti-pattern the page's own Note names and `donts[1]`
     // forbids.
     if (unique.isEmpty) return const SizedBox.shrink();
 
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
 
-    // [DsText], never a bare [Text]: every string goes through a [DsLineBox] so
+    // [ElText], never a bare [Text]: every string goes through a [ElLineBox] so
     // the paragraph measures `font-size × line-height` rather than the engine's
     // rounded ascent-plus-descent. Bare, this renders 19.0 against a declared
     // 18.5714 — and in the list branch **every item** quantizes, so a
     // four-message password error drifts by nearly two pixels on its own.
-    DsText ink(String message) => DsText(
-          message,
-          DsComponentType.textSm,
-          color: theme.destructiveInk,
-        );
+    ElText ink(String message) =>
+        ElText(message, ElComponentType.textSm, color: theme.destructiveInk);
 
     final Widget content = unique.length == 1
         ? ink(unique.single)

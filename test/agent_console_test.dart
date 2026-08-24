@@ -2,8 +2,8 @@
 /// files the console family owns, against the numbers and behaviours measured
 /// on `/design-system/components/agent/console`.
 ///
-/// The transcript's own parts (`DsUserMessage`, `DsToolChip`, `DsApprovalCard`,
-/// `DsWelcomeCard`, …) are another lane's and are tested there; what this file
+/// The transcript's own parts (`ElUserMessage`, `ElToolChip`, `ElApprovalCard`,
+/// `ElWelcomeCard`, …) are another lane's and are tested there; what this file
 /// pins is the **machine** — which of them the console builds, when, and out of
 /// what state — plus the two things the console family draws itself: the status
 /// line's shimmer and the launcher's shell.
@@ -21,21 +21,21 @@ import 'package:flutter_test/flutter_test.dart';
 
 /* ── A transport with a script in a list ─────────────────────────────────── */
 
-/// The smallest thing that satisfies [DsAgentTransport]: a turn list a test
+/// The smallest thing that satisfies [ElAgentTransport]: a turn list a test
 /// writes directly, and the four flags around it.
-class _FakeTransport extends ChangeNotifier implements DsAgentTransport {
+class _FakeTransport extends ChangeNotifier implements ElAgentTransport {
   _FakeTransport({
-    List<DsAgentTurn>? turns,
-    List<DsPendingApproval>? approvals,
+    List<ElAgentTurn>? turns,
+    List<ElPendingApproval>? approvals,
     this.isLoading = false,
     this.isReady = true,
     this.error,
-    this.capabilities = const DsAgentCapabilities(),
-  })  : _turns = turns ?? <DsAgentTurn>[],
-        _approvals = approvals ?? <DsPendingApproval>[];
+    this.capabilities = const ElAgentCapabilities(),
+  }) : _turns = turns ?? <ElAgentTurn>[],
+       _approvals = approvals ?? <ElPendingApproval>[];
 
-  final List<DsAgentTurn> _turns;
-  final List<DsPendingApproval> _approvals;
+  final List<ElAgentTurn> _turns;
+  final List<ElPendingApproval> _approvals;
 
   @override
   bool isLoading;
@@ -47,25 +47,25 @@ class _FakeTransport extends ChangeNotifier implements DsAgentTransport {
   Object? error;
 
   @override
-  final DsAgentCapabilities capabilities;
+  final ElAgentCapabilities capabilities;
 
   /// What the console asked this transport to send, in order.
-  final List<({String text, DsAgentSendOptions options})> sent =
-      <({String text, DsAgentSendOptions options})>[];
+  final List<({String text, ElAgentSendOptions options})> sent =
+      <({String text, ElAgentSendOptions options})>[];
 
   int aborts = 0;
   int resets = 0;
 
   @override
-  List<DsAgentTurn> get turns => _turns;
+  List<ElAgentTurn> get turns => _turns;
 
   @override
-  List<DsPendingApproval> get pendingApprovals => _approvals;
+  List<ElPendingApproval> get pendingApprovals => _approvals;
 
   @override
   Future<void> send(
     String text, [
-    DsAgentSendOptions options = const DsAgentSendOptions(),
+    ElAgentSendOptions options = const ElAgentSendOptions(),
   ]) async {
     sent.add((text: text, options: options));
     notifyListeners();
@@ -85,12 +85,12 @@ class _FakeTransport extends ChangeNotifier implements DsAgentTransport {
   }
 }
 
-const DsToolStateMap _toolStates = <String, DsAgentState>{
-  'search_inventory': DsAgentState.searching,
-  'export_activity': DsAgentState.writing,
+const ElToolStateMap _toolStates = <String, ElAgentState>{
+  'search_inventory': ElAgentState.searching,
+  'export_activity': ElAgentState.writing,
 };
 
-const DsAgentPersona _persona = DsAgentPersona(
+const ElAgentPersona _persona = ElAgentPersona(
   name: 'Vault',
   blurb: 'Ask about packs, pulls, prices and your wallet.',
   suggestions: <String>['What sealed boxes are left?'],
@@ -106,11 +106,11 @@ Future<void> _pump(
   tester.view.physicalSize = size;
   addTearDown(tester.view.reset);
 
-  final DsThemeController theme = DsThemeController(mode: DsThemeMode.light);
+  final ElThemeController theme = ElThemeController(mode: ElThemeMode.light);
   addTearDown(theme.dispose);
 
   await tester.pumpWidget(
-    DsTheme(
+    ElTheme(
       controller: theme,
       child: Directionality(
         textDirection: TextDirection.ltr,
@@ -124,10 +124,10 @@ Future<void> _pump(
               disableAnimations: true,
             ),
             child: DefaultTextStyle(
-              style: DsText.styleOf(
+              style: ElText.styleOf(
                 context,
-                DsType.body,
-                color: DsTheme.of(context).foreground,
+                ElType.body,
+                color: ElTheme.of(context).foreground,
               ),
               // A fresh key per pump: `Overlay` reads `initialEntries` once
               // and ignores every later change, so a test that pumps twice
@@ -151,73 +151,75 @@ void main() {
   /* ── The status line ───────────────────────────────────────────────────── */
 
   group('StatusLine', () {
-    test('anim-shimmer-text is 2.6s over a 220% tile, not the shimmer utility',
-        () {
-      // PROBE CORRECTION. `DsShimmerText` (attachment.dart) is shadcn's
-      // `shimmer`: 2s linear, a `3ch + 40px` band. The status line wears
-      // `anim-shimmer-text`, measured live mid-turn as `pulls-shimmer 2.6s
-      // cubic-bezier(0.65,0,0.35,1) infinite` over `background-size: 220%`.
-      expect(DsAgentShimmerText.period, DsDurations.shimmerText);
-      expect(DsAgentShimmerText.period, const Duration(milliseconds: 2600));
-      expect(DsAgentShimmerText.tileFactor, 2.2);
-      // `linear-gradient(100deg, --muted-foreground 30%, --agent 50%,
-      //  --muted-foreground 70%)`.
-      expect(DsAgentShimmerText.stops, <double>[0.30, 0.50, 0.70]);
-    });
+    test(
+      'anim-shimmer-text is 2.6s over a 220% tile, not the shimmer utility',
+      () {
+        // PROBE CORRECTION. `ElShimmerText` (attachment.dart) is shadcn's
+        // `shimmer`: 2s linear, a `3ch + 40px` band. The status line wears
+        // `anim-shimmer-text`, measured live mid-turn as `pulls-shimmer 2.6s
+        // cubic-bezier(0.65,0,0.35,1) infinite` over `background-size: 220%`.
+        expect(ElAgentShimmerText.period, ElDurations.shimmerText);
+        expect(ElAgentShimmerText.period, const Duration(milliseconds: 2600));
+        expect(ElAgentShimmerText.tileFactor, 2.2);
+        // `linear-gradient(100deg, --muted-foreground 30%, --agent 50%,
+        //  --muted-foreground 70%)`.
+        expect(ElAgentShimmerText.stops, <double>[0.30, 0.50, 0.70]);
+      },
+    );
 
     test('the tile travels 200% → −200%, which on a 220% tile is ∓2.4W', () {
       // `background-position: X%` puts the tile's left edge at `(W − S)·X/100`.
       // With `S = 2.2W` that is `−1.2·W·X/100`: −2.4W at the `200%` stop and
       // +2.4W at `−200%`.
       const double w = 100;
-      expect(DsAgentShimmerText.offsetAt(0, w), closeTo(-2.4 * w, 0.001));
-      expect(DsAgentShimmerText.offsetAt(1, w), closeTo(2.4 * w, 0.001));
+      expect(ElAgentShimmerText.offsetAt(0, w), closeTo(-2.4 * w, 0.001));
+      expect(ElAgentShimmerText.offsetAt(1, w), closeTo(2.4 * w, 0.001));
       // `--ease-in-out` is symmetric, so the midpoint is the midpoint.
-      expect(DsAgentShimmerText.offsetAt(0.5, w), closeTo(0, 0.001));
+      expect(ElAgentShimmerText.offsetAt(0.5, w), closeTo(0, 0.001));
     });
 
-    testWidgets('Ready sits still and every busy state shimmers',
-        (WidgetTester tester) async {
+    testWidgets('Ready sits still and every busy state shimmers', (
+      WidgetTester tester,
+    ) async {
       await _pump(
         tester,
-        const Center(child: DsAgentStatusLine(state: DsAgentState.idle)),
+        const Center(child: ElAgentStatusLine(state: ElAgentState.idle)),
       );
       expect(find.text('Ready'), findsOneWidget);
-      expect(find.byType(DsAgentShimmerText), findsNothing);
+      expect(find.byType(ElAgentShimmerText), findsNothing);
 
       await _pump(
         tester,
-        const Center(child: DsAgentStatusLine(state: DsAgentState.searching)),
+        const Center(child: ElAgentStatusLine(state: ElAgentState.searching)),
       );
       expect(find.text('Searching'), findsOneWidget);
-      expect(find.byType(DsAgentShimmerText), findsOneWidget);
+      expect(find.byType(ElAgentShimmerText), findsOneWidget);
     });
 
-    testWidgets('the three resting states are the only still ones',
-        (WidgetTester tester) async {
-      for (final DsAgentState state in DsAgentState.values) {
-        await _pump(
-          tester,
-          Center(child: DsAgentStatusLine(state: state)),
-        );
+    testWidgets('the three resting states are the only still ones', (
+      WidgetTester tester,
+    ) async {
+      for (final ElAgentState state in ElAgentState.values) {
+        await _pump(tester, Center(child: ElAgentStatusLine(state: state)));
         expect(
-          find.byType(DsAgentShimmerText),
+          find.byType(ElAgentShimmerText),
           state.isBusy ? findsOneWidget : findsNothing,
           reason: state.name,
         );
       }
     });
 
-    testWidgets('voice wins over the machine, in both directions',
-        (WidgetTester tester) async {
+    testWidgets('voice wins over the machine, in both directions', (
+      WidgetTester tester,
+    ) async {
       // *"Voice wins while it is active, because a live microphone is the more
       // urgent fact."*
       await _pump(
         tester,
         const Center(
-          child: DsAgentStatusLine(
-            state: DsAgentState.searching,
-            voice: DsAgentVoice(listening: true),
+          child: ElAgentStatusLine(
+            state: ElAgentState.searching,
+            voice: ElAgentVoice(listening: true),
           ),
         ),
       );
@@ -227,22 +229,22 @@ void main() {
       await _pump(
         tester,
         const Center(
-          child: DsAgentStatusLine(
-            state: DsAgentState.idle,
-            voice: DsAgentVoice(speaking: true),
+          child: ElAgentStatusLine(
+            state: ElAgentState.idle,
+            voice: ElAgentVoice(speaking: true),
           ),
         ),
       );
       expect(find.text('Speaking'), findsOneWidget);
       // `isBusy(idle)` is false, but voice makes the line live anyway.
-      expect(find.byType(DsAgentShimmerText), findsOneWidget);
+      expect(find.byType(ElAgentShimmerText), findsOneWidget);
     });
 
     test('no label carries the ellipsis its own doc comment promises', () {
       // DRIFT, carried from `agent_core.dart`: `states.ts` L43 says *"present
       // participles with an ellipsis for anything ongoing"* and not one label
       // has one. Reproduced, never repaired.
-      for (final DsAgentState state in DsAgentState.values) {
+      for (final ElAgentState state in ElAgentState.values) {
         expect(state.label, isNot(contains('…')), reason: state.name);
       }
     });
@@ -253,187 +255,196 @@ void main() {
   group('AgentFace', () {
     test('FACE_SIZE is the avatar ladder, exactly', () {
       // `agent-face.tsx` L34: `{ sm: 32, md: 48, lg: 80, xl: 128 }`.
-      expect(dsAgentFaceSize(DsAgentAvatarSize.sm), 32);
-      expect(dsAgentFaceSize(DsAgentAvatarSize.md), 48);
-      expect(dsAgentFaceSize(DsAgentAvatarSize.lg), 80);
-      expect(dsAgentFaceSize(DsAgentAvatarSize.xl), 128);
+      expect(elAgentFaceSize(ElAgentAvatarSize.sm), 32);
+      expect(elAgentFaceSize(ElAgentAvatarSize.md), 48);
+      expect(elAgentFaceSize(ElAgentAvatarSize.lg), 80);
+      expect(elAgentFaceSize(ElAgentAvatarSize.xl), 128);
     });
 
-    testWidgets('the registry supplies the default renderer',
-        (WidgetTester tester) async {
+    testWidgets('the registry supplies the default renderer', (
+      WidgetTester tester,
+    ) async {
       // `avatar: Avatar = CubeAvatar` — the seam is a default, not a
       // requirement, so a console with no `avatar` prop still has a face.
       await _pump(
         tester,
-        const Center(child: DsAgentFace(state: DsAgentState.idle)),
+        const Center(child: ElAgentFace(state: ElAgentState.idle)),
       );
-      expect(find.byType(DsCubeAvatar), findsOneWidget);
+      expect(find.byType(ElCubeAvatar), findsOneWidget);
     });
 
-    testWidgets('an explicit builder wins, and is handed every prop',
-        (WidgetTester tester) async {
-      DsAgentState? sawState;
-      DsAgentAvatarSize? sawSize;
+    testWidgets('an explicit builder wins, and is handed every prop', (
+      WidgetTester tester,
+    ) async {
+      ElAgentState? sawState;
+      ElAgentAvatarSize? sawSize;
       Color? sawAccent;
       double? sawSpeed;
 
       await _pump(
         tester,
         Center(
-          child: DsAgentFace(
-            state: DsAgentState.retrying,
-            size: DsAgentAvatarSize.xl,
+          child: ElAgentFace(
+            state: ElAgentState.retrying,
+            size: ElAgentAvatarSize.xl,
             accent: const Color(0xFF00FF00),
             speed: 2,
-            avatar: (
-              BuildContext context,
-              DsAgentState state,
-              DsAgentAvatarSize size,
-              Color? accent,
-              double? speed,
-            ) {
-              sawState = state;
-              sawSize = size;
-              sawAccent = accent;
-              sawSpeed = speed;
-              return const SizedBox.square(dimension: 10);
-            },
+            avatar:
+                (
+                  BuildContext context,
+                  ElAgentState state,
+                  ElAgentAvatarSize size,
+                  Color? accent,
+                  double? speed,
+                ) {
+                  sawState = state;
+                  sawSize = size;
+                  sawAccent = accent;
+                  sawSpeed = speed;
+                  return const SizedBox.square(dimension: 10);
+                },
           ),
         ),
       );
 
-      expect(find.byType(DsCubeAvatar), findsNothing);
-      expect(sawState, DsAgentState.retrying);
-      expect(sawSize, DsAgentAvatarSize.xl);
+      expect(find.byType(ElCubeAvatar), findsNothing);
+      expect(sawState, ElAgentState.retrying);
+      expect(sawSize, ElAgentAvatarSize.xl);
       expect(sawAccent, const Color(0xFF00FF00));
       expect(sawSpeed, 2);
     });
 
-    testWidgets('an active voice replaces the avatar with the orb, at its box',
-        (WidgetTester tester) async {
+    testWidgets('an active voice replaces the avatar with the orb, at its box', (
+      WidgetTester tester,
+    ) async {
       double? sawSize;
-      DsOrbState? sawState;
-      final DsAgentOrbBuilder original = DsAgentAvatarRegistry.orb;
-      addTearDown(() => DsAgentAvatarRegistry.orb = original);
-      DsAgentAvatarRegistry.orb = (
-        BuildContext context,
-        DsOrbState state,
-        ValueListenable<double>? level,
-        double size,
-      ) {
-        sawState = state;
-        sawSize = size;
-        return SizedBox.square(dimension: size);
-      };
+      ElOrbState? sawState;
+      final ElAgentOrbBuilder original = ElAgentAvatarRegistry.orb;
+      addTearDown(() => ElAgentAvatarRegistry.orb = original);
+      ElAgentAvatarRegistry.orb =
+          (
+            BuildContext context,
+            ElOrbState state,
+            ValueListenable<double>? level,
+            double size,
+          ) {
+            sawState = state;
+            sawSize = size;
+            return SizedBox.square(dimension: size);
+          };
 
       await _pump(
         tester,
         const Center(
-          child: DsAgentFace(
-            state: DsAgentState.searching,
-            size: DsAgentAvatarSize.lg,
-            voice: DsAgentVoice(listening: true),
+          child: ElAgentFace(
+            state: ElAgentState.searching,
+            size: ElAgentAvatarSize.lg,
+            voice: ElAgentVoice(listening: true),
           ),
         ),
       );
 
-      expect(find.byType(DsCubeAvatar), findsNothing);
-      expect(sawState, DsOrbState.listening);
+      expect(find.byType(ElCubeAvatar), findsNothing);
+      expect(sawState, ElOrbState.listening);
       // The orb takes a *number* where the avatar takes a rung; `FACE_SIZE` is
       // what bridges them.
-      expect(sawSize, dsAgentFaceSize(DsAgentAvatarSize.lg));
+      expect(sawSize, elAgentFaceSize(ElAgentAvatarSize.lg));
     });
   });
 
   /* ── The console ───────────────────────────────────────────────────────── */
 
   group('AgentConsole', () {
-    testWidgets('the avatar flag is what brings the header',
-        (WidgetTester tester) async {
+    testWidgets('the avatar flag is what brings the header', (
+      WidgetTester tester,
+    ) async {
       final _FakeTransport transport = _FakeTransport();
       addTearDown(transport.dispose);
 
       await _pump(
         tester,
-        DsAgentConsole(transport: transport, persona: _persona, height: 600),
+        ElAgentConsole(transport: transport, persona: _persona, height: 600),
       );
-      expect(find.byType(DsAgentStatusLine), findsOneWidget);
+      expect(find.byType(ElAgentStatusLine), findsOneWidget);
 
       await _pump(
         tester,
-        DsAgentConsole(
+        ElAgentConsole(
           transport: transport,
           persona: _persona,
-          features: const DsAgentFeatures(avatar: false),
+          features: const ElAgentFeatures(avatar: false),
           height: 600,
         ),
       );
-      expect(find.byType(DsAgentStatusLine), findsNothing);
+      expect(find.byType(ElAgentStatusLine), findsNothing);
     });
 
-    testWidgets('an empty transport draws the welcome card and nothing else',
-        (WidgetTester tester) async {
+    testWidgets('an empty transport draws the welcome card and nothing else', (
+      WidgetTester tester,
+    ) async {
       final _FakeTransport transport = _FakeTransport();
       addTearDown(transport.dispose);
 
       await _pump(
         tester,
-        DsAgentConsole(
+        ElAgentConsole(
           transport: transport,
           persona: _persona,
-          commands: const <DsAgentCommand>[
-            DsAgentCommand(
+          commands: const <ElAgentCommand>[
+            ElAgentCommand(
               id: 'inventory',
               label: 'inventory',
-              group: DsAgentCommandGroup.skill,
+              group: ElAgentCommandGroup.skill,
             ),
-            DsAgentCommand(
+            ElAgentCommand(
               id: 'guide',
               label: 'guide',
-              group: DsAgentCommandGroup.command,
+              group: ElAgentCommandGroup.command,
             ),
           ],
           height: 600,
         ),
       );
 
-      expect(find.byType(DsWelcomeCard), findsOneWidget);
+      expect(find.byType(ElWelcomeCard), findsOneWidget);
       // Only skills become chips — the console filters, because
-      // `DsAgentCapability` carries no group of its own.
+      // `ElAgentCapability` carries no group of its own.
       expect(find.text('inventory'), findsOneWidget);
       expect(find.text('guide'), findsNothing);
     });
 
-    testWidgets('the suggestions flag empties the starter prompts',
-        (WidgetTester tester) async {
+    testWidgets('the suggestions flag empties the starter prompts', (
+      WidgetTester tester,
+    ) async {
       final _FakeTransport transport = _FakeTransport();
       addTearDown(transport.dispose);
 
       await _pump(
         tester,
-        DsAgentConsole(
+        ElAgentConsole(
           transport: transport,
           persona: _persona,
-          features: const DsAgentFeatures(suggestions: false),
+          features: const ElAgentFeatures(suggestions: false),
           height: 600,
         ),
       );
       expect(find.text('What sealed boxes are left?'), findsNothing);
     });
 
-    testWidgets('a starter prompt sends immediately, with the model attached',
-        (WidgetTester tester) async {
+    testWidgets('a starter prompt sends immediately, with the model attached', (
+      WidgetTester tester,
+    ) async {
       final _FakeTransport transport = _FakeTransport();
       addTearDown(transport.dispose);
 
       await _pump(
         tester,
-        DsAgentConsole(
+        ElAgentConsole(
           transport: transport,
           persona: _persona,
-          models: const <DsAgentModel>[
-            DsAgentModel(id: 'fast', label: 'Fast'),
-            DsAgentModel(id: 'deep', label: 'Deep'),
+          models: const <ElAgentModel>[
+            ElAgentModel(id: 'fast', label: 'Fast'),
+            ElAgentModel(id: 'deep', label: 'Deep'),
           ],
           height: 600,
         ),
@@ -449,28 +460,29 @@ void main() {
       expect(transport.sent.single.options.model, 'fast');
     });
 
-    testWidgets('every turn kind reaches the renderer it belongs to',
-        (WidgetTester tester) async {
+    testWidgets('every turn kind reaches the renderer it belongs to', (
+      WidgetTester tester,
+    ) async {
       final _FakeTransport transport = _FakeTransport(
-        turns: <DsAgentTurn>[
-          const DsUserTurn(id: 'u', text: 'What sealed boxes are left?'),
-          const DsTextTurn(id: 't', text: 'Let me look that up.'),
-          const DsToolTurn(
+        turns: <ElAgentTurn>[
+          const ElUserTurn(id: 'u', text: 'What sealed boxes are left?'),
+          const ElTextTurn(id: 't', text: 'Let me look that up.'),
+          const ElToolTurn(
             id: 'tool',
             name: 'search_inventory',
             params: <String, Object?>{'limit': 3},
-            status: DsAgentTurnStatus.ok,
+            status: ElAgentTurnStatus.ok,
             attempt: 1,
             ms: 897,
           ),
-          const DsActionTurn(
+          const ElActionTurn(
             id: 'act',
             action: 'purchase_pack',
             params: <String, Object?>{},
-            status: DsAgentTurnStatus.ok,
+            status: ElAgentTurnStatus.ok,
             ms: 694,
           ),
-          const DsErrorTurn(
+          const ElErrorTurn(
             id: 'err',
             message: 'The pricing service did not respond in time.',
             fatal: false,
@@ -481,7 +493,7 @@ void main() {
 
       await _pump(
         tester,
-        DsAgentConsole(
+        ElAgentConsole(
           transport: transport,
           persona: _persona,
           toolStates: _toolStates,
@@ -490,39 +502,40 @@ void main() {
         size: const Size(1000, 1400),
       );
 
-      expect(find.byType(DsWelcomeCard), findsNothing);
-      expect(find.byType(DsUserMessage), findsOneWidget);
-      expect(find.byType(DsAgentMessage), findsOneWidget);
-      expect(find.byType(DsToolChip), findsOneWidget);
-      expect(find.byType(DsActionChip), findsOneWidget);
+      expect(find.byType(ElWelcomeCard), findsNothing);
+      expect(find.byType(ElUserMessage), findsOneWidget);
+      expect(find.byType(ElAgentMessage), findsOneWidget);
+      expect(find.byType(ElToolChip), findsOneWidget);
+      expect(find.byType(ElActionChip), findsOneWidget);
       // The `error` turn is an inline paragraph the console draws itself.
       expect(
         find.text('The pricing service did not respond in time.'),
         findsOneWidget,
       );
       // The chip's label comes from the same map that drives the face.
-      expect(find.text(DsAgentState.searching.label), findsOneWidget);
+      expect(find.text(ElAgentState.searching.label), findsOneWidget);
       // `humanise("purchase_pack")`.
       expect(find.text('Purchase pack'), findsOneWidget);
     });
 
-    testWidgets('toolTrace off drops both chips and keeps everything else',
-        (WidgetTester tester) async {
+    testWidgets('toolTrace off drops both chips and keeps everything else', (
+      WidgetTester tester,
+    ) async {
       final _FakeTransport transport = _FakeTransport(
-        turns: <DsAgentTurn>[
-          const DsUserTurn(id: 'u', text: 'hello'),
-          const DsToolTurn(
+        turns: <ElAgentTurn>[
+          const ElUserTurn(id: 'u', text: 'hello'),
+          const ElToolTurn(
             id: 'tool',
             name: 'search_inventory',
             params: <String, Object?>{},
-            status: DsAgentTurnStatus.ok,
+            status: ElAgentTurnStatus.ok,
             attempt: 1,
           ),
-          const DsActionTurn(
+          const ElActionTurn(
             id: 'act',
             action: 'purchase_pack',
             params: <String, Object?>{},
-            status: DsAgentTurnStatus.ok,
+            status: ElAgentTurnStatus.ok,
           ),
         ],
       );
@@ -530,117 +543,119 @@ void main() {
 
       await _pump(
         tester,
-        DsAgentConsole(
+        ElAgentConsole(
           transport: transport,
-          features: const DsAgentFeatures(toolTrace: false),
+          features: const ElAgentFeatures(toolTrace: false),
           height: 600,
         ),
       );
 
-      expect(find.byType(DsToolChip), findsNothing);
-      expect(find.byType(DsActionChip), findsNothing);
-      expect(find.byType(DsUserMessage), findsOneWidget);
-    });
-
-    testWidgets('a pending approval draws its card, with the caller\'s sentence',
-        (WidgetTester tester) async {
-      final _FakeTransport transport = _FakeTransport(
-        turns: <DsAgentTurn>[
-          const DsActionTurn(
-            id: 'mock-purchase_pack-1',
-            action: 'purchase_pack',
-            params: <String, Object?>{'pack': 'Eclipse Vault', 'price': 129},
-            status: DsAgentTurnStatus.running,
-          ),
-        ],
-        approvals: <DsPendingApproval>[
-          DsPendingApproval(
-            turnId: 'mock-purchase_pack-1',
-            action: 'purchase_pack',
-            params: const <String, Object?>{'pack': 'Eclipse Vault'},
-            approve: () {},
-            reject: ([String? reason]) {},
-          ),
-        ],
-        isLoading: true,
-      );
-      addTearDown(transport.dispose);
-
-      await _pump(
-        tester,
-        DsAgentConsole(
-          transport: transport,
-          persona: _persona,
-          height: 600,
-          describeApproval: (String action, Map<String, Object?> params) =>
-              'Buy ${params['pack']} for \$129.00.',
-        ),
-        size: const Size(1000, 1400),
-      );
-
-      expect(find.byType(DsApprovalCard), findsOneWidget);
-      expect(find.text('Buy Eclipse Vault for \$129.00.'), findsOneWidget);
+      expect(find.byType(ElToolChip), findsNothing);
+      expect(find.byType(ElActionChip), findsNothing);
+      expect(find.byType(ElUserMessage), findsOneWidget);
     });
 
     testWidgets(
-        'DRIFT: the gate never reaches awaiting_approval — it reads Processing',
-        (WidgetTester tester) async {
-      // PROBE, on the live console with the card up. `reduceEvent` builds the
-      // action turn with `status: "running"` and **no** `approval` field;
-      // `markApproval` only runs once the user has answered. So the resolver's
-      // branch 2 cannot match while the card is on screen and branch 4 wins.
-      // One of the twenty states is unreachable through this transport.
-      final _FakeTransport transport = _FakeTransport(
-        turns: <DsAgentTurn>[
-          const DsActionTurn(
-            id: 'mock-purchase_pack-1',
-            action: 'purchase_pack',
-            params: <String, Object?>{},
-            status: DsAgentTurnStatus.running,
+      'a pending approval draws its card, with the caller\'s sentence',
+      (WidgetTester tester) async {
+        final _FakeTransport transport = _FakeTransport(
+          turns: <ElAgentTurn>[
+            const ElActionTurn(
+              id: 'mock-purchase_pack-1',
+              action: 'purchase_pack',
+              params: <String, Object?>{'pack': 'Eclipse Vault', 'price': 129},
+              status: ElAgentTurnStatus.running,
+            ),
+          ],
+          approvals: <ElPendingApproval>[
+            ElPendingApproval(
+              turnId: 'mock-purchase_pack-1',
+              action: 'purchase_pack',
+              params: const <String, Object?>{'pack': 'Eclipse Vault'},
+              approve: () {},
+              reject: ([String? reason]) {},
+            ),
+          ],
+          isLoading: true,
+        );
+        addTearDown(transport.dispose);
+
+        await _pump(
+          tester,
+          ElAgentConsole(
+            transport: transport,
+            persona: _persona,
+            height: 600,
+            describeApproval: (String action, Map<String, Object?> params) =>
+                'Buy ${params['pack']} for \$129.00.',
           ),
-        ],
-        approvals: <DsPendingApproval>[
-          DsPendingApproval(
-            turnId: 'mock-purchase_pack-1',
-            action: 'purchase_pack',
-            params: const <String, Object?>{},
-            approve: () {},
-            reject: ([String? reason]) {},
-          ),
-        ],
-        isLoading: true,
-      );
-      addTearDown(transport.dispose);
+          size: const Size(1000, 1400),
+        );
 
-      await _pump(
-        tester,
-        DsAgentConsole(transport: transport, persona: _persona, height: 600),
-        size: const Size(1000, 1400),
-      );
+        expect(find.byType(ElApprovalCard), findsOneWidget);
+        expect(find.text('Buy Eclipse Vault for \$129.00.'), findsOneWidget);
+      },
+    );
 
-      expect(find.text(DsAgentState.processing.label), findsOneWidget);
-      expect(find.text(DsAgentState.awaitingApproval.label), findsNothing);
-    });
+    testWidgets(
+      'DRIFT: the gate never reaches awaiting_approval — it reads Processing',
+      (WidgetTester tester) async {
+        // PROBE, on the live console with the card up. `reduceEvent` builds the
+        // action turn with `status: "running"` and **no** `approval` field;
+        // `markApproval` only runs once the user has answered. So the resolver's
+        // branch 2 cannot match while the card is on screen and branch 4 wins.
+        // One of the twenty states is unreachable through this transport.
+        final _FakeTransport transport = _FakeTransport(
+          turns: <ElAgentTurn>[
+            const ElActionTurn(
+              id: 'mock-purchase_pack-1',
+              action: 'purchase_pack',
+              params: <String, Object?>{},
+              status: ElAgentTurnStatus.running,
+            ),
+          ],
+          approvals: <ElPendingApproval>[
+            ElPendingApproval(
+              turnId: 'mock-purchase_pack-1',
+              action: 'purchase_pack',
+              params: const <String, Object?>{},
+              approve: () {},
+              reject: ([String? reason]) {},
+            ),
+          ],
+          isLoading: true,
+        );
+        addTearDown(transport.dispose);
 
-    testWidgets('the transport\'s standing error is a banner, not a turn',
-        (WidgetTester tester) async {
+        await _pump(
+          tester,
+          ElAgentConsole(transport: transport, persona: _persona, height: 600),
+          size: const Size(1000, 1400),
+        );
+
+        expect(find.text(ElAgentState.processing.label), findsOneWidget);
+        expect(find.text(ElAgentState.awaitingApproval.label), findsNothing);
+      },
+    );
+
+    testWidgets('the transport\'s standing error is a banner, not a turn', (
+      WidgetTester tester,
+    ) async {
       // *"`transport.error` is the standing banner above the composer and means
       // something else entirely — the connection is down."*
       final _FakeTransport transport = _FakeTransport(
-        turns: <DsAgentTurn>[const DsUserTurn(id: 'u', text: 'hello')],
+        turns: <ElAgentTurn>[const ElUserTurn(id: 'u', text: 'hello')],
         error: 'Connection lost.',
       );
       addTearDown(transport.dispose);
 
-      await _pump(
-        tester,
-        DsAgentConsole(transport: transport, height: 600),
-      );
+      await _pump(tester, ElAgentConsole(transport: transport, height: 600));
       expect(find.text('Connection lost.'), findsOneWidget);
     });
 
-    testWidgets('the model picker hides below two models',
-        (WidgetTester tester) async {
+    testWidgets('the model picker hides below two models', (
+      WidgetTester tester,
+    ) async {
       // `if (models.length < 2) return null` — *"a picker with one option is a
       // control that cannot do anything, and offering it implies the choice
       // matters."*
@@ -649,9 +664,9 @@ void main() {
 
       await _pump(
         tester,
-        DsAgentConsole(
+        ElAgentConsole(
           transport: transport,
-          models: const <DsAgentModel>[DsAgentModel(id: 'fast', label: 'Fast')],
+          models: const <ElAgentModel>[ElAgentModel(id: 'fast', label: 'Fast')],
           height: 600,
         ),
       );
@@ -659,11 +674,11 @@ void main() {
 
       await _pump(
         tester,
-        DsAgentConsole(
+        ElAgentConsole(
           transport: transport,
-          models: const <DsAgentModel>[
-            DsAgentModel(id: 'fast', label: 'Fast'),
-            DsAgentModel(id: 'deep', label: 'Deep'),
+          models: const <ElAgentModel>[
+            ElAgentModel(id: 'fast', label: 'Fast'),
+            ElAgentModel(id: 'deep', label: 'Deep'),
           ],
           height: 600,
         ),
@@ -671,22 +686,27 @@ void main() {
       expect(find.text('Fast'), findsOneWidget);
     });
 
-    testWidgets('DIVERGENCE 2 CLOSED: a model hint stacks under its label',
-        (WidgetTester tester) async {
+    testWidgets('DIVERGENCE 2 CLOSED: a model hint stacks under its label', (
+      WidgetTester tester,
+    ) async {
       // `ModelPicker` writes `flex-col items-start gap-1`. The hint rode
-      // [DsMenuItem.shortcut] — and so sat at the *other end of the row* — for
+      // [ElMenuItem.shortcut] — and so sat at the *other end of the row* — for
       // as long as the primitive had no second line; it has one now, on
-      // `DsCommandItem.subtitle`'s terms, and this call site passes it.
+      // `ElCommandItem.subtitle`'s terms, and this call site passes it.
       final _FakeTransport transport = _FakeTransport();
       addTearDown(transport.dispose);
 
       await _pump(
         tester,
-        DsAgentConsole(
+        ElAgentConsole(
           transport: transport,
-          models: const <DsAgentModel>[
-            DsAgentModel(id: 'fast', label: 'Fast', hint: 'Answers in a second'),
-            DsAgentModel(
+          models: const <ElAgentModel>[
+            ElAgentModel(
+              id: 'fast',
+              label: 'Fast',
+              hint: 'Answers in a second',
+            ),
+            ElAgentModel(
               id: 'deep',
               label: 'Deep',
               hint: 'Slower, checks its work',
@@ -700,13 +720,16 @@ void main() {
       await tester.pump();
       await tester.pump();
 
-      final Finder row = find.byType(DsMenuContent);
+      final Finder row = find.byType(ElMenuContent);
       expect(row, findsOneWidget);
       final Rect label = tester.getRect(
         find.descendant(of: row, matching: find.text('Deep')),
       );
       final Rect hint = tester.getRect(
-        find.descendant(of: row, matching: find.text('Slower, checks its work')),
+        find.descendant(
+          of: row,
+          matching: find.text('Slower, checks its work'),
+        ),
       );
       // Under and flush-left, not beside and right-aligned. A shortcut would
       // have put the hint's left edge well right of the label's and its top
@@ -715,19 +738,20 @@ void main() {
       expect(hint.left, closeTo(label.left, 0.01));
     });
 
-    testWidgets('models off hides the picker however long the list is',
-        (WidgetTester tester) async {
+    testWidgets('models off hides the picker however long the list is', (
+      WidgetTester tester,
+    ) async {
       final _FakeTransport transport = _FakeTransport();
       addTearDown(transport.dispose);
 
       await _pump(
         tester,
-        DsAgentConsole(
+        ElAgentConsole(
           transport: transport,
-          features: const DsAgentFeatures(models: false),
-          models: const <DsAgentModel>[
-            DsAgentModel(id: 'fast', label: 'Fast'),
-            DsAgentModel(id: 'deep', label: 'Deep'),
+          features: const ElAgentFeatures(models: false),
+          models: const <ElAgentModel>[
+            ElAgentModel(id: 'fast', label: 'Fast'),
+            ElAgentModel(id: 'deep', label: 'Deep'),
           ],
           height: 600,
         ),
@@ -735,8 +759,9 @@ void main() {
       expect(find.text('Fast'), findsNothing);
     });
 
-    testWidgets('isReady false disables rather than dropping the first message',
-        (WidgetTester tester) async {
+    testWidgets('isReady false disables rather than dropping the first message', (
+      WidgetTester tester,
+    ) async {
       // *"False while the transport is still acquiring whatever it needs before
       // it can carry a message. The composer disables rather than dropping the
       // first message on the floor."* The welcome card is disabled with it, so
@@ -746,7 +771,7 @@ void main() {
 
       await _pump(
         tester,
-        DsAgentConsole(transport: transport, persona: _persona, height: 600),
+        ElAgentConsole(transport: transport, persona: _persona, height: 600),
       );
 
       await tester.tap(find.text('What sealed boxes are left?'));
@@ -754,14 +779,15 @@ void main() {
       expect(transport.sent, isEmpty);
     });
 
-    testWidgets('capabilities are advertised, not assumed',
-        (WidgetTester tester) async {
+    testWidgets('capabilities are advertised, not assumed', (
+      WidgetTester tester,
+    ) async {
       // *"Advertised so the console can render only what this agent can
       // actually do."* The default is a fully-featured agent, which is what the
       // mock transport publishes and what every specimen on the page runs on.
       final _FakeTransport transport = _FakeTransport(
-        capabilities: const DsAgentCapabilities(
-          attachments: DsAgentAttachmentSupport.none,
+        capabilities: const ElAgentCapabilities(
+          attachments: ElAgentAttachmentSupport.none,
           models: false,
           approvals: false,
         ),
@@ -770,39 +796,37 @@ void main() {
 
       expect(transport.capabilities.models, isFalse);
       expect(transport.capabilities.approvals, isFalse);
-      expect(
-        transport.capabilities.attachments,
-        DsAgentAttachmentSupport.none,
-      );
+      expect(transport.capabilities.attachments, ElAgentAttachmentSupport.none);
 
       await _pump(
         tester,
-        DsAgentConsole(transport: transport, persona: _persona, height: 600),
+        ElAgentConsole(transport: transport, persona: _persona, height: 600),
       );
       // KNOWN GAP, and it is the reference's: `AgentConsole` reads
       // `transport.capabilities` **nowhere**. Every switch it honours is a
       // `features` flag the caller sets, so a transport that advertises
       // `models: false` still gets a model picker if the console was given one.
       // Reproduced rather than repaired — see the console's own register.
-      expect(find.byType(DsAgentConsole), findsOneWidget);
+      expect(find.byType(ElAgentConsole), findsOneWidget);
     });
 
     test('the console pays its own inset, and the reference says why', () {
       // *"Padding belongs here rather than on each parent, so it is right on
       // every surface instead of right on the ones that remembered."*
-      expect(DsAgentConsole.padding, ds(5));
-      expect(DsAgentConsole.gap, ds(4));
-      expect(DsAgentConsole.headerGap, ds(3));
-      expect(DsAgentConsole.headerInset, ds(6));
-      expect(DsAgentConsole.turnGap, ds(4));
-      expect(DsAgentConsole.scrollerInset, ds(1));
+      expect(ElAgentConsole.padding, el(5));
+      expect(ElAgentConsole.gap, el(4));
+      expect(ElAgentConsole.headerGap, el(3));
+      expect(ElAgentConsole.headerInset, el(6));
+      expect(ElAgentConsole.turnGap, el(4));
+      expect(ElAgentConsole.scrollerInset, el(1));
       // *"A 32px tolerance, so a user who is essentially at the bottom stays
       // pinned and one who has scrolled up to read is left alone."*
-      expect(DsAgentConsole.pinTolerance, 32);
+      expect(ElAgentConsole.pinTolerance, 32);
     });
 
-    testWidgets('h-152 resolves the measured 608, and its parts sum to it',
-        (WidgetTester tester) async {
+    testWidgets('h-152 resolves the measured 608, and its parts sum to it', (
+      WidgetTester tester,
+    ) async {
       final _FakeTransport transport = _FakeTransport();
       addTearDown(transport.dispose);
 
@@ -812,10 +836,10 @@ void main() {
           alignment: Alignment.topLeft,
           child: SizedBox(
             width: 1078,
-            child: DsAgentConsole(
+            child: ElAgentConsole(
               transport: transport,
               persona: _persona,
-              height: ds(152),
+              height: el(152),
             ),
           ),
         ),
@@ -823,22 +847,19 @@ void main() {
       );
 
       // `608 = 20 + 48 + 16 + scroller + 16 + composer + 20`, measured live.
-      expect(tester.getSize(find.byType(DsAgentConsole)).height, 608);
+      expect(tester.getSize(find.byType(ElAgentConsole)).height, 608);
       // Two faces, and the pair is the point: the header's is `md` and the
       // welcome card's is `lg`, so *"the thing you click is the thing that then
       // talks to you"* holds at both scales off one renderer.
       final Iterable<Size> faces = find
-          .byType(DsAgentFace)
+          .byType(ElAgentFace)
           .evaluate()
           .map((Element e) => (e.renderObject! as RenderBox).size);
       expect(faces.length, 2);
-      expect(
-        faces.map((Size s) => s.height).toSet(),
-        <double>{
-          dsAgentFaceSize(DsAgentAvatarSize.md),
-          dsAgentFaceSize(DsAgentAvatarSize.lg),
-        },
-      );
+      expect(faces.map((Size s) => s.height).toSet(), <double>{
+        elAgentFaceSize(ElAgentAvatarSize.md),
+        elAgentFaceSize(ElAgentAvatarSize.lg),
+      });
     });
   });
 
@@ -849,22 +870,22 @@ void main() {
   /// remove the wrap and the first fails; let it creep up onto the console root
   /// and the second and third fail.
   ///
-  /// `_pump` runs with `disableAnimations: true`, so [DsBlurSwitch] holds its
+  /// `_pump` runs with `disableAnimations: true`, so [ElBlurSwitch] holds its
   /// final stop — which makes each phase a single deterministic tree rather
   /// than a moment in a tween.
   group('AgentConsole switchPhase', () {
-    Future<void> pumpAt(WidgetTester tester, DsSwitchPhase phase) async {
+    Future<void> pumpAt(WidgetTester tester, ElSwitchPhase phase) async {
       final _FakeTransport transport = _FakeTransport(
-        turns: <DsAgentTurn>[
-          const DsUserTurn(id: 'u', text: 'What sealed boxes are left?'),
-          const DsTextTurn(id: 't', text: 'Three sealed boxes match.'),
+        turns: <ElAgentTurn>[
+          const ElUserTurn(id: 'u', text: 'What sealed boxes are left?'),
+          const ElTextTurn(id: 't', text: 'Three sealed boxes match.'),
         ],
       );
       addTearDown(transport.dispose);
 
       await _pump(
         tester,
-        DsAgentConsole(
+        ElAgentConsole(
           transport: transport,
           persona: _persona,
           switchPhase: phase,
@@ -873,57 +894,62 @@ void main() {
       );
     }
 
-    testWidgets('the transcript is inside the blur', (WidgetTester tester) async {
-      await pumpAt(tester, DsSwitchPhase.out);
+    testWidgets('the transcript is inside the blur', (
+      WidgetTester tester,
+    ) async {
+      await pumpAt(tester, ElSwitchPhase.out);
       expect(
         find.ancestor(
-          of: find.byType(DsAgentMessage),
-          matching: find.byType(DsBlurSwitch),
+          of: find.byType(ElAgentMessage),
+          matching: find.byType(ElBlurSwitch),
         ),
         findsOneWidget,
       );
     });
 
-    testWidgets('the composer is NOT — the user is about to type into it',
-        (WidgetTester tester) async {
-      await pumpAt(tester, DsSwitchPhase.out);
-      expect(find.byType(DsAgentComposer), findsOneWidget);
+    testWidgets('the composer is NOT — the user is about to type into it', (
+      WidgetTester tester,
+    ) async {
+      await pumpAt(tester, ElSwitchPhase.out);
+      expect(find.byType(ElAgentComposer), findsOneWidget);
       expect(
         find.ancestor(
-          of: find.byType(DsAgentComposer),
-          matching: find.byType(DsBlurSwitch),
+          of: find.byType(ElAgentComposer),
+          matching: find.byType(ElBlurSwitch),
         ),
         findsNothing,
       );
     });
 
-    testWidgets('the header is NOT — only the transcript is being replaced',
-        (WidgetTester tester) async {
-      await pumpAt(tester, DsSwitchPhase.out);
-      expect(find.byType(DsAgentStatusLine), findsOneWidget);
+    testWidgets('the header is NOT — only the transcript is being replaced', (
+      WidgetTester tester,
+    ) async {
+      await pumpAt(tester, ElSwitchPhase.out);
+      expect(find.byType(ElAgentStatusLine), findsOneWidget);
       expect(
         find.ancestor(
-          of: find.byType(DsAgentStatusLine),
-          matching: find.byType(DsBlurSwitch),
+          of: find.byType(ElAgentStatusLine),
+          matching: find.byType(ElBlurSwitch),
         ),
         findsNothing,
       );
     });
 
-    testWidgets('idle costs nothing — no saveLayer over the transcript',
-        (WidgetTester tester) async {
-      await pumpAt(tester, DsSwitchPhase.idle);
+    testWidgets('idle costs nothing — no saveLayer over the transcript', (
+      WidgetTester tester,
+    ) async {
+      await pumpAt(tester, ElSwitchPhase.idle);
       // The widget is still in the tree; what it must not do is filter.
       expect(
         find.ancestor(
-          of: find.byType(DsAgentMessage),
-          matching: find.byType(DsBlurSwitch),
+          of: find.byType(ElAgentMessage),
+          matching: find.byType(ElBlurSwitch),
         ),
         findsOneWidget,
       );
       expect(
         find.ancestor(
-          of: find.byType(DsAgentMessage),
+          of: find.byType(ElAgentMessage),
           matching: find.byType(ImageFiltered),
         ),
         findsNothing,
@@ -931,22 +957,22 @@ void main() {
     });
 
     testWidgets('out ends blurred and invisible', (WidgetTester tester) async {
-      await pumpAt(tester, DsSwitchPhase.out);
+      await pumpAt(tester, ElSwitchPhase.out);
       final ImageFiltered filtered = tester.widget<ImageFiltered>(
         find
             .ancestor(
-              of: find.byType(DsAgentMessage),
+              of: find.byType(ElAgentMessage),
               matching: find.byType(ImageFiltered),
             )
             .first,
       );
       expect(filtered.imageFilter, isNotNull);
       // `pulls-blur-out` ends on blur(6px); the port halves it to a Gaussian σ.
-      expect(DsBlurSwitch.outRadius, 6);
+      expect(ElBlurSwitch.outRadius, 6);
       final Opacity opacity = tester.widget<Opacity>(
         find
             .ancestor(
-              of: find.byType(DsAgentMessage),
+              of: find.byType(ElAgentMessage),
               matching: find.byType(Opacity),
             )
             .first,
@@ -954,14 +980,15 @@ void main() {
       expect(opacity.opacity, 0);
     });
 
-    testWidgets('in ends sharp and opaque — the swap is finished',
-        (WidgetTester tester) async {
-      await pumpAt(tester, DsSwitchPhase.blurIn);
+    testWidgets('in ends sharp and opaque — the swap is finished', (
+      WidgetTester tester,
+    ) async {
+      await pumpAt(tester, ElSwitchPhase.blurIn);
       // `pulls-blur-in` runs blur(8px) → 0, so its resting stop filters nothing.
-      expect(DsBlurSwitch.inRadius, 8);
+      expect(ElBlurSwitch.inRadius, 8);
       expect(
         find.ancestor(
-          of: find.byType(DsAgentMessage),
+          of: find.byType(ElAgentMessage),
           matching: find.byType(ImageFiltered),
         ),
         findsNothing,
@@ -969,7 +996,7 @@ void main() {
       final Opacity opacity = tester.widget<Opacity>(
         find
             .ancestor(
-              of: find.byType(DsAgentMessage),
+              of: find.byType(ElAgentMessage),
               matching: find.byType(Opacity),
             )
             .first,
@@ -978,15 +1005,17 @@ void main() {
     });
 
     test('the two legs are the measured durations', () {
-      expect(DsBlurSwitchController.outDuration, DsDurations.fast); // 150ms
-      expect(DsBlurSwitchController.inDuration, DsDurations.base); // 250ms
+      expect(ElBlurSwitchController.outDuration, ElDurations.fast); // 150ms
+      expect(ElBlurSwitchController.inDuration, ElDurations.base); // 250ms
     });
 
     test('the default is idle — a console with no history behind it', () {
       expect(
-        DsAgentConsole(transport: _FakeTransport(), persona: _persona)
-            .switchPhase,
-        DsSwitchPhase.idle,
+        ElAgentConsole(
+          transport: _FakeTransport(),
+          persona: _persona,
+        ).switchPhase,
+        ElSwitchPhase.idle,
       );
     });
   });
@@ -995,78 +1024,79 @@ void main() {
 
   group('AgentLauncher', () {
     test('the button and its label are the measured boxes', () {
-      expect(DsAgentLauncher.size, 64); // `size-16`
-      expect(DsAgentLauncher.inset, 24); // `right-6 bottom-6`
-      expect(DsAgentLauncher.labelGap, 12); // `mr-3`
-      expect(DsAgentLauncher.labelRest, 8); // `translate-x-2`
+      expect(ElAgentLauncher.size, 64); // `size-16`
+      expect(ElAgentLauncher.inset, 24); // `right-6 bottom-6`
+      expect(ElAgentLauncher.labelGap, 12); // `mr-3`
+      expect(ElAgentLauncher.labelRest, 8); // `translate-x-2`
       expect(
-        DsAgentLauncher.labelPadding,
+        ElAgentLauncher.labelPadding,
         const EdgeInsets.symmetric(horizontal: 12, vertical: 8), // `px-3 py-2`
       );
     });
 
     test('the dialog resolves 78vw against a 60vw floor and an 80rem cap', () {
       // Measured at 1440×900: 1123.19 × 792.
-      final Size at1440 = DsAgentLauncher.dialogSize(const Size(1440, 900));
+      final Size at1440 = ElAgentLauncher.dialogSize(const Size(1440, 900));
       expect(at1440.width, closeTo(1123.2, 0.05));
       expect(at1440.height, 792);
 
       // `--width-console` is 80rem = 1280, and it binds in the middle band.
-      expect(DsAgentLauncher.dialogMaxWidth, 1280);
+      expect(ElAgentLauncher.dialogMaxWidth, 1280);
       expect(
-        DsAgentLauncher.dialogSize(const Size(1800, 900)).width,
+        ElAgentLauncher.dialogSize(const Size(1800, 900)).width,
         closeTo(1280, 0.05),
       );
 
       // `min(88vh, 52rem)` — the 52rem arm, on a tall viewport.
-      expect(DsAgentLauncher.dialogMaxHeight, 832);
-      expect(DsAgentLauncher.dialogSize(const Size(1440, 1400)).height, 832);
+      expect(ElAgentLauncher.dialogMaxHeight, 832);
+      expect(ElAgentLauncher.dialogSize(const Size(1440, 1400)).height, 832);
     });
 
-    test('min-width is applied after max-width, so past ~2133 the cap loses',
-        () {
+    test('min-width is applied after max-width, so past ~2133 the cap loses', () {
       // CSS resolves the used width as `max(min-width, min(max-width, width))`.
       // Both bounds here are viewport-relative against a fixed 80rem cap, so on
       // an ultrawide `60vw` overtakes it: a 2400px window gets 1440, not 1280.
       // A naive `clamp(min, max)` throws at exactly this input.
       expect(
-        DsAgentLauncher.dialogSize(const Size(2400, 1400)).width,
+        ElAgentLauncher.dialogSize(const Size(2400, 1400)).width,
         closeTo(1440, 0.05),
       );
       // The crossover: 60vw = 1280 at 2133.33.
       expect(
-        DsAgentLauncher.dialogSize(const Size(2133.33, 900)).width,
+        ElAgentLauncher.dialogSize(const Size(2133.33, 900)).width,
         closeTo(1280, 0.05),
       );
     });
 
-    testWidgets('the trigger has no layout box, so the section keeps its height',
-        (WidgetTester tester) async {
-      await _pump(
-        tester,
-        const Align(
-          alignment: Alignment.topLeft,
-          child: DsAgentLauncher(
-            label: 'Ask the assistant',
-            title: 'Vault',
-            description: 'Ask about packs, pulls, prices and your wallet.',
-            child: SizedBox.shrink(),
-          ),
-        ),
-      );
-
-      // `position: fixed` — out of flow. The launcher section on the console
-      // page measures 404.8 with a 224px panel in it, and a launcher that took
-      // part in layout would push it.
-      expect(tester.getSize(find.byType(DsAgentLauncher)), Size.zero);
-      // …while the control itself is drawn, into the overlay.
-      expect(find.text('Ask the assistant'), findsOneWidget);
-      expect(find.byType(DsCubeAvatar), findsOneWidget);
-    });
-
     testWidgets(
-        'PROBE: the label snaps 8px and only its opacity rides the 250ms',
-        (WidgetTester tester) async {
+      'the trigger has no layout box, so the section keeps its height',
+      (WidgetTester tester) async {
+        await _pump(
+          tester,
+          const Align(
+            alignment: Alignment.topLeft,
+            child: ElAgentLauncher(
+              label: 'Ask the assistant',
+              title: 'Vault',
+              description: 'Ask about packs, pulls, prices and your wallet.',
+              child: SizedBox.shrink(),
+            ),
+          ),
+        );
+
+        // `position: fixed` — out of flow. The launcher section on the console
+        // page measures 404.8 with a 224px panel in it, and a launcher that took
+        // part in layout would push it.
+        expect(tester.getSize(find.byType(ElAgentLauncher)), Size.zero);
+        // …while the control itself is drawn, into the overlay.
+        expect(find.text('Ask the assistant'), findsOneWidget);
+        expect(find.byType(ElCubeAvatar), findsOneWidget);
+      },
+    );
+
+    testWidgets('PROBE: the label snaps 8px and only its opacity rides the 250ms', (
+      WidgetTester tester,
+    ) async {
       // `translate-x-2` compiles to the standalone `translate` property, which
       // is NOT in `transition-[opacity,transform]`. Traced with a real pointer:
       // `translate` goes 8px → 0px in one frame at `pointerover`, while opacity
@@ -1075,7 +1105,7 @@ void main() {
         tester,
         const Align(
           alignment: Alignment.topLeft,
-          child: DsAgentLauncher(
+          child: ElAgentLauncher(
             label: 'Ask the assistant',
             title: 'Vault',
             description: 'x',
@@ -1097,22 +1127,24 @@ void main() {
       final double atRest = labelX();
       expect(labelOpacity(), 0);
 
-      final TestGesture gesture =
-          await tester.createGesture(kind: PointerDeviceKind.mouse);
+      final TestGesture gesture = await tester.createGesture(
+        kind: PointerDeviceKind.mouse,
+      );
       addTearDown(gesture.removePointer);
       await gesture.addPointer(location: Offset.zero);
-      await gesture.moveTo(tester.getCenter(find.byType(DsCubeAvatar)));
+      await gesture.moveTo(tester.getCenter(find.byType(ElCubeAvatar)));
       await tester.pump();
 
       // One frame, and the 8px is already gone — no intermediate value.
-      expect(atRest - labelX(), closeTo(DsAgentLauncher.labelRest, 0.01));
+      expect(atRest - labelX(), closeTo(ElAgentLauncher.labelRest, 0.01));
       // The fade is what the 250ms governs.
       expect(labelOpacity(), 1);
     });
 
-    testWidgets('GAP CLOSED: hover:border-agent/50 is painted on the pill',
-        (WidgetTester tester) async {
-      // It was not, for as long as [DsButtonSurface] had `fill` / `hoverFill` /
+    testWidgets('GAP CLOSED: hover:border-agent/50 is painted on the pill', (
+      WidgetTester tester,
+    ) async {
+      // It was not, for as long as [ElButtonSurface] had `fill` / `hoverFill` /
       // `border` / `ink` / `hoverInk` and no `hoverBorder`: the resting rim was
       // right and the hover rim never moved. The fix was one field on the
       // primitive — reported from here rather than forked into this file — and
@@ -1121,7 +1153,7 @@ void main() {
         tester,
         const Align(
           alignment: Alignment.topLeft,
-          child: DsAgentLauncher(
+          child: ElAgentLauncher(
             label: 'Ask the assistant',
             title: 'Vault',
             description: 'x',
@@ -1130,15 +1162,18 @@ void main() {
         ),
       );
 
-      Color rimOf() => (tester
-              .widget<DsMachineSurface>(find.byType(DsMachineSurface))
-              .border! as Border)
-          .top
-          .color;
+      Color rimOf() =>
+          (tester
+                      .widget<ElMachineSurface>(find.byType(ElMachineSurface))
+                      .border!
+                  as Border)
+              .top
+              .color;
 
-      final DsThemeData light = DsThemeData.light;
-      final Color rim =
-          light.agent.withValues(alpha: DsAgentLauncher.hoverRimAlpha);
+      final ElThemeData light = ElThemeData.light;
+      final Color rim = light.agent.withValues(
+        alpha: ElAgentLauncher.hoverRimAlpha,
+      );
       // The bite: the two colours have to differ, or the assertions below pass
       // with the override deleted.
       expect(rim, isNot(light.input));
@@ -1147,11 +1182,12 @@ void main() {
       // overrides nothing at rest.
       expect(rimOf(), light.input);
 
-      final TestGesture mouse =
-          await tester.createGesture(kind: PointerDeviceKind.mouse);
+      final TestGesture mouse = await tester.createGesture(
+        kind: PointerDeviceKind.mouse,
+      );
       addTearDown(mouse.removePointer);
       await mouse.addPointer(location: Offset.zero);
-      await mouse.moveTo(tester.getCenter(find.byType(DsCubeAvatar)));
+      await mouse.moveTo(tester.getCenter(find.byType(ElCubeAvatar)));
       await tester.pump();
 
       // `--agent` at half alpha. The harness runs reduced-motion, so the
@@ -1185,17 +1221,19 @@ void main() {
     Future<void> pumpConsole(
       WidgetTester tester,
       ValueNotifier<double> inset, {
-      required DsAgentTransport transport,
+      required ElAgentTransport transport,
     }) async {
       tester.view.devicePixelRatio = 1;
       tester.view.physicalSize = phone;
       addTearDown(tester.view.reset);
 
-      final DsThemeController theme = DsThemeController(mode: DsThemeMode.light);
+      final ElThemeController theme = ElThemeController(
+        mode: ElThemeMode.light,
+      );
       addTearDown(theme.dispose);
 
       await tester.pumpWidget(
-        DsTheme(
+        ElTheme(
           controller: theme,
           child: Directionality(
             textDirection: TextDirection.ltr,
@@ -1203,25 +1241,25 @@ void main() {
               valueListenable: inset,
               // Held outside the builder, so the console's element — and its
               // state, its scroll offset, its draft — survives the keyboard.
-              child: DsAgentConsole(transport: transport),
+              child: ElAgentConsole(transport: transport),
               builder: (BuildContext context, double bottom, Widget? console) =>
                   MediaQuery(
-                data: MediaQueryData(
-                  size: phone,
-                  viewInsets: EdgeInsets.only(bottom: bottom),
-                  disableAnimations: true,
-                ),
-                child: Builder(
-                  builder: (BuildContext context) => DefaultTextStyle(
-                    style: DsText.styleOf(
-                      context,
-                      DsType.body,
-                      color: DsTheme.of(context).foreground,
+                    data: MediaQueryData(
+                      size: phone,
+                      viewInsets: EdgeInsets.only(bottom: bottom),
+                      disableAnimations: true,
                     ),
-                    child: console!,
+                    child: Builder(
+                      builder: (BuildContext context) => DefaultTextStyle(
+                        style: ElText.styleOf(
+                          context,
+                          ElType.body,
+                          color: ElTheme.of(context).foreground,
+                        ),
+                        child: console!,
+                      ),
+                    ),
                   ),
-                ),
-              ),
             ),
           ),
         ),
@@ -1233,7 +1271,7 @@ void main() {
         .state<ScrollableState>(
           find
               .descendant(
-                of: find.byType(DsAgentConsole),
+                of: find.byType(ElAgentConsole),
                 matching: find.byType(Scrollable),
               )
               .first,
@@ -1241,45 +1279,49 @@ void main() {
         .position;
 
     _FakeTransport chatty() => _FakeTransport(
-          turns: <DsAgentTurn>[
-            for (int i = 0; i < 20; i++)
-              DsUserTurn(id: 'u$i', text: 'A message long enough to stack up $i'),
-          ],
-        );
+      turns: <ElAgentTurn>[
+        for (int i = 0; i < 20; i++)
+          ElUserTurn(id: 'u$i', text: 'A message long enough to stack up $i'),
+      ],
+    );
 
-    testWidgets('the composer sits fully above a 300pt keyboard at 375×812',
-        (WidgetTester tester) async {
+    testWidgets('the composer sits fully above a 300pt keyboard at 375×812', (
+      WidgetTester tester,
+    ) async {
       await pumpConsole(
         tester,
         ValueNotifier<double>(keyboard),
         transport: chatty(),
       );
 
-      final Rect composer = tester.getRect(find.byType(DsAgentComposer));
+      final Rect composer = tester.getRect(find.byType(ElAgentComposer));
       // The order's own test: fully above the keyboard's top edge.
       expect(composer.bottom, lessThanOrEqualTo(phone.height - keyboard));
       // And by exactly the console's own `p-5` and not a pixel more — the lift
       // is the keyboard's height, not a guess at it.
       expect(
         composer.bottom,
-        closeTo(phone.height - keyboard - DsAgentConsole.padding, 0.01),
+        closeTo(phone.height - keyboard - ElAgentConsole.padding, 0.01),
       );
       // The console itself did not move or resize; the spacer is internal.
-      expect(tester.getRect(find.byType(DsAgentConsole)),
-          Rect.fromLTWH(0, 0, phone.width, phone.height));
+      expect(
+        tester.getRect(find.byType(ElAgentConsole)),
+        Rect.fromLTWH(0, 0, phone.width, phone.height),
+      );
       // And the composer wears the family's own hook as well, so it is covered
       // on the surfaces where nothing above it has made the room.
       expect(
         find.descendant(
-          of: find.byType(DsAgentComposer),
-          matching: find.byType(DsFieldVisibility),
+          of: find.byType(ElAgentComposer),
+          matching: find.byType(ElFieldVisibility),
         ),
         findsOneWidget,
       );
     });
 
-    testWidgets('the scroller gives up exactly what the composer gains',
-        (WidgetTester tester) async {
+    testWidgets('the scroller gives up exactly what the composer gains', (
+      WidgetTester tester,
+    ) async {
       final ValueNotifier<double> inset = ValueNotifier<double>(0);
       await pumpConsole(tester, inset, transport: chatty());
 
@@ -1287,17 +1329,20 @@ void main() {
       // content it holds — the transcript is longer than the viewport here,
       // which is the case the order is about.
       final double restingScroller = scrollerOf(tester).viewportDimension;
-      final double restingComposer =
-          tester.getRect(find.byType(DsAgentComposer)).bottom;
+      final double restingComposer = tester
+          .getRect(find.byType(ElAgentComposer))
+          .bottom;
       // With no keyboard the composer sits on the console's own bottom inset.
-      expect(restingComposer,
-          closeTo(phone.height - DsAgentConsole.padding, 0.01));
+      expect(
+        restingComposer,
+        closeTo(phone.height - ElAgentConsole.padding, 0.01),
+      );
 
       inset.value = keyboard;
       await tester.pump();
 
       expect(
-        restingComposer - tester.getRect(find.byType(DsAgentComposer)).bottom,
+        restingComposer - tester.getRect(find.byType(ElAgentComposer)).bottom,
         closeTo(keyboard, 0.01),
       );
       expect(
@@ -1306,8 +1351,9 @@ void main() {
       );
     });
 
-    testWidgets('stick-to-bottom survives the keyboard opening',
-        (WidgetTester tester) async {
+    testWidgets('stick-to-bottom survives the keyboard opening', (
+      WidgetTester tester,
+    ) async {
       final ValueNotifier<double> inset = ValueNotifier<double>(0);
       final _FakeTransport transport = chatty();
       await pumpConsole(tester, inset, transport: transport);
@@ -1335,17 +1381,20 @@ void main() {
       expect(after.pixels, after.maxScrollExtent);
     });
 
-    testWidgets('and inside the launcher dialog, where it was reported',
-        (WidgetTester tester) async {
+    testWidgets('and inside the launcher dialog, where it was reported', (
+      WidgetTester tester,
+    ) async {
       tester.view.devicePixelRatio = 1;
       tester.view.physicalSize = phone;
       addTearDown(tester.view.reset);
 
-      final DsThemeController theme = DsThemeController(mode: DsThemeMode.light);
+      final ElThemeController theme = ElThemeController(
+        mode: ElThemeMode.light,
+      );
       addTearDown(theme.dispose);
 
       await tester.pumpWidget(
-        DsTheme(
+        ElTheme(
           controller: theme,
           child: Directionality(
             textDirection: TextDirection.ltr,
@@ -1357,21 +1406,21 @@ void main() {
               ),
               child: Builder(
                 builder: (BuildContext context) => DefaultTextStyle(
-                  style: DsText.styleOf(
+                  style: ElText.styleOf(
                     context,
-                    DsType.body,
-                    color: DsTheme.of(context).foreground,
+                    ElType.body,
+                    color: ElTheme.of(context).foreground,
                   ),
                   child: Overlay(
                     initialEntries: <OverlayEntry>[
                       OverlayEntry(
                         builder: (BuildContext context) => Align(
                           alignment: Alignment.topLeft,
-                          child: DsAgentLauncher(
+                          child: ElAgentLauncher(
                             label: 'Ask the assistant',
                             title: 'Vault',
                             description: 'x',
-                            child: DsAgentConsole(transport: chatty()),
+                            child: ElAgentConsole(transport: chatty()),
                           ),
                         ),
                       ),
@@ -1387,43 +1436,40 @@ void main() {
 
       // Open it: the console is now inside a dialog the console does not size,
       // which is the surface the bug was reported against.
-      await tester.tap(find.byType(DsCubeAvatar));
+      await tester.tap(find.byType(ElCubeAvatar));
       await tester.pumpAndSettle();
 
-      expect(find.byType(DsAgentComposer), findsOneWidget);
+      expect(find.byType(ElAgentComposer), findsOneWidget);
       expect(
-        tester.getRect(find.byType(DsAgentComposer)).bottom,
+        tester.getRect(find.byType(ElAgentComposer)).bottom,
         lessThanOrEqualTo(phone.height - keyboard),
       );
     });
 
-    testWidgets('with no keyboard the console builds the tree it always did',
-        (WidgetTester tester) async {
-      await pumpConsole(
-        tester,
-        ValueNotifier<double>(0),
-        transport: chatty(),
-      );
+    testWidgets('with no keyboard the console builds the tree it always did', (
+      WidgetTester tester,
+    ) async {
+      await pumpConsole(tester, ValueNotifier<double>(0), transport: chatty());
 
       // The spacer is built ONLY when there is a keyboard, so a desktop tree is
       // identical widget for widget to the one before this change. Nothing but
       // the composer's own gap sits under it.
       expect(
-        tester.getRect(find.byType(DsAgentComposer)).bottom,
-        closeTo(phone.height - DsAgentConsole.padding, 0.01),
+        tester.getRect(find.byType(ElAgentComposer)).bottom,
+        closeTo(phone.height - ElAgentConsole.padding, 0.01),
       );
       final Column column = tester.widget<Column>(
         find
             .descendant(
-              of: find.byType(DsAgentConsole),
+              of: find.byType(ElAgentConsole),
               matching: find.byType(Column),
             )
             .first,
       );
       expect(
         column.children.whereType<SizedBox>().where(
-              (SizedBox box) => box.height == 0,
-            ),
+          (SizedBox box) => box.height == 0,
+        ),
         isEmpty,
       );
     });

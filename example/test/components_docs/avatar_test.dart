@@ -1,11 +1,11 @@
 /// Tests for the avatar documentation page.
 ///
-/// Two of these tests feed [DsAvatar] bytes that never touch the network: a
+/// Two of these tests feed [ElAvatar] bytes that never touch the network: a
 /// tiny valid PNG (so the "image loads" state is real, not asserted on
 /// faith) and four bytes that are not a decodable image at all (so the
 /// "decode fails" state is exercised the same way: locally, deterministically,
 /// and without an `errorBuilder` to paper over what actually happens). Both
-/// byte arrays were verified against the live [DsAvatar] widget before this
+/// byte arrays were verified against the live [ElAvatar] widget before this
 /// file was written: the valid PNG mounts an [Image] with no exception, and
 /// the corrupt bytes still leave the fallback initials on screen while
 /// [WidgetTester.takeException] reports the decode failure: which is why the
@@ -64,8 +64,8 @@ final Uint8List _corruptBytes = Uint8List.fromList(<int>[1, 2, 3, 4]);
 
 Widget _harness({
   required Widget child,
-  required DsThemeController controller,
-}) => DsTheme(
+  required ElThemeController controller,
+}) => ElTheme(
   controller: controller,
   child: MaterialApp(
     debugShowCheckedModeBanner: false,
@@ -80,8 +80,8 @@ void main() {
       tester.view.physicalSize = const Size(1440, 900);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
-      final DsThemeController controller = DsThemeController(
-        mode: DsThemeMode.dark,
+      final ElThemeController controller = ElThemeController(
+        mode: ElThemeMode.dark,
       );
 
       await tester.pumpWidget(
@@ -89,7 +89,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // The live preview deliberately includes a corrupt-bytes DsAvatar (see
+      // The live preview deliberately includes a corrupt-bytes ElAvatar (see
       // the file-level doc comment): that specimen reports exactly the
       // decode failure this page's state matrix describes, so it must be
       // drained here rather than read as a real test failure.
@@ -97,20 +97,20 @@ void main() {
 
       expect(find.text('Avatar'), findsWidgets);
       expect(find.byType(DocsCodeExample), findsAtLeastNWidgets(1));
-      expect(find.byType(DsAvatar), findsAtLeastNWidgets(1));
+      expect(find.byType(ElAvatar), findsAtLeastNWidgets(1));
       expect(
         find.byKey(const ValueKey<String>('docs-layout-sidebar')),
         findsOneWidget,
       );
 
-      // The API table lists every public DsAvatar constructor parameter this
+      // The API table lists every public ElAvatar constructor parameter this
       // worker found by reading lib/src/components/avatar.dart directly.
-      final DocsApiTable dsAvatarTable = tester.widget<DocsApiTable>(
+      final DocsApiTable elAvatarTable = tester.widget<DocsApiTable>(
         find.byWidgetPredicate(
-          (Widget w) => w is DocsApiTable && w.title == 'DsAvatar',
+          (Widget w) => w is DocsApiTable && w.title == 'ElAvatar',
         ),
       );
-      final Set<String> documented = dsAvatarTable.facts
+      final Set<String> documented = elAvatarTable.facts
           .map((DocsApiFact fact) => fact.name)
           .toSet();
       expect(
@@ -135,7 +135,7 @@ void main() {
       // reshape brief requires.
       double? previousTop;
       for (final String id in _avatarSectionOrder) {
-        final Finder finder = find.byKey(DsSection.anchorKey(id));
+        final Finder finder = find.byKey(ElSection.anchorKey(id));
         expect(finder, findsOneWidget, reason: 'missing section "$id"');
         final double top = tester.getTopLeft(finder).dy;
         if (previousTop != null) {
@@ -151,12 +151,12 @@ void main() {
       // The new component-specific specimens actually mount real widgets,
       // not just section prose: badge-with-icon, the dropdown trigger, and
       // the overflow count.
-      expect(find.byType(DsDropdownMenu), findsOneWidget);
-      expect(find.byType(DsIcon), findsWidgets);
+      expect(find.byType(ElDropdownMenu), findsOneWidget);
+      expect(find.byType(ElIcon), findsWidgets);
       expect(find.text('+248'), findsOneWidget);
 
       // The theme controller flips in place: no second widget tree.
-      controller.setMode(DsThemeMode.light);
+      controller.setMode(ElThemeMode.light);
       await tester.pump();
       expect(tester.takeException(), isNull);
     },
@@ -168,8 +168,8 @@ void main() {
       tester.view.physicalSize = const Size(390, 844);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
-      final DsThemeController controller = DsThemeController(
-        mode: DsThemeMode.dark,
+      final ElThemeController controller = ElThemeController(
+        mode: ElThemeMode.dark,
       );
 
       await tester.pumpWidget(
@@ -197,7 +197,7 @@ void main() {
       addTearDown(tester.view.reset);
       await tester.pumpWidget(
         _harness(
-          controller: DsThemeController(mode: DsThemeMode.light),
+          controller: ElThemeController(mode: ElThemeMode.light),
           child: const AvatarDocPage(),
         ),
       );
@@ -215,7 +215,7 @@ void main() {
       addTearDown(tester.view.reset);
       await tester.pumpWidget(
         _harness(
-          controller: DsThemeController(mode: DsThemeMode.light),
+          controller: ElThemeController(mode: ElThemeMode.light),
           child: const AvatarDocPage(),
         ),
       );
@@ -226,15 +226,15 @@ void main() {
   );
 
   testWidgets(
-    'a DsAvatar with no image renders its fallback initials outright',
+    'a ElAvatar with no image renders its fallback initials outright',
     (WidgetTester tester) async {
       tester.view.physicalSize = const Size(800, 800);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
       await tester.pumpWidget(
         _harness(
-          controller: DsThemeController(mode: DsThemeMode.dark),
-          child: const Center(child: DsAvatar(fallback: 'ZZ')),
+          controller: ElThemeController(mode: ElThemeMode.dark),
+          child: const Center(child: ElAvatar(fallback: 'ZZ')),
         ),
       );
       await tester.pumpAndSettle();
@@ -245,16 +245,16 @@ void main() {
   );
 
   testWidgets(
-    'a DsAvatar with a locally decodable image swaps the fallback for the image',
+    'a ElAvatar with a locally decodable image swaps the fallback for the image',
     (WidgetTester tester) async {
       tester.view.physicalSize = const Size(800, 800);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
       await tester.pumpWidget(
         _harness(
-          controller: DsThemeController(mode: DsThemeMode.dark),
+          controller: ElThemeController(mode: ElThemeMode.dark),
           child: Center(
-            child: DsAvatar(fallback: 'ZZ', image: MemoryImage(_validPng)),
+            child: ElAvatar(fallback: 'ZZ', image: MemoryImage(_validPng)),
           ),
         ),
       );
@@ -266,16 +266,16 @@ void main() {
   );
 
   testWidgets(
-    'a DsAvatar whose image fails to decode still leaves readable fallback text on screen',
+    'a ElAvatar whose image fails to decode still leaves readable fallback text on screen',
     (WidgetTester tester) async {
       tester.view.physicalSize = const Size(800, 800);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
       await tester.pumpWidget(
         _harness(
-          controller: DsThemeController(mode: DsThemeMode.dark),
+          controller: ElThemeController(mode: ElThemeMode.dark),
           child: Center(
-            child: DsAvatar(fallback: 'ZZ', image: MemoryImage(_corruptBytes)),
+            child: ElAvatar(fallback: 'ZZ', image: MemoryImage(_corruptBytes)),
           ),
         ),
       );

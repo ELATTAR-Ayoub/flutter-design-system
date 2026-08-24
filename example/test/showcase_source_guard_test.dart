@@ -56,7 +56,7 @@ void main() {
         violations,
         isEmpty,
         reason:
-            'Signal Studio must use public Ds* components and tokens.\n'
+            'Signal Studio must use public El* components and tokens.\n'
             '${violations.join('\n')}',
       );
     },

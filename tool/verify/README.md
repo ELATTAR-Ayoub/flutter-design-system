@@ -31,9 +31,9 @@ until phase 3 and moved here so it survives sessions.
 
 - **Scroll truth is read, never inferred.** The web capture drives
   `window.scrollTo` and reads `window.scrollY`; the Flutter capture drives
-  the gallery's js_interop seam (`__dsScrollTo` / `__dsScrollY`, installed
+  the gallery's js_interop seam (`__elScrollTo` / `__elScrollY`, installed
   by `example/lib/scroll_bridge*.dart`). Pixel matching cannot recover
-  advances — `DsPageGlow` is viewport-fixed, so scrolled content is never
+  advances — `ElPageGlow` is viewport-fixed, so scrolled content is never
   a pure translation and SAD has no zero to find. The wheel path in
   `capture.js` survives only as a fallback for bundles without the seam;
   its totals over-append at the bottom clamp.

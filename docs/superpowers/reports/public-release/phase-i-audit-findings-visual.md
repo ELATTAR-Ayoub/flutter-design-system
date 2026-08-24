@@ -7,7 +7,7 @@ build, using the app's own boot parameters (`?route=`, `?theme=`, `?motion=`,
 
 ## BLOCKER F1 — the entire public site renders in Flutter's "you forgot a Material" error style
 
-Every `DsText` on every public route shows **yellow double underlines**, and
+Every `ElText` on every public route shows **yellow double underlines**, and
 every inherit-colour string renders in **error red** — in both themes, at all
 three viewports.
 
@@ -21,8 +21,8 @@ That debugLabel string is present in the shipped `main.dart.js`.
 `example/lib/shell.dart:165` neutralises this for the docs shell, and
 `example/lib/showcase/showcase_app.dart:151` does the same for the showcase.
 `example/lib/site/site_shell.dart` and `example/lib/shots_docs/shot_preview_host.dart`
-never got it. `DsText` (`lib/src/theme_scope.dart:244-262`) builds with
-`inherit: true` and never sets `decoration`; its `DsTypeColor.none` arm (`:238-241`)
+never got it. `ElText` (`lib/src/theme_scope.dart:244-262`) builds with
+`inherit: true` and never sets `decoration`; its `ElTypeColor.none` arm (`:238-241`)
 resolves colour as `DefaultTextStyle.of(context).style.color ?? theme.foreground`,
 so both the underline and the red leak through.
 

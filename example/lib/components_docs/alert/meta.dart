@@ -19,7 +19,7 @@ const ComponentDocEntry alertDoc = ComponentDocEntry(
   description:
       'A persistent inline message that shares one bordered card surface '
       'across five variants, told apart only by icon color and bloom.',
-  dependencies: <String>[],
-  exports: <String>['DsAlert', 'DsAlertVariant'],
+  dependencies: <String>['bloom-cosmic', 'source-foundation'],
+  exports: <String>['ElAlert', 'ElAlertVariant'],
   sourcePath: 'lib/src/components/alert.dart',
 );

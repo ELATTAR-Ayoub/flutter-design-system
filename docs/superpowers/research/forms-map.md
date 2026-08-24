@@ -2,7 +2,7 @@
 
 **Files that produce the render** (all under `D:\DESIGN\Design-System-2026-8\design-system\`):
 - `app\design-system\components\base\forms\page.tsx` — the page. **`"use client"`** (the first ported page that is). 655 lines; five page-local components (`AccountForm`, `PasswordForm`, `ServerErrorForm`, `ComposedForm`, `SubmitStates`) and four module-level Zod schemas.
-- `components\ds\kit.tsx` — `DsPageHeader`, `DsSection`, `Panel`, `StateGrid` (:145), `StateCell` (:173), `Meta` (:202), `Code`, `DoDont`, `Note`, `PageFootNav`. **`StateGrid`/`StateCell`/`Meta` are used here and are not on any foundations page.**
+- `components\el\kit.tsx` — `ElPageHeader`, `ElSection`, `Panel`, `StateGrid` (:145), `StateCell` (:173), `Meta` (:202), `Code`, `DoDont`, `Note`, `PageFootNav`. **`StateGrid`/`StateCell`/`Meta` are used here and are not on any foundations page.**
 - `components\ui\form.tsx` — the wiring layer. **No presentation at all.** §3.
 - `components\ui\field.tsx` — the presentation layer: `FieldSet`, `FieldLegend`, `FieldGroup`, `Field`, `FieldLabel`, `FieldDescription`, `FieldError` (+ `FieldContent`, `FieldTitle`, `FieldSeparator`, unused here).
 - `components\ui\label.tsx` — `Label` (radix `Label.Root`), which `FieldLabel` extends.
@@ -11,7 +11,7 @@
 - `components\ui\alert.tsx` — the server-error surface; carries `bloom-cosmic` + `starfield`.
 - `components\ui\sonner.tsx` + `app\layout.tsx:39` (`<Toaster position="bottom-right" />`) — six toasts fire from this page.
 - `components\ui\icon.tsx` — `XCircle` (Alert), `ChevronDown`/`Check`/`ChevronUp` (Select), `Loader2` (Spinner), `Check`/`X` (DoDont), `ArrowLeft`/`ArrowRight` (foot nav).
-- `lib\ds\nav.ts:165–177` — `findCategory("base","forms")`; `siblings()` → prev **Inputs**, next **Selects & Pickers**.
+- `lib\el\nav.ts:165–177` — `findCategory("base","forms")`; `siblings()` → prev **Inputs**, next **Selects & Pickers**.
 - `app\globals.css` — every token/utility below.
 - Deps: `react-hook-form ^7.84.0`, `@hookform/resolvers ^5.7.1`, `zod ^4.4.3`, `sonner ^2.0.7`, `radix-ui ^1.6.7`, `lucide-react ^1.28.0`.
 
@@ -27,7 +27,7 @@ Identical shell (`shared-map.md` §1). What is new on this page:
 
 | thing | value |
 |---|---|
-| Route | `/design-system/components/base/forms` (base group → `${DS_ROOT}/components/base/forms`) |
+| Route | `/design-system/components/base/forms` (base group → `${EL_ROOT}/components/base/forms`) |
 | Specimen column | **1080px** at the 1440 frame, as everywhere |
 | **Form column** | `<form className="max-w-md">` = **448px** (28rem; Tailwind container scale not overridden) — every one of the four forms |
 | Panel body | `bg-background p-6` → 24px, so the 448px form sits left-aligned in a 1030px body |
@@ -35,7 +35,7 @@ Identical shell (`shared-map.md` §1). What is new on this page:
 
 ---
 
-## 1 · Page header (`DsPageHeader`)
+## 1 · Page header (`ElPageHeader`)
 
 `<header class="mb-14 border-b border-border pb-10">`.
 
@@ -44,7 +44,7 @@ Identical shell (`shared-map.md` §1). What is new on this page:
 3. `type-lead mt-4 max-w-2xl` → **"Assembling inputs into something that validates, submits, fails and says so — with the accessible wiring guaranteed rather than remembered."** (em dash U+2014).
 4. Chips `ul.mt-7 flex flex-wrap gap-2`, each `type-chip rounded-pill border border-border bg-card px-3 py-1.5 text-muted-foreground`, from `category.contents`. Verbatim, in order:
    **Form · Validation · Field errors · Submit states · Server errors · Composed fields**
-   Six chips, and they are exactly the six `DsSection` titles. They are `<li>`, **not links** — no anchor wiring.
+   Six chips, and they are exactly the six `ElSection` titles. They are `<li>`, **not links** — no anchor wiring.
 
 The Flutter nav registry already carries all of this byte-for-byte (`example\lib\nav.dart:225–238`).
 
@@ -52,7 +52,7 @@ The Flutter nav registry already carries all of this byte-for-byte (`example\lib
 
 ## 2 · Section inventory (verbatim)
 
-Six sections, `PageFootNav` last. `DsSection` shell: `<section id class="mb-20">`; `<h2 class="type-h3">`; description `type-small mt-2 max-w-2xl`.
+Six sections, `PageFootNav` last. `ElSection` shell: `<section id class="mb-20">`; `<h2 class="type-h3">`; description `type-small mt-2 max-w-2xl`.
 
 | # | `id` | title | description (verbatim) |
 |---|---|---|---|
@@ -131,7 +131,7 @@ formMessageId     = `${id}-form-item-message`
 | `FieldError` | `role="alert"` + `text-sm font-normal text-destructive-ink` | **13px / 1.428571 (18.571px) / 400 / `--destructive-ink`** |
 | `FieldError` multi | `<ul class="ml-4 flex list-disc flex-col gap-1">` | 16px indent, disc markers, **4px** between items |
 
-**Three different line-heights on three consecutive lines** (17.875 / 19.5 / 18.571). The field family uses Tailwind's `text-sm` ladder (`--text-sm--line-height` = `calc(1.25/0.875)` = 1.428571, never overridden), *not* `.type-small`'s 1.5. Porting these as `DsType.small` would be wrong on two of the three.
+**Three different line-heights on three consecutive lines** (17.875 / 19.5 / 18.571). The field family uses Tailwind's `text-sm` ladder (`--text-sm--line-height` = `calc(1.25/0.875)` = 1.428571, never overridden), *not* `.type-small`'s 1.5. Porting these as `ElType.small` would be wrong on two of the three.
 
 **`nth-last-2:-mt-1`** *(measured — emitted at byte 192937 as `margin-top: calc(var(--spacing) * -1)`)*. `FieldError` returns `null` when valid, so the description's position in the child list changes with validity:
 
@@ -195,14 +195,14 @@ Emitted byte offsets in the built stylesheet, equal specificity (0,2,0) througho
 | web | Flutter |
 |---|---|
 | `useId()` per `FormField` instance | not needed — Flutter has no id graph. The *reason* it exists (two forms on one page) is satisfied by two independent controller objects. |
-| `htmlFor` ↔ `id` | `MergeSemantics` around label + control, or pass the label string into the control's `Semantics(label:)`. `DsInput.label` (`input.dart:92`) already does the latter and renders nothing visible — a visible `DsFieldLabel` must therefore feed it, not duplicate it. |
+| `htmlFor` ↔ `id` | `MergeSemantics` around label + control, or pass the label string into the control's `Semantics(label:)`. `ElInput.label` (`input.dart:92`) already does the latter and renders nothing visible — a visible `ElFieldLabel` must therefore feed it, not duplicate it. |
 | `aria-describedby` → description | `Semantics(hint: <description>)` on the control. There is no describedby graph; hint is the only channel that reads after the label. |
 | `aria-describedby` → description **+ error** | append the error text to `hint` while invalid (concatenate, description first — that is the DOM order the id list encodes). |
 | `aria-invalid` | **`Semantics(validationResult: SemanticsValidationResult.invalid)`** — verified present in the pinned SDK (Flutter 3.44.8; `SemanticsValidationResult { none, valid, invalid }`). Use `.valid` never — the web emits `aria-invalid="false"`, which maps to `.none` in practice, and `.valid` would announce a state the reference does not. |
 | `role="alert"` on `FieldError` | **`Semantics(liveRegion: true)`** on the error widget. Same "announce on appearance" contract. |
 | `FieldError` renders `null` when valid | **build nothing** — do not build a zero-height `SizedBox` with semantics. The Note in §3 of the page names the empty-live-region anti-pattern explicitly, and `donts[1]` forbids it. |
 | `shouldFocusError` | a form-level `List<FocusNode>` in field-declaration order; on failed validate, `.requestFocus()` the first node whose field has an error. Reproduce the reference's *gap* only if the fidelity bar demands it (§16 Q4). |
-| `Slot` merging props onto five DOM shapes | a `DsField` that takes a `child` and threads `(invalid, describedBy, focusNode)` down via `InheritedWidget` — the Flutter analogue of a Slot is context, not prop-merging. |
+| `Slot` merging props onto five DOM shapes | a `ElField` that takes a `child` and threads `(invalid, describedBy, focusNode)` down via `InheritedWidget` — the Flutter analogue of a Slot is context, not prop-merging. |
 
 ---
 
@@ -683,41 +683,41 @@ Package root `D:\DESIGN\Design-System-2026-8\flutter-design-system\`.
 
 | need | where |
 |---|---|
-| `DsButton` — 7 variants (`primary premium secondary outline ghost destructive link`), 4 sizes (`sm md icon iconSm`), keyboard, disabled@0.45 + `IgnorePointer` | `lib\src\components\button.dart:38`, `:90`, `:170`, `:562` |
-| `DsButton.md` = **40px**, level with `DsInput.height` | `button.dart:201`, `input.dart:95` |
-| **Focus-ring helper** `DsButton.withFocusRing(DsShadowSpec, Color)` | `button.dart:241` |
-| `DsInput` — pill, `--input` border, `--card` fill, permanent `DsShadows.pressed`, focus border `primary@50%` + ring `ring@35%`, 250ms `DsCurves.out`, own/inherited controller + focus node | `lib\src\components\input.dart:62–272` |
-| `DsShadows.pressed / btn / btnPrimary / e1 / e3` | `lib\src\foundation\shadows.dart:197 / 204 / 214 / 159 / 171` |
-| `DsMachineSurface` (inset painting, CSS paint order) | `lib\src\effects\machine_surface.dart:26` |
-| `DsThemeData` — `input`, `ring`, `destructive`, `destructiveInk`, `popover`, `muted`, `accent` … (~102 fields) | `lib\src\foundation\theme.dart:30` |
-| `DsDurations` / `DsCurves` / `DsTransforms` | `lib\src\foundation\motion.dart:14 / 206 / 173` |
-| `DsRadii` (`sm md lg pill` + `xl4`), `DsWidths.hairline`, `ds()` | `lib\src\foundation\spacing.dart:78 / 20` |
-| `DsType.*` 28 specs incl. `label`, `small`, `caption`, `micro`, `numSm`, `chip`, `code` | `lib\src\foundation\typography.dart:277–544` |
-| `DsComponentType.buttonLabel` / `.sheetBody` (13/400, what `DsInput` types with) | `typography.dart:239 / 247` |
-| Kit: `DsPageHeader :54` · `DsSection :148` · `DsPanel :242` · `DsCode :448` · `DsDoDont :735` · `DsNote :834` (+`DsNoteTone`) · `DsMeta :390` · `DsGrid :908` · `DsPageFootNav :1156` | `example\lib\kit.dart` |
+| `ElButton` — 7 variants (`primary premium secondary outline ghost destructive link`), 4 sizes (`sm md icon iconSm`), keyboard, disabled@0.45 + `IgnorePointer` | `lib\src\components\button.dart:38`, `:90`, `:170`, `:562` |
+| `ElButton.md` = **40px**, level with `ElInput.height` | `button.dart:201`, `input.dart:95` |
+| **Focus-ring helper** `ElButton.withFocusRing(ElShadowSpec, Color)` | `button.dart:241` |
+| `ElInput` — pill, `--input` border, `--card` fill, permanent `ElShadows.pressed`, focus border `primary@50%` + ring `ring@35%`, 250ms `ElCurves.out`, own/inherited controller + focus node | `lib\src\components\input.dart:62–272` |
+| `ElShadows.pressed / btn / btnPrimary / e1 / e3` | `lib\src\foundation\shadows.dart:197 / 204 / 214 / 159 / 171` |
+| `ElMachineSurface` (inset painting, CSS paint order) | `lib\src\effects\machine_surface.dart:26` |
+| `ElThemeData` — `input`, `ring`, `destructive`, `destructiveInk`, `popover`, `muted`, `accent` … (~102 fields) | `lib\src\foundation\theme.dart:30` |
+| `ElDurations` / `ElCurves` / `ElTransforms` | `lib\src\foundation\motion.dart:14 / 206 / 173` |
+| `ElRadii` (`sm md lg pill` + `xl4`), `ElWidths.hairline`, `el()` | `lib\src\foundation\spacing.dart:78 / 20` |
+| `ElType.*` 28 specs incl. `label`, `small`, `caption`, `micro`, `numSm`, `chip`, `code` | `lib\src\foundation\typography.dart:277–544` |
+| `ElComponentType.buttonLabel` / `.sheetBody` (13/400, what `ElInput` types with) | `typography.dart:239 / 247` |
+| Kit: `ElPageHeader :54` · `ElSection :148` · `ElPanel :242` · `ElCode :448` · `ElDoDont :735` · `ElNote :834` (+`ElNoteTone`) · `ElMeta :390` · `ElGrid :908` · `ElPageFootNav :1156` | `example\lib\kit.dart` |
 | Nav entry for `forms` — slug/title/blurb/6 contents, verbatim; siblings resolve | `example\lib\nav.dart:225–238`, `:747` |
-| `DsIconGlyph`: `check`, `x`, `chevronDown`, `chevronUp`, `arrowLeft`, `arrowRight`, `eye`, `eyeOff`, `info`, `alertTriangle` | `lib\src\components\icon_paths.dart:67–151` |
+| `ElIconGlyph`: `check`, `x`, `chevronDown`, `chevronUp`, `arrowLeft`, `arrowRight`, `eye`, `eyeOff`, `info`, `alertTriangle` | `lib\src\components\icon_paths.dart:67–151` |
 | `Semantics(validationResult:)` + `liveRegion:` | Flutter **3.44.8** — verified in the pinned SDK |
 
 ### 14.2 · Missing — must be built
 
 | # | missing | notes |
 |---|---|---|
-| 1 | **`DsButton.loading`** | **Confirmed absent.** No `loading` / `busy` / `pending` anywhere in `lib\`. The plan's Task A scoped variants only, so this is a genuine gap, and it is load-bearing: two of four forms and one of four state cells depend on it. Needs: prepend spinner, force-disable, and `Semantics` busy. |
-| 2 | **A spinner** | Nothing in the package. Nearest are `DsShimmer` (`lib\src\motion\keyframes.dart:868`) and `DsPulseLive` (`:940`) — neither rotates. Needs `pulls-spin`: 360° over **900ms**, **linear**, infinite, 16px, stroke 2.4. |
-| 3 | **`loaderCircle` / `xCircle` glyphs** | `DsIconGlyph` has neither. `xCircle` is required by the server-error Alert; `loaderCircle` (lucide `Loader2`) by the spinner. Both are off-set additions like `rotateCcw` (`icon_paths.dart:148–150`) and must stay out of the icons page registry. |
-| 4 | **`DsInput.invalid`** | `DsInput` has **no** invalid state, no destructive border, no destructive ring, no validation semantics. Add `invalid` → border `theme.destructive`, ring `destructive@20%`, `SemanticsValidationResult.invalid`, and make it **outrank focus** (§3.3). |
-| 5 | **A field / form layer** | Nothing. Needs `DsFieldGroup` (column, 20px), `DsField` (vertical 8px / horizontal), `DsFieldSet` + `DsFieldLegend`, `DsFieldLabel`, `DsFieldDescription` (with the `nth-last-2` −4px rule), **`DsFieldError`** (`liveRegion`, null when empty, string vs bulleted list), and the `data-invalid` colour cascade onto label + typed text. |
+| 1 | **`ElButton.loading`** | **Confirmed absent.** No `loading` / `busy` / `pending` anywhere in `lib\`. The plan's Task A scoped variants only, so this is a genuine gap, and it is load-bearing: two of four forms and one of four state cells depend on it. Needs: prepend spinner, force-disable, and `Semantics` busy. |
+| 2 | **A spinner** | Nothing in the package. Nearest are `ElShimmer` (`lib\src\motion\keyframes.dart:868`) and `ElPulseLive` (`:940`) — neither rotates. Needs `pulls-spin`: 360° over **900ms**, **linear**, infinite, 16px, stroke 2.4. |
+| 3 | **`loaderCircle` / `xCircle` glyphs** | `ElIconGlyph` has neither. `xCircle` is required by the server-error Alert; `loaderCircle` (lucide `Loader2`) by the spinner. Both are off-set additions like `rotateCcw` (`icon_paths.dart:148–150`) and must stay out of the icons page registry. |
+| 4 | **`ElInput.invalid`** | `ElInput` has **no** invalid state, no destructive border, no destructive ring, no validation semantics. Add `invalid` → border `theme.destructive`, ring `destructive@20%`, `SemanticsValidationResult.invalid`, and make it **outrank focus** (§3.3). |
+| 5 | **A field / form layer** | Nothing. Needs `ElFieldGroup` (column, 20px), `ElField` (vertical 8px / horizontal), `ElFieldSet` + `ElFieldLegend`, `ElFieldLabel`, `ElFieldDescription` (with the `nth-last-2` −4px rule), **`ElFieldError`** (`liveRegion`, null when empty, string vs bulleted list), and the `data-invalid` colour cascade onto label + typed text. |
 | 6 | **A form controller** | No `Form`/`FormField`/validation anywhere in `lib\`. Needs value store, per-field error map, `mode`/`reValidateMode`/`criteriaMode` equivalents, a `root.serverError` slot outside the schema, `clearErrors`, `setError`, `reset(values)`, `isSubmitting`, and focus-on-error over an ordered `FocusNode` list. |
 | 7 | **A schema/validator layer** | Zod has no Flutter analogue. Needs an ordered rule list per field that returns **all** issues (so `criteriaMode: "all"` is expressible) plus a first-issue mode, and the Zod-4 email regex from §5.1 verbatim. |
-| 8 | **`DsTextarea`** | Nothing multiline. `DsInput` hard-pins `SizedBox(height: DsInput.height)` (`input.dart:249`) and `EditableText` defaults to one line. Needs `min-h-20` 80px floor, autogrow (`field-sizing: content`), `rounded-lg`, `px-3.5 py-2.5`, **lh 1.625**. |
-| 9 | **`DsCheckbox`** | 20px, `rounded-sm`, `shadow-pressed` → `shadow-btn-primary`, hand-authored tick path `M5 12.5 10 17.5 19 7` at 14px stroke 3.2 (not lucide), indeterminate `M6 12h12`, `check-draw`/`dash-draw`/`jelly`, 44×36 hit area. |
-| 10 | **`DsRadioGroup` / `DsRadioGroupItem`** | 20px circle, 8px dot at `shadow-e1`, `dot-pop` 320ms spring, `jelly`, 44×36 hit area, group gap. |
-| 11 | **`DsSwitch`** | 44×24 track / 20px thumb / 20px travel; track `shadow-pressed` ↔ `shadow-btn-primary`, thumb always `shadow-btn`; thumb on **spring**, track on **out**; `jelly`; 68×40 hit area. |
-| 12 | **`DsSelect`** | Trigger (40px pill, `shadow-pressed`, chevron 16/2.4) + portal content (`min-w-36`, `rounded-lg`, `shadow-md` **stock Tailwind, no token**, `ring-1 foreground/10`, `p-2`) + items + check indicator + keyboard nav. **No open/close animation** (§8.3). |
-| 13 | **`DsAlert`** | 5 variants, 2-col grid, 16/14 padding, 12px radius, `role="alert"`. Plus `bloom-cosmic` (4 infinite animations, `screen`/`multiply` theme split, `oklch(from …)` relative colour) and `starfield`. **The single biggest new effect on this page.** |
-| 14 | **A toast host** | `DsToaster` bottom-right, 356px, `--shadow-e3`, `-ink` glyph, `bloom-cosmic`. Only `success` and `error` needed here. |
-| 15 | **`StateGrid` / `StateCell`** | Absent repo-wide. Closest is the private `_SpecimenCell` (`example\lib\pages\shadows.dart:802`). Lift into `kit.dart` as `DsStateGrid(cols:)` / `DsStateCell(label:, note:)` — `gap-px` over a `--border` fill, `min-h-14` stage, `micro` label + `caption` note. |
+| 8 | **`ElTextarea`** | Nothing multiline. `ElInput` hard-pins `SizedBox(height: ElInput.height)` (`input.dart:249`) and `EditableText` defaults to one line. Needs `min-h-20` 80px floor, autogrow (`field-sizing: content`), `rounded-lg`, `px-3.5 py-2.5`, **lh 1.625**. |
+| 9 | **`ElCheckbox`** | 20px, `rounded-sm`, `shadow-pressed` → `shadow-btn-primary`, hand-authored tick path `M5 12.5 10 17.5 19 7` at 14px stroke 3.2 (not lucide), indeterminate `M6 12h12`, `check-draw`/`dash-draw`/`jelly`, 44×36 hit area. |
+| 10 | **`ElRadioGroup` / `ElRadioGroupItem`** | 20px circle, 8px dot at `shadow-e1`, `dot-pop` 320ms spring, `jelly`, 44×36 hit area, group gap. |
+| 11 | **`ElSwitch`** | 44×24 track / 20px thumb / 20px travel; track `shadow-pressed` ↔ `shadow-btn-primary`, thumb always `shadow-btn`; thumb on **spring**, track on **out**; `jelly`; 68×40 hit area. |
+| 12 | **`ElSelect`** | Trigger (40px pill, `shadow-pressed`, chevron 16/2.4) + portal content (`min-w-36`, `rounded-lg`, `shadow-md` **stock Tailwind, no token**, `ring-1 foreground/10`, `p-2`) + items + check indicator + keyboard nav. **No open/close animation** (§8.3). |
+| 13 | **`ElAlert`** | 5 variants, 2-col grid, 16/14 padding, 12px radius, `role="alert"`. Plus `bloom-cosmic` (4 infinite animations, `screen`/`multiply` theme split, `oklch(from …)` relative colour) and `starfield`. **The single biggest new effect on this page.** |
+| 14 | **A toast host** | `ElToaster` bottom-right, 356px, `--shadow-e3`, `-ink` glyph, `bloom-cosmic`. Only `success` and `error` needed here. |
+| 15 | **`StateGrid` / `StateCell`** | Absent repo-wide. Closest is the private `_SpecimenCell` (`example\lib\pages\shadows.dart:802`). Lift into `kit.dart` as `ElStateGrid(cols:)` / `ElStateCell(label:, note:)` — `gap-px` over a `--border` fill, `min-h-14` stage, `micro` label + `caption` note. |
 | 16 | **`example\lib\pages\forms.dart`** + a `switch` arm | `main.dart:100–108` routes only 4 pages; `forms` falls to `PlaceholderPage`. **Note `shadows.dart`, `motion.dart`, `icons.dart` are also unrouted** — `main.dart` is unmodified in git. |
 | 17 | **`_referenceHeight` for the forms route** | `example\test\vertical_parity_probe_test.dart:45–50` has only overview/colors/typography/spacing. Must be measured off the live dev server at 1440×900. **Complicated here:** the page's height changes with form state (errors add rows), so the reference must be captured in a defined state — see §16 Q3. |
 | 18 | Wrap-parity + page tests | `example\test\wrap_parity_probe_test.dart`; page test modelled on `example\test\spacing_page_test.dart`. |
@@ -727,8 +727,8 @@ Package root `D:\DESIGN\Design-System-2026-8\flutter-design-system\`.
 `test\token_guard_test.dart:40–53` forbids, outside `lib\src\foundation\`: `Color(0x`, `Color.from`, `fontSize:<digit>`, `letterSpacing:<digit>`, `FontWeight.w<digit>`, `\bCurves.`, `Duration((milli|micro)seconds:<digit>`, `BorderRadius.circular(<digit>`, `BoxShadow(`. Bare `0`/`0.0` is legal for the marked rules; escape hatch is `allow-hardcoded: <reason>` **anywhere on the line** (plain substring test at `:86`). Roots scanned: `lib`, `example/lib`. It is a **raw text scan including comments**.
 
 Consequences here:
-- The seven new animation timings (**150, 200, 280, 320, 600, 900, 1000 ms**) have no `--duration-*` token except 150 (`fast`), 250 (`base`) and 1000 (`bloom`). 200/280/320/600/900 need either new `DsDurations` members or escape hatches — same question as `shadows-map.md` Q3, now five entries larger.
-- Checkbox `strokeWidth 3.2`, the tick path `M5 12.5 10 17.5 19 7`, `stroke-dasharray 22`/`12`, the jelly scale triples and `dot-pop`'s 1.35 are all literals. Put the glyph in `icon_paths.dart` (it is geometry, and that file already holds transcribed paths) and the scalars in `foundation\motion.dart` beside `DsTransforms`.
+- The seven new animation timings (**150, 200, 280, 320, 600, 900, 1000 ms**) have no `--duration-*` token except 150 (`fast`), 250 (`base`) and 1000 (`bloom`). 200/280/320/600/900 need either new `ElDurations` members or escape hatches — same question as `shadows-map.md` Q3, now five entries larger.
+- Checkbox `strokeWidth 3.2`, the tick path `M5 12.5 10 17.5 19 7`, `stroke-dasharray 22`/`12`, the jelly scale triples and `dot-pop`'s 1.35 are all literals. Put the glyph in `icon_paths.dart` (it is geometry, and that file already holds transcribed paths) and the scalars in `foundation\motion.dart` beside `ElTransforms`.
 - The Zod email regex is a string literal — no rule matches it, but it belongs beside the validator, not in a page.
 - Doc comments quoting `Duration(milliseconds: 900)` will trip the scanner. Write timings in prose.
 
@@ -761,14 +761,14 @@ Consequences here:
 
 ## 16 · Open questions for the supervisor
 
-1. **Scope of the greenfield build.** This page needs a form controller, a validator, a field layer, and **six** new components (Textarea, Checkbox, Radio, Switch, Select, Alert) plus a spinner and a toast host. That is more new surface than the last three foundations pages combined, and Select/Alert/Toast are each properly the subject of a later page (`selects`, `feedback`). **Recommendation:** build the form/field/validator layer and `DsButton.loading` + spinner **fully**, since they are this page's actual subject; build Textarea/Checkbox/Radio/Switch to full parity (they are simple and `inputs`/`selection` will need them anyway); and build `DsSelect` and `DsAlert` to the fidelity this page renders — a working menu and a static-bloom Alert — leaving the bloom's four infinite animations and the full Select variant matrix to `feedback` and `selects`. Confirm before I plan.
-2. **`DsButton.loading` — build now?** It is missing, Task A did not mandate it, and two forms plus a state cell are unbuildable without it. **Recommendation: yes, now**, with the spinner, since it is a Button API change and doing it later means touching `button.dart` twice.
+1. **Scope of the greenfield build.** This page needs a form controller, a validator, a field layer, and **six** new components (Textarea, Checkbox, Radio, Switch, Select, Alert) plus a spinner and a toast host. That is more new surface than the last three foundations pages combined, and Select/Alert/Toast are each properly the subject of a later page (`selects`, `feedback`). **Recommendation:** build the form/field/validator layer and `ElButton.loading` + spinner **fully**, since they are this page's actual subject; build Textarea/Checkbox/Radio/Switch to full parity (they are simple and `inputs`/`selection` will need them anyway); and build `ElSelect` and `ElAlert` to the fidelity this page renders — a working menu and a static-bloom Alert — leaving the bloom's four infinite animations and the full Select variant matrix to `feedback` and `selects`. Confirm before I plan.
+2. **`ElButton.loading` — build now?** It is missing, Task A did not mandate it, and two forms plus a state cell are unbuildable without it. **Recommendation: yes, now**, with the spinner, since it is a Button API change and doing it later means touching `button.dart` twice.
 3. **`_referenceHeight` for a stateful page.** The vertical parity probe asserts a single height, but this page's height changes as errors appear (a 4-item password list adds ~90px). **Recommendation:** measure the **pristine** state (nothing typed, nothing submitted) and have the Flutter page test pump the same pristine state. Flag if you would rather the probe skip this route entirely.
 4. **Reproduce the focus-on-error gap?** The reference silently fails to focus the composed form's failing fields (§3.4, drift 7). The fidelity bar says drift included — but this drift is an accessibility regression, not a visual one, and it is invisible in a screenshot. **Recommendation:** implement focus-on-error correctly for *all* fields in Flutter and record the divergence here, rather than porting a bug that nothing can see. Needs your call.
 5. **`aria-invalid` beating focus (drift 6).** Same shape: a measured, deliberate-looking cascade outcome that removes the focus ring from errored fields. **Recommendation:** reproduce exactly — it *is* visible, it is what the page renders, and RULES violations are the reference's to own.
-6. **Where do the new timings live?** 200 / 280 / 320 / 600 / 900 ms have no CSS token. **Recommendation:** add `DsDurations.dashDraw / checkDraw / dotPop / jelly / spin` in `foundation\motion.dart`, consistent with whatever was decided for `shadows-map` Q3 — one policy, not two.
-7. **The validator's shape.** Zod is a schema library; Flutter has none in-repo and the port takes no dependencies. **Recommendation:** a tiny `DsRule<T>` list per field (`(value) => String?`) with an "all issues" and a "first issue" collection mode — enough to express both `criteriaMode`s and nothing more. The Zod-4 email regex ships verbatim as one rule.
-8. **Toast host placement.** The web mounts `<Toaster/>` once in the root layout. In Flutter this is an `Overlay` entry owned by the example app's shell, not by `lib\`. **Recommendation:** put `DsToaster`'s widget in `lib\` and its mounting in `example\lib\shell.dart`, mirroring the split.
+6. **Where do the new timings live?** 200 / 280 / 320 / 600 / 900 ms have no CSS token. **Recommendation:** add `ElDurations.dashDraw / checkDraw / dotPop / jelly / spin` in `foundation\motion.dart`, consistent with whatever was decided for `shadows-map` Q3 — one policy, not two.
+7. **The validator's shape.** Zod is a schema library; Flutter has none in-repo and the port takes no dependencies. **Recommendation:** a tiny `ElRule<T>` list per field (`(value) => String?`) with an "all issues" and a "first issue" collection mode — enough to express both `criteriaMode`s and nothing more. The Zod-4 email regex ships verbatim as one rule.
+8. **Toast host placement.** The web mounts `<Toaster/>` once in the root layout. In Flutter this is an `Overlay` entry owned by the example app's shell, not by `lib\`. **Recommendation:** put `ElToaster`'s widget in `lib\` and its mounting in `example\lib\shell.dart`, mirroring the split.
 9. **Two `AccountForm`s (drift 19).** Confirm both instances are built as separate live forms rather than the second being a still — the §2 Note's whole argument ("asks nothing until you submit, then re-checks on every keystroke") is only demonstrable if it is live.
 
 
@@ -817,11 +817,11 @@ the mechanism (rather than the number) the finding.
 
 **Port impact, landed 2026-08-15.** `lib\src\components\checkbox.dart` and
 `lib\src\components\radio.dart` ran their socket transition at
-`DsDurations.fast` (150ms) where the browser runs 250ms. Both now use
-`DsDurations.transitionDefault`, a new member of
+`ElDurations.fast` (150ms) where the browser runs 250ms. Both now use
+`ElDurations.transitionDefault`, a new member of
 `lib\src\foundation\motion.dart` that spells `--default-transition-duration`
 separately from `--duration-base` so a retune of the token cannot silently move
-the utilities. The three `pump(DsDurations.fast)` calls in
+the utilities. The three `pump(ElDurations.fast)` calls in
 `test\selection_feedback_test.dart` were retuned with it.
 
 **Also note §14's summary line** ("The seven new animation timings ... 150

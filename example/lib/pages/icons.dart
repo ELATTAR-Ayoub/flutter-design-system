@@ -1,9 +1,9 @@
 /// `/design-system/icons`: the Icons foundation page.
 ///
 /// The page's subject is the component the whole site is drawn with, so almost
-/// every specimen here is the real thing: the ladder is seven live [DsIcon]s at
+/// every specimen here is the real thing: the ladder is seven live [ElIcon]s at
 /// seven sizes, the tones grid is ten live glyphs resolving ten tokens, the
-/// pairings are five live [DsButton]s, and the registry is all 63 curated
+/// pairings are five live [ElButton]s, and the registry is all 63 curated
 /// glyphs stroked from their own transcribed geometry. Nothing on it is a
 /// picture of an icon.
 ///
@@ -51,18 +51,18 @@
 /// 5. The reference's usage snippet imports `PackageOpen` and then uses
 ///    `Heart`. See the translation note above: this is the one that does not
 ///    ship.
-/// 6. A [DsNote] title renders muted-foreground in **every** tone; the tone
+/// 6. A [ElNote] title renders muted-foreground in **every** tone; the tone
 ///    shows only in the border and the wash. The header *eyebrow* is the
 ///    reverse case and does take action-ink. (Recorded once, in `kit.dart`.)
 /// 7. `.type-code` declares no `font-weight`, so both the `<pre>` and the
 ///    inline chip render at 400: the only mono classes on the site that are
-///    not 600. Carried by [DsCodeBlock].
+///    not 600. Carried by [ElCodeBlock].
 /// 8. `leading-relaxed` (1.625) overrides `.type-code`'s 1.4 in the `<pre>`.
-///    Also carried by [DsCodeBlock].
+///    Also carried by [ElCodeBlock].
 /// 9. **`subtle` and `muted` are the same colour.** The tones grid ships two
 ///    identical swatches on purpose: see [_TonesSection] (ruling I-Q6).
 /// 10. Button labels are **13px**: `--text-sm` is aliased to `--text-small`.
-///     Stated once, in `DsComponentType.buttonLabel`.
+///     Stated once, in `ElComponentType.buttonLabel`.
 /// 11. Fonts: the prose says Space Grotesk, the tokens say Inter Local. Tokens
 ///     win, per the project's standing decision.
 /// 12. Three curated names, `Filter`, `HelpCircle`, `AlertTriangle`: are
@@ -85,11 +85,11 @@ import '../nav.dart';
 const double _leadingSnug = 1.375;
 
 /// `size-9`: the plinth every 20px specimen glyph is mounted on.
-final double _tileSize = ds(9);
+final double _tileSize = el(9);
 
 /// `h-14`: the box the seven ladder glyphs share, so they hang from one
 /// vertical midpoint.
-final double _ladderBox = ds(14);
+final double _ladderBox = el(14);
 
 /* ── Page data ───────────────────────────────────────────────────────────── */
 
@@ -102,7 +102,7 @@ final double _ladderBox = ds(14);
 /// The last line is **104 characters**, half again the TSX block's longest at
 /// 71. Measured rather than assumed (ruling I-Q8): at 12.5px Geist Mono that
 /// is roughly 784px against a text box near 1000px, so like the reference's
-/// TSX it does **not** actually scroll at the 1440 frame, [DsCodeBlock]'s
+/// TSX it does **not** actually scroll at the 1440 frame, [ElCodeBlock]'s
 /// scroller ships because `overflow-x-auto scrollbar-thin` is in the class
 /// list, and this is the sample that reaches the edge of a narrower column
 /// where the TSX never would. `icons_page_test.dart` pins both halves.
@@ -111,34 +111,34 @@ import 'package:elattar_design_system/elattar_design_system.dart';
 
 // Decorative — adjacent text already says "Open Pack",
 // so the glyph is hidden from screen readers.
-const DsIcon(DsIconGlyph.packageOpen, size: DsIconSize.md, tone: DsIconTone.inherit)
+const ElIcon(ElIconGlyph.packageOpen, size: ElIconSize.md, tone: ElIconTone.inherit)
 
 // Meaningful — icon-only control, so it must be named.
-const DsIcon(DsIconGlyph.heart, size: DsIconSize.lg, tone: DsIconTone.value, label: 'Add to favourites')''';
+const ElIcon(ElIconGlyph.heart, size: ElIconSize.lg, tone: ElIconTone.value, label: 'Add to favourites')''';
 
 /// `sizeUse`: one line of §3's use list per rung of the ladder.
 ///
 /// Keyed by the enum rather than by its printed key, so the ladder, the
 /// specimen row and this list cannot drift apart.
-const Map<DsIconSize, String> _sizeUse = <DsIconSize, String>{
-  DsIconSize.xs: 'Pips and inline markers inside badges.',
-  DsIconSize.sm: 'Beside 13px text. Inside badges and chips. Small buttons.',
-  DsIconSize.md: 'The default. Inside standard buttons, rows, inputs.',
-  DsIconSize.lg: 'Navigation items, large buttons, stat tiles.',
-  DsIconSize.xl: 'Empty states, feature panels, section headers.',
-  DsIconSize.xl2: 'Reveal moments, rarity glyphs on cards.',
-  DsIconSize.xl3: 'Hero and error illustrations.',
+const Map<ElIconSize, String> _sizeUse = <ElIconSize, String>{
+  ElIconSize.xs: 'Pips and inline markers inside badges.',
+  ElIconSize.sm: 'Beside 13px text. Inside badges and chips. Small buttons.',
+  ElIconSize.md: 'The default. Inside standard buttons, rows, inputs.',
+  ElIconSize.lg: 'Navigation items, large buttons, stat tiles.',
+  ElIconSize.xl: 'Empty states, feature panels, section headers.',
+  ElIconSize.xl2: 'Reveal moments, rarity glyphs on cards.',
+  ElIconSize.xl3: 'Hero and error illustrations.',
 };
 
 /// The `size` prop's Meta value: the whole ladder, printed off the ladder.
 ///
 /// The separators are U+00B7, matching the use list in `#sizes`, and the two
-/// top rungs come out **`2xl`** and **`3xl`** through [DsIconSize.label]: the
+/// top rungs come out **`2xl`** and **`3xl`** through [ElIconSize.label]: the
 /// enum spells them `xl2`/`xl3` because a Dart identifier cannot start with a
 /// digit, and that rename must not reach rendered copy.
 String get _sizeRow {
-  final Iterable<String> rungs = DsIconSize.values.map(
-    (DsIconSize size) => '${size.label} ${DsIcon.pxFor(size).toInt()}',
+  final Iterable<String> rungs = ElIconSize.values.map(
+    (ElIconSize size) => '${size.label} ${ElIcon.pxFor(size).toInt()}',
   );
   return '${rungs.join(' · ')}. Default md.';
 }
@@ -147,24 +147,24 @@ String get _sizeRow {
 ///
 /// The reference's own `toneUse` literal declares `error` before `info`; the
 /// grid renders `Object.keys(ICON_TONES)` instead, so the declaration order
-/// never reaches the screen. [DsIconTone.values] **is** that key order, which
+/// never reaches the screen. [ElIconTone.values] **is** that key order, which
 /// is what the grid iterates.
-const Map<DsIconTone, String> _toneUse = <DsIconTone, String>{
-  DsIconTone.normal: 'Primary text weight.',
-  DsIconTone.muted: 'Beside body copy. Most common.',
-  DsIconTone.subtle: 'Metadata and decorative affordances.',
-  DsIconTone.action: 'Interactive, selected, active.',
-  DsIconTone.value: 'Reward, premium, ranking — worth.',
-  DsIconTone.success: 'Confirmed, cleared, live, gained.',
-  DsIconTone.warning: 'Pending, needs attention.',
-  DsIconTone.info: 'Neutral notice, explainer.',
-  DsIconTone.error: 'Failed, destructive.',
-  DsIconTone.inherit: 'Takes the parent colour — the default inside buttons.',
+const Map<ElIconTone, String> _toneUse = <ElIconTone, String>{
+  ElIconTone.normal: 'Primary text weight.',
+  ElIconTone.muted: 'Beside body copy. Most common.',
+  ElIconTone.subtle: 'Metadata and decorative affordances.',
+  ElIconTone.action: 'Interactive, selected, active.',
+  ElIconTone.value: 'Reward, premium, ranking — worth.',
+  ElIconTone.success: 'Confirmed, cleared, live, gained.',
+  ElIconTone.warning: 'Pending, needs attention.',
+  ElIconTone.info: 'Neutral notice, explainer.',
+  ElIconTone.error: 'Failed, destructive.',
+  ElIconTone.inherit: 'Takes the parent colour — the default inside buttons.',
 };
 
 /// One entry of `ICON_GROUPS`: the glyph, the name `icons.ts` whitelists it
 /// under, and the single meaning it is pinned to.
-typedef _Entry = ({DsIconGlyph glyph, String name, String use});
+typedef _Entry = ({ElIconGlyph glyph, String name, String use});
 
 /// One of the four groups the curated set is filed in.
 typedef _IconGroup = ({String title, String blurb, List<_Entry> icons});
@@ -185,63 +185,63 @@ const List<_IconGroup> _groups = <_IconGroup>[
         'way they move.',
     icons: <_Entry>[
       (
-        glyph: DsIconGlyph.package,
+        glyph: ElIconGlyph.package,
         name: 'Package',
         use: 'Packs — marketplace nav',
       ),
       (
-        glyph: DsIconGlyph.radio,
+        glyph: ElIconGlyph.radio,
         name: 'Radio',
         use: 'Live Pulls — nav, live state',
       ),
-      (glyph: DsIconGlyph.layers, name: 'Layers', use: 'Stash — inventory nav'),
-      (glyph: DsIconGlyph.gift, name: 'Gift', use: 'Rewards nav'),
-      (glyph: DsIconGlyph.trophy, name: 'Trophy', use: 'Leaderboard nav'),
-      (glyph: DsIconGlyph.wallet, name: 'Wallet', use: 'Wallet nav'),
+      (glyph: ElIconGlyph.layers, name: 'Layers', use: 'Stash — inventory nav'),
+      (glyph: ElIconGlyph.gift, name: 'Gift', use: 'Rewards nav'),
+      (glyph: ElIconGlyph.trophy, name: 'Trophy', use: 'Leaderboard nav'),
+      (glyph: ElIconGlyph.wallet, name: 'Wallet', use: 'Wallet nav'),
       (
-        glyph: DsIconGlyph.user,
+        glyph: ElIconGlyph.user,
         name: 'User',
         use: 'Account nav, avatar fallback',
       ),
       (
-        glyph: DsIconGlyph.search,
+        glyph: ElIconGlyph.search,
         name: 'Search',
         use: 'Search input and trigger',
       ),
-      (glyph: DsIconGlyph.bell, name: 'Bell', use: 'Notifications'),
-      (glyph: DsIconGlyph.settings, name: 'Settings', use: 'Preferences'),
-      (glyph: DsIconGlyph.logOut, name: 'LogOut', use: 'Sign out'),
+      (glyph: ElIconGlyph.bell, name: 'Bell', use: 'Notifications'),
+      (glyph: ElIconGlyph.settings, name: 'Settings', use: 'Preferences'),
+      (glyph: ElIconGlyph.logOut, name: 'LogOut', use: 'Sign out'),
       (
-        glyph: DsIconGlyph.layoutGrid,
+        glyph: ElIconGlyph.layoutGrid,
         name: 'LayoutGrid',
         use: 'Grid view toggle',
       ),
-      (glyph: DsIconGlyph.rows3, name: 'Rows3', use: 'List view toggle'),
+      (glyph: ElIconGlyph.rows3, name: 'Rows3', use: 'List view toggle'),
       (
-        glyph: DsIconGlyph.chevronDown,
+        glyph: ElIconGlyph.chevronDown,
         name: 'ChevronDown',
         use: 'Disclosure, select',
       ),
-      (glyph: DsIconGlyph.chevronUp, name: 'ChevronUp', use: 'Disclosure open'),
+      (glyph: ElIconGlyph.chevronUp, name: 'ChevronUp', use: 'Disclosure open'),
       (
-        glyph: DsIconGlyph.chevronLeft,
+        glyph: ElIconGlyph.chevronLeft,
         name: 'ChevronLeft',
         use: 'Carousel back',
       ),
       (
-        glyph: DsIconGlyph.chevronRight,
+        glyph: ElIconGlyph.chevronRight,
         name: 'ChevronRight',
         use: 'Carousel forward, breadcrumb',
       ),
-      (glyph: DsIconGlyph.arrowLeft, name: 'ArrowLeft', use: 'Back'),
+      (glyph: ElIconGlyph.arrowLeft, name: 'ArrowLeft', use: 'Back'),
       (
-        glyph: DsIconGlyph.arrowRight,
+        glyph: ElIconGlyph.arrowRight,
         name: 'ArrowRight',
         use: 'Forward, see all',
       ),
-      (glyph: DsIconGlyph.ellipsis, name: 'Ellipsis', use: 'Overflow menu'),
+      (glyph: ElIconGlyph.ellipsis, name: 'Ellipsis', use: 'Overflow menu'),
       (
-        glyph: DsIconGlyph.externalLink,
+        glyph: ElIconGlyph.externalLink,
         name: 'ExternalLink',
         use: 'Leaves the product',
       ),
@@ -252,52 +252,52 @@ const List<_IconGroup> _groups = <_IconGroup>[
     blurb: 'Things the user does. Destructive actions use only Trash2 and Ban.',
     icons: <_Entry>[
       (
-        glyph: DsIconGlyph.packageOpen,
+        glyph: ElIconGlyph.packageOpen,
         name: 'PackageOpen',
         use: 'Open Pack — the primary action',
       ),
       (
-        glyph: DsIconGlyph.shoppingCart,
+        glyph: ElIconGlyph.shoppingCart,
         name: 'ShoppingCart',
         use: 'Buy, add to cart',
       ),
-      (glyph: DsIconGlyph.heart, name: 'Heart', use: 'Favourite'),
-      (glyph: DsIconGlyph.eye, name: 'Eye', use: 'Inspect card, show password'),
-      (glyph: DsIconGlyph.eyeOff, name: 'EyeOff', use: 'Hide password'),
-      (glyph: DsIconGlyph.share2, name: 'Share2', use: 'Share pull'),
-      (glyph: DsIconGlyph.copy, name: 'Copy', use: 'Copy referral or address'),
-      (glyph: DsIconGlyph.filter, name: 'Filter', use: 'Filter drawer trigger'),
+      (glyph: ElIconGlyph.heart, name: 'Heart', use: 'Favourite'),
+      (glyph: ElIconGlyph.eye, name: 'Eye', use: 'Inspect card, show password'),
+      (glyph: ElIconGlyph.eyeOff, name: 'EyeOff', use: 'Hide password'),
+      (glyph: ElIconGlyph.share2, name: 'Share2', use: 'Share pull'),
+      (glyph: ElIconGlyph.copy, name: 'Copy', use: 'Copy referral or address'),
+      (glyph: ElIconGlyph.filter, name: 'Filter', use: 'Filter drawer trigger'),
       (
-        glyph: DsIconGlyph.slidersHorizontal,
+        glyph: ElIconGlyph.slidersHorizontal,
         name: 'SlidersHorizontal',
         use: 'Sort and advanced filters',
       ),
       (
-        glyph: DsIconGlyph.plus,
+        glyph: ElIconGlyph.plus,
         name: 'Plus',
         use: 'Increase quantity, deposit',
       ),
-      (glyph: DsIconGlyph.minus, name: 'Minus', use: 'Decrease quantity'),
+      (glyph: ElIconGlyph.minus, name: 'Minus', use: 'Decrease quantity'),
       (
-        glyph: DsIconGlyph.refreshCw,
+        glyph: ElIconGlyph.refreshCw,
         name: 'RefreshCw',
         use: 'Retry, refresh feed',
       ),
-      (glyph: DsIconGlyph.download, name: 'Download', use: 'Withdraw, export'),
-      (glyph: DsIconGlyph.upload, name: 'Upload', use: 'Deposit'),
-      (glyph: DsIconGlyph.truck, name: 'Truck', use: 'Ship card'),
+      (glyph: ElIconGlyph.download, name: 'Download', use: 'Withdraw, export'),
+      (glyph: ElIconGlyph.upload, name: 'Upload', use: 'Deposit'),
+      (glyph: ElIconGlyph.truck, name: 'Truck', use: 'Ship card'),
       (
-        glyph: DsIconGlyph.trash2,
+        glyph: ElIconGlyph.trash2,
         name: 'Trash2',
         use: 'Delete — destructive only',
       ),
       (
-        glyph: DsIconGlyph.ban,
+        glyph: ElIconGlyph.ban,
         name: 'Ban',
         use: 'Cancel, blocked — destructive only',
       ),
-      (glyph: DsIconGlyph.x, name: 'X', use: 'Close, dismiss, clear'),
-      (glyph: DsIconGlyph.check, name: 'Check', use: 'Confirm, selected'),
+      (glyph: ElIconGlyph.x, name: 'X', use: 'Close, dismiss, clear'),
+      (glyph: ElIconGlyph.check, name: 'Check', use: 'Confirm, selected'),
     ],
   ),
   (
@@ -311,33 +311,33 @@ const List<_IconGroup> _groups = <_IconGroup>[
         'components/pulls/rarity-symbol.tsx, never a Lucide glyph.',
     icons: <_Entry>[
       (
-        glyph: DsIconGlyph.sparkles,
+        glyph: ElIconGlyph.sparkles,
         name: 'Sparkles',
         use: 'Reveal and reward moments',
       ),
       (
-        glyph: DsIconGlyph.crown,
+        glyph: ElIconGlyph.crown,
         name: 'Crown',
         use: 'Leaderboard leader, top hit',
       ),
-      (glyph: DsIconGlyph.flame, name: 'Flame', use: 'Hot pack badge'),
-      (glyph: DsIconGlyph.zap, name: 'Zap', use: 'New, turbo open'),
-      (glyph: DsIconGlyph.star, name: 'Star', use: 'Featured'),
-      (glyph: DsIconGlyph.tag, name: 'Tag', use: 'Card set, category'),
-      (glyph: DsIconGlyph.percent, name: 'Percent', use: 'Rarity odds'),
-      (glyph: DsIconGlyph.medal, name: 'Medal', use: 'Rank badge'),
+      (glyph: ElIconGlyph.flame, name: 'Flame', use: 'Hot pack badge'),
+      (glyph: ElIconGlyph.zap, name: 'Zap', use: 'New, turbo open'),
+      (glyph: ElIconGlyph.star, name: 'Star', use: 'Featured'),
+      (glyph: ElIconGlyph.tag, name: 'Tag', use: 'Card set, category'),
+      (glyph: ElIconGlyph.percent, name: 'Percent', use: 'Rarity odds'),
+      (glyph: ElIconGlyph.medal, name: 'Medal', use: 'Rank badge'),
       (
-        glyph: DsIconGlyph.activity,
+        glyph: ElIconGlyph.activity,
         name: 'Activity',
         use: 'Popularity, volatility',
       ),
       (
-        glyph: DsIconGlyph.trendingUp,
+        glyph: ElIconGlyph.trendingUp,
         name: 'TrendingUp',
         use: 'Rank up, value gain',
       ),
       (
-        glyph: DsIconGlyph.trendingDown,
+        glyph: ElIconGlyph.trendingDown,
         name: 'TrendingDown',
         use: 'Rank down, value loss',
       ),
@@ -350,58 +350,58 @@ const List<_IconGroup> _groups = <_IconGroup>[
         'as by colour, so bonus never reads as real money.',
     icons: <_Entry>[
       (
-        glyph: DsIconGlyph.circleDollarSign,
+        glyph: ElIconGlyph.circleDollarSign,
         name: 'CircleDollarSign',
         use: 'Available balance',
       ),
       (
-        glyph: DsIconGlyph.creditCard,
+        glyph: ElIconGlyph.creditCard,
         name: 'CreditCard',
         use: 'Payment method',
       ),
       (
-        glyph: DsIconGlyph.arrowDownLeft,
+        glyph: ElIconGlyph.arrowDownLeft,
         name: 'ArrowDownLeft',
         use: 'Money in — deposit, sale, refund',
       ),
       (
-        glyph: DsIconGlyph.arrowUpRight,
+        glyph: ElIconGlyph.arrowUpRight,
         name: 'ArrowUpRight',
         use: 'Money out — purchase, withdrawal',
       ),
       (
-        glyph: DsIconGlyph.hourglass,
+        glyph: ElIconGlyph.hourglass,
         name: 'Hourglass',
         use: 'Pending balance, pending withdrawal',
       ),
       (
-        glyph: DsIconGlyph.clock,
+        glyph: ElIconGlyph.clock,
         name: 'Clock',
         use: 'Timestamp, time remaining',
       ),
       (
-        glyph: DsIconGlyph.lock,
+        glyph: ElIconGlyph.lock,
         name: 'Lock',
         use: 'Locked reward, security setting',
       ),
       (
-        glyph: DsIconGlyph.shield,
+        glyph: ElIconGlyph.shield,
         name: 'Shield',
         use: 'Security, provably fair',
       ),
       (
-        glyph: DsIconGlyph.shieldCheck,
+        glyph: ElIconGlyph.shieldCheck,
         name: 'ShieldCheck',
         use: 'Verified account',
       ),
-      (glyph: DsIconGlyph.info, name: 'Info', use: 'Information state'),
+      (glyph: ElIconGlyph.info, name: 'Info', use: 'Information state'),
       (
-        glyph: DsIconGlyph.helpCircle,
+        glyph: ElIconGlyph.helpCircle,
         name: 'HelpCircle',
         use: 'Help, odds explainer',
       ),
       (
-        glyph: DsIconGlyph.alertTriangle,
+        glyph: ElIconGlyph.alertTriangle,
         name: 'AlertTriangle',
         use: 'Warning state',
       ),
@@ -426,12 +426,12 @@ class IconsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     // Every one of the four header props comes from the registry: this page
     // overrides none of them, unlike the colors page.
-    final DsCategoryHit here = findCategory('foundations', 'icons');
+    final ElCategoryHit here = findCategory('foundations', 'icons');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        DsPageHeader(
+        ElPageHeader(
           eyebrow: here.group.title,
           title: here.category.title,
           blurb: here.category.blurb,
@@ -448,7 +448,7 @@ class IconsPage extends StatelessWidget {
         // resolves `next` to null and the kit renders the bare `flex-1` spacer
         // beside the Previous card, which keeps that card at exactly half the
         // row rather than letting it stretch.
-        const DsPageFootNav(groupId: 'foundations', slug: 'icons'),
+        const ElPageFootNav(groupId: 'foundations', slug: 'icons'),
       ],
     );
   }
@@ -461,7 +461,7 @@ class _ComponentSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsSection(
+    return ElSection(
       id: 'component',
       title: 'The Icon component',
       description:
@@ -472,10 +472,10 @@ class _ComponentSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          const DsPanel(label: 'Usage', child: DsCodeBlock(_usage)),
-          SizedBox(height: ds(4)),
-          DsMeta(
-            items: <DsMetaItem>[
+          const ElPanel(label: 'Usage', child: ElCodeBlock(_usage)),
+          SizedBox(height: el(4)),
+          ElMeta(
+            items: <ElMetaItem>[
               const (
                 k: 'icon',
                 v: TextSpan(text: 'A Lucide icon component. Required.'),
@@ -499,7 +499,7 @@ class _ComponentSection extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: ds(4)),
+          SizedBox(height: el(4)),
           // The copy ships verbatim, and it is approximate rather than exact.
           // `strokeFor` is a three-rung snap (2.4 / 2 / 1.6), not a clamp, so
           // the rendered stroke still climbs 1.20 → 1.40 → 1.60 → 1.67 → 2.00
@@ -507,14 +507,14 @@ class _ComponentSection extends StatelessWidget {
           // icon do not in fact carry the same optical weight. The port ships
           // the ternary, not the claim, `icon.dart:198` transcribes it and
           // `test/components_test.dart` pins all seven rungs.
-          DsNote(
+          ElNote(
             title: 'Stroke scales with the box',
-            child: DsText(
+            child: ElText(
               'Lucide is drawn on a 24px grid for a 2px stroke. Rendered at '
               '12px that stroke reads twice as heavy, and at 40px it reads '
               'thin. The component compensates automatically, so a 12px icon '
               'and a 40px icon carry the same optical weight.',
-              DsType.small,
+              ElType.small,
             ),
           ),
         ],
@@ -530,38 +530,38 @@ class _SizesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
 
-    return DsSection(
+    return ElSection(
       id: 'sizes',
       title: 'Sizes',
       description:
           'Seven steps. Icons pair with text, so each size exists to '
           'sit beside a specific type class.',
-      child: DsPanel(
+      child: ElPanel(
         label: 'The ladder',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             // `flex flex-wrap items-end gap-8`.
             Wrap(
-              spacing: ds(8),
-              runSpacing: ds(8),
+              spacing: el(8),
+              runSpacing: el(8),
               crossAxisAlignment: WrapCrossAlignment.end,
               children: <Widget>[
-                for (final DsIconSize size in DsIconSize.values)
+                for (final ElIconSize size in ElIconSize.values)
                   _LadderCell(size: size),
               ],
             ),
             // `mt-6 space-y-2 border-t border-border pt-5`.
             Container(
-              margin: EdgeInsets.only(top: ds(6)),
-              padding: EdgeInsets.only(top: ds(5)),
+              margin: EdgeInsets.only(top: el(6)),
+              padding: EdgeInsets.only(top: el(5)),
               decoration: BoxDecoration(
                 border: Border(
                   top: BorderSide(
                     color: theme.border,
-                    width: DsWidths.hairline,
+                    width: ElWidths.hairline,
                   ),
                 ),
               ),
@@ -570,11 +570,11 @@ class _SizesSection extends StatelessWidget {
                 children: <Widget>[
                   for (
                     int i = 0;
-                    i < DsIconSize.values.length;
+                    i < ElIconSize.values.length;
                     i++
                   ) ...<Widget>[
-                    if (i > 0) SizedBox(height: ds(2)),
-                    _LadderUseLine(size: DsIconSize.values[i]),
+                    if (i > 0) SizedBox(height: el(2)),
+                    _LadderUseLine(size: ElIconSize.values[i]),
                   ],
                 ],
               ),
@@ -590,11 +590,11 @@ class _SizesSection extends StatelessWidget {
 class _LadderCell extends StatelessWidget {
   const _LadderCell({required this.size});
 
-  final DsIconSize size;
+  final ElIconSize size;
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -615,20 +615,20 @@ class _LadderCell extends StatelessWidget {
           height: _ladderBox,
           child: Center(
             widthFactor: 1,
-            child: DsIcon(
-              DsIconGlyph.packageOpen,
+            child: ElIcon(
+              ElIconGlyph.packageOpen,
               size: size,
-              tone: DsIconTone.muted,
+              tone: ElIconTone.muted,
             ),
           ),
         ),
-        SizedBox(height: ds(2)),
+        SizedBox(height: el(2)),
         // The **key**, not `.name`: `2xl` and `3xl`, which Dart spells `xl2`
         // and `xl3`.
-        DsText(size.label, DsType.numSm, color: theme.actionInk),
-        SizedBox(height: ds(1)),
+        ElText(size.label, ElType.numSm, color: theme.actionInk),
+        SizedBox(height: el(1)),
         // `.type-micro` uppercases, which leaves digits and `px` untouched.
-        DsText('${DsIcon.pxFor(size).toInt()}px', DsType.micro),
+        ElText('${ElIcon.pxFor(size).toInt()}px', ElType.micro),
       ],
     );
   }
@@ -643,27 +643,27 @@ class _LadderCell extends StatelessWidget {
 class _LadderUseLine extends StatelessWidget {
   const _LadderUseLine({required this.size});
 
-  final DsIconSize size;
+  final ElIconSize size;
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
 
-    return DsRichText(
+    return ElRichText(
       TextSpan(
         children: <InlineSpan>[
           TextSpan(
-            text: '${size.label} · ${DsIcon.pxFor(size).toInt()}px',
-            style: DsText.styleOf(
+            text: '${size.label} · ${ElIcon.pxFor(size).toInt()}px',
+            style: ElText.styleOf(
               context,
-              DsType.numSm,
+              ElType.numSm,
               color: theme.mutedForeground,
             ),
           ),
           TextSpan(text: ' — ${_sizeUse[size]!}'),
         ],
       ),
-      DsType.small,
+      ElType.small,
     );
   }
 }
@@ -675,13 +675,13 @@ class _TonesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsSection(
+    return ElSection(
       id: 'tones',
       title: 'Tones',
       description:
           'Icons never carry a raw hex. Every tone maps to a token, '
           'which keeps icon colour inside the 70/20/10 balance automatically.',
-      child: DsPanel(
+      child: ElPanel(
         label: 'Ten tones',
         // `grid gap-x-8 gap-y-5 sm:grid-cols-2 lg:grid-cols-3`: ten cells in
         // a 3×4 grid at the desktop frame, with two empty cells on the last
@@ -689,8 +689,8 @@ class _TonesSection extends StatelessWidget {
         child: _Grid(
           sm: 2,
           lg: 3,
-          gapX: ds(8),
-          gapY: ds(5),
+          gapX: el(8),
+          gapY: el(5),
           children: <Widget>[
             // Two things this grid reproduces rather than tidies. `muted` and
             // `subtle` are the **same colour** (ruling I-Q6): `subtle` is a
@@ -700,7 +700,7 @@ class _TonesSection extends StatelessWidget {
             // And `inherit` renders as plain `--foreground`, because nothing
             // here sets a text colour on the panel body, so `text-current`
             // resolves to what `<body>` set.
-            for (final DsIconTone tone in DsIconTone.values)
+            for (final ElIconTone tone in ElIconTone.values)
               _ToneCell(tone: tone),
           ],
         ),
@@ -712,23 +712,23 @@ class _TonesSection extends StatelessWidget {
 class _ToneCell extends StatelessWidget {
   const _ToneCell({required this.tone});
 
-  final DsIconTone tone;
+  final ElIconTone tone;
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
 
     return Row(
       children: <Widget>[
-        _GlyphTile(glyph: DsIconGlyph.search, tone: tone),
-        SizedBox(width: ds(3)),
+        _GlyphTile(glyph: ElIconGlyph.search, tone: tone),
+        SizedBox(width: el(3)),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               // The **key**: `default`, which Dart spells `normal`.
-              DsText(tone.label, DsType.numSm, color: theme.actionInk),
+              ElText(tone.label, ElType.numSm, color: theme.actionInk),
               _UseCopy(_toneUse[tone]!),
             ],
           ),
@@ -745,38 +745,38 @@ class _InContextSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsSection(
+    return ElSection(
       id: 'in-context',
       title: 'Icons in controls',
       description:
           "Inside a button an icon should inherit the button's "
           'colour, not assert its own. The one exception is a destructive '
           'action, where the error tone is the point.',
-      child: DsPanel(
+      child: ElPanel(
         label: 'Correct pairings',
         // `flex flex-wrap gap-3`.
         child: Wrap(
-          spacing: ds(3),
-          runSpacing: ds(3),
+          spacing: el(3),
+          runSpacing: el(3),
           children: <Widget>[
             _PairedButton(
-              variant: DsButtonVariant.primary,
-              glyph: DsIconGlyph.packageOpen,
+              variant: ElButtonVariant.primary,
+              glyph: ElIconGlyph.packageOpen,
               label: 'Open Pack',
             ),
             _PairedButton(
-              variant: DsButtonVariant.secondary,
-              glyph: DsIconGlyph.heart,
+              variant: ElButtonVariant.secondary,
+              glyph: ElIconGlyph.heart,
               label: 'Favourite',
             ),
             _PairedButton(
-              variant: DsButtonVariant.outline,
-              glyph: DsIconGlyph.search,
+              variant: ElButtonVariant.outline,
+              glyph: ElIconGlyph.search,
               label: 'Search',
             ),
             _PairedButton(
-              variant: DsButtonVariant.destructive,
-              glyph: DsIconGlyph.trash2,
+              variant: ElButtonVariant.destructive,
+              glyph: ElIconGlyph.trash2,
               label: 'Remove',
             ),
             const _IconOnlyButton(),
@@ -796,7 +796,7 @@ class _InContextSection extends StatelessWidget {
 /// `[&_svg:not([class*='size-'])]:size-4` matches, and a CSS rule beats an SVG
 /// presentation attribute. `strokeWidth` is not CSS, so it keeps the value
 /// computed for 14px, 2.4: and `strokeFor(16)` is also 2.4, so the two
-/// coincide and no stroke drift is visible. [DsIcon.sizePx] is therefore not
+/// coincide and no stroke drift is visible. [ElIcon.sizePx] is therefore not
 /// needed here; 16px is written directly and the override is recorded in this
 /// comment.
 class _PairedButton extends StatelessWidget {
@@ -806,13 +806,13 @@ class _PairedButton extends StatelessWidget {
     required this.label,
   });
 
-  final DsButtonVariant variant;
-  final DsIconGlyph glyph;
+  final ElButtonVariant variant;
+  final ElIconGlyph glyph;
   final String label;
 
   @override
   Widget build(BuildContext context) {
-    return DsButton(
+    return ElButton(
       variant: variant,
       // Live, and deliberately inert: these are specimens on a docs page, and
       // a null callback would disable them down to `opacity-45`.
@@ -820,10 +820,10 @@ class _PairedButton extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          DsIcon(glyph, size: DsIconSize.md, tone: DsIconTone.inherit),
+          ElIcon(glyph, size: ElIconSize.md, tone: ElIconTone.inherit),
           // `gap-2` on the `default` size, asked of the component rather than
           // restated.
-          SizedBox(width: DsButton.gapFor(DsButtonSize.md)),
+          SizedBox(width: ElButton.gapFor(ElButtonSize.md)),
           // A bare text node inside the button, exactly as
           // `<Button>…Open Pack</Button>` is: it inherits the button's own
           // `text-sm font-medium` and its animated ink from the
@@ -854,15 +854,15 @@ class _IconOnlyButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsButton(
-      variant: DsButtonVariant.ghost,
-      size: DsButtonSize.icon,
+    return ElButton(
+      variant: ElButtonVariant.ghost,
+      size: ElButtonSize.icon,
       label: 'Add to favourites',
       onPressed: () {},
-      child: const DsIcon(
-        DsIconGlyph.heart,
-        size: DsIconSize.md,
-        tone: DsIconTone.value,
+      child: const ElIcon(
+        ElIconGlyph.heart,
+        size: ElIconSize.md,
+        tone: ElIconTone.value,
       ),
     );
   }
@@ -875,7 +875,7 @@ class _SetSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsSection(
+    return ElSection(
       id: 'set',
       title: 'The curated set — $_iconCount glyphs',
       description:
@@ -888,7 +888,7 @@ class _SetSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           for (int i = 0; i < _groups.length; i++) ...<Widget>[
-            if (i > 0) SizedBox(height: ds(4)),
+            if (i > 0) SizedBox(height: el(4)),
             _GroupPanel(group: _groups[i]),
           ],
         ],
@@ -904,19 +904,19 @@ class _GroupPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsPanel(
+    return ElPanel(
       label: group.title,
       note: '${group.icons.length} glyphs',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           // `p.type-small.mb-6`.
-          DsText(group.blurb, DsType.small),
-          SizedBox(height: ds(6)),
+          ElText(group.blurb, ElType.small),
+          SizedBox(height: el(6)),
           // `grid gap-px … sm:grid-cols-2 lg:grid-cols-3`: the kit's lattice
           // with this page's own column map, which is none of `StateGrid`'s
           // five. The frame is shared; the map is not.
-          DsStateGrid.columns(
+          ElStateGrid.columns(
             sm: 2,
             lg: 3,
             children: <Widget>[
@@ -931,7 +931,7 @@ class _GroupPanel extends StatelessWidget {
 
 /// `div.flex.items-center.gap-3.bg-background.p-4`.
 ///
-/// The tile itself is the kit's [DsStateCell]; what is page-local is what
+/// The tile itself is the kit's [ElStateCell]; what is page-local is what
 /// stands in it: a glyph beside its name and its single meaning, where the
 /// kit's own cell holds a demo well over a label.
 class _EntryCell extends StatelessWidget {
@@ -941,14 +941,14 @@ class _EntryCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
 
-    return DsStateCell.bare(
-      padding: EdgeInsets.all(ds(4)),
+    return ElStateCell.bare(
+      padding: EdgeInsets.all(el(4)),
       child: Row(
         children: <Widget>[
-          _GlyphTile(glyph: entry.glyph, tone: DsIconTone.muted),
-          SizedBox(width: ds(3)),
+          _GlyphTile(glyph: entry.glyph, tone: ElIconTone.muted),
+          SizedBox(width: el(3)),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -959,9 +959,9 @@ class _EntryCell extends StatelessWidget {
                 // a text column of roughly 208px at the 1440 frame. It is
                 // transcribed anyway, because the reference declares it and a
                 // narrower column is exactly where it would start to matter.
-                DsText(
+                ElText(
                   entry.name,
-                  DsType.numSm,
+                  ElType.numSm,
                   color: theme.foreground,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -983,13 +983,13 @@ class _RulesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsSection(
+    return ElSection(
       id: 'rules',
       title: 'Rules',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          const DsDoDont(
+          const ElDoDont(
             dos: <String>[
               'Import Lucide glyphs through the Icon component so size, tone '
                   'and labelling are enforced.',
@@ -1017,16 +1017,16 @@ class _RulesSection extends StatelessWidget {
               "Don't reuse Trash2 or Ban for anything non-destructive.",
             ],
           ),
-          SizedBox(height: ds(4)),
+          SizedBox(height: el(4)),
           // Default tone, therefore `action`, and **no title**: so the whole
           // note is one `.type-small text-muted-foreground` line carrying an
           // inline `Code` chip.
-          DsNote(
-            child: DsRichText(
+          ElNote(
+            child: ElRichText(
               TextSpan(
                 children: <InlineSpan>[
                   const TextSpan(text: 'The set is defined in '),
-                  DsCode.span('lib/ds/icons.ts'),
+                  ElCode.span('lib/el/icons.ts'),
                   const TextSpan(
                     text:
                         '. Adding a glyph means adding it there with its '
@@ -1034,7 +1034,7 @@ class _RulesSection extends StatelessWidget {
                   ),
                 ],
               ),
-              DsType.small,
+              ElType.small,
             ),
           ),
         ],
@@ -1054,12 +1054,12 @@ class _RulesSection extends StatelessWidget {
 class _GlyphTile extends StatelessWidget {
   const _GlyphTile({required this.glyph, required this.tone});
 
-  final DsIconGlyph glyph;
-  final DsIconTone tone;
+  final ElIconGlyph glyph;
+  final ElIconTone tone;
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
 
     return Container(
       width: _tileSize,
@@ -1067,12 +1067,12 @@ class _GlyphTile extends StatelessWidget {
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: theme.card,
-        borderRadius: BorderRadius.circular(DsRadii.md),
-        border: Border.all(color: theme.border, width: DsWidths.hairline),
+        borderRadius: BorderRadius.circular(ElRadii.md),
+        border: Border.all(color: theme.border, width: ElWidths.hairline),
       ),
       // 20px, stroke 2.0: the one rung of the ladder where `48/px` lands in
       // the ternary's middle branch and the authored stroke survives.
-      child: DsIcon(glyph, size: DsIconSize.lg, tone: tone),
+      child: ElIcon(glyph, size: ElIconSize.lg, tone: tone),
     );
   }
 }
@@ -1089,20 +1089,20 @@ class _UseCopy extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextStyle style = DsText.styleOf(
+    final TextStyle style = ElText.styleOf(
       context,
-      DsType.small,
+      ElType.small,
     ).copyWith(height: _leadingSnug);
-    // Not a `.type-*` class any more, so it cannot go through [DsText]: but
+    // Not a `.type-*` class any more, so it cannot go through [ElText]: but
     // the line box still has to be the one CSS lays out.
-    return DsLineBox(
+    return ElLineBox(
       style: style,
       child: Text(text, style: style),
     );
   }
 }
 
-/// [DsGrid] with the two axes' gaps stated separately.
+/// [ElGrid] with the two axes' gaps stated separately.
 ///
 /// The kit's own grid takes one `gap`, which is right for the `gap-4` and
 /// `gap-6` grids every other page uses. Both grids on this page need two:
@@ -1134,8 +1134,8 @@ class _Grid extends StatelessWidget {
 
   int _columns(double viewport) {
     int columns = _base;
-    if (sm != null && viewport >= DsBreakpoints.sm) columns = sm!;
-    if (lg != null && viewport >= DsBreakpoints.lg) columns = lg!;
+    if (sm != null && viewport >= ElBreakpoints.sm) columns = sm!;
+    if (lg != null && viewport >= ElBreakpoints.lg) columns = lg!;
     return columns;
   }
 

@@ -48,7 +48,7 @@
 /// > surface.
 ///
 /// The negative margins are how CSS spells that. Flutter has no margins, so the
-/// port spells it as layout: [DsDialogContent] pays its 16px padding on the
+/// port spells it as layout: [ElDialogContent] pays its 16px padding on the
 /// **body children only**, and the bands are laid out flush. Measured against
 /// the reference, the two descriptions agree to the pixel — header top equals
 /// content top, footer bottom equals content bottom, and both are 384 wide
@@ -67,15 +67,15 @@
 /// the following are **orders**, recorded as such so a later reader does not
 /// mistake them for transcription and does not "correct" them back:
 ///
-///  1. **The compact clamp** — [DsModalCompact]. At or below 600 logical
+///  1. **The compact clamp** — [ElModalCompact]. At or below 600 logical
 ///     pixels of viewport width every centred modal takes `max-width: 90vw`
 ///     and `max-height: 75vh`, and its body scrolls inside the panel rather
 ///     than running off the screen. The trigger was a real overflow: the
 ///     dialogs page's shipment form, 384 wide plus two 16px gutters and a
 ///     three-band column, does not fit a 375x812 phone. Desktop geometry is
-///     untouched — above the breakpoint [DsModalCompact.constraintsFor]
+///     untouched — above the breakpoint [ElModalCompact.constraintsFor]
 ///     returns an unbounded box and every measured pin still holds.
-///  2. **Back dismisses the topmost overlay** — [DsModalPortalState]. An
+///  2. **Back dismisses the topmost overlay** — [ElModalPortalState]. An
 ///     [OverlayPortal] is not a route, so Android's back button walks straight
 ///     past an open dialog and leaves the app. Every open portal registers
 ///     itself in one static stack and the host mounts a [PopScope] that
@@ -142,8 +142,8 @@ const double _mediaCloseAlpha = 0.80;
 /// is still exactly as big as its content. Above [breakpoint] every method
 /// here is the identity, which is what keeps the measured desktop geometry
 /// green.
-class DsModalCompact {
-  const DsModalCompact._();
+class ElModalCompact {
+  const ElModalCompact._();
 
   /// At or below this viewport width the clamp is in force.
   static const double breakpoint = 600;
@@ -165,22 +165,20 @@ class DsModalCompact {
 
   /// The box a centred modal may not exceed on [viewport] — and an unbounded
   /// one above the breakpoint, which is a no-op wherever it is applied.
-  static BoxConstraints constraintsFor(Size viewport) => isCompact(
-        viewport.width,
-      )
-          ? BoxConstraints(
-              maxWidth: viewport.width * maxWidthFraction,
-              maxHeight: viewport.height * maxHeightFraction,
-            )
-          : const BoxConstraints();
+  static BoxConstraints constraintsFor(Size viewport) =>
+      isCompact(viewport.width)
+      ? BoxConstraints(
+          maxWidth: viewport.width * maxWidthFraction,
+          maxHeight: viewport.height * maxHeightFraction,
+        )
+      : const BoxConstraints();
 
   /// [width] under the compact cap — for a panel that sizes itself rather than
   /// taking the constraint, which is the sheet's case.
-  static double clampWidth(double width, Size viewport) => isCompact(
-        viewport.width,
-      )
-          ? math.min(width, viewport.width * maxWidthFraction)
-          : width;
+  static double clampWidth(double width, Size viewport) =>
+      isCompact(viewport.width)
+      ? math.min(width, viewport.width * maxWidthFraction)
+      : width;
 
   /// [box] under both caps — for a panel that sets an explicit width *and*
   /// height, which is the agent launcher's dialog.
@@ -195,25 +193,22 @@ class DsModalCompact {
 /* ── The portal ──────────────────────────────────────────────────────────── */
 
 /// Builds the thing that opens the overlay. `DialogTrigger asChild`.
-typedef DsModalTriggerBuilder = Widget Function(
-  BuildContext context,
-  VoidCallback open,
-);
+typedef ElModalTriggerBuilder =
+    Widget Function(BuildContext context, VoidCallback open);
 
 /// Builds the overlay's content, given the callback that closes it —
 /// `DialogClose asChild`, handed over rather than looked up.
-typedef DsModalContentBuilder = Widget Function(
-  BuildContext context,
-  VoidCallback close,
-);
+typedef ElModalContentBuilder =
+    Widget Function(BuildContext context, VoidCallback close);
 
 /// Wraps the content in its enter/exit animation. [animation] runs 0→1 on
 /// open and 1→0 on close.
-typedef DsModalTransitionBuilder = Widget Function(
-  BuildContext context,
-  Animation<double> animation,
-  Widget child,
-);
+typedef ElModalTransitionBuilder =
+    Widget Function(
+      BuildContext context,
+      Animation<double> animation,
+      Widget child,
+    );
 
 /// `DialogPortal` + `DialogOverlay` + the open state `Dialog.Root` owns.
 ///
@@ -230,28 +225,28 @@ typedef DsModalTransitionBuilder = Widget Function(
 ///
 /// Uncontrolled, like `Dialog.Root` with no `open` prop: the state lives here
 /// and the trigger gets a callback. That is the opposite choice from
-/// `DsPopover`, whose `open` is a prop — and deliberately so. A popover is
+/// `ElPopover`, whose `open` is a prop — and deliberately so. A popover is
 /// opened by a combobox that is already holding the boolean for its own
 /// reasons; a dialog is opened by a button that has no other business.
-class DsModalPortal extends StatefulWidget {
-  const DsModalPortal({
+class ElModalPortal extends StatefulWidget {
+  const ElModalPortal({
     super.key,
     required this.trigger,
     required this.content,
     required this.transition,
     this.alignment = Alignment.center,
-    this.enterDuration = DsDurations.jelly,
-    this.exitDuration = DsDurations.base,
-    this.overlayDuration = DsDurations.overlay,
-    this.overlayCurve = DsCurves.out,
+    this.enterDuration = ElDurations.jelly,
+    this.exitDuration = ElDurations.base,
+    this.overlayDuration = ElDurations.overlay,
+    this.overlayCurve = ElCurves.out,
     this.dismissOnOverlayTap = true,
     this.clampToViewport = true,
     this.onOpenChange,
   });
 
-  final DsModalTriggerBuilder trigger;
-  final DsModalContentBuilder content;
-  final DsModalTransitionBuilder transition;
+  final ElModalTriggerBuilder trigger;
+  final ElModalContentBuilder content;
+  final ElModalTransitionBuilder transition;
 
   /// Where the content sits in the theatre. Centre for a dialog, an edge for a
   /// sheet or a drawer.
@@ -277,7 +272,7 @@ class DsModalPortal extends StatefulWidget {
   final bool dismissOnOverlayTap;
 
   /// USER-ORDERED MOBILE ADAPTATION — whether the content is held inside
-  /// [DsModalCompact]'s 90vw x 75vh box on a phone.
+  /// [ElModalCompact]'s 90vw x 75vh box on a phone.
   ///
   /// On for the centred modals, which is what the order names: dialog, alert
   /// dialog, and the agent launcher's console dialog. **Off for the sheet and
@@ -293,35 +288,35 @@ class DsModalPortal extends StatefulWidget {
   final ValueChanged<bool>? onOpenChange;
 
   @override
-  State<DsModalPortal> createState() => DsModalPortalState();
+  State<ElModalPortal> createState() => ElModalPortalState();
 }
 
 /// The state, public so a caller holding a [GlobalKey] can drive the overlay
 /// from outside — which is what the drawer's drag-to-dismiss needs.
-class DsModalPortalState extends State<DsModalPortal>
+class ElModalPortalState extends State<ElModalPortal>
     with TickerProviderStateMixin {
   /// USER-ORDERED MOBILE ADAPTATION — every open portal in the app, oldest
   /// first. See the library doc's adaptation 2.
   ///
   /// Static because *"the topmost open overlay"* is a property of the app and
   /// not of any one portal. Two dialogs open at once are two unrelated
-  /// [DsModalPortal]s — a confirmation raised from inside another dialog's
+  /// [ElModalPortal]s — a confirmation raised from inside another dialog's
   /// content is a portal nested in the element tree but a **sibling** here —
   /// and back has to pick exactly one of them. A per-widget [PopScope] cannot:
   /// [ModalRoute] notifies *every* registered entry on a blocked pop, so
   /// without this list a single back press would close the whole stack at
   /// once. Each entry is notified, checks whether it is [_stack]'s last, and
   /// all but one return.
-  static final List<DsModalPortalState> _stack = <DsModalPortalState>[];
+  static final List<ElModalPortalState> _stack = <ElModalPortalState>[];
 
   /// The open portals, oldest first. Read-only, and exposed for the tests that
   /// pin the unwind order.
-  static List<DsModalPortalState> get openModals =>
-      List<DsModalPortalState>.unmodifiable(_stack);
+  static List<ElModalPortalState> get openModals =>
+      List<ElModalPortalState>.unmodifiable(_stack);
 
   final OverlayPortalController _portal = OverlayPortalController();
 
-  /// Built in [initState] rather than lazily, on `DsPopover`'s hard-won
+  /// Built in [initState] rather than lazily, on `ElPopover`'s hard-won
   /// precedent: a modal that never opened would otherwise construct its
   /// controller inside [dispose], where creating a ticker means an
   /// inherited-widget lookup on an element that is already deactivated.
@@ -357,7 +352,7 @@ class DsModalPortalState extends State<DsModalPortal>
     super.dispose();
   }
 
-  Duration _timed(Duration d) => dsAnimationDuration(context, d);
+  Duration _timed(Duration d) => elAnimationDuration(context, d);
 
   void open() {
     if (_open) return;
@@ -436,7 +431,7 @@ class DsModalPortalState extends State<DsModalPortal>
     );
     if (widget.clampToViewport) {
       panel = ConstrainedBox(
-        constraints: DsModalCompact.constraintsFor(MediaQuery.sizeOf(context)),
+        constraints: ElModalCompact.constraintsFor(MediaQuery.sizeOf(context)),
         child: panel,
       );
     }
@@ -453,7 +448,7 @@ class DsModalPortalState extends State<DsModalPortal>
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: widget.dismissOnOverlayTap ? close : null,
-            child: const DsDialogOverlay(),
+            child: const ElDialogOverlay(),
           ),
         ),
         Align(
@@ -474,18 +469,18 @@ class DsModalPortalState extends State<DsModalPortal>
 
   @override
   Widget build(BuildContext context) => PopScope<Object?>(
-        // USER-ORDERED MOBILE ADAPTATION 2. [PopScope] paints nothing and
-        // measures nothing — it builds its child verbatim — so the trigger's
-        // box is untouched, which matters for the agent launcher whose trigger
-        // is required to measure [Size.zero].
-        canPop: !_open,
-        onPopInvokedWithResult: _onPop,
-        child: OverlayPortal(
-          controller: _portal,
-          overlayChildBuilder: _buildOverlay,
-          child: widget.trigger(context, open),
-        ),
-      );
+    // USER-ORDERED MOBILE ADAPTATION 2. [PopScope] paints nothing and
+    // measures nothing — it builds its child verbatim — so the trigger's
+    // box is untouched, which matters for the agent launcher whose trigger
+    // is required to measure [Size.zero].
+    canPop: !_open,
+    onPopInvokedWithResult: _onPop,
+    child: OverlayPortal(
+      controller: _portal,
+      overlayChildBuilder: _buildOverlay,
+      child: widget.trigger(context, open),
+    ),
+  );
 }
 
 /// `DialogOverlay` — `fixed inset-0 bg-background/15
@@ -494,14 +489,14 @@ class DsModalPortalState extends State<DsModalPortal>
 /// Shared by dialog, alert dialog, sheet and drawer: all four class lists are
 /// byte-identical apart from the `isolate` the dialog's carries, which has no
 /// paint of its own.
-class DsDialogOverlay extends StatelessWidget {
-  const DsDialogOverlay({super.key});
+class ElDialogOverlay extends StatelessWidget {
+  const ElDialogOverlay({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return BackdropFilter(
-      filter: ui.ImageFilter.blur(sigmaX: DsBlurs.xs, sigmaY: DsBlurs.xs),
+      filter: ui.ImageFilter.blur(sigmaX: ElBlurs.xs, sigmaY: ElBlurs.xs),
       child: ColoredBox(
         color: theme.background.withValues(alpha: _barrierAlpha),
       ),
@@ -539,8 +534,8 @@ class DsDialogOverlay extends StatelessWidget {
 ///     first frame measures `matrix(0.92, 0, 0, 0.92, 0, 22.08)` — 22.08 is
 ///     0.92 x 24, not 24. Wrapping the translate *inside* the scale is what
 ///     reproduces that.
-class DsJellyTransition extends StatelessWidget {
-  const DsJellyTransition({
+class ElJellyTransition extends StatelessWidget {
+  const ElJellyTransition({
     super.key,
     required this.animation,
     required this.child,
@@ -577,7 +572,7 @@ class DsJellyTransition extends StatelessWidget {
     final double t = progress.clamp(0.0, 1.0);
     if (entering) {
       if (t <= _inBreak) {
-        final double local = DsCurves.spring.transform(t / _inBreak);
+        final double local = ElCurves.spring.transform(t / _inBreak);
         return (
           scale: _lerp(_inScale[0], _inScale[1], local),
           shift: _lerp(_inShift[0], _inShift[1], local),
@@ -585,8 +580,9 @@ class DsJellyTransition extends StatelessWidget {
           opacity: local.clamp(0.0, 1.0),
         );
       }
-      final double local =
-          DsCurves.spring.transform((t - _inBreak) / (1 - _inBreak));
+      final double local = ElCurves.spring.transform(
+        (t - _inBreak) / (1 - _inBreak),
+      );
       return (
         scale: _lerp(_inScale[1], _inScale[2], local),
         shift: _lerp(_inShift[1], _inShift[2], local),
@@ -594,15 +590,16 @@ class DsJellyTransition extends StatelessWidget {
       );
     }
     if (t <= _outBreak) {
-      final double local = DsCurves.inOut.transform(t / _outBreak);
+      final double local = ElCurves.inOut.transform(t / _outBreak);
       return (
         scale: _lerp(_outScale[0], _outScale[1], local),
         shift: _lerp(_outShift[0], _outShift[1], local),
         opacity: 1,
       );
     }
-    final double local =
-        DsCurves.inOut.transform((t - _outBreak) / (1 - _outBreak));
+    final double local = ElCurves.inOut.transform(
+      (t - _outBreak) / (1 - _outBreak),
+    );
     return (
       scale: _lerp(_outScale[1], _outScale[2], local),
       shift: _lerp(_outShift[1], _outShift[2], local),
@@ -612,28 +609,28 @@ class DsJellyTransition extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
-        animation: animation,
-        child: child,
-        builder: (BuildContext context, Widget? child) {
-          final bool entering = animation.status != AnimationStatus.reverse;
-          final ({double scale, double shift, double opacity}) frame = sample(
-            entering ? animation.value : 1 - animation.value,
-            entering: entering,
-          );
-          return Opacity(
-            opacity: frame.opacity.clamp(0.0, 1.0),
-            child: Transform.scale(
-              scale: frame.scale,
-              // Inside the scale, because `scale() translateY()` scales the
-              // translate — see the class doc.
-              child: Transform.translate(
-                offset: Offset(0, frame.shift),
-                child: child,
-              ),
-            ),
-          );
-        },
+    animation: animation,
+    child: child,
+    builder: (BuildContext context, Widget? child) {
+      final bool entering = animation.status != AnimationStatus.reverse;
+      final ({double scale, double shift, double opacity}) frame = sample(
+        entering ? animation.value : 1 - animation.value,
+        entering: entering,
       );
+      return Opacity(
+        opacity: frame.opacity.clamp(0.0, 1.0),
+        child: Transform.scale(
+          scale: frame.scale,
+          // Inside the scale, because `scale() translateY()` scales the
+          // translate — see the class doc.
+          child: Transform.translate(
+            offset: Offset(0, frame.shift),
+            child: child,
+          ),
+        ),
+      );
+    },
+  );
 }
 
 /* ── The dialog ──────────────────────────────────────────────────────────── */
@@ -641,7 +638,7 @@ class DsJellyTransition extends StatelessWidget {
 /// `DialogContent variant` — *"not a separate modal"*, per the page's own copy:
 /// *"It keeps the same focus trap, overlay, dismissal, motion,
 /// title/description wiring and action components."*
-enum DsDialogVariant {
+enum ElDialogVariant {
   /// The three-zone default: banded header, lit body, banded footer.
   normal,
 
@@ -651,48 +648,45 @@ enum DsDialogVariant {
 }
 
 /// `Dialog` — trigger, portal, overlay, content.
-class DsDialog extends StatelessWidget {
-  const DsDialog({
+class ElDialog extends StatelessWidget {
+  const ElDialog({
     super.key,
     required this.trigger,
     required this.content,
     this.onOpenChange,
   });
 
-  final DsModalTriggerBuilder trigger;
-  final DsModalContentBuilder content;
+  final ElModalTriggerBuilder trigger;
+  final ElModalContentBuilder content;
   final ValueChanged<bool>? onOpenChange;
 
   @override
-  Widget build(BuildContext context) => DsModalPortal(
-        trigger: trigger,
-        content: content,
-        onOpenChange: onOpenChange,
-        transition: (
-          BuildContext context,
-          Animation<double> animation,
-          Widget child,
-        ) =>
-            DsJellyTransition(animation: animation, child: child),
-      );
+  Widget build(BuildContext context) => ElModalPortal(
+    trigger: trigger,
+    content: content,
+    onOpenChange: onOpenChange,
+    transition:
+        (BuildContext context, Animation<double> animation, Widget child) =>
+            ElJellyTransition(animation: animation, child: child),
+  );
 }
 
 /// `DialogContent` — the panel itself.
-class DsDialogContent extends StatelessWidget {
-  const DsDialogContent({
+class ElDialogContent extends StatelessWidget {
+  const ElDialogContent({
     super.key,
     required this.children,
-    this.variant = DsDialogVariant.normal,
+    this.variant = ElDialogVariant.normal,
     this.showCloseButton = true,
     this.onClose,
   });
 
-  /// The grid's children, in order. A [DsDialogHeader] first and a
-  /// [DsDialogFooter] last is the anatomy, but the class list enforces none of
+  /// The grid's children, in order. A [ElDialogHeader] first and a
+  /// [ElDialogFooter] last is the anatomy, but the class list enforces none of
   /// it and neither does this.
   final List<Widget> children;
 
-  final DsDialogVariant variant;
+  final ElDialogVariant variant;
 
   /// `showCloseButton`, defaulted on by the reference. Turning it off also
   /// drops the header's `pr-12`, because the reservation is
@@ -701,38 +695,38 @@ class DsDialogContent extends StatelessWidget {
   /// `pr-12`"*.
   final bool showCloseButton;
 
-  /// Wired by [DsDialog]; the X calls it.
+  /// Wired by [ElDialog]; the X calls it.
   final VoidCallback? onClose;
 
   /// `sm:max-w-sm` — 384.
-  static double get maxWidth => DsContainers.sm;
+  static double get maxWidth => ElContainers.sm;
 
   /// `sm:max-w-md` — 448, the media variant.
-  static double get mediaMaxWidth => DsContainers.md;
+  static double get mediaMaxWidth => ElContainers.md;
 
   /// `p-4` / `gap-4`, both zero on the media variant.
-  static double get padding => ds(4);
+  static double get padding => el(4);
 
   /// `rounded-xl`.
-  static double get radius => DsRadii.xl;
+  static double get radius => ElRadii.xl;
 
   /// `ring-1 ring-foreground/10`, and **nothing under it** — measured, the
   /// content's whole `box-shadow` is this one spread ring. A dialog needs no
   /// elevation because the scrim already separates it from the page.
-  static DsShadowSpec get ringSpec => DsShadowSpec(<DsShadowLayer>[
-        DsShadowLayer(
-          0,
-          0,
-          0,
-          DsWidths.hairline,
-          (DsThemeData t) => t.foreground.withValues(alpha: _ringAlpha),
-        ),
-      ]);
+  static ElShadowSpec get ringSpec => ElShadowSpec(<ElShadowLayer>[
+    ElShadowLayer(
+      0,
+      0,
+      0,
+      ElWidths.hairline,
+      (ElThemeData t) => t.foreground.withValues(alpha: _ringAlpha),
+    ),
+  ]);
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
-    final bool media = variant == DsDialogVariant.media;
+    final ElThemeData theme = ElTheme.of(context);
+    final bool media = variant == ElDialogVariant.media;
     final BorderRadius shape = BorderRadius.circular(radius);
     final double gap = media ? 0 : padding;
 
@@ -743,9 +737,10 @@ class DsDialogContent extends StatelessWidget {
     for (int i = 0; i < children.length; i++) {
       if (i > 0 && gap > 0) rows.add(SizedBox(height: gap));
       final Widget child = children[i];
-      final bool bleeds = child is DsDialogHeader ||
-          child is DsDialogFooter ||
-          child is DsDialogMedia;
+      final bool bleeds =
+          child is ElDialogHeader ||
+          child is ElDialogFooter ||
+          child is ElDialogMedia;
       rows.add(
         bleeds
             ? child
@@ -757,12 +752,13 @@ class DsDialogContent extends StatelessWidget {
     }
     // `p-4`'s top and bottom, which only the body pays for: a leading header or
     // a trailing footer has already cancelled its side.
-    final bool padTop = !media &&
+    final bool padTop =
+        !media &&
         children.isNotEmpty &&
-        children.first is! DsDialogHeader &&
-        children.first is! DsDialogMedia;
+        children.first is! ElDialogHeader &&
+        children.first is! ElDialogMedia;
     final bool padBottom =
-        !media && children.isNotEmpty && children.last is! DsDialogFooter;
+        !media && children.isNotEmpty && children.last is! ElDialogFooter;
 
     final List<Widget> column = <Widget>[
       if (padTop) SizedBox(height: padding),
@@ -778,7 +774,7 @@ class DsDialogContent extends StatelessWidget {
     // slack and takes only what its content needs, so with room to spare the
     // column is laid out exactly as it was before this existed and every
     // measured pin still reads the same number. The scroll only engages once
-    // the incoming maximum actually binds — [DsModalCompact]'s 75vh on a
+    // the incoming maximum actually binds — [ElModalCompact]'s 75vh on a
     // phone, or a viewport shorter than the panel anywhere else.
     //
     // Pinning the bands rather than scrolling the whole panel is the reference
@@ -786,9 +782,11 @@ class DsDialogContent extends StatelessWidget {
     // the task and the footer *is* the decision, so they are the two things a
     // reader must not have to scroll to find. `dialog.tsx` puts it as *"three
     // readable zones"*, and on a phone only the middle one may move.
-    final bool bandFirst = children.isNotEmpty &&
-        (children.first is DsDialogHeader || children.first is DsDialogMedia);
-    final bool bandLast = children.isNotEmpty && children.last is DsDialogFooter;
+    final bool bandFirst =
+        children.isNotEmpty &&
+        (children.first is ElDialogHeader || children.first is ElDialogMedia);
+    final bool bandLast =
+        children.isNotEmpty && children.last is ElDialogFooter;
     final Widget? head = bandFirst ? column.removeAt(0) : null;
     final Widget? foot = bandLast ? column.removeLast() : null;
 
@@ -816,37 +814,33 @@ class DsDialogContent extends StatelessWidget {
           panel,
           Positioned(
             // `absolute top-2 right-2`.
-            top: ds(2),
-            right: ds(2),
+            top: el(2),
+            right: el(2),
             child: _CloseButton(onPressed: onClose, media: media),
           ),
         ],
       );
     }
 
-    return DsDialogContentGroup(
+    return ElDialogContentGroup(
       showCloseButton: showCloseButton,
       variant: variant,
       child: ConstrainedBox(
-        constraints: BoxConstraints(
-          maxWidth: media ? mediaMaxWidth : maxWidth,
-        ),
+        constraints: BoxConstraints(maxWidth: media ? mediaMaxWidth : maxWidth),
         child: DefaultTextStyle(
           // `text-sm text-popover-foreground`.
-          style: DsText.styleOf(
+          style: ElText.styleOf(
             context,
-            DsComponentType.sheetBody,
+            ElComponentType.sheetBody,
             color: theme.popoverForeground,
           ),
-          child: DsMachineSurface(
+          child: ElMachineSurface(
             spec: ringSpec,
             radius: shape,
             fill: theme.popover,
             // `overflow-hidden` on the media variant, so the artwork's square
             // corners are cut by the panel's.
-            child: media
-                ? ClipRRect(borderRadius: shape, child: panel)
-                : panel,
+            child: media ? ClipRRect(borderRadius: shape, child: panel) : panel,
           ),
         ),
       ),
@@ -856,8 +850,8 @@ class DsDialogContent extends StatelessWidget {
 
 /// The `group/dialog-content` the bands read their two `group-data-*` hooks
 /// off — `data-close-button` and `data-variant`.
-class DsDialogContentGroup extends InheritedWidget {
-  const DsDialogContentGroup({
+class ElDialogContentGroup extends InheritedWidget {
+  const ElDialogContentGroup({
     super.key,
     required this.showCloseButton,
     required this.variant,
@@ -865,13 +859,13 @@ class DsDialogContentGroup extends InheritedWidget {
   });
 
   final bool showCloseButton;
-  final DsDialogVariant variant;
+  final ElDialogVariant variant;
 
-  static DsDialogContentGroup? maybeOf(BuildContext context) =>
-      context.dependOnInheritedWidgetOfExactType<DsDialogContentGroup>();
+  static ElDialogContentGroup? maybeOf(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<ElDialogContentGroup>();
 
   @override
-  bool updateShouldNotify(DsDialogContentGroup old) =>
+  bool updateShouldNotify(ElDialogContentGroup old) =>
       old.showCloseButton != showCloseButton || old.variant != variant;
 }
 
@@ -888,19 +882,19 @@ class _CloseButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
-    final Widget button = DsButton(
-      variant: DsButtonVariant.ghost,
-      size: DsButtonSize.iconSm,
+    final ElThemeData theme = ElTheme.of(context);
+    final Widget button = ElButton(
+      variant: ElButtonVariant.ghost,
+      size: ElButtonSize.iconSm,
       label: 'Close',
       onPressed: onPressed,
-      child: const DsIcon(DsIconGlyph.x),
+      child: const ElIcon(ElIconGlyph.x),
     );
     if (!media) return button;
     return ClipRRect(
-      borderRadius: BorderRadius.circular(DsRadii.pill),
+      borderRadius: BorderRadius.circular(ElRadii.pill),
       child: BackdropFilter(
-        filter: ui.ImageFilter.blur(sigmaX: DsBlurs.xs, sigmaY: DsBlurs.xs),
+        filter: ui.ImageFilter.blur(sigmaX: ElBlurs.xs, sigmaY: ElBlurs.xs),
         child: ColoredBox(
           color: theme.popover.withValues(alpha: _mediaCloseAlpha),
           child: button,
@@ -913,35 +907,36 @@ class _CloseButton extends StatelessWidget {
 /* ── The bands ───────────────────────────────────────────────────────────── */
 
 /// `DialogHeader` — the muted band that names the task.
-class DsDialogHeader extends StatelessWidget {
-  const DsDialogHeader({super.key, required this.children});
+class ElDialogHeader extends StatelessWidget {
+  const ElDialogHeader({super.key, required this.children});
 
   /// `flex flex-col gap-2`.
   final List<Widget> children;
 
   /// `pr-12` — the lane the absolutely-positioned close button lands in.
-  static double get closeButtonLane => ds(12);
+  static double get closeButtonLane => el(12);
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
-    final DsDialogContentGroup? group = DsDialogContentGroup.maybeOf(context);
-    final bool media = group?.variant == DsDialogVariant.media;
-    final double pad = DsDialogContent.padding;
-    final double right =
-        (group?.showCloseButton ?? true) && !media ? closeButtonLane : pad;
+    final ElThemeData theme = ElTheme.of(context);
+    final ElDialogContentGroup? group = ElDialogContentGroup.maybeOf(context);
+    final bool media = group?.variant == ElDialogVariant.media;
+    final double pad = ElDialogContent.padding;
+    final double right = (group?.showCloseButton ?? true) && !media
+        ? closeButtonLane
+        : pad;
 
     final Widget stack = Padding(
       padding: media
           // `p-4 pb-2`.
-          ? EdgeInsets.fromLTRB(pad, pad, pad, ds(2))
+          ? EdgeInsets.fromLTRB(pad, pad, pad, el(2))
           : EdgeInsets.fromLTRB(pad, pad, right, pad),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           for (int i = 0; i < children.length; i++) ...<Widget>[
-            if (i > 0) SizedBox(height: ds(2)),
+            if (i > 0) SizedBox(height: el(2)),
             children[i],
           ],
         ],
@@ -957,10 +952,10 @@ class DsDialogHeader extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.muted.withValues(alpha: _bandAlpha),
         borderRadius: BorderRadius.vertical(
-          top: Radius.circular(DsDialogContent.radius),
+          top: Radius.circular(ElDialogContent.radius),
         ),
         border: Border(
-          bottom: BorderSide(color: theme.border, width: DsWidths.hairline),
+          bottom: BorderSide(color: theme.border, width: ElWidths.hairline),
         ),
       ),
       child: stack,
@@ -969,8 +964,8 @@ class DsDialogHeader extends StatelessWidget {
 }
 
 /// `DialogFooter` — *"the CTAs"*, banded to match.
-class DsDialogFooter extends StatelessWidget {
-  const DsDialogFooter({super.key, required this.children});
+class ElDialogFooter extends StatelessWidget {
+  const ElDialogFooter({super.key, required this.children});
 
   /// `flex flex-col-reverse gap-2 sm:flex-row sm:justify-end`. The port renders
   /// the `sm:` branch, which is the one every measured frame is in.
@@ -978,21 +973,21 @@ class DsDialogFooter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     final bool media =
-        DsDialogContentGroup.maybeOf(context)?.variant == DsDialogVariant.media;
-    final double pad = DsDialogContent.padding;
+        ElDialogContentGroup.maybeOf(context)?.variant == ElDialogVariant.media;
+    final double pad = ElDialogContent.padding;
 
     final Widget row = Padding(
       padding: media
           // `p-4 pt-2`.
-          ? EdgeInsets.fromLTRB(pad, ds(2), pad, pad)
+          ? EdgeInsets.fromLTRB(pad, el(2), pad, pad)
           : EdgeInsets.all(pad),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: <Widget>[
           for (int i = 0; i < children.length; i++) ...<Widget>[
-            if (i > 0) SizedBox(width: ds(2)),
+            if (i > 0) SizedBox(width: el(2)),
             children[i],
           ],
         ],
@@ -1004,10 +999,10 @@ class DsDialogFooter extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.muted.withValues(alpha: _bandAlpha),
         borderRadius: BorderRadius.vertical(
-          bottom: Radius.circular(DsDialogContent.radius),
+          bottom: Radius.circular(ElDialogContent.radius),
         ),
         border: Border(
-          top: BorderSide(color: theme.border, width: DsWidths.hairline),
+          top: BorderSide(color: theme.border, width: ElWidths.hairline),
         ),
       ),
       child: row,
@@ -1016,31 +1011,31 @@ class DsDialogFooter extends StatelessWidget {
 }
 
 /// `DialogTitle` — `font-heading text-base leading-none font-medium`.
-class DsDialogTitle extends StatelessWidget {
-  const DsDialogTitle(this.text, {super.key});
+class ElDialogTitle extends StatelessWidget {
+  const ElDialogTitle(this.text, {super.key});
 
   final String text;
 
   @override
-  Widget build(BuildContext context) => DsText(
-        text,
-        DsComponentType.dialogTitle,
-        color: DsTheme.of(context).foreground,
-      );
+  Widget build(BuildContext context) => ElText(
+    text,
+    ElComponentType.dialogTitle,
+    color: ElTheme.of(context).foreground,
+  );
 }
 
 /// `DialogDescription` — `text-sm text-muted-foreground`.
-class DsDialogDescription extends StatelessWidget {
-  const DsDialogDescription(this.text, {super.key});
+class ElDialogDescription extends StatelessWidget {
+  const ElDialogDescription(this.text, {super.key});
 
   final String text;
 
   @override
-  Widget build(BuildContext context) => DsText(
-        text,
-        DsComponentType.sheetBody,
-        color: DsTheme.of(context).mutedForeground,
-      );
+  Widget build(BuildContext context) => ElText(
+    text,
+    ElComponentType.sheetBody,
+    color: ElTheme.of(context).mutedForeground,
+  );
 }
 
 /// `DialogMedia` — *"Full-bleed visual lead for announcement, editorial and
@@ -1049,8 +1044,8 @@ class DsDialogDescription extends StatelessWidget {
 ///
 /// `relative aspect-video overflow-hidden bg-muted` — measured 448 x 252, which
 /// is 16:9 to the pixel.
-class DsDialogMedia extends StatelessWidget {
-  const DsDialogMedia({super.key, required this.child});
+class ElDialogMedia extends StatelessWidget {
+  const ElDialogMedia({super.key, required this.child});
 
   final Widget child;
 
@@ -1059,12 +1054,9 @@ class DsDialogMedia extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => AspectRatio(
-        aspectRatio: aspect,
-        child: ClipRect(
-          child: ColoredBox(
-            color: DsTheme.of(context).muted,
-            child: child,
-          ),
-        ),
-      );
+    aspectRatio: aspect,
+    child: ClipRect(
+      child: ColoredBox(color: ElTheme.of(context).muted, child: child),
+    ),
+  );
 }

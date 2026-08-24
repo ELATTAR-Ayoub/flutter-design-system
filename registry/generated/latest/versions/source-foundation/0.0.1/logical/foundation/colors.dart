@@ -28,7 +28,7 @@ import 'dart:ui' show Color;
 ///
 /// Alpha is kept as a straight (non-premultiplied) double and is NOT quantised:
 /// `hsl(240 20% 20% / 0.04)` stays 0.04, never a pre-composited opaque colour.
-Color dsHsl(double h, double s, double l, [double a = 1]) {
+Color elHsl(double h, double s, double l, [double a = 1]) {
   final double sat = s / 100;
   final double lig = l / 100;
 
@@ -75,7 +75,7 @@ Color dsHsl(double h, double s, double l, [double a = 1]) {
 }
 
 /// CSS's channel serialisation: clamp to `0..1`, then `round(x * 255) / 255`.
-/// Going through the 8-bit grid is what makes [dsHsl] agree with the hexes read
+/// Going through the 8-bit grid is what makes [elHsl] agree with the hexes read
 /// off the live page, and what makes two tokens spelled the same compare equal.
 double _to8Bit(double channel) => (channel.clamp(0, 1) * 255).round() / 255;
 
@@ -86,7 +86,7 @@ Color _hex(int argb) => Color(argb);
 ///
 /// Legal everywhere in the package (the token guard exempts it by name): it is
 /// the absence of a colour, not a colour choice.
-const Color dsTransparent = Color(0x00000000);
+const Color elTransparent = Color(0x00000000);
 
 // ─────────────────────────────────────────────────────────────────────────────
 // OKLab / OKLCH
@@ -98,7 +98,7 @@ const Color dsTransparent = Color(0x00000000);
 /// Both are pervasive in the reference — every glow, wash, rim and bloom stop
 /// goes through one of them (globals-map §10.1–10.2) — so they are computed
 /// here rather than eyeballed into hex.
-class DsOklab {
+class ElOklab {
   /// CSS `color-mix(in oklab, [a] `tA`%, [b])`.
   ///
   /// [tA] is the weight of [a] in `0..1` (CSS puts the percentage on the first
@@ -296,23 +296,23 @@ class _Oklab {
 ///
 /// Theme-independent by definition — these are the colours themselves, and
 /// nothing here flips between light and dark. Which END of a ramp carries a
-/// glyph is a per-theme answer and lives on `DsThemeData.actionInk` / `valueInk`
+/// glyph is a per-theme answer and lives on `ElThemeData.actionInk` / `valueInk`
 /// (globals.css L586–594 / L782–802).
 ///
 /// "Three blues, three limes. Nothing else. Monochrome comes from zinc via the
 /// shadcn semantic tokens" (L81–83).
-class DsPalette {
+class ElPalette {
   /// `--color-action-bright: hsl(213 94% 78%)` — globals.css L103. Ink on dark.
   /// Rasterises `#92C2FC`.
-  static final Color actionBright = dsHsl(213, 94, 78);
+  static final Color actionBright = elHsl(213, 94, 78);
 
   /// `--color-action: hsl(217 91% 53%)` — globals.css L104. The fill.
   /// Rasterises `#1A6EF4`.
-  static final Color action = dsHsl(217, 91, 53);
+  static final Color action = elHsl(217, 91, 53);
 
   /// `--color-action-dark: hsl(224 76% 33%)` — globals.css L105. Ink on light.
   /// Rasterises `#143694`.
-  static final Color actionDark = dsHsl(224, 76, 33);
+  static final Color actionDark = elHsl(224, 76, 33);
 
   /// `--color-value-bright: #d9f99d` — globals.css L107. Lime, lifted.
   static final Color valueBright = _hex(0xFFD9F99D);
@@ -328,7 +328,7 @@ class DsPalette {
   /// The one foreground in this system that deliberately does NOT flip with the
   /// theme: the value foil is an opaque metal ramp, the same lime on a white
   /// page as on a black one, so its label has to be dark in both (L111–126).
-  static final Color valueForeground = dsHsl(240, 10, 8);
+  static final Color valueForeground = elHsl(240, 10, 8);
 
   /// `--color-success: #10b981` — globals.css L148. Emerald 500.
   static final Color success = _hex(0xFF10B981);
@@ -354,5 +354,5 @@ class DsPalette {
 
   /// `--color-destructive-deep: hsl(0 72.2% 46%)` — globals.css L165.
   /// Light-theme ink on red washes.
-  static final Color destructiveDeep = dsHsl(0, 72.2, 46);
+  static final Color destructiveDeep = elHsl(0, 72.2, 46);
 }

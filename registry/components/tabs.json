@@ -1,0 +1,32 @@
+{
+  "name": "tabs",
+  "type": "component",
+  "version": "0.0.1",
+  "description": "`components/ui/tabs.tsx` — one travelling mark and a set of views behind it.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/tabs.dart",
+      "target": "@ui/tabs.dart",
+      "sha256": "4954aac6d03ff98ca27a511c31d47ddd787f6d8a326183fdef530000c5d1526f"
+    }
+  ],
+  "registryDependencies": [
+    "button",
+    "machine-surface",
+    "sliding-pill",
+    "source-foundation"
+  ],
+  "semanticDependencies": [
+    "button",
+    "machine-surface",
+    "sliding-pill"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "documentationRoute": "/components/tabs",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/tabs.dart"
+}

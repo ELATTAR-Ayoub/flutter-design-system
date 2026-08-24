@@ -1,0 +1,25 @@
+{
+  "name": "marker",
+  "type": "component",
+  "version": "0.0.1",
+  "description": "`components/ui/marker.tsx` — *\\\"a note **about** a list, sitting in the",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/marker.dart",
+      "target": "@ui/marker.dart",
+      "sha256": "ba139c17a0fbe337da3894acebe768a997d3b0e253a238ba70c9b5c6ea88536b"
+    }
+  ],
+  "registryDependencies": [
+    "source-foundation"
+  ],
+  "semanticDependencies": [],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "documentationRoute": "/components/marker",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/marker.dart"
+}

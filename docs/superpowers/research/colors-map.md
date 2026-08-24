@@ -1,7 +1,7 @@
 # Map — `/design-system/colors` (Colors foundation page)
 
 **Route file:** `D:\DESIGN\Design-System-2026-8\design-system\app\design-system\colors\page.tsx` (server component, no local components).
-**Imports that render:** `Code, DsPageHeader, DsSection, Note, PageFootNav, Panel` from `D:\DESIGN\Design-System-2026-8\design-system\components\ds\kit.tsx`; `TokenSwatchList` from `D:\DESIGN\Design-System-2026-8\design-system\components\ds\token-swatch.tsx` (client); `findCategory` from `D:\DESIGN\Design-System-2026-8\design-system\lib\ds\nav.ts`; `Icon` from `D:\DESIGN\Design-System-2026-8\design-system\components\ui\icon.tsx` (via kit's `PageFootNav`). Token values: `D:\DESIGN\Design-System-2026-8\design-system\app\globals.css`. Shell: `app\design-system\layout.tsx`, `app\layout.tsx`.
+**Imports that render:** `Code, ElPageHeader, ElSection, Note, PageFootNav, Panel` from `D:\DESIGN\Design-System-2026-8\design-system\components\el\kit.tsx`; `TokenSwatchList` from `D:\DESIGN\Design-System-2026-8\design-system\components\el\token-swatch.tsx` (client); `findCategory` from `D:\DESIGN\Design-System-2026-8\design-system\lib\el\nav.ts`; `Icon` from `D:\DESIGN\Design-System-2026-8\design-system\components\ui\icon.tsx` (via kit's `PageFootNav`). Token values: `D:\DESIGN\Design-System-2026-8\design-system\app\globals.css`. Shell: `app\design-system\layout.tsx`, `app\layout.tsx`.
 
 ---
 
@@ -9,13 +9,13 @@
 
 - `app/layout.tsx`: `<html class="${GeistMono.variable} h-full antialiased" suppressHydrationWarning>`; `next-themes` `ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange`. **Default theme is dark.**
 - `app/design-system/layout.tsx`: sticky header `h-(--height-site-header)` = **4rem/64px**, `z-40 border-b border-border bg-background/85 backdrop-blur-xl px-6`, containing mobile-nav trigger (`lg:hidden`, sheet `w-72`), Logo link with `press`, pill `type-micro rounded-pill border border-border px-2.5 py-1` reading verbatim **"Design System v0.1"** (`hidden sm:block`), right-aligned `type-micro` verbatim **"Desktop-first · 1440 frame · Light & dark"** (`hidden md:block`), and the ThemeToggle (3-way radiogroup Light/System/Dark, sliding pill indicator `bg-card shadow-e1`, options `size-7` icons `size-3.5`, `press` on each).
-- Content frame: `mx-auto flex w-full max-w-(--width-shell)` = **1680px**; `DsSidebar` = `aside sticky top-16 hidden lg:block h-[calc(100dvh-4rem)] w-60 border-r border-border px-6 pt-10 overflow-y-auto` (nav items `type-nav`, group labels `type-label`, left-border active markers); `main min-w-0 flex-1 px-6 py-12 lg:px-12` → inner `mx-auto max-w-(--width-content)` = **1080px**.
+- Content frame: `mx-auto flex w-full max-w-(--width-shell)` = **1680px**; `ElSidebar` = `aside sticky top-16 hidden lg:block h-[calc(100dvh-4rem)] w-60 border-r border-border px-6 pt-10 overflow-y-auto` (nav items `type-nav`, group labels `type-label`, left-border active markers); `main min-w-0 flex-1 px-6 py-12 lg:px-12` → inner `mx-auto max-w-(--width-content)` = **1080px**.
 - Body backdrop (both themes): `radial-gradient(120% 90% at 62% 34%, var(--page-glow) 0%, transparent 64%)`, `background-attachment: fixed`, over `bg-background`. `--page-glow`: light `hsl(240 30% 98%)`, dark `hsl(240 8% 10%)`.
 - Global: `:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px }` (`--ring` = `--color-action` light, `--color-action-bright` dark). `::selection` = `color-mix(in oklab, var(--color-action) 35%, transparent)` with `color: var(--foreground)`. `html { scroll-behavior: smooth; scroll-padding-block-start: var(--scroll-offset) }` where `--scroll-offset = calc(4rem + var(--spacing)*8)` = **96px** — anchored sections land 96px below viewport top, animated smooth (disabled under `prefers-reduced-motion`).
 
 ---
 
-## 1. Live-measurement machinery (`components/ds/token-swatch.tsx`) — how contrast is "measured live"
+## 1. Live-measurement machinery (`components/el/token-swatch.tsx`) — how contrast is "measured live"
 
 This is the page's engine; port it faithfully or precompute per theme.
 
@@ -37,7 +37,7 @@ This is the page's engine; port it faithfully or precompute per theme.
 
 ---
 
-## 2. Page header (`DsPageHeader`)
+## 2. Page header (`ElPageHeader`)
 
 `header.mb-14.border-b.border-border.pb-10`:
 - Eyebrow `p.type-label.text-action-ink` (11px/1/600, uppercase, tracking 0.16em): verbatim **"Foundations"** (from `findCategory("foundations","colors").group.title`).
@@ -53,7 +53,7 @@ This is the page's engine; port it faithfully or precompute per theme.
 
 ⚠ **Rendering fact for 1:1 port:** the `Note` title looks like it should take the tone ink, but `.type-label` declares `color: var(--muted-foreground)` on the element itself, which beats inheritance of the wrapper's `text-action-ink`. **Note titles render muted-foreground in every tone**; the tone shows only in the border + background wash. `Code` inline = `code.type-code.rounded-sm.border.border-border.bg-card.px-1.5.py-0.5.text-muted-foreground` (mono 12.5px/1.4, radius 6px).
 
-## 4. Section anatomy (`DsSection`, all five)
+## 4. Section anatomy (`ElSection`, all five)
 
 `section#<id>.mb-20` (80px stack gap); heading block `mb-6`: `h2.type-h3.text-foreground` (21px/1.3/600, tracking −0.01em — note it is **type-h3**, not h2 class) + description `p.type-small.mt-2.max-w-2xl` (muted). No `scroll-mt` (global scroll-padding handles the 96px offset).
 
@@ -209,7 +209,7 @@ Default transition tokens (context): `--duration-tick 80ms / fast 150ms / base 2
 
 ## 12. Internal drift (both sides, explicitly)
 
-1. **Nav registry vs page chips.** `lib/ds/nav.ts` colors category `contents` = `["Surfaces","Action ramp","Value ramp","Text","Borders","Semantic","What is not a token","70 / 20 / 10 balance"]` and blurb "Surfaces, the action and value ramps, text, hairlines, semantic states, and every contrast ratio measured live in both themes." — these render on the Foundations index card and drive the sidebar. The **page itself** renders chips `["Monochrome","Action ramp","Value ramp","State","What is not a token"]` and a different blurb (§2). Section headings on the page are Monochrome/Action/Value/State/beyond; there is no "70 / 20 / 10 balance" section (the 70/20/10 target lives only in `globals.css` comments).
+1. **Nav registry vs page chips.** `lib/el/nav.ts` colors category `contents` = `["Surfaces","Action ramp","Value ramp","Text","Borders","Semantic","What is not a token","70 / 20 / 10 balance"]` and blurb "Surfaces, the action and value ramps, text, hairlines, semantic states, and every contrast ratio measured live in both themes." — these render on the Foundations index card and drive the sidebar. The **page itself** renders chips `["Monochrome","Action ramp","Value ramp","State","What is not a token"]` and a different blurb (§2). Section headings on the page are Monochrome/Action/Value/State/beyond; there is no "70 / 20 / 10 balance" section (the 70/20/10 target lives only in `globals.css` comments).
 2. **"Aliased by --input" on the Accent swatch** is true in dark only (dark `--accent` = `--input` = `hsl(240 5.3% 26.1%)`); in light `--accent` = `hsl(240 4.8% 95.9%)` while `--input` = `hsl(240 5.9% 90%)` (= `--border`). Copy claims the alias unconditionally.
 3. **"Aliased by --secondary and --border" on the Muted swatch**: `--secondary` matches in both themes; `--border` matches in dark (15.9%) but in light `--border` = 90% ≠ `--muted` 95.9%.
 4. **Copy vs measurement, muted-foreground**: note says "about 13:1" on dark; live badge computes 13.5:1.
@@ -271,6 +271,6 @@ The **badge** columns in §5–8 are unaffected and were re-confirmed against th
 
 ### What the port does with it
 
-`DsTokenRegistry.printedValue` no longer carries a per-token string table. Shortest-hex is a pure function of the resolved colour, so the readout is **derived** from the same `DsThemeData` field the swatch paints (`dsCssColorText` in `example/lib/token_swatch.dart`) — nothing is hardcoded, and a rebrand moves the swatch and its caption together. Verified against all 43 custom properties the compiled sheet actually emits, both themes, exact string match.
+`ElTokenRegistry.printedValue` no longer carries a per-token string table. Shortest-hex is a pure function of the resolved colour, so the readout is **derived** from the same `ElThemeData` field the swatch paints (`elCssColorText` in `example/lib/token_swatch.dart`) — nothing is hardcoded, and a rebrand moves the swatch and its caption together. Verified against all 43 custom properties the compiled sheet actually emits, both themes, exact string match.
 
 Also observed while sweeping the full registry, and *not* acted on: `--color-success-ink`, `--color-warning-ink`, `--color-info-ink` and `--color-destructive-ink` return **empty** on the live page — Tailwind tree-shakes `@theme` variables no generated utility references. None is swatched on this page. The port keeps them registered, since their absence is a property of what the reference site happens to use rather than of the design system.

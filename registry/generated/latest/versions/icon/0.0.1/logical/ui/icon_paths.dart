@@ -2,14 +2,14 @@
 ///
 /// Source of truth: `design-system/node_modules/lucide-react/dist/esm/icons/`
 /// — lucide-react **1.28.0**, ISC, both confirmed in that package's
-/// `package.json`. One module per glyph; [DsIconGlyph] names them all and each
-/// entry in [DsIconPaths.elements] carries its module in a header comment.
+/// `package.json`. One module per glyph; [ElIconGlyph] names them all and each
+/// entry in [ElIconPaths.elements] carries its module in a header comment.
 ///
 /// Each module exports `__iconNode`: an ordered list of `[tag, attributes]`
 /// SVG elements drawn on lucide's 24×24 grid and stroked, via the `<svg>`
 /// wrapper in `dist/esm/Icon.mjs` + `dist/esm/defaultAttributes.mjs`, with
 /// `fill="none" stroke="currentColor" stroke-width="2"
-/// stroke-linecap="round" stroke-linejoin="round"`. [DsIconPaths.elements] is
+/// stroke-linecap="round" stroke-linejoin="round"`. [ElIconPaths.elements] is
 /// that list transcribed element for element and attribute for attribute —
 /// `d` strings copied character for character, lowercase relative commands,
 /// packed signs and leading-dot decimals included — with each element's lucide
@@ -32,7 +32,7 @@
 /// box. That is also why this file is not a token file: it states no design
 /// value, only the shape of a third-party glyph. The one attribute that is
 /// *almost* colour — `fill="currentColor"` on one node — is transcribed as the
-/// boolean [DsIconElement.filled], not as a colour, for the same reason.
+/// boolean [ElIconElement.filled], not as a colour, for the same reason.
 library;
 
 import 'dart:math' as math;
@@ -51,8 +51,7 @@ import 'package:flutter/painting.dart';
 ///    mobile nav sheet, [sun]/[monitor]/[moon] for the theme toggle,
 ///    [arrowLeft] and [arrowRight] for the foot nav and index cards, [check]
 ///    (with [x]) for the do/don't lists.
-///  * **The curated set** — the 63 entries of `lib/ds/icons.ts`, which the
-///    icons page renders in full, listed below in that file's own four groups
+///  * **The curated set** — the 63 entries of the legacy curated icon registry,`r`n///    which the icons page renders in full, listed below in that source's four groups
 ///    and group order. Four of them ([arrowLeft], [arrowRight], [x], [check])
 ///    are already above as docs chrome and are not repeated.
 ///
@@ -65,7 +64,7 @@ import 'package:flutter/painting.dart';
 /// comment below cites the module the geometry actually came from, so an audit
 /// against `filter.mjs` does not find an empty file and conclude the
 /// transcription is wrong.
-enum DsIconGlyph {
+enum ElIconGlyph {
   // ── docs chrome ──
   menu,
   x,
@@ -224,7 +223,7 @@ enum DsIconGlyph {
   /// /page.tsx` L344, L381) — and nothing else in the corpus renders it.
   ///
   /// Off-set rather than curated on the same test the other eleven pass: it is
-  /// not in `lib/ds/icons.ts`'s sixty-three, so the icons page's registry must
+  /// not in the legacy curated registry's sixty-three, so the icons page's registry must
   /// keep excluding it. Note that [clock] — its neighbour in meaning — **is**
   /// curated, entry 6 of "Money & status"; a page that shows both would print
   /// one and not the other.
@@ -235,7 +234,7 @@ enum DsIconGlyph {
   calendar,
 
   /// `shield-alert.mjs`. Off-set: the dialogs page's `DangerZone` heading
-  /// (`components/ds/danger-zone-demo.tsx` L4, rendered at L97) and nothing
+  /// (the lineage danger-zone demo source, rendered at L97) and nothing
   /// else in the corpus.
   ///
   /// Its crest is [shield]'s, character for character and under the same key
@@ -246,7 +245,7 @@ enum DsIconGlyph {
   /// `gavel.mjs`. Off-set: the navigation page's `MARKET_LINKS`, where it
   /// labels *"Ending soon"* inside the navigation menu's Marketplace panel.
   ///
-  /// Not in `lib/ds/icons.ts`'s sixty-three, so the icons page's registry keeps
+  /// Not in the legacy curated registry's sixty-three, so the icons page's registry keeps
   /// excluding it — the same standing as [calendar] and [shieldAlert].
   ///
   /// Five open strokes and no closed contour at all: the mallet's handle (with
@@ -265,14 +264,14 @@ enum DsIconGlyph {
 /// a special case at the call site.
 ///
 /// Five of the seven appear in the glyphs transcribed by hand below.
-/// [DsIconEllipseElement] and [DsIconPolygonElement] arrived with the generated
+/// [ElIconEllipseElement] and [ElIconPolygonElement] arrived with the generated
 /// registry (`icon_paths.g.dart`), which is the same 24-unit model applied to
 /// all 1756 modules; they live here, in the sealed hierarchy, because a sealed
 /// class cannot be extended from another library and because one model for both
 /// halves is what lets the identity check compare them element for element.
 @immutable
-sealed class DsIconElement {
-  const DsIconElement();
+sealed class ElIconElement {
+  const ElIconElement();
 
   /// Whether this node carries `fill="currentColor"`.
   ///
@@ -294,8 +293,8 @@ sealed class DsIconElement {
 /// The string is parsed on every [addTo] rather than pre-baked into a [Path]:
 /// a const element cannot hold a mutable [Path], and handing out a shared one
 /// would let a caller mutate every future icon.
-class DsIconPathElement extends DsIconElement {
-  const DsIconPathElement(this.d);
+class ElIconPathElement extends ElIconElement {
+  const ElIconPathElement(this.d);
 
   /// The `d` attribute, character for character as lucide ships it.
   final String d;
@@ -309,8 +308,8 @@ class DsIconPathElement extends DsIconElement {
 /// Constructor order is `(x1, y1, x2, y2)`, i.e. point-then-point; lucide
 /// writes the attributes `x1, x2, y1, y2`, so the transcription below reorders
 /// them deliberately.
-class DsIconLineElement extends DsIconElement {
-  const DsIconLineElement(this.x1, this.y1, this.x2, this.y2);
+class ElIconLineElement extends ElIconElement {
+  const ElIconLineElement(this.x1, this.y1, this.x2, this.y2);
 
   /// `x1` — start x.
   final double x1;
@@ -334,10 +333,10 @@ class DsIconLineElement extends DsIconElement {
 /// `["circle", { cx, cy, r }]` — a closed circular subpath.
 ///
 /// [filled] transcribes `fill="currentColor"`, which one node in the set
-/// carries. See [DsIconElement.filled]: it is an extra paint pass, not a
+/// carries. See [ElIconElement.filled]: it is an extra paint pass, not a
 /// replacement for the inherited stroke.
-class DsIconCircleElement extends DsIconElement {
-  const DsIconCircleElement(this.cx, this.cy, this.r, {this.filled = false});
+class ElIconCircleElement extends ElIconElement {
+  const ElIconCircleElement(this.cx, this.cy, this.r, {this.filled = false});
 
   /// `cx` — centre x.
   final double cx;
@@ -378,8 +377,8 @@ class DsIconCircleElement extends DsIconElement {
 /// Constructor order is `(x, y, width, height, rx)`; lucide usually writes
 /// `width, height, x, y, rx` — `gift.mjs` is the one that writes
 /// `x, y, width, height, rx` — so the transcription reorders deliberately.
-class DsIconRectElement extends DsIconElement {
-  const DsIconRectElement(
+class ElIconRectElement extends ElIconElement {
+  const ElIconRectElement(
     this.x,
     this.y,
     this.width,
@@ -410,24 +409,24 @@ class DsIconRectElement extends DsIconElement {
 
   @override
   void addTo(Path path) => path.addRRect(
-        RRect.fromRectAndRadius(
-          Rect.fromLTWH(x, y, width, height),
-          // SVG's mutual-auto rule, both directions, and square when neither
-          // is written.
-          Radius.elliptical(rx ?? ry ?? 0, ry ?? rx ?? 0),
-        ),
-      );
+    RRect.fromRectAndRadius(
+      Rect.fromLTWH(x, y, width, height),
+      // SVG's mutual-auto rule, both directions, and square when neither
+      // is written.
+      Radius.elliptical(rx ?? ry ?? 0, ry ?? rx ?? 0),
+    ),
+  );
 }
 
 /// `["polyline", { points }]` — an **open** run of straight segments.
 ///
 /// `moveTo` the first point, `lineTo` the rest, and no `close()`: closing is
-/// what [DsIconPolygonElement] means. `package.mjs`'s
+/// what [ElIconPolygonElement] means. `package.mjs`'s
 /// `points: "3.29 7 12 12 20.71 7"` is the only polyline in the embedded set;
 /// the package holds six, `mailbox`'s being the one whose `points` are
 /// comma-separated rather than space-separated.
-class DsIconPolylineElement extends DsIconElement {
-  const DsIconPolylineElement(this.points);
+class ElIconPolylineElement extends ElIconElement {
+  const ElIconPolylineElement(this.points);
 
   /// The `points` attribute, parsed into its coordinate pairs in source order.
   final List<Offset> points;
@@ -445,18 +444,18 @@ class DsIconPolylineElement extends DsIconElement {
 /// `["ellipse", { cx, cy, rx, ry }]` — a closed elliptical subpath.
 ///
 /// None of the glyphs transcribed by hand below use one, which is what the old
-/// docstring on [DsIconElement] generalised into "the one lucide never reaches
+/// docstring on [ElIconElement] generalised into "the one lucide never reaches
 /// for". Over the whole package it appears **16 times across 15 glyphs** —
 /// `database` and its nine siblings, `cone`, `cylinder`, `drum`, `ellipse` and
 /// `torus` — and every one of the 16 is genuinely non-circular (`rx != ry`), so
-/// not one of them could have been demoted to a [DsIconCircleElement] without
+/// not one of them could have been demoted to a [ElIconCircleElement] without
 /// changing the drawn shape.
 ///
 /// [Rect.fromCenter] takes diameters, so both radii are doubled here; a circle
 /// is the `rx == ry` case of the same call, and stays its own type because
 /// lucide spells it as its own tag.
-class DsIconEllipseElement extends DsIconElement {
-  const DsIconEllipseElement(this.cx, this.cy, this.rx, this.ry);
+class ElIconEllipseElement extends ElIconElement {
+  const ElIconEllipseElement(this.cx, this.cy, this.rx, this.ry);
 
   /// `cx` — centre x.
   final double cx;
@@ -472,19 +471,15 @@ class DsIconEllipseElement extends DsIconElement {
 
   @override
   void addTo(Path path) => path.addOval(
-        Rect.fromCenter(
-          center: Offset(cx, cy),
-          width: rx * 2,
-          height: ry * 2,
-        ),
-      );
+    Rect.fromCenter(center: Offset(cx, cy), width: rx * 2, height: ry * 2),
+  );
 }
 
 /// `["polygon", { points }]` — the same run of segments as a polyline, but
 /// **closed**.
 ///
 /// lucide emits two, `navigation` and `navigation-2`, and neither is in the
-/// hand-transcribed set — which is what let [DsIconPolylineElement]'s old
+/// hand-transcribed set — which is what let [ElIconPolylineElement]'s old
 /// docstring say "lucide emits none".
 ///
 /// **Why this is a type of its own and not a polyline with a repeated point.**
@@ -496,8 +491,8 @@ class DsIconEllipseElement extends DsIconElement {
 /// they are different operations. Spelling a polygon as a polyline would be a
 /// silent rewrite of the kind this file's "structure over stringification"
 /// ruling forbids.
-class DsIconPolygonElement extends DsIconElement {
-  const DsIconPolygonElement(this.points);
+class ElIconPolygonElement extends ElIconElement {
+  const ElIconPolygonElement(this.points);
 
   /// The `points` attribute, parsed into its coordinate pairs in source order.
   final List<Offset> points;
@@ -514,8 +509,8 @@ class DsIconPolygonElement extends DsIconElement {
 }
 
 /// The embedded lucide glyphs.
-class DsIconPaths {
-  const DsIconPaths._();
+class ElIconPaths {
+  const ElIconPaths._();
 
   /// The viewBox lucide authors on: `viewBox="0 0 24 24"`, so 24×24.
   ///
@@ -527,590 +522,641 @@ class DsIconPaths {
   ///
   /// Order matters twice: it is the paint order, and it is what makes this a
   /// diffable transcript of the eight `.mjs` files.
-  static const Map<DsIconGlyph, List<DsIconElement>> elements =
-      <DsIconGlyph, List<DsIconElement>>{
+  static const Map<ElIconGlyph, List<ElIconElement>>
+  elements = <ElIconGlyph, List<ElIconElement>>{
     // `menu.mjs` — three 16-unit rules at y = 5 / 12 / 19.
-    DsIconGlyph.menu: <DsIconElement>[
-      DsIconPathElement('M4 5h16'), // key: 1tepv9
-      DsIconPathElement('M4 12h16'), // key: 1lakjw
-      DsIconPathElement('M4 19h16'), // key: 1djgab
+    ElIconGlyph.menu: <ElIconElement>[
+      ElIconPathElement('M4 5h16'), // key: 1tepv9
+      ElIconPathElement('M4 12h16'), // key: 1lakjw
+      ElIconPathElement('M4 19h16'), // key: 1djgab
     ],
 
     // `x.mjs` — two diagonals. The first is absolute with an implicit
     // `lineto`, the second is the relative spelling of the same idea; both are
     // kept exactly as authored.
-    DsIconGlyph.x: <DsIconElement>[
-      DsIconPathElement('M18 6 6 18'), // key: 1bl5f8
-      DsIconPathElement('m6 6 12 12'), // key: d8bk6v
+    ElIconGlyph.x: <ElIconElement>[
+      ElIconPathElement('M18 6 6 18'), // key: 1bl5f8
+      ElIconPathElement('m6 6 12 12'), // key: d8bk6v
     ],
 
     // `sun.mjs` — a circle plus eight rays; nine subpaths in total.
-    DsIconGlyph.sun: <DsIconElement>[
-      DsIconCircleElement(12, 12, 4), // key: 4exip2
-      DsIconPathElement('M12 2v2'), // key: tus03m
-      DsIconPathElement('M12 20v2'), // key: 1lh1kg
-      DsIconPathElement('m4.93 4.93 1.41 1.41'), // key: 149t6j
-      DsIconPathElement('m17.66 17.66 1.41 1.41'), // key: ptbguv
-      DsIconPathElement('M2 12h2'), // key: 1t8f8n
-      DsIconPathElement('M20 12h2'), // key: 1q8mjw
-      DsIconPathElement('m6.34 17.66-1.41 1.41'), // key: 1m8zz5
-      DsIconPathElement('m19.07 4.93-1.41 1.41'), // key: 1shlcs
+    ElIconGlyph.sun: <ElIconElement>[
+      ElIconCircleElement(12, 12, 4), // key: 4exip2
+      ElIconPathElement('M12 2v2'), // key: tus03m
+      ElIconPathElement('M12 20v2'), // key: 1lh1kg
+      ElIconPathElement('m4.93 4.93 1.41 1.41'), // key: 149t6j
+      ElIconPathElement('m17.66 17.66 1.41 1.41'), // key: ptbguv
+      ElIconPathElement('M2 12h2'), // key: 1t8f8n
+      ElIconPathElement('M20 12h2'), // key: 1q8mjw
+      ElIconPathElement('m6.34 17.66-1.41 1.41'), // key: 1m8zz5
+      ElIconPathElement('m19.07 4.93-1.41 1.41'), // key: 1shlcs
     ],
 
     // `monitor.mjs` — screen, stand foot, stand neck.
-    DsIconGlyph.monitor: <DsIconElement>[
+    ElIconGlyph.monitor: <ElIconElement>[
       // width: 20, height: 14, x: 2, y: 3, rx: 2
-      DsIconRectElement(2, 3, 20, 14, 2), // key: 48i651
+      ElIconRectElement(2, 3, 20, 14, 2), // key: 48i651
       // x1: 8, x2: 16, y1: 21, y2: 21
-      DsIconLineElement(8, 21, 16, 21), // key: 1svkeh
+      ElIconLineElement(8, 21, 16, 21), // key: 1svkeh
       // x1: 12, x2: 12, y1: 17, y2: 21
-      DsIconLineElement(12, 17, 12, 21), // key: vw1qmm
+      ElIconLineElement(12, 17, 12, 21), // key: vw1qmm
     ],
 
     // `moon.mjs` — one subpath: a 9-unit large arc, a cubic hook, a 6-unit arc
     // back and a second hook. The only glyph in this set that uses `A`/`a`, and
     // therefore the only one that exercises the arc conversion.
-    DsIconGlyph.moon: <DsIconElement>[
-      DsIconPathElement(
-          'M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401'), // key: kfwtm
+    ElIconGlyph.moon: <ElIconElement>[
+      ElIconPathElement(
+        'M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401',
+      ), // key: kfwtm
     ],
 
     // `arrow-left.mjs` — head first, then the shaft.
-    DsIconGlyph.arrowLeft: <DsIconElement>[
-      DsIconPathElement('m12 19-7-7 7-7'), // key: 1l729n
-      DsIconPathElement('M19 12H5'), // key: x3x0zl
+    ElIconGlyph.arrowLeft: <ElIconElement>[
+      ElIconPathElement('m12 19-7-7 7-7'), // key: 1l729n
+      ElIconPathElement('M19 12H5'), // key: x3x0zl
     ],
 
     // `arrow-right.mjs` — shaft first, then the head. Mirrors arrow-left
     // geometrically but not in element order — kept as lucide ships it.
-    DsIconGlyph.arrowRight: <DsIconElement>[
-      DsIconPathElement('M5 12h14'), // key: 1ays0h
-      DsIconPathElement('m12 5 7 7-7 7'), // key: xquz4c
+    ElIconGlyph.arrowRight: <ElIconElement>[
+      ElIconPathElement('M5 12h14'), // key: 1ays0h
+      ElIconPathElement('m12 5 7 7-7 7'), // key: xquz4c
     ],
 
     // `check.mjs` — one stroke: the long fall, then the relative short rise.
-    DsIconGlyph.check: <DsIconElement>[
-      DsIconPathElement('M20 6 9 17l-5-5'), // key: 1gmf2c
+    ElIconGlyph.check: <ElIconElement>[
+      ElIconPathElement('M20 6 9 17l-5-5'), // key: 1gmf2c
     ],
 
     // ─── curated · "Navigation & structure" ─────────────────────────────────
 
     // `package.mjs` — the closed box, the vertical seam, the lid ridge and the
     // strap crease. Element 3 is the set's only `polyline`.
-    DsIconGlyph.package: <DsIconElement>[
-      DsIconPathElement(
-          'M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z'), // key: 1a0edw
-      DsIconPathElement('M12 22V12'), // key: d0xqtd
+    ElIconGlyph.package: <ElIconElement>[
+      ElIconPathElement(
+        'M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z',
+      ), // key: 1a0edw
+      ElIconPathElement('M12 22V12'), // key: d0xqtd
       // points: "3.29 7 12 12 20.71 7"
-      DsIconPolylineElement(<Offset>[
+      ElIconPolylineElement(<Offset>[
         Offset(3.29, 7),
         Offset(12, 12),
         Offset(20.71, 7),
       ]), // key: ousv84
-      DsIconPathElement('m7.5 4.27 9 5.15'), // key: 1c824w
+      ElIconPathElement('m7.5 4.27 9 5.15'), // key: 1c824w
     ],
 
     // `radio.mjs` — two pairs of broadcast arcs, inner then outer on each
     // side, around a 2-unit core.
-    DsIconGlyph.radio: <DsIconElement>[
-      DsIconPathElement('M16.247 7.761a6 6 0 0 1 0 8.478'), // key: 1fwjs5
-      DsIconPathElement('M19.075 4.933a10 10 0 0 1 0 14.134'), // key: ehdyv1
-      DsIconPathElement('M4.925 19.067a10 10 0 0 1 0-14.134'), // key: 1q22gi
-      DsIconPathElement('M7.753 16.239a6 6 0 0 1 0-8.478'), // key: r2q7qm
-      DsIconCircleElement(12, 12, 2), // key: 1c9p78
+    ElIconGlyph.radio: <ElIconElement>[
+      ElIconPathElement('M16.247 7.761a6 6 0 0 1 0 8.478'), // key: 1fwjs5
+      ElIconPathElement('M19.075 4.933a10 10 0 0 1 0 14.134'), // key: ehdyv1
+      ElIconPathElement('M4.925 19.067a10 10 0 0 1 0-14.134'), // key: 1q22gi
+      ElIconPathElement('M7.753 16.239a6 6 0 0 1 0-8.478'), // key: r2q7qm
+      ElIconCircleElement(12, 12, 2), // key: 1c9p78
     ],
 
     // `layers.mjs` — the closed top plate, then two open sweeps for the sheets
     // beneath it.
-    DsIconGlyph.layers: <DsIconElement>[
-      DsIconPathElement(
-          'M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z'), // key: zw3jo
-      DsIconPathElement(
-          'M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12'), // key: 1wduqc
-      DsIconPathElement(
-          'M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17'), // key: kqbvx6
+    ElIconGlyph.layers: <ElIconElement>[
+      ElIconPathElement(
+        'M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z',
+      ), // key: zw3jo
+      ElIconPathElement(
+        'M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12',
+      ), // key: 1wduqc
+      ElIconPathElement(
+        'M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17',
+      ), // key: kqbvx6
     ],
 
     // `gift.mjs` — the ribbon drop, the box, the bow, and the lid as a `rect`.
-    DsIconGlyph.gift: <DsIconElement>[
-      DsIconPathElement('M12 7v14'), // key: 1akyts
-      DsIconPathElement(
-          'M20 11v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8'), // key: 1sqzm4
-      DsIconPathElement(
-          'M7.5 7a1 1 0 0 1 0-5A4.8 8 0 0 1 12 7a4.8 8 0 0 1 4.5-5 1 1 0 0 1 0 5'), // key: kc0143
+    ElIconGlyph.gift: <ElIconElement>[
+      ElIconPathElement('M12 7v14'), // key: 1akyts
+      ElIconPathElement(
+        'M20 11v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8',
+      ), // key: 1sqzm4
+      ElIconPathElement(
+        'M7.5 7a1 1 0 0 1 0-5A4.8 8 0 0 1 12 7a4.8 8 0 0 1 4.5-5 1 1 0 0 1 0 5',
+      ), // key: kc0143
       // x: 3, y: 7, width: 18, height: 4, rx: 1 — the one rect lucide writes
       // position-first; every other spells width and height first.
-      DsIconRectElement(3, 7, 18, 4, 1), // key: 1hberx
+      ElIconRectElement(3, 7, 18, 4, 1), // key: 1hberx
     ],
 
     // `trophy.mjs` — the two stem halves, the right and left handles, the base
     // rule and the closed cup.
-    DsIconGlyph.trophy: <DsIconElement>[
-      DsIconPathElement(
-          'M10 14.66V17a1 1 0 0 1-1 1 2 2 0 0 0-2 2v2'), // key: pwuv1l
-      DsIconPathElement(
-          'M14 14.66V17a1 1 0 0 0 1 1 2 2 0 0 1 2 2v2'), // key: 1y54w1
-      DsIconPathElement(
-          'M17.916 10H19.5A2.5 2.5 0 0 0 22 7.5V5a1 1 0 0 0-1-1h-3'), // key: e30mpu
-      DsIconPathElement('M4 22h16'), // key: 57wxv0
-      DsIconPathElement(
-          'M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z'), // key: 1mhfuq
-      DsIconPathElement(
-          'M6.084 10H4.5A2.5 2.5 0 0 1 2 7.5V5a1 1 0 0 1 1-1h3'), // key: i0yafy
+    ElIconGlyph.trophy: <ElIconElement>[
+      ElIconPathElement(
+        'M10 14.66V17a1 1 0 0 1-1 1 2 2 0 0 0-2 2v2',
+      ), // key: pwuv1l
+      ElIconPathElement(
+        'M14 14.66V17a1 1 0 0 0 1 1 2 2 0 0 1 2 2v2',
+      ), // key: 1y54w1
+      ElIconPathElement(
+        'M17.916 10H19.5A2.5 2.5 0 0 0 22 7.5V5a1 1 0 0 0-1-1h-3',
+      ), // key: e30mpu
+      ElIconPathElement('M4 22h16'), // key: 57wxv0
+      ElIconPathElement(
+        'M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z',
+      ), // key: 1mhfuq
+      ElIconPathElement(
+        'M6.084 10H4.5A2.5 2.5 0 0 1 2 7.5V5a1 1 0 0 1 1-1h3',
+      ), // key: i0yafy
     ],
 
     // `wallet.mjs` — the flap with its card slot, then the body.
-    DsIconGlyph.wallet: <DsIconElement>[
-      DsIconPathElement(
-          'M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1'), // key: 18etb6
-      DsIconPathElement(
-          'M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4'), // key: xoc0q4
+    ElIconGlyph.wallet: <ElIconElement>[
+      ElIconPathElement(
+        'M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1',
+      ), // key: 18etb6
+      ElIconPathElement(
+        'M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4',
+      ), // key: xoc0q4
     ],
 
     // `user.mjs` — the shoulders, then the head.
-    DsIconGlyph.user: <DsIconElement>[
-      DsIconPathElement(
-          'M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2'), // key: 975kel
-      DsIconCircleElement(12, 7, 4), // key: 17ys0d
+    ElIconGlyph.user: <ElIconElement>[
+      ElIconPathElement(
+        'M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2',
+      ), // key: 975kel
+      ElIconCircleElement(12, 7, 4), // key: 17ys0d
     ],
 
     // `search.mjs` — the handle first, then the lens.
-    DsIconGlyph.search: <DsIconElement>[
-      DsIconPathElement('m21 21-4.34-4.34'), // key: 14j7rj
-      DsIconCircleElement(11, 11, 8), // key: 4ej97u
+    ElIconGlyph.search: <ElIconElement>[
+      ElIconPathElement('m21 21-4.34-4.34'), // key: 14j7rj
+      ElIconCircleElement(11, 11, 8), // key: 4ej97u
     ],
 
     // `bell.mjs` — the clapper, then the dome. The dome is the set's longest
     // run of absolute cubics.
-    DsIconGlyph.bell: <DsIconElement>[
-      DsIconPathElement('M10.268 21a2 2 0 0 0 3.464 0'), // key: vwvbt9
-      DsIconPathElement(
-          'M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326'), // key: 11g9vi
+    ElIconGlyph.bell: <ElIconElement>[
+      ElIconPathElement('M10.268 21a2 2 0 0 0 3.464 0'), // key: vwvbt9
+      ElIconPathElement(
+        'M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326',
+      ), // key: 11g9vi
     ],
 
     // `settings.mjs` — the twelve-lobed cog as one subpath of alternating
     // 2.34-unit arcs, then the hub.
-    DsIconGlyph.settings: <DsIconElement>[
-      DsIconPathElement(
-          'M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915'), // key: 1i5ecw
-      DsIconCircleElement(12, 12, 3), // key: 1v7zrd
+    ElIconGlyph.settings: <ElIconElement>[
+      ElIconPathElement(
+        'M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915',
+      ), // key: 1i5ecw
+      ElIconCircleElement(12, 12, 3), // key: 1v7zrd
     ],
 
     // `log-out.mjs` — the arrow head, the shaft, then the doorway it leaves.
-    DsIconGlyph.logOut: <DsIconElement>[
-      DsIconPathElement('m16 17 5-5-5-5'), // key: 1bji2h
-      DsIconPathElement('M21 12H9'), // key: dn1m92
-      DsIconPathElement(
-          'M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4'), // key: 1uf3rs
+    ElIconGlyph.logOut: <ElIconElement>[
+      ElIconPathElement('m16 17 5-5-5-5'), // key: 1bji2h
+      ElIconPathElement('M21 12H9'), // key: dn1m92
+      ElIconPathElement(
+        'M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4',
+      ), // key: 1uf3rs
     ],
 
     // `layout-grid.mjs` — four 7-unit tiles: top-left, top-right,
     // bottom-right, bottom-left. Four `rect`s and nothing else.
-    DsIconGlyph.layoutGrid: <DsIconElement>[
+    ElIconGlyph.layoutGrid: <ElIconElement>[
       // width: 7, height: 7, x: 3, y: 3, rx: 1
-      DsIconRectElement(3, 3, 7, 7, 1), // key: 1g98yp
+      ElIconRectElement(3, 3, 7, 7, 1), // key: 1g98yp
       // width: 7, height: 7, x: 14, y: 3, rx: 1
-      DsIconRectElement(14, 3, 7, 7, 1), // key: 6d4xhi
+      ElIconRectElement(14, 3, 7, 7, 1), // key: 6d4xhi
       // width: 7, height: 7, x: 14, y: 14, rx: 1
-      DsIconRectElement(14, 14, 7, 7, 1), // key: nxv5o0
+      ElIconRectElement(14, 14, 7, 7, 1), // key: nxv5o0
       // width: 7, height: 7, x: 3, y: 14, rx: 1
-      DsIconRectElement(3, 14, 7, 7, 1), // key: 1bb6yr
+      ElIconRectElement(3, 14, 7, 7, 1), // key: 1bb6yr
     ],
 
     // `rows-3.mjs` — the frame, then the two dividing rules.
-    DsIconGlyph.rows3: <DsIconElement>[
+    ElIconGlyph.rows3: <ElIconElement>[
       // width: 18, height: 18, x: 3, y: 3, rx: 2
-      DsIconRectElement(3, 3, 18, 18, 2), // key: afitv7
-      DsIconPathElement('M21 9H3'), // key: 1338ky
-      DsIconPathElement('M21 15H3'), // key: 9uk58r
+      ElIconRectElement(3, 3, 18, 18, 2), // key: afitv7
+      ElIconPathElement('M21 9H3'), // key: 1338ky
+      ElIconPathElement('M21 15H3'), // key: 9uk58r
     ],
 
     // `chevron-down.mjs` — one relative V.
-    DsIconGlyph.chevronDown: <DsIconElement>[
-      DsIconPathElement('m6 9 6 6 6-6'), // key: qrunsl
+    ElIconGlyph.chevronDown: <ElIconElement>[
+      ElIconPathElement('m6 9 6 6 6-6'), // key: qrunsl
     ],
 
     // `chevron-up.mjs`.
-    DsIconGlyph.chevronUp: <DsIconElement>[
-      DsIconPathElement('m18 15-6-6-6 6'), // key: 153udz
+    ElIconGlyph.chevronUp: <ElIconElement>[
+      ElIconPathElement('m18 15-6-6-6 6'), // key: 153udz
     ],
 
     // `chevron-left.mjs`.
-    DsIconGlyph.chevronLeft: <DsIconElement>[
-      DsIconPathElement('m15 18-6-6 6-6'), // key: 1wnfg3
+    ElIconGlyph.chevronLeft: <ElIconElement>[
+      ElIconPathElement('m15 18-6-6 6-6'), // key: 1wnfg3
     ],
 
     // `chevron-right.mjs`.
-    DsIconGlyph.chevronRight: <DsIconElement>[
-      DsIconPathElement('m9 18 6-6-6-6'), // key: mthhwq
+    ElIconGlyph.chevronRight: <ElIconElement>[
+      ElIconPathElement('m9 18 6-6-6-6'), // key: mthhwq
     ],
 
     // `ellipsis.mjs` — three 1-unit dots, authored centre, right, left.
-    DsIconGlyph.ellipsis: <DsIconElement>[
-      DsIconCircleElement(12, 12, 1), // key: 41hilf
-      DsIconCircleElement(19, 12, 1), // key: 1wjl8i
-      DsIconCircleElement(5, 12, 1), // key: 1pcz8c
+    ElIconGlyph.ellipsis: <ElIconElement>[
+      ElIconCircleElement(12, 12, 1), // key: 41hilf
+      ElIconCircleElement(19, 12, 1), // key: 1wjl8i
+      ElIconCircleElement(5, 12, 1), // key: 1pcz8c
     ],
 
     // `external-link.mjs` — the arrow corner, the diagonal, the open frame.
-    DsIconGlyph.externalLink: <DsIconElement>[
-      DsIconPathElement('M15 3h6v6'), // key: 1q9fwt
-      DsIconPathElement('M10 14 21 3'), // key: gplh6r
-      DsIconPathElement(
-          'M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6'), // key: a6xqqp
+    ElIconGlyph.externalLink: <ElIconElement>[
+      ElIconPathElement('M15 3h6v6'), // key: 1q9fwt
+      ElIconPathElement('M10 14 21 3'), // key: gplh6r
+      ElIconPathElement(
+        'M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6',
+      ), // key: a6xqqp
     ],
 
     // ─── curated · "Actions" ────────────────────────────────────────────────
 
     // `package-open.mjs` — the seam, then three closed flaps.
-    DsIconGlyph.packageOpen: <DsIconElement>[
-      DsIconPathElement('M12 22v-9'), // key: x3hkom
-      DsIconPathElement(
-          'M15.17 2.21a1.67 1.67 0 0 1 1.63 0L21 4.57a1.93 1.93 0 0 1 0 3.36L8.82 14.79a1.655 1.655 0 0 1-1.64 0L3 12.43a1.93 1.93 0 0 1 0-3.36z'), // key: 2ntwy6
-      DsIconPathElement(
-          'M20 13v3.87a2.06 2.06 0 0 1-1.11 1.83l-6 3.08a1.93 1.93 0 0 1-1.78 0l-6-3.08A2.06 2.06 0 0 1 4 16.87V13'), // key: 1pmm1c
-      DsIconPathElement(
-          'M21 12.43a1.93 1.93 0 0 0 0-3.36L8.83 2.2a1.64 1.64 0 0 0-1.63 0L3 4.57a1.93 1.93 0 0 0 0 3.36l12.18 6.86a1.636 1.636 0 0 0 1.63 0z'), // key: 12ttoo
+    ElIconGlyph.packageOpen: <ElIconElement>[
+      ElIconPathElement('M12 22v-9'), // key: x3hkom
+      ElIconPathElement(
+        'M15.17 2.21a1.67 1.67 0 0 1 1.63 0L21 4.57a1.93 1.93 0 0 1 0 3.36L8.82 14.79a1.655 1.655 0 0 1-1.64 0L3 12.43a1.93 1.93 0 0 1 0-3.36z',
+      ), // key: 2ntwy6
+      ElIconPathElement(
+        'M20 13v3.87a2.06 2.06 0 0 1-1.11 1.83l-6 3.08a1.93 1.93 0 0 1-1.78 0l-6-3.08A2.06 2.06 0 0 1 4 16.87V13',
+      ), // key: 1pmm1c
+      ElIconPathElement(
+        'M21 12.43a1.93 1.93 0 0 0 0-3.36L8.83 2.2a1.64 1.64 0 0 0-1.63 0L3 4.57a1.93 1.93 0 0 0 0 3.36l12.18 6.86a1.636 1.636 0 0 0 1.63 0z',
+      ), // key: 12ttoo
     ],
 
     // `shopping-cart.mjs` — the two wheels first, then the basket and handle
     // as one stroke.
-    DsIconGlyph.shoppingCart: <DsIconElement>[
-      DsIconCircleElement(8, 21, 1), // key: jimo8o
-      DsIconCircleElement(19, 21, 1), // key: 13723u
-      DsIconPathElement(
-          'M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12'), // key: 9zh506
+    ElIconGlyph.shoppingCart: <ElIconElement>[
+      ElIconCircleElement(8, 21, 1), // key: jimo8o
+      ElIconCircleElement(19, 21, 1), // key: 13723u
+      ElIconPathElement(
+        'M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12',
+      ), // key: 9zh506
     ],
 
     // `heart.mjs` — one open subpath: the two lobes as arcs meeting over a
     // cubic, then the fall to the tip and back.
-    DsIconGlyph.heart: <DsIconElement>[
-      DsIconPathElement(
-          'M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5'), // key: mvr1a0
+    ElIconGlyph.heart: <ElIconElement>[
+      ElIconPathElement(
+        'M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5',
+      ), // key: mvr1a0
     ],
 
     // `eye.mjs` — the lid outline as two 10.75-unit arcs, then the iris.
-    DsIconGlyph.eye: <DsIconElement>[
-      DsIconPathElement(
-          'M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0'), // key: 1nclc0
-      DsIconCircleElement(12, 12, 3), // key: 1v7zrd
+    ElIconGlyph.eye: <ElIconElement>[
+      ElIconPathElement(
+        'M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0',
+      ), // key: 1nclc0
+      ElIconCircleElement(12, 12, 3), // key: 1v7zrd
     ],
 
     // `eye-off.mjs` — the lid broken into two arcs, the interrupted iris, and
     // the slash last.
-    DsIconGlyph.eyeOff: <DsIconElement>[
-      DsIconPathElement(
-          'M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49'), // key: ct8e1f
-      DsIconPathElement(
-          'M14.084 14.158a3 3 0 0 1-4.242-4.242'), // key: 151rxh
-      DsIconPathElement(
-          'M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143'), // key: 13bj9a
-      DsIconPathElement('m2 2 20 20'), // key: 1ooewy
+    ElIconGlyph.eyeOff: <ElIconElement>[
+      ElIconPathElement(
+        'M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49',
+      ), // key: ct8e1f
+      ElIconPathElement('M14.084 14.158a3 3 0 0 1-4.242-4.242'), // key: 151rxh
+      ElIconPathElement(
+        'M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143',
+      ), // key: 13bj9a
+      ElIconPathElement('m2 2 20 20'), // key: 1ooewy
     ],
 
     // `share-2.mjs` — the three nodes, then the two `line`s that join them.
-    DsIconGlyph.share2: <DsIconElement>[
-      DsIconCircleElement(18, 5, 3), // key: gq8acd
-      DsIconCircleElement(6, 12, 3), // key: w7nqdw
-      DsIconCircleElement(18, 19, 3), // key: 1xt0gg
+    ElIconGlyph.share2: <ElIconElement>[
+      ElIconCircleElement(18, 5, 3), // key: gq8acd
+      ElIconCircleElement(6, 12, 3), // key: w7nqdw
+      ElIconCircleElement(18, 19, 3), // key: 1xt0gg
       // x1: 8.59, x2: 15.42, y1: 13.51, y2: 17.49
-      DsIconLineElement(8.59, 13.51, 15.42, 17.49), // key: 47mynk
+      ElIconLineElement(8.59, 13.51, 15.42, 17.49), // key: 47mynk
       // x1: 15.41, x2: 8.59, y1: 6.51, y2: 10.49
-      DsIconLineElement(15.41, 6.51, 8.59, 10.49), // key: 1n3mei
+      ElIconLineElement(15.41, 6.51, 8.59, 10.49), // key: 1n3mei
     ],
 
     // `copy.mjs` — the front sheet, then the back one. The front sheet is one
     // of the two `rect`s in the whole set that spell `ry` (equal to `rx`).
-    DsIconGlyph.copy: <DsIconElement>[
+    ElIconGlyph.copy: <ElIconElement>[
       // width: 14, height: 14, x: 8, y: 8, rx: 2, ry: 2
-      DsIconRectElement(8, 8, 14, 14, 2, ry: 2), // key: 17jyea
-      DsIconPathElement(
-          'M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2'), // key: zix9uf
+      ElIconRectElement(8, 8, 14, 14, 2, ry: 2), // key: 17jyea
+      ElIconPathElement(
+        'M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2',
+      ), // key: zix9uf
     ],
 
     // `funnel.mjs` — the curated set calls this one **Filter**, and
     // `filter.mjs` in 1.28.0 is a one-line re-export of this module.
-    DsIconGlyph.filter: <DsIconElement>[
-      DsIconPathElement(
-          'M10 20a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14z'), // key: sc7q7i
+    ElIconGlyph.filter: <ElIconElement>[
+      ElIconPathElement(
+        'M10 20a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14z',
+      ), // key: sc7q7i
     ],
 
     // `sliders-horizontal.mjs` — three tracks and three handles, nine separate
     // rules. The set's longest element list.
-    DsIconGlyph.slidersHorizontal: <DsIconElement>[
-      DsIconPathElement('M10 5H3'), // key: 1qgfaw
-      DsIconPathElement('M12 19H3'), // key: yhmn1j
-      DsIconPathElement('M14 3v4'), // key: 1sua03
-      DsIconPathElement('M16 17v4'), // key: 1q0r14
-      DsIconPathElement('M21 12h-9'), // key: 1o4lsq
-      DsIconPathElement('M21 19h-5'), // key: 1rlt1p
-      DsIconPathElement('M21 5h-7'), // key: 1oszz2
-      DsIconPathElement('M8 10v4'), // key: tgpxqk
-      DsIconPathElement('M8 12H3'), // key: a7s4jb
+    ElIconGlyph.slidersHorizontal: <ElIconElement>[
+      ElIconPathElement('M10 5H3'), // key: 1qgfaw
+      ElIconPathElement('M12 19H3'), // key: yhmn1j
+      ElIconPathElement('M14 3v4'), // key: 1sua03
+      ElIconPathElement('M16 17v4'), // key: 1q0r14
+      ElIconPathElement('M21 12h-9'), // key: 1o4lsq
+      ElIconPathElement('M21 19h-5'), // key: 1rlt1p
+      ElIconPathElement('M21 5h-7'), // key: 1oszz2
+      ElIconPathElement('M8 10v4'), // key: tgpxqk
+      ElIconPathElement('M8 12H3'), // key: a7s4jb
     ],
 
     // `plus.mjs` — the bar `arrow-right` also opens with, then the stem.
-    DsIconGlyph.plus: <DsIconElement>[
-      DsIconPathElement('M5 12h14'), // key: 1ays0h
-      DsIconPathElement('M12 5v14'), // key: s699le
+    ElIconGlyph.plus: <ElIconElement>[
+      ElIconPathElement('M5 12h14'), // key: 1ays0h
+      ElIconPathElement('M12 5v14'), // key: s699le
     ],
 
     // `minus.mjs` — plus without its stem; lucide dedupes to the same key.
-    DsIconGlyph.minus: <DsIconElement>[
-      DsIconPathElement('M5 12h14'), // key: 1ays0h
+    ElIconGlyph.minus: <ElIconElement>[
+      ElIconPathElement('M5 12h14'), // key: 1ays0h
     ],
 
     // `refresh-cw.mjs` — the top arc and its arrow corner, then the bottom arc
     // and its corner.
-    DsIconGlyph.refreshCw: <DsIconElement>[
-      DsIconPathElement(
-          'M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8'), // key: v9h5vc
-      DsIconPathElement('M21 3v5h-5'), // key: 1q7to0
-      DsIconPathElement(
-          'M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16'), // key: 3uifl3
-      DsIconPathElement('M8 16H3v5'), // key: 1cv678
+    ElIconGlyph.refreshCw: <ElIconElement>[
+      ElIconPathElement(
+        'M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8',
+      ), // key: v9h5vc
+      ElIconPathElement('M21 3v5h-5'), // key: 1q7to0
+      ElIconPathElement(
+        'M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16',
+      ), // key: 3uifl3
+      ElIconPathElement('M8 16H3v5'), // key: 1cv678
     ],
 
     // `download.mjs` — the shaft, the tray, the arrow head.
-    DsIconGlyph.download: <DsIconElement>[
-      DsIconPathElement('M12 15V3'), // key: m9g1x1
-      DsIconPathElement(
-          'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4'), // key: ih7n3h
-      DsIconPathElement('m7 10 5 5 5-5'), // key: brsn70
+    ElIconGlyph.download: <ElIconElement>[
+      ElIconPathElement('M12 15V3'), // key: m9g1x1
+      ElIconPathElement(
+        'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4',
+      ), // key: ih7n3h
+      ElIconPathElement('m7 10 5 5 5-5'), // key: brsn70
     ],
 
     // `upload.mjs` — the same tray (same lucide key), a longer shaft and the
     // head pointing the other way; note the element order differs from
     // `download`.
-    DsIconGlyph.upload: <DsIconElement>[
-      DsIconPathElement('M12 3v12'), // key: 1x0j5s
-      DsIconPathElement('m17 8-5-5-5 5'), // key: 7q97r8
-      DsIconPathElement(
-          'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4'), // key: ih7n3h
+    ElIconGlyph.upload: <ElIconElement>[
+      ElIconPathElement('M12 3v12'), // key: 1x0j5s
+      ElIconPathElement('m17 8-5-5-5 5'), // key: 7q97r8
+      ElIconPathElement(
+        'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4',
+      ), // key: ih7n3h
     ],
 
     // `truck.mjs` — the cab, the axle rule, the box, then the two wheels.
-    DsIconGlyph.truck: <DsIconElement>[
-      DsIconPathElement(
-          'M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2'), // key: wrbu53
-      DsIconPathElement('M15 18H9'), // key: 1lyqi6
-      DsIconPathElement(
-          'M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14'), // key: lysw3i
-      DsIconCircleElement(17, 18, 2), // key: 332jqn
-      DsIconCircleElement(7, 18, 2), // key: 19iecd
+    ElIconGlyph.truck: <ElIconElement>[
+      ElIconPathElement(
+        'M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2',
+      ), // key: wrbu53
+      ElIconPathElement('M15 18H9'), // key: 1lyqi6
+      ElIconPathElement(
+        'M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14',
+      ), // key: lysw3i
+      ElIconCircleElement(17, 18, 2), // key: 332jqn
+      ElIconCircleElement(7, 18, 2), // key: 19iecd
     ],
 
     // `trash-2.mjs` — the two ribs, the can, the lid rule, the handle.
-    DsIconGlyph.trash2: <DsIconElement>[
-      DsIconPathElement('M10 11v6'), // key: nco0om
-      DsIconPathElement('M14 11v6'), // key: outv1u
-      DsIconPathElement(
-          'M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6'), // key: miytrc
-      DsIconPathElement('M3 6h18'), // key: d0wm0j
-      DsIconPathElement(
-          'M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2'), // key: e791ji
+    ElIconGlyph.trash2: <ElIconElement>[
+      ElIconPathElement('M10 11v6'), // key: nco0om
+      ElIconPathElement('M14 11v6'), // key: outv1u
+      ElIconPathElement(
+        'M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6',
+      ), // key: miytrc
+      ElIconPathElement('M3 6h18'), // key: d0wm0j
+      ElIconPathElement(
+        'M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2',
+      ), // key: e791ji
     ],
 
     // `ban.mjs` — the ring, then its bar.
-    DsIconGlyph.ban: <DsIconElement>[
-      DsIconCircleElement(12, 12, 10), // key: 1mglay
-      DsIconPathElement('M4.929 4.929 19.07 19.071'), // key: 196cmz
+    ElIconGlyph.ban: <ElIconElement>[
+      ElIconCircleElement(12, 12, 10), // key: 1mglay
+      ElIconPathElement('M4.929 4.929 19.07 19.071'), // key: 196cmz
     ],
 
     // ─── curated · "Collectible domain" ─────────────────────────────────────
 
     // `sparkles.mjs` — the four-point star as one closed subpath of eight
     // alternating arcs and linetos, then the small cross and the 2-unit disc.
-    DsIconGlyph.sparkles: <DsIconElement>[
-      DsIconPathElement(
-          'M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z'), // key: 1s2grr
-      DsIconPathElement('M20 2v4'), // key: 1rf3ol
-      DsIconPathElement('M22 4h-4'), // key: gwowj6
-      DsIconCircleElement(4, 20, 2), // key: 6kqj1y
+    ElIconGlyph.sparkles: <ElIconElement>[
+      ElIconPathElement(
+        'M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z',
+      ), // key: 1s2grr
+      ElIconPathElement('M20 2v4'), // key: 1rf3ol
+      ElIconPathElement('M22 4h-4'), // key: gwowj6
+      ElIconCircleElement(4, 20, 2), // key: 6kqj1y
     ],
 
     // `crown.mjs` — the closed crown outline, then the separate base rule.
-    DsIconGlyph.crown: <DsIconElement>[
-      DsIconPathElement(
-          'M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z'), // key: 1vdc57
-      DsIconPathElement('M5 21h14'), // key: 11awu3
+    ElIconGlyph.crown: <ElIconElement>[
+      ElIconPathElement(
+        'M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z',
+      ), // key: 1vdc57
+      ElIconPathElement('M5 21h14'), // key: 11awu3
     ],
 
     // `flame.mjs` — the only glyph in the set that uses `q` and `t`
     // (`q1 4 4 6.5t3 5.5`), so the only real exercise of the quadratic and
     // reflected-quadratic branches of the parser.
-    DsIconGlyph.flame: <DsIconElement>[
-      DsIconPathElement(
-          'M12 3q1 4 4 6.5t3 5.5a1 1 0 0 1-14 0 5 5 0 0 1 1-3 1 1 0 0 0 5 0c0-2-1.5-3-1.5-5q0-2 2.5-4'), // key: 1slcih
+    ElIconGlyph.flame: <ElIconElement>[
+      ElIconPathElement(
+        'M12 3q1 4 4 6.5t3 5.5a1 1 0 0 1-14 0 5 5 0 0 1 1-3 1 1 0 0 0 5 0c0-2-1.5-3-1.5-5q0-2 2.5-4',
+      ), // key: 1slcih
     ],
 
     // `zap.mjs` — one closed bolt. The set's densest arc packing: `0 00-2.474`
     // is two flags and a coordinate with no separators at all, which is why
     // the parser scans flags one character at a time.
-    DsIconGlyph.zap: <DsIconElement>[
-      DsIconPathElement(
-          'M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z'), // key: 1v7up4
+    ElIconGlyph.zap: <ElIconElement>[
+      ElIconPathElement(
+        'M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z',
+      ), // key: 1v7up4
     ],
 
     // `star.mjs` — one closed five-point star: ten linetos with a rounded arc
     // at every vertex.
-    DsIconGlyph.star: <DsIconElement>[
-      DsIconPathElement(
-          'M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z'), // key: r04s7s
+    ElIconGlyph.star: <ElIconElement>[
+      ElIconPathElement(
+        'M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z',
+      ), // key: r04s7s
     ],
 
     // `tag.mjs` — the closed label, then the punched hole. That hole is the
-    // set's **only** `fill="currentColor"` node; see [DsIconElement.filled].
-    DsIconGlyph.tag: <DsIconElement>[
-      DsIconPathElement(
-          'M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z'), // key: vktsd0
+    // set's **only** `fill="currentColor"` node; see [ElIconElement.filled].
+    ElIconGlyph.tag: <ElIconElement>[
+      ElIconPathElement(
+        'M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z',
+      ), // key: vktsd0
       // cx: 7.5, cy: 7.5, r: .5, fill: "currentColor"
-      DsIconCircleElement(7.5, 7.5, 0.5, filled: true), // key: kqv944
+      ElIconCircleElement(7.5, 7.5, 0.5, filled: true), // key: kqv944
     ],
 
     // `percent.mjs` — the slash as a `line`, then the two rings.
-    DsIconGlyph.percent: <DsIconElement>[
+    ElIconGlyph.percent: <ElIconElement>[
       // x1: 19, x2: 5, y1: 5, y2: 19
-      DsIconLineElement(19, 5, 5, 19), // key: 1x9vlm
-      DsIconCircleElement(6.5, 6.5, 2.5), // key: 4mh3h7
-      DsIconCircleElement(17.5, 17.5, 2.5), // key: 1mdrzq
+      ElIconLineElement(19, 5, 5, 19), // key: 1x9vlm
+      ElIconCircleElement(6.5, 6.5, 2.5), // key: 4mh3h7
+      ElIconCircleElement(17.5, 17.5, 2.5), // key: 1mdrzq
     ],
 
     // `medal.mjs` — the ribbon, its two folds, the bar, the disc, and the
     // numeral last so it sits over the disc.
-    DsIconGlyph.medal: <DsIconElement>[
-      DsIconPathElement(
-          'M7.21 15 2.66 7.14a2 2 0 0 1 .13-2.2L4.4 2.8A2 2 0 0 1 6 2h12a2 2 0 0 1 1.6.8l1.6 2.14a2 2 0 0 1 .14 2.2L16.79 15'), // key: 143lza
-      DsIconPathElement('M11 12 5.12 2.2'), // key: qhuxz6
-      DsIconPathElement('m13 12 5.88-9.8'), // key: hbye0f
-      DsIconPathElement('M8 7h8'), // key: i86dvs
-      DsIconCircleElement(12, 17, 5), // key: qbz8iq
-      DsIconPathElement('M12 18v-2h-.5'), // key: fawc4q
+    ElIconGlyph.medal: <ElIconElement>[
+      ElIconPathElement(
+        'M7.21 15 2.66 7.14a2 2 0 0 1 .13-2.2L4.4 2.8A2 2 0 0 1 6 2h12a2 2 0 0 1 1.6.8l1.6 2.14a2 2 0 0 1 .14 2.2L16.79 15',
+      ), // key: 143lza
+      ElIconPathElement('M11 12 5.12 2.2'), // key: qhuxz6
+      ElIconPathElement('m13 12 5.88-9.8'), // key: hbye0f
+      ElIconPathElement('M8 7h8'), // key: i86dvs
+      ElIconCircleElement(12, 17, 5), // key: qbz8iq
+      ElIconPathElement('M12 18v-2h-.5'), // key: fawc4q
     ],
 
     // `activity.mjs` — one pulse trace, drawn as a path rather than a
     // polyline because the peaks are rounded with 0.25-unit arcs.
-    DsIconGlyph.activity: <DsIconElement>[
-      DsIconPathElement(
-          'M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2'), // key: 169zse
+    ElIconGlyph.activity: <ElIconElement>[
+      ElIconPathElement(
+        'M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2',
+      ), // key: 169zse
     ],
 
     // `trending-up.mjs` — the arrow corner, then the trace.
-    DsIconGlyph.trendingUp: <DsIconElement>[
-      DsIconPathElement('M16 7h6v6'), // key: box55l
-      DsIconPathElement('m22 7-8.5 8.5-5-5L2 17'), // key: 1t1m79
+    ElIconGlyph.trendingUp: <ElIconElement>[
+      ElIconPathElement('M16 7h6v6'), // key: box55l
+      ElIconPathElement('m22 7-8.5 8.5-5-5L2 17'), // key: 1t1m79
     ],
 
     // `trending-down.mjs` — the same construction, mirrored.
-    DsIconGlyph.trendingDown: <DsIconElement>[
-      DsIconPathElement('M16 17h6v-6'), // key: t6n2it
-      DsIconPathElement('m22 17-8.5-8.5-5 5L2 7'), // key: x473p
+    ElIconGlyph.trendingDown: <ElIconElement>[
+      ElIconPathElement('M16 17h6v-6'), // key: t6n2it
+      ElIconPathElement('m22 17-8.5-8.5-5 5L2 7'), // key: x473p
     ],
 
     // ─── curated · "Money & status" ─────────────────────────────────────────
 
     // `circle-dollar-sign.mjs` — the ring (lucide's shared 10-unit circle,
     // key `1mglay`), the S, then the stem.
-    DsIconGlyph.circleDollarSign: <DsIconElement>[
-      DsIconCircleElement(12, 12, 10), // key: 1mglay
-      DsIconPathElement(
-          'M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8'), // key: 1h4pet
-      DsIconPathElement('M12 18V6'), // key: zqpxq5
+    ElIconGlyph.circleDollarSign: <ElIconElement>[
+      ElIconCircleElement(12, 12, 10), // key: 1mglay
+      ElIconPathElement(
+        'M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8',
+      ), // key: 1h4pet
+      ElIconPathElement('M12 18V6'), // key: zqpxq5
     ],
 
     // `credit-card.mjs` — the card, then the magnetic stripe as a `line`.
-    DsIconGlyph.creditCard: <DsIconElement>[
+    ElIconGlyph.creditCard: <ElIconElement>[
       // width: 20, height: 14, x: 2, y: 5, rx: 2
-      DsIconRectElement(2, 5, 20, 14, 2), // key: ynyp8z
+      ElIconRectElement(2, 5, 20, 14, 2), // key: ynyp8z
       // x1: 2, x2: 22, y1: 10, y2: 10
-      DsIconLineElement(2, 10, 22, 10), // key: 1b3vmo
+      ElIconLineElement(2, 10, 22, 10), // key: 1b3vmo
     ],
 
     // `arrow-down-left.mjs` — the diagonal, then the corner.
-    DsIconGlyph.arrowDownLeft: <DsIconElement>[
-      DsIconPathElement('M17 7 7 17'), // key: 15tmo1
-      DsIconPathElement('M17 17H7V7'), // key: 1org7z
+    ElIconGlyph.arrowDownLeft: <ElIconElement>[
+      ElIconPathElement('M17 7 7 17'), // key: 15tmo1
+      ElIconPathElement('M17 17H7V7'), // key: 1org7z
     ],
 
     // `arrow-up-right.mjs` — corner first here, then the diagonal.
-    DsIconGlyph.arrowUpRight: <DsIconElement>[
-      DsIconPathElement('M7 7h10v10'), // key: 1tivn9
-      DsIconPathElement('M7 17 17 7'), // key: 1vkiza
+    ElIconGlyph.arrowUpRight: <ElIconElement>[
+      ElIconPathElement('M7 7h10v10'), // key: 1tivn9
+      ElIconPathElement('M7 17 17 7'), // key: 1vkiza
     ],
 
     // `hourglass.mjs` — the two rails, then the lower and upper bulbs.
-    DsIconGlyph.hourglass: <DsIconElement>[
-      DsIconPathElement('M5 22h14'), // key: ehvnwv
-      DsIconPathElement('M5 2h14'), // key: pdyrp9
-      DsIconPathElement(
-          'M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22'), // key: 1d314k
-      DsIconPathElement(
-          'M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2'), // key: 1vvvr6
+    ElIconGlyph.hourglass: <ElIconElement>[
+      ElIconPathElement('M5 22h14'), // key: ehvnwv
+      ElIconPathElement('M5 2h14'), // key: pdyrp9
+      ElIconPathElement(
+        'M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22',
+      ), // key: 1d314k
+      ElIconPathElement(
+        'M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2',
+      ), // key: 1vvvr6
     ],
 
     // `clock.mjs` — the ring, then both hands as one stroke.
-    DsIconGlyph.clock: <DsIconElement>[
-      DsIconCircleElement(12, 12, 10), // key: 1mglay
-      DsIconPathElement('M12 6v6l4 2'), // key: mmk7yg
+    ElIconGlyph.clock: <ElIconElement>[
+      ElIconCircleElement(12, 12, 10), // key: 1mglay
+      ElIconPathElement('M12 6v6l4 2'), // key: mmk7yg
     ],
 
     // `lock.mjs` — the body, then the shackle. The body is the second of the
     // two `rect`s that spell `ry`.
-    DsIconGlyph.lock: <DsIconElement>[
+    ElIconGlyph.lock: <ElIconElement>[
       // width: 18, height: 11, x: 3, y: 11, rx: 2, ry: 2
-      DsIconRectElement(3, 11, 18, 11, 2, ry: 2), // key: 1w4ew1
-      DsIconPathElement('M7 11V7a5 5 0 0 1 10 0v4'), // key: fwvmzm
+      ElIconRectElement(3, 11, 18, 11, 2, ry: 2), // key: 1w4ew1
+      ElIconPathElement('M7 11V7a5 5 0 0 1 10 0v4'), // key: fwvmzm
     ],
 
     // `shield.mjs` — one closed crest.
-    DsIconGlyph.shield: <DsIconElement>[
-      DsIconPathElement(
-          'M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z'), // key: oel41y
+    ElIconGlyph.shield: <ElIconElement>[
+      ElIconPathElement(
+        'M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z',
+      ), // key: oel41y
     ],
 
     // `shield-check.mjs` — the same crest character for character (lucide
     // keeps the same key, `oel41y`), plus the tick.
-    DsIconGlyph.shieldCheck: <DsIconElement>[
-      DsIconPathElement(
-          'M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z'), // key: oel41y
-      DsIconPathElement('m9 12 2 2 4-4'), // key: dzmm74
+    ElIconGlyph.shieldCheck: <ElIconElement>[
+      ElIconPathElement(
+        'M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z',
+      ), // key: oel41y
+      ElIconPathElement('m9 12 2 2 4-4'), // key: dzmm74
     ],
 
     // `info.mjs` — the ring, the stem, and `h.01`: a 0.01-unit stroke that a
     // round linecap renders as the tittle. Three glyphs use that trick.
-    DsIconGlyph.info: <DsIconElement>[
-      DsIconCircleElement(12, 12, 10), // key: 1mglay
-      DsIconPathElement('M12 16v-4'), // key: 1dtifu
-      DsIconPathElement('M12 8h.01'), // key: e9boi3
+    ElIconGlyph.info: <ElIconElement>[
+      ElIconCircleElement(12, 12, 10), // key: 1mglay
+      ElIconPathElement('M12 16v-4'), // key: 1dtifu
+      ElIconPathElement('M12 8h.01'), // key: e9boi3
     ],
 
     // `circle-question-mark.mjs` — the curated set calls this one
     // **HelpCircle**, and `help-circle.mjs` in 1.28.0 is a one-line re-export
     // of this module.
-    DsIconGlyph.helpCircle: <DsIconElement>[
-      DsIconCircleElement(12, 12, 10), // key: 1mglay
-      DsIconPathElement('M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3'), // key: 1u773s
-      DsIconPathElement('M12 17h.01'), // key: p32p05
+    ElIconGlyph.helpCircle: <ElIconElement>[
+      ElIconCircleElement(12, 12, 10), // key: 1mglay
+      ElIconPathElement('M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3'), // key: 1u773s
+      ElIconPathElement('M12 17h.01'), // key: p32p05
     ],
 
     // `triangle-alert.mjs` — the curated set calls this one **AlertTriangle**,
     // and `alert-triangle.mjs` in 1.28.0 is a one-line re-export of this
     // module.
-    DsIconGlyph.alertTriangle: <DsIconElement>[
-      DsIconPathElement(
-          'm21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3'), // key: wmoenq
-      DsIconPathElement('M12 9v4'), // key: juzpu7
-      DsIconPathElement('M12 17h.01'), // key: p32p05
+    ElIconGlyph.alertTriangle: <ElIconElement>[
+      ElIconPathElement(
+        'm21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3',
+      ), // key: wmoenq
+      ElIconPathElement('M12 9v4'), // key: juzpu7
+      ElIconPathElement('M12 17h.01'), // key: p32p05
     ],
 
     // ─── off-set ────────────────────────────────────────────────────────────
 
     // `rotate-ccw.mjs` — the motion page's replay control. Not a member of the
     // curated 63, so the icons page's registry must not list it.
-    DsIconGlyph.rotateCcw: <DsIconElement>[
-      DsIconPathElement(
-          'M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8'), // key: 1357e3
-      DsIconPathElement('M3 3v5h5'), // key: 1xhq8a
+    ElIconGlyph.rotateCcw: <ElIconElement>[
+      ElIconPathElement(
+        'M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8',
+      ), // key: 1357e3
+      ElIconPathElement('M3 3v5h5'), // key: 1xhq8a
     ],
 
     // `loader-circle.mjs` — the loading spinner's glyph, imported in the
@@ -1118,90 +1164,97 @@ class DsIconPaths {
     // this module and nothing else). One open arc: three quarters of a 9-unit
     // ring, drawn as a single sweep that stops short of closing, which is what
     // makes a rotation read as a spinner rather than as a wheel.
-    DsIconGlyph.loaderCircle: <DsIconElement>[
-      DsIconPathElement('M21 12a9 9 0 1 1-6.219-8.56'), // key: 13zald
+    ElIconGlyph.loaderCircle: <ElIconElement>[
+      ElIconPathElement('M21 12a9 9 0 1 1-6.219-8.56'), // key: 13zald
     ],
 
     // `play.mjs` — the `PlayPauseDemo` swap. One closed path: a triangle whose
     // three corners are 2-unit arcs, which is why it is a `path` and not a
     // `polygon`.
-    DsIconGlyph.play: <DsIconElement>[
-      DsIconPathElement(
-          'M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z'), // key: 10ikf1
+    ElIconGlyph.play: <ElIconElement>[
+      ElIconPathElement(
+        'M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z',
+      ), // key: 10ikf1
     ],
 
     // `pause.mjs` — two 5×18 bars at x = 14 and x = 5, in that order. The
     // right-hand bar is declared first; the transcription keeps lucide's order
     // because order is paint order.
-    DsIconGlyph.pause: <DsIconElement>[
-      DsIconRectElement(14, 3, 5, 18, 1), // key: kaeet6
-      DsIconRectElement(5, 3, 5, 18, 1), // key: 1wsw3u
+    ElIconGlyph.pause: <ElIconElement>[
+      ElIconRectElement(14, 3, 5, 18, 1), // key: kaeet6
+      ElIconRectElement(5, 3, 5, 18, 1), // key: 1wsw3u
     ],
 
     // `volume-2.mjs` — the `MuteDemo` swap. The speaker body plus two arcs.
-    DsIconGlyph.volume2: <DsIconElement>[
-      DsIconPathElement(
-          'M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z'), // key: uqj9uw
-      DsIconPathElement('M16 9a5 5 0 0 1 0 6'), // key: 1q6k2b
-      DsIconPathElement('M19.364 18.364a9 9 0 0 0 0-12.728'), // key: ijwkga
+    ElIconGlyph.volume2: <ElIconElement>[
+      ElIconPathElement(
+        'M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z',
+      ), // key: uqj9uw
+      ElIconPathElement('M16 9a5 5 0 0 1 0 6'), // key: 1q6k2b
+      ElIconPathElement('M19.364 18.364a9 9 0 0 0 0-12.728'), // key: ijwkga
     ],
 
     // `volume-x.mjs` — the same speaker body under the same content hash, with
     // a cross where the arcs were. The two `line` nodes are the two diagonals,
     // declared in lucide's `x1, x2, y1, y2` order and reordered here to this
     // element's point-then-point constructor.
-    DsIconGlyph.volumeX: <DsIconElement>[
-      DsIconPathElement(
-          'M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z'), // key: uqj9uw
-      DsIconLineElement(22, 9, 16, 15), // key: 1ewh16
-      DsIconLineElement(16, 9, 22, 15), // key: 5ykzw1
+    ElIconGlyph.volumeX: <ElIconElement>[
+      ElIconPathElement(
+        'M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z',
+      ), // key: uqj9uw
+      ElIconLineElement(22, 9, 16, 15), // key: 1ewh16
+      ElIconLineElement(16, 9, 22, 15), // key: 5ykzw1
     ],
 
     // `circle-check.mjs` — sonner's success toast. The shared 10-unit ring,
     // then a tick drawn inside it.
-    DsIconGlyph.circleCheck: <DsIconElement>[
-      DsIconCircleElement(12, 12, 10), // key: 1mglay
-      DsIconPathElement('m9 12 2 2 4-4'), // key: dzmm74
+    ElIconGlyph.circleCheck: <ElIconElement>[
+      ElIconCircleElement(12, 12, 10), // key: 1mglay
+      ElIconPathElement('m9 12 2 2 4-4'), // key: dzmm74
     ],
 
     // `octagon-x.mjs` — sonner's error toast. The two diagonals are declared
     // AROUND the octagon, not after it: lucide writes the first stroke, then
     // the plate, then the second stroke, so the plate paints over the first
     // diagonal's middle. Order is paint order and the order is kept.
-    DsIconGlyph.octagonX: <DsIconElement>[
-      DsIconPathElement('m15 9-6 6'), // key: 1uzhvr
-      DsIconPathElement(
-          'M2.586 16.726A2 2 0 0 1 2 15.312V8.688a2 2 0 0 1 .586-1.414l4.688-4.688A2 2 0 0 1 8.688 2h6.624a2 2 0 0 1 1.414.586l4.688 4.688A2 2 0 0 1 22 8.688v6.624a2 2 0 0 1-.586 1.414l-4.688 4.688a2 2 0 0 1-1.414.586H8.688a2 2 0 0 1-1.414-.586z'), // key: 2d38gg
-      DsIconPathElement('m9 9 6 6'), // key: z0biqf
+    ElIconGlyph.octagonX: <ElIconElement>[
+      ElIconPathElement('m15 9-6 6'), // key: 1uzhvr
+      ElIconPathElement(
+        'M2.586 16.726A2 2 0 0 1 2 15.312V8.688a2 2 0 0 1 .586-1.414l4.688-4.688A2 2 0 0 1 8.688 2h6.624a2 2 0 0 1 1.414.586l4.688 4.688A2 2 0 0 1 22 8.688v6.624a2 2 0 0 1-.586 1.414l-4.688 4.688a2 2 0 0 1-1.414.586H8.688a2 2 0 0 1-1.414-.586z',
+      ), // key: 2d38gg
+      ElIconPathElement('m9 9 6 6'), // key: z0biqf
     ],
 
     // `circle-x.mjs` — the forms page's server-error Alert, imported there as
     // `XCircle`. Every node is borrowed: the ring is [circleCheck]'s and both
     // diagonals are [octagonX]'s, keys included — which is exactly what shared
     // keys are supposed to look like, since they are content hashes.
-    DsIconGlyph.circleX: <DsIconElement>[
-      DsIconCircleElement(12, 12, 10), // key: 1mglay
-      DsIconPathElement('m15 9-6 6'), // key: 1uzhvr
-      DsIconPathElement('m9 9 6 6'), // key: z0biqf
+    ElIconGlyph.circleX: <ElIconElement>[
+      ElIconCircleElement(12, 12, 10), // key: 1mglay
+      ElIconPathElement('m15 9-6 6'), // key: 1uzhvr
+      ElIconPathElement('m9 9 6 6'), // key: z0biqf
     ],
 
     // `at-sign.mjs` — the inputs page's Email addon. The bowl is a 4-unit
     // circle; the path is the tail that starts inside the ring at (16,8), runs
     // down and around, and stops short of closing so the `@` reads as open.
-    DsIconGlyph.atSign: <DsIconElement>[
-      DsIconCircleElement(12, 12, 4), // key: 4exip2
-      DsIconPathElement('M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-4 8'), // key: 7n84p3
+    ElIconGlyph.atSign: <ElIconElement>[
+      ElIconCircleElement(12, 12, 4), // key: 4exip2
+      ElIconPathElement(
+        'M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-4 8',
+      ), // key: 7n84p3
     ],
 
     // `ticket.mjs` — the inputs page's Invite-code addon. The outline plus
     // three stub perforations down the x = 13 line. Its `d` ends in an
     // uppercase `Z`, which is kept verbatim.
-    DsIconGlyph.ticket: <DsIconElement>[
-      DsIconPathElement(
-          'M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z'), // key: qn84l0
-      DsIconPathElement('M13 5v2'), // key: dyzc3o
-      DsIconPathElement('M13 17v2'), // key: 1ont0d
-      DsIconPathElement('M13 11v2'), // key: 1wjjxi
+    ElIconGlyph.ticket: <ElIconElement>[
+      ElIconPathElement(
+        'M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z',
+      ), // key: qn84l0
+      ElIconPathElement('M13 5v2'), // key: dyzc3o
+      ElIconPathElement('M13 17v2'), // key: 1ont0d
+      ElIconPathElement('M13 11v2'), // key: 1wjjxi
     ],
 
     // `calendar.mjs` — the selects page's date-picker triggers. Two 3-unit
@@ -1209,31 +1262,33 @@ class DsIconPaths {
     // strip from the grid. Lucide declares the tabs FIRST and the plate
     // second, so the plate paints over their feet; order is paint order and
     // the order is kept.
-    DsIconGlyph.calendar: <DsIconElement>[
-      DsIconPathElement('M8 2v3'), // key: 1ioesn
-      DsIconPathElement('M16 2v3'), // key: otl347
-      DsIconRectElement(3, 3, 18, 18, 2), // key: h1oib
-      DsIconPathElement('M3 9h18'), // key: 1pudct
+    ElIconGlyph.calendar: <ElIconElement>[
+      ElIconPathElement('M8 2v3'), // key: 1ioesn
+      ElIconPathElement('M16 2v3'), // key: otl347
+      ElIconRectElement(3, 3, 18, 18, 2), // key: h1oib
+      ElIconPathElement('M3 9h18'), // key: 1pudct
     ],
 
     // `shield-alert.mjs` — the crest, then the stem and the dot.
-    DsIconGlyph.shieldAlert: <DsIconElement>[
-      DsIconPathElement(
-          'M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z'), // key: oel41y
-      DsIconPathElement('M12 8v4'), // key: 1got3b
-      DsIconPathElement('M12 16h.01'), // key: 1drbdi
+    ElIconGlyph.shieldAlert: <ElIconElement>[
+      ElIconPathElement(
+        'M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z',
+      ), // key: oel41y
+      ElIconPathElement('M12 8v4'), // key: 1got3b
+      ElIconPathElement('M12 16h.01'), // key: 1drbdi
     ],
 
     // `gavel.mjs` — the navigation page's "Ending soon". Handle first (the arc
     // in it is the grip's rounded end), then the block, then the head's two
     // faces and its band. Five open strokes; nothing here closes.
-    DsIconGlyph.gavel: <DsIconElement>[
-      DsIconPathElement(
-          'm14 13-8.381 8.38a1 1 0 0 1-3.001-3l8.384-8.381'), // key: pgg06f
-      DsIconPathElement('m16 16 6-6'), // key: vzrcl6
-      DsIconPathElement('m21.5 10.5-8-8'), // key: a17d9x
-      DsIconPathElement('m8 8 6-6'), // key: 18bi4p
-      DsIconPathElement('m8.5 7.5 8 8'), // key: 1oyaui
+    ElIconGlyph.gavel: <ElIconElement>[
+      ElIconPathElement(
+        'm14 13-8.381 8.38a1 1 0 0 1-3.001-3l8.384-8.381',
+      ), // key: pgg06f
+      ElIconPathElement('m16 16 6-6'), // key: vzrcl6
+      ElIconPathElement('m21.5 10.5-8-8'), // key: a17d9x
+      ElIconPathElement('m8 8 6-6'), // key: 18bi4p
+      ElIconPathElement('m8.5 7.5 8 8'), // key: 1oyaui
     ],
   };
 
@@ -1248,16 +1303,16 @@ class DsIconPaths {
   ///
   /// A **fresh** path every call: [Path] is mutable, and a shared instance
   /// would let one painter's `transform`/`addPath` corrupt every other icon.
-  static Path pathFor(DsIconGlyph glyph) {
+  static Path pathFor(ElIconGlyph glyph) {
     final Path path = Path();
-    for (final DsIconElement element in elements[glyph]!) {
+    for (final ElIconElement element in elements[glyph]!) {
       element.addTo(path);
     }
     return path;
   }
 
   /// The glyph's `fill="currentColor"` elements as one [Path], or `null` when
-  /// it has none — which is every glyph but [DsIconGlyph.tag].
+  /// it has none — which is every glyph but [ElIconGlyph.tag].
   ///
   /// `null` rather than an empty [Path] so the painter can skip the second
   /// `drawPath` outright instead of asking Skia to fill nothing.
@@ -1265,9 +1320,9 @@ class DsIconPaths {
   /// Both passes use the same colour, so their order cannot show; the painter
   /// runs stroke first, which also happens to be lucide's element order here
   /// (tag's dot is its last node).
-  static Path? fillPathFor(DsIconGlyph glyph) {
+  static Path? fillPathFor(ElIconGlyph glyph) {
     Path? path;
-    for (final DsIconElement element in elements[glyph]!) {
+    for (final ElIconElement element in elements[glyph]!) {
       if (!element.filled) continue;
       element.addTo(path ??= Path());
     }
@@ -1290,7 +1345,7 @@ class DsIconPaths {
   /// 27.5% of the way in from each edge — that is what pinches the waist and
   /// makes the arms concave rather than a plain diamond.
   ///
-  /// **Deliberately NOT a [DsIconGlyph].** Every member of that enum is a
+  /// **Deliberately NOT a [ElIconGlyph].** Every member of that enum is a
   /// transcript of one lucide module, stroked through `icon.dart`'s ladder,
   /// and the icons page's registry is derived from it by subtraction (78 =
   /// chrome + curated + off-set). This shape is none of those things: its
@@ -1298,13 +1353,14 @@ class DsIconPaths {
   /// all**, and there is no size rung or tone that would make sense for it. It
   /// lands in this file because this file is where transcribed geometry lives
   /// — supervisor ruling F7 — and it stays out of the enum so that neither the
-  /// registry arithmetic nor `DsIcon` can ever reach it by accident.
+  /// registry arithmetic nor `ElIcon` can ever reach it by accident.
   ///
-  /// Held as a [DsIconPathElement] rather than a bare [String] so the `d`
+  /// Held as a [ElIconPathElement] rather than a bare [String] so the `d`
   /// reads as one more transcript beside the others, and so [sparkle] can go
   /// through the same parser every glyph above does.
-  static const DsIconPathElement sparkleElement = DsIconPathElement(
-      'M12 0C12 6.6 17.4 12 24 12C17.4 12 12 17.4 12 24C12 17.4 6.6 12 0 12C6.6 12 12 6.6 12 0Z');
+  static const ElIconPathElement sparkleElement = ElIconPathElement(
+    'M12 0C12 6.6 17.4 12 24 12C17.4 12 12 17.4 12 24C12 17.4 6.6 12 0 12C6.6 12 12 6.6 12 0Z',
+  );
 
   /// [sparkleElement] as a fresh [Path] in 24-unit coordinates — the caller
   /// scales and translates, exactly as the SVG's own
@@ -1376,12 +1432,7 @@ class _SvgPathParser {
 
   /// Whitespace and commas, per the `wsp`/`comma-wsp` productions.
   static bool _isSeparator(String c) =>
-      c == ' ' ||
-      c == ',' ||
-      c == '\t' ||
-      c == '\n' ||
-      c == '\r' ||
-      c == '\f';
+      c == ' ' || c == ',' || c == '\t' || c == '\n' || c == '\r' || c == '\f';
 
   void _skip() {
     while (_i < _d.length && _isSeparator(_d[_i])) {
@@ -1450,10 +1501,10 @@ class _SvgPathParser {
   /// The command an unlettered argument set repeats: `M`/`m` degrade to
   /// `L`/`l`, everything else repeats itself.
   static String _implicitRepeat(String command) => switch (command) {
-        'M' => 'L',
-        'm' => 'l',
-        _ => command,
-      };
+    'M' => 'L',
+    'm' => 'l',
+    _ => command,
+  };
 
   void run(Path path) {
     _skip();
@@ -1505,12 +1556,7 @@ class _SvgPathParser {
         _cubicTo(path, _point(), _point(), _point());
       case 'c':
         final Offset origin = _current;
-        _cubicTo(
-          path,
-          origin + _point(),
-          origin + _point(),
-          origin + _point(),
-        );
+        _cubicTo(path, origin + _point(), origin + _point(), origin + _point());
       case 'S':
         _cubicTo(path, _reflectedCubic, _point(), _point());
       case 's':
@@ -1565,8 +1611,14 @@ class _SvgPathParser {
   }
 
   void _cubicTo(Path path, Offset control1, Offset control2, Offset to) {
-    path.cubicTo(control1.dx, control1.dy, control2.dx, control2.dy, to.dx,
-        to.dy);
+    path.cubicTo(
+      control1.dx,
+      control1.dy,
+      control2.dx,
+      control2.dy,
+      to.dx,
+      to.dy,
+    );
     _current = to;
     _cubicControl = control2;
     _quadControl = null;
@@ -1658,10 +1710,12 @@ class _SvgPathParser {
     final double x1p2 = x1p * x1p;
     final double y1p2 = y1p * y1p;
     final double denominator = rx2 * y1p2 + ry2 * x1p2;
-    double radicand =
-        denominator == 0 ? 0 : (rx2 * ry2 - denominator) / denominator;
+    double radicand = denominator == 0
+        ? 0
+        : (rx2 * ry2 - denominator) / denominator;
     if (radicand < 0) {
-      radicand = 0; // F.6.6 leaves this at exactly 0; float error can dip below.
+      radicand =
+          0; // F.6.6 leaves this at exactly 0; float error can dip below.
     }
     final double coefficient =
         (largeArc == sweep ? -1 : 1) * math.sqrt(radicand);

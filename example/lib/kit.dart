@@ -1,4 +1,4 @@
-/// The docs component library, `components/ds/kit.tsx`.
+/// The docs component library, `components/el/kit.tsx`.
 ///
 /// Every foundation page is assembled out of these and nothing else: a header,
 /// sections, framed panels, notes, reference lists, do/don't pairs, index
@@ -6,9 +6,9 @@
 /// here, once.
 ///
 /// Two rendering facts that look like bugs and are not:
-/// * `DsSection` renders an `h2` **styled `.type-h3`**: the reference's own
+/// * `ElSection` renders an `h2` **styled `.type-h3`**: the reference's own
 ///   deliberate choice, so a page's sections sit a step below its `h1`.
-/// * A [DsNote] title is **always** muted-foreground, in every tone.
+/// * A [ElNote] title is **always** muted-foreground, in every tone.
 ///   `.type-label` declares `color: var(--muted-foreground)` on the element
 ///   itself, which beats the wrapper's `text-*-ink` by inheritance. The tone
 ///   shows in the border and the wash, never in the title.
@@ -22,31 +22,31 @@ import 'shell.dart';
 
 /// `max-w-2xl`, 42rem, the measure every blurb and section description is cut
 /// to.
-final double _measure2xl = ds(168);
+final double _measure2xl = el(168);
 
-/// `sm:grid-cols-[minmax(0,13rem)_1fr]`: the key column in [DsMeta] and the
+/// `sm:grid-cols-[minmax(0,13rem)_1fr]`: the key column in [ElMeta] and the
 /// left column of a swatch row.
-final double _keyColumn = ds(52);
+final double _keyColumn = el(52);
 
 /// `hover:border-action/45` on a lifting card.
 const double _cardHoverBorderAlpha = 0.45;
 
-/// `border-<tone>/30` and `bg-<tone>/[0.08]` on a [DsNote].
+/// `border-<tone>/30` and `bg-<tone>/[0.08]` on a [ElNote].
 const double _noteBorderAlpha = 0.30;
 const double _noteWashAlpha = 0.08;
 
-/// `border-<tone>/25` and `bg-<tone>/[0.06]` on a [DsDoDont] panel.
+/// `border-<tone>/25` and `bg-<tone>/[0.06]` on a [ElDoDont] panel.
 const double _doDontBorderAlpha = 0.25;
 const double _doDontWashAlpha = 0.06;
 
 /// `group-hover:translate-x-0.5`: how far a card's arrow slides.
-final double _arrowSlide = ds(0.5);
+final double _arrowSlide = el(0.5);
 
 /* ── Page header ─────────────────────────────────────────────────────────── */
 
 /// `header.mb-14.border-b.border-border.pb-10`.
-class DsPageHeader extends StatelessWidget {
-  const DsPageHeader({
+class ElPageHeader extends StatelessWidget {
+  const ElPageHeader({
     super.key,
     required this.eyebrow,
     required this.title,
@@ -67,38 +67,38 @@ class DsPageHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     final List<String> chips = contents ?? const <String>[];
 
     return Container(
-      margin: EdgeInsets.only(bottom: ds(14)),
-      padding: EdgeInsets.only(bottom: ds(10)),
+      margin: EdgeInsets.only(bottom: el(14)),
+      padding: EdgeInsets.only(bottom: el(10)),
       decoration: BoxDecoration(
         border: Border(
-          bottom: BorderSide(color: theme.border, width: DsWidths.hairline),
+          bottom: BorderSide(color: theme.border, width: ElWidths.hairline),
         ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          DsText(eyebrow, DsType.label, color: theme.actionInk),
-          SizedBox(height: ds(4)),
-          DsText(
+          ElText(eyebrow, ElType.label, color: theme.actionInk),
+          SizedBox(height: el(4)),
+          ElText(
             title,
-            DsType.h1,
-            fontSize: DsFluid.h1(context),
+            ElType.h1,
+            fontSize: ElFluid.h1(context),
             color: theme.foreground,
           ),
-          SizedBox(height: ds(4)),
+          SizedBox(height: el(4)),
           ConstrainedBox(
             constraints: BoxConstraints(maxWidth: _measure2xl),
-            child: DsText(blurb, DsType.lead),
+            child: ElText(blurb, ElType.lead),
           ),
           if (chips.isNotEmpty) ...<Widget>[
-            SizedBox(height: ds(7)),
+            SizedBox(height: el(7)),
             Wrap(
-              spacing: ds(2),
-              runSpacing: ds(2),
+              spacing: el(2),
+              runSpacing: el(2),
               children: <Widget>[
                 for (final String chip in chips) _HeaderChip(label: chip),
               ],
@@ -118,15 +118,15 @@ class _HeaderChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: ds(3), vertical: ds(1.5)),
+      padding: EdgeInsets.symmetric(horizontal: el(3), vertical: el(1.5)),
       decoration: BoxDecoration(
         color: theme.card,
-        borderRadius: BorderRadius.circular(DsRadii.pill),
-        border: Border.all(color: theme.border, width: DsWidths.hairline),
+        borderRadius: BorderRadius.circular(ElRadii.pill),
+        border: Border.all(color: theme.border, width: ElWidths.hairline),
       ),
-      child: DsText(label, DsType.chip, color: theme.mutedForeground),
+      child: ElText(label, ElType.chip, color: theme.mutedForeground),
     );
   }
 }
@@ -139,8 +139,8 @@ class _HeaderChip extends StatelessWidget {
 /// The reference has **no** `scroll-mt-*` anywhere, `html` carries
 /// `scroll-padding-block-start: var(--scroll-offset)` (96px), which is where
 /// [scrollTo] puts the section's top edge.
-class DsSection extends StatelessWidget {
-  const DsSection({
+class ElSection extends StatelessWidget {
+  const ElSection({
     super.key,
     required this.id,
     required this.title,
@@ -183,37 +183,39 @@ class DsSection extends StatelessWidget {
 
     final double delta =
         box.localToGlobal(Offset.zero, ancestor: viewport).dy -
-            DsWidths.scrollOffset;
+        ElWidths.scrollOffset;
     final ScrollPosition position = scrollable.position;
     await position.animateTo(
-      (position.pixels + delta)
-          .clamp(position.minScrollExtent, position.maxScrollExtent),
-      duration: dsAnimationDuration(target, DsDurations.slow),
-      curve: DsCurves.inOut,
+      (position.pixels + delta).clamp(
+        position.minScrollExtent,
+        position.maxScrollExtent,
+      ),
+      duration: elAnimationDuration(target, ElDurations.slow),
+      curve: ElCurves.inOut,
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return Padding(
       key: anchorKey(id),
-      padding: EdgeInsets.only(bottom: ds(20)),
+      padding: EdgeInsets.only(bottom: el(20)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           Padding(
-            padding: EdgeInsets.only(bottom: ds(6)),
+            padding: EdgeInsets.only(bottom: el(6)),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 // An `h2` wearing `.type-h3`, intentionally.
-                DsText(title, DsType.h3, color: theme.foreground),
+                ElText(title, ElType.h3, color: theme.foreground),
                 if (description != null) ...<Widget>[
-                  SizedBox(height: ds(2)),
+                  SizedBox(height: el(2)),
                   ConstrainedBox(
                     constraints: BoxConstraints(maxWidth: _measure2xl),
-                    child: DsText(description!, DsType.small),
+                    child: ElText(description!, ElType.small),
                   ),
                 ],
               ],
@@ -233,8 +235,8 @@ class DsSection extends StatelessWidget {
 /// `overflow-hidden rounded-xl border border-border bg-card`, an optional
 /// muted header strip, and a `--background` body: so a specimen is never
 /// judged against the card it is mounted on.
-class DsPanel extends StatelessWidget {
-  const DsPanel({
+class ElPanel extends StatelessWidget {
+  const ElPanel({
     super.key,
     this.label,
     this.note,
@@ -269,14 +271,14 @@ class DsPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
-    final BorderRadius radius = BorderRadius.circular(DsRadii.xl);
+    final ElThemeData theme = ElTheme.of(context);
+    final BorderRadius radius = BorderRadius.circular(ElRadii.xl);
 
     return DecoratedBox(
       decoration: BoxDecoration(
         color: theme.card,
         borderRadius: radius,
-        border: Border.all(color: theme.border, width: DsWidths.hairline),
+        border: Border.all(color: theme.border, width: ElWidths.hairline),
       ),
       // `box-sizing: border-box`: the frame is paid for out of the panel's
       // own width, so the strip and the body start at the border's inner edge
@@ -284,25 +286,27 @@ class DsPanel extends StatelessWidget {
       // inside it, so the body's fill still reaches that edge instead of
       // leaving a hairline of card showing.
       child: Padding(
-        padding: const EdgeInsets.all(DsWidths.hairline),
+        padding: const EdgeInsets.all(ElWidths.hairline),
         child: ClipRRect(
           // `overflow-hidden`, so the body's fill stops at the corner: on the
           // *inner* curve, which CSS derives as the outer radius less the
           // border it sits inside.
-          borderRadius: BorderRadius.circular(DsRadii.xl - DsWidths.hairline),
+          borderRadius: BorderRadius.circular(ElRadii.xl - ElWidths.hairline),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               if (label != null || note != null)
                 Container(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: ds(5), vertical: ds(3)),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: el(5),
+                    vertical: el(3),
+                  ),
                   decoration: BoxDecoration(
                     color: theme.muted,
                     border: Border(
                       bottom: BorderSide(
                         color: theme.border,
-                        width: DsWidths.hairline,
+                        width: ElWidths.hairline,
                       ),
                     ),
                   ),
@@ -312,7 +316,7 @@ class DsPanel extends StatelessWidget {
                 color: bodyFill ?? theme.background,
                 padding: flush
                     ? EdgeInsets.zero
-                    : bodyPadding ?? EdgeInsets.all(ds(6)),
+                    : bodyPadding ?? EdgeInsets.all(el(6)),
                 child: child,
               ),
             ],
@@ -363,16 +367,16 @@ class _PanelStrip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     final Widget? labelText = label == null
         ? null
-        : DsText(label!, DsType.label, color: theme.mutedForeground);
+        : ElText(label!, ElType.label, color: theme.mutedForeground);
     final Widget? noteText = note == null
         ? null
         // `.type-num-*` declares no colour of its own; the strip states it.
-        : DsText(
+        : ElText(
             note!,
-            DsType.numSm,
+            ElType.numSm,
             color: theme.mutedForeground,
             // Alignment only matters in the one shape where the note fills the
             // row: with no label to push it over, it right-aligns itself.
@@ -387,10 +391,10 @@ class _PanelStrip extends StatelessWidget {
       children: <Widget>[
         if (labelText != null)
           Flexible(
-            flex: _basis(context, label!, DsType.label),
+            flex: _basis(context, label!, ElType.label),
             child: labelText,
           ),
-        if (labelText != null && noteText != null) SizedBox(width: ds(4)),
+        if (labelText != null && noteText != null) SizedBox(width: el(4)),
         if (noteText != null)
           if (labelText == null)
             // One run and nothing to share with: it takes the strip, and its
@@ -398,7 +402,7 @@ class _PanelStrip extends StatelessWidget {
             Expanded(child: noteText)
           else
             Flexible(
-              flex: _basis(context, note!, DsType.numSm),
+              flex: _basis(context, note!, ElType.numSm),
               child: noteText,
             ),
       ],
@@ -410,7 +414,7 @@ class _PanelStrip extends StatelessWidget {
   /// Rounded because [Flexible.flex] is an `int`, and floored at 1 because
   /// `flex: 0` is not a small share: it is no share at all, and a run that
   /// measured zero would be given no width to lay out in.
-  static int _basis(BuildContext context, String text, DsTypeSpec spec) {
+  static int _basis(BuildContext context, String text, ElTypeSpec spec) {
     final int width = _naturalWidth(context, text, spec).round();
     return width < 1 ? 1 : width;
   }
@@ -425,14 +429,14 @@ class _PanelStrip extends StatelessWidget {
   static double _naturalWidth(
     BuildContext context,
     String text,
-    DsTypeSpec spec,
+    ElTypeSpec spec,
   ) {
     final TextPainter painter = TextPainter(
       text: TextSpan(
         text: spec.uppercase ? text.toUpperCase() : text,
         // Colour cannot move a glyph, so the strip's own `text-*` override is
         // left off and the class resolves its metrics alone.
-        style: DsText.styleOf(context, spec),
+        style: ElText.styleOf(context, spec),
       ),
       textDirection: Directionality.of(context),
     )..layout();
@@ -444,14 +448,14 @@ class _PanelStrip extends StatelessWidget {
 
 /* ── Row ─────────────────────────────────────────────────────────────────── */
 
-/// How a [DsRow] lines its specimens up within a run.
+/// How a [ElRow] lines its specimens up within a run.
 ///
 /// The reference's `align` prop offers a fourth value, `baseline`, which no
 /// page passes. It is **not** declared here: [Wrap] cross-aligns by
 /// [WrapCrossAlignment], which has no baseline member, so the value would have
 /// to silently behave like [start]: and a parameter that quietly does the
 /// wrong thing is worse than an absent one.
-enum DsRowAlign {
+enum ElRowAlign {
   /// `items-center`: the default.
   center,
 
@@ -467,31 +471,31 @@ enum DsRowAlign {
 ///
 /// One gap on both axes: `gap-4` sets `row-gap` and `column-gap` together, so
 /// a run that wraps sits 16px under the one above it.
-class DsRow extends StatelessWidget {
-  const DsRow({
+class ElRow extends StatelessWidget {
+  const ElRow({
     super.key,
     required this.children,
-    this.align = DsRowAlign.center,
+    this.align = ElRowAlign.center,
   });
 
   final List<Widget> children;
 
-  final DsRowAlign align;
+  final ElRowAlign align;
 
   /// `gap-4`.
-  static double get gap => ds(4);
+  static double get gap => el(4);
 
   @override
   Widget build(BuildContext context) => Wrap(
-        spacing: gap,
-        runSpacing: gap,
-        crossAxisAlignment: switch (align) {
-          DsRowAlign.center => WrapCrossAlignment.center,
-          DsRowAlign.start => WrapCrossAlignment.start,
-          DsRowAlign.end => WrapCrossAlignment.end,
-        },
-        children: children,
-      );
+    spacing: gap,
+    runSpacing: gap,
+    crossAxisAlignment: switch (align) {
+      ElRowAlign.center => WrapCrossAlignment.center,
+      ElRowAlign.start => WrapCrossAlignment.start,
+      ElRowAlign.end => WrapCrossAlignment.end,
+    },
+    children: children,
+  );
 }
 
 /* ── State matrices ──────────────────────────────────────────────────────── */
@@ -501,18 +505,18 @@ class DsRow extends StatelessWidget {
 ///
 /// The container is painted `--border` **and** bordered `--border`, and the
 /// `gap-px` gutters let that fill show through between `bg-background`
-/// [DsStateCell]s. So there is no divider widget anywhere in here: the gaps
+/// [ElStateCell]s. So there is no divider widget anywhere in here: the gaps
 /// *are* the rules, and a short last row leaves its trailing slots showing the
 /// field, which is what an empty CSS grid cell does.
-class DsStateGrid extends StatelessWidget {
+class ElStateGrid extends StatelessWidget {
   /// `StateGrid cols={n}`: one of the kit's five column maps.
   ///
   /// Every one of them is 2-up on a phone; they part company at `sm:` and
   /// again at `lg:`. The buttons page passes 4 (variants) and 5 (states).
-  const DsStateGrid({super.key, required this.children, this.cols = 4})
-      : base = null,
-        sm = null,
-        lg = null;
+  const ElStateGrid({super.key, required this.children, this.cols = 4})
+    : base = null,
+      sm = null,
+      lg = null;
 
   /// A lattice with a column map of its own.
   ///
@@ -520,7 +524,7 @@ class DsStateGrid extends StatelessWidget {
   /// lg:grid-cols-3`, which is none of the five above: it is a page-local
   /// grid in the reference too. Only the *frame* is shared, and this is what
   /// sharing it looks like.
-  const DsStateGrid.columns({
+  const ElStateGrid.columns({
     super.key,
     required this.children,
     this.base = 1,
@@ -540,7 +544,7 @@ class DsStateGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     // `{2: "grid-cols-1 sm:grid-cols-2", 3: "grid-cols-2 sm:grid-cols-3",
     //   4: "grid-cols-2 sm:grid-cols-4",
     //   5: "grid-cols-2 sm:grid-cols-3 lg:grid-cols-5",
@@ -557,20 +561,20 @@ class DsStateGrid extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: theme.border,
-        borderRadius: BorderRadius.circular(DsRadii.lg),
-        border: Border.all(color: theme.border, width: DsWidths.hairline),
+        borderRadius: BorderRadius.circular(ElRadii.lg),
+        border: Border.all(color: theme.border, width: ElWidths.hairline),
       ),
       // `box-sizing: border-box`, as everywhere else in the kit: the frame is
       // paid for out of the grid's own width.
       child: Padding(
-        padding: const EdgeInsets.all(DsWidths.hairline),
+        padding: const EdgeInsets.all(ElWidths.hairline),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(DsRadii.lg - DsWidths.hairline),
-          child: DsGrid(
+          borderRadius: BorderRadius.circular(ElRadii.lg - ElWidths.hairline),
+          child: ElGrid(
             base: map.$1,
             sm: map.$2,
             lg: map.$3,
-            gap: DsWidths.hairline,
+            gap: ElWidths.hairline,
             children: children,
           ),
         ),
@@ -579,7 +583,7 @@ class DsStateGrid extends StatelessWidget {
   }
 }
 
-/// `div.bg-background.p-5`: one opaque tile in a [DsStateGrid], holding a
+/// `div.bg-background.p-5`: one opaque tile in a [ElStateGrid], holding a
 /// specimen over its name.
 ///
 /// The demo well is `mb-4 flex min-h-14 items-center justify-center`: **56px
@@ -588,8 +592,8 @@ class DsStateGrid extends StatelessWidget {
 ///
 /// [label] and [note] are the same 10.5px, `.type-micro` and `.type-caption`
 /// are separated only by case, weight, tracking and leading.
-class DsStateCell extends StatelessWidget {
-  const DsStateCell({
+class ElStateCell extends StatelessWidget {
+  const ElStateCell({
     super.key,
     required this.label,
     this.note,
@@ -602,9 +606,9 @@ class DsStateCell extends StatelessWidget {
   /// glyph beside its name: a different composition doing the same structural
   /// job, which is to be the solid tile the lattice shows between. Sharing the
   /// tile is what keeps one `gap-px` grid in the port instead of two.
-  const DsStateCell.bare({super.key, required this.child, this.padding})
-      : label = null,
-        note = null;
+  const ElStateCell.bare({super.key, required this.child, this.padding})
+    : label = null,
+      note = null;
 
   /// `.type-micro text-center text-muted-foreground`, 10.5px, uppercased by
   /// the class.
@@ -616,50 +620,50 @@ class DsStateCell extends StatelessWidget {
 
   final Widget child;
 
-  /// Overrides `p-5`. [DsStateCell.bare] only: the labelled cell's padding is
+  /// Overrides `p-5`. [ElStateCell.bare] only: the labelled cell's padding is
   /// part of the kit's anatomy.
   final EdgeInsetsGeometry? padding;
 
   /// `min-h-14`.
-  static double get wellHeight => ds(14);
+  static double get wellHeight => el(14);
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
 
     if (label == null) {
       return Container(
         color: theme.background,
-        padding: padding ?? EdgeInsets.all(ds(4)),
+        padding: padding ?? EdgeInsets.all(el(4)),
         child: child,
       );
     }
 
     return Container(
       color: theme.background,
-      padding: EdgeInsets.all(ds(5)),
+      padding: EdgeInsets.all(el(5)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           Padding(
-            padding: EdgeInsets.only(bottom: ds(4)),
+            padding: EdgeInsets.only(bottom: el(4)),
             child: ConstrainedBox(
               constraints: BoxConstraints(minHeight: wellHeight),
               child: Center(child: child),
             ),
           ),
-          DsText(
+          ElText(
             label!,
-            DsType.micro,
+            ElType.micro,
             color: theme.mutedForeground,
             align: TextAlign.center,
           ),
           if (note != null) ...<Widget>[
-            SizedBox(height: ds(1.5)),
-            DsText(
+            SizedBox(height: el(1.5)),
+            ElText(
               note!,
-              DsType.caption,
+              ElType.caption,
               color: theme.mutedForeground,
               align: TextAlign.center,
             ),
@@ -672,52 +676,51 @@ class DsStateCell extends StatelessWidget {
 
 /* ── Reference blocks ────────────────────────────────────────────────────── */
 
-/// One `<dt>/<dd>` pair in a [DsMeta].
-typedef DsMetaItem = ({String k, InlineSpan v});
+/// One `<dt>/<dd>` pair in a [ElMeta].
+typedef ElMetaItem = ({String k, InlineSpan v});
 
 /// `dl.divide-y.divide-border.overflow-hidden.rounded-lg.border.bg-card`: the
 /// token/prop reference list.
 ///
-/// Values are [InlineSpan]s because half of them contain [DsCode] chips; a
+/// Values are [InlineSpan]s because half of them contain [ElCode] chips; a
 /// bare `TextSpan(text: …)` inherits the row's own `.type-small` muted style.
-class DsMeta extends StatelessWidget {
-  const DsMeta({super.key, required this.items});
+class ElMeta extends StatelessWidget {
+  const ElMeta({super.key, required this.items});
 
-  final List<DsMetaItem> items;
+  final List<ElMetaItem> items;
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
-    final bool wide = MediaQuery.sizeOf(context).width >= DsBreakpoints.sm;
+    final ElThemeData theme = ElTheme.of(context);
+    final bool wide = MediaQuery.sizeOf(context).width >= ElBreakpoints.sm;
 
-    return DsDividedList(
-      radius: DsRadii.lg,
+    return ElDividedList(
+      radius: ElRadii.lg,
       children: <Widget>[
-        for (final DsMetaItem item in items)
+        for (final ElMetaItem item in items)
           Padding(
-            padding:
-                EdgeInsets.symmetric(horizontal: ds(4), vertical: ds(3)),
+            padding: EdgeInsets.symmetric(horizontal: el(4), vertical: el(3)),
             child: wide
                 ? Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       SizedBox(
                         width: _keyColumn,
-                        child: DsText(
+                        child: ElText(
                           item.k,
-                          DsType.numSm,
+                          ElType.numSm,
                           color: theme.actionInk,
                         ),
                       ),
-                      SizedBox(width: ds(4)),
+                      SizedBox(width: el(4)),
                       Expanded(child: _MetaValue(value: item.v)),
                     ],
                   )
                 : Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      DsText(item.k, DsType.numSm, color: theme.actionInk),
-                      SizedBox(height: ds(1)),
+                      ElText(item.k, ElType.numSm, color: theme.actionInk),
+                      SizedBox(height: el(1)),
                       _MetaValue(value: item.v),
                     ],
                   ),
@@ -733,22 +736,22 @@ class _MetaValue extends StatelessWidget {
   final InlineSpan value;
 
   @override
-  Widget build(BuildContext context) => DsRichText(value, DsType.small);
+  Widget build(BuildContext context) => ElRichText(value, ElType.small);
 }
 
 /// `code.type-code.rounded-sm.border.border-border.bg-card.px-1.5.py-0.5` —
 /// the inline code chip.
-class DsCode extends StatelessWidget {
-  const DsCode(this.text, {super.key})
-      : chip = text,
-        _openLeft = false,
-        _openRight = false;
+class ElCode extends StatelessWidget {
+  const ElCode(this.text, {super.key})
+    : chip = text,
+      _openLeft = false,
+      _openRight = false;
 
   /// One slice of a chip that a line break ran through: see [span].
   ///
   /// Positional because two of the fields are private, and a named parameter
   /// may not be: the whole chip, then the left edge, then the right.
-  const DsCode._fragment(this.text, this.chip, this._openLeft, this._openRight);
+  const ElCode._fragment(this.text, this.chip, this._openLeft, this._openRight);
 
   /// What this widget draws: a slice of [chip], or all of it.
   final String text;
@@ -768,7 +771,7 @@ class DsCode extends StatelessWidget {
 
   /// What the chip's frame costs it vertically: `py-0.5` twice, plus a
   /// hairline on each edge. A browser paints all four outside the line box.
-  static final double _frame = (ds(0.5) + DsWidths.hairline) * 2;
+  static final double _frame = (el(0.5) + ElWidths.hairline) * 2;
 
   /// The chip cut at every break opportunity CSS gives it.
   ///
@@ -796,7 +799,7 @@ class DsCode extends StatelessWidget {
   /// `<code>` is an inline element: the line box grows for its `line-height`
   /// only: never for its padding or its border, which overflow the leading —
   /// and its glyphs sit on the sentence's own baseline. A [WidgetSpan] makes
-  /// no such distinction, so [DsInlineBox] hides the frame from the line and
+  /// no such distinction, so [ElInlineBox] hides the frame from the line and
   /// `PlaceholderAlignment.baseline` does the rest.
   ///
   /// A placeholder is also atomic, and a chip is not: it goes on one span per
@@ -827,23 +830,22 @@ class DsCode extends StatelessWidget {
     String chip, {
     required bool openLeft,
     required bool openRight,
-  }) =>
-      WidgetSpan(
-        alignment: PlaceholderAlignment.baseline,
-        baseline: TextBaseline.alphabetic,
-        child: DsInlineBox(
-          trim: _frame,
-          child: DsCode._fragment(text, chip, openLeft, openRight),
-        ),
-      );
+  }) => WidgetSpan(
+    alignment: PlaceholderAlignment.baseline,
+    baseline: TextBaseline.alphabetic,
+    child: ElInlineBox(
+      trim: _frame,
+      child: ElCode._fragment(text, chip, openLeft, openRight),
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     // `px-1.5 py-0.5` plus the border, which insets content as CSS's
     // border-box does: and which an open edge does not have.
-    final double pad = ds(1.5) + DsWidths.hairline;
-    final double lead = ds(0.5) + DsWidths.hairline;
+    final double pad = el(1.5) + ElWidths.hairline;
+    final double lead = el(0.5) + ElWidths.hairline;
     return CustomPaint(
       painter: _ChipFrame(
         fill: theme.card,
@@ -858,9 +860,9 @@ class DsCode extends StatelessWidget {
           _openRight ? 0 : pad,
           lead,
         ),
-        child: DsText(
+        child: ElText(
           text,
-          DsType.code,
+          ElType.code,
           color: theme.mutedForeground,
           inline: true,
         ),
@@ -891,7 +893,7 @@ class _ChipFrame extends CustomPainter {
   final bool openRight;
 
   /// Enough for the hidden side's corners and border to fall outside the clip.
-  static const double _overhang = DsRadii.sm + DsWidths.hairline;
+  static const double _overhang = ElRadii.sm + ElWidths.hairline;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -901,11 +903,11 @@ class _ChipFrame extends CustomPainter {
       size.width + (openRight ? _overhang : 0),
       size.height,
     );
-    const Radius radius = Radius.circular(DsRadii.sm);
+    const Radius radius = Radius.circular(ElRadii.sm);
     // Half the hairline: a CSS border is drawn inside the border box, so the
     // stroke's centre line sits half a width in: the same inset
     // `BoxBorder.paintUniformBorder` uses for `BorderSide.strokeAlignInside`.
-    final double inset = DsWidths.hairline / 2;
+    final double inset = ElWidths.hairline / 2;
 
     canvas.save();
     canvas.clipRect(Offset.zero & size);
@@ -916,12 +918,12 @@ class _ChipFrame extends CustomPainter {
     canvas.drawRRect(
       RRect.fromRectAndRadius(
         whole.deflate(inset),
-        Radius.circular(DsRadii.sm - inset),
+        Radius.circular(ElRadii.sm - inset),
       ),
       Paint()
         ..color = stroke
         ..style = PaintingStyle.stroke
-        ..strokeWidth = DsWidths.hairline,
+        ..strokeWidth = ElWidths.hairline,
     );
     canvas.restore();
   }
@@ -936,38 +938,38 @@ class _ChipFrame extends CustomPainter {
 
 /// `pre.type-code.scrollbar-thin.overflow-x-auto.rounded-lg.border.border-border
 /// .bg-background.p-5.leading-relaxed.text-muted-foreground`: the multi-line
-/// code sample. [DsCode]'s block-level twin, and the only one of the pair that
+/// code sample. [ElCode]'s block-level twin, and the only one of the pair that
 /// scrolls.
 ///
 /// Three cascade facts decide how it reads, and two of them are utilities
 /// beating the component layer:
 /// * **`leading-relaxed` beats `.type-code`.** The class declares its own
-///   leading inside `@layer components`, [DsType.code]'s, which owns that
+///   leading inside `@layer components`, [ElType.code]'s, which owns that
 ///   number: and `leading-relaxed` is a utility, so the utility's 1.625 wins:
 ///   20.3125px per line. That override is why the style is assembled here
-///   rather than handed to [DsText], which renders a `.type-*` class as
-///   declared. The ratio is read off [DsComponentType.textareaBody], which
+///   rather than handed to [ElText], which renders a `.type-*` class as
+///   declared. The ratio is read off [ElComponentType.textareaBody], which
 ///   resolves the same utility on `Textarea`: one spelling of one number,
 ///   not a second literal that can drift from it.
 /// * **`.type-code` sets no `font-weight`**, so a sample inherits 400. It is
 ///   the one mono class on the site that is not 600.
-/// * The fill is `--background`: the same colour as the [DsPanel] body it
+/// * The fill is `--background`: the same colour as the [ElPanel] body it
 ///   sits in: so only the hairline tells the two apart.
 ///
 /// `<pre>` neither wraps nor reflows: it keeps the line breaks it was authored
 /// with and hands anything too wide for the column to `overflow-x-auto`.
-class DsCodeBlock extends StatefulWidget {
-  const DsCodeBlock(this.code, {super.key});
+class ElCodeBlock extends StatefulWidget {
+  const ElCodeBlock(this.code, {super.key});
 
   /// The sample, exactly as authored: newlines included, blank lines
   /// included, and never re-broken to fit.
   final String code;
 
   @override
-  State<DsCodeBlock> createState() => _DsCodeBlockState();
+  State<ElCodeBlock> createState() => _DsCodeBlockState();
 }
 
-class _DsCodeBlockState extends State<DsCodeBlock> {
+class _DsCodeBlockState extends State<ElCodeBlock> {
   /// The scroller and its bar read the same position, which is what makes the
   /// thumb track the text rather than a second, parallel scroll offset.
   final ScrollController _scroller = ScrollController();
@@ -980,27 +982,29 @@ class _DsCodeBlockState extends State<DsCodeBlock> {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
-    final TextStyle style =
-        DsText.styleOf(context, DsType.code, color: theme.mutedForeground)
-            .copyWith(height: DsComponentType.textareaBody.height);
+    final ElThemeData theme = ElTheme.of(context);
+    final TextStyle style = ElText.styleOf(
+      context,
+      ElType.code,
+      color: theme.mutedForeground,
+    ).copyWith(height: ElComponentType.textareaBody.height);
 
     return DecoratedBox(
       decoration: BoxDecoration(
         color: theme.background,
-        borderRadius: BorderRadius.circular(DsRadii.lg),
-        border: Border.all(color: theme.border, width: DsWidths.hairline),
+        borderRadius: BorderRadius.circular(ElRadii.lg),
+        border: Border.all(color: theme.border, width: ElWidths.hairline),
       ),
       // `box-sizing: border-box`: the hairline is paid for out of the block's
       // own width, so the scroll port starts at the border's inner edge. Same
-      // treatment [DsPanel] gives its body, and the reason the frame stays put
+      // treatment [ElPanel] gives its body, and the reason the frame stays put
       // while the text underneath it moves.
       child: Padding(
-        padding: const EdgeInsets.all(DsWidths.hairline),
+        padding: const EdgeInsets.all(ElWidths.hairline),
         child: ClipRRect(
           // The inner curve: the outer radius less the border inside it.
-          borderRadius: BorderRadius.circular(DsRadii.lg - DsWidths.hairline),
-          child: DsThinScrollbar(
+          borderRadius: BorderRadius.circular(ElRadii.lg - ElWidths.hairline),
+          child: ElThinScrollbar(
             controller: _scroller,
             child: SingleChildScrollView(
               controller: _scroller,
@@ -1009,8 +1013,8 @@ class _DsCodeBlockState extends State<DsCodeBlock> {
               // content: the left inset is what the first line starts behind,
               // and the right one is what the longest line ends against once
               // it has been scrolled to.
-              padding: EdgeInsets.all(ds(5)),
-              child: DsLineBox(
+              padding: EdgeInsets.all(el(5)),
+              child: ElLineBox(
                 style: style,
                 // `softWrap: false` in a horizontally unbounded port is
                 // `white-space: pre`: the sample is laid out at its own
@@ -1028,33 +1032,33 @@ class _DsCodeBlockState extends State<DsCodeBlock> {
 /* ── Do / Don't ──────────────────────────────────────────────────────────── */
 
 /// The rule pair. Every page that has a trap states it here.
-class DsDoDont extends StatelessWidget {
-  const DsDoDont({super.key, required this.dos, required this.donts});
+class ElDoDont extends StatelessWidget {
+  const ElDoDont({super.key, required this.dos, required this.donts});
 
   final List<String> dos;
   final List<String> donts;
 
   @override
   Widget build(BuildContext context) {
-    return DsGrid(
+    return ElGrid(
       sm: 2,
       children: <Widget>[
         _DoDontPanel(
           heading: 'Do',
-          tone: DsPalette.value,
-          ink: DsTheme.of(context).valueInk,
-          glyph: DsIconGlyph.check,
-          iconTone: DsIconTone.value,
+          tone: ElPalette.value,
+          ink: ElTheme.of(context).valueInk,
+          glyph: ElIconGlyph.check,
+          iconTone: ElIconTone.value,
           items: dos,
         ),
         _DoDontPanel(
           // `Don&rsquo;t`: a real right single quotation mark, not an
           // apostrophe.
           heading: 'Don’t',
-          tone: DsTheme.of(context).destructive,
-          ink: DsTheme.of(context).destructiveInk,
-          glyph: DsIconGlyph.x,
-          iconTone: DsIconTone.error,
+          tone: ElTheme.of(context).destructive,
+          ink: ElTheme.of(context).destructiveInk,
+          glyph: ElIconGlyph.x,
+          iconTone: ElIconTone.error,
           items: donts,
         ),
       ],
@@ -1075,43 +1079,39 @@ class _DoDontPanel extends StatelessWidget {
   final String heading;
   final Color tone;
   final Color ink;
-  final DsIconGlyph glyph;
-  final DsIconTone iconTone;
+  final ElIconGlyph glyph;
+  final ElIconTone iconTone;
   final List<String> items;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(ds(5)),
+      padding: EdgeInsets.all(el(5)),
       decoration: BoxDecoration(
         color: tone.withValues(alpha: _doDontWashAlpha),
-        borderRadius: BorderRadius.circular(DsRadii.lg),
+        borderRadius: BorderRadius.circular(ElRadii.lg),
         border: Border.all(
           color: tone.withValues(alpha: _doDontBorderAlpha),
-          width: DsWidths.hairline,
+          width: ElWidths.hairline,
         ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          DsText(heading, DsType.label, color: ink),
-          SizedBox(height: ds(3)),
+          ElText(heading, ElType.label, color: ink),
+          SizedBox(height: el(3)),
           for (int i = 0; i < items.length; i++) ...<Widget>[
-            if (i > 0) SizedBox(height: ds(2.5)),
+            if (i > 0) SizedBox(height: el(2.5)),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Padding(
                   // `mt-0.5`: the glyph sits on the first line's x-height.
-                  padding: EdgeInsets.only(top: ds(0.5)),
-                  child: DsIcon(
-                    glyph,
-                    size: DsIconSize.sm,
-                    tone: iconTone,
-                  ),
+                  padding: EdgeInsets.only(top: el(0.5)),
+                  child: ElIcon(glyph, size: ElIconSize.sm, tone: iconTone),
                 ),
-                SizedBox(width: ds(2.5)),
-                Expanded(child: DsText(items[i], DsType.small)),
+                SizedBox(width: el(2.5)),
+                Expanded(child: ElText(items[i], ElType.small)),
               ],
             ),
           ],
@@ -1123,46 +1123,46 @@ class _DoDontPanel extends StatelessWidget {
 
 /* ── Note ────────────────────────────────────────────────────────────────── */
 
-/// Which ramp a [DsNote] washes itself with.
-enum DsNoteTone { action, value, error }
+/// Which ramp a [ElNote] washes itself with.
+enum ElNoteTone { action, value, error }
 
 /// Callout for a rule or trap worth interrupting the reader for.
-class DsNote extends StatelessWidget {
-  const DsNote({
+class ElNote extends StatelessWidget {
+  const ElNote({
     super.key,
-    this.tone = DsNoteTone.action,
+    this.tone = ElNoteTone.action,
     this.title,
     required this.child,
   });
 
-  final DsNoteTone tone;
+  final ElNoteTone tone;
 
   /// Renders `--muted-foreground` in **every** tone: see the library note.
   final String? title;
 
   /// Wrapped in `.type-small text-muted-foreground`, so a plain [Text.rich]
-  /// with [DsCode] chips inherits the right style.
+  /// with [ElCode] chips inherits the right style.
   final Widget child;
 
-  Color _tone(DsThemeData theme) => switch (tone) {
-        DsNoteTone.action => DsPalette.action,
-        DsNoteTone.value => DsPalette.value,
-        DsNoteTone.error => theme.destructive,
-      };
+  Color _tone(ElThemeData theme) => switch (tone) {
+    ElNoteTone.action => ElPalette.action,
+    ElNoteTone.value => ElPalette.value,
+    ElNoteTone.error => theme.destructive,
+  };
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     final Color ramp = _tone(theme);
 
     return Container(
-      padding: EdgeInsets.all(ds(5)),
+      padding: EdgeInsets.all(el(5)),
       decoration: BoxDecoration(
         color: ramp.withValues(alpha: _noteWashAlpha),
-        borderRadius: BorderRadius.circular(DsRadii.lg),
+        borderRadius: BorderRadius.circular(ElRadii.lg),
         border: Border.all(
           color: ramp.withValues(alpha: _noteBorderAlpha),
-          width: DsWidths.hairline,
+          width: ElWidths.hairline,
         ),
       ),
       child: Column(
@@ -1171,11 +1171,11 @@ class DsNote extends StatelessWidget {
           if (title != null) ...<Widget>[
             // No colour override: `.type-label` brings its own
             // `--muted-foreground`, which is what the browser renders here.
-            DsText(title!, DsType.label),
-            SizedBox(height: ds(2)),
+            ElText(title!, ElType.label),
+            SizedBox(height: el(2)),
           ],
           DefaultTextStyle(
-            style: DsText.styleOf(context, DsType.small),
+            style: ElText.styleOf(context, ElType.small),
             child: child,
           ),
         ],
@@ -1187,22 +1187,22 @@ class DsNote extends StatelessWidget {
 /* ── Index cards ─────────────────────────────────────────────────────────── */
 
 /// `grid gap-4 sm:grid-cols-2 xl:grid-cols-3`: the foundations index.
-class DsIndexGrid extends StatelessWidget {
-  const DsIndexGrid({super.key, required this.children});
+class ElIndexGrid extends StatelessWidget {
+  const ElIndexGrid({super.key, required this.children});
 
   final List<Widget> children;
 
   @override
   Widget build(BuildContext context) =>
-      DsGrid(sm: 2, xl: 3, children: children);
+      ElGrid(sm: 2, xl: 3, children: children);
 }
 
 /// A responsive card grid: [base] columns, widened at each named breakpoint.
 ///
 /// Rows stretch to their tallest card, which is what a CSS grid row does and
 /// what lets a card push its chip strip to the bottom edge.
-class DsGrid extends StatelessWidget {
-  const DsGrid({
+class ElGrid extends StatelessWidget {
+  const ElGrid({
     super.key,
     required this.children,
     this.base = 1,
@@ -1225,23 +1225,25 @@ class DsGrid extends StatelessWidget {
 
   int _columns(double viewport) {
     int columns = base;
-    if (sm != null && viewport >= DsBreakpoints.sm) columns = sm!;
-    if (md != null && viewport >= DsBreakpoints.md) columns = md!;
-    if (lg != null && viewport >= DsBreakpoints.lg) columns = lg!;
-    if (xl != null && viewport >= DsBreakpoints.xl) columns = xl!;
+    if (sm != null && viewport >= ElBreakpoints.sm) columns = sm!;
+    if (md != null && viewport >= ElBreakpoints.md) columns = md!;
+    if (lg != null && viewport >= ElBreakpoints.lg) columns = lg!;
+    if (xl != null && viewport >= ElBreakpoints.xl) columns = xl!;
     return columns;
   }
 
   @override
   Widget build(BuildContext context) {
-    final double space = gap ?? ds(4);
+    final double space = gap ?? el(4);
     final int columns = _columns(MediaQuery.sizeOf(context).width);
     final List<List<Widget>> rows = <List<Widget>>[];
     for (int i = 0; i < children.length; i += columns) {
-      rows.add(children.sublist(
-        i,
-        i + columns > children.length ? children.length : i + columns,
-      ));
+      rows.add(
+        children.sublist(
+          i,
+          i + columns > children.length ? children.length : i + columns,
+        ),
+      );
     }
 
     return Column(
@@ -1277,18 +1279,18 @@ class DsGrid extends StatelessWidget {
 /// Two shapes, one component, as the reference has them: the six-up index card
 /// (`p-5`, `.type-h4` title, 16px arrow) and the three-up group card (`p-7`, a
 /// `N sets` label over a `.type-h3` title, 20px arrow).
-class DsIndexCard extends StatelessWidget {
-  const DsIndexCard({
+class ElIndexCard extends StatelessWidget {
+  const ElIndexCard({
     super.key,
     required this.href,
     required this.title,
     required this.blurb,
     required this.contents,
-  })  : label = null,
-        _group = false;
+  }) : label = null,
+       _group = false;
 
   /// The `#components` variant.
-  const DsIndexCard.group({
+  const ElIndexCard.group({
     super.key,
     required this.href,
     required this.label,
@@ -1310,74 +1312,82 @@ class DsIndexCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
-    final double pad = _group ? ds(7) : ds(5);
-    final double chipGap = _group ? ds(5) : ds(4);
+    final ElThemeData theme = ElTheme.of(context);
+    final double pad = _group ? el(7) : el(5);
+    final double chipGap = _group ? el(5) : el(4);
 
-    return DsLiftCard(
-      radius: BorderRadius.circular(DsRadii.xl),
+    return ElLiftCard(
+      radius: BorderRadius.circular(ElRadii.xl),
       fill: theme.card,
       borderColor: theme.border,
-      hoverBorderColor:
-          DsPalette.action.withValues(alpha: _cardHoverBorderAlpha),
+      hoverBorderColor: ElPalette.action.withValues(
+        alpha: _cardHoverBorderAlpha,
+      ),
       padding: EdgeInsets.all(pad),
       onTap: () => AppRouter.of(context).navigate(href),
       builder: (BuildContext context, bool hovered) =>
           SelectionContainer.disabled(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                Expanded(
-                  child: _group
-                      ? Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            DsText(
-                              label!,
-                              DsType.label,
-                              color: theme.actionInk,
-                            ),
-                            SizedBox(height: ds(3)),
-                            DsText(title, DsType.h3, color: theme.foreground),
-                          ],
-                        )
-                      : DsText(title, DsType.h4, color: theme.foreground),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Expanded(
+                      child: _group
+                          ? Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                ElText(
+                                  label!,
+                                  ElType.label,
+                                  color: theme.actionInk,
+                                ),
+                                SizedBox(height: el(3)),
+                                ElText(
+                                  title,
+                                  ElType.h3,
+                                  color: theme.foreground,
+                                ),
+                              ],
+                            )
+                          : ElText(title, ElType.h4, color: theme.foreground),
+                    ),
+                    SizedBox(width: _group ? el(4) : el(3)),
+                    Padding(
+                      // `mt-1` on the group card, `mt-0.5` on the index card.
+                      padding: EdgeInsets.only(top: _group ? el(1) : el(0.5)),
+                      child: _CardArrow(hovered: hovered, large: _group),
+                    ),
+                  ],
                 ),
-                SizedBox(width: _group ? ds(4) : ds(3)),
-                Padding(
-                  // `mt-1` on the group card, `mt-0.5` on the index card.
-                  padding: EdgeInsets.only(top: _group ? ds(1) : ds(0.5)),
-                  child: _CardArrow(hovered: hovered, large: _group),
+                SizedBox(height: _group ? el(3) : el(2)),
+                // `grow`: the blurb takes the slack so the chips sit on the
+                // bottom edge however tall the row's tallest card is.
+                Expanded(child: ElText(blurb, ElType.small)),
+                SizedBox(height: chipGap),
+                Container(
+                  padding: EdgeInsets.only(top: chipGap),
+                  decoration: BoxDecoration(
+                    border: Border(
+                      top: BorderSide(
+                        color: theme.border,
+                        width: ElWidths.hairline,
+                      ),
+                    ),
+                  ),
+                  child: Wrap(
+                    spacing: el(1.5),
+                    runSpacing: el(1.5),
+                    children: <Widget>[
+                      for (final String chip in contents)
+                        _CardChip(label: chip),
+                    ],
+                  ),
                 ),
               ],
             ),
-            SizedBox(height: _group ? ds(3) : ds(2)),
-            // `grow`: the blurb takes the slack so the chips sit on the
-            // bottom edge however tall the row's tallest card is.
-            Expanded(child: DsText(blurb, DsType.small)),
-            SizedBox(height: chipGap),
-            Container(
-              padding: EdgeInsets.only(top: chipGap),
-              decoration: BoxDecoration(
-                border: Border(
-                  top:
-                      BorderSide(color: theme.border, width: DsWidths.hairline),
-                ),
-              ),
-              child: Wrap(
-                spacing: ds(1.5),
-                runSpacing: ds(1.5),
-                children: <Widget>[
-                  for (final String chip in contents) _CardChip(label: chip),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
+          ),
     );
   }
 }
@@ -1386,7 +1396,7 @@ class DsIndexCard extends StatelessWidget {
 /// group-hover:translate-x-0.5 group-hover:text-action-ink`.
 ///
 /// `duration-fast` is not a utility Tailwind v4 can generate, so the slide
-/// and the tint both run at [DsDurations.transitionDefault]: probed at
+/// and the tint both run at [ElDurations.transitionDefault]: probed at
 /// 0.25s on the index, the components index and every group page.
 class _CardArrow extends StatelessWidget {
   const _CardArrow({required this.hovered, required this.large});
@@ -1402,33 +1412,36 @@ class _CardArrow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
-    final Duration transition =
-        dsAnimationDuration(context, DsDurations.transitionDefault);
+    final ElThemeData theme = ElTheme.of(context);
+    final Duration transition = elAnimationDuration(
+      context,
+      ElDurations.transitionDefault,
+    );
     // `AnimatedSlide` measures its offset in child widths, and the two
     // variants are different widths for the same 2px travel.
-    final double px = large ? ds(5) : DsIcon.pxFor(DsIconSize.md);
+    final double px = large ? el(5) : ElIcon.pxFor(ElIconSize.md);
 
     return AnimatedSlide(
       offset: Offset(hovered ? _arrowSlide / px : 0, 0),
       duration: transition,
-      curve: DsCurves.out,
+      curve: ElCurves.out,
       child: TweenAnimationBuilder<Color?>(
         tween: ColorTween(
           end: hovered ? theme.actionInk : theme.mutedForeground,
         ),
         duration: transition,
-        curve: DsCurves.out,
+        curve: ElCurves.out,
         builder: (BuildContext context, Color? colour, Widget? child) =>
             DefaultTextStyle.merge(
-          style: TextStyle(color: colour),
-          child: child!,
-        ),
-        child: DsIcon(
-          DsIconGlyph.arrowRight,
-          sizePx: large ? ds(5) : null,
-          strokeOverride:
-              large ? DsIcon.strokeFor(DsIcon.pxFor(DsIconSize.md)) : null,
+              style: TextStyle(color: colour),
+              child: child!,
+            ),
+        child: ElIcon(
+          ElIconGlyph.arrowRight,
+          sizePx: large ? el(5) : null,
+          strokeOverride: large
+              ? ElIcon.strokeFor(ElIcon.pxFor(ElIconSize.md))
+              : null,
         ),
       ),
     );
@@ -1443,14 +1456,14 @@ class _CardChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: ds(2), vertical: ds(1)),
+      padding: EdgeInsets.symmetric(horizontal: el(2), vertical: el(1)),
       decoration: BoxDecoration(
         color: theme.muted,
-        borderRadius: BorderRadius.circular(DsRadii.sm),
+        borderRadius: BorderRadius.circular(ElRadii.sm),
       ),
-      child: DsText(label, DsType.caption, color: theme.mutedForeground),
+      child: ElText(label, ElType.caption, color: theme.mutedForeground),
     );
   }
 }
@@ -1462,30 +1475,30 @@ class _CardChip extends StatelessWidget {
 /// Reads its two neighbours out of the nav registry, so the order of the pages
 /// is stated once. A missing side is an empty flex slot, not a missing card —
 /// the present side keeps its half of the row.
-class DsPageFootNav extends StatelessWidget {
-  const DsPageFootNav({super.key, required this.groupId, required this.slug});
+class ElPageFootNav extends StatelessWidget {
+  const ElPageFootNav({super.key, required this.groupId, required this.slug});
 
   final String groupId;
   final String slug;
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
-    final DsSiblings around = siblings(groupId, slug);
+    final ElThemeData theme = ElTheme.of(context);
+    final ElSiblings around = siblings(groupId, slug);
     if (around.prev == null && around.next == null) {
       return const SizedBox.shrink();
     }
 
     return Container(
       // No `mt-8` here, and that is not an omission: the nav always follows a
-      // `DsSection`, whose `mb-20` is an adjoining margin. CSS collapses the
+      // `ElSection`, whose `mb-20` is an adjoining margin. CSS collapses the
       // pair to the larger of the two, so the 80px below the last section is
       // the whole gap and the nav's own 32px never shows. Flutter has no
       // margin collapsing: it would add them: so the collapse is done here.
-      padding: EdgeInsets.only(top: ds(8)),
+      padding: EdgeInsets.only(top: el(8)),
       decoration: BoxDecoration(
         border: Border(
-          top: BorderSide(color: theme.border, width: DsWidths.hairline),
+          top: BorderSide(color: theme.border, width: ElWidths.hairline),
         ),
       ),
       child: IntrinsicHeight(
@@ -1497,7 +1510,7 @@ class DsPageFootNav extends StatelessWidget {
                   ? const SizedBox.shrink()
                   : _FootNavCard(link: around.prev!, isNext: false),
             ),
-            SizedBox(width: ds(4)),
+            SizedBox(width: el(4)),
             Expanded(
               child: around.next == null
                   ? const SizedBox.shrink()
@@ -1513,7 +1526,7 @@ class DsPageFootNav extends StatelessWidget {
 class _FootNavCard extends StatefulWidget {
   const _FootNavCard({required this.link, required this.isNext});
 
-  final DsNavLink link;
+  final ElNavLink link;
   final bool isNext;
 
   @override
@@ -1525,11 +1538,11 @@ class _FootNavCardState extends State<_FootNavCard> {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
 
-    final Widget arrow = DsIcon(
-      widget.isNext ? DsIconGlyph.arrowRight : DsIconGlyph.arrowLeft,
-      tone: DsIconTone.muted,
+    final Widget arrow = ElIcon(
+      widget.isNext ? ElIconGlyph.arrowRight : ElIconGlyph.arrowLeft,
+      tone: ElIconTone.muted,
     );
     final Widget copy = Column(
       crossAxisAlignment: widget.isNext
@@ -1537,15 +1550,15 @@ class _FootNavCardState extends State<_FootNavCard> {
           : CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        DsText(
+        ElText(
           widget.isNext ? 'Next' : 'Previous',
-          DsType.micro,
+          ElType.micro,
           align: widget.isNext ? TextAlign.right : TextAlign.left,
         ),
-        SizedBox(height: ds(1)),
-        DsText(
+        SizedBox(height: el(1)),
+        ElText(
           widget.link.title,
-          DsType.small,
+          ElType.small,
           color: theme.foreground,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
@@ -1558,20 +1571,20 @@ class _FootNavCardState extends State<_FootNavCard> {
       cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => _hovered = true),
       onExit: (_) => setState(() => _hovered = false),
-      child: DsPress(
+      child: ElPress(
         onTap: () => AppRouter.of(context).navigate(widget.link.href),
         child: SelectionContainer.disabled(
           child: Container(
-            padding: EdgeInsets.symmetric(horizontal: ds(5), vertical: ds(4)),
+            padding: EdgeInsets.symmetric(horizontal: el(5), vertical: el(4)),
             decoration: BoxDecoration(
               color: theme.card,
-              borderRadius: BorderRadius.circular(DsRadii.lg),
+              borderRadius: BorderRadius.circular(ElRadii.lg),
               // `hover:border-input` with no transition utility on colour:
               // the card's `press` covers `transform` only, so this swap is
               // instant.
               border: Border.all(
                 color: _hovered ? theme.input : theme.border,
-                width: DsWidths.hairline,
+                width: ElWidths.hairline,
               ),
             ),
             child: Row(
@@ -1579,9 +1592,9 @@ class _FootNavCardState extends State<_FootNavCard> {
                   ? MainAxisAlignment.end
                   : MainAxisAlignment.start,
               children: <Widget>[
-                if (!widget.isNext) ...<Widget>[arrow, SizedBox(width: ds(3))],
+                if (!widget.isNext) ...<Widget>[arrow, SizedBox(width: el(3))],
                 Flexible(child: copy),
-                if (widget.isNext) ...<Widget>[SizedBox(width: ds(3)), arrow],
+                if (widget.isNext) ...<Widget>[SizedBox(width: el(3)), arrow],
               ],
             ),
           ),
@@ -1596,13 +1609,13 @@ class _FootNavCardState extends State<_FootNavCard> {
 /// `divide-y divide-border overflow-hidden rounded-lg border border-border
 /// bg-card`: one card with hairlines between its rows and none at its edges.
 ///
-/// Public because three pages stack rows this way outside [DsMeta]: the
+/// Public because three pages stack rows this way outside [ElMeta]: the
 /// overview's numbered rules (`rounded-xl`), the typography specimen rows, and
 /// the colors page's swatch list.
-class DsDividedList extends StatelessWidget {
-  const DsDividedList({
+class ElDividedList extends StatelessWidget {
+  const ElDividedList({
     super.key,
-    this.radius = DsRadii.lg,
+    this.radius = ElRadii.lg,
     required this.children,
   });
 
@@ -1611,22 +1624,22 @@ class DsDividedList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     final BorderRadius shape = BorderRadius.circular(radius);
 
     return DecoratedBox(
       decoration: BoxDecoration(
         color: theme.card,
         borderRadius: shape,
-        border: Border.all(color: theme.border, width: DsWidths.hairline),
+        border: Border.all(color: theme.border, width: ElWidths.hairline),
       ),
       // `box-sizing: border-box`: the frame costs the rows a pixel on each
       // side, so a row's content box is the list's width less two.
       child: Padding(
-        padding: const EdgeInsets.all(DsWidths.hairline),
+        padding: const EdgeInsets.all(ElWidths.hairline),
         child: ClipRRect(
           // The inner curve: the outer radius less the border inside it.
-          borderRadius: BorderRadius.circular(radius - DsWidths.hairline),
+          borderRadius: BorderRadius.circular(radius - ElWidths.hairline),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
@@ -1639,7 +1652,7 @@ class DsDividedList extends StatelessWidget {
                       border: Border(
                         top: BorderSide(
                           color: theme.border,
-                          width: DsWidths.hairline,
+                          width: ElWidths.hairline,
                         ),
                       ),
                     ),
@@ -1647,7 +1660,7 @@ class DsDividedList extends StatelessWidget {
                     // adds to that row's height and sits above its content
                     // rather than over the first pixel of it.
                     child: Padding(
-                      padding: const EdgeInsets.only(top: DsWidths.hairline),
+                      padding: const EdgeInsets.only(top: ElWidths.hairline),
                       child: children[i],
                     ),
                   ),

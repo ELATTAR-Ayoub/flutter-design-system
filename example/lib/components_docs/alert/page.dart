@@ -6,14 +6,14 @@
 /// own top-level examples are Basic, Destructive, Action, Custom Colors, and
 /// RTL, none of them grouped under one "Variants" heading, so this page
 /// mirrors that shape instead of the single API-table "Variants" section an
-/// earlier draft used. Custom Colors has no counterpart here: DsAlert has no
-/// style-override hook, only [DsAlertVariant] -- see the Custom colors note
+/// earlier draft used. Custom Colors has no counterpart here: ElAlert has no
+/// style-override hook, only [ElAlertVariant] -- see the Custom colors note
 /// inside API reference below for why that section is skipped rather than
 /// faked.
 /// Composed from the Phase C docs primitives (`docs_layout.dart`,
-/// `docs_code.dart`, `docs_facts.dart`, `kit.dart`'s `DsSection`/`DsPanel`)
+/// `docs_code.dart`, `docs_facts.dart`, `kit.dart`'s `ElSection`/`ElPanel`)
 /// the same way `dialog_page.dart` does. Every usage example below is real
-/// Dart against [DsAlert]'s actual constructor: nothing here manufactures a
+/// Dart against [ElAlert]'s actual constructor: nothing here manufactures a
 /// shadcn example the Dart API does not support.
 library;
 
@@ -39,9 +39,9 @@ class AlertDocPage extends StatelessWidget {
       title: alertDoc.title,
       description: alertDoc.description,
     ),
-    breadcrumbs: const <DsBreadcrumbEntry>[
-      DsBreadcrumbEntry.link('Components'),
-      DsBreadcrumbEntry.page('Alert'),
+    breadcrumbs: const <ElBreadcrumbEntry>[
+      ElBreadcrumbEntry.link('Components'),
+      ElBreadcrumbEntry.page('Alert'),
     ],
     toc: const <DocsTocEntry>[
       DocsTocEntry(title: 'Installation', anchor: 'install'),
@@ -85,89 +85,89 @@ class _AlertArticle extends StatelessWidget {
       // alert page carries no equivalent -- added in our own house style
       // rather than dropped, per the parity brief's "ours only" allowance.
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: DsWidths.prose),
-        child: DsText(
+        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+        child: ElText(
           'A condition worth explaining, not a question and not a '
-            'one-off confirmation.',
-          DsType.body,
+          'one-off confirmation.',
+          ElType.body,
         ),
       ),
-      SizedBox(height: ds(6)),
+      SizedBox(height: el(6)),
       const _Prose(<String>[
-          'DsAlert renders an inline, persistent region on the page '
-              'itself: role="alert" on the reference, Semantics(container: '
-              'true, liveRegion: true) here. No scrim, no auto-dismiss, no '
-              'portal. It stays exactly where it is mounted until whatever '
-              'renders it removes it -- the caller owns its lifetime, '
-              'DsAlert has none of its own.',
-          'Reach for an alert dialog instead when the situation blocks '
-              'the page and demands one answer before the user can '
-              'continue -- a confirmation, an irreversible action. It '
-              'shares DsDialogContent\'s own panel and its scrim; DsAlert '
-              'has neither.',
-          'Reach for a toaster (DsToaster) instead when the message is '
-              'transient -- it announces once near a screen corner and '
-              'clears itself on a timer. DsAlert never times out and '
-              'never floats; it lays out like any other block in the '
-              'page\'s own flow.',
-        ]),
+        'ElAlert renders an inline, persistent region on the page '
+            'itself: role="alert" on the reference, Semantics(container: '
+            'true, liveRegion: true) here. No scrim, no auto-dismiss, no '
+            'portal. It stays exactly where it is mounted until whatever '
+            'renders it removes it -- the caller owns its lifetime, '
+            'ElAlert has none of its own.',
+        'Reach for an alert dialog instead when the situation blocks '
+            'the page and demands one answer before the user can '
+            'continue -- a confirmation, an irreversible action. It '
+            'shares ElDialogContent\'s own panel and its scrim; ElAlert '
+            'has neither.',
+        'Reach for a toaster (ElToaster) instead when the message is '
+            'transient -- it announces once near a screen corner and '
+            'clears itself on a timer. ElAlert never times out and '
+            'never floats; it lays out like any other block in the '
+            'page\'s own flow.',
+      ]),
 
       // Ours only: status/version/platform metadata.
       const DocsInstallFacts(
-          title: 'Status facts',
-          facts: <DocsInstallFact>[
-            DocsInstallFact(
-              label: 'Status',
-              value: 'Source-available, not registry-listed',
-              description:
-                  'Ships in the package today; elattar add alert is not '
-                  'wired up yet -- see Installation below.',
-            ),
-            DocsInstallFact(
-              label: 'Version',
-              value: '0.0.1',
-              description: 'Tracks the package version in pubspec.yaml.',
-            ),
-            DocsInstallFact(
-              label: 'Platforms',
-              value: 'Android, iOS, Web, macOS, Windows, Linux',
-              description:
-                  'Pure flutter/widgets.dart and dart:ui -- no platform '
-                  'channel, so every Flutter target renders it '
-                  'identically.',
-            ),
-          ],
-        ),
+        title: 'Status facts',
+        facts: <DocsInstallFact>[
+          DocsInstallFact(
+            label: 'Status',
+            value: 'Registry install available',
+            description:
+                'Ships in the package today; elattar add alert is not '
+                'wired up yet -- see Installation below.',
+          ),
+          DocsInstallFact(
+            label: 'Version',
+            value: '0.0.1',
+            description: 'Tracks the package version in pubspec.yaml.',
+          ),
+          DocsInstallFact(
+            label: 'Platforms',
+            value: 'Android, iOS, Web, macOS, Windows, Linux',
+            description:
+                'Pure flutter/widgets.dart and dart:ui -- no platform '
+                'channel, so every Flutter target renders it '
+                'identically.',
+          ),
+        ],
+      ),
 
       // shadcn: the live demo that opens the page, before any heading.
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: DsWidths.prose),
-        child: DsText(
+        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+        child: ElText(
           'One card surface, five variants -- the destructive specimen '
-            'also carries an action. Each variant gets its own dedicated '
-            'specimen further down.',
-          DsType.body,
+          'also carries an action. Each variant gets its own dedicated '
+          'specimen further down.',
+          ElType.body,
         ),
       ),
-      SizedBox(height: ds(6)),
+      SizedBox(height: el(6)),
       DocsCodeExample(
-          title: 'Live specimen',
-          description:
-              'Every DsAlertVariant value, in the reference\'s own '
-              'declaration order.',
-          preview: const _AlertPreview(),
-          manualFiles: const <DocsCodeFile>[
-            DocsCodeFile(
-              path: 'preview.dart',
-              title: 'Specimen source',
-              description: 'The exact Dart that produced the preview above.',
-              code: _previewCode,
-            ),
-          ],
-        ),
+        title: 'Live specimen',
+        description:
+            'Every ElAlertVariant value, in the reference\'s own '
+            'declaration order.',
+        preview: const _AlertPreview(),
+        manualFiles: const <DocsCodeFile>[
+          DocsCodeFile(
+            path: 'preview.dart',
+            title: 'Specimen source',
+            description: 'The exact Dart that produced the preview above.',
+            code: _previewCode,
+          ),
+        ],
+      ),
 
       // shadcn: Installation, Command and Manual tabs.
-      DsSection(
+      ElSection(
         id: 'install',
         title: 'Installation',
         description:
@@ -199,19 +199,19 @@ class _AlertArticle extends StatelessWidget {
       ),
 
       // shadcn: Usage -- imports plus basic construction.
-      DsSection(
+      ElSection(
         id: 'usage',
         title: 'Usage',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            DsPanel(
+            ElPanel(
               label: 'DART',
               note: 'SMALLEST CORRECT EXAMPLE',
               child: const DocsSelectableCodeBlock(code: _smallestUsageCode),
             ),
-            SizedBox(height: ds(5)),
-            DsPanel(
+            SizedBox(height: el(5)),
+            ElPanel(
               label: 'DART',
               note: 'WITH AN ICON, A VARIANT, AND AN ACTION',
               child: const DocsSelectableCodeBlock(code: _actionUsageCode),
@@ -220,19 +220,19 @@ class _AlertArticle extends StatelessWidget {
         ),
       ),
 
-      // shadcn: Composition -- the widget-hierarchy tree. DsAlert is one
+      // shadcn: Composition -- the widget-hierarchy tree. ElAlert is one
       // widget with four optional-content slots, not a family of separate
       // subcomponents the way Icon/AlertTitle/AlertDescription/AlertAction
       // are on the reference; this is that same anatomy read off the one
       // constructor instead of off four JSX tags.
-      DsSection(
+      ElSection(
         id: 'composition',
         title: 'Composition',
         description:
-            'DsAlert folds Icon, AlertTitle, AlertDescription, and '
+            'ElAlert folds Icon, AlertTitle, AlertDescription, and '
             'AlertAction into four constructor slots on one widget, '
             'rather than four composable subcomponents.',
-        child: DsPanel(
+        child: ElPanel(
           label: 'DART',
           note: 'ANATOMY',
           child: const DocsSelectableCodeBlock(code: _compositionAnatomyCode),
@@ -240,11 +240,11 @@ class _AlertArticle extends StatelessWidget {
       ),
 
       // shadcn: Basic -- the default variant, icon + title + description.
-      DsSection(
+      ElSection(
         id: 'basic',
         title: 'Basic',
         description:
-            'DsAlertVariant.normal, the constructor\'s own default: an '
+            'ElAlertVariant.normal, the constructor\'s own default: an '
             'icon, a title, and a description.',
         child: DocsCodeExample(
           title: 'Basic',
@@ -260,11 +260,11 @@ class _AlertArticle extends StatelessWidget {
       ),
 
       // shadcn: Destructive -- the error-styled variant, no action.
-      DsSection(
+      ElSection(
         id: 'destructive',
         title: 'Destructive',
         description:
-            'DsAlertVariant.destructive on its own: compare with Action '
+            'ElAlertVariant.destructive on its own: compare with Action '
             'below, which adds an action slot on top of the same variant.',
         child: DocsCodeExample(
           title: 'Destructive',
@@ -280,7 +280,7 @@ class _AlertArticle extends StatelessWidget {
       ),
 
       // shadcn: Action -- an interactive element positioned in the alert.
-      DsSection(
+      ElSection(
         id: 'action',
         title: 'Action',
         description:
@@ -302,13 +302,13 @@ class _AlertArticle extends StatelessWidget {
         ),
       ),
 
-      // Ours only: DsAlertVariant.success has no counterpart example on the
+      // Ours only: ElAlertVariant.success has no counterpart example on the
       // reference page, which only demos default and destructive by name.
-      DsSection(
+      ElSection(
         id: 'success',
         title: 'Success',
         description:
-            'DsAlertVariant.success, for a confirmation that already '
+            'ElAlertVariant.success, for a confirmation that already '
             'happened.',
         child: DocsCodeExample(
           title: 'Success',
@@ -323,12 +323,12 @@ class _AlertArticle extends StatelessWidget {
         ),
       ),
 
-      // Ours only: DsAlertVariant.warning.
-      DsSection(
+      // Ours only: ElAlertVariant.warning.
+      ElSection(
         id: 'warning',
         title: 'Warning',
         description:
-            'DsAlertVariant.warning, for a condition that needs attention '
+            'ElAlertVariant.warning, for a condition that needs attention '
             'but has not failed outright.',
         child: DocsCodeExample(
           title: 'Warning',
@@ -343,11 +343,11 @@ class _AlertArticle extends StatelessWidget {
         ),
       ),
 
-      // Ours only: DsAlertVariant.info.
-      DsSection(
+      // Ours only: ElAlertVariant.info.
+      ElSection(
         id: 'info',
         title: 'Info',
-        description: 'DsAlertVariant.info, for a low-stakes announcement.',
+        description: 'ElAlertVariant.info, for a low-stakes announcement.',
         child: DocsCodeExample(
           title: 'Info',
           preview: const Center(child: _InfoPreview()),
@@ -363,14 +363,14 @@ class _AlertArticle extends StatelessWidget {
 
       // Ours only: stacking more than one alert. No counterpart section on
       // the reference page.
-      DsSection(
+      ElSection(
         id: 'stacked-alerts',
         title: 'Stacked alerts',
         description:
             'Stacking more than one alert reads as a list of conditions, '
             'not a traffic light, because every variant shares the same '
             'card fill -- only the icon and the bloom move.',
-        child: DsPanel(
+        child: ElPanel(
           label: 'DART',
           note: 'STACKED IN A REVIEW FLOW',
           child: const DocsSelectableCodeBlock(code: _stackedCode),
@@ -378,11 +378,11 @@ class _AlertArticle extends StatelessWidget {
       ),
 
       // shadcn: RTL.
-      DsSection(
+      ElSection(
         id: 'rtl',
         title: 'RTL',
         description:
-            'DsAlert reads Directionality.of(context) the way any Row '
+            'ElAlert reads Directionality.of(context) the way any Row '
             'does, so the icon and text column swap sides under RTL. '
             'DOCUMENTED DRIFT: the padding (EdgeInsets.fromLTRB) and the '
             'action slot\'s Positioned(top, right) are both physical, not '
@@ -399,21 +399,21 @@ class _AlertArticle extends StatelessWidget {
       ),
 
       // shadcn: API Reference -- one prop table per class in the family.
-      // DsAlert has no separate AlertTitle/AlertDescription/AlertAction
+      // ElAlert has no separate AlertTitle/AlertDescription/AlertAction
       // classes to give their own tables to, so the two tables here are
-      // DsAlert's own constructor/statics and the DsAlertVariant enum.
-      DsSection(
+      // ElAlert's own constructor/statics and the ElAlertVariant enum.
+      ElSection(
         id: 'api',
         title: 'API reference',
         description:
-            'Every DsAlert constructor parameter and static member, and '
-            'every DsAlertVariant value, read directly from '
+            'Every ElAlert constructor parameter and static member, and '
+            'every ElAlertVariant value, read directly from '
             'lib/src/components/alert.dart.',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             const DocsApiTable(
-              title: 'DsAlert',
+              title: 'ElAlert',
               facts: <DocsApiFact>[
                 DocsApiFact(
                   name: 'title',
@@ -436,7 +436,7 @@ class _AlertArticle extends StatelessWidget {
                   description:
                       'Optional, defaults to null. The leading size-4 '
                       'glyph, recolored by variant through the '
-                      'surrounding DefaultTextStyle. DsAlert does not '
+                      'surrounding DefaultTextStyle. ElAlert does not '
                       'choose an icon for a variant -- the caller '
                       'supplies one, or none.',
                 ),
@@ -451,37 +451,37 @@ class _AlertArticle extends StatelessWidget {
                 ),
                 DocsApiFact(
                   name: 'variant',
-                  type: 'DsAlertVariant',
+                  type: 'ElAlertVariant',
                   description:
-                      'Optional, defaults to DsAlertVariant.normal. '
+                      'Optional, defaults to ElAlertVariant.normal. '
                       'Selects the icon ink color and the '
                       '--bloom-1/--bloom-2 pair; fill, border, radius, '
                       'and padding never change.',
                 ),
                 DocsApiFact(
-                  name: 'DsAlert.actionInset (static)',
+                  name: 'ElAlert.actionInset (static)',
                   type: 'double',
                   description:
-                      'ds(2) -- the 8px offset the action slot sits from '
+                      'el(2) -- the 8px offset the action slot sits from '
                       'the border box on both axes.',
                 ),
                 DocsApiFact(
-                  name: 'DsAlert.actionLane (static)',
+                  name: 'ElAlert.actionLane (static)',
                   type: 'double',
                   description:
-                      'ds(20) -- the fixed 80px right-padding lane '
+                      'el(20) -- the fixed 80px right-padding lane '
                       'substituted for the base 16px whenever action is '
                       'non-null.',
                 ),
               ],
             ),
-            SizedBox(height: ds(6)),
+            SizedBox(height: el(6)),
             const DocsApiTable(
-              title: 'DsAlertVariant',
+              title: 'ElAlertVariant',
               facts: <DocsApiFact>[
                 DocsApiFact(
                   name: 'normal',
-                  type: 'DsAlertVariant',
+                  type: 'ElAlertVariant',
                   description:
                       'cva key "default" (the label getter renames it -- '
                       'default is a Dart keyword). Ink: '
@@ -490,44 +490,44 @@ class _AlertArticle extends StatelessWidget {
                 ),
                 DocsApiFact(
                   name: 'destructive',
-                  type: 'DsAlertVariant',
+                  type: 'ElAlertVariant',
                   description:
                       'Ink: theme.destructiveInk. Bloom: '
                       'theme.destructive / --color-action.',
                 ),
                 DocsApiFact(
                   name: 'success',
-                  type: 'DsAlertVariant',
+                  type: 'ElAlertVariant',
                   description:
                       'Ink: theme.successInk. Bloom: --color-success / '
                       '--color-value.',
                 ),
                 DocsApiFact(
                   name: 'warning',
-                  type: 'DsAlertVariant',
+                  type: 'ElAlertVariant',
                   description:
                       'Ink: theme.warningInk. Bloom: --color-warning / '
                       '--color-action.',
                 ),
                 DocsApiFact(
                   name: 'info',
-                  type: 'DsAlertVariant',
+                  type: 'ElAlertVariant',
                   description:
                       'Ink: theme.infoInk. Bloom: --color-info / '
                       '--color-action.',
                 ),
               ],
             ),
-            SizedBox(height: ds(4)),
-            DsPanel(
+            SizedBox(height: el(4)),
+            ElPanel(
               label: 'CUSTOM COLORS',
               note: 'SKIPPED',
               child: const _Prose(<String>[
                 'The reference\'s Custom Colors example overrides an '
                     'alert\'s classes directly to swap in an ad hoc '
-                    'palette. DsAlert has no equivalent hook: its only '
+                    'palette. ElAlert has no equivalent hook: its only '
                     'color control point is variant, which selects one of '
-                    'five predetermined ink/bloom pairs from DsThemeData '
+                    'five predetermined ink/bloom pairs from ElThemeData '
                     'rather than accepting an arbitrary Color. Faking a '
                     'freeform override here would document a capability '
                     'this widget does not have, so this section is '
@@ -540,11 +540,11 @@ class _AlertArticle extends StatelessWidget {
       ),
 
       // Ours: States and feedback.
-      DsSection(
+      ElSection(
         id: 'states',
         title: 'States and feedback',
         description:
-            'DsAlert is a synchronous, presentational primitive -- it '
+            'ElAlert is a synchronous, presentational primitive -- it '
             'holds no internal state and listens to no gestures. Rows '
             'that do not apply are marked N/A with the reason, rather '
             'than inventing asynchronous behavior for a synchronous '
@@ -561,17 +561,17 @@ class _AlertArticle extends StatelessWidget {
             DocsStateFact(
               state: 'Hover / Focus-visible / Pressed / Selected',
               treatment:
-                  'N/A -- DsAlert has no MouseRegion, FocusNode, or '
+                  'N/A -- ElAlert has no MouseRegion, FocusNode, or '
                   'GestureDetector of its own.',
               userSignal:
                   'A widget mounted in the action slot carries its own '
-                  'hover, focus, and press states independently; DsAlert '
+                  'hover, focus, and press states independently; ElAlert '
                   'does not style them.',
             ),
             DocsStateFact(
               state: 'Loading',
               treatment:
-                  'N/A -- DsAlert is synchronous and presentational; it '
+                  'N/A -- ElAlert is synchronous and presentational; it '
                   'has no loading affordance to invent.',
               userSignal: 'Not applicable.',
             ),
@@ -585,7 +585,7 @@ class _AlertArticle extends StatelessWidget {
             DocsStateFact(
               state: 'Error / Success / Warning / Info',
               treatment:
-                  'A compile-time variant choice (DsAlertVariant), not a '
+                  'A compile-time variant choice (ElAlertVariant), not a '
                   'runtime transition -- see Basic, Destructive, Success, '
                   'Warning, and Info above.',
               userSignal:
@@ -603,7 +603,7 @@ class _AlertArticle extends StatelessWidget {
             DocsStateFact(
               state: 'Reduced motion',
               treatment:
-                  'DsBloomCosmic settles its drift, hover swell, and '
+                  'ElBloomCosmic settles its drift, hover swell, and '
                   'starfield to their resting frame under '
                   'MediaQuery.disableAnimations.',
               userSignal: 'Fill, border, ink, and text are unaffected.',
@@ -613,7 +613,7 @@ class _AlertArticle extends StatelessWidget {
       ),
 
       // Ours: Accessibility and keyboard behavior.
-      DsSection(
+      ElSection(
         id: 'a11y',
         title: 'Accessibility and keyboard behavior',
         child: const _LabeledFacts(<(String, String)>[
@@ -634,19 +634,19 @@ class _AlertArticle extends StatelessWidget {
             'Keyboard interactions',
             'None on the alert body -- it holds no FocusNode. When '
                 'action is supplied, that child widget (for example '
-                'DsButton) carries its own Tab stop and its own '
-                'Enter/Space activation; DsAlert neither adds nor removes '
+                'ElButton) carries its own Tab stop and its own '
+                'Enter/Space activation; ElAlert neither adds nor removes '
                 'it.',
           ),
           (
             'Focus behavior',
-            'DsAlert never requests focus on mount, unlike a dialog -- it '
+            'ElAlert never requests focus on mount, unlike a dialog -- it '
                 'does not interrupt whatever the user was doing.',
           ),
           (
             'Touch target',
             'N/A for the alert body itself. The action slot inherits '
-                'whatever touch target its own widget defines -- DsAlert '
+                'whatever touch target its own widget defines -- ElAlert '
                 'does not resize it.',
           ),
           (
@@ -654,13 +654,13 @@ class _AlertArticle extends StatelessWidget {
             'Every specimen on this page pairs its variant\'s ink color '
                 'with a distinct icon glyph and with title/description '
                 'text, so meaning never rides on hue alone -- but that is '
-                'the caller\'s discipline, not something DsAlert enforces: '
+                'the caller\'s discipline, not something ElAlert enforces: '
                 'icon is an arbitrary optional Widget?, not derived from '
                 'variant.',
           ),
           (
             'Error wiring',
-            'N/A -- DsAlert has no form-field validation hookup; that is '
+            'N/A -- ElAlert has no form-field validation hookup; that is '
                 'a field.dart concern. An alert is how a page states a '
                 'condition, not how a field reports one.',
           ),
@@ -680,14 +680,14 @@ class _AlertArticle extends StatelessWidget {
       ),
 
       // Ours: Responsive/platform behavior.
-      DsSection(
+      ElSection(
         id: 'responsive',
         title: 'Responsive and platform behavior',
         child: const _Prose(<String>[
-          'DsAlert has no breakpoint logic of its own -- its width is '
+          'ElAlert has no breakpoint logic of its own -- its width is '
               'whatever its parent gives it, and title/description text '
               'simply wraps to more lines as that width shrinks.',
-          'The one width-sensitive detail is DsAlert.actionLane: when '
+          'The one width-sensitive detail is ElAlert.actionLane: when '
               'action is present, the right padding is a fixed 80px lane, '
               'applied unconditionally rather than sized to the button, '
               'so the same alert can wrap its description column '
@@ -697,7 +697,7 @@ class _AlertArticle extends StatelessWidget {
       ),
 
       // Ours: Dependencies, files, assets, fonts, and shaders.
-      DsSection(
+      ElSection(
         id: 'dependencies',
         title: 'Dependencies, files, assets, fonts, and shaders',
         child: const DocsInstallFacts(
@@ -707,7 +707,7 @@ class _AlertArticle extends StatelessWidget {
               label: 'Files',
               value: 'lib/src/components/alert.dart',
               description:
-                  'One file; DsAlert and DsAlertVariant both live here.',
+                  'One file; ElAlert and ElAlertVariant both live here.',
             ),
             DocsInstallFact(
               label: 'Package imports',
@@ -716,13 +716,13 @@ class _AlertArticle extends StatelessWidget {
                   'foundation/theme.dart, foundation/typography.dart, '
                   'theme_scope.dart',
               description:
-                  'DsBloomCosmic paints the fill and its idle animation; '
+                  'ElBloomCosmic paints the fill and its idle animation; '
                   'the rest are the shared spacing, theme, typography, '
                   'and theme-mode primitives every component reads.',
             ),
             DocsInstallFact(
               label: 'Registry dependencies',
-              value: 'none declared -- alert has no registry manifest yet',
+              value: 'none declared -- alert ships in the registry',
               description:
                   'A real registry/components/alert.json is a later '
                   'pass; see Installation above.',
@@ -741,7 +741,7 @@ class _AlertArticle extends StatelessWidget {
       ),
 
       // Ours: Theming notes.
-      DsSection(
+      ElSection(
         id: 'theming',
         title: 'Theming notes',
         child: const _Prose(<String>[
@@ -750,19 +750,19 @@ class _AlertArticle extends StatelessWidget {
               'token pair -- the icon ink (theme.mutedForeground, '
               'destructiveInk, successInk, warningInk, or infoInk) and '
               'the bloom\'s two stops (--bloom-1 / --bloom-2) -- both '
-              'read from DsThemeData rather than hardcoded.',
+              'read from ElThemeData rather than hardcoded.',
           'That is a deliberate reversal of tinting the whole card: five '
               'differently-tinted cards stacked on a page read as a '
               'traffic light rather than as one component, and body text '
               'is the least legible place to spend a hue. Flip '
-              'DsThemeController between light and dark and every '
+              'ElThemeController between light and dark and every '
               'variant\'s ink and bloom follow the active theme '
               'automatically -- nothing on this page opts out.',
         ]),
       ),
 
       // Ours: Source, tests, report issue, and edit docs.
-      DsSection(
+      ElSection(
         id: 'source',
         title: 'Source, tests, and reporting an issue',
         child: DocsInstallFacts(
@@ -778,7 +778,7 @@ class _AlertArticle extends StatelessWidget {
               label: 'Package tests',
               value: 'none yet',
               description:
-                  'No test in the root package exercises DsAlert '
+                  'No test in the root package exercises ElAlert '
                   'directly today; this documentation page\'s own '
                   'specimen-mount test is the only coverage that '
                   'currently exists.',
@@ -801,7 +801,7 @@ class _AlertArticle extends StatelessWidget {
   );
 }
 
-/// Every [DsAlertVariant] value, in the reference's own declaration order --
+/// Every [ElAlertVariant] value, in the reference's own declaration order --
 /// the same specimen the "Manual" tab's [_previewCode] reproduces.
 class _AlertPreview extends StatelessWidget {
   const _AlertPreview();
@@ -810,44 +810,44 @@ class _AlertPreview extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
-      const DsAlert(
-        icon: DsIcon(DsIconGlyph.bell),
+      const ElAlert(
+        icon: ElIcon(ElIconGlyph.bell),
         title: 'Heads up',
         description: 'You can revert this later from Settings → Preferences.',
       ),
-      SizedBox(height: ds(4)),
-      DsAlert(
-        variant: DsAlertVariant.destructive,
-        icon: const DsIcon(DsIconGlyph.circleX),
+      SizedBox(height: el(4)),
+      ElAlert(
+        variant: ElAlertVariant.destructive,
+        icon: const ElIcon(ElIconGlyph.circleX),
         title: 'Payment failed',
         description: 'We could not process your card ending in 4242.',
-        action: DsButton(
-          variant: DsButtonVariant.secondary,
-          size: DsButtonSize.sm,
+        action: ElButton(
+          variant: ElButtonVariant.secondary,
+          size: ElButtonSize.sm,
           onPressed: () {},
           child: const Text('Retry'),
         ),
       ),
-      SizedBox(height: ds(4)),
-      const DsAlert(
-        variant: DsAlertVariant.success,
-        icon: DsIcon(DsIconGlyph.circleCheck),
+      SizedBox(height: el(4)),
+      const ElAlert(
+        variant: ElAlertVariant.success,
+        icon: ElIcon(ElIconGlyph.circleCheck),
         title: 'Changes saved',
         description: 'Your profile was updated successfully.',
       ),
-      SizedBox(height: ds(4)),
-      const DsAlert(
-        variant: DsAlertVariant.warning,
-        icon: DsIcon(DsIconGlyph.alertTriangle),
+      SizedBox(height: el(4)),
+      const ElAlert(
+        variant: ElAlertVariant.warning,
+        icon: ElIcon(ElIconGlyph.alertTriangle),
         title: 'Withdrawal under review',
         description:
             'Large withdrawals are held for a security review before '
             'they clear.',
       ),
-      SizedBox(height: ds(4)),
-      const DsAlert(
-        variant: DsAlertVariant.info,
-        icon: DsIcon(DsIconGlyph.info),
+      SizedBox(height: el(4)),
+      const ElAlert(
+        variant: ElAlertVariant.info,
+        icon: ElIcon(ElIconGlyph.info),
         title: 'New feature available',
         description: 'The command palette is now available via Cmd+K.',
       ),
@@ -855,28 +855,28 @@ class _AlertPreview extends StatelessWidget {
   );
 }
 
-/// The Basic section's own specimen: [DsAlertVariant.normal], carried
+/// The Basic section's own specimen: [ElAlertVariant.normal], carried
 /// verbatim from [_AlertPreview]'s first entry.
 class _BasicPreview extends StatelessWidget {
   const _BasicPreview();
 
   @override
-  Widget build(BuildContext context) => const DsAlert(
-    icon: DsIcon(DsIconGlyph.bell),
+  Widget build(BuildContext context) => const ElAlert(
+    icon: ElIcon(ElIconGlyph.bell),
     title: 'Heads up',
     description: 'You can revert this later from Settings → Preferences.',
   );
 }
 
-/// The Destructive section's own specimen: [DsAlertVariant.destructive]
+/// The Destructive section's own specimen: [ElAlertVariant.destructive]
 /// with no action slot, so it reads distinctly from Action below.
 class _DestructivePreview extends StatelessWidget {
   const _DestructivePreview();
 
   @override
-  Widget build(BuildContext context) => const DsAlert(
-    variant: DsAlertVariant.destructive,
-    icon: DsIcon(DsIconGlyph.circleX),
+  Widget build(BuildContext context) => const ElAlert(
+    variant: ElAlertVariant.destructive,
+    icon: ElIcon(ElIconGlyph.circleX),
     title: 'Payment failed',
     description: 'We could not process your card ending in 4242.',
   );
@@ -888,14 +888,14 @@ class _ActionPreview extends StatelessWidget {
   const _ActionPreview();
 
   @override
-  Widget build(BuildContext context) => DsAlert(
-    variant: DsAlertVariant.destructive,
-    icon: const DsIcon(DsIconGlyph.circleX),
+  Widget build(BuildContext context) => ElAlert(
+    variant: ElAlertVariant.destructive,
+    icon: const ElIcon(ElIconGlyph.circleX),
     title: 'Payment failed',
     description: 'We could not process your card ending in 4242.',
-    action: DsButton(
-      variant: DsButtonVariant.secondary,
-      size: DsButtonSize.sm,
+    action: ElButton(
+      variant: ElButtonVariant.secondary,
+      size: ElButtonSize.sm,
       onPressed: () {},
       child: const Text('Retry'),
     ),
@@ -908,9 +908,9 @@ class _SuccessPreview extends StatelessWidget {
   const _SuccessPreview();
 
   @override
-  Widget build(BuildContext context) => const DsAlert(
-    variant: DsAlertVariant.success,
-    icon: DsIcon(DsIconGlyph.circleCheck),
+  Widget build(BuildContext context) => const ElAlert(
+    variant: ElAlertVariant.success,
+    icon: ElIcon(ElIconGlyph.circleCheck),
     title: 'Changes saved',
     description: 'Your profile was updated successfully.',
   );
@@ -922,9 +922,9 @@ class _WarningPreview extends StatelessWidget {
   const _WarningPreview();
 
   @override
-  Widget build(BuildContext context) => const DsAlert(
-    variant: DsAlertVariant.warning,
-    icon: DsIcon(DsIconGlyph.alertTriangle),
+  Widget build(BuildContext context) => const ElAlert(
+    variant: ElAlertVariant.warning,
+    icon: ElIcon(ElIconGlyph.alertTriangle),
     title: 'Withdrawal under review',
     description:
         'Large withdrawals are held for a security review before they '
@@ -937,9 +937,9 @@ class _InfoPreview extends StatelessWidget {
   const _InfoPreview();
 
   @override
-  Widget build(BuildContext context) => const DsAlert(
-    variant: DsAlertVariant.info,
-    icon: DsIcon(DsIconGlyph.info),
+  Widget build(BuildContext context) => const ElAlert(
+    variant: ElAlertVariant.info,
+    icon: ElIcon(ElIconGlyph.info),
     title: 'New feature available',
     description: 'The command palette is now available via Cmd+K.',
   );
@@ -957,20 +957,20 @@ class _RtlPreview extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        const DsAlert(
-          icon: DsIcon(DsIconGlyph.bell),
+        const ElAlert(
+          icon: ElIcon(ElIconGlyph.bell),
           title: 'تنبيه',
           description: 'يمكنك التراجع عن هذا لاحقًا من الإعدادات.',
         ),
-        SizedBox(height: ds(4)),
-        DsAlert(
-          variant: DsAlertVariant.destructive,
-          icon: const DsIcon(DsIconGlyph.circleX),
+        SizedBox(height: el(4)),
+        ElAlert(
+          variant: ElAlertVariant.destructive,
+          icon: const ElIcon(ElIconGlyph.circleX),
           title: 'فشل الدفع',
           description: 'تعذر معالجة بطاقتك المنتهية بـ 4242.',
-          action: DsButton(
-            variant: DsButtonVariant.secondary,
-            size: DsButtonSize.sm,
+          action: ElButton(
+            variant: ElButtonVariant.secondary,
+            size: ElButtonSize.sm,
             onPressed: () {},
             child: const Text('إعادة المحاولة'),
           ),
@@ -988,13 +988,13 @@ class _Prose extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ConstrainedBox(
-    constraints: const BoxConstraints(maxWidth: DsWidths.prose),
+    constraints: const BoxConstraints(maxWidth: ElWidths.prose),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         for (int i = 0; i < paragraphs.length; i++) ...<Widget>[
-          if (i > 0) SizedBox(height: ds(4)),
-          DsText(paragraphs[i], DsType.body),
+          if (i > 0) SizedBox(height: el(4)),
+          ElText(paragraphs[i], ElType.body),
         ],
       ],
     ),
@@ -1010,15 +1010,15 @@ class _LabeledFacts extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ConstrainedBox(
-    constraints: const BoxConstraints(maxWidth: DsWidths.prose),
+    constraints: const BoxConstraints(maxWidth: ElWidths.prose),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         for (int i = 0; i < entries.length; i++) ...<Widget>[
-          if (i > 0) SizedBox(height: ds(4)),
-          DsText(entries[i].$1, DsType.label),
-          SizedBox(height: ds(1)),
-          DsText(entries[i].$2, DsType.body),
+          if (i > 0) SizedBox(height: el(4)),
+          ElText(entries[i].$1, ElType.label),
+          SizedBox(height: el(1)),
+          ElText(entries[i].$2, ElType.body),
         ],
       ],
     ),
@@ -1026,115 +1026,115 @@ class _LabeledFacts extends StatelessWidget {
 }
 
 const String _previewCode = '''
-DsAlert(
-  icon: const DsIcon(DsIconGlyph.bell),
+ElAlert(
+  icon: const ElIcon(ElIconGlyph.bell),
   title: 'Heads up',
   description: 'You can revert this later from Settings → Preferences.',
 )
 
-DsAlert(
-  variant: DsAlertVariant.destructive,
-  icon: const DsIcon(DsIconGlyph.circleX),
+ElAlert(
+  variant: ElAlertVariant.destructive,
+  icon: const ElIcon(ElIconGlyph.circleX),
   title: 'Payment failed',
   description: 'We could not process your card ending in 4242.',
-  action: DsButton(
-    variant: DsButtonVariant.secondary,
-    size: DsButtonSize.sm,
+  action: ElButton(
+    variant: ElButtonVariant.secondary,
+    size: ElButtonSize.sm,
     onPressed: () {},
     child: const Text('Retry'),
   ),
 )
 
-DsAlert(
-  variant: DsAlertVariant.success,
-  icon: const DsIcon(DsIconGlyph.circleCheck),
+ElAlert(
+  variant: ElAlertVariant.success,
+  icon: const ElIcon(ElIconGlyph.circleCheck),
   title: 'Changes saved',
   description: 'Your profile was updated successfully.',
 )
 
-DsAlert(
-  variant: DsAlertVariant.warning,
-  icon: const DsIcon(DsIconGlyph.alertTriangle),
+ElAlert(
+  variant: ElAlertVariant.warning,
+  icon: const ElIcon(ElIconGlyph.alertTriangle),
   title: 'Withdrawal under review',
   description: 'Large withdrawals are held for a security review before they clear.',
 )
 
-DsAlert(
-  variant: DsAlertVariant.info,
-  icon: const DsIcon(DsIconGlyph.info),
+ElAlert(
+  variant: ElAlertVariant.info,
+  icon: const ElIcon(ElIconGlyph.info),
   title: 'New feature available',
   description: 'The command palette is now available via Cmd+K.',
 )
 ''';
 
-const String _smallestUsageCode = '''DsAlert(
+const String _smallestUsageCode = '''ElAlert(
   title: 'Heads up',
 )''';
 
-const String _actionUsageCode = '''DsAlert(
-  variant: DsAlertVariant.destructive,
-  icon: const DsIcon(DsIconGlyph.circleX),
+const String _actionUsageCode = '''ElAlert(
+  variant: ElAlertVariant.destructive,
+  icon: const ElIcon(ElIconGlyph.circleX),
   title: 'Payment failed',
   description: 'We could not process your card ending in 4242.',
-  action: DsButton(
-    variant: DsButtonVariant.secondary,
-    size: DsButtonSize.sm,
+  action: ElButton(
+    variant: ElButtonVariant.secondary,
+    size: ElButtonSize.sm,
     onPressed: () {},
     child: const Text('Retry'),
   ),
 )''';
 
-const String _compositionAnatomyCode = '''DsAlert(
+const String _compositionAnatomyCode = '''ElAlert(
   icon: ...,          // optional leading glyph, size-4, recolored by variant
   title: '...',       // required -- the only field with no default
   description: '...', // optional, the row omits itself entirely when null
   action: ...,        // optional trailing slot, pinned top-right
-  variant: DsAlertVariant.normal, // selects icon ink + the two bloom stops only
+  variant: ElAlertVariant.normal, // selects icon ink + the two bloom stops only
 )''';
 
-const String _basicCode = '''DsAlert(
-  icon: const DsIcon(DsIconGlyph.bell),
+const String _basicCode = '''ElAlert(
+  icon: const ElIcon(ElIconGlyph.bell),
   title: 'Heads up',
   description: 'You can revert this later from Settings → Preferences.',
 )''';
 
-const String _destructiveCode = '''DsAlert(
-  variant: DsAlertVariant.destructive,
-  icon: const DsIcon(DsIconGlyph.circleX),
+const String _destructiveCode = '''ElAlert(
+  variant: ElAlertVariant.destructive,
+  icon: const ElIcon(ElIconGlyph.circleX),
   title: 'Payment failed',
   description: 'We could not process your card ending in 4242.',
 )''';
 
-const String _actionCode = '''DsAlert(
-  variant: DsAlertVariant.destructive,
-  icon: const DsIcon(DsIconGlyph.circleX),
+const String _actionCode = '''ElAlert(
+  variant: ElAlertVariant.destructive,
+  icon: const ElIcon(ElIconGlyph.circleX),
   title: 'Payment failed',
   description: 'We could not process your card ending in 4242.',
-  action: DsButton(
-    variant: DsButtonVariant.secondary,
-    size: DsButtonSize.sm,
+  action: ElButton(
+    variant: ElButtonVariant.secondary,
+    size: ElButtonSize.sm,
     onPressed: () {},
     child: const Text('Retry'),
   ),
 )''';
 
-const String _successCode = '''DsAlert(
-  variant: DsAlertVariant.success,
-  icon: const DsIcon(DsIconGlyph.circleCheck),
+const String _successCode = '''ElAlert(
+  variant: ElAlertVariant.success,
+  icon: const ElIcon(ElIconGlyph.circleCheck),
   title: 'Changes saved',
   description: 'Your profile was updated successfully.',
 )''';
 
-const String _warningCode = '''DsAlert(
-  variant: DsAlertVariant.warning,
-  icon: const DsIcon(DsIconGlyph.alertTriangle),
+const String _warningCode = '''ElAlert(
+  variant: ElAlertVariant.warning,
+  icon: const ElIcon(ElIconGlyph.alertTriangle),
   title: 'Withdrawal under review',
   description: 'Large withdrawals are held for a security review before they clear.',
 )''';
 
-const String _infoCode = '''DsAlert(
-  variant: DsAlertVariant.info,
-  icon: const DsIcon(DsIconGlyph.info),
+const String _infoCode = '''ElAlert(
+  variant: ElAlertVariant.info,
+  icon: const ElIcon(ElIconGlyph.info),
   title: 'New feature available',
   description: 'The command palette is now available via Cmd+K.',
 )''';
@@ -1142,16 +1142,16 @@ const String _infoCode = '''DsAlert(
 const String _stackedCode = '''Column(
   crossAxisAlignment: CrossAxisAlignment.stretch,
   children: <Widget>[
-    DsAlert(
-      variant: DsAlertVariant.warning,
-      icon: const DsIcon(DsIconGlyph.alertTriangle),
+    ElAlert(
+      variant: ElAlertVariant.warning,
+      icon: const ElIcon(ElIconGlyph.alertTriangle),
       title: 'Withdrawal under review',
       description: 'Large withdrawals are held for a security review before they clear.',
     ),
-    SizedBox(height: ds(4)),
-    DsAlert(
-      variant: DsAlertVariant.info,
-      icon: const DsIcon(DsIconGlyph.info),
+    SizedBox(height: el(4)),
+    ElAlert(
+      variant: ElAlertVariant.info,
+      icon: const ElIcon(ElIconGlyph.info),
       title: 'New feature available',
       description: 'The command palette is now available via Cmd+K.',
     ),
@@ -1160,8 +1160,8 @@ const String _stackedCode = '''Column(
 
 const String _rtlCode = '''Directionality(
   textDirection: TextDirection.rtl,
-  child: DsAlert(
-    icon: const DsIcon(DsIconGlyph.bell),
+  child: ElAlert(
+    icon: const ElIcon(ElIconGlyph.bell),
     title: 'تنبيه',
     description: 'يمكنك التراجع عن هذا لاحقًا من الإعدادات.',
   ),

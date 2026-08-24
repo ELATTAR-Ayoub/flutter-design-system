@@ -26,7 +26,7 @@ Do not copy the skill into a personal agent configuration directory and edit it 
 
 ## Good first contribution areas
 
-- Fix a bug in a public `Ds*` API or its tests.
+- Fix a bug in a public `El*` API or its tests.
 - Improve documentation or examples for the package.
 - Add verification coverage for an existing component or effect.
 - Improve the CLI (`packages/elattar_cli/`) or the registry (`registry/`, `tool/registry_builder/`) — both are implemented and tested in this repository already, just not published (`publish_to: none`, private repository). Extending their test coverage or closing gaps in what they scaffold is welcome.
@@ -79,7 +79,7 @@ Please include:
 
 ## Design-system rules
 
-- Prefer public `Ds*` APIs over reaching into private internals.
+- Prefer public `El*` APIs over reaching into private internals.
 - Keep new behavior token-driven and theme-aware.
 - Preserve accessibility semantics and keyboard behavior.
 - Match existing naming and placement conventions.

@@ -1,6 +1,6 @@
 # Elattar Design System
 
-Elattar's Flutter design system package: foundations, components, effects, and motion primitives exposed through public `Ds*` APIs.
+Elattar's Flutter design system package: foundations, components, effects, and motion primitives exposed through public `El*` APIs.
 
 [Install](#install-today) • [Agent Skill](#agent-skill) • [Development](#development) • [Verification](#verification) • [Contributing](#contributing)
 
@@ -24,8 +24,9 @@ outside it to obtain:
   repository is private, so there is currently no route for anyone else to
   install it.
 - A generated static component registry (`registry/`, built by
-  `tool/registry_builder/`) that the CLI reads from: 20 items, schema v1,
-  every declared sha256 verified against source.
+  `tool/registry_builder/`) that the CLI reads from: 99 items total,
+  including 84 components, schema v1, every declared sha256 verified against
+  source.
 
 What is planned and not shipped yet:
 
@@ -69,8 +70,8 @@ import 'package:flutter/material.dart';
 
 void main() {
   runApp(
-    DsTheme(
-      controller: DsThemeController(),
+    ElTheme(
+      controller: ElThemeController(),
       child: const MaterialApp(home: DemoPage()),
     ),
   );
@@ -81,14 +82,14 @@ class DemoPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
 
     return ColoredBox(
       color: theme.background,
       child: Center(
-        child: DsButton(
+        child: ElButton(
           onPressed: () {},
-          child: const DsText('Continue', DsType.label),
+          child: const ElText('Continue', ElType.label),
         ),
       ),
     );
@@ -101,7 +102,7 @@ class DemoPage extends StatelessWidget {
 The current package includes:
 
 - Foundation tokens and theme data for color, typography, spacing, surfaces, shadows, media, and motion
-- Public `Ds*` components spanning forms, selection, overlays, feedback, navigation, data display, charts, chat, and agent-oriented UI
+- Public `El*` components spanning forms, selection, overlays, feedback, navigation, data display, charts, chat, and agent-oriented UI
 - Visual effects and motion helpers used by the maintained component set
 - Bundled package assets for fonts, textures, and the orb shader path used by package tests and the example app
 
@@ -112,7 +113,7 @@ The example app is the best place to inspect real specimens and integration patt
 
 ## Agent Skill
 
-This repository carries a coding-agent skill, `elattar-flutter-ui-director`, that teaches an agent to build Flutter UI from this design system: inventory the public `Ds*` APIs before inventing a widget, resolve every visual value from foundation tokens, cover loading/empty/error/success and accessibility states, respect responsive contracts, and run the right verification ladder.
+This repository carries a coding-agent skill, `elattar-flutter-ui-director`, that teaches an agent to build Flutter UI from this design system: inventory the public `El*` APIs before inventing a widget, resolve every visual value from foundation tokens, cover loading/empty/error/success and accessibility states, respect responsive contracts, and run the right verification ladder.
 
 - Skill source: [`skills/elattar-flutter-ui-director/SKILL.md`](skills/elattar-flutter-ui-director/SKILL.md)
 - Repository contract: [`AGENTS.md`](AGENTS.md)
@@ -156,8 +157,8 @@ elattar add button
 ```
 
 Both commands read the generated registry at `registry/generated/latest/`
-(20 items, schema v1, built by `tool/registry_builder/`) and scaffold a
-consumer project from it.
+(99 items total, including 84 components, schema v1, built by
+`tool/registry_builder/`) and scaffold a consumer project from it.
 
 Today, the supported way to use the design system from outside this
 repository is as the maintained Flutter package — see

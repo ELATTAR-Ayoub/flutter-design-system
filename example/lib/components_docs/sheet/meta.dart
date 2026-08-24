@@ -1,86 +1,45 @@
-/// Documentation metadata for the paired sheet and drawer components.
+/// Documentation metadata for the `sheet` component.
 ///
-/// A worker-owned file: the supervisor folds [sheetDoc] into `catalog.dart`'s
-/// `componentDocs` list in a later, serialized pass. This file only ever
-/// imports `catalog.dart` for the [ComponentDocEntry] shape: it never edits
-/// it.
+/// Split from a former combined sheet+drawer page: this file now documents
+/// `lib/src/components/sheet.dart` alone. `lib/src/components/drawer.dart`
+/// has its own page and its own `../drawer/meta.dart` now, not this one.
 ///
-/// Sheet and drawer are documented on **one page, one entry** because they
-/// are the same idea: an edge-anchored overlay that keeps the page behind
-/// it in place, instead of a centred modal that interrupts: at different
-/// edges. [ComponentDocEntry] carries one `sourcePath`; because both
-/// components have real source files, this one names the primary of the
-/// two (`sheet.dart`) and `page.dart`'s own Dependencies section names
-/// `drawer.dart` explicitly as the second.
-///
-/// Neither `sheet` nor `drawer` has a `registry/components/*.json` manifest
-/// yet, so [dependencies] names the real modules the two source files import
-/// (for the dependencies panel), not a validated `registryDependencies` list.
-/// `page.dart`'s installation section says plainly that both are already
-/// usable through the published package: they are exported from the barrel
-///: but neither is yet installable through `elattar add`.
+/// [dependencies] names the real modules `sheet.dart` imports (for the
+/// dependencies panel), not a validated `registryDependencies` list: neither
+/// `sheet` nor `drawer` has a `registry/components/*.json` manifest yet, so
+/// `page.dart`'s Installation section says plainly that the component is
+/// already usable through the published package (it is exported from the
+/// barrel) but installable through `elattar add sheet`.
 library;
 
 import '../catalog.dart';
 
-/// IA §9.2's expanded description: sheet and drawer against dialog, and
-/// sheet against drawer: not a restatement of either name.
-const String sheetExpandedDescription =
-    'Sheet and drawer are both edge-anchored overlay panels that slide in '
-    'over the page and leave the page itself in place behind a scrim: the '
-    'opposite choice from DsDialog, which centres itself and interrupts. '
-    'Reach for one of these two instead of a dialog whenever the content is '
-    'a side task the user is still oriented by the underlying page for: a '
-    'filter panel, an account menu, a set of card actions: rather than a '
-    'question that needs a direct, page-blocking answer. '
-    'Between the two: DsSheetOverlay opens on any of four edges (top, '
-    'right, bottom, left) and does not drag; DsDrawer is pinned to the '
-    'bottom only, and is the one panel in the family a user can drag closed '
-    'with a finger, which is what makes it the right container for card '
-    'actions and other touch-first bottom sheets on a phone. They are not '
-    'the same widget with a side parameter: see Variants and sizes below '
-    'for exactly how the implementations diverge even where DsSheetSide.'
-    'bottom and DsDrawer both anchor to the same edge.';
-
 const ComponentDocEntry sheetDoc = ComponentDocEntry(
   name: 'sheet',
-  title: 'Sheet & Drawer',
+  title: 'Sheet',
   description:
-      'Edge-anchored overlay panels that slide in and keep the page behind '
-      'them in place, Sheet on any of four sides, Drawer pinned to the '
-      'bottom and draggable closed.',
+      'An edge-anchored overlay panel, top, right, bottom, or left, that '
+      'slides in and keeps the page behind it in place instead of '
+      'interrupting it.',
   dependencies: <String>[
-    'source-foundation',
-    'dialog',
     'button',
+    'dialog',
     'icon',
-    'ds-safe-area',
+    'safe-area',
+    'source-foundation',
   ],
   exports: <String>[
-    // lib/src/components/sheet.dart
-    'DsSheet',
-    'DsSheetPanel',
-    'DsSheetSide',
-    'DsSheetOverlay',
-    'DsSheetTransition',
-    'DsSheetContent',
-    'DsSheetContentGroup',
-    'DsSheetHeader',
-    'DsSheetFooter',
-    'DsSheetTitle',
-    'DsSheetDescription',
-    // lib/src/components/drawer.dart
-    'DsDrawer',
-    'DsDrawerContent',
-    'DsDrawerHandle',
-    'DsDrawerHeader',
-    'DsDrawerFooter',
-    'DsDrawerTitle',
-    'DsDrawerDescription',
+    'ElSheet',
+    'ElSheetPanel',
+    'ElSheetSide',
+    'ElSheetOverlay',
+    'ElSheetTransition',
+    'ElSheetContent',
+    'ElSheetContentGroup',
+    'ElSheetHeader',
+    'ElSheetFooter',
+    'ElSheetTitle',
+    'ElSheetDescription',
   ],
   sourcePath: 'lib/src/components/sheet.dart',
 );
-
-/// The second source file this one page documents. Named here rather than
-/// only in prose so `page.dart` has one place to read it from.
-const String drawerSourcePath = 'lib/src/components/drawer.dart';

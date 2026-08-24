@@ -1,0 +1,29 @@
+{
+  "name": "empty",
+  "type": "component",
+  "version": "0.0.1",
+  "description": "`components/ui/empty.tsx` — six parts, and two of them are drifts.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/empty.dart",
+      "target": "@ui/empty.dart",
+      "sha256": "f4cd07b07a5b3a69bc616b29f65b9146d7a6e1182bc0b63b82d1359b165180b8"
+    }
+  ],
+  "registryDependencies": [
+    "icon",
+    "source-foundation"
+  ],
+  "semanticDependencies": [
+    "icon"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "documentationRoute": "/components/empty",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/empty.dart",
+  "deprecated": false
+}

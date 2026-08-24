@@ -11,8 +11,8 @@ Widget _harness({
 }) {
   return MediaQuery(
     data: MediaQueryData(size: size),
-    child: DsTheme(
-      controller: DsThemeController(mode: DsThemeMode.dark),
+    child: ElTheme(
+      controller: ElThemeController(mode: ElThemeMode.dark),
       child: MaterialApp(
         home: SingleChildScrollView(controller: controller, child: child),
       ),
@@ -28,9 +28,9 @@ DocsLayout _layout({required Widget child}) => DocsLayout(
     description:
         'A long description that should remain readable at every supported width.',
   ),
-  breadcrumbs: const <DsBreadcrumbEntry>[
-    DsBreadcrumbEntry.link('Docs'),
-    DsBreadcrumbEntry.page('Foundations'),
+  breadcrumbs: const <ElBreadcrumbEntry>[
+    ElBreadcrumbEntry.link('Docs'),
+    ElBreadcrumbEntry.page('Foundations'),
   ],
   sidebar: const <DocsSidebarEntry>[
     DocsSidebarEntry(title: 'Introduction', route: '/docs', selected: true),
@@ -53,7 +53,7 @@ Widget _tallArticle({Key? usageKey}) => Column(
     const SizedBox(height: 900),
     KeyedSubtree(
       key: usageKey ?? docsAnchorKey('usage'),
-      child: DsText('The usage section body', DsType.body),
+      child: ElText('The usage section body', ElType.body),
     ),
     const SizedBox(height: 2400),
   ],
@@ -146,8 +146,13 @@ void main() {
         );
       }
 
+      // `/docs` itself is deliberately absent from the rail (`showInSidebar`
+      // is false on the section landing, so the section and its own children
+      // are not listed as peers). Assert against a row that is actually there.
       expect(
-        wearsClickCursor(const ValueKey<String>('docs-sidebar:/docs')),
+        wearsClickCursor(
+          const ValueKey<String>('docs-sidebar:/docs/installation'),
+        ),
         isTrue,
         reason: 'a sidebar row is a tap target and must read as one',
       );
@@ -167,7 +172,7 @@ void main() {
     await tester.pumpWidget(
       _harness(
         size: const Size(1440, 900),
-        child: _layout(child: DsText('Article body', DsType.body)),
+        child: _layout(child: ElText('Article body', ElType.body)),
       ),
     );
 
@@ -199,7 +204,7 @@ void main() {
     await tester.pumpWidget(
       _harness(
         size: const Size(390, 844),
-        child: _layout(child: DsText('Article body', DsType.body)),
+        child: _layout(child: ElText('Article body', ElType.body)),
       ),
     );
 
@@ -225,14 +230,14 @@ void main() {
           size: Size(390, 844),
           textScaler: TextScaler.linear(2),
         ),
-        child: DsTheme(
-          controller: DsThemeController(mode: DsThemeMode.light),
+        child: ElTheme(
+          controller: ElThemeController(mode: ElThemeMode.light),
           child: MaterialApp(
             home: SingleChildScrollView(
               child: _layout(
-                child: DsText(
+                child: ElText(
                   'Article body with enough text to exercise wrapping.',
-                  DsType.body,
+                  ElType.body,
                 ),
               ),
             ),
@@ -278,15 +283,21 @@ void main() {
           ],
           next: const DocsPageLink(title: 'Next', route: '/next'),
           onNavigate: routes.add,
-          child: DsText('Body', DsType.body),
+          child: ElText('Body', ElType.body),
         ),
       ),
     );
 
-    await tester.tap(find.text('Install'));
+    // The left rail is the SAME on every documentation page now, so it is
+    // built from the site's own routes and component catalog rather than from
+    // `sidebar:`. Tapping a canonical entry is therefore the real test of
+    // "the rail routes"; the old assertion tapped a per-page entry that no
+    // longer renders, because cross-page navigation cannot vary per page.
+    await tester.ensureVisible(find.text('Installation').first);
+    await tester.tap(find.text('Installation').first);
     await tester.ensureVisible(find.text('Next'));
     await tester.tap(find.text('Next'));
-    expect(routes, <String>['/install', '/next']);
+    expect(routes, <String>['/docs/installation', '/next']);
   });
 
   group('an anchor scrolls the article; it never routes', () {
@@ -392,10 +403,10 @@ void main() {
     });
 
     // The dialog, input and select guides mark no anchors of their own: they
-    // are built out of `kit.dart`'s `DsSection`s whose ids already *are* their
+    // are built out of `kit.dart`'s `ElSection`s whose ids already *are* their
     // TOC anchors. This is the arm that resolves those, and it is why
     // `kit.dart` needed no change.
-    testWidgets('a kit DsSection id resolves without any extra marking', (
+    testWidgets('a kit ElSection id resolves without any extra marking', (
       WidgetTester tester,
     ) async {
       // Matches the real test surface to the `MediaQuery` size below: see
@@ -426,10 +437,10 @@ void main() {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 const SizedBox(height: 900),
-                DsSection(
+                ElSection(
                   id: 'states',
                   title: 'States',
-                  child: DsText('State matrix', DsType.body),
+                  child: ElText('State matrix', ElType.body),
                 ),
                 const SizedBox(height: 2400),
               ],

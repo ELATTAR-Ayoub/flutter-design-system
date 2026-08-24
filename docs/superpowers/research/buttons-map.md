@@ -5,7 +5,7 @@
 | file | role |
 |---|---|
 | `app\design-system\components\base\buttons\page.tsx` | the page — 399 lines, server component, **no page-local components, no module-level data**; one inline array literal at `:125–131` |
-| `components\ds\kit.tsx` | `Code`, `DoDont`, `DsPageHeader`, `DsSection`, `Meta`, `Note`, `PageFootNav`, `Panel`, `Row`, `StateCell`, `StateGrid` — **11 of the kit's 13 exports**, the widest use on any page |
+| `components\el\kit.tsx` | `Code`, `DoDont`, `ElPageHeader`, `ElSection`, `Meta`, `Note`, `PageFootNav`, `Panel`, `Row`, `StateCell`, `StateGrid` — **11 of the kit's 13 exports**, the widest use on any page |
 | `components\ui\button.tsx` | 146 lines — the whole point of the page |
 | `components\ui\button-group.tsx` | 84 lines — `ButtonGroup`, `ButtonGroupText`, `ButtonGroupSeparator` |
 | `components\ui\separator.tsx` | 29 lines — what `ButtonGroupSeparator` wraps |
@@ -15,9 +15,9 @@
 | `components\ui\kbd.tsx` | 27 lines — `Kbd`, `KbdGroup` |
 | `components\ui\spinner.tsx` | 12 lines — `loading`'s spinner |
 | `components\ui\icon-swap.tsx` | client; the two-state icon wheel |
-| `components\ds\icon-swap-demo.tsx` | client; `ViewSwitchDemo`, `PlayPauseDemo`, `FavouriteDemo`, `MuteDemo` |
+| `components\el\icon-swap-demo.tsx` | client; `ViewSwitchDemo`, `PlayPauseDemo`, `FavouriteDemo`, `MuteDemo` |
 | `components\ui\icon.tsx` | every glyph on the page |
-| `lib\ds\nav.ts` `:131–145` (`buttons`), `:560–566` (group `base`) | eyebrow/title/blurb/chips + foot-nav siblings |
+| `lib\el\nav.ts` `:131–145` (`buttons`), `:560–566` (group `base`) | eyebrow/title/blurb/chips + foot-nav siblings |
 | `app\design-system\layout.tsx`, `app\globals.css`, `app\layout.tsx` | shell, tokens, fonts |
 
 Read with **`shared-map.md`** (§1 shell + `SlidingIndicator`; §2 kit anatomy incl. `Row`/`StateGrid`/`StateCell`/`Meta`; §5 `Icon` + the full `Button` cva) and **`globals-map.md`** (§3b type tokens, §3d radii, §3f motion, §5 type classes, §7 utilities, §8 keyframes). **`icons-map.md`** owns the glyph ledger and the stroke ladder; **`shadows-map.md`** §4/§5.1–5.4 owns every `--shadow-*`, `sheen-action` and `foil-value`; **`motion-map.md`** §5/§6 owns `btn-spring`, `press`, `anim-jelly`. Nothing there is repeated here except where this page consumes it differently.
@@ -34,11 +34,11 @@ First **non-foundations** page in the port. Shell, sidebar, 1680/240/1080 frame,
 | 2 | **Eyebrow is composed, not literal** — `eyebrow={`${group.title} · Base`}` (`page:49`). Foundations pages pass a bare string. Result: **"Base Components · Base"** (drift 1). |
 | 3 | **`Row`, `StateGrid`, `StateCell` render for the first time in the port's corpus.** `shared-map.md` §2 records them as "not used on the 4 audited pages". This page uses all three. |
 
-Nine sections, in DOM order: `#variants` · `#sizes` · `#states` · `#icons` · `#groups` · `#toggle` · `#kbd` · `#api` · `#rules`. Every one is a bare `DsSection` (`mb-20`, heading block `mb-6`); **the page never passes `className` to `DsSection`**, and `#api` / `#rules` pass no `description`.
+Nine sections, in DOM order: `#variants` · `#sizes` · `#states` · `#icons` · `#groups` · `#toggle` · `#kbd` · `#api` · `#rules`. Every one is a bare `ElSection` (`mb-20`, heading block `mb-6`); **the page never passes `className` to `ElSection`**, and `#api` / `#rules` pass no `description`.
 
 ---
 
-## 1 · Page header (`DsPageHeader`, `page:48–53`)
+## 1 · Page header (`ElPageHeader`, `page:48–53`)
 
 | slot | source | verbatim |
 |---|---|---|
@@ -164,23 +164,23 @@ Every value below is the resolved pixel, not the class. `--spacing` is 0.25rem.
 
 ### 3.2 · The size-ladder gap against the port
 
-`lib\src\components\button.dart:90` — `enum DsButtonSize` has **four** members, and its own doc at `:86–89` says so.
+`lib\src\components\button.dart:90` — `enum ElButtonSize` has **four** members, and its own doc at `:86–89` says so.
 
 | reference | port | verdict |
 |---|---|---|
 | `xs` | — | **missing** |
-| `sm` | `DsButtonSize.sm` `:92` | exists |
-| `default` | `DsButtonSize.md` `:95` | exists (**renamed** — `default` is a Dart keyword) |
+| `sm` | `ElButtonSize.sm` `:92` | exists |
+| `default` | `ElButtonSize.md` `:95` | exists (**renamed** — `default` is a Dart keyword) |
 | `lg` | — | **missing** |
 | `xl` | — | **missing** |
 | `icon-xs` | — | **missing** (not needed by this page) |
-| `icon-sm` | `DsButtonSize.iconSm` `:101` | exists |
-| `icon` | `DsButtonSize.icon` `:98` | exists |
+| `icon-sm` | `ElButtonSize.iconSm` `:101` | exists |
+| `icon` | `ElButtonSize.icon` `:98` | exists |
 | `icon-lg` | — | **missing** |
 
-Existing resolvers, all `switch`-exhaustive so a new enum value breaks the build loudly: `heightFor` `:201–204`, `gapFor` `:211–215` (**exposed, not applied** — `DsButton` takes one `child`, so an icon+label caller builds its own `Row` and asks for the gap), `paddingXFor` `:218–222`, `isSquare` `:225–226`.
+Existing resolvers, all `switch`-exhaustive so a new enum value breaks the build loudly: `heightFor` `:201–204`, `gapFor` `:211–215` (**exposed, not applied** — `ElButton` takes one `child`, so an icon+label caller builds its own `Row` and asks for the gap), `paddingXFor` `:218–222`, `isSquare` `:225–226`.
 
-**The blocking gap is not the enum — it is type.** `button.dart:489–493` resolves **one** text style for every size: `DsText.styleOf(context, DsComponentType.buttonLabel, …)`. `xs` (12), `lg`/`xl` (15) and the `caps` emphasis (12 + 0.09em + uppercase) all need a per-size text dimension that does not exist. See open question 2.
+**The blocking gap is not the enum — it is type.** `button.dart:489–493` resolves **one** text style for every size: `ElText.styleOf(context, ElComponentType.buttonLabel, …)`. `xs` (12), `lg`/`xl` (15) and the `caps` emphasis (12 + 0.09em + uppercase) all need a per-size text dimension that does not exist. See open question 2.
 
 ---
 
@@ -662,39 +662,39 @@ Package root `D:\DESIGN\Design-System-2026-8\flutter-design-system\`.
 
 | need | where |
 |---|---|
-| **All seven variants** | `DsButtonVariant` (`lib\src\components\button.dart:38`) — `primary` :45 (renamed from `default`), `premium` :50, `secondary` :57, `outline` :63, `ghost` :68, `destructive` :77, `link` :83. Guarded by `test\components_test.dart:503` ("all seven cva variants, in source order"). |
-| Variant paint + state table | `_ButtonSkin` :133, `_skin` :294–390, `_surface` :425–463 (`DsSheenAction` primary, `DsFoilValue` premium, `DsMachineSurface` for the other five), `_SpringColors` :579–617 |
-| Press scale | `DsPress(scale: DsTransforms.buttonScale = 0.95)` :531–537, `tick` down / `base` up; tested `components_test.dart:274` |
-| Focus ring, Tailwind slot order | `DsButton.withFocusRing(spec, ring)` :241–245, `_focusBorder` :394–397; spread 3 (:109), alpha 0.50 (:112), destructive overrides 0.50/0.25 (:124–125). **`DsInput` already consumes it** (`input.dart:214–217`) |
+| **All seven variants** | `ElButtonVariant` (`lib\src\components\button.dart:38`) — `primary` :45 (renamed from `default`), `premium` :50, `secondary` :57, `outline` :63, `ghost` :68, `destructive` :77, `link` :83. Guarded by `test\components_test.dart:503` ("all seven cva variants, in source order"). |
+| Variant paint + state table | `_ButtonSkin` :133, `_skin` :294–390, `_surface` :425–463 (`ElSheenAction` primary, `ElFoilValue` premium, `ElMachineSurface` for the other five), `_SpringColors` :579–617 |
+| Press scale | `ElPress(scale: ElTransforms.buttonScale = 0.95)` :531–537, `tick` down / `base` up; tested `components_test.dart:274` |
+| Focus ring, Tailwind slot order | `ElButton.withFocusRing(spec, ring)` :241–245, `_focusBorder` :394–397; spread 3 (:109), alpha 0.50 (:112), destructive overrides 0.50/0.25 (:124–125). **`ElInput` already consumes it** (`input.dart:214–217`) |
 | Real `:focus-visible` + keyboard activation | `Focus` :554–560, `_onKey` :276–284 (Enter / NumpadEnter / Space) |
 | Icon-only + accessible name | `size: icon|iconSm` + `label:` → `Semantics(button:, label:)` :567–568; square layout :470, :516–529 |
 | Disabled | `_enabled` :256 → `Opacity(0.45)` + `IgnorePointer` :562–565 |
 | Semibold on premium only | `_applySemibold` :405–416, `_semiboldWght` :129 |
-| **Travelling pill substrate** | `DsSlidingPillGroup` (`lib\src\motion\sliding_pill.dart:33`) — `activeIndex` (**−1 or out-of-range hides the pill**, :44–45, :161–167, :196), `pill`, `children`, `padding`, `gap`. `AnimatedPositioned` :183–192 (250ms `DsCurves.spring`, `Duration.zero` before `_placed`), `AnimatedOpacity` :194–198 (150ms `DsCurves.out`), jelly controller :81–84 + `_replayJelly` :121–124 (**skipped on first placement**) + `Transform.scale` :199–208. Measures post-frame (`_measure` :132–151) in place of the web's Mutation/Resize observers. Library doc :1–21 cites `sliding-indicator.tsx`, `slide-pill` (`globals.css:2256`) and `yuki-jelly` (`:2431–2438`). |
-| `yuki-jelly` keyframes, transcribed | `DsJelly` (`lib\src\motion\keyframes.dart:435–450`), `duration = DsDurations.animJelly` 600ms |
-| Durations / curves / transforms | `lib\src\foundation\motion.dart` — `tick` 80 :18, `fast` 150 :21, `base` 250 :27, `slow` **400** :30, `animJelly` 600 :71, `buttonScale` 0.95 :192; `DsCurves.spring` :211, `.out` :216 |
-| Reduced-motion gate | `dsAnimationDuration(context, d)` (`lib\src\theme_scope.dart:332`) — already threaded through `sliding_pill.dart:175, 184` |
-| Docs kit — prose/reference primitives | `example\lib\kit.dart` — `DsPageHeader` :54, `DsSection` :148, `DsPanel` :242, `DsMeta` :390 (+ `DsMetaItem` :383), `DsCode` :448 / `DsCode.span` :514 / `DsCodeBlock` :663, `DsDoDont` :735, `DsNote` :834 (+ `DsNoteTone` :831), `DsGrid` :908, `DsPageFootNav` :1156 |
+| **Travelling pill substrate** | `ElSlidingPillGroup` (`lib\src\motion\sliding_pill.dart:33`) — `activeIndex` (**−1 or out-of-range hides the pill**, :44–45, :161–167, :196), `pill`, `children`, `padding`, `gap`. `AnimatedPositioned` :183–192 (250ms `ElCurves.spring`, `Duration.zero` before `_placed`), `AnimatedOpacity` :194–198 (150ms `ElCurves.out`), jelly controller :81–84 + `_replayJelly` :121–124 (**skipped on first placement**) + `Transform.scale` :199–208. Measures post-frame (`_measure` :132–151) in place of the web's Mutation/Resize observers. Library doc :1–21 cites `sliding-indicator.tsx`, `slide-pill` (`globals.css:2256`) and `yuki-jelly` (`:2431–2438`). |
+| `yuki-jelly` keyframes, transcribed | `ElJelly` (`lib\src\motion\keyframes.dart:435–450`), `duration = ElDurations.animJelly` 600ms |
+| Durations / curves / transforms | `lib\src\foundation\motion.dart` — `tick` 80 :18, `fast` 150 :21, `base` 250 :27, `slow` **400** :30, `animJelly` 600 :71, `buttonScale` 0.95 :192; `ElCurves.spring` :211, `.out` :216 |
+| Reduced-motion gate | `elAnimationDuration(context, d)` (`lib\src\theme_scope.dart:332`) — already threaded through `sliding_pill.dart:175, 184` |
+| Docs kit — prose/reference primitives | `example\lib\kit.dart` — `ElPageHeader` :54, `ElSection` :148, `ElPanel` :242, `ElMeta` :390 (+ `ElMetaItem` :383), `ElCode` :448 / `ElCode.span` :514 / `ElCodeBlock` :663, `ElDoDont` :735, `ElNote` :834 (+ `ElNoteTone` :831), `ElGrid` :908, `ElPageFootNav` :1156 |
 | Nav entry, character-for-character | `example\lib\nav.dart:193–206` — slug `buttons`, title, blurb and all six `contents` chips already match `nav.ts:133–145`. Group `base` at :648–655; all 14 base categories present. **No nav work needed.** |
-| Shadows the page needs | `DsShadows.btn / btnPrimary / btnValue / btnDown / chip` (`lib\src\foundation\shadows.dart`) |
+| Shadows the page needs | `ElShadows.btn / btnPrimary / btnValue / btnDown / chip` (`lib\src\foundation\shadows.dart`) |
 
 ### 15.2 · Missing — must be built
 
 | # | missing | notes |
 |---|---|---|
 | 1 | **5 of 9 button sizes** — `xs`, `lg`, `xl`, `icon-xs`, `icon-lg` | Enum `:90`; add to `heightFor` :201, `gapFor` :211, `paddingXFor` :218, `isSquare` :225. All four are exhaustive switches, so the compiler lists the work. |
-| 2 | **Per-size button type** | `button.dart:489–493` resolves one `DsComponentType.buttonLabel` for every size. Needs 12 / 13 / 15 by rung, plus the `caps` treatment (12px + 600 + 0.09em + uppercase). |
-| 3 | **`emphasis`** | No third axis on `DsButton` at all. `--tracking-cta` 0.09em has no port token. |
+| 2 | **Per-size button type** | `button.dart:489–493` resolves one `ElComponentType.buttonLabel` for every size. Needs 12 / 13 / 15 by rung, plus the `caps` treatment (12px + 600 + 0.09em + uppercase). |
+| 3 | **`emphasis`** | No third axis on `ElButton` at all. `--tracking-cta` 0.09em has no port token. |
 | 4 | **`loading` + a spinner** | No `loading` param, and **no spinner widget anywhere in the repo**. Needs `pulls-spin` 0.9s **linear** ∞ on a 16px `Loader2` glyph, prepended before the child, forcing disabled + `Semantics(… busy?)`. `Loader2` is very likely among the 59 glyphs `icons-map.md` §12.3 lists as missing from `icon_paths.dart` — check before building. |
-| 5 | **`asChild`** | No child-render delegation, no link affordance. `DsButtonVariant.link` (:83) is paint-only and still requires `onPressed`. Only needed if the API section must be truthful. |
+| 5 | **`asChild`** | No child-render delegation, no link affordance. `ElButtonVariant.link` (:83) is paint-only and still requires `onPressed`. Only needed if the API section must be truthful. |
 | 6 | **`ButtonGroup` / `ButtonGroupText` / `ButtonGroupSeparator`** | Nothing exists. Needs: flush row, stretch-to-tallest, per-position corner squaring **with the asymmetric `rounded-r-lg` end** (drift 7), single-hairline joins (`border-l-0`), 1px `--input` separator inset 1px vertically, and a `--muted` text cell. |
 | 7 | **`Toggle`** | Nothing exists. 32×32 min, 12px radius, `--muted` pressed fill, 250ms `--ease-out` on everything, **no press scale**, 50% disabled, 3px focus ring. |
-| 8 | **`ToggleGroup` / `ToggleGroupItem`** | Nothing exists. `DsSlidingPillGroup` is the substrate but is **not** a toggle group — no selection semantics, no roving focus, no roles, no per-item styling. Its only consumer today is `example\lib\theme_toggle.dart:52/:70`. Needs: 8px gap, item ink flip to `--primary-foreground` when selected, pill = `--primary` + `DsRadii.pill` + `DsShadows.chip`, and **deselect → `activeIndex: -1`** (already supported). |
+| 8 | **`ToggleGroup` / `ToggleGroupItem`** | Nothing exists. `ElSlidingPillGroup` is the substrate but is **not** a toggle group — no selection semantics, no roving focus, no roles, no per-item styling. Its only consumer today is `example\lib\theme_toggle.dart:52/:70`. Needs: 8px gap, item ink flip to `--primary-foreground` when selected, pill = `--primary` + `ElRadii.pill` + `ElShadows.chip`, and **deselect → `activeIndex: -1`** (already supported). |
 | 9 | **`Kbd` / `KbdGroup`** | Nothing exists. 20px tall, 20px min, 6px radius, `--muted`, 12px/500 Inter, muted ink, no border, no shadow. |
-| 10 | **`IconSwap`** | Nothing exists (`swap-roll` has no port equivalent either). Needs a fixed clip box, a stacked strip translated by `offset × 160%` of the **glyph's** height on 400ms `DsCurves.spring`, opacity on the same curve, and `DsJelly` on the arriving glyph at a **150ms delay** — replayed on every change *and on first mount*. |
-| 11 | **Docs `Row`** | `example\lib\kit.dart` has none; pages inline `Wrap(spacing: ds(3), runSpacing: ds(3))` by hand (`icons.dart:745–747`, `shadows.dart:~408`). This page needs `align: end` for the size ladder. Promote to the kit. |
+| 10 | **`IconSwap`** | Nothing exists (`swap-roll` has no port equivalent either). Needs a fixed clip box, a stacked strip translated by `offset × 160%` of the **glyph's** height on 400ms `ElCurves.spring`, opacity on the same curve, and `ElJelly` on the arriving glyph at a **150ms delay** — replayed on every change *and on first mount*. |
+| 11 | **Docs `Row`** | `example\lib\kit.dart` has none; pages inline `Wrap(spacing: el(3), runSpacing: el(3))` by hand (`icons.dart:745–747`, `shadows.dart:~408`). This page needs `align: end` for the size ladder. Promote to the kit. |
 | 12 | **Docs `StateGrid` / `StateCell`** | Missing. Private prototypes exist and should be **promoted, not re-forked**: `_HairlineGrid` (`example\lib\pages\icons.dart:921`) is already the `gap-px` lattice; `_EntryCell` (`icons.dart:956`) is close to a cell. Needs the `cols: 4` and `cols: 5` responsive maps, the 56px `min-h-14` demo well, and `type-caption` for the note. |
-| 13 | **`type-caption` and `type-num` in `DsType`** | Confirm both exist in `lib\src\foundation\typography.dart`; the corpus has not needed either before. |
+| 13 | **`type-caption` and `type-num` in `ElType`** | Confirm both exist in `lib\src\foundation\typography.dart`; the corpus has not needed either before. |
 | 14 | **`example\lib\pages\buttons.dart` + a `main.dart` arm** | `pageFor` (`example\lib\main.dart:100–106`) has arms only for overview / colors / typography / spacing. **`shadows`, `motion` and `icons` pages exist on disk and are also unrouted** — same debt, three pages deep. `shell_test.dart:228–230` only asserts `pageFor(...)` is `isNotNull`, which a `PlaceholderPage` satisfies, so nothing fails today. |
 | 15 | **`_referenceHeight['buttons']`** | `example\test\vertical_parity_probe_test.dart:45–50` has exactly four keys (`overview` 2402.66, `colors` 3781.83, `typography` 6039.94, `spacing` 4159.36). Must be measured off the live dev server at 1440×900 / DPR 1. |
 | 16 | **`_referenceBreaks['buttons']`** | `example\test\wrap_parity_probe_test.dart:183–367`, same four keys. It is a **closed inventory**: an absent paragraph is asserted to be single-line (:443–451) and every table key must be seen (:465–471). This page has ~20 paragraphs plus 13 StateCell notes — expect a large table. |
@@ -705,27 +705,27 @@ Package root `D:\DESIGN\Design-System-2026-8\flutter-design-system\`.
 `test\token_guard_test.dart` rules at `:40–53` — forbidden outside `lib\src\foundation\`: `Color(0x`, `Color.from`, `fontSize:<digit>`, `letterSpacing:<digit>`, `FontWeight.w<digit>`, `Curves.`, `Duration((milli|micro)seconds:<digit>`, `BorderRadius.circular(<digit>`, `BoxShadow(`. Escape hatch `// allow-hardcoded: <reason>` on the line (:86).
 
 Consequences specific to this page:
-- **The guard is a raw text scan including comments and string literals** (:13–15). The API `Meta` values and any `DsCodeBlock` sample are plain strings, so they are safe — but a code sample containing `Duration(milliseconds: 250)` or `BorderRadius.circular(12)` would trip it.
+- **The guard is a raw text scan including comments and string literals** (:13–15). The API `Meta` values and any `ElCodeBlock` sample are plain strings, so they are safe — but a code sample containing `Duration(milliseconds: 250)` or `BorderRadius.circular(12)` would trip it.
 - `160%` (swap-roll travel), `0.09em` (caps tracking), `0.9s` (spinner) and the `--text-*` rungs 12/13/15 must all reach the widget through `lib\src\foundation\` constants, not literals.
-- The ToggleGroup pill's radius must be `DsRadii.pill`, the item's `DsRadii.lg`, the Kbd's `DsRadii.sm`.
+- The ToggleGroup pill's radius must be `ElRadii.pill`, the item's `ElRadii.lg`, the Kbd's `ElRadii.sm`.
 
 ---
 
 ## 16 · Open questions (with recommendations)
 
 1. **Section scope vs the chip contract.** The six chips promise Button, Button Group, Icon Button, Toggle, Toggle Group, Kbd; the page also renders an **IconSwap** panel that no chip mentions. Build all nine sections including IconSwap (it is a third of §7 and carries load-bearing copy), or stage it? **Recommend: all nine.** The chips are a subset of the page in the reference too, and dropping IconSwap would orphan two paragraphs of copy that reference it by name.
-2. **Size ladder + per-size type.** Missing sizes are cheap (four exhaustive switches); **per-size type is the real work** and touches `typography.dart`. Add `DsComponentType.buttonLabelXs/Sm/Md/Lg/Xl` + a `caps` variant, or give `DsButton` a resolved `TextStyle` per size inside `button.dart` with the sizes declared in `foundation`? **Recommend: extend `DsComponentType`** — the guard forbids `fontSize:` outside `foundation` anyway, so the sizes have to live there regardless; putting the whole style there keeps one owner.
+2. **Size ladder + per-size type.** Missing sizes are cheap (four exhaustive switches); **per-size type is the real work** and touches `typography.dart`. Add `ElComponentType.buttonLabelXs/Sm/Md/Lg/Xl` + a `caps` variant, or give `ElButton` a resolved `TextStyle` per size inside `button.dart` with the sizes declared in `foundation`? **Recommend: extend `ElComponentType`** — the guard forbids `fontSize:` outside `foundation` anyway, so the sizes have to live there regardless; putting the whole style there keeps one owner.
 3. **Build `icon-xs`?** Never rendered, but the API `Meta` lists it verbatim and the reference cva declares it. **Recommend: build it.** Nine-of-nine costs one enum value and four switch arms, and it makes the printed API row true.
 4. **`asChild`.** No Flutter analogue and no router in the example app. **Recommend: do not build.** Keep the `Meta` row verbatim (the fidelity bar says translate the reference's own copy, drift included) and record the divergence rather than inventing a link API for a docs page.
 5. **The `loading` spinner glyph.** `Loader2` is not in the port's curated 63 (`icons-map.md` §12.3 lists 59 glyphs still to add). Is `Loader2` among the missing, and should it be pulled forward as part of this page or waited for? **Recommend: pull it forward** — one glyph, and the States section cannot render without it.
 6. **`Toggle`/`ToggleGroup`: real interaction or specimens?** The section description says the states "persist"; the page's toggles are genuinely clickable. **Recommend: real.** Both are small, and a dead ToggleGroup would make the sliding pill — the one piece already built — untestable on the page it belongs to.
-7. **ToggleGroup deselection.** Radix `type="single"` lets a click on the active item clear the selection, and `DsSlidingPillGroup` already handles that via `activeIndex: -1`. Mirror the deselect, or lock the group to one-always-selected? **Recommend: mirror.** The port's substrate documents the −1 case explicitly (`sliding_pill.dart:44–45`), so mirroring costs nothing and exercises a path that is otherwise dead.
+7. **ToggleGroup deselection.** Radix `type="single"` lets a click on the active item clear the selection, and `ElSlidingPillGroup` already handles that via `activeIndex: -1`. Mirror the deselect, or lock the group to one-always-selected? **Recommend: mirror.** The port's substrate documents the −1 case explicitly (`sliding_pill.dart:44–45`), so mirroring costs nothing and exercises a path that is otherwise dead.
 8. **The two static state cells.** "Hover" is pixel-identical to "Default" (drift 13) and "Focus" is a hand-drawn ring. Reproduce the classes exactly — including the no-op — or make them show what they name? **Recommend: reproduce exactly.** The fidelity bar is the reference's own UI translated, drift included; the drift register is where the observation lives.
 9. **The spinner's a11y hole (drift 4).** Flutter has no equivalent of "props silently dropped by a destructure" — the port must *choose* whether the spinner is announced. **Recommend: mirror the web** (spinner excluded from semantics; only the button's busy state exposed) and record it, consistent with drift 3's treatment.
 10. **Promote `_HairlineGrid` / `_EntryCell` from `icons.dart`?** Doing so edits a page that is finished but unrouted and unreviewed. **Recommend: promote** — `StateGrid`/`StateCell` are kit primitives in the reference (`kit.tsx:145–197`), and a second private fork would be the third copy of the `gap-px` lattice.
 11. **`main.dart` routing debt.** `shadows`, `motion` and `icons` are built and unrouted; `buttons` would be the fourth. Add all four arms as part of this build, or only `buttons`? **Recommend: all four**, plus tighten `shell_test.dart:228–230` so `isNotNull` no longer passes on a `PlaceholderPage` — otherwise the same debt silently accrues again.
 12. **Parity measurement.** `_referenceHeight['buttons']` and a `_referenceBreaks['buttons']` table must both be measured off `localhost:3000` at the 1440 frame. Is that measurement mine to take (dev server + the existing `PARITY_DUMP=1` / `WRAP_DUMP=1` rigs), or supplied? Same question stands open for the three unrouted pages.
-13. **Reduced motion.** The reference's blanket rule collapses `swap-roll`, `anim-jelly`, the pill travel and the foil to 0.01ms. The port routes everything through `dsAnimationDuration`. Confirm the intended equivalence: reduced motion should make the swap and the pill **instant** (not disabled), and should freeze the foil at its first frame.
+13. **Reduced motion.** The reference's blanket rule collapses `swap-roll`, `anim-jelly`, the pill travel and the foil to 0.01ms. The port routes everything through `elAnimationDuration`. Confirm the intended equivalence: reduced motion should make the swap and the pill **instant** (not disabled), and should freeze the foil at its first frame.
 
 
 ---
@@ -753,4 +753,4 @@ rule that reads `var(--duration-*)` **directly**, not from a utility class:
 
 No entry in this map transcribed a no-op utility as a real value. The port's
 `button.dart`, `press.dart`, `sliding_pill.dart` and `keyframes.dart` keep
-`DsDurations.tick` / `.base` / `.fast` / `.slow` unchanged for the same reason.
+`ElDurations.tick` / `.base` / `.fast` / `.slow` unchanged for the same reason.

@@ -32,22 +32,22 @@ const List<DocsCodeFile> _duplicateBasenames = <DocsCodeFile>[
   DocsCodeFile(path: 'lib/widgets/two/config.dart', code: 'class ConfigTwo {}'),
 ];
 
-Future<DsThemeController> _pumpTree(
+Future<ElThemeController> _pumpTree(
   WidgetTester tester, {
   required List<DocsCodeFile> files,
   Size size = _wide,
-  DsThemeMode mode = DsThemeMode.dark,
+  ElThemeMode mode = ElThemeMode.dark,
   String label = 'Files',
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final DsThemeController theme = DsThemeController(mode: mode);
+  final ElThemeController theme = ElThemeController(mode: mode);
   addTearDown(theme.dispose);
 
   await tester.pumpWidget(
-    DsTheme(
+    ElTheme(
       controller: theme,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -106,7 +106,7 @@ void main() {
     expect(find.bySemanticsLabel('Selected file solo.dart'), findsOneWidget);
     // The one file-entry row, plus the copy control for its source — not
     // the bare 1 this used to assert before the copy affordance existed.
-    expect(find.byType(DsButton), findsNWidgets(2));
+    expect(find.byType(ElButton), findsNWidgets(2));
 
     // Tapping the only, already-selected entry must not throw or blank the
     // pane.
@@ -120,12 +120,12 @@ void main() {
   ) async {
     await _pumpTree(tester, files: _twoFiles);
 
-    final Iterable<DsButton> entries = tester
-        .widgetList<DsButton>(find.byType(DsButton))
-        .where((DsButton b) => b.key is ValueKey<String>);
+    final Iterable<ElButton> entries = tester
+        .widgetList<ElButton>(find.byType(ElButton))
+        .where((ElButton b) => b.key is ValueKey<String>);
     expect(entries.length, 2);
-    for (final DsButton entry in entries) {
-      // A DsButton always carries a callback and an accessible label — a
+    for (final ElButton entry in entries) {
+      // A ElButton always carries a callback and an accessible label — a
       // disabled or unlabeled control here would mean the row degraded to
       // decoration.
       expect(entry.onPressed, isNotNull);
@@ -138,12 +138,12 @@ void main() {
     (WidgetTester tester) async {
       await _pumpTree(tester, files: _twoFiles, size: _wide);
 
-      final List<DsButton> entries = tester
-          .widgetList<DsButton>(find.byType(DsButton))
-          .where((DsButton b) => b.key is ValueKey<String>)
+      final List<ElButton> entries = tester
+          .widgetList<ElButton>(find.byType(ElButton))
+          .where((ElButton b) => b.key is ValueKey<String>)
           .toList();
       expect(entries, isNotEmpty);
-      for (final DsButton entry in entries) {
+      for (final ElButton entry in entries) {
         expect(entry.expanded, isTrue);
       }
     },
@@ -154,12 +154,12 @@ void main() {
     (WidgetTester tester) async {
       await _pumpTree(tester, files: _twoFiles, size: _narrow);
 
-      final List<DsButton> entries = tester
-          .widgetList<DsButton>(find.byType(DsButton))
-          .where((DsButton b) => b.key is ValueKey<String>)
+      final List<ElButton> entries = tester
+          .widgetList<ElButton>(find.byType(ElButton))
+          .where((ElButton b) => b.key is ValueKey<String>)
           .toList();
       expect(entries, isNotEmpty);
-      for (final DsButton entry in entries) {
+      for (final ElButton entry in entries) {
         expect(entry.expanded, isFalse);
       }
 
@@ -174,23 +174,23 @@ void main() {
     testWidgets('renders the same structure on light', (
       WidgetTester tester,
     ) async {
-      await _pumpTree(tester, files: _twoFiles, mode: DsThemeMode.light);
+      await _pumpTree(tester, files: _twoFiles, mode: ElThemeMode.light);
 
       expect(find.text('class A {}'), findsOneWidget);
       // 2 file-entry rows + 1 copy control for the selected file.
-      expect(find.byType(DsButton), findsNWidgets(3));
+      expect(find.byType(ElButton), findsNWidgets(3));
     });
 
     testWidgets('flipping the theme in place preserves selection', (
       WidgetTester tester,
     ) async {
-      final DsThemeController theme = await _pumpTree(tester, files: _twoFiles);
+      final ElThemeController theme = await _pumpTree(tester, files: _twoFiles);
 
       await tester.tap(find.bySemanticsLabel('Select file b.dart'));
       await tester.pump();
       expect(find.text('class B {}'), findsOneWidget);
 
-      theme.setMode(DsThemeMode.light);
+      theme.setMode(ElThemeMode.light);
       await tester.pump();
 
       // The theme flip must not reset internal selection state.
@@ -207,12 +207,12 @@ void main() {
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
 
-        final DsThemeController theme = DsThemeController(
-          mode: DsThemeMode.dark,
+        final ElThemeController theme = ElThemeController(
+          mode: ElThemeMode.dark,
         );
         addTearDown(theme.dispose);
 
-        Widget host(List<DocsCodeFile> files) => DsTheme(
+        Widget host(List<DocsCodeFile> files) => ElTheme(
           controller: theme,
           child: MaterialApp(
             debugShowCheckedModeBanner: false,
@@ -255,7 +255,7 @@ void main() {
         find.byKey(const ValueKey<String>('docs-file-tree-empty')),
         findsOneWidget,
       );
-      expect(find.byType(DsButton), findsNothing);
+      expect(find.byType(ElButton), findsNothing);
     });
   });
 
@@ -290,7 +290,10 @@ void main() {
         find.bySemanticsLabel('Copy lib/widgets/demo/a.dart'),
         findsOneWidget,
       );
-      expect(find.bySemanticsLabel('Copy lib/widgets/demo/b.dart'), findsNothing);
+      expect(
+        find.bySemanticsLabel('Copy lib/widgets/demo/b.dart'),
+        findsNothing,
+      );
 
       await tester.tap(find.bySemanticsLabel('Select file b.dart'));
       await tester.pump();
@@ -299,7 +302,10 @@ void main() {
         find.bySemanticsLabel('Copy lib/widgets/demo/b.dart'),
         findsOneWidget,
       );
-      expect(find.bySemanticsLabel('Copy lib/widgets/demo/a.dart'), findsNothing);
+      expect(
+        find.bySemanticsLabel('Copy lib/widgets/demo/a.dart'),
+        findsNothing,
+      );
     });
 
     testWidgets(
@@ -310,13 +316,13 @@ void main() {
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
 
-        final DsThemeController theme = DsThemeController(
-          mode: DsThemeMode.dark,
+        final ElThemeController theme = ElThemeController(
+          mode: ElThemeMode.dark,
         );
         addTearDown(theme.dispose);
 
         await tester.pumpWidget(
-          DsTheme(
+          ElTheme(
             controller: theme,
             child: MaterialApp(
               debugShowCheckedModeBanner: false,
@@ -350,11 +356,11 @@ void main() {
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
 
-      final DsThemeController theme = DsThemeController(mode: DsThemeMode.dark);
+      final ElThemeController theme = ElThemeController(mode: ElThemeMode.dark);
       addTearDown(theme.dispose);
 
       await tester.pumpWidget(
-        DsTheme(
+        ElTheme(
           controller: theme,
           child: MaterialApp(
             debugShowCheckedModeBanner: false,
@@ -462,7 +468,7 @@ void main() {
       expect(vertical.position.maxScrollExtent, greaterThan(0));
     });
 
-    // Catches: re-wrapping a multi-line listing in `DsLineBox`. That widget
+    // Catches: re-wrapping a multi-line listing in `ElLineBox`. That widget
     // restores a paragraph's CSS height by growing the *paragraph* and
     // centring the difference, so 400 lines of half-pixel correction landed as
     // one lump of dead air above the first line — the audit's F6.
@@ -474,7 +480,7 @@ void main() {
       expect(
         find.descendant(
           of: find.byType(DocsSelectableCodeBlock),
-          matching: find.byType(DsLineBox),
+          matching: find.byType(ElLineBox),
         ),
         findsNothing,
         reason: 'a whole-paragraph leading correction belongs to one line',
@@ -492,11 +498,11 @@ void main() {
           )
           .top;
       // `p-5` and the hairline the frame is paid out of — nothing else.
-      expect(firstLineTop - blockTop, closeTo(ds(5) + DsWidths.hairline, 1));
+      expect(firstLineTop - blockTop, closeTo(el(5) + ElWidths.hairline, 1));
     });
 
     // The single-line command block keeps its line box: there the correction
-    // is one line's worth, which is exactly what `DsLineBox` is for.
+    // is one line's worth, which is exactly what `ElLineBox` is for.
     testWidgets('a one-line block keeps its CSS line box', (
       WidgetTester tester,
     ) async {
@@ -505,7 +511,7 @@ void main() {
       expect(
         find.descendant(
           of: find.byType(DocsSelectableCodeBlock),
-          matching: find.byType(DsLineBox),
+          matching: find.byType(ElLineBox),
         ),
         findsOneWidget,
       );

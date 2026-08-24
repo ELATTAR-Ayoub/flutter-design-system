@@ -3,8 +3,8 @@
 /// Two families, and the page exists to make the difference physical. Ambient
 /// depth says how far a surface floats; machine depth says whether it can be
 /// pressed. Nothing here is a drawing of a shadow: every specimen is the real
-/// `--shadow-*` token painted by [DsMachineSurface], and `#in-use` is five live
-/// [DsButton]s and one genuinely editable [DsInput]: so "press the buttons and
+/// `--shadow-*` token painted by [ElMachineSurface], and `#in-use` is five live
+/// [ElButton]s and one genuinely editable [ElInput]: so "press the buttons and
 /// focus the field" is a thing the reader can do rather than a thing the page
 /// claims.
 ///
@@ -12,7 +12,7 @@
 ///
 /// 1. **`--shadow-btn`'s use copy against the buttons.** The specimen says
 ///    *"Secondary, outline and destructive buttons."* Only
-///    [DsButtonVariant.outline] carries `shadow-btn`; `secondary` and
+///    [ElButtonVariant.outline] carries `shadow-btn`; `secondary` and
 ///    `destructive` declare no shadow class at all. Visible in `#in-use` on
 ///    this very page: "View Hits" is flat, "Filters" is a machine surface.
 /// 2. **The `#in-use` caption against its own specimens.** *"Buttons carry
@@ -23,7 +23,7 @@
 ///    comment and the utility's own rationale all say 44; the render is 48.
 ///    Supervisor ruling S8: print 44, render 48, [_glassControlHeight].
 /// 4. **"Two utilities, one material": there are three.** `glass-panel`,
-///    `glass-panel-deep` and `glass-control` all exist ([DsGlassPanelDeep] has
+///    `glass-panel-deep` and `glass-control` all exist ([ElGlassPanelDeep] has
 ///    a home in the package). The Panel label narrows honestly to
 ///    "glass-panel and glass-control"; the section description does not.
 /// 5. **The glow cells' rim classes differ from the spacing page's.** Here
@@ -36,14 +36,14 @@
 ///    action". Same two glows, two copies.
 /// 7. **The Input's own JSDoc claims "a placeholder at 60% muted".** The class
 ///    is `placeholder:text-muted-foreground` at full opacity: prose describing
-///    an intent the class never carried. [DsInput] renders the class.
+///    an intent the class never carried. [ElInput] renders the class.
 /// 8. **`--shadow-key` / `--shadow-key-down` name the `press-key` utility**,
 ///    which exists in globals.css and is never demonstrated. The two tokens
 ///    render as unrelated stills side by side rather than as one key in two
 ///    positions, so this page ships them as stills too.
 /// 9. **`--radius-4xl` renders here (32px) while the spacing page's ladder is
 ///    labelled "Seven steps" and stops at `3xl`.** This is the page where the
-///    undocumented rung actually appears, [DsRadii.xl4], on both glass cells.
+///    undocumented rung actually appears, [ElRadii.xl4], on both glass cells.
 /// 10. **Fonts.** The globals prose and the nav blurbs say Space Grotesk;
 ///    `--font-sans` / `--font-heading` are "Inter Local". Per the project
 ///    decision, fonts follow tokens, not prose.
@@ -80,22 +80,22 @@ const double _bolder = 700;
 
 /// `max-w-sm`, 24rem. Tailwind's **container** scale, which `globals.css` does
 /// not override (shadows-map §0); it is not the spacing scale, so it is not
-/// `ds(96)` even though the two coincide here.
+/// `el(96)` even though the two coincide here.
 // allow-hardcoded: framework default with no token to read it from.
 const double _measureSm = 384;
 
 /// `h-24`: the height every specimen box on this page shares.
-final double _specimenHeight = ds(24);
+final double _specimenHeight = el(24);
 
 /// `h-12`: the `glass-control` specimen. **Drift 3:** the caption beside it
 /// says 44px. Ruling S8 is to print the copy and render the class.
-final double _glassControlHeight = ds(12);
+final double _glassControlHeight = el(12);
 
 /* ── Page data (the reference's two module-level arrays) ─────────────────── */
 
 /// One shadow specimen: the class the box wears, the token it prints, the spec
 /// that paints it, and what it is for.
-typedef _Specimen = ({String token, String cls, DsShadowSpec spec, String use});
+typedef _Specimen = ({String token, String cls, ElShadowSpec spec, String use});
 
 /// `const ambient`: four ambient steps. The four `use` strings are
 /// **character-identical** to the spacing page's Elevation panel; only the
@@ -104,37 +104,37 @@ final List<_Specimen> _ambient = <_Specimen>[
   (
     token: '--shadow-e1',
     cls: 'shadow-e1',
-    spec: DsShadows.e1,
+    spec: ElShadows.e1,
     use: 'Resting rows, chips, table headers. Barely there.',
   ),
   (
     token: '--shadow-e2',
     cls: 'shadow-e2',
-    spec: DsShadows.e2,
+    spec: ElShadows.e2,
     use: 'Cards and pack cards at rest.',
   ),
   (
     token: '--shadow-e3',
     cls: 'shadow-e3',
-    spec: DsShadows.e3,
+    spec: ElShadows.e3,
     use: 'Hovered cards, popovers, dropdowns, sticky bars.',
   ),
   (
     token: '--shadow-e4',
     cls: 'shadow-e4',
-    spec: DsShadows.e4,
+    spec: ElShadows.e4,
     use: 'Dialogs, drawers, the pack-opening stage.',
   ),
 ];
 
 /// `const machine`: the eight machine surfaces. Every one of these carries at
 /// least one `inset` layer, which is why the cells go through
-/// [DsMachineSurface] rather than a plain decoration.
+/// [ElMachineSurface] rather than a plain decoration.
 final List<_Specimen> _machine = <_Specimen>[
   (
     token: '--shadow-btn',
     cls: 'shadow-btn',
-    spec: DsShadows.btn,
+    spec: ElShadows.btn,
     // DRIFT 1, kept: only `outline` carries this class.
     use:
         'Secondary, outline and destructive buttons. An inner top highlight '
@@ -143,19 +143,19 @@ final List<_Specimen> _machine = <_Specimen>[
   (
     token: '--shadow-btn-primary',
     cls: 'shadow-btn-primary',
-    spec: DsShadows.btnPrimary,
+    spec: ElShadows.btnPrimary,
     use: 'The primary button. Same depth plus a blue cast beneath it.',
   ),
   (
     token: '--shadow-btn-value',
     cls: 'shadow-btn-value',
-    spec: DsShadows.btnValue,
+    spec: ElShadows.btnValue,
     use: 'The premium button. Lime cast, for money and reward actions.',
   ),
   (
     token: '--shadow-btn-down',
     cls: 'shadow-btn-down',
-    spec: DsShadows.btnDown,
+    spec: ElShadows.btnDown,
     use:
         'Any button while pressed. The surface sinks into its socket instead '
         'of merely dimming.',
@@ -163,7 +163,7 @@ final List<_Specimen> _machine = <_Specimen>[
   (
     token: '--shadow-key',
     cls: 'shadow-key',
-    spec: DsShadows.key,
+    spec: ElShadows.key,
     // DRIFT 8, kept: `press-key` exists and is never demonstrated.
     use:
         'A raised key with a visible side wall. Used by the press-key '
@@ -172,19 +172,19 @@ final List<_Specimen> _machine = <_Specimen>[
   (
     token: '--shadow-key-down',
     cls: 'shadow-key-down',
-    spec: DsShadows.keyDown,
+    spec: ElShadows.keyDown,
     use: 'The same key, travelled 3px down into its socket.',
   ),
   (
     token: '--shadow-pressed',
     cls: 'shadow-pressed',
-    spec: DsShadows.pressed,
+    spec: ElShadows.pressed,
     use: 'A sunken socket. Every input, textarea and input group sits in one.',
   ),
   (
     token: '--shadow-chip',
     cls: 'shadow-chip',
-    spec: DsShadows.chip,
+    spec: ElShadows.chip,
     use: 'Badge and chip depth. Lighter than a button, but not flat.',
   ),
 ];
@@ -198,12 +198,12 @@ class ShadowsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     // The header reads its own copy out of the nav registry, exactly as
     // `findCategory("foundations", "shadows")` does in the reference.
-    final DsCategoryHit here = findCategory('foundations', 'shadows');
+    final ElCategoryHit here = findCategory('foundations', 'shadows');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        DsPageHeader(
+        ElPageHeader(
           eyebrow: here.group.title,
           title: here.category.title,
           blurb: here.category.blurb,
@@ -213,8 +213,8 @@ class ShadowsPage extends StatelessWidget {
         // foundations set that carries a margin of its own. It sits between the
         // header and the first section, at page level.
         Padding(
-          padding: EdgeInsets.only(bottom: ds(12)),
-          child: const DsNote(
+          padding: EdgeInsets.only(bottom: el(12)),
+          child: const ElNote(
             title: 'Two families, one idea',
             child: _PageNoteBody(),
           ),
@@ -224,10 +224,10 @@ class ShadowsPage extends StatelessWidget {
         const _InUseSection(),
         const _GlowSection(),
         const _GlassSection(),
-        const DsSection(
+        const ElSection(
           id: 'rules',
           title: 'Rules',
-          child: DsDoDont(
+          child: ElDoDont(
             dos: <String>[
               'Use the surface ladder plus a hairline for depth first; add a '
                   'shadow only to confirm it.',
@@ -237,7 +237,7 @@ class ShadowsPage extends StatelessWidget {
               'Reserve the two glows for selection and reward.',
             ],
             // Straight apostrophes, as the source array has them: only the
-            // panel heading uses the curly `&rsquo;`, and [DsDoDont] owns that.
+            // panel heading uses the curly `&rsquo;`, and [ElDoDont] owns that.
             donts: <String>[
               "Don't put an ambient shadow on a control — it will read as "
                   'floating rather than pressable.',
@@ -248,7 +248,7 @@ class ShadowsPage extends StatelessWidget {
             ],
           ),
         ),
-        const DsPageFootNav(groupId: 'foundations', slug: 'shadows'),
+        const ElPageFootNav(groupId: 'foundations', slug: 'shadows'),
       ],
     );
   }
@@ -265,9 +265,9 @@ class _PageNoteBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextStyle base = DsText.styleOf(context, DsType.small);
+    final TextStyle base = ElText.styleOf(context, ElType.small);
 
-    return DsRichText(
+    return ElRichText(
       TextSpan(
         children: <InlineSpan>[
           const TextSpan(
@@ -288,7 +288,7 @@ class _PageNoteBody extends StatelessWidget {
           ),
         ],
       ),
-      DsType.small,
+      ElType.small,
     );
   }
 }
@@ -316,9 +316,9 @@ class _AmbientSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
 
-    return DsSection(
+    return ElSection(
       id: 'ambient',
       title: 'Ambient depth',
       description:
@@ -326,22 +326,22 @@ class _AmbientSection extends StatelessWidget {
           'darkening, so depth mostly comes from the surface ladder — these '
           'only confirm it.',
       // An actual U+2192 arrow, not `->`.
-      child: DsPanel(
+      child: ElPanel(
         label: 'e1 → e4',
-        child: DsGrid(
+        child: ElGrid(
           sm: 2,
           lg: 4,
-          gap: ds(6),
+          gap: el(6),
           children: <Widget>[
             for (final _Specimen specimen in _ambient)
               _SpecimenCell(
                 specimen: specimen,
-                radius: DsRadii.lg,
+                radius: ElRadii.lg,
                 // `border border-border`: the ambient cells have one and the
                 // machine cells do not.
                 border: Border.all(
                   color: theme.border,
-                  width: DsWidths.hairline,
+                  width: ElWidths.hairline,
                 ),
               ),
           ],
@@ -358,25 +358,25 @@ class _MachineSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsSection(
+    return ElSection(
       id: 'machine',
       title: 'Machine surfaces',
       description:
           'Depth that implies a mechanism. These carry inset '
           'highlights and shades, so a control looks like it has a top face '
           'and a side wall.',
-      child: DsPanel(
+      child: ElPanel(
         label: 'The machine set',
         // Three columns at `lg`, so the last row of eight holds two.
-        child: DsGrid(
+        child: ElGrid(
           sm: 2,
           lg: 3,
-          gap: ds(6),
+          gap: el(6),
           children: <Widget>[
             for (final _Specimen specimen in _machine)
               // `rounded-pill bg-card` and **no border**: the two ways a
               // machine cell differs from an ambient one.
-              _SpecimenCell(specimen: specimen, radius: DsRadii.pill),
+              _SpecimenCell(specimen: specimen, radius: ElRadii.pill),
           ],
         ),
       ),
@@ -391,32 +391,32 @@ class _InUseSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsSection(
+    return ElSection(
       id: 'in-use',
       title: 'Raised against recessed',
       description:
           'The rule in one panel. Press the buttons and focus the '
           'field — the button sinks, the field is already sunken and only its '
           'ring changes.',
-      child: DsPanel(
+      child: ElPanel(
         label: 'Press and focus these',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             // `flex flex-wrap items-center gap-4`.
             Wrap(
-              spacing: ds(4),
-              runSpacing: ds(4),
+              spacing: el(4),
+              runSpacing: el(4),
               crossAxisAlignment: WrapCrossAlignment.center,
               children: const <Widget>[
-                _LiveButton(DsButtonVariant.primary, 'Open Pack'),
-                _LiveButton(DsButtonVariant.premium, 'Deposit Funds'),
-                _LiveButton(DsButtonVariant.secondary, 'View Hits'),
-                _LiveButton(DsButtonVariant.outline, 'Filters'),
-                _LiveButton(DsButtonVariant.ghost, 'Skip'),
+                _LiveButton(ElButtonVariant.primary, 'Open Pack'),
+                _LiveButton(ElButtonVariant.premium, 'Deposit Funds'),
+                _LiveButton(ElButtonVariant.secondary, 'View Hits'),
+                _LiveButton(ElButtonVariant.outline, 'Filters'),
+                _LiveButton(ElButtonVariant.ghost, 'Skip'),
               ],
             ),
-            SizedBox(height: ds(6)),
+            SizedBox(height: el(6)),
             // `<div class="mt-6 max-w-sm">` around a `w-full` Input: a block
             // box that fills the panel and stops at 384px. [Align] hands the
             // cap a loose constraint, which is what makes it a *max*.
@@ -428,13 +428,13 @@ class _InUseSection extends StatelessWidget {
                 // the reference's `<input>` carries no `aria-label` either, and
                 // an unlabelled field's accessible name in HTML *is* its
                 // placeholder. Same string announced, one less thing invented.
-                child: const DsInput(
+                child: const ElInput(
                   placeholder: 'Search packs, cards and sets',
                   label: 'Search packs, cards and sets',
                 ),
               ),
             ),
-            SizedBox(height: ds(6)),
+            SizedBox(height: el(6)),
             const _InUseCaption(),
           ],
         ),
@@ -452,18 +452,18 @@ class _InUseSection extends StatelessWidget {
 class _LiveButton extends StatelessWidget {
   const _LiveButton(this.variant, this.label);
 
-  final DsButtonVariant variant;
+  final ElButtonVariant variant;
   final String label;
 
   @override
   Widget build(BuildContext context) {
-    return DsButton(
+    return ElButton(
       variant: variant,
       onPressed: () {},
       // A bare [Text]: the button installs its own `DefaultTextStyle`, which
       // already carries the resolved class, `btn-spring`'s animated ink and —
       // on premium: the `font-semibold` override. Re-resolving the class
-      // through [DsText] here would silently drop both.
+      // through [ElText] here would silently drop both.
       child: Text(label),
     );
   }
@@ -476,25 +476,25 @@ class _InUseCaption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsRichText(
+    return ElRichText(
       TextSpan(
         children: <InlineSpan>[
           const TextSpan(text: 'Buttons carry '),
-          DsCode.span('shadow-btn'),
+          ElCode.span('shadow-btn'),
           const TextSpan(text: ' or '),
-          DsCode.span('shadow-btn-primary'),
+          ElCode.span('shadow-btn-primary'),
           const TextSpan(text: ' and drop to '),
-          DsCode.span('shadow-btn-down'),
+          ElCode.span('shadow-btn-down'),
           const TextSpan(text: ' on '),
-          DsCode.span(':active'),
+          ElCode.span(':active'),
           const TextSpan(text: '. The input carries '),
-          DsCode.span('shadow-pressed'),
+          ElCode.span('shadow-pressed'),
           const TextSpan(
             text: ' permanently — it is a socket, and it never rises.',
           ),
         ],
       ),
-      DsType.small,
+      ElType.small,
     );
   }
 }
@@ -506,26 +506,26 @@ class _GlowSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
 
-    return DsSection(
+    return ElSection(
       id: 'glow',
       title: 'Rationed glow',
       description:
           'Two glows, and they are the scarcest thing in the system. '
           'Both derive from the accent tokens, so they follow the palette '
           'automatically.',
-      child: DsPanel(
+      child: ElPanel(
         label: 'Selected and celebrated',
-        child: DsGrid(
+        child: ElGrid(
           sm: 2,
-          gap: ds(6),
+          gap: el(6),
           children: <Widget>[
             // DRIFT 5: `border-primary/40` here, `border-action/40` on the
             // spacing page. `--primary` *is* `var(--color-action)`, so the two
             // rims are the same pixels cut from two different class names.
             _GlowCell(
-              spec: DsShadows.glowAction,
+              spec: ElShadows.glowAction,
               rim: theme.primary,
               label: 'glow-action',
               ink: theme.actionInk,
@@ -537,8 +537,8 @@ class _GlowSection extends StatelessWidget {
               emphasis: 'this is the thing you chose',
             ),
             _GlowCell(
-              spec: DsShadows.glowValue,
-              rim: DsPalette.value,
+              spec: ElShadows.glowValue,
+              rim: ElPalette.value,
               label: 'glow-value',
               ink: theme.valueInk,
               lead: 'Celebrated tiers, reward unlocks, premium actions. Says ',
@@ -561,7 +561,7 @@ class _GlowCell extends StatelessWidget {
     required this.emphasis,
   });
 
-  final DsShadowSpec spec;
+  final ElShadowSpec spec;
 
   /// The ramp the `border-<ramp>/40` rim is cut from.
   final Color rim;
@@ -582,17 +582,17 @@ class _GlowCell extends StatelessWidget {
       children: <Widget>[
         _SpecimenBox(
           spec: spec,
-          radius: DsRadii.lg,
+          radius: ElRadii.lg,
           border: Border.all(
             color: rim.withValues(alpha: _glowBorderAlpha),
-            width: DsWidths.hairline,
+            width: ElWidths.hairline,
           ),
-          child: DsText(label, DsType.numSm, color: ink),
+          child: ElText(label, ElType.numSm, color: ink),
         ),
-        SizedBox(height: ds(3)),
+        SizedBox(height: el(3)),
         // `.type-small` at its own 1.5 leading: the glow captions carry no
         // `leading-snug`, unlike the twelve specimen captions above.
-        DsRichText(
+        ElRichText(
           TextSpan(
             children: <InlineSpan>[
               TextSpan(text: lead),
@@ -603,7 +603,7 @@ class _GlowCell extends StatelessWidget {
               const TextSpan(text: '.'),
             ],
           ),
-          DsType.small,
+          ElType.small,
         ),
       ],
     );
@@ -617,26 +617,26 @@ class _GlassSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsSection(
+    return ElSection(
       id: 'glass',
       title: 'Glass',
       // DRIFT 4: "Two utilities": there are three.
       description:
           'A surface in front of the page rather than cut out of it. '
           'Two utilities, one material — the split is scale, not taste.',
-      child: DsPanel(
+      child: ElPanel(
         // …which the label, unlike the description, narrows honestly.
         label: 'glass-panel and glass-control',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            DsGrid(
+            ElGrid(
               sm: 2,
-              gap: ds(6),
+              gap: el(6),
               children: const <Widget>[_GlassPanelCell(), _GlassControlCell()],
             ),
-            SizedBox(height: ds(6)),
-            const DsNote(
+            SizedBox(height: el(6)),
+            const ElNote(
               title: 'Neither needs a dark: variant',
               child: _GlassNoteBody(),
             ),
@@ -654,50 +654,50 @@ class _GlassPanelCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         SizedBox(
           height: _specimenHeight,
-          child: DsGlassPanel(
+          child: ElGlassPanel(
             // DRIFT 9: `--radius-4xl`, the rung the spacing page's ladder does
             // not document, renders here.
-            radius: BorderRadius.circular(DsRadii.xl4),
+            radius: BorderRadius.circular(ElRadii.xl4),
             // `text-foreground`, not `text-muted-foreground`: the one
             // specimen label on the page that is not muted.
             child: Center(
-              child: DsText(
+              child: ElText(
                 'glass-panel',
-                DsType.numSm,
+                ElType.numSm,
                 color: theme.foreground,
               ),
             ),
           ),
         ),
-        SizedBox(height: ds(3)),
-        DsRichText(
+        SizedBox(height: el(3)),
+        ElRichText(
           TextSpan(
             children: <InlineSpan>[
               const TextSpan(text: 'Card scale. Translucent '),
-              DsCode.span('--card'),
+              ElCode.span('--card'),
               const TextSpan(
                 text:
                     ', a backdrop blur, a hairline rim of the ink colour '
                     'and ',
               ),
-              DsCode.span('--shadow-e2'),
+              ElCode.span('--shadow-e2'),
               const TextSpan(
                 text:
                     ' beneath. The page’s own light shows through it, which '
                     'is the whole reason to reach for this over ',
               ),
-              DsCode.span('bg-card'),
+              ElCode.span('bg-card'),
               const TextSpan(text: '.'),
             ],
           ),
-          DsType.small,
+          ElType.small,
         ),
       ],
     );
@@ -715,7 +715,7 @@ class _GlassControlCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -725,22 +725,22 @@ class _GlassControlCell extends StatelessWidget {
           child: DecoratedBox(
             decoration: BoxDecoration(
               color: theme.card,
-              borderRadius: BorderRadius.circular(DsRadii.xl4),
+              borderRadius: BorderRadius.circular(ElRadii.xl4),
             ),
             child: Center(
               child: SizedBox(
                 height: _glassControlHeight,
-                child: DsGlassControl(
-                  radius: BorderRadius.circular(DsRadii.pill),
-                  padding: EdgeInsets.symmetric(horizontal: ds(4)),
+                child: ElGlassControl(
+                  radius: BorderRadius.circular(ElRadii.pill),
+                  padding: EdgeInsets.symmetric(horizontal: el(4)),
                   // `inline-flex`: the box is as wide as its content plus its
                   // padding, so the width factor shrink-wraps while the
                   // 48px height stays tight.
                   child: Center(
                     widthFactor: 1,
-                    child: DsText(
+                    child: ElText(
                       'glass-control',
-                      DsType.numSm,
+                      ElType.numSm,
                       color: theme.foreground,
                     ),
                   ),
@@ -749,8 +749,8 @@ class _GlassControlCell extends StatelessWidget {
             ),
           ),
         ),
-        SizedBox(height: ds(3)),
-        DsRichText(
+        SizedBox(height: el(3)),
+        ElRichText(
           TextSpan(
             children: <InlineSpan>[
               // DRIFT 3, printed as written against a 48px render.
@@ -759,7 +759,7 @@ class _GlassControlCell extends StatelessWidget {
                     'Control scale. No blur and no ambient shadow: at 44px '
                     'there is nothing behind it worth blurring, and ',
               ),
-              DsCode.span('e2'),
+              ElCode.span('e2'),
               const TextSpan(
                 text:
                     ' under something that small reads as grime rather than '
@@ -767,7 +767,7 @@ class _GlassControlCell extends StatelessWidget {
               ),
             ],
           ),
-          DsType.small,
+          ElType.small,
         ),
       ],
     );
@@ -781,19 +781,19 @@ class _GlassNoteBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsRichText(
+    return ElRichText(
       TextSpan(
         children: <InlineSpan>[
           const TextSpan(text: 'Both mix from '),
-          DsCode.span('--card'),
+          ElCode.span('--card'),
           const TextSpan(text: ' and '),
-          DsCode.span('--foreground'),
+          ElCode.span('--foreground'),
           const TextSpan(
             text:
                 ', so a light edge on dark and a dark edge on light fall out '
                 'of the same expression. The top highlight is ',
           ),
-          DsCode.span('--rim-strong'),
+          ElCode.span('--rim-strong'),
           const TextSpan(
             text:
                 ' — the same token every raised control carries, which is '
@@ -801,7 +801,7 @@ class _GlassNoteBody extends StatelessWidget {
           ),
         ],
       ),
-      DsType.small,
+      ElType.small,
     );
   }
 }
@@ -828,7 +828,7 @@ class _SpecimenCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -837,15 +837,15 @@ class _SpecimenCell extends StatelessWidget {
           spec: specimen.spec,
           radius: radius,
           border: border,
-          child: DsText(
+          child: ElText(
             specimen.cls,
-            DsType.numSm,
+            ElType.numSm,
             color: theme.mutedForeground,
           ),
         ),
-        SizedBox(height: ds(3)),
-        DsText(specimen.token, DsType.numSm, color: theme.actionInk),
-        SizedBox(height: ds(1)),
+        SizedBox(height: el(3)),
+        ElText(specimen.token, ElType.numSm, color: theme.actionInk),
+        SizedBox(height: el(1)),
         _UseCopy(specimen.use),
       ],
     );
@@ -854,7 +854,7 @@ class _SpecimenCell extends StatelessWidget {
 
 /// `grid h-24 place-items-center … bg-card ${cls}`: the specimen itself.
 ///
-/// Every box on this page goes through [DsMachineSurface], the ambient four
+/// Every box on this page goes through [ElMachineSurface], the ambient four
 /// included. Half of these tokens carry `inset` layers that a [BoxDecoration]
 /// cannot paint at all, and the other half would need a second code path to say
 /// the same thing: so there is one path, and the difference between the two
@@ -867,7 +867,7 @@ class _SpecimenBox extends StatelessWidget {
     required this.child,
   });
 
-  final DsShadowSpec spec;
+  final ElShadowSpec spec;
   final double radius;
   final BoxBorder? border;
   final Widget child;
@@ -876,10 +876,10 @@ class _SpecimenBox extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       height: _specimenHeight,
-      child: DsMachineSurface(
+      child: ElMachineSurface(
         spec: spec,
         radius: BorderRadius.circular(radius),
-        fill: DsTheme.of(context).card,
+        fill: ElTheme.of(context).card,
         border: border,
         // `place-items-center`.
         child: Center(child: child),
@@ -901,13 +901,13 @@ class _UseCopy extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextStyle style = DsText.styleOf(
+    final TextStyle style = ElText.styleOf(
       context,
-      DsType.small,
+      ElType.small,
     ).copyWith(height: _leadingSnug);
-    // Not a `.type-*` class, so it cannot go through [DsText]: but the line
+    // Not a `.type-*` class, so it cannot go through [ElText]: but the line
     // box still has to be the one CSS lays out.
-    return DsLineBox(
+    return ElLineBox(
       style: style,
       child: Text(text, style: style),
     );

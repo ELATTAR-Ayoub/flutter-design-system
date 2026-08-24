@@ -22,10 +22,10 @@
 ///
 /// ## What is page-local, and why
 ///
-/// [_ToastPreview] and [_ToastPreviewStack] port `components/ds/toast-preview.tsx`
+/// [_ToastPreview] and [_ToastPreviewStack] port `components/el/toast-preview.tsx`
 ///: a **docs-side** component, like `Panel` and `Note`, and the port's docs
 /// side is this package. It has exactly one consumer, so it stays here on the
-/// B10 precedent. Three things make it a different object from [DsToast] rather
+/// B10 precedent. Three things make it a different object from [ElToast] rather
 /// than a call of it:
 ///
 ///  * it renders **the preview's own numbers**, which are measurably not the
@@ -33,8 +33,8 @@
 ///  * it writes its own `[data-button]`. `toast-preview.tsx` L42–46 spells the
 ///    `<button>` inline rather than letting sonner render one, so
 ///    [_ToastActionPill] is that element and not a stand-in for the live pill.
-///    The live one now comes from `DsToastAction`, which [_ToastSectionState._error]
-///    passes and `DsToast` paints: the two are the same 32px secondary pill
+///    The live one now comes from `ElToastAction`, which [_ToastSectionState._error]
+///    passes and `ElToast` paints: the two are the same 32px secondary pill
 ///    because `.cn-toast [data-button]` styles both, exactly as the preview's
 ///    own doc-comment claims of the whole object;
 ///  * it is static. No queue, no lifetime, no dismissal: a `<li>` in a list.
@@ -42,7 +42,7 @@
 /// [_PackCardSkeleton]'s and [_PullRowSkeletons]'s containers are inline
 /// `div`s on the reference and stay inline here. [_SeamedList] is the
 /// `space-y-px` container `selection.dart` already met: it **cannot** be
-/// `DsDividedList`, which fills with `--card` and draws each seam as a border
+/// `ElDividedList`, which fills with `--card` and draws each seam as a border
 /// on the row. This one declares no background at all, so its seams are the
 /// panel's `--background` showing through and every row supplies its own fill.
 ///
@@ -63,7 +63,7 @@
 /// | the error specimen, total | 93.88 | **96.5** |
 ///
 /// **This file renders the right-hand column**, because this file renders the
-/// preview. The live toaster the five buttons fire into is `DsToaster`, mounted
+/// preview. The live toaster the five buttons fire into is `ElToaster`, mounted
 /// once by the shell, and its choreography is wave B2's.
 ///
 /// ## Drift register: recorded, shipped as written (feedback-map §16)
@@ -78,7 +78,7 @@
 ///     warning *toast* still carries `--color-value-bright` over
 ///     `--color-value-dark`, the pair the Alert was moved off after
 ///     `alert.tsx` recorded that it *"worked only by accident"*. Both ship as
-///     written, [DsBloomCosmic.toastWarning] is that pair.
+///     written, [ElBloomCosmic.toastWarning] is that pair.
 ///  3. **Specimen 5 is `variant="info"` wearing an `AlertTriangle`** and
 ///     warning copy. A cyan triangle over a cyan bloom; every other specimen's
 ///     glyph matches its variant.
@@ -90,34 +90,34 @@
 ///     bare `<Progress value={20.6} />`; the other six all pass an
 ///     `aria-label`, including the two beside an identical `type-label`. Its
 ///     readout "412 / 2,000" is a sibling span, unassociated: so
-///     [DsProgress.label] goes unpassed exactly once.
+///     [ElProgress.label] goes unpassed exactly once.
 ///  7. **[_progressTones]' comment contradicts its contents**: see the
 ///     comment, transcribed verbatim above the array.
 ///  8. **`Empty`'s dashed border never paints.** `border-dashed` with no width
-///     class; carried by `DsEmpty`.
+///     class; carried by `ElEmpty`.
 ///  9. **`EmptyMedia` defeats `Icon size="xl"`**: a 16px box drawn with the
-///     24px rung's stroke; carried by `DsEmptyMedia`.
+///     24px rung's stroke; carried by `ElEmptyMedia`.
 /// 10. **`Spinner`'s `role="status"` and `aria-label="Loading"` are dropped**
-///     by `Icon`'s destructure; carried by `DsSpinner` under ruling B9.
+///     by `Icon`'s destructure; carried by `ElSpinner` under ruling B9.
 /// 11. **`size-5` / `size-6` spinners keep the 16px stroke.** `Icon` computes
 ///     `strokeWidth` from the size **prop** and the class overrides only the
 ///     box, so the 20px and 24px spinners are drawn at 2.4 where the ladder
-///     would give 2. The port's `DsSpinner` takes a box and derives its stroke
+///     would give 2. The port's `ElSpinner` takes a box and derives its stroke
 ///     from it, so it renders those two at the ladder's own 2: the one place
 ///     on this page where the port is *more* consistent than the reference.
 ///     Recorded here rather than worked around from the call site: the fix is
 ///     one `strokeOverride` inside `spinner.dart`, which is not this file.
 /// 12. **`Alert` is `role="alert"` with no `aria-live`**: five permanently
-///     mounted live regions on one page. `DsAlert` already sets `liveRegion`.
+///     mounted live regions on one page. `ElAlert` already sets `liveRegion`.
 /// 13. **The live toast carries no role at all** and sonner announces through
-///     a separate visually-hidden region; `DsToast` labels itself instead: an
+///     a separate visually-hidden region; `ElToast` labels itself instead: an
 ///     already-shipped, deliberate divergence.
 /// 14. **Two reduced-motion regimes.** `globals.css` collapses durations to
 ///     0.01ms; sonner's own sheet sets `animation: none`. The port has one
 ///     switch, `?motion=reduced`, and both regimes land on the resting frame.
 /// 15. **The bloom reaches the border but not past it.** `overflow: hidden`
 ///     clips to the padding box, so the 1px `--border` stroke sits outside the
-///     light. Modelled by `DsAlert` and by [_ToastPreview] here.
+///     light. Modelled by `ElAlert` and by [_ToastPreview] here.
 /// 16. **`.cn-toast`'s selector is written three times** to beat sonner's
 ///     unlayered sheet. The port has no cascade; the values are just the
 ///     values.
@@ -162,51 +162,53 @@ const double _bolder = 700;
 const double _medium = 500;
 
 /// `new Promise((res) => setTimeout(res, 1800))`: the Promise button's demo.
-const Duration _promiseLatency = Duration(milliseconds: 1800); // allow-hardcoded: the page's own demo latency, a call-site constant and not a --duration-* token
+const Duration _promiseLatency = Duration(
+  milliseconds: 1800,
+); // allow-hardcoded: the page's own demo latency, a call-site constant and not a --duration-* token
 
 /// `[data-title]` and `[data-button]`, 13px at **1.5**, at 500.
 ///
 /// The leading is `.cn-toast`'s own 1.5, which both slots inherit because
 /// neither declares one of their own; the size is `--text-small`. Both are
-/// read off [DsType.small]: the one spec that already transcribes that pair —
+/// read off [ElType.small]: the one spec that already transcribes that pair —
 /// so the only number written here is the weight.
 ///
-/// It is deliberately **not** `DsComponentType.buttonLabel`, which is the same
+/// It is deliberately **not** `ElComponentType.buttonLabel`, which is the same
 /// 13/500 at `text-sm`'s 1.428571. On a five-toast stack that ratio is 8.4px of
 /// accumulated shortfall, and it is the whole of drift 4's leading column.
-final DsTypeSpec _toastMedium = DsTypeSpec(
-  family: DsFonts.sans,
-  size: DsType.small.size,
-  height: DsType.small.height,
+final ElTypeSpec _toastMedium = ElTypeSpec(
+  family: ElFonts.sans,
+  size: ElType.small.size,
+  height: ElType.small.height,
   wght: _medium,
 );
 
 /// The stroke lucide authors its 24px grid with, and the one a glyph rendered
 /// **raw** keeps.
 ///
-/// `TOAST_ICONS[type]` is a lucide component, not the DS `Icon` wrapper, so the
+/// `TOAST_ICONS[type]` is a lucide component, not the Elattar `Icon` wrapper, so the
 /// preview's glyphs never meet `icon.tsx`'s ladder: they are `size-4` at
 /// lucide's default 2, next to five `<Spinner/>`s of the same glyph at 2.4.
 /// Spelled as the ladder's own answer at the grid's own size rather than typed,
 /// which is the `theme_toggle.dart` precedent.
-final double _lucideStroke = DsIcon.strokeFor(DsIconPaths.viewBox);
+final double _lucideStroke = ElIcon.strokeFor(ElIconPaths.viewBox);
 
 /* Every tone the bar ships, rendered live rather than described. `default` and
    `value` are shown above in their own context, so this row is the four that
    say something about the reading itself. */
 const List<_ToneRow> _progressTones = <_ToneRow>[
-  (tone: DsProgressTone.normal, label: 'Steps today', value: 72),
-  (tone: DsProgressTone.success, label: 'Hydration goal met', value: 100),
-  (tone: DsProgressTone.warning, label: 'Storage used', value: 86),
+  (tone: ElProgressTone.normal, label: 'Steps today', value: 72),
+  (tone: ElProgressTone.success, label: 'Hydration goal met', value: 100),
+  (tone: ElProgressTone.warning, label: 'Storage used', value: 86),
   (
-    tone: DsProgressTone.destructive,
+    tone: ElProgressTone.destructive,
     label: 'Sleep against an 8h need',
     value: 67,
   ),
 ];
 
 /// One row of [_progressTones], `as const`, so the shape is the array's.
-typedef _ToneRow = ({DsProgressTone tone, String label, double value});
+typedef _ToneRow = ({ElProgressTone tone, String label, double value});
 
 /* ── Page helpers ────────────────────────────────────────────────────────── */
 
@@ -216,14 +218,14 @@ typedef _ToneRow = ({DsProgressTone tone, String label, double value});
 /// override being handed to the span, because that would drop the `opsz` entry
 /// `font-optical-sizing: auto` puts there.
 TextStyle _strong(TextStyle base) => base.copyWith(
-      fontWeight: FontWeight.bold,
-      fontVariations: <FontVariation>[
-        for (final FontVariation v
-            in base.fontVariations ?? const <FontVariation>[])
-          if (v.axis != 'wght') v,
-        const FontVariation('wght', _bolder),
-      ],
-    );
+  fontWeight: FontWeight.bold,
+  fontVariations: <FontVariation>[
+    for (final FontVariation v
+        in base.fontVariations ?? const <FontVariation>[])
+      if (v.axis != 'wght') v,
+    const FontVariation('wght', _bolder),
+  ],
+);
 
 /// `<em>`: the page has two, both inside a Note.
 const TextStyle _em = TextStyle(fontStyle: FontStyle.italic);
@@ -246,12 +248,12 @@ Widget _atLineStart(Widget child) =>
 /// the panel's full 982. [Align] is what turns the incoming constraint loose
 /// again, and its own start alignment is the rest of the declaration.
 Widget _measured(double maxWidth, Widget child) => Align(
-      alignment: Alignment.centerLeft,
-      child: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: maxWidth),
-        child: child,
-      ),
-    );
+  alignment: Alignment.centerLeft,
+  child: ConstrainedBox(
+    constraints: BoxConstraints(maxWidth: maxWidth),
+    child: child,
+  ),
+);
 
 /* ── Page ────────────────────────────────────────────────────────────────── */
 
@@ -260,12 +262,12 @@ class FeedbackPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsCategoryHit here = findCategory('base', 'feedback');
+    final ElCategoryHit here = findCategory('base', 'feedback');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        DsPageHeader(
+        ElPageHeader(
           // The eyebrow says "Base" twice, on all fourteen base pages: the
           // group is already called "Base Components" and the page interpolates
           // a second literal after a U+00B7 anyway.
@@ -278,8 +280,8 @@ class FeedbackPage extends StatelessWidget {
         // `className="mb-12"`, 48px. The only Note in the corpus that sits
         // outside every section, and therefore the only one at the full 1080.
         Padding(
-          padding: EdgeInsets.only(bottom: ds(12)),
-          child: const DsNote(
+          padding: EdgeInsets.only(bottom: el(12)),
+          child: const ElNote(
             title: 'Which one to reach for',
             child: _WhichOneBody(),
           ),
@@ -291,7 +293,7 @@ class FeedbackPage extends StatelessWidget {
         const _EmptySection(),
         const _ApiSection(),
         const _RulesSection(),
-        const DsPageFootNav(groupId: 'base', slug: 'feedback'),
+        const ElPageFootNav(groupId: 'base', slug: 'feedback'),
       ],
     );
   }
@@ -304,20 +306,19 @@ class _WhichOneBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
-    final TextStyle base = DsText.styleOf(context, DsType.small);
+    final ElThemeData theme = ElTheme.of(context);
+    final TextStyle base = ElText.styleOf(context, ElType.small);
     final TextStyle strong = _strong(base).copyWith(color: theme.foreground);
 
-    return DsRichText(
+    return ElRichText(
       TextSpan(
         children: <InlineSpan>[
           TextSpan(text: 'Alert', style: strong),
-          const TextSpan(
-            text: ' stays on the page and explains a condition. ',
-          ),
+          const TextSpan(text: ' stays on the page and explains a condition. '),
           TextSpan(text: 'Toast', style: strong),
           const TextSpan(
-            text: ' is transient confirmation of something the user just '
+            text:
+                ' is transient confirmation of something the user just '
                 'did. ',
           ),
           TextSpan(text: 'Skeleton', style: strong),
@@ -328,12 +329,13 @@ class _WhichOneBody extends StatelessWidget {
           const TextSpan(text: ' shows how far through something is. '),
           TextSpan(text: 'Empty', style: strong),
           const TextSpan(
-            text: ' is for when there is genuinely nothing, and it always '
+            text:
+                ' is for when there is genuinely nothing, and it always '
                 'offers a way forward.',
           ),
         ],
       ),
-      DsType.small,
+      ElType.small,
     );
   }
 }
@@ -345,98 +347,103 @@ class _AlertSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsSection(
+    return ElSection(
       id: 'alert',
       title: 'Alert',
-      description: 'Five variants. Stock shadcn only ships default and '
+      description:
+          'Five variants. Stock shadcn only ships default and '
           'destructive, so success, warning and information were added to '
           'cover the states the brief requires.',
-      child: DsPanel(
+      child: ElPanel(
         label: 'All five variants',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             // `div.space-y-4`: five alerts, 16px between them.
-            const DsAlert(
-              icon: DsIcon(
-                DsIconGlyph.info,
-                size: DsIconSize.md,
-                tone: DsIconTone.inherit,
+            const ElAlert(
+              icon: ElIcon(
+                ElIconGlyph.info,
+                size: ElIconSize.md,
+                tone: ElIconTone.inherit,
               ),
               title: 'Provably fair',
-              description: 'Every pack roll is seeded and verifiable. The seed '
+              description:
+                  'Every pack roll is seeded and verifiable. The seed '
                   'for this pack is published after opening.',
             ),
-            SizedBox(height: ds(4)),
-            const DsAlert(
-              variant: DsAlertVariant.success,
-              icon: DsIcon(
-                DsIconGlyph.circleCheck,
-                size: DsIconSize.md,
-                tone: DsIconTone.inherit,
+            SizedBox(height: el(4)),
+            const ElAlert(
+              variant: ElAlertVariant.success,
+              icon: ElIcon(
+                ElIconGlyph.circleCheck,
+                size: ElIconSize.md,
+                tone: ElIconTone.inherit,
               ),
               title: 'Deposit cleared',
               description: r'$250.00 was added to your available balance.',
             ),
-            SizedBox(height: ds(4)),
-            DsAlert(
-              variant: DsAlertVariant.warning,
-              icon: const DsIcon(
-                DsIconGlyph.hourglass,
-                size: DsIconSize.md,
-                tone: DsIconTone.inherit,
+            SizedBox(height: el(4)),
+            ElAlert(
+              variant: ElAlertVariant.warning,
+              icon: const ElIcon(
+                ElIconGlyph.hourglass,
+                size: ElIconSize.md,
+                tone: ElIconTone.inherit,
               ),
               title: 'Withdrawal under review',
-              description: r'Withdrawals over $1,000 are reviewed manually and '
+              description:
+                  r'Withdrawals over $1,000 are reviewed manually and '
                   'usually clear within one business day.',
               // `<AlertAction><Button variant="secondary" size="sm"/></…>` —
               // a slot, and the button inside it is the page's. Its `onClick`
               // is absent on the reference, so it is live and does nothing;
               // a null handler here would dim it instead.
-              action: DsButton(
-                variant: DsButtonVariant.secondary,
-                size: DsButtonSize.sm,
+              action: ElButton(
+                variant: ElButtonVariant.secondary,
+                size: ElButtonSize.sm,
                 onPressed: () {},
                 child: const Text('Details'),
               ),
             ),
-            SizedBox(height: ds(4)),
-            DsAlert(
-              variant: DsAlertVariant.destructive,
-              icon: const DsIcon(
-                DsIconGlyph.circleX,
-                size: DsIconSize.md,
-                tone: DsIconTone.inherit,
+            SizedBox(height: el(4)),
+            ElAlert(
+              variant: ElAlertVariant.destructive,
+              icon: const ElIcon(
+                ElIconGlyph.circleX,
+                size: ElIconSize.md,
+                tone: ElIconTone.inherit,
               ),
               title: 'Payment failed',
-              description: 'Your card was declined. No packs were opened and '
+              description:
+                  'Your card was declined. No packs were opened and '
                   'nothing was charged.',
-              action: DsButton(
-                variant: DsButtonVariant.secondary,
-                size: DsButtonSize.sm,
+              action: ElButton(
+                variant: ElButtonVariant.secondary,
+                size: ElButtonSize.sm,
                 onPressed: () {},
                 child: const Text('Retry'),
               ),
             ),
-            SizedBox(height: ds(4)),
+            SizedBox(height: el(4)),
             // DRIFT 3: the `info` variant wearing an `AlertTriangle`, over
             // warning copy. A cyan triangle on a cyan bloom.
-            const DsAlert(
-              variant: DsAlertVariant.info,
-              icon: DsIcon(
-                DsIconGlyph.alertTriangle,
-                size: DsIconSize.md,
-                tone: DsIconTone.inherit,
+            const ElAlert(
+              variant: ElAlertVariant.info,
+              icon: ElIcon(
+                ElIconGlyph.alertTriangle,
+                size: ElIconSize.md,
+                tone: ElIconTone.inherit,
               ),
               title: 'Purchase limit approaching',
-              description: r'You have used $840 of your $1,000 weekly limit. '
+              description:
+                  r'You have used $840 of your $1,000 weekly limit. '
                   'Limits are set in Preferences and exist to help you stay in '
                   'control.',
             ),
             // `className="mt-6"`. This Note is INSIDE the Panel, which is what
             // makes it 1030 wide where the page-level one is 1080.
-            SizedBox(height: ds(6)),
-            const DsNote(
+            SizedBox(height: el(6)),
+            const ElNote(
               title: 'One surface, five meanings',
               child: _OneSurfaceBody(),
             ),
@@ -452,22 +459,24 @@ class _OneSurfaceBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
-    final TextStyle base = DsText.styleOf(context, DsType.small);
+    final ElThemeData theme = ElTheme.of(context);
+    final TextStyle base = ElText.styleOf(context, ElType.small);
     final TextStyle strong = _strong(base).copyWith(color: theme.foreground);
 
-    return DsRichText(
+    return ElRichText(
       TextSpan(
         children: <InlineSpan>[
           const TextSpan(
-            text: 'Every variant shares the same background, border and text '
+            text:
+                'Every variant shares the same background, border and text '
                 'colour. Only the ',
           ),
           TextSpan(text: 'icon', style: strong),
           const TextSpan(text: ' and the '),
           TextSpan(text: 'bloom', style: strong),
           const TextSpan(
-            text: ' behind it change — three declarations. Stock shadcn tints '
+            text:
+                ' behind it change — three declarations. Stock shadcn tints '
                 'the whole card and recolours the copy; five tinted cards on '
                 'one page read as a traffic light rather than as one '
                 'component, and body text is the least legible place to spend '
@@ -475,7 +484,7 @@ class _OneSurfaceBody extends StatelessWidget {
           ),
         ],
       ),
-      DsType.small,
+      ElType.small,
     );
   }
 }
@@ -503,37 +512,36 @@ class _ToastSectionState extends State<_ToastSection> {
   }
 
   /// `toast("Added to favourites")`: the untyped call, which is the one the
-  /// controller spells as [DsToastController.show].
-  void _neutral() => docsToasts.show(
-        const DsToastMessage(title: 'Added to favourites'),
-      );
+  /// controller spells as [ElToastController.show].
+  void _neutral() =>
+      docsToasts.show(const ElToastMessage(title: 'Added to favourites'));
 
   /// `toast.success(…, { description })`.
   ///
   /// **No `glyph:` override anywhere on this page.** `TOAST_ICONS` is
-  /// [DsToastType.glyph]'s table to answer, and a call site that passed the
+  /// [ElToastType.glyph]'s table to answer, and a call site that passed the
   /// geometry by hand would be routing around it.
   void _success() => docsToasts.success(
-        r'Sold 3 cards for $2,481.00',
-        description: 'Credited to your available balance.',
-      );
+    r'Sold 3 cards for $2,481.00',
+    description: 'Credited to your available balance.',
+  );
 
   /// `toast.error(…, { description, action })`.
   ///
   /// The reference's options carry
   /// `action: { label: "Retry", onClick: () => {} }` (`page.tsx` L227), and the
-  /// live toast renders it as `[data-button]`. `DsToastMessage.action` landed
+  /// live toast renders it as `[data-button]`. `ElToastMessage.action` landed
   /// with wave B2's toaster, so the fired toast now carries the pill itself and
   /// the preview one panel up is no longer the only place it can be looked at.
   ///
   /// No `onPressed`: the reference's handler is an empty arrow, and the
-  /// dismissal that follows a press is sonner's own, [DsToastAction] runs the
-  /// handler and `DsToaster` deletes the toast after it, handler or not.
+  /// dismissal that follows a press is sonner's own, [ElToastAction] runs the
+  /// handler and `ElToaster` deletes the toast after it, handler or not.
   void _error() => docsToasts.error(
-        'Could not reach the vault',
-        description: 'Nothing was charged. Try again in a moment.',
-        action: const DsToastAction(label: 'Retry'),
-      );
+    'Could not reach the vault',
+    description: 'Nothing was charged. Try again in a moment.',
+    action: const ElToastAction(label: 'Retry'),
+  );
 
   /// `toast.warning(…)`.
   void _warning() => docsToasts.warning('Only 12 packs left in this print run');
@@ -562,16 +570,17 @@ class _ToastSectionState extends State<_ToastSection> {
 
   @override
   Widget build(BuildContext context) {
-    return DsSection(
+    return ElSection(
       id: 'toast',
       title: 'Toast',
-      description: 'Transient confirmation, bottom-right. Never used for '
+      description:
+          'Transient confirmation, bottom-right. Never used for '
           'errors that require a decision — those get an Alert or a Dialog, '
           'because a toast disappears.',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          DsPanel(
+          ElPanel(
             label: 'All five, side by side',
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -580,75 +589,76 @@ class _ToastSectionState extends State<_ToastSection> {
                   children: <Widget>[
                     _ToastPreview(title: 'Added to favourites'),
                     _ToastPreview(
-                      type: DsToastType.success,
+                      type: ElToastType.success,
                       title: r'Sold 3 cards for $2,481.00',
                       description: 'Credited to your available balance.',
                     ),
                     _ToastPreview(
-                      type: DsToastType.error,
+                      type: ElToastType.error,
                       title: 'Could not reach the vault',
-                      description: 'Nothing was charged. Try again in a '
+                      description:
+                          'Nothing was charged. Try again in a '
                           'moment.',
                       action: 'Retry',
                     ),
                     _ToastPreview(
-                      type: DsToastType.warning,
+                      type: ElToastType.warning,
                       title: 'Only 12 packs left in this print run',
                     ),
                     _ToastPreview(
-                      type: DsToastType.loading,
+                      type: ElToastType.loading,
                       title: 'Requesting withdrawal…',
                       description: 'This usually takes a few seconds.',
                     ),
                   ],
                 ),
                 // `className="mt-6"`.
-                SizedBox(height: ds(6)),
+                SizedBox(height: el(6)),
                 const _NotMockUpsBody(),
                 // `className="mt-3"`.
-                SizedBox(height: ds(3)),
+                SizedBox(height: el(3)),
                 const _BloomIsSharedBody(),
               ],
             ),
           ),
           // `className="mt-4"`.
-          SizedBox(height: ds(4)),
-          DsPanel(
+          SizedBox(height: el(4)),
+          ElPanel(
             label: 'Click to fire a real one',
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                DsRow(
+                ElRow(
                   children: <Widget>[
-                    DsButton(
-                      variant: DsButtonVariant.outline,
+                    ElButton(
+                      variant: ElButtonVariant.outline,
                       onPressed: _neutral,
                       child: const Text('Neutral'),
                     ),
-                    DsButton(
-                      variant: DsButtonVariant.outline,
+                    ElButton(
+                      variant: ElButtonVariant.outline,
                       onPressed: _success,
                       child: const Text('Success'),
                     ),
-                    DsButton(
-                      variant: DsButtonVariant.outline,
+                    ElButton(
+                      variant: ElButtonVariant.outline,
                       onPressed: _error,
                       child: const Text('Error'),
                     ),
-                    DsButton(
-                      variant: DsButtonVariant.outline,
+                    ElButton(
+                      variant: ElButtonVariant.outline,
                       onPressed: _warning,
                       child: const Text('Warning'),
                     ),
-                    DsButton(
-                      variant: DsButtonVariant.outline,
+                    ElButton(
+                      variant: ElButtonVariant.outline,
                       onPressed: _firePromise,
                       child: const Text('Promise'),
                     ),
                   ],
                 ),
                 // `className="mt-5"`.
-                SizedBox(height: ds(5)),
+                SizedBox(height: el(5)),
                 const _ConfiguredOnceBody(),
               ],
             ),
@@ -670,18 +680,18 @@ class _ToastPreviewStack extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          for (int i = 0; i < children.length; i++) ...<Widget>[
-            if (i > 0) SizedBox(height: ds(4)),
-            children[i],
-          ],
-        ],
-      );
+    crossAxisAlignment: CrossAxisAlignment.start,
+    mainAxisSize: MainAxisSize.min,
+    children: <Widget>[
+      for (int i = 0; i < children.length; i++) ...<Widget>[
+        if (i > 0) SizedBox(height: el(4)),
+        children[i],
+      ],
+    ],
+  );
 }
 
-/// `components/ds/toast-preview.tsx`, *"a toast, rendered where you can look
+/// `components/el/toast-preview.tsx`, *"a toast, rendered where you can look
 /// at one."*
 ///
 /// The same tree sonner builds, `[data-icon]`, `[data-content]`,
@@ -692,7 +702,7 @@ class _ToastPreviewStack extends StatelessWidget {
 ///
 /// | declaration | value |
 /// |---|---|
-/// | `width: var(--width, 22.25rem)` | **356px**, [DsToaster.width] |
+/// | `width: var(--width, 22.25rem)` | **356px**, [ElToaster.width] |
 /// | `display: flex; align-items: flex-start` | icon beside content, both top-aligned |
 /// | `gap: calc(--spacing * 3)` | 12px |
 /// | `padding: calc(--spacing * 4)` | 16px |
@@ -708,14 +718,14 @@ class _ToastPreviewStack extends StatelessWidget {
 /// whole toast. Four infinite animations per preview, twenty across the stack.
 class _ToastPreview extends StatelessWidget {
   const _ToastPreview({
-    this.type = DsToastType.normal,
+    this.type = ElToastType.normal,
     required this.title,
     this.description,
     this.action,
   });
 
   /// `data-type`, `default` renders no glyph at all.
-  final DsToastType type;
+  final ElToastType type;
 
   final String title;
   final String? description;
@@ -725,22 +735,22 @@ class _ToastPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
-    final BorderRadius radius = BorderRadius.circular(DsRadii.lg);
+    final ElThemeData theme = ElTheme.of(context);
+    final BorderRadius radius = BorderRadius.circular(ElRadii.lg);
     // `const Icon = type === "default" ? null : TOAST_ICONS[type]`.
-    final DsIconGlyph? glyph = type.glyph;
+    final ElIconGlyph? glyph = type.glyph;
 
     Widget content = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        DsText(title, _toastMedium, color: theme.foreground),
+        ElText(title, _toastMedium, color: theme.foreground),
         if (description != null) ...<Widget>[
           // `[data-content] { gap: calc(--spacing * 1) }`.
-          SizedBox(height: ds(1)),
+          SizedBox(height: el(1)),
           // `[data-description]` sets font-size and colour and **no leading**,
           // so it keeps `.cn-toast`'s 1.5: which is `.type-small` exactly.
-          DsText(description!, DsType.small),
+          ElText(description!, ElType.small),
         ],
       ],
     );
@@ -753,29 +763,33 @@ class _ToastPreview extends StatelessWidget {
           if (glyph != null) ...<Widget>[
             Padding(
               // `[data-icon] { margin-top: calc(--spacing * 0.5) }`.
-              padding: EdgeInsets.only(top: ds(0.5)),
-              child: type == DsToastType.loading
+              padding: EdgeInsets.only(top: el(0.5)),
+              child: type == ElToastType.loading
                   // `className="size-4 anim-spin"`, `pulls-spin`, 900ms,
                   // linear, forever. Reduced motion holds it at 0°, which is
                   // where a fill-less animation reverts to.
-                  ? DsKeyframePlayer(
-                      duration: DsDurations.spin,
-                      fill: DsKeyframeFill.none,
+                  ? ElKeyframePlayer(
+                      duration: ElDurations.spin,
+                      fill: ElKeyframeFill.none,
                       repeat: true,
-                      builder: (BuildContext context, double t, Widget? child) =>
-                          Transform.rotate(angle: t * 2 * math.pi, child: child),
+                      builder:
+                          (BuildContext context, double t, Widget? child) =>
+                              Transform.rotate(
+                                angle: t * 2 * math.pi,
+                                child: child,
+                              ),
                       child: _previewGlyph(glyph, theme),
                     )
                   : _previewGlyph(glyph, theme),
             ),
             // `gap: calc(--spacing * 3)`.
-            SizedBox(width: ds(3)),
+            SizedBox(width: el(3)),
           ],
           // `[data-content] { min-width: 0 }`: it shrinks, and the pill's
           // `margin-left: auto` takes whatever is left over.
           Expanded(child: content),
           if (action != null) ...<Widget>[
-            SizedBox(width: ds(3)),
+            SizedBox(width: el(3)),
             _ToastActionPill(label: action!),
           ],
         ],
@@ -784,7 +798,7 @@ class _ToastPreview extends StatelessWidget {
 
     Widget toast = Padding(
       // `padding: calc(--spacing * 4)`.
-      padding: EdgeInsets.all(ds(4)),
+      padding: EdgeInsets.all(el(4)),
       child: content,
     );
 
@@ -793,50 +807,67 @@ class _ToastPreview extends StatelessWidget {
     // `box-shadow: var(--shadow-e3)` and `border: 1px solid var(--border)`,
     // outside the bloom's clip because `overflow: hidden` clips to the padding
     // box: so the border stroke sits outside the light (drift 15).
-    toast = DsMachineSurface(
-      spec: DsShadows.e3,
+    toast = ElMachineSurface(
+      spec: ElShadows.e3,
       radius: radius,
-      border: Border.all(color: theme.border, width: DsWidths.hairline),
+      border: Border.all(color: theme.border, width: ElWidths.hairline),
       child: toast,
     );
 
-    return SizedBox(width: DsToaster.width, child: toast);
+    return SizedBox(width: ElToaster.width, child: toast);
   }
 
   /// `<Icon className="size-4"/>`, raw, 16px at lucide's own stroke, in the
   /// type's `-ink`.
-  Widget _previewGlyph(DsIconGlyph glyph, DsThemeData theme) => DsIcon(
-        glyph,
-        sizePx: ds(4),
-        strokeOverride: _lucideStroke,
-        tone: DsIconTone.inherit,
-      );
+  Widget _previewGlyph(ElIconGlyph glyph, ElThemeData theme) => ElIcon(
+    glyph,
+    sizePx: el(4),
+    strokeOverride: _lucideStroke,
+    tone: ElIconTone.inherit,
+  );
 
   /// `.cn-toast[data-type="…"]`'s `--bloom-1` / `--bloom-2` pair.
   ///
   /// Four of the five agree with the Alert variant of the same name. `warning`
-  /// does not, DRIFT 2, and [DsBloomCosmic.toastWarning] is the pair the Alert
+  /// does not, DRIFT 2, and [ElBloomCosmic.toastWarning] is the pair the Alert
   /// was moved off.
   static Widget _bloomFor(
-    DsToastType type, {
+    ElToastType type, {
     required BorderRadius radius,
     required Color fill,
     required Widget child,
-  }) =>
-      switch (type) {
-        DsToastType.success =>
-          DsBloomCosmic.success(radius: radius, fill: fill, child: child),
-        DsToastType.info =>
-          DsBloomCosmic.info(radius: radius, fill: fill, child: child),
-        DsToastType.warning =>
-          DsBloomCosmic.toastWarning(radius: radius, fill: fill, child: child),
-        DsToastType.error =>
-          DsBloomCosmic.destructive(radius: radius, fill: fill, child: child),
-        DsToastType.loading =>
-          DsBloomCosmic.loading(radius: radius, fill: fill, child: child),
-        DsToastType.normal =>
-          DsBloomCosmic.action(radius: radius, fill: fill, child: child),
-      };
+  }) => switch (type) {
+    ElToastType.success => ElBloomCosmic.success(
+      radius: radius,
+      fill: fill,
+      child: child,
+    ),
+    ElToastType.info => ElBloomCosmic.info(
+      radius: radius,
+      fill: fill,
+      child: child,
+    ),
+    ElToastType.warning => ElBloomCosmic.toastWarning(
+      radius: radius,
+      fill: fill,
+      child: child,
+    ),
+    ElToastType.error => ElBloomCosmic.destructive(
+      radius: radius,
+      fill: fill,
+      child: child,
+    ),
+    ElToastType.loading => ElBloomCosmic.loading(
+      radius: radius,
+      fill: fill,
+      child: child,
+    ),
+    ElToastType.normal => ElBloomCosmic.action(
+      radius: radius,
+      fill: fill,
+      child: child,
+    ),
+  };
 }
 
 /// `[data-button]`, `variant="secondary" size="sm"` written out by hand,
@@ -845,7 +876,7 @@ class _ToastPreview extends StatelessWidget {
 /// **The preview's own element**, not the live pill: `toast-preview.tsx`
 /// L42–46 writes `<button type="button" data-button="">` into its own markup,
 /// so this is a port of that `<button>`. The live toast's pill is
-/// `DsToastAction`'s, painted by `DsToast`; both are the same 32px secondary
+/// `ElToastAction`'s, painted by `ElToast`; both are the same 32px secondary
 /// pill because the one `.cn-toast [data-button]` block styles both.
 ///
 /// `flex-shrink: 0; margin-left: auto; height: calc(--spacing * 8);
@@ -859,17 +890,17 @@ class _ToastPreview extends StatelessWidget {
 /// transparent control over moving light reads as a hole. The hover goes to
 /// `--accent`, and `--duration-base` is read from the variable directly here
 /// rather than through a `duration-<word>` utility, so it is genuinely
-/// [DsDurations.base].
+/// [ElDurations.base].
 class _ToastActionPill extends StatefulWidget {
   const _ToastActionPill({required this.label});
 
   final String label;
 
   /// `height: calc(--spacing * 8)`.
-  static double get height => ds(8);
+  static double get height => el(8);
 
   /// `padding-inline: calc(--spacing * 3.5)`.
-  static double get paddingX => ds(3.5);
+  static double get paddingX => el(3.5);
 
   @override
   State<_ToastActionPill> createState() => _ToastActionPillState();
@@ -885,7 +916,7 @@ class _ToastActionPillState extends State<_ToastActionPill> {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     final Color fill = _hovered ? theme.accent : theme.secondary;
 
     return MouseRegion(
@@ -894,31 +925,31 @@ class _ToastActionPillState extends State<_ToastActionPill> {
       onExit: (_) => _hover(false),
       child: TweenAnimationBuilder<Color?>(
         tween: ColorTween(end: fill),
-        duration: dsAnimationDuration(context, DsDurations.base),
-        curve: DsCurves.out,
+        duration: elAnimationDuration(context, ElDurations.base),
+        curve: ElCurves.out,
         builder: (BuildContext context, Color? wash, Widget? child) =>
             DecoratedBox(
-          decoration: BoxDecoration(
-            color: wash ?? fill,
-            borderRadius: BorderRadius.circular(DsRadii.pill),
-            // `border: 1px solid transparent`: declared, and it still costs
-            // the pill its pixel on each side.
-            border: Border.all(
-              color: dsTransparent,
-              width: DsWidths.hairline,
+              decoration: BoxDecoration(
+                color: wash ?? fill,
+                borderRadius: BorderRadius.circular(ElRadii.pill),
+                // `border: 1px solid transparent`: declared, and it still costs
+                // the pill its pixel on each side.
+                border: Border.all(
+                  color: elTransparent,
+                  width: ElWidths.hairline,
+                ),
+              ),
+              child: child,
             ),
-          ),
-          child: child,
-        ),
         child: SizedBox(
           height: _ToastActionPill.height,
           child: Padding(
             padding: EdgeInsets.symmetric(
-              horizontal: _ToastActionPill.paddingX - DsWidths.hairline,
+              horizontal: _ToastActionPill.paddingX - ElWidths.hairline,
             ),
             child: Center(
               widthFactor: 1,
-              child: DsText(
+              child: ElText(
                 widget.label,
                 _toastMedium,
                 color: theme.secondaryForeground,
@@ -936,26 +967,28 @@ class _NotMockUpsBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsRichText(
+    return ElRichText(
       TextSpan(
         children: <InlineSpan>[
           const TextSpan(
-            text: 'These are not mock-ups. They render the same markup sonner '
+            text:
+                'These are not mock-ups. They render the same markup sonner '
                 'produces and are styled by the same ',
           ),
-          DsCode.span('.cn-toast'),
+          ElCode.span('.cn-toast'),
           const TextSpan(text: ' block in '),
-          DsCode.span('globals.css'),
+          ElCode.span('globals.css'),
           const TextSpan(text: ' — the only difference is the missing '),
-          DsCode.span('data-sonner-toast'),
+          ElCode.span('data-sonner-toast'),
           const TextSpan(
-            text: ' attribute that would make them fixed to the corner of the '
+            text:
+                ' attribute that would make them fixed to the corner of the '
                 'viewport. Change a value there and both these and the live '
                 'toast move together.',
           ),
         ],
       ),
-      DsType.small,
+      ElType.small,
     );
   }
 }
@@ -965,29 +998,31 @@ class _BloomIsSharedBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsRichText(
+    return ElRichText(
       TextSpan(
         children: <InlineSpan>[
           const TextSpan(text: 'The bloom is '),
-          DsCode.span('bloom-cosmic'),
+          ElCode.span('bloom-cosmic'),
           const TextSpan(
-            text: ', shared with Alert. Two layers drift at different speeds '
+            text:
+                ', shared with Alert. Two layers drift at different speeds '
                 'and rotate against each other — a deep field over 18s and a '
                 'brighter near field over 11s — so they never line up and the '
                 'surface reads as two distances rather than one flat wash. '
                 'Each type sets two hues and nothing else. It is CSS rather '
                 'than a ',
           ),
-          DsCode.span('ShaderSurface'),
+          ElCode.span('ShaderSurface'),
           const TextSpan(
-            text: ' because sonner builds the live toast and offers nowhere to '
+            text:
+                ' because sonner builds the live toast and offers nowhere to '
                 'mount a canvas, and because a 160×72 zone renders at 80×36 — '
                 'far too few pixels for a noise field. Same call as the '
                 'premium button.',
           ),
         ],
       ),
-      DsType.small,
+      ElType.small,
     );
   }
 }
@@ -997,19 +1032,19 @@ class _ConfiguredOnceBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsRichText(
+    return ElRichText(
       TextSpan(
         children: <InlineSpan>[
           const TextSpan(
             text: 'Position and theme are configured once on the ',
           ),
-          DsCode.span('<Toaster />'),
+          ElCode.span('<Toaster />'),
           const TextSpan(
             text: ' in the root layout, so no screen can move them.',
           ),
         ],
       ),
-      DsType.small,
+      ElType.small,
     );
   }
 }
@@ -1021,35 +1056,33 @@ class _SkeletonSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsSection(
+    return ElSection(
       id: 'skeleton',
       title: 'Skeleton',
-      description: 'A skeleton must match the footprint of what it replaces. A '
+      description:
+          'A skeleton must match the footprint of what it replaces. A '
           'generic grey rectangle where a pack card will appear causes a '
           'layout jump, which is worse than a spinner.',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          const DsGrid(
+          const ElGrid(
             lg: 2,
             children: <Widget>[
-              DsPanel(
-                label: 'Pack card skeleton',
-                child: _PackCardSkeleton(),
-              ),
-              DsPanel(
+              ElPanel(label: 'Pack card skeleton', child: _PackCardSkeleton()),
+              ElPanel(
                 label: 'Live pull row skeleton',
                 child: _PullRowSkeletons(),
               ),
             ],
           ),
-          SizedBox(height: ds(4)),
-          DsPanel(
+          SizedBox(height: el(4)),
+          ElPanel(
             label: 'Inline placeholders',
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                DsRow(
+                ElRow(
                   children: <Widget>[
                     ConstrainedBox(
                       constraints: const BoxConstraints(
@@ -1061,26 +1094,24 @@ class _SkeletonSection extends StatelessWidget {
                 ),
                 // DRIFT 5: no `mt-6`, and no gap at all. The list butts
                 // straight into the paragraph above it.
-                const DsMeta(
-                  items: <DsMetaItem>[
+                const ElMeta(
+                  items: <ElMetaItem>[
                     (
                       k: 'Default',
                       v: TextSpan(text: 'div — use for block placeholders'),
                     ),
                     (
                       k: 'as="span"',
-                      v: TextSpan(
-                        text: 'inline-block, for text placeholders',
-                      ),
+                      v: TextSpan(text: 'inline-block, for text placeholders'),
                     ),
                   ],
                 ),
               ],
             ),
           ),
-          SizedBox(height: ds(4)),
-          const DsNote(
-            tone: DsNoteTone.error,
+          SizedBox(height: el(4)),
+          const ElNote(
+            tone: ElNoteTone.error,
             title: 'The common mistake',
             child: _CommonMistakeBody(),
           ),
@@ -1097,47 +1128,47 @@ class _PackCardSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
 
     return DecoratedBox(
       decoration: BoxDecoration(
         color: theme.card,
-        borderRadius: BorderRadius.circular(DsRadii.lg),
-        border: Border.all(color: theme.border, width: DsWidths.hairline),
+        borderRadius: BorderRadius.circular(ElRadii.lg),
+        border: Border.all(color: theme.border, width: ElWidths.hairline),
       ),
       child: Padding(
         // `p-4` plus the border it is measured inside: `box-sizing:
         // border-box` pays for the frame out of the box, and [DecoratedBox]
         // paints a border without reserving space for it.
-        padding: EdgeInsets.all(ds(4) + DsWidths.hairline),
+        padding: EdgeInsets.all(el(4) + ElWidths.hairline),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             // `mb-4 h-32 w-full rounded-md`: the art.
-            DsSkeleton(height: ds(32)),
-            SizedBox(height: ds(4)),
+            ElSkeleton(height: el(32)),
+            SizedBox(height: el(4)),
             // `h-3 w-24`: the set name.
-            _atLineStart(DsSkeleton(width: ds(24), height: ds(3))),
+            _atLineStart(ElSkeleton(width: el(24), height: el(3))),
             // `mt-2.5 h-4 w-40`: the card name.
-            SizedBox(height: ds(2.5)),
-            _atLineStart(DsSkeleton(width: ds(40), height: ds(4))),
+            SizedBox(height: el(2.5)),
+            _atLineStart(ElSkeleton(width: el(40), height: el(4))),
             // `mt-4 flex gap-2`: two rarity pills.
-            SizedBox(height: ds(4)),
+            SizedBox(height: el(4)),
             Row(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                DsSkeleton(width: ds(20), height: ds(5), radius: DsRadii.pill),
-                SizedBox(width: ds(2)),
-                DsSkeleton(width: ds(16), height: ds(5), radius: DsRadii.pill),
+                ElSkeleton(width: el(20), height: el(5), radius: ElRadii.pill),
+                SizedBox(width: el(2)),
+                ElSkeleton(width: el(16), height: el(5), radius: ElRadii.pill),
               ],
             ),
             // `mt-4 h-6 w-20`: the price.
-            SizedBox(height: ds(4)),
-            _atLineStart(DsSkeleton(width: ds(20), height: ds(6))),
+            SizedBox(height: el(4)),
+            _atLineStart(ElSkeleton(width: el(20), height: el(6))),
             // `mt-4 h-10 w-full rounded-md`: the buy button.
-            SizedBox(height: ds(4)),
-            DsSkeleton(height: ds(10)),
+            SizedBox(height: el(4)),
+            ElSkeleton(height: el(10)),
           ],
         ),
       ),
@@ -1153,7 +1184,7 @@ class _PullRowSkeletons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
 
     return _SeamedList(
       children: <Widget>[
@@ -1161,38 +1192,29 @@ class _PullRowSkeletons extends StatelessWidget {
           ColoredBox(
             color: theme.card,
             child: Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: ds(4),
-                vertical: ds(3),
-              ),
+              padding: EdgeInsets.symmetric(horizontal: el(4), vertical: el(3)),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   // `size-8 rounded-pill`: the avatar.
-                  DsSkeleton(
-                    width: ds(8),
-                    height: ds(8),
-                    radius: DsRadii.pill,
-                  ),
-                  SizedBox(width: ds(3)),
+                  ElSkeleton(width: el(8), height: el(8), radius: ElRadii.pill),
+                  SizedBox(width: el(3)),
                   // `div.min-w-0.flex-1`.
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
+                        _atLineStart(ElSkeleton(width: el(20), height: el(3))),
+                        SizedBox(height: el(2)),
                         _atLineStart(
-                          DsSkeleton(width: ds(20), height: ds(3)),
-                        ),
-                        SizedBox(height: ds(2)),
-                        _atLineStart(
-                          DsSkeleton(width: ds(36), height: ds(3.5)),
+                          ElSkeleton(width: el(36), height: el(3.5)),
                         ),
                       ],
                     ),
                   ),
-                  SizedBox(width: ds(3)),
-                  DsSkeleton(width: ds(16), height: ds(4)),
+                  SizedBox(width: el(3)),
+                  ElSkeleton(width: el(16), height: el(4)),
                 ],
               ),
             ),
@@ -1216,25 +1238,25 @@ class _SeamedList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(DsRadii.lg),
-        border: Border.all(color: theme.border, width: DsWidths.hairline),
+        borderRadius: BorderRadius.circular(ElRadii.lg),
+        border: Border.all(color: theme.border, width: ElWidths.hairline),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(DsWidths.hairline),
+        padding: const EdgeInsets.all(ElWidths.hairline),
         child: ClipRRect(
           // `overflow-hidden` against the border's inner edge, so the first
           // and last rows take the container's corners.
-          borderRadius: BorderRadius.circular(DsRadii.lg - DsWidths.hairline),
+          borderRadius: BorderRadius.circular(ElRadii.lg - ElWidths.hairline),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               for (int i = 0; i < children.length; i++) ...<Widget>[
-                if (i > 0) const SizedBox(height: DsWidths.hairline),
+                if (i > 0) const SizedBox(height: ElWidths.hairline),
                 children[i],
               ],
             ],
@@ -1252,27 +1274,27 @@ class _InlinePlaceholderBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsRichText(
+    return ElRichText(
       TextSpan(
         children: <InlineSpan>[
           const TextSpan(
             text: 'Standing in for words inside a sentence needs ',
           ),
-          DsCode.span('as="span"'),
+          ElCode.span('as="span"'),
           const TextSpan(text: ' — like '),
           // `h-3.5 w-28 align-middle`, `inline-block`, centred on the
           // surrounding lowercase, which is what `vertical-align: middle` is.
-          DsSkeleton.span(width: ds(28), height: ds(3.5)),
+          ElSkeleton.span(width: el(28), height: el(3.5)),
           const TextSpan(text: ' here — because a '),
-          DsCode.span('<div>'),
+          ElCode.span('<div>'),
           const TextSpan(text: ' inside a '),
-          DsCode.span('<p>'),
+          ElCode.span('<p>'),
           const TextSpan(
             text: ' is invalid HTML that every guard in this repo passes.',
           ),
         ],
       ),
-      DsType.body,
+      ElType.body,
     );
   }
 }
@@ -1282,13 +1304,14 @@ class _CommonMistakeBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsRichText(
+    return ElRichText(
       TextSpan(
         children: <InlineSpan>[
           const TextSpan(text: 'Do not build one '),
-          DsCode.span('SkeletonCard'),
+          ElCode.span('SkeletonCard'),
           const TextSpan(
-            text: ' and use it everywhere. Each component that loads gets a '
+            text:
+                ' and use it everywhere. Each component that loads gets a '
                 'skeleton shaped like ',
           ),
           const TextSpan(text: 'itself', style: _em),
@@ -1297,7 +1320,7 @@ class _CommonMistakeBody extends StatelessWidget {
           ),
         ],
       ),
-      DsType.small,
+      ElType.small,
     );
   }
 }
@@ -1309,19 +1332,20 @@ class _ProgressSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
 
-    return DsSection(
+    return ElSection(
       id: 'progress',
       // DRIFT 18: the title and the `id` disagree, and the chip list splits
       // the two halves into separate entries.
       title: 'Progress & Spinner',
-      description: 'Progress when the total is known — pack supply, XP toward '
+      description:
+          'Progress when the total is known — pack supply, XP toward '
           'the next rank, a reveal sequence. Spinner when it is not.',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          DsPanel(
+          ElPanel(
             label: 'Progress',
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1338,16 +1362,16 @@ class _ProgressSection extends StatelessWidget {
                         value: 20.6,
                       ),
                       // `space-y-8`, 32px between rows.
-                      SizedBox(height: ds(8)),
+                      SizedBox(height: el(8)),
                       _ProgressReading(
                         label: 'XP to Rank 25',
                         readout: '3,480 / 5,000',
                         readoutColor: theme.valueInk,
                         value: 69.6,
-                        tone: DsProgressTone.value,
+                        tone: ElProgressTone.value,
                         ariaLabel: 'XP to Rank 25',
                       ),
-                      SizedBox(height: ds(8)),
+                      SizedBox(height: el(8)),
                       _ProgressReading(
                         label: 'Revealing cards',
                         readout: '4 of 6',
@@ -1357,21 +1381,21 @@ class _ProgressSection extends StatelessWidget {
                     ],
                   ),
                 ),
-                SizedBox(height: ds(6)),
-                DsText(
+                SizedBox(height: el(6)),
+                ElText(
                   'The XP bar is the one place a progress track leaves the '
                   'action ramp — progression toward a reward is a value '
                   'signal.',
-                  DsType.small,
+                  ElType.small,
                 ),
-                SizedBox(height: ds(4)),
+                SizedBox(height: el(4)),
                 // No title, default `action` tone: and inside the Panel.
-                const DsNote(child: _SunkenChannelBody()),
+                const ElNote(child: _SunkenChannelBody()),
               ],
             ),
           ),
-          SizedBox(height: ds(4)),
-          DsPanel(
+          SizedBox(height: el(4)),
+          ElPanel(
             // U+2014 in the label.
             label: 'Tone — the shape of the reading, not its direction',
             child: Column(
@@ -1382,8 +1406,12 @@ class _ProgressSection extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: <Widget>[
-                      for (int i = 0; i < _progressTones.length; i++) ...<Widget>[
-                        if (i > 0) SizedBox(height: ds(8)),
+                      for (
+                        int i = 0;
+                        i < _progressTones.length;
+                        i++
+                      ) ...<Widget>[
+                        if (i > 0) SizedBox(height: el(8)),
                         _ProgressReading(
                           label: _progressTones[i].label,
                           readout: '${_progressTones[i].value.toInt()}%',
@@ -1395,44 +1423,38 @@ class _ProgressSection extends StatelessWidget {
                     ],
                   ),
                 ),
-                SizedBox(height: ds(6)),
+                SizedBox(height: el(6)),
                 const _InkEndBody(),
-                SizedBox(height: ds(4)),
-                const DsNote(
-                  tone: DsNoteTone.error,
-                  child: _SafeBandBody(),
-                ),
+                SizedBox(height: el(4)),
+                const ElNote(tone: ElNoteTone.error, child: _SafeBandBody()),
               ],
             ),
           ),
-          SizedBox(height: ds(4)),
-          DsPanel(
+          SizedBox(height: el(4)),
+          ElPanel(
             label: 'Spinner',
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                DsRow(
+                ElRow(
                   children: <Widget>[
-                    const DsSpinner(),
+                    const ElSpinner(),
                     // `className="size-5"` / `"size-6"`: the class beats the
                     // attribute and only the box changes (drift 11).
-                    DsSpinner(size: ds(5)),
+                    ElSpinner(size: el(5)),
                     DefaultTextStyle.merge(
                       style: TextStyle(color: theme.actionInk),
-                      child: DsSpinner(size: ds(6)),
+                      child: ElSpinner(size: el(6)),
                     ),
-                    const DsButton(
-                      loading: true,
-                      child: Text('Opening pack'),
-                    ),
-                    const DsButton(
-                      variant: DsButtonVariant.premium,
+                    const ElButton(loading: true, child: Text('Opening pack')),
+                    const ElButton(
+                      variant: ElButtonVariant.premium,
                       loading: true,
                       child: Text('Processing deposit'),
                     ),
                   ],
                 ),
-                SizedBox(height: ds(5)),
+                SizedBox(height: el(5)),
                 const _LoadingPropBody(),
               ],
             ),
@@ -1450,7 +1472,7 @@ class _ProgressReading extends StatelessWidget {
     required this.readout,
     required this.value,
     this.readoutColor,
-    this.tone = DsProgressTone.normal,
+    this.tone = ElProgressTone.normal,
     this.ariaLabel,
   });
 
@@ -1466,14 +1488,14 @@ class _ProgressReading extends StatelessWidget {
   /// `text-value-ink` on the XP row; `--muted-foreground` on the other six.
   final Color? readoutColor;
 
-  final DsProgressTone tone;
+  final ElProgressTone tone;
 
   /// `aria-label`, absent exactly once: drift 6.
   final String? ariaLabel;
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1484,17 +1506,17 @@ class _ProgressReading extends StatelessWidget {
           textBaseline: TextBaseline.alphabetic,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            DsText(label, DsType.label),
-            DsText(
+            ElText(label, ElType.label),
+            ElText(
               readout,
-              DsType.numSm,
+              ElType.numSm,
               color: readoutColor ?? theme.mutedForeground,
             ),
           ],
         ),
         // `mb-2.5`, 10px.
-        SizedBox(height: ds(2.5)),
-        DsProgress(value: value, tone: tone, label: ariaLabel),
+        SizedBox(height: el(2.5)),
+        ElProgress(value: value, tone: tone, label: ariaLabel),
       ],
     );
   }
@@ -1505,13 +1527,13 @@ class _SunkenChannelBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsText(
+    return ElText(
       // `&rsquo;`: a real right single quotation mark.
       'Same 10px sunken channel as the Slider’s track, because it is the same '
       'object — a filled channel. The only difference is the missing thumb, '
       'because you cannot grab this one. Stock shadcn ships a 4px hair, which '
       'reads as a different component entirely next to a price filter.',
-      DsType.small,
+      ElType.small,
     );
   }
 }
@@ -1521,30 +1543,31 @@ class _InkEndBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsRichText(
+    return ElRichText(
       TextSpan(
         children: <InlineSpan>[
           const TextSpan(text: 'Every fill names the '),
-          DsCode.span('-ink'),
+          ElCode.span('-ink'),
           const TextSpan(
-            text: ' end of its ramp rather than the raw token, for the reason '
+            text:
+                ' end of its ramp rather than the raw token, for the reason '
                 'a glyph does: a filled channel carries no foreground, so the '
                 'only thing that makes it visible is its contrast with the '
                 'track. Measured on this page, ',
           ),
-          DsCode.span('--primary'),
+          ElCode.span('--primary'),
           const TextSpan(text: ' is 1.63:1 against '),
-          DsCode.span('--muted'),
+          ElCode.span('--muted'),
           const TextSpan(text: ' and '),
-          DsCode.span('--action-ink'),
+          ElCode.span('--action-ink'),
           const TextSpan(text: ' is 6.97:1; on light, raw '),
-          DsCode.span('--color-success'),
+          ElCode.span('--color-success'),
           const TextSpan(text: ' is 1.73:1 and '),
-          DsCode.span('--success-ink'),
+          ElCode.span('--success-ink'),
           const TextSpan(text: ' is 4.93:1.'),
         ],
       ),
-      DsType.small,
+      ElType.small,
     );
   }
 }
@@ -1554,20 +1577,21 @@ class _SafeBandBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsRichText(
+    return ElRichText(
       TextSpan(
         children: <InlineSpan>[
-          DsCode.span('destructive'),
+          ElCode.span('destructive'),
           const TextSpan(text: ' is for a reading '),
           const TextSpan(text: 'outside its safe band', style: _em),
           const TextSpan(
-            text: ', never for one that merely fell. A figure moving the wrong '
+            text:
+                ', never for one that merely fell. A figure moving the wrong '
                 'way is news, not a fault — RULES §1.4 — and it stays on the '
                 'default tone.',
           ),
         ],
       ),
-      DsType.small,
+      ElType.small,
     );
   }
 }
@@ -1577,19 +1601,19 @@ class _LoadingPropBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsRichText(
+    return ElRichText(
       TextSpan(
         children: <InlineSpan>[
           const TextSpan(text: 'Inside a button, use the '),
-          DsCode.span('loading'),
+          ElCode.span('loading'),
           const TextSpan(
             text: ' prop rather than placing a spinner by hand — it also sets ',
           ),
-          DsCode.span('aria-busy'),
+          ElCode.span('aria-busy'),
           const TextSpan(text: ' and disables the control.'),
         ],
       ),
-      DsType.small,
+      ElType.small,
     );
   }
 }
@@ -1601,42 +1625,43 @@ class _EmptySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsSection(
+    return ElSection(
       id: 'empty',
       title: 'Empty states',
       // Straight single quotes around 'No results', here and in §7's fourth
       // don't.
-      description: "An empty state must explain why it is empty and give one "
+      description:
+          "An empty state must explain why it is empty and give one "
           "clear way out. A blank panel with 'No results' is an unfinished "
           'screen.',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          DsGrid(
+          ElGrid(
             lg: 2,
             children: <Widget>[
-              DsPanel(
+              ElPanel(
                 // U+2014 in both labels.
                 label: 'Empty Stash — first-time user',
-                child: DsEmpty(
+                child: ElEmpty(
                   children: <Widget>[
-                    const DsEmptyHeader(
+                    const ElEmptyHeader(
                       children: <Widget>[
-                        DsEmptyMedia(
-                          glyph: DsIconGlyph.packageOpen,
-                          tone: DsIconTone.action,
+                        ElEmptyMedia(
+                          glyph: ElIconGlyph.packageOpen,
+                          tone: ElIconTone.action,
                         ),
-                        DsEmptyTitle('Your Stash is empty'),
-                        DsEmptyDescription(
+                        ElEmptyTitle('Your Stash is empty'),
+                        ElEmptyDescription(
                           'Cards land here the moment a pack finishes '
                           'opening. Open your first pack to start a '
                           'collection.',
                         ),
                       ],
                     ),
-                    DsEmptyContent(
+                    ElEmptyContent(
                       children: <Widget>[
-                        DsButton(
+                        ElButton(
                           onPressed: () {},
                           child: const Text('Browse Packs'),
                         ),
@@ -1645,27 +1670,27 @@ class _EmptySection extends StatelessWidget {
                   ],
                 ),
               ),
-              DsPanel(
+              ElPanel(
                 label: 'No search results — filters too narrow',
-                child: DsEmpty(
+                child: ElEmpty(
                   children: <Widget>[
-                    const DsEmptyHeader(
+                    const ElEmptyHeader(
                       children: <Widget>[
-                        DsEmptyMedia(
-                          glyph: DsIconGlyph.search,
-                          tone: DsIconTone.subtle,
+                        ElEmptyMedia(
+                          glyph: ElIconGlyph.search,
+                          tone: ElIconTone.subtle,
                         ),
-                        DsEmptyTitle('No packs match those filters'),
-                        DsEmptyDescription(
+                        ElEmptyTitle('No packs match those filters'),
+                        ElEmptyDescription(
                           r'Nothing between $0 and $10 has a legendary floor. '
                           'Widening the price range will help.',
                         ),
                       ],
                     ),
-                    DsEmptyContent(
+                    ElEmptyContent(
                       children: <Widget>[
-                        DsButton(
-                          variant: DsButtonVariant.outline,
+                        ElButton(
+                          variant: ElButtonVariant.outline,
                           onPressed: () {},
                           child: const Text('Reset filters'),
                         ),
@@ -1676,13 +1701,13 @@ class _EmptySection extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: ds(4)),
-          DsText(
+          SizedBox(height: el(4)),
+          ElText(
             'Note the difference: the first is empty because the user is new, '
             'the second because their filters are too narrow. Same component, '
             'completely different copy and action. Brand-specific empty states '
             'belong to the product that needs them, not to the chassis.',
-            DsType.small,
+            ElType.small,
           ),
         ],
       ),
@@ -1697,37 +1722,41 @@ class _ApiSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const DsSection(
+    return const ElSection(
       id: 'api',
       title: 'API',
-      child: DsMeta(
-        items: <DsMetaItem>[
+      child: ElMeta(
+        items: <ElMetaItem>[
           (
             k: 'Alert variant',
             v: TextSpan(
               // U+00B7 between the five names.
-              text: 'default · destructive · success · warning · info. The '
+              text:
+                  'default · destructive · success · warning · info. The '
                   'last three were added for this product.',
             ),
           ),
           (
             k: 'AlertAction',
             v: TextSpan(
-              text: 'Absolutely positioned top-right slot for a single small '
+              text:
+                  'Absolutely positioned top-right slot for a single small '
                   'action.',
             ),
           ),
           (
             k: 'toast()',
             v: TextSpan(
-              text: 'toast, toast.success, toast.error, toast.warning, '
+              text:
+                  'toast, toast.success, toast.error, toast.warning, '
                   'toast.promise. Options: description, action.',
             ),
           ),
           (
             k: 'Skeleton',
             v: TextSpan(
-              text: "Size it with Tailwind classes to match the real "
+              text:
+                  "Size it with Tailwind classes to match the real "
                   "content's geometry.",
             ),
           ),
@@ -1735,14 +1764,16 @@ class _ApiSection extends StatelessWidget {
             k: 'Progress value',
             v: TextSpan(
               // U+2013 in the range.
-              text: '0–100. Always pair with a readout showing the underlying '
+              text:
+                  '0–100. Always pair with a readout showing the underlying '
                   'figures.',
             ),
           ),
           (
             k: 'Empty',
             v: TextSpan(
-              text: 'Empty + EmptyHeader + EmptyMedia + EmptyTitle + '
+              text:
+                  'Empty + EmptyHeader + EmptyMedia + EmptyTitle + '
                   'EmptyDescription + EmptyContent.',
             ),
           ),
@@ -1759,12 +1790,12 @@ class _RulesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const DsSection(
+    return const ElSection(
       id: 'rules',
       title: 'Rules',
       // Five and five. Every apostrophe inside an item is straight; only the
-      // panel heading's own "Don’t" carries U+2019, and that is `DsDoDont`'s.
-      child: DsDoDont(
+      // panel heading's own "Don’t" carries U+2019, and that is `ElDoDont`'s.
+      child: ElDoDont(
         dos: <String>[
           'Shape every skeleton like the component it stands in for.',
           "Pair a progress bar with the real numbers — '412 / 2,000', not just "

@@ -1,0 +1,32 @@
+{
+  "name": "stat",
+  "type": "component",
+  "version": "0.0.1",
+  "description": "`components/ui/stat.tsx` — a labelled figure, an optional delta, an",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/stat.dart",
+      "target": "@ui/stat.dart",
+      "sha256": "b8dad3e8750c43f6ce0d17cc869970b6aba7a44fb09fadf710e18359efcbb71b"
+    }
+  ],
+  "registryDependencies": [
+    "icon",
+    "skeleton",
+    "source-foundation",
+    "swap-in"
+  ],
+  "semanticDependencies": [
+    "icon",
+    "skeleton",
+    "swap-in"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "documentationRoute": "/components/stat",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/stat.dart"
+}

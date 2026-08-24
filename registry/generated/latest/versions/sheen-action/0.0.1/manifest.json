@@ -9,12 +9,12 @@
     {
       "source": "lib/src/effects/sheen_action.dart",
       "target": "@effects/sheen_action.dart",
-      "sha256": "bde8fd6414a89866b893e397caa5dcebd902b012ac6b2a286430e1af7c944bb5"
+      "sha256": "b2371a385c517a5ed6126518076244c672c422b32a525b6c42eda01aeaf9b1a7"
     }
   ],
   "registryDependencies": [
-    "source-foundation",
-    "machine-surface"
+    "machine-surface",
+    "source-foundation"
   ],
   "semanticDependencies": [
     "machine-surface"

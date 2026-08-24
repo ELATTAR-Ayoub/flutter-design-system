@@ -3,7 +3,7 @@
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`, per the
-/// Phase J brief. The live `DsThemeController` is flipped in place for theme
+/// Phase J brief. The live `ElThemeController` is flipped in place for theme
 /// coverage rather than re-pumped under a new controller.
 library;
 
@@ -12,14 +12,14 @@ import 'package:example/components_docs/radio/meta.dart';
 import 'package:example/components_docs/radio/page.dart';
 import 'package:example/docs/docs_code.dart';
 import 'package:example/docs/docs_facts.dart';
-import 'package:example/kit.dart' show DsSection;
+import 'package:example/kit.dart' show ElSection;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 const Size _wide = Size(1440, 900);
 const Size _narrow = Size(390, 844);
 
-/// Every public constructor parameter of `DsRadioGroup<T>`, enumerated by
+/// Every public constructor parameter of `ElRadioGroup<T>`, enumerated by
 /// reading `lib/src/components/radio.dart` directly (Step 1 of the task
 /// cycle). The API table must cover all of these by name.
 const List<String> _radioGroupParams = <String>[
@@ -34,7 +34,7 @@ const List<String> _radioGroupParams = <String>[
   'hint',
 ];
 
-/// Every public constructor parameter of `DsRadioGroupItem<T>`.
+/// Every public constructor parameter of `ElRadioGroupItem<T>`.
 const List<String> _radioGroupItemParams = <String>[
   'value',
   'enabled',
@@ -44,30 +44,30 @@ const List<String> _radioGroupItemParams = <String>[
   'hint',
 ];
 
-/// The rest of the public surface: the static helpers on `DsRadioGroup` and
-/// `DsRadioGroupItem`. Neither type exposes an enum the way `DsCheckboxState`
+/// The rest of the public surface: the static helpers on `ElRadioGroup` and
+/// `ElRadioGroupItem`. Neither type exposes an enum the way `ElCheckboxState`
 /// does: a radio item's checked-ness is derived by comparing the group's
 /// `value` against the item's own, not read off a state field.
 const List<String> _radioStatics = <String>[
-  'DsRadioGroup.defaultGap',
-  'DsRadioGroupItem.size',
+  'ElRadioGroup.defaultGap',
+  'ElRadioGroupItem.size',
 ];
 
-Future<DsThemeController> _pump(
+Future<ElThemeController> _pump(
   WidgetTester tester, {
   Size size = _wide,
-  DsThemeMode mode = DsThemeMode.dark,
+  ElThemeMode mode = ElThemeMode.dark,
   ValueChanged<String>? onNavigate,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final DsThemeController theme = DsThemeController(mode: mode);
+  final ElThemeController theme = ElThemeController(mode: mode);
   addTearDown(theme.dispose);
 
   await tester.pumpWidget(
-    DsTheme(
+    ElTheme(
       controller: theme,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -90,8 +90,8 @@ void main() {
       await _pump(tester);
 
       final List<String> titles = tester
-          .widgetList<DsSection>(find.byType(DsSection))
-          .map((DsSection section) => section.title)
+          .widgetList<ElSection>(find.byType(ElSection))
+          .map((ElSection section) => section.title)
           .toList();
 
       expect(titles, <String>[
@@ -142,7 +142,7 @@ void main() {
     },
   );
 
-  testWidgets('the API table covers every DsRadioGroup and DsRadioGroupItem '
+  testWidgets('the API table covers every ElRadioGroup and ElRadioGroupItem '
       'constructor parameter and every static helper', (
     WidgetTester tester,
   ) async {
@@ -162,7 +162,7 @@ void main() {
       expect(
         documented,
         contains(param),
-        reason: 'DsRadioGroup constructor parameter "$param" is undocumented',
+        reason: 'ElRadioGroup constructor parameter "$param" is undocumented',
       );
     }
     for (final String param in _radioGroupItemParams) {
@@ -170,7 +170,7 @@ void main() {
         documented,
         contains(param),
         reason:
-            'DsRadioGroupItem constructor parameter "$param" is undocumented',
+            'ElRadioGroupItem constructor parameter "$param" is undocumented',
       );
     }
     for (final String member in _radioStatics) {
@@ -189,34 +189,34 @@ void main() {
       expect(group, findsOneWidget);
       await tester.ensureVisible(group);
 
-      expect(tester.widget<DsRadioGroup<String>>(group).value, 'daily');
+      expect(tester.widget<ElRadioGroup<String>>(group).value, 'daily');
 
       final Finder items = find.descendant(
         of: group,
-        matching: find.byType(DsRadioGroupItem<String>),
+        matching: find.byType(ElRadioGroupItem<String>),
       );
       expect(items, findsNWidgets(3));
 
       // Selecting "weekly" (index 1) moves the group's value off "daily" —
-      // DsRadioGroup.value is a single nullable T, so this alone proves the
+      // ElRadioGroup.value is a single nullable T, so this alone proves the
       // control cannot hold two selections: setting it to a new value is what
       // "deselects the previous one" means for a component with exactly one
       // value field.
       await tester.tap(items.at(1), warnIfMissed: false);
       await tester.pump();
-      expect(tester.widget<DsRadioGroup<String>>(group).value, 'weekly');
+      expect(tester.widget<ElRadioGroup<String>>(group).value, 'weekly');
 
       // …and selecting a third option moves it again, off "weekly" this time
       // proof that at most one item is ever "the" value, since the group
       // holds exactly one T? and nothing else.
       await tester.tap(items.at(2), warnIfMissed: false);
       await tester.pump();
-      expect(tester.widget<DsRadioGroup<String>>(group).value, 'monthly');
+      expect(tester.widget<ElRadioGroup<String>>(group).value, 'monthly');
 
       // …and back to the first option, off "monthly".
       await tester.tap(items.at(0), warnIfMissed: false);
       await tester.pump();
-      expect(tester.widget<DsRadioGroup<String>>(group).value, 'daily');
+      expect(tester.widget<ElRadioGroup<String>>(group).value, 'daily');
 
       expect(tester.takeException(), isNull);
     },
@@ -252,13 +252,13 @@ void main() {
     'both themes render the article with no exceptions when flipped in '
     'place',
     (WidgetTester tester) async {
-      final DsThemeController theme = await _pump(
+      final ElThemeController theme = await _pump(
         tester,
-        mode: DsThemeMode.light,
+        mode: ElThemeMode.light,
       );
       expect(find.text(radioDoc.title), findsWidgets);
 
-      theme.setMode(DsThemeMode.dark);
+      theme.setMode(ElThemeMode.dark);
       await tester.pump();
       expect(find.text(radioDoc.title), findsWidgets);
       expect(tester.takeException(), isNull);

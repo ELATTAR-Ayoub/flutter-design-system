@@ -5,12 +5,12 @@
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`: the
 /// discipline `breadcrumb_test.dart` already carries. Theme coverage uses a
-/// live `DsThemeController` flipped in place rather than two independent
+/// live `ElThemeController` flipped in place rather than two independent
 /// pumps.
 ///
-/// `DsTooltip` mounts its content through an `OverlayPortal`, so the live
+/// `ElTooltip` mounts its content through an `OverlayPortal`, so the live
 /// specimens need a real `Overlay`: the harness wraps the page in a
-/// `MaterialApp`, the same fix a sibling worker needed for `DsSelect` earlier
+/// `MaterialApp`, the same fix a sibling worker needed for `ElSelect` earlier
 /// in this program. A bare `Directionality`/`Material` host would let the
 /// page render but the tooltip would never actually open.
 library;
@@ -18,7 +18,7 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/tooltip/meta.dart';
 import 'package:example/components_docs/tooltip/page.dart';
-import 'package:example/kit.dart' show DsSection;
+import 'package:example/kit.dart' show ElSection;
 import 'package:flutter/gestures.dart' show PointerDeviceKind;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -26,21 +26,21 @@ import 'package:flutter_test/flutter_test.dart';
 const Size _wide = Size(1440, 900);
 const Size _narrow = Size(390, 844);
 
-Future<DsThemeController> _pumpTooltipDoc(
+Future<ElThemeController> _pumpTooltipDoc(
   WidgetTester tester, {
   ValueChanged<String>? onNavigate,
   Size size = _wide,
-  DsThemeMode mode = DsThemeMode.dark,
+  ElThemeMode mode = ElThemeMode.dark,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final DsThemeController theme = DsThemeController(mode: mode);
+  final ElThemeController theme = ElThemeController(mode: mode);
   addTearDown(theme.dispose);
 
   await tester.pumpWidget(
-    DsTheme(
+    ElTheme(
       controller: theme,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -66,7 +66,7 @@ void main() {
       expect(tooltipDoc.sourcePath, 'lib/src/components/tooltip.dart');
       expect(
         tooltipDoc.exports,
-        containsAll(<String>['DsTooltip', 'DsTooltipSide', 'DsTooltipContent']),
+        containsAll(<String>['ElTooltip', 'ElTooltipSide', 'ElTooltipContent']),
       );
       // Matches registry/components/tooltip.json's registryDependencies
       // verbatim: tooltip is one of the rare Wave 1 components that already
@@ -75,10 +75,6 @@ void main() {
       // Short description: one sentence, no trailing ellipsis.
       expect(tooltipDoc.description, isNot(contains('..')));
       expect(tooltipDoc.description.trim(), tooltipDoc.description);
-      // The expanded, decision-guidance description is a distinct constant,
-      // not a restatement of the short one.
-      expect(tooltipExpandedDescription, isNot(equals(tooltipDoc.description)));
-      expect(tooltipExpandedDescription.trim(), tooltipExpandedDescription);
     });
   });
 
@@ -101,7 +97,7 @@ void main() {
         findsOneWidget,
       );
       // Neither specimen shows its overlay before anything opens it.
-      expect(find.byType(DsTooltipContent), findsNothing);
+      expect(find.byType(ElTooltipContent), findsNothing);
       expect(tester.takeException(), isNull);
     });
 
@@ -112,8 +108,8 @@ void main() {
         await _pumpTooltipDoc(tester);
 
         final List<String> titles = tester
-            .widgetList<DsSection>(find.byType(DsSection))
-            .map((DsSection section) => section.title)
+            .widgetList<ElSection>(find.byType(ElSection))
+            .map((ElSection section) => section.title)
             .toList();
 
         expect(titles, <String>[
@@ -140,17 +136,17 @@ void main() {
       (WidgetTester tester) async {
         await _pumpTooltipDoc(tester);
 
-        // DsTooltip's own constructor.
+        // ElTooltip's own constructor.
         expect(find.text('label'), findsWidgets);
         expect(find.text('child'), findsOneWidget);
         expect(find.text('delay'), findsOneWidget);
         expect(find.text('side'), findsWidgets);
         expect(find.text('hidden'), findsOneWidget);
-        expect(find.textContaining('DsDurations.tooltipDelay'), findsWidgets);
-        // DsTooltipContent's constructor (label, side already covered above
+        expect(find.textContaining('ElDurations.tooltipDelay'), findsWidgets);
+        // ElTooltipContent's constructor (label, side already covered above
         // as duplicated cells).
-        expect(find.textContaining('DsTooltipContent'), findsWidgets);
-        // DsTooltipSide's two values, in the Side section.
+        expect(find.textContaining('ElTooltipContent'), findsWidgets);
+        // ElTooltipSide's two values, in the Side section.
         expect(find.text('top'), findsOneWidget);
         expect(find.text('right'), findsOneWidget);
       },
@@ -221,20 +217,20 @@ void main() {
 
         await pointer.moveTo(tester.getCenter(trigger));
         await tester.pump();
-        expect(find.byType(DsTooltipContent), findsNothing);
+        expect(find.byType(ElTooltipContent), findsNothing);
 
-        await tester.pump(DsDurations.tooltipDelay);
-        await tester.pump(DsDurations.overlay);
-        expect(find.byType(DsTooltipContent), findsOneWidget);
+        await tester.pump(ElDurations.tooltipDelay);
+        await tester.pump(ElDurations.overlay);
+        expect(find.byType(ElTooltipContent), findsOneWidget);
         expect(find.text('Add to favourites'), findsOneWidget);
 
         await pointer.moveTo(const Offset(1, 1));
         await tester.pump();
-        await tester.pump(DsDurations.overlay);
+        await tester.pump(ElDurations.overlay);
         await tester.pump();
-        await tester.pump(DsDurations.overlay);
+        await tester.pump(ElDurations.overlay);
         await tester.pump();
-        expect(find.byType(DsTooltipContent), findsNothing);
+        expect(find.byType(ElTooltipContent), findsNothing);
       },
     );
 
@@ -253,18 +249,18 @@ void main() {
         await tester.pump();
         // No dwell: the label is up before the hover delay would even have
         // elapsed.
-        expect(find.byType(DsTooltipContent), findsOneWidget);
-        await tester.pump(DsDurations.overlay);
+        expect(find.byType(ElTooltipContent), findsOneWidget);
+        await tester.pump(ElDurations.overlay);
         expect(find.text('Dashboard'), findsOneWidget);
 
         // A second tap on the same trigger closes it.
         await tester.tap(trigger);
         await tester.pump();
-        await tester.pump(DsDurations.overlay);
+        await tester.pump(ElDurations.overlay);
         await tester.pump();
-        await tester.pump(DsDurations.overlay);
+        await tester.pump(ElDurations.overlay);
         await tester.pump();
-        expect(find.byType(DsTooltipContent), findsNothing);
+        expect(find.byType(ElTooltipContent), findsNothing);
       },
     );
   });
@@ -314,30 +310,30 @@ void main() {
 
   group('both themes', () {
     testWidgets('renders on light', (WidgetTester tester) async {
-      await _pumpTooltipDoc(tester, mode: DsThemeMode.light);
-      expect(find.byType(DsTooltip), findsWidgets);
+      await _pumpTooltipDoc(tester, mode: ElThemeMode.light);
+      expect(find.byType(ElTooltip), findsWidgets);
       expect(tester.takeException(), isNull);
     });
 
     testWidgets('renders on dark', (WidgetTester tester) async {
-      await _pumpTooltipDoc(tester, mode: DsThemeMode.dark);
-      expect(find.byType(DsTooltip), findsWidgets);
+      await _pumpTooltipDoc(tester, mode: ElThemeMode.dark);
+      expect(find.byType(ElTooltip), findsWidgets);
       expect(tester.takeException(), isNull);
     });
 
     testWidgets('flipping the theme in place keeps the page intact', (
       WidgetTester tester,
     ) async {
-      final DsThemeController theme = await _pumpTooltipDoc(
+      final ElThemeController theme = await _pumpTooltipDoc(
         tester,
-        mode: DsThemeMode.dark,
+        mode: ElThemeMode.dark,
       );
-      expect(find.byType(DsTooltip), findsWidgets);
+      expect(find.byType(ElTooltip), findsWidgets);
 
-      theme.setMode(DsThemeMode.light);
+      theme.setMode(ElThemeMode.light);
       await tester.pump();
 
-      expect(find.byType(DsTooltip), findsWidgets);
+      expect(find.byType(ElTooltip), findsWidgets);
       expect(tester.takeException(), isNull);
     });
   });

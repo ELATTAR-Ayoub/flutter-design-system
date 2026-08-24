@@ -1,0 +1,26 @@
+{
+  "name": "separator",
+  "type": "component",
+  "version": "0.0.1",
+  "description": "`components/ui/separator.tsx` — a hairline, and nothing else.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/separator.dart",
+      "target": "@ui/separator.dart",
+      "sha256": "9ed933c6b9cb791fc5bc686d2eae2d839d077c37f81d251c984dcf4a9aca6996"
+    }
+  ],
+  "registryDependencies": [
+    "source-foundation"
+  ],
+  "semanticDependencies": [],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "documentationRoute": "/components/separator",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/separator.dart",
+  "deprecated": false
+}

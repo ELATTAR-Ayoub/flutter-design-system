@@ -223,6 +223,9 @@ class RegistryGenerator {
   }
 
   void _writePayloads(RegistryDocument document) {
+    if (_output.existsSync()) {
+      _output.deleteSync(recursive: true);
+    }
     _output.createSync(recursive: true);
     for (final RegistryItem item in document.items) {
       final Directory itemOutput = Directory(

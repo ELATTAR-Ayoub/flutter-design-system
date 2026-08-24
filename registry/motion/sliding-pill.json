@@ -1,0 +1,28 @@
+{
+  "name": "sliding-pill",
+  "type": "motion",
+  "version": "0.0.1",
+  "description": "The travelling selection pill — `components/ui/sliding-indicator.tsx` plus",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/motion/sliding_pill.dart",
+      "target": "@motion/sliding_pill.dart",
+      "sha256": "1d4abd31b06947d7bc940d86f087c5e78edc03fa6764926a9ce41f43d2eedb58"
+    }
+  ],
+  "registryDependencies": [
+    "keyframes",
+    "source-foundation"
+  ],
+  "semanticDependencies": [
+    "keyframes"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "documentationRoute": "/docs/motion/sliding-pill",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/motion/sliding_pill.dart"
+}

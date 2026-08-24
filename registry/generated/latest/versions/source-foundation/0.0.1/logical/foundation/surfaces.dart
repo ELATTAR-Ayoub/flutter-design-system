@@ -2,8 +2,8 @@
 library;
 
 /// Fill opacity by semantic surface role.
-class DsSurfaceOpacity {
-  const DsSurfaceOpacity._();
+class ElSurfaceOpacity {
+  const ElSurfaceOpacity._();
 
   /// Standard card-scale glass material.
   static const double glassPanel = 0.74;

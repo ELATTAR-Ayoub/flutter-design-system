@@ -87,9 +87,6 @@ flutter:
       final File spinnerFile = File(
         '${fixture.path}/lib/components/ui/spinner.dart',
       );
-      final File motionFile = File(
-        '${fixture.path}/lib/design_system/motion/press.dart',
-      );
       final File effectFile = File(
         '${fixture.path}/lib/design_system/effects/machine_surface.dart',
       );
@@ -107,7 +104,6 @@ flutter:
       expect(buttonFile.existsSync(), isTrue);
       expect(iconFile.existsSync(), isTrue);
       expect(spinnerFile.existsSync(), isTrue);
-      expect(motionFile.existsSync(), isTrue);
       expect(effectFile.existsSync(), isTrue);
       expect(foundationFile.existsSync(), isTrue);
       expect(fontFile.existsSync(), isTrue);
@@ -168,7 +164,6 @@ flutter:
           'icon',
           'spinner',
           'source-foundation',
-          'press-motion',
           'machine-surface',
           'foil-value',
           'sheen-action',

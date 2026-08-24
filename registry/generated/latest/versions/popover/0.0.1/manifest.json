@@ -9,13 +9,16 @@
     {
       "source": "lib/src/components/popover.dart",
       "target": "@ui/popover.dart",
-      "sha256": "4d944d325f8fe5b0283b58c47d2918c26f3aaf4909001e5659ab30c70b04cdfe"
+      "sha256": "5872f328851c1a77ed6b8f0fad76e0621b7eacfa3964a3fc3f1f100eced5de8f"
     }
   ],
   "registryDependencies": [
+    "machine-surface",
     "source-foundation"
   ],
-  "semanticDependencies": [],
+  "semanticDependencies": [
+    "machine-surface"
+  ],
   "pubDependencies": {},
   "assets": [],
   "fonts": [],

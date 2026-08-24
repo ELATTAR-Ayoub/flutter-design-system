@@ -36,6 +36,7 @@ class Installer {
     final Set<String> foundationFiles = <String>{};
     final Map<String, String> pubDependencies = <String, String>{};
     final List<String> assets = <String>[];
+    final List<String> shaders = <String>[];
     final List<FontRegistration> fonts = <FontRegistration>[];
     for (final InstallItem item in items) {
       pubDependencies.addAll(item.pubDependencies);
@@ -108,14 +109,19 @@ class Installer {
         );
       }
       for (final InstallResource resource in item.shaders) {
+        final String destination = mapper.destination(
+          projectRoot.path,
+          resource.target,
+        );
         _queueResource(
           operations,
           conflicts,
-          mapper.destination(projectRoot.path, resource.target),
+          destination,
           resource.source,
           repositoryRoot,
           overwrite,
         );
+        shaders.add(_relative(projectRoot.path, destination));
       }
     }
     final String uiBarrel = _barrel(
@@ -146,6 +152,7 @@ class Installer {
     pubspec = pubspecEditor.addDependencies(pubspec, pubDependencies);
     pubspec = pubspecEditor.addAssets(pubspec, assets);
     pubspec = pubspecEditor.addFonts(pubspec, fonts);
+    pubspec = pubspecEditor.addShaders(pubspec, shaders);
     // pubspec.yaml is a structured merge target. Existing content is
     // preserved, so it does not participate in copied-source conflicts.
     if (pubspec != currentPubspec) {

@@ -2,11 +2,11 @@
 /// known set, and every one of them answers a pointer.
 ///
 /// The page four new components and one new primitive were built for, and the
-/// last of the base-component pages the port owed a route. `DsSelect` shipped
+/// last of the base-component pages the port owed a route. `ElSelect` shipped
 /// with `forms` at *"the fidelity the forms page renders"* and deferred its
 /// groups, labels, separators, scroll caps and explicit width to here; the
-/// other six specimens, [DsNativeSelect], [DsCombobox], [DsCommand],
-/// [DsCalendar] twice and [DsDatePicker]: arrive with this page.
+/// other six specimens, [ElNativeSelect], [ElCombobox], [ElCommand],
+/// [ElCalendar] twice and [ElDatePicker]: arrive with this page.
 ///
 /// **The fidelity bar is that all ten specimens are live** (selects-map §11).
 /// A reader can open a grouped menu with two labels and a separator, type into
@@ -29,8 +29,8 @@
 /// ## The clock is load-bearing (ruling L2)
 ///
 /// None of the three calendars is passed `month` or `defaultMonth`, so all
-/// three open on **the reader's current month**, [DsCalendar] reproduces
-/// `getInitialMonth` through [DsClock]. That makes this page's rendered height
+/// three open on **the reader's current month**, [ElCalendar] reproduces
+/// `getInitialMonth` through [ElClock]. That makes this page's rendered height
 /// a function of the wall clock: a four-, five- or six-week month differs by
 /// one 36px row per on-page calendar, ×2 (the third is in a popover and does
 /// not push the document). Every number the page test pins is measured under a
@@ -83,7 +83,7 @@
 /// 10. **`SelectTrigger`'s `w-fit` is dead in both directions on this page.**
 ///     In the Panel it loses to the vertical field's `*:w-full`; in the three
 ///     state cells it loses to `w-40` through twMerge. It never once applies —
-///     which is why every [DsSelect] below passes `expand` or `width`.
+///     which is why every [ElSelect] below passes `expand` or `width`.
 /// 11. **Tailwind's stock `shadow-md` is now on three overlays**: fixed
 ///     black, no theme response, under three surfaces whose fill flips.
 /// 12. **`Command`'s `bg-popover` is discarded by the call site; its
@@ -92,7 +92,7 @@
 ///     both themes)*: twMerge keeps `rounded-xl!` under its own group key and
 ///     `!important` then wins the cascade over the later `rounded-lg`. Half
 ///     the drift stands (the fill really is `--card`), half was wrong, and the
-///     port ships [DsRadii.xl].
+///     port ships [ElRadii.xl].
 /// 13. **The palette's check indicator is `display:none` on every row.** It is
 ///     hidden whenever a row carries a shortcut, and all four do. The
 ///     component ships a selection affordance the page can never show.
@@ -109,14 +109,14 @@
 ///     from this page: nothing validates.
 /// 18. **The "Disabled" state cell ships an empty `<SelectContent />`**: a
 ///     menu with no rows behind a trigger that cannot open it (ruling L5:
-///     nothing-opens is the parity, and [DsSelect] already renders nothing).
+///     nothing-opens is the parity, and [ElSelect] already renders nothing).
 /// 19. **`Select` is no longer the only control with `dark:` variants** —
 ///     `NativeSelect` carries the same four.
 /// 20. **The date-picker trigger is the one Button on the page that does not
 ///     scale on press.** `PopoverTrigger` stamps `aria-haspopup="dialog"`,
 ///     which cancels `active:not-aria-[haspopup]:scale-95`. Its disabled twin
 ///     beside it: same variant, same classes, no popover: would squish if it
-///     were not disabled. Assertable as [DsDatePicker.pressScaleSuppressed].
+///     were not disabled. Assertable as [ElDatePicker.pressScaleSuppressed].
 /// 21. **`Combobox` is the corpus's only `@base-ui/react` component**: a
 ///     second state vocabulary, a second positioner variable set and a second
 ///     filter philosophy, in one section.
@@ -182,8 +182,8 @@ const double _measureSm = 384;
 const double _measureXs = 320;
 
 /// `w-40` on the three state-cell triggers: the third width case, and the one
-/// [DsSelect.expand] could not spell.
-final double _triggerWidth = ds(40);
+/// [ElSelect.expand] could not spell.
+final double _triggerWidth = el(40);
 
 /// `useState(new Date(2026, 6, 30))`, §5's `selected` and §7's `picked`.
 ///
@@ -192,8 +192,8 @@ final double _triggerWidth = ds(40);
 DateTime get _seedDay => DateTime(2026, 7, 30);
 
 /// `useState({from: new Date(2026, 6, 12), to: new Date(2026, 6, 20)})`, §6.
-DsDateRange get _seedRange =>
-    DsDateRange(from: DateTime(2026, 7, 12), to: DateTime(2026, 7, 20));
+ElDateRange get _seedRange =>
+    ElDateRange(from: DateTime(2026, 7, 12), to: DateTime(2026, 7, 20));
 
 /// The disabled twin's frozen value, *"Locked to the tax year"*, and the
 /// start of the UK one.
@@ -216,12 +216,12 @@ class SelectsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsCategoryHit here = findCategory('base', 'selects');
+    final ElCategoryHit here = findCategory('base', 'selects');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        DsPageHeader(
+        ElPageHeader(
           // DRIFT 1.
           eyebrow: '${here.group.title} · Base',
           title: here.category.title,
@@ -231,8 +231,8 @@ class SelectsPage extends StatelessWidget {
         // `className="mb-12"`, 48px, above the first section rather than
         // inside it.
         Padding(
-          padding: EdgeInsets.only(bottom: ds(12)),
-          child: const DsNote(
+          padding: EdgeInsets.only(bottom: el(12)),
+          child: const ElNote(
             title: 'Choosing the right one',
             child: _ChoosingBody(),
           ),
@@ -246,7 +246,7 @@ class SelectsPage extends StatelessWidget {
         const _DatePickerSection(),
         const _ApiSection(),
         const _RulesSection(),
-        const DsPageFootNav(groupId: 'base', slug: 'selects'),
+        const ElPageFootNav(groupId: 'base', slug: 'selects'),
       ],
     );
   }
@@ -267,12 +267,12 @@ class _Measure extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Align(
-        alignment: AlignmentDirectional.centerStart,
-        child: ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: width),
-          child: child,
-        ),
-      );
+    alignment: AlignmentDirectional.centerStart,
+    child: ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: width),
+      child: child,
+    ),
+  );
 }
 
 /// The opening `Note`'s four `<Code>` chips.
@@ -281,30 +281,33 @@ class _ChoosingBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsRichText(
+    return ElRichText(
       TextSpan(
         children: <InlineSpan>[
           const TextSpan(text: 'Under about eight fixed options, use '),
-          DsCode.span('Select'),
+          ElCode.span('Select'),
           const TextSpan(
-            text: '. Over that, or when the user knows what they are looking '
+            text:
+                '. Over that, or when the user knows what they are looking '
                 'for, use ',
           ),
-          DsCode.span('Combobox'),
+          ElCode.span('Combobox'),
           const TextSpan(
-            text: ' so they can type. For cross-product navigation and '
+            text:
+                ' so they can type. For cross-product navigation and '
                 'actions, use the ',
           ),
-          DsCode.span('Command'),
+          ElCode.span('Command'),
           const TextSpan(text: ' palette. '),
-          DsCode.span('NativeSelect'),
+          ElCode.span('NativeSelect'),
           const TextSpan(
-            text: ' exists for long, boring lists like country — the OS picker '
+            text:
+                ' exists for long, boring lists like country — the OS picker '
                 'beats anything custom on mobile.',
           ),
         ],
       ),
-      DsType.small,
+      ElType.small,
     );
   }
 }
@@ -335,25 +338,25 @@ class _SelectSectionState extends State<_SelectSection> {
   /// The grouped menu, in DOM order: label, three rows, separator, label, two
   /// rows. The heterogeneous list `_placement()` was rewritten for: the
   /// chosen row sits 40px into the content, not `8 + 0.5 × 34.571`.
-  static const List<DsSelectChild<String>> _sortOptions =
-      <DsSelectChild<String>>[
-    DsSelectGroup<String>(
-      label: 'Activity',
-      children: <DsSelectOption<String>>[
-        DsSelectOption<String>(value: 'popular', label: 'Most popular'),
-        DsSelectOption<String>(value: 'newest', label: 'Newest'),
-        DsSelectOption<String>(value: 'volatility', label: 'Volatility'),
-      ],
-    ),
-    DsSelectSeparator(),
-    DsSelectGroup<String>(
-      label: 'Price',
-      children: <DsSelectOption<String>>[
-        DsSelectOption<String>(value: 'low', label: 'Price: low to high'),
-        DsSelectOption<String>(value: 'high', label: 'Price: high to low'),
-      ],
-    ),
-  ];
+  static const List<ElSelectChild<String>> _sortOptions =
+      <ElSelectChild<String>>[
+        ElSelectGroup<String>(
+          label: 'Activity',
+          children: <ElSelectOption<String>>[
+            ElSelectOption<String>(value: 'popular', label: 'Most popular'),
+            ElSelectOption<String>(value: 'newest', label: 'Newest'),
+            ElSelectOption<String>(value: 'volatility', label: 'Volatility'),
+          ],
+        ),
+        ElSelectSeparator(),
+        ElSelectGroup<String>(
+          label: 'Price',
+          children: <ElSelectOption<String>>[
+            ElSelectOption<String>(value: 'low', label: 'Price: low to high'),
+            ElSelectOption<String>(value: 'high', label: 'Price: high to low'),
+          ],
+        ),
+      ];
 
   /// `[…].map((r) => <SelectItem value={r.toLowerCase()}>)`: six flat rows,
   /// the labels cased and the values not.
@@ -368,26 +371,28 @@ class _SelectSectionState extends State<_SelectSection> {
 
   @override
   Widget build(BuildContext context) {
-    return DsSection(
+    return ElSection(
       id: 'select',
       title: 'Select',
-      description: 'A fixed set of options with one selected. The trigger '
+      description:
+          'A fixed set of options with one selected. The trigger '
           'shows the current value, never a placeholder pretending to be a '
           'label.',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          DsPanel(
+          ElPanel(
             label: 'Sort and filter selects',
             child: _Measure(
               width: _measureSm,
-              child: DsFieldGroup(
+              child: ElFieldGroup(
                 children: <Widget>[
-                  DsField(
+                  ElField(
                     label: 'Sort by',
-                    description: 'Grouped with labels so long option lists '
+                    description:
+                        'Grouped with labels so long option lists '
                         'stay scannable.',
-                    child: DsSelect<String>(
+                    child: ElSelect<String>(
                       options: _sortOptions,
                       value: _sort,
                       onChanged: (String next) => setState(() => _sort = next),
@@ -396,12 +401,12 @@ class _SelectSectionState extends State<_SelectSection> {
                       expand: true,
                     ),
                   ),
-                  DsField(
+                  ElField(
                     label: 'Minimum rarity',
-                    child: DsSelect<String>(
-                      options: <DsSelectOption<String>>[
+                    child: ElSelect<String>(
+                      options: <ElSelectOption<String>>[
                         for (final String rarity in _rarities)
-                          DsSelectOption<String>(
+                          ElSelectOption<String>(
                             value: rarity.toLowerCase(),
                             label: rarity,
                           ),
@@ -418,15 +423,15 @@ class _SelectSectionState extends State<_SelectSection> {
             ),
           ),
           // `StateGrid className="mt-4"`.
-          SizedBox(height: ds(4)),
-          DsStateGrid(
+          SizedBox(height: el(4)),
+          ElStateGrid(
             cols: 3,
             children: <Widget>[
-              DsStateCell(
+              ElStateCell(
                 label: 'Default',
-                child: DsSelect<String>(
-                  options: const <DsSelectOption<String>>[
-                    DsSelectOption<String>(value: 'a', label: 'Common'),
+                child: ElSelect<String>(
+                  options: const <ElSelectOption<String>>[
+                    ElSelectOption<String>(value: 'a', label: 'Common'),
                   ],
                   value: _cellDefault,
                   onChanged: (String next) =>
@@ -440,11 +445,11 @@ class _SelectSectionState extends State<_SelectSection> {
                   label: 'Default',
                 ),
               ),
-              DsStateCell(
+              ElStateCell(
                 label: 'Selected',
-                child: DsSelect<String>(
-                  options: const <DsSelectOption<String>>[
-                    DsSelectOption<String>(value: 'a', label: 'Legendary'),
+                child: ElSelect<String>(
+                  options: const <ElSelectOption<String>>[
+                    ElSelectOption<String>(value: 'a', label: 'Legendary'),
                   ],
                   value: _cellSelected,
                   onChanged: (String next) =>
@@ -453,14 +458,14 @@ class _SelectSectionState extends State<_SelectSection> {
                   label: 'Selected',
                 ),
               ),
-              DsStateCell(
+              ElStateCell(
                 label: 'Disabled',
                 // DRIFT 18. `<Select disabled>` over an empty
                 // `<SelectContent />`: the trigger cannot open, and there
                 // would be nothing behind it if it could. Both halves are
                 // written, as the reference writes both.
-                child: DsSelect<String>(
-                  options: const <DsSelectChild<String>>[],
+                child: ElSelect<String>(
+                  options: const <ElSelectChild<String>>[],
                   value: null,
                   onChanged: null,
                   enabled: false,
@@ -490,30 +495,31 @@ class _NativeSectionState extends State<_NativeSection> {
   /// `defaultValue="us"`.
   String _country = 'us';
 
-  static const List<DsSelectOption<String>> _countries =
-      <DsSelectOption<String>>[
-    DsSelectOption<String>(value: 'us', label: 'United States'),
-    DsSelectOption<String>(value: 'gb', label: 'United Kingdom'),
-    DsSelectOption<String>(value: 'ca', label: 'Canada'),
-    DsSelectOption<String>(value: 'de', label: 'Germany'),
-    DsSelectOption<String>(value: 'jp', label: 'Japan'),
-  ];
+  static const List<ElSelectOption<String>> _countries =
+      <ElSelectOption<String>>[
+        ElSelectOption<String>(value: 'us', label: 'United States'),
+        ElSelectOption<String>(value: 'gb', label: 'United Kingdom'),
+        ElSelectOption<String>(value: 'ca', label: 'Canada'),
+        ElSelectOption<String>(value: 'de', label: 'Germany'),
+        ElSelectOption<String>(value: 'jp', label: 'Japan'),
+      ];
 
   @override
   Widget build(BuildContext context) {
-    return DsSection(
+    return ElSection(
       id: 'native',
       title: 'Native Select',
-      description: "Renders the operating system's own picker. Correct for "
+      description:
+          "Renders the operating system's own picker. Correct for "
           'country, region, timezone and other long, uninteresting lists — '
           'especially on mobile.',
-      child: DsPanel(
+      child: ElPanel(
         label: 'Native select',
         child: _Measure(
           width: _measureSm,
-          child: DsFieldGroup(
+          child: ElFieldGroup(
             children: <Widget>[
-              DsField(
+              ElField(
                 label: 'Country',
                 description: 'Used in shipping and account settings.',
                 // DRIFT 8. 32px, 12px radius, transparent, no socket: beside
@@ -521,7 +527,7 @@ class _NativeSectionState extends State<_NativeSection> {
                 // the OS list (ruling L6, the first by-construction
                 // divergence); the *specimen* is the closed control, and that
                 // is reproduced to the pixel.
-                child: DsNativeSelect<String>(
+                child: ElNativeSelect<String>(
                   options: _countries,
                   value: _country,
                   onChanged: (String next) => setState(() => _country = next),
@@ -553,22 +559,23 @@ class _ComboboxSectionState extends State<_ComboboxSection> {
 
   @override
   Widget build(BuildContext context) {
-    return DsSection(
+    return ElSection(
       id: 'combobox',
       title: 'Combobox',
-      description: 'A select the user can type into. Used for card sets, pack '
+      description:
+          'A select the user can type into. Used for card sets, pack '
           'names and any list long enough that scrolling is worse than typing.',
-      child: DsPanel(
+      child: ElPanel(
         label: 'Filter by card set',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             _Measure(
               width: _measureSm,
-              child: DsCombobox<String>(
-                items: <DsComboboxItem<String>>[
+              child: ElCombobox<String>(
+                items: <ElComboboxItem<String>>[
                   for (final String set in _sets)
-                    DsComboboxItem<String>(value: set, label: set),
+                    ElComboboxItem<String>(value: set, label: set),
                 ],
                 value: _set,
                 onChanged: (String next) => setState(() => _set = next),
@@ -578,11 +585,11 @@ class _ComboboxSectionState extends State<_ComboboxSection> {
             ),
             // `<p className="type-small mt-5">`: a bare paragraph, not a
             // `Note`, and the only caption on the page.
-            SizedBox(height: ds(5)),
-            DsText(
+            SizedBox(height: el(5)),
+            ElText(
               'Typing narrows the list. The empty state says what happened '
               'rather than showing a blank panel.',
-              DsType.small,
+              ElType.small,
             ),
           ],
         ),
@@ -601,51 +608,52 @@ class _CommandSection extends StatelessWidget {
   /// The separator is a property of the group it precedes rather than a list
   /// entry of its own, so the arrangement cannot drift from the groups it
   /// separates.
-  static const List<DsCommandGroup> _groups = <DsCommandGroup>[
-    DsCommandGroup(
+  static const List<ElCommandGroup> _groups = <ElCommandGroup>[
+    ElCommandGroup(
       heading: 'Packs',
-      items: <DsCommandItem>[
+      items: <ElCommandItem>[
         // DRIFT 4: the prices ride `CommandShortcut`, which is 12px sans at
         // 0.1em: not the numerical foundation Do 5 asks for.
-        DsCommandItem(
+        ElCommandItem(
           label: 'Eclipse Vault',
-          icon: DsIconGlyph.search,
+          icon: ElIconGlyph.search,
           shortcut: r'$48.00',
         ),
-        DsCommandItem(
+        ElCommandItem(
           label: 'Golden Rift',
-          icon: DsIconGlyph.search,
+          icon: ElIconGlyph.search,
           shortcut: r'$120.00',
         ),
       ],
     ),
-    DsCommandGroup(
+    ElCommandGroup(
       heading: 'Actions',
       separatorBefore: true,
-      items: <DsCommandItem>[
+      items: <ElCommandItem>[
         // DRIFT 14: two platform idioms on one specimen, U+2318 here, and
         // "Ctrl + K" in the Panel's own header strip.
-        DsCommandItem(label: 'Open Wallet', shortcut: '⌘W'),
-        DsCommandItem(label: 'Go to Stash', shortcut: '⌘S'),
+        ElCommandItem(label: 'Open Wallet', shortcut: '⌘W'),
+        ElCommandItem(label: 'Go to Stash', shortcut: '⌘S'),
       ],
     ),
   ];
 
   @override
   Widget build(BuildContext context) {
-    return DsSection(
+    return ElSection(
       id: 'command',
       title: 'Command palette',
-      description: 'Keyboard-first navigation across the whole product. '
+      description:
+          'Keyboard-first navigation across the whole product. '
           'Opened with Ctrl+K from anywhere, and the fastest route for a '
           'returning collector.',
       // DRIFT 3. The note advertises a binding that does not exist: no
       // keydown listener anywhere on the page opens this palette, which is
       // always open in the first place.
-      child: const DsPanel(
+      child: const ElPanel(
         label: 'Command palette',
         note: 'Ctrl + K',
-        child: DsCommand(
+        child: ElCommand(
           groups: _groups,
           placeholder: 'Search packs, cards and actions…',
           emptyLabel: 'Nothing matches that.',
@@ -669,13 +677,14 @@ class _CalendarSectionState extends State<_CalendarSection> {
 
   @override
   Widget build(BuildContext context) {
-    return DsSection(
+    return ElSection(
       id: 'calendar',
       title: 'Calendar',
-      description: 'Used for filtering the Stash by date acquired, and '
+      description:
+          'Used for filtering the Stash by date acquired, and '
           'transaction history in the Wallet. Never for anything the user has '
           'to type.',
-      child: DsPanel(
+      child: ElPanel(
         label: 'Single',
         // `root` is `w-fit` and here that is real: the calendar is 222px wide
         // and the panel body is 1030. Aligned, never stretched: a calendar
@@ -685,7 +694,7 @@ class _CalendarSectionState extends State<_CalendarSection> {
           // No `month` and no `defaultMonth`, exactly as the reference passes
           // none: the grid opens on the clock's current month and the seeded
           // 30 July lands wherever that month puts it (drift 2).
-          child: DsCalendar.single(
+          child: ElCalendar.single(
             selected: _date,
             onSelected: (DateTime? next) => setState(() => _date = next),
           ),
@@ -705,7 +714,7 @@ class _DateRangeSection extends StatefulWidget {
 }
 
 class _DateRangeSectionState extends State<_DateRangeSection> {
-  DsDateRange? _range = _seedRange;
+  ElDateRange? _range = _seedRange;
 
   /// `rangeLabel` (page:82–85): the Panel's own `note`, derived from the live
   /// range.
@@ -714,39 +723,40 @@ class _DateRangeSectionState extends State<_DateRangeSection> {
   /// the Panel header: the only place on the page where a specimen writes into
   /// its own chrome, and a fidelity requirement rather than decoration.
   String get _rangeLabel {
-    final DsDateRange? range = _range;
+    final ElDateRange? range = _range;
     return range != null && range.isComplete
-        ? '${DsDateFormat.dayMonth(range.from!)} – '
-            '${DsDateFormat.dayMonth(range.to!)}'
+        ? '${ElDateFormat.dayMonth(range.from!)} – '
+              '${ElDateFormat.dayMonth(range.to!)}'
         : 'Pick two dates';
   }
 
   @override
   Widget build(BuildContext context) {
-    return DsSection(
+    return ElSection(
       id: 'date-range',
       title: 'Date Range',
       // The apostrophe in "Wallet's" is **straight**; the quotes around
       // "between these dates" are curly U+201C/U+201D. Both as authored.
-      description: 'The same Calendar in range mode: a start, an end, and '
+      description:
+          'The same Calendar in range mode: a start, an end, and '
           "every day between them marked. Used for the Wallet's "
           'statement period and any “between these dates” filter.',
-      child: DsGrid(
+      child: ElGrid(
         lg: 2,
         children: <Widget>[
-          DsPanel(
+          ElPanel(
             label: 'Range',
             note: _rangeLabel,
             child: Align(
               alignment: AlignmentDirectional.centerStart,
-              child: DsCalendar.range(
+              child: ElCalendar.range(
                 selected: _range,
-                onSelected: (DsDateRange? next) =>
+                onSelected: (ElDateRange? next) =>
                     setState(() => _range = next),
               ),
             ),
           ),
-          const DsNote(
+          const ElNote(
             title: 'This section existed only as a promise',
             child: _PromiseBody(),
           ),
@@ -762,31 +772,33 @@ class _PromiseBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsRichText(
+    return ElRichText(
       TextSpan(
         children: <InlineSpan>[
-          DsCode.span('nav.ts'),
+          ElCode.span('nav.ts'),
           const TextSpan(
-            text: ' has listed “Date Range” since the tree was '
+            text:
+                ' has listed “Date Range” since the tree was '
                 'written, and the section above it was titled “Calendar '
                 'and date range” — but no calendar anywhere in the repo '
                 'was ever rendered in ',
           ),
-          DsCode.span('mode="range"'),
+          ElCode.span('mode="range"'),
           const TextSpan(text: '. Nothing catches that: '),
-          DsCode.span('check:refs'),
+          ElCode.span('check:refs'),
           const TextSpan(text: ' reads CSS references, not the nav, and a '),
-          DsCode.span('contents'),
+          ElCode.span('contents'),
           const TextSpan(
-            text: ' entry with no section is invisible to every guard here. '
+            text:
+                ' entry with no section is invisible to every guard here. '
                 'The same bug removed “Chart” from Data Display. '
                 'Adding a string to ',
           ),
-          DsCode.span('contents'),
+          ElCode.span('contents'),
           const TextSpan(text: ' is a commitment, not a label.'),
         ],
       ),
-      DsType.small,
+      ElType.small,
     );
   }
 }
@@ -817,34 +829,35 @@ class _DatePickerSectionState extends State<_DatePickerSection> {
   Widget build(BuildContext context) {
     final bool picked = _picked != null;
 
-    return DsSection(
+    return ElSection(
       id: 'date-picker',
       title: 'Date Picker',
-      description: 'A Calendar inside a Popover, behind a trigger that shows '
+      description:
+          'A Calendar inside a Popover, behind a trigger that shows '
           'the current value. The most common date control there is, and the '
           'one shadcn documents as a recipe rather than a file.',
-      child: DsGrid(
+      child: ElGrid(
         lg: 2,
         children: <Widget>[
-          DsPanel(
+          ElPanel(
             label: 'Every state',
             child: _Measure(
               width: _measureXs,
-              child: DsFieldGroup(
+              child: ElFieldGroup(
                 children: <Widget>[
-                  DsField(
+                  ElField(
                     label: 'Acquired after',
                     // The description is live too, and says which face the
                     // trigger is currently wearing.
                     description: picked
                         ? 'Selected. Dates use the shared numerical mono '
-                            'foundation.'
+                              'foundation.'
                         : 'Empty. The placeholder sits in the sans face — it '
-                            'is a word, not a value.',
+                              'is a word, not a value.',
                     focusNode: _pickerFocus,
                     // DRIFT 20: the one Button on the page that does not
                     // squish on press.
-                    child: DsDatePicker(
+                    child: ElDatePicker(
                       value: _picked,
                       onChanged: (DateTime? next) =>
                           setState(() => _picked = next),
@@ -861,9 +874,9 @@ class _DatePickerSectionState extends State<_DatePickerSection> {
                   if (picked)
                     Align(
                       alignment: AlignmentDirectional.centerStart,
-                      child: DsButton(
-                        variant: DsButtonVariant.ghost,
-                        size: DsButtonSize.sm,
+                      child: ElButton(
+                        variant: ElButtonVariant.ghost,
+                        size: ElButtonSize.sm,
                         onPressed: () => setState(() => _picked = null),
                         child: const Text('Clear date'),
                       ),
@@ -871,14 +884,15 @@ class _DatePickerSectionState extends State<_DatePickerSection> {
                   // `<Field data-disabled>`, DRIFT 16. The field dims the
                   // label to 0.50, the disabled trigger dims itself to 0.45,
                   // and the description is dimmed by neither.
-                  DsField(
+                  ElField(
                     label: 'Locked to the tax year',
-                    description: 'Disabled. The control is exempt from '
+                    description:
+                        'Disabled. The control is exempt from '
                         'contrast, the description beside it is not.',
                     enabled: false,
                     // No handler at all: the twin is a plain disabled Button
                     // with a mono date inside it, and no popover behind it.
-                    child: DsDatePicker(value: _taxYearStart),
+                    child: ElDatePicker(value: _taxYearStart),
                   ),
                 ],
               ),
@@ -888,39 +902,43 @@ class _DatePickerSectionState extends State<_DatePickerSection> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              const DsNote(
-                tone: DsNoteTone.error,
+              const ElNote(
+                tone: ElNoteTone.error,
                 title: 'Never format a date with toISOString()',
                 child: _ToIsoBody(),
               ),
-              SizedBox(height: ds(4)),
-              DsMeta(
-                items: <DsMetaItem>[
+              SizedBox(height: el(4)),
+              ElMeta(
+                items: <ElMetaItem>[
                   (
                     k: 'format(d, "d MMM yyyy")',
                     v: const TextSpan(
-                      text: 'Local date, no timezone conversion. date-fns is '
+                      text:
+                          'Local date, no timezone conversion. date-fns is '
                           'already a dependency — react-day-picker brings it.',
                     ),
                   ),
                   (
                     k: 'autoFocus',
                     v: const TextSpan(
-                      text: 'On the Calendar inside the popover, so the '
+                      text:
+                          'On the Calendar inside the popover, so the '
                           'keyboard lands on the grid rather than behind it.',
                     ),
                   ),
                   (
                     k: 'The trigger is a Button',
                     v: const TextSpan(
-                      text: 'Not an Input. There is nothing to type, so '
+                      text:
+                          'Not an Input. There is nothing to type, so '
                           'nothing should look typeable.',
                     ),
                   ),
                   (
                     k: 'Clearing',
                     v: const TextSpan(
-                      text: 'A date picker with no way back to empty is a '
+                      text:
+                          'A date picker with no way back to empty is a '
                           'trap. Offer it whenever the field is optional.',
                     ),
                   ),
@@ -941,27 +959,29 @@ class _ToIsoBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsRichText(
+    return ElRichText(
       TextSpan(
         children: <InlineSpan>[
-          DsCode.span('toISOString()'),
+          ElCode.span('toISOString()'),
           const TextSpan(
-            text: ' converts to UTC first. Pick the 30th anywhere west of '
+            text:
+                ' converts to UTC first. Pick the 30th anywhere west of '
                 'Greenwich and ',
           ),
-          DsCode.span('date.toISOString().slice(0, 10)'),
+          ElCode.span('date.toISOString().slice(0, 10)'),
           const TextSpan(
-            text: ' renders the 29th — the calendar shows one day selected and '
+            text:
+                ' renders the 29th — the calendar shows one day selected and '
                 'the trigger shows another. It is invisible in London, wrong '
                 'in New York, and this page shipped it until now. Use ',
           ),
-          DsCode.span('date-fns'),
+          ElCode.span('date-fns'),
           const TextSpan(text: '’ '),
-          DsCode.span('format'),
+          ElCode.span('format'),
           const TextSpan(text: ', which reads the local calendar date.'),
         ],
       ),
-      DsType.small,
+      ElType.small,
     );
   }
 }
@@ -973,43 +993,48 @@ class _ApiSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsSection(
+    return ElSection(
       id: 'api',
       title: 'API',
-      child: DsMeta(
-        items: <DsMetaItem>[
+      child: ElMeta(
+        items: <ElMetaItem>[
           (
             k: 'Select',
             v: const TextSpan(
-              text: 'Select + SelectTrigger + SelectValue + SelectContent + '
+              text:
+                  'Select + SelectTrigger + SelectValue + SelectContent + '
                   'SelectItem. Group with SelectGroup and SelectLabel.',
             ),
           ),
           (
             k: 'NativeSelect',
             v: const TextSpan(
-              text: 'A real <select>. Use NativeSelectOption for options; the '
+              text:
+                  'A real <select>. Use NativeSelectOption for options; the '
                   'OS renders the picker.',
             ),
           ),
           (
             k: 'Combobox',
             v: const TextSpan(
-              text: 'Pass items, then render each with a function child inside '
+              text:
+                  'Pass items, then render each with a function child inside '
                   'ComboboxList. ComboboxEmpty covers no-results.',
             ),
           ),
           (
             k: 'Command',
             v: const TextSpan(
-              text: 'Command + CommandInput + CommandList + CommandGroup + '
+              text:
+                  'Command + CommandInput + CommandList + CommandGroup + '
                   'CommandItem. CommandShortcut right-aligns metadata.',
             ),
           ),
           (
             k: 'Calendar',
             v: const TextSpan(
-              text: 'mode="single" | "range" | "multiple". Pair with Popover '
+              text:
+                  'mode="single" | "range" | "multiple". Pair with Popover '
                   'for a date picker.',
             ),
           ),
@@ -1026,12 +1051,12 @@ class _RulesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const DsSection(
+    return const ElSection(
       id: 'rules',
       title: 'Rules',
       // Five dos against four don'ts: unequal columns, as `selection` has
       // them too.
-      child: DsDoDont(
+      child: ElDoDont(
         dos: <String>[
           'Use Select under about eight options, Combobox above it.',
           'Group long option lists with labels so they stay scannable.',

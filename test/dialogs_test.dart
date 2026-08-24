@@ -74,10 +74,10 @@ Future<void> _loadFont(String family, String file) async {
   await loader.load();
 }
 
-/// A host with a real [Overlay] under a [DsTheme], which is all any of these
+/// A host with a real [Overlay] under a [ElTheme], which is all any of these
 /// widgets needs.
-Widget _host(Widget child, {DsThemeMode mode = DsThemeMode.light}) => DsTheme(
-  controller: DsThemeController(mode: mode),
+Widget _host(Widget child, {ElThemeMode mode = ElThemeMode.light}) => ElTheme(
+  controller: ElThemeController(mode: mode),
   child: MaterialApp(
     debugShowCheckedModeBanner: false,
     home: Scaffold(body: Center(child: child)),
@@ -85,29 +85,29 @@ Widget _host(Widget child, {DsThemeMode mode = DsThemeMode.light}) => DsTheme(
 );
 
 Widget _dialog({
-  DsDialogVariant variant = DsDialogVariant.normal,
+  ElDialogVariant variant = ElDialogVariant.normal,
   bool showCloseButton = true,
   double body = 100,
-}) => DsDialog(
+}) => ElDialog(
   trigger: (BuildContext context, VoidCallback open) =>
-      DsButton(onPressed: open, child: const Text('open')),
-  content: (BuildContext context, VoidCallback close) => DsDialogContent(
+      ElButton(onPressed: open, child: const Text('open')),
+  content: (BuildContext context, VoidCallback close) => ElDialogContent(
     variant: variant,
     showCloseButton: showCloseButton,
     onClose: close,
     children: <Widget>[
-      const DsDialogHeader(
+      const ElDialogHeader(
         children: <Widget>[
-          DsDialogTitle('Title'),
-          DsDialogDescription('Description'),
+          ElDialogTitle('Title'),
+          ElDialogDescription('Description'),
         ],
       ),
       // 100 is the measured case; a taller one is the shipment form that
       // ran off a phone and is what the compact clamp exists for.
       SizedBox(height: body),
-      DsDialogFooter(
+      ElDialogFooter(
         children: <Widget>[
-          DsButton(onPressed: close, child: const Text('Cancel')),
+          ElButton(onPressed: close, child: const Text('Cancel')),
         ],
       ),
     ],
@@ -116,58 +116,58 @@ Widget _dialog({
 
 /// The alert dialog, with a question long enough to outgrow a phone when the
 /// caller asks for one.
-Widget _alertDialog({String? description}) => DsAlertDialog(
+Widget _alertDialog({String? description}) => ElAlertDialog(
   trigger: (BuildContext context, VoidCallback open) =>
-      DsButton(onPressed: open, child: const Text('open')),
-  content: (BuildContext context, VoidCallback close) => DsAlertDialogContent(
-    header: DsAlertDialogHeader(
-      title: const DsAlertDialogTitle('Sure?'),
-      description: DsAlertDialogDescription(
+      ElButton(onPressed: open, child: const Text('open')),
+  content: (BuildContext context, VoidCallback close) => ElAlertDialogContent(
+    header: ElAlertDialogHeader(
+      title: const ElAlertDialogTitle('Sure?'),
+      description: ElAlertDialogDescription(
         description ?? 'It cannot be undone.',
       ),
     ),
-    footer: DsAlertDialogFooter(
-      cancel: DsAlertDialogCancel(label: 'Keep', onPressed: close),
-      action: DsAlertDialogAction(label: 'Delete', onPressed: close),
+    footer: ElAlertDialogFooter(
+      cancel: ElAlertDialogCancel(label: 'Keep', onPressed: close),
+      action: ElAlertDialogAction(label: 'Delete', onPressed: close),
     ),
   ),
 );
 
 /// The four-sided sheet, at file scope so the mobile group can reach it too.
-Widget _sheet(DsSheetSide side) => DsSheetOverlay(
+Widget _sheet(ElSheetSide side) => ElSheetOverlay(
   side: side,
   trigger: (BuildContext context, VoidCallback open) =>
-      DsButton(onPressed: open, child: const Text('open')),
-  content: (BuildContext context, VoidCallback close) => DsSheetContent(
+      ElButton(onPressed: open, child: const Text('open')),
+  content: (BuildContext context, VoidCallback close) => ElSheetContent(
     side: side,
     onClose: close,
     children: const <Widget>[
-      DsSheetHeader(
+      ElSheetHeader(
         children: <Widget>[
-          DsSheetTitle('Filter packs'),
-          DsSheetDescription('184 packs.'),
+          ElSheetTitle('Filter packs'),
+          ElSheetDescription('184 packs.'),
         ],
       ),
-      DsSheetFooter(children: <Widget>[SizedBox(height: 40)]),
+      ElSheetFooter(children: <Widget>[SizedBox(height: 40)]),
     ],
   ),
 );
 
 /// The bottom drawer, likewise.
-Widget _drawer() => DsDrawer(
+Widget _drawer() => ElDrawer(
   trigger: (BuildContext context, VoidCallback open) =>
-      DsButton(onPressed: open, child: const Text('open')),
-  content: (BuildContext context, VoidCallback close) => DsDrawerContent(
+      ElButton(onPressed: open, child: const Text('open')),
+  content: (BuildContext context, VoidCallback close) => ElDrawerContent(
     children: <Widget>[
-      const DsDrawerHeader(
+      const ElDrawerHeader(
         children: <Widget>[
-          DsDrawerTitle('Voidwing Ascendant'),
-          DsDrawerDescription('Legendary'),
+          ElDrawerTitle('Voidwing Ascendant'),
+          ElDrawerDescription('Legendary'),
         ],
       ),
-      DsDrawerFooter(
+      ElDrawerFooter(
         children: <Widget>[
-          DsButton(onPressed: close, child: const Text('Close')),
+          ElButton(onPressed: close, child: const Text('Close')),
         ],
       ),
     ],
@@ -177,13 +177,13 @@ Widget _drawer() => DsDrawer(
 Future<void> _open(WidgetTester t) async {
   await t.tap(find.text('open'));
   await t.pump();
-  await t.pump(DsDurations.jelly);
+  await t.pump(ElDurations.jelly);
 }
 
 /// Runs the exit and lets the portal's post-completion `setState` land.
 Future<void> _settleExit(WidgetTester t) async {
   await t.pump();
-  await t.pump(DsDurations.overlay);
+  await t.pump(ElDurations.overlay);
   await t.pump();
 }
 
@@ -196,18 +196,18 @@ void main() {
     await _loadFont('Redaction35', 'Redaction35-Italic.ttf');
   });
 
-  group('DsModalPortal', () {
+  group('ElModalPortal', () {
     testWidgets('nothing is mounted until the trigger is pressed', (
       WidgetTester t,
     ) async {
       _useFrame(t);
       await t.pumpWidget(_host(_dialog()));
-      expect(find.byType(DsDialogContent), findsNothing);
-      expect(find.byType(DsDialogOverlay), findsNothing);
+      expect(find.byType(ElDialogContent), findsNothing);
+      expect(find.byType(ElDialogOverlay), findsNothing);
 
       await _open(t);
-      expect(find.byType(DsDialogContent), findsOneWidget);
-      expect(find.byType(DsDialogOverlay), findsOneWidget);
+      expect(find.byType(ElDialogContent), findsOneWidget);
+      expect(find.byType(ElDialogOverlay), findsOneWidget);
     });
 
     testWidgets('a tap on the scrim closes a dialog and Escape does too', (
@@ -218,12 +218,12 @@ void main() {
       await _open(t);
       await t.tapAt(const Offset(10, 10));
       await _settleExit(t);
-      expect(find.byType(DsDialogContent), findsNothing);
+      expect(find.byType(ElDialogContent), findsNothing);
 
       await _open(t);
       await t.sendKeyEvent(LogicalKeyboardKey.escape);
       await _settleExit(t);
-      expect(find.byType(DsDialogContent), findsNothing);
+      expect(find.byType(ElDialogContent), findsNothing);
     });
 
     testWidgets('the alert dialog refuses the scrim and yields to Escape', (
@@ -232,23 +232,23 @@ void main() {
       _useFrame(t);
       await t.pumpWidget(
         _host(
-          DsAlertDialog(
+          ElAlertDialog(
             trigger: (BuildContext context, VoidCallback open) =>
-                DsButton(onPressed: open, child: const Text('open')),
+                ElButton(onPressed: open, child: const Text('open')),
             content: (BuildContext context, VoidCallback close) =>
-                DsAlertDialogContent(
-                  header: const DsAlertDialogHeader(
-                    title: DsAlertDialogTitle('Sure?'),
-                    description: DsAlertDialogDescription(
+                ElAlertDialogContent(
+                  header: const ElAlertDialogHeader(
+                    title: ElAlertDialogTitle('Sure?'),
+                    description: ElAlertDialogDescription(
                       'It cannot be undone.',
                     ),
                   ),
-                  footer: DsAlertDialogFooter(
-                    cancel: DsAlertDialogCancel(
+                  footer: ElAlertDialogFooter(
+                    cancel: ElAlertDialogCancel(
                       label: 'Keep',
                       onPressed: close,
                     ),
-                    action: DsAlertDialogAction(
+                    action: ElAlertDialogAction(
                       label: 'Delete',
                       onPressed: close,
                     ),
@@ -261,7 +261,7 @@ void main() {
       await t.tapAt(const Offset(10, 10));
       await _settleExit(t);
       expect(
-        find.byType(DsAlertDialogContent),
+        find.byType(ElAlertDialogContent),
         findsOneWidget,
         reason: '*"cannot be dismissed by clicking outside"*',
       );
@@ -269,31 +269,31 @@ void main() {
       await t.sendKeyEvent(LogicalKeyboardKey.escape);
       await _settleExit(t);
       expect(
-        find.byType(DsAlertDialogContent),
+        find.byType(ElAlertDialogContent),
         findsNothing,
         reason: 'Radix blocks onPointerDownOutside only — measured',
       );
     });
   });
 
-  group('DsJellyTransition', () {
+  group('ElJellyTransition', () {
     // The keyframes, sampled where CSS declares them. Every number here is the
     // one globals.css writes; the trace confirmed all three stops.
     test('yuki-jelly-in stops at 0 / 60 / 100%', () {
       final ({double scale, double shift, double opacity}) start =
-          DsJellyTransition.sample(0, entering: true);
+          ElJellyTransition.sample(0, entering: true);
       expect(start.scale, closeTo(0.92, 0.001));
       expect(start.shift, closeTo(24, 0.001));
       expect(start.opacity, closeTo(0, 0.001));
 
       final ({double scale, double shift, double opacity}) peak =
-          DsJellyTransition.sample(0.6, entering: true);
+          ElJellyTransition.sample(0.6, entering: true);
       expect(peak.scale, closeTo(1.02, 0.001));
       expect(peak.shift, closeTo(-4, 0.001));
       expect(peak.opacity, closeTo(1, 0.001));
 
       final ({double scale, double shift, double opacity}) end =
-          DsJellyTransition.sample(1, entering: true);
+          ElJellyTransition.sample(1, entering: true);
       expect(end.scale, closeTo(1, 0.001));
       expect(end.shift, closeTo(0, 0.001));
       expect(end.opacity, closeTo(1, 0.001));
@@ -301,11 +301,11 @@ void main() {
 
     test('yuki-jelly-out stops at 0 / 30 / 100%', () {
       expect(
-        DsJellyTransition.sample(0, entering: false).scale,
+        ElJellyTransition.sample(0, entering: false).scale,
         closeTo(1, 0.001),
       );
       final ({double scale, double shift, double opacity}) anticipate =
-          DsJellyTransition.sample(0.3, entering: false);
+          ElJellyTransition.sample(0.3, entering: false);
       expect(anticipate.scale, closeTo(1.01, 0.001));
       expect(
         anticipate.shift,
@@ -315,7 +315,7 @@ void main() {
       expect(anticipate.opacity, closeTo(1, 0.001));
 
       final ({double scale, double shift, double opacity}) gone =
-          DsJellyTransition.sample(1, entering: false);
+          ElJellyTransition.sample(1, entering: false);
       expect(gone.scale, closeTo(0.94, 0.001));
       expect(gone.shift, closeTo(16, 0.001));
       expect(gone.opacity, closeTo(0, 0.001));
@@ -325,7 +325,7 @@ void main() {
       // At the midpoint of the first segment the spring is already past its
       // linear share — 30% of 420ms is 50% of the 0→60% leg, and
       // `--ease-spring` puts it well beyond half the travel.
-      final double half = DsJellyTransition.sample(0.3, entering: true).scale;
+      final double half = ElJellyTransition.sample(0.3, entering: true).scale;
       final double linear = 0.92 + (1.02 - 0.92) * 0.5;
       expect(
         half,
@@ -348,7 +348,7 @@ void main() {
       final List<Transform> stack = t
           .widgetList<Transform>(
             find.descendant(
-              of: find.byType(DsJellyTransition),
+              of: find.byType(ElJellyTransition),
               matching: find.byType(Transform),
             ),
           )
@@ -365,19 +365,19 @@ void main() {
     });
   });
 
-  group('DsDialogContent', () {
+  group('ElDialogContent', () {
     testWidgets('the default is 384 wide and the media variant 448', (
       WidgetTester t,
     ) async {
       _useFrame(t);
       await t.pumpWidget(_host(_dialog()));
       await _open(t);
-      expect(t.getSize(find.byType(DsDialogContent)).width, DsContainers.sm);
+      expect(t.getSize(find.byType(ElDialogContent)).width, ElContainers.sm);
 
       _useFrame(t);
-      await t.pumpWidget(_host(_dialog(variant: DsDialogVariant.media)));
+      await t.pumpWidget(_host(_dialog(variant: ElDialogVariant.media)));
       await _open(t);
-      expect(t.getSize(find.byType(DsDialogContent)).width, DsContainers.md);
+      expect(t.getSize(find.byType(ElDialogContent)).width, ElContainers.md);
     });
 
     testWidgets('the bands bleed and cancel the padding on their own side', (
@@ -386,9 +386,9 @@ void main() {
       _useFrame(t);
       await t.pumpWidget(_host(_dialog()));
       await _open(t);
-      final Rect content = t.getRect(find.byType(DsDialogContent));
-      final Rect header = t.getRect(find.byType(DsDialogHeader));
-      final Rect footer = t.getRect(find.byType(DsDialogFooter));
+      final Rect content = t.getRect(find.byType(ElDialogContent));
+      final Rect header = t.getRect(find.byType(ElDialogHeader));
+      final Rect footer = t.getRect(find.byType(ElDialogFooter));
 
       expect(header.top, closeTo(content.top, 0.01));
       expect(header.left, closeTo(content.left, 0.01));
@@ -403,18 +403,18 @@ void main() {
       await t.pumpWidget(_host(_dialog()));
       await _open(t);
       final Rect withX = t.getRect(find.text('Title'));
-      final Rect header = t.getRect(find.byType(DsDialogHeader));
+      final Rect header = t.getRect(find.byType(ElDialogHeader));
       // `p-4 pr-12` — the title column stops 48px from the band's right edge.
       expect(
         header.right - withX.left - t.getSize(find.text('Title')).width,
-        greaterThan(ds(12) - 1),
+        greaterThan(el(12) - 1),
       );
 
       _useFrame(t);
       await t.pumpWidget(_host(_dialog(showCloseButton: false)));
       await _open(t);
       expect(
-        find.byType(DsIcon),
+        find.byType(ElIcon),
         findsNothing,
         reason: 'no X, and the group-data hook drops the lane with it',
       );
@@ -424,28 +424,28 @@ void main() {
       WidgetTester t,
     ) async {
       _useFrame(t);
-      await t.pumpWidget(_host(_dialog(variant: DsDialogVariant.media)));
+      await t.pumpWidget(_host(_dialog(variant: ElDialogVariant.media)));
       await _open(t);
-      final Rect content = t.getRect(find.byType(DsDialogContent));
-      final Rect header = t.getRect(find.byType(DsDialogHeader));
+      final Rect content = t.getRect(find.byType(ElDialogContent));
+      final Rect header = t.getRect(find.byType(ElDialogHeader));
       // `p-4 pb-2` inside a panel with `p-0`, so the header starts flush.
       expect(header.top, closeTo(content.top, 0.01));
       expect(header.width, closeTo(content.width, 0.01));
     });
   });
 
-  group('DsBadge', () {
+  group('ElBadge', () {
     testWidgets('h-5 is a hard border box whatever the label does', (
       WidgetTester t,
     ) async {
       _useFrame(t);
       await t.pumpWidget(
         _host(
-          const DsBadge(label: 'New release', variant: DsBadgeVariant.action),
+          const ElBadge(label: 'New release', variant: ElBadgeVariant.action),
         ),
       );
-      final Size size = t.getSize(find.byType(DsBadge));
-      expect(size.height, DsBadge.height);
+      final Size size = t.getSize(find.byType(ElBadge));
+      expect(size.height, ElBadge.height);
       // `w-fit` — measured 89.06 for this label at 12px/500; the port is within
       // a pixel of it on the same face.
       expect(size.width, closeTo(89.06, 3));
@@ -454,13 +454,13 @@ void main() {
     testWidgets('the unfilled variants take neither ramp nor shadow', (
       WidgetTester t,
     ) async {
-      for (final DsBadgeVariant v in DsBadgeVariant.values) {
+      for (final ElBadgeVariant v in ElBadgeVariant.values) {
         _useFrame(t);
-        await t.pumpWidget(_host(DsBadge(label: 'x', variant: v)));
+        await t.pumpWidget(_host(ElBadge(label: 'x', variant: v)));
         expect(
           find.descendant(
-            of: find.byType(DsBadge),
-            matching: find.byType(DsMachineSurface),
+            of: find.byType(ElBadge),
+            matching: find.byType(ElMachineSurface),
           ),
           v.filled ? findsOneWidget : findsNothing,
           reason: '$v',
@@ -469,29 +469,29 @@ void main() {
     });
   });
 
-  group('DsSheet', () {
-    Widget sheet(DsSheetSide side) => DsSheetOverlay(
+  group('ElSheet', () {
+    Widget sheet(ElSheetSide side) => ElSheetOverlay(
       side: side,
       trigger: (BuildContext context, VoidCallback open) =>
-          DsButton(onPressed: open, child: const Text('open')),
-      content: (BuildContext context, VoidCallback close) => DsSheetContent(
+          ElButton(onPressed: open, child: const Text('open')),
+      content: (BuildContext context, VoidCallback close) => ElSheetContent(
         side: side,
         onClose: close,
         children: const <Widget>[
-          DsSheetHeader(
+          ElSheetHeader(
             children: <Widget>[
-              DsSheetTitle('Filter packs'),
-              DsSheetDescription('184 packs.'),
+              ElSheetTitle('Filter packs'),
+              ElSheetDescription('184 packs.'),
             ],
           ),
-          DsSheetFooter(children: <Widget>[SizedBox(height: 40)]),
+          ElSheetFooter(children: <Widget>[SizedBox(height: 40)]),
         ],
       ),
     );
 
-    for (final DsSheetSide side in <DsSheetSide>[
-      DsSheetSide.left,
-      DsSheetSide.right,
+    for (final ElSheetSide side in <ElSheetSide>[
+      ElSheetSide.left,
+      ElSheetSide.right,
     ]) {
       testWidgets('the ${side.name} sheet pins itself to its own edge at 384', (
         WidgetTester t,
@@ -500,12 +500,12 @@ void main() {
         await t.pumpWidget(_host(sheet(side)));
         await t.tap(find.text('open'));
         await t.pump();
-        await t.pump(DsDurations.overlay);
+        await t.pump(ElDurations.overlay);
         await t.pump();
-        final Rect panel = t.getRect(find.byType(DsSheetContent));
-        expect(panel.width, DsContainers.sm);
+        final Rect panel = t.getRect(find.byType(ElSheetContent));
+        expect(panel.width, ElContainers.sm);
         expect(panel.height, _frame.height);
-        if (side == DsSheetSide.left) {
+        if (side == ElSheetSide.left) {
           expect(panel.left, closeTo(0, 0.01));
         } else {
           expect(panel.right, closeTo(_frame.width, 0.01));
@@ -517,21 +517,21 @@ void main() {
       WidgetTester t,
     ) async {
       _useFrame(t);
-      await t.pumpWidget(_host(sheet(DsSheetSide.right)));
+      await t.pumpWidget(_host(sheet(ElSheetSide.right)));
       await t.tap(find.text('open'));
       await t.pump();
       // First frame: `--tw-enter-translate-x: calc(.1 * 100%)` — measured 38.4
-      // against a 384 panel, and NOT the 40 that `ds(10)` would give.
-      final Rect first = t.getRect(find.byType(DsSheetContent));
+      // against a 384 panel, and NOT the 40 that `el(10)` would give.
+      final Rect first = t.getRect(find.byType(ElSheetContent));
       expect(
-        first.left - (_frame.width - DsContainers.sm),
-        closeTo(DsContainers.sm * DsSheetTransition.fraction, 0.5),
+        first.left - (_frame.width - ElContainers.sm),
+        closeTo(ElContainers.sm * ElSheetTransition.fraction, 0.5),
       );
-      expect(DsContainers.sm * DsSheetTransition.fraction, closeTo(38.4, 0.01));
+      expect(ElContainers.sm * ElSheetTransition.fraction, closeTo(38.4, 0.01));
 
-      await t.pump(DsDurations.overlay);
+      await t.pump(ElDurations.overlay);
       expect(
-        t.getRect(find.byType(DsSheetContent)).right,
+        t.getRect(find.byType(ElSheetContent)).right,
         closeTo(_frame.width, 0.5),
       );
     });
@@ -540,13 +540,13 @@ void main() {
       WidgetTester t,
     ) async {
       _useFrame(t);
-      await t.pumpWidget(_host(sheet(DsSheetSide.right)));
+      await t.pumpWidget(_host(sheet(ElSheetSide.right)));
       await t.tap(find.text('open'));
       await t.pump();
-      await t.pump(DsDurations.overlay);
+      await t.pump(ElDurations.overlay);
       expect(
-        t.getRect(find.byType(DsSheetFooter)).bottom,
-        closeTo(t.getRect(find.byType(DsSheetContent)).bottom, 0.5),
+        t.getRect(find.byType(ElSheetFooter)).bottom,
+        closeTo(t.getRect(find.byType(ElSheetContent)).bottom, 0.5),
       );
     });
 
@@ -567,35 +567,35 @@ void main() {
       addTearDown(t.view.resetPadding);
       addTearDown(t.view.resetViewPadding);
 
-      await t.pumpWidget(_host(sheet(DsSheetSide.right)));
+      await t.pumpWidget(_host(sheet(ElSheetSide.right)));
       await t.tap(find.text('open'));
       await t.pump();
-      await t.pump(DsDurations.overlay);
+      await t.pump(ElDurations.overlay);
 
-      expect(t.getRect(find.byType(DsSheetHeader)).top, statusBar);
+      expect(t.getRect(find.byType(ElSheetHeader)).top, statusBar);
       expect(
-        t.getRect(find.byType(DsSheetFooter)).bottom,
+        t.getRect(find.byType(ElSheetFooter)).bottom,
         _phone.height - gestureBar,
       );
-      expect(t.getRect(find.byType(DsSheetContent)).height, _phone.height);
+      expect(t.getRect(find.byType(ElSheetContent)).height, _phone.height);
     });
   });
 
-  group('DsDrawer', () {
-    Widget drawer() => DsDrawer(
+  group('ElDrawer', () {
+    Widget drawer() => ElDrawer(
       trigger: (BuildContext context, VoidCallback open) =>
-          DsButton(onPressed: open, child: const Text('open')),
-      content: (BuildContext context, VoidCallback close) => DsDrawerContent(
+          ElButton(onPressed: open, child: const Text('open')),
+      content: (BuildContext context, VoidCallback close) => ElDrawerContent(
         children: <Widget>[
-          const DsDrawerHeader(
+          const ElDrawerHeader(
             children: <Widget>[
-              DsDrawerTitle('Voidwing Ascendant'),
-              DsDrawerDescription('Legendary'),
+              ElDrawerTitle('Voidwing Ascendant'),
+              ElDrawerDescription('Legendary'),
             ],
           ),
-          DsDrawerFooter(
+          ElDrawerFooter(
             children: <Widget>[
-              DsButton(onPressed: close, child: const Text('Close')),
+              ElButton(onPressed: close, child: const Text('Close')),
             ],
           ),
         ],
@@ -609,9 +609,9 @@ void main() {
       await t.pumpWidget(_host(drawer()));
       await t.tap(find.text('open'));
       await t.pump();
-      await t.pump(DsDurations.drawer);
+      await t.pump(ElDurations.drawer);
 
-      final Rect panel = t.getRect(find.byType(DsDrawerContent));
+      final Rect panel = t.getRect(find.byType(ElDrawerContent));
       expect(
         panel.width,
         _frame.width,
@@ -621,7 +621,7 @@ void main() {
       expect(
         panel.height,
         lessThanOrEqualTo(
-          _frame.height * DsDrawerContent.maxHeightFraction + 0.5,
+          _frame.height * ElDrawerContent.maxHeightFraction + 0.5,
         ),
       );
     });
@@ -633,15 +633,15 @@ void main() {
       await t.pumpWidget(_host(drawer()));
       await t.tap(find.text('open'));
       await t.pump();
-      await t.pump(DsDurations.drawer);
+      await t.pump(ElDurations.drawer);
       final Size grip = t.getSize(
         find.descendant(
-          of: find.byType(DsDrawerHandle),
+          of: find.byType(ElDrawerHandle),
           matching: find.byType(SizedBox),
         ),
       );
-      expect(grip.width, DsDrawerHandle.width);
-      expect(grip.height, DsDrawerHandle.height);
+      expect(grip.width, ElDrawerHandle.width);
+      expect(grip.height, ElDrawerHandle.height);
     });
 
     testWidgets(
@@ -651,8 +651,8 @@ void main() {
         await t.pumpWidget(_host(drawer()));
         await t.tap(find.text('open'));
         await t.pump();
-        await t.pump(DsDurations.drawer);
-        final Rect panel = t.getRect(find.byType(DsDrawerContent));
+        await t.pump(ElDurations.drawer);
+        final Rect panel = t.getRect(find.byType(ElDrawerContent));
 
         // Short of vaul's 0.25 `closeThreshold`.
         TestGesture drag = await t.startGesture(
@@ -663,8 +663,8 @@ void main() {
         await t.pump();
         await drag.up();
         await t.pump();
-        await t.pump(DsDurations.drawer);
-        expect(find.byType(DsDrawerContent), findsOneWidget);
+        await t.pump(ElDurations.drawer);
+        expect(find.byType(ElDrawerContent), findsOneWidget);
 
         drag = await t.startGesture(panel.topCenter + const Offset(0, 8));
         await t.pump();
@@ -672,19 +672,19 @@ void main() {
         await t.pump();
         await drag.up();
         await t.pump();
-        await t.pump(DsDurations.drawer);
+        await t.pump(ElDurations.drawer);
         await t.pump();
-        await t.pump(DsDurations.drawer);
+        await t.pump(ElDurations.drawer);
         await t.pump();
-        expect(find.byType(DsDrawerContent), findsNothing);
+        expect(find.byType(ElDrawerContent), findsNothing);
       },
     );
   });
 
-  group('DsTooltip', () {
-    Widget tip() => DsTooltip(
+  group('ElTooltip', () {
+    Widget tip() => ElTooltip(
       label: 'Open this pack',
-      child: DsButton(onPressed: () {}, child: const Text('trigger')),
+      child: ElButton(onPressed: () {}, child: const Text('trigger')),
     );
 
     testWidgets('it waits the provider delay, then labels the control', (
@@ -700,20 +700,20 @@ void main() {
 
       await pointer.moveTo(t.getCenter(find.text('trigger')));
       await t.pump();
-      expect(find.byType(DsTooltipContent), findsNothing);
+      expect(find.byType(ElTooltipContent), findsNothing);
 
-      await t.pump(DsDurations.tooltipDelay);
-      await t.pump(DsDurations.overlay);
-      expect(find.byType(DsTooltipContent), findsOneWidget);
+      await t.pump(ElDurations.tooltipDelay);
+      await t.pump(ElDurations.overlay);
+      expect(find.byType(ElTooltipContent), findsOneWidget);
       expect(find.text('Open this pack'), findsOneWidget);
 
       await pointer.moveTo(const Offset(2, 2));
       await t.pump();
-      await t.pump(DsDurations.overlay);
+      await t.pump(ElDurations.overlay);
       await t.pump();
-      await t.pump(DsDurations.overlay);
+      await t.pump(ElDurations.overlay);
       await t.pump();
-      expect(find.byType(DsTooltipContent), findsNothing);
+      expect(find.byType(ElTooltipContent), findsNothing);
     });
 
     testWidgets('it sits above its trigger with the arrow lane between them', (
@@ -727,17 +727,17 @@ void main() {
       addTearDown(pointer.removePointer);
       await pointer.addPointer(location: Offset.zero);
       await pointer.moveTo(t.getCenter(find.text('trigger')));
-      await t.pump(DsDurations.tooltipDelay);
-      await t.pump(DsDurations.overlay);
+      await t.pump(ElDurations.tooltipDelay);
+      await t.pump(ElDurations.overlay);
 
-      final Rect trigger = t.getRect(find.byType(DsButton));
-      final Rect content = t.getRect(find.byType(DsTooltipContent));
+      final Rect trigger = t.getRect(find.byType(ElButton));
+      final Rect content = t.getRect(find.byType(ElTooltipContent));
       // The box is the pill PLUS the 10px arrow lane, and its bottom is the
       // trigger's top — which is where the measured 10px gap comes from.
       expect(content.bottom, closeTo(trigger.top, 0.5));
       expect(content.center.dx, closeTo(trigger.center.dx, 0.5));
       // `px-3 py-1.5` on `text-xs` — 28px of pill, plus the lane.
-      expect(content.height, closeTo(28 + DsTooltip.arrowSize, 1));
+      expect(content.height, closeTo(28 + ElTooltip.arrowSize, 1));
     });
 
     // ── the shrink-wrap pins ────────────────────────────────────────────────
@@ -757,7 +757,7 @@ void main() {
           Align(
             alignment: Alignment.centerLeft,
             child: Padding(
-              padding: EdgeInsets.only(left: ds(50)),
+              padding: EdgeInsets.only(left: el(50)),
               child: tip(),
             ),
           ),
@@ -769,16 +769,16 @@ void main() {
       addTearDown(pointer.removePointer);
       await pointer.addPointer(location: Offset.zero);
       await pointer.moveTo(t.getCenter(find.text('trigger')));
-      await t.pump(DsDurations.tooltipDelay);
-      await t.pump(DsDurations.overlay);
+      await t.pump(ElDurations.tooltipDelay);
+      await t.pump(ElDurations.overlay);
 
-      final Rect trigger = t.getRect(find.byType(DsButton));
-      final Rect content = t.getRect(find.byType(DsTooltipContent));
+      final Rect trigger = t.getRect(find.byType(ElButton));
+      final Rect content = t.getRect(find.byType(ElTooltipContent));
       final Rect label = t.getRect(find.text('Open this pack'));
       // `w-fit`: the label's own width plus `px-3`, and nothing else.
       expect(
         content.width,
-        closeTo(label.width + DsTooltip.horizontalPadding * 2, 0.5),
+        closeTo(label.width + ElTooltip.horizontalPadding * 2, 0.5),
       );
       expect(content.width, lessThan(_frame.width / 2));
       // `align="center"` on a trigger that is NOT the viewport's centre.
@@ -792,12 +792,12 @@ void main() {
       _useFrame(t);
       await t.pumpWidget(
         _host(
-          DsTooltip(
+          ElTooltip(
             // The page's own longest specimen, doubled.
             label:
                 '412 packs remaining of a 2,000 print run, and then no more '
                 'of them will ever be printed again anywhere',
-            child: DsButton(onPressed: () {}, child: const Text('trigger')),
+            child: ElButton(onPressed: () {}, child: const Text('trigger')),
           ),
         ),
       );
@@ -807,13 +807,13 @@ void main() {
       addTearDown(pointer.removePointer);
       await pointer.addPointer(location: Offset.zero);
       await pointer.moveTo(t.getCenter(find.text('trigger')));
-      await t.pump(DsDurations.tooltipDelay);
-      await t.pump(DsDurations.overlay);
+      await t.pump(ElDurations.tooltipDelay);
+      await t.pump(ElDurations.overlay);
 
-      final Rect content = t.getRect(find.byType(DsTooltipContent));
-      expect(content.width, DsContainers.xs);
+      final Rect content = t.getRect(find.byType(ElTooltipContent));
+      expect(content.width, ElContainers.xs);
       // It wrapped rather than ran on: more than one 16px line box.
-      expect(content.height, greaterThan(28 + DsTooltip.arrowSize));
+      expect(content.height, greaterThan(28 + ElTooltip.arrowSize));
     });
 
     testWidgets('the right-side pill wraps its label height too', (
@@ -824,10 +824,10 @@ void main() {
         _host(
           Align(
             alignment: Alignment.topLeft,
-            child: DsTooltip(
+            child: ElTooltip(
               label: 'Open this pack',
-              side: DsTooltipSide.right,
-              child: DsButton(onPressed: () {}, child: const Text('trigger')),
+              side: ElTooltipSide.right,
+              child: ElButton(onPressed: () {}, child: const Text('trigger')),
             ),
           ),
         ),
@@ -838,11 +838,11 @@ void main() {
       addTearDown(pointer.removePointer);
       await pointer.addPointer(location: Offset.zero);
       await pointer.moveTo(t.getCenter(find.text('trigger')));
-      await t.pump(DsDurations.tooltipDelay);
-      await t.pump(DsDurations.overlay);
+      await t.pump(ElDurations.tooltipDelay);
+      await t.pump(ElDurations.overlay);
 
-      final Rect trigger = t.getRect(find.byType(DsButton));
-      final Rect content = t.getRect(find.byType(DsTooltipContent));
+      final Rect trigger = t.getRect(find.byType(ElButton));
+      final Rect content = t.getRect(find.byType(ElTooltipContent));
       // 28px of pill — the lane is the row's leading column, not its height.
       expect(content.height, closeTo(28, 1));
       expect(content.left, closeTo(trigger.right, 0.5));
@@ -854,7 +854,7 @@ void main() {
   // Hover does not exist on a finger. See the component's library note; these
   // run at a phone's own size, and `WidgetTester.tap` is a touch pointer by
   // default, which is the whole routing question.
-  group('DsTooltip — the tap path', () {
+  group('ElTooltip — the tap path', () {
     Widget scene({
       VoidCallback? onTrigger,
       VoidCallback? onElsewhere,
@@ -863,15 +863,15 @@ void main() {
       Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          DsTooltip(
+          ElTooltip(
             label: 'Open this pack',
             hidden: hidden,
-            child: DsButton(
+            child: ElButton(
               onPressed: onTrigger ?? () {},
               child: const Text('trigger'),
             ),
           ),
-          DsButton(
+          ElButton(
             onPressed: onElsewhere ?? () {},
             child: const Text('elsewhere'),
           ),
@@ -890,8 +890,8 @@ void main() {
       await t.pump();
       // No dwell: `delayDuration` filters hover intent, and a tap has none to
       // filter.
-      expect(find.byType(DsTooltipContent), findsOneWidget);
-      await t.pump(DsDurations.overlay);
+      expect(find.byType(ElTooltipContent), findsOneWidget);
+      await t.pump(ElDurations.overlay);
       expect(find.text('Open this pack'), findsOneWidget);
       // The trigger keeps its own gesture — the label is watched, not stolen.
       expect(presses, 1);
@@ -899,7 +899,7 @@ void main() {
       await t.tap(find.text('trigger'));
       await _settleExit(t);
       await _settleExit(t);
-      expect(find.byType(DsTooltipContent), findsNothing);
+      expect(find.byType(ElTooltipContent), findsNothing);
       expect(presses, 2);
     });
 
@@ -912,13 +912,13 @@ void main() {
 
       await t.tap(find.text('trigger'));
       await t.pump();
-      await t.pump(DsDurations.overlay);
-      expect(find.byType(DsTooltipContent), findsOneWidget);
+      await t.pump(ElDurations.overlay);
+      expect(find.byType(ElTooltipContent), findsOneWidget);
 
       await t.tap(find.text('elsewhere'));
       await _settleExit(t);
       await _settleExit(t);
-      expect(find.byType(DsTooltipContent), findsNothing);
+      expect(find.byType(ElTooltipContent), findsNothing);
       // Translucent, not modal: the dismissing tap was not swallowed.
       expect(elsewhere, 1);
     });
@@ -931,13 +931,13 @@ void main() {
 
       await t.tap(find.text('trigger'));
       await t.pump();
-      await t.pump(DsDurations.overlay);
-      expect(find.byType(DsTooltipContent), findsOneWidget);
+      await t.pump(ElDurations.overlay);
+      expect(find.byType(ElTooltipContent), findsOneWidget);
 
-      await t.pump(DsTooltip.touchDwell);
+      await t.pump(ElTooltip.touchDwell);
       await _settleExit(t);
       await _settleExit(t);
-      expect(find.byType(DsTooltipContent), findsNothing);
+      expect(find.byType(ElTooltipContent), findsNothing);
     });
 
     testWidgets('`hidden` is still hidden to a finger', (WidgetTester t) async {
@@ -946,8 +946,8 @@ void main() {
 
       await t.tap(find.text('trigger'));
       await t.pump();
-      await t.pump(DsDurations.overlay);
-      expect(find.byType(DsTooltipContent), findsNothing);
+      await t.pump(ElDurations.overlay);
+      expect(find.byType(ElTooltipContent), findsNothing);
     });
 
     testWidgets('a mouse on the same viewport still waits the dwell', (
@@ -963,7 +963,7 @@ void main() {
 
       await pointer.moveTo(t.getCenter(find.text('trigger')));
       await t.pump();
-      expect(find.byType(DsTooltipContent), findsNothing);
+      expect(find.byType(ElTooltipContent), findsNothing);
 
       // A mouse PRESS is not a tap: it buys nothing the hover was not already
       // going to give, and it must not short-circuit the dwell.
@@ -971,30 +971,30 @@ void main() {
       await t.pump();
       await pointer.up();
       await t.pump();
-      expect(find.byType(DsTooltipContent), findsNothing);
+      expect(find.byType(ElTooltipContent), findsNothing);
 
-      await t.pump(DsDurations.tooltipDelay);
-      await t.pump(DsDurations.overlay);
-      expect(find.byType(DsTooltipContent), findsOneWidget);
+      await t.pump(ElDurations.tooltipDelay);
+      await t.pump(ElDurations.overlay);
+      expect(find.byType(ElTooltipContent), findsOneWidget);
 
       // And the pointer leaving still closes it — the tap path did not take
       // the exit contract away.
       await pointer.moveTo(const Offset(2, 2));
       await _settleExit(t);
       await _settleExit(t);
-      expect(find.byType(DsTooltipContent), findsNothing);
+      expect(find.byType(ElTooltipContent), findsNothing);
     });
   });
 
-  group('DsHoverCard', () {
+  group('ElHoverCard', () {
     testWidgets('it waits 700ms, opens under the trigger, and closes on 300', (
       WidgetTester t,
     ) async {
       _useFrame(t);
       await t.pumpWidget(
         _host(
-          DsHoverCard(
-            trigger: DsButton(onPressed: () {}, child: const Text('trigger')),
+          ElHoverCard(
+            trigger: ElButton(onPressed: () {}, child: const Text('trigger')),
             content: const SizedBox(height: 120),
           ),
         ),
@@ -1009,39 +1009,39 @@ void main() {
       await t.pump();
       await t.pump(const Duration(milliseconds: 600));
       expect(
-        find.byType(DsHoverCardContent),
+        find.byType(ElHoverCardContent),
         findsNothing,
         reason: 'Radix\'s openDelay default is 700, measured 728.3',
       );
 
       await t.pump(const Duration(milliseconds: 200));
-      await t.pump(DsDurations.overlay);
-      expect(find.byType(DsHoverCardContent), findsOneWidget);
+      await t.pump(ElDurations.overlay);
+      expect(find.byType(ElHoverCardContent), findsOneWidget);
       expect(
-        t.getSize(find.byType(DsHoverCardContent)).width,
-        DsHoverCard.defaultWidth,
+        t.getSize(find.byType(ElHoverCardContent)).width,
+        ElHoverCard.defaultWidth,
       );
       // `side="bottom" sideOffset={4}`.
       expect(
-        t.getRect(find.byType(DsHoverCardContent)).top -
-            t.getRect(find.byType(DsButton)).bottom,
-        closeTo(DsHoverCard.sideOffset, 0.5),
+        t.getRect(find.byType(ElHoverCardContent)).top -
+            t.getRect(find.byType(ElButton)).bottom,
+        closeTo(ElHoverCard.sideOffset, 0.5),
       );
 
       await pointer.moveTo(const Offset(2, 2));
       await t.pump();
       await t.pump(const Duration(milliseconds: 200));
       expect(
-        find.byType(DsHoverCardContent),
+        find.byType(ElHoverCardContent),
         findsOneWidget,
         reason: 'the closeDelay is the window for crossing the 4px gap',
       );
       await t.pump(const Duration(milliseconds: 200));
-      await t.pump(DsDurations.overlay);
+      await t.pump(ElDurations.overlay);
       await t.pump();
-      await t.pump(DsDurations.overlay);
+      await t.pump(ElDurations.overlay);
       await t.pump();
-      expect(find.byType(DsHoverCardContent), findsNothing);
+      expect(find.byType(ElHoverCardContent), findsNothing);
     });
   });
 
@@ -1050,7 +1050,7 @@ void main() {
       WidgetTester t,
     ) async {
       _useFrame(t);
-      await t.pumpWidget(_host(_dialog(), mode: DsThemeMode.dark));
+      await t.pumpWidget(_host(_dialog(), mode: ElThemeMode.dark));
       await _open(t);
       expect(t.takeException(), isNull);
     });
@@ -1071,15 +1071,15 @@ void main() {
       await t.pumpWidget(_host(_dialog(body: 1200)));
       await _open(t);
 
-      final Rect panel = t.getRect(find.byType(DsDialogContent));
+      final Rect panel = t.getRect(find.byType(ElDialogContent));
       // 337.5 x 609 at 375 x 812.
       expect(
         panel.width,
-        closeTo(_phone.width * DsModalCompact.maxWidthFraction, 0.01),
+        closeTo(_phone.width * ElModalCompact.maxWidthFraction, 0.01),
       );
       expect(
         panel.height,
-        closeTo(_phone.height * DsModalCompact.maxHeightFraction, 0.01),
+        closeTo(_phone.height * ElModalCompact.maxHeightFraction, 0.01),
       );
       // The whole of the complaint: none of it is off the screen any more.
       expect(panel.top, greaterThanOrEqualTo(-0.01));
@@ -1096,7 +1096,7 @@ void main() {
       await _open(t);
 
       final Finder scroller = find.descendant(
-        of: find.byType(DsDialogContent),
+        of: find.byType(ElDialogContent),
         matching: find.byType(Scrollable),
       );
       final ScrollableState state = t.state<ScrollableState>(scroller);
@@ -1106,15 +1106,15 @@ void main() {
         reason: 'a 1200px body inside a 609px panel has somewhere to go',
       );
 
-      final Rect header = t.getRect(find.byType(DsDialogHeader));
-      final Rect footer = t.getRect(find.byType(DsDialogFooter));
+      final Rect header = t.getRect(find.byType(ElDialogHeader));
+      final Rect footer = t.getRect(find.byType(ElDialogFooter));
       await t.drag(scroller, const Offset(0, -200));
       await t.pump();
 
       expect(state.position.pixels, closeTo(200, 0.5));
       // *"three readable zones"* — on a phone only the middle one may move.
-      expect(t.getRect(find.byType(DsDialogHeader)), header);
-      expect(t.getRect(find.byType(DsDialogFooter)), footer);
+      expect(t.getRect(find.byType(ElDialogHeader)), header);
+      expect(t.getRect(find.byType(ElDialogFooter)), footer);
     });
 
     testWidgets('the alert dialog clamps too, and scrolls its question under a '
@@ -1125,23 +1125,23 @@ void main() {
       );
       await _open(t);
 
-      final Rect panel = t.getRect(find.byType(DsAlertDialogContent));
+      final Rect panel = t.getRect(find.byType(ElAlertDialogContent));
       expect(
         panel.height,
-        closeTo(_phone.height * DsModalCompact.maxHeightFraction, 0.01),
+        closeTo(_phone.height * ElModalCompact.maxHeightFraction, 0.01),
       );
       expect(panel.bottom, lessThanOrEqualTo(_phone.height + 0.01));
 
       final ScrollableState state = t.state<ScrollableState>(
         find.descendant(
-          of: find.byType(DsAlertDialogContent),
+          of: find.byType(ElAlertDialogContent),
           matching: find.byType(Scrollable),
         ),
       );
       expect(state.position.maxScrollExtent, greaterThan(0));
       // *"the footer is the decision"* — and it is still reachable.
       expect(
-        t.getRect(find.byType(DsAlertDialogFooter)).bottom,
+        t.getRect(find.byType(ElAlertDialogFooter)).bottom,
         closeTo(panel.bottom, 0.01),
       );
     });
@@ -1149,27 +1149,27 @@ void main() {
     test('above the breakpoint every clamp is the identity', () {
       // The 600 is the one compact breakpoint the port already keeps, and a
       // `max-width` query includes its own edge.
-      expect(DsModalCompact.breakpoint, 600);
-      expect(DsModalCompact.isCompact(600), isTrue);
-      expect(DsModalCompact.isCompact(600.01), isFalse);
+      expect(ElModalCompact.breakpoint, 600);
+      expect(ElModalCompact.isCompact(600), isTrue);
+      expect(ElModalCompact.isCompact(600.01), isFalse);
 
-      expect(DsModalCompact.constraintsFor(_frame), const BoxConstraints());
+      expect(ElModalCompact.constraintsFor(_frame), const BoxConstraints());
       expect(
-        DsModalCompact.clampWidth(DsContainers.sm, _frame),
-        DsContainers.sm,
+        ElModalCompact.clampWidth(ElContainers.sm, _frame),
+        ElContainers.sm,
       );
       expect(
-        DsModalCompact.clampSize(const Size(1123.2, 792), _frame),
+        ElModalCompact.clampSize(const Size(1123.2, 792), _frame),
         const Size(1123.2, 792),
       );
 
       // …and on a phone it is those two fractions and nothing else.
       expect(
-        DsModalCompact.constraintsFor(_phone).maxWidth,
+        ElModalCompact.constraintsFor(_phone).maxWidth,
         closeTo(337.5, 0.01),
       );
       expect(
-        DsModalCompact.constraintsFor(_phone).maxHeight,
+        ElModalCompact.constraintsFor(_phone).maxHeight,
         closeTo(609, 0.01),
       );
     });
@@ -1180,10 +1180,10 @@ void main() {
       await t.pumpWidget(_host(_dialog()));
       await _open(t);
 
-      expect(t.getSize(find.byType(DsDialogContent)).width, DsContainers.sm);
+      expect(t.getSize(find.byType(ElDialogContent)).width, ElContainers.sm);
       final ScrollableState state = t.state<ScrollableState>(
         find.descendant(
-          of: find.byType(DsDialogContent),
+          of: find.byType(ElDialogContent),
           matching: find.byType(Scrollable),
         ),
       );
@@ -1198,14 +1198,14 @@ void main() {
       'the launcher dialog takes the clamp on a phone and nothing above it',
       () {
         // 1440x900 — the measured 1123.19 x 792, unchanged.
-        final Size wide = DsAgentLauncher.dialogSize(_frame);
+        final Size wide = ElAgentLauncher.dialogSize(_frame);
         expect(wide.width, closeTo(1123.2, 0.05));
         expect(wide.height, closeTo(792, 0.05));
 
         // 375x812 — `78vw` still wins the width (292.5 is inside 90vw), and the
         // 88vh height, which `60vw`'s floor would otherwise protect, is cut to
         // 75vh.
-        final Size phone = DsAgentLauncher.dialogSize(_phone);
+        final Size phone = ElAgentLauncher.dialogSize(_phone);
         expect(phone.width, closeTo(292.5, 0.01));
         expect(phone.height, closeTo(609, 0.01));
       },
@@ -1215,15 +1215,15 @@ void main() {
       WidgetTester t,
     ) async {
       _usePhone(t);
-      await t.pumpWidget(_host(_sheet(DsSheetSide.right)));
+      await t.pumpWidget(_host(_sheet(ElSheetSide.right)));
       await t.tap(find.text('open'));
       await t.pump();
-      await t.pump(DsDurations.overlay);
+      await t.pump(ElDurations.overlay);
 
-      final Rect panel = t.getRect(find.byType(DsSheetContent));
+      final Rect panel = t.getRect(find.byType(ElSheetContent));
       expect(
         panel.width,
-        closeTo(_phone.width * DsModalCompact.maxWidthFraction, 0.01),
+        closeTo(_phone.width * ElModalCompact.maxWidthFraction, 0.01),
         reason: '`sm:max-w-sm` is 384, which does not fit a 375px phone',
       );
       expect(
@@ -1241,14 +1241,14 @@ void main() {
       await t.pumpWidget(_host(_drawer()));
       await t.tap(find.text('open'));
       await t.pump();
-      await t.pump(DsDurations.drawer);
+      await t.pump(ElDurations.drawer);
 
-      final Rect panel = t.getRect(find.byType(DsDrawerContent));
+      final Rect panel = t.getRect(find.byType(ElDrawerContent));
       expect(panel.width, _phone.width, reason: '`inset-x-0` — no 90vw');
       expect(
         panel.height,
         lessThanOrEqualTo(
-          _phone.height * DsDrawerContent.maxHeightFraction + 0.5,
+          _phone.height * ElDrawerContent.maxHeightFraction + 0.5,
         ),
       );
       expect(panel.bottom, closeTo(_phone.height, 0.5));
@@ -1266,7 +1266,7 @@ void main() {
 
       await _back(t);
       await _settleExit(t);
-      expect(find.byType(DsDialogContent), findsNothing);
+      expect(find.byType(ElDialogContent), findsNothing);
       expect(
         find.text('open'),
         findsOneWidget,
@@ -1298,13 +1298,13 @@ void main() {
       // *"cannot be dismissed by clicking outside"* — still true.
       await t.tapAt(const Offset(10, 10));
       await _settleExit(t);
-      expect(find.byType(DsAlertDialogContent), findsOneWidget);
+      expect(find.byType(ElAlertDialogContent), findsOneWidget);
 
       // Back admits no exceptions: the order is that it ALWAYS dismisses,
       // where Escape only does what the reference was measured doing.
       await _back(t);
       await _settleExit(t);
-      expect(find.byType(DsAlertDialogContent), findsNothing);
+      expect(find.byType(ElAlertDialogContent), findsNothing);
     });
 
     testWidgets('stacked overlays unwind topmost-first', (
@@ -1312,40 +1312,40 @@ void main() {
     ) async {
       _usePhone(t);
       expect(
-        DsModalPortalState.openModals,
+        ElModalPortalState.openModals,
         isEmpty,
         reason: 'a disposed portal must not leave an entry behind',
       );
 
       await t.pumpWidget(
         _host(
-          DsDialog(
+          ElDialog(
             trigger: (BuildContext context, VoidCallback open) =>
-                DsButton(onPressed: open, child: const Text('open')),
+                ElButton(onPressed: open, child: const Text('open')),
             content: (BuildContext context, VoidCallback close) =>
-                DsDialogContent(
+                ElDialogContent(
                   onClose: close,
                   children: <Widget>[
-                    const DsDialogHeader(
+                    const ElDialogHeader(
                       children: <Widget>[
-                        DsDialogTitle('Outer'),
-                        DsDialogDescription('The one underneath.'),
+                        ElDialogTitle('Outer'),
+                        ElDialogDescription('The one underneath.'),
                       ],
                     ),
-                    DsDialog(
+                    ElDialog(
                       trigger: (BuildContext context, VoidCallback open) =>
-                          DsButton(
+                          ElButton(
                             onPressed: open,
                             child: const Text('open inner'),
                           ),
                       content: (BuildContext context, VoidCallback close) =>
-                          DsDialogContent(
+                          ElDialogContent(
                             onClose: close,
                             children: const <Widget>[
-                              DsDialogHeader(
+                              ElDialogHeader(
                                 children: <Widget>[
-                                  DsDialogTitle('Inner'),
-                                  DsDialogDescription(
+                                  ElDialogTitle('Inner'),
+                                  ElDialogDescription(
                                     'Raised over the other one.',
                                   ),
                                 ],
@@ -1360,13 +1360,13 @@ void main() {
       );
 
       await _open(t);
-      expect(DsModalPortalState.openModals.length, 1);
+      expect(ElModalPortalState.openModals.length, 1);
       await t.tap(find.text('open inner'));
       await t.pump();
-      await t.pump(DsDurations.jelly);
+      await t.pump(ElDurations.jelly);
       expect(find.text('Inner'), findsOneWidget);
       expect(
-        DsModalPortalState.openModals.length,
+        ElModalPortalState.openModals.length,
         2,
         reason: 'a dialog raised from inside another is a SIBLING here',
       );
@@ -1376,38 +1376,38 @@ void main() {
       await _settleExit(t);
       expect(find.text('Inner'), findsNothing);
       expect(find.text('Outer'), findsOneWidget);
-      expect(DsModalPortalState.openModals.length, 1);
+      expect(ElModalPortalState.openModals.length, 1);
 
       await _back(t);
       await _settleExit(t);
       expect(find.text('Outer'), findsNothing);
-      expect(DsModalPortalState.openModals, isEmpty);
+      expect(ElModalPortalState.openModals, isEmpty);
     });
 
     testWidgets('the sheet and the drawer ride the same host', (
       WidgetTester t,
     ) async {
       _usePhone(t);
-      await t.pumpWidget(_host(_sheet(DsSheetSide.right)));
+      await t.pumpWidget(_host(_sheet(ElSheetSide.right)));
       await t.tap(find.text('open'));
       await t.pump();
-      await t.pump(DsDurations.overlay);
-      expect(find.byType(DsSheetContent), findsOneWidget);
+      await t.pump(ElDurations.overlay);
+      expect(find.byType(ElSheetContent), findsOneWidget);
       await _back(t);
       // Settled rather than counted out: these two run their exits on their own
       // clocks — the sheet on `--duration-overlay`, the drawer on vaul's 500ms
       // — and the sheet's lands exactly on `_settleExit`'s last frame.
       await t.pumpAndSettle();
-      expect(find.byType(DsSheetContent), findsNothing);
+      expect(find.byType(ElSheetContent), findsNothing);
 
       await t.pumpWidget(_host(_drawer()));
       await t.tap(find.text('open'));
       await t.pump();
-      await t.pump(DsDurations.drawer);
-      expect(find.byType(DsDrawerContent), findsOneWidget);
+      await t.pump(ElDurations.drawer);
+      expect(find.byType(ElDrawerContent), findsOneWidget);
       await _back(t);
       await t.pumpAndSettle();
-      expect(find.byType(DsDrawerContent), findsNothing);
+      expect(find.byType(ElDrawerContent), findsNothing);
     });
 
     testWidgets("the agent launcher's console dialog rides it too", (
@@ -1416,7 +1416,7 @@ void main() {
       _usePhone(t);
       await t.pumpWidget(
         _host(
-          const DsAgentLauncher(
+          const ElAgentLauncher(
             label: 'Ask the assistant',
             title: 'Vault',
             description: 'Ask about packs, pulls, prices and your wallet.',
@@ -1426,9 +1426,9 @@ void main() {
       );
 
       expect(find.text('the console'), findsNothing);
-      await t.tap(find.byType(DsButton));
+      await t.tap(find.byType(ElButton));
       await t.pump();
-      await t.pump(DsDurations.jelly);
+      await t.pump(ElDurations.jelly);
       expect(find.text('the console'), findsOneWidget);
 
       await _back(t);

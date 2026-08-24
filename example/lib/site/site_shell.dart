@@ -12,7 +12,7 @@ import 'site_navigation.dart';
 import 'site_routes.dart';
 
 /// Shell-scoped toasts for public-site actions.
-final DsToastController siteToasts = DsToastController();
+final ElToastController siteToasts = ElToastController();
 
 /// Header, search, mobile navigation, reading column, and footer for the
 /// public website.
@@ -70,9 +70,9 @@ class _SiteShellState extends State<SiteShell> {
   }
 
   void _openMobileNavigation() {
-    DsSheet.showLeft(
+    ElSheet.showLeft(
       context,
-      width: DsWidths.sidebarMobile,
+      width: ElWidths.sidebarMobile,
       builder: (BuildContext sheetContext) => _SiteMobileNavigation(
         currentRoute: widget.route,
         onNavigate: (String href) {
@@ -85,36 +85,36 @@ class _SiteShellState extends State<SiteShell> {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     final double viewport = MediaQuery.sizeOf(context).width;
-    final bool desktop = viewport >= DsBreakpoints.lg;
-    final double header = DsSafeArea.topBarHeightOf(
+    final bool desktop = viewport >= ElBreakpoints.lg;
+    final double header = ElSafeArea.topBarHeightOf(
       context,
-      DsWidths.siteHeader,
+      ElWidths.siteHeader,
     );
 
     return DefaultTextStyle(
       // `<body class="… text-foreground">`, exactly as `shell.dart:165` states
       // it for the documentation shell and `showcase/showcase_app.dart:151`
       // states it for Signal Studio. Without it this subtree has no
-      // [DefaultTextStyle] of its own, so every [DsText] inherits
+      // [DefaultTextStyle] of its own, so every [ElText] inherits
       // [WidgetsApp]'s fallback, 0xD0FF0000 ink under a double yellow
-      // underline, the "you forgot a Material" style: because [DsText] builds
+      // underline, the "you forgot a Material" style: because [ElText] builds
       // with `inherit: true` and never declares a `decoration`, and because its
-      // [DsTypeColor.none] classes resolve their ink from
+      // [ElTypeColor.none] classes resolve their ink from
       // `DefaultTextStyle.of(context).style.color`. Both leaked onto every
       // public route until this landed.
-      style: DsText.styleOf(context, DsType.body, color: theme.foreground),
+      style: ElText.styleOf(context, ElType.body, color: theme.foreground),
       child: Stack(
         children: <Widget>[
-          const Positioned.fill(child: DsPageGlow()),
+          const Positioned.fill(child: ElPageGlow()),
           Positioned.fill(
-            child: DsSafeArea(
+            child: ElSafeArea(
               top: false,
               bottom: false,
               child: Center(
                 child: SizedBox(
-                  width: DsWidths.shell,
+                  width: ElWidths.shell,
                   child: _SiteBody(
                     controller: _main,
                     header: header,
@@ -153,7 +153,7 @@ class _SiteShellState extends State<SiteShell> {
                 onNavigate: _navigate,
               ),
             ),
-          Positioned.fill(child: DsToaster(controller: siteToasts)),
+          Positioned.fill(child: ElToaster(controller: siteToasts)),
         ],
       ),
     );
@@ -179,25 +179,25 @@ class _SiteBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       controller: controller,
-      padding: DsSafeArea.scrollPaddingOf(
+      padding: ElSafeArea.scrollPaddingOf(
         context,
         base: EdgeInsets.only(top: header),
       ),
       child: Padding(
         padding: EdgeInsets.symmetric(
-          horizontal: desktop ? ds(12) : ds(6),
-          vertical: ds(12),
+          horizontal: desktop ? el(12) : el(6),
+          vertical: el(12),
         ),
         child: Align(
           alignment: Alignment.topCenter,
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: DsWidths.page),
+            constraints: const BoxConstraints(maxWidth: ElWidths.page),
             child: SelectionArea(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
                   child,
-                  SizedBox(height: ds(12)),
+                  SizedBox(height: el(12)),
                   footer,
                 ],
               ),
@@ -228,37 +228,37 @@ class _SiteHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
-    final bool compact = viewport < DsBreakpoints.sm;
-    final double horizontalPadding = compact ? ds(4) : ds(6);
-    final double compactGap = compact ? ds(2) : ds(3);
+    final ElThemeData theme = ElTheme.of(context);
+    final bool compact = viewport < ElBreakpoints.sm;
+    final double horizontalPadding = compact ? el(4) : el(6);
+    final double compactGap = compact ? el(2) : el(3);
 
     return DecoratedBox(
       decoration: BoxDecoration(
         color: theme.background,
         border: Border(
-          bottom: BorderSide(color: theme.border, width: DsWidths.hairline),
+          bottom: BorderSide(color: theme.border, width: ElWidths.hairline),
         ),
       ),
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-        child: DsSafeArea(
+        child: ElSafeArea(
           bottom: false,
           child: Row(
             children: <Widget>[
               if (!desktop) ...<Widget>[
-                DsButton(
-                  variant: DsButtonVariant.outline,
-                  size: DsButtonSize.icon,
+                ElButton(
+                  variant: ElButtonVariant.outline,
+                  size: ElButtonSize.icon,
                   label: 'Open site navigation',
                   onPressed: onOpenMobileNavigation,
-                  child: const DsIcon(DsIconGlyph.menu),
+                  child: const ElIcon(ElIconGlyph.menu),
                 ),
                 SizedBox(width: compactGap),
               ],
               MouseRegion(
                 cursor: SystemMouseCursors.click,
-                child: DsPress(
+                child: ElPress(
                   onTap: () => onNavigate(homeRoute),
                   child: SelectionContainer.disabled(
                     child: Logo(showMark: !compact),
@@ -266,18 +266,18 @@ class _SiteHeader extends StatelessWidget {
                 ),
               ),
               if (desktop) ...<Widget>[
-                SizedBox(width: ds(6)),
+                SizedBox(width: el(6)),
                 Expanded(
                   child: Wrap(
-                    spacing: ds(2),
-                    runSpacing: ds(2),
+                    spacing: el(2),
+                    runSpacing: el(2),
                     children: <Widget>[
                       for (final SiteNavEntry entry in primarySiteNavigation)
-                        DsButton(
+                        ElButton(
                           variant: route == entry.path
-                              ? DsButtonVariant.secondary
-                              : DsButtonVariant.ghost,
-                          size: DsButtonSize.sm,
+                              ? ElButtonVariant.secondary
+                              : ElButtonVariant.ghost,
+                          size: ElButtonSize.sm,
                           label: entry.title,
                           onPressed: () => onNavigate(entry.path),
                           child: Text(entry.title),
@@ -288,19 +288,19 @@ class _SiteHeader extends StatelessWidget {
               ] else
                 const Spacer(),
               SizedBox(width: compactGap),
-              DsButton(
-                variant: DsButtonVariant.outline,
-                size: compact ? DsButtonSize.icon : DsButtonSize.sm,
+              ElButton(
+                variant: ElButtonVariant.outline,
+                size: compact ? ElButtonSize.icon : ElButtonSize.sm,
                 label: 'Search documentation',
                 onPressed: onOpenSearch,
                 child: compact
-                    ? const DsIcon(DsIconGlyph.search)
+                    ? const ElIcon(ElIconGlyph.search)
                     : Row(
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
-                          DsIcon.lucide(DsLucide.search, size: DsIconSize.sm),
-                          SizedBox(width: DsButton.gapFor(DsButtonSize.sm)),
-                          DsText('Search', DsComponentType.buttonLabel),
+                          ElIcon.lucide(ElLucide.search, size: ElIconSize.sm),
+                          SizedBox(width: ElButton.gapFor(ElButtonSize.sm)),
+                          ElText('Search', ElComponentType.buttonLabel),
                         ],
                       ),
               ),
@@ -356,24 +356,24 @@ class _SearchOverlayState extends State<_SearchOverlay> {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     final List<SiteSearchGroup> groups = siteSearchGroups(_query);
     final bool empty = _query.trim().isNotEmpty && groups.isEmpty;
 
     return Padding(
-      padding: EdgeInsets.fromLTRB(ds(6), ds(4), ds(6), 0),
+      padding: EdgeInsets.fromLTRB(el(6), el(4), el(6), 0),
       child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: DsWidths.page),
+          constraints: const BoxConstraints(maxWidth: ElWidths.page),
           child: DecoratedBox(
             decoration: BoxDecoration(
               color: theme.card,
-              borderRadius: BorderRadius.circular(DsRadii.xl),
-              border: Border.all(color: theme.border, width: DsWidths.hairline),
-              boxShadow: DsShadows.tailwindLg.outerShadows(theme),
+              borderRadius: BorderRadius.circular(ElRadii.xl),
+              border: Border.all(color: theme.border, width: ElWidths.hairline),
+              boxShadow: ElShadows.tailwindLg.outerShadows(theme),
             ),
             child: Padding(
-              padding: EdgeInsets.all(ds(4)),
+              padding: EdgeInsets.all(el(4)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 mainAxisSize: MainAxisSize.min,
@@ -381,46 +381,46 @@ class _SearchOverlayState extends State<_SearchOverlay> {
                   Row(
                     children: <Widget>[
                       Expanded(
-                        child: DsText(
+                        child: ElText(
                           'Search the public site',
-                          DsType.h4,
+                          ElType.h4,
                           color: theme.foreground,
                         ),
                       ),
-                      DsButton(
-                        variant: DsButtonVariant.ghost,
-                        size: DsButtonSize.iconSm,
+                      ElButton(
+                        variant: ElButtonVariant.ghost,
+                        size: ElButtonSize.iconSm,
                         label: 'Close search',
                         onPressed: widget.onClose,
-                        child: const DsIcon(DsIconGlyph.x),
+                        child: const ElIcon(ElIconGlyph.x),
                       ),
                     ],
                   ),
-                  SizedBox(height: ds(3)),
+                  SizedBox(height: el(3)),
                   if (empty)
                     _SearchEmptyState(onNavigate: widget.onNavigate)
                   else
-                    DsCommand(
+                    ElCommand(
                       label: 'Public site search',
                       controller: widget.controller,
                       focusNode: widget.focusNode,
                       placeholder: 'Search pages, docs, and components…',
                       shouldFilter: false,
                       emptyLabel: null,
-                      groups: <DsCommandGroup>[
+                      groups: <ElCommandGroup>[
                         for (int i = 0; i < groups.length; i++)
-                          DsCommandGroup(
+                          ElCommandGroup(
                             heading: groups[i].title,
                             separatorBefore: i > 0 && _query.trim().isEmpty,
-                            items: <DsCommandItem>[
+                            items: <ElCommandItem>[
                               for (final SearchRoute route in groups[i].routes)
-                                DsCommandItem(
+                                ElCommandItem(
                                   label: route.title,
                                   subtitle: route.description,
                                   meta: route.path,
                                   icon: route.isDesignSystemRoute
-                                      ? DsIconGlyph.layers
-                                      : DsIconGlyph.sparkles,
+                                      ? ElIconGlyph.layers
+                                      : ElIconGlyph.sparkles,
                                   keywords: route.keywords,
                                   onSelect: () => widget.onNavigate(route.path),
                                 ),
@@ -445,21 +445,21 @@ class _SearchEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsEmpty(
+    return ElEmpty(
       children: <Widget>[
-        const DsEmptyHeader(
+        const ElEmptyHeader(
           children: <Widget>[
-            DsEmptyMedia(glyph: DsIconGlyph.search),
-            DsEmptyTitle('Nothing matched that search'),
-            DsEmptyDescription(
+            ElEmptyMedia(glyph: ElIconGlyph.search),
+            ElEmptyTitle('Nothing matched that search'),
+            ElEmptyDescription(
               'Try a broader term, or jump straight into the documentation index.',
             ),
           ],
         ),
-        DsEmptyContent(
+        ElEmptyContent(
           children: <Widget>[
-            DsButton(
-              variant: DsButtonVariant.secondary,
+            ElButton(
+              variant: ElButtonVariant.secondary,
               onPressed: () => onNavigate(docsRoute),
               child: const Text('Open documentation'),
             ),
@@ -482,29 +482,29 @@ class _SiteMobileNavigation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: EdgeInsets.symmetric(horizontal: ds(6)),
+      padding: EdgeInsets.symmetric(horizontal: el(6)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Padding(
-            padding: EdgeInsets.only(top: ds(4), bottom: ds(4), right: ds(12)),
+            padding: EdgeInsets.only(top: el(4), bottom: el(4), right: el(12)),
             child: MouseRegion(
               cursor: SystemMouseCursors.click,
-              child: DsPress(
+              child: ElPress(
                 onTap: () => onNavigate(homeRoute),
                 child: SelectionContainer.disabled(child: const Logo()),
               ),
             ),
           ),
           for (final SiteNavGroup group in footerSiteNavigation) ...<Widget>[
-            DsText(group.title, DsType.label),
-            SizedBox(height: ds(3)),
+            ElText(group.title, ElType.label),
+            SizedBox(height: el(3)),
             for (final SiteNavEntry entry in group.entries) ...<Widget>[
-              DsButton(
+              ElButton(
                 variant: currentRoute == entry.path
-                    ? DsButtonVariant.secondary
-                    : DsButtonVariant.ghost,
-                size: DsButtonSize.md,
+                    ? ElButtonVariant.secondary
+                    : ElButtonVariant.ghost,
+                size: ElButtonSize.md,
                 label: entry.title,
                 onPressed: () => onNavigate(entry.path),
                 contentAlignment: Alignment.centerLeft,
@@ -513,9 +513,9 @@ class _SiteMobileNavigation extends StatelessWidget {
                   child: Text(entry.title),
                 ),
               ),
-              SizedBox(height: ds(1)),
+              SizedBox(height: el(1)),
             ],
-            SizedBox(height: ds(5)),
+            SizedBox(height: el(5)),
           ],
         ],
       ),
@@ -530,45 +530,45 @@ class _SiteFooter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return DecoratedBox(
       decoration: BoxDecoration(
         color: theme.card,
-        borderRadius: BorderRadius.circular(DsRadii.xl),
-        border: Border.all(color: theme.border, width: DsWidths.hairline),
+        borderRadius: BorderRadius.circular(ElRadii.xl),
+        border: Border.all(color: theme.border, width: ElWidths.hairline),
       ),
       child: Padding(
-        padding: EdgeInsets.all(ds(6)),
+        padding: EdgeInsets.all(el(6)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            DsText('Build with Elattar', DsType.h4, color: theme.foreground),
-            SizedBox(height: ds(2)),
-            DsText(
+            ElText('Build with Elattar', ElType.h4, color: theme.foreground),
+            SizedBox(height: el(2)),
+            ElText(
               'Start from the foundation, copy the components you need, and keep the design system transparent for every team that adopts it.',
-              DsType.small,
+              ElType.small,
             ),
-            SizedBox(height: ds(6)),
+            SizedBox(height: el(6)),
             Wrap(
-              spacing: ds(6),
-              runSpacing: ds(6),
+              spacing: el(6),
+              runSpacing: el(6),
               children: <Widget>[
                 for (final SiteNavGroup group in footerSiteNavigation)
                   _FooterColumn(group: group, onNavigate: onNavigate),
               ],
             ),
-            SizedBox(height: ds(6)),
+            SizedBox(height: el(6)),
             Wrap(
-              spacing: ds(3),
-              runSpacing: ds(3),
+              spacing: el(3),
+              runSpacing: el(3),
               children: <Widget>[
-                DsButton(
-                  variant: DsButtonVariant.primary,
+                ElButton(
+                  variant: ElButtonVariant.primary,
                   onPressed: () => onNavigate(docsRoute),
                   child: const Text('Read the docs'),
                 ),
-                DsButton(
-                  variant: DsButtonVariant.secondary,
+                ElButton(
+                  variant: ElButtonVariant.secondary,
                   onPressed: () => onNavigate(componentsRoute),
                   child: const Text('Browse components'),
                 ),
@@ -589,28 +589,28 @@ class _FooterColumn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return SizedBox(
-      width: DsWidths.rail,
+      width: ElWidths.rail,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          DsText(group.title, DsType.label, color: theme.foreground),
-          SizedBox(height: ds(3)),
+          ElText(group.title, ElType.label, color: theme.foreground),
+          SizedBox(height: el(3)),
           for (final SiteNavEntry entry in group.entries) ...<Widget>[
             MouseRegion(
               cursor: SystemMouseCursors.click,
-              child: DsPress(
+              child: ElPress(
                 onTap: () => onNavigate(entry.path),
                 child: SelectionContainer.disabled(
                   child: Padding(
-                    padding: EdgeInsets.symmetric(vertical: ds(1)),
-                    child: DsText(entry.title, DsType.small),
+                    padding: EdgeInsets.symmetric(vertical: el(1)),
+                    child: ElText(entry.title, ElType.small),
                   ),
                 ),
               ),
             ),
-            SizedBox(height: ds(1)),
+            SizedBox(height: el(1)),
           ],
         ],
       ),

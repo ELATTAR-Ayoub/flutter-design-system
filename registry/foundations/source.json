@@ -6,17 +6,60 @@
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
   "files": [
-    {"source": "lib/src/foundation/colors.dart", "target": "@foundation/colors.dart", "sha256": "4b8f176fdff07d749b3f43c22b41c86683a6c9dae916df7e52d0d4f8a82f876c"},
-    {"source": "lib/src/foundation/date_format.dart", "target": "@foundation/date_format.dart", "sha256": "33734b9b00b2ed5807b3b370658bb87e90d460d4ad03a94aa55748b721bbf50f"},
-    {"source": "lib/src/foundation/media.dart", "target": "@foundation/media.dart", "sha256": "52da61e72a5574b1cccd3c3dd62c19f9aa3840ca8bf486078a5cc71aadd1b9ae"},
-    {"source": "lib/src/foundation/motion.dart", "target": "@foundation/motion.dart", "sha256": "b329ca191e93f25ebdb3336cef66cb4cb1404f24e56f5c1be8a6250d49dc7481"},
-    {"source": "lib/src/foundation/shadows.dart", "target": "@foundation/shadows.dart", "sha256": "31dae82254cd97febe5241c6354412733342ba38348b66f9cb4d4a8d7e272457"},
-    {"source": "lib/src/foundation/spacing.dart", "target": "@foundation/spacing.dart", "sha256": "bf13f691d0adfe98c74fabcfd1f2eeddd063fbf2f0d4f3490e62f5f50fca0f27"},
-    {"source": "lib/src/foundation/surfaces.dart", "target": "@foundation/surfaces.dart", "sha256": "0dcc18f0ab7bf56c58fa85c90bdfe85880681344c9694463de2461b6733ed5f8"},
-    {"source": "lib/src/foundation/theme.dart", "target": "@foundation/theme.dart", "sha256": "df8c81a6b2565d2408ccef54518b37bdc9687e4b25959cb1aeee4464dbcfda3b"},
-    {"source": "lib/src/foundation/typography.dart", "target": "@foundation/typography.dart", "sha256": "eb2a93e1713a4ca4029c217486fb7f02387fc218abf45074484ba386d12e670c"},
-    {"source": "lib/src/text_layout.dart", "target": "@foundation/text_layout.dart", "sha256": "e38b11b1639d416c96f6749fc8d08d8f7e2bcf6a84decfbf3dce8d44e0eb6de0"},
-    {"source": "lib/src/theme_scope.dart", "target": "@foundation/theme_scope.dart", "sha256": "7524edf51bc2679a4b3dfbff8bca9777d2868813c532b72b52b0f9a29a27c2b9"
+    {
+      "source": "lib/src/foundation/colors.dart",
+      "target": "@foundation/colors.dart",
+      "sha256": "ca52446e2c72a81be0be6bc5ad2974daa76541c6f1db0e5e68705dc1c0113dd3"
+    },
+    {
+      "source": "lib/src/foundation/date_format.dart",
+      "target": "@foundation/date_format.dart",
+      "sha256": "9bda1199073f6b4d4fda3384df10846b88aa4636ca6b3d287feee9de921e7ddf"
+    },
+    {
+      "source": "lib/src/foundation/media.dart",
+      "target": "@foundation/media.dart",
+      "sha256": "392442079d4e9e6bb1dadcff4b0a8a33507c99811bd5e2e4ea4a57d2fae2d312"
+    },
+    {
+      "source": "lib/src/foundation/motion.dart",
+      "target": "@foundation/motion.dart",
+      "sha256": "163e2a500185617cec945e6c3f3c17a963c2881617831fc7a3c642337ccaec9c"
+    },
+    {
+      "source": "lib/src/foundation/shadows.dart",
+      "target": "@foundation/shadows.dart",
+      "sha256": "94dfe317c822047594000155236eedd094b14147f87c6b4a9fbb8d13537c6948"
+    },
+    {
+      "source": "lib/src/foundation/spacing.dart",
+      "target": "@foundation/spacing.dart",
+      "sha256": "448689633efa7a1a4c8f3acef14a11421563261227f58d4895f36ec80f7b8b58"
+    },
+    {
+      "source": "lib/src/foundation/surfaces.dart",
+      "target": "@foundation/surfaces.dart",
+      "sha256": "2f91a8d36c3a055521f064d4f39fee0c22ab1f75bacef633f22c4e6968df197c"
+    },
+    {
+      "source": "lib/src/foundation/theme.dart",
+      "target": "@foundation/theme.dart",
+      "sha256": "9628e3cbc767cd4cb8c794b5ddd1f39cf4e02ec2a8b06f2786c245be7eeed6d3"
+    },
+    {
+      "source": "lib/src/foundation/typography.dart",
+      "target": "@foundation/typography.dart",
+      "sha256": "ca9a9e6bd3c2b936b044bd03d907a4b2b9b6aa9e58f8fd765079fccccf7c9af2"
+    },
+    {
+      "source": "lib/src/text_layout.dart",
+      "target": "@foundation/text_layout.dart",
+      "sha256": "31ac69ec85116c8b70876af76e9bd9a46ceecc76d9064bc3607b0630185787c6"
+    },
+    {
+      "source": "lib/src/theme_scope.dart",
+      "target": "@foundation/theme_scope.dart",
+      "sha256": "9651d66a8af7971af07c52d20f9fe1ba17bf7406f15fc1b269e1babfdabc0aa2"
     }
   ],
   "registryDependencies": [],
@@ -24,9 +67,25 @@
   "pubDependencies": {},
   "assets": [],
   "fonts": [
-    {"source": "assets/fonts/InterVariable.ttf", "target": "@foundation/fonts/InterVariable.ttf", "sha256": "5f27757f43f9e9d371851c372ee2e70c5ac5c65fb915d603667c253de8d3f65a", "family": "InterLocal"},
-    {"source": "assets/fonts/GeistMono-Variable.ttf", "target": "@foundation/fonts/GeistMono-Variable.ttf", "sha256": "0e1af3f507a1c8dfbb03d13ffad585834cd45ed7ccb78c756c7ce7873d180d30", "family": "GeistMono"},
-    {"source": "assets/fonts/Redaction35-Italic.ttf", "target": "@foundation/fonts/Redaction35-Italic.ttf", "sha256": "a87aea4af107f393edf6fe198c4f961ec4ff955407fa62a70563ce403e1499d3", "family": "Redaction35", "style": "italic"}
+    {
+      "source": "assets/fonts/InterVariable.ttf",
+      "target": "@foundation/fonts/InterVariable.ttf",
+      "sha256": "5f27757f43f9e9d371851c372ee2e70c5ac5c65fb915d603667c253de8d3f65a",
+      "family": "InterLocal"
+    },
+    {
+      "source": "assets/fonts/GeistMono-Variable.ttf",
+      "target": "@foundation/fonts/GeistMono-Variable.ttf",
+      "sha256": "0e1af3f507a1c8dfbb03d13ffad585834cd45ed7ccb78c756c7ce7873d180d30",
+      "family": "GeistMono"
+    },
+    {
+      "source": "assets/fonts/Redaction35-Italic.ttf",
+      "target": "@foundation/fonts/Redaction35-Italic.ttf",
+      "sha256": "a87aea4af107f393edf6fe198c4f961ec4ff955407fa62a70563ce403e1499d3",
+      "family": "Redaction35",
+      "style": "italic"
+    }
   ],
   "shaders": [],
   "documentationRoute": "/docs/foundations",

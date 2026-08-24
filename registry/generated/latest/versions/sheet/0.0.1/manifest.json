@@ -1,0 +1,35 @@
+{
+  "name": "sheet",
+  "type": "component",
+  "version": "0.0.1",
+  "description": "`components/ui/sheet.tsx`, left side only — the mobile navigation drawer.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/sheet.dart",
+      "target": "@ui/sheet.dart",
+      "sha256": "6a20113686968fd7f10958564a71ec475dc497266e7e0be531f85900a2e173f8"
+    }
+  ],
+  "registryDependencies": [
+    "button",
+    "dialog",
+    "icon",
+    "safe-area",
+    "source-foundation"
+  ],
+  "semanticDependencies": [
+    "button",
+    "dialog",
+    "icon",
+    "safe-area"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "documentationRoute": "/components/sheet",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/sheet.dart",
+  "deprecated": false
+}

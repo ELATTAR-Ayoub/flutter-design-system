@@ -14,9 +14,11 @@
 /// written down:
 ///  * `dart run packages/elattar_cli/bin/elattar.dart --version` -> `0.0.1`
 ///  * `dart run packages/elattar_cli/bin/elattar.dart init --foundation
-///    source --yes --registry <path>` -> wrote 19 files, exit 0
+///    source --yes --registry REGISTRY_PATH` -> wrote the foundation files,
+///    exit 0
 ///  * `dart run packages/elattar_cli/bin/elattar.dart add button --registry
-///    <path>` -> wrote 12 files, updated lib/components/ui/ui.dart and
+///    REGISTRY_PATH` -> wrote the component dependency closure, updated
+///    lib/components/ui/ui.dart and
 ///    pubspec.yaml's `flutter: fonts:` block, exit 0
 ///  * `dart run packages/elattar_cli/bin/elattar.dart doctor` outside a
 ///    Flutter project -> two `err` lines, exit 1
@@ -49,9 +51,9 @@ class InstallationDocsPage extends StatelessWidget {
           'published outside this repository yet. This page says so '
           'plainly and shows what a checkout can actually run today.',
     ),
-    breadcrumbs: const <DsBreadcrumbEntry>[
-      DsBreadcrumbEntry.link('Docs'),
-      DsBreadcrumbEntry.page('Installation'),
+    breadcrumbs: const <ElBreadcrumbEntry>[
+      ElBreadcrumbEntry.link('Docs'),
+      ElBreadcrumbEntry.page('Installation'),
     ],
     toc: const <DocsTocEntry>[
       DocsTocEntry(title: 'What is available today', anchor: 'overview'),
@@ -77,11 +79,26 @@ class _InstallationArticle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     return Column(
       key: const ValueKey<String>('installation-doc-article'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
+        // The reference's own "Recommended for new projects" callout sits
+        // directly under the intro paragraph, before its first heading. See
+        // https://ui.shadcn.com/docs/installation. This is that same slot:
+        // the one setup path the CLI actually accepts today, stated up front
+        // rather than left for the reader to discover three sections down at
+        // Source foundation.
+        ElAlert(
+          variant: ElAlertVariant.success,
+          icon: const ElIcon(ElIconGlyph.circleCheck),
+          title: 'Recommended: source foundation',
+          description:
+              '`elattar init --foundation source` is the only foundation '
+              'mode the CLI currently accepts. See Source foundation below.',
+        ),
+        SizedBox(height: el(8)),
         _overview(theme),
         _clone(),
         _sourceFoundation(),
@@ -93,13 +110,13 @@ class _InstallationArticle extends StatelessWidget {
     );
   }
 
-  Widget _prose(String text, DsThemeData theme, {DsTypeSpec? spec}) =>
+  Widget _prose(String text, ElThemeData theme, {ElTypeSpec? spec}) =>
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: DsWidths.prose),
-        child: DsText(text, spec ?? DsType.body),
+        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+        child: ElText(text, spec ?? ElType.body),
       );
 
-  Widget _overview(DsThemeData theme) => DsSection(
+  Widget _overview(ElThemeData theme) => ElSection(
     id: 'overview',
     title: 'What is available today',
     child: Column(
@@ -115,7 +132,7 @@ class _InstallationArticle extends StatelessWidget {
           'so this page does not print one.',
           theme,
         ),
-        SizedBox(height: ds(3)),
+        SizedBox(height: el(3)),
         _prose(
           'What does work, verified against this checkout, is running '
           'everything from source: clone the repository, then either copy '
@@ -128,11 +145,11 @@ class _InstallationArticle extends StatelessWidget {
     ),
   );
 
-  Widget _clone() => DsSection(
+  Widget _clone() => ElSection(
     id: 'clone',
     title: 'Clone the repository',
     description: 'The one prerequisite every path below shares.',
-    child: DsPanel(
+    child: ElPanel(
       label: 'CONSOLE',
       note: 'CLONE',
       child: DocsSelectableCodeBlock(
@@ -143,7 +160,7 @@ class _InstallationArticle extends StatelessWidget {
     ),
   );
 
-  Widget _sourceFoundation() => DsSection(
+  Widget _sourceFoundation() => ElSection(
     id: 'source-foundation',
     title: 'Source foundation (recommended)',
     description:
@@ -154,7 +171,7 @@ class _InstallationArticle extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        DsPanel(
+        ElPanel(
           label: 'CONSOLE',
           note: 'FROM A CHECKOUT',
           child: DocsSelectableCodeBlock(
@@ -170,8 +187,8 @@ class _InstallationArticle extends StatelessWidget {
                 '  --registry registry/generated/latest',
           ),
         ),
-        SizedBox(height: ds(4)),
-        DsPanel(
+        SizedBox(height: el(4)),
+        ElPanel(
           label: 'CONSOLE',
           note: 'ACTIVATED LOCALLY',
           child: DocsSelectableCodeBlock(
@@ -183,7 +200,7 @@ class _InstallationArticle extends StatelessWidget {
                 'elattar add button',
           ),
         ),
-        SizedBox(height: ds(4)),
+        SizedBox(height: el(4)),
         const DocsInstallFacts(
           title: 'What init writes',
           facts: <DocsInstallFact>[
@@ -224,20 +241,28 @@ class _InstallationArticle extends StatelessWidget {
     ),
   );
 
-  Widget _packageFoundation(DsThemeData theme) => DsSection(
+  Widget _packageFoundation(ElThemeData theme) => ElSection(
     id: 'package-foundation',
     title: 'Package foundation',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
+        ElAlert(
+          variant: ElAlertVariant.destructive,
+          icon: const ElIcon(ElIconGlyph.circleX),
+          title: 'Not available',
+          description:
+              '`elattar init --foundation package` is refused before it '
+              'touches the project, with exit code 64.',
+        ),
+        SizedBox(height: el(4)),
         _prose(
-          'Not available. `elattar init --foundation package` is refused '
-          'before it touches the project, with exit code 64 and this exact '
-          'message from packages/elattar_cli/lib/src/commands/app.dart:',
+          'This is the exact message packages/elattar_cli/lib/src/commands/'
+          'app.dart returns:',
           theme,
         ),
-        SizedBox(height: ds(3)),
-        DsPanel(
+        SizedBox(height: el(3)),
+        ElPanel(
           label: 'CONSOLE',
           note: 'EXIT 64',
           child: DocsSelectableCodeBlock(
@@ -250,23 +275,23 @@ class _InstallationArticle extends StatelessWidget {
                 'copies the foundation into your project.',
           ),
         ),
-        SizedBox(height: ds(3)),
+        SizedBox(height: el(3)),
         _prose(
           'An earlier build of this CLI did write that broken project; it '
           'was reverted for this reason and this mode is refused up front '
           'now rather than left undocumented.',
           theme,
-          spec: DsType.small,
+          spec: ElType.small,
         ),
       ],
     ),
   );
 
-  Widget _fullPackage() => DsSection(
+  Widget _fullPackage() => ElSection(
     id: 'full-package',
     title: 'Full maintained package',
     description:
-        'Depend on elattar_design_system directly and import Ds* widgets '
+        'Depend on elattar_design_system directly and import El* widgets '
         'from the package barrel, no CLI involved. Also not on pub.dev '
         'yet, so this is a git or path dependency, exactly as this '
         'repository\'s own example/pubspec.yaml consumes it.',
@@ -301,8 +326,8 @@ class _InstallationArticle extends StatelessWidget {
             ),
           ],
         ),
-        SizedBox(height: ds(4)),
-        DsPanel(
+        SizedBox(height: el(4)),
+        ElPanel(
           label: 'CONSOLE',
           note: 'RESOLVE',
           child: DocsSelectableCodeBlock(code: 'flutter pub get'),
@@ -311,13 +336,13 @@ class _InstallationArticle extends StatelessWidget {
     ),
   );
 
-  Widget _verification() => DsSection(
+  Widget _verification() => ElSection(
     id: 'verification',
     title: 'Verification',
     description:
         'elattar doctor checks the project, the config, the manifest, and '
         'the registry it can see, and exits 0 only when every check passes.',
-    child: DsPanel(
+    child: ElPanel(
       label: 'CONSOLE',
       note: 'DOCTOR',
       child: DocsSelectableCodeBlock(
@@ -328,7 +353,7 @@ class _InstallationArticle extends StatelessWidget {
     ),
   );
 
-  Widget _troubleshooting(DsThemeData theme) => DsSection(
+  Widget _troubleshooting(ElThemeData theme) => ElSection(
     id: 'troubleshooting',
     title: 'Troubleshooting',
     child: const DocsStateMatrix(

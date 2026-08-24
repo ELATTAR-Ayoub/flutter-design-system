@@ -1,6 +1,6 @@
 # Typography page map — `/design-system/typography`
 
-**Files that render this page:** `D:\DESIGN\Design-System-2026-8\design-system\app\design-system\typography\page.tsx` (only file in the dir) · kit components `D:\DESIGN\Design-System-2026-8\design-system\components\ds\kit.tsx` · nav data `D:\DESIGN\Design-System-2026-8\design-system\lib\ds\nav.ts` · icon wrapper `D:\DESIGN\Design-System-2026-8\design-system\components\ui\icon.tsx` · all type CSS in `D:\DESIGN\Design-System-2026-8\design-system\app\globals.css` · shell `app\design-system\layout.tsx` · fonts in `public\fonts\`.
+**Files that render this page:** `D:\DESIGN\Design-System-2026-8\design-system\app\design-system\typography\page.tsx` (only file in the dir) · kit components `D:\DESIGN\Design-System-2026-8\design-system\components\el\kit.tsx` · nav data `D:\DESIGN\Design-System-2026-8\design-system\lib\el\nav.ts` · icon wrapper `D:\DESIGN\Design-System-2026-8\design-system\components\ui\icon.tsx` · all type CSS in `D:\DESIGN\Design-System-2026-8\design-system\app\globals.css` · shell `app\design-system\layout.tsx` · fonts in `public\fonts\`.
 
 ---
 
@@ -60,11 +60,11 @@
 - `--destructive-ink` → light: hsl(0 72.2% 46%); dark: #f87171. Fills: `--color-action` hsl(217 91% 53%), `--color-value` #a3e635, `--destructive` hsl(0 72.2% 50.6%)
 - Body background carries a fixed radial glow: `radial-gradient(120% 90% at 62% 34%, var(--page-glow) 0%, transparent 64%)`, `--page-glow` hsl(240 30% 98%) light / hsl(240 8% 10%) dark. `::selection` = `color-mix(in oklab, var(--color-action) 35%, transparent)` behind `--foreground`.
 
-**Shell context** (`app/design-system/layout.tsx`): sticky header `h-(--height-site-header)`=4rem, `border-b bg-background/85 backdrop-blur-xl px-6`, contains logo (class `press`), pill "Design System v0.1" (`type-micro rounded-pill border px-2.5 py-1`, ≥sm), right label "Desktop-first · 1440 frame · Light & dark" (`type-micro`, ≥md), ThemeToggle. Content: `max-w-(--width-shell)`=1680px row → DsSidebar + `<main class="min-w-0 flex-1 px-6 py-12 lg:px-12">` → inner `mx-auto max-w-(--width-content)`=1080px. `html` has `scroll-behavior: smooth` and `scroll-padding-block-start: var(--scroll-offset)` = 4rem + 32px = **96px**; sections set no scroll-margin.
+**Shell context** (`app/design-system/layout.tsx`): sticky header `h-(--height-site-header)`=4rem, `border-b bg-background/85 backdrop-blur-xl px-6`, contains logo (class `press`), pill "Design System v0.1" (`type-micro rounded-pill border px-2.5 py-1`, ≥sm), right label "Desktop-first · 1440 frame · Light & dark" (`type-micro`, ≥md), ThemeToggle. Content: `max-w-(--width-shell)`=1680px row → ElSidebar + `<main class="min-w-0 flex-1 px-6 py-12 lg:px-12">` → inner `mx-auto max-w-(--width-content)`=1080px. `html` has `scroll-behavior: smooth` and `scroll-padding-block-start: var(--scroll-offset)` = 4rem + 32px = **96px**; sections set no scroll-margin.
 
 ---
 
-## 1. PAGE HEADER (`DsPageHeader`)
+## 1. PAGE HEADER (`ElPageHeader`)
 
 `<header class="mb-14 border-b border-border pb-10">`
 - Eyebrow `type-label text-action-ink`: **"Foundations"**
@@ -76,7 +76,7 @@
 
 ## 2. SECTION `id="rule"` — "Two foundation faces"
 
-`DsSection`: `<section class="mb-20">`, heading block `mb-6` with `<h2 class="type-h3 text-foreground">` (section titles use **type-h3**, 21px/600) and description `type-small mt-2 max-w-2xl`.
+`ElSection`: `<section class="mb-20">`, heading block `mb-6` with `<h2 class="type-h3 text-foreground">` (section titles use **type-h3**, 21px/600) and description `type-small mt-2 max-w-2xl`.
 Title: **"Two foundation faces"**. Description: **"The whole type system is a single rule with no exceptions, which is what keeps it consistent across every screen and component."**
 
 Body: `grid gap-4 sm:grid-cols-2` of two `Panel`s.

@@ -1,11 +1,11 @@
-/// `DsSidebar` and the twenty-two parts around it, against the live
+/// `ElSidebar` and the twenty-two parts around it, against the live
 /// reference's own numbers.
 ///
 /// Everything pinned here was measured on
 /// `http://localhost:3000/design-system/components/base/sidebar` at 1440 × 900
 /// on 2026-08-16 (`sb-inv.js`, `sb-tree.js`, `sb-collapse.js`, `sb-parts.js`,
 /// `sb-tip.js`, `sb-matrix.js`), not derived from the class lists. Where the
-/// two disagreed the probe won — see [DsSidebar]'s own drift register.
+/// two disagreed the probe won — see [ElSidebar]'s own drift register.
 ///
 /// The page test (`example/test/sidebar_page_test.dart`) owns the column's
 /// geometry; this file owns the component's behaviour and its state table.
@@ -35,22 +35,23 @@ extension on WidgetTester {
   /// unless [animate] asks otherwise.
   Future<void> pumpDs(
     Widget child, {
-    DsThemeMode mode = DsThemeMode.light,
+    ElThemeMode mode = ElThemeMode.light,
     bool animate = false,
     Size size = _stage,
   }) async {
     useStage(size);
-    final DsThemeController theme = DsThemeController(mode: mode);
+    final ElThemeController theme = ElThemeController(mode: mode);
     addTearDown(theme.dispose);
     await pumpWidget(
-      DsTheme(
+      ElTheme(
         controller: theme,
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
           home: Builder(
             builder: (BuildContext context) => MediaQuery(
-              data: MediaQuery.of(context)
-                  .copyWith(disableAnimations: !animate),
+              data: MediaQuery.of(
+                context,
+              ).copyWith(disableAnimations: !animate),
               child: Directionality(
                 textDirection: TextDirection.ltr,
                 child: Align(alignment: Alignment.topLeft, child: child),
@@ -66,32 +67,31 @@ extension on WidgetTester {
 
 /// A shell that fills the stage: a panel and a main column.
 Widget _shell({
-  DsSidebarSide side = DsSidebarSide.left,
-  DsSidebarVariant variant = DsSidebarVariant.sidebar,
-  DsSidebarCollapsible collapsible = DsSidebarCollapsible.icon,
+  ElSidebarSide side = ElSidebarSide.left,
+  ElSidebarVariant variant = ElSidebarVariant.sidebar,
+  ElSidebarCollapsible collapsible = ElSidebarCollapsible.icon,
   bool rail = true,
   bool defaultOpen = true,
-}) =>
-    SizedBox(
-      width: _stage.width,
-      height: _stage.height,
-      child: DsSidebarProvider(
+}) => SizedBox(
+  width: _stage.width,
+  height: _stage.height,
+  child: ElSidebarProvider(
+    variant: variant,
+    defaultOpen: defaultOpen,
+    children: <Widget>[
+      ElSidebar(
+        side: side,
         variant: variant,
-        defaultOpen: defaultOpen,
+        collapsible: collapsible,
         children: <Widget>[
-          DsSidebar(
-            side: side,
-            variant: variant,
-            collapsible: collapsible,
-            children: <Widget>[
-              const DsSidebarContent(children: <Widget>[_Menu()]),
-              if (rail) const DsSidebarRail(),
-            ],
-          ),
-          const DsSidebarInset(child: DsSidebarTrigger()),
+          const ElSidebarContent(children: <Widget>[_Menu()]),
+          if (rail) const ElSidebarRail(),
         ],
       ),
-    );
+      const ElSidebarInset(child: ElSidebarTrigger()),
+    ],
+  ),
+);
 
 /// The three-row menu every case below drives.
 class _Menu extends StatelessWidget {
@@ -99,271 +99,289 @@ class _Menu extends StatelessWidget {
 
   final int activeIndex;
 
-  static const List<String> labels = <String>['All cards', 'Favourites',
-      'Wallet'];
+  static const List<String> labels = <String>[
+    'All cards',
+    'Favourites',
+    'Wallet',
+  ];
 
   @override
-  Widget build(BuildContext context) => DsSidebarGroup(
-        children: <Widget>[
-          DsSidebarGroupContent(
-            child: DsSidebarMenu(
-              children: <Widget>[
-                for (int i = 0; i < labels.length; i++)
-                  DsSidebarMenuItem(
-                    button: DsSidebarMenuButton(
-                      isActive: i == activeIndex,
-                      tooltip: labels[i],
-                      child: DsSidebarMenuRow(
-                        leading: DsIcon(
-                          DsIconGlyph.layers,
-                          sizePx: DsButton.iconPxFor(DsButtonSize.sm),
-                        ),
-                        label: DsSidebarMenuLabel(labels[i]),
-                      ),
+  Widget build(BuildContext context) => ElSidebarGroup(
+    children: <Widget>[
+      ElSidebarGroupContent(
+        child: ElSidebarMenu(
+          children: <Widget>[
+            for (int i = 0; i < labels.length; i++)
+              ElSidebarMenuItem(
+                button: ElSidebarMenuButton(
+                  isActive: i == activeIndex,
+                  tooltip: labels[i],
+                  child: ElSidebarMenuRow(
+                    leading: ElIcon(
+                      ElIconGlyph.layers,
+                      sizePx: ElButton.iconPxFor(ElButtonSize.sm),
                     ),
+                    label: ElSidebarMenuLabel(labels[i]),
                   ),
-              ],
-            ),
-          ),
-        ],
-      );
+                ),
+              ),
+          ],
+        ),
+      ),
+    ],
+  );
 }
 
 double _widthOf(WidgetTester tester, Finder finder) =>
     tester.renderObject<RenderBox>(finder).size.width;
 
-Rect _rectOf(WidgetTester tester, Finder finder) =>
-    tester.getRect(finder);
+Rect _rectOf(WidgetTester tester, Finder finder) => tester.getRect(finder);
 
 void main() {
   /* ── Collapse ──────────────────────────────────────────────────────────── */
 
   group('collapse', () {
-    testWidgets('icon mode narrows 256 → 48 and back',
-        (WidgetTester tester) async {
+    testWidgets('icon mode narrows 256 → 48 and back', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpDs(_shell());
-      final Finder panel = find.byType(DsSidebar);
-      expect(_widthOf(tester, panel), DsWidths.sidebar);
+      final Finder panel = find.byType(ElSidebar);
+      expect(_widthOf(tester, panel), ElWidths.sidebar);
 
-      await tester.tap(find.byType(DsSidebarTrigger));
+      await tester.tap(find.byType(ElSidebarTrigger));
       await tester.pump();
-      await tester.pump(DsDurations.base);
-      expect(_widthOf(tester, panel), DsWidths.sidebarIcon);
+      await tester.pump(ElDurations.base);
+      expect(_widthOf(tester, panel), ElWidths.sidebarIcon);
 
-      await tester.tap(find.byType(DsSidebarTrigger));
+      await tester.tap(find.byType(ElSidebarTrigger));
       await tester.pump();
-      await tester.pump(DsDurations.base);
-      expect(_widthOf(tester, panel), DsWidths.sidebar);
+      await tester.pump(ElDurations.base);
+      expect(_widthOf(tester, panel), ElWidths.sidebar);
     });
 
-    testWidgets('the width leg is LINEAR over 250ms, not eased',
-        (WidgetTester tester) async {
+    testWidgets('the width leg is LINEAR over 250ms, not eased', (
+      WidgetTester tester,
+    ) async {
       // Measured: 256 → 48 in even ~13.85px steps per 16.6ms frame, reaching 48
       // exactly 250ms after the flip, with no front-loading and no overshoot.
       await tester.pumpDs(_shell(), animate: true);
-      final Finder panel = find.byType(DsSidebar);
+      final Finder panel = find.byType(ElSidebar);
 
-      await tester.tap(find.byType(DsSidebarTrigger));
+      await tester.tap(find.byType(ElSidebarTrigger));
       await tester.pump();
 
-      const double travel = DsWidths.sidebar - DsWidths.sidebarIcon;
+      const double travel = ElWidths.sidebar - ElWidths.sidebarIcon;
       for (final double fraction in <double>[0.25, 0.5, 0.75]) {
-        await tester.pump(Duration(
-          microseconds:
-              (DsDurations.base.inMicroseconds * 0.25).round(),
-        ));
-        final double want = DsWidths.sidebar - travel * fraction;
+        await tester.pump(
+          Duration(
+            microseconds: (ElDurations.base.inMicroseconds * 0.25).round(),
+          ),
+        );
+        final double want = ElWidths.sidebar - travel * fraction;
         expect(
           _widthOf(tester, panel),
           closeTo(want, 1),
           reason: 'at $fraction of the run the panel should be $want',
         );
       }
-      await tester.pump(DsDurations.base);
-      expect(_widthOf(tester, panel), DsWidths.sidebarIcon);
+      await tester.pump(ElDurations.base);
+      expect(_widthOf(tester, panel), ElWidths.sidebarIcon);
     });
 
-    testWidgets('offcanvas closes the gap and slides the panel out',
-        (WidgetTester tester) async {
-      await tester.pumpDs(
-        _shell(collapsible: DsSidebarCollapsible.offcanvas),
-      );
-      final Finder panel = find.byType(DsSidebar);
-      expect(_widthOf(tester, panel), DsWidths.sidebar);
+    testWidgets('offcanvas closes the gap and slides the panel out', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpDs(_shell(collapsible: ElSidebarCollapsible.offcanvas));
+      final Finder panel = find.byType(ElSidebar);
+      expect(_widthOf(tester, panel), ElWidths.sidebar);
 
-      await tester.tap(find.byType(DsSidebarTrigger));
+      await tester.tap(find.byType(ElSidebarTrigger));
       await tester.pump();
-      await tester.pump(DsDurations.base);
+      await tester.pump(ElDurations.base);
 
       // The gap goes to nothing; the container keeps its 256 and leaves.
       expect(_widthOf(tester, panel), 0);
-      final Rect content = _rectOf(tester, find.byType(DsSidebarContent));
-      expect(content.width, closeTo(DsWidths.sidebar - DsWidths.hairline, 0.5));
-      expect(content.left, closeTo(-DsWidths.sidebar, 0.5));
+      final Rect content = _rectOf(tester, find.byType(ElSidebarContent));
+      expect(content.width, closeTo(ElWidths.sidebar - ElWidths.hairline, 0.5));
+      expect(content.left, closeTo(-ElWidths.sidebar, 0.5));
     });
 
-    testWidgets('collapsible=none never collapses and shows no rail',
-        (WidgetTester tester) async {
-      await tester.pumpDs(
-        _shell(collapsible: DsSidebarCollapsible.none),
-      );
-      expect(_widthOf(tester, find.byType(DsSidebar)), DsWidths.sidebar);
-      await tester.tap(find.byType(DsSidebarTrigger));
+    testWidgets('collapsible=none never collapses and shows no rail', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpDs(_shell(collapsible: ElSidebarCollapsible.none));
+      expect(_widthOf(tester, find.byType(ElSidebar)), ElWidths.sidebar);
+      await tester.tap(find.byType(ElSidebarTrigger));
       await tester.pump();
-      await tester.pump(DsDurations.base);
-      expect(_widthOf(tester, find.byType(DsSidebar)), DsWidths.sidebar);
+      await tester.pump(ElDurations.base);
+      expect(_widthOf(tester, find.byType(ElSidebar)), ElWidths.sidebar);
     });
 
-    testWidgets('the row snaps to a 32px square on the flip\'s first frame',
-        (WidgetTester tester) async {
+    testWidgets('the row snaps to a 32px square on the flip\'s first frame', (
+      WidgetTester tester,
+    ) async {
       // `size-8!` is not in `btn-spring`'s property list, so it lands whole
       // while the panel is still 256 wide (measured at Δ0).
       await tester.pumpDs(_shell(), animate: true);
 
-      await tester.tap(find.byType(DsSidebarTrigger));
+      await tester.tap(find.byType(ElSidebarTrigger));
       await tester.pump();
-      await tester.pump(DsDurations.frame);
+      await tester.pump(ElDurations.frame);
 
       final Size row = tester
-          .renderObject<RenderBox>(find.byType(DsSidebarMenuButton).first)
+          .renderObject<RenderBox>(find.byType(ElSidebarMenuButton).first)
           .size;
-      expect(row.height, DsSidebarMenuButton.iconSize);
-      expect(_widthOf(tester, find.byType(DsSidebar)),
-          greaterThan(DsWidths.sidebarIcon));
+      expect(row.height, ElSidebarMenuButton.iconSize);
+      expect(
+        _widthOf(tester, find.byType(ElSidebar)),
+        greaterThan(ElWidths.sidebarIcon),
+      );
     });
 
-    testWidgets('⌘B and Ctrl-B both toggle, from anywhere',
-        (WidgetTester tester) async {
+    testWidgets('⌘B and Ctrl-B both toggle, from anywhere', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpDs(_shell());
-      final Finder panel = find.byType(DsSidebar);
+      final Finder panel = find.byType(ElSidebar);
 
       await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
-      await tester.sendKeyEvent(DsSidebarProvider.shortcut);
+      await tester.sendKeyEvent(ElSidebarProvider.shortcut);
       await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
       await tester.pump();
-      await tester.pump(DsDurations.base);
-      expect(_widthOf(tester, panel), DsWidths.sidebarIcon);
+      await tester.pump(ElDurations.base);
+      expect(_widthOf(tester, panel), ElWidths.sidebarIcon);
 
       await tester.sendKeyDownEvent(LogicalKeyboardKey.metaLeft);
-      await tester.sendKeyEvent(DsSidebarProvider.shortcut);
+      await tester.sendKeyEvent(ElSidebarProvider.shortcut);
       await tester.sendKeyUpEvent(LogicalKeyboardKey.metaLeft);
       await tester.pump();
-      await tester.pump(DsDurations.base);
-      expect(_widthOf(tester, panel), DsWidths.sidebar);
+      await tester.pump(ElDurations.base);
+      expect(_widthOf(tester, panel), ElWidths.sidebar);
     });
 
     testWidgets('a bare `b` does nothing', (WidgetTester tester) async {
       await tester.pumpDs(_shell());
-      await tester.sendKeyEvent(DsSidebarProvider.shortcut);
+      await tester.sendKeyEvent(ElSidebarProvider.shortcut);
       await tester.pump();
-      await tester.pump(DsDurations.base);
-      expect(_widthOf(tester, find.byType(DsSidebar)), DsWidths.sidebar);
+      await tester.pump(ElDurations.base);
+      expect(_widthOf(tester, find.byType(ElSidebar)), ElWidths.sidebar);
     });
   });
 
   /* ── The frame variants ────────────────────────────────────────────────── */
 
   group('variants', () {
-    testWidgets('floating pays p-2 on both edges and rounds its panel',
-        (WidgetTester tester) async {
-      await tester.pumpDs(_shell(variant: DsSidebarVariant.floating));
+    testWidgets('floating pays p-2 on both edges and rounds its panel', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpDs(_shell(variant: ElSidebarVariant.floating));
       // Measured: a 256px container holding a 240 × 366 inner card at
       // `rounded-lg`, inside a 382px frame.
-      expect(_widthOf(tester, find.byType(DsSidebar)), DsWidths.sidebar);
-      final Rect inner = _rectOf(tester, find.byType(DsSidebarContent));
+      expect(_widthOf(tester, find.byType(ElSidebar)), ElWidths.sidebar);
+      final Rect inner = _rectOf(tester, find.byType(ElSidebarContent));
       // Measured 240 — 256 less `p-2` on both edges, and no border at all:
       // the floating panel wears a ring, which costs no layout.
       expect(
         inner.width,
-        closeTo(DsWidths.sidebar - 2 * DsSidebar.framePadding, 0.5),
+        closeTo(ElWidths.sidebar - 2 * ElSidebar.framePadding, 0.5),
       );
     });
 
-    testWidgets('floating and inset collapse to 64 of gap and 66 of container',
-        (WidgetTester tester) async {
-      await tester.pumpDs(_shell(variant: DsSidebarVariant.inset));
-      await tester.tap(find.byType(DsSidebarTrigger));
-      await tester.pump();
-      await tester.pump(DsDurations.base);
+    testWidgets(
+      'floating and inset collapse to 64 of gap and 66 of container',
+      (WidgetTester tester) async {
+        await tester.pumpDs(_shell(variant: ElSidebarVariant.inset));
+        await tester.tap(find.byType(ElSidebarTrigger));
+        await tester.pump();
+        await tester.pump(ElDurations.base);
 
-      // `calc(var(--sidebar-width-icon) + --spacing(4))` and its `+2px` twin.
-      expect(_widthOf(tester, find.byType(DsSidebar)), DsSidebar.insetIconGap);
-      expect(DsSidebar.insetIconGap, DsWidths.sidebarIcon + ds(4));
-      expect(DsSidebar.insetIconWidth,
-          DsSidebar.insetIconGap + 2 * DsWidths.hairline);
-    });
+        // `calc(var(--sidebar-width-icon) + --spacing(4))` and its `+2px` twin.
+        expect(
+          _widthOf(tester, find.byType(ElSidebar)),
+          ElSidebar.insetIconGap,
+        );
+        expect(ElSidebar.insetIconGap, ElWidths.sidebarIcon + el(4));
+        expect(
+          ElSidebar.insetIconWidth,
+          ElSidebar.insetIconGap + 2 * ElWidths.hairline,
+        );
+      },
+    );
 
-    testWidgets('the inset variant insets the main column, ml-0 while open',
-        (WidgetTester tester) async {
-      await tester.pumpDs(_shell(variant: DsSidebarVariant.inset));
+    testWidgets('the inset variant insets the main column, ml-0 while open', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpDs(_shell(variant: ElSidebarVariant.inset));
       final Finder card = find.descendant(
-        of: find.byType(DsSidebarInset),
+        of: find.byType(ElSidebarInset),
         matching: find.byType(ClipRRect),
       );
       final Rect open = _rectOf(tester, card);
-      expect(open.height, _stage.height - 2 * DsSidebarInset.margin);
-      expect(open.left, _rectOf(tester, find.byType(DsSidebar)).right);
+      expect(open.height, _stage.height - 2 * ElSidebarInset.margin);
+      expect(open.left, _rectOf(tester, find.byType(ElSidebar)).right);
 
-      await tester.tap(find.byType(DsSidebarTrigger));
+      await tester.tap(find.byType(ElSidebarTrigger));
       await tester.pump();
-      await tester.pump(DsDurations.base);
+      await tester.pump(ElDurations.base);
 
       // `peer-data-[state=collapsed]:ml-2` — the lane opens once it collapses.
       expect(
         _rectOf(tester, card).left,
-        _rectOf(tester, find.byType(DsSidebar)).right + DsSidebarInset.margin,
+        _rectOf(tester, find.byType(ElSidebar)).right + ElSidebarInset.margin,
       );
     });
 
-    testWidgets('side=right puts the panel on the far edge',
-        (WidgetTester tester) async {
-      await tester.pumpDs(_shell(side: DsSidebarSide.right));
+    testWidgets('side=right puts the panel on the far edge', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpDs(_shell(side: ElSidebarSide.right));
       // The gap is still the first flex item — the container is what moves.
-      final Rect content = _rectOf(tester, find.byType(DsSidebarContent));
-      expect(
-        content.right,
-        closeTo(DsWidths.sidebar, 0.5),
-      );
+      final Rect content = _rectOf(tester, find.byType(ElSidebarContent));
+      expect(content.right, closeTo(ElWidths.sidebar, 0.5));
     });
   });
 
   /* ── Rows ──────────────────────────────────────────────────────────────── */
 
   group('rows', () {
-    testWidgets('the three sizes map onto Button\'s own ladder',
-        (WidgetTester tester) async {
-      expect(DsSidebarMenuButtonSize.sm.button, DsButtonSize.xs);
-      expect(DsSidebarMenuButtonSize.md.button, DsButtonSize.sm);
-      expect(DsSidebarMenuButtonSize.lg.button, DsButtonSize.lg);
-      expect(DsSidebarMenuSubButtonSize.md.button, DsButtonSize.sm);
+    testWidgets('the three sizes map onto Button\'s own ladder', (
+      WidgetTester tester,
+    ) async {
+      expect(ElSidebarMenuButtonSize.sm.button, ElButtonSize.xs);
+      expect(ElSidebarMenuButtonSize.md.button, ElButtonSize.sm);
+      expect(ElSidebarMenuButtonSize.lg.button, ElButtonSize.lg);
+      expect(ElSidebarMenuSubButtonSize.md.button, ElButtonSize.sm);
     });
 
-    testWidgets('a default row is 37.5 tall at h-auto px-2 py-2',
-        (WidgetTester tester) async {
-      await tester.pumpDs(_shell(collapsible: DsSidebarCollapsible.none));
+    testWidgets('a default row is 37.5 tall at h-auto px-2 py-2', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpDs(_shell(collapsible: ElSidebarCollapsible.none));
       final Size row = tester
-          .renderObject<RenderBox>(find.byType(DsSidebarMenuButton).first)
+          .renderObject<RenderBox>(find.byType(ElSidebarMenuButton).first)
           .size;
       // 19.5 of line box, `py-2` twice, and a 1px border twice.
       expect(row.height, closeTo(37.5, 0.01));
     });
 
-    testWidgets('the row wears rounded-lg, not the pill',
-        (WidgetTester tester) async {
-      await tester.pumpDs(_shell(collapsible: DsSidebarCollapsible.none));
-      final DsButton button = tester.widget<DsButton>(
+    testWidgets('the row wears rounded-lg, not the pill', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpDs(_shell(collapsible: ElSidebarCollapsible.none));
+      final ElButton button = tester.widget<ElButton>(
         find.descendant(
-          of: find.byType(DsSidebarMenuButton).first,
-          matching: find.byType(DsButton),
+          of: find.byType(ElSidebarMenuButton).first,
+          matching: find.byType(ElButton),
         ),
       );
-      expect(button.radius, BorderRadius.circular(DsRadii.lg));
+      expect(button.radius, BorderRadius.circular(ElRadii.lg));
       expect(button.autoHeight, isTrue);
-      expect(button.variant, DsButtonVariant.ghost);
+      expect(button.variant, ElButtonVariant.ghost);
     });
 
-    testWidgets('a badge reserves pr-16 and an action pr-10',
-        (WidgetTester tester) async {
+    testWidgets('a badge reserves pr-16 and an action pr-10', (
+      WidgetTester tester,
+    ) async {
       Future<EdgeInsetsGeometry> paddingWith({
         Widget? badge,
         Widget? action,
@@ -371,21 +389,21 @@ void main() {
         await tester.pumpDs(
           SizedBox(
             width: 400,
-            child: DsSidebarProvider(
+            child: ElSidebarProvider(
               children: <Widget>[
                 Expanded(
-                  child: DsSidebar(
-                    collapsible: DsSidebarCollapsible.none,
+                  child: ElSidebar(
+                    collapsible: ElSidebarCollapsible.none,
                     expand: true,
                     children: <Widget>[
-                      DsSidebarGroup(
+                      ElSidebarGroup(
                         children: <Widget>[
-                          DsSidebarGroupContent(
-                            child: DsSidebarMenu(
+                          ElSidebarGroupContent(
+                            child: ElSidebarMenu(
                               children: <Widget>[
-                                DsSidebarMenuItem(
-                                  button: const DsSidebarMenuButton(
-                                    child: DsSidebarMenuLabel('Reports'),
+                                ElSidebarMenuItem(
+                                  button: const ElSidebarMenuButton(
+                                    child: ElSidebarMenuLabel('Reports'),
                                   ),
                                   badge: badge,
                                   action: action,
@@ -402,50 +420,53 @@ void main() {
             ),
           ),
         );
-        return tester.widget<DsButton>(find.byType(DsButton).first).padding!;
+        return tester.widget<ElButton>(find.byType(ElButton).first).padding!;
       }
 
       double right(EdgeInsetsGeometry padding) =>
           padding.resolve(TextDirection.ltr).right;
 
-      expect(right(await paddingWith()), DsSidebarMenuButton.padding);
+      expect(right(await paddingWith()), ElSidebarMenuButton.padding);
       expect(
-        right(await paddingWith(badge: const DsSidebarMenuBadge('3'))),
-        DsSidebarMenuButton.badgeLane,
+        right(await paddingWith(badge: const ElSidebarMenuBadge('3'))),
+        ElSidebarMenuButton.badgeLane,
       );
       expect(
-        right(await paddingWith(
-          action: const DsSidebarMenuAction(
-            label: 'Add',
-            child: DsIcon(DsIconGlyph.plus),
+        right(
+          await paddingWith(
+            action: const ElSidebarMenuAction(
+              label: 'Add',
+              child: ElIcon(ElIconGlyph.plus),
+            ),
           ),
-        )),
-        DsSidebarMenuButton.actionLane,
+        ),
+        ElSidebarMenuButton.actionLane,
       );
     });
 
-    testWidgets('the badge is h-5 with a min-w-5 floor and mono figures',
-        (WidgetTester tester) async {
+    testWidgets('the badge is h-5 with a min-w-5 floor and mono figures', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpDs(
         SizedBox(
           width: 300,
-          child: DsSidebarProvider(
+          child: ElSidebarProvider(
             children: <Widget>[
               Expanded(
-                child: DsSidebar(
-                  collapsible: DsSidebarCollapsible.none,
+                child: ElSidebar(
+                  collapsible: ElSidebarCollapsible.none,
                   expand: true,
                   children: <Widget>[
-                    DsSidebarGroup(
+                    ElSidebarGroup(
                       children: <Widget>[
-                        DsSidebarGroupContent(
-                          child: DsSidebarMenu(
+                        ElSidebarGroupContent(
+                          child: ElSidebarMenu(
                             children: <Widget>[
-                              DsSidebarMenuItem(
-                                button: const DsSidebarMenuButton(
-                                  child: DsSidebarMenuLabel('Reports'),
+                              ElSidebarMenuItem(
+                                button: const ElSidebarMenuButton(
+                                  child: ElSidebarMenuLabel('Reports'),
                                 ),
-                                badge: const DsSidebarMenuBadge('3'),
+                                badge: const ElSidebarMenuBadge('3'),
                               ),
                             ],
                           ),
@@ -461,51 +482,50 @@ void main() {
       );
 
       final Size badge = tester
-          .renderObject<RenderBox>(find.byType(DsSidebarMenuBadge))
+          .renderObject<RenderBox>(find.byType(ElSidebarMenuBadge))
           .size;
-      expect(badge.height, DsBadge.height);
+      expect(badge.height, ElBadge.height);
       // The floor, not the width: a one-digit count measures narrower than
       // 20 in every face, and this file loads none — the page test carries the
       // rendered numbers.
-      expect(badge.width, greaterThanOrEqualTo(DsSidebarMenuBadge.minWidth));
+      expect(badge.width, greaterThanOrEqualTo(ElSidebarMenuBadge.minWidth));
       expect(
-        tester.widget<DsBadge>(find.byType(DsBadge)).spec,
-        DsComponentType.sidebarMenuBadge,
+        tester.widget<ElBadge>(find.byType(ElBadge)).spec,
+        ElComponentType.sidebarMenuBadge,
       );
       // The chip is `pointer-events-none` — a click goes to the row under it.
       expect(find.byType(IgnorePointer), findsWidgets);
     });
 
-    testWidgets('a sub list hangs off a spine and hides in icon mode',
-        (WidgetTester tester) async {
-      await tester.pumpDs(
-        _shellWithSubmenu(),
-      );
-      expect(find.byType(DsSidebarMenuSubButton), findsNWidgets(2));
+    testWidgets('a sub list hangs off a spine and hides in icon mode', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpDs(_shellWithSubmenu());
+      expect(find.byType(ElSidebarMenuSubButton), findsNWidgets(2));
       final Size sub = tester
-          .renderObject<RenderBox>(find.byType(DsSidebarMenuSubButton).first)
+          .renderObject<RenderBox>(find.byType(ElSidebarMenuSubButton).first)
           .size;
-      expect(sub.height, DsButton.heightFor(DsButtonSize.sm));
+      expect(sub.height, ElButton.heightFor(ElButtonSize.sm));
 
-      await tester.tap(find.byType(DsSidebarTrigger));
+      await tester.tap(find.byType(ElSidebarTrigger));
       await tester.pump();
-      await tester.pump(DsDurations.base);
-      expect(find.byType(DsSidebarMenuSubButton), findsNothing);
+      await tester.pump(ElDurations.base);
+      expect(find.byType(ElSidebarMenuSubButton), findsNothing);
     });
   });
 
   /* ── The pill ──────────────────────────────────────────────────────────── */
 
   group('pill', () {
-    testWidgets('lands on the active row and takes its rect',
-        (WidgetTester tester) async {
-      await tester.pumpDs(_shell(collapsible: DsSidebarCollapsible.none));
+    testWidgets('lands on the active row and takes its rect', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpDs(_shell(collapsible: ElSidebarCollapsible.none));
       await tester.pump();
 
-      final Rect row =
-          tester.getRect(find.byType(DsSidebarMenuButton).first);
+      final Rect row = tester.getRect(find.byType(ElSidebarMenuButton).first);
       final Finder pill = find.descendant(
-        of: find.byType(DsSidebarMenu),
+        of: find.byType(ElSidebarMenu),
         matching: find.byType(AnimatedPositioned),
       );
       expect(pill, findsOneWidget);
@@ -514,18 +534,18 @@ void main() {
       expect(painted.top, closeTo(row.top, 0.01));
     });
 
-    testWidgets('takes the topmost active row when two claim it',
-        (WidgetTester tester) async {
+    testWidgets('takes the topmost active row when two claim it', (
+      WidgetTester tester,
+    ) async {
       // DRIFT 8: `querySelector('[data-active="true"]')` returns the first
       // match, and the sub-link below never claims the pill at all.
       await tester.pumpDs(_shellWithSubmenu(activeSub: true));
       await tester.pump();
 
-      final Rect row =
-          tester.getRect(find.byType(DsSidebarMenuButton).first);
+      final Rect row = tester.getRect(find.byType(ElSidebarMenuButton).first);
       final Rect painted = tester.getRect(
         find.descendant(
-          of: find.byType(DsSidebarMenu),
+          of: find.byType(ElSidebarMenu),
           matching: find.byType(AnimatedPositioned),
         ),
       );
@@ -533,16 +553,17 @@ void main() {
       expect(painted.height, closeTo(row.height, 0.01));
     });
 
-    testWidgets('a menu with nothing active paints no pill',
-        (WidgetTester tester) async {
+    testWidgets('a menu with nothing active paints no pill', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpDs(
         SizedBox(
           width: 300,
-          child: DsSidebarProvider(
+          child: ElSidebarProvider(
             children: <Widget>[
               Expanded(
-                child: DsSidebar(
-                  collapsible: DsSidebarCollapsible.none,
+                child: ElSidebar(
+                  collapsible: ElSidebarCollapsible.none,
                   expand: true,
                   children: const <Widget>[_Menu(activeIndex: -1)],
                 ),
@@ -554,7 +575,7 @@ void main() {
       await tester.pump();
       expect(
         find.descendant(
-          of: find.byType(DsSidebarMenu),
+          of: find.byType(ElSidebarMenu),
           matching: find.byType(AnimatedPositioned),
         ),
         findsNothing,
@@ -565,53 +586,57 @@ void main() {
   /* ── Tooltip ───────────────────────────────────────────────────────────── */
 
   group('tooltip', () {
-    testWidgets('is hidden while the panel is open and shows on the rail',
-        (WidgetTester tester) async {
+    testWidgets('is hidden while the panel is open and shows on the rail', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpDs(_shell());
 
-      DsTooltip tip() =>
-          tester.widget<DsTooltip>(find.byType(DsTooltip).first);
-      expect(tip().side, DsTooltipSide.right);
+      ElTooltip tip() => tester.widget<ElTooltip>(find.byType(ElTooltip).first);
+      expect(tip().side, ElTooltipSide.right);
       expect(tip().hidden, isTrue);
 
-      await tester.tap(find.byType(DsSidebarTrigger));
+      await tester.tap(find.byType(ElSidebarTrigger));
       await tester.pump();
-      await tester.pump(DsDurations.base);
+      await tester.pump(ElDurations.base);
       expect(tip().hidden, isFalse);
     });
 
-    testWidgets('a hidden tooltip never opens on hover',
-        (WidgetTester tester) async {
+    testWidgets('a hidden tooltip never opens on hover', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpDs(_shell(), animate: true);
-      final TestGesture gesture =
-          await tester.createGesture(kind: PointerDeviceKind.mouse);
+      final TestGesture gesture = await tester.createGesture(
+        kind: PointerDeviceKind.mouse,
+      );
       await gesture.addPointer(location: Offset.zero);
       addTearDown(gesture.removePointer);
 
-      await gesture
-          .moveTo(tester.getCenter(find.byType(DsSidebarMenuButton).first));
-      await tester.pump(DsDurations.tooltipDelay);
-      await tester.pump(DsDurations.overlay);
-      expect(find.byType(DsTooltipContent), findsNothing);
+      await gesture.moveTo(
+        tester.getCenter(find.byType(ElSidebarMenuButton).first),
+      );
+      await tester.pump(ElDurations.tooltipDelay);
+      await tester.pump(ElDurations.overlay);
+      expect(find.byType(ElTooltipContent), findsNothing);
     });
   });
 
   /* ── Disclosure ────────────────────────────────────────────────────────── */
 
   group('collapsible group', () {
-    testWidgets('the line thickens 1 → 4 and the content folds away',
-        (WidgetTester tester) async {
+    testWidgets('the line thickens 1 → 4 and the content folds away', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpDs(
         SizedBox(
           width: 320,
-          child: DsSidebarProvider(
+          child: ElSidebarProvider(
             children: <Widget>[
               Expanded(
-                child: DsSidebar(
-                  collapsible: DsSidebarCollapsible.none,
+                child: ElSidebar(
+                  collapsible: ElSidebarCollapsible.none,
                   expand: true,
                   children: <Widget>[
-                    DsSidebarCollapsibleGroup(
+                    ElSidebarCollapsibleGroup(
                       label: 'Collection',
                       toggleLabel: 'Toggle Collection group',
                       child: const _Menu(),
@@ -624,30 +649,31 @@ void main() {
         ),
       );
 
-      expect(find.byType(DsSidebarMenuButton), findsNWidgets(3));
+      expect(find.byType(ElSidebarMenuButton), findsNWidgets(3));
 
-      await tester.tap(find.byType(DsButton).first);
+      await tester.tap(find.byType(ElButton).first);
       await tester.pump();
-      await tester.pump(DsDurations.jelly);
+      await tester.pump(ElDurations.jelly);
 
-      expect(find.byType(DsSidebarMenuButton), findsNothing);
-      expect(DsSidebarCollapsibleGroup.lineOpen, DsWidths.hairline);
-      expect(DsSidebarCollapsibleGroup.lineClosed, ds(1));
+      expect(find.byType(ElSidebarMenuButton), findsNothing);
+      expect(ElSidebarCollapsibleGroup.lineOpen, ElWidths.hairline);
+      expect(ElSidebarCollapsibleGroup.lineClosed, el(1));
     });
 
-    testWidgets('the group label is h-8 and .type-nav-sm',
-        (WidgetTester tester) async {
+    testWidgets('the group label is h-8 and .type-nav-sm', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpDs(
         SizedBox(
           width: 320,
-          child: DsSidebarProvider(
+          child: ElSidebarProvider(
             children: <Widget>[
               Expanded(
-                child: DsSidebar(
-                  collapsible: DsSidebarCollapsible.none,
+                child: ElSidebar(
+                  collapsible: ElSidebarCollapsible.none,
                   expand: true,
                   children: <Widget>[
-                    DsSidebarCollapsibleGroup(
+                    ElSidebarCollapsibleGroup(
                       label: 'Collection',
                       toggleLabel: 'Toggle Collection group',
                       child: const _Menu(),
@@ -661,74 +687,77 @@ void main() {
       );
       expect(
         tester
-            .renderObject<RenderBox>(find.byType(DsSidebarGroupLabel))
+            .renderObject<RenderBox>(find.byType(ElSidebarGroupLabel))
             .size
             .height,
-        DsSidebarGroupLabel.height,
+        ElSidebarGroupLabel.height,
       );
-      expect(DsType.navSm.size, 11.5);
-      expect(DsType.navSm.height, 1.2);
+      expect(ElType.navSm.size, 11.5);
+      expect(ElType.navSm.height, 1.2);
     });
   });
 
   /* ── The input and the skeleton ────────────────────────────────────────── */
 
   group('parts', () {
-    testWidgets('SidebarInput is h-8, --background filled and socket-less',
-        (WidgetTester tester) async {
+    testWidgets('SidebarInput is h-8, --background filled and socket-less', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpDs(
-        const SizedBox(width: 300, child: DsSidebarInput(placeholder: 'Search')),
+        const SizedBox(
+          width: 300,
+          child: ElSidebarInput(placeholder: 'Search'),
+        ),
       );
       expect(
-        tester.renderObject<RenderBox>(find.byType(DsInput)).size.height,
-        DsSidebarInput.height,
+        tester.renderObject<RenderBox>(find.byType(ElInput)).size.height,
+        ElSidebarInput.height,
       );
-      final DsInput input = tester.widget<DsInput>(find.byType(DsInput));
-      expect(input.boxHeight, ds(8));
+      final ElInput input = tester.widget<ElInput>(find.byType(ElInput));
+      expect(input.boxHeight, el(8));
       expect(input.flat, isTrue);
       expect(input.fill, isNotNull);
     });
 
-    testWidgets('the skeleton width is a stable hash of its seed',
-        (WidgetTester tester) async {
+    testWidgets('the skeleton width is a stable hash of its seed', (
+      WidgetTester tester,
+    ) async {
       // DRIFT 4: the reference hashes `useId()` so server and client agree;
       // there is no hydration here, so the seed is the caller's.
-      final double a = DsSidebarMenuSkeleton.widthFraction('row-1');
-      expect(a, DsSidebarMenuSkeleton.widthFraction('row-1'));
+      final double a = ElSidebarMenuSkeleton.widthFraction('row-1');
+      expect(a, ElSidebarMenuSkeleton.widthFraction('row-1'));
       expect(a, greaterThanOrEqualTo(0.5));
       expect(a, lessThanOrEqualTo(0.9));
-      expect(
-        DsSidebarMenuSkeleton.widthFraction('row-2'),
-        isNot(equals(a)),
-      );
+      expect(ElSidebarMenuSkeleton.widthFraction('row-2'), isNot(equals(a)));
 
       await tester.pumpDs(
         const SizedBox(
           width: 240,
-          child: DsSidebarMenuSkeleton(showIcon: true, seed: 'row-1'),
+          child: ElSidebarMenuSkeleton(showIcon: true, seed: 'row-1'),
         ),
       );
       expect(
         tester
-            .renderObject<RenderBox>(find.byType(DsSidebarMenuSkeleton))
+            .renderObject<RenderBox>(find.byType(ElSidebarMenuSkeleton))
             .size
             .height,
-        DsSidebarMenuSkeleton.height,
+        ElSidebarMenuSkeleton.height,
       );
     });
 
-    testWidgets('useSidebar reports the four fields the readout prints',
-        (WidgetTester tester) async {
-      late DsSidebarScope scope;
+    testWidgets('useSidebar reports the four fields the readout prints', (
+      WidgetTester tester,
+    ) async {
+      late ElSidebarScope scope;
       await tester.pumpDs(
         SizedBox(
           width: _stage.width,
           height: _stage.height,
-          child: DsSidebarProvider(
+          child: ElSidebarProvider(
             children: <Widget>[
               Builder(
                 builder: (BuildContext context) {
-                  scope = DsSidebarScope.of(context);
+                  scope = ElSidebarScope.of(context);
                   return const SizedBox.shrink();
                 },
               ),
@@ -749,22 +778,23 @@ void main() {
       expect(scope.collapsed, isTrue);
     });
 
-    testWidgets('a narrow viewport takes the mobile branch',
-        (WidgetTester tester) async {
+    testWidgets('a narrow viewport takes the mobile branch', (
+      WidgetTester tester,
+    ) async {
       // `useIsMobile()` — `(max-width: 767px)`, and the panel becomes a sheet
       // that is closed until `openMobile` says otherwise.
-      expect(DsSidebarProvider.isMobileWidth(767), isTrue);
-      expect(DsSidebarProvider.isMobileWidth(DsBreakpoints.md), isFalse);
+      expect(ElSidebarProvider.isMobileWidth(767), isTrue);
+      expect(ElSidebarProvider.isMobileWidth(ElBreakpoints.md), isFalse);
 
       await tester.pumpDs(_shell(), size: const Size(400, 700));
-      expect(find.byType(DsSidebarContent), findsNothing);
+      expect(find.byType(ElSidebarContent), findsNothing);
 
-      await tester.tap(find.byType(DsSidebarTrigger));
+      await tester.tap(find.byType(ElSidebarTrigger));
       await tester.pump();
-      expect(find.byType(DsSheetContent), findsOneWidget);
+      expect(find.byType(ElSheetContent), findsOneWidget);
       expect(
-        tester.widget<DsSheetContent>(find.byType(DsSheetContent)).width,
-        DsWidths.sidebarMobile,
+        tester.widget<ElSheetContent>(find.byType(ElSheetContent)).width,
+        ElWidths.sidebarMobile,
       );
     });
   });
@@ -772,50 +802,49 @@ void main() {
 
 /// A panel whose one row carries a submenu.
 Widget _shellWithSubmenu({bool activeSub = false}) => SizedBox(
-      width: _stage.width,
-      height: _stage.height,
-      child: DsSidebarProvider(
+  width: _stage.width,
+  height: _stage.height,
+  child: ElSidebarProvider(
+    children: <Widget>[
+      ElSidebar(
+        collapsible: ElSidebarCollapsible.icon,
         children: <Widget>[
-          DsSidebar(
-            collapsible: DsSidebarCollapsible.icon,
+          ElSidebarContent(
             children: <Widget>[
-              DsSidebarContent(
+              ElSidebarGroup(
                 children: <Widget>[
-                  DsSidebarGroup(
-                    children: <Widget>[
-                      DsSidebarGroupContent(
-                        child: DsSidebarMenu(
-                          children: <Widget>[
-                            DsSidebarMenuItem(
-                              button: const DsSidebarMenuButton(
-                                isActive: true,
-                                child: DsSidebarMenuLabel('All cards'),
+                  ElSidebarGroupContent(
+                    child: ElSidebarMenu(
+                      children: <Widget>[
+                        ElSidebarMenuItem(
+                          button: const ElSidebarMenuButton(
+                            isActive: true,
+                            child: ElSidebarMenuLabel('All cards'),
+                          ),
+                          submenu: ElSidebarMenuSub(
+                            children: <Widget>[
+                              ElSidebarMenuSubItem(
+                                child: ElSidebarMenuSubButton(
+                                  label: 'Open',
+                                  isActive: activeSub,
+                                ),
                               ),
-                              submenu: DsSidebarMenuSub(
-                                children: <Widget>[
-                                  DsSidebarMenuSubItem(
-                                    child: DsSidebarMenuSubButton(
-                                      label: 'Open',
-                                      isActive: activeSub,
-                                    ),
-                                  ),
-                                  const DsSidebarMenuSubItem(
-                                    child:
-                                        DsSidebarMenuSubButton(label: 'Settled'),
-                                  ),
-                                ],
+                              const ElSidebarMenuSubItem(
+                                child: ElSidebarMenuSubButton(label: 'Settled'),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ],
               ),
             ],
           ),
-          const DsSidebarInset(child: DsSidebarTrigger()),
         ],
       ),
-    );
+      const ElSidebarInset(child: ElSidebarTrigger()),
+    ],
+  ),
+);

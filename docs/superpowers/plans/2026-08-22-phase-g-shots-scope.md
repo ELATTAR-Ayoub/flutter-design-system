@@ -41,7 +41,7 @@ The prose gate is not machine-checkable. It is replaced by:
 1. A source guard over `example/lib/shots/**`, mirroring
    `example/test/showcase_source_guard_test.dart` (bans `Theme.of(`, `Colors.`,
    `Color(`, bare `Text(`, `TextStyle(`, `Scaffold(`, hardcoded layout numbers…).
-2. Every `Ds*` symbol used must trace to a declared registry dependency.
+2. Every `El*` symbol used must trace to a declared registry dependency.
 
 Plus explicit visual review. Not golden images — this repo has no golden
 infrastructure and standing one up is a phase of its own.
@@ -50,21 +50,21 @@ infrastructure and standing one up is a phase of its own.
 
 Reuse the existing rig: real test-view sizing (`tester.view.physicalSize`, not
 synthetic `MediaQuery` — this was a Phase F review correction), a live
-`DsThemeController` flipped in place, `MediaQueryData.disableAnimations` as the
-motion freeze, and `DsClock` for any shot rendering a date.
+`ElThemeController` flipped in place, `MediaQueryData.disableAnimations` as the
+motion freeze, and `ElClock` for any shot rendering a date.
 
 ## The seventeen-item ceiling
 
 A shot may only depend on registry items that exist. The registry holds exactly
 seventeen: `source-foundation`, `press-motion`, `machine-surface`, `foil-value`,
-`sheen-action`, `icon`, `spinner`, `ds-rule`, `field`, `popover`, `tooltip`,
+`sheen-action`, `icon`, `spinner`, `rule`, `field`, `popover`, `tooltip`,
 `button`, `card`, `dialog`, `alert-dialog`, `input`, `select`.
 
-Consequence: **`DsGrid`, `DsPageHeader` and `DsSection` are off-limits** — they
+Consequence: **`ElGrid`, `ElPageHeader` and `ElSection` are off-limits** — they
 live in the example app's own kit, not the package and not the registry. So are
-`DsBadge`, `DsSeparator`, `DsTable`, `DsAvatar`, `DsTabs`, `DsTextarea`: real
+`ElBadge`, `ElSeparator`, `ElTable`, `ElAvatar`, `ElTabs`, `ElTextarea`: real
 components, but not registry items. Responsive layout is hand-rolled from
-`MediaQuery.sizeOf(context).width` against `DsBreakpoints`.
+`MediaQuery.sizeOf(context).width` against `ElBreakpoints`.
 
 `foil-value` is deliberately excluded from the first three shots — it runs two
 infinite animations that the deterministic-preview gate would have to freeze.

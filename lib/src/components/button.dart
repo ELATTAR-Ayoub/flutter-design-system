@@ -41,7 +41,7 @@
 /// must stay; the focus ring is the opposite case and is why [withFocusRing]
 /// takes a progress. Decide per token pair, never by rule.
 ///
-/// `DsPress` is deliberately **not** used here. §3.9 of the audit traces a live
+/// `ElPress` is deliberately **not** used here. §3.9 of the audit traces a live
 /// `.press` surface and it matches that widget to four decimal places, release
 /// overshoot included — because `press` animates `transform`, which *is* in its
 /// own transition list. One utility, two properties, opposite behaviour.
@@ -49,7 +49,7 @@
 /// Two variants are not a flat fill. `default` wears `sheen-action` and
 /// `premium` wears `foil-value` — a gradient ramp plus two blended
 /// pseudo-layers each — so those two route their surface through
-/// [DsSheenAction] / [DsFoilValue] instead of [DsMachineSurface]. The rest of
+/// [ElSheenAction] / [ElFoilValue] instead of [ElMachineSurface]. The rest of
 /// the state table is shared.
 library;
 
@@ -70,7 +70,7 @@ import '../theme_scope.dart';
 import 'spinner.dart';
 
 /// The seven `cva` variants, in the reference's own declaration order.
-enum DsButtonVariant {
+enum ElButtonVariant {
   /// `variant="default"` — `sheen-action bg-primary text-primary-foreground
   /// shadow-btn-primary active:shadow-btn-down`. *"Primary action. Blue is
   /// interaction."*
@@ -88,7 +88,7 @@ enum DsButtonVariant {
   /// aria-expanded:bg-accent` — *"Neutral action beside a primary one."*
   ///
   /// Carries **no shadow class at all**, which the shadows page's own copy
-  /// contradicts — see the drift note on [DsButton].
+  /// contradicts — see the drift note on [ElButton].
   secondary,
 
   /// `border-input bg-card text-foreground shadow-btn hover:bg-muted
@@ -138,7 +138,7 @@ enum DsButtonVariant {
 /// declares it and the API table prints it, and the page shows 8 of the 9
 /// (drift 17). Supervisor ruling B3 — build nine of nine, so the printed API
 /// row stays true.
-enum DsButtonSize {
+enum ElButtonSize {
   /// `h-6 gap-1 px-2.5 text-xs` — 24px tall. *"Dense internal use only — chips
   /// inside combobox and attachment."*
   xs,
@@ -149,7 +149,7 @@ enum DsButtonSize {
   /// `h-10 gap-2 px-4 text-sm` — 40px tall. The `default` size.
   ///
   /// Named [md] because `default` is a Dart keyword — the same rename
-  /// [DsButtonVariant.primary] carries, and for the same reason.
+  /// [ElButtonVariant.primary] carries, and for the same reason.
   md,
 
   /// `h-12 gap-2.5 px-6 text-body` — 48px tall.
@@ -174,7 +174,7 @@ enum DsButtonSize {
 
 /// The third cva axis (`button.tsx` L71–75) — *"uppercase label treatment for
 /// pack and money CTAs."*
-enum DsButtonEmphasis {
+enum ElButtonEmphasis {
   /// `emphasis="none"` — the empty string. The cva's own default.
   none,
 
@@ -195,7 +195,7 @@ const double _disabledOpacity = 0.45;
 /// blur, 3px spread.
 const double _focusRingSpread = 3;
 
-/// `focus-visible:ring-ring/50` on every variant but [DsButtonVariant.destructive].
+/// `focus-visible:ring-ring/50` on every variant but [ElButtonVariant.destructive].
 const double _focusRingAlpha = 0.50;
 
 /// `border-destructive/25` / `bg-destructive/10` at rest.
@@ -231,7 +231,7 @@ class _ButtonSkin {
   final Color fill;
   final Color border;
   final Color content;
-  final DsShadowSpec shadow;
+  final ElShadowSpec shadow;
 
   /// The colour `focus-visible:ring-*` paints, already at its modifier alpha.
   final Color ring;
@@ -242,14 +242,15 @@ class _ButtonSkin {
   /// `hover:underline` — link only.
   final bool underline;
 
-  /// [DsButtonSurface] applied over this skin.
-  _ButtonSkin withSurface(DsButtonSurface? surface, {required bool hovered}) {
+  /// [ElButtonSurface] applied over this skin.
+  _ButtonSkin withSurface(ElButtonSurface? surface, {required bool hovered}) {
     if (surface == null) return this;
     return _ButtonSkin(
-      fill: (hovered ? surface.hoverFill ?? surface.fill : surface.fill) ?? fill,
+      fill:
+          (hovered ? surface.hoverFill ?? surface.fill : surface.fill) ?? fill,
       border:
           (hovered ? surface.hoverBorder ?? surface.border : surface.border) ??
-              border,
+          border,
       content:
           (hovered ? surface.hoverInk ?? surface.ink : surface.ink) ?? content,
       shadow: shadow,
@@ -274,8 +275,8 @@ class _ButtonSkin {
 /// as the computed values on the live control. Every field is optional and a
 /// null one leaves the variant's own value alone, which is what an absent
 /// utility does.
-class DsButtonSurface {
-  const DsButtonSurface({
+class ElButtonSurface {
+  const ElButtonSurface({
     this.fill,
     this.hoverFill,
     this.border,
@@ -325,17 +326,17 @@ class DsButtonSurface {
 /// is where a reader will go looking for it: the shadows page's specimen copy
 /// says `--shadow-btn` is for *"Secondary, outline and destructive buttons"*
 /// and its `#in-use` caption says buttons *"carry `shadow-btn` or
-/// `shadow-btn-primary`"*. In fact only [DsButtonVariant.outline] carries
-/// `shadow-btn`; [DsButtonVariant.secondary] and [DsButtonVariant.destructive]
-/// declare no shadow class at all, and [DsButtonVariant.premium] carries
+/// `shadow-btn-primary`"*. In fact only [ElButtonVariant.outline] carries
+/// `shadow-btn`; [ElButtonVariant.secondary] and [ElButtonVariant.destructive]
+/// declare no shadow class at all, and [ElButtonVariant.premium] carries
 /// `shadow-btn-value`. The copy ships as written; the buttons ship as coded.
-class DsButton extends StatefulWidget {
-  const DsButton({
+class ElButton extends StatefulWidget {
+  const ElButton({
     super.key,
     required this.child,
-    this.variant = DsButtonVariant.primary,
-    this.size = DsButtonSize.md,
-    this.emphasis = DsButtonEmphasis.none,
+    this.variant = ElButtonVariant.primary,
+    this.size = ElButtonSize.md,
+    this.emphasis = ElButtonEmphasis.none,
     this.loading = false,
     this.onPressed,
     this.label,
@@ -413,22 +414,22 @@ class DsButton extends StatefulWidget {
   /// still fire — a suppressed trigger still sinks into its socket.
   final bool suppressPressScale;
 
-  /// Utilities appended to the variant's class list — see [DsButtonSurface].
+  /// Utilities appended to the variant's class list — see [ElButtonSurface].
   ///
   /// Null on every button in the system but one: `MessageScrollerButton`,
   /// which is a `secondary` button wearing five measured colour overrides.
-  final DsButtonSurface? surface;
+  final ElButtonSurface? surface;
 
   /// The button's content — an icon, a label, or a row of both spaced by
   /// [gapFor].
   final Widget child;
 
-  final DsButtonVariant variant;
+  final ElButtonVariant variant;
 
-  final DsButtonSize size;
+  final ElButtonSize size;
 
-  /// The uppercase treatment. See [DsButtonEmphasis.caps].
-  final DsButtonEmphasis emphasis;
+  /// The uppercase treatment. See [ElButtonEmphasis.caps].
+  final ElButtonEmphasis emphasis;
 
   /// `loading` (`button.tsx` L104, L120–127, L134–136) — four things at once:
   ///
@@ -442,13 +443,13 @@ class DsButton extends StatefulWidget {
   /// So it **prepends a spinner**, **disables the button** — which pulls in the
   /// base `disabled:pointer-events-none disabled:opacity-45` — and announces
   /// itself as busy. The port does the first two exactly; the third is where
-  /// Flutter runs out of vocabulary, and [_DsButtonState.build] records why.
+  /// Flutter runs out of vocabulary, and [_ElButtonState.build] records why.
   ///
   /// DOCUMENTED DRIFT (buttons-map drift 3, forms-map drift 2). The prop's own
   /// JSDoc says *"The label stays in place so the button does not change width
   /// mid-action"*, the states cell is captioned *"Disabled, width held"*, and
   /// the rules list repeats it a fourth time. The spinner is **prepended**, so
-  /// the button grows by [DsSpinner.px] + [gapFor] = **24px on the `default`
+  /// the button grows by [ElSpinner.px] + [gapFor] = **24px on the `default`
   /// rung**. It is accidentally true only where a parent stretches the button
   /// to a fixed width, which is what the forms page does and what the states
   /// grid does not. Four statements, false every time; all four ship.
@@ -483,13 +484,13 @@ class DsButton extends StatefulWidget {
   final EdgeInsets? padding;
 
   /// `h-*` / `size-*`.
-  static double heightFor(DsButtonSize size) => switch (size) {
-        DsButtonSize.xs || DsButtonSize.iconXs => ds(6),
-        DsButtonSize.sm || DsButtonSize.iconSm => ds(8),
-        DsButtonSize.md || DsButtonSize.icon => ds(10),
-        DsButtonSize.lg || DsButtonSize.iconLg => ds(12),
-        DsButtonSize.xl => ds(14),
-      };
+  static double heightFor(ElButtonSize size) => switch (size) {
+    ElButtonSize.xs || ElButtonSize.iconXs => el(6),
+    ElButtonSize.sm || ElButtonSize.iconSm => el(8),
+    ElButtonSize.md || ElButtonSize.icon => el(10),
+    ElButtonSize.lg || ElButtonSize.iconLg => el(12),
+    ElButtonSize.xl => el(14),
+  };
 
   /// `gap-*` — the space between an icon and its label.
   ///
@@ -500,31 +501,29 @@ class DsButton extends StatefulWidget {
   /// and therefore owns the gap in front of it.
   ///
   /// `lg` and `xl` share `gap-2.5`; the four squares declare none.
-  static double gapFor(DsButtonSize size) => switch (size) {
-        DsButtonSize.xs => ds(1),
-        DsButtonSize.sm => ds(1.5),
-        DsButtonSize.md => ds(2),
-        DsButtonSize.lg || DsButtonSize.xl => ds(2.5),
-        DsButtonSize.iconXs ||
-        DsButtonSize.iconSm ||
-        DsButtonSize.icon ||
-        DsButtonSize.iconLg =>
-          0,
-      };
+  static double gapFor(ElButtonSize size) => switch (size) {
+    ElButtonSize.xs => el(1),
+    ElButtonSize.sm => el(1.5),
+    ElButtonSize.md => el(2),
+    ElButtonSize.lg || ElButtonSize.xl => el(2.5),
+    ElButtonSize.iconXs ||
+    ElButtonSize.iconSm ||
+    ElButtonSize.icon ||
+    ElButtonSize.iconLg => 0,
+  };
 
   /// `px-*`. The square sizes have none — they centre their glyph.
-  static double paddingXFor(DsButtonSize size) => switch (size) {
-        DsButtonSize.xs => ds(2.5),
-        DsButtonSize.sm => ds(3.5),
-        DsButtonSize.md => ds(4),
-        DsButtonSize.lg => ds(6),
-        DsButtonSize.xl => ds(8),
-        DsButtonSize.iconXs ||
-        DsButtonSize.iconSm ||
-        DsButtonSize.icon ||
-        DsButtonSize.iconLg =>
-          0,
-      };
+  static double paddingXFor(ElButtonSize size) => switch (size) {
+    ElButtonSize.xs => el(2.5),
+    ElButtonSize.sm => el(3.5),
+    ElButtonSize.md => el(4),
+    ElButtonSize.lg => el(6),
+    ElButtonSize.xl => el(8),
+    ElButtonSize.iconXs ||
+    ElButtonSize.iconSm ||
+    ElButtonSize.icon ||
+    ElButtonSize.iconLg => 0,
+  };
 
   /// `[&_svg:not([class*='size-'])]:size-*` — the px a rung forces on an icon
   /// child that does not state a size of its own.
@@ -534,61 +533,60 @@ class DsButton extends StatefulWidget {
   ///
   /// **This is the port's honest version of a CSS descendant selector.** The
   /// reference restyles the `<svg>` from the button; a Flutter parent cannot
-  /// reach into [child] and resize a [DsIcon], so the rung publishes the number
+  /// reach into [child] and resize a [ElIcon], so the rung publishes the number
   /// and the caller passes it. It is also why buttons-map drift 6 exists at
   /// all: `Icon size="sm"` writes 14 as an *attribute* and never emits a
   /// `size-*` class, so the CSS wins the box at 16 while `strokeWidth` keeps
   /// being computed from the declared 14. Invisible only because
   /// `strokeFor(14) == strokeFor(16) == 2.4`.
-  static double iconPxFor(DsButtonSize size) => switch (size) {
-        DsButtonSize.xs || DsButtonSize.iconXs => 12,
-        DsButtonSize.sm || DsButtonSize.iconSm => 14,
-        DsButtonSize.md || DsButtonSize.lg || DsButtonSize.icon => 16,
-        DsButtonSize.xl || DsButtonSize.iconLg => 20,
-      };
+  static double iconPxFor(ElButtonSize size) => switch (size) {
+    ElButtonSize.xs || ElButtonSize.iconXs => 12,
+    ElButtonSize.sm || ElButtonSize.iconSm => 14,
+    ElButtonSize.md || ElButtonSize.lg || ElButtonSize.icon => 16,
+    ElButtonSize.xl || ElButtonSize.iconLg => 20,
+  };
 
   /// The `text-*` class a rung declares, or **null** where it declares none.
   ///
   /// Null is not a missing case: the four `icon-*` rungs genuinely set no
   /// font-size, so their label inherits whatever the page is set in — which is
-  /// what [_DsButtonState.build] reproduces by merging only the ink into the
+  /// what [_ElButtonState.build] reproduces by merging only the ink into the
   /// ambient [DefaultTextStyle] instead of replacing it.
   ///
   /// [emphasis] is checked first because cva emits it last: `caps` overrides
   /// every rung's own class, squares included.
-  static DsTypeSpec? typeFor(DsButtonSize size, DsButtonEmphasis emphasis) {
-    if (emphasis == DsButtonEmphasis.caps) {
-      return DsComponentType.buttonLabelCaps;
+  static ElTypeSpec? typeFor(ElButtonSize size, ElButtonEmphasis emphasis) {
+    if (emphasis == ElButtonEmphasis.caps) {
+      return ElComponentType.buttonLabelCaps;
     }
     return switch (size) {
-      DsButtonSize.xs => DsComponentType.buttonLabelXs,
-      DsButtonSize.sm => DsComponentType.buttonLabelSm,
-      DsButtonSize.md => DsComponentType.buttonLabel,
-      DsButtonSize.lg => DsComponentType.buttonLabelLg,
-      DsButtonSize.xl => DsComponentType.buttonLabelXl,
-      DsButtonSize.iconXs ||
-      DsButtonSize.iconSm ||
-      DsButtonSize.icon ||
-      DsButtonSize.iconLg =>
-        null,
+      ElButtonSize.xs => ElComponentType.buttonLabelXs,
+      ElButtonSize.sm => ElComponentType.buttonLabelSm,
+      ElButtonSize.md => ElComponentType.buttonLabel,
+      ElButtonSize.lg => ElComponentType.buttonLabelLg,
+      ElButtonSize.xl => ElComponentType.buttonLabelXl,
+      ElButtonSize.iconXs ||
+      ElButtonSize.iconSm ||
+      ElButtonSize.icon ||
+      ElButtonSize.iconLg => null,
     };
   }
 
   /// Whether the size is one of the four squares.
-  static bool isSquare(DsButtonSize size) =>
-      size == DsButtonSize.iconXs ||
-      size == DsButtonSize.iconSm ||
-      size == DsButtonSize.icon ||
-      size == DsButtonSize.iconLg;
+  static bool isSquare(ElButtonSize size) =>
+      size == ElButtonSize.iconXs ||
+      size == ElButtonSize.iconSm ||
+      size == ElButtonSize.icon ||
+      size == ElButtonSize.iconLg;
 
   /// [spec] with `focus-visible:ring-3 focus-visible:ring-<c>` composited in
-  /// front of it — the shared focus-ring helper both this widget and `DsInput`
+  /// front of it — the shared focus-ring helper both this widget and `ElInput`
   /// reach for.
   ///
   /// Tailwind v4 composites its shadow slots in the order `inset-shadow,
   /// inset-ring, ring-offset, **ring**, shadow`, so the ring paints *in front
   /// of* the element's own `--tw-shadow` rather than behind it. CSS paints the
-  /// first-listed `box-shadow` layer on top and [DsShadowSpec.outerShadows]
+  /// first-listed `box-shadow` layer on top and [ElShadowSpec.outerShadows]
   /// reverses the list to reproduce that, so **prepending** the ring layer is
   /// exactly what "in front of" means here.
   ///
@@ -611,29 +609,27 @@ class DsButton extends StatefulWidget {
   /// makes today. The reference's inputs and selection controls were **not**
   /// measured (audit §5), so nothing here claims they snap — only that this
   /// helper does not animate them for free.
-  static DsShadowSpec withFocusRing(
-    DsShadowSpec spec,
+  static ElShadowSpec withFocusRing(
+    ElShadowSpec spec,
     Color ring, {
     double progress = 1,
-  }) =>
-      DsShadowSpec(<DsShadowLayer>[
-        DsShadowLayer(
-          0,
-          0,
-          0,
-          _focusRingSpread * progress,
-          (DsThemeData _) => ring.withValues(
-            alpha: clampDouble(ring.a * progress, 0, 1),
-          ),
-        ),
-        ...spec.layers,
-      ]);
+  }) => ElShadowSpec(<ElShadowLayer>[
+    ElShadowLayer(
+      0,
+      0,
+      0,
+      _focusRingSpread * progress,
+      (ElThemeData _) =>
+          ring.withValues(alpha: clampDouble(ring.a * progress, 0, 1)),
+    ),
+    ...spec.layers,
+  ]);
 
   @override
-  State<DsButton> createState() => _DsButtonState();
+  State<ElButton> createState() => _ElButtonState();
 }
 
-class _DsButtonState extends State<DsButton> {
+class _ElButtonState extends State<ElButton> {
   bool _hovered = false;
   bool _pressed = false;
   bool _focused = false;
@@ -663,7 +659,8 @@ class _DsButtonState extends State<DsButton> {
   /// focus ring would mark a control that cannot be operated from the keyboard.
   KeyEventResult _onKey(FocusNode node, KeyEvent event) {
     if (!_enabled || event is! KeyDownEvent) return KeyEventResult.ignored;
-    final bool activates = event.logicalKey == LogicalKeyboardKey.enter ||
+    final bool activates =
+        event.logicalKey == LogicalKeyboardKey.enter ||
         event.logicalKey == LogicalKeyboardKey.numpadEnter ||
         event.logicalKey == LogicalKeyboardKey.space;
     if (!activates) return KeyEventResult.ignored;
@@ -680,10 +677,10 @@ class _DsButtonState extends State<DsButton> {
   /// same property: premium's `active:shadow-btn-down` beats its
   /// `hover:shadow-glow-value`, and outline's beats nothing but its own rest.
   ///
-  /// [DsButton.expanded] enters the table as `lit` — the three variants that
+  /// [ElButton.expanded] enters the table as `lit` — the three variants that
   /// declare an `aria-expanded:` class declare the fill they already paint on
   /// hover, so an open trigger is a button whose hover is held.
-  _ButtonSkin _skin(DsThemeData theme) {
+  _ButtonSkin _skin(ElThemeData theme) {
     // `hover:` and `aria-expanded:` resolve to one colour on every variant that
     // declares both, so they resolve to one flag here. `active:` still outranks
     // it where a variant declares one — ghost's `active:bg-muted` shows while
@@ -691,84 +688,86 @@ class _DsButtonState extends State<DsButton> {
     final bool lit = _hovered || widget.expanded;
 
     switch (widget.variant) {
-      case DsButtonVariant.primary:
+      case ElButtonVariant.primary:
         return _ButtonSkin(
           // `bg-primary` under the `sheen-action` ramp, which is opaque and
           // covers it — carried anyway because the class list carries it.
           fill: theme.primary,
-          border: dsTransparent,
+          border: elTransparent,
           content: theme.primaryForeground,
-          shadow: _pressed ? DsShadows.btnDown : DsShadows.btnPrimary,
+          shadow: _pressed ? ElShadows.btnDown : ElShadows.btnPrimary,
           ring: theme.ring.withValues(alpha: _focusRingAlpha),
         );
 
-      case DsButtonVariant.premium:
+      case ElButtonVariant.premium:
         return _ButtonSkin(
-          fill: DsPalette.value,
-          border: dsTransparent,
+          fill: ElPalette.value,
+          border: elTransparent,
           // `--color-value-foreground`: the one foreground in the system that
           // deliberately does NOT flip with the theme (globals.css L111–127) —
           // the foil is an opaque metal ramp, the same lime on a white page as
           // on a black one, so its label has to be dark in both.
-          content: DsPalette.valueForeground,
+          content: ElPalette.valueForeground,
           shadow: _pressed
-              ? DsShadows.btnDown
+              ? ElShadows.btnDown
               : _hovered
-                  // `hover:shadow-glow-value` replaces the token WHOLESALE:
-                  // the inset rim and the inner shade disappear, they are not
-                  // added to.
-                  ? DsShadows.glowValue
-                  : DsShadows.btnValue,
+              // `hover:shadow-glow-value` replaces the token WHOLESALE:
+              // the inset rim and the inner shade disappear, they are not
+              // added to.
+              ? ElShadows.glowValue
+              : ElShadows.btnValue,
           ring: theme.ring.withValues(alpha: _focusRingAlpha),
           semibold: true,
         );
 
-      case DsButtonVariant.secondary:
+      case ElButtonVariant.secondary:
         return _ButtonSkin(
           // No `active:` class of its own, so a press keeps the hover fill and
           // changes nothing but the scale. `aria-expanded:bg-accent` is that
           // same hover fill under another name.
           fill: lit ? theme.accent : theme.secondary,
-          border: dsTransparent,
+          border: elTransparent,
           content: theme.secondaryForeground,
-          shadow: DsShadows.none,
+          shadow: ElShadows.none,
           ring: theme.ring.withValues(alpha: _focusRingAlpha),
         );
 
-      case DsButtonVariant.outline:
+      case ElButtonVariant.outline:
         return _ButtonSkin(
           // `active:` changes only the elevation here — the fill stays put.
           // `aria-expanded:bg-muted` is the hover fill again.
           fill: lit ? theme.muted : theme.card,
           border: theme.input,
           content: theme.foreground,
-          shadow: _pressed ? DsShadows.btnDown : DsShadows.btn,
+          shadow: _pressed ? ElShadows.btnDown : ElShadows.btn,
           ring: theme.ring.withValues(alpha: _focusRingAlpha),
         );
 
-      case DsButtonVariant.ghost:
+      case ElButtonVariant.ghost:
         return _ButtonSkin(
           // The one variant that declares all three: `hover:bg-secondary`,
           // `active:bg-muted` and `aria-expanded:bg-secondary`.
           fill: _pressed
               ? theme.muted
               : lit
-                  ? theme.secondary
-                  : dsTransparent,
+              ? theme.secondary
+              : elTransparent,
           // The base class list is `border border-transparent` for every
           // variant: a real 1px border that costs a pixel of inner width.
-          border: dsTransparent,
+          border: elTransparent,
           // `hover:text-foreground` and `aria-expanded:text-foreground`, plus
           // the press that implies a hover on a pointer device.
           content: lit || _pressed ? theme.foreground : theme.mutedForeground,
-          shadow: DsShadows.none,
+          shadow: ElShadows.none,
           ring: theme.ring.withValues(alpha: _focusRingAlpha),
         );
 
-      case DsButtonVariant.destructive:
+      case ElButtonVariant.destructive:
         return _ButtonSkin(
           fill: theme.destructive.withValues(
-            alpha: _hovered ? _destructiveHoverFillAlpha : _destructiveFillAlpha,
+            alpha: _hovered
+                ? _destructiveHoverFillAlpha
+                : _destructiveFillAlpha,
           ),
           border: theme.destructive.withValues(
             alpha: _hovered
@@ -776,16 +775,16 @@ class _DsButtonState extends State<DsButton> {
                 : _destructiveBorderAlpha,
           ),
           content: theme.destructiveInk,
-          shadow: DsShadows.none,
+          shadow: ElShadows.none,
           ring: theme.destructive.withValues(alpha: _destructiveFocusRingAlpha),
         );
 
-      case DsButtonVariant.link:
+      case ElButtonVariant.link:
         return _ButtonSkin(
-          fill: dsTransparent,
-          border: dsTransparent,
+          fill: elTransparent,
+          border: elTransparent,
           content: theme.actionInk,
-          shadow: DsShadows.none,
+          shadow: ElShadows.none,
           ring: theme.ring.withValues(alpha: _focusRingAlpha),
           underline: _hovered,
         );
@@ -794,10 +793,10 @@ class _DsButtonState extends State<DsButton> {
 
   /// `focus-visible:border-ring`, or `focus-visible:border-destructive/50`
   /// where the variant overrides it.
-  Color _focusBorder(DsThemeData theme) =>
-      widget.variant == DsButtonVariant.destructive
-          ? theme.destructive.withValues(alpha: _destructiveFocusBorderAlpha)
-          : theme.ring;
+  Color _focusBorder(ElThemeData theme) =>
+      widget.variant == ElButtonVariant.destructive
+      ? theme.destructive.withValues(alpha: _destructiveFocusBorderAlpha)
+      : theme.ring;
 
   /// `font-semibold` as an override on the resolved `text-sm` style.
   ///
@@ -859,18 +858,18 @@ class _DsButtonState extends State<DsButton> {
   /// The spinner is **prepended**, and the gap between it and the label is the
   /// rung's own `gap-*`, because in CSS it is the button's flex `gap` doing the
   /// spacing rather than anything the spinner brings. That is where the missing
-  /// 24px of [DsButton.loading]'s drift comes from: 16 for the glyph, 8 for
+  /// 24px of [ElButton.loading]'s drift comes from: 16 for the glyph, 8 for
   /// `gap-2`.
   Widget _content() {
-    final Widget label = widget.emphasis == DsButtonEmphasis.caps
+    final Widget label = widget.emphasis == ElButtonEmphasis.caps
         ? _caps(widget.child)
         : widget.child;
     if (!widget.loading) return label;
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        const DsSpinner(),
-        SizedBox(width: DsButton.gapFor(widget.size)),
+        const ElSpinner(),
+        SizedBox(width: ElButton.gapFor(widget.size)),
         label,
       ],
     );
@@ -879,20 +878,20 @@ class _DsButtonState extends State<DsButton> {
   /// The variant's surface.
   ///
   /// Three of the seven paint a flat `background-color` and go through
-  /// [DsMachineSurface] directly. `default` and `premium` paint a gradient
+  /// [ElMachineSurface] directly. `default` and `premium` paint a gradient
   /// `background-image` plus two blended pseudo-layers, which is what
-  /// [DsSheenAction] and [DsFoilValue] are; they take the same shadow spec,
+  /// [ElSheenAction] and [ElFoilValue] are; they take the same shadow spec,
   /// radius and border and splice the ramp in where CSS puts it.
   Widget _surface({
-    required DsShadowSpec spec,
+    required ElShadowSpec spec,
     required BorderRadius radius,
     required Border border,
     required Color fill,
     required Widget child,
   }) {
     switch (widget.variant) {
-      case DsButtonVariant.primary:
-        return DsSheenAction(
+      case ElButtonVariant.primary:
+        return ElSheenAction(
           spec: spec,
           radius: radius,
           border: border,
@@ -900,20 +899,20 @@ class _DsButtonState extends State<DsButton> {
           pressed: _pressed,
           child: child,
         );
-      case DsButtonVariant.premium:
-        return DsFoilValue(
+      case ElButtonVariant.premium:
+        return ElFoilValue(
           spec: spec,
           radius: radius,
           border: border,
           hovered: _hovered,
           child: child,
         );
-      case DsButtonVariant.secondary:
-      case DsButtonVariant.outline:
-      case DsButtonVariant.ghost:
-      case DsButtonVariant.destructive:
-      case DsButtonVariant.link:
-        return DsMachineSurface(
+      case ElButtonVariant.secondary:
+      case ElButtonVariant.outline:
+      case ElButtonVariant.ghost:
+      case ElButtonVariant.destructive:
+      case ElButtonVariant.link:
+        return ElMachineSurface(
           spec: spec,
           radius: radius,
           fill: fill,
@@ -925,18 +924,19 @@ class _DsButtonState extends State<DsButton> {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
-    final _ButtonSkin skin =
-        _skin(theme).withSurface(widget.surface, hovered: _hovered);
-    final double height = DsButton.heightFor(widget.size);
-    final bool square = DsButton.isSquare(widget.size);
+    final ElThemeData theme = ElTheme.of(context);
+    final _ButtonSkin skin = _skin(
+      theme,
+    ).withSurface(widget.surface, hovered: _hovered);
+    final double height = ElButton.heightFor(widget.size);
+    final bool square = ElButton.isSquare(widget.size);
     final BorderRadius radius =
-        widget.radius ?? BorderRadius.circular(DsRadii.pill);
+        widget.radius ?? BorderRadius.circular(ElRadii.pill);
 
     // `btn-spring`: 250ms, dropping to `--duration-tick` while active.
-    final Duration transition = dsAnimationDuration(
+    final Duration transition = elAnimationDuration(
       context,
-      _pressed ? DsDurations.tick : DsDurations.base,
+      _pressed ? ElDurations.tick : ElDurations.base,
     );
 
     final Color borderColor = _focused ? _focusBorder(theme) : skin.border;
@@ -947,21 +947,23 @@ class _DsButtonState extends State<DsButton> {
     Widget button = TweenAnimationBuilder<double>(
       tween: Tween<double>(end: _focused ? 1 : 0),
       duration: transition,
-      curve: DsCurves.spring,
+      curve: ElCurves.spring,
       builder: (BuildContext context, double ringT, Widget? _) {
         // Below zero the spring has undershot on the way out; the layer's alpha
         // is clamped to nothing there, so the browser paints no ring either.
-        final DsShadowSpec spec = ringT <= 0
+        final ElShadowSpec spec = ringT <= 0
             ? skin.shadow
-            : DsButton.withFocusRing(skin.shadow, skin.ring, progress: ringT);
+            : ElButton.withFocusRing(skin.shadow, skin.ring, progress: ringT);
         return _SpringColors(
           fill: skin.fill,
           border: borderColor,
           content: skin.content,
           duration: transition,
           builder: (BuildContext context, Color fill, Color border, Color ink) {
-            final DsTypeSpec? typeSpec =
-                DsButton.typeFor(widget.size, widget.emphasis);
+            final ElTypeSpec? typeSpec = ElButton.typeFor(
+              widget.size,
+              widget.emphasis,
+            );
             // Null means the rung declares no `text-*` class — the four
             // squares. CSS then leaves `font-size`, `line-height` and family
             // inherited, and the only thing the button contributes is its own
@@ -970,7 +972,7 @@ class _DsButtonState extends State<DsButton> {
             // never sets.
             TextStyle style = typeSpec == null
                 ? DefaultTextStyle.of(context).style.copyWith(color: ink)
-                : DsText.styleOf(context, typeSpec, color: ink);
+                : ElText.styleOf(context, typeSpec, color: ink);
             if (skin.semibold) style = _applySemibold(style);
             if (skin.underline) {
               // `underline-offset-4` has no Flutter equivalent — [TextStyle]
@@ -984,21 +986,24 @@ class _DsButtonState extends State<DsButton> {
             return _surface(
               spec: spec,
               radius: radius,
-              border: Border.all(color: border, width: DsWidths.hairline),
+              border: Border.all(color: border, width: ElWidths.hairline),
               fill: fill,
               child: Padding(
                 // Just `px-*`: the border is inside the box and the surface
                 // already insets this child by its width, the way `box-sizing:
                 // border-box` does.
-                padding: widget.padding ??
+                padding:
+                    widget.padding ??
                     EdgeInsets.symmetric(
-                      horizontal: DsButton.paddingXFor(widget.size),
+                      horizontal: ElButton.paddingXFor(widget.size),
                     ),
                 child: widget.contentAlignment == null
                     ? Center(
                         widthFactor: square ? null : 1,
-                        child:
-                            DefaultTextStyle(style: style, child: _content()),
+                        child: DefaultTextStyle(
+                          style: style,
+                          child: _content(),
+                        ),
                       )
                     // `w-full justify-start`: no width factor, so the box takes
                     // the measure it is offered, and `heightFactor: 1` is what
@@ -1006,8 +1011,10 @@ class _DsButtonState extends State<DsButton> {
                     : Align(
                         alignment: widget.contentAlignment!,
                         heightFactor: widget.autoHeight ? 1 : null,
-                        child:
-                            DefaultTextStyle(style: style, child: _content()),
+                        child: DefaultTextStyle(
+                          style: style,
+                          child: _content(),
+                        ),
                       ),
               ),
             );
@@ -1034,7 +1041,7 @@ class _DsButtonState extends State<DsButton> {
     // the reference through every hold length it was driven at (B6).
     //
     // …and `not-aria-[haspopup]` is the whole of it: a trigger asks for no
-    // scale at all, at any hold length. See [DsButton.suppressPressScale].
+    // scale at all, at any hold length. See [ElButton.suppressPressScale].
     //
     // `transform-origin: 50% 50%` is [Transform.scale]'s own default, and the
     // scale is applied *outside* the shadow-painting surface so the whole
@@ -1042,10 +1049,10 @@ class _DsButtonState extends State<DsButton> {
     // does.
     button = Transform.scale(
       scale: _pressed && !widget.suppressPressScale
-          ? DsTransforms.buttonScale
+          ? ElTransforms.buttonScale
           : 1,
       child: Listener(
-        // The one thing `DsPress` was contributing besides the animation: a hit
+        // The one thing `ElPress` was contributing besides the animation: a hit
         // area that covers the whole control rather than only what its child
         // happens to paint. A `ghost` or `link` button has no fill to hit.
         behavior: HitTestBehavior.opaque,
@@ -1078,7 +1085,9 @@ class _DsButtonState extends State<DsButton> {
           // in that competing region in the first place — this MouseRegion is
           // then the only cursor annotation left anywhere inside the button,
           // and it is what wins, everywhere, both states.
-          cursor: _enabled ? SystemMouseCursors.click : SystemMouseCursors.basic,
+          cursor: _enabled
+              ? SystemMouseCursors.click
+              : SystemMouseCursors.basic,
           onEnter: (_) => _setHovered(true),
           onExit: (_) => _setHovered(false),
           child: SelectionContainer.disabled(child: button),
@@ -1115,7 +1124,7 @@ class _DsButtonState extends State<DsButton> {
     button = TweenAnimationBuilder<double>(
       tween: Tween<double>(end: _enabled ? 1 : _disabledOpacity),
       duration: transition,
-      curve: DsCurves.spring,
+      curve: ElCurves.spring,
       builder: (BuildContext context, double value, Widget? child) => Opacity(
         // The spring overshoots past 1 on the way back to enabled. CSS clamps
         // `opacity` to 0..1 for its used value, so a browser cannot show that
@@ -1182,28 +1191,28 @@ class _SpringColors extends StatelessWidget {
   final Color content;
   final Duration duration;
   final Widget Function(BuildContext, Color fill, Color border, Color content)
-      builder;
+  builder;
 
   @override
   Widget build(BuildContext context) {
     return TweenAnimationBuilder<Color?>(
       tween: ColorTween(end: fill),
       duration: duration,
-      curve: DsCurves.spring,
+      curve: ElCurves.spring,
       builder: (BuildContext context, Color? f, Widget? _) =>
           TweenAnimationBuilder<Color?>(
-        tween: ColorTween(end: border),
-        duration: duration,
-        curve: DsCurves.spring,
-        builder: (BuildContext context, Color? b, Widget? _) =>
-            TweenAnimationBuilder<Color?>(
-          tween: ColorTween(end: content),
-          duration: duration,
-          curve: DsCurves.spring,
-          builder: (BuildContext context, Color? c, Widget? _) =>
-              builder(context, f ?? fill, b ?? border, c ?? content),
-        ),
-      ),
+            tween: ColorTween(end: border),
+            duration: duration,
+            curve: ElCurves.spring,
+            builder: (BuildContext context, Color? b, Widget? _) =>
+                TweenAnimationBuilder<Color?>(
+                  tween: ColorTween(end: content),
+                  duration: duration,
+                  curve: ElCurves.spring,
+                  builder: (BuildContext context, Color? c, Widget? _) =>
+                      builder(context, f ?? fill, b ?? border, c ?? content),
+                ),
+          ),
     );
   }
 }

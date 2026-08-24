@@ -17,6 +17,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart' show debugPaintBaselinesEnabled;
 import 'package:flutter/services.dart'
     show SystemChrome, SystemUiMode, rootBundle;
+import 'package:flutter_web_plugins/url_strategy.dart' show usePathUrlStrategy;
 
 import 'nav.dart';
 import 'docs_pages/catalog.dart';
@@ -95,7 +96,48 @@ import 'components_docs/toaster/page.dart';
 import 'components_docs/toggle/meta.dart' as toggle;
 import 'components_docs/toggle/page.dart';
 import 'components_docs/tooltip/meta.dart' as tooltip;
+import 'components_docs/aspect_ratio/meta.dart' as aspect_ratio;
+import 'components_docs/button/meta.dart' as button;
+import 'components_docs/button_group/meta.dart' as button_group;
+import 'components_docs/combobox/meta.dart' as combobox;
+import 'components_docs/context_menu/meta.dart' as context_menu;
+import 'components_docs/drawer/meta.dart' as drawer;
+import 'components_docs/rule/meta.dart' as rule;
+import 'components_docs/empty/meta.dart' as empty;
+import 'components_docs/form/meta.dart' as form;
+import 'components_docs/hover_card/meta.dart' as hover_card;
+import 'components_docs/input_otp/meta.dart' as input_otp;
+import 'components_docs/item/meta.dart' as item;
+import 'components_docs/kbd/meta.dart' as kbd;
+import 'components_docs/marker/meta.dart' as marker;
+import 'components_docs/menubar/meta.dart' as menubar;
+import 'components_docs/nav_user/meta.dart' as nav_user;
+import 'components_docs/resizable/meta.dart' as resizable;
+import 'components_docs/selection_control/meta.dart' as selection_control;
+import 'components_docs/skeleton/meta.dart' as skeleton;
+import 'components_docs/spinner/meta.dart' as spinner;
+import 'components_docs/toggle_group/meta.dart' as toggle_group;
 import 'components_docs/tooltip/page.dart';
+import 'components_docs/aspect_ratio/page.dart';
+import 'components_docs/button_group/page.dart';
+import 'components_docs/combobox/page.dart';
+import 'components_docs/context_menu/page.dart';
+import 'components_docs/drawer/page.dart';
+import 'components_docs/rule/page.dart';
+import 'components_docs/empty/page.dart';
+import 'components_docs/form/page.dart';
+import 'components_docs/hover_card/page.dart';
+import 'components_docs/input_otp/page.dart';
+import 'components_docs/item/page.dart';
+import 'components_docs/kbd/page.dart';
+import 'components_docs/marker/page.dart';
+import 'components_docs/menubar/page.dart';
+import 'components_docs/nav_user/page.dart';
+import 'components_docs/resizable/page.dart';
+import 'components_docs/selection_control/page.dart';
+import 'components_docs/skeleton/page.dart';
+import 'components_docs/spinner/page.dart';
+import 'components_docs/toggle_group/page.dart';
 import 'pages/agent_avatar.dart';
 import 'pages/agent_voice.dart';
 import 'pages/buttons.dart';
@@ -121,12 +163,10 @@ import 'pages/selection.dart';
 import 'pages/selects.dart';
 import 'pages/shadows.dart';
 import 'pages/sidebar.dart';
-import 'pages/sidebar_demo.dart';
 import 'pages/spacing.dart';
 import 'pages/transcript.dart';
 import 'pages/typography.dart';
 import 'shell.dart';
-import 'showcase/showcase_app.dart';
 import 'skills_docs/catalog.dart';
 import 'skills_docs/skills_page.dart';
 import 'site/pages/public_pages.dart';
@@ -140,7 +180,7 @@ const double _selectionAlpha = 0.35;
 /// Boots the app, and on a phone asks the platform for the window the design
 /// depends on.
 ///
-/// USER-ORDERED MOBILE ADAPTATION (2026-08-16), and the half of [DsSafeArea]'s
+/// USER-ORDERED MOBILE ADAPTATION (2026-08-16), and the half of [ElSafeArea]'s
 /// ruling that a widget cannot state: *backgrounds paint edge-to-edge.* A page
 /// glow that stops at the status bar is not the design, so the app draws
 /// **under** both system bars ([SystemUiMode.edgeToEdge]) and the widgets below
@@ -168,6 +208,14 @@ void main() => runDocsApp();
 /// while retaining the same router, theme, and return path as the docs app.
 void runDocsApp({String? initialRoute}) {
   WidgetsFlutterBinding.ensureInitialized();
+  // `#/design-system/colors` -> `/design-system/colors`: the address bar the
+  // reference (ui.shadcn.com) shows, and what makes a typed or reloaded path
+  // resolvable at all rather than only a hash fragment the server never sees.
+  // A no-op off the web: `flutter_web_plugins` gates the real implementation
+  // behind its own `dart.library.ui_web` conditional export, the same seam
+  // `scroll_bridge.dart` uses for `dart.library.js_interop`, so this call is
+  // safe on the VM the widget tests run on without a stub of our own.
+  usePathUrlStrategy();
   // Flutter Inspector persists "Show baselines" through the VM service while
   // a debug session is alive. Reset it on every fresh boot so the diagnostic
   // ideographic/alphabetic rules can never be mistaken for product styling.
@@ -229,7 +277,7 @@ class DocsApp extends StatefulWidget {
   /// trip is treated as a typo.
   ///
   /// A `Z`-suffixed or offset-bearing value is converted **to local time**:
-  /// [DsClock] is a calendar clock, and the point of freezing it is that both
+  /// [ElClock] is a calendar clock, and the point of freezing it is that both
   /// renderers agree on which day it is.
   static DateTime? parseClock(String? raw) {
     if (raw == null || raw.isEmpty) return null;
@@ -238,7 +286,7 @@ class DocsApp extends StatefulWidget {
     // The date half only — the time half cannot roll a month over, and an
     // offset-bearing value is *supposed* to land on a different calendar day.
     if (raw.length >= 10 && !parsed.isUtc && !raw.contains('+')) {
-      if (DsDateFormat.dayKey(parsed) != raw.substring(0, 10)) return null;
+      if (ElDateFormat.dayKey(parsed) != raw.substring(0, 10)) return null;
     }
     return parsed.isUtc ? parsed.toLocal() : parsed;
   }
@@ -254,11 +302,11 @@ class _DocsAppState extends State<DocsApp> {
   /// — deep-link plumbing for the side-by-side verification harness. It sets
   /// only the initial controller values; nothing rendered differs from the
   /// reference.
-  final DsThemeController _theme = DsThemeController(
+  final ElThemeController _theme = ElThemeController(
     mode: switch (Uri.base.queryParameters['theme']) {
-      'light' => DsThemeMode.light,
-      'system' => DsThemeMode.system,
-      _ => DsThemeMode.dark,
+      'light' => ElThemeMode.light,
+      'system' => ElThemeMode.system,
+      _ => ElThemeMode.dark,
     },
   );
   late final AppRouter _router;
@@ -270,8 +318,26 @@ class _DocsAppState extends State<DocsApp> {
       route:
           widget.initialRoute ??
           Uri.base.queryParameters['route'] ??
-          (kIsWeb ? homeRoute : dsRoot),
+          _pathRoute() ??
+          (kIsWeb ? homeRoute : elRoot),
     );
+  }
+
+  /// The address bar's own path: `/components/button` for a page reached by
+  /// a typed URL, a bookmark or a hard reload, now that [usePathUrlStrategy]
+  /// (see [runDocsApp]) puts the route there instead of behind a `#`.
+  ///
+  /// Checked after `?route=`, never before it: the GitHub Pages entry point
+  /// stays authoritative when both are present, exactly as it was before this
+  /// existed. Null for `/` and for the empty path — those already fall through
+  /// to the same default the boot sequence used when there was no path
+  /// signal at all — and null off the web, where [Uri.base] is a `file://` URI
+  /// for the test binary rather than a route.
+  static String? _pathRoute() {
+    if (!kIsWeb) return null;
+    final String path = Uri.base.path;
+    if (path.isEmpty || path == '/') return null;
+    return path;
   }
 
   /// `?motion=reduced` — the third boot parameter, and the only one that
@@ -284,7 +350,7 @@ class _DocsAppState extends State<DocsApp> {
   /// reads `disableAnimations` off the platform's accessibility features and
   /// not off a media query — so on this side the same state is plumbed by
   /// hand, forcing [MediaQueryData.disableAnimations] on the tree below. That
-  /// is the flag `dsAnimationDuration` resolves against, so every duration in
+  /// is the flag `elAnimationDuration` resolves against, so every duration in
   /// the package collapses to zero exactly as `prefers-reduced-motion` makes
   /// it, and exactly as the page tests' own harness does.
   ///
@@ -311,7 +377,7 @@ class _DocsAppState extends State<DocsApp> {
   /// renderers agree on the month, the week count, the `today` cell and the
   /// document height.
   ///
-  /// It reaches the tree as a [DsClock] above [MaterialApp] — above, not
+  /// It reaches the tree as a [ElClock] above [MaterialApp] — above, not
   /// below, for the reason the library note gives: a pushed route is a sibling
   /// of `home` rather than a descendant, and a calendar inside a sheet must
   /// resolve the same "now" as one on the page.
@@ -331,7 +397,7 @@ class _DocsAppState extends State<DocsApp> {
 
   @override
   Widget build(BuildContext context) {
-    final Widget app = DsTheme(
+    final Widget app = ElTheme(
       controller: _theme,
       child: AppRouterScope(
         router: _router,
@@ -349,7 +415,7 @@ class _DocsAppState extends State<DocsApp> {
     // Above [MaterialApp], beside the theme scope and the router — the three
     // things that outlive every page, and the three a pushed route has to be
     // able to read. See [_clock].
-    return DsClock(now: frozen, child: app);
+    return ElClock(now: frozen, child: app);
   }
 }
 
@@ -371,7 +437,7 @@ class _DocsHome extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
+    final ElThemeData theme = ElTheme.of(context);
     // Depends on the router, so a `navigate()` rebuilds the shell and the page
     // together.
     final String route = AppRouter.of(context).route;
@@ -387,7 +453,7 @@ class _DocsHome extends StatelessWidget {
     // this href by construction does not appear.
 
     final Widget home = DefaultSelectionStyle(
-      selectionColor: DsPalette.action.withValues(alpha: _selectionAlpha),
+      selectionColor: ElPalette.action.withValues(alpha: _selectionAlpha),
       cursorColor: theme.foreground,
       child: switch (route) {
         _ when siteRouteFor(route) != null => SiteShell(
@@ -397,11 +463,18 @@ class _DocsHome extends StatelessWidget {
             onNavigate: AppRouter.of(context).navigate,
           ),
         ),
-        showcaseRoute => SignalStudioShowcase(
-          onOpenDesignSystem: () => AppRouter.of(context).navigate(dsRoot),
+        // Only the home page and the documentation tree exist now. Every
+        // other route, including the whole legacy `/el/...` gallery, the
+        // showcase and the sidebar demo, resolves to the documentation shell
+        // so a stale link lands somewhere real instead of opening a page that
+        // is no longer part of the site.
+        _ => SiteShell(
+          route: docsRoute,
+          child: publicPageFor(
+            docsRoute,
+            onNavigate: AppRouter.of(context).navigate,
+          ),
         ),
-        sidebarDemoRoute => const SidebarDemoPage(),
-        _ => DocsShell(route: route, child: pageFor(route)),
       },
     );
 
@@ -492,6 +565,45 @@ final Map<String, _ComponentDocPageBuilder> _componentDocPageBuilders =
           ToggleDocPage(onNavigate: onNavigate),
       tooltip.tooltipDoc.route: ({onNavigate}) =>
           TooltipDocPage(onNavigate: onNavigate),
+      aspect_ratio.aspectRatioDoc.route: ({onNavigate}) =>
+          AspectRatioDocPage(onNavigate: onNavigate),
+      button.buttonDoc.route: ({onNavigate}) =>
+          ButtonDocPage(onNavigate: onNavigate),
+      button_group.buttonGroupDoc.route: ({onNavigate}) =>
+          ButtonGroupDocPage(onNavigate: onNavigate),
+      combobox.comboboxDoc.route: ({onNavigate}) =>
+          ComboboxDocPage(onNavigate: onNavigate),
+      context_menu.contextMenuDoc.route: ({onNavigate}) =>
+          ContextMenuDocPage(onNavigate: onNavigate),
+      drawer.drawerDoc.route: ({onNavigate}) =>
+          DrawerDocPage(onNavigate: onNavigate),
+      rule.elRuleDoc.route: ({onNavigate}) =>
+          ElRuleDocPage(onNavigate: onNavigate),
+      empty.emptyDoc.route: ({onNavigate}) =>
+          EmptyDocPage(onNavigate: onNavigate),
+      form.formDoc.route: ({onNavigate}) => FormDocPage(onNavigate: onNavigate),
+      hover_card.hoverCardDoc.route: ({onNavigate}) =>
+          HoverCardDocPage(onNavigate: onNavigate),
+      input_otp.inputOtpDoc.route: ({onNavigate}) =>
+          InputOtpDocPage(onNavigate: onNavigate),
+      item.itemDoc.route: ({onNavigate}) => ItemDocPage(onNavigate: onNavigate),
+      kbd.kbdDoc.route: ({onNavigate}) => KbdDocPage(onNavigate: onNavigate),
+      marker.markerDoc.route: ({onNavigate}) =>
+          MarkerDocPage(onNavigate: onNavigate),
+      menubar.menubarDoc.route: ({onNavigate}) =>
+          MenubarDocPage(onNavigate: onNavigate),
+      nav_user.navUserDoc.route: ({onNavigate}) =>
+          NavUserDocPage(onNavigate: onNavigate),
+      resizable.resizableDoc.route: ({onNavigate}) =>
+          ResizableDocPage(onNavigate: onNavigate),
+      selection_control.selectionControlDoc.route: ({onNavigate}) =>
+          SelectionControlDocPage(onNavigate: onNavigate),
+      skeleton.skeletonDoc.route: ({onNavigate}) =>
+          SkeletonDocPage(onNavigate: onNavigate),
+      spinner.spinnerDoc.route: ({onNavigate}) =>
+          SpinnerDocPage(onNavigate: onNavigate),
+      toggle_group.toggleGroupDoc.route: ({onNavigate}) =>
+          ToggleGroupDocPage(onNavigate: onNavigate),
     };
 
 /// Resolves public website destinations without changing the
@@ -651,33 +763,33 @@ class _SkillsRouteState extends State<_SkillsRoute> {
 /// index routes. `shell_test` is what says that out loud.
 Widget pageFor(String route) {
   return switch (route) {
-    dsRoot => const OverviewPage(),
-    '$dsRoot/colors' => const ColorsPage(),
-    '$dsRoot/typography' => const TypographyPage(),
-    '$dsRoot/spacing' => const SpacingPage(),
-    '$dsRoot/shadows' => const ShadowsPage(),
-    '$dsRoot/motion' => const MotionPage(),
-    '$dsRoot/icons' => const IconsPage(),
-    '$dsRoot/components/base/buttons' => const ButtonsPage(),
-    '$dsRoot/components/base/inputs' => const InputsPage(),
-    '$dsRoot/components/base/forms' => const FormsPage(),
-    '$dsRoot/components/base/selects' => const SelectsPage(),
-    '$dsRoot/components/base/selection' => const SelectionPage(),
-    '$dsRoot/components/base/dialogs' => const DialogsPage(),
-    '$dsRoot/components/base/menus' => const MenusPage(),
-    '$dsRoot/components/base/navigation' => const NavigationPage(),
-    '$dsRoot/components/base/feedback' => const FeedbackPage(),
-    '$dsRoot/components/base/chat' => const ChatPage(),
-    '$dsRoot/components/base/data' => const DataPage(),
-    '$dsRoot/components/base/charts' => const ChartsPage(),
-    '$dsRoot/components/base/layout' => const LayoutPage(),
-    '$dsRoot/components/base/sidebar' => const SidebarPage(),
-    '$dsRoot/components/agent/console' => const ConsolePage(),
-    '$dsRoot/components/agent/avatar' => const AgentAvatarPage(),
-    '$dsRoot/components/agent/composer' => const ComposerPage(),
-    '$dsRoot/components/agent/transcript' => const TranscriptPage(),
-    '$dsRoot/components/agent/history' => const HistoryPage(),
-    '$dsRoot/components/agent/voice' => const AgentVoicePage(),
+    elRoot => const OverviewPage(),
+    '$elRoot/colors' => const ColorsPage(),
+    '$elRoot/typography' => const TypographyPage(),
+    '$elRoot/spacing' => const SpacingPage(),
+    '$elRoot/shadows' => const ShadowsPage(),
+    '$elRoot/motion' => const MotionPage(),
+    '$elRoot/icons' => const IconsPage(),
+    '$elRoot/components/base/buttons' => const ButtonsPage(),
+    '$elRoot/components/base/inputs' => const InputsPage(),
+    '$elRoot/components/base/forms' => const FormsPage(),
+    '$elRoot/components/base/selects' => const SelectsPage(),
+    '$elRoot/components/base/selection' => const SelectionPage(),
+    '$elRoot/components/base/dialogs' => const DialogsPage(),
+    '$elRoot/components/base/menus' => const MenusPage(),
+    '$elRoot/components/base/navigation' => const NavigationPage(),
+    '$elRoot/components/base/feedback' => const FeedbackPage(),
+    '$elRoot/components/base/chat' => const ChatPage(),
+    '$elRoot/components/base/data' => const DataPage(),
+    '$elRoot/components/base/charts' => const ChartsPage(),
+    '$elRoot/components/base/layout' => const LayoutPage(),
+    '$elRoot/components/base/sidebar' => const SidebarPage(),
+    '$elRoot/components/agent/console' => const ConsolePage(),
+    '$elRoot/components/agent/avatar' => const AgentAvatarPage(),
+    '$elRoot/components/agent/composer' => const ComposerPage(),
+    '$elRoot/components/agent/transcript' => const TranscriptPage(),
+    '$elRoot/components/agent/history' => const HistoryPage(),
+    '$elRoot/components/agent/voice' => const AgentVoicePage(),
     _ => _placeholderFor(route),
   };
 }
@@ -685,14 +797,14 @@ Widget pageFor(String route) {
 /// Names the placeholder from the nav registry rather than from a second list
 /// — a route that is in the tree cannot render an unnamed page.
 Widget _placeholderFor(String route) {
-  for (final DsGroup group in dsGroups) {
+  for (final ElGroup group in elGroups) {
     if (route == group.href) {
       return PlaceholderPage(
         eyebrow: "Elattar's Design System",
         title: group.title,
       );
     }
-    for (final DsCategory category in group.categories) {
+    for (final ElCategory category in group.categories) {
       if (categoryHref(group, category) == route) {
         return PlaceholderPage(eyebrow: group.title, title: category.title);
       }

@@ -1,0 +1,26 @@
+{
+  "name": "avatar",
+  "type": "component",
+  "version": "0.0.1",
+  "description": "`components/ui/avatar.tsx` — the circle, its rim, and the initials behind it.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/avatar.dart",
+      "target": "@ui/avatar.dart",
+      "sha256": "633d0216cea5e86bda8bc75ce939e2a8cb4297491af0cfc17da17cc933883aa6"
+    }
+  ],
+  "registryDependencies": [
+    "source-foundation"
+  ],
+  "semanticDependencies": [],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "documentationRoute": "/components/avatar",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/avatar.dart",
+  "deprecated": false
+}

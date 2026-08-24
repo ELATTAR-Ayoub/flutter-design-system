@@ -35,7 +35,7 @@ import '../token_swatch.dart';
 /// this file, so a page cannot end up named one thing in the sidebar and
 /// another at the top of itself. The blurb and the chips below are the page's
 /// own: the registry's differ, and that drift is the reference's (§12.1).
-final DsCategoryHit _here = findCategory('foundations', 'colors');
+final ElCategoryHit _here = findCategory('foundations', 'colors');
 
 /* ── The four ramps, as the reference declares them ──────────────────────── */
 
@@ -45,42 +45,46 @@ final DsCategoryHit _here = findCategory('foundations', 'colors');
 /// `--card`, `--muted` or `--accent`, so a ratio for them would be a number
 /// without a question, and the reference passes `measure: false`.
 const List<Widget> _monochrome = <Widget>[
-  DsTokenSwatch(
+  ElTokenSwatch(
     token: '--background',
     name: 'Background',
     use: 'The page. White on light, zinc 950 on dark. Utility: bg-background.',
     measure: false,
   ),
-  DsTokenSwatch(
+  ElTokenSwatch(
     token: '--card',
     name: 'Card',
-    use: 'Containers. Aliased by --popover and --sidebar. '
+    use:
+        'Containers. Aliased by --popover and --sidebar. '
         'Utilities: bg-card, bg-popover.',
     measure: false,
   ),
-  DsTokenSwatch(
+  ElTokenSwatch(
     token: '--muted',
     name: 'Muted',
-    use: 'Fills and hairlines. Aliased by --secondary and --border. '
+    use:
+        'Fills and hairlines. Aliased by --secondary and --border. '
         'Utilities: bg-muted, border-border.',
     measure: false,
   ),
-  DsTokenSwatch(
+  ElTokenSwatch(
     token: '--accent',
     name: 'Accent',
-    use: 'Hover surfaces and stronger borders. Aliased by --input. '
+    use:
+        'Hover surfaces and stronger borders. Aliased by --input. '
         'Utilities: bg-accent, border-input.',
     measure: false,
   ),
-  DsTokenSwatch(
+  ElTokenSwatch(
     token: '--foreground',
     name: 'Foreground',
     use: 'All primary text. Utility: text-foreground.',
   ),
-  DsTokenSwatch(
+  ElTokenSwatch(
     token: '--muted-foreground',
     name: 'Muted foreground',
-    use: 'Secondary text, metadata, helper copy. The one step that is not a '
+    use:
+        'Secondary text, metadata, helper copy. The one step that is not a '
         'mirror between themes — see the note below. '
         'Utility: text-muted-foreground.',
   ),
@@ -88,29 +92,33 @@ const List<Widget> _monochrome = <Widget>[
 
 /// `#action`: the ink first, then the three ends of the ramp.
 const List<Widget> _action = <Widget>[
-  DsTokenSwatch(
+  ElTokenSwatch(
     token: '--color-action-ink',
     name: 'Action ink',
-    use: 'The text-safe end, resolved for whichever theme you are in. The ONLY '
+    use:
+        'The text-safe end, resolved for whichever theme you are in. The ONLY '
         'action colour allowed on text, icons and links. '
         'Utility: text-action-ink.',
   ),
-  DsTokenSwatch(
+  ElTokenSwatch(
     token: '--color-action-bright',
     name: 'Action bright',
-    use: 'The lifted end. Ink on dark, and the focus ring there. Illegible as '
+    use:
+        'The lifted end. Ink on dark, and the focus ring there. Illegible as '
         'text on light — never name it directly.',
   ),
-  DsTokenSwatch(
+  ElTokenSwatch(
     token: '--color-action',
     name: 'Action',
-    use: 'The fill. Drives --primary: buttons, selection, active nav. Never '
+    use:
+        'The fill. Drives --primary: buttons, selection, active nav. Never '
         'carries a glyph — put text-primary-foreground on top.',
   ),
-  DsTokenSwatch(
+  ElTokenSwatch(
     token: '--color-action-dark',
     name: 'Action dark',
-    use: "The deep end. Ink on light, plus gradient floors and the foil ramp's "
+    use:
+        "The deep end. Ink on light, plus gradient floors and the foil ramp's "
         'base.',
   ),
 ];
@@ -120,23 +128,24 @@ const List<Widget> _action = <Widget>[
 /// The order is not the action ramp's: mid comes second here and last-but-one
 /// there. Kept as shipped.
 const List<Widget> _value = <Widget>[
-  DsTokenSwatch(
+  ElTokenSwatch(
     token: '--color-value-ink',
     name: 'Value ink',
-    use: 'The text-safe end, resolved per theme. Every figure, label and glyph '
+    use:
+        'The text-safe end, resolved per theme. Every figure, label and glyph '
         'that means worth.',
   ),
-  DsTokenSwatch(
+  ElTokenSwatch(
     token: '--color-value',
     name: 'Value',
     use: 'Balances, rankings, premium actions, reward surfaces.',
   ),
-  DsTokenSwatch(
+  ElTokenSwatch(
     token: '--color-value-bright',
     name: 'Value bright',
     use: "Reward moments and the foil gradient's top stop.",
   ),
-  DsTokenSwatch(
+  ElTokenSwatch(
     token: '--color-value-dark',
     name: 'Value dark',
     use: 'Foil gradient floor, and ink on light.',
@@ -149,24 +158,26 @@ const List<Widget> _value = <Widget>[
 /// `--destructive`, which is shadcn's own and the only one of the four with a
 /// theme block behind it.
 const List<Widget> _state = <Widget>[
-  DsTokenSwatch(
+  ElTokenSwatch(
     token: '--color-success',
     name: 'Success',
-    use: 'Completed, cleared, live, gained. Emerald rather than a plain green, '
+    use:
+        'Completed, cleared, live, gained. Emerald rather than a plain green, '
         'to open a gap against lime.',
   ),
-  DsTokenSwatch(
+  ElTokenSwatch(
     token: '--color-warning',
     name: 'Warning',
     use: 'Pending, needs attention, purchase limit approaching.',
   ),
-  DsTokenSwatch(
+  ElTokenSwatch(
     token: '--color-info',
     name: 'Information',
-    use: 'Neutral notices and explainers. Cyan rather than blue, so a notice '
+    use:
+        'Neutral notices and explainers. Cyan rather than blue, so a notice '
         'cannot be mistaken for the brand.',
   ),
-  DsTokenSwatch(
+  ElTokenSwatch(
     token: '--destructive',
     name: 'Destructive',
     use: "shadcn's own. Deletes, failed payments, validation errors.",
@@ -183,10 +194,11 @@ class ColorsPage extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        DsPageHeader(
+        ElPageHeader(
           eyebrow: _here.group.title,
           title: _here.category.title,
-          blurb: 'Zinc for everything structural, blue for action, lime for '
+          blurb:
+              'Zinc for everything structural, blue for action, lime for '
               'worth, four state colours, and nothing else. Two roles, two '
               'themes, and every value on this page measured rather than '
               'claimed.',
@@ -203,52 +215,56 @@ class ColorsPage extends StatelessWidget {
 
         // `Note … className="mb-12"`, before any section.
         Padding(
-          padding: EdgeInsets.only(bottom: ds(12)),
-          child: DsNote(
+          padding: EdgeInsets.only(bottom: el(12)),
+          child: ElNote(
             title: 'Measured, not asserted',
-            child: DsRichText(
+            child: ElRichText(
               TextSpan(
                 children: <InlineSpan>[
                   const TextSpan(
-                    text: 'Every value below is read from the live stylesheet '
+                    text:
+                        'Every value below is read from the live stylesheet '
                         'and every contrast ratio is computed from it at '
                         'runtime. Nothing on this page is typed by hand, so it '
                         'cannot disagree with ',
                   ),
-                  DsCode.span('app/globals.css'),
+                  ElCode.span('app/globals.css'),
                   const TextSpan(
-                    text: ' — and it re-measures when you flip the theme, so '
+                    text:
+                        ' — and it re-measures when you flip the theme, so '
                         'the ratios you are reading are the ratios for the '
                         'mode you are actually in. The rules that govern all '
                         'of it live in ',
                   ),
-                  DsCode.span('RULES.md'),
+                  ElCode.span('RULES.md'),
                   const TextSpan(text: '.'),
                 ],
               ),
-              DsType.small,
+              ElType.small,
             ),
           ),
         ),
 
-        DsSection(
+        ElSection(
           id: 'monochrome',
           title: 'Monochrome — zinc',
-          description: "Six steps on shadcn's own token names, read downward "
+          description:
+              "Six steps on shadcn's own token names, read downward "
               'on light and upward on dark. There is no second naming system.',
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              const DsTokenSwatchList(rows: _monochrome),
-              SizedBox(height: ds(4)), // `mt-4`
-              DsNote(
-                tone: DsNoteTone.value,
+              const ElTokenSwatchList(rows: _monochrome),
+              SizedBox(height: el(4)), // `mt-4`
+              ElNote(
+                tone: ElNoteTone.value,
                 title: 'The one step that is not a mirror',
-                child: DsRichText(
+                child: ElRichText(
                   TextSpan(
                     children: <InlineSpan>[
                       const TextSpan(
-                        text: 'Every other neutral inverts cleanly between the '
+                        text:
+                            'Every other neutral inverts cleanly between the '
                             'two themes. Muted foreground does not. On dark it '
                             'is zinc 300, which measures about 13:1; the '
                             'mirror image would be zinc 400 on white, which '
@@ -256,11 +272,12 @@ class ColorsPage extends StatelessWidget {
                             'zinc 500, which this system shipped for a long '
                             'time: that clears AA on ',
                       ),
-                      DsCode.span('--background'),
+                      ElCode.span('--background'),
                       const TextSpan(text: ' and misses it on '),
-                      DsCode.span('--muted'),
+                      ElCode.span('--muted'),
                       const TextSpan(
-                        text: ' by a tenth of a point — and muted text on a '
+                        text:
+                            ' by a tenth of a point — and muted text on a '
                             'muted fill is the most repeated pair in the whole '
                             'system. Light sits one step deeper than zinc 500 '
                             'so both pairs clear. Flip the theme and watch the '
@@ -269,53 +286,58 @@ class ColorsPage extends StatelessWidget {
                       ),
                     ],
                   ),
-                  DsType.small,
+                  ElType.small,
                 ),
               ),
             ],
           ),
         ),
 
-        DsSection(
+        ElSection(
           id: 'action',
           title: 'Action — the thing that acts',
-          description: 'Buttons, links, focus, selection, the agent. It '
+          description:
+              'Buttons, links, focus, selection, the agent. It '
               'answers one question: can I act on this, or is this the thing I '
               'picked? It is a blue today; it has been purple and wine before, '
               'and no component knew.',
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              const DsTokenSwatchList(rows: _action),
-              SizedBox(height: ds(4)),
-              DsNote(
-                title: 'One text-safe shade per theme — and it is not the same '
+              const ElTokenSwatchList(rows: _action),
+              SizedBox(height: el(4)),
+              ElNote(
+                title:
+                    'One text-safe shade per theme — and it is not the same '
                     'shade',
-                child: DsRichText(
+                child: ElRichText(
                   TextSpan(
                     children: <InlineSpan>[
                       const TextSpan(
-                        text: 'The ratios above are measured live, so flip the '
+                        text:
+                            'The ratios above are measured live, so flip the '
                             'theme and watch them trade places. On dark, ',
                       ),
-                      DsCode.span('--color-action-bright'),
+                      ElCode.span('--color-action-bright'),
                       const TextSpan(
-                        text: ' clears AA and the deep end fails. On light it '
+                        text:
+                            ' clears AA and the deep end fails. On light it '
                             'is exactly reversed. A component cannot know '
                             'which surface it is sitting on, so it never names '
                             'either end — it writes ',
                       ),
-                      DsCode.span('text-action-ink'),
+                      ElCode.span('text-action-ink'),
                       const TextSpan(
-                        text: ', and the theme block answers. The mid shade is '
+                        text:
+                            ', and the theme block answers. The mid shade is '
                             'a fill in both themes and can never carry a '
                             'glyph; put ',
                       ),
-                      DsCode.span('text-primary-foreground'),
+                      ElCode.span('text-primary-foreground'),
                       const TextSpan(text: ' on top of it.'),
                     ],
                   ),
-                  DsType.small,
+                  ElType.small,
                 ),
               ),
             ],
@@ -324,31 +346,33 @@ class ColorsPage extends StatelessWidget {
 
         // The one section with no note: the value ramp follows the action
         // ramp's rule, and the reference does not restate it.
-        const DsSection(
+        const ElSection(
           id: 'value',
           title: 'Value — the thing that is worth something',
-          description: 'Balances, rankings, rewards, premium actions. Nothing '
+          description:
+              'Balances, rankings, rewards, premium actions. Nothing '
               'else. It is lime today, and it follows the same ink rule the '
               'action ramp does.',
-          child: DsTokenSwatchList(rows: _value),
+          child: ElTokenSwatchList(rows: _value),
         ),
 
-        DsSection(
+        ElSection(
           id: 'state',
           title: 'State',
-          description: 'Four meanings, fixed. Two of them moved when the brand '
+          description:
+              'Four meanings, fixed. Two of them moved when the brand '
               'did, and both moves were forced rather than aesthetic.',
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              const DsTokenSwatchList(rows: _state),
-              SizedBox(height: ds(4)),
-              DsNote(
-                tone: DsNoteTone.value,
+              const ElTokenSwatchList(rows: _state),
+              SizedBox(height: el(4)),
+              ElNote(
+                tone: ElNoteTone.value,
                 title: 'Why info is cyan and success is emerald',
                 // "in the same same row": the source breaks the line between
                 // the two, JSX collapses it, and the doubled word ships.
-                child: DsText(
+                child: ElText(
                   'A state colour has one job: to be unmistakable for anything '
                   'else on the screen. Information used to be blue 400, which '
                   'stopped working the moment action became blue — a neutral '
@@ -359,29 +383,31 @@ class ColorsPage extends StatelessWidget {
                   'amber, and lime sits forty degrees away from it, where the '
                   'old value hue sat almost on top of it. That collision is '
                   'the one this rebrand fixed by accident.',
-                  DsType.small,
+                  ElType.small,
                 ),
               ),
             ],
           ),
         ),
 
-        DsSection(
+        ElSection(
           id: 'beyond',
           title: 'What is deliberately not a colour token',
-          description: 'Two things this system refuses to express as a colour, '
+          description:
+              'Two things this system refuses to express as a colour, '
               'because a colour is the wrong tool for both.',
-          child: DsGrid(
+          child: ElGrid(
             sm: 2,
             children: <Widget>[
-              DsPanel(
+              ElPanel(
                 label: 'Texture',
-                child: DsRichText(
+                child: ElRichText(
                   TextSpan(
-                    style: DsText.styleOf(context, DsType.small),
+                    style: ElText.styleOf(context, ElType.small),
                     children: <InlineSpan>[
                       const TextSpan(
-                        text: 'A surface that has to feel rare, precious or '
+                        text:
+                            'A surface that has to feel rare, precious or '
                             'alive is a ',
                       ),
                       // `<em>`: the browser slants the same face; so does
@@ -391,36 +417,38 @@ class ColorsPage extends StatelessWidget {
                         style: TextStyle(fontStyle: FontStyle.italic),
                       ),
                       const TextSpan(
-                        text: ', not a hue — a moving gradient, a foil ramp, '
+                        text:
+                            ', not a hue — a moving gradient, a foil ramp, '
                             'an iridescent bloom. Those live in ',
                       ),
-                      DsCode.span('globals.css'),
+                      ElCode.span('globals.css'),
                       const TextSpan(text: ' as utilities ('),
-                      DsCode.span('foil-value'),
+                      ElCode.span('foil-value'),
                       const TextSpan(text: ', '),
-                      DsCode.span('bloom-cosmic'),
+                      ElCode.span('bloom-cosmic'),
                       const TextSpan(text: ', '),
-                      DsCode.span('sheen-action'),
+                      ElCode.span('sheen-action'),
                       const TextSpan(
-                        text: ') and are built from the two ramps above, so '
+                        text:
+                            ') and are built from the two ramps above, so '
                             'they follow a rebrand without carrying colour '
                             'tokens of their own.',
                       ),
                     ],
                   ),
-                  DsType.small,
+                  ElType.small,
                 ),
               ),
-              DsPanel(
+              ElPanel(
                 label: 'Meaning',
-                child: DsText(
+                child: ElText(
                   'Nothing may be communicated by colour alone. A state ships '
                   'its glyph and its label as well as its hue; a status ships '
                   'its sentence. The four state colours above are a second '
                   'signal on top of a first one, never the only one — which is '
                   'also what keeps this system legible when both themes and '
                   'every form of colour-blindness are accounted for.',
-                  DsType.small,
+                  ElType.small,
                 ),
               ),
             ],
@@ -428,7 +456,7 @@ class ColorsPage extends StatelessWidget {
         ),
 
         // Colors is index 0 of foundations: no previous, next is Typography.
-        const DsPageFootNav(groupId: 'foundations', slug: 'colors'),
+        const ElPageFootNav(groupId: 'foundations', slug: 'colors'),
       ],
     );
   }

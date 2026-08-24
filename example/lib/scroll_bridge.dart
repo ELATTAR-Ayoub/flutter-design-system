@@ -1,5 +1,5 @@
-/// The capture rig's scroll seam, `window.__dsScrollTo`, `__dsScrollY` and
-/// `__dsScrollMax`.
+/// The capture rig's scroll seam, `window.__elScrollTo`, `__elScrollY` and
+/// `__elScrollMax`.
 ///
 /// **Why this exists.** The rig photographs a page taller than the viewport in
 /// passes and stitches them. On the web app it drives that with `window.scrollY`
@@ -10,7 +10,7 @@
 ///
 /// The obvious substitute: infer the offset by matching the overlap between
 /// two shots: cannot work here, and the reason is a design decision three
-/// files away. `--body-glow` is `background-attachment: fixed`, so [DsPageGlow]
+/// files away. `--body-glow` is `background-attachment: fixed`, so [ElPageGlow]
 /// sits at the bottom of the shell's [Stack], **outside both scroll views**.
 /// Scrolled content is therefore never a pure translation: every pass repaints
 /// the same fixed gradient behind different content, so the overlap at the

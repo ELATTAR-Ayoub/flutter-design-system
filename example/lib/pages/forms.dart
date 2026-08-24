@@ -8,8 +8,8 @@
 ///
 /// What this page owns and what it borrows: the *composition* is here: four
 /// controllers, four rule lists, five hand-wired controls and the toast calls —
-/// and every pixel is a package component. `DsForm` / `DsRule` are the
-/// `useForm` + Zod pair, `DsField` is the `Field` family, and `DsToaster` is
+/// and every pixel is a package component. `ElForm` / `ElRule` are the
+/// `useForm` + Zod pair, `ElField` is the `Field` family, and `ElToaster` is
 /// mounted once by the shell (ruling F8) exactly as `<Toaster/>` is mounted once
 /// by the root layout.
 ///
@@ -19,13 +19,13 @@
 ///
 /// ## Divergences: reproduced behaviour the reference does not have
 ///
-/// * **Focus-on-error lands on every field (ruling F4).** `DsForm.submit`
+/// * **Focus-on-error lands on every field (ruling F4).** `ElForm.submit`
 ///   focuses the first invalid field in registration order whatever its shape,
 ///   so submitting the composed form untouched puts focus on the Plan trigger.
 ///   The reference focuses nothing at all there: see drift 7: because RHF
 ///   needs a DOM ref and all three failing fields are hand-wired. An invisible
 ///   accessibility regression is the one drift class this port does not ship.
-/// * **`form.reset(values)`** has no single call in the port: `DsForm.reset`
+/// * **`form.reset(values)`** has no single call in the port: `ElForm.reset`
 ///   goes back to `defaultValues`. [_resetToSavedValues] does what RHF does —
 ///   reset, then write the saved strings back through the controllers, which at
 ///   a zeroed submit count re-validates nothing. The account form is therefore
@@ -43,7 +43,7 @@
 /// **A `<legend>` is not a flex item.** The measured gap between "Payout
 /// rhythm" and the radios is **6px**, not 6 + the fieldset's own `gap-3`: a
 /// rendered legend is lifted out of the fieldset's anonymous content box, so
-/// only its `mb-1.5` applies. [DsFieldSet] is therefore given the content box's
+/// only its `mb-1.5` applies. [ElFieldSet] is therefore given the content box's
 /// children: the group and its message: and the legend sits above it. That is
 /// the CSS box tree, not a workaround.
 ///
@@ -170,10 +170,10 @@ const Duration _serverLatency = Duration(
 /// Zod 4 runs every string check without aborting and `criteriaMode` is left at
 /// `firstError`, so `""` raises `too_small` **and** `invalid_format` and renders
 /// only the first of them.
-List<DsRule<String>> _handleRules() => <DsRule<String>>[
-  DsRule.minLength(3, 'At least 3 characters.'),
-  DsRule.maxLength(20, 'No more than 20 characters.'),
-  DsRule.pattern(
+List<ElRule<String>> _handleRules() => <ElRule<String>>[
+  ElRule.minLength(3, 'At least 3 characters.'),
+  ElRule.maxLength(20, 'No more than 20 characters.'),
+  ElRule.pattern(
     RegExp(r'^[a-z0-9_]+$'),
     'Lowercase letters, numbers and underscores only.',
   ),
@@ -181,11 +181,11 @@ List<DsRule<String>> _handleRules() => <DsRule<String>>[
 
 /// `passwordSchema.password`: four checks and `criteriaMode: "all"`, which is
 /// the only place in the corpus `FieldError`'s list branch fires.
-List<DsRule<String>> _passwordRules() => <DsRule<String>>[
-  DsRule.minLength(10, 'At least 10 characters.'),
-  DsRule.pattern(RegExp('[A-Z]'), 'One capital letter.'),
-  DsRule.pattern(RegExp('[0-9]'), 'One number.'),
-  DsRule.pattern(RegExp('[^A-Za-z0-9]'), 'One symbol.'),
+List<ElRule<String>> _passwordRules() => <ElRule<String>>[
+  ElRule.minLength(10, 'At least 10 characters.'),
+  ElRule.pattern(RegExp('[A-Z]'), 'One capital letter.'),
+  ElRule.pattern(RegExp('[0-9]'), 'One number.'),
+  ElRule.pattern(RegExp('[^A-Za-z0-9]'), 'One symbol.'),
 ];
 
 /* ── Page ────────────────────────────────────────────────────────────────── */
@@ -195,12 +195,12 @@ class FormsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsCategoryHit here = findCategory('base', 'forms');
+    final ElCategoryHit here = findCategory('base', 'forms');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        DsPageHeader(
+        ElPageHeader(
           // DRIFT 1. The group is already called "Base Components"; the page
           // interpolates a second literal after a U+00B7 anyway.
           eyebrow: '${here.group.title} · Base',
@@ -214,7 +214,7 @@ class FormsPage extends StatelessWidget {
         const _SubmitStatesSection(),
         const _ServerErrorsSection(),
         const _ComposedFieldsSection(),
-        const DsPageFootNav(groupId: 'base', slug: 'forms'),
+        const ElPageFootNav(groupId: 'base', slug: 'forms'),
       ],
     );
   }
@@ -227,7 +227,7 @@ class _FormSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsSection(
+    return ElSection(
       id: 'form',
       title: 'Form',
       description:
@@ -237,17 +237,17 @@ class _FormSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          const DsPanel(label: 'A whole form, live', child: _AccountForm()),
+          const ElPanel(label: 'A whole form, live', child: _AccountForm()),
           // `className="mt-6"` on the Note, the Meta and every DoDont on the
           // page.
-          SizedBox(height: ds(6)),
-          const DsNote(
+          SizedBox(height: el(6)),
+          const ElNote(
             title: 'Why there is no FormItem',
             child: _WhyNoFormItemBody(),
           ),
-          SizedBox(height: ds(6)),
-          const DsMeta(
-            items: <DsMetaItem>[
+          SizedBox(height: el(6)),
+          const ElMeta(
+            items: <ElMetaItem>[
               (
                 k: 'Form',
                 v: TextSpan(
@@ -301,7 +301,7 @@ class _WhyNoFormItemBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsRichText(
+    return ElRichText(
       TextSpan(
         children: <InlineSpan>[
           const TextSpan(
@@ -309,34 +309,34 @@ class _WhyNoFormItemBody extends StatelessWidget {
                 'Stock shadcn ships a second generation of these primitives '
                 '— ',
           ),
-          DsCode.span('FormItem'),
+          ElCode.span('FormItem'),
           const TextSpan(text: ', '),
-          DsCode.span('FormLabel'),
+          ElCode.span('FormLabel'),
           const TextSpan(text: ', '),
-          DsCode.span('FormDescription'),
+          ElCode.span('FormDescription'),
           const TextSpan(text: ', '),
-          DsCode.span('FormMessage'),
+          ElCode.span('FormMessage'),
           const TextSpan(
             text:
                 ' — each carrying its own presentation. This system already '
                 'has that presentation in ',
           ),
-          DsCode.span('field.tsx'),
+          ElCode.span('field.tsx'),
           const TextSpan(text: ', whose '),
-          DsCode.span('FieldError'),
+          ElCode.span('FieldError'),
           const TextSpan(
             text: ' takes React Hook Form’s error shape verbatim. So ',
           ),
-          DsCode.span('FormLabel'),
+          ElCode.span('FormLabel'),
           const TextSpan(text: ' here '),
           const TextSpan(
             text: 'renders',
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
           const TextSpan(text: ' '),
-          DsCode.span('FieldLabel'),
+          ElCode.span('FieldLabel'),
           const TextSpan(text: ' and adds one attribute: '),
-          DsCode.span('htmlFor'),
+          ElCode.span('htmlFor'),
           const TextSpan(
             text:
                 '. Two vocabularies for one idea is what RULES §1.1 forbids; '
@@ -344,7 +344,7 @@ class _WhyNoFormItemBody extends StatelessWidget {
           ),
         ],
       ),
-      DsType.small,
+      ElType.small,
     );
   }
 }
@@ -356,7 +356,7 @@ class _ValidationSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsSection(
+    return ElSection(
       id: 'validation',
       title: 'Validation',
       description:
@@ -369,32 +369,32 @@ class _ValidationSection extends StatelessWidget {
           // independent: two controllers, so nothing they hold is shared.
           // DRIFT 5. The label advertises two RHF defaults as configuration;
           // the separator is U+00B7.
-          const DsPanel(
+          const ElPanel(
             label: 'mode: onSubmit · reValidateMode: onChange',
             child: _AccountForm(),
           ),
-          SizedBox(height: ds(6)),
+          SizedBox(height: el(6)),
           // Not `const`: `.type-small` is resolved at runtime, so the one Note
           // on the page with no chips in it is still a runtime widget.
-          DsNote(
+          ElNote(
             title: 'Validate late, re-validate early',
             // DRIFT 4. This paragraph argues against the mode the next section
             // ships.
-            child: DsText(
+            child: ElText(
               'The account form above asks nothing until you submit, then '
               're-checks on every keystroke. Validating on the first keystroke '
               'tells someone their email is invalid while they are still '
               'typing the third character, which is true and useless. Once '
               'they have submitted, they have asked to be told — so from that '
               'point the feedback is immediate.',
-              DsType.small,
+              ElType.small,
             ),
           ),
-          SizedBox(height: ds(6)),
+          SizedBox(height: el(6)),
           // The double quotes inside rows 1, 2 and 4 are straight `"` in the
           // source, not the curly pair the Panel labels use.
-          const DsMeta(
-            items: <DsMetaItem>[
+          const ElMeta(
+            items: <ElMetaItem>[
               (
                 k: 'mode',
                 v: TextSpan(
@@ -465,7 +465,7 @@ class _FieldErrorsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsSection(
+    return ElSection(
       id: 'field-errors',
       title: 'Field errors',
       description:
@@ -475,18 +475,18 @@ class _FieldErrorsSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           // The em dash is U+2014.
-          const DsPanel(
+          const ElPanel(
             label: 'criteriaMode: all — type a weak password',
             child: _PasswordForm(),
           ),
-          SizedBox(height: ds(6)),
-          const DsNote(
+          SizedBox(height: el(6)),
+          const ElNote(
             title: 'What the wiring actually guarantees',
             child: _WiringGuaranteesBody(),
           ),
           // `<div className="mt-6">` around the DoDont rather than on it.
-          SizedBox(height: ds(6)),
-          const DsDoDont(dos: _dos, donts: _donts),
+          SizedBox(height: el(6)),
+          const ElDoDont(dos: _dos, donts: _donts),
         ],
       ),
     );
@@ -498,7 +498,7 @@ class _WiringGuaranteesBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsRichText(
+    return ElRichText(
       TextSpan(
         children: <InlineSpan>[
           const TextSpan(
@@ -507,17 +507,17 @@ class _WiringGuaranteesBody extends StatelessWidget {
                 'and none of them were typed at the call site. The control '
                 'carries ',
           ),
-          DsCode.span('aria-invalid'),
+          ElCode.span('aria-invalid'),
           const TextSpan(text: ' and an '),
-          DsCode.span('aria-describedby'),
+          ElCode.span('aria-describedby'),
           const TextSpan(
             text:
                 ' that points at the description while valid and at '
                 'description + error once it is not. The error itself is a ',
           ),
-          DsCode.span('FieldError'),
+          ElCode.span('FieldError'),
           const TextSpan(text: ' with '),
-          DsCode.span('role="alert"'),
+          ElCode.span('role="alert"'),
           const TextSpan(
             text:
                 ', and it renders nothing at all when the field is valid '
@@ -525,7 +525,7 @@ class _WiringGuaranteesBody extends StatelessWidget {
           ),
         ],
       ),
-      DsType.small,
+      ElType.small,
     );
   }
 }
@@ -539,7 +539,7 @@ class _SubmitStatesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsSection(
+    return ElSection(
       id: 'submit-states',
       title: 'Submit states',
       description:
@@ -549,8 +549,8 @@ class _SubmitStatesSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           const _SubmitStates(),
-          SizedBox(height: ds(6)),
-          const DsNote(
+          SizedBox(height: el(6)),
+          const ElNote(
             title: 'Both signals, or neither counts',
             child: _BothSignalsBody(),
           ),
@@ -565,16 +565,16 @@ class _BothSignalsBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsRichText(
+    return ElRichText(
       TextSpan(
         children: <InlineSpan>[
-          DsCode.span('loading'),
+          ElCode.span('loading'),
           const TextSpan(
             text:
                 ' on the Button is the first signal — it swaps in a spinner, '
                 'sets ',
           ),
-          DsCode.span('aria-busy'),
+          ElCode.span('aria-busy'),
           const TextSpan(
             text:
                 ' and disables the control, so a slow save cannot be '
@@ -585,7 +585,7 @@ class _BothSignalsBody extends StatelessWidget {
           ),
         ],
       ),
-      DsType.small,
+      ElType.small,
     );
   }
 }
@@ -597,7 +597,7 @@ class _ServerErrorsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsSection(
+    return ElSection(
       id: 'server-errors',
       title: 'Server errors',
       description:
@@ -608,18 +608,18 @@ class _ServerErrorsSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           // The quotes around `taken` are U+201C / U+201D.
-          const DsPanel(
+          const ElPanel(
             label: 'Submit “taken” to fail, anything else to succeed',
             child: _ServerErrorForm(),
           ),
-          SizedBox(height: ds(6)),
-          const DsNote(
+          SizedBox(height: el(6)),
+          const ElNote(
             title: 'Two places, because they answer two questions',
             child: _TwoPlacesBody(),
           ),
-          SizedBox(height: ds(6)),
-          const DsMeta(
-            items: <DsMetaItem>[
+          SizedBox(height: el(6)),
+          const ElMeta(
+            items: <ElMetaItem>[
               (
                 k: 'setError("root.serverError")',
                 v: TextSpan(
@@ -656,10 +656,10 @@ class _TwoPlacesBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const TextStyle italic = TextStyle(fontStyle: FontStyle.italic);
-    return DsRichText(
+    return ElRichText(
       TextSpan(
         children: <InlineSpan>[
-          DsCode.span('setError("root.serverError")'),
+          ElCode.span('setError("root.serverError")'),
           const TextSpan(text: ' holds what went wrong with the '),
           const TextSpan(text: 'submission', style: italic),
           const TextSpan(
@@ -668,7 +668,7 @@ class _TwoPlacesBody extends StatelessWidget {
                 'explaining, which is exactly what RULES §5 reserves Alert '
                 'for. ',
           ),
-          DsCode.span('setError("handle")'),
+          ElCode.span('setError("handle")'),
           const TextSpan(text: ' holds what is wrong with the '),
           const TextSpan(text: 'field', style: italic),
           const TextSpan(
@@ -680,7 +680,7 @@ class _TwoPlacesBody extends StatelessWidget {
           ),
         ],
       ),
-      DsType.small,
+      ElType.small,
     );
   }
 }
@@ -692,7 +692,7 @@ class _ComposedFieldsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsSection(
+    return ElSection(
       id: 'composed-fields',
       title: 'Composed fields',
       // The angle brackets are a JSX string attribute, so they are text.
@@ -702,12 +702,12 @@ class _ComposedFieldsSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          const DsPanel(
+          const ElPanel(
             label: 'Five control shapes, one binding',
             child: _ComposedForm(),
           ),
-          SizedBox(height: ds(6)),
-          const DsNote(
+          SizedBox(height: el(6)),
+          const ElNote(
             title: 'Why FormControl is a Slot',
             child: _WhyFormControlIsSlotBody(),
           ),
@@ -722,7 +722,7 @@ class _WhyFormControlIsSlotBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsRichText(
+    return ElRichText(
       TextSpan(
         children: <InlineSpan>[
           const TextSpan(
@@ -732,25 +732,25 @@ class _WhyFormControlIsSlotBody extends StatelessWidget {
                 'the wiring for five controls that share no DOM shape. Note '
                 'where it sits on the Select: around the ',
           ),
-          DsCode.span('SelectTrigger'),
+          ElCode.span('SelectTrigger'),
           const TextSpan(text: ', not the '),
-          DsCode.span('Select'),
+          ElCode.span('Select'),
           const TextSpan(
             text:
                 ' — the trigger is the focusable thing, so it is the thing '
                 'that needs the id. Controls that are not ',
           ),
-          DsCode.span('<input>'),
+          ElCode.span('<input>'),
           const TextSpan(text: ' take '),
-          DsCode.span('onValueChange'),
+          ElCode.span('onValueChange'),
           const TextSpan(text: ' or '),
-          DsCode.span('onCheckedChange'),
+          ElCode.span('onCheckedChange'),
           const TextSpan(text: ', so they are wired by hand from '),
-          DsCode.span('field'),
+          ElCode.span('field'),
           const TextSpan(text: ' rather than spread.'),
         ],
       ),
-      DsType.small,
+      ElType.small,
     );
   }
 }
@@ -771,14 +771,14 @@ class _AccountForm extends StatefulWidget {
 }
 
 class _AccountFormState extends State<_AccountForm> {
-  late final DsForm _form = DsForm(
-    mode: DsValidateMode.onSubmit,
-    reValidateMode: DsValidateMode.onChange,
-    fields: <DsFormFieldBase>[
-      DsTextFormField(name: 'handle', rules: _handleRules()),
-      DsTextFormField(
+  late final ElForm _form = ElForm(
+    mode: ElValidateMode.onSubmit,
+    reValidateMode: ElValidateMode.onChange,
+    fields: <ElFormFieldBase>[
+      ElTextFormField(name: 'handle', rules: _handleRules()),
+      ElTextFormField(
         name: 'email',
-        rules: <DsRule<String>>[DsRule.email('That is not an email address.')],
+        rules: <ElRule<String>>[ElRule.email('That is not an email address.')],
       ),
     ],
   );
@@ -795,7 +795,7 @@ class _AccountFormState extends State<_AccountForm> {
       if (!mounted) return;
       docsToasts.success(
         'Saved as @${_form.text('handle').value}',
-        glyph: DsIconGlyph.circleCheck,
+        glyph: ElIconGlyph.circleCheck,
       );
       _resetToSavedValues(_form);
     });
@@ -806,30 +806,30 @@ class _AccountFormState extends State<_AccountForm> {
     return ListenableBuilder(
       listenable: _form,
       builder: (BuildContext context, Widget? child) {
-        final DsTextFormField handle = _form.text('handle');
-        final DsTextFormField email = _form.text('email');
+        final ElTextFormField handle = _form.text('handle');
+        final ElTextFormField email = _form.text('email');
         final bool busy = _form.isSubmitting;
 
         return _Measure(
-          child: DsFieldGroup(
+          child: ElFieldGroup(
             children: <Widget>[
-              DsField(
+              ElField(
                 label: 'Handle',
                 description: 'This is how you appear on leaderboards.',
                 errors: handle.errors,
                 focusNode: handle.focusNode,
-                child: DsInput(
+                child: ElInput(
                   controller: handle.controller,
                   placeholder: 'ayoub',
                   autofillHints: const <String>[AutofillHints.username],
                 ),
               ),
-              DsField(
+              ElField(
                 label: 'Email',
                 description: 'Receipts and nothing else.',
                 errors: email.errors,
                 focusNode: email.focusNode,
-                child: DsInput(
+                child: ElInput(
                   controller: email.controller,
                   placeholder: 'you@example.com',
                   keyboardType: TextInputType.emailAddress,
@@ -839,7 +839,7 @@ class _AccountFormState extends State<_AccountForm> {
               // DRIFT 2. The label swaps and the button would grow by the
               // spinner's 24px: except that `FieldGroup` stretches it to the
               // form's 448px, which pins the width by accident.
-              DsButton(
+              ElButton(
                 loading: busy,
                 onPressed: _submit,
                 child: Text(busy ? 'Saving' : 'Save Account'),
@@ -854,15 +854,15 @@ class _AccountFormState extends State<_AccountForm> {
 
 /// `form.reset(values)`: the just-saved values become the new baseline.
 ///
-/// `DsForm.reset` goes back to `defaultValues`, which is the one thing RHF's
+/// `ElForm.reset` goes back to `defaultValues`, which is the one thing RHF's
 /// `reset(values)` does *not* do, so the strings are read first and written
 /// back through the controllers afterwards. Writing them back at a zeroed
 /// submit count re-validates nothing, `mode` governs again: which is exactly
 /// the state a reset form is in: values kept, messages gone, asking late.
-void _resetToSavedValues(DsForm form) {
+void _resetToSavedValues(ElForm form) {
   final Map<String, String> saved = <String, String>{
-    for (final DsFormFieldBase field in form.fields)
-      if (field is DsTextFormField) field.name: field.value,
+    for (final ElFormFieldBase field in form.fields)
+      if (field is ElTextFormField) field.name: field.value,
   };
   form.reset();
   for (final MapEntry<String, String> entry in saved.entries) {
@@ -882,13 +882,13 @@ class _PasswordForm extends StatefulWidget {
 }
 
 class _PasswordFormState extends State<_PasswordForm> {
-  late final DsForm _form = DsForm(
+  late final ElForm _form = ElForm(
     // `mode: "onChange"`: asked on the first keystroke.
-    mode: DsValidateMode.onChange,
-    fields: <DsFormFieldBase>[
-      DsTextFormField(
+    mode: ElValidateMode.onChange,
+    fields: <ElFormFieldBase>[
+      ElTextFormField(
         name: 'password',
-        issueMode: DsIssueMode.all,
+        issueMode: ElIssueMode.all,
         rules: _passwordRules(),
       ),
     ],
@@ -904,7 +904,7 @@ class _PasswordFormState extends State<_PasswordForm> {
     await _form.submit(
       () => docsToasts.success(
         'Password accepted',
-        glyph: DsIconGlyph.circleCheck,
+        glyph: ElIconGlyph.circleCheck,
       ),
     );
   }
@@ -914,26 +914,26 @@ class _PasswordFormState extends State<_PasswordForm> {
     return ListenableBuilder(
       listenable: _form,
       builder: (BuildContext context, Widget? child) {
-        final DsTextFormField password = _form.text('password');
+        final ElTextFormField password = _form.text('password');
 
         return _Measure(
-          child: DsFieldGroup(
+          child: ElFieldGroup(
             children: <Widget>[
-              DsField(
+              ElField(
                 label: 'New password',
                 description:
                     'Type a weak one — every unmet rule is listed at once.',
                 errors: password.errors,
                 focusNode: password.focusNode,
-                child: DsInput(
+                child: ElInput(
                   controller: password.controller,
                   obscureText: true,
                   autofillHints: const <String>[AutofillHints.newPassword],
                 ),
               ),
               // No `loading` here: the submit body is synchronous.
-              DsButton(
-                variant: DsButtonVariant.outline,
+              ElButton(
+                variant: ElButtonVariant.outline,
                 onPressed: _submit,
                 child: const Text('Set Password'),
               ),
@@ -957,12 +957,12 @@ class _ServerErrorForm extends StatefulWidget {
 }
 
 class _ServerErrorFormState extends State<_ServerErrorForm> {
-  late final DsForm _form = DsForm(
-    fields: <DsFormFieldBase>[
-      DsTextFormField(
+  late final ElForm _form = ElForm(
+    fields: <ElFormFieldBase>[
+      ElTextFormField(
         name: 'handle',
         initialValue: 'taken',
-        rules: <DsRule<String>>[DsRule.minLength(3, 'At least 3 characters.')],
+        rules: <ElRule<String>>[ElRule.minLength(3, 'At least 3 characters.')],
       ),
     ],
   );
@@ -995,11 +995,11 @@ class _ServerErrorFormState extends State<_ServerErrorForm> {
         _form.setError('handle', 'Already registered.');
         docsToasts.error(
           'Could not claim that handle',
-          glyph: DsIconGlyph.octagonX,
+          glyph: ElIconGlyph.octagonX,
         );
         return;
       }
-      docsToasts.success('Claimed @$handle', glyph: DsIconGlyph.circleCheck);
+      docsToasts.success('Claimed @$handle', glyph: ElIconGlyph.circleCheck);
     });
   }
 
@@ -1008,35 +1008,35 @@ class _ServerErrorFormState extends State<_ServerErrorForm> {
     return ListenableBuilder(
       listenable: _form,
       builder: (BuildContext context, Widget? child) {
-        final DsTextFormField handle = _form.text('handle');
+        final ElTextFormField handle = _form.text('handle');
         final bool busy = _form.isSubmitting;
 
         return _Measure(
-          child: DsFieldGroup(
+          child: ElFieldGroup(
             children: <Widget>[
               // The Alert is the first child of the group, so it is followed by
               // the group's own 20px.
               if (_rootError != null)
-                DsAlert(
-                  variant: DsAlertVariant.destructive,
+                ElAlert(
+                  variant: ElAlertVariant.destructive,
                   // The page supplies the glyph and the variant only says what
                   // colour it comes out, `tone="inherit"` is `text-current`.
-                  icon: const DsIcon(
-                    DsIconGlyph.circleX,
-                    tone: DsIconTone.inherit,
+                  icon: const ElIcon(
+                    ElIconGlyph.circleX,
+                    tone: ElIconTone.inherit,
                   ),
                   title: 'Could not save',
                   description: _rootError,
                 ),
-              DsField(
+              ElField(
                 label: 'Claim a handle',
                 description:
                     '“taken” fails on the server. Anything else succeeds.',
                 errors: handle.errors,
                 focusNode: handle.focusNode,
-                child: DsInput(controller: handle.controller),
+                child: ElInput(controller: handle.controller),
               ),
-              DsButton(
+              ElButton(
                 loading: busy,
                 onPressed: _submit,
                 child: Text(busy ? 'Claiming' : 'Claim Handle'),
@@ -1064,50 +1064,50 @@ class _ComposedForm extends StatefulWidget {
 }
 
 class _ComposedFormState extends State<_ComposedForm> {
-  late final DsForm _form = DsForm(
-    fields: <DsFormFieldBase>[
-      DsFormField<String>(
+  late final ElForm _form = ElForm(
+    fields: <ElFormFieldBase>[
+      ElFormField<String>(
         name: 'plan',
         initialValue: '',
-        rules: <DsRule<String>>[DsRule.minLength(1, 'Pick a plan.')],
+        rules: <ElRule<String>>[ElRule.minLength(1, 'Pick a plan.')],
       ),
       // `z.enum([...], { message })`. Zod 4 applies the same message to the
       // invalid-**type** case, which is how an untouched group renders a
       // sentence rather than a type error.
-      DsFormField<String?>(
+      ElFormField<String?>(
         name: 'payout',
         initialValue: null,
-        rules: <DsRule<String?>>[
-          DsRule.oneOf<String>(<String>[
+        rules: <ElRule<String?>>[
+          ElRule.oneOf<String>(<String>[
             'daily',
             'weekly',
           ], 'Pick a payout rhythm.'),
         ],
       ),
-      DsTextFormField(
+      ElTextFormField(
         name: 'bio',
-        rules: <DsRule<String>>[
-          DsRule.maxLength(160, '160 characters is the ceiling.'),
+        rules: <ElRule<String>>[
+          ElRule.maxLength(160, '160 characters is the ceiling.'),
         ],
       ),
       // DRIFT 20. `z.boolean()`: no message, and the only field on the page
       // with no `FormError` beneath it.
-      DsFormField<bool>(name: 'alerts', initialValue: true),
+      ElFormField<bool>(name: 'alerts', initialValue: true),
       // `.refine`, not `z.literal(true)`: a literal types the field as `true`,
       // so the `false` default cannot assign and the schema ends up unable to
       // describe the only state the checkbox starts in.
-      DsFormField<bool>(
+      ElFormField<bool>(
         name: 'terms',
         initialValue: false,
-        rules: <DsRule<bool>>[DsRule.accepted('You have to accept the terms.')],
+        rules: <ElRule<bool>>[ElRule.accepted('You have to accept the terms.')],
       ),
     ],
   );
 
-  static const List<DsSelectOption<String>> _plans = <DsSelectOption<String>>[
-    DsSelectOption<String>(value: 'free', label: 'Free'),
-    DsSelectOption<String>(value: 'pro', label: 'Pro'),
-    DsSelectOption<String>(value: 'vault', label: 'Vault'),
+  static const List<ElSelectOption<String>> _plans = <ElSelectOption<String>>[
+    ElSelectOption<String>(value: 'free', label: 'Free'),
+    ElSelectOption<String>(value: 'pro', label: 'Pro'),
+    ElSelectOption<String>(value: 'vault', label: 'Vault'),
   ];
 
   @override
@@ -1120,7 +1120,7 @@ class _ComposedFormState extends State<_ComposedForm> {
     await _form.submit(
       () => docsToasts.success(
         'Preferences saved',
-        glyph: DsIconGlyph.circleCheck,
+        glyph: ElIconGlyph.circleCheck,
       ),
     );
   }
@@ -1130,23 +1130,23 @@ class _ComposedFormState extends State<_ComposedForm> {
     return ListenableBuilder(
       listenable: _form,
       builder: (BuildContext context, Widget? child) {
-        final DsFormField<String> plan = _form.field<String>('plan');
-        final DsFormField<String?> payout = _form.field<String?>('payout');
-        final DsTextFormField bio = _form.text('bio');
-        final DsFormField<bool> alerts = _form.field<bool>('alerts');
-        final DsFormField<bool> terms = _form.field<bool>('terms');
+        final ElFormField<String> plan = _form.field<String>('plan');
+        final ElFormField<String?> payout = _form.field<String?>('payout');
+        final ElTextFormField bio = _form.text('bio');
+        final ElFormField<bool> alerts = _form.field<bool>('alerts');
+        final ElFormField<bool> terms = _form.field<bool>('terms');
 
         return _Measure(
-          child: DsFieldGroup(
+          child: ElFieldGroup(
             children: <Widget>[
               // `plan`: no description (drift 20). `FormControl` wraps the
               // trigger, not the Select, so the trigger is what takes the focus
               // node and the wiring.
-              DsField(
+              ElField(
                 label: 'Plan',
                 errors: plan.errors,
                 focusNode: plan.focusNode,
-                child: DsSelect<String>(
+                child: ElSelect<String>(
                   options: _plans,
                   value: plan.value.isEmpty ? null : plan.value,
                   onChanged: (String value) => plan.value = value,
@@ -1157,24 +1157,24 @@ class _ComposedFormState extends State<_ComposedForm> {
                 ),
               ),
               _PayoutFieldSet(field: payout),
-              DsField(
+              ElField(
                 label: 'Bio',
                 description: '160 characters at most.',
                 errors: bio.errors,
                 focusNode: bio.focusNode,
                 // DRIFT 9. `rows={3}` is inert; `min-h-20` is the floor.
-                child: DsTextarea(controller: bio.controller),
+                child: ElTextarea(controller: bio.controller),
               ),
               // `alerts`: a horizontal field, no description, no error, and
               // nothing that can fail. The label is the field's, so the switch
               // states no name of its own: the reference's `<Switch/>` carries
               // no `aria-label` either and is named by the `FormLabel` beside
               // it.
-              DsField(
+              ElField(
                 label: 'Price alerts',
-                orientation: DsFieldOrientation.horizontal,
+                orientation: ElFieldOrientation.horizontal,
                 focusNode: alerts.focusNode,
-                child: DsSwitch(
+                child: ElSwitch(
                   value: alerts.value,
                   onChanged: (bool next) => alerts.value = next,
                 ),
@@ -1185,30 +1185,30 @@ class _ComposedFormState extends State<_ComposedForm> {
               // It nests because its horizontal `Field` is `flex-row`: a
               // `<FormError/>` inside it would sit *beside* the label rather
               // than under the row, so the message needs an outer vertical
-              // `Field` to fall into. [DsField]'s horizontal branch is already
+              // `Field` to fall into. [ElField]'s horizontal branch is already
               // a column holding the row, and the description/message slots
               // append to that column: so the wrapper collapses into it and
               // the rendered box tree is the same one: row, `gap-2`, message.
               //
               // Collapsing it is also what keeps the wiring intact. A nested
-              // [DsField] publishes a *new* [DsFieldScope] that shadows the
+              // [ElField] publishes a *new* [ElFieldScope] that shadows the
               // outer one, so the checkbox would adopt a null focus node and a
               // valid state: focus-on-error (ruling F4) would stop landing on
               // it and the message would stop being announced with it.
-              DsField(
+              ElField(
                 label: 'I accept the terms',
-                orientation: DsFieldOrientation.horizontal,
+                orientation: ElFieldOrientation.horizontal,
                 errors: terms.errors,
                 focusNode: terms.focusNode,
-                child: DsCheckbox(
+                child: ElCheckbox(
                   state: terms.value
-                      ? DsCheckboxState.checked
-                      : DsCheckboxState.unchecked,
-                  onChanged: (DsCheckboxState next) =>
-                      terms.value = next == DsCheckboxState.checked,
+                      ? ElCheckboxState.checked
+                      : ElCheckboxState.unchecked,
+                  onChanged: (ElCheckboxState next) =>
+                      terms.value = next == ElCheckboxState.checked,
                 ),
               ),
-              DsButton(
+              ElButton(
                 onPressed: _submit,
                 child: const Text('Save Preferences'),
               ),
@@ -1227,14 +1227,14 @@ class _ComposedFormState extends State<_ComposedForm> {
 /// RadioGroup container is a `div`, so the usual `FormLabel` pattern would emit
 /// markup that validates nowhere and announces nothing (`page.tsx` L322–325).
 ///
-/// The legend sits **outside** [DsFieldSet] on purpose: see the library note:
+/// The legend sits **outside** [ElFieldSet] on purpose: see the library note:
 /// a rendered `<legend>` is lifted out of the fieldset's anonymous content box,
 /// so the fieldset's `gap-3` never applies to it and only its `mb-1.5` does.
-/// [DsFieldSet] is that content box, holding the group and its message.
+/// [ElFieldSet] is that content box, holding the group and its message.
 class _PayoutFieldSet extends StatelessWidget {
   const _PayoutFieldSet({required this.field});
 
-  final DsFormField<String?> field;
+  final ElFormField<String?> field;
 
   @override
   Widget build(BuildContext context) {
@@ -1246,16 +1246,16 @@ class _PayoutFieldSet extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        const DsFieldLegend('Payout rhythm'),
-        SizedBox(height: DsFieldLegend.spaceBelow),
-        DsFieldSet(
+        const ElFieldLegend('Payout rhythm'),
+        SizedBox(height: ElFieldLegend.spaceBelow),
+        ElFieldSet(
           tightForGroup: true,
           children: <Widget>[
-            DsRadioGroup<String>(
+            ElRadioGroup<String>(
               value: field.value,
               onChanged: (String next) => field.value = next,
               // `className="gap-3"` tw-merges over the Root's own `gap-2`.
-              gap: DsFieldSet.groupGap,
+              gap: ElFieldSet.groupGap,
               invalid: field.invalid,
               focusNode: field.focusNode,
               label: 'Payout rhythm',
@@ -1266,19 +1266,19 @@ class _PayoutFieldSet extends StatelessWidget {
               // its own field rather than on the group's: the group's field
               // belongs to the legend.
               children: const <Widget>[
-                DsField(
+                ElField(
                   label: 'Daily',
-                  orientation: DsFieldOrientation.horizontal,
-                  child: DsRadioGroupItem<String>(value: 'daily'),
+                  orientation: ElFieldOrientation.horizontal,
+                  child: ElRadioGroupItem<String>(value: 'daily'),
                 ),
-                DsField(
+                ElField(
                   label: 'Weekly',
-                  orientation: DsFieldOrientation.horizontal,
-                  child: DsRadioGroupItem<String>(value: 'weekly'),
+                  orientation: ElFieldOrientation.horizontal,
+                  child: ElRadioGroupItem<String>(value: 'weekly'),
                 ),
               ],
             ),
-            if (field.errors.isNotEmpty) DsFieldError(field.errors),
+            if (field.errors.isNotEmpty) ElFieldError(field.errors),
           ],
         ),
       ],
@@ -1305,47 +1305,47 @@ class _SubmitStatesState extends State<_SubmitStates> {
 
   @override
   Widget build(BuildContext context) {
-    return DsStateGrid(
+    return ElStateGrid(
       children: <Widget>[
-        DsStateCell(
+        ElStateCell(
           label: 'Idle',
           note: 'Nothing pending',
           // Clickable with no handler: a bare `<button>` is not a disabled
           // one, so it keeps full opacity and the pointer.
-          child: DsButton(onPressed: () {}, child: const Text('Save Account')),
+          child: ElButton(onPressed: () {}, child: const Text('Save Account')),
         ),
         // Static, but animating: the spinner never stops and `loading` implies
         // `disabled`, so the cell also shows the 45% dim.
-        DsStateCell(
+        ElStateCell(
           label: 'Pending',
           note: 'isSubmitting',
-          child: DsButton(
+          child: ElButton(
             loading: true,
             onPressed: () {},
             child: const Text('Saving'),
           ),
         ),
-        DsStateCell(
+        ElStateCell(
           label: 'Success',
           note: 'Outcome confirmed',
-          child: DsButton(
+          child: ElButton(
             variant: _saved
-                ? DsButtonVariant.secondary
-                : DsButtonVariant.primary,
+                ? ElButtonVariant.secondary
+                : ElButtonVariant.primary,
             onPressed: () {
               setState(() => _saved = true);
               docsToasts.success(
                 'Account saved',
-                glyph: DsIconGlyph.circleCheck,
+                glyph: ElIconGlyph.circleCheck,
               );
             },
             child: Text(_saved ? 'Saved' : 'Click to save'),
           ),
         ),
-        const DsStateCell(
+        const ElStateCell(
           label: 'Disabled',
           note: 'Nothing has changed',
-          child: DsButton(child: Text('Save Account')),
+          child: ElButton(child: Text('Save Account')),
         ),
       ],
     );

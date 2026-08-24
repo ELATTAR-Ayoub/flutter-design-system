@@ -1,7 +1,7 @@
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/table/meta.dart';
 import 'package:example/components_docs/table/page.dart';
-import 'package:example/kit.dart' show DsSection;
+import 'package:example/kit.dart' show ElSection;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -9,63 +9,63 @@ import 'package:flutter_test/flutter_test.dart';
 
 Widget _harness({
   required Widget child,
-  required DsThemeController controller,
-}) => DsTheme(
+  required ElThemeController controller,
+}) => ElTheme(
   controller: controller,
   child: MaterialApp(home: SingleChildScrollView(child: child)),
 );
 
-/// A minimal, real [DsTable]: the same shape [TableDocPage]'s own preview
+/// A minimal, real [ElTable]: the same shape [TableDocPage]'s own preview
 /// specimen uses (an icon-and-label first cell, a right-aligned money
 /// column, a badge column): mounted directly, without the rest of the doc
-/// article around it, so the assertions below are about `DsTable` itself and
+/// article around it, so the assertions below are about `ElTable` itself and
 /// do not depend on how the page happens to compose it.
 Widget _realisticTable({
   bool selectSecondRow = false,
   bool firstCellIsNonWrappingRow = true,
-}) => DsTable(
-  header: const <DsTableCellSpec>[
-    DsTableCellSpec(child: Text('Type')),
-    DsTableCellSpec(child: Text('Detail')),
-    DsTableCellSpec(child: Text('Amount'), align: DsTableAlign.end),
+}) => ElTable(
+  header: const <ElTableCellSpec>[
+    ElTableCellSpec(child: Text('Type')),
+    ElTableCellSpec(child: Text('Detail')),
+    ElTableCellSpec(child: Text('Amount'), align: ElTableAlign.end),
   ],
-  rows: <DsTableRowSpec>[
-    DsTableRowSpec(
-      cells: <DsTableCellSpec>[
-        DsTableCellSpec(
+  rows: <ElTableRowSpec>[
+    ElTableRowSpec(
+      cells: <ElTableCellSpec>[
+        ElTableCellSpec(
           child: firstCellIsNonWrappingRow
               ? Row(
                   mainAxisSize: MainAxisSize.min,
                   children: const <Widget>[
-                    DsIcon.lucide(DsLucide.arrowDownLeft, size: DsIconSize.sm),
+                    ElIcon.lucide(ElLucide.arrowDownLeft, size: ElIconSize.sm),
                     SizedBox(width: 8),
                     Text('Subscription renewal'),
                   ],
                 )
               : const Text('Subscription renewal'),
         ),
-        const DsTableCellSpec(child: Text('Studio Pro annual plan')),
-        const DsTableCellSpec(align: DsTableAlign.end, child: Text('\$129.00')),
+        const ElTableCellSpec(child: Text('Studio Pro annual plan')),
+        const ElTableCellSpec(align: ElTableAlign.end, child: Text('\$129.00')),
       ],
     ),
-    DsTableRowSpec(
+    ElTableRowSpec(
       selected: selectSecondRow,
-      cells: const <DsTableCellSpec>[
-        DsTableCellSpec(child: Text('Payout')),
-        DsTableCellSpec(child: Text('Weekly creator payout')),
-        DsTableCellSpec(align: DsTableAlign.end, child: Text('\$412.50')),
+      cells: const <ElTableCellSpec>[
+        ElTableCellSpec(child: Text('Payout')),
+        ElTableCellSpec(child: Text('Weekly creator payout')),
+        ElTableCellSpec(align: ElTableAlign.end, child: Text('\$412.50')),
       ],
     ),
   ],
 );
 
-/// Every [Container] one [DsTable] paints, header row first then body rows,
-/// each row left to right: the order `DsTable.build` composes its
+/// Every [Container] one [ElTable] paints, header row first then body rows,
+/// each row left to right: the order `ElTable.build` composes its
 /// `TableRow`s in. `_HeaderCell` and `_BodyCell` are private, so this is the
 /// only way a test outside `table.dart` reads back what either one painted.
 ///
 /// Scoped to a single `Table` [of] rather than the whole tree, because
-/// `page.dart` mounts more than one live `DsTable` specimen: an unscoped
+/// `page.dart` mounts more than one live `ElTable` specimen: an unscoped
 /// search would mix containers from whichever one the finder happened to
 /// visit first.
 List<Container> _cellContainers(WidgetTester tester, {required Finder of}) =>
@@ -86,7 +86,7 @@ BoxDecoration _decoration(Container c) => c.decoration! as BoxDecoration;
 void main() {
   group('table docs page', () {
     testWidgets(
-      'renders the article, the full API table, and a live DsTable specimen with real rows',
+      'renders the article, the full API table, and a live ElTable specimen with real rows',
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(1440, 900);
         tester.view.devicePixelRatio = 1;
@@ -95,7 +95,7 @@ void main() {
         String? destination;
         await tester.pumpWidget(
           _harness(
-            controller: DsThemeController(mode: DsThemeMode.dark),
+            controller: ElThemeController(mode: ElThemeMode.dark),
             child: TableDocPage(
               onNavigate: (String route) => destination = route,
             ),
@@ -109,33 +109,33 @@ void main() {
         );
 
         // Every public member enumerated from lib/src/components/table.dart:
-        // DsTable's own constructor and static tokens, DsTableCellSpec,
-        // DsTableRowSpec (both constructors) plus isSpan, DsTableAlign and its
-        // alignment getter, DsTableColumnWidth's three overrides, and the two
+        // ElTable's own constructor and static tokens, ElTableCellSpec,
+        // ElTableRowSpec (both constructors) plus isSpan, ElTableAlign and its
+        // alignment getter, ElTableColumnWidth's three overrides, and the two
         // top-level hover-motion getters.
         for (final String member in <String>[
-          // DsTable
+          // ElTable
           'header', 'rows', 'caption',
-          'DsTable.headerHeight', 'DsTable.cellPadding',
-          'DsTable.captionGap', 'DsTable.ruleWidth',
-          'DsTable.collapsedRemainder',
-          // DsTableCellSpec
+          'ElTable.headerHeight', 'ElTable.cellPadding',
+          'ElTable.captionGap', 'ElTable.ruleWidth',
+          'ElTable.collapsedRemainder',
+          // ElTableCellSpec
           'child', 'align', 'checkbox',
-          // DsTableRowSpec
+          // ElTableRowSpec
           'cells', 'selected', 'span', 'spanHeight', 'isSpan',
-          // DsTableAlign
+          // ElTableAlign
           'start', 'end', 'alignment',
-          // DsTableColumnWidth
+          // ElTableColumnWidth
           'minIntrinsicWidth', 'maxIntrinsicWidth', 'flex',
           // top-level
-          'dsTableHoverDuration', 'dsTableHoverCurve',
+          'elTableHoverDuration', 'elTableHoverCurve',
         ]) {
           expect(find.text(member), findsWidgets, reason: 'missing $member');
         }
 
-        // A live DsTable specimen, with real (non-placeholder) row content,
+        // A live ElTable specimen, with real (non-placeholder) row content,
         // mounts somewhere on the page.
-        expect(find.byType(DsTable), findsWidgets);
+        expect(find.byType(ElTable), findsWidgets);
         expect(
           find.text('Showing the 5 most recent transactions of 248.'),
           findsOneWidget,
@@ -143,7 +143,7 @@ void main() {
         );
 
         expect(tableDoc.name, 'table');
-        expect(tableDoc.exports, containsAll(<String>['DsTable']));
+        expect(tableDoc.exports, containsAll(<String>['ElTable']));
         expect(destination, isNull);
         expect(tester.takeException(), isNull);
       },
@@ -158,15 +158,15 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: DsThemeController(mode: DsThemeMode.dark),
+            controller: ElThemeController(mode: ElThemeMode.dark),
             child: const TableDocPage(),
           ),
         );
         await tester.pumpAndSettle();
 
         final List<String> titles = tester
-            .widgetList<DsSection>(find.byType(DsSection))
-            .map((DsSection section) => section.title)
+            .widgetList<ElSection>(find.byType(ElSection))
+            .map((ElSection section) => section.title)
             .toList();
 
         expect(titles, <String>[
@@ -189,14 +189,14 @@ void main() {
     );
 
     test(
-      'DsTableAlign resolves literal, direction-blind Alignment values (backs RTL)',
+      'ElTableAlign resolves literal, direction-blind Alignment values (backs RTL)',
       () {
         // The whole finding the RTL section documents: `start`/`end` map to
         // the plain, non-directional Alignment class, not
         // AlignmentDirectional.centerStart/.centerEnd, so no ambient
         // Directionality can change what these resolve to.
-        expect(DsTableAlign.start.alignment, Alignment.centerLeft);
-        expect(DsTableAlign.end.alignment, Alignment.centerRight);
+        expect(ElTableAlign.start.alignment, Alignment.centerLeft);
+        expect(ElTableAlign.end.alignment, Alignment.centerRight);
       },
     );
 
@@ -210,7 +210,7 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: DsThemeController(mode: DsThemeMode.dark),
+            controller: ElThemeController(mode: ElThemeMode.dark),
             child: const TableDocPage(),
           ),
         );
@@ -229,8 +229,8 @@ void main() {
           findsNothing,
         );
         // The live demo wraps its specimen in a horizontal scroll
-        // view precisely because DsTable does not provide one itself: see
-        // the "DsTable overflow behaviour" group below for the bare-widget
+        // view precisely because ElTable does not provide one itself: see
+        // the "ElTable overflow behaviour" group below for the bare-widget
         // proof. This assertion is what keeps that claim honest: if a future
         // edit to page.dart drops the wrapper, this page would start
         // throwing "RenderFlex overflowed" at 390px and this test would
@@ -246,16 +246,16 @@ void main() {
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
 
-        final DsThemeController controller = DsThemeController(
-          mode: DsThemeMode.dark,
+        final ElThemeController controller = ElThemeController(
+          mode: ElThemeMode.dark,
         );
         await tester.pumpWidget(
           _harness(controller: controller, child: const TableDocPage()),
         );
         await tester.pumpAndSettle();
 
-        DsThemeData themeOf() =>
-            DsTheme.of(tester.element(find.byType(TableDocPage)));
+        ElThemeData themeOf() =>
+            ElTheme.of(tester.element(find.byType(TableDocPage)));
         final Finder preview = find.byKey(_previewTableKey);
 
         final Color darkBorder = _decoration(
@@ -263,7 +263,7 @@ void main() {
         ).border!.bottom.color;
         expect(darkBorder, themeOf().border);
 
-        controller.setMode(DsThemeMode.light);
+        controller.setMode(ElThemeMode.light);
         await tester.pumpAndSettle();
 
         final Color lightBorder = _decoration(
@@ -279,7 +279,7 @@ void main() {
     );
   });
 
-  /// These tests are about `DsTable` itself, not about how `page.dart`
+  /// These tests are about `ElTable` itself, not about how `page.dart`
   /// composes it: a bare specimen the size of the doc page's own preview,
   /// mounted on its own, so a claim made in the Responsive section (no
   /// scroll container of its own; columns compress; a non-wrapping cell can
@@ -287,7 +287,7 @@ void main() {
   /// independently-checkable widget test rather than asserted from reading
   /// the source alone.
   group(
-    'DsTable overflow behaviour at 390px (backs the Responsive section)',
+    'ElTable overflow behaviour at 390px (backs the Responsive section)',
     () {
       Future<void> pumpNarrow(WidgetTester tester, Widget child) async {
         tester.view.physicalSize = const Size(390, 844);
@@ -295,7 +295,7 @@ void main() {
         addTearDown(tester.view.reset);
         await tester.pumpWidget(
           _harness(
-            controller: DsThemeController(mode: DsThemeMode.dark),
+            controller: ElThemeController(mode: ElThemeMode.dark),
             child: Padding(padding: const EdgeInsets.all(16), child: child),
           ),
         );
@@ -305,7 +305,7 @@ void main() {
         'un-wrapped: a plain-text cell reflows (wraps, grows taller) with no '
         'exception, but a non-wrapping Row cell overflows',
         (WidgetTester tester) async {
-          // Plain text: DsTable's own columns compress toward each cell's
+          // Plain text: ElTable's own columns compress toward each cell's
           // min-intrinsic width; a Text cell simply wraps.
           await pumpNarrow(
             tester,
@@ -333,7 +333,7 @@ void main() {
       );
 
       testWidgets(
-        'a bare horizontal SingleChildScrollView around DsTable throws: its '
+        'a bare horizontal SingleChildScrollView around ElTable throws: its '
         'root Column stretches its cross axis, which needs a bounded width',
         (WidgetTester tester) async {
           // The failure repeats across layout and semantics, which is more
@@ -389,7 +389,7 @@ void main() {
     },
   );
 
-  group('DsTable row state (backs the States section)', () {
+  group('ElTable row state (backs the States section)', () {
     testWidgets(
       'rest has no fill, hover fades in muted/50%, and a selected row wins '
       'over hover at full muted strength',
@@ -398,8 +398,8 @@ void main() {
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
 
-        final DsThemeController controller = DsThemeController(
-          mode: DsThemeMode.dark,
+        final ElThemeController controller = ElThemeController(
+          mode: ElThemeMode.dark,
         );
         await tester.pumpWidget(
           _harness(
@@ -409,14 +409,14 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        final DsThemeData theme = DsTheme.of(
-          tester.element(find.byType(DsTable)),
+        final ElThemeData theme = ElTheme.of(
+          tester.element(find.byType(ElTable)),
         );
 
         // Containers, in build order: header cell ×3, row0 cell ×3 (rest),
         // row1 cell ×3 (selected).
         List<Container> cells() =>
-            _cellContainers(tester, of: find.byType(DsTable));
+            _cellContainers(tester, of: find.byType(ElTable));
         expect(cells().length, 9);
 
         final Color rest = _decoration(cells()[3]).color!;
@@ -430,7 +430,7 @@ void main() {
         expect(
           selected,
           theme.muted,
-          reason: 'DsTableRowSpec.selected is theme.muted at full strength',
+          reason: 'ElTableRowSpec.selected is theme.muted at full strength',
         );
 
         // Hover row 0 (unselected) and let the 250ms transition settle.
@@ -471,8 +471,8 @@ void main() {
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
 
-        final DsThemeController controller = DsThemeController(
-          mode: DsThemeMode.dark,
+        final ElThemeController controller = ElThemeController(
+          mode: ElThemeMode.dark,
         );
         await tester.pumpWidget(
           MediaQuery(
@@ -482,8 +482,8 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        final DsThemeData theme = DsTheme.of(
-          tester.element(find.byType(DsTable)),
+        final ElThemeData theme = ElTheme.of(
+          tester.element(find.byType(ElTable)),
         );
 
         final TestGesture pointer = await tester.createGesture(
@@ -499,14 +499,14 @@ void main() {
         await tester.pump();
 
         final Color hovered = _decoration(
-          _cellContainers(tester, of: find.byType(DsTable))[3],
+          _cellContainers(tester, of: find.byType(ElTable))[3],
         ).color!;
         expect(hovered, theme.muted.withValues(alpha: 0.5));
       },
     );
   });
 
-  group('DsTableRowSpec.span (backs the Empty state and Composition)', () {
+  group('ElTableRowSpec.span (backs the Empty state and Composition)', () {
     testWidgets(
       'a spanning row lays its widget out beside the table body, at the '
       'given height, and asserts if it is not the only row',
@@ -517,13 +517,13 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: DsThemeController(mode: DsThemeMode.dark),
-            child: DsTable(
-              header: const <DsTableCellSpec>[
-                DsTableCellSpec(child: Text('Card')),
+            controller: ElThemeController(mode: ElThemeMode.dark),
+            child: ElTable(
+              header: const <ElTableCellSpec>[
+                ElTableCellSpec(child: Text('Card')),
               ],
-              rows: <DsTableRowSpec>[
-                DsTableRowSpec.span(const Text('No results.'), spanHeight: 120),
+              rows: <ElTableRowSpec>[
+                ElTableRowSpec.span(const Text('No results.'), spanHeight: 120),
               ],
             ),
           ),

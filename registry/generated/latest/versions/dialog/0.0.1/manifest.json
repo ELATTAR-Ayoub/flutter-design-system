@@ -9,17 +9,19 @@
     {
       "source": "lib/src/components/dialog.dart",
       "target": "@ui/dialog.dart",
-      "sha256": "88fe5926b49d3b828f8e8346337db6f571094e05500dbafae41281bebcef0762"
+      "sha256": "2c686727fb668336681f449d51049192e5d41e354a20a113d6162f8579ffe759"
     }
   ],
   "registryDependencies": [
-    "source-foundation",
+    "button",
+    "icon",
+    "machine-surface",
+    "source-foundation"
+  ],
+  "semanticDependencies": [
     "button",
     "icon",
     "machine-surface"
-  ],
-  "semanticDependencies": [
-    "icon"
   ],
   "pubDependencies": {},
   "assets": [],

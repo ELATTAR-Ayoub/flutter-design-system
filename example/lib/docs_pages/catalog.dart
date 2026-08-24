@@ -71,7 +71,7 @@ const List<DocsPageEntry> docsPageEntries = <DocsPageEntry>[
     slug: 'theming',
     title: 'Theming',
     description:
-        'Semantic tokens, DsThemeController, light and dark resolution, and '
+        'Semantic tokens, ElThemeController, light and dark resolution, and '
         'how a consumer overrides them.',
     route: docsThemingRoute,
   ),
@@ -87,7 +87,7 @@ const List<DocsPageEntry> docsPageEntries = <DocsPageEntry>[
     slug: 'typeset',
     title: 'Typeset',
     description:
-        'The DsType scale, DsTypeSpec anatomy, the fluid clamps, and the '
+        'The ElType scale, ElTypeSpec anatomy, the fluid clamps, and the '
         'three font families.',
     route: docsTypesetRoute,
   ),
@@ -96,7 +96,7 @@ const List<DocsPageEntry> docsPageEntries = <DocsPageEntry>[
     title: 'Registry',
     description:
         'Schema v1, what a registry item is, how dependencies resolve, and '
-        'the 20 items published today.',
+        'the 99 items generated today.',
     route: docsRegistryRoute,
   ),
   DocsPageEntry(

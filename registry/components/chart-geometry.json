@@ -1,0 +1,23 @@
+{
+  "name": "chart-geometry",
+  "type": "component",
+  "version": "0.0.1",
+  "description": "The maths under every chart on `/design-system/components/base/charts`.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/chart_geometry.dart",
+      "target": "@ui/chart_geometry.dart",
+      "sha256": "c906b0a88886122bf1332686120346fa0f598ef8de31550c6e2efcbef057b2dc"
+    }
+  ],
+  "registryDependencies": [],
+  "semanticDependencies": [],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "documentationRoute": "/components/chart-geometry",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/chart_geometry.dart"
+}

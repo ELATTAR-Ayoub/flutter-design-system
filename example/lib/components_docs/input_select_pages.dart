@@ -23,7 +23,7 @@ class InputDocPage extends StatelessWidget {
         eyebrow: 'Components',
         title: 'Input',
         description:
-            'DsInput is the system’s text-entry socket: a pill field that composes with DsField for labels, descriptions, errors, and form semantics.',
+            'ElInput is the system’s text-entry socket: a pill field that composes with ElField for labels, descriptions, errors, and form semantics.',
       ),
       toc: const <DocsTocEntry>[
         DocsTocEntry(title: 'Preview', anchor: 'preview'),
@@ -41,11 +41,11 @@ class InputDocPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          DsSection(
+          ElSection(
             id: 'preview',
             title: 'Live preview',
             description:
-                'Preview the field as a DsField companion. Toggle the common documentation states to see how the socket, semantics, and helper copy behave together.',
+                'Preview the field as a ElField companion. Toggle the common documentation states to see how the socket, semantics, and helper copy behave together.',
             child: DocsCodeExample(
               title: 'Interactive input preview',
               description:
@@ -54,7 +54,7 @@ class InputDocPage extends StatelessWidget {
               command: DocsCodeCommand(
                 command: entry.command,
                 description:
-                    'Installs DsInput into lib/components/ui with its field and surface dependencies.',
+                    'Installs ElInput into lib/components/ui with its field and surface dependencies.',
               ),
               manualFiles: const <DocsCodeFile>[
                 DocsCodeFile(
@@ -66,12 +66,12 @@ class InputDocPage extends StatelessWidget {
                 DocsCodeFile(
                   path: 'usage.dart',
                   title: 'Usage',
-                  description: 'Compose DsInput inside DsField.',
+                  description: 'Compose ElInput inside ElField.',
                   code: '''
-DsField(
+ElField(
   label: 'Email',
   description: 'We will send updates only when something changes.',
-  child: DsInput(
+  child: ElInput(
     label: 'Email',
     placeholder: 'you@example.com',
   ),
@@ -80,17 +80,17 @@ DsField(
               ],
             ),
           ),
-          DsSection(
+          ElSection(
             id: 'installation',
             title: 'Installation',
             description:
-                'The CLI places DsInput under lib/components/ui and keeps the shared foundations and field dependencies aligned with the registry.',
+                'The CLI places ElInput under lib/components/ui and keeps the shared foundations and field dependencies aligned with the registry.',
             child: DocsInstallFacts(
               facts: <DocsInstallFact>[
                 DocsInstallFact(
                   label: 'CLI command',
                   value: entry.command,
-                  description: 'Adds DsInput plus its transitive dependencies.',
+                  description: 'Adds ElInput plus its transitive dependencies.',
                 ),
                 DocsInstallFact(
                   label: 'Installed path',
@@ -100,18 +100,18 @@ DsField(
                 ),
                 DocsInstallFact(
                   label: 'Best companion',
-                  value: 'DsField',
+                  value: 'ElField',
                   description:
-                      'Use DsField for visible labels, descriptions, and error messaging around the input socket.',
+                      'Use ElField for visible labels, descriptions, and error messaging around the input socket.',
                 ),
               ],
             ),
           ),
-          DsSection(
+          ElSection(
             id: 'usage',
             title: 'Usage',
             description:
-                'Use DsInput directly for a simple field, or wrap it in DsField when the user needs visible label, description, and error copy.',
+                'Use ElInput directly for a simple field, or wrap it in ElField when the user needs visible label, description, and error copy.',
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
@@ -123,16 +123,16 @@ DsField(
                   command: const DocsCodeCommand(
                     command: 'elattar add input',
                     description:
-                        'Installs the input socket; DsField comes along as a dependency.',
+                        'Installs the input socket; ElField comes along as a dependency.',
                   ),
                   manualFiles: const <DocsCodeFile>[
                     DocsCodeFile(
                       path: 'field_usage.dart',
                       code: '''
-DsField(
+ElField(
   label: 'Display name',
   description: 'Shown publicly on your profile.',
-  child: DsInput(
+  child: ElInput(
     label: 'Display name',
     initialValue: 'Astra Vale',
   ),
@@ -140,7 +140,7 @@ DsField(
                     ),
                   ],
                 ),
-                SizedBox(height: ds(6)),
+                SizedBox(height: el(6)),
                 DocsCodeExample(
                   title: 'Read-only and bare compositions',
                   description:
@@ -150,7 +150,7 @@ DsField(
                     DocsCodeFile(
                       path: 'read_only_usage.dart',
                       code: '''
-const DsInput(
+const ElInput(
   label: 'Wallet address',
   initialValue: '0xA71c…4F2b',
   readOnly: true,
@@ -159,7 +159,7 @@ const DsInput(
                     DocsCodeFile(
                       path: 'bare_usage.dart',
                       code: '''
-const DsInput(
+const ElInput(
   placeholder: 'Search packs',
   bare: true,
 )''',
@@ -169,7 +169,7 @@ const DsInput(
               ],
             ),
           ),
-          DsSection(
+          ElSection(
             id: 'api',
             title: 'API',
             description:
@@ -239,7 +239,7 @@ const DsInput(
               ],
             ),
           ),
-          DsSection(
+          ElSection(
             id: 'states',
             title: 'States',
             description:
@@ -289,14 +289,14 @@ const DsInput(
               ],
             ),
           ),
-          DsSection(
+          ElSection(
             id: 'accessibility',
             title: 'Accessibility',
             description:
                 'Document the input as a labeled field, not as placeholder-only text entry. The control publishes one merged semantic node for name, hint, and validation result.',
             child: _Bullets(
               items: const <String>[
-                'Use a visible DsField label for production forms; placeholders disappear as soon as the user types.',
+                'Use a visible ElField label for production forms; placeholders disappear as soon as the user types.',
                 'invalid publishes SemanticsValidationResult.invalid and the destructive treatment.',
                 'readOnly is semantic first: users can still select and copy the value.',
                 'hint is the described-by style channel for supportive or recovery copy.',
@@ -304,14 +304,14 @@ const DsInput(
               ],
             ),
           ),
-          DsSection(
+          ElSection(
             id: 'dependencies',
             title: 'Dependencies',
             description:
                 'Registry dependencies explain what the installer has to bring along for the input socket to render and behave correctly.',
             child: _DependenciesPanel(entry: entry),
           ),
-          DsSection(
+          ElSection(
             id: 'source',
             title: 'Source',
             description:
@@ -338,7 +338,7 @@ class SelectDocPage extends StatelessWidget {
         eyebrow: 'Components',
         title: 'Select',
         description:
-            'DsSelect is a typed trigger-and-menu control with grouped options, separators, placeholder state, and keyboard-friendly selection behavior.',
+            'ElSelect is a typed trigger-and-menu control with grouped options, separators, placeholder state, and keyboard-friendly selection behavior.',
       ),
       toc: const <DocsTocEntry>[
         DocsTocEntry(title: 'Preview', anchor: 'preview'),
@@ -356,7 +356,7 @@ class SelectDocPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          DsSection(
+          ElSection(
             id: 'preview',
             title: 'Live preview',
             description:
@@ -369,7 +369,7 @@ class SelectDocPage extends StatelessWidget {
               command: DocsCodeCommand(
                 command: entry.command,
                 description:
-                    'Installs DsSelect and the popover, icon, field, and surface dependencies it needs.',
+                    'Installs ElSelect and the popover, icon, field, and surface dependencies it needs.',
               ),
               manualFiles: const <DocsCodeFile>[
                 DocsCodeFile(
@@ -384,21 +384,21 @@ class SelectDocPage extends StatelessWidget {
                   title: 'Typed usage',
                   description: 'A typed menu with grouped options.',
                   code: '''
-DsSelect<String>(
-  options: const <DsSelectChild<String>>[
-    DsSelectGroup(
+ElSelect<String>(
+  options: const <ElSelectChild<String>>[
+    ElSelectGroup(
       label: 'Activity',
       children: [
-        DsSelectOption(value: 'popular', label: 'Most popular'),
-        DsSelectOption(value: 'newest', label: 'Newest'),
+        ElSelectOption(value: 'popular', label: 'Most popular'),
+        ElSelectOption(value: 'newest', label: 'Newest'),
       ],
     ),
-    DsSelectSeparator(),
-    DsSelectGroup(
+    ElSelectSeparator(),
+    ElSelectGroup(
       label: 'Price',
       children: [
-        DsSelectOption(value: 'low', label: 'Price: low to high'),
-        DsSelectOption(value: 'high', label: 'Price: high to low'),
+        ElSelectOption(value: 'low', label: 'Price: low to high'),
+        ElSelectOption(value: 'high', label: 'Price: high to low'),
       ],
     ),
   ],
@@ -411,7 +411,7 @@ DsSelect<String>(
               ],
             ),
           ),
-          DsSection(
+          ElSection(
             id: 'installation',
             title: 'Installation',
             description:
@@ -422,7 +422,7 @@ DsSelect<String>(
                   label: 'CLI command',
                   value: entry.command,
                   description:
-                      'Adds DsSelect plus its transitive dependencies.',
+                      'Adds ElSelect plus its transitive dependencies.',
                 ),
                 DocsInstallFact(
                   label: 'Installed path',
@@ -439,7 +439,7 @@ DsSelect<String>(
               ],
             ),
           ),
-          DsSection(
+          ElSection(
             id: 'usage',
             title: 'Usage',
             description:
@@ -456,21 +456,21 @@ DsSelect<String>(
                     DocsCodeFile(
                       path: 'grouped_select.dart',
                       code: '''
-DsSelect<String>(
-  options: const <DsSelectChild<String>>[
-    DsSelectGroup(
+ElSelect<String>(
+  options: const <ElSelectChild<String>>[
+    ElSelectGroup(
       label: 'Category',
       children: [
-        DsSelectOption(value: 'design', label: 'Design & culture'),
-        DsSelectOption(value: 'photo', label: 'Photography'),
+        ElSelectOption(value: 'design', label: 'Design & culture'),
+        ElSelectOption(value: 'photo', label: 'Photography'),
       ],
     ),
-    DsSelectSeparator(),
-    DsSelectGroup(
+    ElSelectSeparator(),
+    ElSelectGroup(
       label: 'Visibility',
       children: [
-        DsSelectOption(value: 'public', label: 'Public'),
-        DsSelectOption(value: 'private', label: 'Private'),
+        ElSelectOption(value: 'public', label: 'Public'),
+        ElSelectOption(value: 'private', label: 'Private'),
       ],
     ),
   ],
@@ -481,7 +481,7 @@ DsSelect<String>(
                     ),
                   ],
                 ),
-                SizedBox(height: ds(6)),
+                SizedBox(height: el(6)),
                 DocsCodeExample(
                   title: 'Size and width control',
                   description:
@@ -491,12 +491,12 @@ DsSelect<String>(
                     DocsCodeFile(
                       path: 'sized_select.dart',
                       code: '''
-DsSelect<String>(
+ElSelect<String>(
   options: rarityOptions,
   value: rarity,
   onChanged: onChanged,
   placeholder: 'Any rarity',
-  size: DsSelectSize.sm,
+  size: ElSelectSize.sm,
   width: 160,
 )''',
                     ),
@@ -505,7 +505,7 @@ DsSelect<String>(
               ],
             ),
           ),
-          DsSection(
+          ElSection(
             id: 'api',
             title: 'API',
             description:
@@ -514,7 +514,7 @@ DsSelect<String>(
               facts: <DocsApiFact>[
                 DocsApiFact(
                   name: 'options',
-                  type: 'List<DsSelectChild<T>>',
+                  type: 'List<ElSelectChild<T>>',
                   description:
                       'Accepts options, groups, and separators in menu order.',
                 ),
@@ -536,7 +536,7 @@ DsSelect<String>(
                 ),
                 DocsApiFact(
                   name: 'size',
-                  type: 'DsSelectSize',
+                  type: 'ElSelectSize',
                   description:
                       'sm renders a 32px trigger; md renders the default 40px trigger.',
                 ),
@@ -572,7 +572,7 @@ DsSelect<String>(
               ],
             ),
           ),
-          DsSection(
+          ElSection(
             id: 'states',
             title: 'States',
             description:
@@ -622,14 +622,14 @@ DsSelect<String>(
               ],
             ),
           ),
-          DsSection(
+          ElSection(
             id: 'accessibility',
             title: 'Accessibility',
             description:
-                'Document DsSelect as a typed trigger with a real keyboard path. Labels, placeholder messaging, and disabled-option behavior all matter to the user model.',
+                'Document ElSelect as a typed trigger with a real keyboard path. Labels, placeholder messaging, and disabled-option behavior all matter to the user model.',
             child: _Bullets(
               items: const <String>[
-                'Provide a visible DsField label in forms, or pass label for accessible naming when the trigger stands alone.',
+                'Provide a visible ElField label in forms, or pass label for accessible naming when the trigger stands alone.',
                 'Placeholder is for the empty selection state only; it is not a substitute for labeling the control.',
                 'Keyboard navigation moves through selectable rows only and skips group labels, separators, and disabled options.',
                 'invalid publishes the destructive treatment and semantic invalid state on the trigger.',
@@ -637,14 +637,14 @@ DsSelect<String>(
               ],
             ),
           ),
-          DsSection(
+          ElSection(
             id: 'dependencies',
             title: 'Dependencies',
             description:
-                'The installer brings along the support primitives that let DsSelect behave like a real trigger + menu system.',
+                'The installer brings along the support primitives that let ElSelect behave like a real trigger + menu system.',
             child: _DependenciesPanel(entry: entry),
           ),
-          DsSection(
+          ElSection(
             id: 'source',
             title: 'Source',
             description:
@@ -681,9 +681,9 @@ class _ComponentDocShell extends StatelessWidget {
     return DocsLayout(
       route: entry.route,
       intro: intro,
-      breadcrumbs: <DsBreadcrumbEntry>[
-        const DsBreadcrumbEntry.link('Components'),
-        DsBreadcrumbEntry.page(entry.title),
+      breadcrumbs: <ElBreadcrumbEntry>[
+        const ElBreadcrumbEntry.link('Components'),
+        ElBreadcrumbEntry.page(entry.title),
       ],
       sidebar: <DocsSidebarEntry>[
         for (final ComponentDocEntry doc in componentDocs)
@@ -709,31 +709,31 @@ class _DependenciesPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
-    return DsPanel(
+    final ElThemeData theme = ElTheme.of(context);
+    return ElPanel(
       label: 'Registry dependencies',
       note: '${entry.dependencies.length} items',
       child: Wrap(
-        spacing: ds(2),
-        runSpacing: ds(2),
+        spacing: el(2),
+        runSpacing: el(2),
         children: <Widget>[
           for (final String dependency in entry.dependencies)
             Container(
               padding: EdgeInsets.symmetric(
-                horizontal: ds(3),
-                vertical: ds(1.5),
+                horizontal: el(3),
+                vertical: el(1.5),
               ),
               decoration: BoxDecoration(
                 color: theme.muted,
-                borderRadius: BorderRadius.circular(DsRadii.pill),
+                borderRadius: BorderRadius.circular(ElRadii.pill),
                 border: Border.all(
                   color: theme.border,
-                  width: DsWidths.hairline,
+                  width: ElWidths.hairline,
                 ),
               ),
-              child: DsText(
+              child: ElText(
                 dependency,
-                DsType.chip,
+                ElType.chip,
                 color: theme.mutedForeground,
               ),
             ),
@@ -776,30 +776,30 @@ class _Bullets extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DsThemeData theme = DsTheme.of(context);
-    return DsPanel(
+    final ElThemeData theme = ElTheme.of(context);
+    return ElPanel(
       label: 'Guidance',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           for (int index = 0; index < items.length; index++) ...<Widget>[
-            if (index > 0) SizedBox(height: ds(3)),
+            if (index > 0) SizedBox(height: el(3)),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Padding(
-                  padding: EdgeInsets.only(top: ds(1.5)),
+                  padding: EdgeInsets.only(top: el(1.5)),
                   child: Container(
-                    width: ds(1.5),
-                    height: ds(1.5),
+                    width: el(1.5),
+                    height: el(1.5),
                     decoration: BoxDecoration(
                       color: theme.actionInk,
                       shape: BoxShape.circle,
                     ),
                   ),
                 ),
-                SizedBox(width: ds(3)),
-                Expanded(child: DsText(items[index], DsType.small)),
+                SizedBox(width: el(3)),
+                Expanded(child: ElText(items[index], ElType.small)),
               ],
             ),
           ],
@@ -828,8 +828,8 @@ class _InputPreviewState extends State<_InputPreview> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         Wrap(
-          spacing: ds(2),
-          runSpacing: ds(2),
+          spacing: el(2),
+          runSpacing: el(2),
           children: <Widget>[
             _TogglePill(
               selected: _invalid,
@@ -853,15 +853,15 @@ class _InputPreviewState extends State<_InputPreview> {
             ),
           ],
         ),
-        SizedBox(height: ds(5)),
-        DsField(
+        SizedBox(height: el(5)),
+        ElField(
           label: 'Email',
           description:
               'Visible labels carry the durable meaning. Placeholders only help while the field is empty.',
           errors: _invalid
               ? const <String>['That address is missing a valid domain.']
               : const <String>[],
-          child: DsInput(
+          child: ElInput(
             key: ValueKey<String>(
               'input-preview:$_invalid:$_disabled:$_readOnly:$_showValue',
             ),
@@ -884,10 +884,10 @@ class _FieldCompanionPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsField(
+    return ElField(
       label: 'Display name',
       description: 'Shown publicly on your profile.',
-      child: const DsInput(label: 'Display name', initialValue: 'Astra Vale'),
+      child: const ElInput(label: 'Display name', initialValue: 'Astra Vale'),
     );
   }
 }
@@ -900,27 +900,27 @@ class _InputReadOnlyBarePreview extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        const DsField(
+        const ElField(
           label: 'Wallet address',
           description: 'Copyable, but not editable.',
-          child: DsInput(
+          child: ElInput(
             label: 'Wallet address',
             initialValue: '0xA71c…4F2b',
             readOnly: true,
           ),
         ),
-        SizedBox(height: ds(5)),
+        SizedBox(height: el(5)),
         Container(
-          padding: EdgeInsets.symmetric(horizontal: ds(4), vertical: ds(2)),
+          padding: EdgeInsets.symmetric(horizontal: el(4), vertical: el(2)),
           decoration: BoxDecoration(
-            color: DsTheme.of(context).muted,
-            borderRadius: BorderRadius.circular(DsRadii.lg),
+            color: ElTheme.of(context).muted,
+            borderRadius: BorderRadius.circular(ElRadii.lg),
             border: Border.all(
-              color: DsTheme.of(context).border,
-              width: DsWidths.hairline,
+              color: ElTheme.of(context).border,
+              width: ElWidths.hairline,
             ),
           ),
-          child: const DsInput(
+          child: const ElInput(
             placeholder: 'Search packs',
             label: 'Search packs',
             bare: true,
@@ -942,7 +942,7 @@ class _SelectPreviewState extends State<_SelectPreview> {
   String? _value;
   bool _invalid = false;
   bool _disabled = false;
-  DsSelectSize _size = DsSelectSize.md;
+  ElSelectSize _size = ElSelectSize.md;
 
   @override
   Widget build(BuildContext context) {
@@ -950,18 +950,18 @@ class _SelectPreviewState extends State<_SelectPreview> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         Wrap(
-          spacing: ds(2),
-          runSpacing: ds(2),
+          spacing: el(2),
+          runSpacing: el(2),
           children: <Widget>[
             _TogglePill(
-              selected: _size == DsSelectSize.md,
+              selected: _size == ElSelectSize.md,
               label: 'Size md',
-              onPressed: () => setState(() => _size = DsSelectSize.md),
+              onPressed: () => setState(() => _size = ElSelectSize.md),
             ),
             _TogglePill(
-              selected: _size == DsSelectSize.sm,
+              selected: _size == ElSelectSize.sm,
               label: 'Size sm',
-              onPressed: () => setState(() => _size = DsSelectSize.sm),
+              onPressed: () => setState(() => _size = ElSelectSize.sm),
             ),
             _TogglePill(
               selected: _invalid,
@@ -975,15 +975,15 @@ class _SelectPreviewState extends State<_SelectPreview> {
             ),
           ],
         ),
-        SizedBox(height: ds(5)),
-        DsField(
+        SizedBox(height: el(5)),
+        ElField(
           label: 'Sort order',
           description:
               'Grouped options stay keyboard-friendly: the arrows skip labels, separators, and disabled rows.',
           errors: _invalid
               ? const <String>['Choose a sort order before continuing.']
               : const <String>[],
-          child: DsSelect<String>(
+          child: ElSelect<String>(
             options: _sortOptions,
             value: _value,
             onChanged: _disabled
@@ -999,11 +999,11 @@ class _SelectPreviewState extends State<_SelectPreview> {
                 : 'Grouped menu with disabled rows.',
           ),
         ),
-        SizedBox(height: ds(4)),
-        DsText(
+        SizedBox(height: el(4)),
+        ElText(
           _value == null ? 'No value selected yet.' : 'Selected: $_value',
-          DsType.small,
-          color: DsTheme.of(context).mutedForeground,
+          ElType.small,
+          color: ElTheme.of(context).mutedForeground,
         ),
       ],
     );
@@ -1022,10 +1022,10 @@ class _GroupedSelectPreviewState extends State<_GroupedSelectPreview> {
 
   @override
   Widget build(BuildContext context) {
-    return DsField(
+    return ElField(
       label: 'Category',
       description: 'A grouped menu with semantic sections.',
-      child: DsSelect<String>(
+      child: ElSelect<String>(
         options: _profileOptions,
         value: _category,
         onChanged: (String next) => setState(() => _category = next),
@@ -1057,14 +1057,14 @@ class _SelectSizePreviewState extends State<_SelectSizePreview> {
           label: _expand ? 'Expand on' : 'Expand off',
           onPressed: () => setState(() => _expand = !_expand),
         ),
-        SizedBox(height: ds(5)),
-        DsSelect<String>(
+        SizedBox(height: el(5)),
+        ElSelect<String>(
           options: _rarityOptions,
           value: _rarity,
           onChanged: (String next) => setState(() => _rarity = next),
           placeholder: 'Any rarity',
-          size: DsSelectSize.sm,
-          width: _expand ? null : ds(40),
+          size: ElSelectSize.sm,
+          width: _expand ? null : el(40),
           expand: _expand,
           label: 'Rarity',
         ),
@@ -1086,12 +1086,12 @@ class _TogglePill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsButton(
-      variant: selected ? DsButtonVariant.primary : DsButtonVariant.secondary,
-      size: DsButtonSize.sm,
+    return ElButton(
+      variant: selected ? ElButtonVariant.primary : ElButtonVariant.secondary,
+      size: ElButtonSize.sm,
       label: label,
       onPressed: onPressed,
-      child: DsText(label, DsComponentType.buttonLabel),
+      child: ElText(label, ElComponentType.buttonLabel),
     );
   }
 }
@@ -1114,21 +1114,21 @@ DocsPageLink? _pageLinkAfter(String name) {
   return DocsPageLink(title: next.title, route: next.route);
 }
 
-const List<DsSelectChild<String>> _sortOptions = <DsSelectChild<String>>[
-  DsSelectGroup<String>(
+const List<ElSelectChild<String>> _sortOptions = <ElSelectChild<String>>[
+  ElSelectGroup<String>(
     label: 'Activity',
-    children: <DsSelectOption<String>>[
-      DsSelectOption<String>(value: 'popular', label: 'Most popular'),
-      DsSelectOption<String>(value: 'newest', label: 'Newest'),
-      DsSelectOption<String>(value: 'volatility', label: 'Volatility'),
+    children: <ElSelectOption<String>>[
+      ElSelectOption<String>(value: 'popular', label: 'Most popular'),
+      ElSelectOption<String>(value: 'newest', label: 'Newest'),
+      ElSelectOption<String>(value: 'volatility', label: 'Volatility'),
     ],
   ),
-  DsSelectSeparator(),
-  DsSelectGroup<String>(
+  ElSelectSeparator(),
+  ElSelectGroup<String>(
     label: 'Price',
-    children: <DsSelectOption<String>>[
-      DsSelectOption<String>(value: 'low', label: 'Price: low to high'),
-      DsSelectOption<String>(
+    children: <ElSelectOption<String>>[
+      ElSelectOption<String>(value: 'low', label: 'Price: low to high'),
+      ElSelectOption<String>(
         value: 'high',
         label: 'Price: high to low',
         enabled: false,
@@ -1137,26 +1137,26 @@ const List<DsSelectChild<String>> _sortOptions = <DsSelectChild<String>>[
   ),
 ];
 
-const List<DsSelectChild<String>> _profileOptions = <DsSelectChild<String>>[
-  DsSelectGroup<String>(
+const List<ElSelectChild<String>> _profileOptions = <ElSelectChild<String>>[
+  ElSelectGroup<String>(
     label: 'Category',
-    children: <DsSelectOption<String>>[
-      DsSelectOption<String>(value: 'design', label: 'Design & culture'),
-      DsSelectOption<String>(value: 'photo', label: 'Photography'),
+    children: <ElSelectOption<String>>[
+      ElSelectOption<String>(value: 'design', label: 'Design & culture'),
+      ElSelectOption<String>(value: 'photo', label: 'Photography'),
     ],
   ),
-  DsSelectSeparator(),
-  DsSelectGroup<String>(
+  ElSelectSeparator(),
+  ElSelectGroup<String>(
     label: 'Visibility',
-    children: <DsSelectOption<String>>[
-      DsSelectOption<String>(value: 'public', label: 'Public'),
-      DsSelectOption<String>(value: 'private', label: 'Private'),
+    children: <ElSelectOption<String>>[
+      ElSelectOption<String>(value: 'public', label: 'Public'),
+      ElSelectOption<String>(value: 'private', label: 'Private'),
     ],
   ),
 ];
 
-const List<DsSelectChild<String>> _rarityOptions = <DsSelectChild<String>>[
-  DsSelectOption<String>(value: 'common', label: 'Common'),
-  DsSelectOption<String>(value: 'rare', label: 'Rare'),
-  DsSelectOption<String>(value: 'mythic', label: 'Mythic'),
+const List<ElSelectChild<String>> _rarityOptions = <ElSelectChild<String>>[
+  ElSelectOption<String>(value: 'common', label: 'Common'),
+  ElSelectOption<String>(value: 'rare', label: 'Rare'),
+  ElSelectOption<String>(value: 'mythic', label: 'Mythic'),
 ];

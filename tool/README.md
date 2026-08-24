@@ -124,7 +124,7 @@ SVG's mutual-auto rule applies: an absent `rx` takes `ry`'s value and vice
 versa, and absent together means square corners. The generator resolves it
 **at emit time**, explicitly, and records the omission in a trailing comment
 (`// key: 1bwicg; rx absent (= ry)`) so the transcript still shows what
-lucide wrote. The pre-merge `DsIconRectElement` took `rx` as a non-null
+lucide wrote. The pre-merge `ElIconRectElement` took `rx` as a non-null
 positional, which could not express the distinction at all; both radii are
 nullable now and the element applies the rule itself, so a hand transcript can
 spell the omission where the generator states the resolved value — see
@@ -151,7 +151,7 @@ control points included. So this is one bad node, not a slope.
 The generator reproduces it verbatim — dropping or "fixing" a node would
 make the registry disagree with its source and hide the defect. **The
 consequence is a renderer decision, not a data one**, and it has been taken:
-`DsIcon.paintGlyph` clips to the 24-grid with a single `Canvas.clipRect`,
+`ElIcon.paintGlyph` clips to the 24-grid with a single `Canvas.clipRect`,
 which is the browser's own rule rather than a special case for one glyph.
 Measured on the rendered pixels, at 24 px on a 40×24 surface:
 
@@ -185,15 +185,15 @@ dart2js and the AOT compiler shake per **top-level symbol**:
 - An `enum` retains its members' data through `values` and through any map
   keyed on it. ❌
 
-So an `enum DsIconGlyph { … }` plus a `const Map<DsIconGlyph, List<…>>` — the
+So an `enum ElIconGlyph { … }` plus a `const Map<ElIconGlyph, List<…>>` — the
 shape the curated 78 use, which is right for 78 — is **all-or-nothing** at
 1756. There is no arrangement of a name-keyed lookup that avoids this: going
 from a runtime string to a glyph requires naming every glyph.
 
 ### The shape chosen
 
-`DsLucide` is a class of 1756 `static const` fields, one per glyph. Naming
-`DsLucide.zap` pulls in `zap` and nothing else — the Dart spelling of the
+`ElLucide` is a class of 1756 `static const` fields, one per glyph. Naming
+`ElLucide.zap` pulls in `zap` and nothing else — the Dart spelling of the
 property `lucide-react` gets on the web by shipping one module per icon and
 letting the bundler drop the rest.
 
@@ -209,9 +209,9 @@ variant, glyph chosen from a query parameter so nothing folds away:
 | variant | `main.dart.js` | gzip −9 | Δ raw | Δ gzip |
 |---|---|---|---|---|
 | shell only, registry not imported | 1,505,742 | 461,784 | — | — |
-| **1 glyph** (`DsLucide.zap`) | 1,512,008 | 463,634 | **+6,266** | **+1,850** |
+| **1 glyph** (`ElLucide.zap`) | 1,512,008 | 463,634 | **+6,266** | **+1,850** |
 | **6 glyphs**, chosen at runtime | 1,514,136 | 464,716 | **+8,394** | **+2,932** |
-| **whole set** via `dsLucideLookup` | 1,939,598 | 607,590 | **+433,856** | **+145,806** |
+| **whole set** via `elLucideLookup` | 1,939,598 | 607,590 | **+433,856** | **+145,806** |
 
 Read it as:
 
@@ -240,17 +240,17 @@ the gallery nothing.
 
 ## The merge — done
 
-The generated registry used to ship its **own** node model (`DsLucideNode`
-and its seven subclasses) because `DsIconElement` is `sealed` and cannot be
+The generated registry used to ship its **own** node model (`ElLucideNode`
+and its seven subclasses) because `ElIconElement` is `sealed` and cannot be
 extended from another library, while the full set needs two node types the
 hierarchy did not have (`ellipse`, `polygon`) plus a `rect` whose `rx` may be
 absent. That shim is gone. `icon_paths.dart` now declares all seven types,
-and this file is emitted **against them**: `DS_ICON_MODEL` still selects the
+and this file is emitted **against them**: `EL_ICON_MODEL` still selects the
 table, `SEALED` is the default, and `SHIM` is kept only because re-running
 under it reproduces the pre-merge file's node lines byte for byte.
 
 The parser never was duplicated — the shim's `addTo` delegated to
-`DsIconPathElement` — so all 5932 `d` strings have always gone through the
+`ElIconPathElement` — so all 5932 `d` strings have always gone through the
 port's own reader.
 
 **The merge changed no data.** Re-running under `SEALED` and renaming the
@@ -264,16 +264,16 @@ other — its two signature functions collapsed into one.
 One integration step remains out of scope, and is not required for the
 registry to be correct:
 
-- **Rendering.** `DsIcon` takes a `DsIconGlyph`; a `DsLucideGlyph` needs
-  either a second constructor or a widened parameter. `DsIcon.paintGlyph` is
-  already the seam — it takes a `Path`, not a glyph — and `DsIcon.strokeFor`,
+- **Rendering.** `ElIcon` takes a `ElIconGlyph`; a `ElLucideGlyph` needs
+  either a second constructor or a widened parameter. `ElIcon.paintGlyph` is
+  already the seam — it takes a `Path`, not a glyph — and `ElIcon.strokeFor`,
   the per-size stroke retune that is the reason this port draws paths instead
   of using an icon font, is geometry-independent and needs no change at all.
   Nothing imports `icon_paths.g.dart` from `lib/` today, which is what keeps
   the gallery's cost at the +2 bytes measured above.
 
 **The curated/off-set distinction survives untouched.** The generated set is
-the *universe*; `lib/ds/icons.ts`'s curated 63 stay an explicit list, and the
+the *universe*; `lib/el/icons.ts`'s curated 63 stay an explicit list, and the
 icons page's registry keeps enumerating them by name. Nothing about making
 1756 glyphs available changes which ones that page prints — which is the
 point of keeping the two lists separate, and `example/test/icons_page_test.dart`
