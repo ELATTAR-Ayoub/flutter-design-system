@@ -15,6 +15,15 @@
 /// way: "Nine classes" over ten specimen rows, and `.type-micro` called "the
 /// floor … never smaller" while `.type-tag` ships a step below it.
 ///
+/// **One deliberate departure, added at the v0.0.1 public release.** The
+/// transcript above is faithful, and it is also reachable by a public reader
+/// who has no way to know that "Space Grotesk" is the reference's error
+/// rather than this system's contract. A correction banner now sits at the
+/// top of the page, pointing at `/docs/typeset`, which is canonical and reads
+/// its values from the tokens. That banner adds height this page's parity
+/// captures do not have: it is the one intentional difference, and it is here
+/// rather than in the transcript so the specimens themselves stay comparable.
+///
 /// `Spec` is a page-local component in the reference, so [_Spec] is local here
 /// too; `.prose` is a CSS layer with no component at all, so [_Prose] is this
 /// file's own: a Flutter widget set carrying the rhythm of globals.css
@@ -63,6 +72,24 @@ class TypographyPage extends StatelessWidget {
           blurb: here.category.blurb,
           contents: here.category.contents,
         ),
+        // See the library note: this page transcribes the reference, and the
+        // reference's copy names a face it does not ship. Correcting the
+        // transcript would make the page stop being one; leaving it alone
+        // would let a public reader walk away with the wrong font name. So
+        // the transcript stands and the correction sits above it.
+        SizedBox(height: el(6)),
+        const ElAlert(
+          variant: ElAlertVariant.info,
+          icon: ElIcon(ElIconGlyph.info),
+          title: 'This page transcribes the reference, including its error',
+          description:
+              'The copy below names Space Grotesk as the word face. The '
+              'tokens do not: --font-sans is Inter, and no Space Grotesk '
+              'asset exists here or in the reference. Everything on this page '
+              'renders in Inter. For the token contract, with values read '
+              'from the tokens themselves, see Typeset under Docs.',
+        ),
+        SizedBox(height: el(6)),
         const _RuleSection(),
         const _WordScaleSection(),
         const _NumericScaleSection(),
