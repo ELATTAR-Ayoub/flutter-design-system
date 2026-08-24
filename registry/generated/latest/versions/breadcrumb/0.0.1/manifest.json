@@ -23,6 +23,7 @@
   "assets": [],
   "fonts": [],
   "shaders": [],
+  "licenses": [],
   "documentationRoute": "/components/breadcrumb",
   "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/breadcrumb.dart",
   "deprecated": false

@@ -25,6 +25,7 @@
   "assets": [],
   "fonts": [],
   "shaders": [],
+  "licenses": [],
   "documentationRoute": "/components/context-menu",
   "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/context_menu.dart",
   "deprecated": false

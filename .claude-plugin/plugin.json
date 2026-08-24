@@ -8,6 +8,7 @@
   },
   "homepage": "https://github.com/ELATTAR-Ayoub/flutter-design-system",
   "repository": "https://github.com/ELATTAR-Ayoub/flutter-design-system",
+  "license": "MIT",
   "keywords": [
     "flutter",
     "dart",

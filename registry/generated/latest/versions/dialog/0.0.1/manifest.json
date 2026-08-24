@@ -27,6 +27,7 @@
   "assets": [],
   "fonts": [],
   "shaders": [],
+  "licenses": [],
   "documentationRoute": "/components/dialog",
   "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/dialog.dart",
   "deprecated": false

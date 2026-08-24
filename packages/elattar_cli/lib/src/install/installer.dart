@@ -29,6 +29,7 @@ class Installer {
     required Directory repositoryRoot,
     required List<InstallItem> items,
     bool overwrite = false,
+    Map<String, String> textNotices = const <String, String>{},
   }) {
     final List<InstallOperation> operations = <InstallOperation>[];
     final List<InstallConflict> conflicts = <InstallConflict>[];
@@ -123,6 +124,43 @@ class Installer {
         );
         shaders.add(_relative(projectRoot.path, destination));
       }
+      // Notices, copied byte for byte into `LICENSES/`.
+      //
+      // Three deliberate differences from every other resource above. They are
+      // not added to `assets`, so they never enter the consumer's
+      // `pubspec.yaml` or their app bundle — a license belongs in the
+      // repository, not in the shipped binary. They do not pass through the
+      // import transformer or the source rewriter, because a rewritten notice
+      // is no longer the text the upstream project published. And nothing here
+      // removes a notice: `_queue` only ever writes the destinations this plan
+      // names, so a consumer's own `LICENSES/` entries survive `--overwrite`
+      // untouched, and an identical re-install is a no-op rather than a
+      // conflict.
+      for (final InstallResource resource in item.licenses) {
+        _queueResource(
+          operations,
+          conflicts,
+          mapper.destination(projectRoot.path, resource.target),
+          resource.source,
+          repositoryRoot,
+          overwrite,
+        );
+      }
+    }
+    // Notices the CLI carries itself rather than reads from the registry —
+    // today just Elattar's own MIT text, which `init` must write into every
+    // project whether or not a registry is reachable. Keyed by logical target
+    // so they land in `LICENSES/` through the same mapper as the registry's
+    // notices, and queued through `_queue` so an identical re-run is a no-op.
+    for (final MapEntry<String, String> notice in textNotices.entries) {
+      _queue(
+        operations,
+        conflicts,
+        mapper.destination(projectRoot.path, notice.key),
+        'cli:${notice.key}',
+        notice.value,
+        overwrite,
+      );
     }
     final String uiBarrel = _barrel(
       uiFiles,

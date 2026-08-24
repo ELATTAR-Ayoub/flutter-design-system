@@ -120,6 +120,7 @@ class RegistryItem {
     required this.assets,
     required this.fonts,
     required this.shaders,
+    this.licenses = const <RegistryResource>[],
     required this.documentationRoute,
     required this.sourceLink,
     this.deprecated = false,
@@ -139,6 +140,26 @@ class RegistryItem {
   final List<RegistryResource> assets;
   final List<RegistryFont> fonts;
   final List<RegistryResource> shaders;
+
+  /// Third-party license notices this item must not be installed without.
+  ///
+  /// Separate from [assets] for two reasons that both matter.
+  ///
+  /// A notice is not a bundled asset: it belongs in the consumer's root
+  /// `LICENSES/` directory (the `@license/` prefix), not in `assets/`, and it
+  /// must never be registered in the consumer's `pubspec.yaml` asset list —
+  /// shipping a license file inside an app bundle is not what any of these
+  /// licenses ask for, and it would grow every binary for nothing.
+  ///
+  /// And unlike every other resource, a notice is deliberately **exempt from
+  /// cross-item target deduplication**. Deduplication keeps the first item
+  /// that claims a target and drops the rest, which is right for a shared
+  /// source file — install either item and you get the file. It is exactly
+  /// wrong for a notice: a consumer who installs only the item whose copy was
+  /// dropped would receive the geometry and not the license that permits it.
+  /// Every item that redistributes third-party material declares its own
+  /// notice, and the installer writes identical bytes idempotently.
+  final List<RegistryResource> licenses;
   final String documentationRoute;
   final String sourceLink;
   final bool deprecated;
@@ -169,6 +190,12 @@ class RegistryItem {
       assets: _resources(json, 'assets', path, RegistryResource.fromJson),
       fonts: _resources(json, 'fonts', path, RegistryFont.fromJson),
       shaders: _resources(json, 'shaders', path, RegistryResource.fromJson),
+      // Optional: the overwhelming majority of items redistribute nothing and
+      // carry no notice, so requiring an empty array in 96 manifests would be
+      // noise. Absent means none.
+      licenses: json.containsKey('licenses')
+          ? _resources(json, 'licenses', path, RegistryResource.fromJson)
+          : const <RegistryResource>[],
       documentationRoute: _string(json, 'documentationRoute', path),
       sourceLink: _string(json, 'sourceLink', path),
       deprecated: json['deprecated'] as bool? ?? false,

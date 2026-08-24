@@ -29,6 +29,7 @@
   "assets": [],
   "fonts": [],
   "shaders": [],
+  "licenses": [],
   "documentationRoute": "/components/agent-launcher",
   "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/agent_launcher.dart",
   "deprecated": false

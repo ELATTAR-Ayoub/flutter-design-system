@@ -20,6 +20,7 @@
   "assets": [],
   "fonts": [],
   "shaders": [],
+  "licenses": [],
   "documentationRoute": "/docs/effects/page-glow",
   "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/effects/page_glow.dart",
   "deprecated": false

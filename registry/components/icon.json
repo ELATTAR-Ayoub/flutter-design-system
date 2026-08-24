@@ -19,12 +19,12 @@
     {
       "source": "lib/src/components/icon_paths.g.dart",
       "target": "@ui/icon_paths.g.dart",
-      "sha256": "a57629dad023c46232ea08e27e21c3b4c90a06802d00a1180396bff169419209"
+      "sha256": "609fd4ceab67fce3ff39b4a687c08af737cb8161306d3b3aae1c8dc59527ff0f"
     },
     {
       "source": "lib/src/components/icon_paths.g.index.dart",
       "target": "@ui/icon_paths.g.index.dart",
-      "sha256": "295f3dbce8baac3eae373dbace980301da318ca3912de3f2836b9cb7056ef4e2"
+      "sha256": "2b4d37b8131ec204ed359484ee030175e6bfede8ca2e72d6bc20bc9d9d2f5215"
     }
   ],
   "registryDependencies": [
@@ -35,6 +35,13 @@
   "assets": [],
   "fonts": [],
   "shaders": [],
+  "licenses": [
+    {
+      "source": "third_party/lucide/LICENSE",
+      "target": "@license/Lucide-ISC.txt",
+      "sha256": "b495047bd93a9b06913511076f504daba17d5bbeb3e0650f3bb53a4220329c57"
+    }
+  ],
   "documentationRoute": "/components/icon",
   "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/icon.dart"
 }

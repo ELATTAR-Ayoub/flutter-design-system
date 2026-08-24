@@ -21,7 +21,7 @@
     {
       "source": "assets/textures/perlin-noise.png",
       "target": "@assets/textures/perlin-noise.png",
-      "sha256": "6327c82c7700d6774794f7b06517e45bfedba50ef3b71abac280bd2595e98e6c"
+      "sha256": "3fa8bdce594fad7586bfe3be10be04bcf77eca38ef85d2ab811c5e0445ce0785"
     }
   ],
   "fonts": [],
@@ -29,7 +29,14 @@
     {
       "source": "shaders/orb.frag",
       "target": "@shaders/orb.frag",
-      "sha256": "65a449c07b01dd14c0c3229f70c66cb4744fb7410c6d3b13c1c0419b282f8d28"
+      "sha256": "95a0050d596eda3b0cd9fe8f61bd4a7b152a5eed66bc7532b997518ef04a92fe"
+    }
+  ],
+  "licenses": [
+    {
+      "source": "third_party/elevenlabs-ui/LICENSE",
+      "target": "@license/ElevenLabs-UI-MIT.txt",
+      "sha256": "ad3f66b8568970d067e3bd47b690ad013945a61f972559743946a3a6558dc828"
     }
   ],
   "documentationRoute": "/docs/effects/voice-orb",

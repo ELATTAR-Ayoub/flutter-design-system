@@ -88,6 +88,23 @@
     }
   ],
   "shaders": [],
+  "licenses": [
+    {
+      "source": "third_party/fonts/inter/OFL.txt",
+      "target": "@license/Inter-OFL-1.1.txt",
+      "sha256": "262481e844521b326f5ecd053e59b98c8b2da78c8ee1bdbb6e8174305e54935a"
+    },
+    {
+      "source": "third_party/fonts/geist-mono/OFL.txt",
+      "target": "@license/Geist-Mono-OFL-1.1.txt",
+      "sha256": "c683bfbcc7e087f5d37a54ef628f10387c451a83ddc459b151403a164ac46c90"
+    },
+    {
+      "source": "third_party/fonts/redaction/OFL.txt",
+      "target": "@license/Redaction-OFL-1.1.txt",
+      "sha256": "8c13186f0201838de84a9254fb79265e9a6441e2352e1fdc245ae031cbb5848d"
+    }
+  ],
   "documentationRoute": "/docs/foundations",
   "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/elattar_design_system.dart",
   "deprecated": false

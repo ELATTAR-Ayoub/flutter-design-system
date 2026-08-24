@@ -21,6 +21,18 @@ const String fontsDirectory = 'assets/elattar/fonts';
 /// under the design-system folders: `@app/shots/x/y.dart` -> `lib/shots/x/y.dart`.
 const String appDirectory = 'lib';
 
+/// Third-party license notices, at the consumer's project root.
+///
+/// Not under `lib/` and not under `assets/`: a notice exists to be found by a
+/// person reading the repository and by whatever scans the project for
+/// licenses, and neither of those looks inside a widget tree or an app bundle.
+/// The uppercase name is the convention every such scanner already knows.
+///
+/// `tool/registry_builder/lib/registry_validator.dart` holds the other half of
+/// this pair — the `@license/` prefix in its allowlist — and
+/// `test/license_distribution_test.dart` fails if the two drift.
+const String licensesDirectory = 'LICENSES';
+
 class LogicalTargetMapper {
   const LogicalTargetMapper();
 
@@ -56,6 +68,9 @@ class LogicalTargetMapper {
     }
     if (relative.startsWith('@app/')) {
       return _join(projectRoot, '$appDirectory/${relative.substring(5)}');
+    }
+    if (relative.startsWith('@license/')) {
+      return _join(projectRoot, '$licensesDirectory/${relative.substring(9)}');
     }
     throw ArgumentError.value(
       logicalTarget,

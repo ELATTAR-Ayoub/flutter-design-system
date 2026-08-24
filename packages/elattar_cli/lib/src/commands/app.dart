@@ -7,6 +7,7 @@ import 'package:yaml/yaml.dart';
 
 import '../config.dart';
 import '../identity.dart';
+import '../license_notice.dart';
 import '../install/installer.dart';
 import '../install/models.dart';
 import '../install/target_mapper.dart';
@@ -493,6 +494,15 @@ class ElattarCli {
       repositoryRoot: registry.repositoryRoot,
       items: installItems,
       overwrite: overwrite,
+      // Passed on every mutation, not only on `init`. `init` is where it
+      // first lands, but a project whose `LICENSES/ELATTAR-MIT.txt` was
+      // deleted should get it back on the next `add` rather than quietly
+      // continue without the one notice every installed component needs.
+      // Identical content is a no-op, so this costs nothing when it is
+      // already there.
+      textNotices: const <String, String>{
+        elattarMitNoticeTarget: elattarMitNotice,
+      },
     );
     final List<_WritePlan> writes = <_WritePlan>[
       for (final InstallOperation operation in installPlan.operations)
@@ -866,6 +876,14 @@ InstallItem _toInstallItem(RegistryItem item) {
     ],
     shaders: <InstallResource>[
       for (final RegistryResource resource in item.shaders)
+        InstallResource(
+          source: resource.source,
+          target: resource.target,
+          sha256: resource.sha256,
+        ),
+    ],
+    licenses: <InstallResource>[
+      for (final RegistryResource resource in item.licenses)
         InstallResource(
           source: resource.source,
           target: resource.target,

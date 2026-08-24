@@ -20,6 +20,7 @@
   "assets": [],
   "fonts": [],
   "shaders": [],
+  "licenses": [],
   "documentationRoute": "/docs/effects/media-scrim",
   "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/effects/media_scrim.dart",
   "deprecated": false

@@ -187,6 +187,7 @@ class RegistryItem {
     required this.assets,
     required this.fonts,
     required this.shaders,
+    this.licenses = const <RegistryResource>[],
     required this.documentationRoute,
     required this.sourceLink,
     required this.deprecated,
@@ -206,6 +207,15 @@ class RegistryItem {
   final List<RegistryResource> assets;
   final List<RegistryFont> fonts;
   final List<RegistryResource> shaders;
+
+  /// Third-party license notices this item may not be installed without.
+  ///
+  /// They install to the consumer's root `LICENSES/` directory through the
+  /// `@license/` prefix, are never registered as Flutter assets, and — unlike
+  /// every other resource — may legitimately be declared identically by more
+  /// than one item, because each item that redistributes third-party material
+  /// has to carry its own notice.
+  final List<RegistryResource> licenses;
   final String documentationRoute;
   final String sourceLink;
   final bool deprecated;
@@ -234,6 +244,9 @@ class RegistryItem {
       assets: _resources(json, 'assets', path, RegistryResource.fromJson),
       fonts: _resources(json, 'fonts', path, RegistryFont.fromJson),
       shaders: _resources(json, 'shaders', path, RegistryResource.fromJson),
+      licenses: json.containsKey('licenses')
+          ? _resources(json, 'licenses', path, RegistryResource.fromJson)
+          : const <RegistryResource>[],
       documentationRoute: _string(json, 'documentationRoute', path),
       sourceLink: _string(json, 'sourceLink', path),
       deprecated: json['deprecated'] as bool? ?? false,
@@ -252,6 +265,7 @@ class RegistryItem {
     yield* assets;
     yield* fonts;
     yield* shaders;
+    yield* licenses;
   }
 }
 

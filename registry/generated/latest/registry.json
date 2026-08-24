@@ -33,6 +33,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/accordion",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/accordion.dart",
       "deprecated": false
@@ -72,6 +73,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/agent-attach-menu",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/agent_attach_menu.dart",
       "deprecated": false
@@ -111,6 +113,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/agent-attachments",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/agent_attachments.dart",
       "deprecated": false
@@ -142,6 +145,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/agent-avatar",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/agent_avatar.dart",
       "deprecated": false
@@ -185,6 +189,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/agent-composer",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/agent_composer.dart",
       "deprecated": false
@@ -238,6 +243,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/agent-console",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/agent_console.dart",
       "deprecated": false
@@ -267,6 +273,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/agent-core",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/agent_core.dart",
       "deprecated": false
@@ -304,6 +311,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/agent-face",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/agent_face.dart",
       "deprecated": false
@@ -363,6 +371,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/agent-history",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/agent_history.dart",
       "deprecated": false
@@ -398,6 +407,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/agent-launcher",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/agent_launcher.dart",
       "deprecated": false
@@ -424,6 +434,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/agent-markdown",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/agent_markdown.dart",
       "deprecated": false
@@ -453,6 +464,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/agent-slash-palette",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/agent_slash_palette.dart",
       "deprecated": false
@@ -492,6 +504,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/agent-transcript",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/agent_transcript.dart",
       "deprecated": false
@@ -521,6 +534,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/alert",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/alert.dart",
       "deprecated": false
@@ -556,6 +570,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/alert-dialog",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/alert_dialog.dart",
       "deprecated": false
@@ -580,6 +595,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/aspect-ratio",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/aspect_ratio.dart",
       "deprecated": false
@@ -615,6 +631,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/attachment",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/attachment.dart",
       "deprecated": false
@@ -641,6 +658,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/avatar",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/avatar.dart",
       "deprecated": false
@@ -670,6 +688,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/badge",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/badge.dart",
       "deprecated": false
@@ -701,6 +720,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/docs/effects/bloom-cosmic",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/effects/bloom_cosmic.dart",
       "deprecated": false
@@ -730,6 +750,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/breadcrumb",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/breadcrumb.dart",
       "deprecated": false
@@ -759,6 +780,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/bubble",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/bubble.dart",
       "deprecated": false
@@ -794,6 +816,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/button",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/button.dart",
       "deprecated": false
@@ -823,6 +846,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/button-group",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/button_group.dart",
       "deprecated": false
@@ -856,6 +880,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/calendar",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/calendar.dart",
       "deprecated": false
@@ -882,6 +907,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/card",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/card.dart",
       "deprecated": false
@@ -913,6 +939,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/carousel",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/carousel.dart",
       "deprecated": false
@@ -939,6 +966,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/chart",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/chart.dart",
       "deprecated": false
@@ -970,6 +998,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/chart-cartesian",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/chart_cartesian.dart",
       "deprecated": false
@@ -994,6 +1023,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/chart-geometry",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/chart_geometry.dart",
       "deprecated": false
@@ -1027,6 +1057,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/chart-polar",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/chart_polar.dart",
       "deprecated": false
@@ -1062,6 +1093,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/checkbox",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/checkbox.dart",
       "deprecated": false
@@ -1088,6 +1120,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/collapsible",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/collapsible.dart",
       "deprecated": false
@@ -1125,6 +1158,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/combobox",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/combobox.dart",
       "deprecated": false
@@ -1158,6 +1192,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/command",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/command.dart",
       "deprecated": false
@@ -1189,6 +1224,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/context-menu",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/context_menu.dart",
       "deprecated": false
@@ -1222,6 +1258,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/dialog",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/dialog.dart",
       "deprecated": false
@@ -1251,6 +1288,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/drawer",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/drawer.dart",
       "deprecated": false
@@ -1284,6 +1322,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/dropdown-menu",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/dropdown_menu.dart",
       "deprecated": false
@@ -1313,6 +1352,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/empty",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/empty.dart",
       "deprecated": false
@@ -1342,6 +1382,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/field",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/field.dart",
       "deprecated": false
@@ -1371,6 +1412,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/docs/effects/foil-value",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/effects/foil_value.dart",
       "deprecated": false
@@ -1399,6 +1441,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/form",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/form.dart",
       "deprecated": false
@@ -1428,6 +1471,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/docs/effects/glass",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/effects/glass.dart",
       "deprecated": false
@@ -1457,6 +1501,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/hover-card",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/hover_card.dart",
       "deprecated": false
@@ -1482,12 +1527,12 @@
         {
           "source": "lib/src/components/icon_paths.g.dart",
           "target": "@ui/icon_paths.g.dart",
-          "sha256": "a57629dad023c46232ea08e27e21c3b4c90a06802d00a1180396bff169419209"
+          "sha256": "609fd4ceab67fce3ff39b4a687c08af737cb8161306d3b3aae1c8dc59527ff0f"
         },
         {
           "source": "lib/src/components/icon_paths.g.index.dart",
           "target": "@ui/icon_paths.g.index.dart",
-          "sha256": "295f3dbce8baac3eae373dbace980301da318ca3912de3f2836b9cb7056ef4e2"
+          "sha256": "2b4d37b8131ec204ed359484ee030175e6bfede8ca2e72d6bc20bc9d9d2f5215"
         }
       ],
       "registryDependencies": [
@@ -1498,6 +1543,13 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [
+        {
+          "source": "third_party/lucide/LICENSE",
+          "target": "@license/Lucide-ISC.txt",
+          "sha256": "b495047bd93a9b06913511076f504daba17d5bbeb3e0650f3bb53a4220329c57"
+        }
+      ],
       "documentationRoute": "/components/icon",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/icon.dart",
       "deprecated": false
@@ -1527,6 +1579,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/icon-swap",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/icon_swap.dart",
       "deprecated": false
@@ -1560,6 +1613,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/input",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/input.dart",
       "deprecated": false
@@ -1597,6 +1651,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/input-group",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/input_group.dart",
       "deprecated": false
@@ -1636,6 +1691,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/input-otp",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/input_otp.dart",
       "deprecated": false
@@ -1662,6 +1718,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/item",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/item.dart",
       "deprecated": false
@@ -1691,6 +1748,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/kbd",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/kbd.dart",
       "deprecated": false
@@ -1717,6 +1775,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/docs/motion/keyframes",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/motion/keyframes.dart",
       "deprecated": false
@@ -1743,6 +1802,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/docs/motion/lift",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/motion/lift.dart",
       "deprecated": false
@@ -1769,6 +1829,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/docs/effects/machine-surface",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/effects/machine_surface.dart",
       "deprecated": false
@@ -1795,6 +1856,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/marker",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/marker.dart",
       "deprecated": false
@@ -1821,6 +1883,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/docs/effects/media-scrim",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/effects/media_scrim.dart",
       "deprecated": false
@@ -1852,6 +1915,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/menu",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/menu.dart",
       "deprecated": false
@@ -1883,6 +1947,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/menubar",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/menubar.dart",
       "deprecated": false
@@ -1912,6 +1977,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/message",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/message.dart",
       "deprecated": false
@@ -1943,6 +2009,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/message-scroller",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/message_scroller.dart",
       "deprecated": false
@@ -1982,6 +2049,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/native-select",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/native_select.dart",
       "deprecated": false
@@ -2021,6 +2089,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/nav-user",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/nav_user.dart",
       "deprecated": false
@@ -2054,6 +2123,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/navigation-menu",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/navigation_menu.dart",
       "deprecated": false
@@ -2080,6 +2150,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/docs/effects/page-glow",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/effects/page_glow.dart",
       "deprecated": false
@@ -2111,6 +2182,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/pagination",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/pagination.dart",
       "deprecated": false
@@ -2140,6 +2212,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/popover",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/popover.dart",
       "deprecated": false
@@ -2166,6 +2239,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/docs/motion/press",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/motion/press.dart",
       "deprecated": false
@@ -2195,6 +2269,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/progress",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/progress.dart",
       "deprecated": false
@@ -2230,6 +2305,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/questionnaire",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/questionnaire.dart",
       "deprecated": false
@@ -2265,6 +2341,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/radio",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/radio.dart",
       "deprecated": false
@@ -2291,6 +2368,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/resizable",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/resizable.dart",
       "deprecated": false
@@ -2315,6 +2393,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/docs/foundations/rules",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/rule.dart",
       "deprecated": false
@@ -2339,6 +2418,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/safe-area",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/safe_area.dart",
       "deprecated": false
@@ -2365,6 +2445,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/scroll-area",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/scroll_area.dart",
       "deprecated": false
@@ -2402,6 +2483,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/select",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/select.dart",
       "deprecated": false
@@ -2435,6 +2517,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/selection-control",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/selection_control.dart",
       "deprecated": false
@@ -2461,6 +2544,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/separator",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/separator.dart",
       "deprecated": false
@@ -2490,6 +2574,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/docs/effects/sheen-action",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/effects/sheen_action.dart",
       "deprecated": false
@@ -2525,6 +2610,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/sheet",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/sheet.dart",
       "deprecated": false
@@ -2574,6 +2660,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/sidebar",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/sidebar.dart",
       "deprecated": false
@@ -2603,6 +2690,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/skeleton",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/skeleton.dart",
       "deprecated": false
@@ -2636,6 +2724,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/slider",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/slider.dart",
       "deprecated": false
@@ -2665,6 +2754,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/docs/motion/sliding-pill",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/motion/sliding_pill.dart",
       "deprecated": false
@@ -2759,6 +2849,23 @@
         }
       ],
       "shaders": [],
+      "licenses": [
+        {
+          "source": "third_party/fonts/inter/OFL.txt",
+          "target": "@license/Inter-OFL-1.1.txt",
+          "sha256": "262481e844521b326f5ecd053e59b98c8b2da78c8ee1bdbb6e8174305e54935a"
+        },
+        {
+          "source": "third_party/fonts/geist-mono/OFL.txt",
+          "target": "@license/Geist-Mono-OFL-1.1.txt",
+          "sha256": "c683bfbcc7e087f5d37a54ef628f10387c451a83ddc459b151403a164ac46c90"
+        },
+        {
+          "source": "third_party/fonts/redaction/OFL.txt",
+          "target": "@license/Redaction-OFL-1.1.txt",
+          "sha256": "8c13186f0201838de84a9254fb79265e9a6441e2352e1fdc245ae031cbb5848d"
+        }
+      ],
       "documentationRoute": "/docs/foundations",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/elattar_design_system.dart",
       "deprecated": false
@@ -2788,6 +2895,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/spinner",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/spinner.dart",
       "deprecated": false
@@ -2817,6 +2925,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/docs/effects/starfield",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/effects/starfield.dart",
       "deprecated": false
@@ -2850,6 +2959,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/stat",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/stat.dart",
       "deprecated": false
@@ -2879,6 +2989,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/docs/motion/swap-in",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/motion/swap_in.dart",
       "deprecated": false
@@ -2912,6 +3023,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/switch",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/switch.dart",
       "deprecated": false
@@ -2938,6 +3050,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/table",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/table.dart",
       "deprecated": false
@@ -2971,6 +3084,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/tabs",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/tabs.dart",
       "deprecated": false
@@ -3002,6 +3116,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/textarea",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/textarea.dart",
       "deprecated": false
@@ -3037,6 +3152,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/toaster",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/toaster.dart",
       "deprecated": false
@@ -3070,6 +3186,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/toggle",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/toggle.dart",
       "deprecated": false
@@ -3103,6 +3220,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/toggle-group",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/toggle_group.dart",
       "deprecated": false
@@ -3129,6 +3247,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/tooltip",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/tooltip.dart",
       "deprecated": false
@@ -3160,6 +3279,7 @@
       "assets": [],
       "fonts": [],
       "shaders": [],
+      "licenses": [],
       "documentationRoute": "/components/voice",
       "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/lib/src/components/voice.dart",
       "deprecated": false
@@ -3187,7 +3307,7 @@
         {
           "source": "assets/textures/perlin-noise.png",
           "target": "@assets/textures/perlin-noise.png",
-          "sha256": "6327c82c7700d6774794f7b06517e45bfedba50ef3b71abac280bd2595e98e6c"
+          "sha256": "3fa8bdce594fad7586bfe3be10be04bcf77eca38ef85d2ab811c5e0445ce0785"
         }
       ],
       "fonts": [],
@@ -3195,7 +3315,14 @@
         {
           "source": "shaders/orb.frag",
           "target": "@shaders/orb.frag",
-          "sha256": "65a449c07b01dd14c0c3229f70c66cb4744fb7410c6d3b13c1c0419b282f8d28"
+          "sha256": "95a0050d596eda3b0cd9fe8f61bd4a7b152a5eed66bc7532b997518ef04a92fe"
+        }
+      ],
+      "licenses": [
+        {
+          "source": "third_party/elevenlabs-ui/LICENSE",
+          "target": "@license/ElevenLabs-UI-MIT.txt",
+          "sha256": "ad3f66b8568970d067e3bd47b690ad013945a61f972559743946a3a6558dc828"
         }
       ],
       "documentationRoute": "/docs/effects/voice-orb",

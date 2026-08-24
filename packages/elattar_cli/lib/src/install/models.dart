@@ -66,6 +66,7 @@ class InstallItem {
     this.assets = const <InstallResource>[],
     this.fonts = const <InstallFont>[],
     this.shaders = const <InstallResource>[],
+    this.licenses = const <InstallResource>[],
     this.dependencies = const <String>[],
     this.pubDependencies = const <String, String>{},
   });
@@ -76,6 +77,13 @@ class InstallItem {
   final List<InstallResource> assets;
   final List<InstallFont> fonts;
   final List<InstallResource> shaders;
+
+  /// Third-party notices copied verbatim into the consumer's `LICENSES/`.
+  ///
+  /// Byte copies, never rewritten: a license text that had its imports
+  /// "transformed" would no longer be the text the upstream project
+  /// published, which is the one property that makes it a valid notice.
+  final List<InstallResource> licenses;
   final List<String> dependencies;
   final Map<String, String> pubDependencies;
 }

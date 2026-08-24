@@ -13,7 +13,21 @@ const Set<String> logicalTargetPrefixes = <String>{
   // Application-level compositions (shots). These land in the consumer's own
   // `lib/`, never inside the design-system folders.
   '@app/',
+  // Third-party license notices. These land in the consumer's root
+  // `LICENSES/` directory, outside `lib/` and outside the asset bundle:
+  // a notice has to be findable by a human reading the repository, not
+  // compiled into the app. `packages/elattar_cli/lib/src/install/
+  // target_mapper.dart` holds the other half of this pair, and
+  // `test/license_distribution_test.dart` fails if the two lists drift apart.
+  licenseTargetPrefix,
 };
+
+/// The one prefix that installs outside `lib/`, `assets/` and `shaders/`.
+///
+/// Named rather than inlined because three separate rules refer to it: only
+/// the `licenses` group may use it, that group may use nothing else, and a
+/// shared target is an error everywhere except here.
+const String licenseTargetPrefix = '@license/';
 
 final RegExp _sha256 = RegExp(r'^[0-9a-fA-F]{64}$');
 final RegExp _name = RegExp(r'^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$');
@@ -51,6 +65,9 @@ RegistryValidationResult validateRegistry(RegistryDocument document) {
 
   final Map<String, RegistryItem> byName = <String, RegistryItem>{};
   final Map<String, String> targetOwners = <String, String>{};
+  // Target -> sha256, not target -> item: a notice may be declared by many
+  // items, and what has to agree is the content, not the owner.
+  final Map<String, String> licenseOwners = <String, String>{};
   for (int i = 0; i < document.items.length; i++) {
     final RegistryItem item = document.items[i];
     final String path = r'$.items[' + i.toString() + ']';
@@ -65,7 +82,7 @@ RegistryValidationResult validateRegistry(RegistryDocument document) {
     } else {
       byName[item.name] = item;
     }
-    _validateItem(item, path, errors, targetOwners);
+    _validateItem(item, path, errors, targetOwners, licenseOwners);
   }
 
   for (final RegistryItem item in document.items) {
@@ -100,11 +117,13 @@ void _validateItem(
   String path,
   List<String> errors,
   Map<String, String> targetOwners,
+  Map<String, String> licenseOwners,
 ) {
   if (item.files.isEmpty &&
       item.assets.isEmpty &&
       item.fonts.isEmpty &&
-      item.shaders.isEmpty) {
+      item.shaders.isEmpty &&
+      item.licenses.isEmpty) {
     errors.add(
       '$path must declare at least one distributable file or resource.',
     );
@@ -140,7 +159,42 @@ void _validateItem(
         item.name,
       );
       _validateHash(resource.sha256, '$path.$label[$i].sha256', errors);
+      if (resource.target.startsWith(licenseTargetPrefix)) {
+        errors.add(
+          '$path.$label[$i].target uses $licenseTargetPrefix, which only the '
+          '"licenses" group may use.',
+        );
+      }
     }
+  }
+  // Licenses, validated apart from the loop above because they are the one
+  // group a target may legitimately be shared on. `_validateTarget`'s owner
+  // map exists to catch two items claiming the same install path with
+  // different content; for a notice, two items claiming the same path with
+  // the *same* content is the correct and expected shape, and forbidding it
+  // would force notices to be declared by exactly one item — leaving anyone
+  // who installs a different item holding unlicensed material.
+  for (int i = 0; i < item.licenses.length; i++) {
+    final RegistryResource resource = item.licenses[i];
+    _validateSource(resource.source, '$path.licenses[$i].source', errors);
+    _validateHash(resource.sha256, '$path.licenses[$i].sha256', errors);
+    final String target = resource.target;
+    if (!target.startsWith(licenseTargetPrefix) ||
+        target.contains('..') ||
+        target.endsWith('/')) {
+      errors.add(
+        '$path.licenses[$i].target must be a safe path under '
+        '$licenseTargetPrefix.',
+      );
+    }
+    final String? owner = licenseOwners[target];
+    if (owner != null && owner != resource.sha256) {
+      errors.add(
+        '$path.licenses[$i] declares $target with different content than '
+        'another item does; a notice must be one text or two names.',
+      );
+    }
+    licenseOwners[target] = resource.sha256;
   }
   for (int i = 0; i < item.fonts.length; i++) {
     final RegistryFont font = item.fonts[i];

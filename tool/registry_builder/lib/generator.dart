@@ -156,6 +156,11 @@ class RegistryGenerator {
         for (final RegistryResource resource in item.shaders)
           if (resources.contains(resource)) resource,
       ],
+      // Licenses pass through whole, deliberately skipping the deduplication
+      // above. Dropping a duplicate notice would leave whichever item lost
+      // the race redistributing third-party material with nothing that
+      // permits it. See `RegistryItem.licenses`.
+      licenses: item.licenses,
       documentationRoute: item.documentationRoute,
       sourceLink: item.sourceLink,
       deprecated: item.deprecated,
@@ -206,6 +211,7 @@ class RegistryGenerator {
       ...item.assets,
       ...item.fonts,
       ...item.shaders,
+      ...item.licenses,
     ]) {
       final File source = File(_join(repositoryRoot.path, resource.source));
       if (!source.existsSync()) {
@@ -239,6 +245,7 @@ class RegistryGenerator {
         ...item.assets,
         ...item.fonts,
         ...item.shaders,
+        ...item.licenses,
       ]) {
         _copyPayload(item, resource.source, resource.target, itemOutput);
       }
@@ -540,6 +547,10 @@ Map<String, Object?> _itemJson(RegistryItem item) => <String, Object?>{
   ],
   'shaders': <Object?>[
     for (final RegistryResource resource in item.shaders)
+      _resourceJson(resource),
+  ],
+  'licenses': <Object?>[
+    for (final RegistryResource resource in item.licenses)
       _resourceJson(resource),
   ],
   'documentationRoute': item.documentationRoute,

@@ -15,6 +15,7 @@
 // the risk the hand transcription in `icon_paths.dart` was written to avoid.
 
 import { readdirSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import path from 'node:path';
 
@@ -68,6 +69,36 @@ const T = MODEL[process.env.EL_ICON_MODEL ?? 'SEALED'];
 const pkg = JSON.parse(
   readFileSync(path.join(PACKAGE_DIR, 'package.json'), 'utf8'),
 );
+
+/** lucide's own `LICENSE`, read from the installed package rather than typed
+ *  out here.
+ *
+ *  ISC's one condition is that the copyright notice and the permission notice
+ *  appear in every copy, and the generated file below is a copy of 1756
+ *  glyphs' worth of lucide geometry that travels on its own: the `icon`
+ *  registry item installs it into consumer projects, where nothing else would
+ *  carry the notice. Naming the license in a comment, which is what this
+ *  header used to do, is not satisfying it.
+ *
+ *  Read rather than hardcoded for two reasons. The file is not only ISC —
+ *  roughly 110 glyphs are inherited from Feather and carry a second, MIT
+ *  notice from Cole Bemis, and a hand-copied "the ISC bit" would have dropped
+ *  it. And a lucide upgrade rewrites this text without asking, so the only
+ *  version that stays correct is the one the generator re-reads on every run.
+ *
+ *  `third_party/lucide/LICENSE` holds the same bytes as an ordinary file, and
+ *  `test/license_distribution_test.dart` fails if the two ever disagree. */
+const license = readFileSync(path.join(PACKAGE_DIR, 'LICENSE'), 'utf8');
+
+/** [license] as a Dart comment block, verbatim, one `//` per line. */
+function licenseComment() {
+  return license
+    .replace(/\r\n/g, '\n')
+    .replace(/\n+$/, '')
+    .split('\n')
+    .map((line) => (line.length === 0 ? '//' : `// ${line}`))
+    .join('\n');
+}
 
 /** `[name, __iconNode]` for every real module, and `[alias, target]` for every
  *  module that is nothing but a re-export. */
@@ -228,6 +259,16 @@ function header(extra) {
 // each module and reads the \`__iconNode\` array lucide exports, so every
 // number and every \`d\` string below is that package's own, character for
 // character. Node order is lucide's, and node order is paint order.
+//
+// The geometry below is lucide's work, redistributed under lucide's terms.
+// What follows is \`${pkg.name}\` ${pkg.version}'s own \`LICENSE\`, reproduced
+// verbatim from the installed package because ISC requires the notice to
+// travel with every copy and this file is copied into consumer projects on
+// its own. The same bytes are in \`third_party/lucide/LICENSE\`.
+//
+// ---------------------------------------------------------------------------
+${licenseComment()}
+// ---------------------------------------------------------------------------
 ${extra}`;
 }
 
@@ -563,8 +604,41 @@ ElLucideGlyph? elLucideLookup(String name) =>
 `)}`;
 
 mkdirSync(OUT_DIR, { recursive: true });
-writeFileSync(path.join(OUT_DIR, 'icon_paths.g.dart'), registry);
-writeFileSync(path.join(OUT_DIR, 'icon_paths.g.index.dart'), index);
+const outputs = [
+  path.join(OUT_DIR, 'icon_paths.g.dart'),
+  path.join(OUT_DIR, 'icon_paths.g.index.dart'),
+];
+writeFileSync(outputs[0], registry);
+writeFileSync(outputs[1], index);
+
+// Format the output here rather than leaving it to whoever regenerates.
+//
+// This script emits valid but unformatted Dart, and the checked-in files are
+// formatted, so "regenerate" without this step produced a 21,000-line diff in
+// which the header change was invisible and every glyph looked rewritten. The
+// geometry was identical; only the line breaking differed. Folding the
+// formatter into the generator makes regeneration one reproducible command
+// and makes a real diff mean a real change — which is the whole premise of
+// checking generated files in.
+//
+// Invoked through the shell as one quoted command string, not as an argv
+// array: `dart` is a `.bat` shim on Windows, which Node will not resolve
+// without a shell, and passing an argv array *with* `shell: true` is
+// deprecated (DEP0190) because the arguments are concatenated unescaped. One
+// pre-quoted string is the form that is correct on both platforms.
+// The executable is left unquoted on purpose: `cmd.exe` mis-parses a command
+// line whose *first* token is quoted when later tokens are quoted too. Only
+// the paths need quoting, and only they get it.
+const formatted = spawnSync(
+  `dart format ${outputs.map((file) => `"${file}"`).join(' ')}`,
+  { stdio: ['ignore', 'ignore', 'inherit'], shell: true },
+);
+if (formatted.status !== 0) {
+  console.error(
+    'dart format failed; the generated files are written but unformatted.',
+  );
+  process.exitCode = formatted.status ?? 1;
+}
 
 const kb = (s) => `${(Buffer.byteLength(s) / 1024).toFixed(1)} KiB`;
 console.log(`${pkg.name} ${pkg.version} (${pkg.license})`);
