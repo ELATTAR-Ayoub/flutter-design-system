@@ -1,37 +1,43 @@
-# Line endings for the files whose bytes are a claim.
+# Every text file is LF in the index and LF on checkout, on every platform.
 #
-# `core.autocrlf` is enabled on at least one maintainer machine, so a text file
-# without an attribute here is checked out CRLF on Windows and LF everywhere
-# else. That is normally harmless. It is not harmless for a license notice: the
-# whole point of `THIRD_PARTY_NOTICES.md` is that each file below is
-# byte-for-byte what the upstream project publishes, recorded by sha256. A
-# platform-dependent checkout would make every one of those hashes wrong on one
-# of the two platforms, and `test/license_distribution_test.dart` compares them.
+# This is not a style preference. The generated registry records a sha256 for
+# each of the 112 files it distributes, computed from the file as it sits in
+# the working tree. With `core.autocrlf` enabled — as it is on at least one
+# maintainer machine — and no attributes file, 51 of those 112 files were
+# checked out CRLF on Windows and LF everywhere else, so the recorded hashes
+# were correct on exactly one operating system.
 #
-# So: pin every notice to LF, on every platform, and mark the redistributed
-# binaries binary so nothing ever tries to translate them.
+# Three things that breaks, all of them quietly:
 #
-# NOTE: this file deliberately does NOT normalise the whole repository. 51 of
-# the 112 files the registry hashes currently carry CRLF in a Windows worktree,
-# which makes the generated registry's sha256 values platform-dependent. That is
-# a real cross-platform defect, but fixing it re-normalises several hundred
-# files and regenerates every registry hash, so it belongs in its own reviewed
-# change alongside the CI matrix that would catch it — not smuggled into the
-# licensing commit.
+#   * `dart run tool/registry_builder/bin/build.dart .` produces different
+#     hashes per platform, so the reproducibility gate (`git diff --exit-code`
+#     after a rebuild) fails on whichever platform did not write the registry.
+#   * A consumer verifying a downloaded payload against its declared sha256
+#     fails for reasons that have nothing to do with the payload.
+#   * `THIRD_PARTY_NOTICES.md` records a hash per redistributed file. A hash
+#     that only holds on one platform is not a provenance record.
+#
+# `text=auto` still detects binary content and leaves it alone; the explicit
+# rules below exist so that detection is never the thing standing between a
+# font and corruption.
+* text=auto eol=lf
 
-# Elattar's own license, and the notices installed into consumer projects.
-LICENSE                     text eol=lf
-THIRD_PARTY_NOTICES.md      text eol=lf
+# Redistributed binaries and build inputs. Never translate these.
+*.ttf   binary
+*.otf   binary
+*.woff  binary
+*.woff2 binary
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.ico   binary
+*.gif   binary
+*.webp  binary
+*.mp4   binary
+*.zip   binary
+*.jar   binary
+*.keystore binary
 
-# Verbatim upstream license texts. Byte fidelity here is the deliverable.
-third_party/**              text eol=lf
-
-# Redistributed binaries. Never translate these.
-*.ttf                       binary
-*.otf                       binary
-*.woff                      binary
-*.woff2                     binary
-*.png                       binary
-*.jpg                       binary
-*.jpeg                      binary
-*.ico                       binary
+# Windows-only tooling that other tools expect to find with CRLF.
+*.bat   text eol=crlf
+*.cmd   text eol=crlf
