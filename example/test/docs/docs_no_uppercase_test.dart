@@ -59,7 +59,7 @@ void main() {
       isEmpty,
       reason:
           'documentation pages must not render uppercase text. Use '
-          'ElType.caption, ElType.small or ElType.textSm instead:\n'
+          'ElType.caption, ElType.small or ElType.section instead:\n'
           '${offences.join('\n')}',
     );
   });
