@@ -70,6 +70,20 @@ flutter:
     - skills/elattar-flutter-ui-director/
     - skills/elattar-flutter-ui-director/references/
 
+    # The generated registry's two catalog files, and the changelog, declared
+    # here for the same reason as the skill above: both sit at the repository
+    # root, above `example/`, and an asset path may not climb above its own
+    # project root. Declared on the package, they reach the docs app as
+    # `packages/elattar_design_system/<path>`.
+    #
+    # Only these three files, not the directory. `registry/generated/latest/`
+    # also holds every payload the registry distributes — the whole component
+    # surface, twice over — and bundling that into the web build would add
+    # megabytes to serve two counts and a version string.
+    - registry/generated/latest/registry.json
+    - registry/generated/latest/index.json
+    - CHANGELOG.md
+
   # The orb's fragment stage — see the header of the file itself for the five
   # edits made to the vendored GLSL and why each one was unavoidable.
   shaders:

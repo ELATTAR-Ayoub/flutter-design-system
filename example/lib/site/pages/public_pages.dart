@@ -15,6 +15,15 @@ import '../../components_docs/catalog.dart';
 // same [DocsLayout] shell every other documentation page uses, which is where
 // the shared left rail and the in-page right rail come from.
 import '../../docs/docs_layout.dart';
+import '../../docs_pages/catalog.dart'
+    show
+        docsChangelogRoute,
+        docsCliRoute,
+        docsInstallationRoute,
+        docsIntroductionRoute,
+        docsRegistryRoute,
+        docsThemingRoute,
+        docsTypesetRoute;
 import '../site_routes.dart' show componentsRoute, docsRoute, skillsRoute;
 import 'home_showcase.dart';
 
@@ -397,33 +406,53 @@ class _DocsList extends StatelessWidget {
 
   final PublicNavigate? onNavigate;
 
+  /// The guide cards, in the sidebar's own reading order.
+  ///
+  /// **Every one of these goes somewhere.** Five of the seven used to route
+  /// to `publicHomeRoute` — a card that advertises Installation and returns
+  /// you to the front page reads as a broken site, and it was the most
+  /// visible thing on `/docs`. Two of them ("Flutter & Dart", "Repository")
+  /// described pages that do not exist and never did; they are replaced by
+  /// the three that do.
+  ///
+  /// Routes are the `docs_pages/catalog.dart` constants rather than literals,
+  /// so a route that is renamed cannot leave a card pointing at nothing.
   static const List<({String title, String body, String route})> _entries =
       <({String title, String body, String route})>[
         (
           title: 'Introduction',
           body: 'The mental model, principles and package boundaries.',
-          route: publicHomeRoute,
+          route: docsIntroductionRoute,
         ),
         (
           title: 'Installation',
-          body:
-              'Initialize the foundation and choose the compact package mode.',
-          route: publicHomeRoute,
+          body: 'Install the CLI, set up a project, add your first component.',
+          route: docsInstallationRoute,
         ),
         (
           title: 'Theming',
           body: 'Understand themes, semantic colors and typography tokens.',
-          route: '/design-system/colors',
+          route: docsThemingRoute,
         ),
         (
           title: 'CLI',
           body: 'Initialize, add, inspect and update copied components.',
-          route: publicHomeRoute,
+          route: docsCliRoute,
         ),
         (
-          title: 'Flutter & Dart',
-          body: 'The APIs, conventions and source layout for consumers.',
-          route: publicHomeRoute,
+          title: 'Typeset',
+          body: 'The 27 named type roles, and how to choose between them.',
+          route: docsTypesetRoute,
+        ),
+        (
+          title: 'Registry',
+          body: 'What an item declares, and how a name becomes files.',
+          route: docsRegistryRoute,
+        ),
+        (
+          title: 'Changelog',
+          body: 'Every release, rendered from the repository CHANGELOG.',
+          route: docsChangelogRoute,
         ),
         (
           title: 'Skills',
@@ -432,11 +461,6 @@ class _DocsList extends StatelessWidget {
           // route. `skillsRoute`, not a literal: one spelling of `/skills`.
           body: 'The workflow that keeps implementation consistent.',
           route: skillsRoute,
-        ),
-        (
-          title: 'Repository',
-          body: 'Follow the source, registry and contribution workflow.',
-          route: publicHomeRoute,
         ),
       ];
 

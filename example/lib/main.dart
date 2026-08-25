@@ -21,10 +21,13 @@ import 'package:flutter_web_plugins/url_strategy.dart' show usePathUrlStrategy;
 
 import 'nav.dart';
 import 'docs_pages/catalog.dart';
+import 'docs_pages/changelog_page.dart';
 import 'docs_pages/cli_page.dart';
 import 'docs_pages/installation_page.dart';
 import 'docs_pages/introduction_page.dart';
+import 'docs_pages/registry_page.dart';
 import 'docs_pages/theming_page.dart';
+import 'docs_pages/typeset_page.dart';
 import 'components_docs/button/page.dart';
 import 'components_docs/button_card_pages.dart' as legacy_button_card;
 import 'components_docs/dialog_page.dart';
@@ -634,12 +637,25 @@ Widget publicPageFor(String route, {PublicNavigate? onNavigate}) {
     docsInstallationRoute => InstallationDocsPage(onNavigate: onNavigate),
     docsThemingRoute => ThemingDocsPage(onNavigate: onNavigate),
     docsCliRoute => CliDocsPage(onNavigate: onNavigate),
+    docsTypesetRoute => TypesetDocsPage(onNavigate: onNavigate),
+    docsRegistryRoute => RegistryDocsPage(onNavigate: onNavigate),
+    docsChangelogRoute => ChangelogDocsPage(onNavigate: onNavigate),
     componentsRoute => PublicComponentsPage(onNavigate: onNavigate),
     '/components/button' => const ButtonDocPage(),
     '/components/input' => const InputDocPage(),
     '/components/card' => const legacy_button_card.CardDocPage(),
     '/components/dialog' => const DialogDocPage(),
     '/components/select' => const SelectDocPage(),
+    // The deliberate fallback. Every route the site declares now resolves
+    // above — `site_routes_test.dart` asserts that every entry in
+    // `docsPageEntries` is reachable, which is what stopped three declared
+    // routes from silently landing here.
+    //
+    // What remains is a genuinely unknown path: a stale bookmark, a typo, a
+    // link from somewhere else. Sending that to the homepage is a choice, not
+    // an oversight — a deep-linked static site has nowhere better to put it,
+    // and a "not found" screen for a path the site never advertised is worse
+    // for a reader than the front page. Tested below rather than assumed.
     _ => PublicHomePage(onNavigate: onNavigate),
   };
 }

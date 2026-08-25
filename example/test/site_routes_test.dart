@@ -16,6 +16,9 @@ void main() {
         docsInstallationRoute,
         docsThemingRoute,
         docsCliRoute,
+        docsTypesetRoute,
+        docsRegistryRoute,
+        docsChangelogRoute,
         skillsRoute,
       ]);
       expect(siteRoutes.map((SiteRoute route) => route.title), <String>[
@@ -26,13 +29,17 @@ void main() {
         'Installation',
         'Theming',
         'CLI',
+        'Typeset',
+        'Registry',
+        'Changelog',
         'Skills',
       ]);
     });
 
     test('the Sections group (every sidebar-visible destination, in order) '
         'reproduces the reference reading order exactly: Introduction, '
-        'Components, Installation, Theming, CLI, Skills', () {
+        'Components, Installation, Theming, CLI, Typeset, Registry, '
+        'Changelog, Skills', () {
       final List<String> sectionTitles = siteRoutes
           .where(
             (SiteRoute route) =>
@@ -51,15 +58,70 @@ void main() {
         'Installation',
         'Theming',
         'CLI',
+        'Typeset',
+        'Registry',
+        'Changelog',
         'Skills',
       ]);
       expect(sectionTitles, isNot(contains('Documentation')));
-      // Typeset, Registry and Changelog have no page yet
-      // (`docs_pages/catalog.dart` declares the routes; nothing routes to
-      // them in `main.dart`), so they must not appear in the sidebar.
-      expect(sectionTitles, isNot(contains('Typeset')));
-      expect(sectionTitles, isNot(contains('Registry')));
-      expect(sectionTitles, isNot(contains('Changelog')));
+      // Typeset, Registry and Changelog used to be asserted *absent* here,
+      // correctly: `docs_pages/catalog.dart` declared the routes and nothing
+      // in `main.dart` routed to them, so listing them in the sidebar would
+      // have advertised three blank screens. They have pages now, and the
+      // same assertion runs the other way — a declared route that is not in
+      // the sidebar is as much a defect as a sidebar entry with no page.
+      for (final String title in <String>['Typeset', 'Registry', 'Changelog']) {
+        expect(sectionTitles, contains(title));
+      }
+    });
+
+    test('the three newest routes are searchable by name and by topic', () {
+      // Search reads `siteRoutes`, so a route that is in the table is
+      // findable — but only if its keywords describe what a person would
+      // actually type. "typography" reaching Typeset matters more than
+      // "typeset" doing so, because the page is named after the thing it
+      // documents rather than after the word people use for it.
+      const Map<String, String> searches = <String, String>{
+        'typeset': docsTypesetRoute,
+        'typography': docsTypesetRoute,
+        'font': docsTypesetRoute,
+        'registry': docsRegistryRoute,
+        'offline': docsRegistryRoute,
+        'changelog': docsChangelogRoute,
+        'releases': docsChangelogRoute,
+      };
+      searches.forEach((String query, String route) {
+        expect(
+          searchSiteRoutes(query).map((SearchRoute r) => r.path),
+          contains(route),
+          reason: 'searching "$query" should reach $route',
+        );
+      });
+    });
+
+    test('every declared docs route is deep-linkable and unique', () {
+      // A route in the catalog that `siteRouteFor` cannot resolve is a deep
+      // link that 404s inside the app, which is how the three of these
+      // behaved before they had pages.
+      for (final DocsPageEntry entry in docsPageEntries) {
+        final SiteRoute? route = siteRouteFor(entry.route);
+        expect(
+          route,
+          isNotNull,
+          reason: '${entry.route} is declared but does not resolve',
+        );
+        expect(route!.title, entry.title);
+        expect(route.section, SiteSection.docs);
+      }
+
+      final Set<String> paths = <String>{};
+      for (final SiteRoute route in siteRoutes) {
+        expect(
+          paths.add(route.path),
+          isTrue,
+          reason: '${route.path} appears twice in siteRoutes',
+        );
+      }
     });
 
     test('lookup is exact and unknown paths return null', () {

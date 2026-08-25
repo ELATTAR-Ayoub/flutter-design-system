@@ -10,6 +10,7 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/docs_pages/catalog.dart';
 import 'package:example/main.dart';
+import 'package:example/site/pages/public_pages.dart';
 import 'package:example/site/site_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -56,12 +57,20 @@ List<String> _sectionsOrder(WidgetTester tester) {
 }
 
 void main() {
-  group('the four docs_pages routes resolve through publicPageFor', () {
+  group('every docs_pages route resolves through publicPageFor', () {
+    // All seven the catalog declares. Three of them — typeset, registry and
+    // changelog — were declared for weeks with nothing routing to them, so
+    // `publicPageFor` fell through to its default arm and served the
+    // homepage. A declared route that quietly resolves to a different page
+    // is worse than a missing one: it looks like it worked.
     const Map<String, Key> pages = <String, Key>{
       docsIntroductionRoute: ValueKey<String>('introduction-doc-article'),
       docsInstallationRoute: ValueKey<String>('installation-doc-article'),
       docsThemingRoute: ValueKey<String>('theming-doc-article'),
       docsCliRoute: ValueKey<String>('cli-doc-article'),
+      docsTypesetRoute: ValueKey<String>('typeset-doc-article'),
+      docsRegistryRoute: ValueKey<String>('registry-doc-article'),
+      docsChangelogRoute: ValueKey<String>('changelog-doc-article'),
     };
 
     for (final MapEntry<String, Key> page in pages.entries) {
@@ -88,10 +97,26 @@ void main() {
     }
   });
 
+  testWidgets('an unknown path falls back to the homepage, deliberately', (
+    WidgetTester tester,
+  ) async {
+    // Documented in `publicPageFor`: a path the site never advertised is a
+    // stale bookmark or a typo, and a static deep-linked site has nowhere
+    // better to send it. The value of asserting it is that the fallback stops
+    // being able to absorb a *declared* route by accident — which is what it
+    // did to typeset, registry and changelog for weeks.
+    _sizeTo(tester, const Size(1440, 900));
+    await tester.pumpWidget(_harness(publicPageFor('/docs/not-a-real-page')));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(PublicHomePage), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets(
     'the Sections group lists Introduction, Components, Installation, '
-    'Theming, CLI and Skills in that order; Documentation, Typeset, '
-    'Registry and Changelog have no entry there',
+    'Theming, CLI, Typeset, Registry, Changelog and Skills in that order; '
+    'Documentation alone has no entry there',
     (WidgetTester tester) async {
       _sizeTo(tester, const Size(1440, 900));
       await tester.pumpWidget(_harness(publicPageFor(docsIntroductionRoute)));
@@ -107,12 +132,18 @@ void main() {
         docsInstallationRoute,
         docsThemingRoute,
         docsCliRoute,
+        docsTypesetRoute,
+        docsRegistryRoute,
+        docsChangelogRoute,
         skillsRoute,
       ]);
       expect(order, isNot(contains(docsRoute)));
-      expect(order, isNot(contains(docsTypesetRoute)));
-      expect(order, isNot(contains(docsRegistryRoute)));
-      expect(order, isNot(contains(docsChangelogRoute)));
+      // Asserted absent until each grew a page. Now every route the
+      // catalog declares must reach the sidebar, which is the property that
+      // stops a declared route from being invisible.
+      expect(order, contains(docsTypesetRoute));
+      expect(order, contains(docsRegistryRoute));
+      expect(order, contains(docsChangelogRoute));
 
       expect(tester.takeException(), isNull);
     },

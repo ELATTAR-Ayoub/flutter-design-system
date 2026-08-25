@@ -9,10 +9,13 @@ import '../nav.dart';
 import '../components_docs/catalog.dart';
 import '../docs_pages/catalog.dart'
     show
+        docsChangelogRoute,
         docsCliRoute,
         docsInstallationRoute,
         docsIntroductionRoute,
-        docsThemingRoute;
+        docsRegistryRoute,
+        docsThemingRoute,
+        docsTypesetRoute;
 import '../skills_docs/catalog.dart';
 
 /// The top-level destinations exposed by the public website.
@@ -77,8 +80,10 @@ const String skillsRoute = '/skills';
 
 /// Public website destinations, in header/navigation order.
 ///
-/// [docsIntroductionRoute], [docsInstallationRoute], [docsThemingRoute] and
-/// [docsCliRoute] are the four `docs_pages/` articles this list wires into
+/// All seven `docs_pages/` articles are wired in here:
+/// [docsIntroductionRoute], [docsInstallationRoute], [docsThemingRoute],
+/// [docsCliRoute], [docsTypesetRoute], [docsRegistryRoute] and
+/// [docsChangelogRoute]. They reach
 /// both the header/footer navigation (`site_navigation.dart`'s
 /// `primarySiteNavigation`) and the documentation shell's "Sections" rail
 /// (`docs/docs_layout.dart`'s `_defaultSidebarGroups`, which reads this list
@@ -87,7 +92,7 @@ const String skillsRoute = '/skills';
 /// [skillsRoute] entries so that, read in order and skipping [docsRoute]
 /// (see [SiteRoute.showInSidebar]), they reproduce the reference "Sections"
 /// order exactly: Introduction, Components, Installation, Theming, CLI,
-/// Skills. [docsRoute] ("Documentation") is left in [siteRoutes] rather than
+/// Typeset, Registry, Changelog, Skills. [docsRoute] ("Documentation") is left in [siteRoutes] rather than
 /// removed or renamed: dropping it would silently break
 /// `site_navigation.dart`'s eagerly evaluated `siteQuickSearchRoutes`
 /// (`searchRouteByPath(docsRoute)` throws for an unresolvable path) and
@@ -95,11 +100,6 @@ const String skillsRoute = '/skills';
 /// change is meant to touch. It is excluded from the sidebar's "Sections"
 /// group alone, via [SiteRoute.showInSidebar]: `false` for this one entry,
 /// `true` (the default) for every other entry below.
-///
-/// Typeset, Registry and Changelog are the other three routes
-/// `docs_pages/catalog.dart` declares (`docsTypesetRoute`, `docsRegistryRoute`,
-/// `docsChangelogRoute`). They have no page to route to yet, so they are
-/// deliberately absent here too, rather than linked to a blank screen.
 const List<SiteRoute> siteRoutes = <SiteRoute>[
   SiteRoute(
     path: homeRoute,
@@ -158,6 +158,49 @@ const List<SiteRoute> siteRoutes = <SiteRoute>[
         'The elattar command surface: init, add, list, search, info, and '
         'doctor, with exit codes and workflows.',
     keywords: <String>['cli', 'command line', 'elattar', 'commands'],
+  ),
+  SiteRoute(
+    path: docsTypesetRoute,
+    section: SiteSection.docs,
+    title: 'Typeset',
+    description:
+        'The ElType scale, ElTypeSpec anatomy, the fluid clamps, and the '
+        'three font families.',
+    keywords: <String>[
+      'typeset',
+      'typography',
+      'type',
+      'font',
+      'fonts',
+      'text',
+      'scale',
+    ],
+  ),
+  SiteRoute(
+    path: docsRegistryRoute,
+    section: SiteSection.docs,
+    title: 'Registry',
+    description:
+        'Schema v1, what a registry item is, how dependencies resolve, and '
+        'what the published registry contains.',
+    keywords: <String>[
+      'registry',
+      'schema',
+      'items',
+      'dependencies',
+      'hashes',
+      'offline',
+      'cache',
+    ],
+  ),
+  SiteRoute(
+    path: docsChangelogRoute,
+    section: SiteSection.docs,
+    title: 'Changelog',
+    description:
+        'Every release, newest first, rendered from the CHANGELOG.md at the '
+        'root of this repository.',
+    keywords: <String>['changelog', 'releases', 'history', 'versions'],
   ),
   SiteRoute(
     path: skillsRoute,
