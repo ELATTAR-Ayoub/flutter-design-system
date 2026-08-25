@@ -23,6 +23,11 @@ import 'dart:math' as math;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:flutter/material.dart';
+// `PointerSignalEvent`/`PointerScrollEvent`/`GestureBinding` for
+// `_RailHitCatchers` below — `material.dart` does not re-export
+// `gestures.dart`. `LayerLink` (also used there) already comes through
+// `material.dart` itself.
+import 'package:flutter/gestures.dart';
 
 import '../components_docs/catalog.dart' show ComponentDocEntry, componentDocs;
 import '../kit.dart' show ElSection;
@@ -192,6 +197,26 @@ class _DocsLayoutState extends State<DocsLayout> {
     debugLabel: 'DocsLayout toc rail',
   );
 
+  /// Tracks each rail's real on-screen box — including `_StickyRail`'s own
+  /// vertical translate — for [_RailHitCatchers] to find from the ambient
+  /// [Overlay]. See that class's doc comment for why an overlay entry is
+  /// what the escaped band needs, not just a wider hit test on this widget's
+  /// own [Stack].
+  final LayerLink _sidebarLink = LayerLink();
+  final LayerLink _tocLink = LayerLink();
+
+  /// Shown once and left showing: [_RailHitCatchers] itself decides, every
+  /// frame, whether either rail is actually on screen (`wide` / `extraWide`)
+  /// and — via [CompositedTransformFollower.showWhenUnlinked] — whether its
+  /// [LayerLink] is actually linked right now.
+  final OverlayPortalController _railHitCatchers = OverlayPortalController();
+
+  @override
+  void initState() {
+    super.initState();
+    _railHitCatchers.show();
+  }
+
   @override
   void dispose() {
     _sidebarScroll.dispose();
@@ -360,11 +385,30 @@ class _DocsLayoutState extends State<DocsLayout> {
       child: widget.child,
     );
 
-    return Semantics(
-      container: true,
-      label: 'Documentation article',
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+    return OverlayPortal(
+      controller: _railHitCatchers,
+      // Built fresh on every `_DocsLayoutState.build` — i.e. whenever
+      // anything below might have moved the rails (ambient scroll, via
+      // `_StickyRail`'s own listener triggering a `setState` up through this
+      // widget's ancestry is not guaranteed, but [CompositedTransformFollower]
+      // does not need it to be: it re-reads its [LayerLink]'s current
+      // transform every compositing frame regardless of when this builder
+      // last ran. This only needs to run often enough to keep `wide` /
+      // `extraWide` current, which a normal rebuild already guarantees.
+      overlayChildBuilder: (BuildContext context) => _RailHitCatchers(
+        wide: wide,
+        extraWide: extraWide,
+        sidebarLink: _sidebarLink,
+        tocLink: _tocLink,
+        sidebarController: _sidebarScroll,
+        tocController: _tocScroll,
+        railMaxHeight: railMaxHeight,
+      ),
+      child: Semantics(
+        container: true,
+        label: 'Documentation article',
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           if (!wide && toc.isNotEmpty)
             _AnchorStrip(entries: toc, onAnchor: _scrollToAnchor),
@@ -449,26 +493,29 @@ class _DocsLayoutState extends State<DocsLayout> {
                       top: 0,
                       child: _StickyRail(
                         articleAnchor: _article,
-                        child: SizedBox(
-                          key: const ValueKey<String>('docs-layout-sidebar'),
-                          // The rail is pinned to the screen edge, so its own
-                          // gutter is what keeps the group labels and rows off
-                          // that edge. Without it the first character of every
-                          // row sits against the glass.
-                          width: ElWidths.rail + el(6),
-                          child: Padding(
-                            padding: EdgeInsets.only(left: el(6)),
-                            child: ConstrainedBox(
-                              constraints: BoxConstraints(
-                                maxHeight: railMaxHeight,
-                              ),
-                              child: Scrollbar(
-                                controller: _sidebarScroll,
-                                child: SingleChildScrollView(
+                        child: CompositedTransformTarget(
+                          link: _sidebarLink,
+                          child: SizedBox(
+                            key: const ValueKey<String>('docs-layout-sidebar'),
+                            // The rail is pinned to the screen edge, so its
+                            // own gutter is what keeps the group labels and
+                            // rows off that edge. Without it the first
+                            // character of every row sits against the glass.
+                            width: ElWidths.rail + el(6),
+                            child: Padding(
+                              padding: EdgeInsets.only(left: el(6)),
+                              child: ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  maxHeight: railMaxHeight,
+                                ),
+                                child: Scrollbar(
                                   controller: _sidebarScroll,
-                                  child: DocsSidebar(
-                                    groups: sidebarGroups,
-                                    onNavigate: _navigate,
+                                  child: SingleChildScrollView(
+                                    controller: _sidebarScroll,
+                                    child: DocsSidebar(
+                                      groups: sidebarGroups,
+                                      onNavigate: _navigate,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -483,24 +530,27 @@ class _DocsLayoutState extends State<DocsLayout> {
                         top: 0,
                         child: _StickyRail(
                           articleAnchor: _article,
-                          child: SizedBox(
-                            key: const ValueKey<String>('docs-layout-toc'),
-                            // Mirrors the left rail's gutter, on the other
-                            // side, for the same reason.
-                            width: ElWidths.rail + el(6),
-                            child: Padding(
-                              padding: EdgeInsets.only(right: el(6)),
-                              child: ConstrainedBox(
-                                constraints: BoxConstraints(
-                                  maxHeight: railMaxHeight,
-                                ),
-                                child: Scrollbar(
-                                  controller: _tocScroll,
-                                  child: SingleChildScrollView(
+                          child: CompositedTransformTarget(
+                            link: _tocLink,
+                            child: SizedBox(
+                              key: const ValueKey<String>('docs-layout-toc'),
+                              // Mirrors the left rail's gutter, on the other
+                              // side, for the same reason.
+                              width: ElWidths.rail + el(6),
+                              child: Padding(
+                                padding: EdgeInsets.only(right: el(6)),
+                                child: ConstrainedBox(
+                                  constraints: BoxConstraints(
+                                    maxHeight: railMaxHeight,
+                                  ),
+                                  child: Scrollbar(
                                     controller: _tocScroll,
-                                    child: _TableOfContents(
-                                      entries: toc,
-                                      onAnchor: _scrollToAnchor,
+                                    child: SingleChildScrollView(
+                                      controller: _tocScroll,
+                                      child: _TableOfContents(
+                                        entries: toc,
+                                        onAnchor: _scrollToAnchor,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -516,6 +566,186 @@ class _DocsLayoutState extends State<DocsLayout> {
           else
             article,
         ],
+        ),
+      ),
+    );
+  }
+}
+
+/// The escaped band's actual event path.
+///
+/// [DocsLayout]'s own `Stack` (`clipBehavior: Clip.none`, in the
+/// [LayoutBuilder] above) paints each rail up to `inset` past its own box —
+/// deliberately, so a rail reaches the screen edge on a wide viewport
+/// instead of stopping at the reading column's margin. But
+/// [RenderBox.hitTest] gates every hit test behind
+/// `if (_size!.contains(position))` before it ever tries a child, and that
+/// gate is not only the Stack's own: `_SiteBody` (site_shell.dart) narrows
+/// the box this widget is given down to [ElWidths.page], centred, and every
+/// ancestor between that narrowing and this Stack — the outer `Column`,
+/// `Semantics`, `_SiteBody`'s own `ConstrainedBox`, and the render objects
+/// `SelectionArea` itself introduces (`RenderTapRegion`, `RenderLeaderLayer`,
+/// a `RenderPointerListener`) — applies the SAME gate against the SAME
+/// narrow box. An earlier version of this fix overrode only the Stack's own
+/// `hitTest`; verified against the real `SiteShell` tree (not just this
+/// widget's own test harness) via a temporary diagnostic that walked the
+/// mounted ancestor chain from the sidebar rail up to the `RenderView`, that
+/// reached only the ~64 of each rail's 264 painted pixels that happen to
+/// fall inside the SAME box every one of those ancestors shares — the rest
+/// of the escaped band stayed exactly as unreachable as before, because the
+/// ancestors that reject it FIRST (`_SiteBody`'s own, walked top-down before
+/// this widget's Stack is ever reached) are not this widget's to override —
+/// they live in a different file, out of this fix's stated scope, and
+/// `SelectionArea`'s own internals are not cleanly subclassable at all.
+///
+/// [Transform.transformHitTests]'s own doc comment names the fix directly:
+/// "Using an [OverlayEntry] or [OverlayPortal] to place the widget in an
+/// [Overlay]." An [Overlay] entry is not a descendant of any of those narrow
+/// ancestors — it paints (and hit-tests) directly against the [Navigator]'s
+/// own full-bleed box (confirmed against the same real tree: the Overlay's
+/// `_RenderTheater` measured the full viewport, unlike everything narrower
+/// nested beneath it), so nothing upstream of it can reject a position
+/// before this widget ever gets to try. This class is that overlay entry:
+/// an invisible, otherwise-inert [CompositedTransformFollower] per rail,
+/// linked (via a [LayerLink]) to a [CompositedTransformTarget] wrapping that
+/// rail's own [SizedBox] — so it tracks the rail's real on-screen box,
+/// including `_StickyRail`'s own vertical translate, automatically on every
+/// compositing frame — sized to match it, and listening only for
+/// [PointerScrollEvent]s, which it forwards to the SAME [ScrollController]
+/// the rail's own [SingleChildScrollView] already uses, via
+/// [ScrollPosition.pointerScroll] — the exact call `Scrollable` itself makes
+/// internally for a wheel event ([RenderFollowerLayer.hitTest] deliberately
+/// skips its own containment check for exactly this reason — see its
+/// comment in `package:flutter/src/rendering/proxy_box.dart`). Nothing about
+/// the rail's existing rendering, painting, or `_StickyRail` stickiness
+/// changes: this widget only adds a second route to the SAME scroll
+/// position, reachable from where the rail actually paints.
+///
+/// Registering through [PointerSignalResolver]
+/// (`GestureBinding.instance.pointerSignalResolver`), exactly as
+/// `Scrollable` does, means this defers correctly to the rail's own
+/// [Scrollable] for the sliver of the band that WAS already reachable
+/// (whichever hit-test entry is tried first wins the resolver; nothing
+/// double-scrolls), and — because a delta that would not actually move the
+/// position is never registered at all — degrades to a silent no-op (never
+/// a swallowed page-scroll) over whatever portion of this catcher's
+/// fixed-height footprint sits below a rail whose content is shorter than
+/// [railMaxHeight]. Clicking a navigation row still depends on the ordinary,
+/// narrower hit-test path (unchanged): only the wheel-scroll gap this class
+/// exists to close is closed here.
+class _RailHitCatchers extends StatelessWidget {
+  const _RailHitCatchers({
+    required this.wide,
+    required this.extraWide,
+    required this.sidebarLink,
+    required this.tocLink,
+    required this.sidebarController,
+    required this.tocController,
+    required this.railMaxHeight,
+  });
+
+  final bool wide;
+  final bool extraWide;
+  final LayerLink sidebarLink;
+  final LayerLink tocLink;
+  final ScrollController sidebarController;
+  final ScrollController tocController;
+  final double railMaxHeight;
+
+  @override
+  Widget build(BuildContext context) {
+    // Tight, full-viewport bounds for the wrapping [Stack]: neither
+    // [_RailWheelCatcher] is [Positioned], so [Stack] would otherwise need
+    // to size itself from the larger of the two — harmless either way, since
+    // an explicit, known-finite box is one fewer thing to reason about than
+    // whatever constraint the ambient [Overlay] happens to hand its entries.
+    //
+    // No [IgnorePointer] wraps this: a [Stack] with no [hitTestSelf] of its
+    // own (it has none) simply reports a MISS wherever neither catcher below
+    // sits — the framework's own hit-test walk then keeps trying whatever is
+    // painted underneath this overlay entry, i.e. the ordinary page. Only
+    // the two small, exactly rail-sized [_RailWheelCatcher]s below are ever
+    // actually reachable here, not this whole full-viewport box.
+    final Size viewport = MediaQuery.sizeOf(context);
+    return SizedBox(
+      width: viewport.width,
+      height: viewport.height,
+      child: Stack(
+        children: <Widget>[
+          if (wide)
+            _RailWheelCatcher(
+              // Distinguishes this from `docs-layout-sidebar` itself (the
+              // rail's own, normally hit-tested [SingleChildScrollView]) so
+              // a test can tell which one actually answered a hit test —
+              // see `docs_rail_scroll_test.dart`.
+              key: const ValueKey<String>('docs-layout-sidebar-wheel-catcher'),
+              link: sidebarLink,
+              height: railMaxHeight,
+              controller: sidebarController,
+            ),
+          if (extraWide)
+            _RailWheelCatcher(
+              key: const ValueKey<String>('docs-layout-toc-wheel-catcher'),
+              link: tocLink,
+              height: railMaxHeight,
+              controller: tocController,
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+/// One rail's invisible wheel-event catcher — see [_RailHitCatchers].
+class _RailWheelCatcher extends StatelessWidget {
+  const _RailWheelCatcher({
+    super.key,
+    required this.link,
+    required this.height,
+    required this.controller,
+  });
+
+  final LayerLink link;
+  final double height;
+  final ScrollController controller;
+
+  /// Mirrors `ScrollableState._receivedPointerSignal` / `_handlePointerScroll`
+  /// (`package:flutter/src/widgets/scrollable.dart`) for the one axis this
+  /// rail ever scrolls: vertical, never reversed. [PointerSignalResolver]
+  /// registration — not a direct [ScrollPosition.pointerScroll] call — is
+  /// what makes this cooperate with, rather than race, the rail's own
+  /// [Scrollable] over the sliver of the band both can reach.
+  void _handlePointerSignal(PointerSignalEvent event) {
+    if (event is! PointerScrollEvent) return;
+    if (!controller.hasClients) return;
+    final ScrollPosition position = controller.position;
+    final double delta = event.scrollDelta.dy;
+    final double target = (position.pixels + delta).clamp(
+      position.minScrollExtent,
+      position.maxScrollExtent,
+    );
+    // Only worth registering interest if it would actually move the rail —
+    // see [_RailHitCatchers]'s doc comment for why that also keeps this
+    // catcher from swallowing an ambient page-scroll over its own dead
+    // space, below a rail whose content is shorter than [height].
+    if (delta == 0.0 || target == position.pixels) return;
+    GestureBinding.instance.pointerSignalResolver.register(
+      event,
+      (PointerSignalEvent resolved) => position.pointerScroll(delta),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return CompositedTransformFollower(
+      link: link,
+      // Nothing to catch (and nothing to show — this paints nothing either
+      // way) while the linked rail is not mounted at all, e.g. `!wide`.
+      showWhenUnlinked: false,
+      child: Listener(
+        behavior: HitTestBehavior.translucent,
+        onPointerSignal: _handlePointerSignal,
+        child: SizedBox(width: ElWidths.rail + el(6), height: height),
       ),
     );
   }
