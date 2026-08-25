@@ -11,9 +11,14 @@
 ///   `components_docs/catalog.dart` entry: rather than the page's own
 ///   retired five-item list.
 /// * The button page's TOC has fourteen example sections as top-level entries,
-///   siblings of Installation and Usage, with no "Examples" wrapper. API
-///   Reference is the only entry with nested [DocsTocEntry.children], and
-///   activating a nested child scrolls the article rather than navigating away.
+///   siblings of Installation and Usage, with no "Examples" wrapper.
+///   `ComponentDocSpec.toc` is flat by design (see
+///   `example/lib/docs/component_doc_page.dart`), so no entry on this page
+///   ever carries a [DocsTocEntry.children] — API Reference's six former
+///   nested anchors were dropped along with it. What survives is the
+///   underlying behaviour [DocsTocEntry.children] existed to prove: activating
+///   any TOC entry — nested or not — scrolls the article rather than
+///   navigating away.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
@@ -162,7 +167,7 @@ void main() {
   );
 
   testWidgets(
-    'activating a nested API Reference child scrolls the article; it never '
+    'activating a TOC entry deep in the page scrolls the article; it never '
     'navigates away',
     (WidgetTester tester) async {
       _setViewSize(tester, _desktop);
@@ -179,10 +184,14 @@ void main() {
       await tester.pump();
       expect(page.offset, 0);
 
+      // API Reference is the surviving, flat TOC entry that stands in for
+      // the six nested `api-elbutton*` anchors Task 11 dropped (see the
+      // library doc above): still a plain top-level entry among the 26 this
+      // page has today, and still exercises the same behaviour — an anchor
+      // tap scrolls the mounted article rather than handing `onNavigate` a
+      // route.
       await tester.tap(
-        find.byKey(
-          const ValueKey<String>('docs-layout-toc-child:api-elbutton'),
-        ),
+        find.byKey(const ValueKey<String>('docs-layout-toc-entry:api')),
       );
       // Advance past the 400ms scroll-to-anchor animation without settling —
       // the Premium example's foil shimmer loops forever and would hang
@@ -190,7 +199,7 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 500));
 
-      expect(routes, isEmpty, reason: 'a nested TOC anchor is not a route');
+      expect(routes, isEmpty, reason: 'a TOC anchor is not a route');
       expect(page.offset, greaterThan(0));
     },
   );
