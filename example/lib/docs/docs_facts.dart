@@ -8,6 +8,8 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:flutter/material.dart';
 
+import 'docs_table.dart' show DocsTable, DocsTableColumn;
+
 class DocsApiFact {
   const DocsApiFact({
     required this.name,
@@ -44,6 +46,12 @@ class DocsInstallFact {
   final String description;
 }
 
+/// [DocsTable] configured for an API reference, in the same titled panel
+/// chrome ([_DocsFactPanel]) as [DocsStateMatrix] and [DocsInstallFacts].
+///
+/// The panel is what 64 existing component pages call this for — some
+/// passing [title] — so it stays; only the rows underneath moved onto
+/// `ElTable` (see `docs_table.dart`).
 class DocsApiTable extends StatelessWidget {
   const DocsApiTable({super.key, required this.facts, this.title = 'API'});
 
@@ -53,16 +61,16 @@ class DocsApiTable extends StatelessWidget {
   @override
   Widget build(BuildContext context) => _DocsFactPanel(
     title: title,
-    child: _FactScroll(
-      minWidth: el(132),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          const _TableHeader(cells: <String>['Property', 'Type', 'Purpose']),
-          for (final DocsApiFact fact in facts)
-            _FactRow(cells: <String>[fact.name, fact.type, fact.description]),
-        ],
-      ),
+    child: DocsTable(
+      columns: const <DocsTableColumn>[
+        DocsTableColumn(header: 'Property', flex: 0.25),
+        DocsTableColumn(header: 'Type', flex: 0.3),
+        DocsTableColumn(header: 'Purpose', flex: 0.45),
+      ],
+      rows: <List<String>>[
+        for (final DocsApiFact fact in facts)
+          <String>[fact.name, fact.type, fact.description],
+      ],
     ),
   );
 }
