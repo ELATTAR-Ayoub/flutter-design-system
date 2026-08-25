@@ -74,6 +74,44 @@ void main() {
     expect(find.text('lib/components/ui/button.dart'), findsOneWidget);
   });
 
+  testWidgets('a titled file renders its title, description, and path', (
+    WidgetTester tester,
+  ) async {
+    // The page InstallSection replaced rendered file.title (or file.path)
+    // as a heading with file.description beneath it — the numbered steps
+    // that told a reader what to do with each manual file. DocsInstall
+    // must not drop that prose just because it now owns the manual pane.
+    await tester.pumpWidget(
+      _host(
+        const SizedBox(
+          width: 640,
+          child: DocsInstall(
+            command: 'elattar add button',
+            manualFiles: <DocsCodeFile>[
+              DocsCodeFile(
+                path: 'lib/components/ui/button.dart',
+                title: '1. Copy the source',
+                description: "Copy the generated source into components/ui.",
+                code: 'class ElButton {}',
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    await tester.tap(find.text('Manual'));
+    await tester.pump();
+
+    expect(find.text('1. Copy the source'), findsOneWidget);
+    expect(
+      find.text('Copy the generated source into components/ui.'),
+      findsOneWidget,
+    );
+    expect(find.text('lib/components/ui/button.dart'), findsOneWidget);
+  });
+
   test('every documented command names a real registry item', () {
     // A reader copies these. A command for an item that is not in the
     // registry fails at the shell, and the page is what told them to run it.

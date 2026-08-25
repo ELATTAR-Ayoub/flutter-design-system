@@ -59,7 +59,28 @@ class _DocsInstallState extends State<DocsInstall> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               for (final DocsCodeFile file in widget.manualFiles) ...<Widget>[
-                ElText(file.path, ElType.small, color: theme.mutedForeground),
+                // The heading the replaced page carried: a numbered step
+                // when one is given, falling back to the bare path.
+                ElText(
+                  file.title ?? file.path,
+                  ElType.small,
+                  color: theme.mutedForeground,
+                ),
+                // A title reads as a step, not a location, so the path still
+                // needs to be on screen somewhere — it is where the file
+                // goes.
+                if (file.title != null) ...<Widget>[
+                  SizedBox(height: el(1)),
+                  ElText(file.path, ElType.code, color: theme.mutedForeground),
+                ],
+                if (file.description != null) ...<Widget>[
+                  SizedBox(height: el(1)),
+                  ElText(
+                    file.description!,
+                    ElType.small,
+                    color: theme.mutedForeground,
+                  ),
+                ],
                 SizedBox(height: el(2)),
                 DocsSnippet(code: file.code),
                 SizedBox(height: el(4)),
