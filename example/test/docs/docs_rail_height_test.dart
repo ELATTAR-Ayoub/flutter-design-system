@@ -36,13 +36,31 @@ void main() {
     );
     await tester.pump();
 
-    final Finder rail = find.byKey(
+    // The cap the implementation targets: the sticky header plus its own
+    // bottom gutter, not just the header. A regression that drops the
+    // gutter term but keeps the header term would still clear a bound of
+    // `viewportHeight - ElWidths.siteHeader` alone, so the full expression
+    // is pinned here, not a looser approximation of it.
+    final double railMaxHeight = viewportHeight - ElWidths.siteHeader - el(4);
+
+    final Finder sidebarRail = find.byKey(
       const ValueKey<String>('docs-layout-sidebar'),
     );
-    expect(rail, findsOneWidget);
+    expect(sidebarRail, findsOneWidget);
     expect(
-      tester.getSize(rail).height,
-      lessThanOrEqualTo(viewportHeight - ElWidths.siteHeader),
+      tester.getSize(sidebarRail).height,
+      lessThanOrEqualTo(railMaxHeight),
     );
+
+    // The table-of-contents rail on the right shares the same
+    // `railMaxHeight` expression (`docs_layout.dart`'s two
+    // `ConstrainedBox.maxHeight` sites), so it is pinned the same way. It
+    // only renders at `ElBreakpoints.xl` and wider; this test's 1600-wide
+    // view clears that.
+    final Finder tocRail = find.byKey(
+      const ValueKey<String>('docs-layout-toc'),
+    );
+    expect(tocRail, findsOneWidget);
+    expect(tester.getSize(tocRail).height, lessThanOrEqualTo(railMaxHeight));
   });
 }
