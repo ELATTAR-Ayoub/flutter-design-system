@@ -1,6 +1,11 @@
 /// Tests for `components_docs/selection_control/page.dart`'s
 /// [SelectionControlDocPage].
 ///
+/// Re-housed onto the kit alongside the page: the section-order test now
+/// reads `DocsSection.id` (the kit's own section widget) instead of
+/// `ElSection`'s title, and the API-table / state-matrix tests open the
+/// relevant `DocsDisclosure` first — closed by default in the new kit.
+///
 /// This page documents [ElSelectionControl], [ElHitArea], and
 /// [ElJellyReplay] — the shared socket primitive ElCheckbox, ElRadioGroup,
 /// and ElSwitch each build their own skin on top of. It has no shadcn/Base
@@ -16,14 +21,34 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/selection_control/meta.dart';
 import 'package:example/components_docs/selection_control/page.dart';
-import 'package:example/docs/docs_code.dart';
+import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_facts.dart';
-import 'package:example/kit.dart' show ElSection;
+import 'package:example/docs/docs_section.dart' show DocsSection;
+import 'package:example/docs/docs_showcase.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 const Size _wide = Size(1440, 900);
 const Size _narrow = Size(390, 844);
+
+/// The house-shape section order this page must render, top to bottom.
+const List<String> _expectedSectionIds = <String>[
+  'preview',
+  'install',
+  'usage',
+  'hit-area',
+  'focus-ring',
+  'inert-vs-disabled',
+  'jelly-replay',
+  'api',
+  'states',
+  'accessibility',
+  'keyboard',
+  'responsive',
+  'dependencies',
+  'theming',
+  'source',
+];
 
 /// Every `ElApiTable` this page must render, by title, and every public
 /// constructor parameter or static member of each documented class found by
@@ -58,6 +83,15 @@ const Map<String, List<String>> _expectedApiTables = <String, List<String>>{
   'ElJellyReplay': <String>['state', 'child'],
 };
 
+/// The single `DocsDisclosure` whose title is [title], matching
+/// `checkbox_test.dart`'s own convention.
+Finder _disclosureTrigger(String title) => find.descendant(
+  of: find.byWidgetPredicate(
+    (Widget widget) => widget is DocsDisclosure && widget.title == title,
+  ),
+  matching: find.byKey(DocsDisclosure.triggerKey),
+);
+
 Future<ElThemeController> _pump(
   WidgetTester tester, {
   Size size = _wide,
@@ -89,34 +123,18 @@ Future<ElThemeController> _pump(
 }
 
 void main() {
-  testWidgets(
-    'sections render in order: Installation, Usage, four reader-problem '
-    'sections, API Reference, and the six trailing sections',
-    (WidgetTester tester) async {
-      await _pump(tester);
+  testWidgets('sections render in the house-shape order, top to bottom', (
+    WidgetTester tester,
+  ) async {
+    await _pump(tester);
 
-      final List<String> titles = tester
-          .widgetList<ElSection>(find.byType(ElSection))
-          .map((ElSection section) => section.title)
-          .toList();
+    final List<String> ids = tester
+        .widgetList<DocsSection>(find.byType(DocsSection))
+        .map((DocsSection section) => section.id)
+        .toList();
 
-      expect(titles, <String>[
-        'Installation',
-        'Usage',
-        'Hit area',
-        'Focus ring',
-        'Inert vs disabled',
-        'Jelly replay',
-        'API Reference',
-        'States',
-        'Accessibility',
-        'Responsive',
-        'Dependencies',
-        'Theming',
-        'Source',
-      ]);
-    },
-  );
+    expect(ids, _expectedSectionIds);
+  });
 
   testWidgets('every live specimen renders without exceptions', (
     WidgetTester tester,
@@ -146,7 +164,7 @@ void main() {
       await _pump(tester, size: _wide);
 
       expect(find.text(selectionControlDoc.title), findsWidgets);
-      expect(find.byType(DocsCodeExample), findsAtLeastNWidgets(1));
+      expect(find.byType(DocsShowcase), findsAtLeastNWidgets(1));
       expect(
         find.byKey(const ValueKey<String>('docs-layout-sidebar')),
         findsOneWidget,
@@ -154,7 +172,7 @@ void main() {
       expect(tester.takeException(), isNull);
 
       await _pump(tester, size: _narrow);
-      await tester.pumpAndSettle();
+      await tester.pump();
 
       expect(
         find.byKey(const ValueKey<String>('docs-layout-anchor-strip')),
@@ -173,6 +191,12 @@ void main() {
     'of its own class',
     (WidgetTester tester) async {
       await _pump(tester);
+
+      final Finder apiTrigger = _disclosureTrigger('API Reference');
+      await tester.ensureVisible(apiTrigger);
+      await tester.tap(apiTrigger);
+      await tester.pump();
+      await tester.pump(ElDurations.jelly);
 
       final List<DocsApiTable> tables = tester
           .widgetList<DocsApiTable>(find.byType(DocsApiTable))
@@ -252,6 +276,12 @@ void main() {
   testWidgets('the state matrix documents rest/checked, focus, invalid, inert, '
       'disabled, and reduced motion', (WidgetTester tester) async {
     await _pump(tester);
+
+    final Finder statesTrigger = _disclosureTrigger('States');
+    await tester.ensureVisible(statesTrigger);
+    await tester.tap(statesTrigger);
+    await tester.pump();
+    await tester.pump(ElDurations.jelly);
 
     final DocsStateMatrix matrix = tester.widget<DocsStateMatrix>(
       find.byType(DocsStateMatrix),

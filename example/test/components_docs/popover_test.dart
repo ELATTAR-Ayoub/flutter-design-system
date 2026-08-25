@@ -2,57 +2,58 @@
 /// `components_docs/popover/page.dart`: the public Popover component
 /// documentation page.
 ///
+/// Re-housed onto `ComponentDocSpec`/`ComponentDocPage`, the same shape
+/// `button_test.dart` and `alert_dialog_test.dart` assert against: sections
+/// read through `DocsSection.title`, and the API table (now inside a
+/// `DocsDisclosure`, closed by default) is opened before its rows are read.
+///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
-/// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`: the
-/// discipline `tooltip_test.dart` already carries. Theme coverage uses a live
-/// `ElThemeController` flipped in place rather than two independent pumps.
+/// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`. Theme
+/// coverage uses a live `ElThemeController` flipped in place rather than two
+/// independent pumps.
 ///
 /// `ElPopover` mounts its content through an `OverlayPortal`, so the live
 /// specimen needs a real `Overlay`: the harness wraps the page in a
-/// `MaterialApp`, the same fix a sibling worker needed for `ElSelect` and
-/// this page's own neighbour, `ElTooltip`. A bare `Directionality`/`Material`
-/// host would let the page render but the popover would never actually open.
-///
-/// `ElPopover`'s open/close transition is a single forward-then-reverse run
-/// with a fixed `ElDurations.overlay` duration: not a loop, so
-/// `pumpAndSettle` is safe where used below; the open/close assertions still
-/// use explicit `pump(duration)` steps to keep the exact frame under test.
+/// `MaterialApp`. No `pumpAndSettle` is used anywhere on this page: the
+/// `DocsDisclosure` chevron and the popover's own open/close transition are
+/// both bounded, but `pumpAndSettle` is avoided uniformly across this
+/// rollout in favour of explicit `pump()`/`pump(duration)` steps.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/popover/meta.dart';
 import 'package:example/components_docs/popover/page.dart';
-import 'package:example/kit.dart' show ElSection;
+import 'package:example/docs/docs_disclosure.dart';
+import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 const Size _wide = Size(1440, 900);
 const Size _narrow = Size(390, 844);
 
-/// The page was reshaped to mirror
-/// https://ui.shadcn.com/docs/components/base/popover section for section:
-/// an unheaded live demo above the first heading, then Installation, Usage,
-/// Composition, then Align (the reference's own live Start/Center/End
-/// example, ported as a data table since every variant section on this
-/// docs site already uses that format), then our Variants addition for the
-/// side/origin/barrier enums the reference does not surface, then API
-/// Reference, then States / Accessibility / Responsive / Dependencies /
-/// Theming / Source. The ordering test below asserts that literal
-/// sequence.
 const List<String> _sectionOrder = <String>[
-  'install',
-  'usage',
-  'composition',
-  'align',
-  'variants',
-  'api',
-  'states',
-  'accessibility',
-  'responsive',
-  'dependencies',
-  'theming',
-  'source',
+  'Preview',
+  'Installation',
+  'Usage',
+  'Composition',
+  'Align',
+  'Variants',
+  'API Reference',
+  'States',
+  'Accessibility',
+  'Keyboard',
+  'Responsive',
+  'Dependencies',
+  'Theming',
+  'Source',
 ];
+
+Finder _disclosureTrigger(String title) => find.descendant(
+  of: find.byWidgetPredicate(
+    (Widget widget) => widget is DocsDisclosure && widget.title == title,
+  ),
+  matching: find.byKey(DocsDisclosure.triggerKey),
+);
 
 Future<ElThemeController> _pumpPopoverDoc(
   WidgetTester tester, {
@@ -122,25 +123,17 @@ void main() {
   });
 
   group('rendered page', () {
-    testWidgets('renders every shadcn-parity section, in order', (
+    testWidgets('sections render top to bottom in the declared house order', (
       WidgetTester tester,
     ) async {
-      await _pumpPopoverDoc(tester);
+      await _pumpPopoverDoc(tester, size: const Size(1440, 4000));
 
-      // Every section anchor exists, and each one sits below the section
-      // before it -- the "in order" half of the shadcn-parity contract.
-      double previousTop = -1;
-      for (final String anchor in _sectionOrder) {
-        final Finder section = find.byKey(ElSection.anchorKey(anchor));
-        expect(section, findsOneWidget, reason: 'section "$anchor" missing');
-        final double top = tester.getTopLeft(section).dy;
-        expect(
-          top,
-          greaterThan(previousTop),
-          reason: 'section "$anchor" should render after the previous section',
-        );
-        previousTop = top;
-      }
+      final List<String> titles = tester
+          .widgetList<DocsSection>(find.byType(DocsSection))
+          .map((DocsSection section) => section.title)
+          .toList();
+
+      expect(titles, _sectionOrder);
       expect(tester.takeException(), isNull);
     });
 
@@ -168,7 +161,14 @@ void main() {
     testWidgets(
       'the API tables document every constructor parameter found in the source',
       (WidgetTester tester) async {
-        await _pumpPopoverDoc(tester);
+        await _pumpPopoverDoc(tester, size: const Size(1440, 4000));
+
+        final Finder apiTrigger = _disclosureTrigger('API Reference');
+        await tester.ensureVisible(apiTrigger);
+        await tester.pump();
+        await tester.tap(apiTrigger);
+        await tester.pump();
+        await tester.pump(ElDurations.jelly);
 
         // ElPopover's own constructor.
         expect(find.text('open'), findsWidgets);
@@ -200,14 +200,19 @@ void main() {
         expect(find.text('availableHeight'), findsOneWidget);
         expect(find.text('anchorWidth'), findsOneWidget);
 
-        // The enum value names, in the Variants section.
-        expect(find.text('top'), findsOneWidget);
-        expect(find.text('bottom'), findsOneWidget);
-        expect(find.text('left'), findsOneWidget);
-        expect(find.text('right'), findsOneWidget);
-        expect(find.text('start'), findsOneWidget);
-        expect(find.text('center'), findsOneWidget);
-        expect(find.text('end'), findsOneWidget);
+        // The enum value names, documented in API Reference. Side and
+        // Align each also render as a live trigger label in their own
+        // ShowcaseSection now (Variants and Align), so these are no
+        // longer exclusive to the table: findsWidgets confirms the fact
+        // is documented without asserting a page-wide uniqueness the
+        // live specimens now legitimately break.
+        expect(find.text('top'), findsWidgets);
+        expect(find.text('bottom'), findsWidgets);
+        expect(find.text('left'), findsWidgets);
+        expect(find.text('right'), findsWidgets);
+        expect(find.text('start'), findsWidgets);
+        expect(find.text('center'), findsWidgets);
+        expect(find.text('end'), findsWidgets);
         expect(find.text('modal'), findsOneWidget);
         expect(find.text('nonModal'), findsOneWidget);
         // 'none' also names the Assets and Shaders install-facts values, so
@@ -225,19 +230,33 @@ void main() {
       expect(find.textContaining('source-foundation'), findsWidgets);
     });
 
-    testWidgets('accessibility plainly documents the caller-owned focus gap', (
+    testWidgets('keyboard plainly documents the caller-owned focus gap', (
       WidgetTester tester,
     ) async {
-      await _pumpPopoverDoc(tester);
+      await _pumpPopoverDoc(tester, size: const Size(1440, 4000));
 
-      expect(find.textContaining('Focus is the content'), findsWidgets);
+      final Finder keyboardTrigger = _disclosureTrigger('Keyboard');
+      await tester.ensureVisible(keyboardTrigger);
+      await tester.pump();
+      await tester.tap(keyboardTrigger);
+      await tester.pump();
+      await tester.pump(ElDurations.jelly);
+
       expect(find.textContaining('Escape'), findsWidgets);
+      expect(find.textContaining('canRequestFocus'), findsWidgets);
     });
 
     testWidgets(
       'responsive section documents the flip-then-shift collision handling',
       (WidgetTester tester) async {
-        await _pumpPopoverDoc(tester);
+        await _pumpPopoverDoc(tester, size: const Size(1440, 4000));
+
+        final Finder responsiveTrigger = _disclosureTrigger('Responsive');
+        await tester.ensureVisible(responsiveTrigger);
+        await tester.pump();
+        await tester.tap(responsiveTrigger);
+        await tester.pump();
+        await tester.pump(ElDurations.jelly);
 
         expect(find.textContaining('flip'), findsWidgets);
         expect(find.textContaining('collision'), findsWidgets);
@@ -270,7 +289,7 @@ void main() {
         const ValueKey<String>('popover-doc-specimen-trigger'),
       );
       await tester.ensureVisible(trigger);
-      await tester.pumpAndSettle();
+      await tester.pump();
 
       expect(
         find.byKey(const ValueKey<String>('popover-doc-specimen-content')),
@@ -298,7 +317,7 @@ void main() {
         const ValueKey<String>('popover-doc-specimen-trigger'),
       );
       await tester.ensureVisible(trigger);
-      await tester.pumpAndSettle();
+      await tester.pump();
 
       await tester.tap(trigger);
       await tester.pump();

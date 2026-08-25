@@ -24,10 +24,35 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/command/meta.dart';
 import 'package:example/components_docs/command/page.dart';
-import 'package:example/kit.dart' show ElSection;
+import 'package:example/docs/docs_disclosure.dart';
+import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+/// The single `DocsDisclosure` whose title is [title]. `DocsDisclosure`'s
+/// own trigger key (`DocsDisclosure.triggerKey`) is one constant shared by
+/// every instance on the page, so a bare `find.byKey` would match all eight
+/// — this narrows to the one panel by its title first.
+Finder _disclosureTrigger(String title) => find.descendant(
+  of: find.byWidgetPredicate(
+    (Widget widget) => widget is DocsDisclosure && widget.title == title,
+  ),
+  matching: find.byKey(DocsDisclosure.triggerKey),
+);
+
+/// Opens the disclosure titled [title]: scrolls its trigger into view (no
+/// `pumpAndSettle` — nothing on this page loops, but a single `pump` is the
+/// habit that keeps it that way), taps it, and lets the panel's own expand
+/// animation finish.
+Future<void> _openDisclosure(WidgetTester tester, String title) async {
+  final Finder trigger = _disclosureTrigger(title);
+  await tester.ensureVisible(trigger);
+  await tester.pump();
+  await tester.tap(trigger);
+  await tester.pump();
+  await tester.pump(ElDurations.jelly);
+}
 
 const Size _wide = Size(1440, 900);
 const Size _narrow = Size(390, 844);
@@ -72,6 +97,16 @@ Finder _commandInput() => find.descendant(
   matching: find.byType(EditableText),
 );
 
+/// Scopes [matching] to the Preview specimen: several sections further
+/// down this page (Filtering, Shortcuts, Groups) now mount their own live
+/// `ElCommand` reusing the same canonical row labels ("Eclipse Vault",
+/// "Open Wallet", "Go to Stash") the Preview specimen uses, since they
+/// share `_usageCommandCode` as their quoted source. A bare `find.text`
+/// would match every one of them; this narrows to the one this test group
+/// is actually about.
+Finder _inPreview(Finder matching) =>
+    find.descendant(of: find.byKey(_commandSpecimenKey), matching: matching);
+
 /// The section order this page promises, after the split.
 ///
 /// The live demo sits unheaded above Installation, so it carries no entry.
@@ -79,6 +114,7 @@ Finder _commandInput() => find.descendant(
 /// Command's own; API Reference is last of those; the trailing six are this
 /// package's fixed extras. Nothing combobox-shaped survives.
 const List<String> _expectedSectionTitles = <String>[
+  'Preview',
   'Installation',
   'Usage',
   'Composition',
@@ -90,6 +126,7 @@ const List<String> _expectedSectionTitles = <String>[
   'API Reference',
   'States',
   'Accessibility',
+  'Keyboard',
   'Responsive',
   'Dependencies',
   'Theming',
@@ -194,27 +231,34 @@ void main() {
         findsOneWidget,
       );
       expect(find.byKey(_commandSpecimenKey), findsOneWidget);
-      expect(find.byType(ElCommand), findsOneWidget);
+      // Filtering, Shortcuts and Groups further down the page each mount
+      // their own live ElCommand too now (see the library doc): this only
+      // asserts the Preview specimen carries exactly one.
+      expect(
+        find.descendant(
+          of: find.byKey(_commandSpecimenKey),
+          matching: find.byType(ElCommand),
+        ),
+        findsOneWidget,
+      );
       expect(tester.takeException(), isNull);
     });
 
     testWidgets(
-      'sections render in the reference-shape order, with no heading before '
-      'Installation',
+      'sections render in the house-kit order, Preview first',
       (WidgetTester tester) async {
-        await _pumpCommandDoc(tester);
+        await _pumpCommandDoc(tester, size: const Size(1440, 6000));
 
-        // Read the mounted ElSection titles rather than find.text: a section
-        // title also renders in the right-rail TOC at this width, so a bare
-        // find.text would match twice.
+        // Read the mounted DocsSection titles rather than find.text: a
+        // section title also renders in the right-rail TOC at this width,
+        // so a bare find.text would match twice.
         final List<String> titles = tester
-            .widgetList<ElSection>(find.byType(ElSection))
-            .map((ElSection section) => section.title)
+            .widgetList<DocsSection>(find.byType(DocsSection))
+            .map((DocsSection section) => section.title)
             .toList();
 
         expect(titles, _expectedSectionTitles);
         expect(titles, isNot(contains('Overview')));
-        expect(titles, isNot(contains('Preview')));
         expect(titles, isNot(contains('Variants')));
         // No component-name prefix survives on any section title.
         for (final String title in titles) {
@@ -226,11 +270,11 @@ void main() {
     testWidgets('every combobox section and specimen is gone from this page', (
       WidgetTester tester,
     ) async {
-      await _pumpCommandDoc(tester);
+      await _pumpCommandDoc(tester, size: const Size(1440, 6000));
 
       final List<String> titles = tester
-          .widgetList<ElSection>(find.byType(ElSection))
-          .map((ElSection section) => section.title)
+          .widgetList<DocsSection>(find.byType(DocsSection))
+          .map((DocsSection section) => section.title)
           .toList();
       // Combobox's own two sections moved out with it.
       expect(titles, isNot(contains('Invalid')));
@@ -253,7 +297,8 @@ void main() {
       'the API tables cover every parameter, static and top-level function '
       'command.dart declares',
       (WidgetTester tester) async {
-        await _pumpCommandDoc(tester);
+        await _pumpCommandDoc(tester, size: const Size(1440, 6000));
+        await _openDisclosure(tester, 'API Reference');
 
         for (final String name in <String>[
           ..._commandParams,
@@ -295,7 +340,8 @@ void main() {
       'the API tables carry the REAL declared types, not the ones the '
       'combined page guessed',
       (WidgetTester tester) async {
-        await _pumpCommandDoc(tester);
+        await _pumpCommandDoc(tester, size: const Size(1440, 6000));
+        await _openDisclosure(tester, 'API Reference');
 
         // The old merged table typed lucideIcon String?. It is a curated
         // generated-glyph enum.
@@ -339,7 +385,8 @@ void main() {
       'accessibility plainly documents the missing live region and the '
       'focus-affordance gap',
       (WidgetTester tester) async {
-        await _pumpCommandDoc(tester);
+        await _pumpCommandDoc(tester, size: const Size(1440, 6000));
+        await _openDisclosure(tester, 'Accessibility');
 
         expect(find.textContaining('live region'), findsWidgets);
         expect(find.textContaining('Known gap'), findsWidgets);
@@ -380,14 +427,14 @@ void main() {
 
       final Finder input = _commandInput();
       await tester.ensureVisible(input);
-      expect(find.text('Eclipse Vault'), findsOneWidget);
+      expect(_inPreview(find.text('Eclipse Vault')), findsOneWidget);
 
       await tester.enterText(input, 'zzzzzznomatch');
       await tester.pump();
 
-      expect(find.text('Nothing matches that.'), findsOneWidget);
-      expect(find.text('Eclipse Vault'), findsNothing);
-      expect(find.text('Open Wallet'), findsNothing);
+      expect(_inPreview(find.text('Nothing matches that.')), findsOneWidget);
+      expect(_inPreview(find.text('Eclipse Vault')), findsNothing);
+      expect(_inPreview(find.text('Open Wallet')), findsNothing);
     });
 
     testWidgets(
@@ -402,18 +449,18 @@ void main() {
         // Source order, before anything is typed: Open Wallet above Go to
         // Stash.
         expect(
-          tester.getTopLeft(find.text('Open Wallet')).dy,
-          lessThan(tester.getTopLeft(find.text('Go to Stash')).dy),
+          tester.getTopLeft(_inPreview(find.text('Open Wallet'))).dy,
+          lessThan(tester.getTopLeft(_inPreview(find.text('Go to Stash'))).dy),
         );
 
         await tester.enterText(input, 't');
         await tester.pump();
 
-        expect(find.text('Open Wallet'), findsOneWidget);
-        expect(find.text('Go to Stash'), findsOneWidget);
+        expect(_inPreview(find.text('Open Wallet')), findsOneWidget);
+        expect(_inPreview(find.text('Go to Stash')), findsOneWidget);
         expect(
-          tester.getTopLeft(find.text('Go to Stash')).dy,
-          lessThan(tester.getTopLeft(find.text('Open Wallet')).dy),
+          tester.getTopLeft(_inPreview(find.text('Go to Stash'))).dy,
+          lessThan(tester.getTopLeft(_inPreview(find.text('Open Wallet'))).dy),
         );
       },
     );
@@ -430,9 +477,9 @@ void main() {
         await tester.enterText(input, '48');
         await tester.pump();
 
-        expect(find.text('Eclipse Vault'), findsOneWidget);
-        expect(find.text('Open Wallet'), findsNothing);
-        expect(find.text('Go to Stash'), findsNothing);
+        expect(_inPreview(find.text('Eclipse Vault')), findsOneWidget);
+        expect(_inPreview(find.text('Open Wallet')), findsNothing);
+        expect(_inPreview(find.text('Go to Stash')), findsNothing);
       },
     );
 
@@ -443,7 +490,10 @@ void main() {
 
       final Finder input = _commandInput();
       await tester.ensureVisible(input);
-      expect(find.textContaining('Nothing picked yet'), findsOneWidget);
+      expect(
+        _inPreview(find.textContaining('Nothing picked yet')),
+        findsOneWidget,
+      );
 
       await tester.tap(input);
       await tester.pump();
@@ -453,7 +503,10 @@ void main() {
       await tester.sendKeyEvent(LogicalKeyboardKey.enter);
       await tester.pump();
 
-      expect(find.textContaining('Last picked: Eclipse Vault'), findsOneWidget);
+      expect(
+        _inPreview(find.textContaining('Last picked: Eclipse Vault')),
+        findsOneWidget,
+      );
       expect(tester.takeException(), isNull);
     });
   });

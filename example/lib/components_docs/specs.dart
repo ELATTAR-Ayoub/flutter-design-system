@@ -20,16 +20,30 @@
 library;
 
 import '../docs/component_doc_page.dart' show ComponentDocSpec;
+import 'accordion/page.dart' as accordion;
+import 'alert_dialog/page.dart' as alert_dialog;
 import 'badge/page.dart' as badge;
+import 'breadcrumb/page.dart' as breadcrumb;
 import 'button/page.dart' as button;
 import 'button_group/page.dart' as button_group;
 import 'checkbox/page.dart' as checkbox;
+import 'combobox/page.dart' as combobox;
+import 'command/page.dart' as command;
+import 'context_menu/page.dart' as context_menu;
+import 'drawer/page.dart' as drawer;
+import 'dropdown_menu/page.dart' as dropdown_menu;
 import 'field/page.dart' as field;
 import 'form/page.dart' as form;
 import 'input_group/page.dart' as input_group;
 import 'input_otp/page.dart' as input_otp;
+import 'menubar/page.dart' as menubar;
 import 'native_select/page.dart' as native_select;
+import 'popover/page.dart' as popover;
 import 'radio/page.dart' as radio;
+import 'selection_control/page.dart' as selection_control;
+import 'sheet/page.dart' as sheet;
+import 'slider/page.dart' as slider;
+import 'switch/page.dart' as switch_;
 import 'textarea/page.dart' as textarea;
 import 'toggle/page.dart' as toggle;
 import 'toggle_group/page.dart' as toggle_group;
@@ -52,6 +66,20 @@ final Map<String, ComponentDocSpec> componentDocSpecs =
         button_group.buttonGroupDocSpec,
         toggle.toggleDocSpec,
         toggle_group.toggleGroupDocSpec,
+        switch_.switchDocSpec,
+        alert_dialog.alertDialogDocSpec,
+        selection_control.selectionControlDocSpec,
+        popover.popoverDocSpec,
+        dropdown_menu.dropdownMenuDocSpec,
+        slider.sliderDocSpec,
+        combobox.comboboxDocSpec,
+        sheet.sheetDocSpec,
+        context_menu.contextMenuDocSpec,
+        menubar.menubarDocSpec,
+        drawer.drawerDocSpec,
+        command.commandDocSpec,
+        breadcrumb.breadcrumbDocSpec,
+        accordion.accordionDocSpec,
       ])
         spec.name: spec,
     };

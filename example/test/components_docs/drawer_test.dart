@@ -5,22 +5,30 @@
 /// Split out of a former combined sheet+drawer test file: this file covers
 /// `DrawerDocPage` alone. Sheet's own coverage lives in `sheet_test.dart`.
 ///
+/// Re-housed onto `ComponentDocSpec`/`ComponentDocPage`, the same shape
+/// `button_test.dart`, `alert_dialog_test.dart` and `sheet_test.dart` assert
+/// against: sections read through `DocsSection.title`, and the API table
+/// (now inside a `DocsDisclosure`, closed by default) is opened before its
+/// rows are read.
+///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never a synthetic `MediaQuery`. Theme
 /// coverage flips a single live `ElThemeController` in place.
 ///
 /// `ElDrawer` mounts its content through an `OverlayPortal`, so the live
 /// specimen needs a real `Overlay`: the harness wraps the page in a
-/// `MaterialApp`. Its open/close transition is a single forward-then-reverse
-/// run on `ElDurations.drawer`, not a loop, so `pumpAndSettle` is safe —
-/// the same discipline the former combined `sheet_test.dart` established for
-/// this exact widget.
+/// `MaterialApp`. No `pumpAndSettle` is used anywhere on this page: an exact
+/// single-jump `pump(duration)` proved to undershoot the exit animation on
+/// this family of pages (`sheet_test.dart` hit the same thing first), so
+/// every open/close step below settles with a short, bounded loop of
+/// `pump(const Duration(milliseconds: 50))` steps instead.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/drawer/meta.dart';
 import 'package:example/components_docs/drawer/page.dart';
-import 'package:example/kit.dart' show ElSection;
+import 'package:example/docs/docs_disclosure.dart';
+import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -28,22 +36,20 @@ import 'package:flutter_test/flutter_test.dart';
 const Size _wide = Size(1440, 900);
 const Size _narrow = Size(390, 844);
 
-/// The shadcn-parity section order this page must render, matching
-/// https://ui.shadcn.com/docs/components/base/drawer's own `<h2>` list
-/// (narrowed to what this port actually has — see the SKIPPED panel inside
-/// Sizing for the rest) plus this corpus's fixed six extras.
 const List<String> _sectionOrder = <String>[
-  'install',
-  'usage',
-  'composition',
-  'sizing',
-  'api',
-  'states',
-  'accessibility',
-  'responsive',
-  'dependencies',
-  'theming',
-  'source',
+  'Preview',
+  'Installation',
+  'Usage',
+  'Composition',
+  'Sizing',
+  'API Reference',
+  'States',
+  'Accessibility',
+  'Keyboard',
+  'Responsive',
+  'Dependencies',
+  'Theming',
+  'Source',
 ];
 
 /// Every constructor parameter name declared on the public classes of
@@ -55,6 +61,23 @@ const List<String> _drawerParamNames = <String>[
   'children', // ElDrawerContent / ElDrawerHeader / ElDrawerFooter
   'text', // ElDrawerTitle / ElDrawerDescription
 ];
+
+Finder _disclosureTrigger(String title) => find.descendant(
+  of: find.byWidgetPredicate(
+    (Widget widget) => widget is DocsDisclosure && widget.title == title,
+  ),
+  matching: find.byKey(DocsDisclosure.triggerKey),
+);
+
+/// Pumps in short, bounded steps rather than a single exact-duration jump:
+/// the granularity that turned out to matter for this overlay family (see
+/// the library note above).
+Future<void> _settle(WidgetTester tester, {int steps = 12}) async {
+  await tester.pump();
+  for (int i = 0; i < steps; i++) {
+    await tester.pump(const Duration(milliseconds: 50));
+  }
+}
 
 Future<ElThemeController> _pumpDrawerDoc(
   WidgetTester tester, {
@@ -112,39 +135,27 @@ void main() {
     });
   });
 
-  group('DrawerDocPage shadcn-parity section order', () {
-    testWidgets('renders every shadcn-parity section, in order', (
+  group('DrawerDocPage house shape', () {
+    testWidgets('renders every section, in order', (
       WidgetTester tester,
     ) async {
-      await _pumpDrawerDoc(tester, size: const Size(1440, 3200));
+      await _pumpDrawerDoc(tester, size: const Size(1440, 3600));
 
-      double previousTop = -1;
-      for (final String anchor in _sectionOrder) {
-        final Finder section = find.byKey(ElSection.anchorKey(anchor));
-        expect(section, findsOneWidget, reason: 'section "$anchor" missing');
-        final double top = tester.getTopLeft(section).dy;
-        expect(
-          top,
-          greaterThan(previousTop),
-          reason: 'section "$anchor" should render after the previous section',
-        );
-        previousTop = top;
-      }
+      final List<String> titles = tester
+          .widgetList<DocsSection>(find.byType(DocsSection))
+          .map((DocsSection section) => section.title)
+          .toList();
+
+      expect(titles, _sectionOrder);
       expect(tester.takeException(), isNull);
     });
 
     testWidgets('Sizing carries the consolidated, honest SKIPPED note', (
       WidgetTester tester,
     ) async {
-      await _pumpDrawerDoc(tester, size: const Size(1440, 3200));
+      await _pumpDrawerDoc(tester, size: const Size(1440, 3600));
 
-      expect(
-        find.descendant(
-          of: find.byKey(ElSection.anchorKey('sizing')),
-          matching: find.textContaining('SKIPPED'),
-        ),
-        findsWidgets,
-      );
+      expect(find.textContaining('SKIPPED'), findsWidgets);
       expect(tester.takeException(), isNull);
     });
   });
@@ -153,13 +164,20 @@ void main() {
     testWidgets(
       'renders the article with every documented constructor parameter',
       (WidgetTester tester) async {
-        await _pumpDrawerDoc(tester);
+        await _pumpDrawerDoc(tester, size: const Size(1440, 3600));
 
         expect(
           find.byKey(const ValueKey<String>('drawer-doc-article')),
           findsOneWidget,
         );
         expect(find.textContaining('Drawer'), findsWidgets);
+
+        final Finder apiTrigger = _disclosureTrigger('API Reference');
+        await tester.ensureVisible(apiTrigger);
+        await tester.pump();
+        await tester.tap(apiTrigger);
+        await tester.pump();
+        await tester.pump(ElDurations.jelly);
 
         for (final String param in _drawerParamNames) {
           expect(
@@ -184,6 +202,14 @@ void main() {
 
       expect(find.textContaining('elattar add drawer'), findsWidgets);
       expect(find.textContaining('source-foundation'), findsWidgets);
+
+      // The manual copy target only renders once the Manual tab is
+      // selected: DocsInstall defaults to the CLI tab.
+      final Finder manualTab = find.text('Manual');
+      await tester.ensureVisible(manualTab);
+      await tester.tap(manualTab);
+      await tester.pump();
+
       expect(
         find.textContaining('lib/components/ui/drawer.dart'),
         findsWidgets,
@@ -218,7 +244,7 @@ void main() {
         );
         await tester.ensureVisible(trigger);
         await tester.tap(trigger);
-        await tester.pumpAndSettle();
+        await _settle(tester);
 
         expect(find.byType(ElDrawerContent), findsOneWidget);
         expect(find.text('Card actions'), findsOneWidget);
@@ -237,14 +263,7 @@ void main() {
         await drag.moveBy(Offset(0, panel.height * 0.6));
         await tester.pump();
         await drag.up();
-        await tester.pump();
-        // Not a single tester.pump(ElDurations.drawer): the reverse
-        // AnimationController reaches value 0 within that frame, but its
-        // whenComplete callback (which hides the portal) needs one more
-        // pump to actually flush the OverlayPortal's removal from the
-        // tree. pumpAndSettle is safe here: this is a bounded exit
-        // animation, not a loop.
-        await tester.pumpAndSettle();
+        await _settle(tester);
         expect(find.byType(ElDrawerContent), findsNothing);
       },
     );
@@ -259,7 +278,7 @@ void main() {
       );
       await tester.ensureVisible(trigger);
       await tester.tap(trigger);
-      await tester.pumpAndSettle();
+      await _settle(tester);
 
       final Rect panel = tester.getRect(find.byType(ElDrawerContent));
       final TestGesture drag = await tester.startGesture(
@@ -269,7 +288,7 @@ void main() {
       await drag.moveBy(Offset(0, panel.height * 0.1));
       await tester.pump();
       await drag.up();
-      await tester.pumpAndSettle();
+      await _settle(tester);
       expect(find.byType(ElDrawerContent), findsOneWidget);
     });
 
@@ -281,11 +300,11 @@ void main() {
       );
       await tester.ensureVisible(trigger);
       await tester.tap(trigger);
-      await tester.pumpAndSettle();
+      await _settle(tester);
       expect(find.byType(ElDrawerContent), findsOneWidget);
 
       await tester.sendKeyEvent(LogicalKeyboardKey.escape);
-      await tester.pumpAndSettle();
+      await _settle(tester);
       expect(find.byType(ElDrawerContent), findsNothing);
     });
 
@@ -296,7 +315,7 @@ void main() {
       expect(tester.takeException(), isNull);
 
       controller.setMode(ElThemeMode.light);
-      await tester.pumpAndSettle();
+      await tester.pump();
       expect(tester.takeException(), isNull);
       expect(find.byType(DrawerDocPage), findsOneWidget);
     });

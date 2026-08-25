@@ -2,9 +2,14 @@
 /// `components_docs/sheet/page.dart`: the public Sheet component
 /// documentation page.
 ///
-/// Split from a former combined sheet+drawer test file: this file now
-/// covers `SheetDocPage` alone. Drawer's own coverage lives in
-/// `drawer_test.dart`.
+/// Split from a former combined sheet+drawer test file: this file covers
+/// `SheetDocPage` alone. Drawer's own coverage lives in `drawer_test.dart`.
+///
+/// Re-housed onto `ComponentDocSpec`/`ComponentDocPage`, the same shape
+/// `button_test.dart` and `alert_dialog_test.dart` assert against: sections
+/// read through `DocsSection.title`/`DocsAnchor.keyFor`, and the API table
+/// (now inside a `DocsDisclosure`, closed by default) is opened before its
+/// rows are read.
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never a synthetic `MediaQuery`. Theme
@@ -12,14 +17,16 @@
 ///
 /// `ElSheetOverlay` mounts its content through an `OverlayPortal`, so the
 /// live specimen needs a real `Overlay`: the harness wraps the page in a
-/// `MaterialApp`. Its open/close transition is a single forward-then-reverse
-/// run on `ElDurations.overlay`, not a loop, so `pumpAndSettle` is safe.
+/// `MaterialApp`. No `pumpAndSettle` is used anywhere on this page: every
+/// open/close/disclosure step below advances with an explicit
+/// `pump()`/`pump(duration)` pair instead.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/sheet/meta.dart';
 import 'package:example/components_docs/sheet/page.dart';
-import 'package:example/kit.dart' show ElSection;
+import 'package:example/docs/docs_disclosure.dart';
+import 'package:example/docs/docs_section.dart' show DocsAnchor, DocsSection;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -27,23 +34,22 @@ import 'package:flutter_test/flutter_test.dart';
 const Size _wide = Size(1440, 900);
 const Size _narrow = Size(390, 844);
 
-/// The shadcn-parity section order this page must render, matching
-/// https://ui.shadcn.com/docs/components/base/sheet's own `<h2>` list plus
-/// this corpus's fixed six extras.
 const List<String> _sectionOrder = <String>[
-  'install',
-  'usage',
-  'composition',
-  'side',
-  'no-close-button',
-  'rtl',
-  'api',
-  'states',
-  'accessibility',
-  'responsive',
-  'dependencies',
-  'theming',
-  'source',
+  'Preview',
+  'Installation',
+  'Usage',
+  'Composition',
+  'Side',
+  'No close button',
+  'RTL',
+  'API Reference',
+  'States',
+  'Accessibility',
+  'Keyboard',
+  'Responsive',
+  'Dependencies',
+  'Theming',
+  'Source',
 ];
 
 /// Every constructor parameter name declared on the public classes of
@@ -73,6 +79,13 @@ Finder _liveOverlaySheet() => find.byWidgetPredicate(
       widget is ElSheetContent &&
       widget.key != const ValueKey<String>('sheet-no-close-button') &&
       widget.key != const ValueKey<String>('sheet-rtl'),
+);
+
+Finder _disclosureTrigger(String title) => find.descendant(
+  of: find.byWidgetPredicate(
+    (Widget widget) => widget is DocsDisclosure && widget.title == title,
+  ),
+  matching: find.byKey(DocsDisclosure.triggerKey),
 );
 
 Future<ElThemeController> _pumpSheetDoc(
@@ -134,34 +147,25 @@ void main() {
     });
   });
 
-  group('SheetDocPage shadcn-parity section order', () {
-    testWidgets('renders every shadcn-parity section, in order', (
+  group('SheetDocPage house shape', () {
+    testWidgets('renders every section, in order', (
       WidgetTester tester,
     ) async {
-      tester.view.physicalSize = const Size(1440, 3200);
-      tester.view.devicePixelRatio = 1;
-      addTearDown(tester.view.reset);
-      await _pumpSheetDoc(tester, size: const Size(1440, 3200));
+      await _pumpSheetDoc(tester, size: const Size(1440, 4000));
 
-      double previousTop = -1;
-      for (final String anchor in _sectionOrder) {
-        final Finder section = find.byKey(ElSection.anchorKey(anchor));
-        expect(section, findsOneWidget, reason: 'section "$anchor" missing');
-        final double top = tester.getTopLeft(section).dy;
-        expect(
-          top,
-          greaterThan(previousTop),
-          reason: 'section "$anchor" should render after the previous section',
-        );
-        previousTop = top;
-      }
+      final List<String> titles = tester
+          .widgetList<DocsSection>(find.byType(DocsSection))
+          .map((DocsSection section) => section.title)
+          .toList();
+
+      expect(titles, _sectionOrder);
       expect(tester.takeException(), isNull);
     });
 
     testWidgets(
       'No close button and RTL sections each mount their own live specimen',
       (WidgetTester tester) async {
-        await _pumpSheetDoc(tester, size: const Size(1440, 3200));
+        await _pumpSheetDoc(tester, size: const Size(1440, 4000));
 
         final Finder noCloseSpecimen = find.byKey(
           const ValueKey<String>('sheet-no-close-button'),
@@ -180,7 +184,7 @@ void main() {
         );
         expect(
           find.descendant(
-            of: find.byKey(ElSection.anchorKey('no-close-button')),
+            of: find.byKey(DocsAnchor.keyFor('no-close-button')),
             matching: find.byType(ElButton),
           ),
           findsNothing,
@@ -192,7 +196,7 @@ void main() {
         expect(rtlSpecimen, findsOneWidget);
         expect(
           find.descendant(
-            of: find.byKey(ElSection.anchorKey('rtl')),
+            of: find.byKey(DocsAnchor.keyFor('rtl')),
             matching: find.byWidgetPredicate(
               (Widget widget) =>
                   widget is Directionality &&
@@ -218,13 +222,20 @@ void main() {
     testWidgets(
       'renders the article with every documented constructor parameter',
       (WidgetTester tester) async {
-        await _pumpSheetDoc(tester);
+        await _pumpSheetDoc(tester, size: const Size(1440, 4000));
 
         expect(
           find.byKey(const ValueKey<String>('sheet-doc-article')),
           findsOneWidget,
         );
         expect(find.textContaining('Sheet'), findsWidgets);
+
+        final Finder apiTrigger = _disclosureTrigger('API Reference');
+        await tester.ensureVisible(apiTrigger);
+        await tester.pump();
+        await tester.tap(apiTrigger);
+        await tester.pump();
+        await tester.pump(ElDurations.jelly);
 
         for (final String param in _sheetParamNames) {
           expect(
@@ -259,6 +270,14 @@ void main() {
 
       expect(find.textContaining('elattar add sheet'), findsWidgets);
       expect(find.textContaining('source-foundation'), findsWidgets);
+
+      // The manual copy target only renders once the Manual tab is
+      // selected: DocsInstall defaults to the CLI tab.
+      final Finder manualTab = find.text('Manual');
+      await tester.ensureVisible(manualTab);
+      await tester.tap(manualTab);
+      await tester.pump();
+
       expect(find.textContaining('lib/components/ui/sheet.dart'), findsWidgets);
     });
 
@@ -291,7 +310,9 @@ void main() {
         );
         await tester.ensureVisible(trigger);
         await tester.tap(trigger);
-        await tester.pumpAndSettle();
+        await tester.pump();
+        await tester.pump(ElDurations.overlay);
+        await tester.pump();
 
         expect(_liveOverlaySheet(), findsOneWidget);
         expect(find.text('Notification settings'), findsOneWidget);
@@ -301,7 +322,10 @@ void main() {
 
         // Tap the scrim, well clear of the right-hand panel, to dismiss.
         await tester.tapAt(const Offset(20, 20));
-        await tester.pumpAndSettle();
+        await tester.pump();
+        for (int i = 0; i < 8; i++) {
+          await tester.pump(const Duration(milliseconds: 50));
+        }
         expect(_liveOverlaySheet(), findsNothing);
       },
     );
@@ -314,32 +338,42 @@ void main() {
       );
       await tester.ensureVisible(trigger);
       await tester.tap(trigger);
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(ElDurations.overlay);
+      await tester.pump();
       expect(_liveOverlaySheet(), findsOneWidget);
 
       await tester.sendKeyEvent(LogicalKeyboardKey.escape);
-      await tester.pumpAndSettle();
+      await tester.pump();
+      for (int i = 0; i < 8; i++) {
+        await tester.pump(const Duration(milliseconds: 50));
+      }
       expect(_liveOverlaySheet(), findsNothing);
     });
 
     testWidgets('the Side section mounts its own independent set of triggers', (
       WidgetTester tester,
     ) async {
-      await _pumpSheetDoc(tester, size: const Size(1440, 3200));
+      await _pumpSheetDoc(tester, size: const Size(1440, 4000));
 
       final Finder sectionTrigger = find.byKey(
         const ValueKey<String>('sheet-example-side:left'),
       );
       await tester.ensureVisible(sectionTrigger);
       await tester.tap(sectionTrigger);
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(ElDurations.overlay);
+      await tester.pump();
 
       expect(_liveOverlaySheet(), findsOneWidget);
       final Rect panel = tester.getRect(_liveOverlaySheet());
       expect(panel.left, closeTo(0, 1));
 
       await tester.sendKeyEvent(LogicalKeyboardKey.escape);
-      await tester.pumpAndSettle();
+      await tester.pump();
+      for (int i = 0; i < 8; i++) {
+        await tester.pump(const Duration(milliseconds: 50));
+      }
       expect(_liveOverlaySheet(), findsNothing);
     });
 
@@ -350,7 +384,7 @@ void main() {
       expect(tester.takeException(), isNull);
 
       controller.setMode(ElThemeMode.light);
-      await tester.pumpAndSettle();
+      await tester.pump();
       expect(tester.takeException(), isNull);
       expect(find.byType(SheetDocPage), findsOneWidget);
     });

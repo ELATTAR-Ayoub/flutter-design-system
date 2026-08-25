@@ -23,9 +23,33 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/context_menu/meta.dart';
 import 'package:example/components_docs/context_menu/page.dart';
-import 'package:example/kit.dart' show ElSection;
+import 'package:example/docs/docs_disclosure.dart';
+import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+/// The single `DocsDisclosure` whose title is [title]. `DocsDisclosure`'s
+/// own trigger key (`DocsDisclosure.triggerKey`) is one constant shared by
+/// every instance on the page, so a bare `find.byKey` would match all eight
+/// — this narrows to the one panel by its title first.
+Finder _disclosureTrigger(String title) => find.descendant(
+  of: find.byWidgetPredicate(
+    (Widget widget) => widget is DocsDisclosure && widget.title == title,
+  ),
+  matching: find.byKey(DocsDisclosure.triggerKey),
+);
+
+/// Opens the disclosure titled [title]: scrolls its trigger into view (no
+/// `pumpAndSettle` — see the library note), taps it, and lets the panel's
+/// own expand animation finish.
+Future<void> _openDisclosure(WidgetTester tester, String title) async {
+  final Finder trigger = _disclosureTrigger(title);
+  await tester.ensureVisible(trigger);
+  await tester.pump();
+  await tester.tap(trigger);
+  await tester.pump();
+  await tester.pump(ElDurations.jelly);
+}
 
 const Size _wide = Size(1440, 900);
 const Size _narrow = Size(390, 844);
@@ -83,14 +107,15 @@ void main() {
     testWidgets('sections render in the shadcn-mirrored order', (
       WidgetTester tester,
     ) async {
-      await _pumpPage(tester);
+      await _pumpPage(tester, size: const Size(1440, 4000));
 
       final List<String> titles = tester
-          .widgetList<ElSection>(find.byType(ElSection))
-          .map((ElSection section) => section.title)
+          .widgetList<DocsSection>(find.byType(DocsSection))
+          .map((DocsSection section) => section.title)
           .toList();
 
       expect(titles, <String>[
+        'Preview',
         'Installation',
         'Usage',
         'Composition',
@@ -106,6 +131,7 @@ void main() {
         'API Reference',
         'States',
         'Accessibility',
+        'Keyboard',
         'Responsive',
         'Dependencies',
         'Theming',
@@ -139,7 +165,8 @@ void main() {
     testWidgets(
       'the API table documents constructor parameters from the source',
       (WidgetTester tester) async {
-        await _pumpPage(tester);
+        await _pumpPage(tester, size: const Size(1440, 4000));
+        await _openDisclosure(tester, 'API Reference');
 
         expect(find.text('child'), findsWidgets);
         expect(find.text('children'), findsWidgets);
@@ -156,13 +183,18 @@ void main() {
       expect(find.textContaining('elattar add context-menu'), findsWidgets);
     });
 
-    testWidgets('accessibility section documents the touch gap', (
-      WidgetTester tester,
-    ) async {
-      await _pumpPage(tester);
+    testWidgets('accessibility and keyboard sections document the touch '
+        'gap and the keyboard-open gap', (WidgetTester tester) async {
+      await _pumpPage(tester, size: const Size(1440, 4000));
+      await _openDisclosure(tester, 'Accessibility');
+      await _openDisclosure(tester, 'Keyboard');
 
       expect(find.textContaining('No touch path'), findsWidgets);
       expect(find.textContaining('Right-click only'), findsWidgets);
+      expect(
+        find.textContaining('no keyboard route to open the menu'),
+        findsWidgets,
+      );
     });
   });
 
@@ -179,7 +211,7 @@ void main() {
         const ValueKey<String>('context-menu-destructive-specimen'),
       );
       await tester.ensureVisible(destructive);
-      await tester.pumpAndSettle();
+      await tester.pump();
 
       expect(top, findsOneWidget);
       expect(destructive, findsOneWidget);

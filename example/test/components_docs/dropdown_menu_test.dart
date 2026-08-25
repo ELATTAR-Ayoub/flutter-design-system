@@ -18,7 +18,8 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/dropdown_menu/meta.dart';
 import 'package:example/components_docs/dropdown_menu/page.dart';
-import 'package:example/kit.dart' show ElSection;
+import 'package:example/docs/docs_disclosure.dart';
+import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -72,11 +73,35 @@ Future<void> _openSpecimenMenu(WidgetTester tester) async {
     const ValueKey<String>('dropdown-menu-doc-specimen-trigger'),
   );
   await tester.ensureVisible(trigger);
-  await tester.pumpAndSettle();
+  await tester.pump();
   await tester.tap(trigger);
   await tester.pump();
   await tester.pump();
   await tester.pump(ElDurations.overlay);
+}
+
+/// The single `DocsDisclosure` whose title is [title]. `DocsDisclosure`'s
+/// own trigger key (`DocsDisclosure.triggerKey`) is one constant shared by
+/// every instance on the page, so a bare `find.byKey` would match all eight
+/// — this narrows to the one panel by its title first, matching
+/// `button_test.dart`'s own convention.
+Finder _disclosureTrigger(String title) => find.descendant(
+  of: find.byWidgetPredicate(
+    (Widget widget) => widget is DocsDisclosure && widget.title == title,
+  ),
+  matching: find.byKey(DocsDisclosure.triggerKey),
+);
+
+/// Opens the disclosure titled [title]: scrolls its trigger into view (no
+/// `pumpAndSettle` — a menu doc page never settles, see the library note),
+/// taps it, and lets the panel's own expand animation finish.
+Future<void> _openDisclosure(WidgetTester tester, String title) async {
+  final Finder trigger = _disclosureTrigger(title);
+  await tester.ensureVisible(trigger);
+  await tester.pump();
+  await tester.tap(trigger);
+  await tester.pump();
+  await tester.pump(ElDurations.jelly);
 }
 
 void main() {
@@ -152,10 +177,10 @@ void main() {
       (WidgetTester tester) async {
         await _pumpDropdownMenuDoc(tester);
 
-        // The shadcn dropdown-menu frame (Preview, Installation, Usage,
-        // Composition, one Examples section per row shape/pattern, API
-        // Reference), then Elattar's own six sections, in that order.
+        // The kit house shape: Preview, Installation, Usage, Composition,
+        // one section per row shape/pattern, then the eight disclosures.
         const List<String> headingsInOrder = <String>[
+          'Preview',
           'Installation',
           'Usage',
           'Composition',
@@ -168,22 +193,23 @@ void main() {
           'Destructive',
           'Complex',
           'API Reference',
-          'States and feedback',
-          'Accessibility and keyboard behavior',
-          'Responsive and platform behavior',
-          'Dependencies, files, and disclosure',
-          'Theming notes',
-          'Source and tests',
+          'States',
+          'Accessibility',
+          'Keyboard',
+          'Responsive',
+          'Dependencies',
+          'Theming',
+          'Source',
         ];
 
-        // Read the mounted ElSection widgets in tree order rather than
+        // Read the mounted DocsSection widgets in tree order rather than
         // text-finding each heading: the section heading and a nested
         // sub-heading (e.g. inside "Complex") can render the same string,
         // which makes a find.text-based check ambiguous even when scoped to
         // the article.
         final List<String> titles = tester
-            .widgetList<ElSection>(find.byType(ElSection))
-            .map((ElSection section) => section.title)
+            .widgetList<DocsSection>(find.byType(DocsSection))
+            .map((DocsSection section) => section.title)
             .toList();
 
         expect(titles, headingsInOrder);
@@ -194,7 +220,8 @@ void main() {
       'the API tables document every constructor parameter found in the '
       'source, for both ElDropdownMenu and the shared menu.dart engine',
       (WidgetTester tester) async {
-        await _pumpDropdownMenuDoc(tester);
+        await _pumpDropdownMenuDoc(tester, size: const Size(1440, 4000));
+        await _openDisclosure(tester, 'API Reference');
 
         // ElMenuTriggerScope.
         expect(find.textContaining('ElMenuTriggerScope'), findsWidgets);
@@ -261,19 +288,26 @@ void main() {
     );
 
     testWidgets(
-      'installation is honest that elattar add dropdown-menu does not '
-      'resolve yet',
+      'installation documents that elattar add dropdown-menu resolves '
+      'both files through the shipped manifest',
       (WidgetTester tester) async {
         await _pumpDropdownMenuDoc(tester);
 
         expect(find.textContaining('elattar add dropdown-menu'), findsWidgets);
-        expect(find.textContaining('not'), findsWidgets);
+        expect(
+          find.textContaining('registry/components/dropdown-menu.json'),
+          findsWidgets,
+        );
       },
     );
 
-    testWidgets('accessibility plainly documents the keyboard-open gap and the '
-        'missing menu-level semantics', (WidgetTester tester) async {
-      await _pumpDropdownMenuDoc(tester);
+    testWidgets('accessibility and keyboard sections plainly document the '
+        'keyboard-open gap and the missing menu-level semantics', (
+      WidgetTester tester,
+    ) async {
+      await _pumpDropdownMenuDoc(tester, size: const Size(1440, 4000));
+      await _openDisclosure(tester, 'Accessibility');
+      await _openDisclosure(tester, 'Keyboard');
 
       expect(
         find.textContaining('does not open the menu'),
@@ -443,7 +477,7 @@ void main() {
           matching: find.text('Account menu'),
         );
         await tester.ensureVisible(label);
-        await tester.pumpAndSettle();
+        await tester.pump();
 
         final FocusNode? node = Focus.maybeOf(
           tester.element(label),

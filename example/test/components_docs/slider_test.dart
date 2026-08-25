@@ -1,10 +1,14 @@
 /// Tests for `components_docs/slider/page.dart`'s [SliderDocPage]: the
 /// slider component documentation page.
 ///
+/// Re-housed onto the kit alongside the page: the section-order test now
+/// reads `DocsSection.id` (the kit's own section widget), and the API-table
+/// / state-matrix tests open the relevant `DocsDisclosure` first — closed by
+/// default in the new kit.
+///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
-/// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`, per the
-/// Phase J brief. The live `ElThemeController` is flipped in place for theme
-/// coverage rather than re-pumped under a new controller.
+/// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`. The live
+/// `ElThemeController` is flipped in place for theme coverage.
 ///
 /// Keyboard behaviour is driven directly against the real `Focus` nodes
 /// `ElSlider` builds per thumb: the same technique `test/slider_test.dart`
@@ -15,9 +19,10 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/slider/meta.dart';
 import 'package:example/components_docs/slider/page.dart';
-import 'package:example/docs/docs_code.dart';
+import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_facts.dart';
-import 'package:example/kit.dart' show ElSection;
+import 'package:example/docs/docs_section.dart' show DocsSection;
+import 'package:example/docs/docs_showcase.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -25,16 +30,9 @@ import 'package:flutter_test/flutter_test.dart';
 const Size _wide = Size(1440, 900);
 const Size _narrow = Size(390, 844);
 
-/// The full shadcn-parity section list, in the order the reshaped page must
-/// render them: mirrors https://ui.shadcn.com/docs/components/base/slider
-/// (Installation, Usage, Range, Multiple Thumbs, Controlled, Disabled, API
-/// Reference), with Vertical and RTL skipped (ElSlider exposes no
-/// orientation parameter and no directionality-aware layout), Overview,
-/// Status and Preview ahead of it per this docs system's own convention, our
-/// Composition examples folded in beside the mirrored examples, and our six
-/// required extra sections (States, Accessibility, Responsive, Dependencies,
-/// Theming, Source) directly after API Reference.
-const List<String> _sectionOrder = <String>[
+/// The house-shape section order this page must render, top to bottom.
+const List<String> _expectedSectionIds = <String>[
+  'preview',
   'install',
   'usage',
   'variants',
@@ -46,6 +44,7 @@ const List<String> _sectionOrder = <String>[
   'api',
   'states',
   'accessibility',
+  'keyboard',
   'responsive',
   'dependencies',
   'theming',
@@ -53,8 +52,8 @@ const List<String> _sectionOrder = <String>[
 ];
 
 /// Every public constructor parameter of `ElSlider`, enumerated by reading
-/// `lib/src/components/slider.dart` directly (Step 1 of the task cycle). The
-/// API table must cover all of these by name.
+/// `lib/src/components/slider.dart` directly. The API table must cover all
+/// of these by name.
 const List<String> _sliderParams = <String>[
   'values',
   'onChanged',
@@ -72,6 +71,15 @@ const List<String> _sliderStatics = <String>[
   'ElSlider.trackHeight',
   'ElSlider.thumbSize',
 ];
+
+/// The single `DocsDisclosure` whose title is [title], matching
+/// `checkbox_test.dart`'s own convention.
+Finder _disclosureTrigger(String title) => find.descendant(
+  of: find.byWidgetPredicate(
+    (Widget widget) => widget is DocsDisclosure && widget.title == title,
+  ),
+  matching: find.byKey(DocsDisclosure.triggerKey),
+);
 
 Future<ElThemeController> _pump(
   WidgetTester tester, {
@@ -120,13 +128,26 @@ Future<void> _focusThumb(WidgetTester tester, Key sliderKey, int index) async {
 }
 
 void main() {
+  testWidgets('sections render in the house-shape order, top to bottom', (
+    WidgetTester tester,
+  ) async {
+    await _pump(tester);
+
+    final List<String> ids = tester
+        .widgetList<DocsSection>(find.byType(DocsSection))
+        .map((DocsSection section) => section.id)
+        .toList();
+
+    expect(ids, _expectedSectionIds);
+  });
+
   testWidgets(
     'renders the article at wide and narrow widths with no exceptions',
     (WidgetTester tester) async {
       await _pump(tester, size: _wide);
 
       expect(find.text(sliderDoc.title), findsWidgets);
-      expect(find.byType(DocsCodeExample), findsAtLeastNWidgets(1));
+      expect(find.byType(DocsShowcase), findsAtLeastNWidgets(1));
       expect(
         find.byKey(const ValueKey<String>('docs-layout-sidebar')),
         findsOneWidget,
@@ -134,7 +155,7 @@ void main() {
       expect(tester.takeException(), isNull);
 
       await _pump(tester, size: _narrow);
-      await tester.pumpAndSettle();
+      await tester.pump();
 
       expect(
         find.byKey(const ValueKey<String>('docs-layout-anchor-strip')),
@@ -149,31 +170,16 @@ void main() {
   );
 
   testWidgets(
-    'slider docs page renders every shadcn-parity section, in order',
-    (WidgetTester tester) async {
-      await _pump(tester);
-
-      double previousTop = -1;
-      for (final String anchor in _sectionOrder) {
-        final Finder section = find.byKey(ElSection.anchorKey(anchor));
-        expect(section, findsOneWidget, reason: 'section "$anchor" missing');
-        final double top = tester.getTopLeft(section).dy;
-        expect(
-          top,
-          greaterThan(previousTop),
-          reason: 'section "$anchor" should render after the previous section',
-        );
-        previousTop = top;
-      }
-      expect(tester.takeException(), isNull);
-    },
-  );
-
-  testWidgets(
     'the API table covers every ElSlider constructor parameter and both '
     'static members',
     (WidgetTester tester) async {
       await _pump(tester);
+
+      final Finder apiTrigger = _disclosureTrigger('API Reference');
+      await tester.ensureVisible(apiTrigger);
+      await tester.tap(apiTrigger);
+      await tester.pump();
+      await tester.pump(ElDurations.jelly);
 
       final List<DocsApiTable> tables = tester
           .widgetList<DocsApiTable>(find.byType(DocsApiTable))
@@ -283,9 +289,35 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets(
+    'the Range, Multiple thumbs, Controlled and Disabled specimens all '
+    'mount their own live ElSlider',
+    (WidgetTester tester) async {
+      await _pump(tester);
+
+      for (final String key in <String>[
+        'slider-example:range',
+        'slider-example:multiple-thumbs',
+        'slider-example:controlled',
+        'slider-example:disabled',
+      ]) {
+        final Finder finder = find.byKey(ValueKey<String>(key));
+        await tester.ensureVisible(finder);
+        expect(finder, findsOneWidget, reason: 'missing specimen "$key"');
+      }
+      expect(tester.takeException(), isNull);
+    },
+  );
+
   testWidgets('the state matrix documents rest, hover, active, focus-visible, '
       'disabled and reduced motion', (WidgetTester tester) async {
     await _pump(tester);
+
+    final Finder statesTrigger = _disclosureTrigger('States');
+    await tester.ensureVisible(statesTrigger);
+    await tester.tap(statesTrigger);
+    await tester.pump();
+    await tester.pump(ElDurations.jelly);
 
     final DocsStateMatrix matrix = tester.widget<DocsStateMatrix>(
       find.byType(DocsStateMatrix),
@@ -331,11 +363,6 @@ void main() {
   ) async {
     await _pump(tester);
 
-    // This test used to assert the opposite, correctly: slider was not a
-    // registry item, and holding the page to saying so was the right guard
-    // against overclaiming. The registry now ships it, so the same guard
-    // points the other way — the page must not tell a reader that a command
-    // which works will not.
     expect(find.textContaining('not yet a registry item'), findsNothing);
     expect(find.textContaining('elattar add slider'), findsWidgets);
   });

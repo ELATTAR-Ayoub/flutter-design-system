@@ -1,20 +1,34 @@
 /// Public documentation page for the `command` component.
 ///
+/// **Re-housed onto the kit.** This page used to hand-compose `ElSection`
+/// panels; it now declares a `ComponentDocSpec`
+/// (`example/lib/docs/component_doc_page.dart`) and hands it to
+/// `ComponentDocPage`, the same shape `button`, `field`, `dropdown_menu`,
+/// `context_menu` and `menubar` established. Every specimen widget and
+/// every code string below is the same one the hand-composed page carried,
+/// with one required addition: the house shape's first section is always
+/// titled Preview (`test/docs/docs_page_shape_test.dart` enforces it), so
+/// the previously-unheaded live demo above Installation now owns a real
+/// `ShowcaseSection` and a rail entry, where it used to be a bare
+/// `DocsCodeExample` with neither. Four sections that were prose-only before
+/// (Filtering, Groups, Scrollable, In a panel) each gain a genuine live
+/// specimen here, since a `ShowcaseSection` is a specimen AND its source: a
+/// Filtering specimen pre-filled with the query "t" so the reorder the
+/// prose describes is visible without typing; a Scrollable specimen with
+/// fifteen rows so `ElCommand.listMaxHeight` genuinely caps and scrolls,
+/// where the old page could only say "the palette above stays short enough
+/// that the cap never triggers"; and an In a panel specimen that actually
+/// opens and closes a container the way the prose describes. A new Keyboard
+/// disclosure is split out of the "ArrowDown and ArrowUp...", "Ctrl+N and
+/// Ctrl+J...", and "loop is false..." bullets the old Accessibility section
+/// folded together.
+///
 /// **Split from a combined page.** This file used to document `ElCommand`
 /// and `ElCombobox<T>` together, on the argument that two "filter as you
 /// type" surfaces read as one idea. They are two separately barrel-exported
 /// public components with two source files, so each now owns a page:
 /// everything about `ElCombobox` moved to `../combobox/page.dart` and is
 /// gone from here, not duplicated.
-///
-/// **Shape.** Copies `button/page.dart`'s frame, the Phase F/J reference
-/// shape: an unheaded live demo above the first heading (a bare
-/// [DocsCodeExample], no [ElSection], so it owns no TOC entry), then
-/// Installation, Usage, then this component's own sections, then API
-/// Reference last of the component-specific sections, then exactly States,
-/// Accessibility, Responsive, Dependencies, Theming, Source. Section titles
-/// carry no `Command` prefix: after the split the page is about one
-/// component and the prefix would say nothing.
 ///
 /// Grounded against https://ui.shadcn.com/docs/components/base/command,
 /// whose own `<h2>` list is About, Installation, Usage, Composition, Basic,
@@ -36,23 +50,311 @@
 ///
 /// **No overlay here.** `ElCommand` mounts inline and anchors to nothing:
 /// `command.dart`'s own "Why this file does not build on `ElPopover`". So
-/// unlike the combobox page, this one's live specimen needs no real
+/// unlike the combobox page, this one's live specimens need no real
 /// [Overlay] to work. `command_test.dart` still wraps it in a `MaterialApp`
 /// for the ordinary reasons a docs page needs one.
-///
-/// [ComponentDocEntry.description] is the page's only rendered description:
-/// the short, one-sentence form. No second, longer paragraph renders
-/// beneath it; Installation is the first section after the hero.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:flutter/widgets.dart';
 
-import '../../docs/docs_code.dart';
+import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
 import '../../docs/docs_layout.dart';
-import '../../kit.dart';
+import '../../docs/docs_section.dart' show DocsAnchor;
 import 'meta.dart';
+
+final ComponentDocSpec commandDocSpec = ComponentDocSpec(
+  name: 'command',
+  title: commandDoc.title,
+  description: commandDoc.description,
+  sections: <DocsPageSection>[
+    ShowcaseSection(
+      id: 'preview',
+      title: 'Preview',
+      description:
+          'Live. Type in the search field: rows drop out as the filter '
+          'narrows, and the survivors re-rank inside their own group.',
+      specimen: _CommandSpecimen(),
+      code: _usageCommandCode,
+      label: 'Preview specimen view',
+      minHeight: el(120),
+    ),
+    InstallSection(
+      id: 'install',
+      title: 'Installation',
+      description:
+          'Already reachable today through both the published package and '
+          'the registry: ElCommand is barrel-exported, and the shipped '
+          'registry/components/command.json manifest resolves through the '
+          'elattar CLI. The Manual tab is for a project not using the CLI.',
+      command: commandDoc.command,
+      manualFiles: <DocsCodeFile>[
+        DocsCodeFile(
+          path: 'lib/components/ui/command.dart',
+          title: '1. Copy the source',
+          description:
+              "Copy lib/src/components/command.dart's generated @ui/"
+              'command.dart payload into components/ui.',
+          code:
+              "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
+              '// Copy the generated command source here when using manual '
+              'mode.',
+        ),
+        const DocsCodeFile(
+          path: 'lib/components/ui/ui.dart',
+          title: '2. Export it from your barrel',
+          description:
+              'Add the export line so ElCommand, ElCommandItem, '
+              'ElCommandGroup and elCommandScore are reachable the same '
+              'way the CLI path already makes them.',
+          code: "export 'command.dart';",
+        ),
+      ],
+    ),
+    SnippetSection(
+      id: 'usage',
+      title: 'Usage',
+      description:
+          'The smallest correct construction: a list of groups, each '
+          'holding rows. Every example below only changes named arguments '
+          'on top of this.',
+      code: _usageCommandCode,
+    ),
+    SnippetSection(
+      id: 'composition',
+      title: 'Composition',
+      description:
+          'shadcn assembles Command from five caller-composed pieces '
+          '(Command, CommandInput, CommandList, CommandGroup, '
+          'CommandItem). This port is one widget configured through data '
+          'instead, so the shape below is a data hierarchy rather than a '
+          'widget tree: the search field, the empty row and the '
+          'scrolling list are built for you and are not addressable from '
+          'a call site.',
+      code: _compositionTreeCommandCode,
+    ),
+    ShowcaseSection(
+      id: 'filtering',
+      title: 'Filtering',
+      description:
+          'Not in shadcn\'s own section list, and the single most '
+          'surprising thing about this component: the rows do not just '
+          'disappear, they move, ranked by elCommandScore, a ported '
+          'fuzzy ranker. This specimen starts with the query "t" '
+          'already typed: Go to Stash rises above Open Wallet, '
+          'reversing the source order, because the "t" beginning the '
+          'word "to" scores 0.891 while the "t" buried inside "Wallet" '
+          'scores 0.17. An empty query short-circuits both passes, so '
+          'source order stands: clear the field to see it. keywords are '
+          "appended to the searchable string rather than scored "
+          "separately: Open Wallet also carries keywords: ['money']. "
+          'What gets scored is ElCommandItem.searchValue, not the label: '
+          "left null, it derives from label, subtitle, meta and shortcut "
+          "concatenated with nothing between them, which means a price "
+          "or a key hint IS searchable — the Eclipse Vault row carries "
+          '\$48.00 as its meta, and typing 48 finds it. Pass '
+          'shouldFilter: false to hold the rows exactly as given and '
+          'filter server-side instead, or filter to substitute a scorer '
+          'of your own; both leave the highlight behaviour untouched.',
+      specimen: _FilteringSpecimen(),
+      code: _filteringCode,
+      label: 'Filtering specimen view',
+      minHeight: el(120),
+    ),
+    ShowcaseSection(
+      id: 'shortcuts',
+      title: 'Shortcuts',
+      description:
+          'shadcn renders a CommandShortcut, a right-aligned key hint, '
+          'beside a row. ElCommandItem.shortcut is the same slot. meta '
+          '(a price, a count, a timestamp) is a second, independent '
+          'trailing slot, and a row can carry both at once: they differ '
+          'in type spec, in whether the selected row brightens them, and '
+          'in whether they displace the trailing check indicator.',
+      specimen: _ShortcutsSpecimen(),
+      code: _shortcutsCode,
+      label: 'Shortcuts specimen view',
+    ),
+    ShowcaseSection(
+      id: 'groups',
+      title: 'Groups',
+      description:
+          'ElCommandGroup renders an optional heading above its rows, '
+          'and separatorBefore draws a rule above the whole group: both '
+          'visible below, where Actions carries a separator before it '
+          'and Packs does not. A group whose rows are all filtered away '
+          'hides its heading with them, and stops occupying space '
+          'entirely. The separator is not painted while a query is '
+          'running: it leaves the tree on the first keystroke and comes '
+          'back when the field is cleared. Rows re-sort inside their own '
+          'group on every keystroke, but the groups themselves never '
+          'move: a faithfully reproduced upstream bug rather than a '
+          'design choice — cmdk\'s second sort pass builds its selector '
+          'from a React useId while the element carries its heading '
+          'instead, so the selector matches nothing and the pass is a '
+          'silent no-op. ElCommand.sortsGroups is a static false that '
+          'records it. Alt+ArrowDown and Alt+ArrowUp step to the next or '
+          'previous group\'s first enabled row, falling back to a plain '
+          'one-row step when there is no such group.',
+      specimen: _GroupsSpecimen(),
+      code: _usageCommandCode,
+      label: 'Groups specimen view',
+      minHeight: el(120),
+    ),
+    ShowcaseSection(
+      id: 'scrollable',
+      title: 'Scrollable',
+      description:
+          'Once the rows need more room than the palette allows, the '
+          'list caps its height and scrolls internally rather than '
+          'growing the page around it: ElCommand.listMaxHeight (288px) '
+          'is that cap, and nothing above it changes the palette\'s '
+          'outer size. This specimen carries fifteen rows, enough to '
+          'genuinely trigger the cap rather than describe it in the '
+          'abstract. An arrow move scrolls the newly highlighted row '
+          'into view; a hover deliberately does not, because a row you '
+          'just pointed at is already on screen. Skipped, and named '
+          'rather than silently dropped: About (this page credits cmdk '
+          'in Installation instead of under a heading of its own, '
+          'beside the version the scorer was ported from), Basic '
+          '(shadcn\'s CommandDialog demo — ElCommand.inDialog reproduces '
+          'what that presentation does to the palette itself, but the '
+          'dialog wrapper is recorded, not built, so there is no live '
+          'specimen to show), and RTL (no Directionality or '
+          'TextDirection branch anywhere in command.dart, and the docs '
+          'shell this page renders inside carries no direction toggle '
+          'to demonstrate one against).',
+      specimen: _ScrollableSpecimen(),
+      code: _scrollableCode,
+      label: 'Scrollable specimen view',
+      minHeight: el(120),
+    ),
+    ShowcaseSection(
+      id: 'in-a-panel',
+      title: 'In a panel',
+      description:
+          'ElCommand owns neither its opening nor its dismissal, '
+          'because it has no container of its own to dismiss. Whatever '
+          'mounts it owns both: this specimen is a small stand-in for '
+          "this site's own header search — a button opens a panel "
+          'holding a live ElCommand, and picking a row closes the panel '
+          'itself, the container dismissing itself the way the prose '
+          'describes.',
+      specimen: _InAPanelSpecimen(),
+      code: _inAPanelCode,
+      label: 'In a panel specimen view',
+      minHeight: el(120),
+    ),
+    DisclosureSection(
+      id: 'api',
+      title: 'API Reference',
+      description:
+          'Every constructor parameter, static helper and top-level '
+          'function lib/src/components/command.dart declares: one table '
+          'each, read off the real constructors.',
+      children: const <DocsTocEntry>[
+        DocsTocEntry(title: 'ElCommand', anchor: 'api-elcommand'),
+        DocsTocEntry(
+          title: 'ElCommand static helpers',
+          anchor: 'api-elcommand-static',
+        ),
+        DocsTocEntry(title: 'ElCommandItem', anchor: 'api-elcommanditem'),
+        DocsTocEntry(title: 'ElCommandGroup', anchor: 'api-elcommandgroup'),
+        DocsTocEntry(title: 'elCommandScore', anchor: 'api-elcommandscore'),
+      ],
+      child: _ApiReferenceContent(),
+    ),
+    DisclosureSection(
+      id: 'states',
+      title: 'States',
+      description:
+          'Read off _DsCommandState, not inferred: the palette is '
+          'always open, so every state below is a state of its list '
+          'rather than of its visibility.',
+      child: DocsStateMatrix(facts: _stateFacts),
+    ),
+    DisclosureSection(
+      id: 'accessibility',
+      title: 'Accessibility',
+      description: 'Keyboard interactions have their own section below.',
+      child: _AccessibilityContent(),
+    ),
+    DisclosureSection(
+      id: 'keyboard',
+      title: 'Keyboard',
+      description:
+          'Read straight off command.dart\'s own root Focus.onKeyEvent, '
+          'not inferred.',
+      child: _KeyboardContent(),
+    ),
+    DisclosureSection(
+      id: 'responsive',
+      title: 'Responsive',
+      child: _ResponsiveContent(),
+    ),
+    DisclosureSection(
+      id: 'dependencies',
+      title: 'Dependencies',
+      child: _DependenciesContent(),
+    ),
+    DisclosureSection(
+      id: 'theming',
+      title: 'Theming',
+      child: _ThemingContent(),
+    ),
+    DisclosureSection(
+      id: 'source',
+      title: 'Source',
+      child: DocsInstallFacts(
+        title: 'Reference',
+        facts: <DocsInstallFact>[
+          DocsInstallFact(
+            label: 'Source',
+            value: commandDoc.sourcePath,
+            description:
+                'Authoritative implementation: ElCommand, ElCommandItem, '
+                'ElCommandGroup and elCommandScore. The truth this page '
+                'was written from.',
+          ),
+          const DocsInstallFact(
+            label: 'Sibling component',
+            value: 'lib/src/components/combobox.dart',
+            description:
+                'ElCombobox, the anchored form control that used to '
+                'share this page. It has its own page now, at '
+                '/components/combobox: reach for it when the reader '
+                'knows roughly what the value is called, and for '
+                'Command when they know what they want to do but not '
+                'what it is named.',
+          ),
+          const DocsInstallFact(
+            label: 'Package tests',
+            value: 'test/components_test.dart',
+            description:
+                'ElCommand and elCommandScore are covered inside the '
+                'shared components suite, including the re-sort. There '
+                'is no dedicated command_test.dart in the package.',
+          ),
+          const DocsInstallFact(
+            label: 'Docs test',
+            value: 'example/test/components_docs/command_test.dart',
+            description:
+                'Covers this page: the section order, every API table, '
+                'the live palette\'s filtering and re-sort, Enter '
+                'committing a row, and both themes at two viewport '
+                'widths.',
+          ),
+          const DocsInstallFact(
+            label: 'Edit these docs',
+            value: 'example/lib/components_docs/command/page.dart',
+            description: 'This file.',
+          ),
+        ],
+      ),
+    ),
+  ],
+);
 
 class CommandDocPage extends StatelessWidget {
   const CommandDocPage({super.key, this.onNavigate});
@@ -64,617 +366,328 @@ class CommandDocPage extends StatelessWidget {
     route: commandDoc.route,
     intro: DocsPageIntro(
       eyebrow: 'COMPONENTS / BASE',
-      title: commandDoc.title,
-      description: commandDoc.description,
+      title: commandDocSpec.title,
+      description: commandDocSpec.description,
     ),
     breadcrumbs: const <ElBreadcrumbEntry>[
       ElBreadcrumbEntry.link('Components'),
       ElBreadcrumbEntry.page('Command'),
     ],
-    toc: const <DocsTocEntry>[
-      DocsTocEntry(title: 'Installation', anchor: 'install'),
-      DocsTocEntry(title: 'Usage', anchor: 'usage'),
-      DocsTocEntry(title: 'Composition', anchor: 'composition'),
-      DocsTocEntry(title: 'Filtering', anchor: 'filtering'),
-      DocsTocEntry(title: 'Shortcuts', anchor: 'shortcuts'),
-      DocsTocEntry(title: 'Groups', anchor: 'groups'),
-      DocsTocEntry(title: 'Scrollable', anchor: 'scrollable'),
-      DocsTocEntry(title: 'In a panel', anchor: 'in-a-panel'),
-      DocsTocEntry(
-        title: 'API Reference',
-        anchor: 'api',
-        children: <DocsTocEntry>[
-          DocsTocEntry(title: 'ElCommand', anchor: 'api-elcommand'),
-          DocsTocEntry(
-            title: 'ElCommand static helpers',
-            anchor: 'api-elcommand-static',
-          ),
-          DocsTocEntry(title: 'ElCommandItem', anchor: 'api-elcommanditem'),
-          DocsTocEntry(title: 'ElCommandGroup', anchor: 'api-elcommandgroup'),
-          DocsTocEntry(title: 'elCommandScore', anchor: 'api-elcommandscore'),
-        ],
-      ),
-      DocsTocEntry(title: 'States', anchor: 'states'),
-      DocsTocEntry(title: 'Accessibility', anchor: 'accessibility'),
-      DocsTocEntry(title: 'Responsive', anchor: 'responsive'),
-      DocsTocEntry(title: 'Dependencies', anchor: 'dependencies'),
-      DocsTocEntry(title: 'Theming', anchor: 'theming'),
-      DocsTocEntry(title: 'Source', anchor: 'source'),
-    ],
+    toc: commandDocSpec.toc,
     previous: const DocsPageLink(
       title: 'Alert Dialog',
       route: '/components/alert-dialog',
     ),
     onNavigate: onNavigate,
-    child: const _CommandArticle(),
+    child: KeyedSubtree(
+      key: const ValueKey<String>('command-doc-article'),
+      child: ComponentDocPage(spec: commandDocSpec, header: false),
+    ),
   );
 }
 
-class _CommandArticle extends StatelessWidget {
-  const _CommandArticle();
+/* ── Showcase specimens ─────────────────────────────────────────────────── */
+
+/// The live command palette.
+///
+/// Row order is deliberate and is what the docs test measures: Open Wallet
+/// sits above Go to Stash in source order, and typing `t` reverses them —
+/// `t` opening the word "to" scores 0.891 where the `t` inside "Wallet"
+/// scores 0.17. Eclipse Vault leads, so it is the row cmdk arms before
+/// anything has been touched.
+class _CommandSpecimen extends StatefulWidget {
+  const _CommandSpecimen();
+
+  @override
+  State<_CommandSpecimen> createState() => _CommandSpecimenState();
+}
+
+class _CommandSpecimenState extends State<_CommandSpecimen> {
+  String? _lastPicked;
 
   @override
   Widget build(BuildContext context) {
     final ElThemeData theme = ElTheme.of(context);
-    return Column(
-      key: const ValueKey<String>('command-doc-article'),
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        _preview(),
-        SizedBox(height: el(6)),
-        _install(),
-        SizedBox(height: el(6)),
-        _usage(),
-        SizedBox(height: el(6)),
-        _composition(),
-        _filtering(theme),
-        _shortcuts(),
-        _groups(theme),
-        _scrollable(theme),
-        _inAPanel(),
-        _api(),
-        _states(),
-        _accessibility(theme),
-        _responsive(theme),
-        _dependencies(theme),
-        _theming(theme),
-        _source(),
-      ],
+    final String? picked = _lastPicked;
+    return KeyedSubtree(
+      key: const ValueKey<String>('command-doc-command-specimen'),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          ElCommand(
+            placeholder: 'Type to filter...',
+            emptyLabel: 'Nothing matches that.',
+            label: 'Docs command palette',
+            groups: <ElCommandGroup>[
+              ElCommandGroup(
+                heading: 'Packs',
+                items: <ElCommandItem>[
+                  ElCommandItem(
+                    label: 'Eclipse Vault',
+                    meta: '\$48.00',
+                    onSelect: () =>
+                        setState(() => _lastPicked = 'Eclipse Vault'),
+                  ),
+                ],
+              ),
+              ElCommandGroup(
+                heading: 'Actions',
+                separatorBefore: true,
+                items: <ElCommandItem>[
+                  ElCommandItem(
+                    label: 'Open Wallet',
+                    keywords: const <String>['money'],
+                    onSelect: () => setState(() => _lastPicked = 'Open Wallet'),
+                  ),
+                  ElCommandItem(
+                    label: 'Go to Stash',
+                    onSelect: () => setState(() => _lastPicked = 'Go to Stash'),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          SizedBox(height: el(3)),
+          ElText(
+            picked == null ? 'Nothing picked yet' : 'Last picked: $picked',
+            ElType.small,
+            color: theme.mutedForeground,
+          ),
+        ],
+      ),
     );
   }
+}
 
-  /// The live-demo slot shadcn renders before its first heading. [ElSection]
-  /// always carries a heading, so this is a bare [DocsCodeExample] instead:
-  /// no title text of its own in the article flow, and no TOC entry.
-  Widget _preview() => DocsCodeExample(
-    title: 'Command',
-    description:
-        'Live. Type in the search field: rows drop out as the filter '
-        'narrows, and the survivors re-rank inside their own group.',
-    preview: const _CommandSpecimen(),
-    manualFiles: const <DocsCodeFile>[
-      DocsCodeFile(
-        path: 'command_preview.dart',
-        title: 'The palette above',
-        code: _usageCommandCode,
-      ),
-    ],
+/// The same three rows as the Preview specimen, pre-filtered by a
+/// `TextEditingController` seeded with `t`: `_search` reads
+/// `_controller.text` directly (a getter, not state cached only on a
+/// listener), so the reorder is visible on first frame with nothing typed.
+class _FilteringSpecimen extends StatefulWidget {
+  const _FilteringSpecimen();
+
+  @override
+  State<_FilteringSpecimen> createState() => _FilteringSpecimenState();
+}
+
+class _FilteringSpecimenState extends State<_FilteringSpecimen> {
+  late final TextEditingController _controller = TextEditingController(
+    text: 't',
   );
 
-  Widget _install() => ElSection(
-    id: 'install',
-    title: 'Installation',
-    description:
-        'Already reachable today through both the published package and the '
-        'registry: ElCommand is barrel-exported, and the shipped manifest '
-        'resolves through the elattar CLI.',
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        ElPanel(
-          label: 'PACKAGE IMPORT',
-          note: 'DART',
-          child: const DocsSelectableCodeBlock(
-            code:
-                "import 'package:elattar_design_system/"
-                "elattar_design_system.dart';\n",
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final ElThemeData theme = ElTheme.of(context);
+    return KeyedSubtree(
+      key: const ValueKey<String>('command-doc-filtering-specimen'),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          ElCommand(
+            controller: _controller,
+            placeholder: 'Type to filter...',
+            emptyLabel: 'Nothing matches that.',
+            label: 'Filtering specimen',
+            groups: <ElCommandGroup>[
+              ElCommandGroup(
+                heading: 'Packs',
+                items: <ElCommandItem>[
+                  ElCommandItem(label: 'Eclipse Vault', meta: '\$48.00'),
+                ],
+              ),
+              ElCommandGroup(
+                heading: 'Actions',
+                separatorBefore: true,
+                items: <ElCommandItem>[
+                  ElCommandItem(
+                    label: 'Open Wallet',
+                    keywords: const <String>['money'],
+                  ),
+                  ElCommandItem(label: 'Go to Stash'),
+                ],
+              ),
+            ],
           ),
-        ),
-        SizedBox(height: el(4)),
-        DocsInstallFacts(
-          title: 'Manual and CLI facts',
-          facts: <DocsInstallFact>[
-            const DocsInstallFact(
-              label: 'CLI',
-              value: 'elattar add command',
-              description:
-                  'Resolves the shipped registry/components/command.json '
-                  'manifest. Use the package import above when you want the '
-                  'published package, or use the CLI when you want the '
-                  'generated local copy.',
-            ),
-            DocsInstallFact(
-              label: 'Manual copy target',
-              value: 'lib/components/ui/command.dart',
-              description:
-                  'Copy ${commandDoc.sourcePath} into components/ui and '
-                  'keep its relative imports pointed at the same '
-                  'foundation and sibling-component files: see '
-                  'Dependencies below for the exact list.',
-            ),
-            DocsInstallFact(
-              label: 'Registry dependencies',
-              value: commandDoc.dependencies.join(', '),
-              description:
-                  'What registry/components/command.json lists as '
-                  'registryDependencies, read directly from the shipped '
-                  'manifest.',
-            ),
-            const DocsInstallFact(
-              label: 'Upstream',
-              value: 'cmdk 1.1.1',
-              description:
-                  'elCommandScore is that library\'s own scorer, ported '
-                  'whole rather than approximated, because cmdk filters '
-                  'AND re-sorts and row order is therefore visible '
-                  'fidelity.',
-            ),
-            const DocsInstallFact(
-              label: 'Assets and shaders',
-              value: 'none',
-              description: 'Pure widget composition; nothing platform-gated.',
+          SizedBox(height: el(3)),
+          ElText(
+            'Query: "t" — Go to Stash outranks Open Wallet',
+            ElType.small,
+            color: theme.mutedForeground,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ShortcutsSpecimen extends StatelessWidget {
+  const _ShortcutsSpecimen();
+
+  @override
+  Widget build(BuildContext context) => KeyedSubtree(
+    key: const ValueKey<String>('command-doc-shortcuts-specimen'),
+    child: ElCommand(
+      placeholder: 'Type to filter...',
+      label: 'Shortcuts specimen',
+      groups: <ElCommandGroup>[
+        ElCommandGroup(
+          items: <ElCommandItem>[
+            ElCommandItem(
+              label: 'Open Wallet',
+              keywords: const <String>['money'],
+              shortcut: 'Ctrl+W',
+              meta: '2 accounts',
             ),
           ],
         ),
       ],
     ),
   );
+}
 
-  Widget _usage() => ElSection(
-    id: 'usage',
-    title: 'Usage',
-    description:
-        'The smallest correct construction: a list of groups, each holding '
-        'rows. Every example below only changes named arguments on top of '
-        'this.',
-    child: ElPanel(
-      label: 'DART',
-      note: 'MINIMAL',
-      child: const DocsSelectableCodeBlock(code: _usageCommandCode),
-    ),
-  );
+/// The same two-group composition Preview mounts, under its own key: the
+/// group heading and `separatorBefore` are what this section is about.
+class _GroupsSpecimen extends StatelessWidget {
+  const _GroupsSpecimen();
 
-  Widget _composition() => ElSection(
-    id: 'composition',
-    title: 'Composition',
-    description:
-        'shadcn assembles Command from five caller-composed pieces '
-        '(Command, CommandInput, CommandList, CommandGroup, CommandItem). '
-        'This port is one widget configured through data instead, so the '
-        'shape below is a data hierarchy rather than a widget tree: the '
-        'search field, the empty row and the scrolling list are built for '
-        'you and are not addressable from a call site.',
-    child: ElPanel(
-      label: 'SHAPE',
-      note: 'ANATOMY',
-      child: const DocsSelectableCodeBlock(code: _compositionTreeCommandCode),
-    ),
-  );
-
-  Widget _filtering(ElThemeData theme) => ElSection(
-    id: 'filtering',
-    title: 'Filtering',
-    description:
-        'Not in shadcn\'s own section list, and the single most surprising '
-        'thing about this component: the rows do not just disappear, they '
-        'move.',
-    child: ElPanel(
-      label: 'elCommandScore, a ported fuzzy ranker',
-      child: _bullets(theme, <String>[
-        'elCommandScore(string, abbreviation, [aliases]) returns a double: '
-            '0 hides the row entirely, 1 is a perfect match, and anything '
-            'between ranks it. Letters need not be adjacent, so "gts" '
-            'still finds "Go to Stash": but where a letter lands matters '
-            'enormously, because a match at the start of a word scores far '
-            'higher than the same letter inside one.',
-        'The measured worked example, from the source\'s own note and '
-            'reproducible in the live palette above: type a single "t". Go '
-            'to Stash rises above Open Wallet, reversing the source order, '
-            'because the "t" beginning the word "to" scores 0.891 while '
-            'the "t" buried inside "Wallet" scores 0.17.',
-        'An empty query short-circuits both passes, so source order '
-            'stands. That is deliberate rather than an optimisation: '
-            'scoring every row against "" returns the same value for all '
-            'of them, and sorting a flat field would shuffle the list for '
-            'no reason.',
-        'keywords are appended to the searchable string rather than scored '
-            'separately, so a row with keywords: [\'money\'] is matched as '
-            '"Open Wallet money".',
-        'What gets scored is ElCommandItem.searchValue, not the label. '
-            'Left null, value derives from label, subtitle, meta and '
-            'shortcut concatenated with nothing between them, which means '
-            'a price or a key hint IS searchable: the Eclipse Vault row '
-            'above carries \$48.00 as its meta, and typing 48 finds it.',
-        'Pass shouldFilter: false to hold the rows exactly as given and '
-            'filter server-side instead, or filter to substitute a scorer '
-            'of your own. Both leave the highlight behaviour untouched.',
-      ]),
-    ),
-  );
-
-  Widget _shortcuts() => ElSection(
-    id: 'shortcuts',
-    title: 'Shortcuts',
-    description:
-        'shadcn renders a CommandShortcut, a right-aligned key hint, '
-        'beside a row. ElCommandItem.shortcut is the same slot. meta (a '
-        'price, a count, a timestamp) is a second, independent trailing '
-        'slot, and a row can carry both at once: they differ in type spec, '
-        'in whether the selected row brightens them, and in whether they '
-        'displace the trailing check indicator.',
-    child: ElPanel(
-      label: 'DART',
-      note: 'SHORTCUT',
-      child: const DocsSelectableCodeBlock(code: _shortcutsCode),
-    ),
-  );
-
-  Widget _groups(ElThemeData theme) => ElSection(
-    id: 'groups',
-    title: 'Groups',
-    description:
-        'ElCommandGroup renders an optional heading above its rows, and '
-        'separatorBefore draws a rule above the whole group: both visible '
-        'in the palette above, where Actions carries a separator before it '
-        'and Packs does not.',
-    child: _bullets(theme, <String>[
-      'A group whose rows are all filtered away hides its heading with '
-          'them, and stops occupying space entirely: type a query neither '
-          'group can match and both headings disappear along with every '
-          'row.',
-      'The separator is not painted while a query is running. It leaves '
-          'the tree on the first keystroke and comes back when the field '
-          'is cleared, which is a one-hairline swing in the palette\'s '
-          'height.',
-      'Rows re-sort inside their own group on every keystroke, but the '
-          'groups themselves never move: a faithfully reproduced upstream '
-          'bug rather than a design choice. cmdk\'s second sort pass '
-          'builds its selector from a React useId while the element '
-          'carries its heading instead, so the selector matches nothing '
-          'and the pass is a silent no-op. ElCommand.sortsGroups is a '
-          'static false that records it.',
-      'Alt+ArrowDown and Alt+ArrowUp step to the next or previous '
-          'group\'s first enabled row, falling back to a plain one-row '
-          'step when there is no such group.',
-    ]),
-  );
-
-  Widget _scrollable(ElThemeData theme) => ElSection(
-    id: 'scrollable',
-    title: 'Scrollable',
-    description:
-        'Once the rows need more room than the palette allows, the list '
-        'caps its height and scrolls internally rather than growing the '
-        'page around it: ElCommand.listMaxHeight is that cap, and nothing '
-        'above it changes the palette\'s outer size. An arrow move scrolls '
-        'the newly highlighted row into view; a hover deliberately does '
-        'not, because a row you just pointed at is already on screen.',
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        _bullets(theme, <String>[
-          'The palette above stays short enough that the cap never '
-              'triggers. A caller feeding it twenty rows would see the '
-              'same internal scroll, not a taller palette.',
-        ]),
-        SizedBox(height: el(3)),
-        ElPanel(
-          label: 'ABOUT, BASIC, RTL',
-          note: 'SKIPPED',
-          child: _bullets(theme, <String>[
-            'About: shadcn opens with a credit to cmdk under its own '
-                'heading. This page credits it in Installation instead, '
-                'beside the version the scorer was ported from, where a '
-                'reader deciding whether to adopt the component will '
-                'actually be looking.',
-            'Basic: their demo is CommandDialog, the palette inside a '
-                'centred dialog. ElCommand.inDialog reproduces what that '
-                'presentation does to the palette itself (its own fill '
-                'and border, and a wider row radius), but the dialog '
-                'wrapper is recorded, not built, so there is no live '
-                'specimen to show and none is faked here.',
-            'RTL: there is no Directionality or TextDirection branch '
-                'anywhere in command.dart, and the docs shell this page '
-                'renders inside carries no direction toggle to '
-                'demonstrate one against.',
-          ]),
+  @override
+  Widget build(BuildContext context) => KeyedSubtree(
+    key: const ValueKey<String>('command-doc-groups-specimen'),
+    child: ElCommand(
+      placeholder: 'Type to filter...',
+      label: 'Groups specimen',
+      groups: <ElCommandGroup>[
+        ElCommandGroup(
+          heading: 'Packs',
+          items: <ElCommandItem>[
+            ElCommandItem(label: 'Eclipse Vault', meta: '\$48.00'),
+          ],
         ),
-      ],
-    ),
-  );
-
-  Widget _inAPanel() => ElSection(
-    id: 'in-a-panel',
-    title: 'In a panel',
-    description:
-        'ElCommand owns neither its opening nor its dismissal, because it '
-        'has no container of its own to dismiss. Whatever mounts it owns '
-        'both: this site\'s own header search is the worked example.',
-    child: ElPanel(
-      label: 'DART',
-      note: 'COMMAND IN A SEARCH PANEL',
-      child: const DocsSelectableCodeBlock(code: _inAPanelCode),
-    ),
-  );
-
-  Widget _api() => ElSection(
-    id: 'api',
-    title: 'API Reference',
-    description:
-        'Every constructor parameter, static helper and top-level '
-        'function lib/src/components/command.dart declares: one table '
-        'each, read off the real constructors.',
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        KeyedSubtree(
-          key: docsAnchorKey('api-elcommand'),
-          child: const DocsApiTable(title: 'ElCommand', facts: _commandFacts),
-        ),
-        SizedBox(height: el(6)),
-        KeyedSubtree(
-          key: docsAnchorKey('api-elcommand-static'),
-          child: const DocsApiTable(
-            title: 'ElCommand static helpers',
-            facts: _commandStaticFacts,
-          ),
-        ),
-        SizedBox(height: el(6)),
-        KeyedSubtree(
-          key: docsAnchorKey('api-elcommanditem'),
-          child: const DocsApiTable(
-            title: 'ElCommandItem',
-            facts: _commandItemFacts,
-          ),
-        ),
-        SizedBox(height: el(6)),
-        KeyedSubtree(
-          key: docsAnchorKey('api-elcommandgroup'),
-          child: const DocsApiTable(
-            title: 'ElCommandGroup',
-            facts: _commandGroupFacts,
-          ),
-        ),
-        SizedBox(height: el(6)),
-        KeyedSubtree(
-          key: docsAnchorKey('api-elcommandscore'),
-          child: const DocsApiTable(
-            title: 'elCommandScore(string, abbreviation, [aliases]) → double',
-            facts: _commandScoreFacts,
-          ),
-        ),
-      ],
-    ),
-  );
-
-  Widget _states() => ElSection(
-    id: 'states',
-    title: 'States',
-    description:
-        'Read off _DsCommandState, not inferred: the palette is always '
-        'open, so every state below is a state of its list rather than of '
-        'its visibility.',
-    child: const DocsStateMatrix(facts: _stateFacts),
-  );
-
-  Widget _accessibility(ElThemeData theme) => ElSection(
-    id: 'accessibility',
-    title: 'Accessibility',
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        ElPanel(
-          label: 'Keyboard and semantics',
-          child: _bullets(theme, <String>[
-            'The caret never leaves the search field. Arrow keys move a '
-                'highlight rather than focus, so typing keeps working '
-                'throughout: the root key handler sits above the text '
-                'field in the tree and sees Home, End and the arrows '
-                'before the field turns them into caret moves.',
-            'ArrowDown and ArrowUp step one row; Home and End jump to the '
-                'first and last; Alt+Arrow steps by group; Meta+Arrow '
-                'jumps to the far end. Enter and NumpadEnter commit the '
-                'highlighted row and fire its onSelect.',
-            'Ctrl+N and Ctrl+J step down, Ctrl+P and Ctrl+K step up, '
-                'while vimBindings is true (the default). Worth naming: '
-                'the reference advertises Ctrl+K as the shortcut that '
-                'OPENS a palette, while inside one Ctrl+K already means '
-                'move up.',
-            'loop is false by default, so the arrows stop dead at both '
-                'ends rather than wrapping.',
-            'Each row reports itself as a button carrying its selected '
-                'and enabled state, and its accessible name joins the '
-                'label to the shortcut when a row has one. The palette as '
-                'a whole is a semantics container named by label.',
-          ]),
-        ),
-        SizedBox(height: el(5)),
-        ElPanel(
-          label: 'Known gaps',
-          note: 'REPORTED, NOT IDEALISED',
-          child: _bullets(theme, <String>[
-            'Known gap: no live region. Nothing announces how many rows '
-                'survived the filter. A sighted reader sees the list '
-                'collapse from twenty rows to two; a screen-reader user is '
-                'told nothing, and finds out only by arrowing through what '
-                'is left. The reference has the same hole, and closing it '
-                'means adding a live region that speaks the result count '
-                'on each keystroke: a real change to the component, not a '
-                'parameter.',
-            'Known gap: the highlight is painted but not announced. No '
-                'relationship is wired from the search field to the row '
-                'Enter would commit, so assistive tech does not read the '
-                'active option as the highlight moves.',
-            'Known gap: no listbox role wiring. The palette does not '
-                'declare itself as a listbox owning a set of options, so '
-                'the rows read as ordinary buttons that happen to sit '
-                'under a text field.',
-            'Known gap: the search field has no focus affordance at all, '
-                'and this one is reproduced deliberately. The reference '
-                'kills the socket shadow outright and its focus predicate '
-                'looks for a data-slot the command input never carries, so '
-                'neither the ring nor a border change can ever fire. It is '
-                'the one text field in the system that shows nothing when '
-                'focused.',
-          ]),
-        ),
-      ],
-    ),
-  );
-
-  Widget _responsive(ElThemeData theme) => ElSection(
-    id: 'responsive',
-    title: 'Responsive',
-    child: _bullets(theme, <String>[
-      'No breakpoint branching anywhere in command.dart: BuildContext '
-          'width is never read for a layout decision, and the same widget '
-          'tree renders at 390px and 1440px.',
-      'The palette fills the width it is given and caps its list height, '
-          'scrolling inside it, so a phone viewport shows the same palette '
-          'as a desktop one: just shorter, with more scrolling.',
-      'Every measurement is a fixed 4px-grid value through el() or a '
-          'component type spec, never a viewport fraction: see the static '
-          'helpers table above for the whole set.',
-      'Row text is single-line and ellipsised rather than wrapped, so a '
-          'long label shortens instead of growing the row. The one row '
-          'that is taller is a row carrying a subtitle, which is a second '
-          'line by construction.',
-      'Platform parity: Android, iOS, Web, macOS, Windows and Linux all '
-          'render the same tree. No dart:io Platform branch anywhere in '
-          'the file, and the vim bindings are Ctrl-based on every one of '
-          'them.',
-    ]),
-  );
-
-  Widget _dependencies(ElThemeData theme) => ElSection(
-    id: 'dependencies',
-    title: 'Dependencies',
-    child: _bullets(theme, <String>[
-      'File: lib/src/components/command.dart. One file, no companions, and '
-          'shipped registry manifest.',
-      'Flutter imports: dart:math (the score decay), '
-          'package:flutter/services.dart (LogicalKeyboardKey, '
-          'HardwareKeyboard, KeyEvent), package:flutter/widgets.dart.',
-      'Foundation imports: foundation/colors.dart, '
-          'foundation/spacing.dart (el()), foundation/theme.dart, '
-          'foundation/typography.dart, theme_scope.dart (ElText, ElTheme).',
-      'Component imports: icon.dart (ElIcon, ElIconGlyph, ElIconTone), '
-          'icon_paths.dart and icon_paths.g.dart (ElLucideGlyph, for '
-          'ElCommandItem.lucideIcon), input.dart (ElInput, the search '
-          'field), input_group.dart (ElInputGroupAddon, for the addon '
-          'inset only).',
-      'Notably NOT imported: popover.dart. The palette is inline and '
-          'anchors to nothing, which is why nothing on this page needs an '
-          'Overlay to work: see Composition.',
-      'It also does not import input_group.dart\'s own ElInputGroup '
-          'widget, only its addon inset. That widget fixes a 40px pill, a '
-          'card fill and a pressed shadow, all three of which this control '
-          'overrides, so the recipe is reused where the widget cannot be.',
-      'Assets: none. Shaders: none.',
-    ]),
-  );
-
-  Widget _theming(ElThemeData theme) => ElSection(
-    id: 'theming',
-    title: 'Theming',
-    child: _bullets(theme, <String>[
-      'Every colour resolves from ElTheme.of(context) at build time: the '
-          'palette fill from card (or popover under inDialog), its stroke '
-          'from border, the search field from input at a fixed alpha for '
-          'both fill and border, the highlighted row from muted, headings '
-          'and trailing meta from mutedForeground. Flipping '
-          'ElThemeController re-resolves all of them on the next frame.',
-      'The highlighted row uses muted, which is a third highlight token '
-          'in this corpus after the select row\'s accent and the combobox '
-          'row\'s accent. Reproduced drift, not a choice this port made.',
-      'Type is by role, never by size: rows and the empty row read the '
-          'sheet-body spec, headings the menu-heading spec (the weight-500 '
-          'member of a three-way group-label split), shortcuts the '
-          'menu-shortcut spec, and subtitles and meta the caption spec. '
-          'The prices riding the shortcut spec are sans rather than the '
-          'numeric foundation, which is reproduced upstream drift.',
-      'Shape is fixed rather than parameterised: the palette corners at '
-          'the extra-large radius, its search field at large, and a row at '
-          'medium (large under inDialog). No caller-facing radius '
-          'parameter exists.',
-      'Nothing here animates. There is no transition on the row '
-          'highlight, so it snaps: which also means this component has '
-          'nothing to reduce under a reduced-motion setting.',
-    ]),
-  );
-
-  Widget _source() => ElSection(
-    id: 'source',
-    title: 'Source',
-    child: DocsInstallFacts(
-      title: 'Reference',
-      facts: <DocsInstallFact>[
-        DocsInstallFact(
-          label: 'Source',
-          value: commandDoc.sourcePath,
-          description:
-              'Authoritative implementation: ElCommand, ElCommandItem, '
-              'ElCommandGroup and elCommandScore. The truth this page was '
-              'written from.',
-        ),
-        const DocsInstallFact(
-          label: 'Sibling component',
-          value: 'lib/src/components/combobox.dart',
-          description:
-              'ElCombobox, the anchored form control that used to share '
-              'this page. It has its own page now, at /components/'
-              'combobox: reach for it when the reader knows roughly what '
-              'the value is called, and for Command when they know what '
-              'they want to do but not what it is named.',
-        ),
-        const DocsInstallFact(
-          label: 'Package tests',
-          value: 'test/components_test.dart',
-          description:
-              'ElCommand and elCommandScore are covered inside the shared '
-              'components suite, including the re-sort. There is no '
-              'dedicated command_test.dart in the package.',
-        ),
-        const DocsInstallFact(
-          label: 'Docs test',
-          value: 'example/test/components_docs/command_test.dart',
-          description:
-              'Covers this page: the section order, every API table, the '
-              'live palette\'s filtering and re-sort, Enter committing a '
-              'row, and both themes at two viewport widths.',
-        ),
-        const DocsInstallFact(
-          label: 'Edit these docs',
-          value: 'example/lib/components_docs/command/page.dart',
-          description: 'This file.',
+        ElCommandGroup(
+          heading: 'Actions',
+          separatorBefore: true,
+          items: <ElCommandItem>[
+            ElCommandItem(label: 'Open Wallet'),
+            ElCommandItem(label: 'Go to Stash'),
+          ],
         ),
       ],
     ),
   );
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
-  crossAxisAlignment: CrossAxisAlignment.start,
-  children: <Widget>[
-    for (final String line in lines) ...<Widget>[
-      ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+/// Fifteen rows in one group: enough to exceed `ElCommand.listMaxHeight`
+/// (288px) and genuinely scroll, rather than describe scrolling in the
+/// abstract the way the old page's static demo did.
+class _ScrollableSpecimen extends StatelessWidget {
+  const _ScrollableSpecimen();
+
+  @override
+  Widget build(BuildContext context) => KeyedSubtree(
+    key: const ValueKey<String>('command-doc-scrollable-specimen'),
+    child: ElCommand(
+      placeholder: 'Type to filter...',
+      label: 'Scrollable specimen',
+      groups: <ElCommandGroup>[
+        ElCommandGroup(
+          heading: 'Every command',
+          items: <ElCommandItem>[
+            for (int i = 1; i <= 15; i++) ElCommandItem(label: 'Command $i'),
+          ],
+        ),
+      ],
+    ),
+  );
+}
+
+/// A small stand-in for this site's own header search: a button opens a
+/// bordered panel holding a live [ElCommand]; picking a row closes the
+/// panel itself, the container dismissing itself the way [ElCommand] never
+/// does on its own.
+class _InAPanelSpecimen extends StatefulWidget {
+  const _InAPanelSpecimen();
+
+  @override
+  State<_InAPanelSpecimen> createState() => _InAPanelSpecimenState();
+}
+
+class _InAPanelSpecimenState extends State<_InAPanelSpecimen> {
+  bool _open = false;
+  String? _lastPicked;
+
+  @override
+  Widget build(BuildContext context) {
+    final ElThemeData theme = ElTheme.of(context);
+    return KeyedSubtree(
+      key: const ValueKey<String>('command-doc-in-a-panel-specimen'),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          ElButton(
+            key: const ValueKey<String>('command-doc-panel-trigger'),
+            variant: ElButtonVariant.outline,
+            label: _open ? 'Close search panel' : 'Open search panel',
+            onPressed: () => setState(() => _open = !_open),
+            child: ElText(
+              _open ? 'Close search panel' : 'Open search panel',
+              ElComponentType.buttonLabel,
+            ),
+          ),
+          if (_open) ...<Widget>[
+            SizedBox(height: el(3)),
+            Container(
+              padding: EdgeInsets.all(el(2)),
+              decoration: BoxDecoration(
+                color: theme.popover,
+                border: Border.all(color: theme.border),
+                borderRadius: BorderRadius.circular(ElRadii.lg),
+              ),
+              child: ElCommand(
+                placeholder: 'Search the docs...',
+                label: 'Docs search panel',
+                groups: <ElCommandGroup>[
+                  ElCommandGroup(
+                    items: <ElCommandItem>[
+                      ElCommandItem(
+                        label: 'Installation',
+                        onSelect: () => setState(() {
+                          _lastPicked = 'Installation';
+                          _open = false;
+                        }),
+                      ),
+                      ElCommandItem(
+                        label: 'Theming',
+                        onSelect: () => setState(() {
+                          _lastPicked = 'Theming';
+                          _open = false;
+                        }),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+          SizedBox(height: el(3)),
+          ElText(
+            _lastPicked == null
+                ? 'Nothing picked yet'
+                : 'Last picked: $_lastPicked (panel closed itself)',
+            ElType.small,
+            color: theme.mutedForeground,
+          ),
+        ],
       ),
-      SizedBox(height: el(2)),
-    ],
-  ],
-);
+    );
+  }
+}
 
 const String _usageCommandCode = '''
 import 'package:elattar_design_system/elattar_design_system.dart';
@@ -722,6 +735,26 @@ const String _compositionTreeCommandCode =
 │        └─ ElCommandItem           one filterable, selectable row
 └─ (built for you) the search field, the empty row, the scrolling list''';
 
+const String _filteringCode = '''ElCommand(
+  controller: TextEditingController(text: 't'), // pre-fills the query
+  groups: <ElCommandGroup>[
+    ElCommandGroup(
+      heading: 'Packs',
+      items: <ElCommandItem>[
+        ElCommandItem(label: 'Eclipse Vault', meta: '\\\$48.00'),
+      ],
+    ),
+    ElCommandGroup(
+      heading: 'Actions',
+      separatorBefore: true,
+      items: <ElCommandItem>[
+        ElCommandItem(label: 'Open Wallet', keywords: <String>['money']),
+        ElCommandItem(label: 'Go to Stash'), // 't' scores this row higher
+      ],
+    ),
+  ],
+)''';
+
 const String _shortcutsCode = '''
 ElCommandItem(
   label: 'Open Wallet',
@@ -730,6 +763,19 @@ ElCommandItem(
   meta: '2 accounts',     // and a second, independent trailing slot
   onSelect: openWallet,
 )''';
+
+const String _scrollableCode = '''ElCommand(
+  groups: <ElCommandGroup>[
+    ElCommandGroup(
+      heading: 'Every command',
+      items: <ElCommandItem>[
+        for (int i = 1; i <= 15; i++) ElCommandItem(label: 'Command \$i'),
+      ],
+    ),
+  ],
+)
+// ElCommand.listMaxHeight (288px) caps the row list; fifteen rows exceed it
+// and the list scrolls internally instead of growing the palette.''';
 
 const String _inAPanelCode = '''
 // This site's own header search: Command mounted in a panel that owns both
@@ -746,6 +792,245 @@ ElPanel(
     onValueChanged: (String value) => setState(() => _highlighted = value),
   ),
 )''';
+
+/* ── Disclosure content ─────────────────────────────────────────────────── */
+
+class _ApiReferenceContent extends StatelessWidget {
+  const _ApiReferenceContent();
+
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: <Widget>[
+      const DocsAnchor(
+        id: 'api-elcommand',
+        child: DocsApiTable(title: 'ElCommand', facts: _commandFacts),
+      ),
+      SizedBox(height: el(6)),
+      const DocsAnchor(
+        id: 'api-elcommand-static',
+        child: DocsApiTable(
+          title: 'ElCommand static helpers',
+          facts: _commandStaticFacts,
+        ),
+      ),
+      SizedBox(height: el(6)),
+      const DocsAnchor(
+        id: 'api-elcommanditem',
+        child: DocsApiTable(title: 'ElCommandItem', facts: _commandItemFacts),
+      ),
+      SizedBox(height: el(6)),
+      const DocsAnchor(
+        id: 'api-elcommandgroup',
+        child: DocsApiTable(
+          title: 'ElCommandGroup',
+          facts: _commandGroupFacts,
+        ),
+      ),
+      SizedBox(height: el(6)),
+      const DocsAnchor(
+        id: 'api-elcommandscore',
+        child: DocsApiTable(
+          title: 'elCommandScore(string, abbreviation, [aliases]) → double',
+          facts: _commandScoreFacts,
+        ),
+      ),
+    ],
+  );
+}
+
+class _AccessibilityContent extends StatelessWidget {
+  const _AccessibilityContent();
+
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: <Widget>[
+      _bullets(ElTheme.of(context), <String>[
+        'Each row reports itself as a button carrying its selected and '
+            'enabled state, and its accessible name joins the label to '
+            'the shortcut when a row has one. The palette as a whole is '
+            'a semantics container named by label.',
+      ]),
+      SizedBox(height: el(3)),
+      ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+        child: ElText(
+          'Known gaps, reported rather than idealised.',
+          ElType.section,
+          color: ElTheme.of(context).destructiveInk,
+        ),
+      ),
+      SizedBox(height: el(2)),
+      _bullets(ElTheme.of(context), <String>[
+        'Known gap: no live region. Nothing announces how many rows '
+            'survived the filter. A sighted reader sees the list '
+            'collapse from twenty rows to two; a screen-reader user is '
+            'told nothing, and finds out only by arrowing through what '
+            'is left. The reference has the same hole, and closing it '
+            'means adding a live region that speaks the result count on '
+            'each keystroke: a real change to the component, not a '
+            'parameter.',
+        'Known gap: the highlight is painted but not announced. No '
+            'relationship is wired from the search field to the row '
+            'Enter would commit, so assistive tech does not read the '
+            'active option as the highlight moves.',
+        'Known gap: no listbox role wiring. The palette does not '
+            'declare itself as a listbox owning a set of options, so '
+            'the rows read as ordinary buttons that happen to sit under '
+            'a text field.',
+        'Known gap: the search field has no focus affordance at all, '
+            'and this one is reproduced deliberately. The reference '
+            'kills the socket shadow outright and its focus predicate '
+            'looks for a data-slot the command input never carries, so '
+            'neither the ring nor a border change can ever fire. It is '
+            'the one text field in the system that shows nothing when '
+            'focused.',
+      ]),
+    ],
+  );
+}
+
+class _KeyboardContent extends StatelessWidget {
+  const _KeyboardContent();
+
+  @override
+  Widget build(BuildContext context) =>
+      _bullets(ElTheme.of(context), <String>[
+        'The caret never leaves the search field. Arrow keys move a '
+            'highlight rather than focus, so typing keeps working '
+            'throughout: the root key handler sits above the text field '
+            'in the tree and sees Home, End and the arrows before the '
+            'field turns them into caret moves.',
+        'ArrowDown and ArrowUp step one row; Home and End jump to the '
+            'first and last; Alt+Arrow steps by group; Meta+Arrow jumps '
+            'to the far end. Enter and NumpadEnter commit the '
+            'highlighted row and fire its onSelect.',
+        'Ctrl+N and Ctrl+J step down, Ctrl+P and Ctrl+K step up, while '
+            'vimBindings is true (the default). Worth naming: the '
+            'reference advertises Ctrl+K as the shortcut that OPENS a '
+            'palette, while inside one Ctrl+K already means move up.',
+        'loop is false by default, so the arrows stop dead at both ends '
+            'rather than wrapping.',
+      ]);
+}
+
+class _ResponsiveContent extends StatelessWidget {
+  const _ResponsiveContent();
+
+  @override
+  Widget build(BuildContext context) =>
+      _bullets(ElTheme.of(context), <String>[
+        'No breakpoint branching anywhere in command.dart: BuildContext '
+            'width is never read for a layout decision, and the same '
+            'widget tree renders at 390px and 1440px.',
+        'The palette fills the width it is given and caps its list '
+            'height, scrolling inside it, so a phone viewport shows the '
+            'same palette as a desktop one: just shorter, with more '
+            'scrolling.',
+        'Every measurement is a fixed 4px-grid value through el() or a '
+            'component type spec, never a viewport fraction: see the '
+            'static helpers table in API Reference for the whole set.',
+        'Row text is single-line and ellipsised rather than wrapped, so '
+            'a long label shortens instead of growing the row. The one '
+            'row that is taller is a row carrying a subtitle, which is '
+            'a second line by construction.',
+        'Platform parity: Android, iOS, Web, macOS, Windows and Linux '
+            'all render the same tree. No dart:io Platform branch '
+            'anywhere in the file, and the vim bindings are Ctrl-based '
+            'on every one of them.',
+      ]);
+}
+
+class _DependenciesContent extends StatelessWidget {
+  const _DependenciesContent();
+
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: <Widget>[
+      _bullets(ElTheme.of(context), <String>[
+        'File: lib/src/components/command.dart. One file, no '
+            'companions, and shipped registry manifest.',
+        'Flutter imports: dart:math (the score decay), '
+            'package:flutter/services.dart (LogicalKeyboardKey, '
+            'HardwareKeyboard, KeyEvent), package:flutter/widgets.dart.',
+        'Foundation imports: foundation/colors.dart, '
+            'foundation/spacing.dart (el()), foundation/theme.dart, '
+            'foundation/typography.dart, theme_scope.dart (ElText, '
+            'ElTheme).',
+        'Component imports: icon.dart (ElIcon, ElIconGlyph, '
+            'ElIconTone), icon_paths.dart and icon_paths.g.dart '
+            '(ElLucideGlyph, for ElCommandItem.lucideIcon), input.dart '
+            '(ElInput, the search field), input_group.dart '
+            '(ElInputGroupAddon, for the addon inset only).',
+        'Notably NOT imported: popover.dart. The palette is inline and '
+            'anchors to nothing, which is why nothing on this page '
+            'needs an Overlay to work: see Composition.',
+        'It also does not import input_group.dart\'s own ElInputGroup '
+            'widget, only its addon inset. That widget fixes a 40px '
+            'pill, a card fill and a pressed shadow, all three of which '
+            'this control overrides, so the recipe is reused where the '
+            'widget cannot be.',
+        'Assets: none. Shaders: none.',
+      ]),
+      SizedBox(height: el(4)),
+      const DocsLinkRow(
+        links: <DocsLink>[
+          DocsLink(label: 'Icon', route: '/components/icon'),
+          DocsLink(label: 'Input group', route: '/components/input_group'),
+        ],
+      ),
+    ],
+  );
+}
+
+class _ThemingContent extends StatelessWidget {
+  const _ThemingContent();
+
+  @override
+  Widget build(BuildContext context) =>
+      _bullets(ElTheme.of(context), <String>[
+        'Every colour resolves from ElTheme.of(context) at build time: '
+            'the palette fill from card (or popover under inDialog), '
+            'its stroke from border, the search field from input at a '
+            'fixed alpha for both fill and border, the highlighted row '
+            'from muted, headings and trailing meta from '
+            'mutedForeground. Flipping ElThemeController re-resolves '
+            'all of them on the next frame.',
+        'The highlighted row uses muted, which is a third highlight '
+            'token in this corpus after the select row\'s accent and '
+            'the combobox row\'s accent. Reproduced drift, not a choice '
+            'this port made.',
+        'Type is by role, never by size: rows and the empty row read '
+            'the sheet-body spec, headings the menu-heading spec (the '
+            'weight-500 member of a three-way group-label split), '
+            'shortcuts the menu-shortcut spec, and subtitles and meta '
+            'the caption spec. The prices riding the shortcut spec are '
+            'sans rather than the numeric foundation, which is '
+            'reproduced upstream drift.',
+        'Shape is fixed rather than parameterised: the palette corners '
+            'at the extra-large radius, its search field at large, and '
+            'a row at medium (large under inDialog). No caller-facing '
+            'radius parameter exists.',
+        'Nothing here animates. There is no transition on the row '
+            'highlight, so it snaps: which also means this component '
+            'has nothing to reduce under a reduced-motion setting.',
+      ]);
+}
+
+Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: <Widget>[
+    for (final String line in lines) ...<Widget>[
+      ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+      ),
+      SizedBox(height: el(2)),
+    ],
+  ],
+);
 
 // ── API tables, read off lib/src/components/command.dart ────────────────────
 
@@ -775,7 +1060,8 @@ const List<DocsApiFact> _commandFacts = <DocsApiFact>[
     type: 'TextEditingController?',
     description:
         'Optional. Defaults to null, which lets the palette own its own. '
-        'Supply one to read or clear the query from outside.',
+        'Supply one to read or clear the query from outside — the '
+        'Filtering specimen above pre-seeds one with "t".',
   ),
   DocsApiFact(
     name: 'focusNode',
@@ -1141,74 +1427,3 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     userSignal: 'Identical either way.',
   ),
 ];
-
-/// The live command palette.
-///
-/// Row order is deliberate and is what the docs test measures: Open Wallet
-/// sits above Go to Stash in source order, and typing `t` reverses them —
-/// `t` opening the word "to" scores 0.891 where the `t` inside "Wallet"
-/// scores 0.17. Eclipse Vault leads, so it is the row cmdk arms before
-/// anything has been touched.
-class _CommandSpecimen extends StatefulWidget {
-  const _CommandSpecimen();
-
-  @override
-  State<_CommandSpecimen> createState() => _CommandSpecimenState();
-}
-
-class _CommandSpecimenState extends State<_CommandSpecimen> {
-  String? _lastPicked;
-
-  @override
-  Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
-    final String? picked = _lastPicked;
-    return KeyedSubtree(
-      key: const ValueKey<String>('command-doc-command-specimen'),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          ElCommand(
-            placeholder: 'Type to filter...',
-            emptyLabel: 'Nothing matches that.',
-            label: 'Docs command palette',
-            groups: <ElCommandGroup>[
-              ElCommandGroup(
-                heading: 'Packs',
-                items: <ElCommandItem>[
-                  ElCommandItem(
-                    label: 'Eclipse Vault',
-                    meta: '\$48.00',
-                    onSelect: () =>
-                        setState(() => _lastPicked = 'Eclipse Vault'),
-                  ),
-                ],
-              ),
-              ElCommandGroup(
-                heading: 'Actions',
-                separatorBefore: true,
-                items: <ElCommandItem>[
-                  ElCommandItem(
-                    label: 'Open Wallet',
-                    keywords: const <String>['money'],
-                    onSelect: () => setState(() => _lastPicked = 'Open Wallet'),
-                  ),
-                  ElCommandItem(
-                    label: 'Go to Stash',
-                    onSelect: () => setState(() => _lastPicked = 'Go to Stash'),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          SizedBox(height: el(3)),
-          ElText(
-            picked == null ? 'Nothing picked yet' : 'Last picked: $picked',
-            ElType.small,
-            color: theme.mutedForeground,
-          ),
-        ],
-      ),
-    );
-  }
-}

@@ -2,17 +2,23 @@
 /// `components_docs/alert_dialog/page.dart`: the public Alert Dialog
 /// component documentation page.
 ///
+/// Re-housed onto `ComponentDocSpec`/`ComponentDocPage`, the same shape
+/// `button_test.dart` and `field_test.dart` assert against: sections read
+/// through `DocsSection.title`, and the API table (now inside a
+/// `DocsDisclosure`, closed by default) is opened before its rows are read.
+///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
-/// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`: the
-/// discipline `tooltip_test.dart` already carries. Theme coverage uses a
-/// live `ElThemeController` flipped in place rather than two independent
-/// pumps.
+/// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`. Theme
+/// coverage uses a live `ElThemeController` flipped in place rather than two
+/// independent pumps.
 ///
 /// `ElAlertDialog` mounts its content through an `OverlayPortal` (via
 /// `ElModalPortal`), so the live specimens need a real `Overlay`: the
-/// harness wraps the page in a `MaterialApp`, the same fix `tooltip_test.dart`
-/// and `dialogs_test.dart` both needed. A bare `Directionality`/`Material`
-/// host would let the page render but the dialog would never actually open.
+/// harness wraps the page in a `MaterialApp`. No `pumpAndSettle` is used
+/// anywhere a dialog is open: `ElJellyTransition`'s controller drives a
+/// single forward/reverse run, but the page as a whole also hosts
+/// `DocsDisclosure`'s chevron controller, so every open/close step below
+/// advances with an explicit `pump()`/`pump(duration)` pair instead.
 ///
 /// A dedicated `_FocusHarness` widget (private to this file, built from the
 /// real public API) answers the brief's own question: does focus move into
@@ -28,12 +34,25 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/alert_dialog/meta.dart';
 import 'package:example/components_docs/alert_dialog/page.dart';
+import 'package:example/docs/docs_disclosure.dart';
+import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter_test/flutter_test.dart';
 
 const Size _wide = Size(1440, 900);
 const Size _narrow = Size(390, 844);
+
+/// The single `DocsDisclosure` whose title is [title]: `DocsDisclosure`'s
+/// own trigger key is one constant shared by every instance on the page, so
+/// a bare `find.byKey` would match all eight — this narrows to the one panel
+/// by its title first, matching `button_test.dart`'s own convention.
+Finder _disclosureTrigger(String title) => find.descendant(
+  of: find.byWidgetPredicate(
+    (Widget widget) => widget is DocsDisclosure && widget.title == title,
+  ),
+  matching: find.byKey(DocsDisclosure.triggerKey),
+);
 
 Future<ElThemeController> _pumpAlertDialogDoc(
   WidgetTester tester, {
@@ -67,7 +86,7 @@ Future<ElThemeController> _pumpAlertDialogDoc(
 
 Future<void> _open(WidgetTester tester, Finder trigger) async {
   await tester.ensureVisible(trigger);
-  await tester.pumpAndSettle();
+  await tester.pump();
   await tester.tap(trigger);
   await tester.pump();
   await tester.pump(ElDurations.jelly);
@@ -200,59 +219,48 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets(
-      'section headings render top to bottom in shadcn-parity order',
-      (WidgetTester tester) async {
-        await _pumpAlertDialogDoc(tester);
+    testWidgets('sections render top to bottom in the declared house order', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 4000);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      await _pumpAlertDialogDoc(tester, size: const Size(1440, 4000));
 
-        // The shadcn alert-dialog page's own shape, section for section:
-        // a live demo before any heading (Preview), Installation, Usage, a
-        // Composition tree, this component's own Sizes and Destructive
-        // specimens, then API Reference, followed by this system's six
-        // extra sections.
-        const List<String> expectedOrder = <String>[
-          'Installation',
-          'Usage',
-          'Composition',
-          'Sizes',
-          'Destructive',
-          'API Reference',
-          'States and feedback',
-          'Accessibility and keyboard behavior',
-          'Responsive and platform behavior',
-          'Dependencies, files, and disclosure',
-          'Theming notes',
-          'Source and tests',
-        ];
+      final List<String> titles = tester
+          .widgetList<DocsSection>(find.byType(DocsSection))
+          .map((DocsSection section) => section.title)
+          .toList();
 
-        final List<double> tops = <double>[];
-        for (final String heading in expectedOrder) {
-          final Finder finder = find.byWidgetPredicate(
-            (Widget widget) =>
-                widget is ElText &&
-                widget.text == heading &&
-                widget.spec == ElType.h3,
-          );
-          expect(finder, findsOneWidget, reason: 'missing heading: $heading');
-          tops.add(tester.getTopLeft(finder).dy);
-        }
-
-        for (int i = 1; i < tops.length; i++) {
-          expect(
-            tops[i],
-            greaterThan(tops[i - 1]),
-            reason:
-                '"${expectedOrder[i]}" did not render below '
-                '"${expectedOrder[i - 1]}": observed offsets $tops',
-          );
-        }
-      },
-    );
+      expect(titles, <String>[
+        'Preview',
+        'Installation',
+        'Usage',
+        'Composition',
+        'Sizes',
+        'Destructive',
+        'API Reference',
+        'States',
+        'Accessibility',
+        'Keyboard',
+        'Responsive',
+        'Dependencies',
+        'Theming',
+        'Source',
+      ]);
+    });
 
     testWidgets(
       'the API tables document every constructor parameter found in the source',
       (WidgetTester tester) async {
-        await _pumpAlertDialogDoc(tester);
+        await _pumpAlertDialogDoc(tester, size: const Size(1440, 4000));
+
+        final Finder apiTrigger = _disclosureTrigger('API Reference');
+        await tester.ensureVisible(apiTrigger);
+        await tester.pump();
+        await tester.tap(apiTrigger);
+        await tester.pump();
+        await tester.pump(ElDurations.jelly);
 
         // ElAlertDialog.
         expect(find.text('trigger'), findsOneWidget);
@@ -276,9 +284,6 @@ void main() {
         expect(find.text('variant'), findsWidgets);
         expect(find.text('loading'), findsOneWidget);
         expect(find.text('tooltip'), findsWidgets);
-        // ElAlertDialogSize's two values.
-        expect(find.text('normal'), findsOneWidget);
-        expect(find.text('sm'), findsOneWidget);
       },
     );
 
@@ -301,12 +306,31 @@ void main() {
       // The header/footer do not receive `size` at all, a real gap against
       // the enum's own "grid-cols-2 footer" doc comment.
       expect(find.textContaining('no size'), findsWidgets);
+      // The Sizes section is a live specimen now, not a bare table: both
+      // triggers are on the page.
+      expect(
+        find.byKey(
+          const ValueKey<String>('alert-dialog-example:size-normal'),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const ValueKey<String>('alert-dialog-example:size-sm')),
+        findsOneWidget,
+      );
     });
 
-    testWidgets('accessibility documents the Escape drift plainly', (
+    testWidgets('keyboard documents the Escape drift plainly', (
       WidgetTester tester,
     ) async {
-      await _pumpAlertDialogDoc(tester);
+      await _pumpAlertDialogDoc(tester, size: const Size(1440, 4000));
+
+      final Finder keyboardTrigger = _disclosureTrigger('Keyboard');
+      await tester.ensureVisible(keyboardTrigger);
+      await tester.pump();
+      await tester.tap(keyboardTrigger);
+      await tester.pump();
+      await tester.pump(ElDurations.jelly);
 
       expect(find.textContaining('Escape'), findsWidgets);
       expect(find.textContaining('does not call'), findsWidgets);

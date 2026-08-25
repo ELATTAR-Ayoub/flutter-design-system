@@ -1,15 +1,21 @@
 /// Public documentation page for the `menubar` component.
 ///
-/// **Shape.** Mirrors `button/page.dart`'s reference shape: an unheaded live
-/// demo above the first heading, then Installation, Usage, and this
-/// component's own sections named plainly, API Reference last of the
-/// shadcn-mirrored sections, then States, Accessibility, Responsive,
-/// Dependencies, Theming, Source.
+/// **Re-housed onto the kit.** This page used to hand-compose `ElSection`
+/// panels; it now declares a `ComponentDocSpec`
+/// (`example/lib/docs/component_doc_page.dart`) and hands it to
+/// `ComponentDocPage`, the same shape `button`, `field`, `dropdown_menu` and
+/// `context_menu` established. Every specimen widget and every code string
+/// below is the same one the hand-composed page carried; the Preview
+/// specimen (previously a bare `DocsCodeExample` with no quoted source)
+/// gains a `code:` string here — it reuses `_menubarCode` verbatim, the same
+/// composition `_MenubarSpecimen` builds by hand. A new Keyboard disclosure
+/// is split out of the "Keyboard" and "Menu navigation" bullets the old
+/// Accessibility section folded together.
 ///
 /// **shadcn parity.** Fetched fresh from
 /// `https://ui.shadcn.com/docs/components/base/menubar`: Menubar,
 /// Installation, Usage, Composition, Checkbox, Radio, Submenu, With Icons,
-/// RTL, API Reference. Every section survives as a top-level `ElSection`.
+/// RTL, API Reference.
 ///
 /// **Split history.** This component used to be documented on the
 /// `navigation_menu` page alongside `navigation_menu`, `context_menu`, and
@@ -19,19 +25,244 @@
 ///
 /// **API tables, verified.** Built from `lib/src/components/menubar.dart`'s
 /// real constructors and static getters: ElMenubar takes exactly one
-/// parameter, `menus`; ElMenubarMenu takes `label` and `children`. The
-/// static helpers table is new — the merged page never surfaced
-/// ElMenubar's own layout constants.
+/// parameter, `menus`; ElMenubarMenu takes `label` and `children`.
+///
+/// **Installation and Dependencies, corrected.** The old page's own facts
+/// claimed "None: unregistered" / "has no manifest" — stale:
+/// `registry/components/menubar.json` exists and resolves `menu`, `popover`,
+/// `source-foundation` today.
+///
+/// **Keyboard, verified against source.** `_step` in `menubar.dart` wraps
+/// with `(open + delta + count) % count`: ArrowLeft/ArrowRight between
+/// triggers DOES wrap, unlike row navigation inside an open menu (which does
+/// not, per the shared `menu.dart` engine).
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:flutter/widgets.dart';
 
-import '../../docs/docs_code.dart';
+import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
 import '../../docs/docs_layout.dart';
-import '../../kit.dart';
+import '../../docs/docs_section.dart' show DocsAnchor;
 import 'meta.dart';
+
+final ComponentDocSpec menubarDocSpec = ComponentDocSpec(
+  name: 'menubar',
+  title: menubarDoc.title,
+  description: menubarDoc.description,
+  sections: <DocsPageSection>[
+    ShowcaseSection(
+      id: 'preview',
+      title: 'Preview',
+      description: 'Click or hover a trigger to cycle between menus.',
+      specimen: _MenubarSpecimen(),
+      code: _menubarCode,
+      label: 'Preview specimen view',
+    ),
+    InstallSection(
+      id: 'install',
+      title: 'Installation',
+      description:
+          'registry/components/menubar.json ships and resolves menu, '
+          'popover and source-foundation automatically: elattar add '
+          'menubar installs lib/src/components/menubar.dart. The Manual '
+          'tab is for a project not using the CLI.',
+      command: menubarDoc.command,
+      manualFiles: <DocsCodeFile>[
+        DocsCodeFile(
+          path: 'lib/components/ui/menubar.dart',
+          title: '1. Copy the source',
+          description:
+              "Copy lib/src/components/menubar.dart's generated @ui/"
+              'menubar.dart payload into components/ui.',
+          code:
+              "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
+              '// Copy the generated menubar source here when using '
+              'manual mode.',
+        ),
+        const DocsCodeFile(
+          path: 'lib/components/ui/ui.dart',
+          title: '2. Export it from your barrel',
+          description:
+              'Add the export line so ElMenubar and ElMenubarMenu are '
+              'reachable the same way the CLI path already makes them.',
+          code: "export 'menubar.dart';",
+        ),
+      ],
+    ),
+    SnippetSection(
+      id: 'usage',
+      title: 'Usage',
+      description:
+          'A strip of menus, each a label and a list of rows. The bar '
+          'owns which menu is open; only one at a time.',
+      code: _menubarCode,
+    ),
+    SnippetSection(
+      id: 'composition',
+      title: 'Composition',
+      description:
+          "What the constructor assembles internally. ElMenubar does "
+          "not take a caller-assembled tree of sub-widgets the way "
+          "shadcn's MenubarMenu markup does: it takes a flat menus list, "
+          'and each menu a flat children list of ElMenuChild rows.',
+      code: _menubarCompositionCode,
+    ),
+    ShowcaseSection(
+      id: 'checkbox',
+      title: 'Checkbox',
+      description:
+          'ElMenuCheckboxItem inside a ElMenubarMenu, for a toggleable '
+          'option. checked is controlled: the caller owns the state and '
+          'the row reports back through onSelect.',
+      specimen: _MenubarCheckbox(),
+      code: _menubarCheckboxCode,
+      label: 'Checkbox specimen view',
+    ),
+    ShowcaseSection(
+      id: 'radio',
+      title: 'Radio',
+      description:
+          'ElMenuRadioGroup and ElMenuRadioItem for a single-select '
+          'group of rows. The group paints nothing: it exists so '
+          'exactly one child row wears the tick.',
+      specimen: _MenubarRadio(),
+      code: _menubarRadioCode,
+      label: 'Radio specimen view',
+    ),
+    ShowcaseSection(
+      id: 'submenu',
+      title: 'Submenu',
+      description:
+          'ElMenuSub nests one level of rows behind a trigger row. '
+          'Allowed one level deep by editorial convention, not by a '
+          'depth check the source enforces.',
+      specimen: _MenubarSubmenu(),
+      code: _menubarSubmenuCode,
+      label: 'Submenu specimen view',
+    ),
+    ShowcaseSection(
+      id: 'with-icons',
+      title: 'With Icons',
+      description:
+          'ElMenuItem.icon puts a 16px leading glyph on a row, forced '
+          'to that size regardless of what ElIconSize the call site '
+          'names.',
+      specimen: _MenubarIcons(),
+      code: _menubarIconsCode,
+      label: 'With Icons specimen view',
+    ),
+    ShowcaseSection(
+      id: 'rtl',
+      title: 'RTL',
+      description:
+          'The same strip read right-to-left. The one thing that does '
+          "not mirror: the menubar's check-row indicator sits on the "
+          "row's start edge in both directions, because it is a drift "
+          "in the reference's own class list (drift 5), not a property "
+          'of direction.',
+      specimen: _MenubarRtl(),
+      code: _menubarRtlCode,
+      label: 'RTL specimen view',
+    ),
+    DisclosureSection(
+      id: 'api',
+      title: 'API Reference',
+      description:
+          'Every constructor parameter ElMenubar and ElMenubarMenu '
+          'declare, plus the static layout helpers the strip is built '
+          'from.',
+      children: const <DocsTocEntry>[
+        DocsTocEntry(title: 'ElMenubar', anchor: 'api-elmenubar'),
+        DocsTocEntry(
+          title: 'ElMenubar static helpers',
+          anchor: 'api-elmenubar-static',
+        ),
+        DocsTocEntry(title: 'ElMenubarMenu', anchor: 'api-elmenubarmenu'),
+      ],
+      child: _ApiReferenceContent(),
+    ),
+    DisclosureSection(
+      id: 'states',
+      title: 'States',
+      description:
+          'Read straight off _DsMenubarState and _MenubarTriggerState, '
+          'not inferred.',
+      child: DocsStateMatrix(facts: _stateFacts),
+    ),
+    DisclosureSection(
+      id: 'accessibility',
+      title: 'Accessibility',
+      description:
+          'Keyboard interactions have their own section below.',
+      child: _AccessibilityContent(),
+    ),
+    DisclosureSection(
+      id: 'keyboard',
+      title: 'Keyboard',
+      description:
+          "Read straight off menubar.dart's own Focus.onKeyEvent (the "
+          "_step method) and the shared menu.dart engine each open "
+          'menu mounts, not inferred.',
+      child: _KeyboardContent(),
+    ),
+    DisclosureSection(
+      id: 'responsive',
+      title: 'Responsive',
+      child: _ResponsiveContent(),
+    ),
+    DisclosureSection(
+      id: 'dependencies',
+      title: 'Dependencies',
+      child: _DependenciesContent(),
+    ),
+    DisclosureSection(
+      id: 'theming',
+      title: 'Theming',
+      child: _ThemingContent(),
+    ),
+    DisclosureSection(
+      id: 'source',
+      title: 'Source',
+      child: DocsInstallFacts(
+        title: 'Reference',
+        facts: <DocsInstallFact>[
+          DocsInstallFact(
+            label: 'Source',
+            value: menubarDoc.sourcePath,
+            description:
+                'Authoritative implementation: the truth this page was '
+                'written from.',
+          ),
+          const DocsInstallFact(
+            label: 'Row model source',
+            value: 'lib/src/components/menu.dart',
+            description:
+                'ElMenuChild and its variants (ElMenuItem, '
+                'ElMenuCheckboxItem, ElMenuRadioGroup/Item, ElMenuSub, '
+                'ElMenuLabel, ElMenuSeparator, ElMenuGroup): not '
+                'documented on this page. See the Dropdown Menu page '
+                'for the full row-model API tables.',
+          ),
+          const DocsInstallFact(
+            label: 'Docs test',
+            value: 'example/test/components_docs/menubar_test.dart',
+            description:
+                'Covers this page: the article mounts, the live '
+                'specimen opens, the full API table, and both themes '
+                'at two viewport widths.',
+          ),
+          const DocsInstallFact(
+            label: 'Edit these docs',
+            value: 'example/lib/components_docs/menubar/page.dart',
+            description: 'This file.',
+          ),
+        ],
+      ),
+    ),
+  ],
+);
 
 class MenubarDocPage extends StatelessWidget {
   const MenubarDocPage({super.key, this.onNavigate});
@@ -43,440 +274,27 @@ class MenubarDocPage extends StatelessWidget {
     route: menubarDoc.route,
     intro: DocsPageIntro(
       eyebrow: 'COMPONENTS / BASE',
-      title: menubarDoc.title,
-      description: menubarDoc.description,
+      title: menubarDocSpec.title,
+      description: menubarDocSpec.description,
     ),
     breadcrumbs: const <ElBreadcrumbEntry>[
       ElBreadcrumbEntry.link('Components'),
       ElBreadcrumbEntry.page('Menubar'),
     ],
-    toc: const <DocsTocEntry>[
-      DocsTocEntry(title: 'Installation', anchor: 'install'),
-      DocsTocEntry(title: 'Usage', anchor: 'usage'),
-      DocsTocEntry(title: 'Composition', anchor: 'composition'),
-      DocsTocEntry(title: 'Checkbox', anchor: 'checkbox'),
-      DocsTocEntry(title: 'Radio', anchor: 'radio'),
-      DocsTocEntry(title: 'Submenu', anchor: 'submenu'),
-      DocsTocEntry(title: 'With Icons', anchor: 'with-icons'),
-      DocsTocEntry(title: 'RTL', anchor: 'rtl'),
-      DocsTocEntry(
-        title: 'API Reference',
-        anchor: 'api',
-        children: <DocsTocEntry>[
-          DocsTocEntry(title: 'ElMenubar', anchor: 'api-elmenubar'),
-          DocsTocEntry(
-            title: 'ElMenubar static helpers',
-            anchor: 'api-elmenubar-static',
-          ),
-          DocsTocEntry(title: 'ElMenubarMenu', anchor: 'api-elmenubarmenu'),
-        ],
-      ),
-      DocsTocEntry(title: 'States', anchor: 'states'),
-      DocsTocEntry(title: 'Accessibility', anchor: 'accessibility'),
-      DocsTocEntry(title: 'Responsive', anchor: 'responsive'),
-      DocsTocEntry(title: 'Dependencies', anchor: 'dependencies'),
-      DocsTocEntry(title: 'Theming', anchor: 'theming'),
-      DocsTocEntry(title: 'Source', anchor: 'source'),
-    ],
+    toc: menubarDocSpec.toc,
     previous: null,
     onNavigate: onNavigate,
-    child: const _MenubarArticle(),
-  );
-}
-
-class _MenubarArticle extends StatelessWidget {
-  const _MenubarArticle();
-
-  @override
-  Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
-    return Column(
+    child: KeyedSubtree(
       key: const ValueKey<String>('menubar-doc-article'),
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        _preview(),
-        SizedBox(height: el(6)),
-        _install(),
-        SizedBox(height: el(6)),
-        _usage(),
-        SizedBox(height: el(6)),
-        _composition(),
-        _checkbox(),
-        _radio(),
-        _submenu(),
-        _withIcons(),
-        _rtl(),
-        _api(),
-        _states(),
-        _accessibility(theme),
-        _responsive(theme),
-        _dependencies(theme),
-        _theming(theme),
-        _source(),
-      ],
-    );
-  }
-
-  Widget _preview() => const DocsCodeExample(
-    title: 'Menubar',
-    description: 'Click or hover a trigger to cycle between menus.',
-    preview: Center(child: _MenubarSpecimen()),
-  );
-
-  Widget _install() => ElSection(
-    id: 'install',
-    title: 'Installation',
-    description:
-        '`elattar add menubar` installs the component and its declared '
-        'dependency closure.',
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        const DocsCodeExample(
-          title: 'Manual installation',
-          manualFiles: <DocsCodeFile>[
-            DocsCodeFile(
-              path: 'lib/components/ui/menubar.dart',
-              code:
-                  "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
-                  '// Copy menubar.dart source from the package when needed.',
-            ),
-          ],
-        ),
-        SizedBox(height: el(4)),
-        const DocsInstallFacts(
-          title: 'Status',
-          facts: <DocsInstallFact>[
-            DocsInstallFact(
-              label: 'Status',
-              value: 'Stable: registry manifest',
-              description:
-                  'ElMenubar and ElMenubarMenu are exported from the '
-                  'public barrel and ship in the registry, so you can '
-                  'be installed through the CLI yet.',
-            ),
-            DocsInstallFact(
-              label: 'Dart / Flutter',
-              value: '>=3.12.2 <4.0.0 / >=3.12.2',
-              description: 'Same constraints as the port.',
-            ),
-            DocsInstallFact(
-              label: 'Platforms',
-              value: 'Android, iOS, Web, macOS, Windows, Linux',
-              description:
-                  'Pure widget composition: nothing is platform-gated.',
-            ),
-          ],
-        ),
-      ],
-    ),
-  );
-
-  Widget _usage() => ElSection(
-    id: 'usage',
-    title: 'Usage',
-    description:
-        'A strip of menus, each a label and a list of rows. The bar owns '
-        'which menu is open; only one at a time.',
-    child: ElPanel(
-      label: 'DART',
-      note: 'MINIMAL',
-      child: DocsSelectableCodeBlock(code: _menubarCode),
-    ),
-  );
-
-  Widget _composition() => ElSection(
-    id: 'composition',
-    title: 'Composition',
-    description:
-        'What the constructor assembles internally. ElMenubar does not '
-        'take a caller-assembled tree of sub-widgets the way shadcn\'s '
-        'MenubarMenu markup does: it takes a flat `menus` list, and each '
-        'menu a flat `children` list of ElMenuChild rows.',
-    child: ElPanel(
-      label: 'Menubar',
-      child: DocsSelectableCodeBlock(code: _menubarCompositionCode),
-    ),
-  );
-
-  Widget _checkbox() => ElSection(
-    id: 'checkbox',
-    title: 'Checkbox',
-    description:
-        'ElMenuCheckboxItem inside a ElMenubarMenu, for a toggleable '
-        'option. checked is controlled: the caller owns the state and the '
-        'row reports back through onSelect.',
-    child: const DocsCodeExample(
-      title: 'Checkbox rows',
-      preview: _MenubarCheckbox(),
-      manualFiles: <DocsCodeFile>[
-        DocsCodeFile(path: 'menubar_checkbox.dart', code: _menubarCheckboxCode),
-      ],
-    ),
-  );
-
-  Widget _radio() => ElSection(
-    id: 'radio',
-    title: 'Radio',
-    description:
-        'ElMenuRadioGroup and ElMenuRadioItem for a single-select group of '
-        'rows. The group paints nothing: it exists so exactly one child '
-        'row wears the tick.',
-    child: const DocsCodeExample(
-      title: 'Radio rows',
-      preview: _MenubarRadio(),
-      manualFiles: <DocsCodeFile>[
-        DocsCodeFile(path: 'menubar_radio.dart', code: _menubarRadioCode),
-      ],
-    ),
-  );
-
-  Widget _submenu() => ElSection(
-    id: 'submenu',
-    title: 'Submenu',
-    description:
-        'ElMenuSub nests one level of rows behind a trigger row. Allowed '
-        'one level deep by editorial convention, not by a depth check the '
-        'source enforces.',
-    child: const DocsCodeExample(
-      title: 'Nested menu',
-      preview: _MenubarSubmenu(),
-      manualFiles: <DocsCodeFile>[
-        DocsCodeFile(path: 'menubar_submenu.dart', code: _menubarSubmenuCode),
-      ],
-    ),
-  );
-
-  Widget _withIcons() => ElSection(
-    id: 'with-icons',
-    title: 'With Icons',
-    description:
-        'ElMenuItem.icon puts a 16px leading glyph on a row, forced to '
-        'that size regardless of what ElIconSize the call site names.',
-    child: const DocsCodeExample(
-      title: 'Rows with leading icons',
-      preview: _MenubarIcons(),
-      manualFiles: <DocsCodeFile>[
-        DocsCodeFile(path: 'menubar_icons.dart', code: _menubarIconsCode),
-      ],
-    ),
-  );
-
-  Widget _rtl() => ElSection(
-    id: 'rtl',
-    title: 'RTL',
-    description:
-        'The same strip read right-to-left. The one thing that does not '
-        'mirror: the menubar\'s check-row indicator sits on the row\'s '
-        'start edge in both directions, because it is a drift in the '
-        'reference\'s own class list (drift 5), not a property of '
-        'direction.',
-    child: const DocsCodeExample(
-      title: 'Right-to-left menubar',
-      preview: _MenubarRtl(),
-      manualFiles: <DocsCodeFile>[
-        DocsCodeFile(path: 'menubar_rtl.dart', code: _menubarRtlCode),
-      ],
-    ),
-  );
-
-  Widget _api() => ElSection(
-    id: 'api',
-    title: 'API Reference',
-    description:
-        'Every constructor parameter ElMenubar and ElMenubarMenu declare, '
-        'plus the static layout helpers the strip is built from.',
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        KeyedSubtree(
-          key: docsAnchorKey('api-elmenubar'),
-          child: const DocsApiTable(
-            title: 'ElMenubar',
-            facts: _menubarApiFacts,
-          ),
-        ),
-        SizedBox(height: el(6)),
-        KeyedSubtree(
-          key: docsAnchorKey('api-elmenubar-static'),
-          child: const DocsApiTable(
-            title: 'ElMenubar static helpers',
-            facts: _menubarStaticFacts,
-          ),
-        ),
-        SizedBox(height: el(6)),
-        KeyedSubtree(
-          key: docsAnchorKey('api-elmenubarmenu'),
-          child: const DocsApiTable(
-            title: 'ElMenubarMenu',
-            facts: _menubarMenuApiFacts,
-          ),
-        ),
-      ],
-    ),
-  );
-
-  Widget _states() => ElSection(
-    id: 'states',
-    title: 'States',
-    description:
-        'Read straight off _DsMenubarState and _MenubarTriggerState, not '
-        'inferred.',
-    child: const DocsStateMatrix(facts: _stateFacts),
-  );
-
-  Widget _accessibility(ElThemeData theme) => ElSection(
-    id: 'accessibility',
-    title: 'Accessibility',
-    child: _bullets(theme, <String>[
-      'Keyboard: Left/Right arrow keys step between open menus. The bar '
-          'itself takes no tab stop (canRequestFocus: false); the keys are '
-          'only live while a menu is already open.',
-      'Menu navigation: inside an open menu, Up/Down step rows, Home/End '
-          'jump to the ends, and typeahead searches by first letter. Rows '
-          'do not wrap past the first or last.',
-      'Hover on keyboard: moving to a sibling menu with arrow keys while a '
-          'menu is open swaps instantly, with no hover delay.',
-      'Escape closes the open menu.',
-    ]),
-  );
-
-  Widget _responsive(ElThemeData theme) => ElSection(
-    id: 'responsive',
-    title: 'Responsive',
-    child: _bullets(theme, <String>[
-      'Click opens a menu on every platform. Hover swaps between menus on '
-          'desktop once one is already open; on touch, tap toggles a menu '
-          'with no multi-trigger hover handoff.',
-      'Documented drift (menus drift 1): the 32px triggers overflow the '
-          '32px-tall root\'s own 24px content box (p-1 leaves 4px on each '
-          'edge). Reproduced rather than clipped: the reference writes no '
-          '`overflow-hidden` either.',
-      'Documented drift (menus drift 2): MenubarContent has no exit '
-          'animation. Switching menus by hover, the outgoing content is '
-          'gone the instant state flips; only the incoming content '
-          'animates in.',
-      'The open menu relies on ElPopover\'s collision algorithm near a '
-          'viewport edge and snaps without transition when it flips.',
-      'Platform parity: no dart:io Platform branch anywhere in the file.',
-    ]),
-  );
-
-  Widget _dependencies(ElThemeData theme) => ElSection(
-    id: 'dependencies',
-    title: 'Dependencies',
-    child: DocsInstallFacts(
-      facts: <DocsInstallFact>[
-        const DocsInstallFact(
-          label: 'Registry item',
-          value: 'None: unregistered',
-          description:
-              'ElMenubar is in the package but has no manifest and cannot '
-              'be installed through the CLI yet.',
-        ),
-        const DocsInstallFact(
-          label: 'Primary dependency',
-          value: 'ElPopover',
-          description:
-              'Mounts each menu\'s content through ElPopover, non-modal '
-              '(ElPopoverBarrier.nonModal), which is what lets a sibling '
-              'trigger be hovered while a menu is open.',
-        ),
-        const DocsInstallFact(
-          label: 'Row model',
-          value: 'ElMenu, ElMenuChild (menu.dart)',
-          description:
-              'The shared row model Menubar, Context Menu, and Dropdown '
-              'Menu all use for their content.',
-        ),
-        const DocsInstallFact(
-          label: 'Platforms',
-          value: 'Android, iOS, Web, macOS, Windows, Linux',
-          description: 'Pure widget composition; nothing platform-gated.',
-        ),
-        const DocsInstallFact(
-          label: 'Verified',
-          value: 'example/test/components_docs/menubar_test.dart',
-          description:
-              'This page\'s own live specimen, section order, and API '
-              'table coverage: 390x844 and 1440x900, both themes.',
-        ),
-      ],
-    ),
-  );
-
-  Widget _theming(ElThemeData theme) => ElSection(
-    id: 'theming',
-    title: 'Theming',
-    child: _bullets(theme, <String>[
-      'Trigger, rest: theme.foreground text, no fill. Trigger, hover or '
-          'open: theme.muted fill — one fill for both states, and it does '
-          'not transition (measured: transition-duration 0s on the '
-          'reference).',
-      'Root: a theme.border, 1px border around the whole strip.',
-      'Menu content: theme.popover / theme.popoverForeground, via '
-          'ElMenuContent\'s own ElPopoverSurface, the same surface Context '
-          'Menu and Dropdown Menu use.',
-      'Menu content animates in through ElDurations.overlay; there is no '
-          'matching exit animation to time (drift 2, above).',
-    ]),
-  );
-
-  Widget _source() => ElSection(
-    id: 'source',
-    title: 'Source',
-    child: DocsInstallFacts(
-      title: 'Reference',
-      facts: <DocsInstallFact>[
-        DocsInstallFact(
-          label: 'Source',
-          value: menubarDoc.sourcePath,
-          description:
-              'Authoritative implementation: the truth this page '
-              'was written from.',
-        ),
-        const DocsInstallFact(
-          label: 'Row model source',
-          value: 'lib/src/components/menu.dart',
-          description:
-              'ElMenuChild and its variants (ElMenuItem, '
-              'ElMenuCheckboxItem, ElMenuRadioGroup/Item, ElMenuSub, '
-              'ElMenuLabel, ElMenuSeparator, ElMenuGroup): not documented '
-              'on this page.',
-        ),
-        const DocsInstallFact(
-          label: 'Docs test',
-          value: 'example/test/components_docs/menubar_test.dart',
-          description:
-              'Covers this page: the article mounts, the live '
-              'specimen opens, the full API table, and both themes at two '
-              'viewport widths.',
-        ),
-        const DocsInstallFact(
-          label: 'Edit these docs',
-          value: 'example/lib/components_docs/menubar/page.dart',
-          description: 'This file.',
-        ),
-      ],
+      child: ComponentDocPage(spec: menubarDocSpec, header: false),
     ),
   );
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
-  crossAxisAlignment: CrossAxisAlignment.start,
-  children: <Widget>[
-    for (final String line in lines) ...<Widget>[
-      ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
-      ),
-      SizedBox(height: el(2)),
-    ],
-  ],
-);
+/* ── Showcase specimens ─────────────────────────────────────────────────── */
 
-/// Mounted exactly once on this page (the unheaded live demo). The key below
-/// is baked into `build`, which is only safe while that stays true.
+/// Mounted exactly once on this page (Preview). The key below is baked into
+/// `build`, which is only safe while that stays true.
 class _MenubarSpecimen extends StatelessWidget {
   const _MenubarSpecimen();
 
@@ -752,6 +570,190 @@ const String _menubarRtlCode = '''Directionality(
   ),
 )''';
 
+/* ── Disclosure content ─────────────────────────────────────────────────── */
+
+class _ApiReferenceContent extends StatelessWidget {
+  const _ApiReferenceContent();
+
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: <Widget>[
+      const DocsAnchor(
+        id: 'api-elmenubar',
+        child: DocsApiTable(title: 'ElMenubar', facts: _menubarApiFacts),
+      ),
+      SizedBox(height: el(6)),
+      const DocsAnchor(
+        id: 'api-elmenubar-static',
+        child: DocsApiTable(
+          title: 'ElMenubar static helpers',
+          facts: _menubarStaticFacts,
+        ),
+      ),
+      SizedBox(height: el(6)),
+      const DocsAnchor(
+        id: 'api-elmenubarmenu',
+        child: DocsApiTable(
+          title: 'ElMenubarMenu',
+          facts: _menubarMenuApiFacts,
+        ),
+      ),
+    ],
+  );
+}
+
+class _AccessibilityContent extends StatelessWidget {
+  const _AccessibilityContent();
+
+  @override
+  Widget build(BuildContext context) =>
+      _bullets(ElTheme.of(context), <String>[
+        'The bar itself takes no tab stop (canRequestFocus: false): a '
+            'keyboard-only user tabs straight past the strip. Opening a '
+            'menu is a click/tap action; there is no keyboard route to '
+            'open one directly, see Keyboard below.',
+        'Hover on keyboard: moving to a sibling menu with arrow keys '
+            'while a menu is open swaps instantly, with no hover delay.',
+        'Escape closes the open menu.',
+      ]);
+}
+
+class _KeyboardContent extends StatelessWidget {
+  const _KeyboardContent();
+
+  @override
+  Widget build(BuildContext context) =>
+      _bullets(ElTheme.of(context), <String>[
+        'GAP: no keyboard route to open a menu. canRequestFocus: false '
+            'means the strip never becomes a focus stop, and _step only '
+            'fires when _open is already non-null: opening the first '
+            'menu requires a pointer-down on a trigger.',
+        'Once a menu is open, ArrowLeft / ArrowRight step between '
+            'triggers and DO wrap: _step computes (open + delta + '
+            'count) % count, unlike row navigation inside the open '
+            'menu itself, which does not wrap.',
+        'Inside the open menu: the same shared menu.dart engine every '
+            'menu root uses — ArrowUp/Down step rows, Home/End jump to '
+            'the ends, typeahead searches by first letter, Enter/Space '
+            'commit the highlighted row.',
+        'Escape closes the open menu. Tab is not intercepted by the '
+            'bar\'s own Focus (skipTraversal: true), so it falls through '
+            'to whatever the open menu content\'s own key handling does.',
+      ]);
+}
+
+class _ResponsiveContent extends StatelessWidget {
+  const _ResponsiveContent();
+
+  @override
+  Widget build(BuildContext context) =>
+      _bullets(ElTheme.of(context), <String>[
+        'Click opens a menu on every platform. Hover swaps between '
+            'menus on desktop once one is already open; on touch, tap '
+            'toggles a menu with no multi-trigger hover handoff.',
+        'Documented drift (menus drift 1): the 32px triggers overflow '
+            "the 32px-tall root's own 24px content box (p-1 leaves 4px "
+            'on each edge). Reproduced rather than clipped: the '
+            'reference writes no overflow-hidden either.',
+        'Documented drift (menus drift 2): MenubarContent has no exit '
+            'animation. Switching menus by hover, the outgoing content '
+            'is gone the instant state flips; only the incoming '
+            'content animates in.',
+        "The open menu relies on ElPopover's collision algorithm near "
+            'a viewport edge and snaps without transition when it '
+            'flips.',
+        'Platform parity: no dart:io Platform branch anywhere in the '
+            'file.',
+      ]);
+}
+
+class _DependenciesContent extends StatelessWidget {
+  const _DependenciesContent();
+
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: <Widget>[
+      DocsInstallFacts(
+        facts: <DocsInstallFact>[
+          const DocsInstallFact(
+            label: 'Registry item',
+            value: 'registry/components/menubar.json',
+            description:
+                'Ships and resolves registryDependencies menu, popover, '
+                'source-foundation automatically.',
+          ),
+          const DocsInstallFact(
+            label: 'Primary dependency',
+            value: 'ElPopover',
+            description:
+                "Mounts each menu's content through ElPopover, "
+                'non-modal (ElPopoverBarrier.nonModal), which is what '
+                'lets a sibling trigger be hovered while a menu is '
+                'open.',
+          ),
+          const DocsInstallFact(
+            label: 'Row model',
+            value: 'ElMenu, ElMenuChild (menu.dart)',
+            description:
+                'The shared row model Menubar, Context Menu, and '
+                'Dropdown Menu all use for their content.',
+          ),
+          const DocsInstallFact(
+            label: 'Platforms',
+            value: 'Android, iOS, Web, macOS, Windows, Linux',
+            description: 'Pure widget composition; nothing platform-gated.',
+          ),
+          const DocsInstallFact(
+            label: 'Verified',
+            value: 'example/test/components_docs/menubar_test.dart',
+            description:
+                "This page's own live specimen, section order, and API "
+                'table coverage: 390x844 and 1440x900, both themes.',
+          ),
+        ],
+      ),
+      SizedBox(height: el(4)),
+      const DocsLinkRow(
+        links: <DocsLink>[DocsLink(label: 'Popover', route: '/components/popover')],
+      ),
+    ],
+  );
+}
+
+class _ThemingContent extends StatelessWidget {
+  const _ThemingContent();
+
+  @override
+  Widget build(BuildContext context) =>
+      _bullets(ElTheme.of(context), <String>[
+        'Trigger, rest: theme.foreground text, no fill. Trigger, hover '
+            'or open: theme.muted fill — one fill for both states, and '
+            'it does not transition (measured: transition-duration 0s '
+            'on the reference).',
+        'Root: a theme.border, 1px border around the whole strip.',
+        'Menu content: theme.popover / theme.popoverForeground, via '
+            "ElMenuContent's own ElPopoverSurface, the same surface "
+            'Context Menu and Dropdown Menu use.',
+        'Menu content animates in through ElDurations.overlay; there '
+            'is no matching exit animation to time (drift 2, above).',
+      ]);
+}
+
+Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: <Widget>[
+    for (final String line in lines) ...<Widget>[
+      ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+      ),
+      SizedBox(height: el(2)),
+    ],
+  ],
+);
+
 const List<DocsApiFact> _menubarApiFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'menus',
@@ -842,8 +844,9 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     state: 'Focus-visible',
     treatment:
         'The bar itself takes no tab stop. While a menu is open, Left/'
-        'Right steps between menus, Up/Down steps rows inside the open '
-        'one, Home/End jump, and typeahead searches by letter.',
+        'Right steps between menus (and wraps), Up/Down steps rows '
+        'inside the open one, Home/End jump, and typeahead searches by '
+        'letter.',
     userSignal: 'Arrow-key navigation once a menu is open by click.',
   ),
   DocsStateFact(

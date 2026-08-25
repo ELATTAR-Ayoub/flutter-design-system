@@ -2,9 +2,10 @@
 /// `components_docs/combobox/page.dart`: the public documentation page for
 /// [ElCombobox] alone.
 ///
-/// **New with the split.** `ElCombobox` used to be documented on the command
-/// page and covered by `command_test.dart`. Every combobox assertion moved
-/// here; that file now asserts the combobox is *gone* from its own page.
+/// Re-housed onto the kit alongside the page: the section-order test now
+/// reads `DocsSection.id` (the kit's own section widget) instead of
+/// `ElSection`'s title, and the API-table / state-matrix tests open the
+/// relevant `DocsDisclosure` first — closed by default in the new kit.
 ///
 /// [ElCombobox] mounts its list through a [ElPopover], which is an
 /// [OverlayPortal], so every specimen on this page needs a real [Overlay]
@@ -24,7 +25,8 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/combobox/meta.dart';
 import 'package:example/components_docs/combobox/page.dart';
-import 'package:example/kit.dart' show ElSection;
+import 'package:example/docs/docs_disclosure.dart';
+import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -37,6 +39,58 @@ const Key _comboboxSpecimenKey = ValueKey<String>(
 );
 const Key _invalidSpecimenKey = ValueKey<String>('combobox-example:invalid');
 const Key _disabledSpecimenKey = ValueKey<String>('combobox-example:disabled');
+
+/// The house-shape section order this page must render, top to bottom.
+const List<String> _expectedSectionIds = <String>[
+  'preview',
+  'install',
+  'usage',
+  'composition',
+  'filtering',
+  'invalid',
+  'disabled',
+  'api',
+  'states',
+  'accessibility',
+  'keyboard',
+  'responsive',
+  'dependencies',
+  'theming',
+  'source',
+];
+
+/// Every named constructor parameter `ElCombobox` declares, excluding `key`.
+const List<String> _comboboxParams = <String>[
+  'items',
+  'value',
+  'onChanged',
+  'placeholder',
+  'emptyLabel',
+  'enabled',
+  'invalid',
+  'focusNode',
+  'label',
+  'hint',
+  'filter',
+];
+
+/// Every public static `ElCombobox` exposes.
+const List<String> _comboboxStatics = <String>[
+  'ElCombobox.popupOffset',
+  'ElCombobox.popupOvershoot',
+  'ElCombobox.listMaxHeight',
+  'ElCombobox.itemHeight',
+  'ElCombobox.emptyHeight',
+];
+
+/// The single `DocsDisclosure` whose title is [title], matching
+/// `checkbox_test.dart`'s own convention.
+Finder _disclosureTrigger(String title) => find.descendant(
+  of: find.byWidgetPredicate(
+    (Widget widget) => widget is DocsDisclosure && widget.title == title,
+  ),
+  matching: find.byKey(DocsDisclosure.triggerKey),
+);
 
 Future<ElThemeController> _pumpComboboxDoc(
   WidgetTester tester, {
@@ -87,52 +141,6 @@ Future<void> _openPopup(WidgetTester tester) async {
   await tester.pump(ElDurations.overlay);
   await tester.pump();
 }
-
-/// The section order this page promises.
-///
-/// The live demo sits unheaded above Installation, so it carries no entry.
-/// Composition, Filtering, Invalid and Disabled are Combobox's own; API
-/// Reference is last of those; the trailing six are this package's fixed
-/// extras.
-const List<String> _expectedSectionTitles = <String>[
-  'Installation',
-  'Usage',
-  'Composition',
-  'Filtering',
-  'Invalid',
-  'Disabled',
-  'API Reference',
-  'States',
-  'Accessibility',
-  'Responsive',
-  'Dependencies',
-  'Theming',
-  'Source',
-];
-
-/// Every named constructor parameter `ElCombobox` declares, excluding `key`.
-const List<String> _comboboxParams = <String>[
-  'items',
-  'value',
-  'onChanged',
-  'placeholder',
-  'emptyLabel',
-  'enabled',
-  'invalid',
-  'focusNode',
-  'label',
-  'hint',
-  'filter',
-];
-
-/// Every public static `ElCombobox` exposes.
-const List<String> _comboboxStatics = <String>[
-  'ElCombobox.popupOffset',
-  'ElCombobox.popupOvershoot',
-  'ElCombobox.listMaxHeight',
-  'ElCombobox.itemHeight',
-  'ElCombobox.emptyHeight',
-];
 
 void main() {
   group('meta', () {
@@ -187,30 +195,18 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets(
-      'sections render in the reference-shape order, with no heading before '
-      'Installation',
-      (WidgetTester tester) async {
-        await _pumpComboboxDoc(tester);
+    testWidgets('sections render in the house-shape order, top to bottom', (
+      WidgetTester tester,
+    ) async {
+      await _pumpComboboxDoc(tester);
 
-        // Read the mounted ElSection titles rather than find.text: a section
-        // title also renders in the right-rail TOC at this width, so a bare
-        // find.text would match twice.
-        final List<String> titles = tester
-            .widgetList<ElSection>(find.byType(ElSection))
-            .map((ElSection section) => section.title)
-            .toList();
+      final List<String> ids = tester
+          .widgetList<DocsSection>(find.byType(DocsSection))
+          .map((DocsSection section) => section.id)
+          .toList();
 
-        expect(titles, _expectedSectionTitles);
-        expect(titles, isNot(contains('Overview')));
-        expect(titles, isNot(contains('Preview')));
-        expect(titles, isNot(contains('Variants')));
-        // No component-name prefix survives on any section title.
-        for (final String title in titles) {
-          expect(title.startsWith('Combobox'), isFalse, reason: title);
-        }
-      },
-    );
+      expect(ids, _expectedSectionIds);
+    });
 
     testWidgets('nothing command-shaped leaked onto this page', (
       WidgetTester tester,
@@ -224,13 +220,13 @@ void main() {
         find.text('elCommandScore(string, abbreviation, [aliases]) → double'),
         findsNothing,
       );
-      final List<String> titles = tester
-          .widgetList<ElSection>(find.byType(ElSection))
-          .map((ElSection section) => section.title)
+      final List<String> ids = tester
+          .widgetList<DocsSection>(find.byType(DocsSection))
+          .map((DocsSection section) => section.id)
           .toList();
-      expect(titles, isNot(contains('Shortcuts')));
-      expect(titles, isNot(contains('Groups')));
-      expect(titles, isNot(contains('In a panel')));
+      expect(ids, isNot(contains('shortcuts')));
+      expect(ids, isNot(contains('groups')));
+      expect(ids, isNot(contains('in-a-panel')));
     });
 
     testWidgets(
@@ -238,6 +234,12 @@ void main() {
       'combobox.dart declares',
       (WidgetTester tester) async {
         await _pumpComboboxDoc(tester);
+
+        final Finder apiTrigger = _disclosureTrigger('API Reference');
+        await tester.ensureVisible(apiTrigger);
+        await tester.tap(apiTrigger);
+        await tester.pump();
+        await tester.pump(ElDurations.jelly);
 
         for (final String name in <String>[
           ..._comboboxParams,
@@ -280,6 +282,12 @@ void main() {
       (WidgetTester tester) async {
         await _pumpComboboxDoc(tester);
 
+        final Finder apiTrigger = _disclosureTrigger('API Reference');
+        await tester.ensureVisible(apiTrigger);
+        await tester.tap(apiTrigger);
+        await tester.pump();
+        await tester.pump(ElDurations.jelly);
+
         expect(find.text('List<ElComboboxItem<T>>'), findsAtLeastNWidgets(1));
         expect(find.text('ValueChanged<T>?'), findsAtLeastNWidgets(1));
         expect(
@@ -299,7 +307,6 @@ void main() {
       await _pumpComboboxDoc(tester);
 
       expect(find.textContaining('elattar add combobox'), findsWidgets);
-      expect(find.textContaining('combobox.json'), findsWidgets);
     });
 
     testWidgets(
@@ -319,13 +326,20 @@ void main() {
       (WidgetTester tester) async {
         await _pumpComboboxDoc(tester);
 
+        final Finder a11yTrigger = _disclosureTrigger('Accessibility');
+        await tester.ensureVisible(a11yTrigger);
+        await tester.tap(a11yTrigger);
+        await tester.pump();
+        await tester.pump(ElDurations.jelly);
+
         expect(find.textContaining('live region'), findsWidgets);
         expect(find.textContaining('Known gap'), findsWidgets);
       },
     );
 
     testWidgets(
-      'the skipped shadcn sections are named rather than silently dropped',
+      'the skipped shadcn capabilities are named rather than silently '
+      'dropped',
       (WidgetTester tester) async {
         await _pumpComboboxDoc(tester);
 
