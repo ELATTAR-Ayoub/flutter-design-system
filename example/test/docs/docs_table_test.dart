@@ -79,7 +79,66 @@ void main() {
     await tester.pump();
 
     expect(tester.getSize(find.byType(ElTable)).width, 640);
+
+    // The table-width assertion above is satisfied by `ElTable`'s own
+    // `Column(crossAxisAlignment: CrossAxisAlignment.stretch)` wrapper
+    // regardless of whether the gutter/flex arithmetic underneath is right —
+    // it proves the outer box fills its bound, not that the columns split
+    // it correctly. Pin a cell too: two 0.5 columns over 640, less
+    // `2 columns × ElTable.cellPadding(8) × 2 == 32` of gutters, is 608 of
+    // content, 304 a column — so the header cell built around 'A' must
+    // measure exactly that.
+    final Iterable<SizedBox> headerAncestors = tester.widgetList<SizedBox>(
+      find.ancestor(of: find.text('A'), matching: find.byType(SizedBox)),
+    );
+    final SizedBox headerCellBox = headerAncestors.firstWhere(
+      (SizedBox box) => box.width == 304,
+      orElse: () => throw StateError(
+        'No ancestor SizedBox of the "A" header cell measures 304 — got '
+        '${headerAncestors.map((SizedBox box) => box.width).toList()}',
+      ),
+    );
+    expect(headerCellBox.width, 304);
   });
+
+  testWidgets(
+    'a column narrower than the floor scrolls instead of cramming',
+    (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1440, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+
+      // Narrower than `_minContentWidth` (`el(132)` == 528, the same floor
+      // `_FactScroll` uses for `DocsStateMatrix`), so the table should hold
+      // at the floor and let a horizontal scroller carry the overflow
+      // rather than compressing every cell to fit.
+      await tester.pumpWidget(
+        _host(
+          const SizedBox(
+            width: 200,
+            child: DocsTable(
+              columns: <DocsTableColumn>[
+                DocsTableColumn(header: 'A', flex: 0.5),
+                DocsTableColumn(header: 'B', flex: 0.5),
+              ],
+              rows: <List<String>>[
+                <String>['one', 'two'],
+              ],
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      final Finder scroller = find.byType(SingleChildScrollView);
+      expect(scroller, findsOneWidget);
+      expect(
+        tester.widget<SingleChildScrollView>(scroller).scrollDirection,
+        Axis.horizontal,
+      );
+      expect(tester.getSize(find.byType(ElTable)).width, 528);
+    },
+  );
 
   testWidgets('the API table renders one row per fact', (
     WidgetTester tester,

@@ -36,6 +36,11 @@ class DocsTable extends StatelessWidget {
   /// One list of cell strings per row, in [columns] order.
   final List<List<String>> rows;
 
+  /// The same floor `_FactScroll` (`docs_facts.dart`) uses for
+  /// `DocsStateMatrix`, so the two table styles agree on where a narrow
+  /// column stops cramming cells and starts scrolling instead.
+  static double get _minContentWidth => el(132);
+
   @override
   Widget build(BuildContext context) {
     final ElThemeData theme = ElTheme.of(context);
@@ -43,20 +48,26 @@ class DocsTable extends StatelessWidget {
     // `ElTable` sizes every column to its widest cell and exposes no width
     // hook, so the table would end at its content and leave a gap. Giving
     // each cell an exact width makes "widest cell" the width we chose, and
-    // the columns then sum to the container. The padding `ElTable` adds
-    // inside each cell is subtracted first, or the sum overshoots.
+    // the columns then sum to the table. The padding `ElTable` adds inside
+    // each cell is subtracted first, or the sum overshoots.
+    //
+    // The table's own width is `max(available, _minContentWidth)`: a wide
+    // container is filled exactly as before, but a container narrower than
+    // the floor keeps the table at the floor width and lets the surrounding
+    // `SingleChildScrollView` scroll it horizontally, rather than shrinking
+    // every cell until the text crams.
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
+        final double tableWidth = constraints.maxWidth < _minContentWidth
+            ? _minContentWidth
+            : constraints.maxWidth;
         final double gutters = columns.length * ElTable.cellPadding * 2;
-        final double content = (constraints.maxWidth - gutters).clamp(
-          0,
-          constraints.maxWidth,
-        );
+        final double content = (tableWidth - gutters).clamp(0, tableWidth);
 
         Widget sized(int column, Widget child) =>
             SizedBox(width: content * columns[column].flex, child: child);
 
-        return ElTable(
+        final Widget table = ElTable(
           header: <ElTableCellSpec>[
             for (int i = 0; i < columns.length; i++)
               ElTableCellSpec(
@@ -81,6 +92,11 @@ class DocsTable extends StatelessWidget {
                 ],
               ),
           ],
+        );
+
+        return SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: SizedBox(width: tableWidth, child: table),
         );
       },
     );
