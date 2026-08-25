@@ -4,6 +4,13 @@
 /// Secondary rather than ghost: on a code surface a ghost control is nearly
 /// invisible against the block it sits on, and this is the only affordance
 /// the block has.
+///
+/// The glyph rolls through [ElIconSwap] (`lib/src/components/icon_swap.dart`)
+/// rather than swapping instantly. That component's own docstring states the
+/// system's rule plainly: *"every control that alternates between icons swaps
+/// them through this... No crossfades, no instant swaps — a control that
+/// changes meaning should show you it changed."* Idle, pending and copied are
+/// three meanings, so they are three cells on the wheel, in that order.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
@@ -42,41 +49,56 @@ class DocsCopyButton extends StatefulWidget {
   /// How long the confirmation holds before reverting.
   static const Duration confirmation = Duration(seconds: 2);
 
+  /// The wheel's three cells, in wheel order.
+  static const int idleIndex = 0;
+  static const int pendingIndex = 1;
+  static const int copiedIndex = 2;
+
   @override
   State<DocsCopyButton> createState() => _DocsCopyButtonState();
 }
 
 class _DocsCopyButtonState extends State<DocsCopyButton> {
-  bool _pending = false;
-  bool _copied = false;
+  int _state = DocsCopyButton.idleIndex;
 
   Future<void> _copy() async {
-    if (_pending) return;
-    setState(() => _pending = true);
+    if (_state == DocsCopyButton.pendingIndex) return;
+    setState(() => _state = DocsCopyButton.pendingIndex);
     await (widget.writer ?? _systemWrite)(widget.text);
     if (!mounted) return;
-    setState(() {
-      _pending = false;
-      _copied = true;
-    });
+    setState(() => _state = DocsCopyButton.copiedIndex);
     await Future<void>.delayed(DocsCopyButton.confirmation);
     if (!mounted) return;
-    setState(() => _copied = false);
+    setState(() => _state = DocsCopyButton.idleIndex);
   }
 
   @override
   Widget build(BuildContext context) {
-    final ElLucideGlyph glyph = switch ((_pending, _copied)) {
-      (true, _) => ElLucide.loaderCircle,
-      (_, true) => ElLucide.check,
-      _ => ElLucide.copy,
-    };
+    // The glyph's own box — `ElButtonSize.iconSm`'s rung is 14px
+    // (`ElButton.iconPxFor`), matching `ElIconSize.sm`. The clip window is
+    // 4px wider than the glyph in every ElIconSwap demo in the package
+    // (`example/lib/pages/buttons.dart`), so the window is derived from the
+    // cell rather than stated as a second number of its own.
+    final double cell = ElButton.iconPxFor(ElButtonSize.iconSm);
+    final double window = cell + el(1);
+
     return ElButton(
       variant: ElButtonVariant.secondary,
       size: ElButtonSize.iconSm,
-      label: _copied ? widget.copiedLabel : widget.copyLabel,
-      onPressed: _pending ? null : _copy,
-      child: ElIcon.lucide(glyph, size: ElIconSize.sm),
+      label: _state == DocsCopyButton.copiedIndex
+          ? widget.copiedLabel
+          : widget.copyLabel,
+      onPressed: _state == DocsCopyButton.pendingIndex ? null : _copy,
+      child: ElIconSwap(
+        activeIndex: _state,
+        window: window,
+        cell: cell,
+        icons: <Widget>[
+          ElIcon.lucide(ElLucide.copy, size: ElIconSize.sm),
+          ElIcon.lucide(ElLucide.loaderCircle, size: ElIconSize.sm),
+          ElIcon.lucide(ElLucide.check, size: ElIconSize.sm),
+        ],
+      ),
     );
   }
 }

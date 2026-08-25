@@ -5,6 +5,8 @@
 /// wait for it rather than observe it.
 library;
 
+import 'dart:async';
+
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/docs/docs_copy_button.dart';
 import 'package:flutter/widgets.dart';
@@ -21,69 +23,92 @@ Widget _host(Widget child) => MediaQuery(
   ),
 );
 
+/// Reads the icons `ElIconSwap` was built with, in wheel order, as their
+/// `lucide` glyphs.
+List<ElLucideGlyph> _wheelGlyphs(WidgetTester tester) => tester
+    .widget<ElIconSwap>(find.byType(ElIconSwap))
+    .icons
+    .map((Widget w) => (w as ElIcon).lucide)
+    .whereType<ElLucideGlyph>()
+    .toList();
+
 void main() {
-  testWidgets('it is a secondary icon button showing the copy glyph', (
-    WidgetTester tester,
-  ) async {
-    await tester.pumpWidget(_host(const DocsCopyButton(text: 'const a = 1;')));
-    await tester.pump();
+  testWidgets(
+    'it swaps its glyph through ElIconSwap, resting on the copy cell',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(_host(const DocsCopyButton(text: 'const a = 1;')));
+      await tester.pump();
 
-    final ElButton button = tester.widget<ElButton>(find.byType(ElButton));
-    expect(button.variant, ElButtonVariant.secondary);
-    expect(button.size, ElButtonSize.iconSm);
-    expect(button.label, 'Copy code');
-    expect(
-      tester.widget<ElIcon>(find.byType(ElIcon)).lucide,
-      ElLucide.copy,
-    );
-  });
+      final ElButton button = tester.widget<ElButton>(find.byType(ElButton));
+      expect(button.variant, ElButtonVariant.secondary);
+      expect(button.size, ElButtonSize.iconSm);
+      expect(button.label, 'Copy code');
+      expect(find.byType(ElIconSwap), findsOneWidget);
 
-  testWidgets('pressing it writes the exact text and confirms', (
-    WidgetTester tester,
-  ) async {
-    final List<String> written = <String>[];
-    await tester.pumpWidget(
-      _host(
-        DocsCopyButton(
-          text: 'const a = 1;',
-          writer: (String value) async => written.add(value),
+      final ElIconSwap swap = tester.widget<ElIconSwap>(
+        find.byType(ElIconSwap),
+      );
+      expect(swap.activeIndex, DocsCopyButton.idleIndex);
+      expect(
+        _wheelGlyphs(tester),
+        <ElLucideGlyph>[ElLucide.copy, ElLucide.loaderCircle, ElLucide.check],
+        reason:
+            'idle, pending and copied are three meanings on one wheel, in '
+            'that order — never an instant swap between two icons',
+      );
+    },
+  );
+
+  testWidgets(
+    'pressing it rolls idle -> pending -> copied and back, writing the exact text',
+    (WidgetTester tester) async {
+      final List<String> written = <String>[];
+      final Completer<void> writeGate = Completer<void>();
+      await tester.pumpWidget(
+        _host(
+          DocsCopyButton(
+            text: 'const a = 1;',
+            writer: (String value) async {
+              written.add(value);
+              await writeGate.future;
+            },
+          ),
         ),
-      ),
-    );
-    await tester.pump();
+      );
+      await tester.pump();
 
-    await tester.tap(find.byType(ElButton));
-    await tester.pump();
-    await tester.pump();
+      await tester.tap(find.byType(ElButton));
+      await tester.pump();
 
-    expect(written, <String>['const a = 1;']);
-    expect(
-      tester.widget<ElIcon>(find.byType(ElIcon)).lucide,
-      ElLucide.check,
-      reason: 'the glyph must confirm, or a copy is indistinguishable '
-          'from a mis-tap',
-    );
-    expect(tester.widget<ElButton>(find.byType(ElButton)).label, 'Copied');
+      // Mid-write: the wheel has already advanced to the pending cell, and
+      // the control is disabled against a second tap.
+      expect(
+        tester.widget<ElIconSwap>(find.byType(ElIconSwap)).activeIndex,
+        DocsCopyButton.pendingIndex,
+      );
+      expect(tester.widget<ElButton>(find.byType(ElButton)).onPressed, isNull);
 
-    // Drain the pending confirmation timer so the test framework does not
-    // flag it as leaked at teardown; the revert itself is test 3's concern.
-    await tester.pump(DocsCopyButton.confirmation);
-  });
+      writeGate.complete();
+      await tester.pump();
+      await tester.pump();
 
-  testWidgets('the confirmation reverts', (WidgetTester tester) async {
-    await tester.pumpWidget(
-      _host(
-        DocsCopyButton(
-          text: 'x',
-          writer: (String value) async {},
-        ),
-      ),
-    );
-    await tester.pump();
-    await tester.tap(find.byType(ElButton));
-    await tester.pump();
-    await tester.pump(const Duration(seconds: 3));
+      expect(written, <String>['const a = 1;']);
+      expect(
+        tester.widget<ElIconSwap>(find.byType(ElIconSwap)).activeIndex,
+        DocsCopyButton.copiedIndex,
+        reason: 'the wheel must confirm, or a copy is indistinguishable '
+            'from a mis-tap',
+      );
+      expect(tester.widget<ElButton>(find.byType(ElButton)).label, 'Copied');
 
-    expect(tester.widget<ElIcon>(find.byType(ElIcon)).lucide, ElLucide.copy);
-  });
+      // Drain the pending confirmation timer so the test framework does not
+      // flag it as leaked at teardown.
+      await tester.pump(DocsCopyButton.confirmation);
+      expect(
+        tester.widget<ElIconSwap>(find.byType(ElIconSwap)).activeIndex,
+        DocsCopyButton.idleIndex,
+      );
+      expect(tester.widget<ElButton>(find.byType(ElButton)).label, 'Copy code');
+    },
+  );
 }
