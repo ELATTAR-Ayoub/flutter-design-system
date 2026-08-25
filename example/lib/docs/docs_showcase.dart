@@ -51,6 +51,7 @@ class DocsShowcase extends StatefulWidget {
     required this.code,
     this.alignment = Alignment.center,
     this.label,
+    this.minHeight,
   });
 
   /// The live component, rendered in the Preview pane.
@@ -67,12 +68,31 @@ class DocsShowcase extends StatefulWidget {
   /// hears the same name once per showcase.
   final String? label;
 
-  /// The stage height. 640 is the reading column's own measure, and a
-  /// specimen judged in a shorter box reads as cramped.
-  static double get tallMinHeight => el(160);
+  /// This stage's own minimum, overriding the breakpoint default.
+  ///
+  /// Null keeps [minHeightFor], which is what every call site wanted before
+  /// this field existed. A section passes its own when its specimen has a
+  /// size of its own worth respecting: a chart, a dialog and a sheet want
+  /// the room; a lone pill does not, and 640 of it read as a mistake.
+  final double? minHeight;
 
-  /// Below `ElBreakpoints.sm` a 640 stage is taller than the whole viewport
-  /// minus header and toggle, which would push the control off screen.
+  /// The stage's default minimum.
+  ///
+  /// **Was 640** — the reading column's own measure, on the reasoning that a
+  /// specimen judged in a shorter box reads as cramped. Held against a real
+  /// page that turned out to be the wrong default by an order of magnitude:
+  /// the Button page put sixteen single pills each in the middle of its own
+  /// 640 box and stood 17,925px tall, which reads as a page of empty rooms
+  /// rather than as generous framing. The default is now the shorter
+  /// measure, and a section that genuinely needs the height asks for it —
+  /// [minHeight] — so one tall specimen costs one line instead of every
+  /// short one costing 400px.
+  static double get tallMinHeight => el(96);
+
+  /// Kept as its own name because [EffectSection] and the narrow branch both
+  /// mean *this* measure specifically, not "whatever the default happens to
+  /// be": if a later change raises [tallMinHeight] again, an effect's host
+  /// and a phone's stage should not follow it up.
   static double get shortMinHeight => el(96);
 
   static double minHeightFor(double viewportWidth) =>
@@ -89,9 +109,9 @@ class _DocsShowcaseState extends State<DocsShowcase> {
 
   @override
   Widget build(BuildContext context) {
-    final double minHeight = DocsShowcase.minHeightFor(
-      MediaQuery.sizeOf(context).width,
-    );
+    final double minHeight =
+        widget.minHeight ??
+        DocsShowcase.minHeightFor(MediaQuery.sizeOf(context).width);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,

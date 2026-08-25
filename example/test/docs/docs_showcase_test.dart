@@ -22,9 +22,14 @@ Widget _showcase() => const DocsShowcase(
 );
 
 void main() {
-  testWidgets('it stands 640 tall at a wide viewport', (
+  testWidgets('it stands 384 tall at a wide viewport', (
     WidgetTester tester,
   ) async {
+    // Was 640 — the reading column's own measure. Held against a real page
+    // it was the wrong default by an order of magnitude: sixteen single
+    // pills, each centred in its own 640 box, made the Button page
+    // 17,925px tall. The default is now the short measure and a section
+    // that needs the room asks for it. See DocsShowcase.tallMinHeight.
     tester.view.physicalSize = const Size(1440, 2000);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
@@ -34,7 +39,54 @@ void main() {
 
     expect(
       tester.getSize(find.byType(DocsShowcaseFrame)).height,
-      greaterThanOrEqualTo(el(160)),
+      el(96),
+    );
+  });
+
+  testWidgets('an explicit minHeight overrides the breakpoint default', (
+    WidgetTester tester,
+  ) async {
+    tester.view.physicalSize = const Size(1440, 2000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(
+      _host(
+        DocsShowcase(
+          specimen: const SizedBox(height: 40, width: 120),
+          code: 'const SizedBox(height: 40, width: 120)',
+          minHeight: el(64),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(tester.getSize(find.byType(DocsShowcaseFrame)).height, el(64));
+  });
+
+  testWidgets('a taller specimen still outgrows its minimum', (
+    WidgetTester tester,
+  ) async {
+    // minHeight is a floor, never a ceiling — that is what makes lowering
+    // the default safe: it removes empty space and crops nothing.
+    tester.view.physicalSize = const Size(1440, 2000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(
+      _host(
+        DocsShowcase(
+          specimen: const SizedBox(height: 900, width: 120),
+          code: 'x',
+          minHeight: el(64),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(
+      tester.getSize(find.byType(DocsShowcaseFrame)).height,
+      greaterThan(900),
     );
   });
 
