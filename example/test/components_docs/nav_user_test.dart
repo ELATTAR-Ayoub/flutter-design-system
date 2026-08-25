@@ -1,34 +1,33 @@
-import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:example/components_docs/nav_user/meta.dart';
-import 'package:example/components_docs/nav_user/page.dart';
-import 'package:example/kit.dart' show ElSection;
-import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
-
+/// Tests for `components_docs/nav_user/meta.dart` and
+/// `components_docs/nav_user/page.dart`: the public Nav User component
+/// documentation page.
+///
+/// **Re-housed onto `ComponentDocSpec`/`ComponentDocPage`**, the same shape
+/// `button_test.dart` and `popover_test.dart` assert against: sections read
+/// through `DocsSection.title`, and the API table (now inside a
+/// `DocsDisclosure`, closed by default) is opened before its rows are read.
+/// No `pumpAndSettle` is used anywhere on this page.
+///
 /// New on 2026-08-24, with the page: `ElNavUser` was documented inside
 /// `carousel/page.dart` until the split.
 ///
-/// The page's own section order, live demo excluded (it has no heading).
-const List<String> _sectionOrder = <String>[
-  'install',
-  'usage',
-  'footer',
-  'account',
-  'menu',
-  'placement',
-  'api',
-  'states',
-  'accessibility',
-  'responsive',
-  'dependencies',
-  'theming',
-  'source',
-];
+/// `MaterialApp` + `Scaffold` so the account dropdown has a real `Overlay` to
+/// mount into: without one it silently never opens.
+library;
 
-/// The same list by title. A section title also renders in the right-rail
-/// TOC at desktop width, so `find.text` would match each twice: the order is
-/// read off the mounted `ElSection` widgets instead.
-const List<String> _sectionTitles = <String>[
+import 'package:elattar_design_system/elattar_design_system.dart';
+import 'package:example/components_docs/nav_user/meta.dart';
+import 'package:example/components_docs/nav_user/page.dart';
+import 'package:example/docs/component_doc_page.dart' show DocsTocEntry;
+import 'package:example/docs/docs_disclosure.dart';
+import 'package:example/docs/docs_install.dart';
+import 'package:example/docs/docs_section.dart' show DocsSection;
+import 'package:example/docs/docs_showcase.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+const List<String> _sectionOrder = <String>[
+  'Preview',
   'Installation',
   'Usage',
   'Sitting in a sidebar footer',
@@ -38,6 +37,7 @@ const List<String> _sectionTitles = <String>[
   'API Reference',
   'States',
   'Accessibility',
+  'Keyboard',
   'Responsive',
   'Dependencies',
   'Theming',
@@ -54,6 +54,13 @@ const List<String> _itemParams = <String>[
   'onSelect',
   'destructive',
 ];
+
+Finder _disclosureTrigger(String title) => find.descendant(
+  of: find.byWidgetPredicate(
+    (Widget widget) => widget is DocsDisclosure && widget.title == title,
+  ),
+  matching: find.byKey(DocsDisclosure.triggerKey),
+);
 
 /// `MaterialApp` + `Scaffold` so the account dropdown has a real `Overlay` to
 /// mount into: without one it silently never opens.
@@ -74,6 +81,7 @@ void main() {
       expect(navUserDoc.name, 'nav_user');
       expect(navUserDoc.title, 'Nav User');
       expect(navUserDoc.route, '/components/nav_user');
+      expect(navUserDoc.command, 'elattar add nav-user');
       expect(navUserDoc.sourcePath, 'lib/src/components/nav_user.dart');
       expect(navUserDoc.exports, <String>[
         'ElNavUser',
@@ -99,12 +107,18 @@ void main() {
       );
       expect(three.initials, 'MO');
     });
+
+    test('the table of contents matches the declared sections', () {
+      expect(
+        navUserDocSpec.toc.map((DocsTocEntry entry) => entry.title).toList(),
+        _sectionOrder,
+      );
+    });
   });
 
   group('nav_user docs page', () {
     testWidgets(
-      'renders the article, all three API tables, and the live specimens '
-      'at desktop size',
+      'renders the article and the live specimens at desktop size',
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(1440, 900);
         tester.view.devicePixelRatio = 1;
@@ -125,24 +139,6 @@ void main() {
           find.byKey(const ValueKey<String>('nav-user-doc-article')),
           findsOneWidget,
         );
-
-        for (final String param in <String>[
-          ..._navUserParams,
-          ..._accountParams,
-          ..._itemParams,
-        ]) {
-          expect(
-            find.text(param),
-            findsWidgets,
-            reason: 'missing param $param',
-          );
-        }
-
-        // The two members the pre-split tables omitted entirely: the static
-        // menu floor, and the whole ElNavUserItem class.
-        expect(find.text('ElNavUser.menuMinWidth'), findsWidgets);
-        expect(find.text('ElNavUserItem'), findsWidgets);
-        expect(find.text('initials'), findsWidgets);
 
         for (final String key in <String>[
           'nav-user-preview',
@@ -190,6 +186,117 @@ void main() {
     );
 
     testWidgets(
+      'the API tables document every constructor parameter found in the source',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(1440, 4000);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+
+        await tester.pumpWidget(
+          _harness(
+            controller: ElThemeController(mode: ElThemeMode.dark),
+            child: const NavUserDocPage(),
+          ),
+        );
+        await tester.pump();
+
+        final Finder apiTrigger = _disclosureTrigger('API Reference');
+        await tester.ensureVisible(apiTrigger);
+        await tester.pump();
+        await tester.tap(apiTrigger);
+        await tester.pump();
+        await tester.pump(ElDurations.jelly);
+
+        for (final String param in <String>[
+          ..._navUserParams,
+          ..._accountParams,
+          ..._itemParams,
+        ]) {
+          expect(
+            find.text(param),
+            findsWidgets,
+            reason: 'missing param $param',
+          );
+        }
+
+        // The two members the pre-split tables omitted entirely: the static
+        // menu floor, and the whole ElNavUserItem class.
+        expect(find.text('ElNavUser.menuMinWidth'), findsWidgets);
+        expect(find.text('ElNavUserItem'), findsWidgets);
+        expect(find.text('initials'), findsWidgets);
+      },
+    );
+
+    testWidgets(
+      'keyboard plainly documents the shared menu engine and the '
+      'component\'s own silence',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(1440, 4000);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+
+        await tester.pumpWidget(
+          _harness(
+            controller: ElThemeController(mode: ElThemeMode.dark),
+            child: const NavUserDocPage(),
+          ),
+        );
+        await tester.pump();
+
+        final Finder keyboardTrigger = _disclosureTrigger('Keyboard');
+        await tester.ensureVisible(keyboardTrigger);
+        await tester.pump();
+        await tester.tap(keyboardTrigger);
+        await tester.pump();
+        await tester.pump(ElDurations.jelly);
+
+        expect(find.textContaining('ArrowDown'), findsWidgets);
+        expect(find.textContaining('wires no key handling'), findsWidgets);
+      },
+    );
+
+    testWidgets(
+      'installation shows the real, registry-backed CLI command',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(
+          _harness(
+            controller: ElThemeController(mode: ElThemeMode.dark),
+            child: const NavUserDocPage(),
+          ),
+        );
+        await tester.pump();
+
+        expect(find.text('elattar add nav-user'), findsWidgets);
+        expect(find.textContaining('avatar'), findsWidgets);
+      },
+    );
+
+    testWidgets(
+      'the page is declared, and every section is a kit component',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(1440, 4000);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+
+        await tester.pumpWidget(
+          _harness(
+            controller: ElThemeController(mode: ElThemeMode.dark),
+            child: const NavUserDocPage(),
+          ),
+        );
+        await tester.pump();
+
+        // Three specimen stages: Preview, Sitting in a sidebar footer,
+        // Naming the account.
+        expect(find.byType(DocsShowcase), findsNWidgets(3));
+        expect(find.byType(DocsInstall), findsOneWidget);
+        // Eight collapsed sections: API Reference, States, Accessibility,
+        // Keyboard, Responsive, Dependencies, Theming, Source.
+        expect(find.byType(DocsDisclosure), findsNWidgets(8));
+      },
+    );
+
+    testWidgets(
       'sections render in the documented order, section for section',
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(1440, 900);
@@ -205,25 +312,10 @@ void main() {
         await tester.pump();
 
         final List<String> titles = tester
-            .widgetList<ElSection>(find.byType(ElSection))
-            .map((ElSection section) => section.title)
+            .widgetList<DocsSection>(find.byType(DocsSection))
+            .map((DocsSection section) => section.title)
             .toList();
-        expect(titles, _sectionTitles);
-
-        double? previousTop;
-        for (final String id in _sectionOrder) {
-          final Finder finder = find.byKey(ElSection.anchorKey(id));
-          expect(finder, findsOneWidget, reason: 'missing section "$id"');
-          final double top = tester.getTopLeft(finder).dy;
-          if (previousTop != null) {
-            expect(
-              top,
-              greaterThan(previousTop),
-              reason: '"$id" is out of order',
-            );
-          }
-          previousTop = top;
-        }
+        expect(titles, _sectionOrder);
       },
     );
 

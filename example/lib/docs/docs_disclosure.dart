@@ -87,7 +87,30 @@ class _DocsDisclosureState extends State<DocsDisclosure>
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                ElText(widget.title, ElType.h4, color: theme.foreground),
+                // [Expanded] and a single ellipsised line, because the
+                // trigger's height is fixed at [triggerHeight] and its width
+                // is the reading column's. An unconstrained title in this
+                // Row overflowed on a phone the moment a page used one
+                // longer than about thirty characters — a real
+                // `RenderFlex overflowed` at 390px, found by a page whose
+                // disclosure was called "What this port leaves out". Every
+                // page shares this widget, so that was a defect waiting for
+                // whichever of the ninety-nine wrote a long enough heading,
+                // and the fix belongs here rather than in a title.
+                //
+                // The full title is never lost: the [Semantics] wrapper
+                // above carries it as this control's label, so a screen
+                // reader still hears all of it.
+                Expanded(
+                  child: ElText(
+                    widget.title,
+                    ElType.h4,
+                    color: theme.foreground,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                SizedBox(width: el(2)),
                 RotationTransition(
                   turns: _turns,
                   child: ElIcon.lucide(

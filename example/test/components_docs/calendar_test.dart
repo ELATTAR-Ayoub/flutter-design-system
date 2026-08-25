@@ -20,12 +20,21 @@
 /// `ElDatePicker` mounts its calendar through a `ElPopover`, which needs a
 /// real `Overlay`, so the harness wraps the page in a `MaterialApp`: the
 /// same fix the `popover` and `select` pages needed.
+///
+/// **Re-housed onto the kit.** Sections that used to render open (a bare
+/// `ElSection`) now live inside a closed-by-default `DocsDisclosure`: the
+/// API tables, the Keyboard table, the reported gaps, and the locale
+/// findings, so those groups open their disclosure first before reading
+/// text out of it — `button_test.dart` and `field_test.dart` established
+/// the same helper.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/calendar/meta.dart';
 import 'package:example/components_docs/calendar/page.dart';
-import 'package:example/kit.dart' show ElSection;
+import 'package:example/docs/component_doc_page.dart' show DocsTocEntry;
+import 'package:example/docs/docs_disclosure.dart';
+import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -77,6 +86,23 @@ Future<ElThemeController> _pumpCalendarDoc(
   return theme;
 }
 
+/// The single `DocsDisclosure` whose title is [title].
+Finder _disclosureTrigger(String title) => find.descendant(
+  of: find.byWidgetPredicate(
+    (Widget widget) => widget is DocsDisclosure && widget.title == title,
+  ),
+  matching: find.byKey(DocsDisclosure.triggerKey),
+);
+
+Future<void> _open(WidgetTester tester, String title) async {
+  final Finder trigger = _disclosureTrigger(title);
+  await tester.ensureVisible(trigger);
+  await tester.pump();
+  await tester.tap(trigger);
+  await tester.pump();
+  await tester.pump(ElDurations.jelly);
+}
+
 /// One 28px day cell: the `SizedBox` `_DayCell` wraps itself in, which is the
 /// only `ElCalendar.cellSize` square that ever contains a digit (the weekday
 /// header squares hold `Su`…`Sa` and the nav squares hold a glyph).
@@ -125,8 +151,7 @@ void main() {
       // registry item names that exist today: foundation (which carries
       // date_format.dart, and therefore ElDateFormat, ElClock and
       // ElCalendarType), button, icon (which ships icon_paths.dart too), and
-      // popover. Nothing invented: `calendar` has no manifest of its own and
-      // this list is what one would have to name.
+      // popover — the same list the shipped manifest names.
       expect(calendarDoc.dependencies, <String>[
         'button',
         'icon',
@@ -139,17 +164,11 @@ void main() {
   });
 
   group('rendered page', () {
-    testWidgets(
-      'sections render in the shadcn-mirrored order, section for section',
-      (WidgetTester tester) async {
-        await _pumpCalendarDoc(tester);
-
-        final List<String> titles = tester
-            .widgetList<ElSection>(find.byType(ElSection))
-            .map((ElSection section) => section.title)
-            .toList();
-
-        expect(titles, <String>[
+    test('the table of contents matches the declared sections', () {
+      expect(
+        calendarDocSpec.toc.map((DocsTocEntry entry) => entry.title).toList(),
+        <String>[
+          'Preview',
           'Installation',
           'Usage',
           'Composition',
@@ -161,6 +180,39 @@ void main() {
           'API Reference',
           'States',
           'Accessibility',
+          'Keyboard',
+          'Responsive',
+          'Dependencies',
+          'Theming',
+          'Source',
+        ],
+      );
+    });
+
+    testWidgets(
+      'sections render in the shadcn-mirrored order, section for section',
+      (WidgetTester tester) async {
+        await _pumpCalendarDoc(tester);
+
+        final List<String> titles = tester
+            .widgetList<DocsSection>(find.byType(DocsSection))
+            .map((DocsSection section) => section.title)
+            .toList();
+
+        expect(titles, <String>[
+          'Preview',
+          'Installation',
+          'Usage',
+          'Composition',
+          'About',
+          'Date picker',
+          'Selected date (with timezone)',
+          'Range calendar',
+          'Presets',
+          'API Reference',
+          'States',
+          'Accessibility',
+          'Keyboard',
           'Responsive',
           'Dependencies',
           'Theming',
@@ -205,6 +257,8 @@ void main() {
     testWidgets('the API tables document every public member found in the '
         'source', (WidgetTester tester) async {
       await _pumpCalendarDoc(tester);
+
+      await _open(tester, 'API Reference');
 
       const List<String> members = <String>[
         // ElCalendar.single / ElCalendar.range constructor parameters.
@@ -316,6 +370,10 @@ void main() {
       await _pumpCalendarDoc(tester);
 
       expect(find.textContaining('elattar add calendar'), findsWidgets);
+
+      // The manifest filename itself is named in the Dependencies
+      // disclosure, closed by default: open it before reading the claim.
+      await _open(tester, 'Dependencies');
       expect(find.textContaining('calendar.json'), findsWidgets);
     });
   });
@@ -362,6 +420,8 @@ void main() {
         'limit', (WidgetTester tester) async {
       await _pumpCalendarDoc(tester);
 
+      await _open(tester, 'Accessibility');
+
       expect(find.textContaining('en-US'), findsWidgets);
       expect(find.textContaining('Sunday'), findsWidgets);
       expect(find.textContaining('intl'), findsWidgets);
@@ -373,6 +433,8 @@ void main() {
     testWidgets('the keyboard table names every key the grid actually '
         'handles', (WidgetTester tester) async {
       await _pumpCalendarDoc(tester);
+
+      await _open(tester, 'Keyboard');
 
       for (final String key in <String>[
         'PageUp',
@@ -394,6 +456,8 @@ void main() {
       WidgetTester tester,
     ) async {
       await _pumpCalendarDoc(tester);
+
+      await _open(tester, 'Accessibility');
 
       // No grid/table role, no non-visual selected or today signal, no
       // min/max bounds, no per-day disabling, and a 28px touch target.
@@ -540,19 +604,22 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('tapping a day in the grid updates the readout the same as a '
-        'preset does', (WidgetTester tester) async {
-      await _pumpCalendarDoc(tester);
+    testWidgets(
+      'tapping a day in the grid updates the readout the same as a '
+      'preset does',
+      (WidgetTester tester) async {
+        await _pumpCalendarDoc(tester);
 
-      final Finder specimen = _specimen('calendar-doc-presets-specimen');
-      await _tapDay(tester, _dayCell(specimen, '21'));
+        final Finder specimen = _specimen('calendar-doc-presets-specimen');
+        await _tapDay(tester, _dayCell(specimen, '21'));
 
-      expect(
-        find.descendant(of: specimen, matching: find.text('21 Aug 2026')),
-        findsOneWidget,
-      );
-      expect(tester.takeException(), isNull);
-    });
+        expect(
+          find.descendant(of: specimen, matching: find.text('21 Aug 2026')),
+          findsOneWidget,
+        );
+        expect(tester.takeException(), isNull);
+      },
+    );
   });
 
   group('live specimen: the date picker', () {

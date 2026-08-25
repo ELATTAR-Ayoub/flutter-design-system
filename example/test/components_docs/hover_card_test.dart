@@ -1,6 +1,7 @@
 /// Tests for `components_docs/hover_card/meta.dart` and
 /// `components_docs/hover_card/page.dart`: the public documentation page
-/// for Hover Card.
+/// for Hover Card, re-housed onto the kit (`ComponentDocSpec` +
+/// `ComponentDocPage`), the same shape `button_test.dart` covers.
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`. Theme
@@ -11,23 +12,26 @@
 /// the live specimens need a real [Overlay]: the harness wraps the page in a
 /// `MaterialApp`, the same fix Popover and Select needed.
 ///
-/// This page mounts `_HoverCardSpecimen` three times (the unheaded live
-/// demo, Trigger Delays, and Basic), each under its own `specimenKey` — the
-/// known-bug guard the page's own doc comment explains. No test here waits
-/// on the card's open/close timers with `pumpAndSettle`: the component's own
-/// docstring notes the reference measured a 700ms open dwell and a 300ms
-/// close dwell, and a bare mount/render check is what the merged page's
-/// original suite also did for this specimen.
+/// This page mounts `_HoverCardSpecimen` three times (Preview, Trigger
+/// Delays, and Basic), each under its own `specimenKey` — the known-bug
+/// guard the page's own doc comment explains. No test here waits on the
+/// card's open/close timers with `pumpAndSettle`: a bare mount/render check
+/// is what this specimen has always needed.
 ///
-/// Split out of the former merged `navigation_menu_test.dart` (Phase F/J),
-/// which covered `navigation_menu`, `menubar`, `context_menu`, and
-/// `hover_card` together.
+/// API Reference and Accessibility are both `DisclosureSection`s now,
+/// closed by default and mounting no content while closed (see
+/// `docs_disclosure_test.dart`), so both tests that read their content open
+/// the relevant `DocsDisclosure` first — the same fix `button_test.dart`
+/// needed for its own API table.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/hover_card/meta.dart';
 import 'package:example/components_docs/hover_card/page.dart';
-import 'package:example/kit.dart' show ElSection;
+import 'package:example/docs/docs_disclosure.dart';
+import 'package:example/docs/docs_install.dart';
+import 'package:example/docs/docs_section.dart' show DocsSection;
+import 'package:example/docs/docs_showcase.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -64,6 +68,26 @@ Future<ElThemeController> _pumpPage(
   return theme;
 }
 
+/// The single `DocsDisclosure` whose title is [title]. `DocsDisclosure`'s
+/// own trigger key is one constant shared by every instance on the page, so
+/// a bare `find.byKey` would match all eight — this narrows to the one
+/// panel by its title first, matching `button_test.dart`'s own helper.
+Finder _disclosureTrigger(String title) => find.descendant(
+  of: find.byWidgetPredicate(
+    (Widget widget) => widget is DocsDisclosure && widget.title == title,
+  ),
+  matching: find.byKey(DocsDisclosure.triggerKey),
+);
+
+Future<void> _open(WidgetTester tester, String title) async {
+  final Finder trigger = _disclosureTrigger(title);
+  await tester.ensureVisible(trigger);
+  await tester.pump();
+  await tester.tap(trigger);
+  await tester.pump();
+  await tester.pump(ElDurations.jelly);
+}
+
 void main() {
   group('meta', () {
     test('hoverCardDoc names the real public API surface', () {
@@ -82,21 +106,25 @@ void main() {
       // Short description: one sentence, no trailing ellipsis.
       expect(hoverCardDoc.description, isNot(contains('..')));
       expect(hoverCardDoc.description.trim(), hoverCardDoc.description);
+      // A real registry manifest, not the stale "unregistered" claim the
+      // hand-composed page used to carry — see this page's own library doc.
+      expect(hoverCardDoc.command, 'elattar add hover-card');
     });
   });
 
   group('rendered page', () {
-    testWidgets('sections render in the shadcn-mirrored order', (
+    testWidgets('sections render in the declared order', (
       WidgetTester tester,
     ) async {
       await _pumpPage(tester);
 
       final List<String> titles = tester
-          .widgetList<ElSection>(find.byType(ElSection))
-          .map((ElSection section) => section.title)
+          .widgetList<DocsSection>(find.byType(DocsSection))
+          .map((DocsSection section) => section.title)
           .toList();
 
       expect(titles, <String>[
+        'Preview',
         'Installation',
         'Usage',
         'Composition',
@@ -106,12 +134,27 @@ void main() {
         'API Reference',
         'States',
         'Accessibility',
+        'Keyboard',
         'Responsive',
         'Dependencies',
         'Theming',
         'Source',
       ]);
     });
+
+    testWidgets(
+      'the page is declared, and every section is a kit component',
+      (WidgetTester tester) async {
+        await _pumpPage(tester);
+
+        // Four specimen stages: Preview, Trigger Delays, Basic, RTL.
+        expect(find.byType(DocsShowcase), findsNWidgets(4));
+        expect(find.byType(DocsInstall), findsOneWidget);
+        // Eight collapsed sections: API Reference, States, Accessibility,
+        // Keyboard, Responsive, Dependencies, Theming, Source.
+        expect(find.byType(DocsDisclosure), findsNWidgets(8));
+      },
+    );
 
     testWidgets(
       'renders the article and all three live specimens under distinct keys',
@@ -143,6 +186,8 @@ void main() {
       (WidgetTester tester) async {
         await _pumpPage(tester);
 
+        await _open(tester, 'API Reference');
+
         expect(find.text('trigger'), findsWidgets);
         expect(find.text('content'), findsWidgets);
         expect(find.text('width'), findsWidgets);
@@ -158,7 +203,10 @@ void main() {
     ) async {
       await _pumpPage(tester);
 
-      expect(find.textContaining('elattar add hover-card'), findsWidgets);
+      // The install command is derived, never a literal — see
+      // `ComponentDocEntry.command`.
+      expect(hoverCardDoc.command, 'elattar add hover-card');
+      expect(find.byType(DocsInstall), findsOneWidget);
     });
 
     testWidgets('accessibility section documents the touch gap', (
@@ -166,10 +214,22 @@ void main() {
     ) async {
       await _pumpPage(tester);
 
+      await _open(tester, 'Accessibility');
+
       expect(find.textContaining('Pointer only'), findsWidgets);
       // ElNote's title renders through ElType.label, which uppercases its
       // text, so match on the body copy instead of the title.
       expect(find.textContaining('optional detail'), findsWidgets);
+    });
+
+    testWidgets('keyboard section documents the absent keyboard path', (
+      WidgetTester tester,
+    ) async {
+      await _pumpPage(tester);
+
+      await _open(tester, 'Keyboard');
+
+      expect(find.textContaining('No keyboard path exists'), findsWidgets);
     });
   });
 

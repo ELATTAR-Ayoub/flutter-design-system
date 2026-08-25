@@ -18,8 +18,10 @@ library;
 
 import '../catalog.dart' show ComponentDocEntry;
 
-/// `item` has no `registry/components/item.json` yet: see `page.dart`'s
-/// installation section for the shipped command and registry dependencies.
+/// `registry/components/item.json` is a real manifest — `files`,
+/// `registryDependencies: [source-foundation]`, a `documentationRoute` —
+/// and `elattar add item` installs from it today. [dependencies] is that
+/// manifest's own `registryDependencies` list, verbatim.
 const ComponentDocEntry itemDoc = ComponentDocEntry(
   name: 'item',
   title: 'Item',

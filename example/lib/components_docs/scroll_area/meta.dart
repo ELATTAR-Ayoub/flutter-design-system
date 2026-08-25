@@ -11,14 +11,17 @@
 /// `scroll_area.scrollAreaDoc` reference and `main.dart`'s route table
 /// needed no edit for this third of the split.
 ///
-/// Not wired into `catalog.dart`'s `componentDocs` list beyond the entry it
-/// already carries: that file is supervisor-owned. `page.dart` reads
-/// [scrollAreaDoc] directly rather than going through
-/// `componentDoc('scroll_area')`.
+/// `catalog.dart`'s `componentDocs` list already carries
+/// `scroll_area.scrollAreaDoc`. `page.dart` reads [scrollAreaDoc] directly
+/// rather than going through `componentDoc('scroll_area')`.
 ///
-/// `scroll_area` installs through `elattar add scroll-area`: see `page.dart`'s
-/// installation section for the shipped command and registry dependencies. [dependencies] is left
-/// empty rather than naming items a manifest does not yet resolve.
+/// `scroll_area` has a real registry manifest,
+/// `registry/components/scroll-area.json` (hyphenated, matching the
+/// registry's own naming), which installs through `elattar add
+/// scroll-area` and lists exactly one registry dependency:
+/// `source-foundation`. [dependencies] mirrors that shipped manifest, not
+/// an invented list — a previous version of this comment claimed
+/// [dependencies] was "left empty," which was never true.
 library;
 
 import '../catalog.dart' show ComponentDocEntry;

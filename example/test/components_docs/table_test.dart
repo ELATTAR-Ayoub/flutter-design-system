@@ -1,7 +1,11 @@
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/table/meta.dart';
 import 'package:example/components_docs/table/page.dart';
-import 'package:example/kit.dart' show ElSection;
+import 'package:example/docs/component_doc_page.dart' show DocsTocEntry;
+import 'package:example/docs/docs_disclosure.dart';
+import 'package:example/docs/docs_install.dart';
+import 'package:example/docs/docs_section.dart' show DocsSection;
+import 'package:example/docs/docs_showcase.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +19,28 @@ Widget _harness({
   child: MaterialApp(home: SingleChildScrollView(child: child)),
 );
 
-/// A minimal, real [ElTable]: the same shape [TableDocPage]'s own preview
+/// The single `DocsDisclosure` whose title is [title]. `DocsDisclosure`'s own
+/// trigger key ([DocsDisclosure.triggerKey]) is one constant shared by every
+/// instance on the page, so a bare `find.byKey` would match all eight — this
+/// narrows to the one panel by its title first, matching `button_test.dart`'s
+/// own convention.
+Finder _disclosureTrigger(String title) => find.descendant(
+  of: find.byWidgetPredicate(
+    (Widget widget) => widget is DocsDisclosure && widget.title == title,
+  ),
+  matching: find.byKey(DocsDisclosure.triggerKey),
+);
+
+Future<void> _open(WidgetTester tester, String title) async {
+  final Finder trigger = _disclosureTrigger(title);
+  await tester.ensureVisible(trigger);
+  await tester.pump();
+  await tester.tap(trigger);
+  await tester.pump();
+  await tester.pump(ElDurations.jelly);
+}
+
+/// A minimal, real [ElTable]: the same shape [TableDocPage]'s own Preview
 /// specimen uses (an icon-and-label first cell, a right-aligned money
 /// column, a badge column): mounted directly, without the rest of the doc
 /// article around it, so the assertions below are about `ElTable` itself and
@@ -78,7 +103,7 @@ List<Container> _cellContainers(WidgetTester tester, {required Finder of}) =>
         )
         .toList();
 
-/// The key `page.dart` puts on its live-demo specimen, ahead of any heading.
+/// The key `page.dart` puts on its Preview specimen.
 const Key _previewTableKey = ValueKey<String>('table-doc-preview-table');
 
 BoxDecoration _decoration(Container c) => c.decoration! as BoxDecoration;
@@ -101,12 +126,14 @@ void main() {
             ),
           ),
         );
-        await tester.pumpAndSettle();
+        await tester.pump();
 
         expect(
           find.byKey(const ValueKey<String>('table-doc-article')),
           findsOneWidget,
         );
+
+        await _open(tester, 'API Reference');
 
         // Every public member enumerated from lib/src/components/table.dart:
         // ElTable's own constructor and static tokens, ElTableCellSpec,
@@ -139,15 +166,65 @@ void main() {
         expect(
           find.text('Showing the 5 most recent transactions of 248.'),
           findsOneWidget,
-          reason: 'the preview specimen should carry a real caption',
+          reason: 'the Preview specimen should carry a real caption',
         );
 
         expect(tableDoc.name, 'table');
         expect(tableDoc.exports, containsAll(<String>['ElTable']));
+        expect(tableDoc.command, 'elattar add table');
         expect(destination, isNull);
         expect(tester.takeException(), isNull);
       },
     );
+
+    testWidgets(
+      'the page is declared, and every section is a kit component',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(1440, 4000);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+
+        await tester.pumpWidget(
+          _harness(
+            controller: ElThemeController(mode: ElThemeMode.dark),
+            child: const TableDocPage(),
+          ),
+        );
+        await tester.pump();
+
+        // Five specimen stages: Preview, Composition, Actions, RTL — Data
+        // Table is deliberately a SnippetSection, not a ShowcaseSection: see
+        // the spec's own description.
+        expect(find.byType(DocsShowcase), findsNWidgets(4));
+        expect(find.byType(DocsInstall), findsOneWidget);
+        // Eight collapsed sections: API Reference, States, Accessibility,
+        // Keyboard, Responsive, Dependencies, Theming, Source.
+        expect(find.byType(DocsDisclosure), findsNWidgets(8));
+      },
+    );
+
+    test('the table of contents matches the declared sections', () {
+      expect(
+        tableDocSpec.toc.map((DocsTocEntry entry) => entry.title).toList(),
+        <String>[
+          'Preview',
+          'Installation',
+          'Usage',
+          'Composition',
+          'Actions',
+          'Data Table',
+          'RTL',
+          'API Reference',
+          'States',
+          'Accessibility',
+          'Keyboard',
+          'Responsive',
+          'Dependencies',
+          'Theming',
+          'Source',
+        ],
+      );
+    });
 
     testWidgets(
       'sections render in the shadcn-mirrored order, section for section',
@@ -162,14 +239,15 @@ void main() {
             child: const TableDocPage(),
           ),
         );
-        await tester.pumpAndSettle();
+        await tester.pump();
 
         final List<String> titles = tester
-            .widgetList<ElSection>(find.byType(ElSection))
-            .map((ElSection section) => section.title)
+            .widgetList<DocsSection>(find.byType(DocsSection))
+            .map((DocsSection section) => section.title)
             .toList();
 
         expect(titles, <String>[
+          'Preview',
           'Installation',
           'Usage',
           'Composition',
@@ -179,6 +257,7 @@ void main() {
           'API Reference',
           'States',
           'Accessibility',
+          'Keyboard',
           'Responsive',
           'Dependencies',
           'Theming',
@@ -202,7 +281,7 @@ void main() {
 
     testWidgets(
       'renders at narrow width with the anchor strip instead of a rail, and '
-      'the wide preview specimen does not overflow',
+      'the wide Preview specimen does not overflow',
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(390, 844);
         tester.view.devicePixelRatio = 1;
@@ -214,7 +293,7 @@ void main() {
             child: const TableDocPage(),
           ),
         );
-        await tester.pumpAndSettle();
+        await tester.pump();
 
         expect(
           find.byKey(const ValueKey<String>('table-doc-article')),
@@ -228,13 +307,13 @@ void main() {
           find.byKey(const ValueKey<String>('docs-layout-sidebar')),
           findsNothing,
         );
-        // The live demo wraps its specimen in a horizontal scroll
-        // view precisely because ElTable does not provide one itself: see
-        // the "ElTable overflow behaviour" group below for the bare-widget
-        // proof. This assertion is what keeps that claim honest: if a future
-        // edit to page.dart drops the wrapper, this page would start
-        // throwing "RenderFlex overflowed" at 390px and this test would
-        // fail loudly instead of a reader finding out first.
+        // The Preview specimen wraps its table in a horizontal scroll view
+        // precisely because ElTable does not provide one itself: see the
+        // "ElTable overflow behaviour" group below for the bare-widget
+        // proof. This assertion is what keeps that claim honest: if a
+        // future edit to page.dart drops the wrapper, this page would
+        // start throwing "RenderFlex overflowed" at 390px and this test
+        // would fail loudly instead of a reader finding out first.
         expect(tester.takeException(), isNull);
       },
     );
@@ -252,7 +331,7 @@ void main() {
         await tester.pumpWidget(
           _harness(controller: controller, child: const TableDocPage()),
         );
-        await tester.pumpAndSettle();
+        await tester.pump();
 
         ElThemeData themeOf() =>
             ElTheme.of(tester.element(find.byType(TableDocPage)));
@@ -264,7 +343,7 @@ void main() {
         expect(darkBorder, themeOf().border);
 
         controller.setMode(ElThemeMode.light);
-        await tester.pumpAndSettle();
+        await tester.pump();
 
         final Color lightBorder = _decoration(
           _cellContainers(tester, of: preview).first,
@@ -280,7 +359,7 @@ void main() {
   });
 
   /// These tests are about `ElTable` itself, not about how `page.dart`
-  /// composes it: a bare specimen the size of the doc page's own preview,
+  /// composes it: a bare specimen the size of the doc page's own Preview,
   /// mounted on its own, so a claim made in the Responsive section (no
   /// scroll container of its own; columns compress; a non-wrapping cell can
   /// overflow; wrapping fixes it a specific way) is pinned to a real,
@@ -407,7 +486,7 @@ void main() {
             child: _realisticTable(selectSecondRow: true),
           ),
         );
-        await tester.pumpAndSettle();
+        await tester.pump();
 
         final ElThemeData theme = ElTheme.of(
           tester.element(find.byType(ElTable)),
@@ -433,7 +512,7 @@ void main() {
           reason: 'ElTableRowSpec.selected is theme.muted at full strength',
         );
 
-        // Hover row 0 (unselected) and let the 250ms transition settle.
+        // Hover row 0 (unselected) and let the 250ms transition run.
         final TestGesture pointer = await tester.createGesture(
           kind: PointerDeviceKind.mouse,
         );
@@ -442,7 +521,8 @@ void main() {
         await pointer.moveTo(
           tester.getCenter(find.text('Studio Pro annual plan')),
         );
-        await tester.pumpAndSettle();
+        await tester.pump();
+        await tester.pump(ElDurations.transitionDefault);
 
         final Color hovered = _decoration(cells()[3]).color!;
         expect(
@@ -458,7 +538,8 @@ void main() {
         await pointer.moveTo(
           tester.getCenter(find.text('Weekly creator payout')),
         );
-        await tester.pumpAndSettle();
+        await tester.pump();
+        await tester.pump(ElDurations.transitionDefault);
         final Color selectedWhileHovered = _decoration(cells()[6]).color!;
         expect(selectedWhileHovered, theme.muted);
       },
@@ -480,7 +561,7 @@ void main() {
             child: _harness(controller: controller, child: _realisticTable()),
           ),
         );
-        await tester.pumpAndSettle();
+        await tester.pump();
 
         final ElThemeData theme = ElTheme.of(
           tester.element(find.byType(ElTable)),
@@ -495,7 +576,7 @@ void main() {
           tester.getCenter(find.text('Studio Pro annual plan')),
         );
         // A single, zero-time pump: a non-reduced hover would still be mid
-        // fade-in at this point (see the test above's pumpAndSettle need).
+        // fade-in at this point (see the test above's post-transition pump).
         await tester.pump();
 
         final Color hovered = _decoration(
@@ -528,7 +609,7 @@ void main() {
             ),
           ),
         );
-        await tester.pumpAndSettle();
+        await tester.pump();
 
         expect(find.text('No results.'), findsOneWidget);
         final RenderBox box = tester.renderObject<RenderBox>(

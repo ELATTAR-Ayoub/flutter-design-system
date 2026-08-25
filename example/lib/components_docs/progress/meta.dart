@@ -12,9 +12,10 @@
 /// already carries: that file is supervisor-owned. `page.dart` reads
 /// [progressDoc] directly rather than going through `componentDoc('progress')`.
 ///
-/// `registry/components/progress.json` does not exist yet: see `page.dart`'s
-/// installation section for the shipped command and registry dependencies. [dependencies] is left
-/// empty rather than naming items a manifest does not yet resolve.
+/// `progress` has a real `registry/components/progress.json` manifest --
+/// [dependencies] is that manifest's own `registryDependencies` list,
+/// verbatim, so `page.dart`'s installation section can render the real
+/// `elattar add progress` command.
 library;
 
 import '../catalog.dart' show ComponentDocEntry;

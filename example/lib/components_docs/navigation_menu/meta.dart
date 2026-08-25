@@ -1,8 +1,14 @@
 /// Documentation metadata for `navigation_menu`.
 ///
-/// No `registry/components/navigation-menu.json` manifest yet: unregistered.
-/// [dependencies] is left empty; the page states in prose that this component
-/// builds on [ElPopover].
+/// **Corrected.** This file used to claim no `registry/components/
+/// navigation-menu.json` manifest existed and that [dependencies] was left
+/// empty. Both are stale: `registry/components/navigation-menu.json` is a
+/// real, shipped manifest today, `registry/generated/latest/registry.json`
+/// carries `navigation-menu`, and `elattar add navigation-menu` is a
+/// genuine, working command. [dependencies] below already matches the
+/// manifest's own `registryDependencies` list, verbatim: `icon`, `popover`
+/// (the [ElPopover] positioner this component builds on), `press-motion`,
+/// and `source-foundation`.
 ///
 /// Phase F/J split: this file used to cover `navigation_menu`, `menubar`,
 /// `context_menu`, and `hover_card` together (they all build on ElPopover).

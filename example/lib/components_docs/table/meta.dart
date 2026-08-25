@@ -4,16 +4,15 @@
 /// supervisor-owned. `page.dart` reads [tableDoc] directly rather than going
 /// through `componentDoc('table')`, so this entry stands on its own until the
 /// supervisor aggregates it.
+///
+/// `table` ships `registry/components/table.json`, so `elattar add table`
+/// resolves today. [dependencies] mirrors that manifest's
+/// `registryDependencies`, which is also the real import list at the top of
+/// `lib/src/components/table.dart`: colour, spacing, theme, typography and
+/// motion tokens, and no other component or effect file.
 library;
 
 import '../catalog.dart' show ComponentDocEntry;
-
-/// `table` has no `registry/components/table.json` yet: see `page.dart`'s
-/// installation section for the shipped command and registry dependencies. [dependencies] is left
-/// empty rather than naming items a manifest does not yet resolve; the page
-/// states in prose what the component would need once registered
-/// (`source-foundation` for its colour, spacing, typography and motion
-/// tokens: table.dart declares no dependency on any other component file).
 const ComponentDocEntry tableDoc = ComponentDocEntry(
   name: 'table',
   title: 'Table',

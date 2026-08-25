@@ -1,44 +1,60 @@
 /// Tests for `components_docs/collapsible/page.dart`'s [CollapsibleDocPage]
-/// the public documentation page for `ElCollapsible` (and the [ElUnfold]
+/// — the public documentation page for `ElCollapsible` (and the [ElUnfold]
 /// animation it shares with `ElAccordion`).
+///
+/// Re-housed onto the kit alongside the page: the section-order test now
+/// reads `DocsSection.id`, and the API-table / state-matrix reads open the
+/// relevant `DocsDisclosure` first — closed by default, unlike the old
+/// page's always-visible `ElSection`.
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery` for
-/// layout: the discipline `buttons_page_test.dart` established and
-/// `docs_file_tree_test.dart` / `skills_docs_test.dart` carry forward. Motion
-/// is frozen through `MediaQuery(disableAnimations: true)`, mounted below
-/// `MaterialApp` so it reaches every descendant `ElUnfold`, rather than
-/// pumping `ElDurations.jelly` / `ElDurations.base` by hand.
+/// layout. Motion is frozen through `MediaQuery(disableAnimations: true)`,
+/// mounted below `MaterialApp` so it reaches every descendant `ElUnfold`,
+/// rather than pumping `ElDurations.jelly` / `ElDurations.base` by hand. No
+/// `pumpAndSettle` anywhere, per the rollout brief: `tester.pump()` (motion
+/// is already disabled, so a single frame settles any tween).
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/collapsible/meta.dart';
-import 'package:example/components_docs/collapsible/page.dart';
-import 'package:example/docs/docs_code.dart';
-import 'package:example/kit.dart';
+import 'package:example/components_docs/collapsible/page.dart'
+    show CollapsibleDocPage, collapsibleDocSpec;
+import 'package:example/docs/component_doc_page.dart' show DocsTocEntry;
+import 'package:example/docs/docs_disclosure.dart';
+import 'package:example/docs/docs_install.dart';
+import 'package:example/docs/docs_section.dart' show DocsSection;
+import 'package:example/docs/docs_showcase.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// The section headings this page must render, in this order: the shadcn
-/// `base/collapsible` shape (Preview stands in for its heading-less live
-/// demo, Installation, Usage, Composition, API Reference) followed by the
-/// six sections shadcn does not have.
+/// The house-shape section order this page must render, top to bottom.
 const List<String> _expectedSectionOrder = <String>[
-  'Installation',
-  'Usage',
-  'Composition',
-  'Independent instances',
-  'API Reference',
-  'States',
-  'Accessibility',
-  'Responsive',
-  'Dependencies',
-  'Theming',
-  'Source',
+  'preview',
+  'install',
+  'usage',
+  'composition',
+  'independent-instances',
+  'api',
+  'states',
+  'accessibility',
+  'keyboard',
+  'responsive',
+  'dependencies',
+  'theming',
+  'source',
 ];
 
 const Size _wide = Size(1440, 900);
 const Size _narrow = Size(390, 844);
+
+/// The single `DocsDisclosure` whose title is [title].
+Finder _disclosureTrigger(String title) => find.descendant(
+  of: find.byWidgetPredicate(
+    (Widget widget) => widget is DocsDisclosure && widget.title == title,
+  ),
+  matching: find.byKey(DocsDisclosure.triggerKey),
+);
 
 Future<ElThemeController> _pumpCollapsible(
   WidgetTester tester, {
@@ -85,21 +101,29 @@ void main() {
         collapsibleDoc.exports,
         containsAll(<String>['ElCollapsible', 'ElUnfold']),
       );
+      expect(collapsibleDoc.command, 'elattar add collapsible');
     });
   });
 
   group('page', () {
-    testWidgets('renders the shadcn-parity section order top to bottom', (
+    testWidgets('renders the house-shape section order top to bottom', (
       WidgetTester tester,
     ) async {
-      await _pumpCollapsible(tester, size: const Size(1440, 3200));
+      await _pumpCollapsible(tester, size: const Size(1440, 3600));
 
-      final List<String> rendered = tester
-          .widgetList<ElSection>(find.byType(ElSection))
-          .map((ElSection section) => section.title)
+      final List<String> ids = tester
+          .widgetList<DocsSection>(find.byType(DocsSection))
+          .map((DocsSection section) => section.id)
           .toList();
 
-      expect(rendered, _expectedSectionOrder);
+      expect(ids, _expectedSectionOrder);
+
+      // Three specimen stages (Preview, Independent instances), one
+      // install section, eight collapsed disclosures. Composition is a
+      // SnippetSection, not a showcase: see the page's own library note.
+      expect(find.byType(DocsShowcase), findsNWidgets(2));
+      expect(find.byType(DocsInstall), findsOneWidget);
+      expect(find.byType(DocsDisclosure), findsNWidgets(8));
     });
 
     testWidgets(
@@ -158,6 +182,12 @@ void main() {
         'constructor parameter', (WidgetTester tester) async {
       await _pumpCollapsible(tester);
 
+      final Finder apiTrigger = _disclosureTrigger('API Reference');
+      await tester.ensureVisible(apiTrigger);
+      await tester.tap(apiTrigger);
+      await tester.pump();
+      await tester.pump(ElDurations.jelly);
+
       // `open` is shared by both ElCollapsible and ElUnfold.
       expect(find.text('open'), findsNWidgets(2));
       // ElCollapsible-only.
@@ -188,12 +218,13 @@ void main() {
 
         await tester.ensureVisible(find.text('Advanced filters'));
         await tester.tap(find.text('Advanced filters'));
-        await tester.pumpAndSettle();
+        await tester.pump();
 
         expect(find.text('Volatility'), findsOneWidget);
 
+        await tester.ensureVisible(find.text('Advanced filters'));
         await tester.tap(find.text('Advanced filters'));
-        await tester.pumpAndSettle();
+        await tester.pump();
 
         expect(find.text('Volatility'), findsNothing);
         expect(tester.takeException(), isNull);
@@ -219,7 +250,7 @@ void main() {
         );
         await tester.ensureVisible(firstTrigger);
         await tester.tap(firstTrigger);
-        await tester.pumpAndSettle();
+        await tester.pump();
 
         expect(
           find.byKey(
@@ -237,16 +268,27 @@ void main() {
       },
     );
 
-    testWidgets('CLI tab is absent from the live preview specimen', (
-      WidgetTester tester,
-    ) async {
-      await _pumpCollapsible(tester);
-
-      final DocsCodeExample example = tester.widget<DocsCodeExample>(
-        find.byType(DocsCodeExample).first,
+    test('the table of contents matches the declared sections', () {
+      expect(
+        collapsibleDocSpec.toc
+            .map((DocsTocEntry entry) => entry.title)
+            .toList(),
+        <String>[
+          'Preview',
+          'Installation',
+          'Usage',
+          'Composition',
+          'Independent instances',
+          'API Reference',
+          'States',
+          'Accessibility',
+          'Keyboard',
+          'Responsive',
+          'Dependencies',
+          'Theming',
+          'Source',
+        ],
       );
-      expect(example.hasCommand, isFalse);
-      expect(example.hasManual, isTrue);
     });
   });
 }

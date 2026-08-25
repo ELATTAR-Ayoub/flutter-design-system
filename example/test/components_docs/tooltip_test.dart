@@ -2,11 +2,22 @@
 /// `components_docs/tooltip/page.dart`: the public Tooltip component
 /// documentation page.
 ///
+/// **Re-housed onto `ComponentDocSpec`/`ComponentDocPage`**, the same shape
+/// `button_test.dart` and `popover_test.dart` assert against: sections read
+/// through `DocsSection.title`, and the API table (now inside a
+/// `DocsDisclosure`, closed by default) is opened before its rows are read.
+///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`: the
 /// discipline `breadcrumb_test.dart` already carries. Theme coverage uses a
 /// live `ElThemeController` flipped in place rather than two independent
 /// pumps.
+///
+/// **No `pumpAndSettle` anywhere on this page.** A tooltip opens on a delay
+/// timer, so a test that opens one uses explicit `pump()` /
+/// `pump(duration)` steps instead — `pumpAndSettle` would either time out
+/// waiting on that timer or race the `DocsDisclosure` chevron's own bounded
+/// animation.
 ///
 /// `ElTooltip` mounts its content through an `OverlayPortal`, so the live
 /// specimens need a real `Overlay`: the harness wraps the page in a
@@ -18,13 +29,44 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/tooltip/meta.dart';
 import 'package:example/components_docs/tooltip/page.dart';
-import 'package:example/kit.dart' show ElSection;
+import 'package:example/docs/component_doc_page.dart' show DocsTocEntry;
+import 'package:example/docs/docs_disclosure.dart';
+import 'package:example/docs/docs_install.dart';
+import 'package:example/docs/docs_section.dart' show DocsSection;
+import 'package:example/docs/docs_showcase.dart';
 import 'package:flutter/gestures.dart' show PointerDeviceKind;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 const Size _wide = Size(1440, 900);
+const Size _tall = Size(1440, 5000);
 const Size _narrow = Size(390, 844);
+
+const List<String> _sectionOrder = <String>[
+  'Preview',
+  'Installation',
+  'Usage',
+  'Composition',
+  'Side',
+  'In a toolbar',
+  'Disabled button',
+  'Hidden trigger',
+  'API Reference',
+  'States',
+  'Accessibility',
+  'Keyboard',
+  'Responsive',
+  'Dependencies',
+  'Theming',
+  'Source',
+];
+
+Finder _disclosureTrigger(String title) => find.descendant(
+  of: find.byWidgetPredicate(
+    (Widget widget) => widget is DocsDisclosure && widget.title == title,
+  ),
+  matching: find.byKey(DocsDisclosure.triggerKey),
+);
 
 Future<ElThemeController> _pumpTooltipDoc(
   WidgetTester tester, {
@@ -56,6 +98,19 @@ Future<ElThemeController> _pumpTooltipDoc(
   return theme;
 }
 
+/// Opens the named disclosure, scrolling its trigger into view first: the
+/// trigger sits well past the fold on a page this long. A bounded
+/// `pump(ElDurations.jelly)` settles the chevron's own animation without
+/// `pumpAndSettle`.
+Future<void> _openDisclosure(WidgetTester tester, String title) async {
+  final Finder trigger = _disclosureTrigger(title);
+  await tester.ensureVisible(trigger);
+  await tester.pump();
+  await tester.tap(trigger);
+  await tester.pump();
+  await tester.pump(ElDurations.jelly);
+}
+
 void main() {
   group('meta', () {
     test('tooltipDoc names the real public API surface', () {
@@ -75,6 +130,13 @@ void main() {
       // Short description: one sentence, no trailing ellipsis.
       expect(tooltipDoc.description, isNot(contains('..')));
       expect(tooltipDoc.description.trim(), tooltipDoc.description);
+    });
+
+    test('the table of contents matches the declared sections', () {
+      expect(
+        tooltipDocSpec.toc.map((DocsTocEntry entry) => entry.title).toList(),
+        _sectionOrder,
+      );
     });
   });
 
@@ -102,39 +164,40 @@ void main() {
     });
 
     testWidgets(
-      'sections render in the shadcn-tooltip-mirrored order, Status gone, '
-      'the six Elattar sections trailing API',
+      'sections render in the shadcn-tooltip-mirrored order, with Preview '
+      'promoted and the eight house disclosures trailing API Reference',
       (WidgetTester tester) async {
-        await _pumpTooltipDoc(tester);
+        await _pumpTooltipDoc(tester, size: _tall);
 
         final List<String> titles = tester
-            .widgetList<ElSection>(find.byType(ElSection))
-            .map((ElSection section) => section.title)
+            .widgetList<DocsSection>(find.byType(DocsSection))
+            .map((DocsSection section) => section.title)
             .toList();
 
-        expect(titles, <String>[
-          'Installation',
-          'Usage',
-          'Composition',
-          'Side',
-          'In a toolbar',
-          'Disabled button',
-          'Hidden trigger',
-          'API Reference',
-          'States and feedback',
-          'Accessibility and keyboard behavior',
-          'Responsive and platform behavior',
-          'Dependencies, files, and disclosure',
-          'Theming notes',
-          'Source and tests',
-        ]);
+        expect(titles, _sectionOrder);
       },
     );
 
     testWidgets(
-      'the API table documents every constructor parameter found in the source',
+      'the page is declared, and every section is a kit component',
       (WidgetTester tester) async {
-        await _pumpTooltipDoc(tester);
+        await _pumpTooltipDoc(tester, size: _tall);
+
+        // Five specimen stages: Preview, Side, In a toolbar, Disabled
+        // button, Hidden trigger.
+        expect(find.byType(DocsShowcase), findsNWidgets(5));
+        expect(find.byType(DocsInstall), findsOneWidget);
+        // Eight collapsed sections: API Reference, States, Accessibility,
+        // Keyboard, Responsive, Dependencies, Theming, Source.
+        expect(find.byType(DocsDisclosure), findsNWidgets(8));
+      },
+    );
+
+    testWidgets(
+      'the API tables document every constructor parameter found in the source',
+      (WidgetTester tester) async {
+        await _pumpTooltipDoc(tester, size: _tall);
+        await _openDisclosure(tester, 'API Reference');
 
         // ElTooltip's own constructor.
         expect(find.text('label'), findsWidgets);
@@ -146,7 +209,8 @@ void main() {
         // ElTooltipContent's constructor (label, side already covered above
         // as duplicated cells).
         expect(find.textContaining('ElTooltipContent'), findsWidgets);
-        // ElTooltipSide's two values, in the Side section.
+        // ElTooltipSide's two values, now a table inside API Reference
+        // rather than inline in the Side section.
         expect(find.text('top'), findsOneWidget);
         expect(find.text('right'), findsOneWidget);
       },
@@ -164,7 +228,8 @@ void main() {
     testWidgets(
       'accessibility plainly documents the missing semantics wiring',
       (WidgetTester tester) async {
-        await _pumpTooltipDoc(tester);
+        await _pumpTooltipDoc(tester, size: _tall);
+        await _openDisclosure(tester, 'Accessibility');
 
         expect(find.textContaining('no Semantics'), findsWidgets);
         expect(find.textContaining('only name'), findsWidgets);
@@ -172,9 +237,21 @@ void main() {
     );
 
     testWidgets(
+      'keyboard plainly documents the total absence of Focus wiring',
+      (WidgetTester tester) async {
+        await _pumpTooltipDoc(tester, size: _tall);
+        await _openDisclosure(tester, 'Keyboard');
+
+        expect(find.textContaining('no Focus or FocusNode'), findsWidgets);
+        expect(find.textContaining('Escape-to-close'), findsWidgets);
+      },
+    );
+
+    testWidgets(
       'responsive behavior documents a tap, correcting a long-press assumption',
       (WidgetTester tester) async {
-        await _pumpTooltipDoc(tester);
+        await _pumpTooltipDoc(tester, size: _tall);
+        await _openDisclosure(tester, 'Responsive');
 
         expect(find.textContaining('not a long press'), findsOneWidget);
         expect(find.textContaining('touchDwell'), findsWidgets);
@@ -207,7 +284,7 @@ void main() {
           const ValueKey<String>('tooltip-doc-specimen-top'),
         );
         await tester.ensureVisible(trigger);
-        await tester.pumpAndSettle();
+        await tester.pump();
 
         final TestGesture pointer = await tester.createGesture(
           kind: PointerDeviceKind.mouse,
@@ -243,7 +320,7 @@ void main() {
           const ValueKey<String>('tooltip-doc-specimen-right'),
         );
         await tester.ensureVisible(trigger);
-        await tester.pumpAndSettle();
+        await tester.pump();
 
         await tester.tap(trigger);
         await tester.pump();
@@ -261,6 +338,40 @@ void main() {
         await tester.pump(ElDurations.overlay);
         await tester.pump();
         expect(find.byType(ElTooltipContent), findsNothing);
+      },
+    );
+
+    testWidgets(
+      'the Hidden trigger specimen actually flips hidden live, and Side '
+      'mounts a real right-side trigger',
+      (WidgetTester tester) async {
+        await _pumpTooltipDoc(tester, size: _tall);
+
+        final Finder sideTrigger = find.byKey(
+          const ValueKey<String>('tooltip-doc-side-right'),
+        );
+        await tester.ensureVisible(sideTrigger);
+        await tester.pump();
+        expect(
+          tester.widget<ElTooltip>(sideTrigger).side,
+          ElTooltipSide.right,
+        );
+
+        final Finder toggle = find.byKey(
+          const ValueKey<String>('tooltip-doc-specimen-hidden-toggle'),
+        );
+        await tester.ensureVisible(toggle);
+        await tester.pump();
+
+        final Finder hiddenTooltip = find.byKey(
+          const ValueKey<String>('tooltip-doc-specimen-hidden'),
+        );
+        expect(tester.widget<ElTooltip>(hiddenTooltip).hidden, isTrue);
+
+        await tester.tap(toggle);
+        await tester.pump();
+
+        expect(tester.widget<ElTooltip>(hiddenTooltip).hidden, isFalse);
       },
     );
   });

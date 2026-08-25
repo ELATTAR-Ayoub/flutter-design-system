@@ -1,11 +1,26 @@
 /// Public documentation page for the `navigation_menu` component.
 ///
-/// **Shape.** Mirrors `button/page.dart`'s reference shape: an unheaded live
-/// demo above the first heading, then Installation, Usage, and this
-/// component's own sections named plainly (no longer prefixed
-/// `Navigation Menu: ...`, since the page is now about exactly one
-/// component), API Reference last of the shadcn-mirrored sections, then
-/// States, Accessibility, Responsive, Dependencies, Theming, Source.
+/// **Re-housed onto the kit.** This page used to hand-compose [ElSection]
+/// panels; it now declares a `ComponentDocSpec`
+/// (`example/lib/docs/component_doc_page.dart`) and hands it to
+/// `ComponentDocPage`, the same shape `button` established. Every specimen
+/// widget and every code string below is the same one the hand-composed
+/// page carried; the Preview section gains real matching code (it had a
+/// live specimen but no code before). New: a Keyboard disclosure, between
+/// Accessibility and Responsive — navigation_menu.dart wires none, and
+/// nothing in ElPress (motion/press.dart), which every trigger and link
+/// row is built on, wires one either: no Focus widget anywhere in either
+/// file, so this is the same "genuinely nothing to report" story
+/// `breadcrumb` and `tabs` already carry, confirmed by grep, not assumed.
+///
+/// **Registry status, corrected.** The hand-composed page's Dependencies
+/// section called this "unregistered," and `meta.dart`'s own doc comment
+/// still says the same — both stale.
+/// `registry/components/navigation-menu.json` exists on disk today, with
+/// the exact `registryDependencies` `meta.dart` already lists (icon,
+/// popover, press-motion, source-foundation), so `elattar add
+/// navigation-menu` genuinely resolves. Installation and Dependencies below
+/// both say so; `meta.dart` is left as found, out of this rollout's scope.
 ///
 /// **shadcn parity.** Fetched fresh from
 /// `https://ui.shadcn.com/docs/components/base/navigation-menu`: Navigation
@@ -13,31 +28,205 @@
 /// Reference. `Link Component` is skipped and named here instead: it
 /// composes a Next.js `Link` render prop; `ElNavigationMenuItem.link()`
 /// takes a plain `onTap` callback, so there is nothing analogous to show.
-/// Every other shadcn section survives as a top-level `ElSection`, matching
-/// shadcn's own flat shape (no "Examples" wrapper).
 ///
 /// **Split history.** This directory used to document `navigation_menu`,
 /// `menubar`, `context_menu`, and `hover_card` together as one page (they
 /// all build on [ElPopover]). Phase F/J split each into its own
-/// `<name>/page.dart`; this file keeps only the navigation menu. The three
-/// sibling components moved to `../menubar/page.dart`,
-/// `../context_menu/page.dart`, and `../hover_card/page.dart`.
-///
-/// **API tables, fixed.** The merged page's API Reference was missing a
-/// table for [ElNavigationMenuIndicator] entirely, despite it being a real,
-/// exported class ([navigationMenuDoc.exports] already listed it). Every
-/// table below was rebuilt from `lib/src/components/navigation_menu.dart`'s
-/// real constructors and static getters, not copied from the old page.
+/// `<name>/page.dart`; this file keeps only the navigation menu.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:flutter/widgets.dart';
 
-import '../../docs/docs_code.dart';
+import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
 import '../../docs/docs_layout.dart';
-import '../../kit.dart';
+import '../../docs/docs_section.dart' show DocsAnchor;
 import 'meta.dart';
+
+final ComponentDocSpec navigationMenuDocSpec = ComponentDocSpec(
+  name: navigationMenuDoc.name,
+  title: navigationMenuDoc.title,
+  description: navigationMenuDoc.description,
+  sections: <DocsPageSection>[
+    ShowcaseSection(
+      id: 'preview',
+      title: 'Preview',
+      description:
+          'Hover or tap a trigger to open its panel; the second trigger '
+          'shares the same viewport as the first.',
+      specimen: _PreviewSpecimen(),
+      code: _previewCode,
+      label: 'Preview specimen view',
+    ),
+    InstallSection(
+      id: 'install',
+      title: 'Installation',
+      description:
+          'navigation-menu is a registry item: elattar add navigation-menu '
+          'installs lib/src/components/navigation_menu.dart and resolves '
+          'icon, popover, press-motion and source-foundation '
+          'automatically. The Manual tab is for a project not using the '
+          'CLI.',
+      command: navigationMenuDoc.command,
+      manualFiles: <DocsCodeFile>[
+        DocsCodeFile(
+          path: 'lib/components/ui/navigation_menu.dart',
+          title: '1. Copy the source',
+          description:
+              "Copy lib/src/components/navigation_menu.dart's generated "
+              '@ui/navigation_menu.dart payload into components/ui.',
+          code:
+              "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
+              '// Copy the generated navigation_menu source here when '
+              'using manual mode.',
+        ),
+        DocsCodeFile(
+          path: 'lib/components/ui/ui.dart',
+          title: '2. Export it from your barrel',
+          description:
+              'Add the export line so ElNavigationMenu and the rest of '
+              'the family are reachable the same way the CLI path '
+              'already makes them.',
+          code: "export 'navigation_menu.dart';",
+        ),
+      ],
+    ),
+    SnippetSection(
+      id: 'usage',
+      title: 'Usage',
+      description:
+          'Each item is either a trigger with a panel, or a plain link. '
+          'The menu owns its own open state: hover to open on a delay, '
+          'or tap to toggle.',
+      code: _navMenuCode,
+    ),
+    SnippetSection(
+      id: 'composition',
+      title: 'Composition',
+      description:
+          'What the constructor assembles internally. ElNavigationMenu '
+          'does not take a caller-assembled tree of sub-widgets the way '
+          "shadcn's NavigationMenuList markup does: it takes a flat "
+          'items list and builds the tree below from it — a structure '
+          'diagram, not code a caller would write, so it stays a '
+          'snippet rather than a stage with nothing live to show.',
+      code: _navMenuCompositionCode,
+    ),
+    ShowcaseSection(
+      id: 'rtl',
+      title: 'RTL',
+      description:
+          'The same trigger-and-panel composition read right-to-left '
+          'under a Directionality. Nothing in ElNavigationMenu mirrors '
+          'by hand: the chevron rotation and the panel anchoring both '
+          'follow direction automatically.',
+      specimen: _RtlSpecimen(),
+      code: _navMenuRtlCode,
+      label: 'RTL specimen view',
+    ),
+    DisclosureSection(
+      id: 'api',
+      title: 'API Reference',
+      description:
+          'Every constructor parameter ElNavigationMenu, '
+          'ElNavigationMenuItem, ElNavigationMenuLink, and '
+          'ElNavigationMenuIndicator declare, plus the static layout '
+          'helpers a caller composing around the trigger reaches for.',
+      children: const <DocsTocEntry>[
+        DocsTocEntry(
+          title: 'ElNavigationMenu',
+          anchor: 'api-elnavigationmenu',
+        ),
+        DocsTocEntry(
+          title: 'ElNavigationMenu static helpers',
+          anchor: 'api-elnavigationmenu-static',
+        ),
+        DocsTocEntry(
+          title: 'ElNavigationMenuItem',
+          anchor: 'api-elnavigationmenuitem',
+        ),
+        DocsTocEntry(
+          title: 'ElNavigationMenuLink',
+          anchor: 'api-elnavigationmenulink',
+        ),
+        DocsTocEntry(
+          title: 'ElNavigationMenuIndicator',
+          anchor: 'api-elnavigationmenuindicator',
+        ),
+      ],
+      child: _ApiReferenceContent(),
+    ),
+    DisclosureSection(
+      id: 'states',
+      title: 'States',
+      description:
+          'Read straight off _DsNavigationMenuState and the trigger/link '
+          'widgets, not inferred: every timing cited is the real '
+          'constant the source names.',
+      child: const DocsStateMatrix(facts: _stateFacts),
+    ),
+    DisclosureSection(
+      id: 'accessibility',
+      title: 'Accessibility',
+      child: _AccessibilityContent(),
+    ),
+    DisclosureSection(
+      id: 'keyboard',
+      title: 'Keyboard',
+      description:
+          'navigation_menu.dart wires no key handling of its own — every '
+          'fact here is about what does NOT happen, read off it and its '
+          'one trigger/link primitive, ElPress (motion/press.dart), '
+          'directly.',
+      child: _KeyboardContent(),
+    ),
+    DisclosureSection(
+      id: 'responsive',
+      title: 'Responsive',
+      child: _ResponsiveContent(),
+    ),
+    DisclosureSection(
+      id: 'dependencies',
+      title: 'Dependencies',
+      child: _DependenciesContent(),
+    ),
+    DisclosureSection(
+      id: 'theming',
+      title: 'Theming',
+      child: _ThemingContent(),
+    ),
+    DisclosureSection(
+      id: 'source',
+      title: 'Source',
+      child: DocsInstallFacts(
+        title: 'Reference',
+        facts: <DocsInstallFact>[
+          DocsInstallFact(
+            label: 'Source',
+            value: navigationMenuDoc.sourcePath,
+            description:
+                'Authoritative implementation: the truth this page was '
+                'written from.',
+          ),
+          const DocsInstallFact(
+            label: 'Docs test',
+            value: 'example/test/components_docs/navigation_menu_test.dart',
+            description:
+                'Covers this page: the article mounts, the live '
+                'specimen opens and closes, the full API table, and '
+                'both themes at two viewport widths.',
+          ),
+          const DocsInstallFact(
+            label: 'Edit these docs',
+            value: 'example/lib/components_docs/navigation_menu/page.dart',
+            description: 'This file.',
+          ),
+        ],
+      ),
+    ),
+  ],
+);
 
 class NavigationMenuDocPage extends StatelessWidget {
   const NavigationMenuDocPage({super.key, this.onNavigate});
@@ -56,405 +245,27 @@ class NavigationMenuDocPage extends StatelessWidget {
       ElBreadcrumbEntry.link('Components'),
       ElBreadcrumbEntry.page('Navigation Menu'),
     ],
-    toc: const <DocsTocEntry>[
-      DocsTocEntry(title: 'Installation', anchor: 'install'),
-      DocsTocEntry(title: 'Usage', anchor: 'usage'),
-      DocsTocEntry(title: 'Composition', anchor: 'composition'),
-      DocsTocEntry(title: 'RTL', anchor: 'rtl'),
-      DocsTocEntry(
-        title: 'API Reference',
-        anchor: 'api',
-        children: <DocsTocEntry>[
-          DocsTocEntry(
-            title: 'ElNavigationMenu',
-            anchor: 'api-elnavigationmenu',
-          ),
-          DocsTocEntry(
-            title: 'ElNavigationMenu static helpers',
-            anchor: 'api-elnavigationmenu-static',
-          ),
-          DocsTocEntry(
-            title: 'ElNavigationMenuItem',
-            anchor: 'api-elnavigationmenuitem',
-          ),
-          DocsTocEntry(
-            title: 'ElNavigationMenuLink',
-            anchor: 'api-elnavigationmenulink',
-          ),
-          DocsTocEntry(
-            title: 'ElNavigationMenuIndicator',
-            anchor: 'api-elnavigationmenuindicator',
-          ),
-        ],
-      ),
-      DocsTocEntry(title: 'States', anchor: 'states'),
-      DocsTocEntry(title: 'Accessibility', anchor: 'accessibility'),
-      DocsTocEntry(title: 'Responsive', anchor: 'responsive'),
-      DocsTocEntry(title: 'Dependencies', anchor: 'dependencies'),
-      DocsTocEntry(title: 'Theming', anchor: 'theming'),
-      DocsTocEntry(title: 'Source', anchor: 'source'),
-    ],
+    toc: navigationMenuDocSpec.toc,
     previous: const DocsPageLink(
       title: 'Popover',
       route: '/components/popover',
     ),
     onNavigate: onNavigate,
-    child: const _NavigationMenuArticle(),
-  );
-}
-
-class _NavigationMenuArticle extends StatelessWidget {
-  const _NavigationMenuArticle();
-
-  @override
-  Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
-    return Column(
+    child: KeyedSubtree(
       key: const ValueKey<String>('navigation-menu-doc-article'),
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        _preview(),
-        SizedBox(height: el(6)),
-        _install(),
-        SizedBox(height: el(6)),
-        _usage(),
-        SizedBox(height: el(6)),
-        _composition(),
-        _rtl(),
-        _api(),
-        _states(),
-        _accessibility(theme),
-        _responsive(theme),
-        _dependencies(theme),
-        _theming(theme),
-        _source(),
-      ],
-    );
-  }
-
-  Widget _preview() => const DocsCodeExample(
-    title: 'Navigation Menu',
-    description:
-        'Hover or tap a trigger to open its panel; the second trigger '
-        'shares the same viewport as the first.',
-    preview: Center(child: _NavigationMenuSpecimen()),
-  );
-
-  Widget _install() => ElSection(
-    id: 'install',
-    title: 'Installation',
-    description:
-        '`elattar add navigation-menu` installs the component and its '
-        'declared dependency closure.',
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        const DocsCodeExample(
-          title: 'Manual installation',
-          manualFiles: <DocsCodeFile>[
-            DocsCodeFile(
-              path: 'lib/components/ui/navigation_menu.dart',
-              code:
-                  "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
-                  '// Copy navigation_menu.dart source from the package when needed.',
-            ),
-          ],
-        ),
-        SizedBox(height: el(4)),
-        const DocsInstallFacts(
-          title: 'Status',
-          facts: <DocsInstallFact>[
-            DocsInstallFact(
-              label: 'Status',
-              value: 'Stable: registry manifest',
-              description:
-                  'ElNavigationMenu, ElNavigationMenuItem, ElNavigationMenuLink, '
-                  'and ElNavigationMenuIndicator are all exported from the '
-                  'public barrel and ship in the registry, so you can '
-                  'installed through the CLI yet.',
-            ),
-            DocsInstallFact(
-              label: 'Dart / Flutter',
-              value: '>=3.12.2 <4.0.0 / >=3.12.2',
-              description: 'Same constraints as the port.',
-            ),
-            DocsInstallFact(
-              label: 'Platforms',
-              value: 'Android, iOS, Web, macOS, Windows, Linux',
-              description:
-                  'Pure widget composition: nothing is platform-gated.',
-            ),
-          ],
-        ),
-      ],
-    ),
-  );
-
-  Widget _usage() => ElSection(
-    id: 'usage',
-    title: 'Usage',
-    description:
-        'Each item is either a trigger with a panel, or a plain link. The '
-        'menu owns its own open state: hover to open on a delay, or tap to '
-        'toggle.',
-    child: ElPanel(
-      label: 'DART',
-      note: 'MINIMAL',
-      child: DocsSelectableCodeBlock(code: _navMenuCode),
-    ),
-  );
-
-  Widget _composition() => ElSection(
-    id: 'composition',
-    title: 'Composition',
-    description:
-        'What the constructor assembles internally. ElNavigationMenu does '
-        'not take a caller-assembled tree of sub-widgets the way shadcn\'s '
-        'NavigationMenuList markup does: it takes a flat `items` list and '
-        'builds the tree below from it.',
-    child: ElPanel(
-      label: 'Navigation Menu',
-      child: DocsSelectableCodeBlock(code: _navMenuCompositionCode),
-    ),
-  );
-
-  Widget _rtl() => ElSection(
-    id: 'rtl',
-    title: 'RTL',
-    description:
-        'The same trigger-and-panel composition read right-to-left under a '
-        'Directionality. Nothing in ElNavigationMenu mirrors by hand: the '
-        'chevron rotation and the panel anchoring both follow direction '
-        'automatically.',
-    child: const DocsCodeExample(
-      title: 'Right-to-left navigation menu',
-      preview: _NavMenuRtl(),
-      manualFiles: <DocsCodeFile>[
-        DocsCodeFile(path: 'nav_menu_rtl.dart', code: _navMenuRtlCode),
-      ],
-    ),
-  );
-
-  Widget _api() => ElSection(
-    id: 'api',
-    title: 'API Reference',
-    description:
-        'Every constructor parameter ElNavigationMenu, ElNavigationMenuItem, '
-        'ElNavigationMenuLink, and ElNavigationMenuIndicator declare, plus '
-        'the static layout helpers a caller composing around the trigger '
-        'reaches for.',
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        KeyedSubtree(
-          key: docsAnchorKey('api-elnavigationmenu'),
-          child: const DocsApiTable(
-            title: 'ElNavigationMenu',
-            facts: _navigationMenuApiFacts,
-          ),
-        ),
-        SizedBox(height: el(6)),
-        KeyedSubtree(
-          key: docsAnchorKey('api-elnavigationmenu-static'),
-          child: const DocsApiTable(
-            title: 'ElNavigationMenu static helpers',
-            facts: _navigationMenuStaticFacts,
-          ),
-        ),
-        SizedBox(height: el(6)),
-        KeyedSubtree(
-          key: docsAnchorKey('api-elnavigationmenuitem'),
-          child: const DocsApiTable(
-            title: 'ElNavigationMenuItem',
-            facts: _navigationMenuItemApiFacts,
-          ),
-        ),
-        SizedBox(height: el(6)),
-        KeyedSubtree(
-          key: docsAnchorKey('api-elnavigationmenulink'),
-          child: const DocsApiTable(
-            title: 'ElNavigationMenuLink',
-            facts: _navigationMenuLinkApiFacts,
-          ),
-        ),
-        SizedBox(height: el(6)),
-        KeyedSubtree(
-          key: docsAnchorKey('api-elnavigationmenuindicator'),
-          child: const DocsApiTable(
-            title: 'ElNavigationMenuIndicator',
-            facts: _navigationMenuIndicatorApiFacts,
-          ),
-        ),
-      ],
-    ),
-  );
-
-  Widget _states() => ElSection(
-    id: 'states',
-    title: 'States',
-    description:
-        'Read straight off _DsNavigationMenuState and the trigger/link '
-        'widgets, not inferred: every timing cited is the real constant '
-        'the source names.',
-    child: const DocsStateMatrix(facts: _stateFacts),
-  );
-
-  Widget _accessibility(ElThemeData theme) => ElSection(
-    id: 'accessibility',
-    title: 'Accessibility',
-    child: _bullets(theme, <String>[
-      'No keyboard opener: only click or hover open a trigger\'s panel. '
-          'Arrow keys do not step between triggers.',
-      'Semantic role: Semantics(button: true, expanded: ...) on a trigger '
-          '(expanded only when the trigger has a chevron); '
-          'Semantics(link: true, selected: active) on a panel row '
-          '(ElNavigationMenuLink).',
-      'Escape behavior: closes the panel if focus is inside it. Focus is '
-          'the panel content\'s own business: the component does not move '
-          'it there.',
-      'Focus trap: none. Focus may leave the panel while it is open.',
-      'Touch: tap opens a trigger\'s panel; tap the same trigger again '
-          'closes it (the skip window still applies to a third tap).',
-    ]),
-  );
-
-  Widget _responsive(ElThemeData theme) => ElSection(
-    id: 'responsive',
-    title: 'Responsive',
-    child: _bullets(theme, <String>[
-      'No breakpoint branching in navigation_menu.dart: BuildContext width '
-          'is never read for a layout decision.',
-      'Every measurement (listGap, triggerHeight, triggerPaddingX, '
-          'triggerGap, panelOffset, panelPadding, indicatorHeight, '
-          'caretSize) is a fixed el() value.',
-      'viewport controls anchoring, not screen size: true anchors one '
-          'shared panel to the bar\'s own leading edge; false anchors each '
-          'item\'s panel to that item instead.',
-      'The panel relies on ElPopover\'s collision algorithm to flip sides '
-          'and shift along the cross axis near a viewport edge, and snaps '
-          'without transition when it does.',
-      'Platform parity: Android, iOS, Web, macOS, Windows, and Linux all '
-          'render the same widget tree; no dart:io Platform branch '
-          'anywhere in the file.',
-    ]),
-  );
-
-  Widget _dependencies(ElThemeData theme) => ElSection(
-    id: 'dependencies',
-    title: 'Dependencies',
-    child: DocsInstallFacts(
-      facts: <DocsInstallFact>[
-        const DocsInstallFact(
-          label: 'Registry item',
-          value: 'None: unregistered',
-          description:
-              'ElNavigationMenu is in the package but has no manifest and '
-              'cannot be installed through the CLI yet.',
-        ),
-        const DocsInstallFact(
-          label: 'Primary dependency',
-          value: 'ElPopover',
-          description:
-              'Mounts the shared or per-item panel through ElPopover for '
-              'placement, animation, and barrier behavior '
-              '(ElPopoverBarrier.none: hover would otherwise fight a '
-              'dismiss barrier).',
-        ),
-        const DocsInstallFact(
-          label: 'Also imports',
-          value: 'ElIcon (chevron), ElPress (trigger tap/hover)',
-          description: 'From icon.dart and motion/press.dart.',
-        ),
-        const DocsInstallFact(
-          label: 'Platforms',
-          value: 'Android, iOS, Web, macOS, Windows, Linux',
-          description: 'Pure widget composition; nothing platform-gated.',
-        ),
-        const DocsInstallFact(
-          label: 'Verified',
-          value: 'example/test/components_docs/navigation_menu_test.dart',
-          description:
-              'This page\'s own live specimen, section order, and API '
-              'table coverage: 390x844 and 1440x900, both themes.',
-        ),
-      ],
-    ),
-  );
-
-  Widget _theming(ElThemeData theme) => ElSection(
-    id: 'theming',
-    title: 'Theming',
-    child: _bullets(theme, <String>[
-      'Trigger, rest: theme.mutedForeground text, transparent fill. '
-          'Trigger, hover or open: theme.secondary fill, theme.foreground '
-          'text: neither transitions (drift 3: only `transform` is '
-          'declared as transitioning, so colour hard-cuts).',
-      'Panel: theme.popover fill, theme.popoverForeground text, via '
-          'ElPopoverSurface, which also applies the ring and shadow.',
-      'Panel row (ElNavigationMenuLink), rest: theme.mutedForeground text, '
-          'transparent fill. Hover or active: theme.accent fill, '
-          'theme.accentForeground text.',
-      'Indicator caret: theme.popover fill, theme.foreground at 10% alpha '
-          'for its ring (matching ElPopoverSurface\'s own rim).',
-      'Animation: panel zoom-in-95/fade-in-0 (no slide) runs through '
-          'ElDurations.overlay; the chevron rotates over '
-          'ElDurations.transitionDefault on ElCurves.spring. Both collapse '
-          'to zero under reduced motion via elAnimationDuration.',
-    ]),
-  );
-
-  Widget _source() => ElSection(
-    id: 'source',
-    title: 'Source',
-    child: DocsInstallFacts(
-      title: 'Reference',
-      facts: <DocsInstallFact>[
-        DocsInstallFact(
-          label: 'Source',
-          value: navigationMenuDoc.sourcePath,
-          description:
-              'Authoritative implementation: the truth this page '
-              'was written from.',
-        ),
-        const DocsInstallFact(
-          label: 'Docs test',
-          value: 'example/test/components_docs/navigation_menu_test.dart',
-          description:
-              'Covers this page: the article mounts, the live '
-              'specimen opens and closes, the full API table, and both '
-              'themes at two viewport widths.',
-        ),
-        const DocsInstallFact(
-          label: 'Edit these docs',
-          value: 'example/lib/components_docs/navigation_menu/page.dart',
-          description: 'This file.',
-        ),
-      ],
+      child: ComponentDocPage(spec: navigationMenuDocSpec, header: false),
     ),
   );
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
-  crossAxisAlignment: CrossAxisAlignment.start,
-  children: <Widget>[
-    for (final String line in lines) ...<Widget>[
-      ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
-      ),
-      SizedBox(height: el(2)),
-    ],
-  ],
-);
+/* ── Showcase specimens ─────────────────────────────────────────────────── */
 
-/// Mounted exactly once on this page (the unheaded live demo). The key below
-/// is baked into `build`, which is only safe while that stays true: a second
-/// mount would give both instances the same key and any finder for it would
-/// match two widgets. If you add one, give this a `specimenKey` field the
-/// way `_ContextMenuSpecimen` and `_HoverCardSpecimen` on the context_menu
-/// and hover_card pages already do, and pass a distinct key at the new site.
-class _NavigationMenuSpecimen extends StatelessWidget {
-  const _NavigationMenuSpecimen();
+/// Mounted exactly once on this page (the Preview section). The key below
+/// is baked into `build`, which is only safe while that stays true: a
+/// second mount would give both instances the same key and any finder for
+/// it would match two widgets.
+class _PreviewSpecimen extends StatelessWidget {
+  const _PreviewSpecimen();
 
   @override
   Widget build(BuildContext context) {
@@ -494,8 +305,8 @@ class _NavigationMenuSpecimen extends StatelessWidget {
   }
 }
 
-class _NavMenuRtl extends StatelessWidget {
-  const _NavMenuRtl();
+class _RtlSpecimen extends StatelessWidget {
+  const _RtlSpecimen();
 
   @override
   Widget build(BuildContext context) {
@@ -524,6 +335,38 @@ class _NavMenuRtl extends StatelessWidget {
     );
   }
 }
+
+/* ── Source strings ─────────────────────────────────────────────────────── */
+
+const String _previewCode = '''ElNavigationMenu(
+  viewport: true,
+  indicator: false,
+  items: <ElNavigationMenuItem>[
+    ElNavigationMenuItem.trigger(
+      label: 'Products',
+      content: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          ElNavigationMenuLink(child: ElText('Item 1', ElType.small)),
+          ElNavigationMenuLink(child: ElText('Item 2', ElType.small)),
+        ],
+      ),
+    ),
+    ElNavigationMenuItem.trigger(
+      label: 'Company',
+      content: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          ElNavigationMenuLink(child: ElText('About', ElType.small)),
+          ElNavigationMenuLink(child: ElText('Careers', ElType.small)),
+        ],
+      ),
+    ),
+    ElNavigationMenuItem.link(label: 'Contact'),
+  ],
+)''';
 
 const String _navMenuCode =
     '''final List<ElNavigationMenuItem> items = <ElNavigationMenuItem>[
@@ -582,6 +425,200 @@ const String _navMenuRtlCode = '''Directionality(
     ],
   ),
 )''';
+
+/* ── Disclosure content ─────────────────────────────────────────────────── */
+
+class _ApiReferenceContent extends StatelessWidget {
+  const _ApiReferenceContent();
+
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: <Widget>[
+      const DocsAnchor(
+        id: 'api-elnavigationmenu',
+        child: DocsApiTable(
+          title: 'ElNavigationMenu',
+          facts: _navigationMenuApiFacts,
+        ),
+      ),
+      SizedBox(height: el(6)),
+      const DocsAnchor(
+        id: 'api-elnavigationmenu-static',
+        child: DocsApiTable(
+          title: 'ElNavigationMenu static helpers',
+          facts: _navigationMenuStaticFacts,
+        ),
+      ),
+      SizedBox(height: el(6)),
+      const DocsAnchor(
+        id: 'api-elnavigationmenuitem',
+        child: DocsApiTable(
+          title: 'ElNavigationMenuItem',
+          facts: _navigationMenuItemApiFacts,
+        ),
+      ),
+      SizedBox(height: el(6)),
+      const DocsAnchor(
+        id: 'api-elnavigationmenulink',
+        child: DocsApiTable(
+          title: 'ElNavigationMenuLink',
+          facts: _navigationMenuLinkApiFacts,
+        ),
+      ),
+      SizedBox(height: el(6)),
+      const DocsAnchor(
+        id: 'api-elnavigationmenuindicator',
+        child: DocsApiTable(
+          title: 'ElNavigationMenuIndicator',
+          facts: _navigationMenuIndicatorApiFacts,
+        ),
+      ),
+    ],
+  );
+}
+
+class _AccessibilityContent extends StatelessWidget {
+  const _AccessibilityContent();
+
+  @override
+  Widget build(BuildContext context) =>
+      _bullets(ElTheme.of(context), <String>[
+        'Semantic role: Semantics(button: true, expanded: ...) on a '
+            'trigger (expanded only when the trigger has a chevron); '
+            'Semantics(link: true, selected: active) on a panel row '
+            '(ElNavigationMenuLink).',
+        'Keyboard interactions: none. See Keyboard below for the full '
+            'account, read directly off the source.',
+        'Escape behavior: closes the panel if focus is inside it. Focus '
+            "is the panel content's own business: the component does not "
+            'move it there.',
+        'Focus trap: none. Focus may leave the panel while it is open.',
+        'Touch: tap opens a trigger\'s panel; tap the same trigger again '
+            'closes it (the skip window still applies to a third tap).',
+      ]);
+}
+
+class _KeyboardContent extends StatelessWidget {
+  const _KeyboardContent();
+
+  @override
+  Widget build(BuildContext context) =>
+      _bullets(ElTheme.of(context), <String>[
+        'No Focus or FocusNode anywhere in navigation_menu.dart, '
+            'confirmed by grep, not assumed: every trigger and panel row '
+            'wraps a MouseRegion and ElPress, never a Focus widget.',
+        'ElPress itself (motion/press.dart), the trigger and link\'s own '
+            'tap/hover primitive, wires no Focus either: only '
+            'PointerDownEvent/PointerUpEvent listeners for the press '
+            'squash. Neither file this page depends on gives a trigger a '
+            'keyboard tab stop.',
+        'Tab order: a trigger or link row never enters keyboard '
+            'traversal. There is no FocusNode to request focus on.',
+        'Activation: opening a panel is pointer-only — a hover after the '
+            '200ms delay, or a tap. There is no KeyEvent handling '
+            'anywhere in either file, so Enter and Space do nothing to a '
+            'trigger: there is nothing focused for them to act on.',
+        'No custom FocusTraversalPolicy and no arrow-key roving-'
+            'tabindex: moot, since nothing here ever enters the focus '
+            'tree to traverse.',
+        'Known gap: a keyboard-only visitor cannot open or navigate a '
+            'panel today. See Accessibility above for the same gap named '
+            'against the semantics tree.',
+      ]);
+}
+
+class _ResponsiveContent extends StatelessWidget {
+  const _ResponsiveContent();
+
+  @override
+  Widget build(BuildContext context) =>
+      _bullets(ElTheme.of(context), <String>[
+        'No breakpoint branching in navigation_menu.dart: BuildContext '
+            'width is never read for a layout decision.',
+        'Every measurement (listGap, triggerHeight, triggerPaddingX, '
+            'triggerGap, panelOffset, panelPadding, indicatorHeight, '
+            'caretSize) is a fixed el() value.',
+        'viewport controls anchoring, not screen size: true anchors one '
+            "shared panel to the bar's own leading edge; false anchors "
+            'each item\'s panel to that item instead.',
+        "The panel relies on ElPopover's collision algorithm to flip "
+            'sides and shift along the cross axis near a viewport edge, '
+            'and snaps without transition when it does.',
+        'Platform parity: Android, iOS, Web, macOS, Windows, and Linux '
+            'all render the same widget tree; no dart:io Platform branch '
+            'anywhere in the file.',
+      ]);
+}
+
+class _DependenciesContent extends StatelessWidget {
+  const _DependenciesContent();
+
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: <Widget>[
+      _bullets(ElTheme.of(context), <String>[
+        'Registry item: registry/components/navigation-menu.json exists '
+            'and lists exactly the dependencies below: elattar add '
+            'navigation-menu is a real, working install path.',
+        'Primary dependency: ElPopover. Mounts the shared or per-item '
+            'panel through ElPopover for placement, animation, and '
+            'barrier behavior (ElPopoverBarrier.none: hover would '
+            'otherwise fight a dismiss barrier).',
+        'Also imports: ElIcon (chevron, from icon.dart) and ElPress '
+            '(trigger tap/hover, from motion/press.dart).',
+        'Platforms: Android, iOS, Web, macOS, Windows, Linux — pure '
+            'widget composition; nothing platform-gated.',
+      ]),
+      SizedBox(height: el(2)),
+      const DocsLinkRow(
+        links: <DocsLink>[DocsLink(label: 'Popover', route: '/components/popover')],
+      ),
+    ],
+  );
+}
+
+class _ThemingContent extends StatelessWidget {
+  const _ThemingContent();
+
+  @override
+  Widget build(BuildContext context) =>
+      _bullets(ElTheme.of(context), <String>[
+        'Trigger, rest: theme.mutedForeground text, transparent fill. '
+            'Trigger, hover or open: theme.secondary fill, '
+            'theme.foreground text: neither transitions (drift: only '
+            'transform is declared as transitioning, so colour '
+            'hard-cuts).',
+        'Panel: theme.popover fill, theme.popoverForeground text, via '
+            'ElPopoverSurface, which also applies the ring and shadow.',
+        'Panel row (ElNavigationMenuLink), rest: theme.mutedForeground '
+            'text, transparent fill. Hover or active: theme.accent fill, '
+            'theme.accentForeground text.',
+        'Indicator caret: theme.popover fill, theme.foreground at 10% '
+            "alpha for its ring (matching ElPopoverSurface's own rim).",
+        'Animation: panel zoom-in-95/fade-in-0 (no slide) runs through '
+            'ElDurations.overlay; the chevron rotates over '
+            'ElDurations.transitionDefault on ElCurves.spring. Both '
+            'collapse to zero under reduced motion via '
+            'elAnimationDuration.',
+      ]);
+}
+
+Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: <Widget>[
+    for (final String line in lines) ...<Widget>[
+      ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+      ),
+      SizedBox(height: el(2)),
+    ],
+  ],
+);
+
+/* ── Facts ───────────────────────────────────────────────────────────────── */
 
 const List<DocsApiFact> _navigationMenuApiFacts = <DocsApiFact>[
   DocsApiFact(
@@ -783,7 +820,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     state: 'Focus-visible',
     treatment:
         'No keyboard opener: only click or hover open a panel. Arrow keys '
-        'do not step between triggers.',
+        'do not step between triggers. See Keyboard for the full account.',
     userSignal: 'Keyboard users cannot open a panel without a pointer.',
   ),
   DocsStateFact(

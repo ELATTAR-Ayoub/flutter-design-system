@@ -11,12 +11,14 @@
 /// Not wired into `catalog.dart`'s `componentDocs` list beyond the reference
 /// that already exists there: that file is supervisor-owned. `page.dart`
 /// reads [statDoc] directly rather than going through `componentDoc('stat')`.
+///
+/// `stat` ships `registry/components/stat.json`, so `elattar add stat`
+/// resolves today. [dependencies] mirrors that manifest's
+/// `registryDependencies`.
 library;
 
 import '../catalog.dart' show ComponentDocEntry;
 
-/// `stat` has no `registry/components/stat.json` yet: see `page.dart`'s
-/// installation section for the shipped command and registry dependencies.
 const ComponentDocEntry statDoc = ComponentDocEntry(
   name: 'stat',
   title: 'Stat',

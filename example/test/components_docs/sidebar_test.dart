@@ -13,18 +13,27 @@
 /// Theme coverage flips a live [ElThemeController] in place rather than
 /// pumping two independent trees.
 ///
-/// The page mounts three real [ElSidebarProvider]s (icon, parts, offcanvas).
-/// Each installs its own `HardwareKeyboard` handler, so ⌘B/Ctrl-B toggles all
-/// three at once, which is the reference's own behaviour, reproduced, and
-/// the reason
-/// the keyboard case below asserts on one named panel rather than on a
-/// count.
+/// The page mounts three real [ElSidebarProvider]s (icon, parts, offcanvas),
+/// one per `ShowcaseSection` (Preview, Composition, Offcanvas) — a
+/// `ShowcaseSection`'s specimen renders in its Preview pane immediately, no
+/// disclosure to open first. Each provider installs its own
+/// `HardwareKeyboard` handler, so ⌘B/Ctrl-B toggles all three at once, which
+/// is the reference's own behaviour, reproduced, and the reason the
+/// keyboard case below asserts on one named panel rather than on a count.
+///
+/// Every reference-table section (Structure, SidebarProvider, Sidebar,
+/// useSidebar, every named part, and the eight trailing disclosures) is now
+/// a `DocsDisclosure`, collapsed by default, twenty-four of them in all: a
+/// test that reads text or a table inside one of those opens it first, the
+/// same helper `button_test.dart` established.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/sidebar/meta.dart';
 import 'package:example/components_docs/sidebar/page.dart';
-import 'package:example/kit.dart' show ElSection;
+import 'package:example/docs/component_doc_page.dart' show DocsTocEntry;
+import 'package:example/docs/docs_disclosure.dart';
+import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter_test/flutter_test.dart';
@@ -42,6 +51,40 @@ const ValueKey<String> _partsKey = ValueKey<String>(
 const ValueKey<String> _offcanvasKey = ValueKey<String>(
   'sidebar-doc-specimen-offcanvas',
 );
+
+/// The page's own declared section order — mirrors `sidebarDocSpec.toc`.
+const List<String> _sidebarSectionOrder = <String>[
+  'Preview',
+  'Installation',
+  'Usage',
+  'Composition',
+  'Structure',
+  'SidebarProvider',
+  'Sidebar',
+  'Offcanvas',
+  'useSidebar',
+  'SidebarHeader',
+  'SidebarFooter',
+  'SidebarContent',
+  'SidebarGroup',
+  'SidebarMenu',
+  'SidebarMenuButton',
+  'SidebarMenuAction',
+  'SidebarMenuSub',
+  'SidebarMenuBadge',
+  'SidebarMenuSkeleton',
+  'SidebarTrigger',
+  'SidebarRail',
+  'Controlled Sidebar',
+  'API Reference',
+  'States',
+  'Accessibility',
+  'Keyboard',
+  'Responsive',
+  'Dependencies',
+  'Theming',
+  'Source',
+];
 
 Future<ElThemeController> _pumpSidebarDoc(
   WidgetTester tester, {
@@ -90,6 +133,29 @@ double _panelWidth(WidgetTester tester, Key specimen) =>
 Future<void> _reveal(WidgetTester tester, Finder finder) async {
   await tester.ensureVisible(finder);
   await tester.pump();
+}
+
+/// The single `DocsDisclosure` whose title is [title]. `DocsDisclosure`'s
+/// own trigger key ([DocsDisclosure.triggerKey]) is one constant shared by
+/// every instance on the page — this page alone carries twenty-four of them
+/// — so a bare `find.byKey` would match all of them; this narrows to the
+/// one panel by its title first, matching `button`'s own docs test.
+Finder _disclosureTrigger(String title) => find.descendant(
+  of: find.byWidgetPredicate(
+    (Widget widget) => widget is DocsDisclosure && widget.title == title,
+  ),
+  matching: find.byKey(DocsDisclosure.triggerKey),
+);
+
+/// Opens the disclosure titled [title]: a closed `DocsDisclosure` mounts no
+/// content at all, so its table or prose must be opened before anything
+/// inside it can be found.
+Future<void> _open(WidgetTester tester, String title) async {
+  final Finder trigger = _disclosureTrigger(title);
+  await _reveal(tester, trigger);
+  await tester.tap(trigger);
+  await tester.pump();
+  await tester.pump(ElDurations.jelly);
 }
 
 void main() {
@@ -146,7 +212,8 @@ void main() {
         ]),
       );
 
-      // Source-level imports, not a registry manifest: sidebar has none.
+      // The sidebar registry manifest's own registryDependencies, mirrored
+      // here — not an invented list. See registry/components/sidebar.json.
       expect(sidebarDoc.dependencies, contains('tooltip'));
       expect(sidebarDoc.dependencies, contains('sheet'));
       expect(sidebarDoc.dependencies, contains('button'));
@@ -168,45 +235,32 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
+    test('the table of contents matches the declared sections', () {
+      expect(
+        sidebarDocSpec.toc.map((DocsTocEntry e) => e.title).toList(),
+        _sidebarSectionOrder,
+      );
+    });
+
     testWidgets(
-      'sections render in the shadcn-mirrored order, section for section',
+      'sections render in the house order, section for section',
       (WidgetTester tester) async {
         await _pumpSidebarDoc(tester);
 
+        // Reading each mounted `DocsSection`'s own `title` field sidesteps
+        // the duplicate-string hazard `find.text` carries here (a section
+        // heading and its own TOC link render the same string).
         final List<String> titles = tester
-            .widgetList<ElSection>(find.byType(ElSection))
-            .map((ElSection section) => section.title)
+            .widgetList<DocsSection>(find.byType(DocsSection))
+            .map((DocsSection section) => section.title)
             .toList();
 
-        expect(titles, <String>[
-          'Installation',
-          'Usage',
-          'Composition',
-          'Structure',
-          'SidebarProvider',
-          'Sidebar',
-          'useSidebar',
-          'SidebarHeader',
-          'SidebarFooter',
-          'SidebarContent',
-          'SidebarGroup',
-          'SidebarMenu',
-          'SidebarMenuButton',
-          'SidebarMenuAction',
-          'SidebarMenuSub',
-          'SidebarMenuBadge',
-          'SidebarMenuSkeleton',
-          'SidebarTrigger',
-          'SidebarRail',
-          'Controlled Sidebar',
-          'API Reference',
-          'States',
-          'Accessibility',
-          'Responsive',
-          'Dependencies',
-          'Theming',
-          'Source',
-        ]);
+        expect(titles, _sidebarSectionOrder);
+
+        // Twenty-four collapsed disclosures: sixteen reference-table
+        // sections (Structure through SidebarRail, minus Sidebar's split-off
+        // Offcanvas showcase) plus the eight trailing ones.
+        expect(find.byType(DocsDisclosure), findsNWidgets(24));
       },
     );
 
@@ -214,6 +268,7 @@ void main() {
       WidgetTester tester,
     ) async {
       await _pumpSidebarDoc(tester);
+      await _open(tester, 'API Reference');
 
       // Every table title in the API section.
       for (final String klass in <String>[
@@ -259,6 +314,7 @@ void main() {
       WidgetTester tester,
     ) async {
       await _pumpSidebarDoc(tester);
+      await _open(tester, 'Sidebar');
 
       for (final String value in <String>[
         'offcanvas',
@@ -281,6 +337,7 @@ void main() {
       WidgetTester tester,
     ) async {
       await _pumpSidebarDoc(tester);
+      await _open(tester, 'SidebarProvider');
 
       expect(find.textContaining('256'), findsWidgets);
       expect(find.textContaining('48'), findsWidgets);
@@ -301,6 +358,7 @@ void main() {
       WidgetTester tester,
     ) async {
       await _pumpSidebarDoc(tester);
+      await _open(tester, 'Accessibility');
 
       // The finding: a row's own accessible name comes from
       // ElButton(label: label ?? tooltip), not from the tooltip overlay,
@@ -310,10 +368,23 @@ void main() {
       expect(find.textContaining('unnamed button'), findsWidgets);
     });
 
+    testWidgets(
+      'keyboard documents the Ctrl-B / Cmd-B shortcut and the rail exception',
+      (WidgetTester tester) async {
+        await _pumpSidebarDoc(tester);
+        await _open(tester, 'Keyboard');
+
+        expect(find.textContaining('Ctrl-B'), findsWidgets);
+        expect(find.textContaining('HardwareKeyboard'), findsWidgets);
+        expect(find.textContaining('tabIndex of -1'), findsWidgets);
+      },
+    );
+
     testWidgets('the mobile breakpoint is documented as the real 768', (
       WidgetTester tester,
     ) async {
       await _pumpSidebarDoc(tester);
+      await _open(tester, 'Responsive');
 
       expect(find.textContaining('768'), findsWidgets);
       expect(find.textContaining('288'), findsWidgets);

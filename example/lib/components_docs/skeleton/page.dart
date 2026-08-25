@@ -1,49 +1,291 @@
 /// Public documentation page for the `skeleton` component.
 ///
+/// **Re-housed onto the kit.** This page used to hand-compose `ElSection`
+/// panels; it now declares a `ComponentDocSpec`
+/// (`example/lib/docs/component_doc_page.dart`) and hands it to
+/// `ComponentDocPage`, the shape `button` established. Every specimen widget
+/// and every code string the old page carried moves across unchanged; what
+/// is new is a code string beside every showcase that used to be a bare
+/// `DocsCodeExample` preview with no source shown (Preview, Text, Form,
+/// Table, RTL, Avoiding layout shift all lacked one), the promotion of the
+/// unheaded top-of-page demo to a real `Preview` section with its own rail
+/// entry, and a Keyboard disclosure between Accessibility and Responsive.
+///
 /// **New route, split out of `progress`.** `ElSkeleton` used to share the
 /// `/components/progress` route with `ElProgress`, its sections prefixed
 /// `Skeleton: ` to tell them apart from the sibling component's own. This
-/// page mirrors ONLY `https://ui.shadcn.com/docs/components/base/skeleton`'s
-/// own section list, fetched fresh: Installation, Usage, Avatar, Card, Text,
-/// Form, Table, RTL. Every section title below drops the redundant
-/// `Skeleton: ` prefix now that the page documents one component only. A
-/// live demo renders ahead of any heading, the same as the reference's own
-/// top-of-page preview: no Overview, Status, or Preview heading precedes
-/// Installation.
+/// page still mirrors ONLY `https://ui.shadcn.com/docs/components/base/
+/// skeleton`'s own section list: Installation, Usage, Avatar, Card, Text,
+/// Form, Table, RTL.
 ///
 /// **Ours only.** `Avoiding layout shift` has no shadcn counterpart section:
 /// it was already a built composition on the pre-split page, showing a real
 /// swap from placeholder to loaded content without the row resizing, rather
 /// than a shape gallery alone. Kept for the same reason.
 ///
-/// The registry manifest ships with the CLI and installs through
-/// `elattar add skeleton`.
+/// **The manifest is real.** `registry/components/skeleton.json` ships
+/// today: `elattar add skeleton` installs `lib/src/components/skeleton.dart`
+/// and resolves `keyframes` and `source-foundation` automatically. The
+/// Manual tab below is for a project not using the CLI.
 ///
 /// **Motion.** `ElSkeleton`'s shimmer is a genuinely infinite
 /// `AnimationController.repeat()` (`ElKeyframePlayer` with `repeat: true`),
 /// gated through `elAnimationDuration` (`theme_scope.dart`) to a fully
 /// stopped controller under `MediaQuery.disableAnimations`: confirmed by the
 /// package's own `test/feedback_effects_test.dart` rasterised reduced-motion
-/// case, and re-confirmed by this page's own docs test. See that test's
-/// dedicated reduced-motion case for how this page verifies it without ever
-/// calling `tester.pumpAndSettle()` against a looping controller.
+/// case, and re-confirmed by this page's own docs test.
 ///
 /// **Narrow-viewport trap, inherited.** `_SkeletonTableDemo`'s row of three
 /// cell-shaped bars measures wider than the 298px a docs panel leaves at a
 /// 390px viewport; it is wrapped in `SingleChildScrollView(scrollDirection:
-/// Axis.horizontal)`, the same mitigation the pre-split page already used
-/// (and `pagination/page.dart`'s Responsive section and `separator/page.dart`
-/// use elsewhere), rather than an unwrapped fixed-width `Row`.
+/// Axis.horizontal)`, the same mitigation `separator/page.dart`'s own wide
+/// specimens use, rather than an unwrapped fixed-width `Row`.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:flutter/widgets.dart';
 
-import '../../docs/docs_code.dart';
+import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
 import '../../docs/docs_layout.dart';
-import '../../kit.dart';
+import '../../docs/docs_section.dart' show DocsAnchor;
 import 'meta.dart';
+
+final ComponentDocSpec skeletonDocSpec = ComponentDocSpec(
+  name: 'skeleton',
+  title: skeletonDoc.title,
+  description: skeletonDoc.description,
+  sections: <DocsPageSection>[
+    ShowcaseSection(
+      id: 'preview',
+      title: 'Preview',
+      description:
+          'A ElSkeleton avatar plus two text lines standing in for content '
+          'that has not arrived yet: the same shape the reference\'s own '
+          'top-of-page demo uses.',
+      specimen: _TopDemo(),
+      code: _previewCode,
+      label: 'Preview specimen view',
+    ),
+    InstallSection(
+      id: 'install',
+      title: 'Installation',
+      description:
+          'skeleton has a real registry manifest, `elattar add skeleton` '
+          'installs lib/src/components/skeleton.dart and resolves keyframes '
+          'and source-foundation automatically. The Manual tab is for a '
+          'project not using the CLI.',
+      command: skeletonDoc.command,
+      manualFiles: <DocsCodeFile>[
+        DocsCodeFile(
+          path: 'lib/components/ui/skeleton.dart',
+          title: '1. Copy the source',
+          description:
+              "Copy lib/src/components/skeleton.dart's generated "
+              '@ui/skeleton.dart payload into components/ui.',
+          code:
+              "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
+              '// Copy the generated skeleton source here when using '
+              'manual mode.',
+        ),
+        const DocsCodeFile(
+          path: 'lib/components/ui/ui.dart',
+          title: '2. Export it from your barrel',
+          description:
+              'Add the export line so ElSkeleton is reachable the same way '
+              'the CLI path already makes it.',
+          code: "export 'skeleton.dart';",
+        ),
+      ],
+    ),
+    SnippetSection(
+      id: 'usage',
+      title: 'Usage',
+      description: 'A block, a circle, and an inline run of placeholder text.',
+      code: _usageCode,
+    ),
+    ShowcaseSection(
+      id: 'avatar',
+      title: 'Avatar',
+      description:
+          'A circular placeholder sized like the avatar it stands in for: '
+          'radius: ElRadii.pill turns the box into a circle the moment '
+          'width and height are equal.',
+      specimen: const KeyedSubtree(
+        key: ValueKey<String>('skeleton-preview:avatar'),
+        child: ElSkeleton(width: 40, height: 40, radius: ElRadii.pill),
+      ),
+      code: _avatarCode,
+      label: 'Avatar specimen view',
+    ),
+    ShowcaseSection(
+      id: 'card',
+      title: 'Card',
+      description:
+          'A block placeholder sized like the card it precedes: the '
+          'caller picks the exact width and height, ElSkeleton has no '
+          'card-shaped default of its own.',
+      specimen: const KeyedSubtree(
+        key: ValueKey<String>('skeleton-preview:card'),
+        child: ElSkeleton(width: 320, height: 128),
+      ),
+      code: _cardCode,
+      label: 'Card specimen view',
+    ),
+    ShowcaseSection(
+      id: 'text',
+      title: 'Text',
+      description:
+          'Two block lines for a paragraph placeholder, rounded-md (the '
+          'default radius), and one inline ElSkeleton.span standing in for '
+          'a run of text inside a sentence rather than a block: the only '
+          'way to exercise that factory.',
+      specimen: _TextSpecimen(),
+      code: _textCode,
+      label: 'Text specimen view',
+    ),
+    ShowcaseSection(
+      id: 'form',
+      title: 'Form',
+      description:
+          'A label-then-field pair, twice, plus a pill-shaped submit-button '
+          'placeholder: the caller sizes each box to match the real form '
+          'control it precedes, the same discipline every other shape on '
+          'this page follows.',
+      specimen: _SkeletonFormDemo(),
+      code: _formCode,
+      label: 'Form specimen view',
+    ),
+    ShowcaseSection(
+      id: 'table',
+      title: 'Table',
+      description:
+          'Three rows of three cell-shaped bars: a table\'s loading state '
+          'is the same "match the footprint" rule as everything else on '
+          'this page, applied once per cell instead of once per block.',
+      specimen: _SkeletonTableDemo(),
+      code: _tableCode,
+      label: 'Table specimen view',
+    ),
+    ShowcaseSection(
+      id: 'rtl',
+      title: 'RTL',
+      description:
+          'ElSkeleton carries no text of its own, so nothing inside it '
+          'mirrors on its own account: the surrounding Row does, because '
+          'Row asks the ambient Directionality which edge is "start". The '
+          'avatar sits on the visual right and the two lines run right to '
+          'left here, purely from the parent Row, not from anything '
+          'ElSkeleton itself does.',
+      specimen: _SkeletonRtlDemo(),
+      code: _rtlCode,
+      label: 'RTL specimen view',
+    ),
+    ShowcaseSection(
+      id: 'layout-shift',
+      title: 'Avoiding layout shift',
+      description:
+          'Not part of the shadcn counterpart\'s own section list: added '
+          'because a shape gallery alone does not show the actual reason a '
+          'skeleton is sized like its content. Press the button to swap '
+          'the placeholders for real content in place: the row never '
+          'resizes, because the skeleton was already sized to match it.',
+      specimen: _LoadingCardComposition(),
+      code: _layoutShiftCode,
+      label: 'Avoiding layout shift specimen view',
+    ),
+    DisclosureSection(
+      id: 'api',
+      title: 'API Reference',
+      description:
+          'Skeleton has no variant enum at all: its "variant" is whatever '
+          'width, height and radius the caller passes, because it must '
+          'match the exact footprint of the content it stands in for.',
+      children: const <DocsTocEntry>[
+        DocsTocEntry(title: 'ElSkeleton', anchor: 'api-elskeleton'),
+        DocsTocEntry(
+          title: 'ElSkeleton static members',
+          anchor: 'api-elskeleton-static',
+        ),
+      ],
+      child: _ApiReferenceContent(),
+    ),
+    DisclosureSection(
+      id: 'states',
+      title: 'States',
+      description:
+          'A presentational StatelessWidget with no onPressed, no '
+          'GestureDetector, and no FocusNode: most of the usual state '
+          'matrix does not apply, so the rows that are genuinely N/A are '
+          'grouped below with the reason instead of invented.',
+      child: const DocsStateMatrix(facts: _stateFacts),
+    ),
+    DisclosureSection(
+      id: 'accessibility',
+      title: 'Accessibility',
+      child: _AccessibilityContent(),
+    ),
+    DisclosureSection(
+      id: 'keyboard',
+      title: 'Keyboard',
+      child: _OneSentence(
+        'ElSkeleton is never in the tab order: no Focus widget, no '
+        'FocusNode, and no key handling exist anywhere in skeleton.dart, '
+        'consistent with it not being interactive content.',
+      ),
+    ),
+    DisclosureSection(
+      id: 'responsive',
+      title: 'Responsive',
+      child: _ResponsiveContent(),
+    ),
+    DisclosureSection(
+      id: 'dependencies',
+      title: 'Dependencies',
+      child: _DependenciesContent(),
+    ),
+    DisclosureSection(
+      id: 'theming',
+      title: 'Theming',
+      child: _ThemingContent(),
+    ),
+    DisclosureSection(
+      id: 'source',
+      title: 'Source',
+      child: DocsInstallFacts(
+        title: 'Reference',
+        facts: <DocsInstallFact>[
+          DocsInstallFact(
+            label: 'Source',
+            value: skeletonDoc.sourcePath,
+            description:
+                'Authoritative implementation: the truth this page was '
+                'written from.',
+          ),
+          const DocsInstallFact(
+            label: 'Package tests',
+            value: 'test/feedback_effects_test.dart',
+            description:
+                'group(\'ElSkeleton\'): the rasterised sweep, and the '
+                'rasterised reduced-motion case that proves a still frame.',
+          ),
+          const DocsInstallFact(
+            label: 'Docs test',
+            value: 'example/test/components_docs/skeleton_test.dart',
+            description:
+                'Covers this page: the API tables, live specimens in every '
+                'shape, the pager, and a dedicated reduced-motion case.',
+          ),
+          const DocsInstallFact(
+            label: 'Edit these docs',
+            value: 'example/lib/components_docs/skeleton/page.dart',
+            description: 'This file.',
+          ),
+        ],
+      ),
+    ),
+  ],
+);
 
 class SkeletonDocPage extends StatelessWidget {
   const SkeletonDocPage({super.key, this.onNavigate});
@@ -62,25 +304,7 @@ class SkeletonDocPage extends StatelessWidget {
       ElBreadcrumbEntry.link('Components'),
       ElBreadcrumbEntry.page('Skeleton'),
     ],
-    sidebar: _sidebar,
-    toc: const <DocsTocEntry>[
-      DocsTocEntry(title: 'Installation', anchor: 'install'),
-      DocsTocEntry(title: 'Usage', anchor: 'usage'),
-      DocsTocEntry(title: 'Avatar', anchor: 'avatar'),
-      DocsTocEntry(title: 'Card', anchor: 'card'),
-      DocsTocEntry(title: 'Text', anchor: 'text'),
-      DocsTocEntry(title: 'Form', anchor: 'form'),
-      DocsTocEntry(title: 'Table', anchor: 'table'),
-      DocsTocEntry(title: 'RTL', anchor: 'rtl'),
-      DocsTocEntry(title: 'Avoiding layout shift', anchor: 'layout-shift'),
-      DocsTocEntry(title: 'API Reference', anchor: 'api'),
-      DocsTocEntry(title: 'States', anchor: 'states'),
-      DocsTocEntry(title: 'Accessibility', anchor: 'accessibility'),
-      DocsTocEntry(title: 'Responsive', anchor: 'responsive'),
-      DocsTocEntry(title: 'Dependencies', anchor: 'dependencies'),
-      DocsTocEntry(title: 'Theming', anchor: 'theming'),
-      DocsTocEntry(title: 'Source', anchor: 'source'),
-    ],
+    toc: skeletonDocSpec.toc,
     previous: const DocsPageLink(
       title: 'Progress',
       route: '/components/progress',
@@ -90,526 +314,269 @@ class SkeletonDocPage extends StatelessWidget {
       route: '/components/separator',
     ),
     onNavigate: onNavigate,
-    child: const _SkeletonArticle(),
+    child: KeyedSubtree(
+      key: const ValueKey<String>('skeleton-doc-article'),
+      child: ComponentDocPage(spec: skeletonDocSpec, header: false),
+    ),
   );
 }
 
-/// `progress` and `skeleton`'s own small family: see `progress/page.dart`'s
-/// own note on why this is scoped to the two siblings rather than the full
-/// component list.
-const List<DocsSidebarEntry> _sidebar = <DocsSidebarEntry>[
-  DocsSidebarEntry(title: 'Progress', route: '/components/progress'),
-  DocsSidebarEntry(
-    title: 'Skeleton',
-    route: '/components/skeleton',
-    selected: true,
-  ),
-];
+/* ── Disclosure content ─────────────────────────────────────────────────── */
 
-class _SkeletonArticle extends StatelessWidget {
-  const _SkeletonArticle();
+/// One honest sentence, for a disclosure this component has nothing more to
+/// say under.
+class _OneSentence extends StatelessWidget {
+  const _OneSentence(this.text);
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) => ConstrainedBox(
+    constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+    child: ElText(
+      text,
+      ElType.small,
+      color: ElTheme.of(context).mutedForeground,
+    ),
+  );
+}
+
+class _ApiReferenceContent extends StatelessWidget {
+  const _ApiReferenceContent();
 
   @override
   Widget build(BuildContext context) {
     final ElThemeData theme = ElTheme.of(context);
     return Column(
-      key: const ValueKey<String>('skeleton-doc-article'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        // The live demo, ahead of any heading: the same shape the reference
-        // opens with. No ElSection wraps it, so it carries no Overview/
-        // Status/Preview heading before Installation.
-        const DocsCodeExample(
-          title: 'Skeleton',
-          description:
-              'A ElSkeleton avatar plus two text lines standing in for '
-              'content that has not arrived yet.',
-          preview: _TopDemo(),
-        ),
-        SizedBox(height: el(6)),
-        _install(),
-        _usage(),
-        _avatar(),
-        _card(),
-        _text(),
-        _form(),
-        _table(),
-        _rtl(),
-        _layoutShift(),
-        _apiReference(theme),
-        _states(),
-        _accessibility(theme),
-        _responsive(theme),
-        _dependencies(theme),
-        _theming(theme),
-        _source(),
-      ],
-    );
-  }
-
-  Widget _install() => ElSection(
-    id: 'install',
-    title: 'Installation',
-    description:
-        '`elattar add skeleton` installs the component and its declared '
-        'dependency closure.',
-    child: DocsInstallFacts(
-      title: 'Installation facts',
-      facts: <DocsInstallFact>[
-        const DocsInstallFact(
-          label: 'Registry item',
-          value: 'registry/components/skeleton.json',
-          description:
-              'Shipped and resolved by `elattar add skeleton`. This is a '
-              'source-only component today.',
-        ),
-        const DocsInstallFact(
-          label: 'Destination',
-          value: 'lib/components/ui/skeleton.dart',
-          description: 'Where a manual copy of the source belongs.',
-        ),
-        const DocsInstallFact(
-          label: 'Foundation',
-          value: 'source only',
-          description: 'No package-backed alternative is offered yet.',
-        ),
-        const DocsInstallFact(
-          label: 'Dependencies',
-          value: 'source-foundation',
-          description:
-              'foundation/theme.dart for the popover/accent gradient '
-              'stops and motion/keyframes.dart for ElShimmer and '
-              'ElKeyframePlayer, the shared looping-animation engine every '
-              '"pulls-*" motion in this system reuses.',
-        ),
-        const DocsInstallFact(
-          label: 'Assets',
-          value: 'none',
-          description: 'No images, icon fonts, or binary assets.',
-        ),
-        const DocsInstallFact(
-          label: 'Shaders',
-          value: 'none',
-          description:
-              'The sweep is a Canvas.drawRect painted with a '
-              'LinearGradient shader object, not an asset-backed fragment '
-              'shader.',
-        ),
-        DocsInstallFact(
-          label: 'Platforms',
-          value: 'Android, iOS, Web, macOS, Windows, Linux',
-          description: 'No platform-conditional code in skeleton.dart.',
-        ),
-        const DocsInstallFact(
-          label: 'Verified',
-          value: 'package tests + docs specimen',
-          description:
-              'test/feedback_effects_test.dart, group(\'ElSkeleton\'), '
-              'rasterises the sweep and proves reduced motion holds a '
-              'fully static frame (zero changed pixels 470ms apart). This '
-              'page\'s own skeleton_test.dart re-proves the settle without '
-              'rasterising, by pumping bounded frames. No registry fixture '
-              'install exists.',
-        ),
-      ],
-    ),
-  );
-
-  Widget _usage() => ElSection(
-    id: 'usage',
-    title: 'Usage',
-    description: 'A block, a circle, and an inline run of placeholder text.',
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-          child: ElText(
-            'ElSkeleton renders a box the exact size of the thing that has '
-            'not arrived yet, with a shimmering highlight sweeping across '
-            'it forever, until the caller swaps it for real content. Reach '
-            'for it when you already know the SHAPE of what is arriving: a '
-            'card, an avatar plus two lines, a table row. A generic grey '
-            'rectangle where a specific shape belongs causes a layout '
-            'jump, which reads as more broken than either a progress bar '
-            '(documented on its own page) or a spinner would.',
-            ElType.body,
-          ),
-        ),
-        SizedBox(height: el(5)),
-        ElPanel(
-          label: 'DART',
-          note: 'MINIMAL',
-          child: DocsSelectableCodeBlock(code: _usageCode),
-        ),
-      ],
-    ),
-  );
-
-  Widget _avatar() => const ElSection(
-    id: 'avatar',
-    title: 'Avatar',
-    description:
-        'A circular placeholder sized like the avatar it stands in for: '
-        'radius: ElRadii.pill turns the box into a circle the moment width '
-        'and height are equal.',
-    child: DocsCodeExample(
-      title: 'Avatar skeleton',
-      preview: KeyedSubtree(
-        key: ValueKey<String>('skeleton-preview:avatar'),
-        child: ElSkeleton(width: 40, height: 40, radius: ElRadii.pill),
-      ),
-    ),
-  );
-
-  Widget _card() => const ElSection(
-    id: 'card',
-    title: 'Card',
-    description:
-        'A block placeholder sized like the card it precedes: the caller '
-        'picks the exact width and height, ElSkeleton has no card-shaped '
-        'default of its own.',
-    child: DocsCodeExample(
-      title: 'Card skeleton',
-      preview: KeyedSubtree(
-        key: ValueKey<String>('skeleton-preview:card'),
-        child: ElSkeleton(width: 320, height: 128),
-      ),
-    ),
-  );
-
-  Widget _text() => ElSection(
-    id: 'text',
-    title: 'Text',
-    description:
-        'Two block lines for a paragraph placeholder, rounded-md (the '
-        'default radius), and one inline ElSkeleton.span standing in for a '
-        'run of text inside a sentence rather than a block: the only way '
-        'to exercise that factory.',
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        DocsCodeExample(
-          title: 'Text line skeletons',
-          preview: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              const KeyedSubtree(
-                key: ValueKey<String>('skeleton-preview:line-1'),
-                child: ElSkeleton(width: 220, height: 14),
+        const DocsAnchor(
+          id: 'api-elskeleton',
+          child: DocsApiTable(
+            title: 'ElSkeleton',
+            facts: <DocsApiFact>[
+              DocsApiFact(
+                name: 'width',
+                type: 'double?',
+                description:
+                    'The box\'s width, or null to take the incoming '
+                    'constraint (the caller\'s footprint, not a default '
+                    'shape).',
               ),
-              SizedBox(height: el(2)),
-              const KeyedSubtree(
-                key: ValueKey<String>('skeleton-preview:line-2'),
-                child: ElSkeleton(width: 160, height: 14),
+              DocsApiFact(
+                name: 'height',
+                type: 'double?',
+                description:
+                    'The box\'s height, or null to take the incoming '
+                    'constraint.',
+              ),
+              DocsApiFact(
+                name: 'radius',
+                type: 'double?',
+                description:
+                    'Overrides ElSkeleton.defaultRadius (10px). Set to '
+                    'ElRadii.pill for an avatar circle or a pill-shaped '
+                    'placeholder.',
               ),
             ],
           ),
         ),
-        SizedBox(height: el(5)),
-        const DocsCodeExample(
-          title: 'Inline skeleton',
-          description:
-              'ElSkeleton.span, aligned to PlaceholderAlignment.middle, '
-              'standing in for a run of text.',
-          preview: _SkeletonInlineDemo(),
-        ),
-      ],
-    ),
-  );
-
-  Widget _form() => const ElSection(
-    id: 'form',
-    title: 'Form',
-    description:
-        'A label-then-field pair, twice, plus a pill-shaped submit-button '
-        'placeholder: the caller sizes each box to match the real form '
-        'control it precedes, the same discipline every other shape on '
-        'this page follows.',
-    child: DocsCodeExample(
-      title: 'Form skeleton',
-      preview: _SkeletonFormDemo(),
-    ),
-  );
-
-  Widget _table() => const ElSection(
-    id: 'table',
-    title: 'Table',
-    description:
-        'Three rows of three cell-shaped bars: a table\'s loading state '
-        'is the same "match the footprint" rule as everything else on '
-        'this page, applied once per cell instead of once per block.',
-    child: DocsCodeExample(
-      title: 'Table skeleton',
-      preview: _SkeletonTableDemo(),
-    ),
-  );
-
-  Widget _rtl() => const ElSection(
-    id: 'rtl',
-    title: 'RTL',
-    description:
-        'ElSkeleton carries no text of its own, so nothing inside it '
-        'mirrors on its own account: the surrounding Row does, because Row '
-        'asks the ambient Directionality which edge is "start". The '
-        'avatar sits on the visual right and the two lines run right to '
-        'left here, purely from the parent Row, not from anything '
-        'ElSkeleton itself does.',
-    child: DocsCodeExample(
-      title: 'Skeleton row under RTL',
-      preview: _SkeletonRtlDemo(),
-    ),
-  );
-
-  Widget _layoutShift() => const ElSection(
-    id: 'layout-shift',
-    title: 'Avoiding layout shift',
-    description:
-        'Not part of the shadcn counterpart\'s own section list: added '
-        'because a shape gallery alone does not show the actual reason a '
-        'skeleton is sized like its content. Press the button to swap the '
-        'placeholders for real content in place: the row never resizes, '
-        'because the skeleton was already sized to match it.',
-    child: DocsCodeExample(
-      title: 'A card that avoids layout shift',
-      preview: _LoadingCardComposition(),
-    ),
-  );
-
-  Widget _apiReference(ElThemeData theme) => ElSection(
-    id: 'api',
-    title: 'API Reference',
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        const DocsApiTable(
-          title: 'ElSkeleton properties',
-          facts: <DocsApiFact>[
-            DocsApiFact(
-              name: 'width',
-              type: 'double?',
-              description:
-                  'The box\'s width, or null to take the incoming '
-                  'constraint (the caller\'s footprint, not a default '
-                  'shape).',
-            ),
-            DocsApiFact(
-              name: 'height',
-              type: 'double?',
-              description:
-                  'The box\'s height, or null to take the incoming '
-                  'constraint.',
-            ),
-            DocsApiFact(
-              name: 'radius',
-              type: 'double?',
-              description:
-                  'Overrides ElSkeleton.defaultRadius (10px). Set to '
-                  'ElRadii.pill for an avatar circle or a pill-shaped '
-                  'placeholder.',
-            ),
-          ],
-        ),
         SizedBox(height: el(6)),
-        const DocsApiTable(
-          title: 'ElSkeleton static members',
-          facts: <DocsApiFact>[
-            DocsApiFact(
-              name: 'ElSkeleton.defaultRadius',
-              type: 'static double',
-              description: 'ElRadii.md (10px): the box\'s resting corner.',
-            ),
-            DocsApiFact(
-              name: 'ElSkeleton.span',
-              type:
-                  'static InlineSpan Function({double? width, double? '
-                  'height, double? radius})',
-              description:
-                  'Returns a WidgetSpan wrapping a ElSkeleton, aligned to '
-                  'PlaceholderAlignment.middle, for a placeholder standing '
-                  'in for a run of text inside a paragraph rather than a '
-                  'block. See Text\'s inline specimen.',
-            ),
-          ],
+        const DocsAnchor(
+          id: 'api-elskeleton-static',
+          child: DocsApiTable(
+            title: 'ElSkeleton static members',
+            facts: <DocsApiFact>[
+              DocsApiFact(
+                name: 'ElSkeleton.defaultRadius',
+                type: 'static double',
+                description: 'ElRadii.md (10px): the box\'s resting corner.',
+              ),
+              DocsApiFact(
+                name: 'ElSkeleton.span',
+                type:
+                    'static InlineSpan Function({double? width, double? '
+                    'height, double? radius})',
+                description:
+                    'Returns a WidgetSpan wrapping a ElSkeleton, aligned '
+                    'to PlaceholderAlignment.middle, for a placeholder '
+                    'standing in for a run of text inside a paragraph '
+                    'rather than a block. See Text\'s inline specimen.',
+              ),
+            ],
+          ),
         ),
         SizedBox(height: el(3)),
         ElText(
-          'Skeleton has no variant enum at all: its "variant" is whatever '
-          'width, height and radius the caller passes, because it must '
-          'match the exact footprint of the content it stands in for. The '
-          'corner is its only real choice: ElSkeleton.defaultRadius (10px) '
-          'fits a block or a text-line placeholder; radius: ElRadii.pill '
-          'turns the same widget into a circle or a pill.',
+          'radius is Skeleton\'s only real choice: ElSkeleton.defaultRadius '
+          '(10px) fits a block or a text-line placeholder; radius: '
+          'ElRadii.pill turns the same widget into a circle or a pill.',
           ElType.small,
           color: theme.mutedForeground,
         ),
       ],
-    ),
-  );
+    );
+  }
+}
 
-  Widget _states() => ElSection(
-    id: 'states',
-    title: 'States',
-    description:
-        'A presentational StatelessWidget with no onPressed, no '
-        'GestureDetector, and no FocusNode: most of IA §9.7\'s rows do not '
-        'apply, so the ones that are genuinely N/A are grouped below with '
-        'the reason instead of invented.',
-    child: const DocsStateMatrix(
-      facts: <DocsStateFact>[
-        DocsStateFact(
-          state: 'Loading (its only state)',
-          treatment:
-              'The shimmer runs forever via ElKeyframePlayer(repeat: true) '
-              'until the caller stops rendering the skeleton and renders '
-              'real content instead: ElSkeleton has no "done" flag of its '
-              'own.',
-          userSignal:
-              'A continuously sweeping highlight signals "still working" '
-              'for as long as the widget is on screen; the caller\'s own '
-              'state (not a ElSkeleton parameter) decides when that ends.',
-        ),
-        DocsStateFact(
-          state: 'Reduced motion',
-          treatment:
-              'MediaQuery.disableAnimations collapses the animation to '
-              'Duration.zero via elAnimationDuration: ElKeyframePlayer '
-              'stops its controller outright (fill: none reverts it to '
-              't=0, its resting frame) rather than merely animating fast.',
-          userSignal:
-              'The skeleton holds one still frame instead of sweeping: '
-              'confirmed by this page\'s docs test and by '
-              'test/feedback_effects_test.dart\'s rasterised case.',
-        ),
-        DocsStateFact(
-          state:
-              'Hover / Focus-visible / Pressed / Selected / Empty / '
-              'Disabled',
-          treatment:
-              'N/A: the widget carries no gesture, focus, or async-flag '
-              'parameter to hold any of these; it is pure paint from its '
-              'constructor arguments.',
-          userSignal:
-              'It does not respond to pointer or keyboard input; there is '
-              'nothing to hover, focus, press, select, or disable.',
-        ),
-      ],
-    ),
-  );
+class _AccessibilityContent extends StatelessWidget {
+  const _AccessibilityContent();
 
-  Widget _accessibility(ElThemeData theme) => ElSection(
-    id: 'accessibility',
-    title: 'Accessibility',
-    child: _bullets(theme, <String>[
-      'Semantic role: NONE. ElSkeleton builds no Semantics node, no '
-          'ExcludeSemantics, and no liveRegion announcement anywhere in '
-          'its source. This is a real gap, not a documented design choice '
-          'the way ElBadge\'s silence is: a placeholder standing in for '
-          'content a user is waiting on gets no "loading" or "busy" '
-          'announcement at all.',
-      'What a screen reader actually gets: because the widget\'s leaf is '
-          'a childless CustomPaint inside a SizedBox, Flutter contributes '
-          'no semantic information for it by default, so in practice it '
-          'is silently skipped, which is closer to "hidden" than '
-          '"announced as busy", but that is an accident of how empty '
-          'render objects are treated, not something ElSkeleton declares. '
-          'A screen reader user gets neither a "content is loading" cue '
-          'nor a guarantee the region is excluded on purpose.',
-      'Recommended mitigation at the call site until this grows its own '
-          'semantics: wrap a loading region in Semantics(label: '
-          "'Loading', liveRegion: true) (or a ElEmpty/ElAlert busy "
-          'announcement) around the whole skeleton group, the same way a '
-          'caller already owns the swap between skeleton and real '
-          'content.',
-      'Keyboard interactions: none, ElSkeleton is never in the tab '
-          'order, consistent with it not being interactive content.',
-    ]),
-  );
+  @override
+  Widget build(BuildContext context) =>
+      _bullets(ElTheme.of(context), <String>[
+        'Semantic role: NONE. ElSkeleton builds no Semantics node, no '
+            'ExcludeSemantics, and no liveRegion announcement anywhere in '
+            'its source. This is a real gap, not a documented design '
+            'choice: a placeholder standing in for content a user is '
+            'waiting on gets no "loading" or "busy" announcement at all.',
+        'What a screen reader actually gets: because the widget\'s leaf is '
+            'a childless CustomPaint inside a SizedBox, Flutter contributes '
+            'no semantic information for it by default, so in practice it '
+            'is silently skipped, which is closer to "hidden" than '
+            '"announced as busy", but that is an accident of how empty '
+            'render objects are treated, not something ElSkeleton '
+            'declares.',
+        'Recommended mitigation at the call site until this grows its own '
+            'semantics: wrap a loading region in Semantics(label: '
+            "'Loading', liveRegion: true) around the whole skeleton group, "
+            'the same way a caller already owns the swap between skeleton '
+            'and real content.',
+      ]);
+}
 
-  Widget _responsive(ElThemeData theme) => ElSection(
-    id: 'responsive',
-    title: 'Responsive',
-    child: _bullets(theme, <String>[
-      'No breakpoint reads from BuildContext, and no platform branch: the '
-          'same widget tree renders at 390px and 1440px and on every '
-          'target platform.',
-      'ElSkeleton\'s geometry is entirely the caller\'s: width and height '
-          'default to null, which takes the incoming constraint exactly '
-          'the way an unconstrained Container would. Responsive behavior '
-          'for a skeleton composition is a property of the layout around '
-          'it, not of ElSkeleton itself.',
-      'Platform parity: Android, iOS, Web, macOS, Windows and Linux all '
-          'render the same widget tree.',
-    ]),
-  );
+class _ResponsiveContent extends StatelessWidget {
+  const _ResponsiveContent();
 
-  Widget _dependencies(ElThemeData theme) => ElSection(
-    id: 'dependencies',
+  @override
+  Widget build(BuildContext context) =>
+      _bullets(ElTheme.of(context), <String>[
+        'No breakpoint reads from BuildContext, and no platform branch: '
+            'the same widget tree renders at 390px and 1440px and on '
+            'every target platform.',
+        'ElSkeleton\'s geometry is entirely the caller\'s: width and '
+            'height default to null, which takes the incoming constraint '
+            'exactly the way an unconstrained Container would. Responsive '
+            'behavior for a skeleton composition is a property of the '
+            'layout around it, not of ElSkeleton itself.',
+        'Platform parity: Android, iOS, Web, macOS, Windows and Linux all '
+            'render the same widget tree.',
+      ]);
+}
+
+class _DependenciesContent extends StatelessWidget {
+  const _DependenciesContent();
+
+  @override
+  Widget build(BuildContext context) => DocsInstallFacts(
     title: 'Dependencies',
-    child: _bullets(theme, <String>[
-      'File: lib/src/components/skeleton.dart (one file, private '
-          '_ShimmerPainter included).',
-      'Foundation imports: foundation/spacing.dart (el(), ElRadii), '
-          'foundation/theme.dart (ElThemeData).',
-      'Motion import: motion/keyframes.dart (ElKeyframePlayer, '
-          'ElShimmer): the same looping-animation engine every "pulls-*" '
-          'infinite motion in this system shares.',
-      'Scope import: theme_scope.dart (ElTheme).',
-      'Assets/fonts/shaders: none: the sweep is a LinearGradient shader '
-          'object drawn by CustomPainter, not a bundled asset.',
-    ]),
-  );
-
-  Widget _theming(ElThemeData theme) => ElSection(
-    id: 'theming',
-    title: 'Theming',
-    child: _bullets(theme, <String>[
-      'The shimmer gradient is theme.popover → theme.accent → '
-          'theme.popover (ElShimmer.gradient(theme)): both stops resolve '
-          'from the live theme, so light and dark each get their own '
-          'correctly contrasted sweep with no override needed.',
-      'ElSkeleton declares no colour parameter of its own: the gradient '
-          'is entirely theme-derived, consistent with every other '
-          'primitive on this page.',
-    ]),
-  );
-
-  Widget _source() => ElSection(
-    id: 'source',
-    title: 'Source',
-    child: DocsInstallFacts(
-      title: 'Reference',
-      facts: <DocsInstallFact>[
-        DocsInstallFact(
-          label: 'Source',
-          value: skeletonDoc.sourcePath,
-          description:
-              'Authoritative implementation: the truth this page was '
-              'written from.',
-        ),
-        const DocsInstallFact(
-          label: 'Package tests',
-          value: 'test/feedback_effects_test.dart',
-          description:
-              'group(\'ElSkeleton\'): the rasterised sweep, and the '
-              'rasterised reduced-motion case that proves a still frame.',
-        ),
-        const DocsInstallFact(
-          label: 'Docs test',
-          value: 'example/test/components_docs/skeleton_test.dart',
-          description:
-              'Covers this page: the API tables, live specimens in every '
-              'shape, the pager, and a dedicated reduced-motion case.',
-        ),
-        const DocsInstallFact(
-          label: 'Edit these docs',
-          value: 'example/lib/components_docs/skeleton/page.dart',
-          description: 'This file.',
-        ),
-      ],
-    ),
+    facts: <DocsInstallFact>[
+      DocsInstallFact(
+        label: 'Files',
+        value: skeletonDoc.sourcePath,
+        description: 'One file, private _ShimmerPainter included.',
+      ),
+      const DocsInstallFact(
+        label: 'Imports',
+        value: 'foundation/spacing.dart (el(), ElRadii), '
+            'foundation/theme.dart (ElThemeData), motion/keyframes.dart '
+            '(ElKeyframePlayer, ElShimmer), theme_scope.dart (ElTheme)',
+        description:
+            'ElKeyframePlayer and ElShimmer are the same '
+            'looping-animation engine every "pulls-*" motion in this '
+            'system reuses. No component dependency.',
+      ),
+      const DocsInstallFact(
+        label: 'Assets, fonts, shaders',
+        value: 'None',
+        description:
+            'The sweep is a Canvas.drawRect painted with a LinearGradient '
+            'shader object, not an asset-backed fragment shader.',
+      ),
+      const DocsInstallFact(
+        label: 'Platforms',
+        value: 'Android, iOS, Web, macOS, Windows, Linux',
+        description: 'No platform-conditional code in skeleton.dart.',
+      ),
+      const DocsInstallFact(
+        label: 'Verified',
+        value: 'package tests + docs specimen',
+        description:
+            'test/feedback_effects_test.dart\'s group(\'ElSkeleton\') '
+            'rasterises the sweep and proves reduced motion holds a fully '
+            'static frame; this page\'s own skeleton_test.dart re-proves '
+            'the settle without rasterising, by pumping bounded frames.',
+      ),
+    ],
   );
 }
+
+class _ThemingContent extends StatelessWidget {
+  const _ThemingContent();
+
+  @override
+  Widget build(BuildContext context) =>
+      _bullets(ElTheme.of(context), <String>[
+        'The shimmer gradient is theme.popover → theme.accent → '
+            'theme.popover (ElShimmer.gradient(theme)): both stops resolve '
+            'from the live theme, so light and dark each get their own '
+            'correctly contrasted sweep with no override needed.',
+        'ElSkeleton declares no colour parameter of its own: the gradient '
+            'is entirely theme-derived, consistent with every other '
+            'primitive on this page.',
+      ]);
+}
+
+Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: <Widget>[
+    for (final String line in lines) ...<Widget>[
+      ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+      ),
+      SizedBox(height: el(2)),
+    ],
+  ],
+);
+
+const List<DocsStateFact> _stateFacts = <DocsStateFact>[
+  DocsStateFact(
+    state: 'Loading (its only state)',
+    treatment:
+        'The shimmer runs forever via ElKeyframePlayer(repeat: true) until '
+        'the caller stops rendering the skeleton and renders real content '
+        'instead: ElSkeleton has no "done" flag of its own.',
+    userSignal:
+        'A continuously sweeping highlight signals "still working" for as '
+        'long as the widget is on screen; the caller\'s own state (not a '
+        'ElSkeleton parameter) decides when that ends.',
+  ),
+  DocsStateFact(
+    state: 'Reduced motion',
+    treatment:
+        'MediaQuery.disableAnimations collapses the animation to '
+        'Duration.zero via elAnimationDuration: ElKeyframePlayer stops its '
+        'controller outright (fill: none reverts it to t=0, its resting '
+        'frame) rather than merely animating fast.',
+    userSignal:
+        'The skeleton holds one still frame instead of sweeping: confirmed '
+        'by this page\'s docs test and by '
+        'test/feedback_effects_test.dart\'s rasterised case.',
+  ),
+  DocsStateFact(
+    state: 'Hover / Focus-visible / Pressed / Selected / Empty / Disabled',
+    treatment:
+        'N/A: the widget carries no gesture, focus, or async-flag '
+        'parameter to hold any of these; it is pure paint from its '
+        'constructor arguments.',
+    userSignal:
+        'It does not respond to pointer or keyboard input; there is '
+        'nothing to hover, focus, press, select, or disable.',
+  ),
+];
+
+/* ── Showcase specimens ─────────────────────────────────────────────────── */
 
 /// The unheaded top-of-page demo: one representative [ElSkeleton] group (an
 /// avatar plus two text lines, the same shape the reference's own default
@@ -663,6 +630,32 @@ class _SkeletonInlineDemo extends StatelessWidget {
   }
 }
 
+/// The two text-line skeletons plus the inline specimen, combined into one
+/// specimen for the Text section: both pieces move across unchanged from the
+/// pre-kit page, which showed them as two separate unheaded demos.
+class _TextSpecimen extends StatelessWidget {
+  const _TextSpecimen();
+
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    mainAxisSize: MainAxisSize.min,
+    children: <Widget>[
+      const KeyedSubtree(
+        key: ValueKey<String>('skeleton-preview:line-1'),
+        child: ElSkeleton(width: 220, height: 14),
+      ),
+      SizedBox(height: el(2)),
+      const KeyedSubtree(
+        key: ValueKey<String>('skeleton-preview:line-2'),
+        child: ElSkeleton(width: 160, height: 14),
+      ),
+      SizedBox(height: el(5)),
+      const _SkeletonInlineDemo(),
+    ],
+  );
+}
+
 /// Two label-then-field pairs and a submit-button placeholder: a form's
 /// loading state, sized like the controls it precedes.
 class _SkeletonFormDemo extends StatelessWidget {
@@ -671,6 +664,7 @@ class _SkeletonFormDemo extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
+    mainAxisSize: MainAxisSize.min,
     children: <Widget>[
       const KeyedSubtree(
         key: ValueKey<String>('skeleton-preview:form-name-label'),
@@ -702,17 +696,15 @@ class _SkeletonFormDemo extends StatelessWidget {
 
 /// Three rows of three cell-shaped bars: a table's loading state. Each row
 /// is one conceptual table row, so it is wrapped in the page's established
-/// horizontal-scroll mitigation (see `pagination/page.dart`'s Responsive
-/// section and `separator/page.dart`'s own wide specimen) rather than
-/// wrapped onto a second line, which would misrepresent a single table row
-/// as two. The 322px this row measures against the 298px a docs panel leaves
-/// at a 390px viewport is what makes the wrap necessary, not decoration.
+/// horizontal-scroll mitigation rather than wrapped onto a second line,
+/// which would misrepresent a single table row as two.
 class _SkeletonTableDemo extends StatelessWidget {
   const _SkeletonTableDemo();
 
   @override
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
+    mainAxisSize: MainAxisSize.min,
     children: <Widget>[
       for (int row = 0; row < 3; row++) ...<Widget>[
         if (row > 0) SizedBox(height: el(3)),
@@ -782,6 +774,7 @@ class _LoadingCardCompositionState extends State<_LoadingCardComposition> {
     final ElThemeData theme = ElTheme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -853,18 +846,7 @@ class _LoadingCardCompositionState extends State<_LoadingCardComposition> {
   }
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
-  crossAxisAlignment: CrossAxisAlignment.start,
-  children: <Widget>[
-    for (final String line in lines) ...<Widget>[
-      ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
-      ),
-      SizedBox(height: el(2)),
-    ],
-  ],
-);
+/* ── Code strings ───────────────────────────────────────────────────────── */
 
 const String _usageCode = '''
 // A block the exact size of the card that will replace it.
@@ -883,3 +865,130 @@ Text.rich(
     ],
   ),
 )''';
+
+const String _previewCode = '''Row(
+  crossAxisAlignment: CrossAxisAlignment.center,
+  children: [
+    ElSkeleton(width: 48, height: 48, radius: ElRadii.pill),
+    SizedBox(width: 12),
+    Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          ElSkeleton(height: 16),
+          SizedBox(height: 8),
+          ElSkeleton(height: 16, width: 200),
+        ],
+      ),
+    ),
+  ],
+)''';
+
+const String _avatarCode = 'ElSkeleton(width: 40, height: 40, radius: ElRadii.pill)';
+
+const String _cardCode = 'ElSkeleton(width: 320, height: 128)';
+
+const String _textCode = '''Column(
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+    ElSkeleton(width: 220, height: 14),
+    SizedBox(height: 8),
+    ElSkeleton(width: 160, height: 14),
+  ],
+)
+
+// Inline, standing in for a run of text inside a sentence.
+Text.rich(
+  TextSpan(
+    style: ElText.styleOf(context, ElType.body),
+    children: [
+      TextSpan(text: 'The next release ships in '),
+      ElSkeleton.span(width: 64, height: 14),
+      TextSpan(text: ' weeks, after code freeze.'),
+    ],
+  ),
+)''';
+
+const String _formCode = '''Column(
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+    ElSkeleton(width: 90, height: 12),
+    SizedBox(height: 8),
+    ElSkeleton(width: 280, height: 36),
+    SizedBox(height: 16),
+    ElSkeleton(width: 90, height: 12),
+    SizedBox(height: 8),
+    ElSkeleton(width: 280, height: 36),
+    SizedBox(height: 16),
+    ElSkeleton(width: 110, height: 36, radius: ElRadii.pill),
+  ],
+)''';
+
+const String _tableCode = '''Column(
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+    for (int row = 0; row < 3; row++)
+      Row(
+        children: [
+          ElSkeleton(width: 140, height: 14),
+          SizedBox(width: 16),
+          ElSkeleton(width: 90, height: 14),
+          SizedBox(width: 16),
+          ElSkeleton(width: 60, height: 14),
+        ],
+      ),
+  ],
+)''';
+
+const String _rtlCode = '''Directionality(
+  textDirection: TextDirection.rtl,
+  child: Row(
+    children: [
+      ElSkeleton(width: 40, height: 40, radius: ElRadii.pill),
+      SizedBox(width: 12),
+      Expanded(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            ElSkeleton(height: 14),
+            SizedBox(height: 8),
+            ElSkeleton(height: 14, width: 160),
+          ],
+        ),
+      ),
+    ],
+  ),
+)''';
+
+const String _layoutShiftCode = '''class _LoadingCard extends StatefulWidget {
+  @override
+  State<_LoadingCard> createState() => _LoadingCardState();
+}
+
+class _LoadingCardState extends State<_LoadingCard> {
+  bool _loaded = false;
+
+  @override
+  Widget build(BuildContext context) => Column(
+    children: [
+      Row(
+        children: [
+          _loaded
+              ? CircleAvatar(child: Icon(Icons.person))
+              : ElSkeleton(width: 40, height: 40, radius: ElRadii.pill),
+          if (!_loaded) ...[
+            ElSkeleton(width: 140, height: 14),
+            ElSkeleton(width: 200, height: 12),
+          ] else ...[
+            Text('Amara Chen'),
+            Text('Design lead: active 2 minutes ago'),
+          ],
+        ],
+      ),
+      ElButton(
+        onPressed: () => setState(() => _loaded = !_loaded),
+        child: Text(_loaded ? 'Show skeleton again' : 'Show loaded content'),
+      ),
+    ],
+  );
+}''';

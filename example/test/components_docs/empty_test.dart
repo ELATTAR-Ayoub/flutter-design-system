@@ -1,7 +1,17 @@
+/// Tests for `components_docs/empty/page.dart`'s [EmptyDocPage].
+///
+/// Re-housed onto the kit alongside the page: the section-order test now
+/// reads `DocsSection.id`/`.title`, and the API-table reads open the
+/// `DocsDisclosure` first — closed by default, unlike the old page's
+/// always-visible `ElSection`.
+library;
+
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/empty/meta.dart';
 import 'package:example/components_docs/empty/page.dart';
-import 'package:example/kit.dart' show ElSection;
+import 'package:example/docs/component_doc_page.dart' show DocsTocEntry;
+import 'package:example/docs/docs_disclosure.dart';
+import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -12,6 +22,48 @@ Widget _harness({
   controller: controller,
   child: MaterialApp(home: SingleChildScrollView(child: child)),
 );
+
+/// The single `DocsDisclosure` whose title is [title].
+Finder _disclosureTrigger(String title) => find.descendant(
+  of: find.byWidgetPredicate(
+    (Widget widget) => widget is DocsDisclosure && widget.title == title,
+  ),
+  matching: find.byKey(DocsDisclosure.triggerKey),
+);
+
+const List<String> _sectionIds = <String>[
+  'preview',
+  'install',
+  'usage',
+  'composition',
+  'input-group',
+  'rtl',
+  'api',
+  'states',
+  'accessibility',
+  'keyboard',
+  'responsive',
+  'dependencies',
+  'theming',
+  'source',
+];
+
+const List<String> _sectionTitles = <String>[
+  'Preview',
+  'Installation',
+  'Usage',
+  'Composition',
+  'Input group',
+  'RTL',
+  'API Reference',
+  'States',
+  'Accessibility',
+  'Keyboard',
+  'Responsive',
+  'Dependencies',
+  'Theming',
+  'Source',
+];
 
 void main() {
   group('empty docs page', () {
@@ -31,11 +83,19 @@ void main() {
             ),
           ),
         );
+        await tester.pump();
 
         expect(
           find.byKey(const ValueKey<String>('empty-doc-article')),
           findsOneWidget,
         );
+
+        final Finder apiTrigger = _disclosureTrigger('API Reference');
+        await tester.ensureVisible(apiTrigger);
+        await tester.pump();
+        await tester.tap(apiTrigger);
+        await tester.pump();
+        await tester.pump(ElDurations.jelly);
 
         for (final String param in <String>[
           'children',
@@ -65,9 +125,17 @@ void main() {
             'ElEmptyContent',
           ]),
         );
+        expect(emptyDoc.command, 'elattar add empty');
         expect(destination, isNull);
       },
     );
+
+    test('the table of contents matches the declared sections', () {
+      expect(
+        emptyDocSpec.toc.map((DocsTocEntry entry) => entry.title).toList(),
+        _sectionTitles,
+      );
+    });
 
     testWidgets(
       'renders at narrow width with the anchor strip instead of a rail',
@@ -82,6 +150,7 @@ void main() {
             child: const EmptyDocPage(),
           ),
         );
+        await tester.pump();
 
         expect(
           find.byKey(const ValueKey<String>('empty-doc-article')),
@@ -102,7 +171,7 @@ void main() {
       'renders the shadcn-shaped section list, in order, with Outline/'
       'Background/Avatar/Avatar Group honestly skipped',
       (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 900);
+        tester.view.physicalSize = const Size(1440, 4000);
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
 
@@ -112,36 +181,29 @@ void main() {
             child: const EmptyDocPage(),
           ),
         );
+        await tester.pump();
 
-        final List<ElSection> sections = tester
-            .widgetList<ElSection>(find.byType(ElSection))
+        final List<DocsSection> sections = tester
+            .widgetList<DocsSection>(find.byType(DocsSection))
             .toList();
         final List<String> sectionIds = sections
-            .map((ElSection section) => section.id)
+            .map((DocsSection section) => section.id)
             .toList();
         final List<String> sectionTitles = sections
-            .map((ElSection section) => section.title)
+            .map((DocsSection section) => section.title)
             .toList();
 
-        expect(sectionIds, <String>[
-          'install',
-          'usage',
-          'composition',
-          'input-group',
-          'rtl',
-          'api',
-          'states',
-          'accessibility',
-          'responsive',
-          'dependencies',
-          'theming',
-          'source',
-        ]);
+        expect(sectionIds, _sectionIds);
+        expect(sectionTitles, _sectionTitles);
 
         expect(sectionTitles, isNot(contains('Outline')));
         expect(sectionTitles, isNot(contains('Background')));
         expect(sectionTitles, isNot(contains('Avatar')));
         expect(sectionTitles, isNot(contains('Avatar Group')));
+
+        // Eight collapsed sections: API Reference, States, Accessibility,
+        // Keyboard, Responsive, Dependencies, Theming, Source.
+        expect(find.byType(DocsDisclosure), findsNWidgets(8));
       },
     );
 
@@ -164,6 +226,7 @@ void main() {
             await tester.pumpWidget(
               _harness(controller: controller, child: const EmptyDocPage()),
             );
+            await tester.pump();
 
             expect(
               find.byKey(const ValueKey<String>('empty-doc-article')),

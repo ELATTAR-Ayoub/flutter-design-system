@@ -13,8 +13,9 @@ library;
 
 import '../catalog.dart' show ComponentDocEntry;
 
-/// `empty` has no `registry/components/empty.json` yet: see `page.dart`'s
-/// installation section for the shipped command and registry dependencies.
+/// `registry/components/empty.json` ships today: [dependencies] is that
+/// manifest's own `registryDependencies` list, verbatim, so `page.dart`'s
+/// Installation section can render the real `elattar add empty` command.
 const ComponentDocEntry emptyDoc = ComponentDocEntry(
   name: 'empty',
   title: 'Empty',

@@ -2,46 +2,49 @@
 /// component documentation page.
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
-/// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`, per the
-/// Phase J brief. The live `ElThemeController` is flipped in place for theme
-/// coverage rather than re-pumped under a new controller.
+/// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`. The live
+/// `ElThemeController` is flipped in place for theme coverage rather than
+/// re-pumped under a new controller.
+///
+/// Re-housed onto the kit alongside the page: sections are now
+/// `DocsSection`s rather than `ElSection`s, and the eight disclosures (API
+/// Reference, States, Accessibility, Keyboard, Responsive, Dependencies,
+/// Theming, Source) are collapsed `DocsDisclosure`s that mount no content
+/// until opened — see `_openDisclosure`, the same helper `button_test.dart`
+/// uses.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/tabs/meta.dart';
 import 'package:example/components_docs/tabs/page.dart';
-import 'package:example/docs/docs_code.dart';
+import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_facts.dart';
 import 'package:example/docs/docs_layout.dart';
-import 'package:example/kit.dart';
+import 'package:example/docs/docs_section.dart' show DocsSection;
+import 'package:example/docs/docs_showcase.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 const Size _wide = Size(1440, 900);
 const Size _narrow = Size(390, 844);
 
-/// The shadcn-parity section order (worker-brief.md): the shadcn tabs page's
-/// own sections, mirrored, skipped or added-to per the Step 3 mapping, then
-/// this package's six fixed extra sections in their required order.
-///
-/// No 'preview' entry: the live demo renders ahead of every heading, the
-/// same as `https://ui.shadcn.com/docs/components/base/tabs` itself, so it
-/// carries no ElSection and no TOC anchor of its own. 'Vertical', 'Disabled'
-/// and 'Icons' have no counterpart: ElTabs has an orientation axis that is
-/// recorded but never wired, no enabled/disabled parameter, and no icon
-/// slot on ElTabItem. 'Composition', 'Line' and 'RTL' mirror the reference.
-/// 'Empty tab' is ours only, covering the real ElTabItem.content: null
-/// state.
+/// The house shape's own section order: Preview, Installation, Usage, one
+/// section per variant/state, then the eight fixed disclosures.
 const List<String> _expectedSectionIds = <String>[
+  'preview',
   'install',
   'usage',
+  'panels',
   'composition',
+  'account-settings',
   'line',
+  'section-switcher',
   'empty-tab',
   'rtl',
   'api',
   'states',
   'accessibility',
+  'keyboard',
   'responsive',
   'dependencies',
   'theming',
@@ -49,8 +52,8 @@ const List<String> _expectedSectionIds = <String>[
 ];
 
 /// Every public constructor parameter of `ElTabs`, enumerated by reading
-/// `lib/src/components/tabs.dart` directly (Step 1 of the task cycle). The
-/// API table must cover all of these by name.
+/// `lib/src/components/tabs.dart` directly. The API table must cover all of
+/// these by name.
 const List<String> _tabsParams = <String>[
   'items',
   'selectedIndex',
@@ -108,6 +111,23 @@ Future<ElThemeController> _pump(
   return theme;
 }
 
+/// The single `DocsDisclosure` whose title is [title], opened. A closed
+/// `DocsDisclosure` mounts no content, so a test reading anything inside one
+/// must open it first — the same helper `button_test.dart` uses.
+Future<void> _openDisclosure(WidgetTester tester, String title) async {
+  final Finder trigger = find.descendant(
+    of: find.byWidgetPredicate(
+      (Widget widget) => widget is DocsDisclosure && widget.title == title,
+    ),
+    matching: find.byKey(DocsDisclosure.triggerKey),
+  );
+  await tester.ensureVisible(trigger);
+  await tester.pump();
+  await tester.tap(trigger);
+  await tester.pump();
+  await tester.pump(ElDurations.jelly);
+}
+
 void main() {
   testWidgets(
     'renders the article at wide and narrow widths with no exceptions',
@@ -115,7 +135,7 @@ void main() {
       await _pump(tester, size: _wide);
 
       expect(find.text(tabsDoc.title), findsWidgets);
-      expect(find.byType(DocsCodeExample), findsAtLeastNWidgets(1));
+      expect(find.byType(DocsShowcase), findsAtLeastNWidgets(1));
       expect(
         find.byKey(const ValueKey<String>('docs-layout-sidebar')),
         findsOneWidget,
@@ -123,7 +143,6 @@ void main() {
       expect(tester.takeException(), isNull);
 
       await _pump(tester, size: _narrow);
-      await tester.pumpAndSettle();
 
       expect(
         find.byKey(const ValueKey<String>('docs-layout-anchor-strip')),
@@ -138,14 +157,18 @@ void main() {
   );
 
   testWidgets(
-    'renders the shadcn-parity section list, in order, and the sidebar TOC '
+    'renders the house-shape section list, in order, and the sidebar TOC '
     'matches it heading for heading',
     (WidgetTester tester) async {
-      await _pump(tester);
+      tester.view.physicalSize = const Size(1440, 6000);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+
+      await _pump(tester, size: const Size(1440, 6000));
 
       final List<String> renderedIds = tester
-          .widgetList<ElSection>(find.byType(ElSection))
-          .map((ElSection section) => section.id)
+          .widgetList<DocsSection>(find.byType(DocsSection))
+          .map((DocsSection section) => section.id)
           .toList();
       expect(renderedIds, _expectedSectionIds);
 
@@ -158,8 +181,8 @@ void main() {
       expect(tocAnchors, _expectedSectionIds);
 
       final Map<String, String> titleById = <String, String>{
-        for (final ElSection section in tester.widgetList<ElSection>(
-          find.byType(ElSection),
+        for (final DocsSection section in tester.widgetList<DocsSection>(
+          find.byType(DocsSection),
         ))
           section.id: section.title,
       };
@@ -169,7 +192,7 @@ void main() {
           entry.title,
           reason:
               'TOC entry for "${entry.anchor}" must read the same title as '
-              'the ElSection it points to',
+              'the DocsSection it points to',
         );
       }
     },
@@ -180,6 +203,7 @@ void main() {
     'and every ElTabsVariant/static member',
     (WidgetTester tester) async {
       await _pump(tester);
+      await _openDisclosure(tester, 'API Reference');
 
       final List<DocsApiTable> tables = tester
           .widgetList<DocsApiTable>(find.byType(DocsApiTable))
@@ -215,31 +239,102 @@ void main() {
       expect(find.byKey(key), findsOneWidget);
       await tester.ensureVisible(find.byKey(key));
 
+      // Scoped to this one specimen: its Info panel's text also appears
+      // verbatim in the live Panels specimen further down the page, now
+      // that both are mounted at once.
+      Finder within(String text) =>
+          find.descendant(of: find.byKey(key), matching: find.text(text));
+
       expect(tester.widget<ElTabs>(find.byKey(key)).selectedIndex, 0);
-      expect(find.text('Update your account details here.'), findsOneWidget);
+      expect(within('Update your account details here.'), findsOneWidget);
       expect(
-        find.text('See who else has access to this workspace.'),
+        within('See who else has access to this workspace.'),
         findsNothing,
       );
 
-      await tester.tap(find.text('Team'), warnIfMissed: false);
+      await tester.tap(within('Team'), warnIfMissed: false);
       await tester.pump();
 
       expect(tester.widget<ElTabs>(find.byKey(key)).selectedIndex, 1);
-      expect(find.text('Update your account details here.'), findsNothing);
-      expect(
-        find.text('See who else has access to this workspace.'),
-        findsOneWidget,
-      );
+      expect(within('Update your account details here.'), findsNothing);
+      expect(within('See who else has access to this workspace.'), findsOneWidget);
 
       // A ElTabItem with content: null, a real state the source itself
       // documents (see tabs.dart's ElTabItem.content doc comment), renders
       // no panel at all when selected, and toggling to it must not throw.
-      await tester.tap(find.text('More'), warnIfMissed: false);
+      await tester.tap(within('More'), warnIfMissed: false);
       await tester.pump();
       expect(
-        find.text('See who else has access to this workspace.'),
+        within('See who else has access to this workspace.'),
         findsNothing,
+      );
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'the Panels specimen mounts panel content and switches between them',
+    (WidgetTester tester) async {
+      await _pump(tester);
+
+      const Key key = ValueKey<String>('tabs-panels-specimen');
+      expect(find.byKey(key), findsOneWidget);
+      await tester.ensureVisible(find.byKey(key));
+
+      // Scoped to this one specimen: its Account panel's text is identical
+      // to the live Preview specimen's Info panel, both mounted at once.
+      Finder within(String text) =>
+          find.descendant(of: find.byKey(key), matching: find.text(text));
+
+      expect(within('Update your account details here.'), findsOneWidget);
+      await tester.tap(within('Password'), warnIfMissed: false);
+      await tester.pump();
+      expect(within('Change your password here.'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'the Account settings specimen mounts a contentless Team trigger '
+    'without throwing',
+    (WidgetTester tester) async {
+      await _pump(tester);
+
+      const Key key = ValueKey<String>('tabs-account-settings-specimen');
+      expect(find.byKey(key), findsOneWidget);
+      await tester.ensureVisible(find.byKey(key));
+
+      await tester.tap(find.text('Team').last, warnIfMissed: false);
+      await tester.pump();
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'the standalone Line specimen renders the line variant and switches '
+    'panels',
+    (WidgetTester tester) async {
+      await _pump(tester);
+
+      const Key key = ValueKey<String>('tabs-line-variant-specimen');
+      expect(find.byKey(key), findsOneWidget);
+      await tester.ensureVisible(find.byKey(key));
+
+      expect(
+        tester.widget<ElTabs>(find.byKey(key)).variant,
+        ElTabsVariant.line,
+      );
+
+      // Scoped: 'Stats' is also this specimen's own choice of label for
+      // Preview's Line cell above, both mounted at once.
+      Finder within(String text) =>
+          find.descendant(of: find.byKey(key), matching: find.text(text));
+
+      await tester.tap(within('Stats'), warnIfMissed: false);
+      await tester.pump();
+      expect(
+        within('Traffic and conversion, broken down by channel.'),
+        findsWidgets,
       );
       expect(tester.takeException(), isNull);
     },
@@ -259,8 +354,8 @@ void main() {
         findsNothing,
         reason:
             'if this starts failing, ElTabs has grown real keyboard focus '
-            'and the Accessibility section of the docs page must be updated '
-            'to stop saying otherwise',
+            'and the Accessibility/Keyboard sections of the docs page must '
+            'be updated to stop saying otherwise',
       );
     },
   );
@@ -375,11 +470,6 @@ void main() {
   ) async {
     await _pump(tester);
 
-    // This test used to assert the opposite, correctly: tabs was not a
-    // registry item, and holding the page to saying so was the right guard
-    // against overclaiming. The registry now ships it, so the same guard
-    // points the other way — the page must not tell a reader that a command
-    // which works will not.
     expect(find.textContaining('not yet a registry item'), findsNothing);
     expect(find.textContaining('elattar add tabs'), findsWidgets);
   });
@@ -389,6 +479,7 @@ void main() {
     'motion, and the page states the missing keyboard support plainly',
     (WidgetTester tester) async {
       await _pump(tester);
+      await _openDisclosure(tester, 'States');
 
       final DocsStateMatrix matrix = tester.widget<DocsStateMatrix>(
         find.byType(DocsStateMatrix),
@@ -412,6 +503,7 @@ void main() {
         );
       }
 
+      await _openDisclosure(tester, 'Keyboard');
       expect(find.textContaining('no keyboard'), findsWidgets);
     },
   );

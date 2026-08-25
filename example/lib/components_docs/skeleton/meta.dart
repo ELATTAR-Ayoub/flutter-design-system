@@ -10,9 +10,9 @@
 /// supervisor-owned, and this entry is new. `page.dart` reads [skeletonDoc]
 /// directly rather than going through `componentDoc('skeleton')`.
 ///
-/// `registry/components/skeleton.json` does not exist yet: see `page.dart`'s
-/// installation section for the shipped command and registry dependencies. [dependencies] is left
-/// empty rather than naming items a manifest does not yet resolve.
+/// `registry/components/skeleton.json` ships today: [dependencies] is that
+/// manifest's own `registryDependencies` list, verbatim, so `page.dart`'s
+/// Installation section can render the real `elattar add skeleton` command.
 library;
 
 import '../catalog.dart' show ComponentDocEntry;

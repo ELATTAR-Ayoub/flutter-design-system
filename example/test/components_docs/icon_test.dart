@@ -1,15 +1,29 @@
+/// Tests for `components_docs/icon/meta.dart` and
+/// `components_docs/icon/page.dart`: the public documentation page for
+/// Icon, re-housed onto the kit (`ComponentDocSpec` + `ComponentDocPage`),
+/// the same shape `button_test.dart` covers.
+///
+/// API Reference, Accessibility, Keyboard, Responsive, Dependencies, and
+/// Theming are all `DisclosureSection`s, closed by default and mounting no
+/// content while closed (see `docs_disclosure_test.dart`), so tests that
+/// read their content open the relevant `DocsDisclosure` first — the same
+/// fix `button_test.dart` needed for its own API table.
+library;
+
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/icon/meta.dart';
 import 'package:example/components_docs/icon/page.dart';
-import 'package:example/kit.dart' show ElSection;
+import 'package:example/docs/docs_disclosure.dart';
+import 'package:example/docs/docs_install.dart';
+import 'package:example/docs/docs_section.dart' show DocsSection;
+import 'package:example/docs/docs_showcase.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// This page's own section order, split off `spinner` and `rule`:
-/// see `example/lib/components_docs/icon/page.dart`'s own library doc.
-/// The unheaded live demo carries no [ElSection] and no heading, so
-/// Installation is the first entry here.
-const List<String> _iconSectionOrder = <String>[
+/// This page's own section order: see
+/// `example/lib/components_docs/icon/page.dart`'s own library doc.
+const List<String> _iconSectionIds = <String>[
+  'preview',
   'install',
   'usage',
   'sizes',
@@ -18,6 +32,7 @@ const List<String> _iconSectionOrder = <String>[
   'api',
   'states',
   'accessibility',
+  'keyboard',
   'responsive',
   'dependencies',
   'theming',
@@ -31,6 +46,22 @@ Widget _harness({
   controller: controller,
   child: MaterialApp(home: SingleChildScrollView(child: child)),
 );
+
+Finder _disclosureTrigger(String title) => find.descendant(
+  of: find.byWidgetPredicate(
+    (Widget widget) => widget is DocsDisclosure && widget.title == title,
+  ),
+  matching: find.byKey(DocsDisclosure.triggerKey),
+);
+
+Future<void> _open(WidgetTester tester, String title) async {
+  final Finder trigger = _disclosureTrigger(title);
+  await tester.ensureVisible(trigger);
+  await tester.pump();
+  await tester.tap(trigger);
+  await tester.pump();
+  await tester.pump(ElDurations.jelly);
+}
 
 void main() {
   group('icon docs page', () {
@@ -48,6 +79,7 @@ void main() {
           child: IconDocPage(onNavigate: (String route) => destination = route),
         ),
       );
+      await tester.pump();
 
       // Article mounts.
       expect(
@@ -96,28 +128,21 @@ void main() {
       // No navigate callback triggered during build.
       expect(destination, isNull);
 
-      // Every section renders, in exactly the order the page declares.
-      double? previousTop;
-      for (final String id in _iconSectionOrder) {
-        final Finder finder = find.byKey(ElSection.anchorKey(id));
-        expect(finder, findsOneWidget, reason: 'missing section "$id"');
-        final double top = tester.getTopLeft(finder).dy;
-        if (previousTop != null) {
-          expect(
-            top,
-            greaterThan(previousTop),
-            reason: '"$id" is out of order',
-          );
-        }
-        previousTop = top;
-      }
-
-      // Section titles match the shape brief exactly, in order.
-      final List<String> titles = tester
-          .widgetList<ElSection>(find.byType(ElSection))
-          .map((ElSection section) => section.title)
+      // Every section renders, in exactly the order the page declares —
+      // both id and title, read off the same mounted `DocsSection` list so
+      // "order" means tree order, not a second hand-typed list to drift
+      // from the first.
+      final List<DocsSection> sections = tester
+          .widgetList<DocsSection>(find.byType(DocsSection))
           .toList();
-      expect(titles, <String>[
+      expect(
+        sections.map((DocsSection section) => section.id).toList(),
+        _iconSectionIds,
+      );
+      expect(sections.map((DocsSection section) => section.title).toList(), <
+        String
+      >[
+        'Preview',
         'Installation',
         'Usage',
         'Sizes',
@@ -126,6 +151,7 @@ void main() {
         'API Reference',
         'States',
         'Accessibility',
+        'Keyboard',
         'Responsive',
         'Dependencies',
         'Theming',
@@ -136,6 +162,30 @@ void main() {
       expect(find.byType(ElSpinner), findsNothing);
       expect(find.textContaining('ElRule'), findsNothing);
     });
+
+    testWidgets(
+      'the page is declared, and every section is a kit component',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(1440, 4000);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+
+        await tester.pumpWidget(
+          _harness(
+            controller: ElThemeController(mode: ElThemeMode.dark),
+            child: const IconDocPage(),
+          ),
+        );
+        await tester.pump();
+
+        // Four specimen stages: Preview, Sizes, Tones, Lucide catalog.
+        expect(find.byType(DocsShowcase), findsNWidgets(4));
+        expect(find.byType(DocsInstall), findsOneWidget);
+        // Eight collapsed sections: API Reference, States, Accessibility,
+        // Keyboard, Responsive, Dependencies, Theming, Source.
+        expect(find.byType(DocsDisclosure), findsNWidgets(8));
+      },
+    );
 
     testWidgets(
       'renders at narrow width with the anchor strip instead of a rail',
@@ -212,6 +262,52 @@ void main() {
       expect(ElIcon.strokeFor(16), 2.4); // 48/16 = 3.0 > 2.6
       expect(ElIcon.strokeFor(32), 2.0); // 48/32 = 1.5, not < 1.5
       expect(ElIcon.strokeFor(40), 1.6); // 48/40 = 1.2 < 1.5
+    });
+
+    testWidgets(
+      'the installation section names all four manifest files and the '
+      'license',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(1440, 900);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+
+        await tester.pumpWidget(
+          _harness(
+            controller: ElThemeController(mode: ElThemeMode.dark),
+            child: const IconDocPage(),
+          ),
+        );
+        await tester.pump();
+
+        expect(
+          find.textContaining('icon_paths.g.index.dart'),
+          findsWidgets,
+        );
+        expect(find.byType(DocsInstall), findsOneWidget);
+      },
+    );
+
+    testWidgets('keyboard section documents ElIcon has no focus of its own', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+
+      await tester.pumpWidget(
+        _harness(
+          controller: ElThemeController(mode: ElThemeMode.dark),
+          child: const IconDocPage(),
+        ),
+      );
+
+      await _open(tester, 'Keyboard');
+
+      expect(
+        find.textContaining('No keyboard behaviour of its own'),
+        findsWidgets,
+      );
     });
   });
 }

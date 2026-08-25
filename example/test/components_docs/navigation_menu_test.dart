@@ -5,24 +5,27 @@
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`. Theme
 /// coverage uses a live `ElThemeController` flipped in place rather than two
-/// independent pumps.
+/// independent pumps. `pumpAndSettle` is never used: several documentation-
+/// shell widgets run controllers that repeat forever, so settling on this
+/// page would hang; every wait below is a bounded `tester.pump()` instead.
 ///
 /// ElNavigationMenu mounts through [OverlayPortal] (via ElPopover), so the
 /// live specimen needs a real [Overlay]: the harness wraps the page in a
 /// `MaterialApp`, the same fix Popover and Select needed.
 ///
-/// This directory used to document `navigation_menu`, `menubar`,
-/// `context_menu`, and `hover_card` together on one page
-/// (`navigation_menu_test.dart` covered all four). Phase F/J split each
-/// component onto its own page and test file; this file now covers only
-/// Navigation Menu. See `menubar_test.dart`, `context_menu_test.dart`, and
-/// `hover_card_test.dart` for the other three.
+/// Re-housed onto the kit alongside the page: sections are now
+/// `DocsSection`s rather than `ElSection`s, and the eight disclosures (API
+/// Reference, States, Accessibility, Keyboard, Responsive, Dependencies,
+/// Theming, Source) are collapsed `DocsDisclosure`s that mount no content
+/// until opened — see `_openDisclosure`, the same helper `button_test.dart`
+/// uses.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/navigation_menu/meta.dart';
 import 'package:example/components_docs/navigation_menu/page.dart';
-import 'package:example/kit.dart' show ElSection;
+import 'package:example/docs/docs_disclosure.dart';
+import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -57,6 +60,23 @@ Future<ElThemeController> _pumpPage(
   );
   await tester.pump();
   return theme;
+}
+
+/// The single `DocsDisclosure` whose title is [title], opened. A closed
+/// `DocsDisclosure` mounts no content, so a test reading anything inside one
+/// must open it first — the same helper `button_test.dart` uses.
+Future<void> _openDisclosure(WidgetTester tester, String title) async {
+  final Finder trigger = find.descendant(
+    of: find.byWidgetPredicate(
+      (Widget widget) => widget is DocsDisclosure && widget.title == title,
+    ),
+    matching: find.byKey(DocsDisclosure.triggerKey),
+  );
+  await tester.ensureVisible(trigger);
+  await tester.pump();
+  await tester.tap(trigger);
+  await tester.pump();
+  await tester.pump(ElDurations.jelly);
 }
 
 void main() {
@@ -94,17 +114,22 @@ void main() {
   });
 
   group('rendered page', () {
-    testWidgets('sections render in the shadcn-mirrored order', (
+    testWidgets('sections render in the house shape, section for section', (
       WidgetTester tester,
     ) async {
-      await _pumpPage(tester);
+      tester.view.physicalSize = const Size(1440, 4000);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+
+      await _pumpPage(tester, size: const Size(1440, 4000));
 
       final List<String> titles = tester
-          .widgetList<ElSection>(find.byType(ElSection))
-          .map((ElSection section) => section.title)
+          .widgetList<DocsSection>(find.byType(DocsSection))
+          .map((DocsSection section) => section.title)
           .toList();
 
       expect(titles, <String>[
+        'Preview',
         'Installation',
         'Usage',
         'Composition',
@@ -112,6 +137,7 @@ void main() {
         'API Reference',
         'States',
         'Accessibility',
+        'Keyboard',
         'Responsive',
         'Dependencies',
         'Theming',
@@ -139,6 +165,7 @@ void main() {
       'the API tables document constructor parameters from the source',
       (WidgetTester tester) async {
         await _pumpPage(tester);
+        await _openDisclosure(tester, 'API Reference');
 
         // ElNavigationMenu.
         expect(find.text('items'), findsWidgets);
@@ -172,9 +199,22 @@ void main() {
       WidgetTester tester,
     ) async {
       await _pumpPage(tester);
+      await _openDisclosure(tester, 'Dependencies');
 
       expect(find.textContaining('ElPopover'), findsWidgets);
     });
+
+    testWidgets(
+      'the Keyboard disclosure names the real, total absence of key '
+      'handling',
+      (WidgetTester tester) async {
+        await _pumpPage(tester);
+        await _openDisclosure(tester, 'Keyboard');
+
+        expect(find.textContaining('Focus'), findsWidgets);
+        expect(find.textContaining('ElPress'), findsWidgets);
+      },
+    );
 
     testWidgets(
       'navigating previous fires onNavigate with the already-routed popover',
@@ -185,8 +225,15 @@ void main() {
           onNavigate: (String route) => destination = route,
         );
 
-        await tester.ensureVisible(find.text('Popover').first);
-        await tester.tap(find.text('Popover').first);
+        final Finder pager = find.byKey(
+          const ValueKey<String>('docs-layout-prev-next'),
+        );
+        final Finder popoverLink = find.descendant(
+          of: pager,
+          matching: find.text('Popover'),
+        );
+        await tester.ensureVisible(popoverLink);
+        await tester.tap(popoverLink);
         expect(destination, '/components/popover');
       },
     );
@@ -202,7 +249,7 @@ void main() {
         const ValueKey<String>('nav-menu-specimen'),
       );
       await tester.ensureVisible(trigger);
-      await tester.pumpAndSettle();
+      await tester.pump();
 
       // Trigger is visible.
       expect(find.text('Products'), findsOneWidget);

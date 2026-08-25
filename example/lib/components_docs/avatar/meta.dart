@@ -1,11 +1,12 @@
 /// Public documentation metadata for the avatar component.
 ///
-/// `avatar` has no `registry/components/avatar.json` manifest yet: see
-/// `AvatarDocPage`'s installation section for what that means today. Because
-/// avatarDoc.dependencies mirrors the shipped manifest
-/// rather than naming registry items nothing has verified; a worker that
-/// invents a dependency name here is exactly the failure mode Phase J's
-/// supervisor notes are warning about.
+/// **Correction.** This file previously claimed `avatar` had no
+/// `registry/components/avatar.json` manifest yet. That was false:
+/// `registry/components/avatar.json` exists, lists exactly one file
+/// (`lib/src/components/avatar.dart`) and one registry dependency
+/// (`source-foundation`), and its own `documentationRoute` already points
+/// at `/components/avatar`. [dependencies] below mirrors that shipped
+/// manifest, not an invented list.
 library;
 
 import '../catalog.dart' show ComponentDocEntry;

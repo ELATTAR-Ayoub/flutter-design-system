@@ -7,12 +7,22 @@
 /// discipline `skills_docs_test.dart` already carries. Theme coverage uses a
 /// live `ElThemeController` flipped in place rather than two independent
 /// pumps.
+///
+/// Re-housed onto the kit alongside the page: sections are now
+/// `DocsSection`s rather than `ElSection`s, and the eight disclosures (API
+/// Reference, States, Accessibility, Keyboard, Responsive, Dependencies,
+/// Theming, Source) are collapsed `DocsDisclosure`s that mount no content
+/// until opened — see `_disclosureTrigger`, the same helper `button_test.dart`
+/// uses.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/breadcrumb/meta.dart';
 import 'package:example/components_docs/breadcrumb/page.dart';
-import 'package:example/kit.dart' show ElSection;
+import 'package:example/docs/docs_disclosure.dart';
+import 'package:example/docs/docs_install.dart';
+import 'package:example/docs/docs_section.dart' show DocsSection;
+import 'package:example/docs/docs_showcase.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -49,6 +59,23 @@ Future<ElThemeController> _pumpBreadcrumbDoc(
   return theme;
 }
 
+/// The single `DocsDisclosure` whose title is [title], opened. Mirrors
+/// `button_test.dart`'s own helper: a closed `DocsDisclosure` mounts no
+/// content, so a test reading anything inside one must open it first.
+Future<void> _openDisclosure(WidgetTester tester, String title) async {
+  final Finder trigger = find.descendant(
+    of: find.byWidgetPredicate(
+      (Widget widget) => widget is DocsDisclosure && widget.title == title,
+    ),
+    matching: find.byKey(DocsDisclosure.triggerKey),
+  );
+  await tester.ensureVisible(trigger);
+  await tester.pump();
+  await tester.tap(trigger);
+  await tester.pump();
+  await tester.pump(ElDurations.jelly);
+}
+
 void main() {
   group('meta', () {
     test('breadcrumbDoc names the real public API surface', () {
@@ -68,30 +95,49 @@ void main() {
 
   group('rendered page', () {
     testWidgets(
-      'sections render in the shadcn-mirrored order, section for section',
+      'sections render in the house shape, section for section',
       (WidgetTester tester) async {
-        await _pumpBreadcrumbDoc(tester);
+        tester.view.physicalSize = const Size(1440, 4000);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
 
+        await _pumpBreadcrumbDoc(tester, size: const Size(1440, 4000));
+
+        // Immune to the duplicate-string hazard `find.text` carries here: a
+        // section heading and its own TOC link render the same string, so
+        // reading each mounted `DocsSection`'s own `title` field sidesteps
+        // that entirely.
         final List<String> titles = tester
-            .widgetList<ElSection>(find.byType(ElSection))
-            .map((ElSection section) => section.title)
+            .widgetList<DocsSection>(find.byType(DocsSection))
+            .map((DocsSection section) => section.title)
             .toList();
 
         expect(titles, <String>[
+          'Preview',
           'Installation',
           'Usage',
           'Composition',
+          'Page header',
           'Basic',
           'Link component',
           'RTL',
           'API Reference',
           'States',
           'Accessibility',
+          'Keyboard',
           'Responsive',
           'Dependencies',
           'Theming',
           'Source',
         ]);
+
+        expect(find.byType(DocsInstall), findsOneWidget);
+        // Five specimen stages: Preview, Page header, Basic, Link
+        // component, RTL.
+        expect(find.byType(DocsShowcase), findsNWidgets(5));
+        // Eight collapsed sections: API Reference, States, Accessibility,
+        // Keyboard, Responsive, Dependencies, Theming, Source.
+        expect(find.byType(DocsDisclosure), findsNWidgets(8));
       },
     );
 
@@ -119,6 +165,7 @@ void main() {
       'the API table documents every constructor parameter found in the source',
       (WidgetTester tester) async {
         await _pumpBreadcrumbDoc(tester);
+        await _openDisclosure(tester, 'API Reference');
 
         // ElBreadcrumb.items
         expect(find.text('items'), findsOneWidget);
@@ -142,7 +189,7 @@ void main() {
     ) async {
       await _pumpBreadcrumbDoc(tester);
 
-      expect(find.text('elattar add breadcrumb'), findsOneWidget);
+      expect(find.textContaining('elattar add breadcrumb'), findsWidgets);
       expect(
         find.textContaining('breadcrumb.json'),
         findsWidgets,
@@ -154,6 +201,7 @@ void main() {
       WidgetTester tester,
     ) async {
       await _pumpBreadcrumbDoc(tester);
+      await _openDisclosure(tester, 'Responsive');
 
       expect(find.textContaining('wraps'), findsWidgets);
       expect(
@@ -162,6 +210,17 @@ void main() {
         reason: 'the page must say this is recorded, not built',
       );
     });
+
+    testWidgets(
+      'the Keyboard disclosure names the real absence of key handling',
+      (WidgetTester tester) async {
+        await _pumpBreadcrumbDoc(tester);
+        await _openDisclosure(tester, 'Keyboard');
+
+        expect(find.textContaining('Focus'), findsWidgets);
+        expect(find.textContaining('Tab'), findsWidgets);
+      },
+    );
 
     testWidgets('a single-crumb specimen renders no separator', (
       WidgetTester tester,
@@ -185,6 +244,31 @@ void main() {
             .widgetList<Directionality>(find.byType(Directionality))
             .where((Directionality d) => d.textDirection == TextDirection.rtl);
         expect(rtl, isNotEmpty);
+      },
+    );
+
+    testWidgets(
+      'the Link component specimen fires its onTap seam on a real tap',
+      (WidgetTester tester) async {
+        await _pumpBreadcrumbDoc(tester);
+
+        expect(find.textContaining('onTap fired: /dashboard'), findsOneWidget);
+
+        // Scoped to the Link component section specifically: 'Projects'
+        // renders as a crumb in several other specimens on this page too,
+        // and only this one is wired to update the state text below it.
+        final Finder section = find.byWidgetPredicate(
+          (Widget widget) => widget is DocsSection && widget.id == 'link-component',
+        );
+        final Finder projects = find.descendant(
+          of: section,
+          matching: find.text('Projects'),
+        );
+        await tester.ensureVisible(projects);
+        await tester.tap(projects);
+        await tester.pump();
+
+        expect(find.textContaining('onTap fired: /projects'), findsOneWidget);
       },
     );
 

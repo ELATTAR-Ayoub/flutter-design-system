@@ -1,38 +1,222 @@
-/// Public documentation page for the `resizable` component.
+/// Public documentation page for the `resizable` component —
+/// `lib/src/components/resizable.dart`'s [ElResizablePanelGroup] and
+/// [ElResizablePanel].
 ///
-/// **New route, split out of `scroll_area`.** `ElResizablePanelGroup` used
-/// to share the `/components/scroll_area` route with `ElScrollArea` and
-/// `ElAspectRatio`, its sections prefixed `Resizable: ` to tell them apart
-/// from the sibling families' own. This page mirrors ONLY
+/// **Re-housed onto the kit.** This page used to hand-compose `ElSection`
+/// panels (plus a manual `_sidebar` list standing in for the shared
+/// `aspect_ratio` / `resizable` / `scroll_area` group, split out of that
+/// route — see the original library note, preserved in git history); it
+/// now declares a `ComponentDocSpec`
+/// (`example/lib/docs/component_doc_page.dart`) and hands it to
+/// `ComponentDocPage`, the shape `button` established. The hand-written
+/// `_sidebar` list is dropped along with it: `DocsLayout` already
+/// synthesizes its own sidebar from the shared catalog once neither
+/// `sidebar` nor `sidebarGroups` is supplied.
+///
+/// **Reference shape**, mirrored from
 /// `https://ui.shadcn.com/docs/components/base/resizable`'s own section
-/// list, fetched fresh: About, Installation, Usage, Composition, Vertical,
-/// Handle, RTL, API Reference, Changelog. Every section title below drops
-/// the redundant `Resizable: ` prefix now that the page documents one
-/// component only. A live demo renders ahead of any heading, the same as
-/// the reference's own top-of-page preview: no Overview, Status, or Preview
-/// heading precedes Installation.
+/// list: About, Installation, Usage, Composition, Vertical, Handle, RTL,
+/// API Reference, Changelog. Every section title below drops the
+/// redundant `Resizable: ` prefix the old shared-route page needed. A live
+/// demo used to render ahead of any heading, the same as the reference's
+/// own top-of-page preview; it is now `Preview`, this page's first
+/// `ShowcaseSection`, so it finally owns a rail entry.
 ///
-/// **Skipped, honestly.** `About` and `Changelog` describe the upstream
-/// `react-resizable-panels` package itself (its version, its own release
-/// notes) rather than a UI affordance a Flutter port can show; there is
-/// nothing to mirror in either. `Vertical` is skipped for a real reason,
-/// not an oversight: [ElResizablePanelGroup] takes no orientation parameter
-/// at all, its `build` method always lays panels into a horizontal `Row`
+/// **Skipped, honestly**, unchanged from the original page's own ruling:
+/// `About` and `Changelog` describe the upstream `react-resizable-panels`
+/// package itself (its version, its own release notes) rather than a UI
+/// affordance a Flutter port can show; there is nothing to mirror in
+/// either. `Vertical` is skipped for a real reason, not an oversight:
+/// [ElResizablePanelGroup] takes no orientation parameter at all, its
+/// `build` method always lays panels into a horizontal `Row`
 /// (`resizable.dart`'s own `Row(crossAxisAlignment: ..., children: row)`),
 /// so there is no vertical mode to demonstrate.
 ///
-/// The registry manifest ships with the CLI and installs through
-/// `elattar add resizable`.
+/// **Composition stays a `SnippetSection`.** It is the shape read off the
+/// reference's own primitives in `resizable.dart`'s doc comment — a
+/// structural sketch of what the constructor assembles internally
+/// (`LayoutBuilder > Stack > Row + _GrabStrip`), not compilable Dart and
+/// not a second live demo: Preview above already shows the real,
+/// constructed thing.
+///
+/// New: a Keyboard disclosure, between Accessibility and Responsive, read
+/// directly off `_GrabStripState._onKey` — the arrow/Home/End handling
+/// used to live as prose folded into Accessibility and States; it gets
+/// its own section now, matching the house shape.
+///
+/// No `registry/components/resizable.json` manifest exists yet: see the
+/// Installation section for the shipped command and the honest statement
+/// of that fact.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:flutter/widgets.dart';
 
-import '../../docs/docs_code.dart';
+import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
 import '../../docs/docs_layout.dart';
-import '../../kit.dart';
 import 'meta.dart';
+
+final ComponentDocSpec resizableDocSpec = ComponentDocSpec(
+  name: 'resizable',
+  title: resizableDoc.title,
+  description: resizableDoc.description,
+  sections: <DocsPageSection>[
+    ShowcaseSection(
+      id: 'preview',
+      title: 'Preview',
+      description:
+          'Two panels sharing a row, split by a draggable separator. Drag '
+          'the seam, or Tab to it and use the arrow keys.',
+      specimen: _PreviewSpecimen(),
+      code: _previewCode,
+      label: 'Preview specimen view',
+    ),
+    InstallSection(
+      id: 'install',
+      title: 'Installation',
+      description:
+          '`elattar add resizable` installs the component and its '
+          'declared dependency closure. No registry/components/'
+          'resizable.json exists yet: copy lib/src/components/'
+          'resizable.dart manually until it does.',
+      command: resizableDoc.command,
+      manualFiles: <DocsCodeFile>[
+        DocsCodeFile(
+          path: 'lib/components/ui/resizable.dart',
+          title: '1. Copy the source',
+          description:
+              'Copy ${resizableDoc.sourcePath} into components/ui and '
+              'keep its relative imports pointed at the same foundation '
+              'files, plus package:flutter/services.dart and '
+              'package:flutter/gestures.dart for the key and drag '
+              'handling.',
+          code:
+              "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
+              '// No registry manifest yet: copy lib/src/components/'
+              'resizable.dart into your project directly.',
+        ),
+      ],
+    ),
+    SnippetSection(
+      id: 'usage',
+      title: 'Usage',
+      description: 'ElResizablePanelGroup with two panels.',
+      code: _usageCode,
+    ),
+    SnippetSection(
+      id: 'composition',
+      title: 'Composition',
+      description:
+          'A structural sketch, not compilable source: what the '
+          'constructor assembles internally, read off resizable.dart\'s '
+          'own doc comment. There is nothing new to stage live here that '
+          'Preview above does not already show.',
+      code: _compositionCode,
+    ),
+    ShowcaseSection(
+      id: 'handle',
+      title: 'Handle',
+      description:
+          'withHandle draws a 4×24 grip on the separator, true by '
+          'default. Setting it to false leaves the hairline draggable '
+          'with no visible affordance: the 24px grab strip still answers '
+          'the pointer either way.',
+      specimen: _HandleSpecimen(),
+      code: _handleCode,
+      label: 'Handle specimen view',
+    ),
+    ShowcaseSection(
+      id: 'rtl',
+      title: 'RTL',
+      description:
+          'The same two-panel group read right-to-left under a '
+          'Directionality. Nothing in ElResizablePanelGroup mirrors by '
+          'hand: the Row it lays panels into reverses child order '
+          'automatically, so the first panel declared renders on the '
+          'reading-start (here, physical right) side.',
+      specimen: _RtlSpecimen(),
+      code: _rtlResizableCode,
+      label: 'RTL specimen view',
+    ),
+    DisclosureSection(
+      id: 'api',
+      title: 'API Reference',
+      child: _ApiReferenceContent(),
+    ),
+    DisclosureSection(
+      id: 'states',
+      title: 'States',
+      description:
+          'ElResizablePanelGroup handles drag and keyboard on its '
+          'separator.',
+      child: DocsStateMatrix(facts: _stateFacts),
+    ),
+    DisclosureSection(
+      id: 'accessibility',
+      title: 'Accessibility',
+      child: _AccessibilityContent(),
+    ),
+    DisclosureSection(
+      id: 'keyboard',
+      title: 'Keyboard',
+      description:
+          'Read directly off _GrabStripState._onKey '
+          '(lib/src/components/resizable.dart): every key it recognises, '
+          'and what it ignores.',
+      child: _KeyboardContent(),
+    ),
+    DisclosureSection(
+      id: 'responsive',
+      title: 'Responsive',
+      child: _ResponsiveContent(),
+    ),
+    DisclosureSection(
+      id: 'dependencies',
+      title: 'Dependencies',
+      child: _DependenciesContent(),
+    ),
+    DisclosureSection(
+      id: 'theming',
+      title: 'Theming',
+      child: _ThemingContent(),
+    ),
+    DisclosureSection(
+      id: 'source',
+      title: 'Source',
+      child: DocsInstallFacts(
+        title: 'Reference',
+        facts: <DocsInstallFact>[
+          DocsInstallFact(
+            label: 'Source',
+            value: resizableDoc.sourcePath,
+            description:
+                'Authoritative implementation: the truth this page was '
+                'written from.',
+          ),
+          const DocsInstallFact(
+            label: 'Package tests',
+            value: 'none yet',
+            description: 'No dedicated unit tests in the package test '
+                'suite.',
+          ),
+          const DocsInstallFact(
+            label: 'Docs test',
+            value: 'example/test/components_docs/resizable_test.dart',
+            description:
+                'Covers this page: the API tables, live specimens, drag '
+                'behaviour, and theme coverage.',
+          ),
+          const DocsInstallFact(
+            label: 'Edit these docs',
+            value: 'example/lib/components_docs/resizable/page.dart',
+            description: 'This file.',
+          ),
+        ],
+      ),
+    ),
+  ],
+);
 
 class ResizableDocPage extends StatelessWidget {
   const ResizableDocPage({super.key, this.onNavigate});
@@ -51,21 +235,7 @@ class ResizableDocPage extends StatelessWidget {
       ElBreadcrumbEntry.link('Components'),
       ElBreadcrumbEntry.page('Resizable'),
     ],
-    sidebar: _sidebar,
-    toc: const <DocsTocEntry>[
-      DocsTocEntry(title: 'Installation', anchor: 'install'),
-      DocsTocEntry(title: 'Usage', anchor: 'usage'),
-      DocsTocEntry(title: 'Composition', anchor: 'composition'),
-      DocsTocEntry(title: 'Handle', anchor: 'handle'),
-      DocsTocEntry(title: 'RTL', anchor: 'rtl'),
-      DocsTocEntry(title: 'API Reference', anchor: 'api'),
-      DocsTocEntry(title: 'States', anchor: 'states'),
-      DocsTocEntry(title: 'Accessibility', anchor: 'accessibility'),
-      DocsTocEntry(title: 'Responsive', anchor: 'responsive'),
-      DocsTocEntry(title: 'Dependencies', anchor: 'dependencies'),
-      DocsTocEntry(title: 'Theming', anchor: 'theming'),
-      DocsTocEntry(title: 'Source', anchor: 'source'),
-    ],
+    toc: resizableDocSpec.toc,
     previous: const DocsPageLink(
       title: 'Aspect ratio',
       route: '/components/aspect_ratio',
@@ -75,57 +245,271 @@ class ResizableDocPage extends StatelessWidget {
       route: '/components/scroll_area',
     ),
     onNavigate: onNavigate,
-    child: const _ResizableArticle(),
+    child: KeyedSubtree(
+      key: const ValueKey<String>('resizable-doc-article'),
+      child: ComponentDocPage(spec: resizableDocSpec, header: false),
+    ),
   );
 }
 
-/// `aspect_ratio`, `resizable`, and `scroll_area`'s own small family: see
-/// `scroll_area/page.dart`'s own note on this scope.
-const List<DocsSidebarEntry> _sidebar = <DocsSidebarEntry>[
-  DocsSidebarEntry(title: 'Aspect ratio', route: '/components/aspect_ratio'),
-  DocsSidebarEntry(
-    title: 'Resizable',
-    route: '/components/resizable',
-    selected: true,
+/* ── Disclosure content ─────────────────────────────────────────────────── */
+
+class _ApiReferenceContent extends StatelessWidget {
+  const _ApiReferenceContent();
+
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: const <Widget>[
+      DocsApiTable(
+        title: 'ElResizablePanelGroup',
+        facts: <DocsApiFact>[
+          DocsApiFact(
+            name: 'panels',
+            type: 'List<ElResizablePanel>',
+            description: 'Required. The panels to arrange.',
+          ),
+          DocsApiFact(
+            name: 'withHandle',
+            type: 'bool',
+            description:
+                'Defaults to true. Draws a visible 4×24 grip on the '
+                'separator.',
+          ),
+          DocsApiFact(
+            name: 'minHeight',
+            type: 'double?',
+            description: 'A minimum height for the entire group.',
+          ),
+        ],
+      ),
+      SizedBox(height: 24),
+      DocsApiTable(
+        title: 'ElResizablePanel',
+        facts: <DocsApiFact>[
+          DocsApiFact(
+            name: 'child',
+            type: 'Widget',
+            description: 'Required. The panel\'s content.',
+          ),
+          DocsApiFact(
+            name: 'defaultSize',
+            type: 'double',
+            description:
+                'Required. A flex-grow weight, not a percentage. Only '
+                'the ratio between panels matters.',
+          ),
+          DocsApiFact(
+            name: 'minSize',
+            type: 'double',
+            description:
+                'Defaults to 0. The minimum width in pixels that this '
+                'panel can be dragged to.',
+          ),
+        ],
+      ),
+    ],
+  );
+}
+
+class _AccessibilityContent extends StatelessWidget {
+  const _AccessibilityContent();
+
+  @override
+  Widget build(BuildContext context) =>
+      _bullets(ElTheme.of(context), <String>[
+        'Semantic role: Semantics(container: true, label: \'Resize\') on '
+            'the grab strip; the group and its panels add no Semantics '
+            'node of their own, content inside each panel announces '
+            'itself.',
+        'Touch target: the drag strip is 24px wide, centred on the 1px '
+            'separator (wider than the reference\'s 4px, a deliberate '
+            'divergence for pointer-only use, see resizable.dart\'s own '
+            'class doc).',
+        'Non-colour signal: the resize cursor '
+            '(SystemMouseCursors.resizeLeftRight) on the separator is the '
+            'only drag affordance; the seam itself is a plain '
+            'theme.border hairline.',
+        'Known platform difference: the resize cursor on hover is not '
+            'available on touch, where the cursor is invisible but drag '
+            'still works.',
+        'See Keyboard below for what the separator listens to, and what '
+            'it ignores.',
+      ]);
+}
+
+/// Read directly off `_GrabStripState._onKey`
+/// (`lib/src/components/resizable.dart`): the strip only inspects
+/// `KeyDownEvent` and `KeyRepeatEvent`, and only four logical keys.
+class _KeyboardContent extends StatelessWidget {
+  const _KeyboardContent();
+
+  @override
+  Widget build(BuildContext context) =>
+      _bullets(ElTheme.of(context), <String>[
+        'Focus: the grab strip carries tabIndex={0}\'s equivalent (a '
+            'Focus widget with its own FocusNode, debugLabel '
+            'elResizableHandleFocusLabel), so Tab and Shift+Tab reach it '
+            'in the surrounding page\'s own order.',
+        'ArrowLeft / ArrowRight: move the separator by keyboardStep, five '
+            'percentage points of the panel space, toward or away from '
+            'the panel before the seam.',
+        'Home: snaps the panel before the seam to its own minSize floor.',
+        'End: snaps the panel before the seam to fill the space, down to '
+            'the following panel\'s minSize floor.',
+        'Every other key: ignored. _onKey only inspects KeyDownEvent and '
+            'KeyRepeatEvent (a matching KeyUpEvent is not handled '
+            'separately), and returns KeyEventResult.ignored for '
+            'anything outside those four keys, so it keeps propagating.',
+      ]);
+}
+
+class _ResponsiveContent extends StatelessWidget {
+  const _ResponsiveContent();
+
+  @override
+  Widget build(BuildContext context) =>
+      _bullets(ElTheme.of(context), <String>[
+        'Renders the same separator at 390px and 1440px: the separator '
+            'is always 1px. Panel widths and the minSize constraint are '
+            'in pixels and need explicit design on narrow screens.',
+        'Never overflows: the group redistributes weights when dragged '
+            'rather than growing past its own constraints.',
+        'Platform-agnostic: no platform-branching code beyond the '
+            'cursor shown on hover.',
+      ]);
+}
+
+class _DependenciesContent extends StatelessWidget {
+  const _DependenciesContent();
+
+  @override
+  Widget build(BuildContext context) => DocsInstallFacts(
+    title: 'Dependencies',
+    facts: <DocsInstallFact>[
+      DocsInstallFact(
+        label: 'Files',
+        value: resizableDoc.sourcePath,
+        description:
+            'One file, includes the private _Seam and _GrabStrip '
+            'widgets.',
+      ),
+      const DocsInstallFact(
+        label: 'Foundation imports',
+        value: 'foundation/spacing.dart (el(), ElWidths, ElRadii), '
+            'foundation/theme.dart (ElThemeData)',
+        description: 'Colour and geometry tokens only.',
+      ),
+      const DocsInstallFact(
+        label: 'Flutter imports',
+        value: 'package:flutter/gestures.dart (DragStartBehavior), '
+            'package:flutter/services.dart (LogicalKeyboardKey)',
+        description: 'For the drag start behavior and the arrow/Home/End '
+            'key handling.',
+      ),
+      const DocsInstallFact(
+        label: 'Scope import',
+        value: 'theme_scope.dart (ElTheme)',
+        description: 'No other component or effect file is imported.',
+      ),
+      const DocsInstallFact(
+        label: 'Platforms',
+        value: 'Android, iOS, Web, macOS, Windows, Linux',
+        description:
+            'Pure widget composition: no platform-conditional code. The '
+            'resize cursor only shows on a platform with a mouse.',
+      ),
+      const DocsInstallFact(
+        label: 'Verified',
+        value: 'docs specimen only',
+        description:
+            'This page\'s live preview. No dedicated package-level unit '
+            'tests and no registry fixture install exist yet.',
+      ),
+    ],
+  );
+}
+
+class _ThemingContent extends StatelessWidget {
+  const _ThemingContent();
+
+  @override
+  Widget build(BuildContext context) =>
+      _bullets(ElTheme.of(context), <String>[
+        'The separator is theme.border, 1px. No state colours: hover '
+            'adds a cursor, not a visual change. The grip is theme.border '
+            'too, 4px wide and 24px tall.',
+        'Reads from the live theme: flipping ElThemeController updates '
+            'the separator colour immediately.',
+      ]);
+}
+
+Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: <Widget>[
+    for (final String line in lines) ...<Widget>[
+      ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+      ),
+      SizedBox(height: el(2)),
+    ],
+  ],
+);
+
+const List<DocsStateFact> _stateFacts = <DocsStateFact>[
+  DocsStateFact(
+    state: 'Rest',
+    treatment: 'Separator at rest colour (theme.border).',
+    userSignal: 'Plain hairline appearance.',
   ),
-  DocsSidebarEntry(title: 'Scroll area', route: '/components/scroll_area'),
+  DocsStateFact(
+    state: 'Hover',
+    treatment:
+        'Separator cursor changes to resize-left-right on pointer over '
+        'the 24px grab strip.',
+    userSignal: 'Drag affordance shown, on a platform with a mouse.',
+  ),
+  DocsStateFact(
+    state: 'Drag',
+    treatment:
+        'Live resize: panels move as you drag, clamped to minSize '
+        'floors. Sampled every frame at exactly the pointer\'s delta, no '
+        'easing, no commit-on-release.',
+    userSignal: 'Smooth, 1:1 drag feedback.',
+  ),
+  DocsStateFact(
+    state: 'Focus',
+    treatment: 'The separator accepts focus (tabIndex={0}\'s equivalent). '
+        'No visible focus ring.',
+    userSignal: 'See Keyboard below for what a focused separator '
+        'responds to.',
+  ),
+  DocsStateFact(
+    state: 'Disabled / Loading / Selected',
+    treatment:
+        'N/A: the group itself has no such state. Content inside each '
+        'panel manages its own states.',
+    userSignal: 'Refer to each panel\'s own content.',
+  ),
+  DocsStateFact(
+    state: 'Reduced motion',
+    treatment:
+        'N/A: no animations. The drag is live and unanimated by design, '
+        'not gated by elAnimationDuration.',
+    userSignal: 'No motion to still.',
+  ),
 ];
 
-class _ResizableArticle extends StatelessWidget {
-  const _ResizableArticle();
+/* ── Showcase specimens ─────────────────────────────────────────────────── */
+
+class _PreviewSpecimen extends StatelessWidget {
+  const _PreviewSpecimen();
 
   @override
   Widget build(BuildContext context) {
     final ElThemeData theme = ElTheme.of(context);
-    return Column(
-      key: const ValueKey<String>('resizable-doc-article'),
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        // The live demo, ahead of any heading: the same shape the reference
-        // opens with. No ElSection wraps it, so it carries no Overview/
-        // Status/Preview heading of its own before Installation.
-        _liveDemo(theme),
-        SizedBox(height: el(8)),
-        _install(),
-        _usage(),
-        _composition(),
-        _handle(theme),
-        _rtl(theme),
-        _api(),
-        _states(),
-        _accessibility(theme),
-        _responsive(theme),
-        _dependencies(theme),
-        _theming(theme),
-        _source(),
-      ],
-    );
-  }
-
-  Widget _liveDemo(ElThemeData theme) => DocsCodeExample(
-    title: 'Resizable panel group',
-    description: 'Two panels sharing a row, split by a draggable separator.',
-    preview: SizedBox(
+    return SizedBox(
       height: el(40),
       child: ElResizablePanelGroup(
         panels: <ElResizablePanel>[
@@ -159,433 +543,28 @@ class _ResizableArticle extends StatelessWidget {
           ),
         ],
       ),
-    ),
-  );
-
-  Widget _install() => ElSection(
-    id: 'install',
-    title: 'Installation',
-    description:
-        '`elattar add resizable` installs the component and its declared '
-        'dependency closure.',
-    child: DocsInstallFacts(
-      title: 'Installation facts',
-      facts: <DocsInstallFact>[
-        const DocsInstallFact(
-          label: 'Registry item',
-          value: 'registry/components/resizable.json',
-          description:
-              'Shipped and resolved by `elattar add resizable`. This is a '
-              'source-only component today.',
-        ),
-        const DocsInstallFact(
-          label: 'Destination',
-          value: 'lib/components/ui/resizable.dart',
-          description: 'Where a manual copy of the source belongs.',
-        ),
-        const DocsInstallFact(
-          label: 'Dependencies',
-          value: 'source-foundation',
-          description:
-              'foundation/spacing.dart and foundation/theme.dart for the '
-              'seam colour, plus package:flutter/services.dart for the '
-              'arrow/Home/End key handling.',
-        ),
-        const DocsInstallFact(
-          label: 'Platforms',
-          value: 'Android, iOS, Web, macOS, Windows, Linux',
-          description:
-              'Pure widget composition: no platform-conditional code. The '
-              'resize cursor (SystemMouseCursors.resizeLeftRight) only '
-              'shows on a platform with a mouse.',
-        ),
-        const DocsInstallFact(
-          label: 'Verified',
-          value: 'docs specimen only',
-          description:
-              'This page\'s live preview. No dedicated package-level unit '
-              'tests.',
-        ),
-      ],
-    ),
-  );
-
-  Widget _usage() => ElSection(
-    id: 'usage',
-    title: 'Usage',
-    description: 'ElResizablePanelGroup with two panels.',
-    child: ElPanel(
-      label: 'DART',
-      note: 'TWO-PANEL LAYOUT',
-      child: DocsSelectableCodeBlock(code: _usageCode),
-    ),
-  );
-
-  Widget _composition() => ElSection(
-    id: 'composition',
-    title: 'Composition',
-    description:
-        'What the constructor assembles internally: the shape read off '
-        'the reference\'s own primitives in the source file\'s doc '
-        'comment.',
-    child: ElPanel(
-      label: 'Resizable',
-      child: DocsSelectableCodeBlock(code: _compositionCode),
-    ),
-  );
-
-  Widget _handle(ElThemeData theme) => ElSection(
-    id: 'handle',
-    title: 'Handle',
-    description:
-        'withHandle draws a 4×24 grip on the separator, true by default. '
-        'Setting it to false leaves the hairline draggable with no '
-        'visible affordance: the 24px grab strip still answers the '
-        'pointer either way.',
-    child: DocsCodeExample(
-      title: 'Handle on and off',
-      preview: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: el(6),
-        children: <Widget>[
-          ElText('withHandle: true (default)', ElType.section),
-          SizedBox(height: el(2)),
-          SizedBox(
-            height: el(20),
-            child: ElResizablePanelGroup(
-              panels: <ElResizablePanel>[
-                ElResizablePanel(
-                  defaultSize: 50,
-                  minSize: 32,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: theme.border),
-                    ),
-                    child: Center(child: ElText('Left', ElType.small)),
-                  ),
-                ),
-                ElResizablePanel(
-                  defaultSize: 50,
-                  minSize: 32,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: theme.border),
-                    ),
-                    child: Center(child: ElText('Right', ElType.small)),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          ElText('withHandle: false', ElType.section),
-          SizedBox(height: el(2)),
-          SizedBox(
-            height: el(20),
-            child: ElResizablePanelGroup(
-              withHandle: false,
-              panels: <ElResizablePanel>[
-                ElResizablePanel(
-                  defaultSize: 50,
-                  minSize: 32,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: theme.border),
-                    ),
-                    child: Center(child: ElText('Left', ElType.small)),
-                  ),
-                ),
-                ElResizablePanel(
-                  defaultSize: 50,
-                  minSize: 32,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: theme.border),
-                    ),
-                    child: Center(child: ElText('Right', ElType.small)),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-      manualFiles: const <DocsCodeFile>[
-        DocsCodeFile(path: 'resizable_handle.dart', code: _handleCode),
-      ],
-    ),
-  );
-
-  Widget _rtl(ElThemeData theme) => ElSection(
-    id: 'rtl',
-    title: 'RTL',
-    description:
-        'The same two-panel group read right-to-left under a '
-        'Directionality. Nothing in ElResizablePanelGroup mirrors by '
-        'hand: the Row it lays panels into reverses child order '
-        'automatically, so the first panel declared renders on the '
-        'reading-start (here, physical right) side.',
-    child: DocsCodeExample(
-      title: 'Right-to-left resizable panels',
-      preview: Directionality(
-        textDirection: TextDirection.rtl,
-        child: SizedBox(
-          height: el(20),
-          child: ElResizablePanelGroup(
-            panels: <ElResizablePanel>[
-              ElResizablePanel(
-                defaultSize: 50,
-                minSize: 32,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: theme.border),
-                  ),
-                  child: Center(child: ElText('أول', ElType.small)),
-                ),
-              ),
-              ElResizablePanel(
-                defaultSize: 50,
-                minSize: 32,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: theme.border),
-                  ),
-                  child: Center(child: ElText('ثاني', ElType.small)),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-      manualFiles: const <DocsCodeFile>[
-        DocsCodeFile(path: 'rtl_resizable.dart', code: _rtlResizableCode),
-      ],
-    ),
-  );
-
-  Widget _api() => ElSection(
-    id: 'api',
-    title: 'API Reference',
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        const DocsApiTable(
-          title: 'ElResizablePanelGroup',
-          facts: <DocsApiFact>[
-            DocsApiFact(
-              name: 'panels',
-              type: 'List<ElResizablePanel>',
-              description: 'Required. The panels to arrange.',
-            ),
-            DocsApiFact(
-              name: 'withHandle',
-              type: 'bool',
-              description:
-                  'Defaults to true. Draws a visible 4×24 grip on the '
-                  'separator.',
-            ),
-            DocsApiFact(
-              name: 'minHeight',
-              type: 'double?',
-              description: 'A minimum height for the entire group.',
-            ),
-          ],
-        ),
-        SizedBox(height: el(6)),
-        const DocsApiTable(
-          title: 'ElResizablePanel',
-          facts: <DocsApiFact>[
-            DocsApiFact(
-              name: 'child',
-              type: 'Widget',
-              description: 'Required. The panel\'s content.',
-            ),
-            DocsApiFact(
-              name: 'defaultSize',
-              type: 'double',
-              description:
-                  'Required. A flex-grow weight, not a percentage. Only '
-                  'the ratio between panels matters.',
-            ),
-            DocsApiFact(
-              name: 'minSize',
-              type: 'double',
-              description:
-                  'Defaults to 0. The minimum width in pixels that this '
-                  'panel can be dragged to.',
-            ),
-          ],
-        ),
-      ],
-    ),
-  );
-
-  Widget _states() => ElSection(
-    id: 'states',
-    title: 'States',
-    description:
-        'ElResizablePanelGroup handles drag and keyboard on its '
-        'separator.',
-    child: const DocsStateMatrix(
-      facts: <DocsStateFact>[
-        DocsStateFact(
-          state: 'Rest',
-          treatment: 'Separator at rest colour (theme.border).',
-          userSignal: 'Plain hairline appearance.',
-        ),
-        DocsStateFact(
-          state: 'Hover',
-          treatment:
-              'Separator cursor changes to resize-left-right on pointer '
-              'over the 24px grab strip.',
-          userSignal: 'Drag affordance shown, on a platform with a mouse.',
-        ),
-        DocsStateFact(
-          state: 'Drag',
-          treatment:
-              'Live resize: panels move as you drag, clamped to minSize '
-              'floors. Sampled every frame at exactly the pointer\'s '
-              'delta, no easing, no commit-on-release.',
-          userSignal: 'Smooth, 1:1 drag feedback.',
-        ),
-        DocsStateFact(
-          state: 'Focus',
-          treatment:
-              'The separator: tabIndex=0, accepts arrow keys and '
-              'Home/End. No visible focus ring.',
-          userSignal: 'Keyboard: arrow keys ±5%, Home/End snap to min/max.',
-        ),
-        DocsStateFact(
-          state: 'Disabled / Loading / Selected',
-          treatment:
-              'N/A: the group itself has no such state. Content inside '
-              'each panel manages its own states.',
-          userSignal: 'Refer to each panel\'s own content.',
-        ),
-        DocsStateFact(
-          state: 'Reduced motion',
-          treatment:
-              'N/A: no animations. The drag is live and unanimated by '
-              'design, not gated by elAnimationDuration.',
-          userSignal: 'No motion to still.',
-        ),
-      ],
-    ),
-  );
-
-  Widget _accessibility(ElThemeData theme) => ElSection(
-    id: 'accessibility',
-    title: 'Accessibility',
-    child: _bullets(theme, <String>[
-      'The separator: tabIndex=0 makes it focusable. Keyboard control: '
-          'arrow keys move 5%, Home goes to the minimum, End to the '
-          'maximum. The separator announces nothing on its own; panels '
-          'announce through their content.',
-      'Touch target: the drag strip is 24px wide, centred on the 1px '
-          'separator (wider than the reference\'s 4px, a deliberate '
-          'divergence for pointer-only use — see resizable.dart\'s own '
-          'class doc).',
-      'Non-colour signal: the resize cursor on the separator is the only '
-          'drag affordance; the seam itself is a plain theme.border '
-          'hairline.',
-      'Known platform difference: SystemMouseCursors.resizeLeftRight on '
-          'hover is not available on touch, where the cursor is invisible '
-          'but drag still works.',
-    ]),
-  );
-
-  Widget _responsive(ElThemeData theme) => ElSection(
-    id: 'responsive',
-    title: 'Responsive',
-    child: _bullets(theme, <String>[
-      'Renders the same separator at 390px and 1440px: the separator is '
-          'always 1px. Panel widths and the minSize constraint are in '
-          'pixels and need explicit design on narrow screens.',
-      'Never overflows: the group redistributes weights when dragged '
-          'rather than growing past its own constraints.',
-      'Platform-agnostic: no platform-branching code beyond the cursor '
-          'shown on hover.',
-    ]),
-  );
-
-  Widget _dependencies(ElThemeData theme) => ElSection(
-    id: 'dependencies',
-    title: 'Dependencies',
-    child: _bullets(theme, <String>[
-      'File: lib/src/components/resizable.dart (one file, includes the '
-          'private _Seam and _GrabStrip widgets).',
-      'Foundation imports: foundation/spacing.dart (el(), ElWidths, '
-          'ElRadii), foundation/theme.dart (ElThemeData).',
-      'Flutter imports: package:flutter/gestures.dart (DragStartBehavior), '
-          'package:flutter/services.dart (LogicalKeyboardKey).',
-      'Scope import: theme_scope.dart (ElTheme).',
-      'Uses LayoutBuilder and the Flex algorithm to redistribute space on '
-          'drag. No external resizing library is called: it is '
-          'self-contained.',
-      'Status: a stable primitive, installable through `elattar add resizable` (see '
-          'Installation). Platforms: Android, iOS, Web, macOS, Windows, '
-          'Linux.',
-    ]),
-  );
-
-  Widget _theming(ElThemeData theme) => ElSection(
-    id: 'theming',
-    title: 'Theming',
-    child: _bullets(theme, <String>[
-      'The separator is theme.border, 1px. No state colours: hover adds '
-          'a cursor, not a visual change. The grip is theme.border too, '
-          '4px wide and 24px tall.',
-      'Reads from the live theme: flipping ElThemeController updates the '
-          'separator colour immediately.',
-    ]),
-  );
-
-  Widget _source() => ElSection(
-    id: 'source',
-    title: 'Source',
-    child: DocsInstallFacts(
-      title: 'Reference',
-      facts: <DocsInstallFact>[
-        DocsInstallFact(
-          label: 'Source',
-          value: resizableDoc.sourcePath,
-          description:
-              'Authoritative implementation: the truth this page was '
-              'written from.',
-        ),
-        const DocsInstallFact(
-          label: 'Package tests',
-          value: 'none yet',
-          description: 'No dedicated unit tests in the package test suite.',
-        ),
-        const DocsInstallFact(
-          label: 'Docs test',
-          value: 'example/test/components_docs/resizable_test.dart',
-          description:
-              'Covers this page: the API tables, live specimens, drag '
-              'behaviour, and theme coverage.',
-        ),
-        const DocsInstallFact(
-          label: 'Edit these docs',
-          value: 'example/lib/components_docs/resizable/page.dart',
-          description: 'This file.',
-        ),
-      ],
-    ),
-  );
+    );
+  }
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => ConstrainedBox(
-  constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-  child: Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: <Widget>[
-      for (final String line in lines) ...<Widget>[
-        ElText('•  $line', ElType.small, color: theme.mutedForeground),
-        SizedBox(height: el(2)),
-      ],
+const String _previewCode = '''
+SizedBox(
+  height: 160,
+  child: ElResizablePanelGroup(
+    panels: [
+      ElResizablePanel(
+        defaultSize: 50,
+        minSize: 32,
+        child: Container(child: const Text('Left panel: drag to resize')),
+      ),
+      ElResizablePanel(
+        defaultSize: 50,
+        minSize: 32,
+        child: Container(child: const Text('Right panel')),
+      ),
     ],
   ),
-);
+)''';
 
 const String _usageCode = '''ElResizablePanelGroup(
   withHandle: true,
@@ -612,6 +591,57 @@ const String _compositionCode = '''// LayoutBuilder
 //              tabIndex=0, arrow keys, Home/End.
 //    _Seam: the 1px hairline, plus a 4×24 grip when withHandle is true''';
 
+class _HandleSpecimen extends StatelessWidget {
+  const _HandleSpecimen();
+
+  @override
+  Widget build(BuildContext context) {
+    final ElThemeData theme = ElTheme.of(context);
+    Widget group({required bool withHandle}) => SizedBox(
+      height: el(20),
+      child: ElResizablePanelGroup(
+        withHandle: withHandle,
+        panels: <ElResizablePanel>[
+          ElResizablePanel(
+            defaultSize: 50,
+            minSize: 32,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                border: Border.all(color: theme.border),
+              ),
+              child: Center(child: ElText('Left', ElType.small)),
+            ),
+          ),
+          ElResizablePanel(
+            defaultSize: 50,
+            minSize: 32,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                border: Border.all(color: theme.border),
+              ),
+              child: Center(child: ElText('Right', ElType.small)),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        ElText('withHandle: true (default)', ElType.section),
+        SizedBox(height: el(2)),
+        group(withHandle: true),
+        SizedBox(height: el(6)),
+        ElText('withHandle: false', ElType.section),
+        SizedBox(height: el(2)),
+        group(withHandle: false),
+      ],
+    );
+  }
+}
+
 const String _handleCode = '''ElResizablePanelGroup(
   withHandle: false, // no visible grip, still draggable
   panels: <ElResizablePanel>[
@@ -619,6 +649,45 @@ const String _handleCode = '''ElResizablePanelGroup(
     ElResizablePanel(defaultSize: 50, minSize: 32, child: right),
   ],
 )''';
+
+class _RtlSpecimen extends StatelessWidget {
+  const _RtlSpecimen();
+
+  @override
+  Widget build(BuildContext context) {
+    final ElThemeData theme = ElTheme.of(context);
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: SizedBox(
+        height: el(20),
+        child: ElResizablePanelGroup(
+          panels: <ElResizablePanel>[
+            ElResizablePanel(
+              defaultSize: 50,
+              minSize: 32,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  border: Border.all(color: theme.border),
+                ),
+                child: Center(child: ElText('أول', ElType.small)),
+              ),
+            ),
+            ElResizablePanel(
+              defaultSize: 50,
+              minSize: 32,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  border: Border.all(color: theme.border),
+                ),
+                child: Center(child: ElText('ثاني', ElType.small)),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 const String _rtlResizableCode = '''Directionality(
   textDirection: TextDirection.rtl,

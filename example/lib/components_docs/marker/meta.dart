@@ -10,9 +10,9 @@ library;
 
 import '../catalog.dart' show ComponentDocEntry;
 
-/// `marker` has no `registry/components/marker.json` yet.
-/// [ComponentDocEntry.dependencies] is left empty rather than naming items a
-/// manifest does not yet resolve.
+/// `registry/components/marker.json` ships today: [dependencies] is that
+/// manifest's own `registryDependencies` list, verbatim, so `page.dart`'s
+/// Installation section can render the real `elattar add marker` command.
 const ComponentDocEntry markerDoc = ComponentDocEntry(
   name: 'marker',
   title: 'Marker',

@@ -1,50 +1,262 @@
 /// Public documentation page for the `hover_card` component.
 ///
-/// **Shape.** Mirrors `button/page.dart`'s reference shape: an unheaded live
-/// demo above the first heading, then Installation, Usage, and this
-/// component's own sections named plainly, API Reference last of the
-/// shadcn-mirrored sections, then States, Accessibility, Responsive,
-/// Dependencies, Theming, Source.
+/// **Re-housed onto the kit.** This page used to hand-compose [ElSection]
+/// panels; it now declares a [ComponentDocSpec]
+/// (`example/lib/docs/component_doc_page.dart`) and hands it to
+/// [ComponentDocPage], the same shape `button`, `field`, and `popover`
+/// established. Every specimen widget and every code string below is the
+/// one the hand-composed page carried; the unheaded live demo above
+/// Installation is now the page's own `Preview` `ShowcaseSection`, so it
+/// finally owns a rail entry, and a dedicated Keyboard disclosure is split
+/// out of the combined Accessibility section, matching `button`'s own
+/// house shape.
 ///
-/// **shadcn parity.** Fetched fresh from
+/// **Corrected, not carried across.** The hand-composed page's
+/// Installation and Dependencies sections both said `hover-card` had "no
+/// registry manifest yet" and was "unregistered." That was false the whole
+/// time this page existed: `registry/components/hover-card.json` is a real
+/// manifest — `files`, `registryDependencies: [popover, source-foundation]`,
+/// a `documentationRoute` — and `elattar add hover-card` installs from it
+/// today. Installation and Dependencies below say so.
+///
+/// **Keyboard, read from the source rather than assumed.** `hover_card.dart`
+/// wires no `Focus`, `FocusNode`, or `onKeyEvent` anywhere: the component's
+/// `_ElHoverCardState.build` opens and closes through a bare `MouseRegion`'s
+/// `onEnter`/`onExit` only. There is no focus-driven open path to document —
+/// the Keyboard disclosure below says exactly that, the same fact
+/// Accessibility's own "No focus" and "No keyboard" bullets already named
+/// before this pass, now given its own heading instead of being folded in.
+///
+/// **shadcn parity**, unchanged from before: fetched fresh from
 /// `https://ui.shadcn.com/docs/components/base/hover-card`: Hover Card,
 /// Installation, Usage, Composition, Trigger Delays, Positioning, Basic,
 /// Sides, RTL, API Reference. Positioning and Sides are both skipped and
 /// named here instead: `HoverCardContent`'s `side`/`align` configure
 /// placement in the reference, and [ElHoverCard] has no such parameters —
 /// placement is fully automatic (collision-aware, via
-/// [elPopoverPlacement]). Every other section survives as a top-level
-/// `ElSection`.
-///
-/// **Split history.** This component used to be documented on the
-/// `navigation_menu` page alongside `navigation_menu`, `menubar`, and
-/// `context_menu`, its sections prefixed `Hover Card: ...`. Phase F/J split
-/// each component onto its own page; that prefix is dropped here since the
-/// page is now about exactly one component.
+/// [elPopoverPlacement]). Every other section survives as its own
+/// declared section.
 ///
 /// **Known bug, carried across correctly.** `_HoverCardSpecimen` takes a
-/// `specimenKey` field because this page mounts it three times: the
-/// unheaded live demo, Trigger Delays, and Basic. A `ValueKey` baked into
-/// `build()` would collide across all three.
+/// `specimenKey` field because this page mounts it three times: Preview,
+/// Trigger Delays, and Basic. A `ValueKey` baked into `build()` would
+/// collide across all three.
 ///
 /// **API tables, verified.** Built from
 /// `lib/src/components/hover_card.dart`'s real constructors: `openDelay`
 /// and `closeDelay` default to the real `ElDurations.hoverCardOpenDelay`
 /// (700ms) and `ElDurations.hoverCardCloseDelay` (300ms) tokens, not bare
-/// literals as the merged page's prose implied. `width` defaults to null,
-/// which falls back to the static `ElHoverCard.defaultWidth` getter (288,
-/// `w-72`) — that fallback is now its own row rather than folded into
-/// `width`'s description.
+/// literals. `width` defaults to null, which falls back to the static
+/// `ElHoverCard.defaultWidth` getter (288, `w-72`) — that fallback is its
+/// own row rather than folded into `width`'s description.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:flutter/widgets.dart';
 
-import '../../docs/docs_code.dart';
+import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
 import '../../docs/docs_layout.dart';
-import '../../kit.dart';
+import '../../docs/docs_section.dart' show DocsAnchor;
+import '../../kit.dart' show ElNote, ElNoteTone;
 import 'meta.dart';
+
+/// The declaration: every section this page shows, in TOC order. `final`,
+/// not `const`: `InstallSection.command` reads `hoverCardDoc.command`, a
+/// computed getter, which is not a constant expression.
+final ComponentDocSpec hoverCardDocSpec = ComponentDocSpec(
+  name: 'hover-card',
+  title: hoverCardDoc.title,
+  description: hoverCardDoc.description,
+  sections: <DocsPageSection>[
+    ShowcaseSection(
+      id: 'preview',
+      title: 'Preview',
+      description:
+          'Move your pointer over the text (not on touch) to see the '
+          'preview.',
+      specimen: const _HoverCardSpecimen(
+        specimenKey: 'hover-card-specimen',
+      ),
+      code: _hoverCardCode,
+      label: 'Hover Card specimen view',
+    ),
+    InstallSection(
+      id: 'install',
+      title: 'Installation',
+      description:
+          'hover-card has a real registry manifest, `elattar add '
+          'hover-card` installs lib/src/components/hover_card.dart and '
+          'resolves popover and source-foundation automatically. The '
+          'Manual tab is for a project not using the CLI.',
+      command: hoverCardDoc.command,
+      manualFiles: <DocsCodeFile>[
+        DocsCodeFile(
+          path: 'lib/components/ui/hover_card.dart',
+          title: '1. Copy the source',
+          description:
+              "Copy lib/src/components/hover_card.dart's generated "
+              '@ui/hover_card.dart payload into components/ui.',
+          code:
+              "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
+              '// Copy the generated hover card source here when using '
+              'manual mode.',
+        ),
+        const DocsCodeFile(
+          path: 'lib/components/ui/ui.dart',
+          title: '2. Export it from your barrel',
+          description:
+              'Add the export line so ElHoverCard and ElHoverCardContent '
+              'are reachable the same way the CLI path already makes '
+              'them.',
+          code: "export 'hover_card.dart';",
+        ),
+      ],
+    ),
+    const SnippetSection(
+      id: 'usage',
+      title: 'Usage',
+      description:
+          'The card opens and closes automatically on pointer entry and '
+          'exit; there is no caller-owned open state to manage.',
+      code: _hoverCardCode,
+    ),
+    const SnippetSection(
+      id: 'composition',
+      title: 'Composition',
+      description:
+          'What the constructor assembles internally, not a runnable '
+          'snippet: ElHoverCard composes elPopoverPlacement and '
+          'ElPopoverSurface directly rather than ElPopover itself. '
+          "ElPopover's full-screen dismiss barrier would take the pointer "
+          'off the trigger and the card would close and reopen forever, '
+          'so there is nothing here to stage live beyond the Preview '
+          'specimen above.',
+      code: _hoverCardCompositionCode,
+    ),
+    ShowcaseSection(
+      id: 'trigger-delays',
+      title: 'Trigger Delays',
+      description:
+          "openDelay (default 700ms, ElDurations.hoverCardOpenDelay: Radix's "
+          'own default) is how long the pointer must rest on the trigger '
+          'before the card opens. closeDelay (default 300ms, '
+          'ElDurations.hoverCardCloseDelay) is the window in which the '
+          'pointer can cross the gap into the card itself before it '
+          'closes. Same composition as Usage above, at its default delays.',
+      specimen: const _HoverCardSpecimen(
+        specimenKey: 'hover-card-delays-specimen',
+      ),
+      code: _hoverCardCode,
+      label: 'Trigger Delays specimen view',
+    ),
+    ShowcaseSection(
+      id: 'basic',
+      title: 'Basic',
+      description:
+          'The same specimen shown in Preview, mounted again under its '
+          'own key: hover the trigger text to see the preview.',
+      specimen: const _HoverCardSpecimen(
+        specimenKey: 'hover-card-basic-specimen',
+      ),
+      code: _hoverCardCode,
+      label: 'Basic specimen view',
+    ),
+    ShowcaseSection(
+      id: 'rtl',
+      title: 'RTL',
+      description:
+          "The card's content reads right-to-left. Placement is "
+          "unaffected: ElHoverCard positions from the trigger's own box, "
+          'which Directionality does not move.',
+      specimen: const _HoverCardRtl(),
+      code: _hoverCardRtlCode,
+      label: 'RTL specimen view',
+    ),
+    DisclosureSection(
+      id: 'api',
+      title: 'API Reference',
+      description:
+          'Every constructor parameter ElHoverCard and ElHoverCardContent '
+          'declare, plus the static layout helpers a width or offset '
+          'falls back to.',
+      children: const <DocsTocEntry>[
+        DocsTocEntry(title: 'ElHoverCard', anchor: 'api-elhovercard'),
+        DocsTocEntry(
+          title: 'ElHoverCard static helpers',
+          anchor: 'api-elhovercard-static',
+        ),
+        DocsTocEntry(
+          title: 'ElHoverCardContent',
+          anchor: 'api-elhovercardcontent',
+        ),
+      ],
+      child: const _ApiReferenceContent(),
+    ),
+    DisclosureSection(
+      id: 'states',
+      title: 'States',
+      description:
+          'Read straight off _ElHoverCardState, not inferred: every timing '
+          'cited is the real ElDurations token the source names.',
+      child: const DocsStateMatrix(facts: _stateFacts),
+    ),
+    DisclosureSection(
+      id: 'accessibility',
+      title: 'Accessibility',
+      child: const _AccessibilityContent(),
+    ),
+    DisclosureSection(
+      id: 'keyboard',
+      title: 'Keyboard',
+      child: const _KeyboardContent(),
+    ),
+    DisclosureSection(
+      id: 'responsive',
+      title: 'Responsive',
+      child: const _ResponsiveContent(),
+    ),
+    DisclosureSection(
+      id: 'dependencies',
+      title: 'Dependencies',
+      child: const _DependenciesContent(),
+    ),
+    DisclosureSection(
+      id: 'theming',
+      title: 'Theming',
+      child: const _ThemingContent(),
+    ),
+    DisclosureSection(
+      id: 'source',
+      title: 'Source',
+      child: DocsInstallFacts(
+        title: 'Reference',
+        facts: <DocsInstallFact>[
+          DocsInstallFact(
+            label: 'Source',
+            value: hoverCardDoc.sourcePath,
+            description:
+                'Authoritative implementation: the truth this page was '
+                'written from.',
+          ),
+          const DocsInstallFact(
+            label: 'Docs test',
+            value: 'example/test/components_docs/hover_card_test.dart',
+            description:
+                'Covers this page: the article mounts, all three live '
+                'specimens, the full API table, and both themes at two '
+                'viewport widths.',
+          ),
+          const DocsInstallFact(
+            label: 'Edit these docs',
+            value: 'example/lib/components_docs/hover_card/page.dart',
+            description: 'This file.',
+          ),
+        ],
+      ),
+    ),
+  ],
+);
 
 class HoverCardDocPage extends StatelessWidget {
   const HoverCardDocPage({super.key, this.onNavigate});
@@ -63,395 +275,22 @@ class HoverCardDocPage extends StatelessWidget {
       ElBreadcrumbEntry.link('Components'),
       ElBreadcrumbEntry.page('Hover Card'),
     ],
-    toc: const <DocsTocEntry>[
-      DocsTocEntry(title: 'Installation', anchor: 'install'),
-      DocsTocEntry(title: 'Usage', anchor: 'usage'),
-      DocsTocEntry(title: 'Composition', anchor: 'composition'),
-      DocsTocEntry(title: 'Trigger Delays', anchor: 'trigger-delays'),
-      DocsTocEntry(title: 'Basic', anchor: 'basic'),
-      DocsTocEntry(title: 'RTL', anchor: 'rtl'),
-      DocsTocEntry(
-        title: 'API Reference',
-        anchor: 'api',
-        children: <DocsTocEntry>[
-          DocsTocEntry(title: 'ElHoverCard', anchor: 'api-elhovercard'),
-          DocsTocEntry(
-            title: 'ElHoverCard static helpers',
-            anchor: 'api-elhovercard-static',
-          ),
-          DocsTocEntry(
-            title: 'ElHoverCardContent',
-            anchor: 'api-elhovercardcontent',
-          ),
-        ],
-      ),
-      DocsTocEntry(title: 'States', anchor: 'states'),
-      DocsTocEntry(title: 'Accessibility', anchor: 'accessibility'),
-      DocsTocEntry(title: 'Responsive', anchor: 'responsive'),
-      DocsTocEntry(title: 'Dependencies', anchor: 'dependencies'),
-      DocsTocEntry(title: 'Theming', anchor: 'theming'),
-      DocsTocEntry(title: 'Source', anchor: 'source'),
-    ],
+    toc: hoverCardDocSpec.toc,
     previous: null,
     onNavigate: onNavigate,
-    child: const _HoverCardArticle(),
-  );
-}
-
-class _HoverCardArticle extends StatelessWidget {
-  const _HoverCardArticle();
-
-  @override
-  Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
-    return Column(
+    child: KeyedSubtree(
       key: const ValueKey<String>('hover-card-doc-article'),
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        _preview(),
-        SizedBox(height: el(6)),
-        _install(),
-        SizedBox(height: el(6)),
-        _usage(),
-        SizedBox(height: el(6)),
-        _composition(),
-        _triggerDelays(),
-        _basic(),
-        _rtl(),
-        _api(),
-        _states(),
-        _accessibility(theme),
-        _responsive(theme),
-        _dependencies(theme),
-        _theming(theme),
-        _source(),
-      ],
-    );
-  }
-
-  Widget _preview() => const DocsCodeExample(
-    title: 'Hover Card',
-    description:
-        'Move your pointer over the text (not on touch) to see the '
-        'preview.',
-    preview: Center(
-      child: _HoverCardSpecimen(specimenKey: 'hover-card-specimen'),
-    ),
-  );
-
-  Widget _install() => ElSection(
-    id: 'install',
-    title: 'Installation',
-    description:
-        '`elattar add hover-card` installs the component and its declared '
-        'dependency closure.',
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        const DocsCodeExample(
-          title: 'Manual installation',
-          manualFiles: <DocsCodeFile>[
-            DocsCodeFile(
-              path: 'lib/components/ui/hover_card.dart',
-              code:
-                  "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
-                  '// Copy hover_card.dart source from the package when needed.',
-            ),
-          ],
-        ),
-        SizedBox(height: el(4)),
-        const DocsInstallFacts(
-          title: 'Status',
-          facts: <DocsInstallFact>[
-            DocsInstallFact(
-              label: 'Status',
-              value: 'Stable: registry manifest',
-              description:
-                  'ElHoverCard and ElHoverCardContent are exported from '
-                  'the public barrel and ship in the registry, so '
-                  'cannot be installed through the CLI yet.',
-            ),
-            DocsInstallFact(
-              label: 'Dart / Flutter',
-              value: '>=3.12.2 <4.0.0 / >=3.12.2',
-              description: 'Same constraints as the port.',
-            ),
-            DocsInstallFact(
-              label: 'Platforms',
-              value: 'Android, iOS, Web, macOS, Windows, Linux',
-              description:
-                  'Pure widget composition: nothing is platform-gated, '
-                  'though the card itself never opens on a touch-only '
-                  'device.',
-            ),
-          ],
-        ),
-      ],
-    ),
-  );
-
-  Widget _usage() => ElSection(
-    id: 'usage',
-    title: 'Usage',
-    description:
-        'The card opens and closes automatically on pointer entry and '
-        'exit; there is no caller-owned open state to manage.',
-    child: ElPanel(
-      label: 'DART',
-      note: 'MINIMAL',
-      child: DocsSelectableCodeBlock(code: _hoverCardCode),
-    ),
-  );
-
-  Widget _composition() => ElSection(
-    id: 'composition',
-    title: 'Composition',
-    description:
-        'What the constructor assembles internally. ElHoverCard composes '
-        '[elPopoverPlacement] and [ElPopoverSurface] directly rather than '
-        '[ElPopover] itself: ElPopover\'s full-screen dismiss barrier '
-        'would take the pointer off the trigger and the card would close '
-        'and reopen forever.',
-    child: ElPanel(
-      label: 'Hover Card',
-      child: DocsSelectableCodeBlock(code: _hoverCardCompositionCode),
-    ),
-  );
-
-  Widget _triggerDelays() => ElSection(
-    id: 'trigger-delays',
-    title: 'Trigger Delays',
-    description:
-        'openDelay (default 700ms, ElDurations.hoverCardOpenDelay: Radix\'s '
-        'own default) is how long the pointer must rest on the trigger '
-        'before the card opens. closeDelay (default 300ms, '
-        'ElDurations.hoverCardCloseDelay) is the window in which the '
-        'pointer can cross the gap into the card itself before it closes.',
-    child: const DocsCodeExample(
-      title: 'Default delays',
-      preview: _HoverCardSpecimen(specimenKey: 'hover-card-delays-specimen'),
-    ),
-  );
-
-  Widget _basic() => ElSection(
-    id: 'basic',
-    title: 'Basic',
-    description:
-        'The same specimen shown at the top of this page, mounted again '
-        'under its own key: hover the trigger text to see the preview.',
-    child: const DocsCodeExample(
-      title: 'Basic hover card',
-      preview: _HoverCardSpecimen(specimenKey: 'hover-card-basic-specimen'),
-      manualFiles: <DocsCodeFile>[
-        DocsCodeFile(path: 'hover_card_basic.dart', code: _hoverCardCode),
-      ],
-    ),
-  );
-
-  Widget _rtl() => ElSection(
-    id: 'rtl',
-    title: 'RTL',
-    description:
-        'The card\'s content reads right-to-left. Placement is '
-        'unaffected: ElHoverCard positions from the trigger\'s own box, '
-        'which Directionality does not move.',
-    child: const DocsCodeExample(
-      title: 'Right-to-left hover card',
-      preview: _HoverCardRtl(),
-      manualFiles: <DocsCodeFile>[
-        DocsCodeFile(path: 'hover_card_rtl.dart', code: _hoverCardRtlCode),
-      ],
-    ),
-  );
-
-  Widget _api() => ElSection(
-    id: 'api',
-    title: 'API Reference',
-    description:
-        'Every constructor parameter ElHoverCard and ElHoverCardContent '
-        'declare, plus the static layout helpers a width or offset falls '
-        'back to.',
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        KeyedSubtree(
-          key: docsAnchorKey('api-elhovercard'),
-          child: const DocsApiTable(
-            title: 'ElHoverCard',
-            facts: _hoverCardApiFacts,
-          ),
-        ),
-        SizedBox(height: el(6)),
-        KeyedSubtree(
-          key: docsAnchorKey('api-elhovercard-static'),
-          child: const DocsApiTable(
-            title: 'ElHoverCard static helpers',
-            facts: _hoverCardStaticFacts,
-          ),
-        ),
-        SizedBox(height: el(6)),
-        KeyedSubtree(
-          key: docsAnchorKey('api-elhovercardcontent'),
-          child: const DocsApiTable(
-            title: 'ElHoverCardContent',
-            facts: _hoverCardContentApiFacts,
-          ),
-        ),
-      ],
-    ),
-  );
-
-  Widget _states() => ElSection(
-    id: 'states',
-    title: 'States',
-    description:
-        'Read straight off _DsHoverCardState, not inferred: every timing '
-        'cited is the real ElDurations token the source names.',
-    child: const DocsStateMatrix(facts: _stateFacts),
-  );
-
-  Widget _accessibility(ElThemeData theme) => ElSection(
-    id: 'accessibility',
-    title: 'Accessibility',
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        _bullets(theme, <String>[
-          'Pointer only: opens on pointer entry after openDelay, closes '
-              'on pointer exit after closeDelay (the gap-crossing '
-              'window). Never appears on touch.',
-          'No focus: the card does not trap focus and cannot be focused '
-              'itself; it is announcement-only. A screen reader must read '
-              'the trigger to learn about the preview.',
-          'No keyboard: the card cannot be opened from the keyboard.',
-        ]),
-        SizedBox(height: el(3)),
-        ElNote(
-          tone: ElNoteTone.error,
-          title: 'A hover-only affordance is invisible on a phone',
-          child: ElText(
-            'Use a hover card for optional detail, not required content: '
-            'do not put anything a touch user must read inside one.',
-            ElType.small,
-          ),
-        ),
-      ],
-    ),
-  );
-
-  Widget _responsive(ElThemeData theme) => ElSection(
-    id: 'responsive',
-    title: 'Responsive',
-    child: _bullets(theme, <String>[
-      'Pointer entry and exit only, on every platform with a pointer. '
-          'Completely hidden on touch: not just disabled, but unmounted '
-          '(the OverlayPortal never shows).',
-      'Placement comes from elPopoverPlacement\'s own collision handling '
-          'near a viewport edge, the same algorithm the combobox and the '
-          'date picker use, and snaps without transition when it flips.',
-      'No breakpoint branching, and no dart:io Platform branch, anywhere '
-          'in hover_card.dart.',
-    ]),
-  );
-
-  Widget _dependencies(ElThemeData theme) => ElSection(
-    id: 'dependencies',
-    title: 'Dependencies',
-    child: DocsInstallFacts(
-      facts: <DocsInstallFact>[
-        const DocsInstallFact(
-          label: 'Registry item',
-          value: 'None: unregistered',
-          description:
-              'ElHoverCard is in the package but has no manifest and '
-              'cannot be installed through the CLI yet.',
-        ),
-        const DocsInstallFact(
-          label: 'Primary dependency',
-          value: 'elPopoverPlacement, ElPopoverSurface',
-          description:
-              'Composes the popover positioner and surface directly, not '
-              'ElPopover itself: see Composition above for why.',
-        ),
-        const DocsInstallFact(
-          label: 'Platforms',
-          value: 'Android, iOS, Web, macOS, Windows, Linux',
-          description: 'Pure widget composition; unmounted entirely on touch.',
-        ),
-        const DocsInstallFact(
-          label: 'Verified',
-          value: 'example/test/components_docs/hover_card_test.dart',
-          description:
-              'This page\'s own three live specimens, section order, and '
-              'API table coverage: 390x844 and 1440x900, both themes.',
-        ),
-      ],
-    ),
-  );
-
-  Widget _theming(ElThemeData theme) => ElSection(
-    id: 'theming',
-    title: 'Theming',
-    child: _bullets(theme, <String>[
-      'Surface: theme.popover fill, theme.popoverForeground text, via '
-          'ElPopoverSurface, which also applies the ring and shadow '
-          '(theme.foreground at 10% alpha).',
-      'Animation: fade-in-0, zoom-in-95, and a slide-in-from-top-2 run '
-          'through ElDurations.overlay (320ms) on ElCurves.out; the exit '
-          'drops the slide.',
-      'Every duration and curve is read live; nothing is a page-local '
-          'constant.',
-    ]),
-  );
-
-  Widget _source() => ElSection(
-    id: 'source',
-    title: 'Source',
-    child: DocsInstallFacts(
-      title: 'Reference',
-      facts: <DocsInstallFact>[
-        DocsInstallFact(
-          label: 'Source',
-          value: hoverCardDoc.sourcePath,
-          description:
-              'Authoritative implementation: the truth this page '
-              'was written from.',
-        ),
-        const DocsInstallFact(
-          label: 'Docs test',
-          value: 'example/test/components_docs/hover_card_test.dart',
-          description:
-              'Covers this page: the article mounts, all three '
-              'live specimens, the full API table, and both themes at two '
-              'viewport widths.',
-        ),
-        const DocsInstallFact(
-          label: 'Edit these docs',
-          value: 'example/lib/components_docs/hover_card/page.dart',
-          description: 'This file.',
-        ),
-      ],
+      child: ComponentDocPage(spec: hoverCardDocSpec, header: false),
     ),
   );
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
-  crossAxisAlignment: CrossAxisAlignment.start,
-  children: <Widget>[
-    for (final String line in lines) ...<Widget>[
-      ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
-      ),
-      SizedBox(height: el(2)),
-    ],
-  ],
-);
+/* ── Showcase specimens ─────────────────────────────────────────────────── */
 
-/// This page mounts a hover card three times: the unheaded live demo,
-/// Trigger Delays, and Basic. `specimenKey` gives each mount its own
-/// [ValueKey] — a key baked into `build()` would collide across all three,
-/// since the page renders as one continuous scroll.
+/// This page mounts a hover card three times: Preview, Trigger Delays, and
+/// Basic. `specimenKey` gives each mount its own [ValueKey] — a key baked
+/// into `build()` would collide across all three, since the page renders as
+/// one continuous scroll.
 class _HoverCardSpecimen extends StatelessWidget {
   const _HoverCardSpecimen({this.specimenKey = 'hover-card-specimen'});
 
@@ -554,6 +393,216 @@ const String _hoverCardRtlCode = '''Directionality(
     ),
   ),
 )''';
+
+/* ── Disclosure content ─────────────────────────────────────────────────── */
+
+class _ApiReferenceContent extends StatelessWidget {
+  const _ApiReferenceContent();
+
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: <Widget>[
+      const DocsAnchor(
+        id: 'api-elhovercard',
+        child: DocsApiTable(title: 'ElHoverCard', facts: _hoverCardApiFacts),
+      ),
+      SizedBox(height: el(6)),
+      const DocsAnchor(
+        id: 'api-elhovercard-static',
+        child: DocsApiTable(
+          title: 'ElHoverCard static helpers',
+          facts: _hoverCardStaticFacts,
+        ),
+      ),
+      SizedBox(height: el(6)),
+      const DocsAnchor(
+        id: 'api-elhovercardcontent',
+        child: DocsApiTable(
+          title: 'ElHoverCardContent',
+          facts: _hoverCardContentApiFacts,
+        ),
+      ),
+    ],
+  );
+}
+
+class _AccessibilityContent extends StatelessWidget {
+  const _AccessibilityContent();
+
+  @override
+  Widget build(BuildContext context) {
+    final ElThemeData theme = ElTheme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        _bullets(theme, <String>[
+          'Pointer only: opens on pointer entry after openDelay, closes '
+              'on pointer exit after closeDelay (the gap-crossing '
+              'window). Never appears on touch.',
+          'No semantic role of its own: neither ElHoverCard nor '
+              'ElHoverCardContent wraps its content in a Semantics node; '
+              'the card\'s text reaches assistive tech through whatever '
+              'default static-text semantics ElText already carries.',
+          'The card does not trap focus and cannot be focused itself: it '
+              'is announcement-only. A screen reader must read the '
+              'trigger to learn about the preview; see Keyboard for the '
+              'focus story in full.',
+        ]),
+        SizedBox(height: el(3)),
+        ElNote(
+          tone: ElNoteTone.error,
+          title: 'A hover-only affordance is invisible on a phone',
+          child: ElText(
+            'Use a hover card for optional detail, not required content: '
+            'do not put anything a touch user must read inside one.',
+            ElType.small,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Read straight off `hover_card.dart`'s `_ElHoverCardState`: no `Focus`,
+/// `FocusNode`, or `onKeyEvent` appears anywhere in the file. Opening and
+/// closing both route through a bare `MouseRegion`'s `onEnter`/`onExit`
+/// only, so there is no focus-driven or keyboard-driven open path to
+/// document — this section says that plainly rather than describing a
+/// keyboard story the source does not have.
+class _KeyboardContent extends StatelessWidget {
+  const _KeyboardContent();
+
+  @override
+  Widget build(BuildContext context) =>
+      _bullets(ElTheme.of(context), <String>[
+        'No keyboard path exists: hover_card.dart wires no Focus, '
+            'FocusNode, or onKeyEvent anywhere. The card opens only from '
+            'MouseRegion.onEnter (pointer entry) and closes only from '
+            'onExit (pointer exit) or the close-delay timer expiring.',
+        'Focusing the trigger does nothing here: whatever focus '
+            'behaviour the trigger widget itself carries is untouched, '
+            'but reaching it by Tab does not open the card — only '
+            'pointer entry does.',
+        'No keyboard dismissal either: since nothing here opens the card '
+            'from the keyboard, there is no Escape handler or keyboard-'
+            'driven close path to speak of. The only ways it closes are '
+            'the pointer leaving past closeDelay, or the trigger and '
+            'card both losing pointer occupancy.',
+      ]);
+}
+
+class _ResponsiveContent extends StatelessWidget {
+  const _ResponsiveContent();
+
+  @override
+  Widget build(BuildContext context) =>
+      _bullets(ElTheme.of(context), <String>[
+        'Pointer entry and exit only, on every platform with a pointer. '
+            'Completely hidden on touch: not just disabled, but unmounted '
+            '(the OverlayPortal never shows).',
+        'Placement comes from elPopoverPlacement\'s own collision handling '
+            'near a viewport edge, the same algorithm the combobox and the '
+            'date picker use, and snaps without transition when it flips.',
+        'No breakpoint branching, and no dart:io Platform branch, anywhere '
+            'in hover_card.dart.',
+      ]);
+}
+
+class _DependenciesContent extends StatelessWidget {
+  const _DependenciesContent();
+
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: <Widget>[
+      DocsInstallFacts(
+        facts: <DocsInstallFact>[
+          const DocsInstallFact(
+            label: 'Registry item',
+            value: 'hover-card',
+            description:
+                'registry/components/hover-card.json exists and is '
+                'installable through the CLI today.',
+          ),
+          const DocsInstallFact(
+            label: 'Destination',
+            value: 'lib/components/ui/hover_card.dart',
+            description:
+                'The same lib/components/ui/ target every component '
+                'installs to.',
+          ),
+          DocsInstallFact(
+            label: 'Dependencies',
+            value: hoverCardDoc.dependencies.join(', '),
+            description:
+                "The manifest's own registryDependencies, resolved "
+                'automatically by `elattar add hover-card`.',
+          ),
+          const DocsInstallFact(
+            label: 'Primary composition',
+            value: 'elPopoverPlacement, ElPopoverSurface',
+            description:
+                'Composes the popover positioner and surface directly, '
+                'not ElPopover itself: ElPopover\'s full-screen dismiss '
+                'barrier would take the pointer off the trigger and the '
+                'card would close and reopen forever, see Composition '
+                'above.',
+          ),
+          const DocsInstallFact(
+            label: 'Platforms',
+            value: 'Android, iOS, Web, macOS, Windows, Linux',
+            description: 'Pure widget composition; unmounted entirely on touch.',
+          ),
+          const DocsInstallFact(
+            label: 'Verified',
+            value: 'example/test/components_docs/hover_card_test.dart',
+            description:
+                "This page's own three live specimens, section order, "
+                'and API table coverage: 390x844 and 1440x900, both '
+                'themes.',
+          ),
+        ],
+      ),
+      SizedBox(height: el(4)),
+      const DocsLinkRow(
+        links: <DocsLink>[
+          DocsLink(label: 'Popover', route: '/components/popover'),
+        ],
+      ),
+    ],
+  );
+}
+
+class _ThemingContent extends StatelessWidget {
+  const _ThemingContent();
+
+  @override
+  Widget build(BuildContext context) =>
+      _bullets(ElTheme.of(context), <String>[
+        'Surface: theme.popover fill, theme.popoverForeground text, via '
+            'ElPopoverSurface, which also applies the ring and shadow '
+            '(theme.foreground at 10% alpha).',
+        'Animation: fade-in-0, zoom-in-95, and a slide-in-from-top-2 run '
+            'through ElDurations.overlay (320ms) on ElCurves.out; the exit '
+            'drops the slide.',
+        'Every duration and curve is read live; nothing is a page-local '
+            'constant.',
+      ]);
+}
+
+Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: <Widget>[
+    for (final String line in lines) ...<Widget>[
+      ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+      ),
+      SizedBox(height: el(2)),
+    ],
+  ],
+);
 
 const List<DocsApiFact> _hoverCardApiFacts = <DocsApiFact>[
   DocsApiFact(

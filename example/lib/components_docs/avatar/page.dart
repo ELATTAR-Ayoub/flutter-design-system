@@ -1,26 +1,33 @@
-/// Public component documentation for the avatar component.
+/// Public documentation page for the `avatar` component.
 ///
-/// Reshaped to the shadcn parity frame (Phase J supervisor's shadcn-parity
-/// pass): the reader knows https://ui.shadcn.com/docs/components/base/avatar
-/// and finds the same answers, in the same order, on this page. The live
-/// demo sits above the first heading, exactly as the reference has it, with
-/// no `Overview`, `Status`, or `Preview` heading anywhere; the Version and
-/// Platforms facts a Status section would have carried live inside
-/// Installation instead, since avatar ships in the registry.
+/// **Re-housed onto the kit.** This page used to hand-compose `ElSection`
+/// panels reshaped to mirror shadcn's own flat section order; it now
+/// declares a `ComponentDocSpec` (`example/lib/docs/component_doc_page.dart`)
+/// and hands it to `ComponentDocPage`, the same shape `button` and `field`
+/// established. Every specimen widget and every code string below is the
+/// same one the hand-composed page carried, re-typed into `ShowcaseSection`s
+/// so each is finally its own specimen AND its own visible source, not a
+/// live demo with no code toggle (the old top-of-page live block) or prose
+/// next to a `DocsCodeExample` (every section under it).
 ///
-/// `avatar` is not backed by a registry manifest yet: see the Installation
-/// section below for exactly what that means today. Three of the live
-/// specimens on this page feed [ElAvatar] bytes that never touch the
-/// network: a tiny valid local PNG for the "image loads" state, and four
-/// bytes that are not a decodable image at all for the "decode fails" state.
-/// Both were verified against the real widget before being written here,
-/// see `example/test/components_docs/avatar_test.dart`.
+/// **Corrected, not just moved.** The hand-composed page's own library doc
+/// and its Installation and Dependencies sections all claimed `avatar` "is
+/// not backed by a registry manifest yet." That was false the whole time:
+/// `registry/components/avatar.json` exists, lists exactly one file
+/// (`lib/src/components/avatar.dart`) and one registry dependency
+/// (`source-foundation`), and its `documentationRoute` already points at
+/// this page. `avatar/meta.dart`'s own doc comment repeated the same claim
+/// and is corrected alongside this file.
 ///
 /// **Skipped from the reference:** "Avatar Group with Icon". [ElAvatarGroup]
 /// composes [ElAvatarGroupCount] for its overflow indicator, and
 /// [ElAvatarGroupCount] takes only a `String label`, there is no icon slot
 /// on it to swap the count text for a glyph. Faking one here would draw a
 /// capability this widget does not have, so the section is not built.
+///
+/// New: a Keyboard disclosure, between Accessibility and Responsive — read
+/// directly off `avatar.dart`: the file wires no `Focus` node and no key
+/// handling anywhere, so `ElAvatar` is not focusable at all.
 library;
 
 import 'dart:typed_data';
@@ -28,11 +35,279 @@ import 'dart:typed_data';
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:flutter/widgets.dart';
 
-import '../../docs/docs_code.dart';
+import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
 import '../../docs/docs_layout.dart';
-import '../../kit.dart';
+import '../../docs/docs_section.dart' show DocsAnchor;
 import 'meta.dart';
+
+final ComponentDocSpec avatarDocSpec = ComponentDocSpec(
+  name: 'avatar',
+  title: avatarDoc.title,
+  description: avatarDoc.description,
+  sections: <DocsPageSection>[
+    ShowcaseSection(
+      id: 'preview',
+      title: 'Preview',
+      description:
+          'Sizes, the sizePx override, a status badge, and a value ring on '
+          'the left; a locally-decodable image and a deliberately corrupted '
+          'one on the right, so the loaded and failed image states are both '
+          'real rather than described from memory. The fallback initials '
+          'render immediately in every case; the image (when supplied and '
+          'decodable) paints over them.',
+      specimen: _PreviewSpecimen(),
+      code: _previewCode,
+      label: 'Preview specimen view',
+    ),
+    InstallSection(
+      id: 'install',
+      title: 'Installation',
+      description:
+          'avatar has a real registry manifest, `elattar add avatar` '
+          'installs lib/src/components/avatar.dart and resolves '
+          'source-foundation automatically. The Manual tab is for a '
+          'project not using the CLI.',
+      command: avatarDoc.command,
+      manualFiles: <DocsCodeFile>[
+        DocsCodeFile(
+          path: 'lib/components/ui/avatar.dart',
+          title: '1. Copy the source',
+          description:
+              "Copy lib/src/components/avatar.dart's generated "
+              '@ui/avatar.dart payload into components/ui.',
+          code:
+              "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
+              '// Copy the generated avatar source here when using '
+              'manual mode.',
+        ),
+        DocsCodeFile(
+          path: 'lib/components/ui/ui.dart',
+          title: '2. Export it from your barrel',
+          description:
+              'Add the export line so ElAvatar and its supporting types '
+              'are reachable the same way the CLI path already makes '
+              'them.',
+          code: "export 'avatar.dart';",
+        ),
+      ],
+    ),
+    SnippetSection(
+      id: 'usage',
+      title: 'Usage',
+      description:
+          'Start from a bare fallback, then add an image, a ring, or a '
+          'badge as the identity needs them.',
+      code: _usageCode,
+    ),
+    SnippetSection(
+      id: 'composition',
+      title: 'Composition',
+      description:
+          'ElAvatar folds AvatarImage and AvatarFallback into one widget\'s '
+          'Stack rather than two composable subcomponents, so there is no '
+          'live specimen to toggle here beyond the ones below: a structural '
+          'sketch of the Stack and the group tree, not runnable Dart.',
+      code: _compositionAnatomyCode,
+    ),
+    ShowcaseSection(
+      id: 'basic',
+      title: 'Basic',
+      description:
+          'A bare fallback, and the same avatar once a decodable image is '
+          'supplied.',
+      specimen: _BasicPreview(),
+      code: _basicCode,
+      label: 'Basic specimen view',
+    ),
+    ShowcaseSection(
+      id: 'badge',
+      title: 'Badge',
+      description: 'A status dot pinned to the bottom-right corner.',
+      specimen: _BadgePreview(),
+      code: _badgeCode,
+      label: 'Badge specimen view',
+    ),
+    ShowcaseSection(
+      id: 'badge-icon',
+      title: 'Badge with icon',
+      description:
+          'ElAvatarBadge.child takes any widget; no corpus call site used '
+          'it until this specimen, so this is new code exercising a real, '
+          'already-public slot rather than a fabricated one.',
+      specimen: _BadgeIconPreview(),
+      code: _badgeIconCode,
+      label: 'Badge with icon specimen view',
+    ),
+    ShowcaseSection(
+      id: 'avatar-group',
+      title: 'Avatar group',
+      description:
+          'ElAvatarGroup overlaps its children by 8px each and forces '
+          'ElAvatarGroup.ringOf(context) onto every one of them, so the '
+          'circles stay separated against the page background.',
+      specimen: _AvatarGroupPreview(),
+      code: _avatarGroupCode,
+      label: 'Avatar group specimen view',
+    ),
+    ShowcaseSection(
+      id: 'avatar-group-count',
+      title: 'Avatar group count',
+      description:
+          'ElAvatarGroupCount reads the group\'s own ring rather than '
+          'carrying one of its own, so it slots in as the group\'s last '
+          'child like any other overflow indicator would. "Who opened this '
+          'pack."',
+      specimen: _AvatarGroupCountPreview(),
+      code: _avatarGroupCountCode,
+      label: 'Avatar group count specimen view',
+    ),
+    ShowcaseSection(
+      id: 'sizes',
+      title: 'Sizes',
+      description:
+          'size picks a rung; sizePx overrides only the box. The badge dot '
+          'always scales off size, even when sizePx has overridden the '
+          'diameter: the same class-beats-attribute split ElIcon.sizePx '
+          'carries, verified in the package\'s own test/data_display_test.dart. '
+          'ElAvatarSize.sm is a 24px avatar with an 8px badge dot; md '
+          '(the default) is 32px with a 10px dot; lg is 40px with a 12px '
+          'dot. sizePx: 40 with size left at its default md still draws a '
+          '10px badge, not the 12px an lg avatar would carry: the '
+          'attribute (size) drives the badge; the class (sizePx) drives '
+          'only the box.',
+      specimen: _SizesPreview(),
+      code: _sizesCode,
+      label: 'Sizes specimen view',
+    ),
+    ShowcaseSection(
+      id: 'dropdown',
+      title: 'Dropdown',
+      description:
+          'ElAvatar takes no onTap of its own, so any pressable ancestor '
+          'can use one as its trigger: here, ElDropdownMenu.trigger, the '
+          'same pattern the sidebar footer\'s NavUser composes.',
+      specimen: _DropdownPreview(),
+      code: _dropdownCode,
+      label: 'Dropdown specimen view',
+    ),
+    ShowcaseSection(
+      id: 'rtl',
+      title: 'RTL',
+      description:
+          'The circle itself has no direction to flip; what does flip is a '
+          'composition around it, an identity row\'s avatar and text trade '
+          'sides under a Directionality the same way ElBreadcrumb\'s own '
+          'RTL specimen does.',
+      specimen: _RtlPreview(),
+      code: _rtlCode,
+      label: 'RTL specimen view',
+    ),
+    DisclosureSection(
+      id: 'api',
+      title: 'API Reference',
+      description:
+          'Every public constructor parameter on ElAvatar, followed by the '
+          'size rungs and the supporting types (ElAvatarBadge, '
+          'ElAvatarGroup, ElAvatarGroupCount, ElAvatarRing, '
+          'elAvatarRingWidth, ElAvatarRimPainter) it is built from.',
+      children: const <DocsTocEntry>[
+        DocsTocEntry(title: 'ElAvatar', anchor: 'api-elavatar'),
+        DocsTocEntry(title: 'ElAvatarSize', anchor: 'api-elavatarsize'),
+        DocsTocEntry(title: 'Supporting types', anchor: 'api-supporting'),
+      ],
+      child: _ApiReferenceContent(),
+    ),
+    DisclosureSection(
+      id: 'states',
+      title: 'States',
+      description:
+          'ElAvatar is not interactive on its own, so hover, focus, press, '
+          'select, and disabled do not apply to it directly: wrap it in a '
+          'pressable ancestor, as NavUser wraps it in a '
+          'ElSidebarMenuButton, if the composition needs one of those.',
+      child: DocsStateMatrix(facts: _stateFacts),
+    ),
+    DisclosureSection(
+      id: 'accessibility',
+      title: 'Accessibility',
+      description:
+          'ElAvatar does not wrap itself in a Semantics node: read directly '
+          'from lib/src/components/avatar.dart, there is none in the '
+          'class.',
+      child: _AccessibilityContent(),
+    ),
+    DisclosureSection(
+      id: 'keyboard',
+      title: 'Keyboard',
+      description:
+          'avatar.dart wires no Focus node and no key handling of its own '
+          'anywhere — every fact here is about what does NOT happen, read '
+          'off ElAvatar.build directly.',
+      child: _KeyboardContent(),
+    ),
+    DisclosureSection(
+      id: 'responsive',
+      title: 'Responsive',
+      description:
+          'ElAvatar has no internal breakpoints and no platform-specific '
+          'behavior; it is a fixed-size visual mark start to finish.',
+      child: _ResponsiveContent(),
+    ),
+    DisclosureSection(
+      id: 'dependencies',
+      title: 'Dependencies',
+      description:
+          "Elattar's own technical-transparency panel: what this "
+          'component needs to install and run.',
+      child: _DependenciesContent(),
+    ),
+    DisclosureSection(
+      id: 'theming',
+      title: 'Theming',
+      description:
+          'Toggle the site theme control to compare: the rim recomputes '
+          'automatically; nothing on this page hardcodes either mode.',
+      child: _ThemingContent(),
+    ),
+    DisclosureSection(
+      id: 'source',
+      title: 'Source',
+      child: DocsInstallFacts(
+        title: 'Reference',
+        facts: <DocsInstallFact>[
+          DocsInstallFact(
+            label: 'Source',
+            value: avatarDoc.sourcePath,
+            description:
+                'Authoritative implementation: the truth this page was '
+                'written from.',
+          ),
+          const DocsInstallFact(
+            label: 'Package tests',
+            value: 'test/data_display_test.dart (ElAvatar group)',
+            description:
+                "The package's own behavioral tests, covering "
+                'ElAvatar and ElAvatarGroup together.',
+          ),
+          const DocsInstallFact(
+            label: 'Docs test',
+            value: 'example/test/components_docs/avatar_test.dart',
+            description:
+                "This documentation page's own coverage, including the "
+                'locally-decodable and deliberately corrupt image bytes '
+                'the Preview specimen renders.',
+          ),
+          const DocsInstallFact(
+            label: 'Edit these docs',
+            value: 'example/lib/components_docs/avatar/page.dart',
+            description: 'This file.',
+          ),
+        ],
+      ),
+    ),
+  ],
+);
 
 class AvatarDocPage extends StatelessWidget {
   const AvatarDocPage({super.key, this.onNavigate});
@@ -40,618 +315,82 @@ class AvatarDocPage extends StatelessWidget {
   final ValueChanged<String>? onNavigate;
 
   @override
-  Widget build(BuildContext context) {
-    return DocsLayout(
-      route: avatarDoc.route,
-      intro: const DocsPageIntro(
-        eyebrow: 'COMPONENTS / BASE',
-        title: 'Avatar',
-        description:
-            'Use ElAvatar to represent a person or account: a photo when one '
-            'loads, initials underneath when it does not. Reach for ElIcon '
-            'instead when the mark is a generic glyph rather than an '
-            'identity; reach for ElItemMedia or a plain image when the '
-            'content is not a person or account at all; and use the '
-            'separate agent_avatar.dart family (ElCubeAvatar / ElAgentCube) '
-            'for the animated isometric agent face: a different component '
-            'with a different rendering model, not a variant of this one.',
-      ),
-      breadcrumbs: const <ElBreadcrumbEntry>[
-        ElBreadcrumbEntry.link('Components'),
-        ElBreadcrumbEntry.page('Avatar'),
-      ],
-      toc: const <DocsTocEntry>[
-        DocsTocEntry(title: 'Installation', anchor: 'install'),
-        DocsTocEntry(title: 'Usage', anchor: 'usage'),
-        DocsTocEntry(title: 'Composition', anchor: 'composition'),
-        DocsTocEntry(title: 'Basic', anchor: 'basic'),
-        DocsTocEntry(title: 'Badge', anchor: 'badge'),
-        DocsTocEntry(title: 'Badge with icon', anchor: 'badge-icon'),
-        DocsTocEntry(title: 'Avatar group', anchor: 'avatar-group'),
-        DocsTocEntry(title: 'Avatar group count', anchor: 'avatar-group-count'),
-        DocsTocEntry(title: 'Sizes', anchor: 'sizes'),
-        DocsTocEntry(title: 'Dropdown', anchor: 'dropdown'),
-        DocsTocEntry(title: 'RTL', anchor: 'rtl'),
-        DocsTocEntry(title: 'API Reference', anchor: 'api'),
-        DocsTocEntry(title: 'States', anchor: 'states'),
-        DocsTocEntry(title: 'Accessibility', anchor: 'accessibility'),
-        DocsTocEntry(title: 'Responsive', anchor: 'responsive'),
-        DocsTocEntry(title: 'Dependencies', anchor: 'dependencies'),
-        DocsTocEntry(title: 'Theming', anchor: 'theming'),
-        DocsTocEntry(title: 'Source', anchor: 'source'),
-      ],
-      onNavigate: onNavigate,
-      child: const _AvatarArticle(),
-    );
-  }
-}
-
-class _AvatarArticle extends StatelessWidget {
-  const _AvatarArticle();
-
-  @override
-  Widget build(BuildContext context) => Column(
-    key: const ValueKey<String>('avatar-doc-article'),
-    crossAxisAlignment: CrossAxisAlignment.stretch,
-    children: <Widget>[
-      // shadcn: the live demo that opens the page, before any heading. No
-      // ElSection, no id, no TOC entry: matching the reference exactly,
-      // "before any heading" means before Installation's own heading too.
-      DocsCodeExample(
-        title: 'Avatar specimens',
-        description:
-            'Sizes, the sizePx override, a status badge, and a value ring on '
-            'the left; a locally-decodable image and a deliberately '
-            'corrupted one on the right, so the loaded and failed image '
-            'states are both real rather than described from memory. The '
-            'fallback initials render immediately in every case; the image '
-            '(when supplied and decodable) paints over them.',
-        preview: const _AvatarPreview(),
-        manualFiles: const <DocsCodeFile>[
-          DocsCodeFile(
-            path: 'main.dart',
-            title: 'Import from the package',
-            description:
-                'avatar ships in the registry, so it is not copied '
-                'into lib/components/ui/. Import it directly instead.',
-            code:
-                "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
-                '// ElAvatar, ElAvatarBadge, ElAvatarGroup and\n'
-                '// ElAvatarGroupCount are all exported from the barrel.',
-          ),
-        ],
-      ),
-      SizedBox(height: el(8)),
-      // shadcn: Installation, Command and Manual tabs.
-      ElSection(
-        id: 'install',
-        title: 'Installation',
-        description:
-            'Install with `elattar add avatar`, or copy the source file manually when you need a local fork.',
-        child: const DocsInstallFacts(
-          facts: <DocsInstallFact>[
-            DocsInstallFact(
-              label: 'CLI',
-              value: 'elattar add avatar',
-              description:
-                  'Installs registry/components/avatar.json and its declared '
-                  'dependency closure.',
-            ),
-            DocsInstallFact(
-              label: 'Package import',
-              value:
-                  "import 'package:elattar_design_system/elattar_design_system.dart';",
-              description: 'Use ElAvatar straight from the package today.',
-            ),
-            DocsInstallFact(
-              label: 'Source path',
-              value: 'lib/src/components/avatar.dart',
-              description: 'The single authoritative source file.',
-            ),
-            DocsInstallFact(
-              label: 'Version',
-              value: '0.0.1',
-              description: 'Tracks the elattar_design_system package version.',
-            ),
-            DocsInstallFact(
-              label: 'Platforms',
-              value: 'Android, iOS, Web, macOS, Windows, Linux',
-              description:
-                  'ElAvatar is built entirely from Flutter framework '
-                  'primitives (CustomPaint, DecoratedBox, Image) with no '
-                  'platform channels, so it renders the same everywhere '
-                  'Flutter itself runs.',
-            ),
-          ],
-        ),
-      ),
-      SizedBox(height: el(6)),
-      // shadcn: Usage, imports plus basic construction.
-      ElSection(
-        id: 'usage',
-        title: 'Usage',
-        description:
-            'Start from a bare fallback, then add an image, a ring, or a '
-            'badge as the identity needs them.',
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            ElPanel(
-              label: 'DART',
-              note: 'SMALLEST EXAMPLE',
-              child: DocsSelectableCodeBlock(code: _smallestUsageCode),
-            ),
-            SizedBox(height: el(4)),
-            ElPanel(
-              label: 'DART',
-              note: 'IMAGE WITH A FALLBACK',
-              child: DocsSelectableCodeBlock(code: _imageUsageCode),
-            ),
-            SizedBox(height: el(4)),
-            ElPanel(
-              label: 'DART',
-              note: 'RING AND BADGE',
-              child: DocsSelectableCodeBlock(code: _ringBadgeUsageCode),
-            ),
-          ],
-        ),
-      ),
-      SizedBox(height: el(6)),
-      // shadcn: Composition, the widget-hierarchy tree. ElAvatar is one
-      // widget with a Stack of optional layers, not a family of separate
-      // subcomponents the way Avatar/AvatarImage/AvatarFallback are on the
-      // reference; ElAvatarGroup is the one real parent/child composition
-      // this family has, so both anatomies are shown together here.
-      ElSection(
-        id: 'composition',
-        title: 'Composition',
-        description:
-            'ElAvatar folds AvatarImage and AvatarFallback into one '
-            'widget\'s Stack rather than two composable subcomponents. '
-            'ElAvatarGroup is the family\'s one real parent/child tree.',
-        child: ElPanel(
-          label: 'DART',
-          note: 'ANATOMY',
-          child: const DocsSelectableCodeBlock(code: _compositionAnatomyCode),
-        ),
-      ),
-      SizedBox(height: el(6)),
-      // shadcn: Basic, a simple avatar with an image and a fallback.
-      ElSection(
-        id: 'basic',
-        title: 'Basic',
-        description:
-            'A bare fallback, and the same avatar once a decodable image '
-            'is supplied.',
-        child: DocsCodeExample(
-          title: 'Basic',
-          preview: const _BasicPreview(),
-          manualFiles: const <DocsCodeFile>[
-            DocsCodeFile(
-              path: 'avatar_basic.dart',
-              title: 'Basic',
-              code: _basicCode,
-            ),
-          ],
-        ),
-      ),
-      SizedBox(height: el(6)),
-      // shadcn: Badge, a status dot pinned to the corner.
-      ElSection(
-        id: 'badge',
-        title: 'Badge',
-        description: 'A status dot pinned to the bottom-right corner.',
-        child: DocsCodeExample(
-          title: 'Badge',
-          preview: const Center(child: _BadgePreview()),
-          manualFiles: const <DocsCodeFile>[
-            DocsCodeFile(
-              path: 'avatar_badge.dart',
-              title: 'Badge',
-              code: _badgeCode,
-            ),
-          ],
-        ),
-      ),
-      SizedBox(height: el(6)),
-      // shadcn: Badge with Icon, a glyph inside the badge instead of no
-      // content at all.
-      ElSection(
-        id: 'badge-icon',
-        title: 'Badge with icon',
-        description:
-            'ElAvatarBadge.child takes any widget; no corpus call site '
-            'used it until this specimen, so this is new code exercising a '
-            'real, already-public slot rather than a fabricated one.',
-        child: DocsCodeExample(
-          title: 'Badge with icon',
-          preview: const Center(child: _BadgeIconPreview()),
-          manualFiles: const <DocsCodeFile>[
-            DocsCodeFile(
-              path: 'avatar_badge_icon.dart',
-              title: 'Badge with icon',
-              code: _badgeIconCode,
-            ),
-          ],
-        ),
-      ),
-      SizedBox(height: el(6)),
-      // shadcn: Avatar Group, overlapping circles.
-      ElSection(
-        id: 'avatar-group',
-        title: 'Avatar group',
-        description:
-            'ElAvatarGroup overlaps its children by 8px each and forces '
-            'ElAvatarGroup.ringOf(context) onto every one of them, so the '
-            'circles stay separated against the page background.',
-        child: DocsCodeExample(
-          title: 'Avatar group',
-          preview: const _AvatarGroupPreview(),
-          manualFiles: const <DocsCodeFile>[
-            DocsCodeFile(
-              path: 'avatar_group.dart',
-              title: 'Avatar group',
-              code: _avatarGroupCode,
-            ),
-          ],
-        ),
-      ),
-      SizedBox(height: el(6)),
-      // shadcn: Avatar Group Count, a "+N" overflow indicator at the end of
-      // the group.
-      ElSection(
-        id: 'avatar-group-count',
-        title: 'Avatar group count',
-        description:
-            'ElAvatarGroupCount reads the group\'s own ring rather than '
-            'carrying one of its own, so it slots in as the group\'s last '
-            'child like any other overflow indicator would.',
-        child: DocsCodeExample(
-          title: 'Avatar group count',
-          description: 'Who opened this pack.',
-          preview: const _AvatarGroupCountPreview(),
-          manualFiles: const <DocsCodeFile>[
-            DocsCodeFile(
-              path: 'avatar_group_count.dart',
-              title: 'Avatar group count',
-              code: _avatarGroupCountCode,
-            ),
-          ],
-        ),
-      ),
-      SizedBox(height: el(6)),
-      // shadcn: Sizes.
-      ElSection(
-        id: 'sizes',
-        title: 'Sizes',
-        description:
-            'size picks a rung (sm/md/lg); sizePx overrides only the box. '
-            'The badge dot always scales off size, even when sizePx has '
-            'overridden the diameter: the same class-beats-attribute split '
-            'ElIcon.sizePx carries, verified in the package\'s own '
-            'test/data_display_test.dart.',
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            const DocsCodeExample(
-              title: 'Sizes',
-              preview: _SizesPreview(),
-              manualFiles: <DocsCodeFile>[
-                DocsCodeFile(
-                  path: 'avatar_sizes.dart',
-                  title: 'Sizes',
-                  code: _sizesCode,
-                ),
-              ],
-            ),
-            SizedBox(height: el(4)),
-            const _Bullets(
-              items: <String>[
-                'ElAvatarSize.sm, 24px avatar, 8px badge dot.',
-                'ElAvatarSize.md, 32px avatar (the default), 10px badge dot.',
-                'ElAvatarSize.lg, 40px avatar, 12px badge dot.',
-                'sizePx: 40 with size left at its default md still draws a '
-                    '10px badge, not the 12px an lg avatar would carry: the '
-                    'attribute (size) drives the badge; the class (sizePx) '
-                    'drives only the box.',
-              ],
-            ),
-          ],
-        ),
-      ),
-      SizedBox(height: el(6)),
-      // shadcn: Dropdown, an avatar used as a menu trigger.
-      ElSection(
-        id: 'dropdown',
-        title: 'Dropdown',
-        description:
-            'ElAvatar takes no onTap of its own, so any pressable ancestor '
-            'can use one as its trigger: here, ElDropdownMenu.trigger, the '
-            'same pattern the sidebar footer\'s NavUser composes.',
-        child: DocsCodeExample(
-          title: 'Dropdown',
-          preview: const _DropdownPreview(),
-          manualFiles: const <DocsCodeFile>[
-            DocsCodeFile(
-              path: 'avatar_dropdown.dart',
-              title: 'Dropdown',
-              code: _dropdownCode,
-            ),
-          ],
-        ),
-      ),
-      SizedBox(height: el(6)),
-      // shadcn: RTL.
-      ElSection(
-        id: 'rtl',
-        title: 'RTL',
-        description:
-            'The circle itself has no direction to flip; what does flip is '
-            'a composition around it, an identity row\'s avatar and text '
-            'trade sides under a Directionality the same way ElBreadcrumb\'s '
-            'own RTL specimen does.',
-        child: DocsCodeExample(
-          title: 'RTL',
-          preview: const _RtlPreview(),
-          manualFiles: const <DocsCodeFile>[
-            DocsCodeFile(path: 'avatar_rtl.dart', title: 'RTL', code: _rtlCode),
-          ],
-        ),
-      ),
-      SizedBox(height: el(6)),
-      ElSection(
-        id: 'api',
-        title: 'API Reference',
-        description:
-            'Every public constructor parameter on ElAvatar, followed by the '
-            'size rungs and the supporting types (ElAvatarBadge, '
-            'ElAvatarGroup, ElAvatarGroupCount, ElAvatarRing, '
-            'elAvatarRingWidth, ElAvatarRimPainter) it is built from.',
-        child: const Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            DocsApiTable(title: 'ElAvatar', facts: _dsAvatarFacts),
-            SizedBox(height: 24),
-            DocsApiTable(title: 'ElAvatarSize', facts: _dsAvatarSizeFacts),
-            SizedBox(height: 24),
-            DocsApiTable(title: 'Supporting types', facts: _supportingFacts),
-          ],
-        ),
-      ),
-      SizedBox(height: el(6)),
-      ElSection(
-        id: 'states',
-        title: 'States',
-        description:
-            'ElAvatar is not interactive on its own, so hover, focus, press, '
-            'select, and disabled do not apply to it directly: wrap it in a '
-            'pressable ancestor, as NavUser wraps it in a '
-            'ElSidebarMenuButton, if the composition needs one of those.',
-        child: const DocsStateMatrix(
-          facts: <DocsStateFact>[
-            DocsStateFact(
-              state: 'Rest (fallback only)',
-              treatment: 'image is null; the fallback renders outright.',
-              userSignal:
-                  'A muted circular fill with initials: no spinner, no '
-                  'empty state.',
-            ),
-            DocsStateFact(
-              state: 'Loading (image)',
-              treatment:
-                  'An image is supplied and is still resolving; the '
-                  'fallback content sits underneath the (still-empty) '
-                  'Image in the same Stack.',
-              userSignal:
-                  'Initials stay legible instead of a blank gap while the '
-                  'photo resolves.',
-            ),
-            DocsStateFact(
-              state: 'Success (image)',
-              treatment:
-                  'The decoded image paints in a ClipRRect over the '
-                  'fallback, BoxFit.cover.',
-              userSignal: 'The photo fully replaces the initials.',
-            ),
-            DocsStateFact(
-              state: 'Error (image)',
-              treatment:
-                  'ElAvatar wires no errorBuilder, so a decode/load failure '
-                  'is reported to FlutterError and the Image paints '
-                  'nothing: the fallback beneath keeps showing through.',
-              userSignal:
-                  'Initials remain readable instead of a broken-image icon, '
-                  'verified in this page\'s own test with a corrupt '
-                  'MemoryImage.',
-            ),
-            DocsStateFact(
-              state: 'Hover / Focus-visible / Pressed / Selected / Disabled',
-              treatment:
-                  'N/A, ElAvatar takes no onTap/onPressed and paints no '
-                  'interactive state of its own.',
-              userSignal:
-                  'Add these by wrapping ElAvatar in an interactive '
-                  'ancestor; they are that ancestor\'s states, not this '
-                  'widget\'s.',
-            ),
-            DocsStateFact(
-              state: 'Empty',
-              treatment:
-                  'N/A: fallback is a required constructor parameter, so '
-                  'there is always something to render.',
-              userSignal: 'There is no "no avatar at all" state to design.',
-            ),
-            DocsStateFact(
-              state: 'Reduced motion',
-              treatment: 'N/A, ElAvatar performs no animation.',
-              userSignal: 'Nothing to freeze; there is nothing moving.',
-            ),
-          ],
-        ),
-      ),
-      SizedBox(height: el(6)),
-      ElSection(
-        id: 'accessibility',
-        title: 'Accessibility',
-        description:
-            'ElAvatar does not wrap itself in a Semantics node: read '
-            'directly from lib/src/components/avatar.dart, there is none in '
-            'the class.',
-        child: const _Bullets(
-          items: <String>[
-            'Give a standalone avatar its own label: wrap it in '
-                'Semantics(label: "…profile photo", image: true, child: '
-                'ElAvatar(...)).',
-            'When the avatar sits beside visible identity text: as it does '
-                'in the sidebar footer\'s NavUser: that adjacent text '
-                'already names the person, so no extra label is needed '
-                'there.',
-            'ElAvatar is not focusable and defines no keyboard behavior of '
-                'its own; keyboard interaction belongs to whatever '
-                'interactive ancestor wraps it.',
-            'The default 24-40px box can sit under common touch-target '
-                'minimums when the avatar itself is the tappable element, '
-                'add touch-target padding on the wrapping control rather '
-                'than shrinking it there.',
-            'Identity itself is never carried by color alone. ring and '
-                'badge are color-only decorations, though: pair a badge '
-                'that communicates real status with a label or tooltip on '
-                'its wrapper, not the dot alone.',
-          ],
-        ),
-      ),
-      SizedBox(height: el(6)),
-      ElSection(
-        id: 'responsive',
-        title: 'Responsive',
-        description:
-            'ElAvatar has no internal breakpoints and no platform-specific '
-            'behavior; it is a fixed-size visual mark start to finish.',
-        child: const _Bullets(
-          items: <String>[
-            'Choose a ElAvatarSize rung per breakpoint, or compute an '
-                'explicit sizePx from the surrounding layout: the widget '
-                'does not adapt on its own.',
-            'ElAvatarGroup.overlap is a fixed 8px constant; it does not '
-                'scale with viewport width.',
-            'No platform channels are used, so behavior is identical on '
-                'every Flutter target this package supports.',
-          ],
-        ),
-      ),
-      SizedBox(height: el(6)),
-      ElSection(
-        id: 'dependencies',
-        title: 'Dependencies',
-        description:
-            'No registry item exists yet, so there are no registry '
-            'dependencies to list: see Installation above.',
-        child: const DocsInstallFacts(
-          title: 'Files and assets',
-          facts: <DocsInstallFact>[
-            DocsInstallFact(
-              label: 'Files',
-              value: 'lib/src/components/avatar.dart',
-              description: 'One file; ElAvatar is not split across sources.',
-            ),
-            DocsInstallFact(
-              label: 'Assets',
-              value: 'None',
-              description:
-                  'ElAvatar takes any ImageProvider the caller supplies; it '
-                  'ships no bundled asset of its own.',
-            ),
-            DocsInstallFact(
-              label: 'Fonts and shaders',
-              value: 'None beyond the foundation',
-              description:
-                  'The fallback text uses whichever ElTypeSpec is passed or '
-                  'defaulted (ElFonts.mono for avatarFallback, ElFonts.sans '
-                  'for avatarInitials): both already shipped by the '
-                  'foundation, not by this component.',
-            ),
-          ],
-        ),
-      ),
-      SizedBox(height: el(6)),
-      ElSection(
-        id: 'theming',
-        title: 'Theming',
-        description:
-            'Toggle the site theme control to compare: the rim recomputes '
-            'automatically; nothing on this page hardcodes either mode.',
-        child: const _Bullets(
-          items: <String>[
-            'The fallback fill/ink default to theme.muted / '
-                'theme.mutedForeground; fallbackFill and fallbackInk '
-                'override either independently, as the leaderboard leader '
-                'specimen does with ElPalette.value.',
-            'The hairline rim always resolves to theme.border: there is '
-                'no parameter that overrides its color.',
-            'The rim blends darken against a light theme and lighten '
-                'against a dark one (theme.kind == ElThemeKind.dark), so '
-                'the same rim reads on a photo and on a flat fill in both '
-                'modes without ever being drawn as a solid line over the '
-                'subject.',
-            'ring and badge take explicit colors from the call site, '
-                'ElAvatarGroup.ringOf(context) is the one built-in helper, '
-                'resolving to theme.background at the shared '
-                'elAvatarRingWidth.',
-          ],
-        ),
-      ),
-      SizedBox(height: el(6)),
-      ElSection(
-        id: 'source',
-        title: 'Source',
-        description:
-            'Where to read the implementation and the tests that already '
-            'cover it.',
-        child: const DocsInstallFacts(
-          title: 'Source references',
-          facts: <DocsInstallFact>[
-            DocsInstallFact(
-              label: 'Package file',
-              value: 'lib/src/components/avatar.dart',
-              description: 'The authoritative source for this component.',
-            ),
-            DocsInstallFact(
-              label: 'Exports',
-              value:
-                  'ElAvatar, ElAvatarSize, ElAvatarRing, elAvatarRingWidth, '
-                  'ElAvatarBadge, ElAvatarGroup, ElAvatarGroupCount, '
-                  'ElAvatarRimPainter',
-              description: 'Public symbols available after import.',
-            ),
-            DocsInstallFact(
-              label: 'Tests',
-              value:
-                  'test/data_display_test.dart (ElAvatar group), '
-                  'example/test/components_docs/avatar_test.dart',
-              description:
-                  'The package\'s own behavioral tests, and this '
-                  'documentation page\'s own coverage.',
-            ),
-          ],
-        ),
-      ),
+  Widget build(BuildContext context) => DocsLayout(
+    route: avatarDoc.route,
+    intro: DocsPageIntro(
+      eyebrow: 'COMPONENTS / BASE',
+      title: avatarDoc.title,
+      description:
+          'Use ElAvatar to represent a person or account: a photo when one '
+          'loads, initials underneath when it does not. Reach for ElIcon '
+          'instead when the mark is a generic glyph rather than an '
+          'identity; reach for ElItemMedia or a plain image when the '
+          'content is not a person or account at all; and use the '
+          'separate agent_avatar.dart family (ElCubeAvatar / ElAgentCube) '
+          'for the animated isometric agent face: a different component '
+          'with a different rendering model, not a variant of this one.',
+    ),
+    breadcrumbs: const <ElBreadcrumbEntry>[
+      ElBreadcrumbEntry.link('Components'),
+      ElBreadcrumbEntry.page('Avatar'),
     ],
+    toc: avatarDocSpec.toc,
+    previous: null,
+    next: null,
+    onNavigate: onNavigate,
+    child: KeyedSubtree(
+      key: const ValueKey<String>('avatar-doc-article'),
+      child: ComponentDocPage(spec: avatarDocSpec, header: false),
+    ),
   );
 }
 
-const String _smallestUsageCode = '''const ElAvatar(fallback: 'AB')''';
+/* ── Showcase specimens ─────────────────────────────────────────────────── */
 
-const String _imageUsageCode = '''ElAvatar(
+const String _usageCode = '''const ElAvatar(fallback: 'AB')
+
+ElAvatar(
   fallback: 'AB',
   image: NetworkImage(user.photoUrl),
   fallbackSpec: ElComponentType.avatarFallback,
-)''';
+)
 
-const String _ringBadgeUsageCode = '''ElAvatar(
+ElAvatar(
   fallback: '#1',
   sizePx: el(10),
   ring: (color: ElPalette.value, width: elAvatarRingWidth),
   badge: ElAvatarBadge(fill: ElPalette.value),
+)''';
+
+const String _previewCode = '''Wrap(
+  spacing: 12,
+  runSpacing: 12,
+  children: [
+    ElAvatar(
+      fallback: 'AB',
+      size: ElAvatarSize.sm,
+      fallbackSpec: ElComponentType.avatarInitials,
+    ),
+    ElAvatar(fallback: 'AB'), // size: ElAvatarSize.md, the default
+    const ElAvatar(fallback: 'AB', size: ElAvatarSize.lg),
+    ElAvatar(
+      fallback: '#1',
+      sizePx: 40,
+      ring: (color: ElPalette.value, width: elAvatarRingWidth),
+    ),
+    ElAvatar(
+      fallback: 'AB',
+      size: ElAvatarSize.lg,
+      badge: ElAvatarBadge(fill: ElPalette.value),
+    ),
+    // Image states: a decodable local image, and a deliberately corrupt
+    // one. The fallback initials stay on screen either way.
+    ElAvatar(
+      fallback: 'AB',
+      size: ElAvatarSize.lg,
+      image: NetworkImage(user.photoUrl),
+    ),
+  ],
 )''';
 
 const String _compositionAnatomyCode = '''ElAvatar
@@ -884,6 +623,63 @@ const List<DocsApiFact> _supportingFacts = <DocsApiFact>[
   ),
 ];
 
+const List<DocsStateFact> _stateFacts = <DocsStateFact>[
+  DocsStateFact(
+    state: 'Rest (fallback only)',
+    treatment: 'image is null; the fallback renders outright.',
+    userSignal:
+        'A muted circular fill with initials: no spinner, no empty state.',
+  ),
+  DocsStateFact(
+    state: 'Loading (image)',
+    treatment:
+        'An image is supplied and is still resolving; the fallback '
+        'content sits underneath the (still-empty) Image in the same '
+        'Stack.',
+    userSignal:
+        'Initials stay legible instead of a blank gap while the photo '
+        'resolves.',
+  ),
+  DocsStateFact(
+    state: 'Success (image)',
+    treatment:
+        'The decoded image paints in a ClipRRect over the fallback, '
+        'BoxFit.cover.',
+    userSignal: 'The photo fully replaces the initials.',
+  ),
+  DocsStateFact(
+    state: 'Error (image)',
+    treatment:
+        'ElAvatar wires no errorBuilder, so a decode/load failure is '
+        'reported to FlutterError and the Image paints nothing: the '
+        'fallback beneath keeps showing through.',
+    userSignal:
+        'Initials remain readable instead of a broken-image icon, '
+        "verified in this page's own test with a corrupt MemoryImage.",
+  ),
+  DocsStateFact(
+    state: 'Hover / Focus-visible / Pressed / Selected / Disabled',
+    treatment:
+        'N/A, ElAvatar takes no onTap/onPressed and paints no '
+        'interactive state of its own.',
+    userSignal:
+        'Add these by wrapping ElAvatar in an interactive ancestor; '
+        "they are that ancestor's states, not this widget's.",
+  ),
+  DocsStateFact(
+    state: 'Empty',
+    treatment:
+        'N/A: fallback is a required constructor parameter, so there is '
+        'always something to render.',
+    userSignal: 'There is no "no avatar at all" state to design.',
+  ),
+  DocsStateFact(
+    state: 'Reduced motion',
+    treatment: 'N/A, ElAvatar performs no animation.',
+    userSignal: 'Nothing to freeze; there is nothing moving.',
+  ),
+];
+
 /// A tiny, fully local, decodable PNG: the same bytes the
 /// `transparent_image` package ships as `kTransparentImage`. Used so the
 /// "image loads" specimens never touch the network.
@@ -900,8 +696,8 @@ final Uint8List _validAvatarPng = Uint8List.fromList(<int>[
 /// exercised deterministically and without a network round trip.
 final Uint8List _corruptAvatarBytes = Uint8List.fromList(<int>[1, 2, 3, 4]);
 
-class _AvatarPreview extends StatelessWidget {
-  const _AvatarPreview();
+class _PreviewSpecimen extends StatelessWidget {
+  const _PreviewSpecimen();
 
   @override
   Widget build(BuildContext context) {
@@ -1164,37 +960,195 @@ class _RtlPreview extends StatelessWidget {
   }
 }
 
-class _Bullets extends StatelessWidget {
-  const _Bullets({required this.items});
+/* ── Disclosure content ─────────────────────────────────────────────────── */
 
-  final List<String> items;
+class _ApiReferenceContent extends StatelessWidget {
+  const _ApiReferenceContent();
 
   @override
-  Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
-    return ElPanel(
-      label: 'Guidance',
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          for (int i = 0; i < items.length; i++) ...<Widget>[
-            if (i > 0) SizedBox(height: el(2)),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                ElText('•  ', ElType.small, color: theme.mutedForeground),
-                Expanded(
-                  child: ElText(
-                    items[i],
-                    ElType.small,
-                    color: theme.mutedForeground,
-                  ),
-                ),
-              ],
-            ),
-          ],
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: <Widget>[
+      const DocsAnchor(
+        id: 'api-elavatar',
+        child: DocsApiTable(title: 'ElAvatar', facts: _dsAvatarFacts),
+      ),
+      SizedBox(height: el(5)),
+      const DocsAnchor(
+        id: 'api-elavatarsize',
+        child: DocsApiTable(title: 'ElAvatarSize', facts: _dsAvatarSizeFacts),
+      ),
+      SizedBox(height: el(5)),
+      const DocsAnchor(
+        id: 'api-supporting',
+        child: DocsApiTable(title: 'Supporting types', facts: _supportingFacts),
+      ),
+    ],
+  );
+}
+
+class _AccessibilityContent extends StatelessWidget {
+  const _AccessibilityContent();
+
+  @override
+  Widget build(BuildContext context) =>
+      _bullets(ElTheme.of(context), <String>[
+        'Give a standalone avatar its own label: wrap it in '
+            'Semantics(label: "…profile photo", image: true, child: '
+            'ElAvatar(...)).',
+        'When the avatar sits beside visible identity text: as it does '
+            'in the sidebar footer\'s NavUser: that adjacent text already '
+            'names the person, so no extra label is needed there.',
+        'ElAvatar is not focusable and defines no keyboard behavior of '
+            'its own; keyboard interaction belongs to whatever '
+            'interactive ancestor wraps it (see Keyboard below).',
+        'The default 24-40px box can sit under common touch-target '
+            'minimums when the avatar itself is the tappable element, '
+            'add touch-target padding on the wrapping control rather '
+            'than shrinking it there.',
+        'Identity itself is never carried by color alone. ring and badge '
+            'are color-only decorations, though: pair a badge that '
+            'communicates real status with a label or tooltip on its '
+            'wrapper, not the dot alone.',
+      ]);
+}
+
+class _KeyboardContent extends StatelessWidget {
+  const _KeyboardContent();
+
+  @override
+  Widget build(BuildContext context) =>
+      _bullets(ElTheme.of(context), <String>[
+        'No key handling of its own: avatar.dart wires no '
+            'Focus.onKeyEvent anywhere. ElAvatar is a plain StatelessWidget '
+            'built from DecoratedBox, Stack, and CustomPaint: none of '
+            'those request focus.',
+        'Not focusable: with no Focus node of its own, ElAvatar cannot '
+            'receive keyboard focus and has no key binding — a keyboard '
+            'user tabs straight past it to whatever interactive ancestor '
+            'wraps it (the Dropdown section above is that ancestor).',
+        'Tab order: avatar.dart declares no FocusTraversalPolicy. Tab and '
+            'Shift+Tab walk whatever order the surrounding page already '
+            'declares.',
+      ]);
+}
+
+class _ResponsiveContent extends StatelessWidget {
+  const _ResponsiveContent();
+
+  @override
+  Widget build(BuildContext context) =>
+      _bullets(ElTheme.of(context), <String>[
+        'Choose a ElAvatarSize rung per breakpoint, or compute an '
+            'explicit sizePx from the surrounding layout: the widget does '
+            'not adapt on its own.',
+        'ElAvatarGroup.overlap is a fixed 8px constant; it does not scale '
+            'with viewport width.',
+        'No platform channels are used, so behavior is identical on '
+            'every Flutter target this package supports.',
+      ]);
+}
+
+class _DependenciesContent extends StatelessWidget {
+  const _DependenciesContent();
+
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: <Widget>[
+      DocsInstallFacts(
+        facts: <DocsInstallFact>[
+          const DocsInstallFact(
+            label: 'Registry item',
+            value: 'avatar',
+            description:
+                'registry/components/avatar.json exists and is '
+                'installable through the CLI today.',
+          ),
+          const DocsInstallFact(
+            label: 'Destination',
+            value: 'lib/components/ui/avatar.dart',
+            description:
+                'The same lib/components/ui/ target every component '
+                'installs to.',
+          ),
+          DocsInstallFact(
+            label: 'Dependencies',
+            value: avatarDoc.dependencies.join(', '),
+            description:
+                "The manifest's registryDependencies, resolved "
+                'automatically by the registry client.',
+          ),
+          const DocsInstallFact(
+            label: 'Assets',
+            value: 'None',
+            description:
+                'ElAvatar takes any ImageProvider the caller supplies; it '
+                'ships no bundled asset of its own.',
+          ),
+          const DocsInstallFact(
+            label: 'Fonts and shaders',
+            value: 'None beyond the foundation',
+            description:
+                'The fallback text uses whichever ElTypeSpec is passed or '
+                'defaulted (ElFonts.mono for avatarFallback, ElFonts.sans '
+                'for avatarInitials): both already shipped by the '
+                'foundation, not by this component.',
+          ),
+          const DocsInstallFact(
+            label: 'Platforms',
+            value: 'Android, iOS, Web, macOS, Windows, Linux',
+            description:
+                'ElAvatar is built entirely from Flutter framework '
+                'primitives (CustomPaint, DecoratedBox, Image) with no '
+                'platform channels, so it renders the same everywhere '
+                'Flutter itself runs.',
+          ),
         ],
       ),
-    );
-  }
+      SizedBox(height: el(4)),
+      const DocsLinkRow(
+        links: <DocsLink>[
+          DocsLink(label: 'Icon', route: '/components/icon'),
+          DocsLink(label: 'Dropdown Menu', route: '/components/dropdown-menu'),
+        ],
+      ),
+    ],
+  );
 }
+
+class _ThemingContent extends StatelessWidget {
+  const _ThemingContent();
+
+  @override
+  Widget build(BuildContext context) =>
+      _bullets(ElTheme.of(context), <String>[
+        'The fallback fill/ink default to theme.muted / '
+            'theme.mutedForeground; fallbackFill and fallbackInk override '
+            'either independently, as the leaderboard leader specimen '
+            'does with ElPalette.value.',
+        'The hairline rim always resolves to theme.border: there is no '
+            'parameter that overrides its color.',
+        'The rim blends darken against a light theme and lighten against '
+            'a dark one (theme.kind == ElThemeKind.dark), so the same rim '
+            'reads on a photo and on a flat fill in both modes without '
+            'ever being drawn as a solid line over the subject.',
+        'ring and badge take explicit colors from the call site, '
+            'ElAvatarGroup.ringOf(context) is the one built-in helper, '
+            'resolving to theme.background at the shared '
+            'elAvatarRingWidth.',
+      ]);
+}
+
+Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: <Widget>[
+    for (final String line in lines) ...<Widget>[
+      ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+      ),
+      SizedBox(height: el(2)),
+    ],
+  ],
+);

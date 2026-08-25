@@ -1,5 +1,11 @@
 /// Tests for the alert component documentation page.
 ///
+/// Re-housed onto the kit alongside the page: the section-order test now
+/// reads `DocsSection.id` (the kit's own section widget), and the
+/// API-table / state-matrix / accessibility / keyboard / dependencies
+/// assertions each open the relevant `DocsDisclosure` first — closed by
+/// default in the new kit, unlike the old page's always-visible `ElSection`.
+///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never a synthetic `MediaQuery`. Theme
 /// coverage flips a single live [ElThemeController] in place rather than
@@ -10,26 +16,19 @@
 /// loops (see `test/effects_test.dart`'s own note) -- `pumpAndSettle` would
 /// hang waiting for an animation that never finishes. `tester.pump()` is
 /// enough to render one frame and assert against it.
-///
-/// The page was reshaped to mirror
-/// https://ui.shadcn.com/docs/components/base/alert section for section:
-/// Preview, Installation, Usage, Composition, then the reference's own
-/// Basic / Destructive / Action / RTL examples (Custom Colors has no
-/// counterpart -- ElAlert has no style-override hook, only variant), then
-/// our Success / Warning / Info / Stacked alerts additions, then API
-/// Reference, then States / Accessibility / Responsive / Dependencies /
-/// Theming / Source. The ordering test below asserts that literal sequence.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/alert/meta.dart';
 import 'package:example/components_docs/alert/page.dart';
-import 'package:example/kit.dart' show ElSection;
+import 'package:example/docs/docs_disclosure.dart';
+import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// The full section list, in the order the reshaped page must render them.
+/// The full section list, in the order the re-housed page must render them.
 const List<String> _sectionOrder = <String>[
+  'preview',
   'install',
   'usage',
   'composition',
@@ -43,7 +42,8 @@ const List<String> _sectionOrder = <String>[
   'rtl',
   'api',
   'states',
-  'a11y',
+  'accessibility',
+  'keyboard',
   'responsive',
   'dependencies',
   'theming',
@@ -59,6 +59,27 @@ Widget _harness(Widget child, {required ElThemeController controller}) =>
       ),
     );
 
+/// The single `DocsDisclosure` whose title is [title]. `DocsDisclosure`'s
+/// own trigger key ([DocsDisclosure.triggerKey]) is one constant shared by
+/// every instance on the page, so a bare `find.byKey` would match all
+/// eight -- this narrows to the one panel by its title first, matching
+/// `button_test.dart`'s own convention.
+Finder _disclosureTrigger(String title) => find.descendant(
+  of: find.byWidgetPredicate(
+    (Widget widget) => widget is DocsDisclosure && widget.title == title,
+  ),
+  matching: find.byKey(DocsDisclosure.triggerKey),
+);
+
+Future<void> _open(WidgetTester tester, String title) async {
+  final Finder trigger = _disclosureTrigger(title);
+  await tester.ensureVisible(trigger);
+  await tester.pump();
+  await tester.tap(trigger);
+  await tester.pump();
+  await tester.pump(ElDurations.jelly);
+}
+
 void main() {
   test('alertDoc exposes accurate registry metadata', () {
     expect(alertDoc.name, 'alert');
@@ -72,9 +93,10 @@ void main() {
       'bloom-cosmic',
       'source-foundation',
     ]);
+    expect(alertDoc.command, 'elattar add alert');
   });
 
-  testWidgets('alert docs page renders every shadcn-parity section, in order', (
+  testWidgets('alert docs page renders every section, in order', (
     WidgetTester tester,
   ) async {
     tester.view.physicalSize = const Size(1440, 900);
@@ -95,20 +117,11 @@ void main() {
     );
     await tester.pump();
 
-    // Every section anchor exists, and each one sits below the section
-    // before it -- the "in order" half of the shadcn-parity contract.
-    double previousTop = -1;
-    for (final String anchor in _sectionOrder) {
-      final Finder section = find.byKey(ElSection.anchorKey(anchor));
-      expect(section, findsOneWidget, reason: 'section "$anchor" missing');
-      final double top = tester.getTopLeft(section).dy;
-      expect(
-        top,
-        greaterThan(previousTop),
-        reason: 'section "$anchor" should render after the previous section',
-      );
-      previousTop = top;
-    }
+    final List<String> ids = tester
+        .widgetList<DocsSection>(find.byType(DocsSection))
+        .map((DocsSection section) => section.id)
+        .toList();
+    expect(ids, _sectionOrder);
 
     // No prose link fires the router: onNavigate stays untouched.
     expect(destination, isNull);
@@ -116,7 +129,7 @@ void main() {
   });
 
   testWidgets(
-    'alert docs page mounts live specimens across the example sections',
+    'alert docs page mounts live specimens across every variant section',
     (WidgetTester tester) async {
       tester.view.physicalSize = const Size(1440, 900);
       tester.view.devicePixelRatio = 1;
@@ -134,69 +147,73 @@ void main() {
 
       // The Preview grid alone already mounts one ElAlert per variant; the
       // per-variant sections below each mount at least one more, and RTL
-      // mounts two.
-      expect(find.text('Alert'), findsWidgets);
-      expect(find.byType(ElAlert), findsAtLeastNWidgets(10));
+      // and Stacked alerts each mount two.
+      expect(find.byType(ElAlert), findsAtLeastNWidgets(12));
 
       // Basic carries ElAlertVariant.normal's own specimen.
-      final Finder basicSection = find.byKey(ElSection.anchorKey('basic'));
-      expect(
-        find.descendant(of: basicSection, matching: find.text('Heads up')),
-        findsWidgets,
-      );
-
-      // Destructive has no action slot; Action reuses the same variant with
-      // one, so the two sections must read differently. (Every
-      // DocsCodeExample carries its own "Copy" ElButton regardless, so the
-      // signal is the "Retry" action label, not ElButton presence.)
-      final Finder destructiveSection = find.byKey(
-        ElSection.anchorKey('destructive'),
+      final Finder basic = find.byKey(
+        const ValueKey<String>('alert-example:basic'),
       );
       expect(
-        find.descendant(of: destructiveSection, matching: find.text('Retry')),
-        findsNothing,
-      );
-      final Finder actionSection = find.byKey(ElSection.anchorKey('action'));
-      expect(
-        find.descendant(of: actionSection, matching: find.text('Retry')),
-        findsWidgets,
-      );
-
-      // Success, Warning, and Info each carry their own live specimen.
-      for (final (String anchor, String title) in <(String, String)>[
-        ('success', 'Changes saved'),
-        ('warning', 'Withdrawal under review'),
-        ('info', 'New feature available'),
-      ]) {
-        final Finder section = find.byKey(ElSection.anchorKey(anchor));
-        expect(
-          find.descendant(of: section, matching: find.text(title)),
-          findsWidgets,
-          reason: '"$anchor" section should carry its own live specimen',
-        );
-      }
-
-      // RTL mounts two alerts inside a right-to-left Directionality.
-      final Finder rtlSection = find.byKey(ElSection.anchorKey('rtl'));
-      expect(
-        find.descendant(of: rtlSection, matching: find.byType(ElAlert)),
-        findsNWidgets(2),
-      );
-      expect(
-        find.descendant(
-          of: rtlSection,
-          matching: find.byWidgetPredicate(
-            (Widget widget) =>
-                widget is Directionality &&
-                widget.textDirection == TextDirection.rtl,
-          ),
-        ),
+        find.descendant(of: basic, matching: find.text('Heads up')),
         findsOneWidget,
       );
 
+      // Destructive has no action slot; Action reuses the same variant
+      // with one, so the two specimens must read differently.
+      final Finder destructive = find.byKey(
+        const ValueKey<String>('alert-example:destructive'),
+      );
+      expect(
+        find.descendant(of: destructive, matching: find.text('Retry')),
+        findsNothing,
+      );
+      final Finder action = find.byKey(
+        const ValueKey<String>('alert-example:action'),
+      );
+      expect(
+        find.descendant(of: action, matching: find.text('Retry')),
+        findsOneWidget,
+      );
+
+      // Success, Warning, and Info each carry their own live specimen.
+      for (final (String key, String title) in <(String, String)>[
+        ('alert-example:success', 'Changes saved'),
+        ('alert-example:warning', 'Withdrawal under review'),
+        ('alert-example:info', 'New feature available'),
+      ]) {
+        final Finder specimen = find.byKey(ValueKey<String>(key));
+        expect(specimen, findsOneWidget);
+        expect(
+          find.descendant(of: specimen, matching: find.text(title)),
+          findsOneWidget,
+          reason: '"$key" should carry its own live specimen',
+        );
+      }
+
+      // Stacked alerts is now live, not code-only: two alerts in one column.
+      final Finder stacked = find.byKey(
+        const ValueKey<String>('alert-example:stacked'),
+      );
+      expect(
+        find.descendant(of: stacked, matching: find.byType(ElAlert)),
+        findsNWidgets(2),
+      );
+
+      // RTL mounts two alerts inside a right-to-left Directionality.
+      final Finder rtl = find.byKey(
+        const ValueKey<String>('alert-example:rtl'),
+      );
+      expect(
+        find.descendant(of: rtl, matching: find.byType(ElAlert)),
+        findsNWidgets(2),
+      );
+      // `rtl`'s own key sits on the Directionality wrapper itself.
+      expect(tester.widget<Directionality>(rtl).textDirection, TextDirection.rtl);
+
       // Composition documents the anatomy as Dart, not a live render.
-      final Finder compositionSection = find.byKey(
-        ElSection.anchorKey('composition'),
+      final Finder compositionSection = find.byWidgetPredicate(
+        (Widget widget) => widget is DocsSection && widget.id == 'composition',
       );
       expect(
         find.descendant(
@@ -206,49 +223,11 @@ void main() {
         findsWidgets,
       );
 
-      // The API table lists every public constructor parameter found on
-      // ElAlert, and every ElAlertVariant value, in the same section.
-      final Finder apiSection = find.byKey(ElSection.anchorKey('api'));
-      expect(apiSection, findsOneWidget);
-      for (final String parameter in <String>[
-        'title',
-        'description',
-        'icon',
-        'action',
-        'variant',
-      ]) {
-        expect(
-          find.descendant(of: apiSection, matching: find.text(parameter)),
-          findsOneWidget,
-          reason: 'constructor parameter "$parameter" should be documented',
-        );
-      }
-      for (final String variant in <String>[
-        'normal',
-        'destructive',
-        'success',
-        'warning',
-        'info',
-      ]) {
-        expect(
-          find.descendant(of: apiSection, matching: find.text(variant)),
-          findsOneWidget,
-          reason: 'ElAlertVariant.$variant should be documented',
-        );
-      }
-      // Custom Colors has no ElAlert equivalent -- recorded as skipped
-      // rather than faked with another variant swatch.
-      expect(
-        find.descendant(
-          of: apiSection,
-          matching: find.textContaining('SKIPPED'),
-        ),
-        findsWidgets,
+      // The install section names the command that installs it, visible
+      // without opening anything (InstallSection defaults to its CLI tab).
+      final Finder installSection = find.byWidgetPredicate(
+        (Widget widget) => widget is DocsSection && widget.id == 'install',
       );
-
-      // The install section names the command that installs it. It asserted
-      // the opposite until the registry covered the whole component surface.
-      final Finder installSection = find.byKey(ElSection.anchorKey('install'));
       expect(
         find.descendant(
           of: installSection,
@@ -257,22 +236,147 @@ void main() {
         findsWidgets,
       );
 
-      // The decision-guidance prose names its neighbours instead of restating
-      // the component's own name (IA 9.2's decision-guidance contract). It
-      // used to live in a `purpose` section; the shadcn frame puts nothing
-      // above `Installation` but the live demo, so the prose now sits
-      // unheaded in the article and is asserted against the article itself.
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets('the API Reference disclosure documents every public member', (
+    WidgetTester tester,
+  ) async {
+    tester.view.physicalSize = const Size(1440, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    final ElThemeController controller = ElThemeController(
+      mode: ElThemeMode.dark,
+    );
+    addTearDown(controller.dispose);
+
+    await tester.pumpWidget(
+      _harness(const AlertDocPage(), controller: controller),
+    );
+    await tester.pump();
+    await _open(tester, 'API Reference');
+
+    final Finder apiSection = find.byWidgetPredicate(
+      (Widget widget) => widget is DocsSection && widget.id == 'api',
+    );
+    expect(apiSection, findsOneWidget);
+    for (final String parameter in <String>[
+      'title',
+      'description',
+      'icon',
+      'action',
+      'variant',
+    ]) {
+      expect(
+        find.descendant(of: apiSection, matching: find.text(parameter)),
+        findsOneWidget,
+        reason: 'constructor parameter "$parameter" should be documented',
+      );
+    }
+    for (final String variant in <String>[
+      'normal',
+      'destructive',
+      'success',
+      'warning',
+      'info',
+    ]) {
+      expect(
+        find.descendant(of: apiSection, matching: find.text(variant)),
+        findsOneWidget,
+        reason: 'ElAlertVariant.$variant should be documented',
+      );
+    }
+    // Custom Colors has no ElAlert equivalent -- recorded as skipped rather
+    // than faked with another variant swatch.
+    expect(
+      find.descendant(
+        of: apiSection,
+        matching: find.textContaining('SKIPPED'),
+      ),
+      findsWidgets,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+    'the Dependencies disclosure links its two documented neighbours',
+    (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1440, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+
+      final ElThemeController controller = ElThemeController(
+        mode: ElThemeMode.dark,
+      );
+      addTearDown(controller.dispose);
+
+      await tester.pumpWidget(
+        _harness(const AlertDocPage(), controller: controller),
+      );
+      await tester.pump();
+      await _open(tester, 'Dependencies');
+
+      final Finder dependenciesSection = find.byWidgetPredicate(
+        (Widget widget) => widget is DocsSection && widget.id == 'dependencies',
+      );
       expect(
         find.descendant(
-          of: find.byKey(const ValueKey<String>('alert-doc-article')),
+          of: dependenciesSection,
           matching: find.textContaining('alert dialog'),
         ),
         findsWidgets,
       );
-
+      expect(
+        find.descendant(
+          of: dependenciesSection,
+          matching: find.text('Alert Dialog'),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(
+          of: dependenciesSection,
+          matching: find.text('Toaster'),
+        ),
+        findsOneWidget,
+      );
       expect(tester.takeException(), isNull);
     },
   );
+
+  testWidgets('the Keyboard disclosure states the alert body has none', (
+    WidgetTester tester,
+  ) async {
+    tester.view.physicalSize = const Size(1440, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    final ElThemeController controller = ElThemeController(
+      mode: ElThemeMode.dark,
+    );
+    addTearDown(controller.dispose);
+
+    await tester.pumpWidget(
+      _harness(const AlertDocPage(), controller: controller),
+    );
+    await tester.pump();
+    await _open(tester, 'Keyboard');
+
+    final Finder keyboardSection = find.byWidgetPredicate(
+      (Widget widget) => widget is DocsSection && widget.id == 'keyboard',
+    );
+    expect(keyboardSection, findsOneWidget);
+    expect(
+      find.descendant(
+        of: keyboardSection,
+        matching: find.textContaining('No key handling'),
+      ),
+      findsWidgets,
+    );
+    expect(tester.takeException(), isNull);
+  });
 
   testWidgets(
     'alert docs page adapts across breakpoints and themes without exceptions',
@@ -299,7 +403,7 @@ void main() {
         find.byKey(const ValueKey<String>('docs-layout-sidebar')),
         findsNothing,
       );
-      expect(find.byType(ElAlert), findsAtLeastNWidgets(10));
+      expect(find.byType(ElAlert), findsAtLeastNWidgets(12));
       expect(tester.takeException(), isNull);
 
       // The controller is flipped in place: no new app, no new element tree.
@@ -335,7 +439,7 @@ void main() {
       find.byKey(const ValueKey<String>('docs-layout-sidebar')),
       findsOneWidget,
     );
-    expect(find.byType(ElAlert), findsAtLeastNWidgets(10));
+    expect(find.byType(ElAlert), findsAtLeastNWidgets(12));
     expect(tester.takeException(), isNull);
   });
 }

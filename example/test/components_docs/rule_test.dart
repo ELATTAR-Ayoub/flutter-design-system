@@ -1,7 +1,17 @@
+/// Tests for `components_docs/rule/page.dart`'s [ElRuleDocPage].
+///
+/// Re-housed onto the kit alongside the page: the section-order test now
+/// reads `DocsSection.id`/`.title`, and the API-table reads open the
+/// `DocsDisclosure` first — closed by default, unlike the old page's
+/// always-visible `ElSection`.
+library;
+
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/rule/meta.dart';
 import 'package:example/components_docs/rule/page.dart';
-import 'package:example/kit.dart' show ElSection;
+import 'package:example/docs/component_doc_page.dart' show DocsTocEntry;
+import 'package:example/docs/docs_disclosure.dart';
+import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -10,7 +20,8 @@ import 'package:flutter_test/flutter_test.dart';
 /// `rule` has no shadcn counterpart, so its own sections (Composing a
 /// rule list, Collecting issues, Deduplicating messages) are named for what
 /// `ElRule` does rather than mirrored from a page that does not exist.
-const List<String> _dsRuleSectionOrder = <String>[
+const List<String> _sectionIds = <String>[
+  'preview',
   'install',
   'usage',
   'composing',
@@ -19,10 +30,28 @@ const List<String> _dsRuleSectionOrder = <String>[
   'api',
   'states',
   'accessibility',
+  'keyboard',
   'responsive',
   'dependencies',
   'theming',
   'source',
+];
+
+const List<String> _sectionTitles = <String>[
+  'Preview',
+  'Installation',
+  'Usage',
+  'Composing a rule list',
+  'Collecting issues',
+  'Deduplicating messages',
+  'API Reference',
+  'States',
+  'Accessibility',
+  'Keyboard',
+  'Responsive',
+  'Dependencies',
+  'Theming',
+  'Source',
 ];
 
 Widget _harness({
@@ -31,6 +60,14 @@ Widget _harness({
 }) => ElTheme(
   controller: controller,
   child: MaterialApp(home: SingleChildScrollView(child: child)),
+);
+
+/// The single `DocsDisclosure` whose title is [title].
+Finder _disclosureTrigger(String title) => find.descendant(
+  of: find.byWidgetPredicate(
+    (Widget widget) => widget is DocsDisclosure && widget.title == title,
+  ),
+  matching: find.byKey(DocsDisclosure.triggerKey),
 );
 
 void main() {
@@ -51,6 +88,7 @@ void main() {
           ),
         ),
       );
+      await tester.pump();
 
       expect(
         find.byKey(const ValueKey<String>('rule-doc-article')),
@@ -69,8 +107,7 @@ void main() {
       );
 
       // Collecting issues: ElIssueMode.first shows 1, ElIssueMode.all
-      // shows 3, for the same failing password value. The caption now
-      // renders through ElType.section, which does not uppercase.
+      // shows 3, for the same failing password value.
       expect(find.text('ElIssueMode.first (1 shown)'), findsOneWidget);
       expect(find.text('ElIssueMode.all (3 shown)'), findsOneWidget);
 
@@ -89,46 +126,60 @@ void main() {
       expect(destination, isNull);
 
       // Every section renders, in exactly the order the page declares.
-      double? previousTop;
-      for (final String id in _dsRuleSectionOrder) {
-        final Finder finder = find.byKey(ElSection.anchorKey(id));
-        expect(finder, findsOneWidget, reason: 'missing section "$id"');
-        final double top = tester.getTopLeft(finder).dy;
-        if (previousTop != null) {
-          expect(
-            top,
-            greaterThan(previousTop),
-            reason: '"$id" is out of order',
-          );
-        }
-        previousTop = top;
-      }
+      final List<String> sectionIds = tester
+          .widgetList<DocsSection>(find.byType(DocsSection))
+          .map((DocsSection section) => section.id)
+          .toList();
+      expect(sectionIds, _sectionIds);
 
       final List<String> titles = tester
-          .widgetList<ElSection>(find.byType(ElSection))
-          .map((ElSection section) => section.title)
+          .widgetList<DocsSection>(find.byType(DocsSection))
+          .map((DocsSection section) => section.title)
           .toList();
-      expect(titles, <String>[
-        'Installation',
-        'Usage',
-        'Composing a rule list',
-        'Collecting issues',
-        'Deduplicating messages',
-        'API Reference',
-        'States',
-        'Accessibility',
-        'Responsive',
-        'Dependencies',
-        'Theming',
-        'Source',
-      ]);
+      expect(titles, _sectionTitles);
 
-      // The corrected API fact: emailPattern is `static final`, not
-      // `static const` (a RegExp built from a raw-string literal is not a
-      // compile-time constant in Dart) — the bug this split fixed.
+      // The API Reference disclosure holds the corrected API fact:
+      // emailPattern is `static final`, not `static const` (a RegExp built
+      // from a raw-string literal is not a compile-time constant in Dart) —
+      // the bug the original split fixed.
+      final Finder apiTrigger = _disclosureTrigger('API Reference');
+      await tester.ensureVisible(apiTrigger);
+      await tester.pump();
+      await tester.tap(apiTrigger);
+      await tester.pump();
+      await tester.pump(ElDurations.jelly);
+
       expect(find.textContaining('static final RegExp'), findsOneWidget);
       expect(find.textContaining('static const RegExp'), findsNothing);
     });
+
+    test('the table of contents matches the declared sections', () {
+      expect(
+        elRuleDocSpec.toc.map((DocsTocEntry entry) => entry.title).toList(),
+        _sectionTitles,
+      );
+    });
+
+    testWidgets(
+      'the page is declared, and every section is a kit component',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(1440, 4000);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+
+        await tester.pumpWidget(
+          _harness(
+            controller: ElThemeController(mode: ElThemeMode.dark),
+            child: const ElRuleDocPage(),
+          ),
+        );
+        await tester.pump();
+
+        // Eight collapsed sections: API Reference, States, Accessibility,
+        // Keyboard, Responsive, Dependencies, Theming, Source.
+        expect(find.byType(DocsDisclosure), findsNWidgets(8));
+      },
+    );
 
     testWidgets(
       'renders at narrow width with the anchor strip instead of a rail',
@@ -143,6 +194,7 @@ void main() {
             child: const ElRuleDocPage(),
           ),
         );
+        await tester.pump();
 
         expect(
           find.byKey(const ValueKey<String>('rule-doc-article')),

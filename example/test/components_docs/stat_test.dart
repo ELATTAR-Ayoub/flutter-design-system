@@ -1,7 +1,11 @@
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/stat/meta.dart';
 import 'package:example/components_docs/stat/page.dart';
-import 'package:example/kit.dart' show ElSection;
+import 'package:example/docs/component_doc_page.dart' show DocsTocEntry;
+import 'package:example/docs/docs_disclosure.dart';
+import 'package:example/docs/docs_install.dart';
+import 'package:example/docs/docs_section.dart' show DocsSection;
+import 'package:example/docs/docs_showcase.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -12,6 +16,23 @@ Widget _harness({
   controller: controller,
   child: MaterialApp(home: SingleChildScrollView(child: child)),
 );
+
+/// The single `DocsDisclosure` whose title is [title].
+Finder _disclosureTrigger(String title) => find.descendant(
+  of: find.byWidgetPredicate(
+    (Widget widget) => widget is DocsDisclosure && widget.title == title,
+  ),
+  matching: find.byKey(DocsDisclosure.triggerKey),
+);
+
+Future<void> _open(WidgetTester tester, String title) async {
+  final Finder trigger = _disclosureTrigger(title);
+  await tester.ensureVisible(trigger);
+  await tester.pump();
+  await tester.tap(trigger);
+  await tester.pump();
+  await tester.pump(ElDurations.jelly);
+}
 
 void main() {
   group('stat docs page', () {
@@ -31,6 +52,7 @@ void main() {
             ),
           ),
         );
+        await tester.pump();
 
         expect(
           find.byKey(const ValueKey<String>('stat-doc-article')),
@@ -43,14 +65,18 @@ void main() {
         expect(find.byType(ElEmpty), findsNothing);
         expect(find.byType(ElKbd), findsNothing);
 
-        final List<String> sectionTitles = tester
-            .widgetList<ElSection>(find.byType(ElSection))
-            .map((ElSection section) => section.title)
+        await _open(tester, 'API Reference');
+        await _open(tester, 'Accessibility');
+
+        final List<String> disclosureTitles = tester
+            .widgetList<DocsDisclosure>(find.byType(DocsDisclosure))
+            .map((DocsDisclosure d) => d.title)
             .toList();
-        expect(sectionTitles, contains('API Reference'));
-        expect(sectionTitles, contains('Accessibility'));
+        expect(disclosureTitles, contains('API Reference'));
+        expect(disclosureTitles, contains('Accessibility'));
 
         expect(statDoc.name, 'stat');
+        expect(statDoc.command, 'elattar add stat');
         expect(
           statDoc.exports,
           containsAll(<String>[
@@ -61,6 +87,7 @@ void main() {
           ]),
         );
         expect(destination, isNull);
+        expect(tester.takeException(), isNull);
       },
     );
 
@@ -77,6 +104,7 @@ void main() {
             child: const StatDocPage(),
           ),
         );
+        await tester.pump();
 
         expect(
           find.byKey(const ValueKey<String>('stat-doc-article')),
@@ -106,6 +134,7 @@ void main() {
       await tester.pumpWidget(
         _harness(controller: controller, child: const StatDocPage()),
       );
+      await tester.pump();
 
       final ElStat stat = tester.widget<ElStat>(find.byType(ElStat).first);
       expect(stat.delta, isNotNull, reason: 'expected a specimen with delta');
@@ -130,6 +159,7 @@ void main() {
           child: const StatDocPage(),
         ),
       );
+      await tester.pump();
 
       for (final ElStatState state in ElStatState.values) {
         expect(
@@ -159,6 +189,7 @@ void main() {
             await tester.pumpWidget(
               _harness(controller: controller, child: const StatDocPage()),
             );
+            await tester.pump();
 
             expect(
               find.byKey(const ValueKey<String>('stat-doc-article')),
@@ -172,10 +203,32 @@ void main() {
       },
     );
 
+    test('the table of contents matches the declared sections', () {
+      expect(
+        statDocSpec.toc.map((DocsTocEntry entry) => entry.title).toList(),
+        <String>[
+          'Preview',
+          'Installation',
+          'Usage',
+          'Composition',
+          'Delta and direction',
+          'Loading, error, and empty',
+          'RTL',
+          'API Reference',
+          'States',
+          'Accessibility',
+          'Keyboard',
+          'Responsive',
+          'Dependencies',
+          'Theming',
+          'Source',
+        ],
+      );
+    });
+
     testWidgets(
-      'renders the ours-only section list, in order: Installation, Usage, '
-      'then stat\'s own sections, then API Reference, then the six extra '
-      'sections',
+      'renders the ours-only section list, in order: Preview, Installation, '
+      'Usage, then stat\'s own sections, then the eight required disclosures',
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(1440, 900);
         tester.view.devicePixelRatio = 1;
@@ -187,18 +240,20 @@ void main() {
             child: const StatDocPage(),
           ),
         );
+        await tester.pump();
 
-        final List<ElSection> sections = tester
-            .widgetList<ElSection>(find.byType(ElSection))
+        final List<DocsSection> sections = tester
+            .widgetList<DocsSection>(find.byType(DocsSection))
             .toList();
         final List<String> sectionIds = sections
-            .map((ElSection section) => section.id)
+            .map((DocsSection section) => section.id)
             .toList();
         final List<String> sectionTitles = sections
-            .map((ElSection section) => section.title)
+            .map((DocsSection section) => section.title)
             .toList();
 
         expect(sectionIds, <String>[
+          'preview',
           'install',
           'usage',
           'composition',
@@ -208,6 +263,7 @@ void main() {
           'api',
           'states',
           'accessibility',
+          'keyboard',
           'responsive',
           'dependencies',
           'theming',
@@ -221,6 +277,7 @@ void main() {
         expect(
           sectionTitles,
           containsAll(<String>[
+            'Preview',
             'Composition',
             'Delta and direction',
             'Loading, error, and empty',
@@ -228,12 +285,19 @@ void main() {
             'API Reference',
             'States',
             'Accessibility',
+            'Keyboard',
             'Responsive',
             'Dependencies',
             'Theming',
             'Source',
           ]),
         );
+
+        // Five specimen stages: Preview, Composition, Delta and direction,
+        // Loading/error/empty, RTL.
+        expect(find.byType(DocsShowcase), findsNWidgets(5));
+        expect(find.byType(DocsInstall), findsOneWidget);
+        expect(find.byType(DocsDisclosure), findsNWidgets(8));
       },
     );
   });

@@ -16,37 +16,16 @@ library;
 import 'dart:typed_data';
 
 import 'package:elattar_design_system/elattar_design_system.dart';
+import 'package:example/components_docs/avatar/meta.dart';
 import 'package:example/components_docs/avatar/page.dart';
-import 'package:example/docs/docs_code.dart';
+import 'package:example/docs/component_doc_page.dart' show DocsTocEntry;
+import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_facts.dart';
-import 'package:example/kit.dart';
+import 'package:example/docs/docs_install.dart';
+import 'package:example/docs/docs_section.dart' show DocsSection;
+import 'package:example/docs/docs_showcase.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-/// The page's own section order, live demo excluded (it has no heading):
-/// shadcn parity brief requires this exact order and this exact set, see
-/// `example/lib/components_docs/avatar/page.dart`'s own library doc for the
-/// "Avatar Group with Icon" section it deliberately skips.
-const List<String> _avatarSectionOrder = <String>[
-  'install',
-  'usage',
-  'composition',
-  'basic',
-  'badge',
-  'badge-icon',
-  'avatar-group',
-  'avatar-group-count',
-  'sizes',
-  'dropdown',
-  'rtl',
-  'api',
-  'states',
-  'accessibility',
-  'responsive',
-  'dependencies',
-  'theming',
-  'source',
-];
 
 /// The 1x1 transparent PNG the `transparent_image` package ships as
 /// `kTransparentImage`: a real, fully local, decodable image.
@@ -62,6 +41,30 @@ final Uint8List _validPng = Uint8List.fromList(<int>[
 /// Four bytes that decode as nothing: no network round trip needed to fail.
 final Uint8List _corruptBytes = Uint8List.fromList(<int>[1, 2, 3, 4]);
 
+/// The page's own declared section order — mirrors `avatarDocSpec.toc`.
+const List<String> _avatarSectionOrder = <String>[
+  'Preview',
+  'Installation',
+  'Usage',
+  'Composition',
+  'Basic',
+  'Badge',
+  'Badge with icon',
+  'Avatar group',
+  'Avatar group count',
+  'Sizes',
+  'Dropdown',
+  'RTL',
+  'API Reference',
+  'States',
+  'Accessibility',
+  'Keyboard',
+  'Responsive',
+  'Dependencies',
+  'Theming',
+  'Source',
+];
+
 Widget _harness({
   required Widget child,
   required ElThemeController controller,
@@ -73,157 +76,253 @@ Widget _harness({
   ),
 );
 
+/// The single `DocsDisclosure` whose title is [title]. `DocsDisclosure`'s
+/// own trigger key ([DocsDisclosure.triggerKey]) is one constant shared by
+/// every instance on the page, so a bare `find.byKey` would match all eight
+/// — this narrows to the one panel by its title first, matching `button`'s
+/// own docs test.
+Finder _disclosureTrigger(String title) => find.descendant(
+  of: find.byWidgetPredicate(
+    (Widget widget) => widget is DocsDisclosure && widget.title == title,
+  ),
+  matching: find.byKey(DocsDisclosure.triggerKey),
+);
+
 void main() {
-  testWidgets(
-    'avatar docs render the article, a complete API table, and a live fallback specimen at desktop width',
-    (WidgetTester tester) async {
-      tester.view.physicalSize = const Size(1440, 900);
-      tester.view.devicePixelRatio = 1;
-      addTearDown(tester.view.reset);
-      final ElThemeController controller = ElThemeController(
-        mode: ElThemeMode.dark,
-      );
+  group('avatar docs page', () {
+    testWidgets(
+      'renders the article, the full API table, and a live specimen of '
+      'every image state this page claims to show',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(1440, 900);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+        final ElThemeController controller = ElThemeController(
+          mode: ElThemeMode.dark,
+        );
 
-      await tester.pumpWidget(
-        _harness(controller: controller, child: const AvatarDocPage()),
-      );
-      await tester.pumpAndSettle();
+        await tester.pumpWidget(
+          _harness(controller: controller, child: const AvatarDocPage()),
+        );
+        // One frame: nothing on this page loops, and `pumpAndSettle` is
+        // forbidden on a documentation page (see the rollout brief).
+        await tester.pump();
 
-      // The live preview deliberately includes a corrupt-bytes ElAvatar (see
-      // the file-level doc comment): that specimen reports exactly the
-      // decode failure this page's state matrix describes, so it must be
-      // drained here rather than read as a real test failure.
-      expect(tester.takeException(), isNotNull);
+        // The Preview specimen deliberately includes a corrupt-bytes
+        // ElAvatar: that specimen reports exactly the decode failure this
+        // page's state matrix describes, so it must be drained here rather
+        // than read as a real test failure.
+        expect(tester.takeException(), isNotNull);
 
-      expect(find.text('Avatar'), findsWidgets);
-      expect(find.byType(DocsCodeExample), findsAtLeastNWidgets(1));
-      expect(find.byType(ElAvatar), findsAtLeastNWidgets(1));
-      expect(
-        find.byKey(const ValueKey<String>('docs-layout-sidebar')),
-        findsOneWidget,
-      );
+        expect(
+          find.byKey(const ValueKey<String>('avatar-doc-article')),
+          findsOneWidget,
+        );
+        expect(find.byType(ElAvatar), findsAtLeastNWidgets(1));
+        expect(
+          find.byKey(const ValueKey<String>('docs-layout-sidebar')),
+          findsOneWidget,
+        );
 
-      // The API table lists every public ElAvatar constructor parameter this
-      // worker found by reading lib/src/components/avatar.dart directly.
-      final DocsApiTable elAvatarTable = tester.widget<DocsApiTable>(
-        find.byWidgetPredicate(
-          (Widget w) => w is DocsApiTable && w.title == 'ElAvatar',
-        ),
-      );
-      final Set<String> documented = elAvatarTable.facts
-          .map((DocsApiFact fact) => fact.name)
-          .toSet();
-      expect(
-        documented,
-        containsAll(<String>[
-          'fallback',
-          'image',
-          'size',
-          'fallbackSpec',
-          'sizePx',
-          'ring',
-          'badge',
-          'fallbackFill',
-          'fallbackInk',
-        ]),
-      );
+        // The API table lives inside the API Reference disclosure, closed
+        // by default (a closed `DocsDisclosure` mounts no content at all),
+        // so it must be opened before reading any of its rows.
+        final Finder apiTrigger = _disclosureTrigger('API Reference');
+        await tester.ensureVisible(apiTrigger);
+        await tester.pump();
+        await tester.tap(apiTrigger);
+        await tester.pump();
+        await tester.pump(ElDurations.jelly);
 
-      // A live specimen of the real widget mounts, fallback path included.
-      expect(find.text('AB'), findsWidgets);
+        final DocsApiTable elAvatarTable = tester.widget<DocsApiTable>(
+          find.byWidgetPredicate(
+            (Widget w) => w is DocsApiTable && w.title == 'ElAvatar',
+          ),
+        );
+        final Set<String> documented = elAvatarTable.facts
+            .map((DocsApiFact fact) => fact.name)
+            .toSet();
+        expect(
+          documented,
+          containsAll(<String>[
+            'fallback',
+            'image',
+            'size',
+            'fallbackSpec',
+            'sizePx',
+            'ring',
+            'badge',
+            'fallbackFill',
+            'fallbackInk',
+          ]),
+        );
+        // The other two API tables this page claims (ElAvatarSize,
+        // Supporting types) are both mounted too, not just named.
+        expect(
+          find.byWidgetPredicate(
+            (Widget w) => w is DocsApiTable && w.title == 'ElAvatarSize',
+          ),
+          findsOneWidget,
+        );
+        expect(
+          find.byWidgetPredicate(
+            (Widget w) =>
+                w is DocsApiTable && w.title == 'Supporting types',
+          ),
+          findsOneWidget,
+        );
 
-      // Every shadcn-mirrored section renders, in exactly the order the
-      // reshape brief requires.
-      double? previousTop;
-      for (final String id in _avatarSectionOrder) {
-        final Finder finder = find.byKey(ElSection.anchorKey(id));
-        expect(finder, findsOneWidget, reason: 'missing section "$id"');
-        final double top = tester.getTopLeft(finder).dy;
-        if (previousTop != null) {
-          expect(
-            top,
-            greaterThan(previousTop),
-            reason: '"$id" is out of order',
-          );
-        }
-        previousTop = top;
-      }
+        // A live specimen of the real widget mounts, fallback path included.
+        expect(find.text('AB'), findsWidgets);
 
-      // The new component-specific specimens actually mount real widgets,
-      // not just section prose: badge-with-icon, the dropdown trigger, and
-      // the overflow count.
-      expect(find.byType(ElDropdownMenu), findsOneWidget);
-      expect(find.byType(ElIcon), findsWidgets);
-      expect(find.text('+248'), findsOneWidget);
+        // The new component-specific specimens actually mount real widgets,
+        // not just section prose: badge-with-icon, the dropdown trigger,
+        // and the overflow count.
+        expect(find.byType(ElDropdownMenu), findsOneWidget);
+        expect(find.byType(ElIcon), findsWidgets);
+        expect(find.text('+248'), findsOneWidget);
 
-      // The theme controller flips in place: no second widget tree.
-      controller.setMode(ElThemeMode.light);
-      await tester.pump();
-      expect(tester.takeException(), isNull);
-    },
-  );
+        expect(avatarDoc.name, 'avatar');
+        expect(
+          avatarDoc.exports,
+          containsAll(<String>[
+            'ElAvatar',
+            'ElAvatarSize',
+            'ElAvatarRing',
+            'elAvatarRingWidth',
+            'ElAvatarBadge',
+            'ElAvatarGroup',
+            'ElAvatarGroupCount',
+            'ElAvatarRimPainter',
+          ]),
+        );
+        expect(avatarDoc.command, 'elattar add avatar');
+        // avatar has a real registry manifest (registry/components/
+        // avatar.json), unlike the stale claim this page used to carry:
+        // its one registry dependency is source-foundation.
+        expect(avatarDoc.dependencies, <String>['source-foundation']);
 
-  testWidgets(
-    'avatar docs expose the narrow anchor strip and hide the sidebar',
-    (WidgetTester tester) async {
-      tester.view.physicalSize = const Size(390, 844);
-      tester.view.devicePixelRatio = 1;
-      addTearDown(tester.view.reset);
-      final ElThemeController controller = ElThemeController(
-        mode: ElThemeMode.dark,
-      );
+        // The theme controller flips in place: no second widget tree.
+        controller.setMode(ElThemeMode.light);
+        await tester.pump();
+        expect(tester.takeException(), isNull);
+      },
+    );
 
-      await tester.pumpWidget(
-        _harness(controller: controller, child: const AvatarDocPage()),
-      );
-      await tester.pumpAndSettle();
+    testWidgets(
+      'the page is declared, and every section is a kit component, in '
+      'the house order',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(1440, 6000);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
 
-      expect(
-        find.byKey(const ValueKey<String>('docs-layout-anchor-strip')),
-        findsOneWidget,
-      );
-      expect(
-        find.byKey(const ValueKey<String>('docs-layout-sidebar')),
-        findsNothing,
-      );
-      expect(tester.takeException(), isNull);
-    },
-  );
+        await tester.pumpWidget(
+          _harness(
+            controller: ElThemeController(mode: ElThemeMode.dark),
+            child: const AvatarDocPage(),
+          ),
+        );
+        await tester.pump();
+        // The corrupt-bytes ElAvatar only reports its decode failure the
+        // first time anything resolves it: Flutter's global ImageCache
+        // caches the resolved (failed) ImageStream keyed by image bytes,
+        // so every later mount within this same test run replays the
+        // cached stream without a second FlutterError. Verified against
+        // the real widget: only the very first test in this file needs to
+        // drain an exception.
+        expect(tester.takeException(), isNull);
 
-  testWidgets(
-    'avatar docs render at 1440x900 in light mode without exceptions',
-    (WidgetTester tester) async {
-      tester.view.physicalSize = const Size(1440, 900);
-      tester.view.devicePixelRatio = 1;
-      addTearDown(tester.view.reset);
-      await tester.pumpWidget(
-        _harness(
-          controller: ElThemeController(mode: ElThemeMode.light),
-          child: const AvatarDocPage(),
-        ),
-      );
-      await tester.pumpAndSettle();
-      expect(find.byType(AvatarDocPage), findsOneWidget);
-      expect(tester.takeException(), isNull);
-    },
-  );
+        // Nine specimen stages: Preview, Basic, Badge, Badge with icon,
+        // Avatar group, Avatar group count, Sizes, Dropdown, RTL — plus
+        // Composition, which is a `SnippetSection` (no live specimen: see
+        // the page's own library doc for why).
+        expect(find.byType(DocsShowcase), findsNWidgets(9));
+        expect(find.byType(DocsInstall), findsOneWidget);
+        // Eight collapsed disclosures: API Reference, States,
+        // Accessibility, Keyboard, Responsive, Dependencies, Theming,
+        // Source.
+        expect(find.byType(DocsDisclosure), findsNWidgets(8));
 
-  testWidgets(
-    'avatar docs render at 390x844 in light mode without exceptions',
-    (WidgetTester tester) async {
-      tester.view.physicalSize = const Size(390, 844);
-      tester.view.devicePixelRatio = 1;
-      addTearDown(tester.view.reset);
-      await tester.pumpWidget(
-        _harness(
-          controller: ElThemeController(mode: ElThemeMode.light),
-          child: const AvatarDocPage(),
-        ),
-      );
-      await tester.pumpAndSettle();
-      expect(find.byType(AvatarDocPage), findsOneWidget);
-      expect(tester.takeException(), isNull);
-    },
-  );
+        expect(
+          avatarDocSpec.toc.map((DocsTocEntry e) => e.title).toList(),
+          _avatarSectionOrder,
+        );
+
+        // Reading each mounted `DocsSection`'s own `title` field sidesteps
+        // the duplicate-string hazard `find.text` carries here (a section
+        // heading and its own TOC link render the same string).
+        final List<String> titles = tester
+            .widgetList<DocsSection>(find.byType(DocsSection))
+            .map((DocsSection section) => section.title)
+            .toList();
+        expect(titles, _avatarSectionOrder);
+      },
+    );
+
+    testWidgets(
+      'avatar docs expose the narrow anchor strip and hide the sidebar',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(390, 844);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+        final ElThemeController controller = ElThemeController(
+          mode: ElThemeMode.dark,
+        );
+
+        await tester.pumpWidget(
+          _harness(controller: controller, child: const AvatarDocPage()),
+        );
+        await tester.pump();
+        expect(tester.takeException(), isNull);
+
+        expect(
+          find.byKey(const ValueKey<String>('docs-layout-anchor-strip')),
+          findsOneWidget,
+        );
+        expect(
+          find.byKey(const ValueKey<String>('docs-layout-sidebar')),
+          findsNothing,
+        );
+      },
+    );
+
+    testWidgets(
+      'avatar docs render at 1440x900 in light mode without exceptions',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(1440, 900);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+        await tester.pumpWidget(
+          _harness(
+            controller: ElThemeController(mode: ElThemeMode.light),
+            child: const AvatarDocPage(),
+          ),
+        );
+        await tester.pump();
+        expect(find.byType(AvatarDocPage), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      },
+    );
+
+    testWidgets(
+      'avatar docs render at 390x844 in light mode without exceptions',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(390, 844);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+        await tester.pumpWidget(
+          _harness(
+            controller: ElThemeController(mode: ElThemeMode.light),
+            child: const AvatarDocPage(),
+          ),
+        );
+        await tester.pump();
+        expect(find.byType(AvatarDocPage), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      },
+    );
+  });
 
   testWidgets(
     'a ElAvatar with no image renders its fallback initials outright',
@@ -237,7 +336,7 @@ void main() {
           child: const Center(child: ElAvatar(fallback: 'ZZ')),
         ),
       );
-      await tester.pumpAndSettle();
+      await tester.pump();
 
       expect(find.text('ZZ'), findsOneWidget);
       expect(find.byType(Image), findsNothing);
@@ -258,7 +357,7 @@ void main() {
           ),
         ),
       );
-      await tester.pumpAndSettle();
+      await tester.pump();
 
       expect(find.byType(Image), findsOneWidget);
       expect(tester.takeException(), isNull);
@@ -279,7 +378,7 @@ void main() {
           ),
         ),
       );
-      await tester.pumpAndSettle();
+      await tester.pump();
 
       expect(find.text('ZZ'), findsOneWidget);
       expect(tester.takeException(), isNotNull);

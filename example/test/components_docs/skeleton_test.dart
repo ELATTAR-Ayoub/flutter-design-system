@@ -4,14 +4,17 @@ import 'dart:ui' as ui;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/skeleton/meta.dart';
 import 'package:example/components_docs/skeleton/page.dart';
-import 'package:example/kit.dart' show ElSection;
+import 'package:example/docs/component_doc_page.dart' show DocsTocEntry;
+import 'package:example/docs/docs_disclosure.dart';
+import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// The `skeleton` documentation page: renders the shadcn-mirrored section
-/// template for [ElSkeleton]. Split off from the former shared `progress`
-/// route; see `skeleton/meta.dart`'s library note.
+/// The `skeleton` documentation page: re-housed onto the kit alongside the
+/// page. The section-order test now reads `DocsSection.id`/`.title`, and
+/// the API-table read opens the `DocsDisclosure` first — closed by default,
+/// unlike the old page's always-visible `ElSection`.
 ///
 /// `ElSkeleton`'s shimmer loops forever, so this file never calls
 /// `tester.pumpAndSettle()`: a looping `AnimationController.repeat()` under
@@ -33,6 +36,56 @@ Widget _harness({
   ),
 );
 
+/// The single `DocsDisclosure` whose title is [title].
+Finder _disclosureTrigger(String title) => find.descendant(
+  of: find.byWidgetPredicate(
+    (Widget widget) => widget is DocsDisclosure && widget.title == title,
+  ),
+  matching: find.byKey(DocsDisclosure.triggerKey),
+);
+
+const List<String> _sectionIds = <String>[
+  'preview',
+  'install',
+  'usage',
+  'avatar',
+  'card',
+  'text',
+  'form',
+  'table',
+  'rtl',
+  'layout-shift',
+  'api',
+  'states',
+  'accessibility',
+  'keyboard',
+  'responsive',
+  'dependencies',
+  'theming',
+  'source',
+];
+
+const List<String> _sectionTitles = <String>[
+  'Preview',
+  'Installation',
+  'Usage',
+  'Avatar',
+  'Card',
+  'Text',
+  'Form',
+  'Table',
+  'RTL',
+  'Avoiding layout shift',
+  'API Reference',
+  'States',
+  'Accessibility',
+  'Keyboard',
+  'Responsive',
+  'Dependencies',
+  'Theming',
+  'Source',
+];
+
 void main() {
   group('skeleton docs page', () {
     testWidgets(
@@ -53,28 +106,11 @@ void main() {
         await tester.pump(const Duration(milliseconds: 300));
 
         final List<String> titles = tester
-            .widgetList<ElSection>(find.byType(ElSection))
-            .map((ElSection section) => section.title)
+            .widgetList<DocsSection>(find.byType(DocsSection))
+            .map((DocsSection section) => section.title)
             .toList();
 
-        expect(titles, <String>[
-          'Installation',
-          'Usage',
-          'Avatar',
-          'Card',
-          'Text',
-          'Form',
-          'Table',
-          'RTL',
-          'Avoiding layout shift',
-          'API Reference',
-          'States',
-          'Accessibility',
-          'Responsive',
-          'Dependencies',
-          'Theming',
-          'Source',
-        ]);
+        expect(titles, _sectionTitles);
       },
     );
 
@@ -108,6 +144,15 @@ void main() {
           findsOneWidget,
         );
 
+        // The API table lives inside the API Reference disclosure, closed
+        // by default, so open it before reading any of its rows.
+        final Finder apiTrigger = _disclosureTrigger('API Reference');
+        await tester.ensureVisible(apiTrigger);
+        await tester.pump();
+        await tester.tap(apiTrigger);
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 300));
+
         // The API table lists every ElSkeleton constructor parameter found
         // in lib/src/components/skeleton.dart.
         for (final String param in <String>['width', 'height', 'radius']) {
@@ -122,7 +167,43 @@ void main() {
 
         expect(skeletonDoc.name, 'skeleton');
         expect(skeletonDoc.exports, containsAll(<String>['ElSkeleton']));
+        expect(skeletonDoc.command, 'elattar add skeleton');
         expect(destination, isNull);
+      },
+    );
+
+    test('the table of contents matches the declared sections', () {
+      expect(
+        skeletonDocSpec.toc.map((DocsTocEntry entry) => entry.title).toList(),
+        _sectionTitles,
+      );
+    });
+
+    testWidgets(
+      'the page is declared, and every section is a kit component',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(1440, 4000);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+
+        await tester.pumpWidget(
+          _harness(
+            size: const Size(1440, 4000),
+            controller: ElThemeController(mode: ElThemeMode.dark),
+            child: const SkeletonDocPage(),
+          ),
+        );
+        await tester.pump();
+
+        final List<String> sectionIds = tester
+            .widgetList<DocsSection>(find.byType(DocsSection))
+            .map((DocsSection section) => section.id)
+            .toList();
+        expect(sectionIds, _sectionIds);
+
+        // Eight collapsed sections: API Reference, States, Accessibility,
+        // Keyboard, Responsive, Dependencies, Theming, Source.
+        expect(find.byType(DocsDisclosure), findsNWidgets(8));
       },
     );
 

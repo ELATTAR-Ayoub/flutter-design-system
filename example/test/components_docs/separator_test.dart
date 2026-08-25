@@ -1,7 +1,19 @@
+/// Tests for `components_docs/separator/page.dart`'s [SeparatorDocPage]:
+/// the public documentation page for `ElSeparator`.
+///
+/// Re-housed onto the kit alongside the page: the section-order test now
+/// reads `DocsSection.id`, and the API-table reads open the `DocsDisclosure`
+/// first — closed by default, unlike the old page's always-visible
+/// `ElSection`.
+library;
+
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/separator/meta.dart';
-import 'package:example/components_docs/separator/page.dart';
-import 'package:example/kit.dart' show ElSection;
+import 'package:example/components_docs/separator/page.dart'
+    show SeparatorDocPage, separatorDocSpec;
+import 'package:example/docs/component_doc_page.dart' show DocsTocEntry;
+import 'package:example/docs/docs_disclosure.dart';
+import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -11,6 +23,14 @@ Widget _harness({
 }) => ElTheme(
   controller: controller,
   child: MaterialApp(home: SingleChildScrollView(child: child)),
+);
+
+/// The single `DocsDisclosure` whose title is [title].
+Finder _disclosureTrigger(String title) => find.descendant(
+  of: find.byWidgetPredicate(
+    (Widget widget) => widget is DocsDisclosure && widget.title == title,
+  ),
+  matching: find.byKey(DocsDisclosure.triggerKey),
 );
 
 void main() {
@@ -32,11 +52,18 @@ void main() {
             ),
           ),
         );
+        await tester.pump();
 
         expect(
           find.byKey(const ValueKey<String>('separator-doc-article')),
           findsOneWidget,
         );
+
+        final Finder apiTrigger = _disclosureTrigger('API Reference');
+        await tester.ensureVisible(apiTrigger);
+        await tester.tap(apiTrigger);
+        await tester.pump();
+        await tester.pump(ElDurations.jelly);
 
         expect(find.text('orientation'), findsWidgets);
 
@@ -62,6 +89,7 @@ void main() {
           separatorDoc.exports,
           containsAll(<String>['ElSeparator', 'ElSeparatorOrientation']),
         );
+        expect(separatorDoc.command, 'elattar add separator');
         expect(destination, isNull);
       },
     );
@@ -79,6 +107,7 @@ void main() {
             child: const SeparatorDocPage(),
           ),
         );
+        await tester.pump();
 
         expect(
           find.byKey(const ValueKey<String>('separator-doc-article')),
@@ -109,6 +138,7 @@ void main() {
         await tester.pumpWidget(
           _harness(controller: controller, child: const SeparatorDocPage()),
         );
+        await tester.pump();
 
         final Finder horizontalKey = find.byKey(
           const ValueKey<String>('separator-preview:horizontal'),
@@ -144,11 +174,11 @@ void main() {
     );
 
     testWidgets(
-      'renders the shadcn-shaped section list, in order: Installation, '
-      'Usage, then separator\'s own promoted sections, then API Reference, '
-      'then the six extra sections',
+      'renders the house-shape section list, in order: Preview, '
+      'Installation, Usage, separator\'s own promoted sections, then the '
+      'eight disclosures',
       (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 900);
+        tester.view.physicalSize = const Size(1440, 4000);
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
 
@@ -158,13 +188,15 @@ void main() {
             child: const SeparatorDocPage(),
           ),
         );
+        await tester.pump();
 
         final List<String> sectionIds = tester
-            .widgetList<ElSection>(find.byType(ElSection))
-            .map((ElSection section) => section.id)
+            .widgetList<DocsSection>(find.byType(DocsSection))
+            .map((DocsSection section) => section.id)
             .toList();
 
         expect(sectionIds, <String>[
+          'preview',
           'install',
           'usage',
           'vertical',
@@ -174,6 +206,7 @@ void main() {
           'api',
           'states',
           'accessibility',
+          'keyboard',
           'responsive',
           'dependencies',
           'theming',
@@ -197,22 +230,36 @@ void main() {
           );
         }
 
-        // 'Vertical' now matches twice: the section title and the
-        // 'Vertical' demo caption, which used to render as 'VERTICAL'
-        // through ElType.label and so did not collide. Now that the
-        // caption renders through ElType.section (no uppercasing), both
-        // share the exact string.
-        expect(
-          find.descendant(of: article, matching: find.text('Vertical')),
-          findsNWidgets(2),
-          reason: 'missing Vertical',
-        );
-
+        // Matches twice: the DocsSection heading and the DocsDisclosure's
+        // own trigger label, which repeats the same title.
         expect(
           find.descendant(of: article, matching: find.text('API Reference')),
-          findsOneWidget,
+          findsNWidgets(2),
         );
       },
     );
+
+    test('the table of contents matches the declared sections', () {
+      expect(
+        separatorDocSpec.toc.map((DocsTocEntry entry) => entry.title).toList(),
+        <String>[
+          'Preview',
+          'Installation',
+          'Usage',
+          'Vertical',
+          'Menu',
+          'List',
+          'RTL',
+          'API Reference',
+          'States',
+          'Accessibility',
+          'Keyboard',
+          'Responsive',
+          'Dependencies',
+          'Theming',
+          'Source',
+        ],
+      );
+    });
   });
 }

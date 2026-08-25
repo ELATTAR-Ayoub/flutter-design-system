@@ -1,15 +1,23 @@
+/// Tests for `components_docs/marker/page.dart`'s [MarkerDocPage].
+///
+/// Re-housed onto the kit alongside the page: the section-order test now
+/// reads `DocsSection.id`/`.title`, and the API-table reads open the
+/// `DocsDisclosure` first — closed by default, unlike the old page's
+/// always-visible `ElSection`.
+library;
+
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/marker/meta.dart';
 import 'package:example/components_docs/marker/page.dart';
-import 'package:example/kit.dart' show ElSection;
+import 'package:example/docs/component_doc_page.dart' show DocsTocEntry;
+import 'package:example/docs/docs_disclosure.dart';
+import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// New on 2026-08-24, with the page: `ElMarker` was documented inside
-/// `carousel/page.dart` until the split, as a single enum table.
-///
-/// The page's own section order, live demo excluded (it has no heading).
-const List<String> _sectionOrder = <String>[
+/// The page's own section order.
+const List<String> _sectionIds = <String>[
+  'preview',
   'install',
   'usage',
   'not-a-mark',
@@ -20,16 +28,16 @@ const List<String> _sectionOrder = <String>[
   'api',
   'states',
   'accessibility',
+  'keyboard',
   'responsive',
   'dependencies',
   'theming',
   'source',
 ];
 
-/// The same list by title. A section title also renders in the right-rail
-/// TOC at desktop width, so `find.text` would match each twice: the order is
-/// read off the mounted `ElSection` widgets instead.
+/// The same list by title.
 const List<String> _sectionTitles = <String>[
+  'Preview',
   'Installation',
   'Usage',
   'What the name gets wrong',
@@ -40,6 +48,7 @@ const List<String> _sectionTitles = <String>[
   'API Reference',
   'States',
   'Accessibility',
+  'Keyboard',
   'Responsive',
   'Dependencies',
   'Theming',
@@ -69,6 +78,14 @@ Widget _harness({
   ),
 );
 
+/// The single `DocsDisclosure` whose title is [title].
+Finder _disclosureTrigger(String title) => find.descendant(
+  of: find.byWidgetPredicate(
+    (Widget widget) => widget is DocsDisclosure && widget.title == title,
+  ),
+  matching: find.byKey(DocsDisclosure.triggerKey),
+);
+
 void main() {
   group('meta', () {
     test('markerDoc names the real public API surface', () {
@@ -77,6 +94,7 @@ void main() {
       expect(markerDoc.route, '/components/marker');
       expect(markerDoc.sourcePath, 'lib/src/components/marker.dart');
       expect(markerDoc.exports, <String>['ElMarker', 'ElMarkerVariant']);
+      expect(markerDoc.command, 'elattar add marker');
       // Nothing from the two families this page was split away from.
       expect(markerDoc.exports, isNot(contains('ElCarousel')));
       expect(markerDoc.exports, isNot(contains('ElNavUser')));
@@ -114,6 +132,13 @@ void main() {
           find.byKey(const ValueKey<String>('marker-doc-article')),
           findsOneWidget,
         );
+
+        final Finder apiTrigger = _disclosureTrigger('API Reference');
+        await tester.ensureVisible(apiTrigger);
+        await tester.pump();
+        await tester.tap(apiTrigger);
+        await tester.pump();
+        await tester.pump(ElDurations.jelly);
 
         for (final String param in _markerParams) {
           expect(
@@ -201,10 +226,17 @@ void main() {
       );
     });
 
+    test('the table of contents matches the declared sections', () {
+      expect(
+        markerDocSpec.toc.map((DocsTocEntry entry) => entry.title).toList(),
+        _sectionTitles,
+      );
+    });
+
     testWidgets(
       'sections render in the documented order, section for section',
       (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 900);
+        tester.view.physicalSize = const Size(1440, 4000);
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
 
@@ -216,26 +248,22 @@ void main() {
         );
         await tester.pump();
 
-        final List<String> titles = tester
-            .widgetList<ElSection>(find.byType(ElSection))
-            .map((ElSection section) => section.title)
+        final List<DocsSection> sections = tester
+            .widgetList<DocsSection>(find.byType(DocsSection))
             .toList();
+        final List<String> ids = sections
+            .map((DocsSection section) => section.id)
+            .toList();
+        final List<String> titles = sections
+            .map((DocsSection section) => section.title)
+            .toList();
+
+        expect(ids, _sectionIds);
         expect(titles, _sectionTitles);
 
-        double? previousTop;
-        for (final String id in _sectionOrder) {
-          final Finder finder = find.byKey(ElSection.anchorKey(id));
-          expect(finder, findsOneWidget, reason: 'missing section "$id"');
-          final double top = tester.getTopLeft(finder).dy;
-          if (previousTop != null) {
-            expect(
-              top,
-              greaterThan(previousTop),
-              reason: '"$id" is out of order',
-            );
-          }
-          previousTop = top;
-        }
+        // Eight collapsed sections: API Reference, States, Accessibility,
+        // Keyboard, Responsive, Dependencies, Theming, Source.
+        expect(find.byType(DocsDisclosure), findsNWidgets(8));
       },
     );
 

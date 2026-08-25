@@ -10,13 +10,14 @@
 ///
 /// [carouselDoc] stays in `catalog.dart`'s `componentDocs` list, which is
 /// supervisor-owned: wiring the two new entries in is not this file's job.
+///
+/// `carousel` ships `registry/components/carousel.json`, so `elattar add
+/// carousel` resolves today. [dependencies] mirrors that manifest's
+/// `registryDependencies`.
 library;
 
 import '../catalog.dart' show ComponentDocEntry;
 
-/// `carousel` has no `registry/components/carousel.json` yet.
-/// [ComponentDocEntry.dependencies] is left empty rather than naming items a
-/// manifest does not yet resolve.
 const ComponentDocEntry carouselDoc = ComponentDocEntry(
   name: 'carousel',
   title: 'Carousel',

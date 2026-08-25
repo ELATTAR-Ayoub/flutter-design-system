@@ -1,25 +1,35 @@
 /// Public documentation page for the `carousel` component.
 ///
-/// **Split, 2026-08-24.** This page used to document three separately
-/// barrel-exported components at once. `ElNavUser` and `ElMarker` moved to
-/// `components_docs/nav_user/page.dart` and
-/// `components_docs/marker/page.dart`; nothing about either one is left
-/// here. What remains is `ElCarousel` and `ElCarouselController` only.
+/// **Re-housed onto the kit.** This page used to hand-compose `ElSection`
+/// panels; it now declares a `ComponentDocSpec`
+/// (`example/lib/docs/component_doc_page.dart`) and hands it to
+/// `ComponentDocPage`, the same shape `button`, `field`, `table`, `stat`
+/// and `calendar` established. Every specimen widget and every code string
+/// below is the one the hand-composed page carried; only where it lives
+/// changed, plus a new required Keyboard disclosure — split out of the old
+/// Accessibility bullet list, which already named the real ArrowLeft/
+/// ArrowRight handling — and the live demo, which used to render ahead of
+/// any heading, is now this page's own `Preview` section.
 ///
-/// **Shaped to the reference page.** Reader-facing order follows
-/// `components_docs/button/page.dart`: an unheaded live demo above the first
-/// heading, then Installation, then Usage, then this component's own
-/// sections, then API Reference last of the component-specific set, then
-/// States / Accessibility / Responsive / Dependencies / Theming / Source.
-/// Inside the component-specific zone the section names mirror
+/// **`carousel` ships a real registry manifest.** `registry/components/
+/// carousel.json` exists (`registryDependencies: [button, icon,
+/// source-foundation]`), so `elattar add carousel` installs today. The
+/// previous version of this page said the opposite — "carousel has no
+/// registry/components/carousel.json yet" — which was wrong; every
+/// install-facing fact below reads off the shipped manifest instead.
+///
+/// **Shaped to the reference page.** Reader-facing order: Preview, then
+/// Installation, Usage, How the motion works, Composition, Sizes, RTL,
+/// Not ported, then the eight required disclosures. Inside
+/// the component-specific zone the section names mirror
 /// https://ui.shadcn.com/docs/components/base/carousel, whose own headings
 /// (fetched 2026-08-24) are: About, Installation, Usage, Composition, Sizes,
 /// Spacing, Orientation, Options, API, Events, Plugins, RTL, API Reference.
 ///
 /// **Skipped, honestly.** Six of those thirteen describe a capability this
 /// port does not have. None of them is faked as a section, and none of them
-/// is quietly dropped either: the on-page "What this port leaves out"
-/// section names all six, and here they are again with their causes.
+/// is quietly dropped either: the "Not ported" disclosure
+/// names all six, and here they are again with their causes.
 /// * Spacing: shadcn's section tunes the inter-item gutter with `pl-[VALUE]`
 ///   on the item and a matching negative `-ml-[VALUE]` on the content.
 ///   `carousel.dart`'s gutter is a private file-level getter, `_gutter`, and
@@ -57,11 +67,239 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:flutter/widgets.dart';
 
-import '../../docs/docs_code.dart';
+import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
 import '../../docs/docs_layout.dart';
-import '../../kit.dart';
+import '../../docs/docs_section.dart' show DocsAnchor;
 import 'meta.dart';
+
+final ComponentDocSpec carouselDocSpec = ComponentDocSpec(
+  name: 'carousel',
+  title: carouselDoc.title,
+  description: carouselDoc.description,
+  sections: <DocsPageSection>[
+    ShowcaseSection(
+      id: 'preview',
+      title: 'Preview',
+      description:
+          'Five slides at 40% of the track each. Drag it, click either '
+          'arrow, or focus it and press ArrowLeft / ArrowRight.',
+      specimen: const _CarouselPreview(),
+      code: _previewCode,
+      label: 'Preview specimen view',
+      minHeight: el(160),
+    ),
+    InstallSection(
+      id: 'install',
+      title: 'Installation',
+      description:
+          'carousel ships a real registry manifest: `elattar add '
+          'carousel` installs lib/src/components/carousel.dart and '
+          'resolves button, icon, and source-foundation automatically. '
+          'The Manual tab is for a project not using the CLI.',
+      command: carouselDoc.command,
+      manualFiles: <DocsCodeFile>[
+        DocsCodeFile(
+          path: 'lib/components/ui/carousel.dart',
+          title: '1. Copy the source',
+          description:
+              "Copy lib/src/components/carousel.dart's generated "
+              '@ui/carousel.dart payload into components/ui.',
+          code:
+              "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
+              '// Copy the generated carousel source here when using '
+              'manual mode.',
+        ),
+        const DocsCodeFile(
+          path: 'lib/components/ui/ui.dart',
+          title: '2. Export it from your barrel',
+          description:
+              'Add the export line so ElCarousel and ElCarouselController '
+              'are reachable the same way the CLI path already makes them.',
+          code: "export 'carousel.dart';",
+        ),
+      ],
+    ),
+    const SnippetSection(
+      id: 'usage',
+      title: 'Usage',
+      description:
+          'The smallest correct import and construction. Every example '
+          'below only changes named arguments on top of this.',
+      code: _usageCode,
+    ),
+    const SnippetSection(
+      id: 'motion',
+      title: 'How the motion works',
+      description:
+          "shadcn's carousel is a wrapper around the Embla Carousel JS "
+          'library. This one is not a wrapper around anything: it is a '
+          "from-scratch reimplementation of Embla's own physics in Dart, "
+          'measured frame by frame off the reference page and reproduced '
+          'to within a hundredth of a pixel over the first ten frames. '
+          'Nothing further to stage live beyond what Preview already '
+          'demonstrates, so this stays a code-only note rather than a '
+          'second copy of the same specimen.',
+      code: _motionCode,
+    ),
+    ShowcaseSection(
+      id: 'composition',
+      title: 'Composition',
+      description:
+          "shadcn's Composition section nests CarouselContent, "
+          'CarouselItem, CarouselPrevious, and CarouselNext inside a '
+          'Carousel wrapper. ElCarousel folds all four into one widget: '
+          'hand it items and basis and it returns a clipped track with '
+          'both arrows already wired to the engine. The one thing a '
+          'caller still owns is the frame padding, and it matters, '
+          'because the arrows are laid out outside the track: pass the '
+          "surrounding frame's own padding to the carousel and clip the "
+          'frame itself, or its own overflow eats every pixel of both '
+          'arrows but the sliver survives clipping too, exactly as '
+          "shadcn's page measures.",
+      specimen: const _CompositionSpecimen(),
+      code: _compositionCode,
+      label: 'Composition specimen view',
+      minHeight: el(160),
+    ),
+    ShowcaseSection(
+      id: 'sizes',
+      title: 'Sizes',
+      description:
+          "shadcn sets item width with basis-* utility classes on "
+          'CarouselItem, including responsive variants. Here basis is a '
+          "single double: the item's share of the track, 0.5 for two at "
+          'once, 0.333 for three. There is no responsive form. One value '
+          'applies at every width, so a caller that wants it to change at '
+          'a breakpoint has to swap the value itself.',
+      specimen: const _SizesSpecimen(),
+      code: _sizesCode,
+      label: 'Sizes specimen view',
+      minHeight: el(160),
+    ),
+    ShowcaseSection(
+      id: 'rtl',
+      title: 'RTL',
+      description:
+          "shadcn's RTL section sets Embla's direction option and rotates "
+          'the arrow buttons to match. DOCUMENTED DRIFT: this port does '
+          'neither. The track is a plain Row, which reads Directionality '
+          "and reverses its children's paint order, but the arrows are "
+          'Positioned(left:, right:) and the drag math is in physical '
+          'pixels, so neither one flips. Wrapped in Directionality.rtl '
+          'below the result is inconsistent rather than mirrored: slide '
+          'order reverses, the controls do not.',
+      specimen: const _RtlSpecimen(),
+      code: _rtlCode,
+      label: 'RTL specimen view',
+      minHeight: el(160),
+    ),
+    DisclosureSection(
+      id: 'not-ported',
+      title: 'Not ported',
+      description:
+          "Six of the reference page's thirteen headings describe a "
+          'capability ElCarousel does not have. None of them is faked '
+          'below, and two of them share one root cause.',
+      child: _NotPortedContent(),
+    ),
+    DisclosureSection(
+      id: 'api',
+      title: 'API Reference',
+      description:
+          'Every constructor parameter and public member, read straight '
+          'off lib/src/components/carousel.dart. Private engine constants '
+          'and the private _Track / _Arrow widgets are not part of the '
+          'API and are not listed.',
+      children: const <DocsTocEntry>[
+        DocsTocEntry(title: 'ElCarousel', anchor: 'api-elcarousel'),
+        DocsTocEntry(
+          title: 'ElCarouselController',
+          anchor: 'api-elcarouselcontroller',
+        ),
+      ],
+      child: _ApiReferenceContent(),
+    ),
+    DisclosureSection(
+      id: 'states',
+      title: 'States',
+      description:
+          'Read off ElCarouselController._step, _constrain, and dragEnd, '
+          'not inferred.',
+      child: DocsStateMatrix(facts: _stateFacts),
+    ),
+    DisclosureSection(
+      id: 'accessibility',
+      title: 'Accessibility',
+      child: _AccessibilityContent(),
+    ),
+    DisclosureSection(
+      id: 'keyboard',
+      title: 'Keyboard',
+      description:
+          "Read off _ElCarouselState._onKey: the region's own Focus "
+          'wraps the track and both arrows, and answers exactly two keys.',
+      child: _KeyboardContent(),
+    ),
+    DisclosureSection(
+      id: 'responsive',
+      title: 'Responsive',
+      child: _ResponsiveContent(),
+    ),
+    DisclosureSection(
+      id: 'dependencies',
+      title: 'Dependencies',
+      child: _DependenciesContent(),
+    ),
+    DisclosureSection(
+      id: 'theming',
+      title: 'Theming',
+      child: _ThemingContent(),
+    ),
+    DisclosureSection(
+      id: 'source',
+      title: 'Source',
+      child: DocsInstallFacts(
+        title: 'Reference',
+        facts: <DocsInstallFact>[
+          DocsInstallFact(
+            label: 'Source',
+            value: carouselDoc.sourcePath,
+            description:
+                'Authoritative implementation: the truth this page was '
+                'written from, including its own measured library note.',
+          ),
+          const DocsInstallFact(
+            label: 'Package tests',
+            value: 'none yet',
+            description: 'No dedicated carousel test in the package suite yet.',
+          ),
+          const DocsInstallFact(
+            label: 'Docs test',
+            value: 'example/test/components_docs/carousel_test.dart',
+            description:
+                'Covers this page: the article mounts, the section order, '
+                'both API tables, the live specimens, and a theme flip at '
+                'two viewport widths.',
+          ),
+          const DocsInstallFact(
+            label: 'Edit these docs',
+            value: 'example/lib/components_docs/carousel/page.dart',
+            description: 'This file.',
+          ),
+          const DocsInstallFact(
+            label: 'Split from this page',
+            value: 'nav_user, marker',
+            description:
+                'ElNavUser and ElMarker used to be documented here. They '
+                'now live at example/lib/components_docs/nav_user/page.dart '
+                'and example/lib/components_docs/marker/page.dart.',
+          ),
+        ],
+      ),
+    ),
+  ],
+);
 
 class CarouselDocPage extends StatelessWidget {
   const CarouselDocPage({super.key, this.onNavigate});
@@ -80,640 +318,227 @@ class CarouselDocPage extends StatelessWidget {
       ElBreadcrumbEntry.link('Components'),
       ElBreadcrumbEntry.page('Carousel'),
     ],
-    toc: const <DocsTocEntry>[
-      DocsTocEntry(title: 'Installation', anchor: 'install'),
-      DocsTocEntry(title: 'Usage', anchor: 'usage'),
-      DocsTocEntry(title: 'How the motion works', anchor: 'motion'),
-      DocsTocEntry(title: 'Composition', anchor: 'composition'),
-      DocsTocEntry(title: 'Sizes', anchor: 'sizes'),
-      DocsTocEntry(title: 'RTL', anchor: 'rtl'),
-      DocsTocEntry(title: 'What this port leaves out', anchor: 'not-ported'),
-      DocsTocEntry(
-        title: 'API Reference',
-        anchor: 'api',
-        children: <DocsTocEntry>[
-          DocsTocEntry(title: 'ElCarousel', anchor: 'api-elcarousel'),
-          DocsTocEntry(
-            title: 'ElCarouselController',
-            anchor: 'api-elcarouselcontroller',
-          ),
-        ],
-      ),
-      DocsTocEntry(title: 'States', anchor: 'states'),
-      DocsTocEntry(title: 'Accessibility', anchor: 'accessibility'),
-      DocsTocEntry(title: 'Responsive', anchor: 'responsive'),
-      DocsTocEntry(title: 'Dependencies', anchor: 'dependencies'),
-      DocsTocEntry(title: 'Theming', anchor: 'theming'),
-      DocsTocEntry(title: 'Source', anchor: 'source'),
-    ],
+    toc: carouselDocSpec.toc,
     previous: const DocsPageLink(
       title: 'Calendar',
       route: '/components/calendar',
     ),
     next: const DocsPageLink(title: 'Checkbox', route: '/components/checkbox'),
     onNavigate: onNavigate,
-    child: const _ArticleContent(),
-  );
-}
-
-class _ArticleContent extends StatelessWidget {
-  const _ArticleContent();
-
-  @override
-  Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
-    return Column(
+    child: KeyedSubtree(
       key: const ValueKey<String>('carousel-doc-article'),
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        _liveDemo(),
-        SizedBox(height: el(6)),
-        _install(),
-        SizedBox(height: el(6)),
-        _usage(),
-        SizedBox(height: el(6)),
-        _motion(theme),
-        _composition(),
-        _sizes(),
-        _rtl(),
-        _notPorted(theme),
-        _api(theme),
-        _states(),
-        _accessibility(theme),
-        _responsive(theme),
-        _dependencies(theme),
-        _theming(theme),
-        _source(),
-      ],
-    );
-  }
-
-  /// The live demo that opens the page, before any heading: no [ElSection],
-  /// no anchor, no TOC entry, matching the reference page exactly.
-  Widget _liveDemo() => DocsCodeExample(
-    title: 'Carousel',
-    description:
-        'Five slides at 40% of the track each. Drag it, click either arrow, '
-        'or focus it and press ArrowLeft / ArrowRight.',
-    preview: const KeyedSubtree(
-      key: ValueKey<String>('carousel-preview'),
-      child: _CarouselPreview(),
-    ),
-    manualFiles: const <DocsCodeFile>[
-      DocsCodeFile(
-        path: 'carousel_preview.dart',
-        title: 'Five slides',
-        code:
-            "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
-            'ElCarousel(\n'
-            '  basis: 0.4,\n'
-            '  padding: EdgeInsets.all(el(6)),\n'
-            '  items: <Widget>[\n'
-            '    for (int i = 0; i < 5; i++)\n'
-            "      SomeCard(title: 'Slide \${i + 1}'),\n"
-            '  ],\n'
-            ')',
-      ),
-    ],
-  );
-
-  Widget _install() => ElSection(
-    id: 'install',
-    title: 'Installation',
-    description:
-        'carousel ships in the registry, so `elattar add carousel` installs '
-        'it and everything it depends on. Copying the source by hand is the '
-        'alternative, not the fallback.',
-    child: DocsInstallFacts(
-      title: 'Installation facts',
-      facts: <DocsInstallFact>[
-        const DocsInstallFact(
-          label: 'Registry item',
-          value: 'registry/components/carousel.json',
-          description:
-              'No registry/components/carousel.json exists. This is a '
-              'source-only component today, and the command a manifest '
-              'would enable is deliberately not shown.',
-        ),
-        const DocsInstallFact(
-          label: 'Manual copy target',
-          value: 'lib/components/ui/carousel.dart',
-          description: 'Where the CLI itself would place the file.',
-        ),
-        const DocsInstallFact(
-          label: 'Foundation',
-          value: 'source only',
-          description: 'No package-backed alternative is offered yet.',
-        ),
-        const DocsInstallFact(
-          label: 'Would-be dependencies',
-          value: 'source-foundation, button, icon',
-          description:
-              "What the shipped manifest resolves: carousel.dart's "
-              'own imports are foundation/spacing.dart, button.dart, '
-              'icon.dart, and icon_paths.g.dart. None of this resolves '
-              'automatically today; copy the imports by hand.',
-        ),
-        const DocsInstallFact(
-          label: 'Assets',
-          value: 'none',
-          description: 'No images, icon fonts, or binary assets.',
-        ),
-        const DocsInstallFact(
-          label: 'Platforms',
-          value: 'Android, iOS, Web, macOS, Windows, Linux',
-          description:
-              'No platform-conditional code anywhere in carousel.dart.',
-        ),
-        const DocsInstallFact(
-          label: 'Verified',
-          value: 'docs specimen only',
-          description:
-              "This page's live specimens and example/test/components_docs/"
-              'carousel_test.dart. No dedicated package-level unit test '
-              'exists yet.',
-        ),
-      ],
-    ),
-  );
-
-  Widget _usage() => ElSection(
-    id: 'usage',
-    title: 'Usage',
-    description:
-        'The smallest correct import and construction. Every example below '
-        'only changes named arguments on top of this.',
-    child: ElPanel(
-      label: 'DART',
-      note: 'MINIMAL',
-      child: DocsSelectableCodeBlock(code: _usageCode),
-    ),
-  );
-
-  /// The reference page's own About section, renamed for the question a
-  /// reader actually arrives with.
-  Widget _motion(ElThemeData theme) => ElSection(
-    id: 'motion',
-    title: 'How the motion works',
-    description:
-        "shadcn's carousel is a wrapper around the Embla Carousel JS "
-        'library. This one is not a wrapper around anything: it is a '
-        "from-scratch reimplementation of Embla's own physics in Dart, "
-        'measured frame by frame off the reference page and reproduced to '
-        'within a hundredth of a pixel over the first ten frames.',
-    child: _bullets(theme, <String>[
-      'The glide is an integrator, not a curve. Each fixed 1/60s step does '
-          'velocity = (velocity + (target - location) / 25) * 0.68, then '
-          'location += velocity. There is no easing curve to name and no '
-          'end time: it asymptotes, and the next click retargets from '
-          'wherever it currently is. That 25 is Embla\'s own duration '
-          'option used as a divisor, and 0.68 its internal friction.',
-      'Dragging is 1:1 in bounds. On pointer down the engine sets its own '
-          'duration to zero, so the track tracks the pointer exactly while '
-          'the drag lasts.',
-      'Past either edge it rubber-bands. Embla\'s ScrollBounds pulls the '
-          'target back toward the location each frame by '
-          'clamp(distancePastEdge / (viewport * 50%), 0.1, 0.99), so the '
-          'resistance is not a fixed ratio: it grows the further you pull.',
-      'Release snaps to the nearest stop, in either direction. No velocity '
-          'projection is involved: measured, the nearest snap is always '
-          'where it lands.',
-      'The snap ladder is trimmed (containScroll: "trimSnaps"). Every '
-          "slide start is clamped into the scrollable range, so the last "
-          'few collapse into one final stop and canScrollNext goes false '
-          'there rather than at the last slide index.',
-      'Reduced motion has no duration to zero, because the engine is an '
-          'integrator. MediaQuery.disableAnimations instead makes it land '
-          'on the target in one call, which is what a zeroed transition '
-          'does everywhere else in this port.',
-    ]),
-  );
-
-  Widget _composition() => ElSection(
-    id: 'composition',
-    title: 'Composition',
-    description:
-        "shadcn's Composition section nests CarouselContent, CarouselItem, "
-        'CarouselPrevious, and CarouselNext inside a Carousel wrapper. '
-        'ElCarousel folds all four into one widget: hand it items and '
-        'basis and it returns a clipped track with both arrows already '
-        'wired to the engine. The one thing a caller still owns is the '
-        'frame padding, and it matters, because the arrows are laid out '
-        'outside the track.',
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        ElPanel(
-          label: 'DART',
-          note: 'ANATOMY',
-          child: DocsSelectableCodeBlock(code: _compositionAnatomyCode),
-        ),
-        SizedBox(height: el(6)),
-        ElText('Composed inside a panel', ElType.section),
-        SizedBox(height: el(2)),
-        ElText(
-          "Pass the panel's own padding to the carousel and give the panel "
-          'flush: true. Each arrow hangs 48px outside the track, so if the '
-          'frame keeps its padding instead, its clip eats all but a sliver '
-          'of both buttons. That is the reference\'s behaviour too, to the '
-          'same 24px, and the keyboard path is the one that always works.',
-          ElType.small,
-        ),
-        SizedBox(height: el(4)),
-        ElPanel(
-          label: 'CAROUSEL INSIDE PANEL',
-          flush: true,
-          child: KeyedSubtree(
-            key: const ValueKey<String>('carousel-example:in-panel'),
-            child: ElCarousel(
-              basis: 0.4,
-              padding: EdgeInsets.all(el(6)),
-              items: <Widget>[
-                for (int i = 0; i < 5; i++)
-                  _DummySlide(label: 'Slide ${i + 1}'),
-              ],
-            ),
-          ),
-        ),
-      ],
-    ),
-  );
-
-  Widget _sizes() => ElSection(
-    id: 'sizes',
-    title: 'Sizes',
-    description:
-        "shadcn sets item width with basis-* utility classes on "
-        'CarouselItem, including responsive variants. Here basis is a '
-        "single double: the item's share of the track, 0.5 for two at "
-        'once, 0.333 for three. There is no responsive form. One value '
-        'applies at every width, so a caller that wants it to change at a '
-        'breakpoint has to swap the value itself.',
-    child: DocsCodeExample(
-      title: 'Two sizes',
-      preview: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          ElText('basis: 0.5, two per view', ElType.section),
-          SizedBox(height: el(3)),
-          KeyedSubtree(
-            key: const ValueKey<String>('carousel-example:basis-half'),
-            child: ElCarousel(
-              basis: 0.5,
-              padding: EdgeInsets.all(el(6)),
-              items: <Widget>[
-                for (int i = 0; i < 5; i++)
-                  _DummySlide(label: 'Slide ${i + 1}'),
-              ],
-            ),
-          ),
-          SizedBox(height: el(6)),
-          ElText('basis: 0.333, three per view', ElType.section),
-          SizedBox(height: el(3)),
-          KeyedSubtree(
-            key: const ValueKey<String>('carousel-example:basis-third'),
-            child: ElCarousel(
-              basis: 0.333,
-              padding: EdgeInsets.all(el(6)),
-              items: <Widget>[
-                for (int i = 0; i < 5; i++)
-                  _DummySlide(label: 'Slide ${i + 1}'),
-              ],
-            ),
-          ),
-        ],
-      ),
-      manualFiles: const <DocsCodeFile>[
-        DocsCodeFile(path: 'carousel_sizes.dart', code: _sizesCode),
-      ],
-    ),
-  );
-
-  Widget _rtl() => ElSection(
-    id: 'rtl',
-    title: 'RTL',
-    description:
-        "shadcn's RTL section sets Embla's direction option and rotates the "
-        'arrow buttons to match. DOCUMENTED DRIFT: this port does neither. '
-        'The track is a plain Row, which reads Directionality and reverses '
-        "its children's paint order, but the arrows are Positioned(left:, "
-        'right:) and the drag math is in physical pixels, so neither one '
-        'flips. Wrapped in Directionality.rtl below the result is '
-        'inconsistent rather than mirrored: slide order reverses, the '
-        'controls do not.',
-    child: DocsCodeExample(
-      title: 'Wrapped in Directionality.rtl',
-      preview: KeyedSubtree(
-        key: const ValueKey<String>('carousel-example:rtl'),
-        child: Directionality(
-          textDirection: TextDirection.rtl,
-          child: ElCarousel(
-            basis: 0.4,
-            padding: EdgeInsets.all(el(6)),
-            items: <Widget>[
-              for (int i = 0; i < 5; i++) _DummySlide(label: 'Slide ${i + 1}'),
-            ],
-          ),
-        ),
-      ),
-      manualFiles: const <DocsCodeFile>[
-        DocsCodeFile(path: 'carousel_rtl.dart', code: _rtlCode),
-      ],
-    ),
-  );
-
-  /// The six reference sections this port has no capability behind. Named on
-  /// the page rather than only in the library doc, so a reader comparing
-  /// pages side by side sees the gaps instead of inferring them.
-  Widget _notPorted(ElThemeData theme) => ElSection(
-    id: 'not-ported',
-    title: 'What this port leaves out',
-    description:
-        'Six of the reference page\'s thirteen headings describe a '
-        'capability ElCarousel does not have. None of them is faked below, '
-        'and two of them share one root cause.',
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        const DocsApiTable(
-          title: 'Skipped sections',
-          facts: <DocsApiFact>[
-            DocsApiFact(
-              name: 'Spacing',
-              type: 'no parameter',
-              description:
-                  'The inter-item gutter is a private file-level getter, '
-                  '_gutter, and no constructor parameter reaches it. One '
-                  'gutter, the same on every carousel.',
-            ),
-            DocsApiFact(
-              name: 'Orientation',
-              type: 'horizontal only',
-              description:
-                  '_Track builds a Row unconditionally and the engine only '
-                  'listens for onHorizontalDrag*. There is no vertical path '
-                  'and no orientation parameter.',
-            ),
-            DocsApiFact(
-              name: 'Options',
-              type: 'private consts',
-              description:
-                  'Every engine constant (_baseDuration, _friction, '
-                  '_edgeOffsetTolerance, _pullBackThreshold) is a private '
-                  'file-level const. There is no opts equivalent: nothing '
-                  'is a knob.',
-            ),
-            DocsApiFact(
-              name: 'API state-tracking',
-              type: 'no controller parameter',
-              description:
-                  'ElCarouselController IS barrel-exported, but it is not '
-                  'attachable from outside: ElCarousel\'s constructor has no '
-                  'controller parameter, so nothing can read selectedIndex '
-                  'to render "slide 3 of 6".',
-            ),
-            DocsApiFact(
-              name: 'Events',
-              type: 'no controller parameter',
-              description:
-                  'Same root cause. ElCarouselController is a '
-                  'ChangeNotifier and does call notifyListeners, so the '
-                  'notifications exist, but with no controller parameter '
-                  'there is no way to reach the instance and add a listener.',
-            ),
-            DocsApiFact(
-              name: 'Plugins',
-              type: 'no plugin surface',
-              description:
-                  'No plugin mechanism of any kind, and no autoplay: '
-                  'carousel.dart contains no Timer and no self-advancing '
-                  'loop, so there is nothing to pause either.',
-            ),
-          ],
-        ),
-        SizedBox(height: el(4)),
-        ElPanel(
-          label: 'ROOT CAUSE',
-          note: 'TWO SECTIONS',
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-            child: ElText(
-              'API state-tracking and Events are both the same missing '
-              'parameter, not two independent gaps. Adding a controller '
-              'argument to ElCarousel would close both at once; until then '
-              'neither is available, and this page does not pretend '
-              'otherwise.',
-              ElType.small,
-              color: theme.mutedForeground,
-            ),
-          ),
-        ),
-      ],
-    ),
-  );
-
-  Widget _api(ElThemeData theme) => ElSection(
-    id: 'api',
-    title: 'API Reference',
-    description:
-        'Every constructor parameter and public member, read straight off '
-        'lib/src/components/carousel.dart. Private engine constants and '
-        'the private _Track / _Arrow widgets are not part of the API and '
-        'are not listed.',
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        KeyedSubtree(
-          key: docsAnchorKey('api-elcarousel'),
-          child: const DocsApiTable(title: 'ElCarousel', facts: _carouselFacts),
-        ),
-        SizedBox(height: el(6)),
-        KeyedSubtree(
-          key: docsAnchorKey('api-elcarouselcontroller'),
-          child: const DocsApiTable(
-            title: 'ElCarouselController',
-            facts: _controllerFacts,
-          ),
-        ),
-        SizedBox(height: el(4)),
-        ElPanel(
-          label: 'ELCAROUSELCONTROLLER',
-          note: 'CAVEAT',
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-            child: ElText(
-              'ElCarousel builds this controller internally: the '
-              'constructor above has no controller parameter. Nothing '
-              'outside ElCarousel can read selectedIndex, canScrollPrev, '
-              'or canScrollNext, or add its own listener, today.',
-              ElType.small,
-              color: theme.mutedForeground,
-            ),
-          ),
-        ),
-      ],
-    ),
-  );
-
-  Widget _states() => ElSection(
-    id: 'states',
-    title: 'States',
-    description:
-        'Read off ElCarouselController._step, _constrain, and dragEnd, not '
-        'inferred.',
-    child: const DocsStateMatrix(facts: _stateFacts),
-  );
-
-  Widget _accessibility(ElThemeData theme) => ElSection(
-    id: 'accessibility',
-    title: 'Accessibility',
-    child: _bullets(theme, <String>[
-      'Keyboard: a Focus node wraps the whole region and handles '
-          'ArrowLeft / ArrowRight (KeyDownEvent and KeyRepeatEvent both), '
-          'calling scrollPrev / scrollNext. This is the path that works '
-          'regardless of what a surrounding frame does to the arrows.',
-      'Previous and next controls are real focusable ElButton widgets '
-          '(outline variant, iconSm) carrying semantic labels: '
-          'previousLabel and nextLabel, defaulting to "Previous slide" and '
-          '"Next slide".',
-      'Button state: previous is disabled at index 0 (canScrollPrev), next '
-          'is disabled at the last trimmed snap (canScrollNext), and each '
-          'one rebuilds off the controller through an AnimatedBuilder.',
-      'Region label: the whole carousel is one Semantics container labelled '
-          '"carousel", which is a generic name and not configurable.',
-      'Known gap: no slide-position announcement. Nothing reports the '
-          'current index or the total count, and there is no live region, '
-          'so a screen-reader user hears no confirmation that an arrow '
-          'press moved anything.',
-      'Autoplay: none exists in the source, so no pause control is needed '
-          'and none is provided.',
-    ]),
-  );
-
-  Widget _responsive(ElThemeData theme) => ElSection(
-    id: 'responsive',
-    title: 'Responsive',
-    child: _bullets(theme, <String>[
-      'No breakpoint branching in carousel.dart. A LayoutBuilder reads the '
-          'incoming width, but only to measure the track and hand the '
-          'engine its metrics, never to choose a different structure.',
-      'Item width follows the container: basis is a fraction of the track, '
-          'so the same basis gives narrower slides at 390px than at '
-          '1440px. Changing the column count between breakpoints is the '
-          "caller's job, since basis takes one value.",
-      'The snap ladder re-measures on layout: setMetrics recomputes the '
-          'trimmed snaps and clamps the current index whenever the '
-          'container or content size changes, so a resize does not leave '
-          'the track parked between stops.',
-      'Arrow overhang is width-independent: each arrow reaches el(12) '
-          'outside the track, paid for out of padding where padding exists '
-          'and overflowing where it does not.',
-      'Platform parity: Android, iOS, Web, macOS, Windows, and Linux all '
-          'render the same tree, and drag and keyboard both behave '
-          'identically. There is no dart:io Platform branch in the file.',
-    ]),
-  );
-
-  Widget _dependencies(ElThemeData theme) => ElSection(
-    id: 'dependencies',
-    title: 'Dependencies',
-    child: _bullets(theme, <String>[
-      'File: lib/src/components/carousel.dart, one file, holding '
-          'ElCarousel, ElCarouselController, and the private _Track and '
-          '_Arrow.',
-      'Flutter imports: dart:math, package:flutter/rendering.dart, '
-          'package:flutter/scheduler.dart (Ticker), '
-          'package:flutter/services.dart (LogicalKeyboardKey), '
-          'package:flutter/widgets.dart.',
-      'Foundation import: foundation/spacing.dart (el()) only. No colour, '
-          'shadow, or typography token is read directly: the arrows get '
-          'all of theirs from ElButton.',
-      'Component imports: button.dart (the two arrows), icon.dart and '
-          'icon_paths.g.dart (their chevron glyphs).',
-      'Registry dependencies: none, from the shipped manifest. '
-          'source-foundation, button, and icon are what one would need to '
-          'list.',
-      'Assets: none. Fonts: none beyond the system type scale. Shaders: '
-          'none.',
-    ]),
-  );
-
-  Widget _theming(ElThemeData theme) => ElSection(
-    id: 'theming',
-    title: 'Theming',
-    child: _bullets(theme, <String>[
-      'carousel.dart reads no colour token of its own. Both arrows are '
-          'ElButton(variant: outline, size: iconSm), so fill, border, ink, '
-          'shadow, and focus ring all resolve inside ElButton off '
-          'ElTheme.of(context) at build time.',
-      'Their glyphs are ElIcon.lucide with tone: ElIconTone.inherit, so '
-          "the chevrons take the button's own resolved ink rather than "
-          'declaring a colour.',
-      'Flipping ElThemeController re-resolves both arrows on the next '
-          'frame. The slides themselves are caller-supplied widgets and '
-          'theme however the caller built them.',
-      'Geometry is not themeable: the gutter (el(4)) and the arrow reach '
-          '(el(12)) are file-level getters over the 4px grid, and no '
-          'theme value moves them.',
-    ]),
-  );
-
-  Widget _source() => ElSection(
-    id: 'source',
-    title: 'Source',
-    child: DocsInstallFacts(
-      title: 'Reference',
-      facts: <DocsInstallFact>[
-        DocsInstallFact(
-          label: 'Source',
-          value: carouselDoc.sourcePath,
-          description:
-              'Authoritative implementation: the truth this page was '
-              'written from, including its own measured library note.',
-        ),
-        const DocsInstallFact(
-          label: 'Package tests',
-          value: 'none yet',
-          description: 'No dedicated carousel test in the package suite yet.',
-        ),
-        const DocsInstallFact(
-          label: 'Docs test',
-          value: 'example/test/components_docs/carousel_test.dart',
-          description:
-              'Covers this page: the article mounts, the section order, '
-              'both API tables, the live specimens, and a theme flip at '
-              'two viewport widths.',
-        ),
-        const DocsInstallFact(
-          label: 'Edit these docs',
-          value: 'example/lib/components_docs/carousel/page.dart',
-          description: 'This file.',
-        ),
-        const DocsInstallFact(
-          label: 'Split from this page',
-          value: 'nav_user, marker',
-          description:
-              'ElNavUser and ElMarker used to be documented here. They now '
-              'live at example/lib/components_docs/nav_user/page.dart and '
-              'example/lib/components_docs/marker/page.dart.',
-        ),
-      ],
+      child: ComponentDocPage(spec: carouselDocSpec, header: false),
     ),
   );
 }
+
+/* ── Showcase specimens ─────────────────────────────────────────────────── */
 
 class _CarouselPreview extends StatelessWidget {
   const _CarouselPreview();
 
   @override
-  Widget build(BuildContext context) => ElCarousel(
-    basis: 0.4,
-    padding: EdgeInsets.all(el(6)),
-    items: <Widget>[
-      for (int i = 0; i < 5; i++) _DummySlide(label: 'Slide ${i + 1}'),
+  Widget build(BuildContext context) => KeyedSubtree(
+    key: const ValueKey<String>('carousel-preview'),
+    child: ElCarousel(
+      basis: 0.4,
+      padding: EdgeInsets.all(el(6)),
+      items: <Widget>[
+        for (int i = 0; i < 5; i++) _DummySlide(label: 'Slide ${i + 1}'),
+      ],
+    ),
+  );
+}
+
+const String _previewCode = '''ElCarousel(
+  basis: 0.4,
+  padding: EdgeInsets.all(el(6)),
+  items: <Widget>[
+    for (int i = 0; i < 5; i++)
+      SomeCard(title: 'Slide \${i + 1}'),
+  ],
+)''';
+
+const String _usageCode = '''
+import 'package:elattar_design_system/elattar_design_system.dart';
+
+ElCarousel(
+  basis: 0.4,
+  items: <Widget>[
+    for (int i = 0; i < 5; i++)
+      SomeCard(title: 'Slide \${i + 1}'),
+  ],
+)''';
+
+const String _motionCode = '''
+// The glide is an integrator, not a curve. Each fixed 1/60s step does
+//   velocity = (velocity + (target - location) / 25) * 0.68
+//   location += velocity
+// There is no easing curve to name and no end time: it asymptotes, and the
+// next click retargets from wherever it currently is. That 25 is Embla's own
+// duration option used as a divisor, and 0.68 its internal friction.
+//
+// Dragging is 1:1 in bounds. On pointer down the engine sets its own
+// duration to zero, so the track tracks the pointer exactly while the drag
+// lasts.
+//
+// Past either edge it rubber-bands. Embla's ScrollBounds pulls the target
+// back toward the location each frame by
+//   clamp(distancePastEdge / (viewport * 50%), 0.1, 0.99)
+// so the resistance is not a fixed ratio: it grows the further you pull.
+//
+// Release snaps to the nearest stop, in either direction. No velocity
+// projection is involved: measured, the nearest snap is always where it
+// lands.
+//
+// The snap ladder is trimmed (containScroll: "trimSnaps"). Every slide start
+// is clamped into the scrollable range, so the last few collapse into one
+// final stop and canScrollNext goes false there rather than at the last
+// slide index.
+//
+// Reduced motion has no duration to zero, because the engine is an
+// integrator. MediaQuery.disableAnimations instead makes it land on the
+// target in one call, which is what a zeroed transition does everywhere
+// else in this port.
+''';
+
+/// A themed, clipped frame around one carousel: the minimum a caller needs
+/// to reproduce the "hand the frame's own padding to the carousel, and clip
+/// the frame" recipe Composition documents. Built from theme tokens rather
+/// than a literal, so the border, fill and radius all move with the theme
+/// the same way a real panel's would.
+class _FlushFrame extends StatelessWidget {
+  const _FlushFrame({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final ElThemeData theme = ElTheme.of(context);
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: theme.card,
+        borderRadius: BorderRadius.circular(ElRadii.xl),
+        border: Border.all(color: theme.border, width: ElWidths.hairline),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(ElRadii.xl),
+        child: child,
+      ),
+    );
+  }
+}
+
+class _CompositionSpecimen extends StatelessWidget {
+  const _CompositionSpecimen();
+
+  @override
+  Widget build(BuildContext context) => _FlushFrame(
+    child: KeyedSubtree(
+      key: const ValueKey<String>('carousel-example:in-panel'),
+      child: ElCarousel(
+        basis: 0.4,
+        padding: EdgeInsets.all(el(6)),
+        items: <Widget>[
+          for (int i = 0; i < 5; i++) _DummySlide(label: 'Slide ${i + 1}'),
+        ],
+      ),
+    ),
+  );
+}
+
+const String _compositionCode = '''ElCarousel(
+  basis: 0.4,                      // the item's share of the track
+  padding: EdgeInsets.all(el(6)),  // frame padding, so the arrows can hang out
+  items: <Widget>[...],            // bare slide content, gutter-padded inside
+  previousLabel: 'Previous slide', // the sr-only name on the left arrow
+  nextLabel: 'Next slide',
+)
+
+// Give the surrounding frame the same padding and clip it, so its own edge
+// (not a second layer of padding) is what the arrows' 24px sliver survives
+// against.
+DecoratedBox(
+  decoration: BoxDecoration(/* theme.card, theme.border, ElRadii.xl */),
+  child: ClipRRect(
+    borderRadius: BorderRadius.circular(ElRadii.xl),
+    child: ElCarousel(...),
+  ),
+)''';
+
+class _SizesSpecimen extends StatelessWidget {
+  const _SizesSpecimen();
+
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    mainAxisSize: MainAxisSize.min,
+    children: <Widget>[
+      ElText('basis: 0.5, two per view', ElType.section),
+      SizedBox(height: el(3)),
+      KeyedSubtree(
+        key: const ValueKey<String>('carousel-example:basis-half'),
+        child: ElCarousel(
+          basis: 0.5,
+          padding: EdgeInsets.all(el(6)),
+          items: <Widget>[
+            for (int i = 0; i < 5; i++) _DummySlide(label: 'Slide ${i + 1}'),
+          ],
+        ),
+      ),
+      SizedBox(height: el(6)),
+      ElText('basis: 0.333, three per view', ElType.section),
+      SizedBox(height: el(3)),
+      KeyedSubtree(
+        key: const ValueKey<String>('carousel-example:basis-third'),
+        child: ElCarousel(
+          basis: 0.333,
+          padding: EdgeInsets.all(el(6)),
+          items: <Widget>[
+            for (int i = 0; i < 5; i++) _DummySlide(label: 'Slide ${i + 1}'),
+          ],
+        ),
+      ),
     ],
   );
 }
+
+const String _sizesCode = '''ElCarousel(
+  basis: 0.5, // two visible at once
+  items: <Widget>[...],
+)
+
+ElCarousel(
+  basis: 0.333, // three visible at once
+  items: <Widget>[...],
+)''';
+
+class _RtlSpecimen extends StatelessWidget {
+  const _RtlSpecimen();
+
+  @override
+  Widget build(BuildContext context) => KeyedSubtree(
+    key: const ValueKey<String>('carousel-example:rtl'),
+    child: Directionality(
+      textDirection: TextDirection.rtl,
+      child: ElCarousel(
+        basis: 0.4,
+        padding: EdgeInsets.all(el(6)),
+        items: <Widget>[
+          for (int i = 0; i < 5; i++) _DummySlide(label: 'Slide ${i + 1}'),
+        ],
+      ),
+    ),
+  );
+}
+
+const String _rtlCode = '''Directionality(
+  textDirection: TextDirection.rtl,
+  child: ElCarousel(
+    basis: 0.4,
+    items: <Widget>[...],
+  ),
+)''';
 
 class _DummySlide extends StatelessWidget {
   const _DummySlide({required this.label});
@@ -733,18 +558,129 @@ class _DummySlide extends StatelessWidget {
   }
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
-  crossAxisAlignment: CrossAxisAlignment.start,
-  children: <Widget>[
-    for (final String line in lines) ...<Widget>[
-      ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
-      ),
-      SizedBox(height: el(2)),
-    ],
-  ],
-);
+/* ── Disclosure content ─────────────────────────────────────────────────── */
+
+class _NotPortedContent extends StatelessWidget {
+  const _NotPortedContent();
+
+  @override
+  Widget build(BuildContext context) {
+    final ElThemeData theme = ElTheme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        const DocsApiTable(
+          title: 'Skipped sections',
+          facts: <DocsApiFact>[
+            DocsApiFact(
+              name: 'Spacing',
+              type: 'no parameter',
+              description:
+                  'The inter-item gutter is a private file-level getter, '
+                  '_gutter, and no constructor parameter reaches it. One '
+                  'gutter, the same on every carousel.',
+            ),
+            DocsApiFact(
+              name: 'Orientation',
+              type: 'horizontal only',
+              description:
+                  '_Track builds a Row unconditionally and the engine '
+                  'only listens for onHorizontalDrag*. There is no '
+                  'vertical path and no orientation parameter.',
+            ),
+            DocsApiFact(
+              name: 'Options',
+              type: 'private consts',
+              description:
+                  'Every engine constant (_baseDuration, _friction, '
+                  '_edgeOffsetTolerance, _pullBackThreshold) is a private '
+                  'file-level const. There is no opts equivalent: nothing '
+                  'is a knob.',
+            ),
+            DocsApiFact(
+              name: 'API state-tracking',
+              type: 'no controller parameter',
+              description:
+                  'ElCarouselController IS barrel-exported, but it is '
+                  "not attachable from outside: ElCarousel's constructor "
+                  'has no controller parameter, so nothing can read '
+                  'selectedIndex to render "slide 3 of 6".',
+            ),
+            DocsApiFact(
+              name: 'Events',
+              type: 'no controller parameter',
+              description:
+                  'Same root cause. ElCarouselController is a '
+                  'ChangeNotifier and does call notifyListeners, so the '
+                  'notifications exist, but with no controller parameter '
+                  'there is no way to reach the instance and add a '
+                  'listener.',
+            ),
+            DocsApiFact(
+              name: 'Plugins',
+              type: 'no plugin surface',
+              description:
+                  'No plugin mechanism of any kind, and no autoplay: '
+                  'carousel.dart contains no Timer and no self-advancing '
+                  'loop, so there is nothing to pause either.',
+            ),
+          ],
+        ),
+        SizedBox(height: el(4)),
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+          child: ElText(
+            'API state-tracking and Events are both the same missing '
+            'parameter, not two independent gaps. Adding a controller '
+            'argument to ElCarousel would close both at once; until then '
+            'neither is available, and this page does not pretend '
+            'otherwise.',
+            ElType.small,
+            color: theme.mutedForeground,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ApiReferenceContent extends StatelessWidget {
+  const _ApiReferenceContent();
+
+  @override
+  Widget build(BuildContext context) {
+    final ElThemeData theme = ElTheme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        const DocsAnchor(
+          id: 'api-elcarousel',
+          child: DocsApiTable(title: 'ElCarousel', facts: _carouselFacts),
+        ),
+        SizedBox(height: el(6)),
+        const DocsAnchor(
+          id: 'api-elcarouselcontroller',
+          child: DocsApiTable(
+            title: 'ElCarouselController',
+            facts: _controllerFacts,
+          ),
+        ),
+        SizedBox(height: el(4)),
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+          child: ElText(
+            'ElCarousel builds this controller internally: the '
+            'constructor above has no controller parameter. Nothing '
+            'outside ElCarousel can read selectedIndex, canScrollPrev, '
+            'or canScrollNext, or add its own listener, today.',
+            ElType.small,
+            color: theme.mutedForeground,
+          ),
+        ),
+      ],
+    );
+  }
+}
 
 const List<DocsApiFact> _carouselFacts = <DocsApiFact>[
   DocsApiFact(
@@ -758,8 +694,8 @@ const List<DocsApiFact> _carouselFacts = <DocsApiFact>[
     name: 'items',
     type: 'List<Widget>',
     description:
-        "Required. One CarouselItem's content each. The gutter padding is "
-        'applied around each one internally; the caller passes bare '
+        "Required. One CarouselItem's content each. The gutter padding "
+        'is applied around each one internally; the caller passes bare '
         'content.',
   ),
   DocsApiFact(
@@ -767,9 +703,9 @@ const List<DocsApiFact> _carouselFacts = <DocsApiFact>[
     type: 'EdgeInsets',
     description:
         'Optional. Defaults to EdgeInsets.zero. The frame padding this '
-        'carousel applies for itself, moved inside so the arrows can hang '
-        "out of it: pass the surrounding panel's own padding and give that "
-        'panel flush: true.',
+        'carousel applies for itself, moved inside so the arrows can '
+        "hang out of it: pass the surrounding frame's own padding and "
+        'clip the frame itself.',
   ),
   DocsApiFact(
     name: 'previousLabel',
@@ -793,8 +729,8 @@ const List<DocsApiFact> _controllerFacts = <DocsApiFact>[
     type: 'TickerProvider?',
     description:
         'The only constructor parameter, and optional. Null means '
-        'headless: every move lands on its target in one call instead of '
-        'ticking, which is the path a disableAnimations test takes. '
+        'headless: every move lands on its target in one call instead '
+        'of ticking, which is the path a disableAnimations test takes. '
         'ElCarousel always passes its own State as the vsync.',
   ),
   DocsApiFact(
@@ -822,8 +758,8 @@ const List<DocsApiFact> _controllerFacts = <DocsApiFact>[
     name: 'canScrollPrev',
     type: 'bool (read-only)',
     description:
-        'api.canScrollPrev(). False at index 0, which is what disables the '
-        'previous arrow.',
+        'api.canScrollPrev(). False at index 0, which is what disables '
+        'the previous arrow.',
   ),
   DocsApiFact(
     name: 'canScrollNext',
@@ -838,8 +774,8 @@ const List<DocsApiFact> _controllerFacts = <DocsApiFact>[
     type: 'List<double> (read-only)',
     description:
         'Every stop the carousel can rest at, trimmed: each slide start '
-        'negated, clamped into the scrollable range, and collapsed where '
-        'clamping made neighbours equal.',
+        'negated, clamped into the scrollable range, and collapsed '
+        'where clamping made neighbours equal.',
   ),
   DocsApiFact(
     name: 'setMetrics({viewSize, slideSizes})',
@@ -879,15 +815,15 @@ const List<DocsApiFact> _controllerFacts = <DocsApiFact>[
     name: 'dragUpdate(double pointerX)',
     type: 'void',
     description:
-        'Writes a new target from the pointer delta. Ignored when no drag '
-        'is in progress.',
+        'Writes a new target from the pointer delta. Ignored when no '
+        'drag is in progress.',
   ),
   DocsApiFact(
     name: 'dragEnd()',
     type: 'void',
     description:
-        'Release: restores the duration, picks the NEAREST snap in either '
-        'direction, and targets it. No velocity projection.',
+        'Release: restores the duration, picks the NEAREST snap in '
+        'either direction, and targets it. No velocity projection.',
   ),
   DocsApiFact(
     name: 'dispose()',
@@ -902,9 +838,9 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Rest',
     treatment:
-        'Location equals target and velocity is under a thousandth of a '
-        'pixel, so the ticker stops itself. The track sits on a trimmed '
-        'snap.',
+        'Location equals target and velocity is under a thousandth of '
+        'a pixel, so the ticker stops itself. The track sits on a '
+        'trimmed snap.',
     userSignal: 'A still track, with one arrow possibly disabled.',
   ),
   DocsStateFact(
@@ -941,60 +877,210 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'At either end',
     treatment:
-        'canScrollPrev is false at index 0 and canScrollNext is false at '
-        'the last trimmed snap; each arrow rebuilds through an '
+        'canScrollPrev is false at index 0 and canScrollNext is false '
+        'at the last trimmed snap; each arrow rebuilds through an '
         'AnimatedBuilder and passes a null onPressed there.',
     userSignal: 'A faded, inert arrow, courtesy of ElButton.',
   ),
   DocsStateFact(
     state: 'Reduced motion',
     treatment:
-        'MediaQuery.disableAnimations sets controller.instant, and every '
-        'move lands on its target in one call. There is no Duration to '
-        'zero here, because the engine is an integrator.',
+        'MediaQuery.disableAnimations sets controller.instant, and '
+        'every move lands on its target in one call. There is no '
+        'Duration to zero here, because the engine is an integrator.',
     userSignal: 'Instant jumps between stops, no glide.',
   ),
 ];
 
-const String _usageCode = '''
-import 'package:elattar_design_system/elattar_design_system.dart';
+class _AccessibilityContent extends StatelessWidget {
+  const _AccessibilityContent();
 
-ElCarousel(
-  basis: 0.4,
-  items: <Widget>[
-    for (int i = 0; i < 5; i++)
-      SomeCard(title: 'Slide \${i + 1}'),
+  @override
+  Widget build(BuildContext context) =>
+      _bullets(ElTheme.of(context), <String>[
+        'Previous and next controls are real focusable ElButton widgets '
+            '(outline variant, iconSm) carrying semantic labels: '
+            'previousLabel and nextLabel, defaulting to "Previous slide" '
+            'and "Next slide".',
+        'Button state: previous is disabled at index 0 (canScrollPrev), '
+            'next is disabled at the last trimmed snap (canScrollNext), '
+            'and each one rebuilds off the controller through an '
+            'AnimatedBuilder.',
+        'Region label: the whole carousel is one Semantics container '
+            'labelled "carousel", which is a generic name and not '
+            'configurable.',
+        'Known gap: no slide-position announcement. Nothing reports the '
+            'current index or the total count, and there is no live '
+            'region, so a screen-reader user hears no confirmation that '
+            'an arrow press moved anything.',
+        'Autoplay: none exists in the source, so no pause control is '
+            'needed and none is provided. See Keyboard for the region\'s '
+            'own key handling.',
+      ]);
+}
+
+/// Read directly off `_ElCarouselState._onKey` (`lib/src/components/
+/// carousel.dart`): the region's Focus wraps the track and both arrows and
+/// answers exactly two keys, whatever a surrounding frame does to the
+/// arrows themselves.
+class _KeyboardContent extends StatelessWidget {
+  const _KeyboardContent();
+
+  @override
+  Widget build(BuildContext context) =>
+      _bullets(ElTheme.of(context), <String>[
+        'ArrowLeft: calls controller.scrollPrev(), the same call the '
+            'previous arrow makes. Handled on both KeyDownEvent and '
+            'KeyRepeatEvent, so holding the key repeats the call.',
+        'ArrowRight: calls controller.scrollNext(), on both KeyDownEvent '
+            'and KeyRepeatEvent as well.',
+        'No other key is handled: onKeyEvent returns '
+            'KeyEventResult.ignored for everything else, including '
+            'Enter, Space, Home, and End.',
+        'This is the path that always works: onKeyDownCapture sits on '
+            'the whole region, so it reaches the engine regardless of '
+            'what a surrounding frame does to the arrow buttons '
+            "themselves — see Composition for the arrows' own clipping "
+            'story.',
+        'The two arrows are real focusable ElButton widgets in the tab '
+            'order beside the region; each still answers Enter/Space '
+            'through its own ElButton behaviour, independent of the '
+            "region's ArrowLeft/ArrowRight handling.",
+      ]);
+}
+
+class _ResponsiveContent extends StatelessWidget {
+  const _ResponsiveContent();
+
+  @override
+  Widget build(BuildContext context) =>
+      _bullets(ElTheme.of(context), <String>[
+        'No breakpoint branching in carousel.dart. A LayoutBuilder reads '
+            'the incoming width, but only to measure the track and hand '
+            'the engine its metrics, never to choose a different '
+            'structure.',
+        'Item width follows the container: basis is a fraction of the '
+            'track, so the same basis gives narrower slides at 390px '
+            'than at 1440px. Changing the column count between '
+            "breakpoints is the caller's job, since basis takes one "
+            'value.',
+        'The snap ladder re-measures on layout: setMetrics recomputes '
+            'the trimmed snaps and clamps the current index whenever the '
+            'container or content size changes, so a resize does not '
+            'leave the track parked between stops.',
+        'Arrow overhang is width-independent: each arrow reaches el(12) '
+            'outside the track, paid for out of padding where padding '
+            'exists and overflowing where it does not.',
+        'Platform parity: Android, iOS, Web, macOS, Windows, and Linux '
+            'all render the same tree, and drag and keyboard both '
+            'behave identically. There is no dart:io Platform branch in '
+            'the file.',
+      ]);
+}
+
+class _DependenciesContent extends StatelessWidget {
+  const _DependenciesContent();
+
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: <Widget>[
+      DocsInstallFacts(
+        facts: <DocsInstallFact>[
+          const DocsInstallFact(
+            label: 'Registry item',
+            value: 'carousel',
+            description:
+                'registry/components/carousel.json exists and is '
+                'installable through the CLI today.',
+          ),
+          const DocsInstallFact(
+            label: 'Destination',
+            value: 'lib/components/ui/carousel.dart',
+            description:
+                'The same lib/components/ui/ target every component '
+                'installs to.',
+          ),
+          DocsInstallFact(
+            label: 'Dependencies',
+            value: carouselDoc.dependencies.join(', '),
+            description:
+                "The manifest's registryDependencies, resolved "
+                'automatically by the registry client, matching '
+                "carousel.dart's own imports: foundation/spacing.dart "
+                '(el()), button.dart (the two arrows), and icon.dart / '
+                'icon_paths.g.dart (their chevron glyphs). No colour, '
+                'shadow, or typography token is read directly: the '
+                'arrows get all of theirs from ElButton.',
+          ),
+          const DocsInstallFact(
+            label: 'Assets',
+            value: 'none',
+            description: 'No images, icon fonts, or binary assets.',
+          ),
+          const DocsInstallFact(
+            label: 'Shaders',
+            value: 'none',
+            description: 'No fragment-shader-backed paint anywhere.',
+          ),
+          const DocsInstallFact(
+            label: 'Platforms',
+            value: 'Android, iOS, Web, macOS, Windows, Linux',
+            description:
+                'No platform-conditional code anywhere in carousel.dart.',
+          ),
+          const DocsInstallFact(
+            label: 'Verified',
+            value: 'docs specimens only',
+            description:
+                "This page's live specimens and "
+                'example/test/components_docs/carousel_test.dart. No '
+                'dedicated package-level unit test exists yet.',
+          ),
+        ],
+      ),
+      SizedBox(height: el(4)),
+      const DocsLinkRow(
+        links: <DocsLink>[
+          DocsLink(label: 'Button', route: '/components/button'),
+          DocsLink(label: 'Icon', route: '/components/icon'),
+        ],
+      ),
+    ],
+  );
+}
+
+class _ThemingContent extends StatelessWidget {
+  const _ThemingContent();
+
+  @override
+  Widget build(BuildContext context) =>
+      _bullets(ElTheme.of(context), <String>[
+        'carousel.dart reads no colour token of its own. Both arrows '
+            'are ElButton(variant: outline, size: iconSm), so fill, '
+            'border, ink, shadow, and focus ring all resolve inside '
+            'ElButton off ElTheme.of(context) at build time.',
+        'Their glyphs are ElIcon.lucide with tone: ElIconTone.inherit, '
+            "so the chevrons take the button's own resolved ink rather "
+            'than declaring a colour.',
+        'Flipping ElThemeController re-resolves both arrows on the next '
+            'frame. The slides themselves are caller-supplied widgets '
+            'and theme however the caller built them.',
+        'Geometry is not themeable: the gutter (el(4)) and the arrow '
+            'reach (el(12)) are file-level getters over the 4px grid, '
+            'and no theme value moves them.',
+      ]);
+}
+
+Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: <Widget>[
+    for (final String line in lines) ...<Widget>[
+      ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+      ),
+      SizedBox(height: el(2)),
+    ],
   ],
-)''';
-
-const String _compositionAnatomyCode = '''ElCarousel(
-  basis: 0.4,                      // the item's share of the track
-  padding: EdgeInsets.all(el(6)),  // frame padding, so the arrows can hang out
-  items: <Widget>[...],            // bare slide content, gutter-padded inside
-  previousLabel: 'Previous slide', // the sr-only name on the left arrow
-  nextLabel: 'Next slide',
-)
-
-// Give the surrounding panel flush: true so its clip does not eat the arrows.
-ElPanel(
-  flush: true,
-  child: ElCarousel(...),
-)''';
-
-const String _sizesCode = '''ElCarousel(
-  basis: 0.5, // two visible at once
-  items: <Widget>[...],
-)
-
-ElCarousel(
-  basis: 0.333, // three visible at once
-  items: <Widget>[...],
-)''';
-
-const String _rtlCode = '''Directionality(
-  textDirection: TextDirection.rtl,
-  child: ElCarousel(
-    basis: 0.4,
-    items: <Widget>[...],
-  ),
-)''';
+);

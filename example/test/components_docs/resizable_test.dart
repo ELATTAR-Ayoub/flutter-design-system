@@ -1,7 +1,10 @@
 /// Tests for `components_docs/resizable/page.dart`'s [ResizableDocPage]:
-/// [ElResizablePanelGroup] and [ElResizablePanel]. New route, split off
-/// from the former shared `scroll_area` route; see `resizable/meta.dart`'s
-/// library note.
+/// [ElResizablePanelGroup] and [ElResizablePanel].
+///
+/// Re-housed onto the kit alongside the page: the section-order test now
+/// reads `DocsSection.id`, and the API-table / state-matrix reads open the
+/// relevant `DocsDisclosure` first — closed by default, unlike the old
+/// page's always-visible `ElSection`.
 ///
 /// Reads `lib/src/components/resizable.dart` directly; every public class
 /// and constructor parameter enumerated below is one this page's API
@@ -14,10 +17,12 @@ library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/resizable/meta.dart';
-import 'package:example/components_docs/resizable/page.dart';
-import 'package:example/docs/docs_code.dart';
+import 'package:example/components_docs/resizable/page.dart'
+    show ResizableDocPage, resizableDocSpec;
+import 'package:example/docs/component_doc_page.dart' show DocsTocEntry;
+import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_facts.dart';
-import 'package:example/kit.dart' show ElSection;
+import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -28,6 +33,14 @@ const Map<String, List<String>> _expectedApiTables = <String, List<String>>{
   'ElResizablePanelGroup': <String>['panels', 'withHandle', 'minHeight'],
   'ElResizablePanel': <String>['child', 'defaultSize', 'minSize'],
 };
+
+/// The single `DocsDisclosure` whose title is [title].
+Finder _disclosureTrigger(String title) => find.descendant(
+  of: find.byWidgetPredicate(
+    (Widget widget) => widget is DocsDisclosure && widget.title == title,
+  ),
+  matching: find.byKey(DocsDisclosure.triggerKey),
+);
 
 Future<ElThemeController> _pump(
   WidgetTester tester, {
@@ -61,29 +74,31 @@ Future<ElThemeController> _pump(
 
 void main() {
   testWidgets(
-    'sections render in the shadcn-mirrored order, section for section, '
-    'with no Vertical section (the honest skip)',
+    'sections render in the house order, section for section, with no '
+    'Vertical section (the honest skip)',
     (WidgetTester tester) async {
-      await _pump(tester);
+      await _pump(tester, size: const Size(1440, 4000));
 
-      final List<String> titles = tester
-          .widgetList<ElSection>(find.byType(ElSection))
-          .map((ElSection section) => section.title)
+      final List<String> ids = tester
+          .widgetList<DocsSection>(find.byType(DocsSection))
+          .map((DocsSection section) => section.id)
           .toList();
 
-      expect(titles, <String>[
-        'Installation',
-        'Usage',
-        'Composition',
-        'Handle',
-        'RTL',
-        'API Reference',
-        'States',
-        'Accessibility',
-        'Responsive',
-        'Dependencies',
-        'Theming',
-        'Source',
+      expect(ids, <String>[
+        'preview',
+        'install',
+        'usage',
+        'composition',
+        'handle',
+        'rtl',
+        'api',
+        'states',
+        'accessibility',
+        'keyboard',
+        'responsive',
+        'dependencies',
+        'theming',
+        'source',
       ]);
     },
   );
@@ -94,7 +109,6 @@ void main() {
       await _pump(tester, size: _wide);
 
       expect(find.text(resizableDoc.title), findsWidgets);
-      expect(find.byType(DocsCodeExample), findsAtLeastNWidgets(1));
       expect(
         find.byKey(const ValueKey<String>('docs-layout-sidebar')),
         findsOneWidget,
@@ -102,7 +116,7 @@ void main() {
       expect(tester.takeException(), isNull);
 
       await _pump(tester, size: _narrow);
-      await tester.pumpAndSettle();
+      await tester.pump();
 
       expect(
         find.byKey(const ValueKey<String>('docs-layout-anchor-strip')),
@@ -121,6 +135,12 @@ void main() {
     WidgetTester tester,
   ) async {
     await _pump(tester);
+
+    final Finder apiTrigger = _disclosureTrigger('API Reference');
+    await tester.ensureVisible(apiTrigger);
+    await tester.tap(apiTrigger);
+    await tester.pump();
+    await tester.pump(ElDurations.jelly);
 
     final List<DocsApiTable> tables = tester
         .widgetList<DocsApiTable>(find.byType(DocsApiTable))
@@ -153,12 +173,12 @@ void main() {
   });
 
   testWidgets('ElResizablePanelGroup renders resizable panels with a draggable '
-      'separator, in the live demo and the Handle and RTL specimens', (
+      'separator, in the Preview demo and the Handle and RTL specimens', (
     WidgetTester tester,
   ) async {
     await _pump(tester);
 
-    // Live demo, Handle (two groups), RTL.
+    // Preview, Handle (two groups), RTL.
     final Finder panelGroup = find.byType(ElResizablePanelGroup);
     expect(panelGroup, findsAtLeastNWidgets(4));
     expect(tester.takeException(), isNull);
@@ -194,6 +214,12 @@ void main() {
   ) async {
     await _pump(tester);
 
+    final Finder statesTrigger = _disclosureTrigger('States');
+    await tester.ensureVisible(statesTrigger);
+    await tester.tap(statesTrigger);
+    await tester.pump();
+    await tester.pump(ElDurations.jelly);
+
     final DocsStateMatrix matrix = tester.widget<DocsStateMatrix>(
       find.byType(DocsStateMatrix),
     );
@@ -208,6 +234,23 @@ void main() {
         reason: 'state matrix is missing the "$expected" row',
       );
     }
+  });
+
+  testWidgets('the keyboard disclosure documents the arrow/Home/End keys', (
+    WidgetTester tester,
+  ) async {
+    await _pump(tester);
+
+    final Finder keyboardTrigger = _disclosureTrigger('Keyboard');
+    await tester.ensureVisible(keyboardTrigger);
+    await tester.tap(keyboardTrigger);
+    await tester.pump();
+    await tester.pump(ElDurations.jelly);
+
+    expect(find.textContaining('ArrowLeft'), findsOneWidget);
+    expect(find.textContaining('ArrowRight'), findsOneWidget);
+    expect(find.textContaining('Home:'), findsOneWidget);
+    expect(find.textContaining('End:'), findsOneWidget);
   });
 
   testWidgets(
@@ -235,6 +278,29 @@ void main() {
       resizableDoc.exports,
       containsAll(<String>['ElResizablePanelGroup', 'ElResizablePanel']),
     );
+    expect(resizableDoc.command, 'elattar add resizable');
     expect(tester.takeException(), isNull);
+  });
+
+  test('the table of contents matches the declared sections', () {
+    expect(
+      resizableDocSpec.toc.map((DocsTocEntry entry) => entry.title).toList(),
+      <String>[
+        'Preview',
+        'Installation',
+        'Usage',
+        'Composition',
+        'Handle',
+        'RTL',
+        'API Reference',
+        'States',
+        'Accessibility',
+        'Keyboard',
+        'Responsive',
+        'Dependencies',
+        'Theming',
+        'Source',
+      ],
+    );
   });
 }

@@ -37,19 +37,26 @@ void main() {
     );
 
     componentDocSpecs.forEach((String name, ComponentDocSpec spec) {
-      // `ComponentDocEntry.name` is spelled inconsistently across the 55
-      // entries — `alert-dialog` and `dropdown-menu` carry a hyphen because
-      // that hyphen is their real route and command spelling, while
-      // `input_group` and `nav_user` carry an underscore. Both are load
-      // bearing (`route` is `/components/$name`) and neither can be
-      // normalised without changing a published URL. So the lookup
-      // normalises on the way in rather than the catalog bending to suit a
-      // test: a spec's `name` is always registry style, hyphenated, and an
-      // entry matches when its own name reduces to the same thing.
+      // Both sides are normalised to the registry's own hyphenated spelling
+      // before they are compared. `ComponentDocEntry.name` is spelled
+      // inconsistently across the catalog — `alert-dialog` and
+      // `dropdown-menu` carry a hyphen because that hyphen is their real
+      // route and command spelling, while `input_group` and `nav_user`
+      // carry an underscore — and both are load bearing, since `route` is
+      // `/components/$name`. Neither can be normalised in place without
+      // moving a published URL.
+      //
+      // So the guard normalises rather than picking a side. A page written
+      // with either spelling resolves; what it may NOT do is name an item
+      // the catalog does not carry, which is what the `orElse` below
+      // reports, and what `docs_install_test.dart` then checks against the
+      // registry itself.
+      final String registryName = name.replaceAll('_', '-');
       final ComponentDocEntry entry = componentDocs.singleWhere(
-        (ComponentDocEntry e) => e.name.replaceAll('_', '-') == name,
+        (ComponentDocEntry e) => e.name.replaceAll('_', '-') == registryName,
         orElse: () => throw StateError(
-          'no catalog entry for the registered spec "$name"',
+          'no catalog entry for the registered spec "$name" — every spec in '
+          'specs.dart must name an item catalog.dart also carries',
         ),
       );
 
@@ -82,7 +89,7 @@ void main() {
         reason: '$name: the command must come from the catalog entry',
       );
       expect(
-        spec.name,
+        spec.name.replaceAll('_', '-'),
         entry.name.replaceAll('_', '-'),
         reason: '$name: the spec and the entry must name the same item',
       );

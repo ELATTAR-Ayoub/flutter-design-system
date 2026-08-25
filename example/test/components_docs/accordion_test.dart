@@ -1,25 +1,52 @@
+/// Tests for `components_docs/accordion/page.dart`'s [AccordionDocPage]:
+/// the public documentation page for `ElAccordion` and `ElAccordionItem`.
+///
+/// Re-housed onto the kit alongside the page: the section-order test now
+/// reads `DocsSection.id` (the kit's own section widget), and the
+/// API-table / state-matrix reads open the relevant `DocsDisclosure`
+/// first — closed by default in the new kit, unlike the old page's
+/// always-visible `ElSection`.
+///
+/// `DocsDisclosure`'s own trigger key is one constant shared by every
+/// disclosure instance on the page: [_disclosureTrigger] narrows to the one
+/// panel by its title first, matching `button_test.dart`'s own convention.
+/// The kit's `DocsDisclosure` is built on the same `ElUnfold` this page's
+/// own live specimens exercise (`ElAccordion`), so every finder below is
+/// scoped to a `ValueKey` or an ancestor first rather than a bare
+/// `find.text`, which would otherwise also match a `DocsDisclosure`
+/// trigger's own label.
+///
+/// No `pumpAndSettle` anywhere: `tester.pump()` plus an explicit duration
+/// pump instead, per the rollout brief.
+library;
+
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/accordion/meta.dart';
-import 'package:example/components_docs/accordion/page.dart';
-import 'package:example/docs/docs_code.dart';
-import 'package:example/kit.dart' show ElSection;
+import 'package:example/components_docs/accordion/page.dart'
+    show AccordionDocPage, accordionDocSpec;
+import 'package:example/docs/component_doc_page.dart' show DocsTocEntry;
+import 'package:example/docs/docs_disclosure.dart';
+import 'package:example/docs/docs_install.dart';
+import 'package:example/docs/docs_section.dart' show DocsSection;
+import 'package:example/docs/docs_showcase.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// Real test-view sizing only: [tester.view.physicalSize] plus
-/// [WidgetTester.view]'s own reset, never a synthetic `MediaQuery` override.
-/// [controller] is a single live [ElThemeController] the caller can flip in
-/// place with [ElThemeController.setMode] instead of rebuilding a second tree
-/// for the other theme.
 Widget _harness({
   required Widget child,
   required ElThemeController controller,
-}) {
-  return ElTheme(
-    controller: controller,
-    child: MaterialApp(home: SingleChildScrollView(child: child)),
-  );
-}
+}) => ElTheme(
+  controller: controller,
+  child: MaterialApp(home: SingleChildScrollView(child: child)),
+);
+
+/// The single `DocsDisclosure` whose title is [title].
+Finder _disclosureTrigger(String title) => find.descendant(
+  of: find.byWidgetPredicate(
+    (Widget widget) => widget is DocsDisclosure && widget.title == title,
+  ),
+  matching: find.byKey(DocsDisclosure.triggerKey),
+);
 
 void main() {
   group('accordionDoc', () {
@@ -33,14 +60,15 @@ void main() {
       );
       expect(accordionDoc.description, isNotEmpty);
       expect(accordionDoc.route, '/components/accordion');
+      expect(accordionDoc.command, 'elattar add accordion');
     });
   });
 
   group('AccordionDocPage', () {
     testWidgets(
-      'sections render in the shadcn-mirrored order, section for section',
+      'sections render in the house order, section for section',
       (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 900);
+        tester.view.physicalSize = const Size(1440, 4000);
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
 
@@ -50,76 +78,104 @@ void main() {
         await tester.pumpWidget(
           _harness(controller: controller, child: const AccordionDocPage()),
         );
-        await tester.pumpAndSettle();
+        await tester.pump();
 
-        final List<String> titles = tester
-            .widgetList<ElSection>(find.byType(ElSection))
-            .map((ElSection section) => section.title)
+        final List<String> ids = tester
+            .widgetList<DocsSection>(find.byType(DocsSection))
+            .map((DocsSection section) => section.id)
             .toList();
 
-        expect(titles, <String>[
-          'Installation',
-          'Usage',
-          'Composition',
-          'Basic',
-          'Card',
-          'API Reference',
-          'States',
-          'Accessibility',
-          'Responsive',
-          'Dependencies',
-          'Theming',
-          'Source',
+        expect(ids, <String>[
+          'preview',
+          'install',
+          'usage',
+          'composition',
+          'basic',
+          'card',
+          'api',
+          'states',
+          'accessibility',
+          'keyboard',
+          'responsive',
+          'dependencies',
+          'theming',
+          'source',
         ]);
+
+        // Six specimen stages (Preview, Composition, Basic, Card), one
+        // install section, eight collapsed disclosures.
+        expect(find.byType(DocsShowcase), findsNWidgets(4));
+        expect(find.byType(DocsInstall), findsOneWidget);
+        expect(find.byType(DocsDisclosure), findsNWidgets(8));
       },
     );
 
-    testWidgets('renders the article at desktop width with every '
-        'documented constructor parameter', (WidgetTester tester) async {
-      tester.view.physicalSize = const Size(1440, 900);
-      tester.view.devicePixelRatio = 1;
-      addTearDown(tester.view.reset);
+    testWidgets(
+      'renders the article at desktop width with every documented '
+      'constructor parameter',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(1440, 900);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
 
-      final ElThemeController controller = ElThemeController(
-        mode: ElThemeMode.dark,
-      );
-      await tester.pumpWidget(
-        _harness(controller: controller, child: const AccordionDocPage()),
-      );
-      await tester.pumpAndSettle();
-
-      expect(
-        find.byKey(const ValueKey<String>('accordion-doc-article')),
-        findsOneWidget,
-      );
-      expect(find.text('Accordion'), findsWidgets);
-      expect(find.byType(DocsCodeExample), findsAtLeastNWidgets(1));
-      expect(find.byType(ElAccordion), findsWidgets);
-
-      // ElAccordion's constructor parameters, from lib/src/components/
-      // accordion.dart: items, openIndex, onChanged.
-      for (final String param in <String>['items', 'openIndex', 'onChanged']) {
-        expect(
-          find.text(param),
-          findsAtLeastNWidgets(1),
-          reason: 'ElAccordion.$param missing from the API table',
+        String? destination;
+        final ElThemeController controller = ElThemeController(
+          mode: ElThemeMode.dark,
         );
-      }
-      // ElAccordionItem's constructor parameters: title, content.
-      for (final String param in <String>['title', 'content']) {
-        expect(
-          find.text(param),
-          findsAtLeastNWidgets(1),
-          reason: 'ElAccordionItem.$param missing from the API table',
+        await tester.pumpWidget(
+          _harness(
+            controller: controller,
+            child: AccordionDocPage(
+              onNavigate: (String route) => destination = route,
+            ),
+          ),
         );
-      }
+        await tester.pump();
 
-      expect(
-        find.byKey(const ValueKey<String>('docs-layout-sidebar')),
-        findsOneWidget,
-      );
-      expect(tester.takeException(), isNull);
-    });
+        expect(
+          find.byKey(const ValueKey<String>('accordion-doc-article')),
+          findsOneWidget,
+        );
+        expect(find.text('Accordion'), findsWidgets);
+        expect(find.byType(ElAccordion), findsWidgets);
+
+        final Finder apiTrigger = _disclosureTrigger('API Reference');
+        await tester.ensureVisible(apiTrigger);
+        await tester.pump();
+        await tester.tap(apiTrigger);
+        await tester.pump();
+        await tester.pump(ElDurations.jelly);
+
+        // ElAccordion's constructor parameters, from
+        // lib/src/components/accordion.dart: items, openIndex, onChanged.
+        for (final String param in <String>[
+          'items',
+          'openIndex',
+          'onChanged',
+        ]) {
+          expect(
+            find.text(param),
+            findsAtLeastNWidgets(1),
+            reason: 'ElAccordion.$param missing from the API table',
+          );
+        }
+        // ElAccordionItem's constructor parameters: title, content.
+        for (final String param in <String>['title', 'content']) {
+          expect(
+            find.text(param),
+            findsAtLeastNWidgets(1),
+            reason: 'ElAccordionItem.$param missing from the API table',
+          );
+        }
+
+        expect(
+          find.byKey(const ValueKey<String>('docs-layout-sidebar')),
+          findsOneWidget,
+        );
+        expect(tester.takeException(), isNull);
+        expect(destination, isNull);
+      },
+    );
 
     testWidgets('renders the narrow anchor strip and drops the sidebar '
         'at mobile width', (WidgetTester tester) async {
@@ -133,7 +189,7 @@ void main() {
       await tester.pumpWidget(
         _harness(controller: controller, child: const AccordionDocPage()),
       );
-      await tester.pumpAndSettle();
+      await tester.pump();
 
       expect(
         find.byKey(const ValueKey<String>('docs-layout-anchor-strip')),
@@ -158,7 +214,7 @@ void main() {
       await tester.pumpWidget(
         _harness(controller: controller, child: const AccordionDocPage()),
       );
-      await tester.pumpAndSettle();
+      await tester.pump();
 
       // The first specimen item opens by default.
       expect(
@@ -175,7 +231,8 @@ void main() {
       final Finder secondTrigger = find.text('Does the chevron rotate?');
       await tester.ensureVisible(secondTrigger);
       await tester.tap(secondTrigger);
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(ElDurations.jelly);
       expect(
         find.textContaining('Nothing on the icon animates'),
         findsOneWidget,
@@ -185,7 +242,8 @@ void main() {
       // Tapping the open trigger again closes it (collapsible -> null).
       await tester.ensureVisible(secondTrigger);
       await tester.tap(secondTrigger);
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(ElDurations.jelly);
       expect(find.textContaining('Nothing on the icon animates'), findsNothing);
       expect(find.textContaining('Only one panel can stay open'), findsNothing);
       expect(tester.takeException(), isNull);
@@ -204,11 +262,11 @@ void main() {
       await tester.pumpWidget(
         _harness(controller: controller, child: const AccordionDocPage()),
       );
-      await tester.pumpAndSettle();
+      await tester.pump();
       expect(tester.takeException(), isNull);
 
       controller.setMode(ElThemeMode.light);
-      await tester.pumpAndSettle();
+      await tester.pump();
       expect(tester.takeException(), isNull);
       expect(find.byType(AccordionDocPage), findsOneWidget);
     });
@@ -232,12 +290,34 @@ void main() {
           ),
         ),
       );
-      await tester.pumpAndSettle();
+      await tester.pump();
 
       final Finder selectLink = find.text('Select').first;
       await tester.ensureVisible(selectLink);
       await tester.tap(selectLink);
       expect(destination, '/components/select');
+    });
+
+    test('the table of contents matches the declared sections', () {
+      expect(
+        accordionDocSpec.toc.map((DocsTocEntry entry) => entry.title).toList(),
+        <String>[
+          'Preview',
+          'Installation',
+          'Usage',
+          'Composition',
+          'Basic',
+          'Card',
+          'API Reference',
+          'States',
+          'Accessibility',
+          'Keyboard',
+          'Responsive',
+          'Dependencies',
+          'Theming',
+          'Source',
+        ],
+      );
     });
   });
 }

@@ -1,7 +1,11 @@
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/carousel/meta.dart';
 import 'package:example/components_docs/carousel/page.dart';
-import 'package:example/kit.dart' show ElSection;
+import 'package:example/docs/component_doc_page.dart' show DocsTocEntry;
+import 'package:example/docs/docs_disclosure.dart';
+import 'package:example/docs/docs_install.dart';
+import 'package:example/docs/docs_section.dart' show DocsAnchor, DocsSection;
+import 'package:example/docs/docs_showcase.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -9,8 +13,12 @@ import 'package:flutter_test/flutter_test.dart';
 /// `nav_user_test.dart` and `marker_test.dart` along with their pages, so
 /// nothing about either is asserted here any more.
 ///
-/// The page's own section order, live demo excluded (it has no heading).
+/// The page's own section order, matching the house shape: `Preview` first,
+/// `Installation` and `Usage` next, then carousel's own sections, then the
+/// eight required disclosures with `Keyboard` — split out of the old
+/// Accessibility bullet list — between Accessibility and Responsive.
 const List<String> _sectionOrder = <String>[
+  'preview',
   'install',
   'usage',
   'motion',
@@ -21,6 +29,7 @@ const List<String> _sectionOrder = <String>[
   'api',
   'states',
   'accessibility',
+  'keyboard',
   'responsive',
   'dependencies',
   'theming',
@@ -29,18 +38,20 @@ const List<String> _sectionOrder = <String>[
 
 /// The same list by title, for the order assertion. `find.text` would match
 /// each of these twice at desktop width (heading plus right-rail TOC entry),
-/// so the order is read off the mounted `ElSection` widgets instead.
+/// so the order is read off the mounted `DocsSection` widgets instead.
 const List<String> _sectionTitles = <String>[
+  'Preview',
   'Installation',
   'Usage',
   'How the motion works',
   'Composition',
   'Sizes',
   'RTL',
-  'What this port leaves out',
+  'Not ported',
   'API Reference',
   'States',
   'Accessibility',
+  'Keyboard',
   'Responsive',
   'Dependencies',
   'Theming',
@@ -69,16 +80,41 @@ Widget _harness({
   ),
 );
 
+/// The single `DocsDisclosure` whose title is [title].
+Finder _disclosureTrigger(String title) => find.descendant(
+  of: find.byWidgetPredicate(
+    (Widget widget) => widget is DocsDisclosure && widget.title == title,
+  ),
+  matching: find.byKey(DocsDisclosure.triggerKey),
+);
+
+/// Opens the named disclosure. A single `tester.pump()`, never
+/// `pumpAndSettle`: the engine is an integrator with no end time, so a
+/// settle on a page carrying a moving carousel would never return.
+Future<void> _open(WidgetTester tester, String title) async {
+  final Finder trigger = _disclosureTrigger(title);
+  await tester.ensureVisible(trigger);
+  await tester.pump();
+  await tester.tap(trigger);
+  await tester.pump();
+}
+
 void main() {
   group('meta', () {
     test('carouselDoc names ElCarousel only, after the split', () {
       expect(carouselDoc.name, 'carousel');
       expect(carouselDoc.title, 'Carousel');
       expect(carouselDoc.route, '/components/carousel');
+      expect(carouselDoc.command, 'elattar add carousel');
       expect(carouselDoc.sourcePath, 'lib/src/components/carousel.dart');
       expect(carouselDoc.exports, <String>[
         'ElCarousel',
         'ElCarouselController',
+      ]);
+      expect(carouselDoc.dependencies, <String>[
+        'button',
+        'icon',
+        'source-foundation',
       ]);
       // The two families that moved out are gone from this entry.
       expect(carouselDoc.exports, isNot(contains('ElNavUser')));
@@ -113,6 +149,8 @@ void main() {
           find.byKey(const ValueKey<String>('carousel-doc-article')),
           findsOneWidget,
         );
+
+        await _open(tester, 'API Reference');
 
         for (final String param in _carouselConstructorParams) {
           expect(
@@ -149,7 +187,8 @@ void main() {
           );
         }
 
-        // Every live specimen this page's own source keys is mounted.
+        // Every live specimen this page's own source keys carries its key
+        // on the page.
         for (final String key in <String>[
           'carousel-preview',
           'carousel-example:in-panel',
@@ -171,7 +210,41 @@ void main() {
             .toSet();
         expect(mountedBases, containsAll(<double>[0.5, 0.333]));
 
+        expect(carouselDoc.command, 'elattar add carousel');
         expect(destination, isNull);
+      },
+    );
+
+    test('the table of contents matches the declared sections', () {
+      expect(
+        carouselDocSpec.toc.map((DocsTocEntry entry) => entry.title).toList(),
+        _sectionTitles,
+      );
+    });
+
+    testWidgets(
+      'the page is declared, and every section is a kit component',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(1440, 4000);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+
+        await tester.pumpWidget(
+          _harness(
+            controller: ElThemeController(mode: ElThemeMode.dark),
+            child: const CarouselDocPage(),
+          ),
+        );
+        await tester.pump();
+
+        // Five specimen stages: Preview, Composition, Sizes, RTL — four —
+        // the motion note and the not-ported table carry no specimen of
+        // their own.
+        expect(find.byType(DocsShowcase), findsNWidgets(4));
+        expect(find.byType(DocsInstall), findsOneWidget);
+        // Nine collapsed sections: Not ported, plus the
+        // eight required disclosures.
+        expect(find.byType(DocsDisclosure), findsNWidgets(9));
       },
     );
 
@@ -191,14 +264,14 @@ void main() {
         await tester.pump();
 
         final List<String> titles = tester
-            .widgetList<ElSection>(find.byType(ElSection))
-            .map((ElSection section) => section.title)
+            .widgetList<DocsSection>(find.byType(DocsSection))
+            .map((DocsSection section) => section.title)
             .toList();
         expect(titles, _sectionTitles);
 
         double? previousTop;
         for (final String id in _sectionOrder) {
-          final Finder finder = find.byKey(ElSection.anchorKey(id));
+          final Finder finder = find.byKey(DocsAnchor.keyFor(id));
           expect(finder, findsOneWidget, reason: 'missing section "$id"');
           final double top = tester.getTopLeft(finder).dy;
           if (previousTop != null) {
@@ -229,6 +302,8 @@ void main() {
         );
         await tester.pump();
 
+        await _open(tester, 'Not ported');
+
         for (final String skipped in <String>[
           'Spacing',
           'Orientation',
@@ -249,16 +324,39 @@ void main() {
         // start implying that the exported controller is attachable.
         expect(
           find.text(
-            'ElCarousel builds this controller internally: the '
-            'constructor above has no controller parameter. Nothing '
-            'outside ElCarousel can read selectedIndex, canScrollPrev, '
-            'or canScrollNext, or add its own listener, today.',
+            'API state-tracking and Events are both the same missing '
+            'parameter, not two independent gaps. Adding a controller '
+            'argument to ElCarousel would close both at once; until then '
+            'neither is available, and this page does not pretend '
+            'otherwise.',
           ),
           findsOneWidget,
-          reason: 'the ElCarouselController caveat panel text changed',
+          reason: "the not-ported disclosure's caveat text changed",
         );
       },
     );
+
+    testWidgets('the Keyboard disclosure names the two keys the region '
+        'actually handles', (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1440, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+
+      await tester.pumpWidget(
+        _harness(
+          controller: ElThemeController(mode: ElThemeMode.dark),
+          child: const CarouselDocPage(),
+        ),
+      );
+      await tester.pump();
+
+      await _open(tester, 'Keyboard');
+
+      expect(find.textContaining('ArrowLeft'), findsWidgets);
+      expect(find.textContaining('ArrowRight'), findsWidgets);
+      expect(find.textContaining('scrollPrev'), findsWidgets);
+      expect(find.textContaining('scrollNext'), findsWidgets);
+    });
 
     testWidgets('carousel arrows are real focusable buttons with labels', (
       WidgetTester tester,

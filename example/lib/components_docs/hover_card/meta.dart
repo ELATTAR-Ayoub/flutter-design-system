@@ -1,9 +1,12 @@
 /// Documentation metadata for `hover_card`.
 ///
-/// No `registry/components/hover-card.json` manifest yet: unregistered.
-/// [dependencies] is left empty; the page states in prose that this
-/// component composes [elPopoverPlacement] and [ElPopoverSurface], not
-/// [ElPopover] itself (a hover-opened surface cannot use ElPopover's
+/// `registry/components/hover-card.json` is a real manifest — `files`,
+/// `registryDependencies: [popover, source-foundation]`, a
+/// `documentationRoute` — and `elattar add hover-card` installs from it
+/// today. [dependencies] is that manifest's own `registryDependencies`
+/// list, verbatim. The page's own Composition section states in prose that
+/// this component composes [elPopoverPlacement] and [ElPopoverSurface],
+/// not [ElPopover] itself (a hover-opened surface cannot use ElPopover's
 /// full-screen dismiss barrier).
 ///
 /// Split out of the former merged `navigation_menu` page (Phase F/J): that

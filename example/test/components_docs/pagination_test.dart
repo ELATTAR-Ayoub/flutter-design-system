@@ -2,20 +2,23 @@
 /// `components_docs/pagination/page.dart`: the public Pagination component
 /// documentation page.
 ///
-/// The page mirrors `https://ui.shadcn.com/docs/components/base/pagination`
-/// section for section: a live demo ahead of any heading, then
-/// Installation, Usage, Composition, Truncation, Simple, Icons only, RTL,
-/// API Reference, then this package's own six (States, Accessibility,
-/// Responsive, Dependencies, Theming, Source). The first test below asserts
-/// that exact order renders; it is the test the brief calls out as the one
-/// that must fail against the pre-reshape page.
+/// Re-housed onto the kit alongside the page: sections are now
+/// `DocsSection`s rather than `ElSection`s, and the eight disclosures (API
+/// Reference, States, Accessibility, Keyboard, Responsive, Dependencies,
+/// Theming, Source) are collapsed `DocsDisclosure`s that mount no content
+/// until opened — see `_openDisclosure`, the same helper `button_test.dart`
+/// uses. `pumpAndSettle` is never used here: several documentation-shell
+/// widgets run controllers that repeat forever, so settling on this page
+/// would hang; every wait below is a bounded `tester.pump()` instead.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/pagination/meta.dart';
 import 'package:example/components_docs/pagination/page.dart';
-import 'package:example/kit.dart' show ElSection;
+import 'package:example/docs/docs_disclosure.dart';
+import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 Widget _harness({
@@ -25,6 +28,23 @@ Widget _harness({
   controller: controller,
   child: MaterialApp(home: SingleChildScrollView(child: child)),
 );
+
+/// The single `DocsDisclosure` whose title is [title], opened. A closed
+/// `DocsDisclosure` mounts no content, so a test reading anything inside one
+/// must open it first — the same helper `button_test.dart` uses.
+Future<void> _openDisclosure(WidgetTester tester, String title) async {
+  final Finder trigger = find.descendant(
+    of: find.byWidgetPredicate(
+      (Widget widget) => widget is DocsDisclosure && widget.title == title,
+    ),
+    matching: find.byKey(DocsDisclosure.triggerKey),
+  );
+  await tester.ensureVisible(trigger);
+  await tester.pump();
+  await tester.tap(trigger);
+  await tester.pump();
+  await tester.pump(ElDurations.jelly);
+}
 
 /// Every constructor parameter [pagination.dart](../../../lib/src/components/pagination.dart)
 /// declares across its four public classes: [ElPagination], [ElPaginationLink],
@@ -40,9 +60,9 @@ const List<String> _apiParamNames = <String>[
 void main() {
   group('pagination docs page', () {
     testWidgets(
-      'sections render in the shadcn-mirrored order, section for section',
+      'renders the house-shape section list, in order',
       (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 900);
+        tester.view.physicalSize = const Size(1440, 8000);
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
 
@@ -52,24 +72,31 @@ void main() {
             child: const PaginationDocPage(),
           ),
         );
-        await tester.pumpAndSettle();
+        await tester.pump();
 
         final List<String> titles = tester
-            .widgetList<ElSection>(find.byType(ElSection))
-            .map((ElSection section) => section.title)
+            .widgetList<DocsSection>(find.byType(DocsSection))
+            .map((DocsSection section) => section.title)
             .toList();
 
         expect(titles, <String>[
+          'Preview',
           'Installation',
           'Usage',
+          'Computed range',
           'Composition',
-          'Truncation',
+          'Composed with other primitives',
+          'Truncation rule',
+          'First page',
+          'Last page',
+          'Single page',
           'Simple',
           'Icons only',
           'RTL',
           'API Reference',
           'States',
           'Accessibility',
+          'Keyboard',
           'Responsive',
           'Dependencies',
           'Theming',
@@ -82,7 +109,7 @@ void main() {
       'renders the article, the full API table, and the truncation worked '
       'example, and reports a tapped page',
       (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 900);
+        tester.view.physicalSize = const Size(1440, 8000);
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
 
@@ -95,12 +122,14 @@ void main() {
             ),
           ),
         );
-        await tester.pumpAndSettle();
+        await tester.pump();
 
         expect(
           find.byKey(const ValueKey<String>('pagination-doc-article')),
           findsOneWidget,
         );
+
+        await _openDisclosure(tester, 'API Reference');
 
         // The API table lists every constructor parameter found in
         // lib/src/components/pagination.dart.
@@ -171,9 +200,9 @@ void main() {
           matching: find.text('48'),
         );
         await tester.ensureVisible(page48);
-        await tester.pumpAndSettle();
+        await tester.pump();
         await tester.tap(page48);
-        await tester.pumpAndSettle();
+        await tester.pump();
         expect(
           find.descendant(
             of: worked,
@@ -190,9 +219,8 @@ void main() {
           );
         }
 
-        // Boundary specimens now live in the Truncation section: first
-        // page (no Previous cell), last page (no Next cell), a single page
-        // (no siblings, no ellipsis at all).
+        // Boundary specimens: first page (no Previous cell), last page (no
+        // Next cell), a single page (no siblings, no ellipsis at all).
         expect(
           find.byKey(const ValueKey<String>('pagination-preview:first-page')),
           findsOneWidget,
@@ -238,7 +266,7 @@ void main() {
     testWidgets(
       'Simple, Icons only, and RTL each mount a real, distinct specimen',
       (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 900);
+        tester.view.physicalSize = const Size(1440, 8000);
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
 
@@ -248,7 +276,7 @@ void main() {
             child: const PaginationDocPage(),
           ),
         );
-        await tester.pumpAndSettle();
+        await tester.pump();
 
         // Simple: page links only, no Previous/Next, no ellipsis.
         final Finder simple = find.byKey(
@@ -330,7 +358,7 @@ void main() {
             child: const PaginationDocPage(),
           ),
         );
-        await tester.pumpAndSettle();
+        await tester.pump();
 
         expect(
           find.byKey(const ValueKey<String>('pagination-doc-article')),
@@ -346,9 +374,9 @@ void main() {
         );
         // Flutter reports a RenderFlex overflow through FlutterError, which
         // flutter_test surfaces via takeException: the classic 390px
-        // failure mode for a long page range the brief calls out. Reaching
-        // this line with no exception is the proof the page's own
-        // horizontal-scroll mitigation works at this width.
+        // failure mode for a long page range. Reaching this line with no
+        // exception is the proof the page's own horizontal-scroll
+        // mitigation works at this width.
         expect(tester.takeException(), isNull);
 
         final Finder worked = find.byKey(
@@ -359,9 +387,9 @@ void main() {
           matching: find.text('48'),
         );
         await tester.ensureVisible(page48);
-        await tester.pumpAndSettle();
+        await tester.pump();
         await tester.tap(page48);
-        await tester.pumpAndSettle();
+        await tester.pump();
         expect(
           find.descendant(
             of: worked,
@@ -376,17 +404,18 @@ void main() {
     testWidgets(
       'the active page ink shifts when the live theme flips light/dark',
       (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 900);
+        tester.view.physicalSize = const Size(1440, 8000);
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
 
         final ElThemeController controller = ElThemeController(
           mode: ElThemeMode.dark,
         );
+        addTearDown(controller.dispose);
         await tester.pumpWidget(
           _harness(controller: controller, child: const PaginationDocPage()),
         );
-        await tester.pumpAndSettle();
+        await tester.pump();
 
         final Finder worked = find.byKey(
           const ValueKey<String>('pagination-preview:worked-example'),
@@ -412,7 +441,7 @@ void main() {
         // Flip the SAME controller in place, not a fresh widget tree: the
         // same object every real theme toggle mutates.
         controller.setMode(ElThemeMode.light);
-        await tester.pumpAndSettle();
+        await tester.pump();
 
         expect(
           find.byKey(const ValueKey<String>('pagination-doc-article')),
@@ -426,6 +455,92 @@ void main() {
           findsOneWidget,
         );
         expect(tester.takeException(), isNull);
+      },
+    );
+
+    testWidgets(
+      'every cell is Tab-reachable and Enter activates a focused page link, '
+      'inherited whole from ElButton',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(1440, 8000);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+
+        await tester.pumpWidget(
+          _harness(
+            controller: ElThemeController(mode: ElThemeMode.dark),
+            child: const PaginationDocPage(),
+          ),
+        );
+        await tester.pump();
+
+        final Finder simple = find.byKey(
+          const ValueKey<String>('pagination-simple'),
+        );
+        await tester.ensureVisible(simple);
+        await tester.pump();
+
+        // Every ElPaginationLink cell wraps a genuinely focusable ElButton:
+        // Focus.canRequestFocus tracks ElButton's own _enabled, which is
+        // always true here (onTap ?? () {} means onPressed is never null).
+        final Iterable<Focus> focusNodes = tester.widgetList<Focus>(
+          find.descendant(of: simple, matching: find.byType(Focus)),
+        );
+        expect(focusNodes, isNotEmpty);
+        expect(focusNodes.every((Focus f) => f.canRequestFocus), isTrue);
+
+        // Enter activates a focused page link the same way a tap does: the
+        // Preview specimen has real, observable onTap callbacks (Simple's
+        // do not), so request focus on its page-48 cell's own ElButton
+        // FocusNode directly and send Enter, then read the "current page"
+        // text back.
+        final Finder worked = find.byKey(
+          const ValueKey<String>('pagination-preview:worked-example'),
+        );
+        final ElPaginationLink link48 = tester
+            .widgetList<ElPaginationLink>(
+              find.descendant(of: worked, matching: find.byType(ElPaginationLink)),
+            )
+            .firstWhere((ElPaginationLink link) => link.label == '48');
+        final Finder link48Cell = find.byWidget(link48);
+        await tester.ensureVisible(link48Cell);
+        await tester.pump();
+        // ElPaginationLink passes no focusNode of its own to the ElButton
+        // it wraps, so Focus auto-creates one internally; reach it through
+        // a genuine descendant's context (the '48' label itself) rather
+        // than the Focus widget's own field, which stays null unset.
+        final BuildContext cellContext = tester.element(
+          find.descendant(of: link48Cell, matching: find.text('48')),
+        );
+        Focus.of(cellContext).requestFocus();
+        await tester.pump();
+        await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+        await tester.pump();
+
+        expect(
+          find.descendant(
+            of: worked,
+            matching: find.text('Current page: 48 of 100'),
+          ),
+          findsOneWidget,
+        );
+      },
+    );
+
+    testWidgets(
+      'the Keyboard disclosure names the real, inherited Enter/Tab story',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(
+          _harness(
+            controller: ElThemeController(mode: ElThemeMode.dark),
+            child: const PaginationDocPage(),
+          ),
+        );
+        await tester.pump();
+        await _openDisclosure(tester, 'Keyboard');
+
+        expect(find.textContaining('Tab'), findsWidgets);
+        expect(find.textContaining('Enter'), findsWidgets);
       },
     );
   });

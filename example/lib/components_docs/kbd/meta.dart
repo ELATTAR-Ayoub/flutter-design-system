@@ -13,8 +13,11 @@ library;
 
 import '../catalog.dart' show ComponentDocEntry;
 
-/// `kbd` has no `registry/components/kbd.json` yet: see `page.dart`'s
-/// installation section for the shipped command and registry dependencies.
+/// `registry/components/kbd.json` is a real manifest — `files`,
+/// `registryDependencies: [machine-surface, source-foundation]`, a
+/// `documentationRoute` — and `elattar add kbd` installs from it today.
+/// [dependencies] is that manifest's own `registryDependencies` list,
+/// verbatim.
 const ComponentDocEntry kbdDoc = ComponentDocEntry(
   name: 'kbd',
   title: 'Kbd',

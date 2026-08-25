@@ -7,13 +7,16 @@
 /// [name], its own route (`/components/resizable`), and its own page class
 /// (`ResizableDocPage`).
 ///
-/// Not wired into `catalog.dart`'s `componentDocs` list: that file is
-/// supervisor-owned, and this entry is new. `page.dart` reads [resizableDoc]
-/// directly rather than going through `componentDoc('resizable')`.
-///
-/// `registry/components/resizable.json` does not exist yet: see `page.dart`'s
-/// installation section for the shipped command and registry dependencies. [dependencies] is left
-/// empty rather than naming items a manifest does not yet resolve.
+/// **Corrected.** This file used to claim the entry was not wired into
+/// `catalog.dart`'s `componentDocs` list and that `registry/components/
+/// resizable.json` did not exist yet, with [dependencies] left empty for
+/// that reason. All three are stale: `catalog.dart`'s `componentDocs` list
+/// carries `resizable.resizableDoc`, `registry/components/resizable.json`
+/// is a real, shipped manifest today, `registry/generated/latest/
+/// registry.json` carries `resizable`, and `elattar add resizable` is a
+/// genuine, working command. [dependencies] below already matches the
+/// manifest's own `registryDependencies` list, verbatim:
+/// `source-foundation` only.
 library;
 
 import '../catalog.dart' show ComponentDocEntry;

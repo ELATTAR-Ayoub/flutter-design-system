@@ -136,4 +136,60 @@ void main() {
       expect(text.spec.uppercase, isFalse, reason: text.text);
     }
   });
+
+  testWidgets('a long title ellipsises rather than overflowing a phone', (
+    WidgetTester tester,
+  ) async {
+    // Every one of the ninety-nine documentation pages shares this trigger,
+    // so an unconstrained title here was a `RenderFlex overflowed` waiting
+    // for whichever page first wrote a heading longer than the column. One
+    // did ("What this port leaves out", at 390px). The fix belongs in the
+    // trigger, not in the page's choice of words.
+    // Enabled BEFORE the first pump: a handle taken afterwards does not
+    // retroactively build the semantics tree for a frame already laid out.
+    final SemanticsHandle handle = tester.ensureSemantics();
+
+    // `_host` already pins the MediaQuery and centres its child, so the
+    // narrow measure is the box handed to the disclosure itself — a phone's
+    // reading column, minus its gutters.
+    await tester.pumpWidget(
+      _host(
+        const SizedBox(
+          width: 320,
+          child: DocsDisclosure(
+            title: 'What this port deliberately leaves out, and why',
+            child: Text('body'),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(tester.takeException(), isNull);
+
+    final Finder trigger = find.byKey(DocsDisclosure.triggerKey);
+    expect(trigger, findsOneWidget);
+    expect(tester.getSize(trigger).height, DocsDisclosure.triggerHeight);
+
+    // The chevron must still be inside the trigger, not pushed past its
+    // right edge by the title.
+    final Finder chevron = find.descendant(
+      of: trigger,
+      matching: find.byType(RotationTransition),
+    );
+    expect(
+      tester.getRect(chevron).right,
+      lessThanOrEqualTo(tester.getRect(trigger).right + 1),
+    );
+
+    // And the whole title still reaches a screen reader, ellipsis or not.
+    // Read off the trigger's own node rather than through
+    // `find.bySemanticsLabel`, which matches on the widget element and does
+    // not see a label contributed by an ancestor [Semantics] wrapper.
+    expect(
+      tester.getSemantics(trigger).label,
+      contains('What this port deliberately leaves out, and why'),
+    );
+    handle.dispose();
+  });
 }

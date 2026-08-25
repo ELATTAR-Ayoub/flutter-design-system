@@ -1,5 +1,11 @@
 /// Tests for the toaster component documentation page.
 ///
+/// Re-housed onto the kit alongside the page: the section-order test now
+/// reads `DocsSection.id` (the kit's own section widget), and the
+/// API-table / accessibility / keyboard / dependencies assertions each open
+/// the relevant `DocsDisclosure` first — closed by default in the new kit,
+/// unlike the old page's always-visible `ElSection`.
+///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never a synthetic `MediaQuery`. Theme
 /// coverage flips a single live [ElThemeController] in place rather than
@@ -19,7 +25,8 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/toaster/meta.dart';
 import 'package:example/components_docs/toaster/page.dart';
-import 'package:example/kit.dart' show ElSection;
+import 'package:example/docs/docs_disclosure.dart';
+import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -33,29 +40,47 @@ Widget _harness(Widget child, {required ElThemeController controller}) =>
       ),
     );
 
-/// The shadcn-parity section order (worker brief, `toaster` component,
-/// counterpart `https://ui.shadcn.com/docs/components/base/toast`): a live
-/// demo ahead of any heading (no entry here), Installation, Usage, When to
-/// use it (this component's own decision-guidance addition), Types, Action,
-/// Promise, API Reference, then the six fixed extras.
-const List<String> _expectedSectionHeadings = <String>[
-  'Installation',
-  'Usage',
-  'When to use it',
-  'Types',
-  'Action',
-  'Promise',
-  'API Reference',
-  'States',
-  'Accessibility',
-  'Responsive',
-  'Dependencies',
-  'Theming',
-  'Source',
+/// The house section order this page must render.
+const List<String> _expectedSectionOrder = <String>[
+  'preview',
+  'install',
+  'usage',
+  'types',
+  'action',
+  'promise',
+  'api',
+  'states',
+  'accessibility',
+  'keyboard',
+  'responsive',
+  'dependencies',
+  'theming',
+  'source',
 ];
 
+/// The single `DocsDisclosure` whose title is [title]. `DocsDisclosure`'s
+/// own trigger key ([DocsDisclosure.triggerKey]) is one constant shared by
+/// every instance on the page, so a bare `find.byKey` would match all
+/// eight -- this narrows to the one panel by its title first, matching
+/// `button_test.dart`'s own convention.
+Finder _disclosureTrigger(String title) => find.descendant(
+  of: find.byWidgetPredicate(
+    (Widget widget) => widget is DocsDisclosure && widget.title == title,
+  ),
+  matching: find.byKey(DocsDisclosure.triggerKey),
+);
+
+Future<void> _open(WidgetTester tester, String title) async {
+  final Finder trigger = _disclosureTrigger(title);
+  await tester.ensureVisible(trigger);
+  await tester.pump();
+  await tester.tap(trigger);
+  await tester.pump();
+  await tester.pump(ElDurations.jelly);
+}
+
 void main() {
-  test('toasterDoc exposes accurate, non-registry metadata', () {
+  test('toasterDoc exposes accurate registry metadata', () {
     expect(toasterDoc.name, 'toaster');
     expect(toasterDoc.title, 'Toaster');
     expect(toasterDoc.sourcePath, 'lib/src/components/toaster.dart');
@@ -81,186 +106,47 @@ void main() {
       'safe-area',
       'source-foundation',
     ]);
+    expect(toasterDoc.command, 'elattar add toaster');
+  });
+
+  testWidgets('toaster docs page renders every section, in order', (
+    WidgetTester tester,
+  ) async {
+    tester.view.physicalSize = const Size(1440, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    final ElThemeController controller = ElThemeController(
+      mode: ElThemeMode.dark,
+    );
+    addTearDown(controller.dispose);
+    String? destination;
+
+    await tester.pumpWidget(
+      _harness(
+        ToasterDocPage(onNavigate: (String route) => destination = route),
+        controller: controller,
+      ),
+    );
+    await tester.pump();
+
+    final List<String> ids = tester
+        .widgetList<DocsSection>(find.byType(DocsSection))
+        .map((DocsSection section) => section.id)
+        .toList();
+    expect(ids, _expectedSectionOrder);
+
+    expect(
+      find.byKey(const ValueKey<String>('docs-layout-sidebar')),
+      findsOneWidget,
+    );
+    expect(destination, isNull);
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets(
-    'toaster docs page renders the article and documents every public '
-    'constructor parameter, controller method, and message field',
-    (WidgetTester tester) async {
-      tester.view.physicalSize = const Size(1440, 900);
-      tester.view.devicePixelRatio = 1;
-      addTearDown(tester.view.reset);
-
-      final ElThemeController controller = ElThemeController(
-        mode: ElThemeMode.dark,
-      );
-      addTearDown(controller.dispose);
-      String? destination;
-
-      await tester.pumpWidget(
-        _harness(
-          ToasterDocPage(onNavigate: (String route) => destination = route),
-          controller: controller,
-        ),
-      );
-      await tester.pump();
-
-      expect(find.text('Toaster'), findsWidgets);
-      expect(
-        find.byKey(const ValueKey<String>('docs-layout-sidebar')),
-        findsOneWidget,
-      );
-
-      // The API section documents ElToaster's own constructor, the imperative
-      // ElToastController surface, and the ElToastMessage/ElToastAction
-      // fields that make up the message a caller queues.
-      final Finder apiSection = find.byKey(ElSection.anchorKey('api'));
-      expect(apiSection, findsOneWidget);
-      for (final String parameter in <String>[
-        // ElToaster's own two constructor parameters.
-        'controller',
-        'position',
-        // ElToastController: the imperative entry point ("toast(...)").
-        'show',
-        'success',
-        'error',
-        'info',
-        'warning',
-        'loading',
-        'settle',
-        'dismiss',
-        'clear',
-        // ElToastMessage's constructor fields.
-        'title',
-        'description',
-        'type',
-        'glyph',
-        'duration',
-        'action',
-        // ElToastAction's constructor fields.
-        'label',
-        'onPressed',
-      ]) {
-        expect(
-          find.descendant(of: apiSection, matching: find.text(parameter)),
-          findsOneWidget,
-          reason: 'API member "$parameter" should be documented',
-        );
-      }
-      // 'promise' names both a ElToastController method (`promise<T>(...)`)
-      // and a ElToastMessage field (`final bool promise`): a real collision
-      // in the source itself, not a test bug, so it is asserted present
-      // rather than asserted unique.
-      expect(
-        find.descendant(of: apiSection, matching: find.text('promise')),
-        findsWidgets,
-        reason:
-            'both the promise() method and the promise field should be '
-            'documented',
-      );
-
-      // Every ElToastType value is documented as the component's status
-      // variants, mirroring shadcn's own Types section.
-      final Finder typesSection = find.byKey(ElSection.anchorKey('types'));
-      expect(typesSection, findsOneWidget);
-      for (final String type in <String>[
-        'success',
-        'info',
-        'warning',
-        'error',
-        'loading',
-        'normal',
-      ]) {
-        expect(
-          find.descendant(of: typesSection, matching: find.text(type)),
-          findsOneWidget,
-          reason: 'ElToastType.$type should be documented',
-        );
-      }
-
-      // Action and Promise are each mirrored as their own top-level
-      // sections, matching shadcn's own split rather than one combined
-      // "Usage" example.
-      final Finder actionSection = find.byKey(ElSection.anchorKey('action'));
-      expect(actionSection, findsOneWidget);
-      expect(
-        find.descendant(
-          of: actionSection,
-          matching: find.textContaining('ElToastAction'),
-        ),
-        findsWidgets,
-      );
-      final Finder promiseSection = find.byKey(ElSection.anchorKey('promise'));
-      expect(promiseSection, findsOneWidget);
-      expect(
-        find.descendant(
-          of: promiseSection,
-          matching: find.textContaining('ElToastController.promise'),
-        ),
-        findsWidgets,
-      );
-
-      // The real timing values: not invented ones, are on the page. 4000ms
-      // is ElToastMessage's default duration/ElToaster.lifetime; 3 is
-      // ElToaster.visibleLimit.
-      expect(
-        find.textContaining('4000ms'),
-        findsWidgets,
-        reason: 'the real 4000ms auto-dismiss lifetime should be documented',
-      );
-      expect(
-        find.textContaining('200ms'),
-        findsWidgets,
-        reason: 'the real 200ms unmount delay should be documented',
-      );
-
-      // The install section names the command that installs it. It asserted
-      // the opposite until the registry covered the whole component surface.
-      final Finder installSection = find.byKey(ElSection.anchorKey('install'));
-      expect(installSection, findsOneWidget);
-      expect(
-        find.descendant(
-          of: installSection,
-          matching: find.textContaining('elattar add toaster'),
-        ),
-        findsWidgets,
-      );
-
-      // The "When to use it" section names its neighbours instead of
-      // restating the component's own name (IA 9.2's decision-guidance
-      // contract): the alert/alert-dialog/toaster trio.
-      final Finder whenToUseSection = find.byKey(
-        ElSection.anchorKey('when-to-use'),
-      );
-      expect(whenToUseSection, findsOneWidget);
-      expect(
-        find.descendant(
-          of: whenToUseSection,
-          matching: find.textContaining('alert'),
-        ),
-        findsWidgets,
-      );
-
-      // The accessibility section states the live-region finding plainly.
-      final Finder a11ySection = find.byKey(ElSection.anchorKey('a11y'));
-      expect(a11ySection, findsOneWidget);
-      expect(
-        find.descendant(
-          of: a11ySection,
-          matching: find.textContaining('liveRegion'),
-        ),
-        findsWidgets,
-      );
-
-      // No prose link fires the router: onNavigate stays untouched.
-      expect(destination, isNull);
-      expect(tester.takeException(), isNull);
-    },
-  );
-
-  testWidgets(
-    'the live specimen fires a real toast through ElToastController, it '
-    'announces via a live region, and it disappears on its own timer',
+    'the Types specimen fires all six ElToastType values live, including '
+    'loading and normal',
     (WidgetTester tester) async {
       tester.view.physicalSize = const Size(1440, 900);
       tester.view.devicePixelRatio = 1;
@@ -276,111 +162,34 @@ void main() {
       );
       await tester.pump();
 
-      // The preview section mounts a real ElToaster over a real
-      // ElToastController: nothing is queued until a specimen control fires
-      // one, exactly like the package's own ElToaster.build, which paints
-      // nothing while its controller is empty.
-      expect(find.byType(ElToaster), findsOneWidget);
-      expect(find.byType(ElToast), findsNothing);
-
-      final Finder trigger = find.widgetWithText(ElButton, 'Show success');
-      expect(trigger, findsOneWidget);
-      await tester.ensureVisible(trigger);
-      await tester.tap(trigger);
-      await tester.pump(); // schedule
-      await tester.pump(); // the post-frame callback that flips data-mounted
-      await tester.pump(ElToaster.transition); // ride the entrance in
-
-      expect(find.byType(ElToast), findsOneWidget);
-      expect(find.text('Changes saved'), findsOneWidget);
-
-      // Accessibility: the toast announces through a live region and never
-      // requests focus (no FocusScope call exists anywhere in toaster.dart —
-      // nothing here steals focus while it does). `Semantics(container:
-      // true, label: message.title)` is a semantics boundary, so the
-      // title/description ElText children below it: which are not
-      // boundaries of their own: merge their literal text upward into this
-      // one node rather than staying separate: the real announced label is
-      // the explicit title, the title again (from the merged ElText), then
-      // the description: not just the title alone.
-      final SemanticsNode node = tester.getSemantics(find.byType(ElToast));
-      expect(node.flagsCollection.isLiveRegion, isTrue);
-      expect(
-        node.label,
-        'Changes saved\nChanges saved\nYour profile was updated successfully.',
+      final Finder host = find.byKey(
+        const ValueKey<String>('toaster-example:types-host'),
       );
-      // Nothing inside the toast can ever hold focus: there is no Focus (or
-      // FocusScope) widget anywhere in its subtree to hold it. Checked on
-      // the widget tree itself rather than on FocusManager.primaryFocus,
-      // which would just as truthfully report the trigger button's own
-      // ordinary post-tap focus: a fact about the button, not the toast.
-      expect(
-        find.descendant(of: find.byType(ElToast), matching: find.byType(Focus)),
-        findsNothing,
-      );
+      expect(host, findsOneWidget);
+      expect(find.descendant(of: host, matching: find.byType(ElToast)), findsNothing);
 
-      // The real 4000ms lifetime: ElToaster.lifetime, expires the clock;
-      // one more pump lets the completion listener call
-      // ElToastController.dismiss, which starts the 200ms unmount window.
-      await tester.pump(ElToaster.lifetime);
-      await tester.pump();
-      // The toast is leaving but is not torn out of the tree yet.
-      expect(find.byType(ElToast), findsOneWidget);
+      for (final (String key, String title) in <(String, String)>[
+        ('toaster-example:types-loading', 'Uploading…'),
+        ('toaster-example:types-normal', 'Note'),
+      ]) {
+        final Finder trigger = find.byKey(ValueKey<String>(key));
+        await tester.ensureVisible(trigger);
+        await tester.tap(trigger);
+        await tester.pump();
+        await tester.pump();
+        await tester.pump(ElToaster.transition);
+        expect(
+          find.descendant(of: host, matching: find.text(title)),
+          findsOneWidget,
+          reason: '"$key" should fire a live toast titled "$title"',
+        );
+      }
 
-      await tester.pump(ElToaster.unmountDelay);
-      await tester.pump();
-
-      // Gone on its own: nothing here tapped a dismiss control.
-      expect(find.byType(ElToast), findsNothing);
-      expect(find.text('Changes saved'), findsNothing);
       expect(tester.takeException(), isNull);
     },
   );
 
-  testWidgets('toaster docs page adapts across breakpoints and themes without '
-      'exceptions', (WidgetTester tester) async {
-    tester.view.physicalSize = const Size(390, 844);
-    tester.view.devicePixelRatio = 1;
-    addTearDown(tester.view.reset);
-
-    final ElThemeController controller = ElThemeController(
-      mode: ElThemeMode.light,
-    );
-    addTearDown(controller.dispose);
-
-    await tester.pumpWidget(
-      _harness(const ToasterDocPage(), controller: controller),
-    );
-    await tester.pump();
-
-    expect(
-      find.byKey(const ValueKey<String>('docs-layout-anchor-strip')),
-      findsOneWidget,
-    );
-    expect(
-      find.byKey(const ValueKey<String>('docs-layout-sidebar')),
-      findsNothing,
-    );
-    expect(find.byType(ElToaster), findsOneWidget);
-    expect(tester.takeException(), isNull);
-
-    // The controller is flipped in place: no new app, no new element tree.
-    controller.setMode(ElThemeMode.dark);
-    await tester.pump();
-    expect(tester.takeException(), isNull);
-
-    tester.view.physicalSize = const Size(1440, 900);
-    await tester.pump();
-    expect(
-      find.byKey(const ValueKey<String>('docs-layout-sidebar')),
-      findsOneWidget,
-    );
-    expect(find.byType(ElToaster), findsOneWidget);
-    expect(tester.takeException(), isNull);
-  });
-
-  testWidgets('toaster docs page renders the shadcn-parity section headings '
-      'in order, with no heading before Installation', (
+  testWidgets('the API Reference disclosure documents every public member', (
     WidgetTester tester,
   ) async {
     tester.view.physicalSize = const Size(1440, 900);
@@ -396,28 +205,389 @@ void main() {
       _harness(const ToasterDocPage(), controller: controller),
     );
     await tester.pump();
+    await _open(tester, 'API Reference');
 
-    final List<String> headings = tester
-        .widgetList<ElText>(find.byType(ElText))
-        .where((ElText text) => text.spec == ElType.h3)
-        .map((ElText text) => text.text)
-        .toList();
+    final Finder apiSection = find.byWidgetPredicate(
+      (Widget widget) => widget is DocsSection && widget.id == 'api',
+    );
+    expect(apiSection, findsOneWidget);
+    for (final String parameter in <String>[
+      // ElToaster's own two constructor parameters.
+      'controller',
+      'position',
+      // ElToastController: the imperative entry point ("toast(...)"), the
+      // members with no ElToastType-value twin.
+      'show',
+      'settle',
+      'dismiss',
+      'clear',
+      // ElToastMessage's constructor fields.
+      'title',
+      'description',
+      'type',
+      'glyph',
+      'duration',
+      'action',
+      // ElToastAction's constructor fields.
+      'label',
+      'onPressed',
+      // ElToastType's own value with no ElToastController-method twin.
+      'normal',
+    ]) {
+      expect(
+        find.descendant(of: apiSection, matching: find.text(parameter)),
+        findsOneWidget,
+        reason: 'API member "$parameter" should be documented',
+      );
+    }
+    // 'promise' names both a ElToastController method (`promise<T>(...)`)
+    // and a ElToastMessage field (`final bool promise`): a real collision
+    // in the source itself, not a test bug, so it is asserted present
+    // rather than asserted unique. 'success' / 'error' / 'info' / 'warning'
+    // / 'loading' name both a ElToastController method AND an ElToastType
+    // value, now that the type table lives in the same API Reference
+    // disclosure -- the same kind of real, source-level collision, so each
+    // is asserted present twice rather than asserted unique.
+    for (final String collision in <String>[
+      'promise',
+      'success',
+      'error',
+      'info',
+      'warning',
+      'loading',
+    ]) {
+      expect(
+        find.descendant(of: apiSection, matching: find.text(collision)),
+        findsAtLeastNWidgets(2),
+        reason: '"$collision" should be documented on both of its tables',
+      );
+    }
 
-    expect(headings, _expectedSectionHeadings);
-
-    // The old convention's own headings must not survive the reshape.
-    // Section headings only: DocsCodeExample renders its own "Preview" tab
-    // label as free text, so a plain find.text('Preview') finds that
-    // affordance rather than a leftover heading. Read the mounted ElSection
-    // titles instead, which are immune to that collision.
-    final List<String> sectionTitles = tester
-        .widgetList<ElSection>(find.byType(ElSection))
-        .map((ElSection section) => section.title)
-        .toList();
-    expect(sectionTitles, isNot(contains('Purpose')));
-    expect(sectionTitles, isNot(contains('Status')));
-    expect(sectionTitles, isNot(contains('Preview')));
-    expect(sectionTitles, isNot(contains('Composition')));
-    expect(sectionTitles, isNot(contains('Composition examples')));
+    // The real timing values -- not invented ones -- are documented. 4000ms
+    // is ElToastMessage's default duration/ElToaster.lifetime; 200ms is
+    // ElToaster.unmountDelay.
+    expect(
+      find.descendant(
+        of: apiSection,
+        matching: find.textContaining('4000ms'),
+      ),
+      findsWidgets,
+      reason: 'the real 4000ms auto-dismiss lifetime should be documented',
+    );
+    expect(
+      find.descendant(
+        of: apiSection,
+        matching: find.textContaining('200ms'),
+      ),
+      findsWidgets,
+      reason: 'the real 200ms unmount delay should be documented',
+    );
+    expect(tester.takeException(), isNull);
   });
+
+  testWidgets(
+    'the Action and Promise sections carry the same code Preview fires live',
+    (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1440, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+
+      final ElThemeController controller = ElThemeController(
+        mode: ElThemeMode.dark,
+      );
+      addTearDown(controller.dispose);
+
+      await tester.pumpWidget(
+        _harness(const ToasterDocPage(), controller: controller),
+      );
+      await tester.pump();
+
+      final Finder actionSection = find.byWidgetPredicate(
+        (Widget widget) => widget is DocsSection && widget.id == 'action',
+      );
+      expect(actionSection, findsOneWidget);
+      expect(
+        find.descendant(
+          of: actionSection,
+          matching: find.textContaining('ElToastAction'),
+        ),
+        findsWidgets,
+      );
+
+      final Finder promiseSection = find.byWidgetPredicate(
+        (Widget widget) => widget is DocsSection && widget.id == 'promise',
+      );
+      expect(promiseSection, findsOneWidget);
+      expect(
+        find.descendant(
+          of: promiseSection,
+          matching: find.textContaining('ElToastController.promise'),
+        ),
+        findsWidgets,
+      );
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'the Dependencies disclosure names its neighbours and links both',
+    (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1440, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+
+      final ElThemeController controller = ElThemeController(
+        mode: ElThemeMode.dark,
+      );
+      addTearDown(controller.dispose);
+
+      await tester.pumpWidget(
+        _harness(const ToasterDocPage(), controller: controller),
+      );
+      await tester.pump();
+      await _open(tester, 'Dependencies');
+
+      final Finder dependenciesSection = find.byWidgetPredicate(
+        (Widget widget) => widget is DocsSection && widget.id == 'dependencies',
+      );
+      expect(
+        find.descendant(
+          of: dependenciesSection,
+          matching: find.textContaining('alert'),
+        ),
+        findsWidgets,
+      );
+      expect(
+        find.descendant(of: dependenciesSection, matching: find.text('Alert')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(
+          of: dependenciesSection,
+          matching: find.text('Alert Dialog'),
+        ),
+        findsOneWidget,
+      );
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets('the Accessibility disclosure states the live-region finding', (
+    WidgetTester tester,
+  ) async {
+    tester.view.physicalSize = const Size(1440, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    final ElThemeController controller = ElThemeController(
+      mode: ElThemeMode.dark,
+    );
+    addTearDown(controller.dispose);
+
+    await tester.pumpWidget(
+      _harness(const ToasterDocPage(), controller: controller),
+    );
+    await tester.pump();
+    await _open(tester, 'Accessibility');
+
+    final Finder a11ySection = find.byWidgetPredicate(
+      (Widget widget) => widget is DocsSection && widget.id == 'accessibility',
+    );
+    expect(a11ySection, findsOneWidget);
+    expect(
+      find.descendant(
+        of: a11ySection,
+        matching: find.textContaining('liveRegion'),
+      ),
+      findsWidgets,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+    'the Keyboard disclosure states the action pill cannot be reached',
+    (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1440, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+
+      final ElThemeController controller = ElThemeController(
+        mode: ElThemeMode.dark,
+      );
+      addTearDown(controller.dispose);
+
+      await tester.pumpWidget(
+        _harness(const ToasterDocPage(), controller: controller),
+      );
+      await tester.pump();
+      await _open(tester, 'Keyboard');
+
+      final Finder keyboardSection = find.byWidgetPredicate(
+        (Widget widget) => widget is DocsSection && widget.id == 'keyboard',
+      );
+      expect(keyboardSection, findsOneWidget);
+      expect(
+        find.descendant(
+          of: keyboardSection,
+          matching: find.textContaining('cannot currently be reached'),
+        ),
+        findsWidgets,
+      );
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'the live Preview specimen fires a real toast through ElToastController, '
+    'it announces via a live region, and it disappears on its own timer',
+    (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1440, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+
+      final ElThemeController controller = ElThemeController(
+        mode: ElThemeMode.dark,
+      );
+      addTearDown(controller.dispose);
+
+      await tester.pumpWidget(
+        _harness(const ToasterDocPage(), controller: controller),
+      );
+      await tester.pump();
+
+      // The Preview section mounts a real ElToaster over a real
+      // ElToastController: nothing is queued until a specimen control fires
+      // one, exactly like the package's own ElToaster.build, which paints
+      // nothing while its controller is empty. Types mounts a second,
+      // independent ElToaster/ElToastController pair, so this scopes to
+      // the Preview section explicitly rather than a bare byType search.
+      final Finder previewSection = find.byWidgetPredicate(
+        (Widget widget) => widget is DocsSection && widget.id == 'preview',
+      );
+      expect(
+        find.descendant(of: previewSection, matching: find.byType(ElToaster)),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: previewSection, matching: find.byType(ElToast)),
+        findsNothing,
+      );
+
+      final Finder trigger = find.descendant(
+        of: previewSection,
+        matching: find.widgetWithText(ElButton, 'Show success'),
+      );
+      expect(trigger, findsOneWidget);
+      await tester.ensureVisible(trigger);
+      await tester.tap(trigger);
+      await tester.pump(); // schedule
+      await tester.pump(); // the post-frame callback that flips data-mounted
+      await tester.pump(ElToaster.transition); // ride the entrance in
+
+      final Finder toast = find.descendant(
+        of: previewSection,
+        matching: find.byType(ElToast),
+      );
+      expect(toast, findsOneWidget);
+      expect(
+        find.descendant(of: previewSection, matching: find.text('Changes saved')),
+        findsOneWidget,
+      );
+
+      // Accessibility: the toast announces through a live region and never
+      // requests focus (no FocusScope call exists anywhere in toaster.dart —
+      // nothing here steals focus while it does). `Semantics(container:
+      // true, label: message.title)` is a semantics boundary, so the
+      // title/description ElText children below it: which are not
+      // boundaries of their own: merge their literal text upward into this
+      // one node rather than staying separate: the real announced label is
+      // the explicit title, the title again (from the merged ElText), then
+      // the description: not just the title alone.
+      final SemanticsNode node = tester.getSemantics(toast);
+      expect(node.flagsCollection.isLiveRegion, isTrue);
+      expect(
+        node.label,
+        'Changes saved\nChanges saved\nYour profile was updated successfully.',
+      );
+      // Nothing inside the toast can ever hold focus: there is no Focus (or
+      // FocusScope) widget anywhere in its subtree to hold it. Checked on
+      // the widget tree itself rather than on FocusManager.primaryFocus,
+      // which would just as truthfully report the trigger button's own
+      // ordinary post-tap focus: a fact about the button, not the toast.
+      expect(
+        find.descendant(of: toast, matching: find.byType(Focus)),
+        findsNothing,
+      );
+
+      // The real 4000ms lifetime: ElToaster.lifetime, expires the clock;
+      // one more pump lets the completion listener call
+      // ElToastController.dismiss, which starts the 200ms unmount window.
+      await tester.pump(ElToaster.lifetime);
+      await tester.pump();
+      // The toast is leaving but is not torn out of the tree yet.
+      expect(
+        find.descendant(of: previewSection, matching: find.byType(ElToast)),
+        findsOneWidget,
+      );
+
+      await tester.pump(ElToaster.unmountDelay);
+      await tester.pump();
+
+      // Gone on its own: nothing here tapped a dismiss control.
+      expect(
+        find.descendant(of: previewSection, matching: find.byType(ElToast)),
+        findsNothing,
+      );
+      expect(
+        find.descendant(of: previewSection, matching: find.text('Changes saved')),
+        findsNothing,
+      );
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'toaster docs page adapts across breakpoints and themes without '
+    'exceptions',
+    (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+
+      final ElThemeController controller = ElThemeController(
+        mode: ElThemeMode.light,
+      );
+      addTearDown(controller.dispose);
+
+      await tester.pumpWidget(
+        _harness(const ToasterDocPage(), controller: controller),
+      );
+      await tester.pump();
+
+      expect(
+        find.byKey(const ValueKey<String>('docs-layout-anchor-strip')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const ValueKey<String>('docs-layout-sidebar')),
+        findsNothing,
+      );
+      expect(find.byType(ElToaster), findsNWidgets(2));
+      expect(tester.takeException(), isNull);
+
+      // The controller is flipped in place: no new app, no new element tree.
+      controller.setMode(ElThemeMode.dark);
+      await tester.pump();
+      expect(tester.takeException(), isNull);
+
+      tester.view.physicalSize = const Size(1440, 900);
+      await tester.pump();
+      expect(
+        find.byKey(const ValueKey<String>('docs-layout-sidebar')),
+        findsOneWidget,
+      );
+      expect(find.byType(ElToaster), findsNWidgets(2));
+      expect(tester.takeException(), isNull);
+    },
+  );
 }

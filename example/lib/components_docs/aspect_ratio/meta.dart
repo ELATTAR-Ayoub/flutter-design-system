@@ -7,15 +7,16 @@
 /// [name], its own route (`/components/aspect_ratio`), and its own page
 /// class (`AspectRatioDocPage`).
 ///
-/// Not wired into `catalog.dart`'s `componentDocs` list: that file is
-/// supervisor-owned, and this entry is new. `page.dart` reads
-/// [aspectRatioDoc] directly rather than going through
-/// `componentDoc('aspect_ratio')`.
-///
-/// `registry/components/aspect_ratio.json` does not exist yet: see
-/// `page.dart`'s installation section for the shipped command and registry dependencies.
-/// [dependencies] is left empty rather than naming items a manifest does
-/// not yet resolve.
+/// **Both wired in, and corrected.** `catalog.dart`'s `componentDocs` list
+/// already carries `aspect_ratio.aspectRatioDoc` — the "not wired in yet"
+/// claim this file used to make was stale. So was the claim that
+/// `registry/components/aspect_ratio.json` "does not exist yet":
+/// `registry/components/aspect-ratio.json` (hyphenated, matching the
+/// registry's own naming) exists, lists exactly one file
+/// (`lib/src/components/aspect_ratio.dart`) and **no** registry
+/// dependencies. [dependencies] is empty because the manifest's own
+/// `registryDependencies` array is empty — not because nothing has
+/// resolved it.
 library;
 
 import '../catalog.dart' show ComponentDocEntry;
