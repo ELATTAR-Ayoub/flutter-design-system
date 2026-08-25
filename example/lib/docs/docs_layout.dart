@@ -312,7 +312,11 @@ class _DocsLayoutState extends State<DocsLayout> {
     // only the "Components" list on a short screen, or a long "ON THIS PAGE"
     // outline, that hits [SingleChildScrollView] instead of stretching the
     // whole page (sidebar, article and all) down to its own height.
-    final double railMaxHeight = MediaQuery.sizeOf(context).height;
+    // Each rail begins BELOW the sticky header, so a rail capped at the full
+    // viewport height runs past the fold and its last rows cannot be
+    // reached. The gutter keeps the final row off the bottom edge.
+    final double railMaxHeight =
+        MediaQuery.sizeOf(context).height - ElWidths.siteHeader - el(4);
     // `_SiteBody` (site_shell.dart) hands this widget a column already capped
     // at `ElWidths.page` and centred inside `ElWidths.shell`, the dead space
     // at the outer edges an earlier audit flagged. That constraint belongs to
