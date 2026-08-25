@@ -154,10 +154,16 @@ void main() {
     final Uint8List png = encodePng(field);
 
     test('is a well-formed 8-bit RGBA PNG of the right size', () {
-      expect(
-        png.sublist(0, 8),
-        <int>[0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A],
-      );
+      expect(png.sublist(0, 8), <int>[
+        0x89,
+        0x50,
+        0x4E,
+        0x47,
+        0x0D,
+        0x0A,
+        0x1A,
+        0x0A,
+      ]);
       expect(utf8.decode(png.sublist(12, 16)), 'IHDR');
       final ByteData header = png.buffer.asByteData();
       expect(header.getUint32(16), textureSize);

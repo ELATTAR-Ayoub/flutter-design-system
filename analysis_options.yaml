@@ -9,6 +9,7 @@ analyzer:
     - tool/registry_builder/**
     - tool/generate_perlin_texture/**
     - tool/release_registry/**
+    - tool/release_audit/**
     - test/project_config_test.dart
     - test/registry_builder_test.dart
     - test/registry_client_test.dart

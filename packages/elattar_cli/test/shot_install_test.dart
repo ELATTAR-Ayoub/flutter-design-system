@@ -5,7 +5,15 @@ import 'package:test/test.dart';
 
 import '../lib/src/registry/client.dart' show sha256Hex;
 
-/// End-to-end proof for the `shot` item kind.
+/// End-to-end proof for the `shot` item kind — against a synthetic registry.
+///
+/// **This is not the consumer-install proof, and CI must not describe it as
+/// one.** No `shot` item has shipped since `9c48294` removed them from the
+/// registry, so this suite builds its own throwaway design system and its own
+/// registry to install from. It proves the item kind still works; it says
+/// nothing about the artifact a public user receives. That claim belongs to
+/// `public_consumer_test.dart`, which installs *this repository's* generated
+/// registry over HTTP and then runs a widget test inside the result.
 ///
 /// Builds a throwaway source repository containing a foundation, a component
 /// and two shots, generates and validates a registry from it with the real

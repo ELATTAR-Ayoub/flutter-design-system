@@ -1,0 +1,10 @@
+name: elattar_release_audit
+description: Fails the build if any v0.0.1 release invariant is broken.
+publish_to: none
+version: 0.0.1
+
+environment:
+  sdk: ^3.12.2
+
+dev_dependencies:
+  test: ^1.25.8

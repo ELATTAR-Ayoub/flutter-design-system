@@ -1,7 +1,35 @@
+# The release gate.
+#
+# Three jobs, split by what each one actually needs rather than by subject
+# matter. The old single job ran the full Flutter suite once and called that
+# CI; it could not have caught a registry that no longer matched its sources,
+# a CLI archive that would not publish, or a Windows path regression, because
+# it never looked.
+#
+#   gates       Dart SDK only, no Flutter, no network beyond pub. Everything
+#               that can fail in two minutes fails here first.
+#   cli-matrix  The consumer boundary, on Ubuntu *and* Windows. This is the
+#               only thing duplicated per operating system: the CLI is built
+#               around path handling, and the full Flutter suite twice would
+#               cost half an hour to learn nothing new.
+#   flutter     One Ubuntu job for the repository itself: analyze, test,
+#               release web build, and the staged versioned registry.
+#
+# Third-party actions are pinned to a reviewed major version, which is this
+# repository's existing policy. Moving to immutable SHAs is a separate,
+# repository-wide decision and is not made here by accident.
+
 name: CI
 
 on:
   pull_request:
+  # The commit that gets tagged has to have been through the pipeline. Before
+  # this, only pull requests were built, so a release could be cut from a
+  # commit CI had never seen.
+  push:
+    branches:
+      - main
+      - public-release-v0.0.1
   workflow_dispatch:
 
 concurrency:
@@ -12,9 +40,155 @@ permissions:
   contents: read
 
 jobs:
-  verify:
+  gates:
+    name: Static and release gates
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Dart
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
+      - name: Cache pub dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.pub-cache
+          key: pub-${{ runner.os }}-${{ hashFiles('**/pubspec.yaml') }}
+          restore-keys: pub-${{ runner.os }}-
+
+      # FIRST, deliberately. `dart pub publish --dry-run` reports a warning for
+      # a dirty git tree, so any step that writes into the checkout before this
+      # one turns the warning count into noise instead of a packaging signal.
+      # The gate is zero warnings.
+      - name: Inspect the CLI publication archive
+        working-directory: packages/elattar_cli
+        run: dart pub publish --dry-run
+
+      # The four things that make a release wrong to publish: a version stated
+      # differently in different files, a placeholder or quietly-extended
+      # license, a provenance ledger whose hashes no longer describe the files,
+      # and a generated registry that disagrees with its own index or with the
+      # tree it came from. No Flutter, no suite, no waiting.
+      - name: Resolve the release audit
+        working-directory: tool/release_audit
+        run: dart pub get
+
+      - name: Audit release invariants
+        run: dart run tool/release_audit/bin/verify.dart .
+
+      # Formatting was previously checked on the CLI alone. Root, example and
+      # the tool packages were checked by nothing.
+      - name: Check formatting — package
+        run: dart format --output=none --set-exit-if-changed lib test
+
+      - name: Check formatting — example
+        run: dart format --output=none --set-exit-if-changed example/lib example/test
+
+      - name: Check formatting — CLI
+        working-directory: packages/elattar_cli
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: Check formatting — tool packages
+        run: |
+          for package in registry_builder release_registry generate_perlin_texture release_audit; do
+            (cd "tool/$package" && dart format --output=none --set-exit-if-changed bin lib test)
+          done
+
+      - name: Analyze CLI
+        working-directory: packages/elattar_cli
+        run: |
+          dart pub get
+          dart analyze
+
+      # `analysis_options.yaml` at the root EXCLUDES every one of these
+      # packages, because each has its own analysis context. They must be
+      # invoked separately or they are analysed and tested by nothing at all.
+      - name: Analyze and test tool packages
+        run: |
+          for package in registry_builder release_registry generate_perlin_texture release_audit; do
+            echo "::group::tool/$package"
+            (cd "tool/$package" && dart pub get && dart analyze && dart test --reporter expanded)
+            echo "::endgroup::"
+          done
+
+      - name: Build registry
+        run: dart run tool/registry_builder/bin/build.dart .
+
+      - name: Validate registry
+        run: dart run tool/registry_builder/bin/validate.dart registry/generated/latest/registry.json
+
+      # The gate the old workflow was missing. It rebuilt the registry, checked
+      # that the rebuild was valid, and threw it away — so a pull request that
+      # changed a distributed source without rebuilding passed clean, and the
+      # committed registry shipped sha256 hashes that no longer described their
+      # own files. A consumer would have received an integrity failure.
+      - name: Registry is reproducible from the committed sources
+        run: git diff --exit-code -- registry/generated/latest registry/component_inventory.json
+
+  cli-matrix:
+    name: Consumer boundary (${{ matrix.os }})
+    needs: gates
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Flutter, not just Dart: the CLI suite ends by running `flutter pub
+      # get`, `flutter analyze` and `flutter test` inside the project it just
+      # installed into. That last one is the point — a consumer project can
+      # analyse clean and still fail to build a widget, because a font family
+      # is a string and a barrel export that resolves is not a widget that
+      # paints.
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Resolve CLI dependencies
+        working-directory: packages/elattar_cli
+        run: dart pub get
+
+      # The whole CLI suite, on both operating systems. It covers path
+      # handling, the HTTP registry source, the persistent cache and
+      # `--offline`, license installation, and — in `public_consumer_test.dart`
+      # — a clean consumer that installs THIS repository's generated registry
+      # over HTTP and then runs.
+      #
+      # `shot_install_test.dart` is NOT that proof and CI no longer says it is:
+      # it builds a synthetic registry of its own, because no `shot` item has
+      # shipped since 9c48294.
+      - name: Test CLI against the generated registry
+        working-directory: packages/elattar_cli
+        run: dart test --reporter expanded --file-reporter=json:reports/cli-tests.json
+
+      - name: Upload CLI test report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cli-test-report-${{ matrix.os }}
+          path: packages/elattar_cli/reports/
+          retention-days: 7
+
+  flutter:
+    name: Flutter repository verification
+    needs: gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
 
     steps:
       - name: Checkout
@@ -33,35 +207,7 @@ jobs:
         run: flutter analyze
 
       - name: Test package
-        run: flutter test --reporter expanded
-
-      # The installer CLI and the registry builder live in their own packages,
-      # outside the root analysis context. Without these steps the import
-      # transformer, its end-to-end shot install proof and the registry
-      # generator are never exercised on a pull request.
-      - name: Install CLI dependencies
-        working-directory: packages/elattar_cli
-        run: dart pub get
-
-      - name: Check CLI formatting
-        working-directory: packages/elattar_cli
-        run: dart format --output=none --set-exit-if-changed .
-
-      - name: Analyze CLI
-        working-directory: packages/elattar_cli
-        run: dart analyze
-
-      # Includes shot_install_test.dart, which installs into a throwaway
-      # consumer project and runs `flutter analyze` over it.
-      - name: Test CLI
-        working-directory: packages/elattar_cli
-        run: dart test --reporter expanded
-
-      - name: Build registry
-        run: dart run tool/registry_builder/bin/build.dart .
-
-      - name: Validate registry
-        run: dart run tool/registry_builder/bin/validate.dart registry/generated/latest/registry.json
+        run: flutter test --reporter expanded --file-reporter=json:reports/package-tests.json
 
       - name: Install example dependencies
         working-directory: example
@@ -73,8 +219,33 @@ jobs:
 
       - name: Test example
         working-directory: example
-        run: flutter test --reporter expanded
+        run: flutter test --reporter expanded --file-reporter=json:reports/example-tests.json
 
       - name: Build example web release
         working-directory: example
         run: flutter build web --release --base-href /flutter-design-system/
+
+      # The registry is staged INTO the built site, so the CLI's pinned
+      # registry URL and the documentation share one origin. Staging here
+      # proves the Pages job's most failure-prone step on every push, rather
+      # than the first time somebody deploys. Nothing is published: this job
+      # has no `pages` permission and uploads no artifact.
+      - name: Stage the versioned registry into the site artifact
+        run: >-
+          dart run tool/release_registry/bin/stage.dart
+          --version 0.0.1
+          --web-root example/build/web
+          --commit ${{ github.sha }}
+
+      - name: Validate the staged registry
+        run: dart run tool/registry_builder/bin/validate.dart example/build/web/registry/0.0.1/registry.json
+
+      - name: Upload Flutter test reports
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: flutter-test-reports
+          path: |
+            reports/
+            example/reports/
+          retention-days: 7

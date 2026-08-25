@@ -41,3 +41,7 @@ migrate_working_dir/
 # 2026-08-24. New briefs should write captures into `.captures/`.
 .captures/
 *.capture.txt
+
+# Machine-readable test reports written by `--file-reporter` in CI. They are
+# uploaded as a failure artifact, never committed.
+reports/
