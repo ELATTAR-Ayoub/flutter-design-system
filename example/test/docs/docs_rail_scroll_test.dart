@@ -205,6 +205,12 @@ void main() {
       // escaped band must actually move the rail's own scroll position —
       // "I can't scroll on left and right sidebars," reproduced as closely
       // as a widget test can.
+      // A notch now GLIDES rather than jumps (`_SmoothRailScroll` in
+      // docs_layout.dart), so the rail has not moved on the frame the event
+      // lands — it has started an animation. Both halves are asserted: that
+      // the movement is animated (nothing on the event frame, something part
+      // way through), and that it still arrives, which is the original
+      // "the rail is present but inert" check unchanged.
       expect(sidebarController.offset, equals(0.0));
       final TestPointer sidebarPointer = TestPointer(
         1,
@@ -217,10 +223,21 @@ void main() {
       await tester.pump();
       expect(
         sidebarController.offset,
-        greaterThan(0.0),
+        equals(0.0),
         reason:
-            'a wheel event over the sidebar rail\'s escaped band did not '
-            'move its ScrollController — the rail is present but inert.',
+            'a wheel notch must start a glide, not teleport the rail on the '
+            'frame the event arrives.',
+      );
+      await tester.pump(ElDurations.fast ~/ 2);
+      final double sidebarMidway = sidebarController.offset;
+      expect(sidebarMidway, greaterThan(0.0), reason: 'the glide never started.');
+      await tester.pump(ElDurations.fast);
+      expect(
+        sidebarController.offset,
+        greaterThan(sidebarMidway),
+        reason:
+            'a wheel event over the sidebar rail did not move its '
+            'ScrollController — the rail is present but inert.',
       );
 
       expect(tocController.offset, equals(0.0));
@@ -230,13 +247,58 @@ void main() {
         tocPointer.scroll(const Offset(0.0, 300.0)),
       );
       await tester.pump();
+      expect(tocController.offset, equals(0.0));
+      await tester.pump(ElDurations.fast ~/ 2);
+      final double tocMidway = tocController.offset;
+      expect(tocMidway, greaterThan(0.0));
+      await tester.pump(ElDurations.fast);
       expect(
         tocController.offset,
-        greaterThan(0.0),
+        greaterThan(tocMidway),
         reason:
-            'a wheel event over the toc rail\'s escaped band did not move '
-            'its ScrollController — the rail is present but inert.',
+            'a wheel event over the toc rail did not move its '
+            'ScrollController — the rail is present but inert.',
       );
+
+      // And the same glide over a rail's own body, not just the escaped
+      // band. That is the half a reader meets first: a `Listener` mounted
+      // INSIDE each `SingleChildScrollView` — so it out-registers that
+      // view's own `Scrollable` on the `PointerSignalResolver` — is what
+      // keeps the two halves of one rail from behaving differently.
+      //
+      // The SIDEBAR, not the toc rail: the toc outline is short enough that
+      // the 300px notch above already carried it to its `maxScrollExtent`,
+      // so a second notch there would be a no-op no matter what handled it.
+      // The sidebar's "Components" list is 55 rows and has room left.
+      await tester.pump(ElDurations.fast);
+      final double sidebarBefore = sidebarController.offset;
+      expect(
+        sidebarBefore,
+        lessThan(sidebarController.position.maxScrollExtent),
+        reason: 'the sidebar must have room left for this to prove anything',
+      );
+      // Inside the painted rail (0..264) and inside the Stack's own box
+      // (200..1400), so this is the ORDINARY hit-test path, not the escaped
+      // band the catcher answers.
+      final Offset sidebarBodyPoint = Offset(220, sidebarRect.top + 40);
+      expect(sidebarBodyPoint.dx, greaterThan(stackLeft));
+      expect(sidebarRect.contains(sidebarBodyPoint), isTrue);
+      final TestPointer sidebarBodyPointer = TestPointer(
+        3,
+        PointerDeviceKind.mouse,
+      );
+      sidebarBodyPointer.hover(sidebarBodyPoint);
+      await tester.sendEventToBinding(
+        sidebarBodyPointer.scroll(const Offset(0.0, 200.0)),
+      );
+      await tester.pump();
+      expect(
+        sidebarController.offset,
+        equals(sidebarBefore),
+        reason: 'the rail body must glide too, not jump.',
+      );
+      await tester.pump(ElDurations.fast * 2);
+      expect(sidebarController.offset, greaterThan(sidebarBefore));
     },
   );
 }

@@ -34,9 +34,28 @@ import '../kit.dart' show ElSection;
 // The ambient router, so the rails navigate on pages that pass no callback.
 import '../shell.dart' show AppRouterScope;
 import '../site/site_routes.dart' show SiteRoute, SiteSection, siteRoutes;
+import 'docs_link.dart';
 import 'docs_sidebar.dart';
 
+export 'docs_link.dart' show DocsLink, DocsLinkRow;
 export 'docs_sidebar.dart' show DocsSidebar, DocsSidebarEntry, DocsSidebarGroup;
+
+/// The share of the viewport's height either rail may occupy.
+///
+/// The rails are a desktop affordance by construction: the left rail only
+/// renders at [ElBreakpoints.lg] and wider and the "ON THIS PAGE" rail only
+/// at [ElBreakpoints.xl], and a narrower viewport — every tablet — gets the
+/// horizontal [_AnchorStrip] instead and no rail at all. So this fraction is
+/// only ever applied to a desktop viewport, and [_DocsLayoutState.build]
+/// applies it only on the `wide` branch to keep that explicit rather than
+/// implied.
+///
+/// A rail that fits inside this never notices it. It is the long
+/// "Components" list, and a long outline on a component page, that stop
+/// short of the fold instead of running the eye all the way to the bottom
+/// edge of the screen: the rail reads as a panel with room around it rather
+/// than as a column of text poured into the window.
+const double _railViewportFraction = 0.8;
 
 /// The "Sections" then "Components" rail [_DocsLayoutState.build] falls back
 /// to when a page supplies neither [DocsLayout.sidebarGroups] nor the legacy
@@ -197,6 +216,14 @@ class _DocsLayoutState extends State<DocsLayout> {
     debugLabel: 'DocsLayout toc rail',
   );
 
+  /// One per rail — see [_SmoothRailScroll]. Held on the state, not rebuilt
+  /// per frame, because each one carries the running target of an in-flight
+  /// wheel animation across events: that is what makes a second notch
+  /// arriving mid-animation extend the same glide instead of restarting it
+  /// from wherever the first had reached.
+  late final _SmoothRailScroll _sidebarWheel = _SmoothRailScroll(_sidebarScroll);
+  late final _SmoothRailScroll _tocWheel = _SmoothRailScroll(_tocScroll);
+
   /// Tracks each rail's real on-screen box — including `_StickyRail`'s own
   /// vertical translate — for [_RailHitCatchers] to find from the ambient
   /// [Overlay]. See that class's doc comment for why an overlay entry is
@@ -340,8 +367,20 @@ class _DocsLayoutState extends State<DocsLayout> {
     // Each rail begins BELOW the sticky header, so a rail capped at the full
     // viewport height runs past the fold and its last rows cannot be
     // reached. The gutter keeps the final row off the bottom edge.
-    final double railMaxHeight =
-        MediaQuery.sizeOf(context).height - ElWidths.siteHeader - el(4);
+    //
+    // [_railViewportFraction] then caps it again, tighter, so a rail rests
+    // at four fifths of the window rather than filling it. Both bounds are
+    // kept: the fold bound is a correctness rule (a row below the fold
+    // cannot be clicked) and the fraction is the house measure, and on a
+    // short window the fold bound is the smaller of the two. Applied on the
+    // `wide` branch only — the branch that renders a rail at all — so the
+    // rule reads as what it is, a desktop rule. See [_railViewportFraction].
+    final double viewportHeight = MediaQuery.sizeOf(context).height;
+    final double foldMaxHeight =
+        viewportHeight - ElWidths.siteHeader - el(4);
+    final double railMaxHeight = wide
+        ? math.min(viewportHeight * _railViewportFraction, foldMaxHeight)
+        : foldMaxHeight;
     // `_SiteBody` (site_shell.dart) hands this widget a column already capped
     // at `ElWidths.page` and centred inside `ElWidths.shell`, the dead space
     // at the outer edges an earlier audit flagged. That constraint belongs to
@@ -400,8 +439,8 @@ class _DocsLayoutState extends State<DocsLayout> {
         extraWide: extraWide,
         sidebarLink: _sidebarLink,
         tocLink: _tocLink,
-        sidebarController: _sidebarScroll,
-        tocController: _tocScroll,
+        sidebarWheel: _sidebarWheel,
+        tocWheel: _tocWheel,
         railMaxHeight: railMaxHeight,
       ),
       child: Semantics(
@@ -512,9 +551,24 @@ class _DocsLayoutState extends State<DocsLayout> {
                                   controller: _sidebarScroll,
                                   child: SingleChildScrollView(
                                     controller: _sidebarScroll,
-                                    child: DocsSidebar(
-                                      groups: sidebarGroups,
-                                      onNavigate: _navigate,
+                                    // Deeper than this view's own
+                                    // `Scrollable`, so it wins the
+                                    // `PointerSignalResolver` and the rail
+                                    // glides here too — see
+                                    // [_SmoothRailScroll].
+                                    child: Listener(
+                                      behavior: HitTestBehavior.translucent,
+                                      onPointerSignal:
+                                          (PointerSignalEvent event) =>
+                                              _sidebarWheel
+                                                  .handlePointerSignal(
+                                                    event,
+                                                    context,
+                                                  ),
+                                      child: DocsSidebar(
+                                        groups: sidebarGroups,
+                                        onNavigate: _navigate,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -547,9 +601,19 @@ class _DocsLayoutState extends State<DocsLayout> {
                                     controller: _tocScroll,
                                     child: SingleChildScrollView(
                                       controller: _tocScroll,
-                                      child: _TableOfContents(
-                                        entries: toc,
-                                        onAnchor: _scrollToAnchor,
+                                      // See the sidebar's twin above.
+                                      child: Listener(
+                                        behavior: HitTestBehavior.translucent,
+                                        onPointerSignal:
+                                            (PointerSignalEvent event) =>
+                                                _tocWheel.handlePointerSignal(
+                                                  event,
+                                                  context,
+                                                ),
+                                        child: _TableOfContents(
+                                          entries: toc,
+                                          onAnchor: _scrollToAnchor,
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -639,8 +703,8 @@ class _RailHitCatchers extends StatelessWidget {
     required this.extraWide,
     required this.sidebarLink,
     required this.tocLink,
-    required this.sidebarController,
-    required this.tocController,
+    required this.sidebarWheel,
+    required this.tocWheel,
     required this.railMaxHeight,
   });
 
@@ -648,8 +712,8 @@ class _RailHitCatchers extends StatelessWidget {
   final bool extraWide;
   final LayerLink sidebarLink;
   final LayerLink tocLink;
-  final ScrollController sidebarController;
-  final ScrollController tocController;
+  final _SmoothRailScroll sidebarWheel;
+  final _SmoothRailScroll tocWheel;
   final double railMaxHeight;
 
   @override
@@ -681,18 +745,95 @@ class _RailHitCatchers extends StatelessWidget {
               key: const ValueKey<String>('docs-layout-sidebar-wheel-catcher'),
               link: sidebarLink,
               height: railMaxHeight,
-              controller: sidebarController,
+              wheel: sidebarWheel,
             ),
           if (extraWide)
             _RailWheelCatcher(
               key: const ValueKey<String>('docs-layout-toc-wheel-catcher'),
               link: tocLink,
               height: railMaxHeight,
-              controller: tocController,
+              wheel: tocWheel,
             ),
         ],
       ),
     );
+  }
+}
+
+/// Turns a mouse-wheel notch over a rail into an animated glide instead of a
+/// jump.
+///
+/// A raw [ScrollPosition.pointerScroll] — what [Scrollable] itself does, and
+/// what this class replaced — moves the rail by the notch's full delta on the
+/// very frame the event arrives. On a trackpad, which emits a stream of small
+/// deltas, that reads fine. On a mouse wheel, which emits one large delta per
+/// notch, the rail teleports: the "ON THIS PAGE" outline snaps by a third of
+/// its height per click, and a reader loses their place in a list whose rows
+/// all look alike. The article underneath scrolls smoothly (the page's own
+/// [Scrollable] is driven by a real physics simulation), so the two surfaces
+/// visibly disagree about what scrolling is.
+///
+/// This animates to the same destination instead, over [ElDurations.fast] on
+/// [ElCurves.out]. Three details matter:
+///
+/// * **The target accumulates.** A notch arriving while a previous glide is
+///   still running measures from that glide's destination ([_target]), not
+///   from wherever the rail has physically reached. Spinning the wheel three
+///   times therefore covers three notches of distance in one continuous
+///   movement rather than three restarted, foreshortened ones.
+/// * **Registration still goes through [PointerSignalResolver].** That is
+///   what lets this cooperate with — rather than race — the rail's own
+///   [Scrollable] over the band both can reach, exactly as the direct
+///   `pointerScroll` call it replaced did. The deepest registrant wins, and
+///   [_DocsLayoutState.build] deliberately mounts this handler *inside* each
+///   rail's [SingleChildScrollView] so it is deeper than that view's own
+///   [Scrollable] and takes the event there too — otherwise the escaped band
+///   would glide and the rail's own body would still jump.
+/// * **A delta that would not move the rail is never registered**, so this
+///   never swallows an ambient page-scroll over a rail that is already at
+///   its end, or over the catcher's dead space below a short rail.
+class _SmoothRailScroll {
+  _SmoothRailScroll(this.controller);
+
+  final ScrollController controller;
+
+  /// Where the in-flight animation is heading, or null when none is.
+  double? _target;
+
+  /// Mirrors `ScrollableState._receivedPointerSignal` for the one axis a rail
+  /// ever scrolls: vertical, never reversed.
+  void handlePointerSignal(PointerSignalEvent event, BuildContext context) {
+    if (event is! PointerScrollEvent) return;
+    if (!controller.hasClients) return;
+    final ScrollPosition position = controller.position;
+    final double delta = event.scrollDelta.dy;
+    if (delta == 0.0) return;
+    final double from = _target ?? position.pixels;
+    final double target = (from + delta).clamp(
+      position.minScrollExtent,
+      position.maxScrollExtent,
+    );
+    if (target == from) return;
+    final Duration duration = elAnimationDuration(context, ElDurations.fast);
+    GestureBinding.instance.pointerSignalResolver.register(
+      event,
+      (PointerSignalEvent resolved) => _glideTo(target, duration),
+    );
+  }
+
+  /// [ScrollPosition.animateTo] already degrades to a jump when [duration] is
+  /// [Duration.zero], which is what `elAnimationDuration` returns under
+  /// "reduce motion" — so this needs no branch of its own for that case, and
+  /// an accessibility setting turns the glide off without turning the rail
+  /// off.
+  void _glideTo(double target, Duration duration) {
+    if (!controller.hasClients) return;
+    _target = target;
+    controller.position
+        .animateTo(target, duration: duration, curve: ElCurves.out)
+        .whenComplete(() {
+          if (_target == target) _target = null;
+        });
   }
 }
 
@@ -702,38 +843,16 @@ class _RailWheelCatcher extends StatelessWidget {
     super.key,
     required this.link,
     required this.height,
-    required this.controller,
+    required this.wheel,
   });
 
   final LayerLink link;
   final double height;
-  final ScrollController controller;
 
-  /// Mirrors `ScrollableState._receivedPointerSignal` / `_handlePointerScroll`
-  /// (`package:flutter/src/widgets/scrollable.dart`) for the one axis this
-  /// rail ever scrolls: vertical, never reversed. [PointerSignalResolver]
-  /// registration — not a direct [ScrollPosition.pointerScroll] call — is
-  /// what makes this cooperate with, rather than race, the rail's own
-  /// [Scrollable] over the sliver of the band both can reach.
-  void _handlePointerSignal(PointerSignalEvent event) {
-    if (event is! PointerScrollEvent) return;
-    if (!controller.hasClients) return;
-    final ScrollPosition position = controller.position;
-    final double delta = event.scrollDelta.dy;
-    final double target = (position.pixels + delta).clamp(
-      position.minScrollExtent,
-      position.maxScrollExtent,
-    );
-    // Only worth registering interest if it would actually move the rail —
-    // see [_RailHitCatchers]'s doc comment for why that also keeps this
-    // catcher from swallowing an ambient page-scroll over its own dead
-    // space, below a rail whose content is shorter than [height].
-    if (delta == 0.0 || target == position.pixels) return;
-    GestureBinding.instance.pointerSignalResolver.register(
-      event,
-      (PointerSignalEvent resolved) => position.pointerScroll(delta),
-    );
-  }
+  /// The same [_SmoothRailScroll] the rail's own body registers, so a notch
+  /// delivered over the escaped band extends the very same glide a notch
+  /// delivered over the rail proper would.
+  final _SmoothRailScroll wheel;
 
   @override
   Widget build(BuildContext context) {
@@ -744,7 +863,8 @@ class _RailWheelCatcher extends StatelessWidget {
       showWhenUnlinked: false,
       child: Listener(
         behavior: HitTestBehavior.translucent,
-        onPointerSignal: _handlePointerSignal,
+        onPointerSignal: (PointerSignalEvent event) =>
+            wheel.handlePointerSignal(event, context),
         child: SizedBox(width: ElWidths.rail + el(6), height: height),
       ),
     );
@@ -974,7 +1094,22 @@ class _TableOfContents extends StatelessWidget {
   }
 }
 
-class _TocRow extends StatelessWidget {
+/// One row of the "ON THIS PAGE" rail.
+///
+/// A row is a **link** and now says so, in all three registers the
+/// `/components` index's own links use ([DocsLink], extracted from it): a
+/// pointer cursor, an ink cross-fade to `actionInk` on hover, and
+/// `Semantics(link: true)` so a screen reader announces it as one. Before
+/// this it carried only the cursor, which meant a rail of rows that looked
+/// exactly like the captions elsewhere on the page and gave no feedback when
+/// the pointer was actually over one — the same complaint the article's own
+/// cross-references drew.
+///
+/// It composes the affordance rather than mounting a [DocsLink]: the
+/// [MouseRegion] has to stay an **ancestor** of the row's keyed
+/// [GestureDetector], which is where `docs_layout_test.dart` looks for it,
+/// and a rail row scrolls rather than routes.
+class _TocRow extends StatefulWidget {
   const _TocRow({
     required this.entry,
     required this.onAnchor,
@@ -988,20 +1123,56 @@ class _TocRow extends StatelessWidget {
   final bool indented;
 
   @override
+  State<_TocRow> createState() => _TocRowState();
+}
+
+class _TocRowState extends State<_TocRow> {
+  bool _hovered = false;
+
+  void _hover(bool value) {
+    if (_hovered == value) return;
+    setState(() => _hovered = value);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final Widget row = MouseRegion(
-      cursor: SystemMouseCursors.click,
-      child: GestureDetector(
-        key: ValueKey<String>('docs-layout-toc-entry:${entry.anchor}'),
-        onTap: () => onAnchor(entry.anchor),
-        behavior: HitTestBehavior.opaque,
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: el(1.5)),
-          child: ElText(entry.title, ElType.small),
+    final ElThemeData theme = ElTheme.of(context);
+    final DocsTocEntry entry = widget.entry;
+    final Widget row = Semantics(
+      // No label: the [ElText] below supplies it and merges up. See
+      // [DocsLink], which makes the same choice for the same reason.
+      link: true,
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        onEnter: (_) => _hover(true),
+        onExit: (_) => _hover(false),
+        child: GestureDetector(
+          key: ValueKey<String>('docs-layout-toc-entry:${entry.anchor}'),
+          onTap: () => widget.onAnchor(entry.anchor),
+          behavior: HitTestBehavior.opaque,
+          child: Padding(
+            padding: EdgeInsets.symmetric(vertical: el(1.5)),
+            child: TweenAnimationBuilder<Color?>(
+              tween: ColorTween(
+                end: _hovered ? theme.actionInk : theme.mutedForeground,
+              ),
+              duration: elAnimationDuration(
+                context,
+                ElDurations.transitionDefault,
+              ),
+              curve: ElCurves.out,
+              builder: (BuildContext context, Color? ink, Widget? _) =>
+                  ElText(
+                    entry.title,
+                    ElType.small,
+                    color: ink ?? theme.mutedForeground,
+                  ),
+            ),
+          ),
         ),
       ),
     );
-    if (!indented) return row;
+    if (!widget.indented) return row;
     return Padding(
       key: ValueKey<String>('docs-layout-toc-child:${entry.anchor}'),
       padding: EdgeInsets.only(left: el(4)),
