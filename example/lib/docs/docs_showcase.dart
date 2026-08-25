@@ -50,6 +50,7 @@ class DocsShowcase extends StatefulWidget {
     required this.specimen,
     required this.code,
     this.alignment = Alignment.center,
+    this.label,
   });
 
   /// The live component, rendered in the Preview pane.
@@ -59,6 +60,12 @@ class DocsShowcase extends StatefulWidget {
   final String code;
 
   final Alignment alignment;
+
+  /// The toggle group's accessible name. Defaults to `'Specimen view'`, the
+  /// name every showcase used before this field existed: a page with many
+  /// showcases on it should pass its own, since a screen reader otherwise
+  /// hears the same name once per showcase.
+  final String? label;
 
   /// The stage height. 640 is the reading column's own measure, and a
   /// specimen judged in a shorter box reads as cramped.
@@ -93,7 +100,7 @@ class _DocsShowcaseState extends State<DocsShowcase> {
         Align(
           alignment: Alignment.centerLeft,
           child: ElToggleGroup(
-            label: 'Specimen view',
+            label: widget.label ?? 'Specimen view',
             items: const <ElToggleGroupItem>[
               ElToggleGroupItem(label: 'Preview'),
               ElToggleGroupItem(label: 'Code'),

@@ -44,11 +44,18 @@ class ShowcaseSection extends DocsPageSection {
     required this.specimen,
     required this.code,
     this.alignment = Alignment.center,
+    this.label,
   });
 
   final Widget specimen;
   final String code;
   final Alignment alignment;
+
+  /// [DocsShowcase.label]. Defaults to null, which lets [DocsShowcase] fall
+  /// back to `'Specimen view'`. A page with more than one showcase should
+  /// give each its own, so its toggle group announces which section it
+  /// belongs to rather than repeating the same name for every one.
+  final String? label;
 }
 
 /// Prose plus one uncapped code block. Usage is the only one Button needs.
@@ -160,8 +167,13 @@ class ComponentDocPage extends StatelessWidget {
 
   Widget _body(DocsPageSection section) => switch (section) {
     ShowcaseSection(:final Widget specimen, :final String code,
-        :final Alignment alignment) =>
-      DocsShowcase(specimen: specimen, code: code, alignment: alignment),
+        :final Alignment alignment, :final String? label) =>
+      DocsShowcase(
+        specimen: specimen,
+        code: code,
+        alignment: alignment,
+        label: label,
+      ),
     SnippetSection(:final String code) => DocsSnippet(code: code),
     InstallSection(:final String command, :final List<DocsCodeFile> manualFiles) =>
       DocsInstall(command: command, manualFiles: manualFiles),

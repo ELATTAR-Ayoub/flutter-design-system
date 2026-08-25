@@ -1,7 +1,11 @@
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/button/meta.dart';
 import 'package:example/components_docs/button/page.dart';
-import 'package:example/kit.dart' show ElSection;
+import 'package:example/docs/component_doc_page.dart' show DocsTocEntry;
+import 'package:example/docs/docs_disclosure.dart';
+import 'package:example/docs/docs_install.dart';
+import 'package:example/docs/docs_section.dart' show DocsSection;
+import 'package:example/docs/docs_showcase.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -11,6 +15,18 @@ Widget _harness({
 }) => ElTheme(
   controller: controller,
   child: MaterialApp(home: SingleChildScrollView(child: child)),
+);
+
+/// The single `DocsDisclosure` whose title is [title]. `DocsDisclosure`'s
+/// own trigger key ([DocsDisclosure.triggerKey]) is one constant shared by
+/// every instance on the page, so a bare `find.byKey` would match all eight
+/// — this narrows to the one panel by its title first, matching the kit's
+/// own convention (see `docs_disclosure_test.dart`).
+Finder _disclosureTrigger(String title) => find.descendant(
+  of: find.byWidgetPredicate(
+    (Widget widget) => widget is DocsDisclosure && widget.title == title,
+  ),
+  matching: find.byKey(DocsDisclosure.triggerKey),
 );
 
 /// Every named constructor parameter `ElButton`'s own class declares
@@ -61,6 +77,19 @@ void main() {
           find.byKey(const ValueKey<String>('button-doc-article')),
           findsOneWidget,
         );
+
+        // The API table lives inside the API Reference disclosure, closed
+        // by default (a closed `DocsDisclosure` mounts no content at all,
+        // see `docs_disclosure_test.dart`), so open it before reading any
+        // of its rows. The trigger sits well past the 900px viewport on a
+        // page this long, so it must be scrolled into view before `tap()`
+        // can hit test it.
+        final Finder apiTrigger = _disclosureTrigger('API Reference');
+        await tester.ensureVisible(apiTrigger);
+        await tester.pump();
+        await tester.tap(apiTrigger);
+        await tester.pump();
+        await tester.pump(ElDurations.jelly);
 
         // Every ElButton constructor parameter is named in the ElButton
         // API table.
@@ -191,30 +220,36 @@ void main() {
     );
 
     testWidgets(
-      'sections render in the shadcn-mirrored order, section for section',
+      'the page is declared, and every section is a kit component',
       (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 900);
+        tester.view.physicalSize = const Size(1440, 4000);
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
 
-        final ElThemeController controller = ElThemeController(
-          mode: ElThemeMode.dark,
-        );
         await tester.pumpWidget(
-          _harness(controller: controller, child: const ButtonDocPage()),
+          _harness(
+            controller: ElThemeController(mode: ElThemeMode.dark),
+            child: const ButtonDocPage(),
+          ),
         );
         await tester.pump();
 
-        // Immune to the duplicate-string hazard `find.text` carries here: a
-        // section heading and its own TOC link render the same string, so
-        // `find.text('States')` finds two widgets, not one. Reading each
-        // mounted `ElSection`'s own `title` field sidesteps that entirely.
-        final List<String> titles = tester
-            .widgetList<ElSection>(find.byType(ElSection))
-            .map((ElSection section) => section.title)
-            .toList();
+        // Sixteen specimen stages: the Preview hero, Size, the seven
+        // variants, Icon, With Icon, Rounded, Spinner, Disabled, Emphasis,
+        // and Button Group.
+        expect(find.byType(DocsShowcase), findsNWidgets(16));
+        expect(find.byType(DocsInstall), findsOneWidget);
+        // Eight collapsed sections: API Reference, States, Accessibility,
+        // Keyboard, Responsive, Dependencies, Theming, Source.
+        expect(find.byType(DocsDisclosure), findsNWidgets(8));
+      },
+    );
 
-        expect(titles, <String>[
+    test('the table of contents matches the declared sections', () {
+      expect(
+        buttonDocSpec.toc.map((DocsTocEntry entry) => entry.title).toList(),
+        <String>[
+          'Preview',
           'Installation',
           'Usage',
           'Size',
@@ -234,11 +269,69 @@ void main() {
           'Button Group',
           'API Reference',
           'States',
-          'Accessibility and keyboard behavior',
-          'Responsive and platform behavior',
-          'Dependencies, files, and install facts',
-          'Theming notes',
-          'Source, tests, and docs',
+          'Accessibility',
+          'Keyboard',
+          'Responsive',
+          'Dependencies',
+          'Theming',
+          'Source',
+        ],
+      );
+    });
+
+    testWidgets(
+      'sections render in the shadcn-mirrored order, section for section',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(1440, 900);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+
+        final ElThemeController controller = ElThemeController(
+          mode: ElThemeMode.dark,
+        );
+        await tester.pumpWidget(
+          _harness(controller: controller, child: const ButtonDocPage()),
+        );
+        await tester.pump();
+
+        // Immune to the duplicate-string hazard `find.text` carries here: a
+        // section heading and its own TOC link render the same string, so
+        // `find.text('States')` finds two widgets, not one. Reading each
+        // mounted `DocsSection`'s own `title` field sidesteps that
+        // entirely — the same fix the old `ElSection` version of this test
+        // made, updated for the kit's own section widget.
+        final List<String> titles = tester
+            .widgetList<DocsSection>(find.byType(DocsSection))
+            .map((DocsSection section) => section.title)
+            .toList();
+
+        expect(titles, <String>[
+          'Preview',
+          'Installation',
+          'Usage',
+          'Size',
+          'Default',
+          'Premium',
+          'Outline',
+          'Secondary',
+          'Ghost',
+          'Destructive',
+          'Link',
+          'Icon',
+          'With Icon',
+          'Rounded',
+          'Spinner',
+          'Disabled',
+          'Emphasis',
+          'Button Group',
+          'API Reference',
+          'States',
+          'Accessibility',
+          'Keyboard',
+          'Responsive',
+          'Dependencies',
+          'Theming',
+          'Source',
         ]);
       },
     );
