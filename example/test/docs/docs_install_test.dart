@@ -89,6 +89,12 @@ void main() {
         (raw! as Map<String, Object?>)['name']! as String,
     };
 
+    expect(
+      componentDocs.length,
+      greaterThanOrEqualTo(55),
+      reason: 'the command-truth guard must not pass vacuously over an empty catalog',
+    );
+
     for (final ComponentDocEntry entry in componentDocs) {
       expect(
         entry.command,
