@@ -111,4 +111,107 @@ void main() {
       expect(text.spec.uppercase, isFalse, reason: text.text);
     }
   });
+
+  testWidgets('an effect section renders its host in a stage', (
+    WidgetTester tester,
+  ) async {
+    // The fifth case. An effect has no variants and often no widget of its
+    // own, so what a reader must see is the thing it is applied TO — staged
+    // at the host's own measure, not at the page default.
+    tester.view.physicalSize = const Size(1440, 2000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(
+      _host(
+        const ComponentDocPage(
+          spec: ComponentDocSpec(
+            name: 'glass',
+            title: 'Glass',
+            description: 'A surface treatment.',
+            sections: <DocsPageSection>[
+              EffectSection(
+                id: 'applied',
+                title: 'Applied',
+                host: SizedBox(height: 120, width: 200),
+                code: 'ElGlass(child: ...)',
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.byType(DocsShowcase), findsOneWidget);
+    expect(find.text('Applied'), findsOneWidget);
+    expect(
+      tester.getSize(find.byType(DocsShowcaseFrame)).height,
+      DocsShowcase.shortMinHeight,
+    );
+  });
+
+  testWidgets('an effect section can ask for more room', (
+    WidgetTester tester,
+  ) async {
+    tester.view.physicalSize = const Size(1440, 2000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(
+      _host(
+        ComponentDocPage(
+          spec: ComponentDocSpec(
+            name: 'starfield',
+            title: 'Starfield',
+            description: 'A field of stars.',
+            sections: <DocsPageSection>[
+              EffectSection(
+                id: 'applied',
+                title: 'Applied',
+                host: const SizedBox(height: 120, width: 200),
+                code: 'ElStarfield()',
+                minHeight: el(160),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(tester.getSize(find.byType(DocsShowcaseFrame)).height, el(160));
+  });
+
+  testWidgets('a showcase section can shorten its own stage', (
+    WidgetTester tester,
+  ) async {
+    tester.view.physicalSize = const Size(1440, 2000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(
+      _host(
+        ComponentDocPage(
+          spec: ComponentDocSpec(
+            name: 'button',
+            title: 'Button',
+            description: 'A control.',
+            sections: <DocsPageSection>[
+              ShowcaseSection(
+                id: 'ghost',
+                title: 'Ghost',
+                specimen: const SizedBox(height: 40, width: 100),
+                code: 'x',
+                minHeight: el(48),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(tester.getSize(find.byType(DocsShowcaseFrame)).height, el(48));
+  });
 }
