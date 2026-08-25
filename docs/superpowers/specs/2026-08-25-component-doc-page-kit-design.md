@@ -79,7 +79,7 @@ Nothing else about the shell changes. The centre column keeps
 
 ## 4. Component inventory
 
-Eleven components. Every repeated piece of a page is one of them; a page
+Thirteen components. Every repeated piece of a page is one of them; a page
 composes them and declares nothing else. All live in `example/lib/docs/`.
 
 ### 4.1 Code
@@ -113,7 +113,7 @@ a mis-tap. Used by every snippet and by the install command.
 **`DocsShowcase`** — the specimen frame, and the component the reader sees most.
 
 - Minimum height `el(160)` = **640**, relaxing to `el(96)` = 384 below
-  `ElBreakpoints.md`: 640 is taller than a 390×844 phone viewport minus header
+  `ElBreakpoints.sm`: 640 is taller than a 390×844 phone viewport minus header
   and toggle, and the title and control must stay on screen.
 - A Preview↔Code toggle on `ElToggleGroup`, one item each.
 - **Preview** centres the live specimen on a neutral surface.
@@ -139,10 +139,15 @@ Carries: API Reference, States, Accessibility, Keyboard, Responsive,
 Dependencies, Theming, Source.
 
 **`DocsTable`** — rewritten on the package's `ElTable` instead of the
-hand-rolled `_TableHeader`/`_FactRow` pair in `docs_facts.dart`. Columns are
-declared as fractions summing to 1 through `ElTableColumnWidth`, so the table
-fills its container with no trailing gap. Horizontal overflow scrolls inside
-its own container; the page never scrolls sideways.
+hand-rolled `_TableHeader`/`_FactRow` pair in `docs_facts.dart`.
+
+`ElTable` exposes no width hook — it hardcodes `defaultColumnWidth: const
+ElTableColumnWidth()`, a widest-cell measure — so a table left alone ends at
+its content and leaves a gap. `DocsTable` therefore declares columns as
+fractions summing to 1 and gives each cell that exact width, which makes
+"widest cell" the width we chose and the columns sum to the container. The
+package component is not given a new parameter for this; the sizing is product
+code.
 
 **`DocsApiTable`** — `DocsTable` with the API column set (property, type,
 default, description) and the `DocsApiFact` model it already has. It is a
@@ -161,7 +166,28 @@ that fails.
 
 Manual shows the installed file paths and their source, as it does today.
 
-### 4.5 Page
+### 4.5 Section and anchor
+
+`ElSection` in `example/lib/kit.dart` does two unrelated jobs: it owns the
+anchor registry the table of contents scrolls to, and it renders a section's
+heading. **92 files call it** — 57 under `components_docs/`, 27 in the gallery
+that no longer routes, 7 elsewhere. Rewriting it in place ripples through all
+of them.
+
+So it is split rather than mutated:
+
+**`DocsAnchor`** — the anchor registry and `scrollTo`, extracted unchanged.
+`docs_layout.dart` finds sections by `ElSection.anchorKey`, and several page
+tests find them the same way, so the registry must stay single.
+
+**`DocsSection`** — the presentation, rebuilt: full width, our type roles, and
+**no private measure cap on the description**. That cap is what leaves a gap on
+the right of every section today.
+
+`ElSection` becomes the two composed and forwards its two statics, so the other
+91 call sites get the corrected behaviour with no edits.
+
+### 4.6 Page
 
 **`ComponentDocPage`** — the page itself, as a component.
 
@@ -177,8 +203,8 @@ sealed class DocsSection
 ```
 
 A page file becomes a declaration: its intro, its ordered sections, its API
-facts. `ComponentDocPage` walks the list, wraps each in the existing
-`ElSection` from `example/lib/kit.dart`, and hands `DocsLayout` the table of
+facts. `ComponentDocPage` walks the list, wraps each in `DocsSection`, and hands
+`DocsLayout` the table of
 contents derived from the same list — so a section can never exist without a
 TOC entry, or a TOC entry without a section.
 
