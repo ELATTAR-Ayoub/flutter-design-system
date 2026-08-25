@@ -248,7 +248,7 @@ class _ResizableArticle extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: el(6),
         children: <Widget>[
-          ElText('withHandle: true (default)', ElType.label),
+          ElText('withHandle: true (default)', ElType.section),
           SizedBox(height: el(2)),
           SizedBox(
             height: el(20),
@@ -277,7 +277,7 @@ class _ResizableArticle extends StatelessWidget {
               ],
             ),
           ),
-          ElText('withHandle: false', ElType.label),
+          ElText('withHandle: false', ElType.section),
           SizedBox(height: el(2)),
           SizedBox(
             height: el(20),

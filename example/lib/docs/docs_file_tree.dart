@@ -196,7 +196,7 @@ class _SelectedFilePane extends StatelessWidget {
                     children: <Widget>[
                       ElText(
                         file.title ?? file.path,
-                        ElType.label,
+                        ElType.section,
                         color: theme.foreground,
                       ),
                       if (file.description != null) ...<Widget>[

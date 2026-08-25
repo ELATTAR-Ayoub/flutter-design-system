@@ -176,6 +176,13 @@ const Set<String> _dsDartKeywords = <String>{
 final RegExp _dsIdentStart = RegExp(r'[A-Za-z_$]');
 final RegExp _dsIdentPart = RegExp(r'[A-Za-z0-9_$]');
 final RegExp _dsDigit = RegExp(r'[0-9]');
+// Equivalent to the old `word[0].toUpperCase() == word[0] &&
+// word[0].toLowerCase() != word[0]` pair: that conjunction is true only when
+// the leading character is an actual cased uppercase letter — a digit,
+// underscore or `$` fails the second half because lower-casing them is a
+// no-op, so they never qualify. A leading `[A-Z]` match captures exactly the
+// same set.
+final RegExp _upperStart = RegExp(r'^[A-Z]');
 
 /// Tokenises one line of Dart-ish source into [ElCodeToken]s, coloured
 /// through [ElPrismPalette].
@@ -264,9 +271,7 @@ List<ElCodeToken> _tokeniseDartLine(String line) {
       final String word = line.substring(start, i);
       if (_dsDartKeywords.contains(word)) {
         out.add(_DsCodeToken(word, _DsCodeTokenKind.keyword));
-      } else if (word.isNotEmpty &&
-          word[0].toUpperCase() == word[0] &&
-          word[0].toLowerCase() != word[0]) {
+      } else if (word.isNotEmpty && _upperStart.hasMatch(word)) {
         out.add(_DsCodeToken(word, _DsCodeTokenKind.type));
       } else {
         out.add(_DsCodeToken(word, _DsCodeTokenKind.plain));

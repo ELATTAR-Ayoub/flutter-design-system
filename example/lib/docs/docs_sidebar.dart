@@ -97,7 +97,7 @@ class _SidebarGroup extends StatelessWidget {
       key: ValueKey<String>('docs-sidebar-group:${group.label}'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        ElText(group.label, ElType.label, color: theme.mutedForeground),
+        ElText(group.label, ElType.section, color: theme.mutedForeground),
         SizedBox(height: el(3)),
         for (int i = 0; i < group.items.length; i++) ...<Widget>[
           if (i > 0) SizedBox(height: el(1)),

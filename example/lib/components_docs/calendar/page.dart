@@ -1142,11 +1142,11 @@ class _CalendarArticle extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        ElText('Enabled', ElType.label),
+        ElText('Enabled', ElType.section),
         SizedBox(height: el(2)),
         const _DatePickerSpecimen(),
         SizedBox(height: el(5)),
-        ElText('Disabled', ElType.label),
+        ElText('Disabled', ElType.section),
         SizedBox(height: el(2)),
         const _DatePickerDisabledSpecimen(),
       ],

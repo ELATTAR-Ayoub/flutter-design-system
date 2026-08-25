@@ -149,7 +149,7 @@ class _SeparatorArticle extends StatelessWidget {
     preview: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        ElText('Horizontal', ElType.label),
+        ElText('Horizontal', ElType.section),
         SizedBox(height: el(3)),
         Align(
           alignment: AlignmentDirectional.centerStart,
@@ -172,7 +172,7 @@ class _SeparatorArticle extends StatelessWidget {
           ),
         ),
         SizedBox(height: el(8)),
-        ElText('Vertical', ElType.label),
+        ElText('Vertical', ElType.section),
         SizedBox(height: el(3)),
         SizedBox(
           height: el(6),

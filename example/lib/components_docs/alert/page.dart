@@ -1016,7 +1016,7 @@ class _LabeledFacts extends StatelessWidget {
       children: <Widget>[
         for (int i = 0; i < entries.length; i++) ...<Widget>[
           if (i > 0) SizedBox(height: el(4)),
-          ElText(entries[i].$1, ElType.label),
+          ElText(entries[i].$1, ElType.section),
           SizedBox(height: el(1)),
           ElText(entries[i].$2, ElType.body),
         ],

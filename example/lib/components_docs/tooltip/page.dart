@@ -858,7 +858,7 @@ class _A11yRow extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          ElText(label, ElType.label, color: theme.actionInk),
+          ElText(label, ElType.section, color: theme.actionInk),
           SizedBox(height: el(1)),
           ElText(body, ElType.small),
         ],
@@ -879,7 +879,7 @@ class _TooltipPreview extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        ElText('Top side: the default', ElType.label),
+        ElText('Top side: the default', ElType.section),
         SizedBox(height: el(3)),
         Wrap(
           spacing: el(4),
@@ -909,7 +909,7 @@ class _TooltipPreview extends StatelessWidget {
           ],
         ),
         SizedBox(height: el(6)),
-        ElText("Right side: a collapsed rail row's only label", ElType.label),
+        ElText("Right side: a collapsed rail row's only label", ElType.section),
         SizedBox(height: el(3)),
         ElTooltip(
           key: const ValueKey<String>('tooltip-doc-specimen-right'),

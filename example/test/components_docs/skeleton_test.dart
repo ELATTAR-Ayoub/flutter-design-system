@@ -180,14 +180,14 @@ void main() {
         await tester.ensureVisible(toggle);
         await tester.pump();
 
-        // ElType.label uppercases its rendered text (theme_scope.dart's
-        // ElText.build: `spec.uppercase ? text.toUpperCase() : text`), so
-        // the name renders as "AMARA CHEN", not "Amara Chen".
-        expect(find.text('AMARA CHEN'), findsNothing);
+        // The name renders through ElType.section, unmodified, as
+        // "Amara Chen" once the loaded state swaps the skeleton row for
+        // the real content.
+        expect(find.text('Amara Chen'), findsNothing);
         await tester.tap(toggle);
         await tester.pump();
         await tester.pump(const Duration(milliseconds: 300));
-        expect(find.text('AMARA CHEN'), findsOneWidget);
+        expect(find.text('Amara Chen'), findsOneWidget);
       },
     );
 

@@ -730,7 +730,7 @@ class _A11yRow extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          ElText(label, ElType.label, color: theme.actionInk),
+          ElText(label, ElType.section, color: theme.actionInk),
           SizedBox(height: el(1)),
           ElText(body, ElType.small),
         ],
@@ -746,7 +746,7 @@ class _BreadcrumbPreview extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      ElText('Typical trail', ElType.label),
+      ElText('Typical trail', ElType.section),
       SizedBox(height: el(2)),
       const ElBreadcrumb(
         items: <ElBreadcrumbEntry>[
@@ -756,7 +756,7 @@ class _BreadcrumbPreview extends StatelessWidget {
         ],
       ),
       SizedBox(height: el(6)),
-      ElText('Single crumb: no separator to derive', ElType.label),
+      ElText('Single crumb: no separator to derive', ElType.section),
       SizedBox(height: el(2)),
       const ElBreadcrumb(
         items: <ElBreadcrumbEntry>[ElBreadcrumbEntry.page('Only crumb')],

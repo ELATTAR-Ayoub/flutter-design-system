@@ -241,7 +241,7 @@ class _ArticleContent extends StatelessWidget {
           child: DocsSelectableCodeBlock(code: _footerCode),
         ),
         SizedBox(height: el(6)),
-        ElText('In a footer', ElType.label),
+        ElText('In a footer', ElType.section),
         SizedBox(height: el(2)),
         ElText(
           'The trigger is a ElSidebarMenuButton at size lg, which is what '

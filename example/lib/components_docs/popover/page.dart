@@ -1199,7 +1199,7 @@ class _A11yRow extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          ElText(label, ElType.label, color: theme.actionInk),
+          ElText(label, ElType.section, color: theme.actionInk),
           SizedBox(height: el(1)),
           ElText(body, ElType.small),
         ],
@@ -1227,7 +1227,7 @@ class _PopoverPreviewState extends State<_PopoverPreview> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        ElText('Bottom side, start aligned', ElType.label),
+        ElText('Bottom side, start aligned', ElType.section),
         SizedBox(height: el(3)),
         ElPopover(
           open: _open,
@@ -1258,7 +1258,7 @@ class _PopoverPreviewState extends State<_PopoverPreview> {
                     children: <Widget>[
                       ElText(
                         'Update dimensions',
-                        ElType.label,
+                        ElType.section,
                         color: theme.popoverForeground,
                       ),
                       SizedBox(height: el(1)),

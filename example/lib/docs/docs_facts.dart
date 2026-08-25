@@ -202,7 +202,7 @@ class _TableHeader extends StatelessWidget {
           for (final String cell in cells)
             SizedBox(
               width: el(44),
-              child: ElText(cell, ElType.label, color: theme.mutedForeground),
+              child: ElText(cell, ElType.section, color: theme.mutedForeground),
             ),
         ],
       ),
@@ -266,7 +266,7 @@ class _InstallRow extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          ElText(fact.label, ElType.label, color: theme.actionInk),
+          ElText(fact.label, ElType.section, color: theme.actionInk),
           SizedBox(height: el(1)),
           _SelectableFactText(
             text: fact.value,

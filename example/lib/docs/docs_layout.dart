@@ -678,7 +678,7 @@ class _Article extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              ElText(intro.eyebrow, ElType.label, color: theme.actionInk),
+              ElText(intro.eyebrow, ElType.section, color: theme.actionInk),
               SizedBox(height: el(2)),
               ElText(
                 intro.title,
@@ -731,7 +731,7 @@ class _TableOfContents extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          ElText('ON THIS PAGE', ElType.label),
+          ElText('ON THIS PAGE', ElType.section),
           SizedBox(height: el(3)),
           for (final DocsTocEntry entry in entries) ...<Widget>[
             _TocRow(entry: entry, onAnchor: onAnchor),

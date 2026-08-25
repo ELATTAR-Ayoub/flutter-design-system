@@ -2858,7 +2858,7 @@ class _A11yRow extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          ElText(label, ElType.label, color: theme.actionInk),
+          ElText(label, ElType.section, color: theme.actionInk),
           SizedBox(height: el(1)),
           ElText(body, ElType.small),
         ],

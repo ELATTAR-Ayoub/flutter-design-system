@@ -984,7 +984,7 @@ class _TabsPreviewState extends State<_TabsPreview> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        ElText('Standard', ElType.label, color: theme.mutedForeground),
+        ElText('Standard', ElType.section, color: theme.mutedForeground),
         SizedBox(height: el(3)),
         ElTabs(
           key: const ValueKey<String>('tabs-live-specimen'),
@@ -1009,7 +1009,7 @@ class _TabsPreviewState extends State<_TabsPreview> {
           onChanged: (int next) => setState(() => _standardIndex = next),
         ),
         SizedBox(height: el(8)),
-        ElText('Line', ElType.label, color: theme.mutedForeground),
+        ElText('Line', ElType.section, color: theme.mutedForeground),
         SizedBox(height: el(3)),
         ElTabs(
           key: const ValueKey<String>('tabs-line-specimen'),

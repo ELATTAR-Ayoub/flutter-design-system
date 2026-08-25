@@ -644,7 +644,7 @@ class _A11yRow extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          ElText(label, ElType.label, color: theme.actionInk),
+          ElText(label, ElType.section, color: theme.actionInk),
           SizedBox(height: el(1)),
           ElText(body, ElType.small),
         ],
@@ -892,7 +892,7 @@ class _InertVsDisabledPreview extends StatelessWidget {
   Widget _labelled(ElThemeData theme, String label, Widget child) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      ElText(label, ElType.label, color: theme.mutedForeground),
+      ElText(label, ElType.section, color: theme.mutedForeground),
       SizedBox(height: el(2)),
       SizedBox(width: el(32), height: el(32), child: child),
     ],

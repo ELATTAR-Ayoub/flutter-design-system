@@ -351,7 +351,7 @@ class _ArticleState extends State<_Article> {
             crossAxisAlignment: CrossAxisAlignment.start,
             spacing: el(4),
             children: <Widget>[
-              ElText('Search with leading icon and button', ElType.label),
+              ElText('Search with leading icon and button', ElType.section),
               ElInputGroup(
                 startAddon: ElInputGroupAddon(
                   align: ElInputGroupAlign.start,
@@ -376,7 +376,7 @@ class _ArticleState extends State<_Article> {
                 ),
                 child: ElInputGroupInput(placeholder: 'Search...'),
               ),
-              ElText('Text addon: currency prefix', ElType.label),
+              ElText('Text addon: currency prefix', ElType.section),
               ElInputGroup(
                 startAddon: ElInputGroupAddon(
                   align: ElInputGroupAlign.start,
@@ -384,7 +384,7 @@ class _ArticleState extends State<_Article> {
                 ),
                 child: ElInputGroupInput(placeholder: '0.00'),
               ),
-              ElText('Kbd addon: keyboard shortcut', ElType.label),
+              ElText('Kbd addon: keyboard shortcut', ElType.section),
               ElInputGroup(
                 endAddon: ElInputGroupAddon(
                   align: ElInputGroupAlign.end,
@@ -392,7 +392,7 @@ class _ArticleState extends State<_Article> {
                 ),
                 child: ElInputGroupInput(placeholder: 'Quick search'),
               ),
-              ElText('Spinner addon: loading state', ElType.label),
+              ElText('Spinner addon: loading state', ElType.section),
               ElInputGroup(
                 endAddon: ElInputGroupAddon(
                   align: ElInputGroupAlign.end,

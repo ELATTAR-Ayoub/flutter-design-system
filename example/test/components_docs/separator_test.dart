@@ -189,18 +189,24 @@ void main() {
         final Finder article = find.byKey(
           const ValueKey<String>('separator-doc-article'),
         );
-        for (final String title in <String>[
-          'Vertical',
-          'Menu',
-          'List',
-          'RTL',
-        ]) {
+        for (final String title in <String>['Menu', 'List', 'RTL']) {
           expect(
             find.descendant(of: article, matching: find.text(title)),
             findsOneWidget,
             reason: 'missing $title',
           );
         }
+
+        // 'Vertical' now matches twice: the section title and the
+        // 'Vertical' demo caption, which used to render as 'VERTICAL'
+        // through ElType.label and so did not collide. Now that the
+        // caption renders through ElType.section (no uppercasing), both
+        // share the exact string.
+        expect(
+          find.descendant(of: article, matching: find.text('Vertical')),
+          findsNWidgets(2),
+          reason: 'missing Vertical',
+        );
 
         expect(
           find.descendant(of: article, matching: find.text('API Reference')),

@@ -817,7 +817,7 @@ class _LoadingCardCompositionState extends State<_LoadingCardComposition> {
                     ? <Widget>[
                         ElText(
                           'Amara Chen',
-                          ElType.label,
+                          ElType.section,
                           color: theme.foreground,
                         ),
                         SizedBox(height: el(1)),

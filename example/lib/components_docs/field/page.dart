@@ -1247,7 +1247,7 @@ class _A11yRow extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          ElText(label, ElType.label, color: theme.actionInk),
+          ElText(label, ElType.section, color: theme.actionInk),
           SizedBox(height: el(1)),
           ElText(body, ElType.small),
         ],
@@ -1489,7 +1489,7 @@ class _FieldPreviewState extends State<_FieldPreview> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        ElText('Vertical, with a live error', ElType.label),
+        ElText('Vertical, with a live error', ElType.section),
         SizedBox(height: el(3)),
         ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: ElContainers.sm),
@@ -1526,7 +1526,7 @@ class _FieldPreviewState extends State<_FieldPreview> {
         SizedBox(height: el(7)),
         ElText(
           'Horizontal, around a checkbox: tap the box or the words',
-          ElType.label,
+          ElType.section,
         ),
         SizedBox(height: el(3)),
         ConstrainedBox(
@@ -1543,7 +1543,7 @@ class _FieldPreviewState extends State<_FieldPreview> {
           ),
         ),
         SizedBox(height: el(7)),
-        ElText('Disabled: the field wins over the control', ElType.label),
+        ElText('Disabled: the field wins over the control', ElType.section),
         SizedBox(height: el(3)),
         ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: ElContainers.sm),
@@ -1561,7 +1561,7 @@ class _FieldPreviewState extends State<_FieldPreview> {
         SizedBox(height: el(7)),
         ElText(
           'Separable: invalid and errors are two different switches',
-          ElType.label,
+          ElType.section,
         ),
         SizedBox(height: el(3)),
         Wrap(

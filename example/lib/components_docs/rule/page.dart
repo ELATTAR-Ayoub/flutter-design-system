@@ -312,12 +312,12 @@ class _DsRuleArticle extends StatelessWidget {
             children: <Widget>[
               ElText(
                 'ElIssueMode.first (${firstOnly.length} shown)',
-                ElType.label,
+                ElType.section,
               ),
               for (final String issue in firstOnly)
                 ElText('• $issue', ElType.small, color: theme.destructiveInk),
               SizedBox(height: el(4)),
-              ElText('ElIssueMode.all (${all.length} shown)', ElType.label),
+              ElText('ElIssueMode.all (${all.length} shown)', ElType.section),
               for (final String issue in all)
                 ElText('• $issue', ElType.small, color: theme.destructiveInk),
             ],

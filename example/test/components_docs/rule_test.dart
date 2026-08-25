@@ -69,10 +69,10 @@ void main() {
       );
 
       // Collecting issues: ElIssueMode.first shows 1, ElIssueMode.all
-      // shows 3, for the same failing password value. ElType.label
-      // uppercases its text, so the caption renders shouting-case.
-      expect(find.text('ELISSUEMODE.FIRST (1 SHOWN)'), findsOneWidget);
-      expect(find.text('ELISSUEMODE.ALL (3 SHOWN)'), findsOneWidget);
+      // shows 3, for the same failing password value. The caption now
+      // renders through ElType.section, which does not uppercase.
+      expect(find.text('ElIssueMode.first (1 shown)'), findsOneWidget);
+      expect(find.text('ElIssueMode.all (3 shown)'), findsOneWidget);
 
       // Deduplicating messages: the repeated 'Required.' collapses to one.
       expect(find.text('Required., Too short.'), findsOneWidget);

@@ -309,7 +309,7 @@ class _ArticleContent extends StatelessWidget {
           child: DocsSelectableCodeBlock(code: _compositionAnatomyCode),
         ),
         SizedBox(height: el(6)),
-        ElText('Composed inside a panel', ElType.label),
+        ElText('Composed inside a panel', ElType.section),
         SizedBox(height: el(2)),
         ElText(
           "Pass the panel's own padding to the carousel and give the panel "
@@ -354,7 +354,7 @@ class _ArticleContent extends StatelessWidget {
       preview: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          ElText('basis: 0.5, two per view', ElType.label),
+          ElText('basis: 0.5, two per view', ElType.section),
           SizedBox(height: el(3)),
           KeyedSubtree(
             key: const ValueKey<String>('carousel-example:basis-half'),
@@ -368,7 +368,7 @@ class _ArticleContent extends StatelessWidget {
             ),
           ),
           SizedBox(height: el(6)),
-          ElText('basis: 0.333, three per view', ElType.label),
+          ElText('basis: 0.333, three per view', ElType.section),
           SizedBox(height: el(3)),
           KeyedSubtree(
             key: const ValueKey<String>('carousel-example:basis-third'),

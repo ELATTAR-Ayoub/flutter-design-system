@@ -552,7 +552,7 @@ class _RtlOtp extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        ElText('أدخل رمز التحقق', ElType.label, color: theme.foreground),
+        ElText('أدخل رمز التحقق', ElType.section, color: theme.foreground),
         SizedBox(height: el(3)),
         Center(child: ElInputOtp()),
       ],

@@ -470,7 +470,7 @@ class _HoverCardSpecimen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          ElText('Preview Title', ElType.label),
+          ElText('Preview Title', ElType.section),
           SizedBox(height: el(1)),
           ElText(
             'This is a hover card: it opens on pointer entry and closes '
@@ -501,7 +501,7 @@ class _HoverCardRtl extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            ElText('عنوان المعاينة', ElType.label),
+            ElText('عنوان المعاينة', ElType.section),
             SizedBox(height: el(1)),
             ElText(
               'هذه بطاقة معاينة تظهر عند دخول المؤشر وتختفي عند خروجه.',
@@ -521,7 +521,7 @@ const String _hoverCardCode = '''return ElHoverCard(
     crossAxisAlignment: CrossAxisAlignment.start,
     mainAxisSize: MainAxisSize.min,
     children: <Widget>[
-      ElText('Card Title', ElType.label),
+      ElText('Card Title', ElType.section),
       SizedBox(height: el(1)),
       ElText(
         'A preview that opens on hover. Pointer-only: not on touch.',
@@ -544,7 +544,7 @@ const String _hoverCardRtlCode = '''Directionality(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        ElText('عنوان المعاينة', ElType.label),
+        ElText('عنوان المعاينة', ElType.section),
         SizedBox(height: el(1)),
         ElText(
           'هذه بطاقة معاينة تظهر عند دخول المؤشر وتختفي عند خروجه.',

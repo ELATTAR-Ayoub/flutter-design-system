@@ -752,7 +752,7 @@ const String _compositionCode = '''ElSheetContent(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          ElText('Price range', ElType.label),
+          ElText('Price range', ElType.section),
           SizedBox(height: el(4)),
           ElSlider(
             values: price,

@@ -716,7 +716,7 @@ class _BadgeArticle extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              ElText('Workspace plan', ElType.label),
+              ElText('Workspace plan', ElType.section),
               SizedBox(width: el(2)),
               const ElBadge(label: 'Pro', variant: ElBadgeVariant.premium),
             ],

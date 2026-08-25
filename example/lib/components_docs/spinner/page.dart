@@ -228,11 +228,11 @@ class _SpinnerArticle extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            ElText('Default (16px, 900ms cycle)', ElType.label),
+            ElText('Default (16px, 900ms cycle)', ElType.section),
             SizedBox(height: el(3)),
             const ElSpinner(),
             SizedBox(height: el(5)),
-            ElText('Larger size (24px)', ElType.label),
+            ElText('Larger size (24px)', ElType.section),
             SizedBox(height: el(3)),
             const ElSpinner(size: 24),
           ],
