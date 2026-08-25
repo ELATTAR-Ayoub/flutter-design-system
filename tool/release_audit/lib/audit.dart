@@ -545,12 +545,27 @@ AuditReport auditRelease(String repoRoot, {required Sha256Hex sha256Hex}) {
       registryPinningFindings(registry, version),
     );
 
+    // EVERY payload array, not just `files`. `assets`, `fonts` and `shaders`
+    // carry the same source/target/sha256 shape, and they are precisely where
+    // the third-party and regenerated material lives: the three font binaries,
+    // the perlin texture and the vendored shader. Auditing `files` alone left
+    // the five entries with provenance significance unhashed against the
+    // registry — the /docs/registry page counts all five arrays and reports
+    // 122 payload entries, which is how the gap became visible.
+    const List<String> payloadArrays = <String>[
+      'files',
+      'licenses',
+      'assets',
+      'fonts',
+      'shaders',
+    ];
     final List<String> payload = <String>[];
-    int hashed = 0;
-    int notices = 0;
+    final Map<String, int> counted = <String, int>{
+      for (final String kind in payloadArrays) kind: 0,
+    };
     for (final Object? raw in registry['items']! as List<Object?>) {
       final Map<String, Object?> item = raw! as Map<String, Object?>;
-      for (final String kind in const <String>['files', 'licenses']) {
+      for (final String kind in payloadArrays) {
         for (final Object? entry
             in (item[kind] as List<Object?>? ?? const <Object?>[])) {
           final Map<String, Object?> record = entry! as Map<String, Object?>;
@@ -567,16 +582,14 @@ AuditReport auditRelease(String repoRoot, {required Sha256Hex sha256Hex}) {
               'records ${record['sha256']}.',
             );
           }
-          if (kind == 'files') {
-            hashed++;
-          } else {
-            notices++;
-          }
+          counted[kind] = counted[kind]! + 1;
         }
       }
     }
+    final int total = counted.values.reduce((int a, int b) => a + b);
     recorder.findings(
-      'all $hashed distributed files and $notices notice payloads hash as recorded',
+      'all $total payload entries hash as recorded '
+      '(${counted.entries.map((MapEntry<String, int> e) => '${e.value} ${e.key}').join(', ')})',
       payload,
     );
 

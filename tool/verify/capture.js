@@ -4,6 +4,15 @@
 // and the Flutter canvas app (no DOM scroll reads — the pixels are the truth).
 //
 // usage: node capture.js <url> <out.png> [--theme dark|light] [--settle ms]
+//        [--nav networkidle2|domcontentloaded] [--reduced] [--clock ...]
+//
+// --nav domcontentloaded is for pages that never go network-idle. The
+// documentation error states are the ones that matter: they render ElAlert,
+// whose ElBloomCosmic controllers repeat forever, and the page keeps the
+// connection busy for as long as it is open. networkidle2 simply never
+// fires there and the capture dies on the 90s navigation timeout. This is
+// the browser-side twin of the rule the widget tests already follow: on any
+// page containing ElAlert, pump, never pumpAndSettle.
 const fs = require('fs');
 const puppeteer = require('puppeteer-core');
 const { PNG } = require('pngjs');
@@ -16,12 +25,13 @@ const MAX_STEPS = 40;
 
 function parseArgs() {
   const [url, out] = process.argv.slice(2);
-  const args = { url, out, theme: null, settle: 1200, reduced: false, clock: null };
+  const args = { url, out, theme: null, settle: 1200, reduced: false, clock: null, nav: 'networkidle2' };
   for (let i = 4; i < process.argv.length; i++) {
     if (process.argv[i] === '--theme') args.theme = process.argv[++i];
     if (process.argv[i] === '--settle') args.settle = +process.argv[++i];
     if (process.argv[i] === '--reduced') args.reduced = true;
     if (process.argv[i] === '--clock') args.clock = process.argv[++i];
+    if (process.argv[i] === '--nav') args.nav = process.argv[++i];
   }
   return args;
 }
@@ -110,7 +120,7 @@ function findAdvance(prevSig, newSig) {
 }
 
 (async () => {
-  const { url, out, theme, settle, reduced, clock } = parseArgs();
+  const { url, out, theme, settle, reduced, clock, nav } = parseArgs();
   const browser = await puppeteer.launch({
     executablePath: CHROME,
     headless: true,
@@ -187,7 +197,7 @@ function findAdvance(prevSig, newSig) {
       }
     });
 
-    await page.goto(url, { waitUntil: 'networkidle2', timeout: 90000 });
+    await page.goto(url, { waitUntil: nav, timeout: 90000 });
     try {
       await page.evaluate(() => document.fonts && document.fonts.ready);
     } catch (_) {}

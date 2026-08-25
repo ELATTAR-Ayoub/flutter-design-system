@@ -20,7 +20,8 @@ until phase 3 and moved here so it survives sessions.
 
 | script | job |
 |---|---|
-| `capture.js <url> <out.png> [--theme t] [--settle ms] [--reduced]` | full-page stitched capture at 1440×900, 810px steps |
+| `capture.js <url> <out.png> [--theme t] [--settle ms] [--reduced] [--nav n]` | full-page stitched capture at 1440×900, 810px steps |
+| `shot.js <url> <out.png> [w] [h] [settle]` | one viewport at any size, fixed settle, prints console + pending requests |
 | `diff.js <a.png> <b.png> <out.png>` | pixelmatch diff: raw / AA-aware / half-res %, first divergent + structural rows |
 | `locate.js <a.png> <b.png> <y>` | per-band alignment profile (δ∈[−32,32]) around a row |
 | `crop.js <in.png> <out.png> <x> <y> <w> <h>` | crop for eyeballing a region |
@@ -43,6 +44,23 @@ until phase 3 and moved here so it survives sessions.
 - **Startup settle gate:** CanvasKit loads fonts outside `document.fonts`;
   capture polls until two consecutive shots are pixel-stable before frame
   0 counts (~570px of phantom height otherwise).
+- **Two pages the stitcher cannot reach on its own.** The documentation
+  *error* states render `ElAlert`, whose `ElBloomCosmic` controllers
+  `repeat(reverse: true)` forever; the page never goes network-idle and
+  `capture.js` dies on its 90s navigation timeout. Pass
+  `--nav domcontentloaded`. This is the browser-side twin of the widget-test
+  rule that on any page containing `ElAlert` you `pump()` and never
+  `pumpAndSettle()`.
+- **Narrow widths are `shot.js`, not `capture.js`.** The matcher's content clip
+  (x∈[248,1424), y≥64) is the wide shell's own geometry. Below the sidebar
+  breakpoint there is no rail to exclude, so the clip means nothing and the
+  stitched advances would be fiction. Capture the first viewport and say that
+  is what it is.
+- **Serve from a short path on Windows.** A capture root nested under a long
+  temp path pushes the deepest bundled assets past MAX_PATH (260): the files
+  exist, `os.listdir` lists them, and `os.path.exists` is False — so the static
+  server 404s them and the app's console fills with asset failures that have
+  nothing to do with the build. `C:/elx/...` is enough.
 - **Reduced motion needs both channels:** `--reduced` emulates
   `prefers-reduced-motion` (freezes the web CSS only — CDP emulation never
   reaches the Flutter engine); the Flutter app freezes via its
