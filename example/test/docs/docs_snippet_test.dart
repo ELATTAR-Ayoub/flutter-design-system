@@ -134,6 +134,38 @@ void main() {
     );
   });
 
+  testWidgets(
+    'the copy control sits inside the header strip, clear of the code body',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(
+        _host(const SizedBox(width: 640, child: DocsSnippet(code: 'final a = 1;'))),
+      );
+      await tester.pump();
+
+      final Rect strip = tester.getRect(
+        find.byKey(const ValueKey<String>('docs-snippet-strip')),
+      );
+      final Rect codeBody = tester.getRect(
+        find.byKey(const ValueKey<String>('docs-snippet-code-body')),
+      );
+      final Rect control = tester.getRect(find.byType(DocsCopyButton));
+
+      // Right-aligned against the strip's own padded content edge, not the
+      // block's outer corner.
+      expect(
+        control.right,
+        closeTo(strip.right - ElAgentCodeBlock.stripPadX, el(1)),
+      );
+      // Clear of the language label sitting at the strip's left edge.
+      expect(control.left, greaterThan(strip.left));
+      // Vertically centred against the strip -- not floating over it from
+      // the block's own top-right corner.
+      expect(control.center.dy, closeTo(strip.center.dy, el(1)));
+      // Never reaching down into the code body below the strip.
+      expect(control.bottom, lessThanOrEqualTo(codeBody.top));
+    },
+  );
+
   testWidgets('an uncapped snippet has no expansion control', (
     WidgetTester tester,
   ) async {

@@ -48,27 +48,13 @@ class DocsSnippet extends StatelessWidget {
   /// Null leaves the block at its natural height.
   final double? maxHeight;
 
-  /// The copy control's inset from the block's top-right corner.
-  static double get controlInset => el(2);
-
   @override
   Widget build(BuildContext context) {
     final Widget block = _DocsSnippetBody(code: code, language: language);
     final double? cap = maxHeight;
 
-    return Stack(
-      children: <Widget>[
-        if (cap == null)
-          block
-        else
-          DocsSnippetOverflow(maxHeight: cap, child: block),
-        Positioned(
-          top: controlInset,
-          right: controlInset,
-          child: DocsCopyButton(text: code),
-        ),
-      ],
-    );
+    if (cap == null) return block;
+    return DocsSnippetOverflow(maxHeight: cap, child: block);
   }
 }
 
@@ -100,6 +86,7 @@ class _DocsSnippetBody extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           Container(
+            key: const ValueKey<String>('docs-snippet-strip'),
             padding: EdgeInsets.symmetric(
               horizontal: ElAgentCodeBlock.stripPadX,
               vertical: ElAgentCodeBlock.stripPadY,
@@ -112,12 +99,35 @@ class _DocsSnippetBody extends StatelessWidget {
                 ),
               ),
             ),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: ElText(label, ElType.caption, color: theme.mutedForeground),
+            // The strip's own bounds fix the row's height — governed by the
+            // language label alone, exactly as before the control moved in
+            // here — and the control rides a Positioned confined to *this*
+            // Container rather than the whole block, so it reads as part of
+            // the strip instead of floating over it. `clipBehavior: Clip.none`
+            // lets its ~32px rung overflow the ~30px strip by under a pixel a
+            // side without being cut, and without the strip growing to fit it.
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: <Widget>[
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: ElText(
+                    label,
+                    ElType.caption,
+                    color: theme.mutedForeground,
+                  ),
+                ),
+                Positioned(
+                  top: el(0),
+                  bottom: el(0),
+                  right: el(0),
+                  child: Center(child: DocsCopyButton(text: code)),
+                ),
+              ],
             ),
           ),
           Container(
+            key: const ValueKey<String>('docs-snippet-code-body'),
             color: ElPrismPalette.ground,
             margin: const EdgeInsets.symmetric(
               vertical: ElPrismPalette.margin,
