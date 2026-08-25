@@ -1,18 +1,21 @@
 /// Tests for `components_docs/toggle/page.dart`'s [ToggleDocPage].
 ///
-/// **Trimmed for the split.** This suite used to cover `ElToggle` AND
-/// `ElToggleGroup` on one page. The group moved to its own page, so every
-/// group assertion moved to `toggle_group_test.dart`, and one assertion was
-/// added in their place: that no `ElToggleGroup` mounts here at all, which is
-/// what keeps the split from silently regressing.
+/// **Re-housed onto the documentation kit.** This suite used to read the old
+/// page's `ElSection`s and its own hand-rolled `docsAnchorKey`/
+/// `ElSection.anchorKey` anchors directly; it now reads `DocsSection` (the
+/// kit's own section widget) and opens each `DocsDisclosure` before reading
+/// what is inside it — closed by default, it mounts no content at all —
+/// matching `button_test.dart`'s own pattern, the worked reference for this
+/// rollout. The pixel-position ordering assertion the old suite made off
+/// `docsAnchorKey`/`ElSection.anchorKey` cannot survive unchanged (those are
+/// not how the kit marks an anchor); it is rewritten below to assert the
+/// identical fact — the sections render in this exact order — by reading
+/// each mounted `DocsSection`'s own `title`, the same substitution
+/// `button_test.dart` itself made for the same reason.
 ///
-/// Section order, matching https://ui.shadcn.com/docs/components/base/toggle
-/// with `Independent toggles` added in its style: Installation, Usage,
-/// Outline, With text, Independent toggles, Sizes, Disabled, RTL, API
-/// Reference, then the six sections shadcn does not carry (States,
-/// Accessibility, Responsive, Dependencies, Theming, Source), all behind the
-/// un-headed hero demo. `Changelog` is skipped: this package ships from
-/// source, not a versioned registry entry.
+/// **Trimmed for the split.** This suite still covers `ElToggle` alone; every
+/// group assertion lives in `toggle_group_test.dart`, and the assertion that
+/// no `ElToggleGroup` mounts here at all is kept, unmoved.
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`. The live
@@ -23,40 +26,21 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/toggle/meta.dart';
 import 'package:example/components_docs/toggle/page.dart';
-import 'package:example/docs/docs_code.dart';
+import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_facts.dart';
-import 'package:example/docs/docs_layout.dart';
-import 'package:example/kit.dart';
+import 'package:example/docs/docs_section.dart' show DocsSection;
+import 'package:example/docs/docs_showcase.dart' show DocsShowcase;
+import 'package:flutter/foundation.dart' show listEquals;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 const Size _wide = Size(1440, 900);
 const Size _narrow = Size(390, 844);
 
-/// The section anchors this page must render, top to bottom, behind the
-/// un-headed `preview` hero demo. Matches page.dart's own `toc:` list exactly.
-const List<String> _sectionOrder = <String>[
-  'install',
-  'usage',
-  'outline',
-  'with-text',
-  'independent',
-  'sizes',
-  'disabled',
-  'rtl',
-  'api',
-  'states',
-  'accessibility',
-  'responsive',
-  'dependencies',
-  'theming',
-  'source',
-];
-
-/// The same list as titles, in the same order: read off each mounted
-/// [ElSection] rather than with `find.text`, since a section heading and its
-/// own TOC link render the same string at wide widths.
+/// The section titles this page must render, top to bottom, matching
+/// `page.dart`'s own `toggleDocSpec.sections` exactly.
 const List<String> _sectionTitles = <String>[
+  'Preview',
   'Installation',
   'Usage',
   'Outline',
@@ -68,6 +52,7 @@ const List<String> _sectionTitles = <String>[
   'API Reference',
   'States',
   'Accessibility',
+  'Keyboard',
   'Responsive',
   'Dependencies',
   'Theming',
@@ -105,6 +90,8 @@ const List<String> _specimenKeys = <String>[
   'toggle-live-specimen',
   'toggle-outline-bold-specimen',
   'toggle-with-text-specimen',
+  'toggle-independent-bold-specimen',
+  'toggle-independent-italic-specimen',
   'toggle-sizes-standard-sm-specimen',
   'toggle-sizes-standard-md-specimen',
   'toggle-sizes-standard-lg-specimen',
@@ -115,6 +102,26 @@ const List<String> _specimenKeys = <String>[
   'toggle-disabled-on-specimen',
   'toggle-rtl-specimen',
 ];
+
+/// The single `DocsDisclosure` whose title is [title]. `DocsDisclosure`'s
+/// own trigger key is one constant shared by every instance on the page, so
+/// a bare `find.byKey` would match all eight — this narrows to the one panel
+/// by its title first.
+Finder _disclosureTrigger(String title) => find.descendant(
+  of: find.byWidgetPredicate(
+    (Widget widget) => widget is DocsDisclosure && widget.title == title,
+  ),
+  matching: find.byKey(DocsDisclosure.triggerKey),
+);
+
+Future<void> _open(WidgetTester tester, String title) async {
+  final Finder trigger = _disclosureTrigger(title);
+  await tester.ensureVisible(trigger);
+  await tester.pump();
+  await tester.tap(trigger);
+  await tester.pump();
+  await tester.pump(ElDurations.base);
+}
 
 Future<ElThemeController> _pump(
   WidgetTester tester, {
@@ -166,7 +173,7 @@ void main() {
           findsOneWidget,
         );
         expect(find.text(toggleDoc.title), findsWidgets);
-        expect(find.byType(DocsCodeExample), findsAtLeastNWidgets(1));
+        expect(find.byType(DocsShowcase), findsAtLeastNWidgets(1));
         expect(
           find.byKey(const ValueKey<String>('docs-layout-sidebar')),
           findsOneWidget,
@@ -174,7 +181,7 @@ void main() {
         expect(tester.takeException(), isNull);
 
         await _pump(tester, size: _narrow);
-        await tester.pumpAndSettle();
+        await tester.pump();
 
         expect(
           find.byKey(const ValueKey<String>('docs-layout-anchor-strip')),
@@ -188,74 +195,53 @@ void main() {
       },
     );
 
+    testWidgets('the section list renders in order, exactly once each', (
+      WidgetTester tester,
+    ) async {
+      await _pump(tester);
+
+      final List<String> titles = tester
+          .widgetList<DocsSection>(find.byType(DocsSection))
+          .map((DocsSection section) => section.title)
+          .toList();
+      expect(titles, _sectionTitles);
+    });
+
     testWidgets(
-      'the section list renders in order, behind the un-headed hero demo',
+      'the group half of the old page is gone: every mounted ElToggleGroup '
+      'is the kit\'s own Preview/Code or CLI/Manual chrome, never a '
+      'documented ElToggleGroup specimen',
       (WidgetTester tester) async {
         await _pump(tester);
 
-        final double previewTop = tester
-            .getTopLeft(find.byKey(docsAnchorKey('preview')))
-            .dy;
-        double previousTop = previewTop;
-        for (final String id in _sectionOrder) {
-          final Finder section = find.byKey(ElSection.anchorKey(id));
-          expect(section, findsOneWidget, reason: 'missing section: $id');
-          final double top = tester.getTopLeft(section).dy;
-          expect(
-            top,
-            greaterThan(previousTop),
-            reason: 'section "$id" is not below the previous section',
-          );
-          previousTop = top;
-        }
-
-        // Titles, in the same order, read off the mounted ElSections: a bare
-        // find.text would match a heading and its own TOC link both.
-        final List<String> titles = tester
-            .widgetList<ElSection>(find.byType(ElSection))
-            .map((ElSection section) => section.title)
-            .toList();
-        expect(titles, _sectionTitles);
-
-        // The prefixed titles the merged page used are gone, and so are the
-        // group's own anchors: checked by absent ElSection anchor, since
-        // several of these words still appear as incidental text elsewhere.
-        for (final String oldId in <String>[
-          'toggle-outline',
-          'toggle-with-text',
-          'toggle-independent',
-          'toggle-sizes',
-          'toggle-disabled',
-          'toggle-rtl',
-          'toggle-group-composition',
-          'toggle-group-outline',
-          'toggle-group-sizes',
-          'toggle-group-disabled',
-          'toggle-group-custom',
-          'toggle-group-rtl',
-          'composition',
-        ]) {
-          expect(
-            find.byKey(ElSection.anchorKey(oldId)),
-            findsNothing,
-            reason: 'the old "$oldId" section should be gone',
-          );
-        }
-      },
-    );
-
-    testWidgets(
-      'the group half of the old page is gone: no ElToggleGroup mounts here',
-      (WidgetTester tester) async {
-        await _pump(tester);
-
-        expect(
+        // DocsShowcase and DocsInstall are both built out of ElToggleGroup
+        // as their own Preview/Code and CLI/Manual view switchers — that is
+        // kit chrome every re-housed page carries, not a component
+        // specimen. What must stay true after the split is that no group
+        // *content* (a documented ElToggleGroup demonstrating the real
+        // component) mounts here: every ElToggleGroup's own items must be
+        // one of those two fixed kit-chrome label sets.
+        const List<String> chromeA = <String>['Preview', 'Code'];
+        const List<String> chromeB = <String>['CLI', 'Manual'];
+        for (final ElToggleGroup group in tester.widgetList<ElToggleGroup>(
           find.byType(ElToggleGroup),
-          findsNothing,
-          reason:
-              'ElToggleGroup belongs to toggle_group/page.dart after the '
-              'split',
-        );
+        )) {
+          final List<String> labels = group.items
+              .map((ElToggleGroupItem item) => item.label)
+              .toList();
+          final bool isKitChrome = listEquals(labels, chromeA) ||
+              listEquals(labels, chromeB);
+          expect(
+            isKitChrome,
+            isTrue,
+            reason:
+                'unexpected ElToggleGroup content on the toggle page: '
+                '$labels — ElToggleGroup belongs to toggle_group/page.dart '
+                'after the split',
+          );
+        }
+
+        await _open(tester, 'API Reference');
 
         // And no group API row leaked into this page's tables either.
         final Set<String> documented = _documentedNames(tester);
@@ -283,6 +269,7 @@ void main() {
       'static helper, and every ElToggleVariant and ElToggleSize value',
       (WidgetTester tester) async {
         await _pump(tester);
+        await _open(tester, 'API Reference');
 
         final List<DocsApiTable> tables = tester
             .widgetList<DocsApiTable>(find.byType(DocsApiTable))
@@ -404,6 +391,35 @@ void main() {
     });
 
     testWidgets(
+      'the Independent toggles specimen mounts two ElToggles that stay '
+      'mutually independent',
+      (WidgetTester tester) async {
+        await _pump(tester);
+
+        final Finder bold = find.byKey(
+          const ValueKey<String>('toggle-independent-bold-specimen'),
+        );
+        final Finder italic = find.byKey(
+          const ValueKey<String>('toggle-independent-italic-specimen'),
+        );
+        await tester.ensureVisible(bold);
+        expect(tester.widget<ElToggle>(bold).pressed, isFalse);
+        expect(tester.widget<ElToggle>(italic).pressed, isFalse);
+
+        await tester.tap(bold, warnIfMissed: false);
+        await tester.pump();
+        expect(tester.widget<ElToggle>(bold).pressed, isTrue);
+        expect(
+          tester.widget<ElToggle>(italic).pressed,
+          isFalse,
+          reason: 'Bold and Italic must not be mutually exclusive',
+        );
+
+        expect(tester.takeException(), isNull);
+      },
+    );
+
+    testWidgets(
       'the Disabled specimens really are disabled, at both pressed values',
       (WidgetTester tester) async {
         await _pump(tester);
@@ -464,6 +480,7 @@ void main() {
       'and no group-only row',
       (WidgetTester tester) async {
         await _pump(tester);
+        await _open(tester, 'States');
 
         final DocsStateMatrix matrix = tester.widget<DocsStateMatrix>(
           find.byType(DocsStateMatrix),

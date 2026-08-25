@@ -1,9 +1,10 @@
 /// Tests for `components_docs/button_group/page.dart`'s [ButtonGroupDocPage].
 ///
-/// Split off the merged test that used to cover [ElInputGroup],
-/// [ElButtonGroup], and [ElInputOtp] together on one page. This file now
-/// covers [ElButtonGroup] and its text/separator members only: see
-/// `input_group_test.dart` and `input_otp_test.dart` for the other two.
+/// **Re-housed onto the documentation kit.** This suite used to read the old
+/// page's `ElSection`s directly; it now reads `DocsSection` (the kit's own
+/// section widget) and opens each `DocsDisclosure` before reading what is
+/// inside it, closed by default, mounts no content at all — matching
+/// `button_test.dart`'s own pattern, the worked reference for this rollout.
 ///
 /// Reads from `lib/src/components/button_group.dart` directly (Step 1 of
 /// the task cycle): every public class and constructor parameter enumerated
@@ -17,13 +18,15 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/button_group/meta.dart';
 import 'package:example/components_docs/button_group/page.dart';
-import 'package:example/docs/docs_code.dart';
+import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_facts.dart';
-import 'package:example/kit.dart' show ElSection;
+import 'package:example/docs/docs_section.dart' show DocsSection;
+import 'package:example/docs/docs_showcase.dart' show DocsShowcase;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 const List<String> _expectedSectionOrder = <String>[
+  'Preview',
   'Installation',
   'Usage',
   'Composition',
@@ -36,17 +39,18 @@ const List<String> _expectedSectionOrder = <String>[
   'RTL',
   'API Reference',
   'States',
-  'Accessibility and keyboard behavior',
-  'Responsive and platform behavior',
-  'Dependencies, files, and assets',
-  'Theming notes',
-  'Source and tests',
+  'Accessibility',
+  'Keyboard',
+  'Responsive',
+  'Dependencies',
+  'Theming',
+  'Source',
 ];
 
 const Size _wide = Size(1440, 900);
 const Size _narrow = Size(390, 844);
 
-/// Every `ElApiTable` this page must render, by title, and every public
+/// Every `DocsApiTable` this page must render, by title, and every public
 /// constructor parameter or static member of that class, read directly off
 /// `lib/src/components/button_group.dart`.
 const Map<String, List<String>> _expectedApiTables = <String, List<String>>{
@@ -63,6 +67,26 @@ const Map<String, List<String>> _expectedApiTables = <String, List<String>>{
   ],
   'ElButtonGroupSeparator': <String>[],
 };
+
+/// The single `DocsDisclosure` whose title is [title]. `DocsDisclosure`'s
+/// own trigger key is one constant shared by every instance on the page, so
+/// a bare `find.byKey` would match all eight — this narrows to the one panel
+/// by its title first.
+Finder _disclosureTrigger(String title) => find.descendant(
+  of: find.byWidgetPredicate(
+    (Widget widget) => widget is DocsDisclosure && widget.title == title,
+  ),
+  matching: find.byKey(DocsDisclosure.triggerKey),
+);
+
+Future<void> _open(WidgetTester tester, String title) async {
+  final Finder trigger = _disclosureTrigger(title);
+  await tester.ensureVisible(trigger);
+  await tester.pump();
+  await tester.tap(trigger);
+  await tester.pump();
+  await tester.pump(ElDurations.base);
+}
 
 Future<ElThemeController> _pump(
   WidgetTester tester, {
@@ -101,7 +125,7 @@ void main() {
       await _pump(tester, size: _wide);
 
       expect(find.text(buttonGroupDoc.title), findsWidgets);
-      expect(find.byType(DocsCodeExample), findsAtLeastNWidgets(1));
+      expect(find.byType(DocsShowcase), findsAtLeastNWidgets(1));
       expect(
         find.byKey(const ValueKey<String>('docs-layout-sidebar')),
         findsOneWidget,
@@ -124,10 +148,11 @@ void main() {
   );
 
   testWidgets(
-    'each ElApiTable covers every public constructor parameter and static '
+    'each DocsApiTable covers every public constructor parameter and static '
     'of its own class',
     (WidgetTester tester) async {
       await _pump(tester);
+      await _open(tester, 'API Reference');
 
       final List<DocsApiTable> tables = tester
           .widgetList<DocsApiTable>(find.byType(DocsApiTable))
@@ -147,7 +172,7 @@ void main() {
         expect(
           documented,
           isNotNull,
-          reason: 'no ElApiTable titled "${expected.key}" was rendered',
+          reason: 'no DocsApiTable titled "${expected.key}" was rendered',
         );
         for (final String param in expected.value) {
           expect(
@@ -166,8 +191,8 @@ void main() {
     await _pump(tester);
 
     final List<String> rendered = tester
-        .widgetList<ElSection>(find.byType(ElSection))
-        .map((ElSection section) => section.title)
+        .widgetList<DocsSection>(find.byType(DocsSection))
+        .map((DocsSection section) => section.title)
         .toList();
 
     expect(rendered, _expectedSectionOrder);

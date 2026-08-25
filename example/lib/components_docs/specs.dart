@@ -20,7 +20,19 @@
 library;
 
 import '../docs/component_doc_page.dart' show ComponentDocSpec;
+import 'badge/page.dart' as badge;
 import 'button/page.dart' as button;
+import 'button_group/page.dart' as button_group;
+import 'checkbox/page.dart' as checkbox;
+import 'field/page.dart' as field;
+import 'form/page.dart' as form;
+import 'input_group/page.dart' as input_group;
+import 'input_otp/page.dart' as input_otp;
+import 'native_select/page.dart' as native_select;
+import 'radio/page.dart' as radio;
+import 'textarea/page.dart' as textarea;
+import 'toggle/page.dart' as toggle;
+import 'toggle_group/page.dart' as toggle_group;
 
 /// Keyed by [ComponentDocSpec.name] — the registry item's own name, with
 /// hyphens, so it matches `registry.json` and `ComponentDocEntry.name`.
@@ -28,6 +40,18 @@ final Map<String, ComponentDocSpec> componentDocSpecs =
     <String, ComponentDocSpec>{
       for (final ComponentDocSpec spec in <ComponentDocSpec>[
         button.buttonDocSpec,
+        input_group.inputGroupDocSpec,
+        input_otp.inputOtpDocSpec,
+        checkbox.checkboxDocSpec,
+        field.fieldDocSpec,
+        form.formDocSpec,
+        radio.radioDocSpec,
+        badge.badgeDocSpec,
+        textarea.textareaDocSpec,
+        native_select.nativeSelectDocSpec,
+        button_group.buttonGroupDocSpec,
+        toggle.toggleDocSpec,
+        toggle_group.toggleGroupDocSpec,
       ])
         spec.name: spec,
     };

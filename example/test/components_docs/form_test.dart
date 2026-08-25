@@ -1,5 +1,11 @@
 /// Tests for `components_docs/form/page.dart`'s [FormDocPage].
 ///
+/// Re-housed onto the kit alongside the page: the section-order test now
+/// reads `DocsSection.title` (the kit's own section widget), and the
+/// API-table / state-matrix tests open the relevant `DocsDisclosure` first —
+/// closed by default in the new kit, unlike the old page's always-visible
+/// `ElSection`.
+///
 /// This page documents [ElForm], [ElFormFieldBase], [ElFormField],
 /// [ElTextFormField], and [ElValidateMode] — the non-visual form state
 /// container. `https://ui.shadcn.com/docs/components/form` has no
@@ -15,9 +21,10 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/form/meta.dart';
 import 'package:example/components_docs/form/page.dart';
-import 'package:example/docs/docs_code.dart';
+import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_facts.dart';
-import 'package:example/kit.dart' show ElSection;
+import 'package:example/docs/docs_section.dart' show DocsSection;
+import 'package:example/docs/docs_showcase.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -73,6 +80,18 @@ const Map<String, List<String>> _expectedApiTables = <String, List<String>>{
   'ElValidateMode': <String>['onSubmit', 'onChange'],
 };
 
+/// The single `DocsDisclosure` whose title is [title]. `DocsDisclosure`'s
+/// own trigger key ([DocsDisclosure.triggerKey]) is one constant shared by
+/// every instance on the page, so a bare `find.byKey` would match every
+/// disclosure on the page — this narrows to the one panel by its title
+/// first, matching `button_test.dart`'s own convention.
+Finder _disclosureTrigger(String title) => find.descendant(
+  of: find.byWidgetPredicate(
+    (Widget widget) => widget is DocsDisclosure && widget.title == title,
+  ),
+  matching: find.byKey(DocsDisclosure.triggerKey),
+);
+
 Future<ElThemeController> _pump(
   WidgetTester tester, {
   Size size = _wide,
@@ -105,17 +124,18 @@ Future<ElThemeController> _pump(
 
 void main() {
   testWidgets(
-    'sections render in order: Installation, Usage, four reader-problem '
-    'sections, API Reference, and the six trailing sections',
+    'sections render in order: Preview, Installation, Usage, four '
+    'reader-problem sections, API Reference, and the eight disclosures',
     (WidgetTester tester) async {
       await _pump(tester);
 
       final List<String> titles = tester
-          .widgetList<ElSection>(find.byType(ElSection))
-          .map((ElSection section) => section.title)
+          .widgetList<DocsSection>(find.byType(DocsSection))
+          .map((DocsSection section) => section.title)
           .toList();
 
       expect(titles, <String>[
+        'Preview',
         'Installation',
         'Usage',
         'Validation timing',
@@ -125,6 +145,7 @@ void main() {
         'API Reference',
         'States',
         'Accessibility',
+        'Keyboard',
         'Responsive',
         'Dependencies',
         'Theming',
@@ -165,7 +186,7 @@ void main() {
       await _pump(tester, size: _wide);
 
       expect(find.text(formDoc.title), findsWidgets);
-      expect(find.byType(DocsCodeExample), findsAtLeastNWidgets(1));
+      expect(find.byType(DocsShowcase), findsAtLeastNWidgets(1));
       expect(
         find.byKey(const ValueKey<String>('docs-layout-sidebar')),
         findsOneWidget,
@@ -192,6 +213,12 @@ void main() {
     'of its own class',
     (WidgetTester tester) async {
       await _pump(tester);
+
+      final Finder apiTrigger = _disclosureTrigger('API Reference');
+      await tester.ensureVisible(apiTrigger);
+      await tester.tap(apiTrigger);
+      await tester.pump();
+      await tester.pump(ElDurations.jelly);
 
       final List<DocsApiTable> tables = tester
           .widgetList<DocsApiTable>(find.byType(DocsApiTable))
@@ -326,6 +353,12 @@ void main() {
     'error, and reset',
     (WidgetTester tester) async {
       await _pump(tester);
+
+      final Finder statesTrigger = _disclosureTrigger('States');
+      await tester.ensureVisible(statesTrigger);
+      await tester.tap(statesTrigger);
+      await tester.pump();
+      await tester.pump(ElDurations.jelly);
 
       final DocsStateMatrix matrix = tester.widget<DocsStateMatrix>(
         find.byType(DocsStateMatrix),

@@ -1,22 +1,24 @@
 /// Tests for `components_docs/toggle_group/page.dart`'s
 /// [ToggleGroupDocPage].
 ///
-/// **New with the split.** `ElToggleGroup` and `ElToggleGroupItem` used to be
-/// documented on `components_docs/toggle/page.dart`; every group assertion
-/// that lived in `toggle_test.dart` moved here, plus one that could not exist
-/// before: that every live group carries its own horizontal-scroll
-/// mitigation, since `ElSlidingPillGroup`'s internal `Row` neither wraps nor
-/// scrolls and overflows a 390px column.
+/// **Re-housed onto the documentation kit.** This suite used to read the old
+/// page's `ElSection`s directly; it now reads `DocsSection` (the kit's own
+/// section widget) and opens each `DocsDisclosure` before reading what is
+/// inside it — closed by default, it mounts no content at all — matching
+/// `button_test.dart`'s own pattern, the worked reference for this rollout.
+/// `Spacing` and `Vertical` are themselves `DisclosureSection`s now (they
+/// carry no live specimen), so their own "what is missing" facts are behind
+/// a trigger too.
 ///
 /// Section order, matching
-/// https://ui.shadcn.com/docs/components/base/toggle-group: Installation,
-/// Usage, Composition, Outline, Sizes, Spacing, Vertical, Disabled, Custom,
-/// RTL, API Reference, then the six sections shadcn does not carry (States,
-/// Accessibility, Responsive, Dependencies, Theming, Source), all behind the
-/// un-headed hero demo. `Spacing` and `Vertical` render as
-/// what-is-missing disclosures rather than demos: `toggle_group.dart` declares
-/// neither a `spacing` nor an `orientation` parameter. `Changelog` is skipped:
-/// this package ships from source, not a versioned registry entry.
+/// https://ui.shadcn.com/docs/components/base/toggle-group: Preview,
+/// Installation, Usage, Composition, Outline, Sizes, Spacing, Vertical,
+/// Disabled, Custom, RTL, then the eight fixed disclosures (API Reference,
+/// States, Accessibility, Keyboard, Responsive, Dependencies, Theming,
+/// Source). `Spacing` and `Vertical` render as what-is-missing disclosures
+/// rather than demos: `toggle_group.dart` declares neither a `spacing` nor
+/// an `orientation` parameter. `Changelog` is skipped: this package ships
+/// from source, not a versioned registry entry.
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`. The live
@@ -27,42 +29,21 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/toggle_group/meta.dart';
 import 'package:example/components_docs/toggle_group/page.dart';
-import 'package:example/docs/docs_code.dart';
+import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_facts.dart';
-import 'package:example/docs/docs_layout.dart';
-import 'package:example/kit.dart';
+import 'package:example/docs/docs_install.dart' show DocsInstall;
+import 'package:example/docs/docs_section.dart' show DocsSection;
+import 'package:example/docs/docs_showcase.dart' show DocsShowcase;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 const Size _wide = Size(1440, 900);
 const Size _narrow = Size(390, 844);
 
-/// The section anchors this page must render, top to bottom, behind the
-/// un-headed `preview` hero demo. Matches page.dart's own `toc:` list exactly.
-const List<String> _sectionOrder = <String>[
-  'install',
-  'usage',
-  'composition',
-  'outline',
-  'sizes',
-  'spacing',
-  'vertical',
-  'disabled',
-  'custom',
-  'rtl',
-  'api',
-  'states',
-  'accessibility',
-  'responsive',
-  'dependencies',
-  'theming',
-  'source',
-];
-
-/// The same list as titles, in the same order: read off each mounted
-/// [ElSection] rather than with `find.text`, since a section heading and its
-/// own TOC link render the same string at wide widths.
+/// The section titles this page must render, top to bottom, matching
+/// `page.dart`'s own `toggleGroupDocSpec.sections` exactly.
 const List<String> _sectionTitles = <String>[
+  'Preview',
   'Installation',
   'Usage',
   'Composition',
@@ -76,6 +57,7 @@ const List<String> _sectionTitles = <String>[
   'API Reference',
   'States',
   'Accessibility',
+  'Keyboard',
   'Responsive',
   'Dependencies',
   'Theming',
@@ -114,6 +96,26 @@ const List<String> _specimenKeys = <String>[
   'toggle-group-custom-specimen',
   'toggle-group-rtl-specimen',
 ];
+
+/// The single `DocsDisclosure` whose title is [title]. `DocsDisclosure`'s
+/// own trigger key is one constant shared by every instance on the page, so
+/// a bare `find.byKey` would match all instances — this narrows to the one
+/// panel by its title first.
+Finder _disclosureTrigger(String title) => find.descendant(
+  of: find.byWidgetPredicate(
+    (Widget widget) => widget is DocsDisclosure && widget.title == title,
+  ),
+  matching: find.byKey(DocsDisclosure.triggerKey),
+);
+
+Future<void> _open(WidgetTester tester, String title) async {
+  final Finder trigger = _disclosureTrigger(title);
+  await tester.ensureVisible(trigger);
+  await tester.pump();
+  await tester.tap(trigger);
+  await tester.pump();
+  await tester.pump(ElDurations.base);
+}
 
 Future<ElThemeController> _pump(
   WidgetTester tester, {
@@ -173,7 +175,7 @@ void main() {
           findsOneWidget,
         );
         expect(find.text(toggleGroupDoc.title), findsWidgets);
-        expect(find.byType(DocsCodeExample), findsAtLeastNWidgets(1));
+        expect(find.byType(DocsShowcase), findsAtLeastNWidgets(1));
         expect(
           find.byKey(const ValueKey<String>('docs-layout-sidebar')),
           findsOneWidget,
@@ -183,7 +185,7 @@ void main() {
         // 390px is where ElSlidingPillGroup's Row overflowed before the
         // mitigation landed: the whole page must still render clean here.
         await _pump(tester, size: _narrow);
-        await tester.pumpAndSettle();
+        await tester.pump();
 
         expect(
           find.byKey(const ValueKey<String>('docs-layout-anchor-strip')),
@@ -197,53 +199,17 @@ void main() {
       },
     );
 
-    testWidgets(
-      'the section list renders in order, behind the un-headed hero demo',
-      (WidgetTester tester) async {
-        await _pump(tester);
+    testWidgets('the section list renders in order, exactly once each', (
+      WidgetTester tester,
+    ) async {
+      await _pump(tester);
 
-        final double previewTop = tester
-            .getTopLeft(find.byKey(docsAnchorKey('preview')))
-            .dy;
-        double previousTop = previewTop;
-        for (final String id in _sectionOrder) {
-          final Finder section = find.byKey(ElSection.anchorKey(id));
-          expect(section, findsOneWidget, reason: 'missing section: $id');
-          final double top = tester.getTopLeft(section).dy;
-          expect(
-            top,
-            greaterThan(previousTop),
-            reason: 'section "$id" is not below the previous section',
-          );
-          previousTop = top;
-        }
-
-        final List<String> titles = tester
-            .widgetList<ElSection>(find.byType(ElSection))
-            .map((ElSection section) => section.title)
-            .toList();
-        expect(titles, _sectionTitles);
-
-        // The prefixed titles the merged page used are gone, and so are the
-        // standalone toggle's own sections.
-        for (final String oldId in <String>[
-          'toggle-group-composition',
-          'toggle-group-outline',
-          'toggle-group-sizes',
-          'toggle-group-disabled',
-          'toggle-group-custom',
-          'toggle-group-rtl',
-          'with-text',
-          'independent',
-        ]) {
-          expect(
-            find.byKey(ElSection.anchorKey(oldId)),
-            findsNothing,
-            reason: 'the old "$oldId" section should not be on this page',
-          );
-        }
-      },
-    );
+      final List<String> titles = tester
+          .widgetList<DocsSection>(find.byType(DocsSection))
+          .map((DocsSection section) => section.title)
+          .toList();
+      expect(titles, _sectionTitles);
+    });
 
     testWidgets(
       'every live group specimen keeps its horizontal-scroll mitigation: '
@@ -275,7 +241,15 @@ void main() {
         }
 
         // One mitigation per live group, and no live group without one.
-        expect(find.byType(ElToggleGroup), findsNWidgets(_specimenKeys.length));
+        // Not a bare `findsNWidgets` on ElToggleGroup: the kit's own
+        // Preview/Code (DocsShowcase) and CLI/Manual (DocsInstall) chrome is
+        // itself built from ElToggleGroup, unkeyed. Scope to the keyed,
+        // component-level specimens only.
+        final List<ElToggleGroup> keyedGroups = tester
+            .widgetList<ElToggleGroup>(find.byType(ElToggleGroup))
+            .where((ElToggleGroup g) => g.key is ValueKey<String>)
+            .toList();
+        expect(keyedGroups, hasLength(_specimenKeys.length));
 
         expect(tester.takeException(), isNull);
       },
@@ -286,6 +260,7 @@ void main() {
       'constructor parameter, plus the one static, one table per class',
       (WidgetTester tester) async {
         await _pump(tester);
+        await _open(tester, 'API Reference');
 
         final List<DocsApiTable> tables = tester
             .widgetList<DocsApiTable>(find.byType(DocsApiTable))
@@ -344,6 +319,7 @@ void main() {
       'the API tables report the real types the constructors declare',
       (WidgetTester tester) async {
         await _pump(tester);
+        await _open(tester, 'API Reference');
 
         final Map<String, String> types = <String, String>{
           for (final DocsApiTable table in tester.widgetList<DocsApiTable>(
@@ -496,20 +472,25 @@ void main() {
       'without implying they work',
       (WidgetTester tester) async {
         await _pump(tester);
+        await _open(tester, 'Spacing');
+        await _open(tester, 'Vertical');
 
-        // ElSection.anchorKey is attached to an inner wrapper, not the
-        // ElSection element itself, so look the section up by its own id.
+        // DocsDisclosure carries the section's own `description:` in its
+        // trigger row, not the DocsSection: read it off the DisclosureSection
+        // titles rendered as DocsSection (title + description both flow
+        // through DocsSection).
         final Map<String, String?> descriptions = <String, String?>{
-          for (final ElSection section in tester.widgetList<ElSection>(
-            find.byType(ElSection),
+          for (final DocsSection section in tester.widgetList<DocsSection>(
+            find.byType(DocsSection),
           ))
-            section.id: section.description,
+            section.title: section.description,
         };
-        expect(descriptions['spacing'], contains('no spacing parameter'));
-        expect(descriptions['vertical'], contains('no orientation parameter'));
+        expect(descriptions['Spacing'], contains('no spacing parameter'));
+        expect(descriptions['Vertical'], contains('no orientation parameter'));
 
         // And the props really are absent from the API tables, which is what
         // makes the disclosure true rather than decorative.
+        await _open(tester, 'API Reference');
         final Set<String> documented = _documentedNames(tester);
         expect(documented, isNot(contains('spacing')));
         expect(documented, isNot(contains('orientation')));
@@ -528,6 +509,7 @@ void main() {
       'nothing-selected one',
       (WidgetTester tester) async {
         await _pump(tester);
+        await _open(tester, 'States');
 
         final DocsStateMatrix matrix = tester.widget<DocsStateMatrix>(
           find.byType(DocsStateMatrix),
@@ -599,6 +581,16 @@ void main() {
         findsNothing,
       );
       expect(find.textContaining('elattar add toggle-group'), findsWidgets);
+
+      // The sibling-files note lives on the Manual tab of Installation, not
+      // the default CLI tab: switch to it before reading its text.
+      final Finder manualTab = find.descendant(
+        of: find.byType(DocsInstall),
+        matching: find.text('Manual'),
+      );
+      await tester.ensureVisible(manualTab);
+      await tester.tap(manualTab);
+      await tester.pump();
       expect(find.textContaining('sliding_pill.dart'), findsWidgets);
     });
 

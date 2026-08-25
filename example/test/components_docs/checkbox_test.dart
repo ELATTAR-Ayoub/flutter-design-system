@@ -1,6 +1,12 @@
 /// Tests for `components_docs/checkbox/page.dart`'s [CheckboxDocPage]:
 /// the checkbox component documentation page.
 ///
+/// Re-housed onto the kit alongside the page: the section-order test now
+/// reads `DocsSection.id` (the kit's own section widget) instead of the old
+/// `ElSection.anchorKey`, and the API-table / state-matrix tests open the
+/// relevant `DocsDisclosure` first — closed by default in the new kit,
+/// unlike the old page's always-visible `ElSection`.
+///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`, per the
 /// Phase J brief. The live `ElThemeController` is flipped in place for theme
@@ -10,34 +16,33 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/checkbox/meta.dart';
 import 'package:example/components_docs/checkbox/page.dart';
-import 'package:example/docs/docs_code.dart';
+import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_facts.dart';
-import 'package:example/kit.dart';
+import 'package:example/docs/docs_section.dart' show DocsSection;
+import 'package:example/docs/docs_showcase.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 const Size _wide = Size(1440, 900);
 const Size _narrow = Size(390, 844);
 
-/// The shadcn-mirrored section order this page must render, top to bottom:
-/// `https://ui.shadcn.com/docs/components/base/checkbox`'s own Installation
-/// through API Reference (the live demo above them carries no heading, the
-/// same as shadcn's own page), then the six Elattar-specific sections below
-/// them.
+/// The house-shape section order this page must render, top to bottom:
+/// Preview, Installation, Usage, one section per state the live grid shows,
+/// then the eight disclosures.
 const List<String> _expectedSectionIds = <String>[
+  'preview',
   'install',
   'usage',
   'checked-state',
   'invalid-state',
   'basic',
-  'description',
   'disabled',
   'group',
   'table',
-  'rtl',
   'api',
   'states',
   'accessibility',
+  'keyboard',
   'responsive',
   'dependencies',
   'theming',
@@ -68,6 +73,18 @@ const List<String> _checkboxStatics = <String>[
   'ElCheckboxState.checked',
   'ElCheckboxState.indeterminate',
 ];
+
+/// The single `DocsDisclosure` whose title is [title]. `DocsDisclosure`'s
+/// own trigger key ([DocsDisclosure.triggerKey]) is one constant shared by
+/// every instance on the page, so a bare `find.byKey` would match every
+/// disclosure on the page — this narrows to the one panel by its title
+/// first, matching `button_test.dart`'s own convention.
+Finder _disclosureTrigger(String title) => find.descendant(
+  of: find.byWidgetPredicate(
+    (Widget widget) => widget is DocsDisclosure && widget.title == title,
+  ),
+  matching: find.byKey(DocsDisclosure.triggerKey),
+);
 
 Future<ElThemeController> _pump(
   WidgetTester tester, {
@@ -100,29 +117,17 @@ Future<ElThemeController> _pump(
 }
 
 void main() {
-  testWidgets('sections render in the shadcn-mirrored order, top to bottom', (
+  testWidgets('sections render in the house-shape order, top to bottom', (
     WidgetTester tester,
   ) async {
     await _pump(tester);
 
-    double previousDy = double.negativeInfinity;
-    for (final String id in _expectedSectionIds) {
-      final Finder finder = find.byKey(ElSection.anchorKey(id));
-      expect(
-        finder,
-        findsOneWidget,
-        reason: 'no ElSection with id "$id" is in the tree',
-      );
-      final double dy = tester.getTopLeft(finder).dy;
-      expect(
-        dy,
-        greaterThan(previousDy),
-        reason:
-            'section "$id" does not come after the previous section in '
-            'the expected order',
-      );
-      previousDy = dy;
-    }
+    final List<String> ids = tester
+        .widgetList<DocsSection>(find.byType(DocsSection))
+        .map((DocsSection section) => section.id)
+        .toList();
+
+    expect(ids, _expectedSectionIds);
   });
 
   testWidgets(
@@ -131,7 +136,7 @@ void main() {
       await _pump(tester, size: _wide);
 
       expect(find.text(checkboxDoc.title), findsWidgets);
-      expect(find.byType(DocsCodeExample), findsAtLeastNWidgets(1));
+      expect(find.byType(DocsShowcase), findsAtLeastNWidgets(1));
       expect(
         find.byKey(const ValueKey<String>('docs-layout-sidebar')),
         findsOneWidget,
@@ -158,6 +163,12 @@ void main() {
     'ElCheckboxState member',
     (WidgetTester tester) async {
       await _pump(tester);
+
+      final Finder apiTrigger = _disclosureTrigger('API Reference');
+      await tester.ensureVisible(apiTrigger);
+      await tester.tap(apiTrigger);
+      await tester.pump();
+      await tester.pump(ElDurations.jelly);
 
       final List<DocsApiTable> tables = tester
           .widgetList<DocsApiTable>(find.byType(DocsApiTable))
@@ -221,6 +232,12 @@ void main() {
   testWidgets('the state matrix documents the checked, indeterminate, inert, '
       'focus-visible, error and disabled states', (WidgetTester tester) async {
     await _pump(tester);
+
+    final Finder statesTrigger = _disclosureTrigger('States');
+    await tester.ensureVisible(statesTrigger);
+    await tester.tap(statesTrigger);
+    await tester.pump();
+    await tester.pump(ElDurations.jelly);
 
     final DocsStateMatrix matrix = tester.widget<DocsStateMatrix>(
       find.byType(DocsStateMatrix),

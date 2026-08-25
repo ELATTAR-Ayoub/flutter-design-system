@@ -1,6 +1,12 @@
 /// Tests for `components_docs/radio/page.dart`'s [RadioDocPage]: the radio
 /// group component documentation page.
 ///
+/// Re-housed onto the kit alongside the page: the section-order test now
+/// reads `DocsSection.title` (the kit's own section widget), and the
+/// API-table / state-matrix tests open the relevant `DocsDisclosure` first —
+/// closed by default in the new kit, unlike the old page's always-visible
+/// `ElSection`.
+///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`, per the
 /// Phase J brief. The live `ElThemeController` is flipped in place for theme
@@ -10,14 +16,38 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/radio/meta.dart';
 import 'package:example/components_docs/radio/page.dart';
-import 'package:example/docs/docs_code.dart';
+import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_facts.dart';
-import 'package:example/kit.dart' show ElSection;
+import 'package:example/docs/docs_section.dart' show DocsSection;
+import 'package:example/docs/docs_showcase.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 const Size _wide = Size(1440, 900);
 const Size _narrow = Size(390, 844);
+
+/// The house-shape section order this page must render, top to bottom:
+/// Preview, Installation, Usage, one section per variant/state, then the
+/// eight disclosures.
+const List<String> _expectedSectionTitles = <String>[
+  'Preview',
+  'Installation',
+  'Usage',
+  'Composition',
+  'Description',
+  'Choice Card',
+  'Fieldset',
+  'Disabled',
+  'Invalid',
+  'API Reference',
+  'States',
+  'Accessibility',
+  'Keyboard',
+  'Responsive',
+  'Dependencies',
+  'Theming',
+  'Source',
+];
 
 /// Every public constructor parameter of `ElRadioGroup<T>`, enumerated by
 /// reading `lib/src/components/radio.dart` directly (Step 1 of the task
@@ -53,6 +83,18 @@ const List<String> _radioStatics = <String>[
   'ElRadioGroupItem.size',
 ];
 
+/// The single `DocsDisclosure` whose title is [title]. `DocsDisclosure`'s
+/// own trigger key ([DocsDisclosure.triggerKey]) is one constant shared by
+/// every instance on the page, so a bare `find.byKey` would match every
+/// disclosure on the page — this narrows to the one panel by its title
+/// first, matching `button_test.dart`'s own convention.
+Finder _disclosureTrigger(String title) => find.descendant(
+  of: find.byWidgetPredicate(
+    (Widget widget) => widget is DocsDisclosure && widget.title == title,
+  ),
+  matching: find.byKey(DocsDisclosure.triggerKey),
+);
+
 Future<ElThemeController> _pump(
   WidgetTester tester, {
   Size size = _wide,
@@ -85,32 +127,16 @@ Future<ElThemeController> _pump(
 
 void main() {
   testWidgets(
-    'sections render in the shadcn-mirrored order, section for section',
+    'sections render in the house-shape order, section for section',
     (WidgetTester tester) async {
       await _pump(tester);
 
       final List<String> titles = tester
-          .widgetList<ElSection>(find.byType(ElSection))
-          .map((ElSection section) => section.title)
+          .widgetList<DocsSection>(find.byType(DocsSection))
+          .map((DocsSection section) => section.title)
           .toList();
 
-      expect(titles, <String>[
-        'Installation',
-        'Usage',
-        'Composition',
-        'Description',
-        'Choice Card',
-        'Fieldset',
-        'Disabled',
-        'Invalid',
-        'API Reference',
-        'States and feedback',
-        'Accessibility',
-        'Responsive and platform behavior',
-        'Dependencies, files, assets, fonts and shaders',
-        'Theming notes',
-        'Source and tests',
-      ]);
+      expect(titles, _expectedSectionTitles);
     },
   );
 
@@ -120,7 +146,7 @@ void main() {
       await _pump(tester, size: _wide);
 
       expect(find.text(radioDoc.title), findsWidgets);
-      expect(find.byType(DocsCodeExample), findsAtLeastNWidgets(1));
+      expect(find.byType(DocsShowcase), findsAtLeastNWidgets(1));
       expect(
         find.byKey(const ValueKey<String>('docs-layout-sidebar')),
         findsOneWidget,
@@ -147,6 +173,12 @@ void main() {
     WidgetTester tester,
   ) async {
     await _pump(tester);
+
+    final Finder apiTrigger = _disclosureTrigger('API Reference');
+    await tester.ensureVisible(apiTrigger);
+    await tester.tap(apiTrigger);
+    await tester.pump();
+    await tester.pump(ElDurations.jelly);
 
     final List<DocsApiTable> tables = tester
         .widgetList<DocsApiTable>(find.byType(DocsApiTable))
@@ -225,6 +257,12 @@ void main() {
   testWidgets('the state matrix documents the selected, focus-visible, error, '
       'disabled and reduced-motion states', (WidgetTester tester) async {
     await _pump(tester);
+
+    final Finder statesTrigger = _disclosureTrigger('States');
+    await tester.ensureVisible(statesTrigger);
+    await tester.tap(statesTrigger);
+    await tester.pump();
+    await tester.pump(ElDurations.jelly);
 
     final DocsStateMatrix matrix = tester.widget<DocsStateMatrix>(
       find.byType(DocsStateMatrix),

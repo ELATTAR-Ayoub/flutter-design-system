@@ -37,7 +37,21 @@ void main() {
     );
 
     componentDocSpecs.forEach((String name, ComponentDocSpec spec) {
-      final ComponentDocEntry entry = componentDoc(name.replaceAll('-', '_'));
+      // `ComponentDocEntry.name` is spelled inconsistently across the 55
+      // entries — `alert-dialog` and `dropdown-menu` carry a hyphen because
+      // that hyphen is their real route and command spelling, while
+      // `input_group` and `nav_user` carry an underscore. Both are load
+      // bearing (`route` is `/components/$name`) and neither can be
+      // normalised without changing a published URL. So the lookup
+      // normalises on the way in rather than the catalog bending to suit a
+      // test: a spec's `name` is always registry style, hyphenated, and an
+      // entry matches when its own name reduces to the same thing.
+      final ComponentDocEntry entry = componentDocs.singleWhere(
+        (ComponentDocEntry e) => e.name.replaceAll('_', '-') == name,
+        orElse: () => throw StateError(
+          'no catalog entry for the registered spec "$name"',
+        ),
+      );
 
       final List<String> titles = spec.sections
           .map((DocsPageSection s) => s.title)

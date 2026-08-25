@@ -1,6 +1,12 @@
 /// Tests for `components_docs/field/page.dart`'s [FieldDocPage]: the field
 /// component documentation page.
 ///
+/// Re-housed onto the kit alongside the page: the section-order test now
+/// reads `DocsSection.id` (the kit's own section widget), and the
+/// API-table / state-matrix tests open the relevant `DocsDisclosure` first —
+/// closed by default in the new kit, unlike the old page's always-visible
+/// `ElSection`.
+///
 /// `field` is a family of nine classes plus one enum
 /// (`lib/src/components/field.dart`, read directly for Step 1 of the task
 /// cycle): [ElField], [ElFieldScope], [ElFieldActivator],
@@ -20,26 +26,21 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/field/meta.dart';
 import 'package:example/components_docs/field/page.dart';
-import 'package:example/docs/docs_code.dart';
+import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_facts.dart';
-import 'package:example/kit.dart';
+import 'package:example/docs/docs_section.dart' show DocsSection;
+import 'package:example/docs/docs_showcase.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// The shadcn parity section order (worker brief, 2026-08-23): every
-/// `ElSection.id` this page renders, top to bottom. `overview` and
-/// `variants` are gone (shadcn's own field page has neither heading; the
-/// enum table now lives inside `api`), and the shadcn per-control headings
-/// (`input`, `textarea`, `select`, `slider`, `fieldset`, `checkbox`,
-/// `switch`, `field-group`, `validation-errors`) are new, promoted out of
-/// the old single `composition` section rather than left nested under it.
+/// The house-shape section order this page must render, top to bottom.
 const List<String> _expectedSectionOrder = <String>[
+  'preview',
   'install',
   'usage',
   'composition',
   'anatomy',
-  'form',
   'input',
   'textarea',
   'select',
@@ -52,6 +53,7 @@ const List<String> _expectedSectionOrder = <String>[
   'api',
   'states',
   'accessibility',
+  'keyboard',
   'responsive',
   'dependencies',
   'theming',
@@ -122,6 +124,18 @@ const Map<String, List<String>> _expectedApiTables = <String, List<String>>{
   'ElFieldOrientation': <String>['vertical', 'horizontal'],
 };
 
+/// The single `DocsDisclosure` whose title is [title]. `DocsDisclosure`'s
+/// own trigger key ([DocsDisclosure.triggerKey]) is one constant shared by
+/// every instance on the page, so a bare `find.byKey` would match every
+/// disclosure on the page — this narrows to the one panel by its title
+/// first, matching `button_test.dart`'s own convention.
+Finder _disclosureTrigger(String title) => find.descendant(
+  of: find.byWidgetPredicate(
+    (Widget widget) => widget is DocsDisclosure && widget.title == title,
+  ),
+  matching: find.byKey(DocsDisclosure.triggerKey),
+);
+
 Future<ElThemeController> _pump(
   WidgetTester tester, {
   Size size = _wide,
@@ -159,7 +173,7 @@ void main() {
       await _pump(tester, size: _wide);
 
       expect(find.text(fieldDoc.title), findsWidgets);
-      expect(find.byType(DocsCodeExample), findsAtLeastNWidgets(1));
+      expect(find.byType(DocsShowcase), findsAtLeastNWidgets(1));
       expect(
         find.byKey(const ValueKey<String>('docs-layout-sidebar')),
         findsOneWidget,
@@ -182,13 +196,13 @@ void main() {
   );
 
   testWidgets(
-    'renders the shadcn field page section order, section for section',
+    'renders the house-shape section order, section for section',
     (WidgetTester tester) async {
       await _pump(tester);
 
       final List<String> ids = tester
-          .widgetList<ElSection>(find.byType(ElSection))
-          .map((ElSection section) => section.id)
+          .widgetList<DocsSection>(find.byType(DocsSection))
+          .map((DocsSection section) => section.id)
           .toList();
 
       expect(ids, _expectedSectionOrder);
@@ -200,6 +214,12 @@ void main() {
     'of its own class',
     (WidgetTester tester) async {
       await _pump(tester);
+
+      final Finder apiTrigger = _disclosureTrigger('API Reference');
+      await tester.ensureVisible(apiTrigger);
+      await tester.tap(apiTrigger);
+      await tester.pump();
+      await tester.pump(ElDurations.jelly);
 
       final List<DocsApiTable> tables = tester
           .widgetList<DocsApiTable>(find.byType(DocsApiTable))
@@ -322,6 +342,12 @@ void main() {
     'reasons for the states that belong to the wrapped control instead',
     (WidgetTester tester) async {
       await _pump(tester);
+
+      final Finder statesTrigger = _disclosureTrigger('States');
+      await tester.ensureVisible(statesTrigger);
+      await tester.tap(statesTrigger);
+      await tester.pump();
+      await tester.pump(ElDurations.jelly);
 
       final DocsStateMatrix matrix = tester.widget<DocsStateMatrix>(
         find.byType(DocsStateMatrix),

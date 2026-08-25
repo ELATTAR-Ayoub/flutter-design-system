@@ -69,7 +69,7 @@ void main() {
       ),
     );
     expect(
-      node.hasFlag(SemanticsFlag.isLink),
+      node.flagsCollection.isLink,
       isTrue,
       reason: 'a screen reader must be told this is a link, not a label',
     );

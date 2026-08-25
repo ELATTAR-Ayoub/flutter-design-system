@@ -1,16 +1,18 @@
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/badge/meta.dart';
 import 'package:example/components_docs/badge/page.dart';
+import 'package:example/docs/docs_disclosure.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// The shadcn-parity section order (worker brief, `badge` component):
-/// live demo (`Preview`), Installation, Usage, Variants, With icon, With
-/// spinner, RTL, our own Composed-with-other-primitives addition, API
-/// Reference, then the six fixed extras. `Link` and `Custom Colors` are
-/// shadcn sections this component genuinely cannot do (ElBadge has no
-/// href/asChild and no colour-override parameter) and are asserted absent.
+/// The house-shape section order (`components_docs/button/page.dart`'s own
+/// reference shape): Preview, Installation, Usage, then one section per
+/// variant/state, then the eight fixed disclosures in their required order.
+/// `Link` and `Custom Colors` are shadcn sections this component genuinely
+/// cannot do (ElBadge has no href/asChild and no colour-override parameter)
+/// and are asserted absent.
 const List<String> _expectedSectionHeadings = <String>[
+  'Preview',
   'Installation',
   'Usage',
   'Variants',
@@ -19,13 +21,25 @@ const List<String> _expectedSectionHeadings = <String>[
   'RTL',
   'Composed with other primitives',
   'API Reference',
-  'States and feedback',
-  'Accessibility and keyboard behavior',
-  'Responsive and platform behavior',
-  'Dependencies, files, and assets',
-  'Theming notes',
-  'Source, tests, and docs',
+  'States',
+  'Accessibility',
+  'Keyboard',
+  'Responsive',
+  'Dependencies',
+  'Theming',
+  'Source',
 ];
+
+/// The single `DocsDisclosure` whose title is [title]. `DocsDisclosure`'s
+/// own trigger key is one constant shared by every instance on the page, so
+/// a bare `find.byKey` would match all eight — this narrows to the one panel
+/// by its title first.
+Finder _disclosureTrigger(String title) => find.descendant(
+  of: find.byWidgetPredicate(
+    (Widget widget) => widget is DocsDisclosure && widget.title == title,
+  ),
+  matching: find.byKey(DocsDisclosure.triggerKey),
+);
 
 Widget _harness({
   required Widget child,
@@ -111,6 +125,16 @@ void main() {
           find.byKey(const ValueKey<String>('badge-doc-article')),
           findsOneWidget,
         );
+
+        // The API table lives inside the API Reference disclosure, closed by
+        // default (a closed DocsDisclosure mounts no content at all), so
+        // open it before reading any of its rows.
+        final Finder apiTrigger = _disclosureTrigger('API Reference');
+        await tester.ensureVisible(apiTrigger);
+        await tester.pump();
+        await tester.tap(apiTrigger);
+        await tester.pump();
+        await tester.pump(ElDurations.base);
 
         // The API table lists every ElBadge constructor parameter found in
         // lib/src/components/badge.dart.

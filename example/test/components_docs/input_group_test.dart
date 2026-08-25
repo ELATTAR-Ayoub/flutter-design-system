@@ -5,6 +5,16 @@
 /// covers [ElInputGroup] and its addon/button/text family only: see
 /// `button_group_test.dart` and `input_otp_test.dart` for the other two.
 ///
+/// Re-housed onto the documentation kit (`ComponentDocSpec` +
+/// `ComponentDocPage`): sections now render as `DocsSection` (from
+/// `docs_section.dart`), not the old `kit.dart` `ElSection`, and the live
+/// preview is a real `Preview` section with its own rail entry rather than
+/// an unheaded `DocsCodeExample` above the first heading. The API Reference
+/// and States sections are now `DocsDisclosure`s, closed by default (a
+/// closed `DocsDisclosure` mounts no content at all — see
+/// `docs_disclosure_test.dart`), so any test reading their content opens
+/// the panel first via [_disclosureTrigger].
+///
 /// Reads from `lib/src/components/input_group.dart` directly (Step 1 of the
 /// task cycle): every public class, enum, and constructor parameter
 /// enumerated below is one this page's API tables must cover.
@@ -17,30 +27,57 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/input_group/meta.dart';
 import 'package:example/components_docs/input_group/page.dart';
-import 'package:example/docs/docs_code.dart';
+import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_facts.dart';
-import 'package:example/kit.dart' show ElSection;
+import 'package:example/docs/docs_section.dart' show DocsSection;
+import 'package:example/docs/docs_showcase.dart' show DocsShowcase;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// The full section list, in order, this page must render: an unheaded live
-/// preview, Installation, Usage, then ElInputGroup's own sections, API
-/// Reference, then the fixed six.
+/// The single `DocsDisclosure` whose title is [title]. `DocsDisclosure`'s
+/// own trigger key ([DocsDisclosure.triggerKey]) is one constant shared by
+/// every instance on the page, so a bare `find.byKey` would match all
+/// eight — this narrows to the one panel by its title first, matching
+/// `button_test.dart`'s own convention.
+Finder _disclosureTrigger(String title) => find.descendant(
+  of: find.byWidgetPredicate(
+    (Widget widget) => widget is DocsDisclosure && widget.title == title,
+  ),
+  matching: find.byKey(DocsDisclosure.triggerKey),
+);
+
+/// Opens the named disclosure: scrolls its trigger into view, taps it, and
+/// pumps through the open animation.
+Future<void> _openDisclosure(WidgetTester tester, String title) async {
+  final Finder trigger = _disclosureTrigger(title);
+  await tester.ensureVisible(trigger);
+  await tester.pump();
+  await tester.tap(trigger);
+  await tester.pump();
+  await tester.pump(ElDurations.jelly);
+}
+
+/// The full section list, in order, this page must render: Preview,
+/// Installation, Usage, then ElInputGroup's own sections, API Reference,
+/// then the eight fixed disclosures.
 const List<String> _expectedSectionOrder = <String>[
+  'Preview',
   'Installation',
   'Usage',
   'Composition',
   'Addon position',
   'Addon content',
+  'Dropdown addon',
   'Custom input',
   'RTL',
   'API Reference',
   'States',
-  'Accessibility and keyboard behavior',
-  'Responsive and platform behavior',
-  'Dependencies, files, and assets',
-  'Theming notes',
-  'Source and tests',
+  'Accessibility',
+  'Keyboard',
+  'Responsive',
+  'Dependencies',
+  'Theming',
+  'Source',
 ];
 
 const Size _wide = Size(1440, 900);
@@ -137,7 +174,7 @@ void main() {
       await _pump(tester, size: _wide);
 
       expect(find.text(inputGroupDoc.title), findsWidgets);
-      expect(find.byType(DocsCodeExample), findsAtLeastNWidgets(1));
+      expect(find.byType(DocsShowcase), findsAtLeastNWidgets(1));
       expect(
         find.byKey(const ValueKey<String>('docs-layout-sidebar')),
         findsOneWidget,
@@ -213,6 +250,7 @@ void main() {
     'of its own class',
     (WidgetTester tester) async {
       await _pump(tester);
+      await _openDisclosure(tester, 'API Reference');
 
       final List<DocsApiTable> tables = tester
           .widgetList<DocsApiTable>(find.byType(DocsApiTable))
@@ -251,8 +289,8 @@ void main() {
     await _pump(tester);
 
     final List<String> rendered = tester
-        .widgetList<ElSection>(find.byType(ElSection))
-        .map((ElSection section) => section.title)
+        .widgetList<DocsSection>(find.byType(DocsSection))
+        .map((DocsSection section) => section.title)
         .toList();
 
     expect(rendered, _expectedSectionOrder);
@@ -287,6 +325,7 @@ void main() {
     WidgetTester tester,
   ) async {
     await _pump(tester);
+    await _openDisclosure(tester, 'States');
 
     final DocsStateMatrix matrix = tester.widget<DocsStateMatrix>(
       find.byType(DocsStateMatrix),

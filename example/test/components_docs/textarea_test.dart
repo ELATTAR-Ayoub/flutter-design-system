@@ -1,20 +1,60 @@
 /// Tests for `components_docs/textarea/page.dart`'s [TextareaDocPage] —
 /// the textarea component documentation page.
 ///
+/// Re-housed onto the documentation kit (`ComponentDocSpec` +
+/// `ComponentDocPage`): sections now render as `DocsSection` (from
+/// `docs_section.dart`), not the old `kit.dart` `ElSection`, and the live
+/// six-cell preview grid is a real `Preview` section with its own rail
+/// entry rather than an unheaded `DocsCodeExample` above the first heading.
+///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`, per the
 /// Phase J brief. The live `ElThemeController` is flipped in place for theme
 /// coverage rather than re-pumped under a new controller.
+///
+/// `pumpAndSettle` is forbidden in a documentation-page test (several
+/// components run controllers that `repeat(reverse: true)` forever), so the
+/// two calls this file used to make are replaced with bounded `pump()`
+/// calls — the same fact each one verified is asserted the same way.
+///
+/// The API Reference and States sections are now `DocsDisclosure`s, closed
+/// by default (a closed `DocsDisclosure` mounts no content at all — see
+/// `docs_disclosure_test.dart`), so any test reading their content opens
+/// the panel first via [_disclosureTrigger].
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/textarea/meta.dart';
 import 'package:example/components_docs/textarea/page.dart';
-import 'package:example/docs/docs_code.dart';
+import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_facts.dart';
-import 'package:example/kit.dart' show ElSection;
+import 'package:example/docs/docs_section.dart' show DocsSection;
+import 'package:example/docs/docs_showcase.dart' show DocsShowcase;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+/// The single `DocsDisclosure` whose title is [title]. `DocsDisclosure`'s
+/// own trigger key ([DocsDisclosure.triggerKey]) is one constant shared by
+/// every instance on the page, so a bare `find.byKey` would match every
+/// one — this narrows to the one panel by its title first, matching
+/// `button_test.dart`'s own convention.
+Finder _disclosureTrigger(String title) => find.descendant(
+  of: find.byWidgetPredicate(
+    (Widget widget) => widget is DocsDisclosure && widget.title == title,
+  ),
+  matching: find.byKey(DocsDisclosure.triggerKey),
+);
+
+/// Opens the named disclosure: scrolls its trigger into view, taps it, and
+/// pumps through the open animation.
+Future<void> _openDisclosure(WidgetTester tester, String title) async {
+  final Finder trigger = _disclosureTrigger(title);
+  await tester.ensureVisible(trigger);
+  await tester.pump();
+  await tester.tap(trigger);
+  await tester.pump();
+  await tester.pump(ElDurations.jelly);
+}
 
 const Size _wide = Size(1440, 900);
 const Size _narrow = Size(390, 844);
@@ -78,7 +118,7 @@ void main() {
       await _pump(tester, size: _wide);
 
       expect(find.text(textareaDoc.title), findsWidgets);
-      expect(find.byType(DocsCodeExample), findsAtLeastNWidgets(1));
+      expect(find.byType(DocsShowcase), findsAtLeastNWidgets(1));
       expect(
         find.byKey(const ValueKey<String>('docs-layout-sidebar')),
         findsOneWidget,
@@ -86,7 +126,8 @@ void main() {
       expect(tester.takeException(), isNull);
 
       await _pump(tester, size: _narrow);
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
 
       expect(
         find.byKey(const ValueKey<String>('docs-layout-anchor-strip')),
@@ -106,13 +147,15 @@ void main() {
       await _pump(tester);
 
       final List<String> titles = tester
-          .widgetList<ElSection>(find.byType(ElSection))
-          .map((ElSection section) => section.title)
+          .widgetList<DocsSection>(find.byType(DocsSection))
+          .map((DocsSection section) => section.title)
           .toList();
 
       expect(titles, <String>[
+        'Preview',
         'Installation',
         'Usage',
+        'Controlled value',
         'Textarea vs. input',
         'Field',
         'Disabled',
@@ -122,6 +165,7 @@ void main() {
         'API Reference',
         'States',
         'Accessibility',
+        'Keyboard',
         'Responsive',
         'Dependencies',
         'Theming',
@@ -135,6 +179,7 @@ void main() {
     'static geometry getters',
     (WidgetTester tester) async {
       await _pump(tester);
+      await _openDisclosure(tester, 'API Reference');
 
       final List<DocsApiTable> tables = tester
           .widgetList<DocsApiTable>(find.byType(DocsApiTable))
@@ -194,6 +239,7 @@ void main() {
     'disabled and reduced motion',
     (WidgetTester tester) async {
       await _pump(tester);
+      await _openDisclosure(tester, 'States');
 
       final DocsStateMatrix matrix = tester.widget<DocsStateMatrix>(
         find.byType(DocsStateMatrix),
@@ -236,7 +282,8 @@ void main() {
       expect(tester.takeException(), isNull);
 
       theme = await _pump(tester, size: _narrow, mode: ElThemeMode.light);
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
       expect(find.text(textareaDoc.title), findsWidgets);
 
       theme.setMode(ElThemeMode.dark);
