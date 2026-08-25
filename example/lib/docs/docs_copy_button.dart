@@ -17,6 +17,8 @@ import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
+import 'docs_toast_scope.dart';
+
 /// Writes [text] to the clipboard.
 typedef DocsClipboardWriter = Future<void> Function(String text);
 
@@ -30,6 +32,7 @@ class DocsCopyButton extends StatefulWidget {
     this.writer,
     this.copyLabel = 'Copy code',
     this.copiedLabel = 'Copied',
+    this.copyToastLabel = 'Copied to clipboard',
   });
 
   /// The exact characters the clipboard receives. Never a re-rendering of the
@@ -45,6 +48,13 @@ class DocsCopyButton extends StatefulWidget {
 
   /// The accessible name while confirming.
   final String copiedLabel;
+
+  /// The success toast's title, fired once the write settles — through
+  /// [DocsToastScope.maybeOf] when a controller is in scope, silently
+  /// skipped when one is not. Distinct from [copiedLabel]: the toast's title
+  /// is announced once by the live region, while [copiedLabel] persists as
+  /// the button's own accessible name for the whole confirmation window.
+  final String copyToastLabel;
 
   /// How long the confirmation holds before reverting.
   static const Duration confirmation = Duration(seconds: 2);
@@ -67,6 +77,9 @@ class _DocsCopyButtonState extends State<DocsCopyButton> {
     await (widget.writer ?? _systemWrite)(widget.text);
     if (!mounted) return;
     setState(() => _state = DocsCopyButton.copiedIndex);
+    // Degrades silently: a bare-pumped widget test and any preview rendered
+    // outside DocsApp's shell have no DocsToastScope above them.
+    DocsToastScope.maybeOf(context)?.success(widget.copyToastLabel);
     await Future<void>.delayed(DocsCopyButton.confirmation);
     if (!mounted) return;
     setState(() => _state = DocsCopyButton.idleIndex);

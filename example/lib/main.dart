@@ -20,6 +20,7 @@ import 'package:flutter/services.dart'
 import 'package:flutter_web_plugins/url_strategy.dart' show usePathUrlStrategy;
 
 import 'nav.dart';
+import 'docs/docs_toast_scope.dart';
 import 'docs_pages/catalog.dart';
 import 'docs_pages/changelog_page.dart';
 import 'docs_pages/cli_page.dart';
@@ -314,6 +315,12 @@ class _DocsAppState extends State<DocsApp> {
   );
   late final AppRouter _router;
 
+  /// Scoped to the app, not a top-level global: [DocsToastScope] is the
+  /// deliberate thread down to [DocsCopyButton] and anything else that wants
+  /// to confirm an action, and this state disposes it with everything else
+  /// that outlives a page rather than leaking it for the app's lifetime.
+  final ElToastController _toasts = ElToastController();
+
   @override
   void initState() {
     super.initState();
@@ -395,6 +402,7 @@ class _DocsAppState extends State<DocsApp> {
   void dispose() {
     _theme.dispose();
     _router.dispose();
+    _toasts.dispose();
     super.dispose();
   }
 
@@ -404,11 +412,31 @@ class _DocsAppState extends State<DocsApp> {
       controller: _theme,
       child: AppRouterScope(
         router: _router,
-        child: MaterialApp(
-          // `metadata.title` in `app/layout.tsx`.
-          title: "Elattar's Design System",
-          debugShowCheckedModeBanner: false,
-          home: _DocsHome(reduceMotion: _reduceMotion),
+        // Reachable the same way the theme scope and the router are: above
+        // [MaterialApp], because a pushed route is a sibling of `home` (see
+        // the library note), not a descendant, so anything mounted only
+        // inside `home` would not reach a toast fired from inside a sheet or
+        // a dialog.
+        child: DocsToastScope(
+          controller: _toasts,
+          child: MaterialApp(
+            // `metadata.title` in `app/layout.tsx`.
+            title: "Elattar's Design System",
+            debugShowCheckedModeBanner: false,
+            home: _DocsHome(reduceMotion: _reduceMotion),
+            // `builder` runs below MaterialApp's own Localizations,
+            // Directionality and MediaQuery but above its Navigator — the one
+            // seam that wraps every route (`home` and anything pushed over
+            // it) with something that still resolves text direction and
+            // media queries, which mounting the host as a sibling of
+            // MaterialApp itself would not.
+            builder: (BuildContext context, Widget? child) => Stack(
+              children: <Widget>[
+                ?child,
+                Positioned.fill(child: ElToaster(controller: _toasts)),
+              ],
+            ),
+          ),
         ),
       ),
     );

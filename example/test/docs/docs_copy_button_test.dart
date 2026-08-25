@@ -9,6 +9,7 @@ import 'dart:async';
 
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/docs/docs_copy_button.dart';
+import 'package:example/docs/docs_toast_scope.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -109,6 +110,58 @@ void main() {
         DocsCopyButton.idleIndex,
       );
       expect(tester.widget<ElButton>(find.byType(ElButton)).label, 'Copy code');
+    },
+  );
+
+  testWidgets(
+    'fires a success toast when a DocsToastScope is in scope',
+    (WidgetTester tester) async {
+      final ElToastController controller = ElToastController();
+      addTearDown(controller.dispose);
+
+      await tester.pumpWidget(
+        _host(
+          DocsToastScope(
+            controller: controller,
+            child: DocsCopyButton(
+              text: 'x',
+              writer: (String value) async {},
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      await tester.tap(find.byType(ElButton));
+      await tester.pump();
+      await tester.pump();
+
+      expect(controller.length, 1);
+      final ElToastMessage? message = controller.messageOf(0);
+      expect(message?.type, ElToastType.success);
+      expect(message?.title, 'Copied to clipboard');
+
+      await tester.pump(DocsCopyButton.confirmation);
+    },
+  );
+
+  testWidgets(
+    'does not throw when no DocsToastScope is in scope',
+    (WidgetTester tester) async {
+      // The widget's own tests everywhere else in this file pump it bare --
+      // this test states that degradation as its own contract rather than
+      // leaving it implicit.
+      await tester.pumpWidget(
+        _host(DocsCopyButton(text: 'x', writer: (String value) async {})),
+      );
+      await tester.pump();
+
+      await tester.tap(find.byType(ElButton));
+      await tester.pump();
+      await tester.pump();
+
+      expect(tester.takeException(), isNull);
+      await tester.pump(DocsCopyButton.confirmation);
     },
   );
 }
