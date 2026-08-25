@@ -17,6 +17,7 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:flutter/widgets.dart';
 
+import 'docs/docs_section.dart';
 import 'nav.dart';
 import 'shell.dart';
 
@@ -153,79 +154,19 @@ class ElSection extends StatelessWidget {
   final String? description;
   final Widget child;
 
-  /// One key per section id, kept so a later lookup finds the same object.
-  ///
-  /// Not a `GlobalObjectKey`: its equality is *identity* on the value, and two
-  /// interpolated strings with the same characters are not the same object —
-  /// the lookup would silently miss.
-  static final Map<String, GlobalKey<State<StatefulWidget>>> _anchors =
-      <String, GlobalKey<State<StatefulWidget>>>{};
-
-  /// The key [scrollTo] looks the section up by.
+  /// Forwarded so `docs_layout.dart` keeps one anchor registry.
   static GlobalKey<State<StatefulWidget>> anchorKey(String id) =>
-      _anchors.putIfAbsent(id, () => GlobalKey<State<StatefulWidget>>());
+      DocsAnchor.keyFor(id);
 
-  /// `html { scroll-behavior: smooth }` to the section with [id], resting
-  /// `--scroll-offset` (96px) below the viewport top.
-  ///
-  /// The browser picks its own smooth-scroll timing; there is no token for it,
-  /// so this uses `--duration-slow` on `--ease-in-out`. Reduced motion forces
-  /// `scroll-behavior: auto`, which is what a zero duration is here.
-  static Future<void> scrollTo(String id) async {
-    final BuildContext? target = anchorKey(id).currentContext;
-    if (target == null) return;
-    final ScrollableState? scrollable = Scrollable.maybeOf(target);
-    if (scrollable == null) return;
-
-    final RenderObject? box = target.findRenderObject();
-    final RenderObject? viewport = scrollable.context.findRenderObject();
-    if (box is! RenderBox || viewport is! RenderBox) return;
-
-    final double delta =
-        box.localToGlobal(Offset.zero, ancestor: viewport).dy -
-        ElWidths.scrollOffset;
-    final ScrollPosition position = scrollable.position;
-    await position.animateTo(
-      (position.pixels + delta).clamp(
-        position.minScrollExtent,
-        position.maxScrollExtent,
-      ),
-      duration: elAnimationDuration(target, ElDurations.slow),
-      curve: ElCurves.inOut,
-    );
-  }
+  static Future<void> scrollTo(String id) => DocsAnchor.scrollTo(id);
 
   @override
-  Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
-    return Padding(
-      key: anchorKey(id),
-      padding: EdgeInsets.only(bottom: el(20)),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          Padding(
-            padding: EdgeInsets.only(bottom: el(6)),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                // An `h2` wearing `.type-h3`, intentionally.
-                ElText(title, ElType.h3, color: theme.foreground),
-                if (description != null) ...<Widget>[
-                  SizedBox(height: el(2)),
-                  ConstrainedBox(
-                    constraints: BoxConstraints(maxWidth: _measure2xl),
-                    child: ElText(description!, ElType.small),
-                  ),
-                ],
-              ],
-            ),
-          ),
-          child,
-        ],
-      ),
-    );
-  }
+  Widget build(BuildContext context) => DocsSection(
+    id: id,
+    title: title,
+    description: description,
+    child: child,
+  );
 }
 
 /* ── Panel ───────────────────────────────────────────────────────────────── */
