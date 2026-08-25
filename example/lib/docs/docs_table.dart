@@ -13,6 +13,7 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
+import 'package:flutter/material.dart' show SelectableText;
 import 'package:flutter/widgets.dart';
 
 export 'docs_facts.dart' show DocsApiTable;
@@ -87,7 +88,22 @@ class DocsTable extends StatelessWidget {
                 cells: <ElTableCellSpec>[
                   for (int i = 0; i < row.length; i++)
                     ElTableCellSpec(
-                      child: sized(i, ElText(row[i], ElType.small)),
+                      child: sized(
+                        i,
+                        // A reader can select a property name or a type
+                        // string to copy it — same approach and the same
+                        // per-column type/colour split `_SelectableFactText`
+                        // used in `_FactRow` (`docs_facts.dart`) before this
+                        // table moved onto `ElTable`. Headers stay plain
+                        // `ElText`: they were not selectable before either.
+                        _SelectableCellText(
+                          text: row[i],
+                          spec: i == 0 ? ElType.body : ElType.small,
+                          color: i == 0
+                              ? theme.foreground
+                              : theme.mutedForeground,
+                        ),
+                      ),
                     ),
                 ],
               ),
@@ -101,4 +117,24 @@ class DocsTable extends StatelessWidget {
       },
     );
   }
+}
+
+/// A body cell's text, selectable — the same wrapper `_SelectableFactText`
+/// (`docs_facts.dart`) was, before `DocsApiTable`'s rows moved onto
+/// [DocsTable]: a reference table's property names and type strings are
+/// worth copying, so plain [ElText] is not enough here.
+class _SelectableCellText extends StatelessWidget {
+  const _SelectableCellText({
+    required this.text,
+    required this.spec,
+    required this.color,
+  });
+
+  final String text;
+  final ElTypeSpec spec;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) =>
+      SelectableText(text, style: ElText.styleOf(context, spec, color: color));
 }
