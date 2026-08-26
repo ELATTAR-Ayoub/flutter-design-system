@@ -12,17 +12,25 @@
 
 # `release_registry/` — publishing a registry version
 
-The CLI pins `https://elattar-ayoub.github.io/flutter-design-system/registry/<version>/`
+The CLI pins `https://flutter.elattar.dev/registry/<version>/`
 and refuses to follow a moving target. This tool is what makes that pin mean
 something.
 
 ## Staging a release
 
-Run it **after** `flutter build web`, because that build clears its own output
-directory:
+Staging must happen **after** `flutter build web`, because that build clears
+its own output directory. `deploy_site` does both in the right order, reading
+the origin and base href from `.env` (see `.env.example`), and is what CI and
+Vercel both run:
 
 ```sh
-cd example && flutter build web --release --base-href /flutter-design-system/ && cd ..
+dart run tool/deploy_site/bin/build_site.dart
+```
+
+To stage by hand against a build you already have — which is what the
+immutability check below is usually exercised against:
+
+```sh
 dart run tool/release_registry/bin/stage.dart --version 0.0.1 --web-root example/build/web
 ```
 

@@ -221,21 +221,21 @@ jobs:
         working-directory: example
         run: flutter test --reporter expanded --file-reporter=json:reports/example-tests.json
 
-      - name: Build example web release
-        working-directory: example
-        run: flutter build web --release --base-href /flutter-design-system/
-
-      # The registry is staged INTO the built site, so the CLI's pinned
-      # registry URL and the documentation share one origin. Staging here
-      # proves the Pages job's most failure-prone step on every push, rather
-      # than the first time somebody deploys. Nothing is published: this job
-      # has no `pages` permission and uploads no artifact.
-      - name: Stage the versioned registry into the site artifact
-        run: >-
-          dart run tool/release_registry/bin/stage.dart
-          --version 0.0.1
-          --web-root example/build/web
-          --commit ${{ github.sha }}
+      # tool/deploy_site is the same script the real deploy (Vercel) runs as
+      # its build command, so this job builds under the same
+      # ELATTAR_SITE_ORIGIN / ELATTAR_SITE_BASE_HREF resolution as production
+      # rather than a CI-only hardcoded --base-href. Neither variable is set
+      # here and no .env exists in a fresh checkout, so this resolves to the
+      # documented defaults in .env.example: the real flutter.elattar.dev
+      # origin at the domain root, byte-for-byte what Vercel builds. It also
+      # stages the versioned registry into the built site (reusing
+      # tool/release_registry, same as the old separate step below used to),
+      # so the CLI's pinned registry URL and the documentation share one
+      # origin and this proves the deploy's most failure-prone step on every
+      # push. Nothing is published: this job has no `pages` permission and
+      # uploads no artifact.
+      - name: Build the docs site and stage the versioned registry
+        run: dart run tool/deploy_site/bin/build_site.dart
 
       - name: Validate the staged registry
         run: dart run tool/registry_builder/bin/validate.dart example/build/web/registry/0.0.1/registry.json

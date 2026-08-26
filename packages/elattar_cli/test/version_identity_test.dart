@@ -50,6 +50,43 @@ void main() {
       expect(defaultRegistryUri.path, endsWith('/$cliVersion/'));
     });
 
+    test('composes siteOrigin and cliVersion rather than restating either', () {
+      // Not `defaultRegistryUrl == 'https://flutter.elattar.dev/registry/'
+      // '0.0.1/'`: a test that spells the origin out again would keep
+      // passing even if `defaultRegistryUrl` stopped deriving from
+      // `siteOrigin` and went back to restating it — exactly the drift the
+      // refactor to a single injected origin closed. Comparing against the
+      // *value* of `siteOrigin` (not a literal copy of it) is what proves
+      // composition rather than restatement.
+      expect(
+        defaultRegistryUrl,
+        startsWith(siteOrigin),
+        reason: 'defaultRegistryUrl must derive from siteOrigin, not a '
+            'hardcoded host',
+      );
+      expect(defaultRegistryUrl, '$siteOrigin/registry/$cliVersion/');
+    });
+
+    test('ends in a trailing slash, so Uri.resolve does not drop a segment', () {
+      expect(defaultRegistryUrl, endsWith('/'));
+      expect(defaultRegistryUri.path, endsWith('/'));
+
+      // Prove the slash is load-bearing rather than decorative: resolving a
+      // relative path against a base URI missing the trailing slash drops
+      // the base's last path segment instead of appending underneath it.
+      final Uri withoutTrailingSlash = Uri.parse(
+        defaultRegistryUrl.substring(0, defaultRegistryUrl.length - 1),
+      );
+      expect(
+        withoutTrailingSlash.resolve('index.json').path,
+        isNot(defaultRegistryUri.resolve('index.json').path),
+        reason:
+            'a base URI without the trailing slash would resolve '
+            '"index.json" one directory up instead of alongside the '
+            'version it is pinned to',
+      );
+    });
+
     test('is the version the generated registry declares', () {
       final File registry = _repoFile('registry/generated/latest/index.json');
       expect(

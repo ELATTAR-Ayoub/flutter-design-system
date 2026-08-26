@@ -92,25 +92,46 @@ final RegExp _schemePattern = RegExp(r'^[A-Za-z][A-Za-z0-9+.\-]+:');
 /// In order:
 ///
 ///   1. [explicit] — what `--registry` was given.
-///   2. [configured] — the `registry:` key in `elattar.yaml`.
-///   3. A `registry/generated/latest` directory at or above [workingDirectory].
+///   2. `ELATTAR_REGISTRY_URL` in the environment. Between the flag and the
+///      config file on the usual grounds: a flag is this invocation, an
+///      environment variable is this shell or this CI job, and
+///      `elattar.yaml` is this project and outlives both. It is what lets a
+///      release rehearsal, a staging host or a fork be pointed somewhere
+///      else without editing a checked-in file — and, unlike a `.env`, it
+///      reaches a CLI that was compiled and published months earlier.
+///   3. [configured] — the `registry:` key in `elattar.yaml`.
+///   4. A `registry/generated/latest` directory at or above [workingDirectory].
 ///      This is the contributor convenience: inside a checkout of the design
 ///      system it is almost always what you meant, and outside one it finds
 ///      nothing, so it cannot hijack a released CLI in a consumer project.
 ///      When it wins, the caller is expected to say so — see
 ///      [LocalRegistryLocation.discovered].
-///   4. [defaultRegistryUri], the versioned public registry this CLI pins.
+///   5. [defaultRegistryUri], the versioned public registry this CLI pins.
 ///
 /// A value with an `http` or `https` scheme is remote; a value with any other
 /// scheme is refused by name rather than being handed to `Directory(...)`,
 /// which is how a mistyped `ftp://` used to surface as a raw
 /// `FileSystemException`.
+/// The environment variable that overrides the registry for one shell or one
+/// CI job. See [resolveRegistryLocation].
+const String registryUrlEnvVar = 'ELATTAR_REGISTRY_URL';
+
 RegistryLocation resolveRegistryLocation({
   String? explicit,
   String? configured,
   Directory? workingDirectory,
+  Map<String, String>? environment,
 }) {
-  final String? named = _firstNonEmpty(<String?>[explicit, configured]);
+  // Injectable rather than read straight off `Platform.environment`, so a
+  // test can exercise the precedence without mutating the process it runs
+  // in — the same seam `file_cache.dart` already uses for
+  // `ELATTAR_CACHE_DIR`.
+  final Map<String, String> env = environment ?? Platform.environment;
+  final String? named = _firstNonEmpty(<String?>[
+    explicit,
+    env[registryUrlEnvVar],
+    configured,
+  ]);
   if (named != null) return _parse(named, workingDirectory);
 
   final Directory? discovered = discoverGeneratedRegistry(

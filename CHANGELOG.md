@@ -6,12 +6,15 @@ The first public release. Elattar becomes something a stranger can install.
 
 ### Distribution
 
-* **`elattar_cli` `0.0.1` is published on pub.dev.** `dart install
-  elattar_cli` puts an `elattar` command on your PATH; `elattar init
-  --foundation source` and `elattar add button` set up a Flutter project
+* **`elattar_cli` `0.0.1` is built and ready to publish, not yet on
+  pub.dev.** The code, tests and CI gates are complete and
+  `dart pub publish --dry-run` reports 0 warnings; the publish itself, the
+  release tag and the site deploy are the steps still ahead. Once published,
+  `dart install elattar_cli` puts an `elattar` command on your PATH; `elattar
+  init --foundation source` and `elattar add button` set up a Flutter project
   without cloning anything. The CLI has one dependency.
 * **A hosted, version-pinned registry.** The CLI reads
-  `https://elattar-ayoub.github.io/flutter-design-system/registry/0.0.1/` by
+  `https://flutter.elattar.dev/registry/0.0.1/` by
   default. That path is immutable: a change ships as a new version rather than
   as a rewrite of a released one, so an installed `0.0.1` keeps installing the
   same sources. `--registry` accepts any other directory or `http(s)` URL.
@@ -23,8 +26,8 @@ The first public release. Elattar becomes something a stranger can install.
   cache directory (`ELATTAR_CACHE_DIR` overrides). `--offline` reads only that
   cache and distinguishes a cache miss from a network failure.
 * **`elattar add --all`** installs the complete registry in one command.
-* **The documentation site is live** at
-  <https://elattar-ayoub.github.io/flutter-design-system/>.
+* **The documentation site will be live** at
+  <https://flutter.elattar.dev>.
 
 ### Licensing and provenance
 
@@ -170,9 +173,10 @@ running reference at 1440×900 in both themes.
   `elattar init` and `elattar add <slug>`) landed alongside the public website
   shell, the documentation system, per-component guide pages, and
   public-repository governance (README, CONTRIBUTING, CODE_OF_CONDUCT,
-  SECURITY, issue templates, the CI and GitHub Pages workflows). At the time
-  this landed neither the CLI nor the registry had a public route; both were
-  published as part of this same `0.0.1` release, described above.
+  SECURITY, issue templates, the CI and deploy workflows). At the time this
+  landed neither the CLI nor the registry had a public route, and as of this
+  writing neither does: `0.0.1` is prepared and gated, not published. The
+  release record above is the current truth.
 
 * Shots (2026-08-23): a `shot` registry item kind installs multi-file,
   product-neutral application compositions into a consumer's `@app/`, with an

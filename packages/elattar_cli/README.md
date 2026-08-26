@@ -102,7 +102,7 @@ Run `elattar` with no arguments for the same summary.
 By default this CLI reads a **hosted, version-pinned registry**:
 
 ```
-https://elattar-ayoub.github.io/flutter-design-system/registry/0.0.1/
+https://flutter.elattar.dev/registry/0.0.1/
 ```
 
 That path is immutable. `elattar_cli 0.0.1` will install the same sources in a
@@ -239,5 +239,5 @@ retrieval date and hash — is in
 
 ## Links
 
-- Documentation — <https://elattar-ayoub.github.io/flutter-design-system/>
+- Documentation — <https://flutter.elattar.dev>
 - Source and issues — <https://github.com/ELATTAR-Ayoub/flutter-design-system>

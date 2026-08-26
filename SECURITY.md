@@ -4,7 +4,7 @@
 
 This repository is at version `0.0.1`, its first public release. Security fixes may land before broader roadmap work, but the project should not be treated as formally hardened or compliance-certified by default.
 
-`elattar_cli` is published on pub.dev and writes source into other people's projects, which is the surface most worth reporting against. Fixes to it ship as a new CLI version. A published registry version is never rewritten, so a corrected payload also ships as a new version rather than as a silent replacement of what people already installed.
+`elattar_cli` writes source into other people's projects, which is the surface most worth reporting against. (It is not yet published to pub.dev — code, tests and CI gates are complete, but the publish itself is still pending.) Fixes to it ship as a new CLI version. A published registry version is never rewritten, so a corrected payload also ships as a new version rather than as a silent replacement of what people already installed.
 
 ## Reporting a vulnerability
 

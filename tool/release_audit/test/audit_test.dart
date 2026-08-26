@@ -152,6 +152,78 @@ const String defaultRegistryUrl =
     test('returns null for a constant that is not declared', () {
       expect(dartStringConstant(identity, 'notThere'), isNull);
     });
+
+    test(
+      'resolves only the requested interpolation, leaving an unrequested '
+      'one as literal text',
+      () {
+        // The real shape post-refactor: `defaultRegistryUrl` interpolates
+        // both `siteOrigin` and `cliVersion` into one literal, and the audit
+        // only ever resolves `cliVersion` (see the comment in audit.dart).
+        // This pins that resolving one placeholder does not choke on, or
+        // silently drop, the other — the exact regression that would make
+        // the version-identity check start comparing `$cliVersion` against
+        // itself instead of against the real version.
+        const String withSiteOrigin = '''
+const String siteOrigin = String.fromEnvironment(
+  'ELATTAR_SITE_ORIGIN',
+  defaultValue: 'https://example.test',
+);
+const String cliVersion = '0.0.1';
+
+const String defaultRegistryUrl = '\$siteOrigin/registry/\$cliVersion/';
+''';
+        expect(
+          dartStringConstant(
+            withSiteOrigin,
+            'defaultRegistryUrl',
+            interpolations: const <String, String>{'cliVersion': '0.0.1'},
+          ),
+          r'$siteOrigin/registry/0.0.1/',
+        );
+      },
+    );
+  });
+
+  group('registryUrlCompositionFinding', () {
+    test('a declaration built from siteOrigin and cliVersion has no finding', () {
+      expect(
+        registryUrlCompositionFinding(
+          r"const String defaultRegistryUrl = '$siteOrigin/registry/$cliVersion/';",
+        ),
+        isNull,
+      );
+    });
+
+    test(
+      'catches a hardcoded origin even when cliVersion is still interpolated',
+      () {
+        expect(
+          registryUrlCompositionFinding(
+            "const String defaultRegistryUrl =\n"
+            "    'https://example.test/registry/'\n"
+            "    '\$cliVersion/';",
+          ),
+          contains('siteOrigin'),
+        );
+      },
+    );
+
+    test('catches a hardcoded version standing in for cliVersion', () {
+      expect(
+        registryUrlCompositionFinding(
+          r"const String defaultRegistryUrl = '$siteOrigin/registry/0.0.1/';",
+        ),
+        isNotNull,
+      );
+    });
+
+    test('catches a missing declaration', () {
+      expect(
+        registryUrlCompositionFinding('const int x = 1;'),
+        contains('is not declared'),
+      );
+    });
   });
 
   group('ledgerHashes', () {

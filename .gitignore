@@ -45,3 +45,6 @@ migrate_working_dir/
 # Machine-readable test reports written by `--file-reporter` in CI. They are
 # uploaded as a failure artifact, never committed.
 reports/
+
+# Local environment. `.env.example` is the committed documentation.
+.env

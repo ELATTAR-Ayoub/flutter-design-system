@@ -204,6 +204,43 @@ String? dartStringConstant(
   return value;
 }
 
+/// Whether `identity.dart`'s `defaultRegistryUrl` declaration composes
+/// `siteOrigin` and `cliVersion` rather than restating either.
+///
+/// Works on the raw declaration text, not the resolved value: resolving
+/// `siteOrigin` would require evaluating `String.fromEnvironment`, which this
+/// audit has no business doing. What matters for drift is that the
+/// declaration *names* both constants instead of spelling a host or a
+/// version out again — a hardcoded `https://...` origin or a literal
+/// `0.0.1` here is exactly the mistake this guards against, independent of
+/// what either constant currently resolves to.
+///
+/// Returns null when the declaration is clean, or a sentence describing what
+/// is wrong when it is not.
+String? registryUrlCompositionFinding(String identitySource) {
+  final RegExpMatch? declaration = RegExp(
+    r'const\s+String\s+defaultRegistryUrl\s*=([^;]*);',
+    dotAll: true,
+  ).firstMatch(identitySource);
+  if (declaration == null) {
+    return 'defaultRegistryUrl is not declared in identity.dart';
+  }
+  final String body = declaration.group(1)!;
+  if (!body.contains(r'$siteOrigin')) {
+    return 'defaultRegistryUrl does not derive from siteOrigin: '
+        '${body.trim()}';
+  }
+  if (!body.contains(r'$cliVersion')) {
+    return 'defaultRegistryUrl does not derive from cliVersion: '
+        '${body.trim()}';
+  }
+  if (RegExp(r'\d+\.\d+\.\d+').hasMatch(body) || body.contains('http')) {
+    return 'defaultRegistryUrl retypes a value instead of deriving it: '
+        '${body.trim()}';
+  }
+  return null;
+}
+
 /// The 64-hex tokens the provenance ledger states, lowercased.
 Set<String> ledgerHashes(String prose) => RegExp(
   '`([0-9a-f]{64})`',
@@ -381,6 +418,14 @@ AuditReport auditRelease(String repoRoot, {required Sha256Hex sha256Hex}) {
   final Map<String, Object?>? registry = readJson(
     'registry/generated/latest/registry.json',
   );
+  // `defaultRegistryUrl` interpolates both `siteOrigin` and `cliVersion` into
+  // one literal now. Only `cliVersion` is substituted here — `siteOrigin`
+  // is left as the literal text `$siteOrigin`, since resolving it would mean
+  // evaluating `String.fromEnvironment`, which this audit has no business
+  // doing. That is fine: the version this check needs lives in the last path
+  // segment, and `$siteOrigin` never appears there, so the trailing-segment
+  // regex below still finds the real version untouched by the unresolved
+  // placeholder ahead of it.
   final String? registryUrl = dartStringConstant(
     readOrEmpty('packages/elattar_cli/lib/src/identity.dart'),
     'defaultRegistryUrl',
@@ -432,19 +477,14 @@ AuditReport auditRelease(String repoRoot, {required Sha256Hex sha256Hex}) {
   final String identitySource = readOrEmpty(
     'packages/elattar_cli/lib/src/identity.dart',
   );
-  final RegExpMatch? urlDeclaration = RegExp(
-    r'const\s+String\s+defaultRegistryUrl\s*=([^;]*);',
-    dotAll: true,
-  ).firstMatch(identitySource);
+  final String? urlCompositionFinding = registryUrlCompositionFinding(
+    identitySource,
+  );
   recorder.record(
-    'the pinned registry URL is derived from cliVersion, not retyped',
-    ok:
-        urlDeclaration != null &&
-        urlDeclaration.group(1)!.contains(r'$cliVersion') &&
-        !RegExp(r'\d+\.\d+\.\d+').hasMatch(urlDeclaration.group(1)!),
-    detail: urlDeclaration == null
-        ? 'defaultRegistryUrl is not declared in identity.dart'
-        : urlDeclaration.group(1)!.trim(),
+    'the pinned registry URL is derived from siteOrigin and cliVersion, '
+    'not retyped',
+    ok: urlCompositionFinding == null,
+    detail: urlCompositionFinding ?? '',
   );
 
   // ── license ───────────────────────────────────────────────────────────────

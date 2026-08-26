@@ -23,9 +23,9 @@ elattar add button
 
 | | |
 | --- | --- |
-| CLI | `elattar_cli` `0.0.1` on pub.dev |
+| CLI | `elattar_cli` `0.0.1` — code, tests and CI gates complete (`dart pub publish --dry-run` reports 0 warnings); not yet published to pub.dev |
 | Registry | 99 items — 84 components, 9 effects, 5 motion, 1 foundation — schema v1 |
-| Documentation | <https://elattar-ayoub.github.io/flutter-design-system/> |
+| Documentation | <https://flutter.elattar.dev> |
 | License | MIT for Elattar's own work; see [License](#license) |
 | Tests | 1510 package, 795 example, 118 CLI, 45 tooling |
 
@@ -54,7 +54,7 @@ file a command would write without writing any of them.
 
 Full instructions, PATH recovery, offline use and troubleshooting are in the
 [CLI package README](packages/elattar_cli/README.md) and on the
-[installation page](https://elattar-ayoub.github.io/flutter-design-system/#/docs/installation).
+[installation page](https://flutter.elattar.dev/docs/installation).
 
 ### Where components come from
 
@@ -161,7 +161,7 @@ the root and routes any agent that reads it into the skill.
 
 **Elsewhere** — the repository root is also a single-plugin Claude Code
 marketplace ([`.claude-plugin/`](.claude-plugin/)), so it can be added as a
-plugin source directly. See [`/skills`](https://elattar-ayoub.github.io/flutter-design-system/#/skills)
+plugin source directly. See [`/skills`](https://flutter.elattar.dev/skills)
 for each route and its current verification state; routes that have not been
 demonstrated end to end say so rather than being presented as working.
 

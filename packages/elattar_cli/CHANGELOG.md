@@ -7,7 +7,9 @@ in the repository root.
 
 ## 0.0.1
 
-First published release.
+First release. Code, tests and CI gates are complete —
+`dart pub publish --dry-run` reports 0 warnings — but this version has not
+been published to pub.dev yet, and no `v0.0.1` git tag exists.
 
 ### Commands
 
@@ -27,7 +29,7 @@ take `--dry-run`; `add` takes `--overwrite`.
 ### Registry
 
 - Reads a **hosted, version-pinned registry** by default:
-  `https://elattar-ayoub.github.io/flutter-design-system/registry/0.0.1/`.
+  `https://flutter.elattar.dev/registry/0.0.1/`.
   The path is immutable, so this version installs the same sources for as long
   as it exists — a later registry cannot change what `0.0.1` does.
 - `--registry` also accepts a local directory, for contributors and mirrors.
