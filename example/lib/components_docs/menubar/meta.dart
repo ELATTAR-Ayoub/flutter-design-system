@@ -1,9 +1,15 @@
 /// Documentation metadata for `menubar`.
 ///
-/// No `registry/components/menubar.json` manifest yet: unregistered.
-/// [dependencies] is left empty; the page states in prose that this
-/// component builds on [ElPopover] and shares its row model
-/// ([ElMenuChild]) with `context_menu`.
+/// **Corrected.** This file used to claim no `registry/components/
+/// menubar.json` manifest existed and that [dependencies] was left empty.
+/// Both are stale: `registry/components/menubar.json` is a real, shipped
+/// manifest today, `registry/generated/latest/registry.json` carries
+/// `menubar`, and `elattar add menubar` is a genuine, working command.
+/// [dependencies] below already matches the manifest's own
+/// `registryDependencies` list, verbatim: `menu`, `popover`, and
+/// `source-foundation` — the shared row model ([ElMenuChild]) `menubar`
+/// builds on, and the [ElPopover] positioner it shares with
+/// `context_menu`.
 ///
 /// Split out of the former merged `navigation_menu` page (Phase F/J): that
 /// page covered `navigation_menu`, `menubar`, `context_menu`, and

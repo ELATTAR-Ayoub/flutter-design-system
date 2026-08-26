@@ -30,11 +30,32 @@ import 'docs_pages/registry_page.dart';
 import 'docs_pages/theming_page.dart';
 import 'docs_pages/typeset_page.dart';
 import 'components_docs/button/page.dart';
-import 'components_docs/button_card_pages.dart' as legacy_button_card;
-import 'components_docs/dialog_page.dart';
-import 'components_docs/input_select_pages.dart';
 import 'components_docs/accordion/meta.dart' as accordion;
 import 'components_docs/accordion/page.dart';
+import 'components_docs/agent_attach_menu/meta.dart' as agent_attach_menu;
+import 'components_docs/agent_attach_menu/page.dart';
+import 'components_docs/agent_attachments/meta.dart' as agent_attachments;
+import 'components_docs/agent_attachments/page.dart';
+import 'components_docs/agent_avatar/meta.dart' as agent_avatar;
+import 'components_docs/agent_avatar/page.dart';
+import 'components_docs/agent_composer/meta.dart' as agent_composer;
+import 'components_docs/agent_composer/page.dart';
+import 'components_docs/agent_console/meta.dart' as agent_console;
+import 'components_docs/agent_console/page.dart';
+import 'components_docs/agent_core/meta.dart' as agent_core;
+import 'components_docs/agent_core/page.dart';
+import 'components_docs/agent_face/meta.dart' as agent_face;
+import 'components_docs/agent_face/page.dart';
+import 'components_docs/agent_history/meta.dart' as agent_history;
+import 'components_docs/agent_history/page.dart';
+import 'components_docs/agent_launcher/meta.dart' as agent_launcher;
+import 'components_docs/agent_launcher/page.dart';
+import 'components_docs/agent_markdown/meta.dart' as agent_markdown;
+import 'components_docs/agent_markdown/page.dart';
+import 'components_docs/agent_slash_palette/meta.dart' as agent_slash_palette;
+import 'components_docs/agent_slash_palette/page.dart';
+import 'components_docs/agent_transcript/meta.dart' as agent_transcript;
+import 'components_docs/agent_transcript/page.dart';
 import 'components_docs/alert/meta.dart' as alert;
 import 'components_docs/alert/page.dart';
 import 'components_docs/alert_dialog/meta.dart' as alert_dialog;
@@ -45,22 +66,38 @@ import 'components_docs/badge/meta.dart' as badge;
 import 'components_docs/badge/page.dart';
 import 'components_docs/breadcrumb/meta.dart' as breadcrumb;
 import 'components_docs/breadcrumb/page.dart';
+import 'components_docs/bubble/meta.dart' as bubble;
+import 'components_docs/bubble/page.dart';
 import 'components_docs/calendar/meta.dart' as calendar;
 import 'components_docs/calendar/page.dart';
+import 'components_docs/card/meta.dart' as card;
+import 'components_docs/card/page.dart';
 import 'components_docs/carousel/meta.dart' as carousel;
 import 'components_docs/carousel/page.dart';
+import 'components_docs/chart/meta.dart' as chart;
+import 'components_docs/chart/page.dart';
+import 'components_docs/chart_cartesian/meta.dart' as chart_cartesian;
+import 'components_docs/chart_cartesian/page.dart';
+import 'components_docs/chart_geometry/meta.dart' as chart_geometry;
+import 'components_docs/chart_geometry/page.dart';
+import 'components_docs/chart_polar/meta.dart' as chart_polar;
+import 'components_docs/chart_polar/page.dart';
 import 'components_docs/checkbox/meta.dart' as checkbox;
 import 'components_docs/checkbox/page.dart';
 import 'components_docs/collapsible/meta.dart' as collapsible;
 import 'components_docs/collapsible/page.dart';
 import 'components_docs/command/meta.dart' as command;
 import 'components_docs/command/page.dart';
+import 'components_docs/dialog/meta.dart' as dialog;
+import 'components_docs/dialog/page.dart';
 import 'components_docs/dropdown_menu/meta.dart' as dropdown_menu;
 import 'components_docs/dropdown_menu/page.dart';
 import 'components_docs/field/meta.dart' as field;
 import 'components_docs/field/page.dart';
 import 'components_docs/icon/meta.dart' as icon;
 import 'components_docs/icon/page.dart';
+import 'components_docs/input/meta.dart' as input;
+import 'components_docs/input/page.dart';
 import 'components_docs/input_group/meta.dart' as input_group;
 import 'components_docs/input_group/page.dart';
 import 'components_docs/native_select/meta.dart' as native_select;
@@ -77,6 +114,8 @@ import 'components_docs/radio/meta.dart' as radio;
 import 'components_docs/radio/page.dart';
 import 'components_docs/scroll_area/meta.dart' as scroll_area;
 import 'components_docs/scroll_area/page.dart';
+import 'components_docs/select/meta.dart' as select;
+import 'components_docs/select/page.dart';
 import 'components_docs/separator/meta.dart' as separator;
 import 'components_docs/separator/page.dart';
 import 'components_docs/sheet/meta.dart' as sheet;
@@ -114,7 +153,10 @@ import 'components_docs/input_otp/meta.dart' as input_otp;
 import 'components_docs/item/meta.dart' as item;
 import 'components_docs/kbd/meta.dart' as kbd;
 import 'components_docs/marker/meta.dart' as marker;
+import 'components_docs/menu/meta.dart' as menu;
 import 'components_docs/menubar/meta.dart' as menubar;
+import 'components_docs/message/meta.dart' as message;
+import 'components_docs/message_scroller/meta.dart' as message_scroller;
 import 'components_docs/nav_user/meta.dart' as nav_user;
 import 'components_docs/resizable/meta.dart' as resizable;
 import 'components_docs/selection_control/meta.dart' as selection_control;
@@ -135,13 +177,56 @@ import 'components_docs/input_otp/page.dart';
 import 'components_docs/item/page.dart';
 import 'components_docs/kbd/page.dart';
 import 'components_docs/marker/page.dart';
+import 'components_docs/menu/page.dart';
 import 'components_docs/menubar/page.dart';
+import 'components_docs/message/page.dart';
+import 'components_docs/message_scroller/page.dart';
 import 'components_docs/nav_user/page.dart';
 import 'components_docs/resizable/page.dart';
 import 'components_docs/selection_control/page.dart';
 import 'components_docs/skeleton/page.dart';
 import 'components_docs/spinner/page.dart';
 import 'components_docs/toggle_group/page.dart';
+import 'components_docs/attachment/meta.dart' as attachment;
+import 'components_docs/attachment/page.dart';
+import 'components_docs/questionnaire/meta.dart' as questionnaire;
+import 'components_docs/questionnaire/page.dart';
+import 'components_docs/voice/meta.dart' as voice;
+import 'components_docs/voice/page.dart';
+import 'components_docs/voice_orb/meta.dart' as voice_orb;
+import 'components_docs/voice_orb/page.dart';
+import 'components_docs/icon_swap/meta.dart' as icon_swap;
+import 'components_docs/icon_swap/page.dart';
+import 'components_docs/lift/meta.dart' as lift;
+import 'components_docs/lift/page.dart';
+import 'components_docs/sliding_pill/meta.dart' as sliding_pill;
+import 'components_docs/sliding_pill/page.dart';
+import 'components_docs/swap_in/meta.dart' as swap_in;
+import 'components_docs/swap_in/page.dart';
+import 'components_docs/foil_value/meta.dart' as foil_value;
+import 'components_docs/foil_value/page.dart';
+import 'components_docs/glass/meta.dart' as glass;
+import 'components_docs/glass/page.dart';
+import 'components_docs/machine_surface/meta.dart' as machine_surface;
+import 'components_docs/machine_surface/page.dart';
+import 'components_docs/media_scrim/meta.dart' as media_scrim;
+import 'components_docs/media_scrim/page.dart';
+import 'components_docs/bloom_cosmic/meta.dart' as bloom_cosmic;
+import 'components_docs/bloom_cosmic/page.dart';
+import 'components_docs/page_glow/meta.dart' as page_glow;
+import 'components_docs/page_glow/page.dart';
+import 'components_docs/sheen_action/meta.dart' as sheen_action;
+import 'components_docs/sheen_action/page.dart';
+import 'components_docs/starfield/meta.dart' as starfield;
+import 'components_docs/starfield/page.dart';
+import 'components_docs/press_motion/meta.dart' as press_motion;
+import 'components_docs/press_motion/page.dart';
+import 'components_docs/keyframes/meta.dart' as keyframes;
+import 'components_docs/keyframes/page.dart';
+import 'components_docs/safe_area/meta.dart' as safe_area;
+import 'components_docs/safe_area/page.dart';
+import 'components_docs/source_foundation/meta.dart' as source_foundation;
+import 'components_docs/source_foundation/page.dart';
 import 'pages/agent_avatar.dart';
 import 'pages/agent_voice.dart';
 import 'pages/buttons.dart';
@@ -525,14 +610,40 @@ typedef _ComponentDocPageBuilder =
 ///
 /// Keyed off each imported `<name>Doc.route` — never a hand-typed
 /// `/components/<name>` literal — so a route can only drift from
-/// `catalog.dart` if the `meta.dart` const it reads from does. `button`,
-/// `input`, `card`, `dialog`, and `select` are deliberately absent: they stay
-/// on their own switch arms below, unmigrated, exactly as they were before
-/// this map existed.
+/// `catalog.dart` if the `meta.dart` const it reads from does. `button` is
+/// deliberately absent: it stays on its own switch arm below, unmigrated,
+/// exactly as it was before this map existed. `input`, `dialog`, `card`, and
+/// `select` used to be absent for the same reason and are now migrated: each
+/// has a real `meta.dart`/`page.dart` pair and a map entry like every other
+/// component here.
 final Map<String, _ComponentDocPageBuilder> _componentDocPageBuilders =
     <String, _ComponentDocPageBuilder>{
       accordion.accordionDoc.route: ({onNavigate}) =>
           AccordionDocPage(onNavigate: onNavigate),
+      agent_attach_menu.agentAttachMenuDoc.route: ({onNavigate}) =>
+          AgentAttachMenuDocPage(onNavigate: onNavigate),
+      agent_attachments.agentAttachmentsDoc.route: ({onNavigate}) =>
+          AgentAttachmentsDocPage(onNavigate: onNavigate),
+      agent_avatar.agentAvatarDoc.route: ({onNavigate}) =>
+          AgentAvatarDocPage(onNavigate: onNavigate),
+      agent_composer.agentComposerDoc.route: ({onNavigate}) =>
+          AgentComposerDocPage(onNavigate: onNavigate),
+      agent_console.agentConsoleDoc.route: ({onNavigate}) =>
+          AgentConsoleDocPage(onNavigate: onNavigate),
+      agent_core.agentCoreDoc.route: ({onNavigate}) =>
+          AgentCoreDocPage(onNavigate: onNavigate),
+      agent_face.agentFaceDoc.route: ({onNavigate}) =>
+          AgentFaceDocPage(onNavigate: onNavigate),
+      agent_history.agentHistoryDoc.route: ({onNavigate}) =>
+          AgentHistoryDocPage(onNavigate: onNavigate),
+      agent_launcher.agentLauncherDoc.route: ({onNavigate}) =>
+          AgentLauncherDocPage(onNavigate: onNavigate),
+      agent_markdown.agentMarkdownDoc.route: ({onNavigate}) =>
+          AgentMarkdownDocPage(onNavigate: onNavigate),
+      agent_slash_palette.agentSlashPaletteDoc.route: ({onNavigate}) =>
+          AgentSlashPaletteDocPage(onNavigate: onNavigate),
+      agent_transcript.agentTranscriptDoc.route: ({onNavigate}) =>
+          AgentTranscriptDocPage(onNavigate: onNavigate),
       alert.alertDoc.route: ({onNavigate}) =>
           AlertDocPage(onNavigate: onNavigate),
       alert_dialog.alertDialogDoc.route: ({onNavigate}) =>
@@ -543,21 +654,36 @@ final Map<String, _ComponentDocPageBuilder> _componentDocPageBuilders =
           BadgeDocPage(onNavigate: onNavigate),
       breadcrumb.breadcrumbDoc.route: ({onNavigate}) =>
           BreadcrumbDocPage(onNavigate: onNavigate),
+      bubble.bubbleDoc.route: ({onNavigate}) =>
+          BubbleDocPage(onNavigate: onNavigate),
       calendar.calendarDoc.route: ({onNavigate}) =>
           CalendarDocPage(onNavigate: onNavigate),
+      card.cardDoc.route: ({onNavigate}) => CardDocPage(onNavigate: onNavigate),
       carousel.carouselDoc.route: ({onNavigate}) =>
           CarouselDocPage(onNavigate: onNavigate),
+      chart.chartDoc.route: ({onNavigate}) =>
+          ChartDocPage(onNavigate: onNavigate),
+      chart_cartesian.chartCartesianDoc.route: ({onNavigate}) =>
+          ChartCartesianDocPage(onNavigate: onNavigate),
+      chart_geometry.chartGeometryDoc.route: ({onNavigate}) =>
+          ChartGeometryDocPage(onNavigate: onNavigate),
+      chart_polar.chartPolarDoc.route: ({onNavigate}) =>
+          ChartPolarDocPage(onNavigate: onNavigate),
       checkbox.checkboxDoc.route: ({onNavigate}) =>
           CheckboxDocPage(onNavigate: onNavigate),
       collapsible.collapsibleDoc.route: ({onNavigate}) =>
           CollapsibleDocPage(onNavigate: onNavigate),
       command.commandDoc.route: ({onNavigate}) =>
           CommandDocPage(onNavigate: onNavigate),
+      dialog.dialogDoc.route: ({onNavigate}) =>
+          DialogDocPage(onNavigate: onNavigate),
       dropdown_menu.dropdownMenuDoc.route: ({onNavigate}) =>
           DropdownMenuDocPage(onNavigate: onNavigate),
       field.fieldDoc.route: ({onNavigate}) =>
           FieldDocPage(onNavigate: onNavigate),
       icon.iconDoc.route: ({onNavigate}) => IconDocPage(onNavigate: onNavigate),
+      input.inputDoc.route: ({onNavigate}) =>
+          InputDocPage(onNavigate: onNavigate),
       input_group.inputGroupDoc.route: ({onNavigate}) =>
           InputGroupDocPage(onNavigate: onNavigate),
       native_select.nativeSelectDoc.route: ({onNavigate}) =>
@@ -574,6 +700,8 @@ final Map<String, _ComponentDocPageBuilder> _componentDocPageBuilders =
           RadioDocPage(onNavigate: onNavigate),
       scroll_area.scrollAreaDoc.route: ({onNavigate}) =>
           ScrollAreaDocPage(onNavigate: onNavigate),
+      select.selectDoc.route: ({onNavigate}) =>
+          SelectDocPage(onNavigate: onNavigate),
       separator.separatorDoc.route: ({onNavigate}) =>
           SeparatorDocPage(onNavigate: onNavigate),
       sheet.sheetDoc.route: ({onNavigate}) =>
@@ -621,8 +749,13 @@ final Map<String, _ComponentDocPageBuilder> _componentDocPageBuilders =
       kbd.kbdDoc.route: ({onNavigate}) => KbdDocPage(onNavigate: onNavigate),
       marker.markerDoc.route: ({onNavigate}) =>
           MarkerDocPage(onNavigate: onNavigate),
+      menu.menuDoc.route: ({onNavigate}) => MenuDocPage(onNavigate: onNavigate),
       menubar.menubarDoc.route: ({onNavigate}) =>
           MenubarDocPage(onNavigate: onNavigate),
+      message.messageDoc.route: ({onNavigate}) =>
+          MessageDocPage(onNavigate: onNavigate),
+      message_scroller.messageScrollerDoc.route: ({onNavigate}) =>
+          MessageScrollerDocPage(onNavigate: onNavigate),
       nav_user.navUserDoc.route: ({onNavigate}) =>
           NavUserDocPage(onNavigate: onNavigate),
       resizable.resizableDoc.route: ({onNavigate}) =>
@@ -635,6 +768,44 @@ final Map<String, _ComponentDocPageBuilder> _componentDocPageBuilders =
           SpinnerDocPage(onNavigate: onNavigate),
       toggle_group.toggleGroupDoc.route: ({onNavigate}) =>
           ToggleGroupDocPage(onNavigate: onNavigate),
+      attachment.attachmentDoc.route: ({onNavigate}) =>
+          AttachmentDocPage(onNavigate: onNavigate),
+      questionnaire.questionnaireDoc.route: ({onNavigate}) =>
+          QuestionnaireDocPage(onNavigate: onNavigate),
+      voice.voiceDoc.route: ({onNavigate}) => VoiceDocPage(onNavigate: onNavigate),
+      voice_orb.voiceOrbDoc.route: ({onNavigate}) =>
+          VoiceOrbDocPage(onNavigate: onNavigate),
+      icon_swap.iconSwapDoc.route: ({onNavigate}) =>
+          IconSwapDocPage(onNavigate: onNavigate),
+      lift.liftDoc.route: ({onNavigate}) => LiftDocPage(onNavigate: onNavigate),
+      sliding_pill.slidingPillDoc.route: ({onNavigate}) =>
+          SlidingPillDocPage(onNavigate: onNavigate),
+      swap_in.swapInDoc.route: ({onNavigate}) =>
+          SwapInDocPage(onNavigate: onNavigate),
+      foil_value.foilValueDoc.route: ({onNavigate}) =>
+          FoilValueDocPage(onNavigate: onNavigate),
+      glass.glassDoc.route: ({onNavigate}) =>
+          GlassDocPage(onNavigate: onNavigate),
+      machine_surface.machineSurfaceDoc.route: ({onNavigate}) =>
+          MachineSurfaceDocPage(onNavigate: onNavigate),
+      media_scrim.mediaScrimDoc.route: ({onNavigate}) =>
+          MediaScrimDocPage(onNavigate: onNavigate),
+      bloom_cosmic.bloomCosmicDoc.route: ({onNavigate}) =>
+          BloomCosmicDocPage(onNavigate: onNavigate),
+      page_glow.pageGlowDoc.route: ({onNavigate}) =>
+          PageGlowDocPage(onNavigate: onNavigate),
+      sheen_action.sheenActionDoc.route: ({onNavigate}) =>
+          SheenActionDocPage(onNavigate: onNavigate),
+      starfield.starfieldDoc.route: ({onNavigate}) =>
+          StarfieldDocPage(onNavigate: onNavigate),
+      press_motion.pressMotionDoc.route: ({onNavigate}) =>
+          PressMotionDocPage(onNavigate: onNavigate),
+      keyframes.keyframesDoc.route: ({onNavigate}) =>
+          KeyframesDocPage(onNavigate: onNavigate),
+      safe_area.safeAreaDoc.route: ({onNavigate}) =>
+          SafeAreaDocPage(onNavigate: onNavigate),
+      source_foundation.sourceFoundationDoc.route: ({onNavigate}) =>
+          SourceFoundationDocPage(onNavigate: onNavigate),
     };
 
 /// Resolves public website destinations without changing the
@@ -670,10 +841,6 @@ Widget publicPageFor(String route, {PublicNavigate? onNavigate}) {
     docsChangelogRoute => ChangelogDocsPage(onNavigate: onNavigate),
     componentsRoute => PublicComponentsPage(onNavigate: onNavigate),
     '/components/button' => const ButtonDocPage(),
-    '/components/input' => const InputDocPage(),
-    '/components/card' => const legacy_button_card.CardDocPage(),
-    '/components/dialog' => const DialogDocPage(),
-    '/components/select' => const SelectDocPage(),
     // The deliberate fallback. Every route the site declares now resolves
     // above — `site_routes_test.dart` asserts that every entry in
     // `docsPageEntries` is reachable, which is what stopped three declared

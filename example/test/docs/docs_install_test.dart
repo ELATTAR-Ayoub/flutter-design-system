@@ -129,7 +129,7 @@ void main() {
 
     expect(
       componentDocs.length,
-      greaterThanOrEqualTo(55),
+      greaterThanOrEqualTo(99),
       reason: 'the command-truth guard must not pass vacuously over an empty catalog',
     );
 
@@ -147,5 +147,46 @@ void main() {
             'item answers to that name',
       );
     }
+  });
+
+  test('every registry item has a documentation page', () {
+    // The whole point of the rollout. The registry ships 99 items; before
+    // this, 44 of them resolved to nothing — a reader following a
+    // dependency list, a search result or a bare URL landed on the
+    // homepage's "not found" fallback, which is indistinguishable from the
+    // item not existing.
+    //
+    // Asserted in the direction that matters. The command-truth test above
+    // proves no page invents an item; this proves no item is left without a
+    // page, and it is the one that can only be satisfied by writing all 99.
+    final Map<String, Object?> registry =
+        jsonDecode(
+              File(
+                '../registry/generated/latest/registry.json',
+              ).readAsStringSync(),
+            )
+            as Map<String, Object?>;
+
+    // `ComponentDocEntry.name` is spelled with hyphens for some entries and
+    // underscores for others, and both are load bearing — `route` is
+    // `/components/$name`. Normalise on the way in rather than pick a side.
+    final Set<String> documented = <String>{
+      for (final ComponentDocEntry entry in componentDocs)
+        entry.name.replaceAll('_', '-'),
+    };
+
+    final List<String> undocumented = <String>[
+      for (final Object? raw in registry['items']! as List<Object?>)
+        if (!documented.contains((raw! as Map<String, Object?>)['name']))
+          (raw as Map<String, Object?>)['name']! as String,
+    ];
+
+    expect(
+      undocumented,
+      isEmpty,
+      reason:
+          '${undocumented.length} registry items resolve to no page: '
+          '${undocumented.join(', ')}',
+    );
   });
 }

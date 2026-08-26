@@ -1,0 +1,255 @@
+import 'package:elattar_design_system/elattar_design_system.dart';
+import 'package:example/components_docs/chart_geometry/meta.dart';
+import 'package:example/components_docs/chart_geometry/page.dart';
+import 'package:example/docs/component_doc_page.dart' show DocsTocEntry;
+import 'package:example/docs/docs_disclosure.dart';
+import 'package:example/docs/docs_install.dart';
+import 'package:example/docs/docs_section.dart' show DocsSection;
+import 'package:example/docs/docs_showcase.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+Widget _harness({
+  required Widget child,
+  required ElThemeController controller,
+}) => ElTheme(
+  controller: controller,
+  child: MaterialApp(home: SingleChildScrollView(child: child)),
+);
+
+/// The single `DocsDisclosure` whose title is [title], matching the kit's own
+/// convention (`DocsDisclosure.triggerKey` is one constant shared by every
+/// instance on the page).
+Finder _disclosureTrigger(String title) => find.descendant(
+  of: find.byWidgetPredicate(
+    (Widget widget) => widget is DocsDisclosure && widget.title == title,
+  ),
+  matching: find.byKey(DocsDisclosure.triggerKey),
+);
+
+/// Every field `ElBandScale`, `ElPointScale`, `ElLinearScale` and
+/// `ElBarSlot` declare (`lib/src/components/chart_geometry.dart`), plus
+/// every `ElCurveType` value — this file has no widget, so there is no
+/// constructor parameter list to assert against; these are the equivalent
+/// completeness check for a file of pure functions and value classes.
+const List<String> _fieldsAndValues = <String>[
+  'count',
+  'start',
+  'extent',
+  'reversed',
+  'bandwidth',
+  'step',
+  'domainMin',
+  'domainMax',
+  'rangeStart',
+  'rangeEnd',
+  'offset',
+  'size',
+  'linear',
+  'natural',
+  'monotone',
+];
+
+const List<String> _sectionTitles = <String>[
+  'Preview',
+  'Installation',
+  'Usage',
+  'Ticks & scales',
+  'Band & point',
+  'Bar layout',
+  'Curves',
+  'Polar',
+  'API Reference',
+  'States',
+  'Accessibility',
+  'Keyboard',
+  'Responsive',
+  'Dependencies',
+  'Theming',
+  'Source',
+];
+
+void main() {
+  group('chart-geometry docs page', () {
+    testWidgets(
+      'renders the article and the full API table for every exported '
+      'class, function and value this page claims to document',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(1440, 4000);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+
+        String? destination;
+        await tester.pumpWidget(
+          _harness(
+            controller: ElThemeController(mode: ElThemeMode.dark),
+            child: ChartGeometryDocPage(
+              onNavigate: (String route) => destination = route,
+            ),
+          ),
+        );
+        await tester.pump();
+
+        expect(
+          find.byKey(const ValueKey<String>('chart-geometry-doc-article')),
+          findsOneWidget,
+        );
+
+        final Finder apiTrigger = _disclosureTrigger('API Reference');
+        await tester.ensureVisible(apiTrigger);
+        await tester.pump();
+        await tester.tap(apiTrigger);
+        await tester.pump();
+        await tester.pump(ElDurations.jelly);
+
+        // Every exported class and top-level function
+        // chart_geometry.dart's own barrel carries is named somewhere in
+        // the API Reference disclosure.
+        for (final String export in chartGeometryDoc.exports) {
+          expect(find.text(export), findsWidgets, reason: 'missing $export');
+        }
+
+        for (final String field in _fieldsAndValues) {
+          expect(
+            find.text(field),
+            findsWidgets,
+            reason: '$field is a field or enum value and must be documented',
+          );
+        }
+
+        // Six live specimens actually paint: elChartNiceTicks/ElLinearScale,
+        // ElBandScale/ElPointScale, elBarSlots/elBarRRect, the four curve
+        // interpolators, and the polar family, all as CustomPaint.
+        expect(find.byType(CustomPaint), findsWidgets);
+
+        expect(chartGeometryDoc.name, 'chart_geometry');
+        expect(chartGeometryDoc.command, 'elattar add chart-geometry');
+        expect(destination, isNull);
+      },
+    );
+
+    testWidgets(
+      'the page is declared, and every section is a kit component',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(1440, 6000);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+
+        await tester.pumpWidget(
+          _harness(
+            controller: ElThemeController(mode: ElThemeMode.dark),
+            child: const ChartGeometryDocPage(),
+          ),
+        );
+        await tester.pump();
+
+        // Six specimen stages: Preview, Ticks & scales, Band & point, Bar
+        // layout, Curves, Polar.
+        expect(find.byType(DocsShowcase), findsNWidgets(6));
+        expect(find.byType(DocsInstall), findsOneWidget);
+        expect(find.byType(DocsDisclosure), findsNWidgets(8));
+      },
+    );
+
+    test('the table of contents matches the declared sections', () {
+      expect(
+        chartGeometryDocSpec.toc.map((DocsTocEntry entry) => entry.title).toList(),
+        _sectionTitles,
+      );
+    });
+
+    testWidgets(
+      'sections render in declaration order',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(1440, 6000);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+
+        final ElThemeController controller = ElThemeController(
+          mode: ElThemeMode.dark,
+        );
+        await tester.pumpWidget(
+          _harness(controller: controller, child: const ChartGeometryDocPage()),
+        );
+        await tester.pump();
+
+        final List<String> titles = tester
+            .widgetList<DocsSection>(find.byType(DocsSection))
+            .map((DocsSection section) => section.title)
+            .toList();
+
+        expect(titles, _sectionTitles);
+      },
+    );
+
+    testWidgets(
+      'renders at narrow width with the anchor strip instead of a rail',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(390, 844);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+
+        await tester.pumpWidget(
+          _harness(
+            controller: ElThemeController(mode: ElThemeMode.dark),
+            child: const ChartGeometryDocPage(),
+          ),
+        );
+        await tester.pump();
+
+        expect(
+          find.byKey(const ValueKey<String>('chart-geometry-doc-article')),
+          findsOneWidget,
+        );
+        expect(
+          find.byKey(const ValueKey<String>('docs-layout-anchor-strip')),
+          findsOneWidget,
+        );
+        expect(
+          find.byKey(const ValueKey<String>('docs-layout-sidebar')),
+          findsNothing,
+        );
+      },
+    );
+
+    testWidgets(
+      'survives a live theme flip in place, at desktop width, without '
+      'throwing',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(1440, 4000);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+
+        final ElThemeController controller = ElThemeController(
+          mode: ElThemeMode.dark,
+        );
+        await tester.pumpWidget(
+          _harness(controller: controller, child: const ChartGeometryDocPage()),
+        );
+        await tester.pump();
+
+        final ElThemeData darkTheme = ElTheme.of(
+          tester.element(
+            find.byKey(const ValueKey<String>('chart-geometry-doc-article')),
+          ),
+        );
+
+        controller.setMode(ElThemeMode.light);
+        await tester.pump();
+
+        final ElThemeData lightTheme = ElTheme.of(
+          tester.element(
+            find.byKey(const ValueKey<String>('chart-geometry-doc-article')),
+          ),
+        );
+
+        expect(lightTheme.background, isNot(darkTheme.background));
+        expect(lightTheme.foreground, isNot(darkTheme.foreground));
+        expect(
+          find.byKey(const ValueKey<String>('chart-geometry-doc-article')),
+          findsOneWidget,
+        );
+      },
+    );
+  });
+}
