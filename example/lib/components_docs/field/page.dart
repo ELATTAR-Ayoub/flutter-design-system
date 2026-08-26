@@ -1560,6 +1560,7 @@ class _DependenciesContent extends StatelessWidget {
       SizedBox(height: el(4)),
       const DocsLinkRow(
         links: <DocsLink>[
+          DocsLink(label: 'Rule', route: '/components/rule'),
           DocsLink(label: 'Form', route: '/components/form'),
           DocsLink(label: 'Checkbox', route: '/components/checkbox'),
           DocsLink(label: 'Radio group', route: '/components/radio'),

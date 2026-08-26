@@ -1350,9 +1350,19 @@ class _DependenciesContent extends StatelessWidget {
         links: <DocsLink>[
           DocsLink(label: 'Field', route: '/components/field'),
           DocsLink(label: 'Checkbox', route: '/components/checkbox'),
+          DocsLink(label: 'Switch', route: '/components/switch'),
           DocsLink(
             label: 'Selection control',
             route: '/components/selection_control',
+          ),
+          DocsLink(
+            label: 'Machine Surface',
+            route: '/components/machine_surface',
+          ),
+          DocsLink(label: 'Keyframes', route: '/components/keyframes'),
+          DocsLink(
+            label: 'Source Foundation',
+            route: '/components/source_foundation',
           ),
         ],
       ),

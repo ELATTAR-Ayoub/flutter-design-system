@@ -572,8 +572,13 @@ class _DependenciesContent extends StatelessWidget {
           DocsLink(label: 'Avatar', route: '/components/avatar'),
           DocsLink(label: 'Dropdown Menu', route: '/components/dropdown-menu'),
           DocsLink(label: 'Icon', route: '/components/icon'),
+          DocsLink(label: 'Menu', route: '/components/menu'),
           DocsLink(label: 'Popover', route: '/components/popover'),
           DocsLink(label: 'Sidebar', route: '/components/sidebar'),
+          DocsLink(
+            label: 'Source Foundation',
+            route: '/components/source_foundation',
+          ),
         ],
       ),
     ],

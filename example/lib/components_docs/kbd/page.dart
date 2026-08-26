@@ -580,7 +580,9 @@ class _DependenciesContent extends StatelessWidget {
   const _DependenciesContent();
 
   @override
-  Widget build(BuildContext context) =>
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: <Widget>[
       _bullets(ElTheme.of(context), <String>[
         'File: lib/src/components/kbd.dart, one file, no companions; the '
             'registry manifest lists exactly one entry under "files".',
@@ -596,7 +598,18 @@ class _DependenciesContent extends StatelessWidget {
             'ElText call already depends on. Shaders: none: the machine '
             'surface renders ElShadows.none, a flat fill and border, not a '
             'fragment-shader paint.',
-      ]);
+      ]),
+      SizedBox(height: el(2)),
+      const DocsLinkRow(
+        links: <DocsLink>[
+          DocsLink(
+            label: 'Machine Surface',
+            route: '/components/machine_surface',
+          ),
+        ],
+      ),
+    ],
+  );
 }
 
 class _ThemingContent extends StatelessWidget {

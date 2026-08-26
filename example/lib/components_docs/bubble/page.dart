@@ -1234,6 +1234,10 @@ class _DependenciesContent extends StatelessWidget {
               label: 'Message Scroller',
               route: '/components/message-scroller',
             ),
+            DocsLink(
+              label: 'Press Motion',
+              route: '/components/press_motion',
+            ),
           ],
         ),
       ),

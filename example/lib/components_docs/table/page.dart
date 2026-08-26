@@ -1195,57 +1195,71 @@ class _DependenciesContent extends StatelessWidget {
   const _DependenciesContent();
 
   @override
-  Widget build(BuildContext context) => DocsInstallFacts(
-    facts: <DocsInstallFact>[
-      const DocsInstallFact(
-        label: 'Registry item',
-        value: 'table',
-        description:
-            'registry/components/table.json exists and is installable '
-            'through the CLI today.',
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: <Widget>[
+      DocsInstallFacts(
+        facts: <DocsInstallFact>[
+          const DocsInstallFact(
+            label: 'Registry item',
+            value: 'table',
+            description:
+                'registry/components/table.json exists and is '
+                'installable through the CLI today.',
+          ),
+          const DocsInstallFact(
+            label: 'Destination',
+            value: 'lib/components/ui/table.dart',
+            description:
+                'The same lib/components/ui/ target every component '
+                'installs to.',
+          ),
+          DocsInstallFact(
+            label: 'Dependencies',
+            value: tableDoc.dependencies.join(', '),
+            description:
+                "The manifest's registryDependencies, resolved "
+                'automatically by the registry client: colors, spacing, '
+                'theme, typography, and motion (the hover-fade duration '
+                'and curve). table.dart imports no other component and '
+                'no effect file: unlike badge or button, it does not '
+                'reach for machine-surface or any other visual effect.',
+          ),
+          const DocsInstallFact(
+            label: 'Assets',
+            value: 'none',
+            description: 'No images, icon fonts, or binary assets.',
+          ),
+          const DocsInstallFact(
+            label: 'Shaders',
+            value: 'none',
+            description: 'Every fill is a plain BoxDecoration colour.',
+          ),
+          const DocsInstallFact(
+            label: 'Platforms',
+            value: 'Android, iOS, Web, macOS, Windows, Linux',
+            description: 'No platform-conditional code in table.dart.',
+          ),
+          const DocsInstallFact(
+            label: 'Verified',
+            value: 'docs specimens only',
+            description:
+                "This page's live specimens and "
+                'example/test/components_docs/table_test.dart. No '
+                'dedicated package-level unit test exists for table.dart '
+                'as of this page, and there is no registry fixture '
+                'install run as part of writing it.',
+          ),
+        ],
       ),
-      const DocsInstallFact(
-        label: 'Destination',
-        value: 'lib/components/ui/table.dart',
-        description:
-            'The same lib/components/ui/ target every component installs '
-            'to.',
-      ),
-      DocsInstallFact(
-        label: 'Dependencies',
-        value: tableDoc.dependencies.join(', '),
-        description:
-            "The manifest's registryDependencies, resolved automatically "
-            'by the registry client: colors, spacing, theme, typography, '
-            'and motion (the hover-fade duration and curve). table.dart '
-            'imports no other component and no effect file: unlike badge '
-            'or button, it does not reach for machine-surface or any '
-            'other visual effect.',
-      ),
-      const DocsInstallFact(
-        label: 'Assets',
-        value: 'none',
-        description: 'No images, icon fonts, or binary assets.',
-      ),
-      const DocsInstallFact(
-        label: 'Shaders',
-        value: 'none',
-        description: 'Every fill is a plain BoxDecoration colour.',
-      ),
-      const DocsInstallFact(
-        label: 'Platforms',
-        value: 'Android, iOS, Web, macOS, Windows, Linux',
-        description: 'No platform-conditional code in table.dart.',
-      ),
-      const DocsInstallFact(
-        label: 'Verified',
-        value: 'docs specimens only',
-        description:
-            "This page's live specimens and "
-            'example/test/components_docs/table_test.dart. No dedicated '
-            'package-level unit test exists for table.dart as of this '
-            'page, and there is no registry fixture install run as part '
-            'of writing it.',
+      SizedBox(height: el(2)),
+      DocsLinkRow(
+        links: <DocsLink>[
+          DocsLink(
+            label: 'Source Foundation',
+            route: '/components/source_foundation',
+          ),
+        ],
       ),
     ],
   );

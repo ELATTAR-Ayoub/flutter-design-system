@@ -543,7 +543,14 @@ class _DependenciesContent extends StatelessWidget {
       ]),
       SizedBox(height: el(4)),
       const DocsLinkRow(
-        links: <DocsLink>[DocsLink(label: 'Stat', route: '/components/stat')],
+        links: <DocsLink>[
+          DocsLink(label: 'Stat', route: '/components/stat'),
+          DocsLink(label: 'Keyframes', route: '/components/keyframes'),
+          DocsLink(
+            label: 'Source Foundation',
+            route: '/components/source_foundation',
+          ),
+        ],
       ),
     ],
   );

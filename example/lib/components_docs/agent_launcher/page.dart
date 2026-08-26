@@ -448,6 +448,7 @@ class _DependenciesContent extends StatelessWidget {
       SizedBox(height: el(4)),
       const DocsLinkRow(
         links: <DocsLink>[
+          DocsLink(label: 'Agent Core', route: '/components/agent-core'),
           DocsLink(label: 'Agent Face', route: '/components/agent_face'),
           DocsLink(label: 'Button', route: '/components/button'),
           DocsLink(label: 'Dialog', route: '/components/dialog'),

@@ -1301,6 +1301,18 @@ class _DependenciesContent extends StatelessWidget {
         child: DocsLinkRow(
           links: <DocsLink>[
             DocsLink(label: 'Toggle', route: '/components/toggle'),
+            DocsLink(label: 'Sliding Pill', route: '/components/sliding_pill'),
+            DocsLink(
+              label: 'Machine Surface',
+              route: '/components/machine_surface',
+            ),
+            DocsLink(
+              label: 'Source Foundation',
+              route: '/components/source_foundation',
+            ),
+            DocsLink(label: 'Tabs', route: '/components/tabs'),
+            DocsLink(label: 'Sidebar', route: '/components/sidebar'),
+            DocsLink(label: 'Icon Swap', route: '/components/icon_swap'),
           ],
         ),
       ),

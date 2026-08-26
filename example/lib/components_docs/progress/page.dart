@@ -843,6 +843,14 @@ class _DependenciesContent extends StatelessWidget {
         links: <DocsLink>[
           DocsLink(label: 'Spinner', route: '/components/spinner'),
           DocsLink(label: 'Skeleton', route: '/components/skeleton'),
+          DocsLink(
+            label: 'Machine Surface',
+            route: '/components/machine_surface',
+          ),
+          DocsLink(
+            label: 'Source Foundation',
+            route: '/components/source_foundation',
+          ),
         ],
       ),
     ],

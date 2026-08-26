@@ -648,7 +648,9 @@ class _DependenciesContent extends StatelessWidget {
   const _DependenciesContent();
 
   @override
-  Widget build(BuildContext context) =>
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: <Widget>[
       _bullets(ElTheme.of(context), <String>[
         'File: lib/src/components/agent_avatar.dart — one file, no '
             'companions; the registry manifest lists exactly one entry '
@@ -667,7 +669,16 @@ class _DependenciesContent extends StatelessWidget {
             'same two, agent-core and keyframes — this component has no '
             'dependency it pulls in only for internal use and hides from '
             'a reader deciding whether to install it.',
-      ]);
+      ]),
+      SizedBox(height: el(2)),
+      const DocsLinkRow(
+        links: <DocsLink>[
+          DocsLink(label: 'Agent Core', route: '/components/agent-core'),
+          DocsLink(label: 'Keyframes', route: '/components/keyframes'),
+        ],
+      ),
+    ],
+  );
 }
 
 class _ThemingContent extends StatelessWidget {

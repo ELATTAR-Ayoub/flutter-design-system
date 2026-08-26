@@ -691,6 +691,10 @@ class _DependenciesContent extends StatelessWidget {
             DocsLink(label: 'Button', route: '/components/button'),
             DocsLink(label: 'Icon', route: '/components/icon'),
             DocsLink(label: 'Kbd', route: '/components/kbd'),
+            DocsLink(
+              label: 'Machine Surface',
+              route: '/components/machine_surface',
+            ),
             DocsLink(label: 'Sidebar', route: '/components/sidebar'),
           ],
         ),

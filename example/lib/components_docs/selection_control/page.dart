@@ -1006,6 +1006,15 @@ class _DependenciesContent extends StatelessWidget {
       const DocsLinkRow(
         links: <DocsLink>[
           DocsLink(label: 'Button', route: '/components/button'),
+          DocsLink(
+            label: 'Machine Surface',
+            route: '/components/machine_surface',
+          ),
+          DocsLink(label: 'Keyframes', route: '/components/keyframes'),
+          DocsLink(
+            label: 'Source Foundation',
+            route: '/components/source_foundation',
+          ),
         ],
       ),
     ],

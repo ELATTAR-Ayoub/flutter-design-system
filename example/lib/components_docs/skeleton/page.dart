@@ -468,44 +468,69 @@ class _DependenciesContent extends StatelessWidget {
   const _DependenciesContent();
 
   @override
-  Widget build(BuildContext context) => DocsInstallFacts(
-    title: 'Dependencies',
-    facts: <DocsInstallFact>[
-      DocsInstallFact(
-        label: 'Files',
-        value: skeletonDoc.sourcePath,
-        description: 'One file, private _ShimmerPainter included.',
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: <Widget>[
+      DocsInstallFacts(
+        title: 'Dependencies',
+        facts: <DocsInstallFact>[
+          DocsInstallFact(
+            label: 'Files',
+            value: skeletonDoc.sourcePath,
+            description: 'One file, private _ShimmerPainter included.',
+          ),
+          const DocsInstallFact(
+            label: 'Imports',
+            value: 'foundation/spacing.dart (el(), ElRadii), '
+                'foundation/theme.dart (ElThemeData), '
+                'motion/keyframes.dart (ElKeyframePlayer, ElShimmer), '
+                'theme_scope.dart (ElTheme)',
+            description:
+                'ElKeyframePlayer and ElShimmer are the same '
+                'looping-animation engine every "pulls-*" motion in this '
+                'system reuses. No other component dependency.',
+          ),
+          const DocsInstallFact(
+            label: 'registryDependencies',
+            value: 'keyframes, source-foundation',
+            description:
+                'Resolved automatically by `elattar add skeleton` — '
+                'copied verbatim from the manifest.',
+          ),
+          const DocsInstallFact(
+            label: 'Assets, fonts, shaders',
+            value: 'None',
+            description:
+                'The sweep is a Canvas.drawRect painted with a '
+                'LinearGradient shader object, not an asset-backed '
+                'fragment shader.',
+          ),
+          const DocsInstallFact(
+            label: 'Platforms',
+            value: 'Android, iOS, Web, macOS, Windows, Linux',
+            description: 'No platform-conditional code in skeleton.dart.',
+          ),
+          const DocsInstallFact(
+            label: 'Verified',
+            value: 'package tests + docs specimen',
+            description:
+                'test/feedback_effects_test.dart\'s group(\'ElSkeleton\') '
+                'rasterises the sweep and proves reduced motion holds a '
+                'fully static frame; this page\'s own skeleton_test.dart '
+                're-proves the settle without rasterising, by pumping '
+                'bounded frames.',
+          ),
+        ],
       ),
-      const DocsInstallFact(
-        label: 'Imports',
-        value: 'foundation/spacing.dart (el(), ElRadii), '
-            'foundation/theme.dart (ElThemeData), motion/keyframes.dart '
-            '(ElKeyframePlayer, ElShimmer), theme_scope.dart (ElTheme)',
-        description:
-            'ElKeyframePlayer and ElShimmer are the same '
-            'looping-animation engine every "pulls-*" motion in this '
-            'system reuses. No component dependency.',
-      ),
-      const DocsInstallFact(
-        label: 'Assets, fonts, shaders',
-        value: 'None',
-        description:
-            'The sweep is a Canvas.drawRect painted with a LinearGradient '
-            'shader object, not an asset-backed fragment shader.',
-      ),
-      const DocsInstallFact(
-        label: 'Platforms',
-        value: 'Android, iOS, Web, macOS, Windows, Linux',
-        description: 'No platform-conditional code in skeleton.dart.',
-      ),
-      const DocsInstallFact(
-        label: 'Verified',
-        value: 'package tests + docs specimen',
-        description:
-            'test/feedback_effects_test.dart\'s group(\'ElSkeleton\') '
-            'rasterises the sweep and proves reduced motion holds a fully '
-            'static frame; this page\'s own skeleton_test.dart re-proves '
-            'the settle without rasterising, by pumping bounded frames.',
+      SizedBox(height: el(2)),
+      DocsLinkRow(
+        links: <DocsLink>[
+          DocsLink(label: 'Keyframes', route: '/components/keyframes'),
+          DocsLink(
+            label: 'Source Foundation',
+            route: '/components/source_foundation',
+          ),
+        ],
       ),
     ],
   );

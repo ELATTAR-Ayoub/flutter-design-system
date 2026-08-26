@@ -1382,17 +1382,25 @@ class _DependenciesContent extends StatelessWidget {
       SizedBox(height: el(4)),
       const DocsLinkRow(
         links: <DocsLink>[
-          DocsLink(label: 'Dropdown Menu', route: '/components/dropdown_menu'),
-          DocsLink(label: 'Context Menu', route: '/components/context_menu'),
+          DocsLink(label: 'Dropdown Menu', route: '/components/dropdown-menu'),
+          DocsLink(label: 'Context Menu', route: '/components/context-menu'),
           DocsLink(label: 'Menubar', route: '/components/menubar'),
           DocsLink(
             label: 'Navigation Menu',
-            route: '/components/navigation_menu',
+            route: '/components/navigation-menu',
           ),
           DocsLink(label: 'Combobox', route: '/components/combobox'),
           DocsLink(label: 'Native Select', route: '/components/native_select'),
           DocsLink(label: 'Calendar', route: '/components/calendar'),
-          DocsLink(label: 'Hover Card', route: '/components/hover_card'),
+          DocsLink(label: 'Hover Card', route: '/components/hover-card'),
+          DocsLink(
+            label: 'Machine Surface',
+            route: '/components/machine_surface',
+          ),
+          DocsLink(
+            label: 'Source Foundation',
+            route: '/components/source_foundation',
+          ),
         ],
       ),
     ],

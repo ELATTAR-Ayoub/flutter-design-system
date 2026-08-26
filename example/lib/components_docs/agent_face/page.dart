@@ -715,6 +715,10 @@ class _DependenciesContent extends StatelessWidget {
       const DocsLinkRow(
         links: <DocsLink>[
           DocsLink(label: 'Agent Avatar', route: '/components/agent_avatar'),
+          DocsLink(label: 'Agent Core', route: '/components/agent-core'),
+          DocsLink(label: 'Keyframes', route: '/components/keyframes'),
+          DocsLink(label: 'Voice', route: '/components/voice'),
+          DocsLink(label: 'Voice Orb', route: '/components/voice_orb'),
         ],
       ),
     ],

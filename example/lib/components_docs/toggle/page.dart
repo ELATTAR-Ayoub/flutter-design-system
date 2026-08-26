@@ -1247,6 +1247,14 @@ class _DependenciesContent extends StatelessWidget {
               label: 'Toggle group',
               route: '/components/toggle-group',
             ),
+            DocsLink(
+              label: 'Machine Surface',
+              route: '/components/machine_surface',
+            ),
+            DocsLink(
+              label: 'Source Foundation',
+              route: '/components/source_foundation',
+            ),
           ],
         ),
       ),

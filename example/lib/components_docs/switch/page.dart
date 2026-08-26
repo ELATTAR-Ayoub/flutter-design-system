@@ -882,6 +882,16 @@ class _DependenciesContent extends StatelessWidget {
             label: 'Selection control',
             route: '/components/selection_control',
           ),
+          DocsLink(
+            label: 'Machine Surface',
+            route: '/components/machine_surface',
+          ),
+          DocsLink(
+            label: 'Source Foundation',
+            route: '/components/source_foundation',
+          ),
+          DocsLink(label: 'Checkbox', route: '/components/checkbox'),
+          DocsLink(label: 'Radio group', route: '/components/radio'),
         ],
       ),
     ],

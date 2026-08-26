@@ -974,6 +974,7 @@ class _DependenciesContent extends StatelessWidget {
           DocsLink(label: 'Icon', route: '/components/icon'),
           DocsLink(label: 'Input group', route: '/components/input_group'),
           DocsLink(label: 'Popover', route: '/components/popover'),
+          DocsLink(label: 'Select', route: '/components/select'),
         ],
       ),
     ],

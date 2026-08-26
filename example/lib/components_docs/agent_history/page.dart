@@ -1051,6 +1051,7 @@ class _DependenciesContent extends StatelessWidget {
       SizedBox(height: el(4)),
       const DocsLinkRow(
         links: <DocsLink>[
+          DocsLink(label: 'Agent Core', route: '/components/agent-core'),
           DocsLink(label: 'Alert', route: '/components/alert'),
           DocsLink(label: 'Alert Dialog', route: '/components/alert-dialog'),
           DocsLink(label: 'Button', route: '/components/button'),
@@ -1065,6 +1066,11 @@ class _DependenciesContent extends StatelessWidget {
           DocsLink(label: 'Icon', route: '/components/icon'),
           DocsLink(label: 'Input', route: '/components/input'),
           DocsLink(label: 'Item', route: '/components/item'),
+          DocsLink(
+            label: 'Machine Surface',
+            route: '/components/machine_surface',
+          ),
+          DocsLink(label: 'Menu', route: '/components/menu'),
           DocsLink(label: 'Popover', route: '/components/popover'),
           DocsLink(label: 'Spinner', route: '/components/spinner'),
         ],

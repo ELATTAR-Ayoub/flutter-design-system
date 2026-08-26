@@ -1712,9 +1712,35 @@ class _DependenciesContent extends StatelessWidget {
       const DocsLinkRow(
         links: <DocsLink>[
           DocsLink(label: 'Icon', route: '/components/icon'),
+          DocsLink(
+            label: 'Agent Attach Menu',
+            route: '/components/agent_attach_menu',
+          ),
+          DocsLink(
+            label: 'Agent Attachments',
+            route: '/components/agent_attachments',
+          ),
+          DocsLink(label: 'Agent Avatar', route: '/components/agent_avatar'),
           DocsLink(label: 'Agent Composer', route: '/components/agent-composer'),
           DocsLink(label: 'Agent Console', route: '/components/agent-console'),
-          DocsLink(label: 'Agent Transcript', route: '/components/agent-transcript'),
+          DocsLink(label: 'Agent Face', route: '/components/agent_face'),
+          DocsLink(label: 'Agent History', route: '/components/agent_history'),
+          DocsLink(
+            label: 'Agent Launcher',
+            route: '/components/agent_launcher',
+          ),
+          DocsLink(
+            label: 'Agent Markdown',
+            route: '/components/agent_markdown',
+          ),
+          DocsLink(
+            label: 'Agent Slash Palette',
+            route: '/components/agent_slash_palette',
+          ),
+          DocsLink(
+            label: 'Agent Transcript',
+            route: '/components/agent-transcript',
+          ),
         ],
       ),
     ],

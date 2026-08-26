@@ -685,8 +685,15 @@ class _DependenciesContent extends StatelessWidget {
       SizedBox(height: el(2)),
       const DocsLinkRow(
         links: <DocsLink>[
+          DocsLink(label: 'Icon', route: '/components/icon'),
+          DocsLink(
+            label: 'Source Foundation',
+            route: '/components/source_foundation',
+          ),
           DocsLink(label: 'Button', route: '/components/button'),
           DocsLink(label: 'Badge', route: '/components/badge'),
+          DocsLink(label: 'Input group', route: '/components/input_group'),
+          DocsLink(label: 'Empty', route: '/components/empty'),
         ],
       ),
     ],

@@ -6,9 +6,11 @@
 /// only: see `../input_group/meta.dart` and `../button_group/meta.dart` for
 /// the other two, each its own route and its own `<name>Doc` const.
 ///
-/// `input_otp` installs through `elattar add input-otp`: see `page.dart`'s installation
-/// section for the honest disclosure. [dependencies] is left empty rather
-/// than naming items a manifest does not yet resolve.
+/// **Corrected.** This note used to end "[dependencies] is left empty rather
+/// than naming items a manifest does not yet resolve" — false twice over.
+/// `registry/components/input-otp.json` is real and resolves seven items,
+/// and the list below has always carried all seven, verbatim. `elattar add
+/// input-otp` is a working command.
 library;
 
 import '../catalog.dart' show ComponentDocEntry;

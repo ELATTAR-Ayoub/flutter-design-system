@@ -571,6 +571,10 @@ class _DependenciesContent extends StatelessWidget {
             label: 'Bloom Cosmic',
             route: '/components/bloom_cosmic',
           ),
+          const DocsLink(
+            label: 'Source Foundation',
+            route: '/components/source_foundation',
+          ),
         ],
       ),
     ],

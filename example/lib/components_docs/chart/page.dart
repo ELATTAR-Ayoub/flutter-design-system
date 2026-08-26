@@ -34,6 +34,7 @@ import '../../docs/docs_facts.dart';
 import '../../docs/docs_layout.dart';
 import '../../docs/docs_section.dart' show DocsAnchor;
 import '../chart_cartesian/meta.dart' as chart_cartesian;
+import '../chart_polar/meta.dart' as chart_polar;
 import 'meta.dart';
 
 /// The declaration: every section this page shows, in TOC order. `final`,
@@ -1089,7 +1090,9 @@ class _DependenciesContent extends StatelessWidget {
   const _DependenciesContent();
 
   @override
-  Widget build(BuildContext context) =>
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: <Widget>[
       _bullets(ElTheme.of(context), <String>[
         'File: lib/src/components/chart.dart — one file, no companions; '
             'the registry manifest lists exactly one entry under "files".',
@@ -1109,7 +1112,22 @@ class _DependenciesContent extends StatelessWidget {
             'chart-cartesian/chart-polar) and handed in as an '
             'ElChartSeries.color. This file only ever renders the colour it '
             'is given.',
-      ]);
+      ]),
+      SizedBox(height: el(2)),
+      DocsLinkRow(
+        links: <DocsLink>[
+          DocsLink(
+            label: chart_cartesian.chartCartesianDoc.title,
+            route: chart_cartesian.chartCartesianDoc.route,
+          ),
+          DocsLink(
+            label: chart_polar.chartPolarDoc.title,
+            route: chart_polar.chartPolarDoc.route,
+          ),
+        ],
+      ),
+    ],
+  );
 }
 
 class _ThemingContent extends StatelessWidget {

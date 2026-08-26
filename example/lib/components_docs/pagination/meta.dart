@@ -5,8 +5,11 @@
 /// supervisor-owned and does not carry this entry yet, so `page.dart` reads
 /// [paginationDoc] directly rather than looking it up through `componentDoc`.
 ///
-/// `pagination` has no `registry/components/pagination.json` yet, [dependencies]
-/// is left empty rather than naming items a manifest does not yet resolve.
+/// **Corrected.** This note used to say `registry/components/pagination.json`
+/// did not exist and that [dependencies] was therefore left empty. Both were
+/// stale, and both were false in the same breath — the list below has never
+/// been empty. The manifest is real, `elattar add pagination` is a working
+/// command, and [dependencies] matches its `registryDependencies` verbatim.
 /// `page.dart`'s installation section says so honestly instead of rendering
 /// an `elattar add pagination` command that would fail.
 library;

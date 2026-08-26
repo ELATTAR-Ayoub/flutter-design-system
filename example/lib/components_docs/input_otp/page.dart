@@ -639,6 +639,11 @@ class _DependenciesContent extends StatelessWidget {
           DocsLink(label: 'Field', route: '/components/field'),
           DocsLink(label: 'Icon', route: '/components/icon'),
           DocsLink(label: 'Input', route: '/components/input'),
+          DocsLink(label: 'Keyframes', route: '/components/keyframes'),
+          DocsLink(
+            label: 'Machine Surface',
+            route: '/components/machine_surface',
+          ),
         ],
       ),
     ],

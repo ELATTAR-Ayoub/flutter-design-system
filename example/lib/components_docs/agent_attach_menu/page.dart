@@ -588,6 +588,7 @@ class _DependenciesContent extends StatelessWidget {
               route: '/components/dropdown-menu',
             ),
             DocsLink(label: 'Icon', route: '/components/icon'),
+            DocsLink(label: 'Menu', route: '/components/menu'),
             DocsLink(label: 'Popover', route: '/components/popover'),
           ],
         ),

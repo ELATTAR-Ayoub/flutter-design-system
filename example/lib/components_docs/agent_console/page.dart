@@ -928,8 +928,15 @@ class _DependenciesContent extends StatelessWidget {
       SizedBox(height: el(4)),
       const DocsLinkRow(
         links: <DocsLink>[
+          DocsLink(label: 'Agent Avatar', route: '/components/agent_avatar'),
           DocsLink(label: 'Agent Core', route: '/components/agent-core'),
           DocsLink(label: 'Agent Composer', route: '/components/agent-composer'),
+          DocsLink(label: 'Agent Face', route: '/components/agent_face'),
+          DocsLink(label: 'Agent History', route: '/components/agent_history'),
+          DocsLink(
+            label: 'Agent Slash Palette',
+            route: '/components/agent_slash_palette',
+          ),
           DocsLink(
             label: 'Agent Transcript',
             route: '/components/agent-transcript',
@@ -938,6 +945,7 @@ class _DependenciesContent extends StatelessWidget {
           DocsLink(label: 'Dropdown Menu', route: '/components/dropdown-menu'),
           DocsLink(label: 'Icon', route: '/components/icon'),
           DocsLink(label: 'Marker', route: '/components/marker'),
+          DocsLink(label: 'Menu', route: '/components/menu'),
           DocsLink(label: 'Popover', route: '/components/popover'),
         ],
       ),

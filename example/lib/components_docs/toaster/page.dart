@@ -1267,7 +1267,18 @@ class _DependenciesContent extends StatelessWidget {
           DocsLink(label: 'Alert', route: '/components/alert'),
           DocsLink(
             label: 'Alert Dialog',
-            route: '/components/alert_dialog',
+            route: '/components/alert-dialog',
+          ),
+          DocsLink(label: 'Bloom Cosmic', route: '/components/bloom_cosmic'),
+          DocsLink(
+            label: 'Machine Surface',
+            route: '/components/machine_surface',
+          ),
+          DocsLink(label: 'Safe Area', route: '/components/safe_area'),
+          DocsLink(label: 'Icon', route: '/components/icon'),
+          DocsLink(
+            label: 'Source Foundation',
+            route: '/components/source_foundation',
           ),
         ],
       ),

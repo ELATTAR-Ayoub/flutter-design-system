@@ -232,7 +232,7 @@ class DrawerDocPage extends StatelessWidget {
     previous: const DocsPageLink(title: 'Dialog', route: '/components/dialog'),
     next: const DocsPageLink(
       title: 'Dropdown Menu',
-      route: '/components/dropdown_menu',
+      route: '/components/dropdown-menu',
     ),
     onNavigate: onNavigate,
     child: KeyedSubtree(
@@ -716,7 +716,9 @@ class _DependenciesContent extends StatelessWidget {
   const _DependenciesContent();
 
   @override
-  Widget build(BuildContext context) =>
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: <Widget>[
       _bullets(ElTheme.of(context), <String>[
         'File: lib/src/components/drawer.dart: one file, no '
             'companions.',
@@ -740,7 +742,15 @@ class _DependenciesContent extends StatelessWidget {
             'and ElDurations.drawer rather than the shared '
             'ElDurations.overlay / ElCurves.out tokens every other '
             'ElModalPortal consumer uses.',
-      ]);
+      ]),
+      SizedBox(height: el(2)),
+      const DocsLinkRow(
+        links: <DocsLink>[
+          DocsLink(label: 'Dialog', route: '/components/dialog'),
+        ],
+      ),
+    ],
+  );
 }
 
 class _ThemingContent extends StatelessWidget {

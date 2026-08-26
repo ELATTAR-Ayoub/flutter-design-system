@@ -1942,6 +1942,7 @@ class _DependenciesContent extends StatelessWidget {
       const DocsLinkRow(
         links: <DocsLink>[
           DocsLink(label: 'Button', route: '/components/button'),
+          DocsLink(label: 'Menu', route: '/components/menu'),
           DocsLink(label: 'Popover', route: '/components/popover'),
         ],
       ),

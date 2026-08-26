@@ -753,68 +753,85 @@ class _DependenciesContent extends StatelessWidget {
   const _DependenciesContent();
 
   @override
-  Widget build(BuildContext context) => DocsInstallFacts(
-    facts: <DocsInstallFact>[
-      const DocsInstallFact(
-        label: 'Registry item',
-        value: 'tooltip',
-        description:
-            'registry/components/tooltip.json exists and is installable '
-            'through the CLI today.',
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: <Widget>[
+      DocsInstallFacts(
+        facts: <DocsInstallFact>[
+          const DocsInstallFact(
+            label: 'Registry item',
+            value: 'tooltip',
+            description:
+                'registry/components/tooltip.json exists and is '
+                'installable through the CLI today.',
+          ),
+          const DocsInstallFact(
+            label: 'Version',
+            value: '0.0.1',
+            description: "The registry manifest's own version field.",
+          ),
+          const DocsInstallFact(
+            label: 'Dart / Flutter',
+            value: '>=3.12.2 <4.0.0 / >=3.44.8',
+            description:
+                "The manifest's minDart and minFlutter constraints.",
+          ),
+          const DocsInstallFact(
+            label: 'Destination',
+            value: 'lib/components/ui/tooltip.dart',
+            description:
+                'The same lib/components/ui/ target every component '
+                'installs to, in both foundation modes.',
+          ),
+          const DocsInstallFact(
+            label: 'Foundation',
+            value: 'source or package compatible',
+            description:
+                'The manifest names only source-foundation: nothing '
+                'here is package-mode-only.',
+          ),
+          DocsInstallFact(
+            label: 'Dependencies',
+            value: tooltipDoc.dependencies.join(', '),
+            description:
+                "The manifest's registryDependencies, resolved "
+                'automatically by the registry client.',
+          ),
+          const DocsInstallFact(
+            label: 'Assets',
+            value: 'none',
+            description: 'No image, font, or shader asset is referenced.',
+          ),
+          const DocsInstallFact(
+            label: 'Shaders',
+            value: 'none',
+            description: 'Not applicable.',
+          ),
+          const DocsInstallFact(
+            label: 'Platforms',
+            value: 'Android, iOS, Web, macOS, Windows, Linux',
+            description:
+                'Pure widget composition; nothing platform-gated.',
+          ),
+          const DocsInstallFact(
+            label: 'Verified',
+            value: 'package tests + this docs specimen',
+            description:
+                "test/dialogs_test.dart's ElTooltip and 'ElTooltip: the "
+                "tap path' groups, plus this page's own live specimens. "
+                'No fixture install was run as part of writing this '
+                'page.',
+          ),
+        ],
       ),
-      const DocsInstallFact(
-        label: 'Version',
-        value: '0.0.1',
-        description: "The registry manifest's own version field.",
-      ),
-      const DocsInstallFact(
-        label: 'Dart / Flutter',
-        value: '>=3.12.2 <4.0.0 / >=3.44.8',
-        description: "The manifest's minDart and minFlutter constraints.",
-      ),
-      const DocsInstallFact(
-        label: 'Destination',
-        value: 'lib/components/ui/tooltip.dart',
-        description:
-            'The same lib/components/ui/ target every component installs '
-            'to, in both foundation modes.',
-      ),
-      const DocsInstallFact(
-        label: 'Foundation',
-        value: 'source or package compatible',
-        description:
-            'The manifest names only source-foundation: nothing here is '
-            'package-mode-only.',
-      ),
-      DocsInstallFact(
-        label: 'Dependencies',
-        value: tooltipDoc.dependencies.join(', '),
-        description:
-            "The manifest's registryDependencies, resolved automatically "
-            'by the registry client.',
-      ),
-      const DocsInstallFact(
-        label: 'Assets',
-        value: 'none',
-        description: 'No image, font, or shader asset is referenced.',
-      ),
-      const DocsInstallFact(
-        label: 'Shaders',
-        value: 'none',
-        description: 'Not applicable.',
-      ),
-      const DocsInstallFact(
-        label: 'Platforms',
-        value: 'Android, iOS, Web, macOS, Windows, Linux',
-        description: 'Pure widget composition; nothing platform-gated.',
-      ),
-      const DocsInstallFact(
-        label: 'Verified',
-        value: 'package tests + this docs specimen',
-        description:
-            "test/dialogs_test.dart's ElTooltip and 'ElTooltip: the tap "
-            "path' groups, plus this page's own live specimens. No "
-            'fixture install was run as part of writing this page.',
+      SizedBox(height: el(2)),
+      DocsLinkRow(
+        links: <DocsLink>[
+          DocsLink(
+            label: 'Source Foundation',
+            route: '/components/source_foundation',
+          ),
+        ],
       ),
     ],
   );

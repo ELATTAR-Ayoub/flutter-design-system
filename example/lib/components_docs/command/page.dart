@@ -978,6 +978,7 @@ class _DependenciesContent extends StatelessWidget {
       const DocsLinkRow(
         links: <DocsLink>[
           DocsLink(label: 'Icon', route: '/components/icon'),
+          DocsLink(label: 'Input', route: '/components/input'),
           DocsLink(label: 'Input group', route: '/components/input_group'),
         ],
       ),

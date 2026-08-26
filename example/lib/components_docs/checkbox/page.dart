@@ -1093,6 +1093,8 @@ class _DependenciesContent extends StatelessWidget {
       const DocsLinkRow(
         links: <DocsLink>[
           DocsLink(label: 'Field', route: '/components/field'),
+          DocsLink(label: 'Icon', route: '/components/icon'),
+          DocsLink(label: 'Keyframes', route: '/components/keyframes'),
           DocsLink(
             label: 'Selection control',
             route: '/components/selection_control',

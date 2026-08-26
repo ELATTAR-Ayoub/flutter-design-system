@@ -1182,7 +1182,18 @@ class _DependenciesContent extends StatelessWidget {
       ]),
       SizedBox(height: el(2)),
       const DocsLinkRow(
-        links: <DocsLink>[DocsLink(label: 'Button', route: '/components/button')],
+        links: <DocsLink>[
+          DocsLink(label: 'Button', route: '/components/button'),
+          DocsLink(label: 'Sliding Pill', route: '/components/sliding_pill'),
+          DocsLink(
+            label: 'Machine Surface',
+            route: '/components/machine_surface',
+          ),
+          DocsLink(
+            label: 'Source Foundation',
+            route: '/components/source_foundation',
+          ),
+        ],
       ),
     ],
   );

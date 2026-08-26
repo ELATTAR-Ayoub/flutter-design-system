@@ -616,7 +616,9 @@ class _DependenciesContent extends StatelessWidget {
   const _DependenciesContent();
 
   @override
-  Widget build(BuildContext context) =>
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: <Widget>[
       _bullets(ElTheme.of(context), <String>[
         'File: lib/src/components/icon.dart (ElIcon widget, ElIconSize/'
             'ElIconTone enums, the glyph painter).',
@@ -638,7 +640,18 @@ class _DependenciesContent extends StatelessWidget {
         'Used by many other components: button, spinner, badge, input '
             'group, menu items, and more all compose ElIcon rather than '
             'painting their own glyphs.',
-      ]);
+      ]),
+      SizedBox(height: el(2)),
+      const DocsLinkRow(
+        links: <DocsLink>[
+          DocsLink(label: 'Badge', route: '/components/badge'),
+          DocsLink(label: 'Button', route: '/components/button'),
+          DocsLink(label: 'Input group', route: '/components/input_group'),
+          DocsLink(label: 'Spinner', route: '/components/spinner'),
+        ],
+      ),
+    ],
+  );
 }
 
 class _ThemingContent extends StatelessWidget {

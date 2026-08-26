@@ -1169,7 +1169,9 @@ class _DependenciesContent extends StatelessWidget {
   const _DependenciesContent();
 
   @override
-  Widget build(BuildContext context) =>
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: <Widget>[
       _bullets(ElTheme.of(context), <String>[
         'File: lib/src/components/button.dart: one file, no companions; '
             'the registry manifest lists exactly one entry under "files".',
@@ -1193,7 +1195,29 @@ class _DependenciesContent extends StatelessWidget {
             'press-motion, icon: a hint at what a button is commonly '
             'composed WITH, not a second import list; button.dart does not '
             'import icon.dart itself.',
-      ]);
+      ]),
+      SizedBox(height: el(2)),
+      const DocsLinkRow(
+        links: <DocsLink>[
+          DocsLink(label: 'Foil Value', route: '/components/foil_value'),
+          DocsLink(label: 'Icon', route: '/components/icon'),
+          DocsLink(
+            label: 'Machine Surface',
+            route: '/components/machine_surface',
+          ),
+          DocsLink(
+            label: 'Press Motion',
+            route: '/components/press_motion',
+          ),
+          DocsLink(
+            label: 'Sheen Action',
+            route: '/components/sheen_action',
+          ),
+          DocsLink(label: 'Spinner', route: '/components/spinner'),
+        ],
+      ),
+    ],
+  );
 }
 
 class _ThemingContent extends StatelessWidget {

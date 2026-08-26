@@ -635,6 +635,10 @@ class _DependenciesContent extends StatelessWidget {
             'macOS, Windows, Linux — pure widget composition, nothing '
             'platform-gated.',
       ]),
+      SizedBox(height: el(2)),
+      const DocsLinkRow(
+        links: <DocsLink>[DocsLink(label: 'Icon', route: '/components/icon')],
+      ),
     ],
   );
 }

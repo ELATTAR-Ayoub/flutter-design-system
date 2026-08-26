@@ -492,7 +492,9 @@ class _KeyboardContent extends StatelessWidget {
   const _KeyboardContent();
 
   @override
-  Widget build(BuildContext context) =>
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: <Widget>[
       _bullets(ElTheme.of(context), <String>[
         'Neither class takes focus or handles a key: no Focus, no '
             'FocusNode, no onKeyEvent anywhere in lift.dart.',
@@ -504,7 +506,13 @@ class _KeyboardContent extends StatelessWidget {
         'The lift itself is pointer-only in the most literal sense: '
             'MouseRegion.onEnter/onExit are what drive _hovered, and '
             'neither fires from keyboard traversal.',
-      ]);
+      ]),
+      SizedBox(height: el(2)),
+      const DocsLinkRow(
+        links: <DocsLink>[DocsLink(label: 'Button', route: '/components/button')],
+      ),
+    ],
+  );
 }
 
 class _ResponsiveContent extends StatelessWidget {

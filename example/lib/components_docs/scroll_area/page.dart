@@ -456,49 +456,65 @@ class _DependenciesContent extends StatelessWidget {
   const _DependenciesContent();
 
   @override
-  Widget build(BuildContext context) => DocsInstallFacts(
-    facts: <DocsInstallFact>[
-      const DocsInstallFact(
-        label: 'Registry item',
-        value: 'scroll-area',
-        description:
-            'registry/components/scroll-area.json exists and is '
-            'installable through the CLI today.',
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: <Widget>[
+      DocsInstallFacts(
+        facts: <DocsInstallFact>[
+          const DocsInstallFact(
+            label: 'Registry item',
+            value: 'scroll-area',
+            description:
+                'registry/components/scroll-area.json exists and is '
+                'installable through the CLI today.',
+          ),
+          const DocsInstallFact(
+            label: 'Destination',
+            value: 'lib/components/ui/scroll_area.dart',
+            description:
+                'The same lib/components/ui/ target every component '
+                'installs to.',
+          ),
+          DocsInstallFact(
+            label: 'Dependencies',
+            value: scrollAreaDoc.dependencies.join(', '),
+            description:
+                "The manifest's registryDependencies, resolved "
+                'automatically by the registry client: '
+                'foundation/spacing.dart (el()) and foundation/theme.dart '
+                '(ElThemeData). No effects, no colors, no shadows: just '
+                'layout and theming.',
+          ),
+          const DocsInstallFact(
+            label: 'Assets',
+            value: 'none',
+            description:
+                'The scrollbar thumb is a DecoratedBox with '
+                'BorderRadius.circular: no image, font, or shader asset.',
+          ),
+          const DocsInstallFact(
+            label: 'Platforms',
+            value: 'Android, iOS, Web, macOS, Windows, Linux',
+            description:
+                'Pure widget composition: no platform-conditional code.',
+          ),
+          const DocsInstallFact(
+            label: 'Verified',
+            value: 'docs specimen only',
+            description:
+                "This page's live specimens. No dedicated package-level "
+                'unit tests.',
+          ),
+        ],
       ),
-      const DocsInstallFact(
-        label: 'Destination',
-        value: 'lib/components/ui/scroll_area.dart',
-        description:
-            'The same lib/components/ui/ target every component installs '
-            'to.',
-      ),
-      DocsInstallFact(
-        label: 'Dependencies',
-        value: scrollAreaDoc.dependencies.join(', '),
-        description:
-            "The manifest's registryDependencies, resolved automatically "
-            'by the registry client: foundation/spacing.dart (el()) and '
-            'foundation/theme.dart (ElThemeData). No effects, no colors, '
-            'no shadows: just layout and theming.',
-      ),
-      const DocsInstallFact(
-        label: 'Assets',
-        value: 'none',
-        description:
-            'The scrollbar thumb is a DecoratedBox with '
-            'BorderRadius.circular: no image, font, or shader asset.',
-      ),
-      const DocsInstallFact(
-        label: 'Platforms',
-        value: 'Android, iOS, Web, macOS, Windows, Linux',
-        description: 'Pure widget composition: no platform-conditional code.',
-      ),
-      const DocsInstallFact(
-        label: 'Verified',
-        value: 'docs specimen only',
-        description:
-            "This page's live specimens. No dedicated package-level unit "
-            'tests.',
+      SizedBox(height: el(2)),
+      DocsLinkRow(
+        links: <DocsLink>[
+          DocsLink(
+            label: 'Source Foundation',
+            route: '/components/source_foundation',
+          ),
+        ],
       ),
     ],
   );

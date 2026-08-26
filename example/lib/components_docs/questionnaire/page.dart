@@ -1178,6 +1178,11 @@ class _DependenciesContent extends StatelessWidget {
           DocsLink(label: 'Button', route: '/components/button'),
           DocsLink(label: 'Input', route: '/components/input'),
           DocsLink(label: 'Kbd', route: '/components/kbd'),
+          DocsLink(label: 'Keyframes', route: '/components/keyframes'),
+          DocsLink(
+            label: 'Source Foundation',
+            route: '/components/source_foundation',
+          ),
         ],
       ),
     ],

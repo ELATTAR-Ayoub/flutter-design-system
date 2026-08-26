@@ -1048,6 +1048,10 @@ class _DependenciesContent extends StatelessWidget {
         links: const <DocsLink>[
           DocsLink(label: 'Field', route: '/components/field'),
           DocsLink(label: 'Input', route: '/components/input'),
+          DocsLink(
+            label: 'Source Foundation',
+            route: '/components/source_foundation',
+          ),
         ],
       ),
     ],

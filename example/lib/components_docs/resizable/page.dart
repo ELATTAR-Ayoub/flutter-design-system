@@ -384,47 +384,69 @@ class _DependenciesContent extends StatelessWidget {
   const _DependenciesContent();
 
   @override
-  Widget build(BuildContext context) => DocsInstallFacts(
-    title: 'Dependencies',
-    facts: <DocsInstallFact>[
-      DocsInstallFact(
-        label: 'Files',
-        value: resizableDoc.sourcePath,
-        description:
-            'One file, includes the private _Seam and _GrabStrip '
-            'widgets.',
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: <Widget>[
+      DocsInstallFacts(
+        title: 'Dependencies',
+        facts: <DocsInstallFact>[
+          DocsInstallFact(
+            label: 'Files',
+            value: resizableDoc.sourcePath,
+            description:
+                'One file, includes the private _Seam and _GrabStrip '
+                'widgets.',
+          ),
+          const DocsInstallFact(
+            label: 'Foundation imports',
+            value: 'foundation/spacing.dart (el(), ElWidths, ElRadii), '
+                'foundation/theme.dart (ElThemeData)',
+            description: 'Colour and geometry tokens only.',
+          ),
+          const DocsInstallFact(
+            label: 'Flutter imports',
+            value: 'package:flutter/gestures.dart (DragStartBehavior), '
+                'package:flutter/services.dart (LogicalKeyboardKey)',
+            description: 'For the drag start behavior and the '
+                'arrow/Home/End key handling.',
+          ),
+          const DocsInstallFact(
+            label: 'Scope import',
+            value: 'theme_scope.dart (ElTheme)',
+            description: 'No other component or effect file is imported.',
+          ),
+          const DocsInstallFact(
+            label: 'registryDependencies',
+            value: 'source-foundation',
+            description:
+                'Resolved automatically by `elattar add resizable` — '
+                'copied verbatim from the manifest.',
+          ),
+          const DocsInstallFact(
+            label: 'Platforms',
+            value: 'Android, iOS, Web, macOS, Windows, Linux',
+            description:
+                'Pure widget composition: no platform-conditional code. '
+                'The resize cursor only shows on a platform with a '
+                'mouse.',
+          ),
+          const DocsInstallFact(
+            label: 'Verified',
+            value: 'docs specimen only',
+            description:
+                'This page\'s live preview. No dedicated package-level '
+                'unit tests and no registry fixture install exist yet.',
+          ),
+        ],
       ),
-      const DocsInstallFact(
-        label: 'Foundation imports',
-        value: 'foundation/spacing.dart (el(), ElWidths, ElRadii), '
-            'foundation/theme.dart (ElThemeData)',
-        description: 'Colour and geometry tokens only.',
-      ),
-      const DocsInstallFact(
-        label: 'Flutter imports',
-        value: 'package:flutter/gestures.dart (DragStartBehavior), '
-            'package:flutter/services.dart (LogicalKeyboardKey)',
-        description: 'For the drag start behavior and the arrow/Home/End '
-            'key handling.',
-      ),
-      const DocsInstallFact(
-        label: 'Scope import',
-        value: 'theme_scope.dart (ElTheme)',
-        description: 'No other component or effect file is imported.',
-      ),
-      const DocsInstallFact(
-        label: 'Platforms',
-        value: 'Android, iOS, Web, macOS, Windows, Linux',
-        description:
-            'Pure widget composition: no platform-conditional code. The '
-            'resize cursor only shows on a platform with a mouse.',
-      ),
-      const DocsInstallFact(
-        label: 'Verified',
-        value: 'docs specimen only',
-        description:
-            'This page\'s live preview. No dedicated package-level unit '
-            'tests and no registry fixture install exist yet.',
+      SizedBox(height: el(2)),
+      DocsLinkRow(
+        links: <DocsLink>[
+          DocsLink(
+            label: 'Source Foundation',
+            route: '/components/source_foundation',
+          ),
+        ],
       ),
     ],
   );

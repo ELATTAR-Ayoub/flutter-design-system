@@ -1029,7 +1029,9 @@ class _DependenciesContent extends StatelessWidget {
   const _DependenciesContent();
 
   @override
-  Widget build(BuildContext context) =>
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: <Widget>[
       _bullets(ElTheme.of(context), <String>[
         'File: lib/src/components/chart_geometry.dart — one file, no '
             'companions.',
@@ -1046,7 +1048,22 @@ class _DependenciesContent extends StatelessWidget {
             'documentation page reading ElTheme.of(context), never from '
             'chart_geometry.dart itself, which does not import theme.dart '
             'at all.',
-      ]);
+      ]),
+      SizedBox(height: el(2)),
+      DocsLinkRow(
+        links: <DocsLink>[
+          DocsLink(
+            label: chart_cartesian.chartCartesianDoc.title,
+            route: chart_cartesian.chartCartesianDoc.route,
+          ),
+          DocsLink(
+            label: chart_polar.chartPolarDoc.title,
+            route: chart_polar.chartPolarDoc.route,
+          ),
+        ],
+      ),
+    ],
+  );
 }
 
 class _ThemingContent extends StatelessWidget {

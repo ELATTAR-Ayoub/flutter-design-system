@@ -721,14 +721,14 @@ class _DependenciesContent extends StatelessWidget {
             'registry/components/agent-attachments.json.',
         'semanticDependencies (the manifest\'s own, narrower field): '
             'agent-core, attachment, button, dialog, icon, tooltip.',
-        'agent-core carries no documentation page of its own yet in this '
-            'rollout, so it is named here in prose only, not as a link.',
       ]),
       SizedBox(height: el(2)),
       ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: ElWidths.prose),
         child: DocsLinkRow(
           links: <DocsLink>[
+            DocsLink(label: 'Agent Core', route: '/components/agent-core'),
+            DocsLink(label: 'Attachment', route: '/components/attachment'),
             DocsLink(label: 'Button', route: '/components/button'),
             DocsLink(label: 'Dialog', route: '/components/dialog'),
             DocsLink(label: 'Icon', route: '/components/icon'),

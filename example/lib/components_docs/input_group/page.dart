@@ -723,7 +723,8 @@ class _DependenciesContent extends StatelessWidget {
             'ElInputGroupInput is a ElInput with bare: true and its own '
             'padding).',
         'Registry dependencies are resolved automatically by `elattar add '
-            'input-group`.',
+            'input-group`: button, field, input, machine-surface, '
+            'press-motion, source-foundation.',
       ]),
       SizedBox(height: el(2)),
       DocsLinkRow(
@@ -731,6 +732,11 @@ class _DependenciesContent extends StatelessWidget {
           DocsLink(label: 'Button', route: '/components/button'),
           DocsLink(label: 'Field', route: '/components/field'),
           DocsLink(label: 'Input', route: '/components/input'),
+          DocsLink(
+            label: 'Machine Surface',
+            route: '/components/machine_surface',
+          ),
+          DocsLink(label: 'Press Motion', route: '/components/press_motion'),
         ],
       ),
     ],

@@ -1037,6 +1037,12 @@ class _DependenciesContent extends StatelessWidget {
           links: <DocsLink>[
             DocsLink(label: 'Button', route: '/components/button'),
             DocsLink(label: 'Icon', route: '/components/icon'),
+            DocsLink(label: 'Dialog', route: '/components/dialog'),
+            DocsLink(label: 'Safe Area', route: '/components/safe_area'),
+            DocsLink(
+              label: 'Source Foundation',
+              route: '/components/source_foundation',
+            ),
           ],
         ),
       ],
@@ -1048,7 +1054,9 @@ class _ThemingContent extends StatelessWidget {
   const _ThemingContent();
 
   @override
-  Widget build(BuildContext context) =>
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: <Widget>[
       _bullets(ElTheme.of(context), <String>[
         'theme.popover fills the panel by default; ElSheetContent\'s '
             'fill parameter is the only override point.',
@@ -1066,7 +1074,15 @@ class _ThemingContent extends StatelessWidget {
         'Every colour is read live off ElTheme.of(context) at build '
             'time. Flipping ElThemeController re-resolves every one '
             'on the next frame: nothing is cached.',
-      ]);
+      ]),
+      SizedBox(height: el(2)),
+      const DocsLinkRow(
+        links: <DocsLink>[
+          DocsLink(label: 'Drawer', route: '/components/drawer'),
+        ],
+      ),
+    ],
+  );
 }
 
 Widget _bullets(ElThemeData theme, List<String> lines) => Column(

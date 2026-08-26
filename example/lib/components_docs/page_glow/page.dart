@@ -409,7 +409,9 @@ class _DependenciesContent extends StatelessWidget {
   const _DependenciesContent();
 
   @override
-  Widget build(BuildContext context) =>
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: <Widget>[
       _bullets(ElTheme.of(context), <String>[
         'File: lib/src/effects/page_glow.dart — one file, one class, no '
             'companions.',
@@ -427,7 +429,18 @@ class _DependenciesContent extends StatelessWidget {
             'app\'s own Positioned.fill backdrop — all site chrome under '
             'example/lib/, none of it a documented registry component to '
             'link here.',
-      ]);
+      ]),
+      SizedBox(height: el(2)),
+      DocsLinkRow(
+        links: <DocsLink>[
+          DocsLink(
+            label: 'Source Foundation',
+            route: '/components/source_foundation',
+          ),
+        ],
+      ),
+    ],
+  );
 }
 
 class _ThemingContent extends StatelessWidget {

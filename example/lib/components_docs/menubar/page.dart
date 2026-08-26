@@ -716,7 +716,10 @@ class _DependenciesContent extends StatelessWidget {
       ),
       SizedBox(height: el(4)),
       const DocsLinkRow(
-        links: <DocsLink>[DocsLink(label: 'Popover', route: '/components/popover')],
+        links: <DocsLink>[
+          DocsLink(label: 'Menu', route: '/components/menu'),
+          DocsLink(label: 'Popover', route: '/components/popover'),
+        ],
       ),
     ],
   );

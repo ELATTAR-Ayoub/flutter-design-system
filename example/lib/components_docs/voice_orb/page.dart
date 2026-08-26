@@ -654,7 +654,9 @@ class _DependenciesContent extends StatelessWidget {
   const _DependenciesContent();
 
   @override
-  Widget build(BuildContext context) =>
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: <Widget>[
       _bullets(ElTheme.of(context), <String>[
         'File: lib/src/effects/voice_orb.dart, plus two non-Dart assets '
             'the manifest ships alongside it: shaders/orb.frag (the '
@@ -677,7 +679,18 @@ class _DependenciesContent extends StatelessWidget {
             '@license/ElevenLabs-UI-MIT.txt: the orb itself is vendored '
             'from ElevenLabs\' UI kit, and that attribution ships with '
             'every install — not a registryDependency, a licence file.',
-      ]);
+      ]),
+      SizedBox(height: el(2)),
+      DocsLinkRow(
+        links: <DocsLink>[
+          DocsLink(
+            label: 'Source Foundation',
+            route: '/components/source_foundation',
+          ),
+        ],
+      ),
+    ],
+  );
 }
 
 class _ThemingContent extends StatelessWidget {

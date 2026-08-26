@@ -892,7 +892,8 @@ class _DependenciesContent extends StatelessWidget {
       SizedBox(height: el(4)),
       const DocsLinkRow(
         links: <DocsLink>[
-          DocsLink(label: 'Alert Dialog', route: '/components/alert_dialog'),
+          DocsLink(label: 'Alert Dialog', route: '/components/alert-dialog'),
+          DocsLink(label: 'Bloom Cosmic', route: '/components/bloom_cosmic'),
           DocsLink(label: 'Toaster', route: '/components/toaster'),
         ],
       ),

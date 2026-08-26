@@ -727,6 +727,11 @@ class _DependenciesContent extends StatelessWidget {
         links: <DocsLink>[
           DocsLink(label: 'Toggle Group', route: '/components/toggle-group'),
           DocsLink(label: 'Tabs', route: '/components/tabs'),
+          DocsLink(label: 'Keyframes', route: '/components/keyframes'),
+          DocsLink(
+            label: 'Source Foundation',
+            route: '/components/source_foundation',
+          ),
         ],
       ),
     ],

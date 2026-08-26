@@ -131,9 +131,12 @@ class ComponentDocEntry {
 /// real `<name>/meta.dart` and a real `<name>/page.dart`, the same as every
 /// other entry here.
 ///
-/// `rule` and `spinner` are meta-only (no `page.dart`) and are
-/// deliberately absent from this list: including them would synthesize a
-/// route and a search entry with nothing to render at the other end.
+/// `rule` and `spinner` were meta-only once, and this note used to say they
+/// were deliberately absent because listing them would synthesize a route
+/// with nothing at the other end. Both have had a real `page.dart` since the
+/// rollout, and both are listed below. The note is kept, corrected, because
+/// the reasoning still holds for any future meta-only entry: an item belongs
+/// in this list when — and only when — something renders at its route.
 const List<ComponentDocEntry> componentDocs = <ComponentDocEntry>[
   accordion.accordionDoc,
   agent_attach_menu.agentAttachMenuDoc,

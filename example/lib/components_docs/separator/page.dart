@@ -392,40 +392,61 @@ class _DependenciesContent extends StatelessWidget {
   const _DependenciesContent();
 
   @override
-  Widget build(BuildContext context) => DocsInstallFacts(
-    title: 'Dependencies',
-    facts: <DocsInstallFact>[
-      DocsInstallFact(
-        label: 'Files',
-        value: separatorDoc.sourcePath,
-        description: 'One file: no companion sources.',
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: <Widget>[
+      DocsInstallFacts(
+        title: 'Dependencies',
+        facts: <DocsInstallFact>[
+          DocsInstallFact(
+            label: 'Files',
+            value: separatorDoc.sourcePath,
+            description: 'One file: no companion sources.',
+          ),
+          const DocsInstallFact(
+            label: 'Imports',
+            value: 'foundation/spacing.dart (el(), ElWidths), '
+                'foundation/theme.dart (ElThemeData), theme_scope.dart '
+                '(ElTheme)',
+            description: 'No component or effect dependency.',
+          ),
+          const DocsInstallFact(
+            label: 'registryDependencies',
+            value: 'source-foundation',
+            description:
+                'Resolved automatically by `elattar add separator` — '
+                'copied verbatim from the manifest.',
+          ),
+          const DocsInstallFact(
+            label: 'Assets, fonts, shaders',
+            value: 'None',
+            description: 'A flat ColoredBox fill: no image, font, or '
+                'shader asset of any kind.',
+          ),
+          const DocsInstallFact(
+            label: 'Platforms',
+            value: 'Android, iOS, Web, macOS, Windows, Linux',
+            description: 'No platform-conditional code in separator.dart.',
+          ),
+          const DocsInstallFact(
+            label: 'Verified',
+            value: 'docs specimen only',
+            description:
+                'This page\'s live preview and '
+                'example/test/components_docs/separator_test.dart. No '
+                'dedicated package-level unit test and no registry '
+                'fixture install exist yet.',
+          ),
+        ],
       ),
-      const DocsInstallFact(
-        label: 'Imports',
-        value: 'foundation/spacing.dart (el(), ElWidths), '
-            'foundation/theme.dart (ElThemeData), theme_scope.dart '
-            '(ElTheme)',
-        description: 'No component or effect dependency.',
-      ),
-      const DocsInstallFact(
-        label: 'Assets, fonts, shaders',
-        value: 'None',
-        description: 'A flat ColoredBox fill: no image, font, or shader '
-            'asset of any kind.',
-      ),
-      const DocsInstallFact(
-        label: 'Platforms',
-        value: 'Android, iOS, Web, macOS, Windows, Linux',
-        description: 'No platform-conditional code in separator.dart.',
-      ),
-      const DocsInstallFact(
-        label: 'Verified',
-        value: 'docs specimen only',
-        description:
-            'This page\'s live preview and '
-            'example/test/components_docs/separator_test.dart. No '
-            'dedicated package-level unit test and no registry fixture '
-            'install exist yet.',
+      SizedBox(height: el(2)),
+      DocsLinkRow(
+        links: <DocsLink>[
+          DocsLink(
+            label: 'Source Foundation',
+            route: '/components/source_foundation',
+          ),
+        ],
       ),
     ],
   );

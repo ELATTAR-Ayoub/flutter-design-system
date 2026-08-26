@@ -1300,6 +1300,7 @@ class _DependenciesContent extends StatelessWidget {
           DocsLink(label: 'Button', route: '/components/button'),
           DocsLink(label: 'Dialog', route: '/components/dialog'),
           DocsLink(label: 'Icon', route: '/components/icon'),
+          DocsLink(label: 'Icon Swap', route: '/components/icon_swap'),
         ],
       ),
     ],
