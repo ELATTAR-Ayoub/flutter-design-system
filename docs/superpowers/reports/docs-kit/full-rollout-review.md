@@ -28,7 +28,7 @@ Every one of the 99 now has a page, and every page is the same page.
 | `6b8082f` | Phase C — the remaining 32; **all 99 documented** |
 | `0e358e9` | Phase D — the seven prose pages |
 | `5f0b875` | The cross-reference link sweep, and nine dead links |
-| *(this)* | The doubled disclosure heading, and this report |
+| `1b2b39c` | The doubled disclosure heading, and this report |
 
 ## The three shell fixes
 
@@ -184,7 +184,7 @@ Every command below was run and its output read.
 | `ft root analyze` | No issues |
 | `ft root test` | 1,510 passed |
 | `ft example analyze lib test` | No issues |
-| `ft example test` | 1,337 passed |
+| `ft example test` | 1,339 passed |
 | `ft root test test/token_guard_test.dart` | 8 passed |
 | `ft example test test/docs` | 58 passed |
 | `ft example test test/components_docs` | 937 passed |
