@@ -392,31 +392,32 @@ class _DocsLayoutState extends State<DocsLayout> {
     // `Align` chain already centres it on. The reading column stays capped
     // at [ElWidths.content] regardless, so only the rails actually reach the
     // wider edge.
-    // How far the rails may escape: the widest box that actually PAINTS.
+    // **The rails no longer escape their own box, and that is the fix.**
     //
-    // This used to be the raw viewport, on the reasoning that "the rails
-    // belong at the edges of the screen" and that clamping them to
-    // [ElWidths.shell] left dead space outside each rail on a wide monitor.
-    // That reasoning was about the right case and reached the wrong
-    // conclusion. `SiteShell` centres everything in a hard
-    // `SizedBox(width: ElWidths.shell)`; past that box nothing is drawn. A
-    // rail told to escape to the viewport therefore does not reach the screen
-    // edge on a monitor wider than 1680 — it walks off the paintable region
-    // and loses the overhang.
+    // They used to be `Positioned` past the Stack's edge so they could sit at
+    // the screen's edge rather than the reading column's. That put them
+    // outside every ancestor box between here and the shell — and
+    // `RenderBox.hitTest` gates on `_size.contains(position)` at EVERY
+    // ancestor, so a pointer over the escaped band was rejected long before
+    // it reached a row. The rails looked present and did nothing.
     //
-    // The damage was invisible below 1680, where the shell is wider than the
-    // window and nothing clips, and grows with the viewport above it.
-    // Measured on the deployed site at 1909 via the browser's own semantics
-    // rects: both rails reported 150px wide instead of 264, each keeping its
-    // OUTER edge and losing the inner 114 — so the left rail showed the tail
-    // of every label ("…Menu", "…ments") and the right rail showed the head
-    // ("Source-first ownersh"). Rows in the clipped band could not be
-    // clicked either, because nothing is hit-tested where nothing is painted.
+    // It degraded with width, which is why it survived: the escape is half
+    // the difference between the viewport and the reading column, so at 1440
+    // roughly 144px of each rail stayed inside the box and clicking mostly
+    // worked, while at 1909 a 24px sliver did and it did not.
     //
-    // `min` rather than the shell outright, so a window NARROWER than the
-    // shell still gets the full-bleed behaviour it always had — that case is
-    // every viewport the rollout was captured at, and it is unchanged.
-    final double fullBleedWidth = math.min(viewport, ElWidths.shell);
+    // A previous fix noticed the same geometry for the WHEEL and routed
+    // scroll events through an `Overlay` (`_RailHitCatchers`), which is not a
+    // descendant of those narrow ancestors. Its own doc comment says plainly
+    // that clicking "still depends on the ordinary, narrower hit-test path
+    // (unchanged)". This closes that half — not by widening a gate, but by
+    // removing the reason there was one.
+    //
+    // The rails now sit at the edges of the box this widget is given, and
+    // `site_shell.dart` hands it the shell's full measure instead of the
+    // narrower page column, so they land close to where the escape was
+    // trying to put them — while staying inside every box that has to
+    // hit-test them.
     final List<DocsTocEntry> toc = widget.toc;
     // The left rail is the SAME on every documentation page, always. It is
     // cross-page navigation, so it cannot vary by which page is open: a reader
@@ -484,10 +485,12 @@ class _DocsLayoutState extends State<DocsLayout> {
                 // inside the real `_SiteBody` column, whose own
                 // `ConstrainedBox(maxWidth: ElWidths.page)` this widget
                 // cannot reach, see the comment above [fullBleedWidth].
-                final double inset = math.max(
-                  0.0,
-                  (fullBleedWidth - constraints.maxWidth) / 2,
-                );
+                // Kept as a named zero rather than deleted: `contentInset`
+                // below is "a rail plus its gap, less whatever already sits
+                // outside this box", and with no escape the second term is
+                // nothing. Spelling that out is clearer than silently
+                // dropping the subtraction.
+                const double inset = 0.0;
                 // The reading column's own margin: a rail plus the gap after
                 // it, less however much of that margin already sits in the
                 // escaped `inset` band outside this widget's own box.
@@ -547,7 +550,7 @@ class _DocsLayoutState extends State<DocsLayout> {
                       ),
                     ),
                     Positioned(
-                      left: -inset,
+                      left: inset,
                       top: 0,
                       child: _StickyRail(
                         articleAnchor: _article,
@@ -599,7 +602,7 @@ class _DocsLayoutState extends State<DocsLayout> {
                     ),
                     if (extraWide)
                       Positioned(
-                        right: -inset,
+                        right: inset,
                         top: 0,
                         child: _StickyRail(
                           articleAnchor: _article,

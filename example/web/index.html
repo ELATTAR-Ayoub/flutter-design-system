@@ -26,8 +26,13 @@
   <meta name="apple-mobile-web-app-title" content="Elattar UI">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="favicon.png"/>
+  <!-- Favicon: the ElLogoMark tile (example/lib/logo.dart), reproduced as
+       vector geometry rather than traced from a screenshot -- see
+       favicon.svg for the resolved token values. SVG first for crisp
+       rendering at any tab-bar density; the PNG is the fallback for
+       browsers that don't support SVG favicons. -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+  <link rel="alternate icon" type="image/png" href="favicon.png"/>
 
   <title>Elattar UI — Flutter Design System</title>
   <link rel="manifest" href="manifest.json">

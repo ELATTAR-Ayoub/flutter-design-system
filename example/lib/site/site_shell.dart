@@ -37,6 +37,29 @@ class SiteShell extends StatefulWidget {
 
 class _SiteShellState extends State<SiteShell> {
   final ScrollController _main = ScrollController();
+
+  /// A new page starts at its top.
+  ///
+  /// The shell owns one scroll position and reuses it across routes, so
+  /// opening a component from halfway down the rail used to land the reader
+  /// halfway down the next page — usually somewhere in its API tables, with
+  /// no indication that anything above existed. Every multi-page site resets
+  /// this; a single-page app has to do it by hand, because nothing reloads.
+  ///
+  /// `jumpTo`, not `animateTo`: this is a page load, and a page load does not
+  /// scroll. Animating would also race the incoming page's own layout.
+  ///
+  /// Guarded on the route actually changing, so it does not fire on a
+  /// rebuild. In-page anchors — the "ON THIS PAGE" rail — do not change the
+  /// route (see the library note in `docs/docs_layout.dart`), so they scroll
+  /// where they mean to and are unaffected by this.
+  @override
+  void didUpdateWidget(SiteShell oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.route != widget.route && _main.hasClients) {
+      _main.jumpTo(_main.position.minScrollExtent);
+    }
+  }
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode(debugLabel: 'SiteSearch');
 
@@ -191,7 +214,16 @@ class _SiteBody extends StatelessWidget {
         child: Align(
           alignment: Alignment.topCenter,
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: ElWidths.page),
+            // The SHELL's measure, not the narrower page column.
+            //
+            // `DocsLayout` lays out three columns — rail, article, rail — and
+            // used to reach past this box to place the outer two, which broke
+            // hit-testing on every row in the overhang. It no longer reaches;
+            // it needs the room instead. Pages that want the narrower column
+            // still cap themselves (`_PublicPage` at `ElBreakpoints.xl`, and
+            // `DocsLayout`'s own article at `ElWidths.article`), so this
+            // widens only what was relying on this box to do the capping.
+            constraints: const BoxConstraints(maxWidth: ElWidths.shell),
             child: SelectionArea(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,

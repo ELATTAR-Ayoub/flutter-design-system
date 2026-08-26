@@ -141,8 +141,10 @@ class _InstallationArticle extends StatelessWidget {
     id: 'install-cli',
     title: 'Install the CLI',
     description:
-        'elattar_cli is on pub.dev. It has one dependency, so this is a '
-        'small resolve rather than a tree to audit.',
+        'elattar_cli is not on pub.dev yet — 0.0.1 is prepared and gated, '
+        'and this command starts working the day it is published. It has '
+        'one dependency, so it will be a small resolve rather than a tree '
+        'to audit.',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[

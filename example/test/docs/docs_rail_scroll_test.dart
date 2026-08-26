@@ -102,17 +102,20 @@ void main() {
       );
       await tester.pump();
 
-      // inset = max(0, (viewport - ElWidths.page) / 2) — docs_layout.dart's
-      // own formula, ~line 385. At this viewport it is 200: the Stack's own
-      // box (the centred ElWidths.page-wide reading column) spans global x
-      // in [200, 1400]. Each rail is ElWidths.rail + el(6) = 264 wide and
-      // pinned `inset` past the Stack's edge, so 200 of its 264 painted
-      // pixels sit outside that box — the escaped band this test targets.
-      const double inset =
-          (viewportWidth - ElWidths.page) / 2; // 200
-      const double stackLeft = inset; // 200
-      const double stackRight = viewportWidth - inset; // 1400
-
+      // **There is no escaped band any more, and that is the point.**
+      //
+      // This test was written when the rails were `Positioned` past their
+      // Stack's edge so they could reach the screen's edge. That escape is
+      // gone: it put them outside every ancestor box that gates a hit test,
+      // so their rows were painted and unclickable — a 24px reachable sliver
+      // at 1909, which is what "the sidebar only works if my mouse is here"
+      // turned out to mean. `docs_rail_bounds_test.dart` now pins the
+      // rails inside the boxes that hit-test them, at six widths.
+      //
+      // What this test guards is unchanged and still worth guarding: a wheel
+      // over a rail scrolls THAT rail, not the article underneath it. The
+      // points below are simply taken on the rails where they now are,
+      // rather than in a band that no longer exists.
       final Finder sidebarKey = find.byKey(
         const ValueKey<String>('docs-layout-sidebar'),
       );
@@ -125,21 +128,16 @@ void main() {
       final Rect sidebarRect = tester.getRect(sidebarKey);
       final Rect tocRect = tester.getRect(tocKey);
 
-      // Sanity-check the diagnosis's own geometry before trusting points
-      // derived from it: each rail really does start outside the Stack's
-      // box on this side, and really does reach inside it — otherwise these
-      // events would not be exercising the escaped band at all.
-      expect(sidebarRect.left, lessThan(stackLeft));
-      expect(sidebarRect.right, greaterThan(stackLeft));
-      expect(tocRect.right, greaterThan(stackRight));
-      expect(tocRect.left, lessThan(stackRight));
-
-      // Clearly left of the Stack's own left edge (200), and clearly inside
-      // the painted sidebar rail (which starts at global x 0).
-      final Offset sidebarEscapedPoint = Offset(50, sidebarRect.top + 20);
-      // Clearly right of the Stack's own right edge (1400), and clearly
-      // inside the painted toc rail (which reaches global x 1600).
-      final Offset tocEscapedPoint = Offset(1550, tocRect.top + 20);
+      // Inside each rail, near its inner edge — the half that was reachable
+      // before the fix is now the whole rail, so either side would do.
+      final Offset sidebarEscapedPoint = Offset(
+        sidebarRect.right - 20,
+        sidebarRect.top + 20,
+      );
+      final Offset tocEscapedPoint = Offset(
+        tocRect.left + 20,
+        tocRect.top + 20,
+      );
 
       expect(sidebarRect.contains(sidebarEscapedPoint), isTrue);
       expect(tocRect.contains(tocEscapedPoint), isTrue);
@@ -277,11 +275,13 @@ void main() {
         lessThan(sidebarController.position.maxScrollExtent),
         reason: 'the sidebar must have room left for this to prove anything',
       );
-      // Inside the painted rail (0..264) and inside the Stack's own box
-      // (200..1400), so this is the ORDINARY hit-test path, not the escaped
-      // band the catcher answers.
-      final Offset sidebarBodyPoint = Offset(220, sidebarRect.top + 40);
-      expect(sidebarBodyPoint.dx, greaterThan(stackLeft));
+      // A second point on the rail, further down and nearer its outer edge.
+      // Before the fix this half of the rail was outside every gating box;
+      // now the ordinary hit-test path reaches all of it.
+      final Offset sidebarBodyPoint = Offset(
+        sidebarRect.left + 20,
+        sidebarRect.top + 40,
+      );
       expect(sidebarRect.contains(sidebarBodyPoint), isTrue);
       final TestPointer sidebarBodyPointer = TestPointer(
         3,

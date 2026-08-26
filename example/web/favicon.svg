@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28">
+  <!--
+    ElLogoMark, reproduced from example/lib/logo.dart rather than traced from
+    a screenshot. Every number here is a source token:
+
+    - Tile: size el(7)=28, radius ElRadii.md=10, fill ElPalette.action
+      = elHsl(217, 91, 53) = #1A6EF4 (lib/src/foundation/colors.dart:311,
+      spacing.dart:16 for el(), spacing.dart:104 for ElRadii.md).
+    - Glyph box: el(4)=16, centred in the 28 tile -> 6px inset each side.
+    - Glyph paths are lucide's own 24-unit grid (ElIconPaths.viewBox=24,
+      icon_paths.dart:519), so the <g> below scales 24 -> 16 (factor 2/3)
+      and offsets by the 6px inset.
+    - stroke-width 2.4 is ElIcon.strokeFor(el(4)) in that 24-unit space
+      (icon.dart:127-134,229-234): scaled = 2*24/16 = 3 > 2.6, so the
+      "heavy" rung 2.4 applies.
+    - Chevron "M6 15.5 12 6l6 9.5" strokes theme.primaryForeground; light
+      and dark themes both resolve it to elHsl(0,0,100) = #FFFFFF
+      (theme.dart:442,505), so one favicon is correct in both modes.
+      stroke-linecap="square" per logo.dart:17-18.
+    - Underline "M6 19h12" strokes ElPalette.valueBright = _hex(0xFFD9F99D)
+      = #D9F99D (colors.dart:318). No stroke-linecap given, so SVG's
+      default "butt" applies, per logo.dart:20-22.
+  -->
+  <rect width="28" height="28" rx="10" fill="#1A6EF4"/>
+  <g transform="translate(6 6) scale(0.6666667)" fill="none" stroke-width="2.4">
+    <path d="M6 15.5 12 6l6 9.5" stroke="#FFFFFF" stroke-linecap="square" stroke-linejoin="miter"/>
+    <path d="M6 19h12" stroke="#D9F99D" stroke-linecap="butt" stroke-linejoin="miter"/>
+  </g>
+</svg>

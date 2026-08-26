@@ -21,6 +21,8 @@ library;
 
 import 'dart:math' as math;
 
+import 'package:flutter/gestures.dart' show HitTestEntry, HitTestResult;
+
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/button/page.dart';
 import 'package:flutter/material.dart' show MaterialApp, SelectionArea;
@@ -84,8 +86,12 @@ void main() {
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
 
+      final List<String> routed = <String>[];
       await tester.pumpWidget(
-        _host(child: const ButtonDocPage(), desktop: true),
+        _host(
+          child: ButtonDocPage(onNavigate: routed.add),
+          desktop: true,
+        ),
       );
       await tester.pump();
 
@@ -117,8 +123,47 @@ void main() {
             'rows there cannot be clicked',
       );
 
+      // Painted is not the same as reachable. Hit-testing is gated by EVERY
+      // ancestor's box, so a rail positioned outside its Stack's box is
+      // rejected before the row is ever reached — it looks present and does
+      // nothing. That is the defect this half exists for, and it is not
+      // visible in a screenshot.
+      final Finder row = find.byKey(
+        const ValueKey<String>('docs-sidebar:/docs/installation'),
+      );
+      expect(row, findsOneWidget, reason: 'no rail row to tap at $width');
+      await tester.tap(row, warnIfMissed: false);
+      await tester.pump();
+      expect(
+        routed,
+        contains('/docs/installation'),
+        reason:
+            'tapping a rail row at $width routed nowhere — the row is '
+            'painted outside every ancestor box that gates the hit test',
+      );
+
       if (toc.evaluate().isNotEmpty) {
         final Rect tocRect = tester.getRect(toc);
+        // The right rail fails the same way, mirrored: it escapes rightward,
+        // so only its LEFT sliver falls inside the gating box. Asserted by
+        // hit test rather than by tapping, because a toc row scrolls the
+        // article rather than routing — reachability is the thing at issue.
+        final Finder tocRow = find.byKey(
+          const ValueKey<String>('docs-layout-toc-entry:install'),
+        );
+        expect(tocRow, findsOneWidget, reason: 'no toc row at $width');
+        final RenderObject tocRowBox = tester.renderObject(tocRow);
+        final HitTestResult hit = tester.hitTestOnBinding(
+          tester.getCenter(tocRow),
+        );
+        expect(
+          hit.path.map((HitTestEntry e) => e.target),
+          contains(tocRowBox),
+          reason:
+              'a pointer over the toc row at $width never reaches it — the '
+              'rail is painted outside a box that gates the hit test',
+        );
+
         expect(
           tocRect.right,
           lessThanOrEqualTo(shellRight),
