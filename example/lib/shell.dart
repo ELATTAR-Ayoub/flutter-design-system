@@ -105,8 +105,15 @@ class AppRouter extends ValueNotifier<String> with WidgetsBindingObserver {
   /// stop: not a new history entry either.
   ///
   /// Reports the change to the engine so the address bar, Back/Forward and
-  /// reload all agree with [value]; `replace: false` is a normal forward
-  /// navigation, which is what makes Back able to undo it.
+  /// reload all agree with [value].
+  ///
+  /// Whether this pushes a history entry or replaces one is **not** decided
+  /// here: it is decided by the history mode the app selected at boot. Flutter
+  /// web defaults to single-entry, where this call replaces and Back leaves
+  /// the site however this method is written. `main.dart`'s `runDocsApp` opts
+  /// into multi-entry so that it pushes — see the comment there, which
+  /// records the measurement. This comment used to claim the push happened
+  /// here; it did not, and Back was broken for as long as that claim stood.
   void navigate(String href) {
     final bool changed = href != value;
     value = href;

@@ -16,7 +16,7 @@ import 'package:flutter/foundation.dart'
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart' show debugPaintBaselinesEnabled;
 import 'package:flutter/services.dart'
-    show SystemChrome, SystemUiMode, rootBundle;
+    show SystemChrome, SystemNavigator, SystemUiMode, rootBundle;
 import 'package:flutter_web_plugins/url_strategy.dart' show usePathUrlStrategy;
 
 import 'nav.dart';
@@ -304,7 +304,40 @@ void runDocsApp({String? initialRoute}) {
   // behind its own `dart.library.ui_web` conditional export, the same seam
   // `scroll_bridge.dart` uses for `dart.library.js_interop`, so this call is
   // safe on the VM the widget tests run on without a stub of our own.
+  // Selected BEFORE the URL strategy: setting a strategy recreates the
+  // engine's browser-history object, and doing that after this call was
+  // observed to drop back to single-entry.
+  if (kIsWeb) SystemNavigator.selectMultiEntryHistory();
   usePathUrlStrategy();
+  // And re-asserted once the first frame is up, because the selection is a
+  // platform message and the engine may not have had a view to apply it to
+  // this early. Selecting a mode already active is a no-op.
+  if (kIsWeb) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      SystemNavigator.selectMultiEntryHistory();
+    });
+  }
+  // **Back must return to the previous page, not leave the site.**
+  //
+  // Flutter web boots in SINGLE-entry history mode, and in that mode
+  // `SystemNavigator.routeInformationUpdated` — what `AppRouter.navigate`
+  // calls on every in-app navigation — reaches the engine as a
+  // `replaceState`, not a `pushState`. The address bar updates and a
+  // reloaded or deep-linked URL still resolves, so the defect is invisible
+  // from everything except the Back button: no history entry is ever
+  // created, `history.length` never grows, and the first Back press takes
+  // the reader off the documentation entirely.
+  //
+  // Measured, not inferred: driving the release build in headless Chrome,
+  // clicking through to `/components/accordion` moved `location.pathname`
+  // and left `history.length` at 3, and Back landed on `about:blank`.
+  //
+  // This opts into multi-entry history, which is what makes that same call
+  // push. `MaterialApp.router` would do it as a side effect of adopting
+  // Router; this app routes through its own `AppRouter` notifier
+  // (`shell.dart`), so it asks directly. Web-only by nature — the channel
+  // has no handler elsewhere — and guarded so the widget tests, which run on
+  // the VM, do not send a message nothing answers.
   // Flutter Inspector persists "Show baselines" through the VM service while
   // a debug session is alive. Reset it on every fresh boot so the diagnostic
   // ideographic/alphabetic rules can never be mistaken for product styling.
