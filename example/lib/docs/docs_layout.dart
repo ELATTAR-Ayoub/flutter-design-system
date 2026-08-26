@@ -392,12 +392,31 @@ class _DocsLayoutState extends State<DocsLayout> {
     // `Align` chain already centres it on. The reading column stays capped
     // at [ElWidths.content] regardless, so only the rails actually reach the
     // wider edge.
-    // The full viewport, never clamped to [ElWidths.shell]. The rails belong
-    // at the EDGES OF THE SCREEN: pinning them to the shell's measure instead
-    // left a margin of dead space outside each rail on a wide monitor. Only
-    // the centre column is capped, at [ElWidths.article], and centred between
-    // them.
-    final double fullBleedWidth = viewport;
+    // How far the rails may escape: the widest box that actually PAINTS.
+    //
+    // This used to be the raw viewport, on the reasoning that "the rails
+    // belong at the edges of the screen" and that clamping them to
+    // [ElWidths.shell] left dead space outside each rail on a wide monitor.
+    // That reasoning was about the right case and reached the wrong
+    // conclusion. `SiteShell` centres everything in a hard
+    // `SizedBox(width: ElWidths.shell)`; past that box nothing is drawn. A
+    // rail told to escape to the viewport therefore does not reach the screen
+    // edge on a monitor wider than 1680 — it walks off the paintable region
+    // and loses the overhang.
+    //
+    // The damage was invisible below 1680, where the shell is wider than the
+    // window and nothing clips, and grows with the viewport above it.
+    // Measured on the deployed site at 1909 via the browser's own semantics
+    // rects: both rails reported 150px wide instead of 264, each keeping its
+    // OUTER edge and losing the inner 114 — so the left rail showed the tail
+    // of every label ("…Menu", "…ments") and the right rail showed the head
+    // ("Source-first ownersh"). Rows in the clipped band could not be
+    // clicked either, because nothing is hit-tested where nothing is painted.
+    //
+    // `min` rather than the shell outright, so a window NARROWER than the
+    // shell still gets the full-bleed behaviour it always had — that case is
+    // every viewport the rollout was captured at, and it is unchanged.
+    final double fullBleedWidth = math.min(viewport, ElWidths.shell);
     final List<DocsTocEntry> toc = widget.toc;
     // The left rail is the SAME on every documentation page, always. It is
     // cross-page navigation, so it cannot vary by which page is open: a reader
