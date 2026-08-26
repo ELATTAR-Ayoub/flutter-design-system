@@ -264,11 +264,23 @@ void main() {
           ),
         );
 
-        final List<String> headings = tester
-            .widgetList<ElText>(find.byType(ElText))
-            .where((ElText text) => text.spec == ElType.h3)
-            .map((ElText text) => text.text)
-            .toList();
+        // Two sources, because the page renders section names two ways and
+        // both are load bearing. A plain section prints its title as
+        // `DocsSection`'s own `.type-h3`; a disclosure prints it as its
+        // trigger row's `.type-h4`, beside the chevron that opens it, and
+        // `DocsSection` deliberately prints no heading above that — see
+        // `DocsSection.heading`. Reading only the h3s would silently stop
+        // asserting the eight trailing disclosures, which is most of the
+        // house shape.
+        final List<String> headings = <String>[
+          ...tester
+              .widgetList<ElText>(find.byType(ElText))
+              .where((ElText text) => text.spec == ElType.h3)
+              .map((ElText text) => text.text),
+          ...tester
+              .widgetList<DocsDisclosure>(find.byType(DocsDisclosure))
+              .map((DocsDisclosure disclosure) => disclosure.title),
+        ];
 
         expect(headings, _expectedSectionHeadings);
 

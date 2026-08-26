@@ -274,6 +274,9 @@ class ComponentDocPage extends StatelessWidget {
           id: section.id,
           title: section.title,
           description: section.description,
+          // A disclosure prints its own title, in its trigger row, next to
+          // the chevron that opens it — see [DocsSection.heading].
+          heading: section is! DisclosureSection,
           child: _body(section),
         ),
     ],

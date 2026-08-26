@@ -6,6 +6,7 @@ import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/docs/component_doc_page.dart';
 import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_install.dart';
+import 'package:example/docs/docs_section.dart';
 import 'package:example/docs/docs_showcase.dart';
 import 'package:example/docs/docs_snippet.dart';
 import 'package:flutter/widgets.dart';
@@ -213,5 +214,73 @@ void main() {
     await tester.pump();
 
     expect(tester.getSize(find.byType(DocsShowcaseFrame)).height, el(48));
+  });
+
+  testWidgets('a disclosure prints its title once, not twice', (
+    WidgetTester tester,
+  ) async {
+    // `DocsDisclosure`'s trigger row IS the heading — a title with the
+    // chevron that opens it beside the title. `DocsSection` printed its own
+    // `.type-h3` above that, so every one of the eight trailing disclosures
+    // on every one of the ninety-nine pages showed its name twice, stacked.
+    // Caught in a capture of the rendered page, not by any test, which is
+    // why this one exists.
+    tester.view.physicalSize = const Size(1440, 3000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(
+      _host(
+        const ComponentDocPage(
+          spec: ComponentDocSpec(
+            name: 'x',
+            title: 'X',
+            description: 'd',
+            sections: <DocsPageSection>[
+              DisclosureSection(
+                id: 'theming',
+                title: 'Theming',
+                description: 'What it reads.',
+                child: Text('tokens'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.text('Theming'), findsOneWidget);
+    // The description still renders — only the duplicated heading is gone,
+    // so a reader still learns what the disclosure holds before opening it.
+    expect(find.text('What it reads.'), findsOneWidget);
+    // And the anchor is still registered, so the rail still scrolls here.
+    expect(DocsAnchor.keyFor('theming').currentContext, isNotNull);
+  });
+
+  testWidgets('a non-disclosure section still prints its heading', (
+    WidgetTester tester,
+  ) async {
+    tester.view.physicalSize = const Size(1440, 3000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(
+      _host(
+        const ComponentDocPage(
+          spec: ComponentDocSpec(
+            name: 'x',
+            title: 'X',
+            description: 'd',
+            sections: <DocsPageSection>[
+              SnippetSection(id: 'usage', title: 'Usage', code: 'x'),
+            ],
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.text('Usage'), findsOneWidget);
   });
 }

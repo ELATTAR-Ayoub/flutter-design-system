@@ -66,12 +66,28 @@ class DocsSection extends StatelessWidget {
     required this.title,
     this.description,
     required this.child,
+    this.heading = true,
   });
 
   final String id;
   final String title;
   final String? description;
   final Widget child;
+
+  /// Whether to print [title] above [child].
+  ///
+  /// False for a section whose body already carries the title as part of its
+  /// own control — a [DocsDisclosure], whose trigger row IS the heading, with
+  /// the chevron beside it. Rendering both printed the title twice: once as
+  /// this section's `.type-h3`, and again as the trigger's `.type-h4`
+  /// directly beneath it, on all eight trailing disclosures of all
+  /// ninety-nine component pages.
+  ///
+  /// The anchor, the spacing and [description] are unaffected — only the
+  /// heading line is dropped, so the rail still scrolls here and a
+  /// description still introduces what the disclosure holds before a reader
+  /// opens it.
+  final bool heading;
 
   /// The gap under the whole section.
   static double get spacing => el(20);
@@ -89,22 +105,24 @@ class DocsSection extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            Padding(
-              padding: EdgeInsets.only(bottom: headingGap),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  // An `h2` wearing `.type-h3`, intentionally.
-                  ElText(title, ElType.h3, color: theme.foreground),
-                  if (description != null) ...<Widget>[
-                    SizedBox(height: el(2)),
-                    // Full width. The old private measure cap left a gap on
-                    // the right of every section.
-                    ElText(description!, ElType.small),
+            if (heading || description != null)
+              Padding(
+                padding: EdgeInsets.only(bottom: headingGap),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    // An `h2` wearing `.type-h3`, intentionally.
+                    if (heading)
+                      ElText(title, ElType.h3, color: theme.foreground),
+                    if (description != null) ...<Widget>[
+                      if (heading) SizedBox(height: el(2)),
+                      // Full width. The old private measure cap left a gap on
+                      // the right of every section.
+                      ElText(description!, ElType.small),
+                    ],
                   ],
-                ],
+                ),
               ),
-            ),
             child,
           ],
         ),

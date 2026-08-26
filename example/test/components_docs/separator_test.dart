@@ -230,11 +230,14 @@ void main() {
           );
         }
 
-        // Matches twice: the DocsSection heading and the DocsDisclosure's
-        // own trigger label, which repeats the same title.
+        // Once, and only once. The title lives on the `DocsDisclosure`'s
+        // trigger row — the control itself, with the chevron beside it —
+        // and `DocsSection` prints no heading above a disclosure, so the
+        // name is not stacked on itself. This used to expect two; that was
+        // the duplication, encoded.
         expect(
           find.descendant(of: article, matching: find.text('API Reference')),
-          findsNWidgets(2),
+          findsOneWidget,
         );
       },
     );
