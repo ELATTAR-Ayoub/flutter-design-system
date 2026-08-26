@@ -215,6 +215,76 @@ harvest.
 
 ---
 
+# Part 3 — The registry follows the reference: mutable, not pinned
+
+## The decision
+
+`elattar_cli` currently pins `https://flutter.elattar.dev/registry/0.0.1/` and
+promises that path never changes. **That promise is dropped.** The CLI will read
+a single mutable path — `/registry/latest/` — the way shadcn's does.
+
+Checked against the reference rather than assumed
+(`https://ui.shadcn.com/r/styles/new-york/button.json`): shadcn serves its
+registry from its own site, with **no version in the path**, the file content
+**inline** in the JSON, and **no checksum of any kind**. Their registry is
+always-latest and mutable by design, so nothing breaks when it changes.
+
+## Why this is safe here
+
+This is a copy-first system. `elattar add` writes files into a project; it never
+updates code already installed. A changed registry therefore cannot alter
+anybody's working tree. The only consequence is that two people installing at
+different times get different source — which is exactly shadcn's behaviour and
+is the normal expectation for this class of tool.
+
+Nothing is published yet, so no promise has been made to anyone. This is the
+last moment the decision is free.
+
+**We keep the sha256 verification** even though shadcn has none. It costs
+nothing, it is already implemented and tested, and it still does real work:
+proving a payload arrived intact. It simply stops being mistaken for a proof
+that the version did not change — which it never was.
+
+## What this reverses, deliberately
+
+`stage.dart --alias` exists today to write a mutable `/registry/latest/` **for
+browsing**, and its comment says: *"A released CLI must never default to it —
+that is the whole distinction this tool exists to keep."* This design makes the
+released CLI default to exactly that. The comment is now wrong and must be
+rewritten to record the reversal and its reasoning, not silently deleted.
+
+Likewise `identity.dart`'s `defaultRegistryUrl` doc comment, which argues at
+length for pinning. It is replaced by the argument above.
+
+## The work
+
+* `defaultRegistryUrl` becomes `$siteOrigin/registry/latest/`. It stops
+  composing `cliVersion`.
+* `release_audit`'s `registryUrlCompositionFinding` currently requires the URL
+  to derive its version from `cliVersion`, and its sibling check extracts the
+  version from the URL to prove four spellings of one number agree. Both change:
+  the URL no longer carries a version, so the audit must stop demanding one —
+  and must not simply be deleted, since the pubspec/`--version`/tag agreement it
+  guards is still real.
+* `tool/deploy_site` stages `/registry/latest/`.
+* The immutability refusal in `stage.dart` no longer applies to `latest`. It
+  should refuse loudly if asked to stage a *versioned* path over different
+  bytes, since that path keeps its old meaning if anyone uses it.
+* Prose: the CLI page, the Registry page, `tool/README.md`, both CHANGELOGs and
+  `identity.dart` all currently state the pin. Every one is corrected. This
+  codebase has a track record of stale claims outliving the thing they
+  described; this is the moment not to add another.
+
+## The risk this accepts
+
+An old CLI and a new registry can disagree. `supportedRegistrySchemaVersion`
+already exists and the client validates it, so an incompatible schema change
+fails with a clear error rather than installing something wrong. That is the
+safety net, and it is adequate — but it means a future breaking schema change
+requires a CLI release, not just a redeploy.
+
+---
+
 ## Constraints that must survive
 
 * `docs_install_test.dart` — every registry item resolves to a page. Extended
