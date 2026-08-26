@@ -37,7 +37,8 @@ import 'package:flutter/widgets.dart';
 import '../docs/docs_code.dart';
 import '../docs/docs_facts.dart';
 import '../docs/docs_layout.dart';
-import '../kit.dart';
+import '../docs/docs_section.dart';
+import '../docs/docs_snippet.dart';
 import 'catalog.dart';
 
 class InstallationDocsPage extends StatelessWidget {
@@ -120,26 +121,23 @@ class _InstallationArticle extends StatelessWidget {
         child: ElText(text, spec ?? ElType.body),
       );
 
-  Widget _quickstart() => ElSection(
+  Widget _quickstart() => DocsSection(
     id: 'quickstart',
     title: 'Quickstart',
     description:
         'From nothing to a themed button in a Flutter project you already '
         'have.',
-    child: ElPanel(
-      label: 'CONSOLE',
-      note: 'QUICKSTART',
-      child: DocsSelectableCodeBlock(
-        code:
-            'dart install elattar_cli\n\n'
-            'cd my_flutter_app\n'
-            'elattar init --foundation source\n'
-            'elattar add button',
-      ),
+    child: const DocsSnippet(
+      language: 'bash',
+      code:
+          'dart install elattar_cli\n\n'
+          'cd my_flutter_app\n'
+          'elattar init --foundation source\n'
+          'elattar add button',
     ),
   );
 
-  Widget _installCli(ElThemeData theme) => ElSection(
+  Widget _installCli(ElThemeData theme) => DocsSection(
     id: 'install-cli',
     title: 'Install the CLI',
     description:
@@ -148,11 +146,7 @@ class _InstallationArticle extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        ElPanel(
-          label: 'CONSOLE',
-          note: 'INSTALL',
-          child: DocsSelectableCodeBlock(code: 'dart install elattar_cli'),
-        ),
+        const DocsSnippet(language: 'bash', code: 'dart install elattar_cli'),
         SizedBox(height: el(4)),
         _prose(
           'On an older SDK, or if you prefer the long spelling, `dart pub '
@@ -198,7 +192,7 @@ class _InstallationArticle extends StatelessWidget {
     ),
   );
 
-  Widget _sourceFoundation() => ElSection(
+  Widget _sourceFoundation() => DocsSection(
     id: 'source-foundation',
     title: 'Set up a project',
     description:
@@ -209,34 +203,32 @@ class _InstallationArticle extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        ElPanel(
-          label: 'CONSOLE',
-          note: 'SET UP',
-          child: DocsSelectableCodeBlock(
-            code:
-                '# Run these from inside your Flutter project.\n'
-                'elattar init --foundation source\n\n'
-                '# One component, with everything it depends on.\n'
-                'elattar add button\n\n'
-                '# Or the whole set.\n'
-                'elattar add --all',
-          ),
+        DocsSnippet(
+          language: 'bash',
+          code:
+              '# Run these from inside your Flutter project.\n'
+              'elattar init --foundation source\n\n'
+              '# One component, with everything it depends on.\n'
+              'elattar add button\n\n'
+              '# Or the whole set.\n'
+              'elattar add --all',
+          // Eight lines is enough to be worth collapsing on a page this
+          // long — see the expansion-control test in
+          // installation_docs_test.dart.
+          maxHeight: el(28),
         ),
         SizedBox(height: el(4)),
-        ElPanel(
-          label: 'CONSOLE',
-          note: 'LOOK BEFORE YOU LEAP',
-          child: DocsSelectableCodeBlock(
-            code:
-                '# Lists every file that would be written, and writes none.\n'
-                'elattar add button --dry-run',
-          ),
+        const DocsSnippet(
+          language: 'bash',
+          code:
+              '# Lists every file that would be written, and writes none.\n'
+              'elattar add button --dry-run',
         ),
       ],
     ),
   );
 
-  Widget _registry(ElThemeData theme) => ElSection(
+  Widget _registry(ElThemeData theme) => DocsSection(
     id: 'registry',
     title: 'Where components come from',
     child: Column(
@@ -251,15 +243,12 @@ class _InstallationArticle extends StatelessWidget {
           theme,
         ),
         SizedBox(height: el(4)),
-        ElPanel(
-          label: 'CONSOLE',
-          note: 'SOMEWHERE ELSE',
-          child: DocsSelectableCodeBlock(
-            code:
-                '# A mirror, or a registry you built yourself.\n'
-                'elattar add button --registry https://example.com/elattar/0.0.1/\n'
-                'elattar add button --registry ../flutter-design-system/registry/generated/latest',
-          ),
+        const DocsSnippet(
+          language: 'bash',
+          code:
+              '# A mirror, or a registry you built yourself.\n'
+              'elattar add button --registry https://example.com/elattar/0.0.1/\n'
+              'elattar add button --registry ../flutter-design-system/registry/generated/latest',
         ),
         SizedBox(height: el(4)),
         _prose(
@@ -274,7 +263,7 @@ class _InstallationArticle extends StatelessWidget {
     ),
   );
 
-  Widget _offline(ElThemeData theme) => ElSection(
+  Widget _offline(ElThemeData theme) => DocsSection(
     id: 'offline',
     title: 'Working offline',
     child: Column(
@@ -286,14 +275,11 @@ class _InstallationArticle extends StatelessWidget {
           theme,
         ),
         SizedBox(height: el(4)),
-        ElPanel(
-          label: 'CONSOLE',
-          note: 'OFFLINE',
-          child: DocsSelectableCodeBlock(
-            code:
-                'elattar add button            # populates the cache\n'
-                'elattar add card --offline    # reads only the cache',
-          ),
+        const DocsSnippet(
+          language: 'bash',
+          code:
+              'elattar add button            # populates the cache\n'
+              'elattar add card --offline    # reads only the cache',
         ),
         SizedBox(height: el(4)),
         const DocsInstallFacts(
@@ -329,7 +315,7 @@ class _InstallationArticle extends StatelessWidget {
     ),
   );
 
-  Widget _whatLands() => ElSection(
+  Widget _whatLands() => DocsSection(
     id: 'what-lands',
     title: 'What lands in your project',
     description:
@@ -386,7 +372,7 @@ class _InstallationArticle extends StatelessWidget {
     ),
   );
 
-  Widget _packageFoundation(ElThemeData theme) => ElSection(
+  Widget _packageFoundation(ElThemeData theme) => DocsSection(
     id: 'package-foundation',
     title: 'Package foundation',
     child: Column(
@@ -407,18 +393,15 @@ class _InstallationArticle extends StatelessWidget {
           theme,
         ),
         SizedBox(height: el(3)),
-        ElPanel(
-          label: 'CONSOLE',
-          note: 'EXIT 64',
-          child: DocsSelectableCodeBlock(
-            code:
-                '\$ elattar init --foundation package\n'
-                'The `package` foundation mode is not available in elattar '
-                '0.0.1: it depends on a package named `elattar_core` that '
-                'does not exist yet, so `flutter pub get` cannot resolve the '
-                'project it produces. Use `--foundation source`, which '
-                'copies the foundation into your project.',
-          ),
+        const DocsSnippet(
+          language: 'bash',
+          code:
+              '\$ elattar init --foundation package\n'
+              'The `package` foundation mode is not available in elattar '
+              '0.0.1: it depends on a package named `elattar_core` that '
+              'does not exist yet, so `flutter pub get` cannot resolve the '
+              'project it produces. Use `--foundation source`, which '
+              'copies the foundation into your project.',
         ),
         SizedBox(height: el(3)),
         _prose(
@@ -432,7 +415,7 @@ class _InstallationArticle extends StatelessWidget {
     ),
   );
 
-  Widget _fullPackage() => ElSection(
+  Widget _fullPackage() => DocsSection(
     id: 'full-package',
     title: 'Full maintained package',
     description:
@@ -464,8 +447,11 @@ class _InstallationArticle extends StatelessWidget {
               path: 'pubspec.yaml',
               title: 'From a local checkout',
               description:
-                  'Path relative to your project. This is the exact form '
-                  'example/pubspec.yaml in this repository uses.',
+                  'Path relative to your project — adjust the number of '
+                  '`../` segments to wherever you cloned the repository. '
+                  'This repository\'s own example/pubspec.yaml uses '
+                  '`path: ../`, because example/ lives directly inside the '
+                  'checkout it depends on.',
               code:
                   'dependencies:\n'
                   '  elattar_design_system:\n'
@@ -474,35 +460,28 @@ class _InstallationArticle extends StatelessWidget {
           ],
         ),
         SizedBox(height: el(4)),
-        ElPanel(
-          label: 'CONSOLE',
-          note: 'RESOLVE',
-          child: DocsSelectableCodeBlock(code: 'flutter pub get'),
-        ),
+        const DocsSnippet(language: 'bash', code: 'flutter pub get'),
       ],
     ),
   );
 
-  Widget _verification() => ElSection(
+  Widget _verification() => DocsSection(
     id: 'verification',
     title: 'Verification',
     description:
         'doctor checks the project, the config, whether your dependencies '
         'actually resolved, the manifest, and the registry it would use. It '
         'exits 0 only when every check passes.',
-    child: ElPanel(
-      label: 'CONSOLE',
-      note: 'DOCTOR',
-      child: DocsSelectableCodeBlock(
-        code:
-            'elattar doctor\n\n'
-            '# Add --verbose to include the cache path.\n'
-            'elattar doctor --verbose',
-      ),
+    child: const DocsSnippet(
+      language: 'bash',
+      code:
+          'elattar doctor\n\n'
+          '# Add --verbose to include the cache path.\n'
+          'elattar doctor --verbose',
     ),
   );
 
-  Widget _troubleshooting(ElThemeData theme) => ElSection(
+  Widget _troubleshooting(ElThemeData theme) => DocsSection(
     id: 'troubleshooting',
     title: 'Troubleshooting',
     child: const DocsStateMatrix(

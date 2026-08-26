@@ -15,10 +15,10 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:flutter/widgets.dart';
 
-import '../docs/docs_code.dart';
 import '../docs/docs_facts.dart';
 import '../docs/docs_layout.dart';
-import '../kit.dart';
+import '../docs/docs_section.dart';
+import '../docs/docs_snippet.dart';
 import 'catalog.dart';
 
 class CliDocsPage extends StatelessWidget {
@@ -69,7 +69,7 @@ class _CliArticle extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         _synopsis(),
-        _running(),
+        _running(theme),
         _globalOptions(theme),
         _commands(theme),
         _workflows(),
@@ -87,45 +87,61 @@ class _CliArticle extends StatelessWidget {
         child: ElText(text, spec ?? ElType.body),
       );
 
-  Widget _synopsis() => ElSection(
+  Widget _synopsis() => DocsSection(
     id: 'synopsis',
     title: 'Synopsis',
-    child: ElPanel(
-      label: 'CONSOLE',
-      note: 'USAGE',
-      child: DocsSelectableCodeBlock(
-        code:
-            'elattar --version\n'
-            'elattar init [--foundation source] [--yes] [--dry-run]\n'
-            '     [--registry PATH_OR_URL] [--offline]\n'
-            'elattar add <items...> [--all] [--overwrite] [--dry-run]\n'
-            '     [--registry PATH_OR_URL] [--offline]\n'
-            'elattar list [--registry PATH_OR_URL] [--offline]\n'
-            'elattar search <query> [--registry PATH_OR_URL] [--offline]\n'
-            'elattar info <name> [--registry PATH_OR_URL] [--offline]\n'
-            'elattar doctor [--registry PATH_OR_URL] [--offline] [--verbose]\n'
-            'elattar help',
-      ),
+    child: const DocsSnippet(
+      language: 'bash',
+      code:
+          'elattar --version\n'
+          'elattar init [--foundation source] [--yes] [--dry-run]\n'
+          '     [--registry PATH_OR_URL] [--offline]\n'
+          'elattar add <items...> [--all] [--overwrite] [--dry-run]\n'
+          '     [--registry PATH_OR_URL] [--offline]\n'
+          'elattar list [--registry PATH_OR_URL] [--offline]\n'
+          'elattar search <query> [--registry PATH_OR_URL] [--offline]\n'
+          'elattar info <name> [--registry PATH_OR_URL] [--offline]\n'
+          'elattar doctor [--registry PATH_OR_URL] [--offline] [--verbose]\n'
+          'elattar help',
     ),
   );
 
-  Widget _running() => ElSection(
+  Widget _running(ElThemeData theme) => DocsSection(
     id: 'running',
     title: 'Running it',
-    child: ElAlert(
-      variant: ElAlertVariant.info,
-      icon: const ElIcon(ElIconGlyph.info),
-      title: 'Getting the command',
-      description:
-          '`dart install elattar_cli` puts `elattar` on your PATH, and every '
-          'command on this page is then exactly what you type. Contributors '
-          'working inside a checkout can run the same commands as '
-          '`dart run packages/elattar_cli/bin/elattar.dart <command>` '
-          'without installing anything. See Installation.',
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        const ElAlert(
+          variant: ElAlertVariant.info,
+          icon: ElIcon(ElIconGlyph.info),
+          title: 'Getting the command',
+          description:
+              '`dart install elattar_cli` puts `elattar` on your PATH, and '
+              'every command on this page is then exactly what you type. '
+              'Contributors working inside a checkout can run the same '
+              'commands as '
+              '`dart run packages/elattar_cli/bin/elattar.dart <command>` '
+              'without installing anything.',
+        ),
+        SizedBox(height: el(3)),
+        Wrap(
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: <Widget>[
+            ElText('See ', ElType.small, color: theme.mutedForeground),
+            const DocsLink(
+              label: 'Installation',
+              route: docsInstallationRoute,
+              underline: true,
+            ),
+            ElText('.', ElType.small, color: theme.mutedForeground),
+          ],
+        ),
+      ],
     ),
   );
 
-  Widget _globalOptions(ElThemeData theme) => ElSection(
+  Widget _globalOptions(ElThemeData theme) => DocsSection(
     id: 'global-options',
     title: 'Global options',
     child: const DocsApiTable(
@@ -149,13 +165,14 @@ class _CliArticle extends StatelessWidget {
           description:
               'Every command below accepts this. Without it, the CLI walks '
               'up from the current directory looking for '
-              'registry/generated/latest.',
+              'registry/generated/latest, then falls back to the versioned '
+              'public registry over HTTP. See Offline and CI usage.',
         ),
       ],
     ),
   );
 
-  Widget _commands(ElThemeData theme) => ElSection(
+  Widget _commands(ElThemeData theme) => DocsSection(
     id: 'commands',
     title: 'Commands',
     child: Column(
@@ -222,37 +239,31 @@ class _CliArticle extends StatelessWidget {
     ),
   );
 
-  Widget _workflows() => ElSection(
+  Widget _workflows() => DocsSection(
     id: 'workflows',
     title: 'Common workflows',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        ElPanel(
-          label: 'CONSOLE',
-          note: 'NEW PROJECT',
-          child: DocsSelectableCodeBlock(
-            code:
-                'elattar init --foundation source --registry registry/generated/latest\n'
-                'elattar add button --registry registry/generated/latest',
-          ),
+        const DocsSnippet(
+          language: 'bash',
+          code:
+              'elattar init --foundation source --registry registry/generated/latest\n'
+              'elattar add button --registry registry/generated/latest',
         ),
         SizedBox(height: el(4)),
-        ElPanel(
-          label: 'CONSOLE',
-          note: 'DISCOVER BEFORE INSTALLING',
-          child: DocsSelectableCodeBlock(
-            code:
-                'elattar list --registry registry/generated/latest\n'
-                'elattar search dialog --registry registry/generated/latest\n'
-                'elattar info button --registry registry/generated/latest',
-          ),
+        const DocsSnippet(
+          language: 'bash',
+          code:
+              'elattar list --registry registry/generated/latest\n'
+              'elattar search dialog --registry registry/generated/latest\n'
+              'elattar info button --registry registry/generated/latest',
         ),
       ],
     ),
   );
 
-  Widget _exitCodes() => ElSection(
+  Widget _exitCodes() => DocsSection(
     id: 'exit-codes',
     title: 'Exit codes',
     description: 'Every code `ElattarCli.run` can return, and what causes it.',
@@ -273,10 +284,10 @@ class _CliArticle extends StatelessWidget {
         ),
         DocsApiFact(
           name: '64',
-          type: 'FormatException',
+          type: 'FormatException / RegistryLocationException',
           description:
-              'Bad or unknown arguments, an unknown command, or the '
-              '--foundation package refusal.',
+              'Bad or unknown arguments, an unknown command, an unusable '
+              '--registry value, or the --foundation package refusal.',
         ),
         DocsApiFact(
           name: '65',
@@ -289,6 +300,13 @@ class _CliArticle extends StatelessWidget {
           type: 'RegistryItemNotFoundException',
           description:
               'add or info named an item the registry does not contain.',
+        ),
+        DocsApiFact(
+          name: '70',
+          type: 'RegistrySourceException',
+          description:
+              'The command was well formed but a remote registry could not '
+              'be reached or read, or --offline found nothing cached.',
         ),
         DocsApiFact(
           name: '72',
@@ -312,7 +330,7 @@ class _CliArticle extends StatelessWidget {
     ),
   );
 
-  Widget _output(ElThemeData theme) => ElSection(
+  Widget _output(ElThemeData theme) => DocsSection(
     id: 'output',
     title: 'Output format',
     child: _prose(
@@ -327,23 +345,55 @@ class _CliArticle extends StatelessWidget {
     ),
   );
 
-  Widget _offline(ElThemeData theme) => ElSection(
+  Widget _offline(ElThemeData theme) => DocsSection(
     id: 'offline',
     title: 'Offline and CI usage',
-    child: _prose(
-      'The registry the CLI reads is a local, generated directory '
-      '(registry/generated/latest/): every command above resolves it by '
-      'filesystem path, and none of the six commands make a network '
-      'request. --registry PATH also rejects a URL outright, with a '
-      '"Remote registries are not supported yet" error, rather than '
-      'attempting to fetch one. That makes every command above safe and '
-      'deterministic to run in CI, provided the registry directory is '
-      'present in the checkout the job runs against.',
-      theme,
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        _prose(
+          '--registry PATH accepts either a local directory or an http(s) '
+          'URL; anything else is refused before it reaches the filesystem. '
+          'Named nothing, the CLI walks up from the working directory '
+          'looking for registry/generated/latest, and only then falls back '
+          'to the versioned public registry over HTTP — so a plain run '
+          'outside a checkout of this repository does make a network '
+          'request by default.',
+          theme,
+        ),
+        SizedBox(height: el(4)),
+        _prose(
+          '--offline is what makes a run deterministic without one: every '
+          'command above restricts itself to whatever is already cached and '
+          'never opens a connection. Pointing --registry at a local, '
+          'checked-in directory (as the workflows above do) removes the '
+          'network dependency a different way, by never resolving to the '
+          'remote registry in the first place.',
+          theme,
+        ),
+        SizedBox(height: el(3)),
+        Wrap(
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: <Widget>[
+            ElText('See ', ElType.small, color: theme.mutedForeground),
+            const DocsLink(
+              label: 'Registry',
+              route: docsRegistryRoute,
+              underline: true,
+            ),
+            ElText(
+              ' for how a registry location resolves and how the cache '
+              'works.',
+              ElType.small,
+              color: theme.mutedForeground,
+            ),
+          ],
+        ),
+      ],
     ),
   );
 
-  Widget _conflicts(ElThemeData theme) => ElSection(
+  Widget _conflicts(ElThemeData theme) => DocsSection(
     id: 'conflicts',
     title: 'Conflicts and recovery',
     child: Column(

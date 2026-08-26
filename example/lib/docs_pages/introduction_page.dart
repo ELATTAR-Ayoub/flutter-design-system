@@ -19,7 +19,7 @@ import 'package:flutter/widgets.dart';
 
 import '../docs/docs_facts.dart';
 import '../docs/docs_layout.dart';
-import '../kit.dart';
+import '../docs/docs_section.dart';
 import 'catalog.dart';
 
 class IntroductionDocsPage extends StatelessWidget {
@@ -92,7 +92,7 @@ class _IntroductionArticle extends StatelessWidget {
         child: ElText(text, spec ?? ElType.body),
       );
 
-  Widget _overview(ElThemeData theme) => ElSection(
+  Widget _overview(ElThemeData theme) => DocsSection(
     id: 'overview',
     title: 'What this is',
     child: Column(
@@ -118,7 +118,7 @@ class _IntroductionArticle extends StatelessWidget {
     ),
   );
 
-  Widget _ownership(ElThemeData theme) => ElSection(
+  Widget _ownership(ElThemeData theme) => DocsSection(
     id: 'ownership',
     title: 'Source-first ownership',
     description:
@@ -130,7 +130,7 @@ class _IntroductionArticle extends StatelessWidget {
         _prose(
           'Running `elattar add button` does not add a dependency, it '
           'copies lib/src/components/button.dart, resolves its registry '
-          'dependencies (press-motion, icon, spinner, and the three visual '
+          'dependencies transitively (icon, spinner, and the three visual '
           'effects it composes), and writes every one of them into '
           'lib/components/ui/ inside your own project. From that point the '
           'file is yours: read it, change it, delete the parts you do not '
@@ -143,15 +143,37 @@ class _IntroductionArticle extends StatelessWidget {
           'dependency stays a black box you configure through the '
           'parameters it exposes; a copied component is source you own '
           'outright, at the cost of picking up fixes manually instead of on '
-          'a version bump. See Installation and Registry for how the copy '
-          'and its dependency graph are produced.',
+          'a version bump.',
           theme,
+        ),
+        SizedBox(height: el(3)),
+        Wrap(
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: <Widget>[
+            ElText('See ', ElType.small, color: theme.mutedForeground),
+            const DocsLink(
+              label: 'Installation',
+              route: docsInstallationRoute,
+              underline: true,
+            ),
+            ElText(' and ', ElType.small, color: theme.mutedForeground),
+            const DocsLink(
+              label: 'Registry',
+              route: docsRegistryRoute,
+              underline: true,
+            ),
+            ElText(
+              ' for how the copy and its dependency graph are produced.',
+              ElType.small,
+              color: theme.mutedForeground,
+            ),
+          ],
         ),
       ],
     ),
   );
 
-  Widget _composition(ElThemeData theme) => ElSection(
+  Widget _composition(ElThemeData theme) => DocsSection(
     id: 'composition',
     title: 'Composition through public El* APIs',
     child: _prose(
@@ -167,7 +189,7 @@ class _IntroductionArticle extends StatelessWidget {
     ),
   );
 
-  Widget _distribution(ElThemeData theme) => ElSection(
+  Widget _distribution(ElThemeData theme) => DocsSection(
     id: 'distribution',
     title: 'Registry and CLI distribution',
     child: Column(
@@ -179,9 +201,31 @@ class _IntroductionArticle extends StatelessWidget {
           'effects, 5 motion primitives, and 1 foundation bundle. '
           'packages/elattar_cli reads that manifest, resolves an item\'s '
           'transitive registryDependencies, and writes the resulting files, '
-          'assets, and font registrations into a consumer project. See CLI '
-          'and Registry for the full command surface and item schema.',
+          'assets, and font registrations into a consumer project.',
           theme,
+        ),
+        SizedBox(height: el(3)),
+        Wrap(
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: <Widget>[
+            ElText('See ', ElType.small, color: theme.mutedForeground),
+            const DocsLink(
+              label: 'CLI',
+              route: docsCliRoute,
+              underline: true,
+            ),
+            ElText(' and ', ElType.small, color: theme.mutedForeground),
+            const DocsLink(
+              label: 'Registry',
+              route: docsRegistryRoute,
+              underline: true,
+            ),
+            ElText(
+              ' for the full command surface and item schema.',
+              ElType.small,
+              color: theme.mutedForeground,
+            ),
+          ],
         ),
         SizedBox(height: el(4)),
         ElAlert(
@@ -196,22 +240,44 @@ class _IntroductionArticle extends StatelessWidget {
     ),
   );
 
-  Widget _defaults(ElThemeData theme) => ElSection(
+  Widget _defaults(ElThemeData theme) => DocsSection(
     id: 'defaults',
     title: 'Beautiful, coherent defaults',
-    child: _prose(
-      'Every color, spacing, radius, shadow, and motion value a component '
-      'paints with resolves from the same semantic token set, see Theming, '
-      'rather than a literal chosen per widget. That is enforced, not '
-      'merely advised: a token guard scans this documentation app itself '
-      'for raw Color(, TextStyle(, or hardcoded layout numbers and fails '
-      'the build if it finds one (test/token_guard_test.dart at the '
-      'repository root).',
-      theme,
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        _prose(
+          'Every color, spacing, radius, shadow, and motion value a '
+          'component paints with resolves from the same semantic token set '
+          'rather than a literal chosen per widget. That is enforced, not '
+          'merely advised: a token guard scans this documentation app '
+          'itself for raw Color(, TextStyle(, or hardcoded layout numbers '
+          'and fails the build if it finds one (test/token_guard_test.dart '
+          'at the repository root).',
+          theme,
+        ),
+        SizedBox(height: el(3)),
+        Wrap(
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: <Widget>[
+            ElText('See ', ElType.small, color: theme.mutedForeground),
+            const DocsLink(
+              label: 'Theming',
+              route: docsThemingRoute,
+              underline: true,
+            ),
+            ElText(
+              ' for how that token set resolves.',
+              ElType.small,
+              color: theme.mutedForeground,
+            ),
+          ],
+        ),
+      ],
     ),
   );
 
-  Widget _platforms(ElThemeData theme) => ElSection(
+  Widget _platforms(ElThemeData theme) => DocsSection(
     id: 'platforms',
     title: 'Flutter platform support',
     child: _prose(
@@ -225,24 +291,45 @@ class _IntroductionArticle extends StatelessWidget {
     ),
   );
 
-  Widget _skill(ElThemeData theme) => ElSection(
+  Widget _skill(ElThemeData theme) => DocsSection(
     id: 'skill',
     title: 'AI-ready skill and open code',
-    child: _prose(
-      'This repository carries a coding-agent skill that teaches an agent '
-      'to discover the public El* surface, resolve values from tokens '
-      'instead of inventing them, and cover states and accessibility before '
-      'calling a change done. It ships in the repository itself, no '
-      'separate install step is needed to use it against a checkout, and '
-      'it is mode-aware: it reads elattar.yaml when present so it can also '
-      'work against a project that installed components through the CLI. '
-      'See the Skills page for supported agents and what it reads and '
-      'provides.',
-      theme,
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        _prose(
+          'This repository carries a coding-agent skill that teaches an '
+          'agent to discover the public El* surface, resolve values from '
+          'tokens instead of inventing them, and cover states and '
+          'accessibility before calling a change done. It ships in the '
+          'repository itself, no separate install step is needed to use it '
+          'against a checkout, and it is mode-aware: it reads elattar.yaml '
+          'when present so it can also work against a project that '
+          'installed components through the CLI.',
+          theme,
+        ),
+        SizedBox(height: el(3)),
+        Wrap(
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: <Widget>[
+            ElText('See ', ElType.small, color: theme.mutedForeground),
+            const DocsLink(
+              label: 'Skills',
+              route: '/skills',
+              underline: true,
+            ),
+            ElText(
+              ' for supported agents and what it reads and provides.',
+              ElType.small,
+              color: theme.mutedForeground,
+            ),
+          ],
+        ),
+      ],
     ),
   );
 
-  Widget _modes(ElThemeData theme) => ElSection(
+  Widget _modes(ElThemeData theme) => DocsSection(
     id: 'modes',
     title: 'Package versus CLI ownership',
     description:

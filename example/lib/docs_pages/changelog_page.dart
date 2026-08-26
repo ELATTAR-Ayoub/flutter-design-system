@@ -13,9 +13,9 @@ import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 
-import '../docs/docs_code.dart';
 import '../docs/docs_layout.dart';
-import '../kit.dart';
+import '../docs/docs_section.dart';
+import '../docs/docs_snippet.dart';
 import 'catalog.dart';
 import 'changelog_document.dart';
 
@@ -116,7 +116,7 @@ class _ChangelogDocsPageState extends State<ChangelogDocsPage> {
 
 /// The rendered document.
 ///
-/// One `ElSection` per release, so each gets the same anchor, heading
+/// One `DocsSection` per release, so each gets the same anchor, heading
 /// semantics and spacing every other docs page uses — and so a link to a
 /// version lands on it.
 class _Document extends StatelessWidget {
@@ -133,7 +133,7 @@ class _Document extends StatelessWidget {
       if (document.preamble.isNotEmpty)
         _Blocks(blocks: document.preamble, onOpenLink: onOpenLink),
       for (final ChangelogRelease release in document.releases)
-        ElSection(
+        DocsSection(
           key: ValueKey<String>('changelog-release-${release.version}'),
           id: _anchorFor(release.version),
           title: release.version,
@@ -177,10 +177,7 @@ class _Block extends StatelessWidget {
     final ElThemeData theme = ElTheme.of(context);
     switch (block.kind) {
       case ChangelogBlockKind.code:
-        return ElPanel(
-          label: 'CODE',
-          child: DocsSelectableCodeBlock(code: block.code),
-        );
+        return DocsSnippet(code: block.code);
 
       case ChangelogBlockKind.heading:
         // `header: true` so a screen reader can jump between them. A release

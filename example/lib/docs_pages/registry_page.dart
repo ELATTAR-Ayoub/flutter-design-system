@@ -20,10 +20,10 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:flutter/widgets.dart';
 
-import '../docs/docs_code.dart';
 import '../docs/docs_facts.dart';
 import '../docs/docs_layout.dart';
-import '../kit.dart';
+import '../docs/docs_section.dart';
+import '../docs/docs_snippet.dart';
 import 'catalog.dart';
 import 'registry_document.dart';
 
@@ -109,7 +109,7 @@ class _RegistryArticle extends StatelessWidget {
     key: const ValueKey<String>('registry-doc-article'),
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
-      ElSection(
+      DocsSection(
         id: 'shipped',
         title: 'What ships today',
         description:
@@ -157,7 +157,7 @@ class _RegistryArticle extends StatelessWidget {
     child: ElText(text, spec ?? ElType.body),
   );
 
-  Widget _item() => ElSection(
+  Widget _item() => DocsSection(
     id: 'item',
     title: 'What an item is',
     description:
@@ -229,7 +229,7 @@ class _RegistryArticle extends StatelessWidget {
     ),
   );
 
-  Widget _dependencies() => ElSection(
+  Widget _dependencies() => DocsSection(
     id: 'dependencies',
     title: 'How dependencies resolve',
     child: Column(
@@ -242,17 +242,14 @@ class _RegistryArticle extends StatelessWidget {
           'detected and reported by name rather than followed.',
         ),
         SizedBox(height: el(4)),
-        const ElPanel(
-          label: 'CONSOLE',
-          note: 'ONE NAME, SEVERAL FILES',
-          child: DocsSelectableCodeBlock(
-            code:
-                '# button depends on icon, field, machine-surface and the\n'
-                '# foundation, so all of them are installed with it.\n'
-                'elattar add button\n\n'
-                '# See the closure without writing anything.\n'
-                'elattar add button --dry-run',
-          ),
+        const DocsSnippet(
+          language: 'bash',
+          code:
+              '# button depends on icon, field, machine-surface and the\n'
+              '# foundation, so all of them are installed with it.\n'
+              'elattar add button\n\n'
+              '# See the closure without writing anything.\n'
+              'elattar add button --dry-run',
         ),
         SizedBox(height: el(4)),
         _prose(
@@ -265,7 +262,7 @@ class _RegistryArticle extends StatelessWidget {
     ),
   );
 
-  Widget _targets() => ElSection(
+  Widget _targets() => DocsSection(
     id: 'targets',
     title: 'Where files land',
     description:
@@ -300,7 +297,7 @@ class _RegistryArticle extends StatelessWidget {
     ),
   );
 
-  Widget _hashes() => ElSection(
+  Widget _hashes() => DocsSection(
     id: 'hashes',
     title: 'Hashes',
     child: Column(
@@ -326,7 +323,7 @@ class _RegistryArticle extends StatelessWidget {
     ),
   );
 
-  Widget _hosted() => ElSection(
+  Widget _hosted() => DocsSection(
     id: 'hosted',
     title: 'Versioned and hosted',
     child: Column(
@@ -341,16 +338,13 @@ class _RegistryArticle extends StatelessWidget {
           'pin mean something.',
         ),
         SizedBox(height: el(4)),
-        const ElPanel(
-          label: 'CONSOLE',
-          note: 'SOMEWHERE ELSE',
-          child: DocsSelectableCodeBlock(
-            code:
-                '# A mirror.\n'
-                'elattar list --registry https://example.com/elattar/0.0.1/\n\n'
-                '# A registry you generated yourself.\n'
-                'elattar list --registry ../flutter-design-system/registry/generated/latest',
-          ),
+        const DocsSnippet(
+          language: 'bash',
+          code:
+              '# A mirror.\n'
+              'elattar list --registry https://example.com/elattar/0.0.1/\n\n'
+              '# A registry you generated yourself.\n'
+              'elattar list --registry ../flutter-design-system/registry/generated/latest',
         ),
         SizedBox(height: el(4)),
         _prose(
@@ -363,7 +357,7 @@ class _RegistryArticle extends StatelessWidget {
     ),
   );
 
-  Widget _offline() => ElSection(
+  Widget _offline() => DocsSection(
     id: 'offline',
     title: 'Cache and offline',
     child: Column(
@@ -375,14 +369,11 @@ class _RegistryArticle extends StatelessWidget {
           'cache and never opens a connection.',
         ),
         SizedBox(height: el(4)),
-        const ElPanel(
-          label: 'CONSOLE',
-          note: 'OFFLINE',
-          child: DocsSelectableCodeBlock(
-            code:
-                'elattar add button            # populates the cache\n'
-                'elattar list --offline        # reads only the cache',
-          ),
+        const DocsSnippet(
+          language: 'bash',
+          code:
+              'elattar add button            # populates the cache\n'
+              'elattar list --offline        # reads only the cache',
         ),
         SizedBox(height: el(4)),
         _prose(
@@ -398,26 +389,23 @@ class _RegistryArticle extends StatelessWidget {
     ),
   );
 
-  Widget _commands() => ElSection(
+  Widget _commands() => DocsSection(
     id: 'commands',
     title: 'Reading the registry',
     description:
         'Four commands answer questions about the registry without changing '
         'anything in your project.',
-    child: const ElPanel(
-      label: 'CONSOLE',
-      note: 'READ ONLY',
-      child: DocsSelectableCodeBlock(
-        code:
-            'elattar list                  # every item, with type and description\n'
-            'elattar search chart          # ranked matches\n'
-            'elattar info button           # one item: files, targets, dependencies\n'
-            'elattar doctor                # what registry would be used, and whether it answers',
-      ),
+    child: const DocsSnippet(
+      language: 'bash',
+      code:
+          'elattar list                  # every item, with type and description\n'
+          'elattar search chart          # ranked matches\n'
+          'elattar info button           # one item: files, targets, dependencies\n'
+          'elattar doctor                # what registry would be used, and whether it answers',
     ),
   );
 
-  Widget _ownership(BuildContext context) => ElSection(
+  Widget _ownership(BuildContext context) => DocsSection(
     id: 'ownership',
     title: 'Source ownership',
     child: Column(

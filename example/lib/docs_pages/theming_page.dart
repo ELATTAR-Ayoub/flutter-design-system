@@ -14,7 +14,8 @@ import 'package:flutter/widgets.dart';
 
 import '../docs/docs_facts.dart';
 import '../docs/docs_layout.dart';
-import '../kit.dart';
+import '../docs/docs_section.dart';
+import '../docs/docs_snippet.dart';
 import 'catalog.dart';
 
 class ThemingDocsPage extends StatelessWidget {
@@ -94,7 +95,7 @@ class _ThemingArticle extends StatelessWidget {
         child: ElText(text, spec ?? ElType.body),
       );
 
-  Widget _overview(ElThemeData theme) => ElSection(
+  Widget _overview(ElThemeData theme) => DocsSection(
     id: 'overview',
     title: 'Overview',
     child: Column(
@@ -127,7 +128,7 @@ class _ThemingArticle extends StatelessWidget {
     ),
   );
 
-  Widget _primitives(ElThemeData theme) => ElSection(
+  Widget _primitives(ElThemeData theme) => DocsSection(
     id: 'primitives',
     title: 'Primitive versus semantic colors',
     child: Column(
@@ -154,7 +155,7 @@ class _ThemingArticle extends StatelessWidget {
     ),
   );
 
-  Widget _surfaces(ElThemeData theme) => ElSection(
+  Widget _surfaces(ElThemeData theme) => DocsSection(
     id: 'surfaces',
     title: 'Surface and foreground pairs',
     description:
@@ -164,7 +165,7 @@ class _ThemingArticle extends StatelessWidget {
     child: _SemanticSwatchGrid(theme: theme),
   );
 
-  Widget _actionValue(ElThemeData theme) => ElSection(
+  Widget _actionValue(ElThemeData theme) => DocsSection(
     id: 'action-value',
     title: 'Action versus value',
     child: Column(
@@ -200,7 +201,7 @@ class _ThemingArticle extends StatelessWidget {
     ),
   );
 
-  Widget _status(ElThemeData theme) => ElSection(
+  Widget _status(ElThemeData theme) => DocsSection(
     id: 'status',
     title: 'Status and -ink roles',
     description:
@@ -231,7 +232,7 @@ class _ThemingArticle extends StatelessWidget {
     ),
   );
 
-  Widget _resolution(ElThemeData theme) => ElSection(
+  Widget _resolution(ElThemeData theme) => DocsSection(
     id: 'resolution',
     title: 'Light, dark, and system',
     description:
@@ -243,19 +244,41 @@ class _ThemingArticle extends StatelessWidget {
     child: const _ThemeModeDemo(),
   );
 
-  Widget _typography(ElThemeData theme) => ElSection(
+  Widget _typography(ElThemeData theme) => DocsSection(
     id: 'typography',
     title: 'Typography selection',
-    child: _prose(
-      'Type is a token axis of its own: every ElText call takes a '
-      'ElTypeSpec from ElType (or a component-scoped ElComponentType spec) '
-      'rather than a raw TextStyle. See Typeset for the full scale, the '
-      'fluid clamps, and the three font families.',
-      theme,
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        _prose(
+          'Type is a token axis of its own: every ElText call takes a '
+          'ElTypeSpec from ElType (or a component-scoped ElComponentType '
+          'spec) rather than a raw TextStyle.',
+          theme,
+        ),
+        SizedBox(height: el(3)),
+        Wrap(
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: <Widget>[
+            ElText('See ', ElType.small, color: theme.mutedForeground),
+            const DocsLink(
+              label: 'Typeset',
+              route: docsTypesetRoute,
+              underline: true,
+            ),
+            ElText(
+              ' for the full scale, the fluid clamps, and the three font '
+              'families.',
+              ElType.small,
+              color: theme.mutedForeground,
+            ),
+          ],
+        ),
+      ],
     ),
   );
 
-  Widget _tokens(ElThemeData theme) => ElSection(
+  Widget _tokens(ElThemeData theme) => DocsSection(
     id: 'tokens',
     title: 'Radius, shadow, and motion roles',
     child: Column(
@@ -301,37 +324,107 @@ class _ThemingArticle extends StatelessWidget {
     ),
   );
 
-  Widget _sourceMode(ElThemeData theme) => ElSection(
+  Widget _sourceMode(ElThemeData theme) => DocsSection(
     id: 'source-mode',
     title: 'Source-mode customization',
-    child: _prose(
-      'After `elattar init --foundation source`, '
-      'lib/design_system/foundation/theme.dart is a full local copy of this '
-      'file — edit ElThemeData.light / .dark directly to change a token. '
-      'The change applies everywhere a copied component reads that token, '
-      'because every copied component imports the same local file. There is '
-      'no build step or codegen between the edit and the next hot reload.',
-      theme,
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        _prose(
+          'After `elattar init --foundation source`, '
+          'lib/design_system/foundation/theme.dart is a full local copy of '
+          'this file — edit ElThemeData.light / .dark directly to change a '
+          'token. The change applies everywhere a copied component reads '
+          'that token, because every copied component imports the same '
+          'local file. There is no build step or codegen between the edit '
+          'and the next hot reload.',
+          theme,
+        ),
+        SizedBox(height: el(4)),
+        // The actual `light` instance this page's own swatches above are
+        // reading from (lib/src/foundation/theme.dart) — capped, since the
+        // full instance runs on for another two dozen fields past what a
+        // reader needs to see the shape of the thing they would edit.
+        DocsSnippet(
+          code:
+              'static final ElThemeData light = _build(\n'
+              '  kind: ElThemeKind.light,\n'
+              '  background: elHsl(0, 0, 100),\n'
+              '  foreground: elHsl(240, 10, 3.9),\n'
+              '  card: elHsl(0, 0, 100),\n'
+              '  cardForeground: elHsl(240, 10, 3.9),\n'
+              '  popover: elHsl(0, 0, 100),\n'
+              '  popoverForeground: elHsl(240, 10, 3.9),\n'
+              '  secondary: elHsl(240, 4.8, 95.9),\n'
+              '  secondaryForeground: elHsl(240, 5.9, 10),\n'
+              '  muted: elHsl(240, 4.8, 95.9),\n'
+              '  mutedForeground: elHsl(240, 4, 40),\n'
+              '  accent: elHsl(240, 4.8, 95.9),\n'
+              '  accentForeground: elHsl(240, 5.9, 10),\n'
+              '  border: elHsl(240, 5.9, 90),\n'
+              '  input: elHsl(240, 5.9, 90),\n'
+              '  pageGlow: elHsl(240, 30, 98),\n'
+              '  primary: ElPalette.action,\n'
+              '  primaryForeground: elHsl(0, 0, 100),\n'
+              '  ring: ElPalette.action,\n'
+              '  actionInk: ElPalette.actionDark,\n'
+              '  valueInk: ElPalette.valueDark,\n'
+              '  successInk: ElPalette.successDeep,\n'
+              '  warningInk: ElPalette.warningDeep,\n'
+              '  infoInk: ElPalette.infoDeep,\n'
+              '  destructiveInk: ElPalette.destructiveDeep,\n'
+              '  destructive: elHsl(0, 72.2, 50.6),\n'
+              '  destructiveForeground: elHsl(0, 0, 98),\n'
+              '  // ...bubble-glow fields, then:\n'
+              '  radius: 10,\n'
+              '  // ...ink/rim layers, chart colours, bloom and star fields\n'
+              '  // follow — see lib/src/foundation/theme.dart for the rest.\n'
+              ');',
+          maxHeight: el(48),
+        ),
+      ],
     ),
   );
 
-  Widget _packageMode(ElThemeData theme) => ElSection(
+  Widget _packageMode(ElThemeData theme) => DocsSection(
     id: 'package-mode',
     title: 'Package-mode theme configuration',
-    child: _prose(
-      'ElTheme takes exactly one configurable input — the controller\'s '
-      'ElThemeMode — and no per-field override parameter. Depending on '
-      'elattar_design_system as a package (see Installation) means the two '
-      'ElThemeData instances are fixed by the version you depend on; '
-      'choosing light, dark, or system through the controller is the whole '
-      'surface. Changing an individual token in package mode means forking '
-      'the dependency, which is precisely the tradeoff source mode exists '
-      'to avoid.',
-      theme,
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        _prose(
+          'ElTheme takes exactly one configurable input — the controller\'s '
+          'ElThemeMode — and no per-field override parameter. Depending on '
+          'elattar_design_system as a package means the two ElThemeData '
+          'instances are fixed by the version you depend on; choosing '
+          'light, dark, or system through the controller is the whole '
+          'surface. Changing an individual token in package mode means '
+          'forking the dependency, which is precisely the tradeoff source '
+          'mode exists to avoid.',
+          theme,
+        ),
+        SizedBox(height: el(3)),
+        Wrap(
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: <Widget>[
+            ElText('See ', ElType.small, color: theme.mutedForeground),
+            const DocsLink(
+              label: 'Installation',
+              route: docsInstallationRoute,
+              underline: true,
+            ),
+            ElText(
+              ' for how a package dependency is added.',
+              ElType.small,
+              color: theme.mutedForeground,
+            ),
+          ],
+        ),
+      ],
     ),
   );
 
-  Widget _verification(ElThemeData theme) => ElSection(
+  Widget _verification(ElThemeData theme) => DocsSection(
     id: 'verification',
     title: 'Contrast and reduced-motion verification',
     child: _prose(

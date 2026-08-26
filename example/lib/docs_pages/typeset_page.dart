@@ -22,10 +22,10 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:flutter/widgets.dart';
 
-import '../docs/docs_code.dart';
 import '../docs/docs_facts.dart';
 import '../docs/docs_layout.dart';
-import '../kit.dart';
+import '../docs/docs_section.dart';
+import '../docs/docs_snippet.dart';
 import 'catalog.dart';
 import 'typeset_catalog.dart';
 
@@ -94,7 +94,7 @@ class _TypesetArticle extends StatelessWidget {
     child: ElText(text, spec ?? ElType.body),
   );
 
-  Widget _choosing(ElThemeData theme) => ElSection(
+  Widget _choosing(ElThemeData theme) => DocsSection(
     id: 'choosing',
     title: 'Choosing a role',
     child: Column(
@@ -112,15 +112,12 @@ class _TypesetArticle extends StatelessWidget {
           'role, and nothing else is required:',
         ),
         SizedBox(height: el(4)),
-        const ElPanel(
-          label: 'DART',
-          note: 'THE WHOLE API',
-          child: DocsSelectableCodeBlock(
-            code:
-                "ElText('Section heading', ElType.h2)\n"
-                "ElText('1,510', ElType.numLg)\n"
-                "ElText('Foundations', ElType.label)",
-          ),
+        const DocsSnippet(
+          language: 'dart',
+          code:
+              "ElText('Section heading', ElType.h2)\n"
+              "ElText('1,510', ElType.numLg)\n"
+              "ElText('Foundations', ElType.label)",
         ),
         SizedBox(height: el(4)),
         _prose(
@@ -134,7 +131,7 @@ class _TypesetArticle extends StatelessWidget {
     ),
   );
 
-  Widget _faces(ElThemeData theme) => ElSection(
+  Widget _faces(ElThemeData theme) => DocsSection(
     id: 'faces',
     title: 'The five faces',
     description:
@@ -182,7 +179,7 @@ class _TypesetArticle extends StatelessWidget {
     ),
   );
 
-  Widget _anatomy(ElThemeData theme) => ElSection(
+  Widget _anatomy(ElThemeData theme) => DocsSection(
     id: 'anatomy',
     title: 'What a spec records',
     description:
@@ -267,7 +264,7 @@ class _TypesetArticle extends StatelessWidget {
     ),
   );
 
-  Widget _groupSection(TypesetGroup group) => ElSection(
+  Widget _groupSection(TypesetGroup group) => DocsSection(
     id: _anchorFor(group),
     title: group.title,
     description: group.description,
@@ -290,7 +287,7 @@ class _TypesetArticle extends StatelessWidget {
     TypesetGroup.accent => 'accent',
   };
 
-  Widget _fluid(ElThemeData theme) => ElSection(
+  Widget _fluid(ElThemeData theme) => DocsSection(
     id: 'fluid',
     title: 'Sizes that are not fixed',
     description:
@@ -300,19 +297,16 @@ class _TypesetArticle extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        const ElPanel(
-          label: 'DART',
-          note: 'FLUID AND RELATIVE',
-          child: DocsSelectableCodeBlock(
-            code:
-                "// Grows with the viewport, clamped at both ends.\n"
-                "ElText('Build the interface you mean.', ElType.display,\n"
-                "    fontSize: ElFluid.display(context))\n\n"
-                "ElText('Typeset', ElType.h1, fontSize: ElFluid.h1(context))\n\n"
-                "// Relative to whatever it sits inside.\n"
-                "ElText('mean', ElType.accent,\n"
-                "    fontSize: ElType.accentSize(ElType.body.size!))",
-          ),
+        const DocsSnippet(
+          language: 'dart',
+          code:
+              "// Grows with the viewport, clamped at both ends.\n"
+              "ElText('Build the interface you mean.', ElType.display,\n"
+              "    fontSize: ElFluid.display(context))\n\n"
+              "ElText('Typeset', ElType.h1, fontSize: ElFluid.h1(context))\n\n"
+              "// Relative to whatever it sits inside.\n"
+              "ElText('mean', ElType.accent,\n"
+              "    fontSize: ElType.accentSize(ElType.body.size!))",
         ),
         SizedBox(height: el(5)),
         _prose(
@@ -326,7 +320,7 @@ class _TypesetArticle extends StatelessWidget {
     ),
   );
 
-  Widget _componentType(ElThemeData theme) => ElSection(
+  Widget _componentType(ElThemeData theme) => DocsSection(
     id: 'component-type',
     title: 'Component typography',
     child: Column(
@@ -347,16 +341,13 @@ class _TypesetArticle extends StatelessWidget {
           'itself.',
         ),
         SizedBox(height: el(4)),
-        const ElPanel(
-          label: 'DART',
-          note: 'PREFER THE COMPONENT',
-          child: DocsSelectableCodeBlock(
-            code:
-                "// Not this.\n"
-                "ElText('Continue', ElComponentType.buttonLabel)\n\n"
-                "// This.\n"
-                "ElButton(onPressed: onPressed, child: const Text('Continue'))",
-          ),
+        const DocsSnippet(
+          language: 'dart',
+          code:
+              "// Not this.\n"
+              "ElText('Continue', ElComponentType.buttonLabel)\n\n"
+              "// This.\n"
+              "ElButton(onPressed: onPressed, child: const Text('Continue'))",
         ),
       ],
     ),
@@ -410,7 +401,7 @@ class _RoleEntry extends StatelessWidget {
           )
         else ...<Widget>[_prose(role.usage), SizedBox(height: el(4)), metadata],
         SizedBox(height: el(3)),
-        DocsSelectableCodeBlock(code: _callSite(role)),
+        DocsSnippet(language: 'dart', code: _callSite(role)),
       ],
     );
   }
